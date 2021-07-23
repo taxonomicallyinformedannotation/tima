@@ -1,0 +1,3 @@
+output: ../data/interim/b988e66d1542430cbc6e703be781e49c_gnps_pretreated.tsv.gz
+gnps: b988e66d1542430cbc6e703be781e49c
+nap: # optional

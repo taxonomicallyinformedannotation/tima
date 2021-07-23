@@ -101,6 +101,27 @@ read_metadatatable <-
     return(readr::read_delim(file = file))
   }
 
+###############################################################################
+
+#' Title
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_library_hits <- function(id) {
+  file <-
+    paste0(
+      "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
+      id,
+      "&block=main&file=DB_result/"
+    )
+  return(readr::read_delim(
+    file = file,
+  ))
+}
 
 ###############################################################################
 
