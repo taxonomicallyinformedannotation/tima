@@ -3,6 +3,32 @@ bin:
   path: bin
 config:
   path: config
+  default: 
+    path: config/default
+    adducts: config/default/prepare_adducts.yaml
+    chemical_classes: config/default/prepare_chemical_classes.yaml
+    dnp: config/default/prepare_dnp.yaml
+    edges: config/default/prepare_edges.yaml
+    features: config/default/prepare_features.yaml
+    gnps: config/default/prepare_gnps.yaml
+    isdb: config/default/prepare_isdb.yaml
+    library: config/default/prepare_library.yaml
+    taxa: config/default/prepare_taxa.yaml
+    annotations: config/default/process_annotations.yaml
+    spectra: config/default/process_spectra.yaml
+  params:
+    path: config/params
+    adducts: config/params/prepare_adducts.yaml
+    chemical_classes: config/params/prepare_chemical_classes.yaml
+    dnp: config/params/prepare_dnp.yaml
+    edges: config/params/prepare_edges.yaml
+    features: config/params/prepare_features.yaml
+    gnps: config/params/prepare_gnps.yaml
+    isdb: config/params/prepare_isdb.yaml
+    library: config/params/prepare_library.yaml
+    taxa: config/params/prepare_taxa.yaml
+    annotations: config/params/process_annotations.yaml
+    spectra: config/params/process_spectra.yaml
 data:
   path: data
   interim:
