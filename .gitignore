@@ -1,0 +1,13 @@
+.idea
+.vscode
+
+*.DS_Store
+*.ipynb_checkpoints
+*.pyc
+*.Rhistory
+
+*.
+data/source/private/**
+data/source/libraries/**
+data/interim/**
+data/processed/**

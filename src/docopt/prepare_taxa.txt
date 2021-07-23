@@ -1,0 +1,15 @@
+You can use this script with the following example:
+Rscript R/inform_features_taxa.R --input '../data/source/example_metadata_manual.csv' --output '../data/processed/b988e66d1542430cbc6e703be781e49c_taxed.tsv.gz' --tool gnps --k.top 1 --extension FALSE
+
+Usage: inform_features_taxa.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--column.name=<column.name>] [--gnps=<gnps>] [--k.top=<k.top>]
+
+Options:
+  -e --extension=<extension>      Is the filename extension in your feature table? Boolean
+  -i --input=<input>              File containing your intensity/sample to attribute biological source. Supports compressed files.
+  -o --output=<output>            Path and filename for the output. If you specify .gz file will be compressed.
+  -t --tool=<tool>                Tool you used for your metadata organization ('gnps' and 'manual' currently supported)
+  -c --column.name=<column.name>  Name of the column containing the lowest possible taxon in your feature file.
+  -k --k.top=<k.top>              Number of allowed biological sources per feature. Should not exceed 5.
+  -g --gnps=<gnps>                Your GNPS job id. Depending on the annotation tool you used
+  -h --help                       Show this screen.
+  -v --version                    Show version.

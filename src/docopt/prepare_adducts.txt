@@ -1,0 +1,12 @@
+You can use this script with the following example:
+Rscript R/3_form_adducts.R --input ../data/processed/db_prepared.tsv.gz --output db_prepared
+
+Usage: 3_form_adducts.R [--input=<input>] [--output=<output>]
+
+Arguments:
+  -i --input=<input>    Path to the input. Starting from src.
+  -o --output=<output>  Filename for the outputs. "_pos" and "_neg" will be appended.
+
+Options:
+  -h --help         Show this screen.
+  -V --version      Show version.

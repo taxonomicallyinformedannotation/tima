@@ -1,0 +1,15 @@
+You can use this script with the following example:
+Rscript R/fill_chemical.R --input '../data/interim/b988e66d1542430cbc6e703be781e49c_isdb_pretreated.tsv.gz' --output '../data/processed/b988e66d1542430cbc6e703be781e49c_isdb_treated.tsv.gz' --ms.mode 'pos'
+
+Usage: fill_features.R [--input=<input>] [--output=<output>] [--ms.mode=<ms.mode>]
+
+Arguments:
+  -c --components=<components>  If your tool is manual, the file containing your component_ids
+  -i --input=<input>            Your isdb result file. Supports compressed files.
+  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+  -m --ms.mode=<ms.mode>        MS mode used. Can be "pos" or "neg"
+  -t --tool=<tool>              Tool used for generating the component ids, currently only GNPS
+
+Options:
+  -h --help                     Show this screen.
+  -v --version                  Show version.

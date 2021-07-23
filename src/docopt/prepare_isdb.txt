@@ -1,0 +1,12 @@
+You can use this script with the following example:
+Rscript R/treat_isdb.R --input '../data/source/example_isdb_result.tsv.gz' --output '../data/interim/b988e66d1542430cbc6e703be781e49c_isdb_pretreated.tsv.gz'
+
+Usage: treat_isdb.R [--input=<input>] [--output=<output>]
+
+Arguments:
+  -i --input=<input>    Your isdb result file. Supports compressed files.
+  -o --output=<output>  Path and filename for the output. If you specify .gz file will be compressed.
+
+Options:
+  -h --help         Show this screen.
+  -v --version      Show version.

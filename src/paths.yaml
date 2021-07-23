@@ -1,0 +1,45 @@
+base_dir: ../
+bin:
+  path: bin
+config:
+  path: config
+data:
+  path: data
+  interim:
+    path: data/interim
+    adducts:
+      path: data/interim/adducts
+      neg: data/interim/adducts/adducts_neg.tsv.gz
+      pos: data/interim/adducts/adducts_pos.tsv.gz
+    annotations:
+      path: data/interim/annotations
+    edges:
+      path: data/interim/edges
+    features:
+      path: data/interim/features
+    libraries:
+      path: data/interim/libraries
+      lotus: data/interim/libraries/lotus_prepared.tsv.gz
+    taxa:
+      path: data/interim/taxa
+      processed:
+        path: data/processed
+  source:
+    path: data/source
+    adducts: data/source/adducts.tsv
+    libraries:
+      path: data/source/libraries
+      lotus: data/source/libraries/lotus.csv.gz
+    neutral_losses: data/source/neutral_losses.tsv
+doc:
+  path: doc
+img:
+  path: img
+src:
+  path: src
+  preprocessing:
+    path: src/preprocessing
+  processing:
+    path: src/processing
+tests:
+  path: tests

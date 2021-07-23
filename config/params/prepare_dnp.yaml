@@ -1,0 +1,2 @@
+input: ../lotus-processor/data/processed/210715_dnp_metadata.csv.gz ## will only work if you have it
+output: data/interim/libraries/dnp_prepared.tsv.gz

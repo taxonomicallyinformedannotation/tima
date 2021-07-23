@@ -1,0 +1,13 @@
+You can use this script with the following example:
+Rscript R/treat_gnps_nap.R -o '../data/processed/yourFileName.txt' -n a7fcca6c95064187b677f450e5aadc33 -g ca61de586af044f7b08f075e03db5996
+
+Usage: treat_gnps_nap.R [--output=<output>] [--nap=<nap>] [--gnps=<gnps>]
+
+Arguments:
+  -o --output=<output>  Path and filename for the output. If you specify .gz file will be compressed.
+  -n --nap=<nap>        Your NAP job id.
+  -g --gnps=<gnps>      Your GNPS job id.
+
+Options:
+  -h --help          Show this screen.
+  -v --version       Show version.

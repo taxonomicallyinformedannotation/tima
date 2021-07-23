@@ -1,0 +1,14 @@
+You can use this script with the following example:
+Rscript R/2_prepare_library.R --output 'bitter_db' --filter TRUE --level family --value Simaroubaceae|Gentianaceae
+
+Usage: 2_prepare_library.R [--output=<output>] [--filter=<filter>] [--level=<level>] [--value=<value>] 
+
+Arguments:
+  -f --filter=<filter>  Boolean. If you want to filter your library for specific organisms
+  -l --level=<level>    The taxonomic level you want to filter. Must be one of {domain, kingdom, phylum, class, order, family, tribe, genus, species, varietas}
+  -v --value=<value>    The value of your filter. (eg. "Gentianaceae", can be OR in form of "Simaroubaceae|Gentianaceae")
+  -o --output=<output>  Filename for the output.
+
+Options:
+  -h --help         Show this screen.
+  -V --version      Show version.
