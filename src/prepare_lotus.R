@@ -1,13 +1,6 @@
 start <- Sys.time()
-language <- "r"
 
-source(file = "R/functions/helpers.R")
-log_debug(x = "sourcing files")
-source(file = "paths.md")
-
-log_debug(x = "loading libraries")
-library(data.table)
-library(dplyr)
+source(file = "R/helpers.R")
 
 log_debug(
   "This script prepares LOTUS referenced structure-organism pairs \n",
@@ -16,19 +9,19 @@ log_debug(
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
-log_debug(x = "loading files")
-tempValidatedSet <-
-  data.table::fread(
-    file = data_source_databases_lotus,
-    sep = ","
-  )
+library(dplyr)
+library(readr)
 
-structureOrganismPairsTable <- tempValidatedSet |>
-  dplyr::mutate(structure_inchikey_2D = substring(
-    text = structure_inchikey,
-    first = 1,
-    last = 14
-  )) |>
+paths <- parse_yaml_paths()
+
+log_debug(x = "loading files")
+lotus <-
+  readr::read_delim(file = paths$data$source$libraries$lotus,)
+
+lotus_prepared <- lotus |>
+  dplyr::mutate(structure_inchikey_2D = substring(text = structure_inchikey,
+                                                  first = 1,
+                                                  last = 14)) |>
   dplyr::select(
     # structure_name,
     structure_inchikey_2D,
@@ -57,15 +50,12 @@ structureOrganismPairsTable <- tempValidatedSet |>
 
 log_debug("ensuring directories exist ...")
 ifelse(
-  test = !dir.exists(data_interim),
-  yes = dir.create(data_interim),
-  no = paste(data_interim, "exists")
+  test = !dir.exists(paths$data$interim$path),
+  yes = dir.create(paths$data$interim$path),
+  no = paste(paths$data$interim$path, "exists")
 )
-data.table::fwrite(
-  x = structureOrganismPairsTable,
-  file = data_interim_lotus_prepared,
-  sep = "\t"
-)
+readr::write_delim(x = lotus_prepared,
+                   file = paths$data$interim$libraries$lotus)
 
 end <- Sys.time()
 

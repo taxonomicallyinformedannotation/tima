@@ -1,56 +1,30 @@
 start <- Sys.time()
-language <- "r"
 
-source(file = "R/functions/helpers.R")
-log_debug(x = "sourcing files")
-source(file = "paths.md")
-
-doc <- readChar(
-  con = docopt_prepare_dnp,
-  nchars = file.info(docopt_prepare_dnp)$size
-)
-
-arguments <- docopt(doc, version = "beta")
-
-log_debug(x = "loading libraries")
-library(data.table)
-library(dplyr)
-library(purrr)
-library(yaml)
+source(file = "R/helpers.R")
 
 log_debug(
   "This script prepares DNP referenced structure-organism pairs \n",
   "for further processing. \n"
 )
-
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
-params <-
-  yaml::read_yaml(file = config_default_dnp, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
-params <-
-  yaml::read_yaml(file = config_params_dnp, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
+library(dplyr)
+library(docopt)
+library(purrr)
+library(readr)
+library(yaml)
 
-log_debug("checking command line arguments")
-if (exists("arguments")) {
-  if (!is.null(arguments$input)) {
-    params$file$input <- arguments$input
-  }
-}
-if (file.exists(params$file$input)) {
+paths <- parse_yaml_paths()
+
+params <- get_params(step = "prepare_dnp")
+
+if (file.exists(params$input)) {
   log_debug(x = "loading files")
-  tempValidatedSet <-
-    data.table::fread(file = params$file$input)
-
-  structureOrganismPairsTable <- tempValidatedSet |>
+  dnp <-
+    readr::read_delim(file = params$input)
+  
+  dnp_prepared <- dnp |>
     dplyr::mutate(structure_inchikey_2D = substring(
       text = structure_inchikey,
       first = 1,
@@ -81,18 +55,15 @@ if (file.exists(params$file$input)) {
     ) |>
     dplyr::distinct() |>
     dplyr::mutate(reference_doi = NA)
-
+  
   log_debug("ensuring directories exist ...")
   ifelse(
-    test = !dir.exists(data_interim),
-    yes = dir.create(data_interim),
-    no = paste(data_interim, "exists")
+    test = !dir.exists(paths$data$interim$path),
+    yes = dir.create(paths$data$interim$path),
+    no = paste(paths$data$interim$path, "exists")
   )
-  data.table::fwrite(
-    x = structureOrganismPairsTable,
-    file = data_interim_dnp_prepared,
-    sep = "\t"
-  )
+  readr::write_delim(x = dnp_prepared,
+                     file = params$output)
 } else {
   log_debug("Sorry, you do not have access to the DNP")
 }

@@ -17,6 +17,8 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
+    config:
+      path: data/interim/config
     edges:
       path: data/interim/edges
     features:
@@ -26,8 +28,10 @@ data:
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
-      processed:
-        path: data/processed
+  processed:
+    path: data/processed
+    config:
+      path: data/processed/config
   source:
     path: data/source
     adducts: data/source/adducts.tsv
