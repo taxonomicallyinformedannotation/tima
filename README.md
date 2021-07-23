@@ -1,6 +1,8 @@
 ## tl;dr:
 
 ```
+docker build -t tima . ## optional
+docker run -it --rm -v $PWD:/app tima bash ## optional
 conda env create -f environment.yml &&
 conda activate tima &&
 bash src/get-lotus.sh &&

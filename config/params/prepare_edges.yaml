@@ -1,0 +1,6 @@
+tool: gnps # manual
+gnps: b988e66d1542430cbc6e703be781e49c # only needed if gnps
+input: data/source/example_edges_manual.csv # input only needed if manual
+output: data/interim/edges/b988e66d1542430cbc6e703be781e49c_edges.tsv.gz
+source_name: CLUSTERID1
+target_name: CLUSTERID2

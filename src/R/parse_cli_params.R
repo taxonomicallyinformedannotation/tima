@@ -26,6 +26,18 @@ parse_cli_params <- function() {
     if (!is.null(arguments$output)) {
       params$file$output <- arguments$output
     }
+    if (!is.null(arguments$source)) {
+      params$source_name <-
+        arguments$source
+    }
+    if (!is.null(arguments$target)) {
+      params$target_name <-
+        arguments$target
+    }
+    if (!is.null(arguments$tool)) {
+      params$tool <-
+        arguments$tool
+    }
     if (!is.null(arguments$value)) {
       params$filter$value <- arguments$value
     }

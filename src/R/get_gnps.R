@@ -1,6 +1,7 @@
 ##########################   Functions - features   ###########################
 
 require(RCurl)
+require(readr)
 
 # download_featuretable <- function(id, path = "feature_table.csv") {
 #   #file = paste0("http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",id,"&block=main&file=cluster_buckets/") #Old buckettable format
@@ -76,7 +77,7 @@ read_featuretable <- function(id) {
       id,
       "&block=main&file=quantification_table_reformatted/"
     )
-  return(read.csv(file = file))
+  return(readr::read_delim(file = file))
 }
 
 ###############################################################################
@@ -97,10 +98,7 @@ read_metadatatable <-
         id,
         "&block=main&file=metadata_table/"
       )
-    return(read.csv(
-      file = file,
-      sep = "\t"
-    ))
+    return(readr::read_delim(file = file))
   }
 
 
@@ -121,10 +119,7 @@ read_clusterinfo <- function(id) {
       id,
       "&block=main&file=clusterinfo_summary/"
     )
-  return(read.csv(
-    file = file,
-    sep = "\t"
-  ))
+  return(readr::read_delim(file = file))
 }
 
 ###############################################################################
@@ -144,10 +139,7 @@ read_nap <- function(id) {
       id,
       "&block=main&file=final_out/node_attributes_table.tsv"
     )
-  return(read.csv(
-    file = file,
-    sep = "\t"
-  ))
+  return(readr::read_delim(file = file))
 }
 
 ###############################################################################
@@ -167,36 +159,7 @@ read_edges <- function(id) {
       id,
       "&block=main&file=networkedges_selfloop/"
     )
-  return(read.csv(
-    file = file,
-    sep = "\t"
-  ))
-}
-
-###############################################################################
-# This function should export the results table as a formatted .graphml file
-
-# require(igraph)
-
-#' Title
-#'
-#' @param graphML
-#' @param final
-#'
-#' @return
-#' @export
-#'
-#' @examples
-make_classyfire_graphml <- function(graphML, final) {
-  finalordered <-
-    final[match(igraph::vertex_attr(graphML, "id"), final$`feature_id`), ]
-
-  for (i in seq_len(ncol(final))) {
-    att <- colnames(finalordered)[i]
-    igraph::vertex_attr(graphML, att) <- finalordered[, i]
-  }
-
-  return(graphML)
+  return(readr::read_delim(file = file))
 }
 
 ###############################################################################

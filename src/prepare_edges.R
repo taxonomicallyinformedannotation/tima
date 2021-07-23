@@ -1,126 +1,90 @@
 start <- Sys.time()
-language <- "r"
 
-source(file = "R/functions/helpers.R")
-log_debug(x = "sourcing files")
-source(file = "paths.md")
+source(file = "R/helpers.R")
+source(file = "R/get_gnps.R")
 
-log_debug(x = "loading libraries")
-library(data.table)
-library(docopt)
-library(dplyr)
-library(purrr)
-library(yaml)
-
-readChar(
-  con = docopt_get_edges,
-  nchars = file.info(docopt_get_edges)$size
-) -> doc
-
-arguments <- docopt::docopt(doc, version = "Taxo_scorer alpha 0.01")
 
 log_debug("This script takes a list of edges and formats it for later on")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
-params <-
-  yaml::read_yaml(file = config_default_edges, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
-params <-
-  yaml::read_yaml(file = config_params_edges, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
+library(dplyr)
+library(docopt)
+library(purrr)
+library(readr)
+library(yaml)
 
-log_debug("checking command line arguments")
-if (exists("arguments")) {
-  if (!is.null(arguments$tool)) {
-    params$tool$edges <- arguments$tool
-  }
-  if (!is.null(arguments$input)) {
-    params$file$edges$source <- arguments$input
-  }
-  if (!is.null(arguments$output)) {
-    params$file$edges$processed <- arguments$output
-  }
-  if (!is.null(arguments$gnps)) {
-    params$job$gnps <- arguments$gnps
-  }
-  if (!is.null(arguments$feature.source)) {
-    params$file$column_name$source_feature <-
-      arguments$feature.source
-  }
-  if (!is.null(arguments$feature.target)) {
-    params$file$column_name$target_feature <-
-      arguments$feature.target
-  }
-}
+paths <- parse_yaml_paths()
+
+params <- get_params(step = "prepare_edges")
+
 stopifnot(
-  "Your --tool parameter (in command line arguments or in 'treat_params.yaml' must be 'manual' or 'gnps" = params$tool$edges %in% c("gnps", "manual")
+  "Your --tool parameter (in command line arguments or in 'treat_params.yaml' must be 'manual' or 'gnps" = params$tool %in% c("gnps", "manual")
 )
-source(file = "R/functions/features.R")
 
-log_debug(x = "loading files ...")
+log_debug(x = "loading files")
 
-if (params$tool$edges == "gnps") {
-  edges_table <- read_edges(params$job$gnps)
+if (params$tool == "gnps") {
+  edges_table <- read_edges(params$gnps)
 }
 
-if (params$tool$edges == "manual") {
+if (params$tool == "manual") {
   edges_table <-
-    data.table::fread(
-      file = params$file$edges$source,
-      sep = "\t"
-    )
+    readr::read_delim(file = params$input)
 }
 
 edges_table_treated <- edges_table |>
   dplyr::select(
-    feature_source = params$file$column_name$source_feature,
-    feature_target = params$file$column_name$target_feature
+    feature_source = params$source_name,
+    feature_target = params$target_name
   ) |>
   dplyr::filter(feature_source != feature_target)
 
 log_debug(x = "exporting formatted edge table ...")
 log_debug("ensuring directories exist ...")
 ifelse(
-  test = !dir.exists(data),
-  yes = dir.create(data),
-  no = paste(data, "exists")
+  test = !dir.exists(paths$data$path),
+  yes = dir.create(paths$data$path),
+  no = paste(paths$data$path, "exists")
 )
 ifelse(
-  test = !dir.exists(data_interim),
-  yes = dir.create(data_interim),
-  no = paste(data_interim, "exists")
+  test = !dir.exists(paths$data$interim$path),
+  yes = dir.create(paths$data$interim$path),
+  no = paste(paths$data$interim$path, "exists")
 )
 ifelse(
-  test = !dir.exists(data_processed),
-  yes = dir.create(data_processed),
-  no = paste(data_processed, "exists")
+  test = !dir.exists(paths$data$interim$edges$path),
+  yes = dir.create(paths$data$interim$edges$path),
+  no = paste(paths$data$interim$edges$path, "exists")
 )
 ifelse(
-  test = !dir.exists(data_processed_params),
-  yes = dir.create(data_processed_params),
-  no = paste(data_processed_params, "exists")
+  test = !dir.exists(paths$data$interim$config$path),
+  yes = dir.create(paths$data$interim$config$path),
+  no = paste(paths$data$interim$config$path, "exists")
 )
 
 log_debug(
   x = "... formatted edge table is saved in",
-  params$file$edges$processed
+  params$output
 )
 
-data.table::fwrite(
+readr::write_delim(
   x = edges_table_treated,
-  file = params$file$edges$processed,
-  sep = "\t"
+  file = params$output
 )
 
-log_debug(x = "... parameters used are saved in", data_processed_params_edges)
-yaml::write_yaml(x = params, file = data_processed_params_edges)
+log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
+yaml::write_yaml(
+  x = params,
+  file = file.path(
+    paths$data$interim$config$path,
+    paste(
+      format(Sys.time(), "%y%m%d_%H%M%OS"),
+      "prepare_edges.yaml",
+      sep = "_"
+    )
+  )
+)
 
 end <- Sys.time()
 
