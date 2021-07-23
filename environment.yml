@@ -1,0 +1,21 @@
+name: tima
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base>=4.1.0
+  - r-crayon
+  - r-data.table
+  - r-docopt
+  - r-dplyr
+  - r-jsonlite
+  - r-purrr
+  - r-RCurl
+  - r-readr
+  - r-R.utils
+  - r-splitstackshape
+  - r-stringi
+  - r-stringr
+  - r-tibble
+  - r-tidyr
+  - r-yaml
