@@ -38,8 +38,10 @@ custom_library <- data.table::rbindlist(libraries)
 if (params$filter$mode == TRUE) {
   custom_library <- custom_library |>
     dplyr::filter(grepl(
-      x = !!as.name(colnames(custom_library)[grepl(pattern = params$filter$level,
-                                                   x = colnames(custom_library))]),
+      x = !!as.name(colnames(custom_library)[grepl(
+        pattern = params$filter$level,
+        x = colnames(custom_library)
+      )]),
       pattern = params$filter$value
     ))
 }
@@ -56,25 +58,26 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
-data.table::fwrite(
+readr::write_delim(
   x = custom_library,
   file = file.path(
     paths$data$interim$libraries$path,
     params$output
-  ),
-  sep = "\t"
+  )
 )
 
-log_debug(x = "... parameters used are saved in", data_processed)
-yaml::write_yaml(x = params,
-                 file = file.path(
-                   paths$data$interim$config$path,
-                   paste(
-                     format(Sys.time(), "%y%m%d_%H%M%OS"),
-                     "prepare_library.yaml",
-                     sep = "_"
-                   )
-                 ))
+log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
+yaml::write_yaml(
+  x = params,
+  file = file.path(
+    paths$data$interim$config$path,
+    paste(
+      format(Sys.time(), "%y%m%d_%H%M%OS"),
+      "prepare_library.yaml",
+      sep = "_"
+    )
+  )
+)
 
 end <- Sys.time()
 

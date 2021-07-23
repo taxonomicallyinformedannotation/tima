@@ -58,12 +58,16 @@ ifelse(
   no = paste(data_processed_params, "exists")
 )
 
-log_debug(x = "... metadata_table_spectral_annotation is saved in",
-          params$file$output)
+log_debug(
+  x = "... metadata_table_spectral_annotation is saved in",
+  params$file$output
+)
 
-fwrite(x = table,
-       file = params$file$output,
-       sep = "\t")
+fwrite(
+  x = table,
+  file = params$file$output,
+  sep = "\t"
+)
 
 log_debug(x = "... parameters used are saved in", data_processed_params_treat_isdb)
 write_yaml(x = params, file = data_processed_params_treat_isdb)

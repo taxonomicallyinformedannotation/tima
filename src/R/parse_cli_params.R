@@ -6,7 +6,7 @@
 #' @examples
 parse_cli_params <- function() {
   log_debug("checking command line arguments")
-  
+
   if (exists("arguments")) {
     if (!is.null(arguments$filter)) {
       params$filter$mode <- arguments$filter
@@ -30,6 +30,6 @@ parse_cli_params <- function() {
       params$filter$value <- arguments$value
     }
   }
-  
+
   return(params)
 }

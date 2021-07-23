@@ -16,12 +16,14 @@ paths <- parse_yaml_paths()
 
 log_debug(x = "loading files")
 lotus <-
-  readr::read_delim(file = paths$data$source$libraries$lotus,)
+  readr::read_delim(file = paths$data$source$libraries$lotus, )
 
 lotus_prepared <- lotus |>
-  dplyr::mutate(structure_inchikey_2D = substring(text = structure_inchikey,
-                                                  first = 1,
-                                                  last = 14)) |>
+  dplyr::mutate(structure_inchikey_2D = substring(
+    text = structure_inchikey,
+    first = 1,
+    last = 14
+  )) |>
   dplyr::select(
     # structure_name,
     structure_inchikey_2D,
@@ -54,8 +56,10 @@ ifelse(
   yes = dir.create(paths$data$interim$path),
   no = paste(paths$data$interim$path, "exists")
 )
-readr::write_delim(x = lotus_prepared,
-                   file = paths$data$interim$libraries$lotus)
+readr::write_delim(
+  x = lotus_prepared,
+  file = paths$data$interim$libraries$lotus
+)
 
 end <- Sys.time()
 

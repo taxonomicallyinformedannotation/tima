@@ -23,7 +23,7 @@ if (file.exists(params$input)) {
   log_debug(x = "loading files")
   dnp <-
     readr::read_delim(file = params$input)
-  
+
   dnp_prepared <- dnp |>
     dplyr::mutate(structure_inchikey_2D = substring(
       text = structure_inchikey,
@@ -55,15 +55,17 @@ if (file.exists(params$input)) {
     ) |>
     dplyr::distinct() |>
     dplyr::mutate(reference_doi = NA)
-  
+
   log_debug("ensuring directories exist ...")
   ifelse(
     test = !dir.exists(paths$data$interim$path),
     yes = dir.create(paths$data$interim$path),
     no = paste(paths$data$interim$path, "exists")
   )
-  readr::write_delim(x = dnp_prepared,
-                     file = params$output)
+  readr::write_delim(
+    x = dnp_prepared,
+    file = params$output
+  )
 } else {
   log_debug("Sorry, you do not have access to the DNP")
 }
