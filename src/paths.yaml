@@ -3,7 +3,7 @@ bin:
   path: bin
 config:
   path: config
-  default: 
+  default:
     path: config/default
   params:
     path: config/params
@@ -41,7 +41,7 @@ img:
   path: img
 src:
   path: src
-  docopt: 
+  docopt:
     path: src/docopt
   preprocessing:
     path: src/preprocessing

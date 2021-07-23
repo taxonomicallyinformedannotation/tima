@@ -22,9 +22,6 @@ paths <- parse_yaml_paths()
 params <- get_params(step = "prepare_gnps")
 
 
-
-
-
 log_debug("loading files ...")
 ## starting it now
 ## will finish later on, when decided if some values will be directly available in GNPS output
@@ -43,18 +40,22 @@ table <- read_library_hits(id = params$job$gnps) |>
     structure_exact_mass = ExactMass,
     score_input = MQScore
   ) |>
-  mutate(library = "GNPS",
-         smiles_2D = NA,
-         molecular_formula = NA)
+  mutate(
+    library = "GNPS",
+    smiles_2D = NA,
+    molecular_formula = NA
+  )
 
 if (!is.null(params$job$nap)) {
   ## look at recent NAP outputs
   ## might be outdated
   log_debug(x = "... annotations table")
   table <- read_nap(id = params$job$nap) |>
-    dplyr::select(feature_id = cluster.index,
-                  score_input = FusionScore,
-                  smiles = FusionSMILES) |>
+    dplyr::select(
+      feature_id = cluster.index,
+      score_input = FusionScore,
+      smiles = FusionSMILES
+    ) |>
     mutate(
       library = "GNPS",
       smiles_2D = NA,
@@ -69,10 +70,12 @@ if (!is.null(params$job$nap)) {
 }
 
 table[] <-
-  lapply(table,
-         function(x) {
-           y_as_na(x, y = "N/A")
-         })
+  lapply(
+    table,
+    function(x) {
+      y_as_na(x, y = "N/A")
+    }
+  )
 
 log_debug(x = "exporting metadata_table_spectral_annotation and parameters used ...")
 log_debug("ensuring directories exist ...")
@@ -91,11 +94,15 @@ ifelse(
   yes = dir.create(data_processed_params),
   no = paste(data_processed_params, "exists")
 )
-log_debug(x = "... metadata_table_spectral_annotation is saved in",
-          params$file$output)
-data.table::fwrite(x = table,
-                   file = params$file$output,
-                   sep = "\t")
+log_debug(
+  x = "... metadata_table_spectral_annotation is saved in",
+  params$file$output
+)
+data.table::fwrite(
+  x = table,
+  file = params$file$output,
+  sep = "\t"
+)
 
 log_debug(x = "... parameters used are saved in", data_processed_params_treat_gnps_nap)
 yaml::write_yaml(x = params, file = data_processed_params_treat_gnps_nap)

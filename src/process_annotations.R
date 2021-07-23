@@ -180,36 +180,36 @@ if (params$ms$annotate == TRUE) {
   if (params$ms$mode == "neg") {
     adduct_file <- data_interim_adducts_neg
   }
-  
+
   adductsTable <- data.table::fread(
     file = adduct_file,
     sep = "\t"
   )
-  
+
   log_debug("... adducts masses for in source dimers and multicharged")
   adductsMassTable <-
     data.table::fread(
       file = data_source_adducts_file,
       sep = "\t"
     )
-  
+
   log_debug("... neutral lossses")
   neutral_losses_table <-
     data.table::fread(
       file = data_source_neutral_losses_file,
       sep = "\t"
     )
-  
+
   adductsM <- adductsMassTable$mass
   names(adductsM) <- adductsMassTable$adduct
-  
+
   if (params$ms$mode == "pos") {
     adduct_db_file <- data_interim_adducts_db_pos
   }
   if (params$ms$mode == "neg") {
     adduct_db_file <- data_interim_adducts_db_neg
   }
-  
+
   log_debug(x = "... exact masses for MS1 annotation")
   structure_exact_mass_table <-
     data.table::fread(
@@ -217,7 +217,7 @@ if (params$ms$annotate == TRUE) {
       sep = "\t"
     ) |>
     dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
-  
+
   log_debug(x = "performing MS1 annotation")
   annotation_table_ms1 <-
     ms1_annotation(
@@ -227,7 +227,7 @@ if (params$ms$annotate == TRUE) {
       adducts = unlist(params$ms$adducts[[params$ms$mode]]),
       neutralLosses = neutral_losses_table
     )
-  
+
   ms1_decoration()
 }
 

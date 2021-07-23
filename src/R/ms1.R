@@ -96,7 +96,8 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) - !!as.name(paste("mz", "dest", sep = "_"))
+                mz) -
+              !!as.name(paste("mz", "dest", sep = "_"))
           ),
           no = abs(
             mz + (0.000001 *
@@ -115,7 +116,8 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) - !!as.name(paste("mz", "dest", sep = "_"))
+                mz) -
+              !!as.name(paste("mz", "dest", sep = "_"))
           )
         )
       )

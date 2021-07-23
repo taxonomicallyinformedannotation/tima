@@ -6,7 +6,7 @@
 #' @examples
 parse_cli_params <- function() {
   log_debug("checking command line arguments")
-  
+
   if (exists("arguments")) {
     if (!is.null(arguments$output)) {
       params$file$output <- arguments$output
@@ -18,6 +18,6 @@ parse_cli_params <- function() {
       params$job$nap <- arguments$nap
     }
   }
-  
+
   return(params)
 }

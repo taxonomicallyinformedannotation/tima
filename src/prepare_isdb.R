@@ -20,19 +20,15 @@ paths <- parse_yaml_paths()
 params <- get_params(step = "prepare_isdb")
 
 
-
-
-
-
 log_debug(x = "loading original annotation table")
 
 table <- data.table::fread(file = params$file$input) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D = short_inchikey,
-                  smiles,
-                  molecular_formula,
-                  structure_exact_mass = exact_mass,
-                  score_input = msms_score
+    inchikey_2D = short_inchikey,
+    smiles,
+    molecular_formula,
+    structure_exact_mass = exact_mass,
+    score_input = msms_score
   ) |>
   dplyr::mutate(
     library = "ISDB",

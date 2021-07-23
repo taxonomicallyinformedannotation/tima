@@ -13,7 +13,7 @@ require(dplyr)
 read_json_complex <- function(json) {
   cat("reading json file \n")
   taxedFeaturesTable <- jsonlite::stream_in(con = gzfile(json))
-  
+
   cat("keeping unique kingdom/kingdoms per feature \n")
   kingdom <- taxedFeaturesTable %>%
     splitstackshape::cSplit("sample_organism_1kingdom", ", ", direction = "long") |>
@@ -21,7 +21,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_1kingdom", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique phylum/phyla per feature \n")
   phylum <- taxedFeaturesTable %>%
     splitstackshape::cSplit("sample_organism_2phylum", ", ", direction = "long") |>
@@ -29,7 +29,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_2phylum", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique class/classes per feature \n")
   class <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_3class", ", ", direction = "long") |>
@@ -37,7 +37,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_3class", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique order/orders per feature \n")
   order <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_4order", ", ", direction = "long") |>
@@ -45,7 +45,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_4order", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique family/families per feature \n")
   family <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_5family", ", ", direction = "long") |>
@@ -53,7 +53,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_5family", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique genus/genera per feature \n")
   genus <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_6genus", ", ", direction = "long") |>
@@ -61,7 +61,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_6genus", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique species per feature \n")
   species <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_7species", ", ", direction = "long") |>
@@ -69,7 +69,7 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_7species", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   cat("keeping unique variety/varieties per feature \n")
   variety <- taxedFeaturesTable |>
     splitstackshape::cSplit("sample_organism_8variety", ", ", direction = "long") |>
@@ -77,10 +77,10 @@ read_json_complex <- function(json) {
     dplyr::summarise_at("sample_organism_8variety", function(x) {
       x <- list(paste(sort(unique(x))))
     })
-  
+
   table <- taxedFeaturesTable %>%
     dplyr::select(dplyr::all_of(feature_id_colname))
-  
+
   cat("joining all together \n")
   table <- dplyr::left_join(table, kingdom)
   table <- dplyr::left_join(table, phylum)
@@ -93,6 +93,6 @@ read_json_complex <- function(json) {
     dplyr::arrange(dplyr::across(dplyr::all_of((
       feature_id_colname
     ))))
-  
+
   return(table)
 }

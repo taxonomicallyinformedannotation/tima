@@ -90,10 +90,10 @@ taxa_ranks_dictionary <-
 if (params$tool$metadata == "gnps") {
   log_debug(x = "loading feature table")
   feature_table <- read_featuretable(id = params$job$gnps)
-  
+
   log_debug(x = "loading metadata table")
   metadata_table <- read_metadatatable(id = params$job$gnps)
-  
+
   log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-
     gsub(
@@ -101,7 +101,7 @@ if (params$tool$metadata == "gnps") {
       replacement = "",
       x = colnames(feature_table)
     )
-  
+
   log_debug(x = "removing \"row m/z\" and from \"row retention time\" columns")
   feature_table <- feature_table %>%
     dplyr::select(
@@ -109,7 +109,7 @@ if (params$tool$metadata == "gnps") {
       -"row.retention.time"
     ) |>
     tibble::column_to_rownames(var = "row.ID")
-  
+
   log_debug(x = "finding top N intensities per feature")
   top_n <- feature_table |>
     tibble::rownames_to_column() |>
@@ -182,7 +182,7 @@ verified_df <- verified |>
   ) |>
   tidyr::unnest(preferredResults, names_repair = "minimal") |>
   dplyr::filter(dataSourceTitleShort != "IRMNG (old)" &
-                  dataSourceTitleShort != "IPNI") |>
+    dataSourceTitleShort != "IPNI") |>
   # filter(!matchedName %in% wrongVerifiedDictionary$wrongOrganismsVerified) |>
   dplyr::mutate(organismType = "clean") %>%
   dplyr::select(
@@ -201,8 +201,8 @@ verified_df$organismDbTaxo <-
   y_as_na(verified_df$organismDbTaxo, "")
 
 dataOrganismVerified <- dplyr::left_join(organism_table,
-                                         verified_df,
-                                         by = c("organism" = "organismValue")
+  verified_df,
+  by = c("organism" = "organismValue")
 ) %>%
   dplyr::select(
     organism,
@@ -238,26 +238,26 @@ if (nrow(warning) != 0) {
     "had no translation,",
     "trying with a more flexible option"
   )
-  
+
   organism_table_2 <- dataOrganismVerified |>
     dplyr::distinct(organism, organismCleaned)
-  
+
   organism_table_3 <- organism_table_2 |>
     dplyr::distinct(organismCleaned)
-  
+
   data.table::fwrite(
     x = organism_table_3,
     file = data_interim_organisms_original_2,
     sep = "\t"
   )
-  
+
   log_debug("submitting to GNVerifier")
   system(command = paste("bash", gnverifier_script_2))
-  
+
   log_debug("cleaning GNVerifier results")
   verified_2 <-
     jsonlite::stream_in(con = file(data_interim_organisms_verified_2))
-  
+
   verified_df_2 <- verified_2 |>
     dplyr::select(
       -curation,
@@ -265,7 +265,7 @@ if (nrow(warning) != 0) {
     ) |>
     tidyr::unnest(preferredResults, names_repair = "minimal") |>
     dplyr::filter(dataSourceTitleShort != "IRMNG (old)" &
-                    dataSourceTitleShort != "IPNI") |>
+      dataSourceTitleShort != "IPNI") |>
     # filter(!matchedName %in% wrongVerifiedDictionary$wrongOrganismsVerified) |>
     dplyr::mutate(organismType = "clean") %>%
     dplyr::select(
@@ -278,19 +278,19 @@ if (nrow(warning) != 0) {
       taxonomy = classificationPath,
       rank = classificationRanks
     )
-  
+
   ## example ID 165 empty, maybe fill later on
   verified_df_2$organismDbTaxo <-
     y_as_na(verified_df_2$organismDbTaxo, "")
-  
+
   dataOrganismVerified_2 <- dplyr::right_join(
     organism_table,
     organism_table_2
   )
   dataOrganismVerified_2 <-
     dplyr::left_join(dataOrganismVerified_2,
-                     verified_df_2,
-                     by = c("organismCleaned" = "organismValue")
+      verified_df_2,
+      by = c("organismCleaned" = "organismValue")
     ) |>
     dplyr::select(
       organism,
@@ -301,17 +301,17 @@ if (nrow(warning) != 0) {
       organismCleaned_dbTaxoTaxonomy = taxonomy,
       organismCleaned_dbTaxoTaxonRanks = rank
     )
-  
+
   dataOrganismVerified_3 <-
     rbind(dataOrganismVerified, dataOrganismVerified_2) |>
     dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
     dplyr::distinct()
-  
+
   warning_2 <-
     dplyr::left_join(organism_table, dataOrganismVerified_3) %>%
     dplyr::filter(!is.na(organism)) %>%
     dplyr::filter(is.na(organismDbTaxo))
-  
+
   if (nrow(warning_2) != 0) {
     log_debug(
       "Warning:",
