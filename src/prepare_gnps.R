@@ -10,11 +10,11 @@ log_debug(
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
-library(data.table)
 library(dplyr)
 library(docopt)
 library(purrr)
-library(splitstackshape)
+library(readr)
+# library(splitstackshape)
 library(yaml)
 
 paths <- parse_yaml_paths()
