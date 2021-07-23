@@ -2,9 +2,6 @@ start <- Sys.time()
 
 source(file = "R/helpers.R")
 source(file = "R/features.R")
-source(file = "R/parse_cli_params.R")
-source(file = "R/parse_yaml_paths.R")
-source(file = "R/parse_yaml_params.R")
 
 log_debug(
   "This script treats GNPS and NAP results to obtain following file : \n
@@ -22,19 +19,11 @@ library(yaml)
 
 paths <- parse_yaml_paths()
 
-step <- "prepare_gnps"
-doc_path <- file.path(paths$src$docopt, paste0(step, ".txt"))
-default_path <- file.path(paths$config$default$path, paste0(step, ".yaml"))
-params_path <- file.path(paths$config$params$path, paste0(step, ".yaml"))
+params <- get_params(step = "prepare_gnps")
 
-doc <- readChar(con = doc_path,
-                nchars = file.info(doc_path)$size)
 
-arguments <- docopt(doc)
 
-params <- parse_yaml_params()
 
-params <- parse_cli_params()
 
 log_debug("loading files ...")
 ## starting it now
