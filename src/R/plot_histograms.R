@@ -10,10 +10,14 @@ require(ggplot2)
 #'
 #' @examples
 plot_histograms <- function(dataframe, label, y = "values") {
-  absolute <- ggplot2::ggplot(dataframe,
-                              ggplot2::aes(x = sample,
-                                           y = get(y),
-                                           fill = ids)) +
+  absolute <- ggplot2::ggplot(
+    dataframe,
+    ggplot2::aes(
+      x = sample,
+      y = get(y),
+      fill = ids
+    )
+  ) +
     ggplot2::geom_col() +
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::scale_fill_manual(
@@ -31,6 +35,6 @@ plot_histograms <- function(dataframe, label, y = "values") {
     ) +
     ggplot2::xlab(label) +
     ggplot2::ylab("absolute")
-  
+
   return(absolute)
 }

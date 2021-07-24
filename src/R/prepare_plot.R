@@ -22,13 +22,15 @@ prepare_plot <- function(dataframe, organism = "species") {
         )
     ) |>
     dplyr::filter(!is.na(get(organism))) |>
-    dplyr::mutate(species =
-                    gsub(
-                      pattern = "([A-Z]{1})(.* )",
-                      replacement = "\\1. ",
-                      x = get(organism),
-                      perl = TRUE
-                    )) |>
+    dplyr::mutate(
+      species =
+        gsub(
+          pattern = "([A-Z]{1})(.* )",
+          replacement = "\\1. ",
+          x = get(organism),
+          perl = TRUE
+        )
+    ) |>
     dplyr::group_by(parents) |>
     dplyr::mutate(group = dplyr::cur_group_id()) |>
     dplyr::group_by(group, ids) |>
@@ -41,7 +43,7 @@ prepare_plot <- function(dataframe, organism = "species") {
     dplyr::rowwise() |>
     dplyr::mutate(color = nice_colors[[group]][subgroup]) |>
     dplyr::mutate(relative = values / tot)
-  
+
   samples$ids <-
     forcats::fct_reorder2(
       .f = samples$ids,
@@ -49,7 +51,7 @@ prepare_plot <- function(dataframe, organism = "species") {
       .y = samples$group,
       .desc = FALSE
     )
-  
+
   samples$color <-
     forcats::fct_reorder2(
       .f = samples$color,
@@ -57,7 +59,7 @@ prepare_plot <- function(dataframe, organism = "species") {
       .y = samples$group,
       .desc = FALSE
     )
-  
+
   samples$species <-
     forcats::fct_reorder2(
       .f = samples$species,
@@ -65,6 +67,6 @@ prepare_plot <- function(dataframe, organism = "species") {
       .y = samples$sample,
       .desc = FALSE
     )
-  
+
   return(samples)
 }

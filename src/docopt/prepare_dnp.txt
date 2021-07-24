@@ -1,11 +1,12 @@
 You can use this script with the following example:
-Rscript R/1_prepare_dnp.R --input '../../lotus-processor/data/processed/210715_dnp_metadata.csv.gz' 
+Rscript prepare_dnp.R --input '../lotus-processor/data/processed/210715_dnp_metadata.csv.gz' 
 
-Usage: 1_prepare_dnp.R [--input=<input>]
+Usage: prepare_dnp.R [--input=<input>] [--output=<output>]
 
 Arguments:
-  -i --input=<input>  Where your dnp is located. Works only with special in lab dnp. Cannot be shared
+  -i --input=<input>    Where your dnp is located. Works only with special in lab dnp. Cannot be shared
+  -o --output=<output>  Output
 
 Options:
-  -h --help         Show this screen.
-  -V --version      Show version.
+  -h --help             Show this screen.
+  -V --version          Show version.

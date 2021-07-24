@@ -1,13 +1,14 @@
 You can use this script with the following example:
-Rscript R/fill_chemical.R --input '../data/interim/b988e66d1542430cbc6e703be781e49c_isdb_pretreated.tsv.gz' --output '../data/processed/b988e66d1542430cbc6e703be781e49c_isdb_treated.tsv.gz' --ms.mode 'pos'
+Rscript prepare_features_components.R --input 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz' --mode 'pos' --tool 'gnps' --gnps 'db1c51fa29a64892af520698a18783e4'
 
-Usage: fill_features.R [--input=<input>] [--output=<output>] [--ms.mode=<ms.mode>]
+Usage: prepare_features_components.R [--input=<input>] [--output=<output>] [--mode=<mode>]
 
 Arguments:
   -c --components=<components>  If your tool is manual, the file containing your component_ids
+  -g --gnps=<gnps>              GNPS job ID.
   -i --input=<input>            Your isdb result file. Supports compressed files.
   -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
-  -m --ms.mode=<ms.mode>        MS mode used. Can be "pos" or "neg"
+  -m --mode=<mode>              MS mode used. Can be "pos" or "neg"
   -t --tool=<tool>              Tool used for generating the component ids, currently only GNPS
 
 Options:

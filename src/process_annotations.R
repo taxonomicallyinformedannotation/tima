@@ -132,14 +132,14 @@ if (params$ms$annotate == TRUE) {
     adduct_db_file <-
       file.path(
         paths$data$interim$adducts$path,
-        paste0(params$name_adducts, "_pos.tsv.gz")
+        paste0(params$name, "_pos.tsv.gz")
       )
   }
   if (params$ms$mode == "neg") {
     adduct_db_file <-
       file.path(
         paths$data$interim$adducts$path,
-        paste0(params$name_adducts, "_neg.tsv.gz")
+        paste0(params$name, "_neg.tsv.gz")
       )
   }
 

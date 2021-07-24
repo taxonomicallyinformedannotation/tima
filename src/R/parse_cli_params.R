@@ -8,14 +8,14 @@ parse_cli_params <- function() {
   log_debug("checking command line arguments")
 
   if (exists("arguments")) {
-    if (!is.null(arguments$ms1)) {
-      params$ms$annotate <- arguments$ms1
-    }
     if (!is.null(arguments$annotations)) {
       params$annotations <- arguments$annotations
     }
     if (!is.null(arguments$column.name)) {
       params$column_name <- arguments$column.name
+    }
+    if (!is.null(arguments$complement)) {
+      params$ms$annotate <- arguments$complement
     }
     if (!is.null(arguments$components)) {
       params$components <- arguments$components
@@ -27,7 +27,7 @@ parse_cli_params <- function() {
       params$extension <- arguments$extension
     }
     if (!is.null(arguments$filter)) {
-      params$mode <- arguments$filter
+      params$filter$mode <- arguments$filter
     }
     if (!is.null(arguments$force)) {
       params$force <- arguments$force
@@ -43,13 +43,19 @@ parse_cli_params <- function() {
         as.numeric(arguments$k.top)
     }
     if (!is.null(arguments$level)) {
-      params$level <- arguments$level
+      params$filter$level <- arguments$level
     }
     if (!is.null(arguments$library)) {
       params$library <- arguments$library
     }
     if (!is.null(arguments$mode)) {
       params$mode <- arguments$mode
+    }
+    if (!is.null(arguments$ms)) {
+      params$ms$mode <- arguments$ms
+    }
+    if (!is.null(arguments$name)) {
+      params$name <- arguments$name
     }
     if (!is.null(arguments$nap)) {
       params$nap <- arguments$nap

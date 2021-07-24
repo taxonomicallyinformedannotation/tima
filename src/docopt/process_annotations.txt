@@ -1,19 +1,21 @@
 You can use this script with the following example:
-Rscript R/annotate_features.R
+Rscript process_annotations.R
 
-Usage: annotate_features.R [--output=<output>] [--annotation.file=<annotation.file>] [--complement=<complement>] [--edges.file=<edges.file>] [--features.file=<features.file>] [--library=<library>] [--mode.ms=<mode.ms>] [--ppm.tol=<ppm.tol>] [--rt.tol=<rt.tol>] [--force=<force>]
+Usage: process_annotations.R [--output=<output>] [--annotation=<annotation>] [--complement=<complement>] [--edges=<edges>] [--features=<features>][--initial.candidates=<initial.candidates>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>]
 
 Options:
-  -a --annotation.file=<annotation.file>  The file obtained by 1_treat_xxx.R script
-  -c --complement=<complement>            Logical: TRUE to complement with MS1 annotation, FALSE not to.
-  -d --directory=<directory>              The name of the directory for the output. Date if empty
-  -e --edges.file=<edges.file>            The file obtained by 2_get_edges.R script
-  -f --features.file=<features.file>      The file obtained by 2_inform_features_taxa.R script
-  -l --library=<library>                  Library to be used.
-  -m --mode.ms=<mode.ms>                  MS mode used ('pos' or 'neg')
-  -o --output=<output>                    Filename for the output. Can be .gz.
-  -p --ppm.tol=<ppm.tol>                  Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
-  -r --rt.tol=<rt.tol>                    Tolerance for adduct attriubtion. Should not exceed 0.1 min.
-  -h --help                               Show this screen.
-  -v --version                            Show version.
-  -0 --force=<force>                      Logical: TRUE to force running with non-recommended parameters. Use it at yur own risks. Can crash. 
+  -a --annotation=<annotation>  The file containing your prepared annotations
+  -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
+  -e --edges=<edges>            The file containing your prepared edges
+  -f --features=<features>      The file containing your prepared features
+  -i --initial.candidates=<initial.candidates>      Number of initial candidates to be considered.
+  -k --k.top=<k.top>            Number of final candidates to be considered.
+  -l --library=<library>        Library to be used.
+  -m --ms=<ms>                  MS mode used ('pos' or 'neg')
+  -n --name=<name>              Name given to the adducted library.
+  -o --output=<output>          Filename for the output. Can be .gz.
+  -p --ppm=<ppm>                Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
+  -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
+  -h --help                     Show this screen.
+  -v --version                  Show version.
+  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at yur own risks. Can crash. 

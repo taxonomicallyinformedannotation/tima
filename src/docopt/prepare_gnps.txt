@@ -1,7 +1,7 @@
 You can use this script with the following example:
-Rscript R/treat_gnps_nap.R -o '../data/processed/yourFileName.txt' -n a7fcca6c95064187b677f450e5aadc33 -g ca61de586af044f7b08f075e03db5996
+Rscript prepare_gnps.R -o 'data/interim/db1c51fa29a64892af520698a18783e4_gnps_pretreated.tsv.gz' -g db1c51fa29a64892af520698a18783e4
 
-Usage: treat_gnps_nap.R [--output=<output>] [--nap=<nap>] [--gnps=<gnps>]
+Usage: prepare_gnps.R [--output=<output>] [--nap=<nap>] [--gnps=<gnps>]
 
 Arguments:
   -o --output=<output>  Path and filename for the output. If you specify .gz file will be compressed.

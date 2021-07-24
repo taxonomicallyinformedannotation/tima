@@ -97,7 +97,8 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) - !!as.name(paste("mz", "dest", sep = "_"))
+                mz) -
+              !!as.name(paste("mz", "dest", sep = "_"))
           ),
           no = abs(
             mz + (0.000001 *
@@ -116,7 +117,8 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) - !!as.name(paste("mz", "dest", sep = "_"))
+                mz) -
+              !!as.name(paste("mz", "dest", sep = "_"))
           )
         )
       )
@@ -545,7 +547,7 @@ ms1_annotation <-
 
     cat("adding \"notAnnotated\" \n")
     df26 <- left_join(df25, df24) %>%
-      distinct() |> 
+      distinct() |>
       mutate(across(mz, as.numeric)) |>
       data.frame()
 
@@ -625,7 +627,7 @@ non_ms1_annotation <-
 
     cat("adding \"notAnnotated\" \n")
     df18 <- left_join(df17, df16) |>
-      distinct() |> 
+      distinct() |>
       mutate(across(mz_error, as.numeric)) |>
       data.frame()
 

@@ -32,8 +32,10 @@ weighted_ms1_path <-
 weighted_path <-
   "../data/processed/210724_164510/FinalResults.tsv.gz"
 
-log_debug("This script performs",
-          green("extract annotations visualization"))
+log_debug(
+  "This script performs",
+  green("extract annotations visualization")
+)
 log_debug("Authors: \n", green("AR"))
 log_debug("Contributors: ...")
 
@@ -66,13 +68,15 @@ feature_table <- read_featuretable(id = params$job$gnps)
 
 ms1 <-
   right_join(ms1,
-             feature_table |> distinct(`row ID`),
-             by = c("feature_id" = "row ID"))
+    feature_table |> distinct(`row ID`),
+    by = c("feature_id" = "row ID")
+  )
 
 no_ms1 <-
   right_join(no_ms1,
-             feature_table |> distinct(`row ID`),
-             by = c("feature_id" = "row ID"))
+    feature_table |> distinct(`row ID`),
+    by = c("feature_id" = "row ID")
+  )
 log_debug(x = "loading metadata table")
 metadata_table <- read_metadatatable(id = params$job$gnps)
 
@@ -86,8 +90,10 @@ colnames(feature_table) <-
 
 log_debug(x = "removing \"row m/z\" and from \"row retention time\" columns")
 feature_table <- feature_table %>%
-  dplyr::select(-"row m/z",
-                -"row retention time") |>
+  dplyr::select(
+    -"row m/z",
+    -"row retention time"
+  ) |>
   tibble::column_to_rownames(var = "row ID")
 
 top_n <- feature_table |>
@@ -129,15 +135,16 @@ final_table <- prepare_hierarchy(dataframe = ms1)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-                   metadata_table |> mutate(
-                     filename = gsub(
-                       pattern = ".mzML",
-                       replacement = "",
-                       x = filename,
-                       fixed = TRUE
-                     )
-                   ),
-                   by = c("sample" = "filename"))
+    metadata_table |> mutate(
+      filename = gsub(
+        pattern = ".mzML",
+        replacement = "",
+        x = filename,
+        fixed = TRUE
+      )
+    ),
+    by = c("sample" = "filename")
+  )
 
 final_table_no_ms1 <- prepare_hierarchy(dataframe = no_ms1)
 
@@ -193,11 +200,11 @@ sunbursts <- plotly::plot_ly() |>
   plotly::add_trace(
     data = final_table_taxed_no_ms1 |>
       dplyr::filter(ATTRIBUTE_species == "Salvia officinalis"),
-    ids = ~ ids,
+    ids = ~ids,
     name = "no_ms1",
-    labels = ~ labels,
-    parents = ~ parents,
-    values = ~ values,
+    labels = ~labels,
+    parents = ~parents,
+    values = ~values,
     maxdepth = 3,
     type = "sunburst",
     branchvalues = "total",
@@ -206,25 +213,31 @@ sunbursts <- plotly::plot_ly() |>
   plotly::add_trace(
     data = final_table_taxed |>
       dplyr::filter(ATTRIBUTE_species == "Salvia officinalis"),
-    ids = ~ ids,
+    ids = ~ids,
     name = "with_ms1",
-    labels = ~ labels,
-    parents = ~ parents,
-    values = ~ values,
+    labels = ~labels,
+    parents = ~parents,
+    values = ~values,
     maxdepth = 3,
     type = "sunburst",
     branchvalues = "total",
     domain = list(column = 1)
   ) |>
-  plotly::layout(colorway = sunburst_colors,
-                 grid = list(columns = 2, # 3
-                             rows = 1))
+  plotly::layout(
+    colorway = sunburst_colors,
+    grid = list(
+      columns = 2, # 3
+      rows = 1
+    )
+  )
 
 sunbursts
 
 final_table_terpenoids <-
-  prepare_hierarchy_2(dataframe = ms1,
-                      pathway = "Terpenoids")
+  prepare_hierarchy_2(
+    dataframe = ms1,
+    pathway = "Terpenoids"
+  )
 
 final_table_terpenoids_taxed <-
   dplyr::left_join(

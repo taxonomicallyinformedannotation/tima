@@ -1,7 +1,7 @@
 You can use this script with the following example:
-Rscript R/2_prepare_library.R --output 'bitter_db' --filter TRUE --level family --value Simaroubaceae|Gentianaceae
+Rscript prepare_library.R --output 'bitter_db.tsv.gz' --filter TRUE --level 'family' --value 'Simaroubaceae|Gentianaceae'
 
-Usage: 2_prepare_library.R [--output=<output>] [--filter=<filter>] [--level=<level>] [--value=<value>] 
+Usage: prepare_library.R [--output=<output>] [--filter=<filter>] [--level=<level>] [--value=<value>] 
 
 Arguments:
   -f --filter=<filter>  Boolean. If you want to filter your library for specific organisms

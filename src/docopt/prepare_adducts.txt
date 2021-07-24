@@ -1,10 +1,10 @@
 You can use this script with the following example:
-Rscript R/3_form_adducts.R --input ../data/processed/db_prepared.tsv.gz --output db_prepared
+Rscript prepare_adducts.R --input data/interim/libraries/library.tsv.gz --output library
 
-Usage: 3_form_adducts.R [--input=<input>] [--output=<output>]
+Usage: prepare_adducts.R [--input=<input>] [--output=<output>]
 
 Arguments:
-  -i --input=<input>    Path to the input. Starting from src.
+  -i --input=<input>    Path to the input. Starting from root of the directory
   -o --output=<output>  Filename for the outputs. "_pos" and "_neg" will be appended.
 
 Options:

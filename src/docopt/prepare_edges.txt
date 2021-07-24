@@ -1,14 +1,14 @@
 You can use this script with the following example:
-Rscript R/get_edges.R --input '../data/source/example_edges_manual.csv' --output '../data/processed/b988e66d1542430cbc6e703be781e49c_edges.tsv.gz' --tool gnps
+Rscript prepare_edges.R --input 'data/source/example_edges_manual.csv' --output 'data/interim/edges/db1c51fa29a64892af520698a18783e4_edges.tsv.gz' --tool gnps
 
-Usage: R/get_edges.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--gnps=<gnps>] [-1 | --feature.source=<feature.source>] [-2 | --feature.target=<feature.target>]
+Usage: prepare_edges.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--gnps=<gnps>] [-1 | --source=<source>] [-2 | --target=<target>]
 
 Options:
   -i --input=<input>                    If manual, your file containing list of edges between features. Supports compressed files.
+  -g --gnps=<gnps>                      Your GNPS job id. Depending on the annotation tool you used
   -o --output=<output>                  Path and filename for the output. If you specify .gz file will be compressed.
   -t --tool=<tool>                      Tool you used for edge generation ('gnps' or 'manual')
-  -g --gnps=<gnps>                      Your GNPS job id. Depending on the annotation tool you used
-  -1 --feature.source=<feature.source>  The column name of your source feature
-  -2 --feature.target=<feature.target>  The column name of your target feature
+  -1 --source=<source>                  The column name of your source feature
+  -2 --target=<target>                  The column name of your target feature
   -h --help                             Show this screen.
   -v --version                          Show version.
