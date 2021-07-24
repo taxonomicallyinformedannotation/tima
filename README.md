@@ -20,24 +20,20 @@ Rscript prepare_adducts.R &&
 
 
 ## get spectral matches
-
-## (spectral-lib-matcher, which is only in python. see related repo)
+### (spectral-lib-matcher, which is only in python. see related repo)
 cd .. &&
 bash src/get_example_isdb.sh && ## get an example result from new isdb without python
-cd src &&
-
 
 ## prepare all files for weighting
 
-cd .. &&
 bash src/get_gnverifier.sh &&
 cd src &&
 Rscript prepare_gnps.R && ## optional
 Rscript prepare_isdb.R &&
 Rscript prepare_features_components.R &&
 Rscript prepare_features_classification.R &&
-Rscript prepare_edges.R 
-
+Rscript prepare_edges.R && 
+Rscript prepare_taxa.R 
 
 ## rest to come
 ```

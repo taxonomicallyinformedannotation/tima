@@ -73,7 +73,7 @@ if (params$tool == "gnps") {
     dplyr::arrange(rowname, rank)
 }
 
-if (params$tool$metadata == "manual") {
+if (params$tool == "manual") {
   metadata_table <-
     readr::read_delim(file = params$input)
 }
@@ -144,7 +144,7 @@ if (params$tool == "gnps") {
     )
 }
 
-if (params$tool$metadata == "manual") {
+if (params$tool == "manual") {
   metadata_table_joined <- metadata_table |>
     dplyr::select(
       feature_id,
@@ -193,32 +193,49 @@ metadata_table_joined_summarized[] <-
            y_as_na(x, y = "")
          })
 
-
 log_debug(x = "exporting metadata_table_biological_annotation and parameters used ...")
 log_debug("ensuring directories exist ...")
 ifelse(
-  test = !dir.exists(data_interim),
-  yes = dir.create(data_interim),
-  no = paste(data_interim, "exists")
+  test = !dir.exists(paths$data$path),
+  yes = dir.create(paths$data$path),
+  no = paste(paths$data$path, "exists")
 )
 ifelse(
-  test = !dir.exists(data_processed),
-  yes = dir.create(data_processed),
-  no = paste(data_processed, "exists")
+  test = !dir.exists(paths$data$interim$path),
+  yes = dir.create(paths$data$interim$path),
+  no = paste(paths$data$interim$path, "exists")
 )
 ifelse(
-  test = !dir.exists(data_processed_params),
-  yes = dir.create(data_processed_params),
-  no = paste(data_processed_params, "exists")
+  test = !dir.exists(paths$data$interim$edges$path),
+  yes = dir.create(paths$data$interim$edges$path),
+  no = paste(paths$data$interim$edges$path, "exists")
 )
-log_debug(x = "... metadata_table_biological_annotation is saved in",
-          params$file$features$taxed)
-data.table::fwrite(x = metadata_table_joined_summarized,
-                   file = params$file$features$taxed,
-                   sep = "\t")
+ifelse(
+  test = !dir.exists(paths$data$interim$config$path),
+  yes = dir.create(paths$data$interim$config$path),
+  no = paste(paths$data$interim$config$path, "exists")
+)
+log_debug(
+  x = "... metadata_table_spectral_annotation is saved in",
+  params$output
+)
+readr::write_delim(
+  x = metadata_table_joined_summarized,
+  file = params$output,
+)
 
-log_debug(x = "... parameters used are saved in", data_processed_params_inform)
-yaml::write_yaml(x = params, file = data_processed_params_inform)
+log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
+yaml::write_yaml(
+  x = params,
+  file = file.path(
+    paths$data$interim$config$path,
+    paste(
+      format(Sys.time(), "%y%m%d_%H%M%OS"),
+      "prepare_taxa.yaml",
+      sep = "_"
+    )
+  )
+)
 
 end <- Sys.time()
 

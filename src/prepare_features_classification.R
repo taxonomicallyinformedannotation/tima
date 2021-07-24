@@ -210,7 +210,7 @@ log_debug(
 )
 
 readr::write_delim(
-  x = table_filled,
+  x = table_final,
   file = params$output
 )
 
