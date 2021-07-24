@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 
-if [ -f ../bin/gnverifier ]; then
-  GNVERIFIER=../bin/gnverifier
-elif [ -f /usr/bin/gnverifier ]; then
-  GNVERIFIER=/usr/bin/gnverifier
-else
-  echo "Sorry you need to install gnverifier in /usr/bin or ../bin"
-  exit 1
-fi
+source src/parse_yaml.sh
+source src/warning_gnverifier.sh
 
-${GNVERIFIER} ../data/interim/organisms/original_2.tsv -s 179 -j 200 -f compact >../data/interim/organisms/verified_2.json
+eval $(parse_yaml src/paths.yaml)
+
+${GNVERIFIER} $data_interim_taxa_original_2 -s 179 -j 200 -f compact >$data_interim_taxa_verified_2

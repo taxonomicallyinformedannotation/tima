@@ -14,6 +14,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$components)) {
       params$components <- arguments$components
     }
+    if (!is.null(arguments$extension)) {
+      params$extension <- arguments$extension
+    }
     if (!is.null(arguments$gnps)) {
       params$gnps <- arguments$gnps
     }

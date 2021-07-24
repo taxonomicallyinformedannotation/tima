@@ -1,0 +1,7 @@
+tool: gnps # manual
+input: data/interim/example_metadata_manual.csv # if you have a manual metadata table
+output: data/interim/taxa/db1c51fa29a64892af520698a18783e4_taxed.tsv.gz  # if you have your metadata table within GNPS
+extension: FALSE # is the filename extension present in your feature table?
+column_name: ATTRIBUTE_species  # biological_source
+gnps: db1c51fa29a64892af520698a18783e4 # needed depending on the tool you used
+top_k: 1 # number of organisms per feature

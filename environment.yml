@@ -16,6 +16,5 @@ dependencies:
   - r-splitstackshape
   - r-stringi
   - r-stringr
-  - r-tibble
   - r-tidyr
   - r-yaml

@@ -28,6 +28,10 @@ data:
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
+      original: data/interim/taxa/original.tsv
+      original_2: data/interim/taxa/original_2.tsv
+      verified: data/interim/taxa/verified.json
+      verified_2: data/interim/taxa/verified_2.json
   processed:
     path: data/processed
     config:
@@ -48,6 +52,8 @@ img:
   path: img
 src:
   path: src
+  gnverifier: src/gnverifierScript.sh
+  gnverifier_2: src/gnverifierScript_2.sh
   docopt:
     path: src/docopt
   preprocessing:

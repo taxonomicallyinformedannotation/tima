@@ -1,4 +1,4 @@
-input: data/interim/annotations/b988e66d1542430cbc6e703be781e49c_isdb_filled.tsv.gz
-output: data/interim/annotations/b988e66d1542430cbc6e703be781e49c_isdb_treated.tsv.gz
+input: data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz
+output: data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_treated.tsv.gz
 library: data/interim/libraries/library.tsv.gz
 quickmode: TRUE
