@@ -2,11 +2,9 @@
 .vscode
 
 *.DS_Store
-*.ipynb_checkpoints
-*.pyc
 *.Rhistory
 
-*.
+bin/**
 data/source/private/**
 data/source/libraries/**
 data/interim/**

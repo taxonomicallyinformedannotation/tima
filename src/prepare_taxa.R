@@ -150,7 +150,7 @@ organism_table <- metadata_table |>
   )) |>
   dplyr::distinct()
 
-log_debug(x = "exporting source organism for GNFinder submission")
+log_debug(x = "exporting source organism for GNVerifier submission")
 log_debug("ensuring directories exist ...")
 ifelse(
   test = !dir.exists(data_interim),
