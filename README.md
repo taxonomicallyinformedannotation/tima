@@ -36,4 +36,6 @@ Rscript prepare_edges.R &&
 Rscript prepare_taxa.R 
 
 ## rest to come
+
+## you can use --help or -h argument for all .R steps to get more info
 ```
