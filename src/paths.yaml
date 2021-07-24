@@ -35,6 +35,9 @@ data:
   source:
     path: data/source
     adducts: data/source/adducts.tsv
+    dictionaries:
+      path: data/source/dictionaries
+      ranks: data/source/dictionaries/ranks.tsv
     libraries:
       path: data/source/libraries
       lotus: data/source/libraries/lotus.csv.gz

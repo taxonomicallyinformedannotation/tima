@@ -8,6 +8,9 @@ parse_cli_params <- function() {
   log_debug("checking command line arguments")
 
   if (exists("arguments")) {
+    if (!is.null(arguments$column.name)) {
+      params$column_name <- arguments$column.name
+    }
     if (!is.null(arguments$components)) {
       params$components <- arguments$components
     }
@@ -16,6 +19,10 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$input)) {
       params$input <- arguments$input
+    }
+    if (!is.null(arguments$k.top)) {
+      params$top_k <-
+        as.numeric(arguments$k.top)
     }
     if (!is.null(arguments$level)) {
       params$level <- arguments$level
