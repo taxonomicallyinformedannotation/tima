@@ -24,6 +24,7 @@ Rscript prepare_adducts.R &&
 cd .. &&
 bash src/get_example_isdb.sh && ## get an example result from new isdb without python
 
+
 ## prepare all files for weighting
 
 bash src/get_gnverifier.sh &&
@@ -35,7 +36,8 @@ Rscript prepare_features_classification.R &&
 Rscript prepare_edges.R && 
 Rscript prepare_taxa.R 
 
-## rest to come
+## And finally the graal!
+Rscript process_annotations.R
 
 ## you can use --help or -h argument for all .R steps to get more info
 ```

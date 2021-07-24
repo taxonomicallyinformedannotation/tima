@@ -35,8 +35,6 @@ feature_table_path <-
 weighted_ms1_path <-
   "../data/processed/210718_145306/yourFinalFile.tsv.gz"
 
-sunburst_path <- "../images/erythro_sunburst.svg"
-
 log_debug(
   "This script performs",
   green("extract annotations visualization")

@@ -15,6 +15,6 @@ warning_gnverifier <- function(dataframe) {
     dplyr::filter(n == 1) |>
     dplyr::select(-n) |>
     dplyr::filter(is.na(organismCleaned))
-  
+
   return(warning)
 }

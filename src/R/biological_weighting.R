@@ -15,10 +15,11 @@ biological_weighting <-
     cat("normalizing initial score \n")
     metadata <- annotationTable %>%
       select(
-        !!as.name(feature_id_colname),
-        !!as.name(component_id_colname),
-        !!as.name(short_inchikey_colname),
-        !!as.name(score_input_colname),
+        feature_id,
+        component_id,
+        inchikey_2D,
+        smiles_2D,
+        score_input,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -33,105 +34,105 @@ biological_weighting <-
         # sample_organism_08_1_subgenus,
         sample_organism_09_species,
         # sample_organism_09_1_subspecies,
-        sample_organism_10_varietas
+        sample_organism_10_varietas,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class
       ) %>%
-      mutate(across(all_of(score_input_colname), as.numeric)) %>%
-      mutate(score_initialNormalized = (!!as.name(score_input_colname) - min(!!as.name(
-        score_input_colname
-      ))) / (max(!!as.name(
-        score_input_colname
-      )) - min(!!as.name(
-        score_input_colname
-      ))))
+      mutate(across(score_input, as.numeric)) %>%
+      mutate(score_initialNormalized = (score_input -
+        min(score_input)) /
+        (max(score_input) -
+          min(score_input)))
 
     sample_domain <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_01_domain
       )
 
     sample_kingdom <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_02_kingdom
       )
 
     sample_phylum <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_03_phylum
       )
 
     sample_class <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_04_class
       )
 
     sample_order <- annotationTable %>%
       distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+        feature_id,
+        inchikey_2D,
         sample_organism_05_order
       )
 
     # sample_infraorder <- annotationTable %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_05_1_infraorder
     #   )
 
     sample_family <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_06_family
       )
 
     # sample_subfamily <- annotationTable %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_06_1_subfamily
     #   )
 
     sample_tribe <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_07_tribe
       )
 
     # sample_subtribe <- annotationTable %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_07_1_subtribe
     #   )
 
     sample_genus <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_08_genus
       )
 
     # sample_subgenus <- annotationTable %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_08_1_subgenus
     #   )
 
     sample_species <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_09_species
       )
 
     # sample_subspecies <- annotationTable %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_09_1_subspecies
     #   )
 
     sample_varietas <- annotationTable %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_10_varietas
       )
 
@@ -139,9 +140,9 @@ biological_weighting <-
 
     cat("selecting DB columns \n")
     candidates <- structureOrganismPairsTable %>%
-      filter(!is.na(!!as.name(short_inchikey_colname_db))) %>%
+      filter(!is.na(structure_inchikey_2D)) %>%
       select(
-        !!as.name(short_inchikey_colname) := !!as.name(short_inchikey_colname_db),
+        inchikey_2D = structure_inchikey_2D,
         candidate_organism_01_domain = organism_taxonomy_01domain,
         candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
         candidate_organism_03_phylum = organism_taxonomy_03phylum,
@@ -162,91 +163,91 @@ biological_weighting <-
     cat("keeping distinct candidates per taxonomical rank \n")
     candidate_domain <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_01_domain
       )
 
     candidate_kingdom <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_02_kingdom
       )
 
     candidate_phylum <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_03_phylum
       )
 
     candidate_class <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_04_class
       )
 
     candidate_order <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_05_order
       )
 
     # candidate_infraorder <- candidates %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     candidate_organism_05_1_infraorder
     #   )
 
     candidate_family <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_06_family
       )
 
     # candidate_subfamily <- candidates %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     candidate_organism_06_1_subfamily
     #   )
 
     candidate_tribe <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_07_tribe
       )
 
     # candidate_subtribe <- candidates %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     candidate_organism_07_1_subtribe
     #   )
 
     candidate_genus <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_08_genus
       )
 
     # candidate_subgenus <- candidates %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     candidate_organism_08_1_subgenus
     #   )
 
     candidate_species <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_09_species
       )
 
     # candidate_subspecies <- candidates %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     candidate_organism_09_1_subspecies
     #   )
 
     candidate_varietas <- candidates %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         candidate_organism_10_varietas
       )
 
@@ -262,14 +263,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_01_domain
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_01_domain,
         score_biological
       )
@@ -277,7 +277,7 @@ biological_weighting <-
     cat("... kingdom \n")
     step_kin <- full_join(step_dom, sample_kingdom) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_02_kingdom
       )
     step_kin <- left_join(step_kin, candidate_kingdom) %>%
@@ -289,14 +289,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_02_kingdom
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_02_kingdom,
         score_biological
       )
@@ -304,7 +303,7 @@ biological_weighting <-
     cat("... phylum \n")
     step_phy <- full_join(step_kin, sample_phylum) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_03_phylum
       )
     step_phy <- left_join(step_phy, candidate_phylum) %>%
@@ -316,14 +315,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_03_phylum
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_03_phylum,
         score_biological
       )
@@ -331,7 +329,7 @@ biological_weighting <-
     cat("... class \n")
     step_cla <- full_join(step_phy, sample_class) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_04_class
       )
     step_cla <- left_join(step_cla, candidate_class) %>%
@@ -343,14 +341,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_04_class
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_04_class,
         score_biological
       )
@@ -358,7 +355,7 @@ biological_weighting <-
     cat("... order \n")
     step_ord <- full_join(step_cla, sample_order) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_05_order
       )
     step_ord <- left_join(step_ord, candidate_order) %>%
@@ -370,14 +367,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_05_order
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_05_order,
         score_biological
       )
@@ -385,7 +381,7 @@ biological_weighting <-
     # cat("... infraorder \n")
     # step_ord2 <- full_join(step_ord, sample_infraorder) %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_05_1_infraorder
     #   )
     # step_ord2 <- left_join(step_ord2, candidate_infraorder) %>%
@@ -397,14 +393,14 @@ biological_weighting <-
     #   left_join(
     #     .,
     #     metadata %>% distinct(
-    #       !!as.name(feature_id_colname),
-    #       !!as.name(short_inchikey_colname),
+    #       feature_id,
+    #       inchikey_2D,
     #       sample_organism_05_1_infraorder
     #     )
     #   ) %>%
     #   distinct(
-    #     !!as.name(feature_id_colname),
-    #     !!as.name(short_inchikey_colname),
+    #     feature_id,
+    #     inchikey_2D,
     #     best_candidate = candidate_organism_05_1_infraorder,
     #     score_biological
     #   )
@@ -412,7 +408,7 @@ biological_weighting <-
     cat("... family \n")
     step_fam <- full_join(step_ord, sample_family) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_06_family
       )
     step_fam <- left_join(step_fam, candidate_family) %>%
@@ -424,14 +420,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_06_family
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_06_family,
         score_biological
       )
@@ -439,7 +434,7 @@ biological_weighting <-
     # cat("... subfamily \n")
     # step_fam2 <- full_join(step_fam, sample_subfamily) %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_06_1_subfamily
     #   )
     # step_fam2 <- left_join(step_fam2, candidate_subfamily) %>%
@@ -451,14 +446,14 @@ biological_weighting <-
     #   left_join(
     #     .,
     #     metadata %>% distinct(
-    #       !!as.name(feature_id_colname),
-    #       !!as.name(short_inchikey_colname),
+    #       feature_id,
+    #       inchikey_2D,
     #       sample_organism_06_1_subfamily
     #     )
     #   ) %>%
     #   distinct(
-    #     !!as.name(feature_id_colname),
-    #     !!as.name(short_inchikey_colname),
+    #     feature_id,
+    #     inchikey_2D,
     #     best_candidate = candidate_organism_06_1_subfamily,
     #     score_biological
     #   )
@@ -466,7 +461,7 @@ biological_weighting <-
     cat("... tribe \n")
     step_tri <- full_join(step_fam, sample_tribe) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_07_tribe
       )
     step_tri <- left_join(step_tri, candidate_tribe) %>%
@@ -478,14 +473,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_07_tribe
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_07_tribe,
         score_biological
       )
@@ -493,7 +487,7 @@ biological_weighting <-
     # cat("... subtribe \n")
     # step_tri2 <- full_join(step_tri, sample_subtribe) %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_07_1_subtribe
     #   )
     # step_tri2 <- left_join(step_tri2, candidate_subtribe) %>%
@@ -505,14 +499,14 @@ biological_weighting <-
     #   left_join(
     #     .,
     #     metadata %>% distinct(
-    #       !!as.name(feature_id_colname),
-    #       !!as.name(short_inchikey_colname),
+    #       feature_id,
+    #       inchikey_2D,
     #       sample_organism_07_1_subtribe
     #     )
     #   ) %>%
     #   distinct(
-    #     !!as.name(feature_id_colname),
-    #     !!as.name(short_inchikey_colname),
+    #     feature_id,
+    #     inchikey_2D,
     #     best_candidate = candidate_organism_07_1_subtribe,
     #     score_biological
     #   )
@@ -520,7 +514,7 @@ biological_weighting <-
     cat("... genus \n")
     step_gen <- full_join(step_tri, sample_genus) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_08_genus
       )
     step_gen <- left_join(step_gen, candidate_genus) %>%
@@ -532,14 +526,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_08_genus
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_08_genus,
         score_biological
       )
@@ -547,7 +540,7 @@ biological_weighting <-
     # cat("... subgenus \n")
     # step_gen2 <- full_join(step_gen, sample_subgenus) %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_08_1_subgenus
     #   )
     # step_gen2 <-
@@ -560,14 +553,14 @@ biological_weighting <-
     #   left_join(
     #     .,
     #     metadata %>% distinct(
-    #       !!as.name(feature_id_colname),
-    #       !!as.name(short_inchikey_colname),
+    #       feature_id,
+    #       inchikey_2D,
     #       sample_organism_08_1_subgenus
     #     )
     #   ) %>%
     #   distinct(
-    #     !!as.name(feature_id_colname),
-    #     !!as.name(short_inchikey_colname),
+    #     feature_id,
+    #     inchikey_2D,
     #     best_candidate = candidate_organism_08_1_subgenus,
     #     score_biological
     #   )
@@ -575,7 +568,7 @@ biological_weighting <-
     cat("... species \n")
     step_spe <- full_join(step_gen, sample_species) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_09_species
       )
     step_spe <- left_join(step_spe, candidate_species) %>%
@@ -587,14 +580,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_09_species
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_09_species,
         score_biological
       )
@@ -602,7 +594,7 @@ biological_weighting <-
     # cat("... subspecies \n")
     # step_spe2 <- full_join(step_spe, sample_subspecies) %>%
     #   distinct(
-    #     !!as.name(short_inchikey_colname),
+    #     inchikey_2D,
     #     sample_organism_09_1_subspecies
     #   )
     # step_spe2 <-
@@ -615,14 +607,14 @@ biological_weighting <-
     #   left_join(
     #     .,
     #     metadata %>% distinct(
-    #       !!as.name(feature_id_colname),
-    #       !!as.name(short_inchikey_colname),
+    #       feature_id,
+    #       inchikey_2D,
     #       sample_organism_09_1_subspecies
     #     )
     #   ) %>%
     #   distinct(
-    #     !!as.name(feature_id_colname),
-    #     !!as.name(short_inchikey_colname),
+    #     feature_id,
+    #     inchikey_2D,
     #     best_candidate = candidate_organism_09_1_subspecies,
     #     score_biological
     #   )
@@ -630,7 +622,7 @@ biological_weighting <-
     cat("... varietas \n")
     step_var <- full_join(step_spe, sample_varietas) %>%
       distinct(
-        !!as.name(short_inchikey_colname),
+        inchikey_2D,
         sample_organism_10_varietas
       )
     step_var <- left_join(step_var, candidate_varietas) %>%
@@ -642,14 +634,13 @@ biological_weighting <-
       left_join(
         .,
         metadata %>% distinct(
-          !!as.name(feature_id_colname),
-          !!as.name(short_inchikey_colname),
+          feature_id,
+          inchikey_2D,
           sample_organism_10_varietas
         )
       ) %>%
-      distinct(
-        !!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         best_candidate = candidate_organism_10_varietas,
         score_biological
       )
@@ -670,10 +661,10 @@ biological_weighting <-
       # step_spe2,
       step_var
     ) %>%
-      group_by(!!as.name(feature_id_colname)) %>%
+      group_by(feature_id) %>%
       arrange(desc(score_biological)) %>%
-      distinct(!!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         .keep_all = TRUE
       ) %>%
       ungroup()
@@ -705,10 +696,10 @@ biological_weighting <-
       0
 
     biologically_weighted_full <- biologically_weighted_full %>%
-      group_by(!!as.name(feature_id_colname)) %>%
+      group_by(feature_id) %>%
       arrange(desc(score_pondered_bio)) %>%
-      distinct(!!as.name(feature_id_colname),
-        !!as.name(short_inchikey_colname),
+      distinct(feature_id,
+        inchikey_2D,
         .keep_all = TRUE
       ) %>%
       mutate(
@@ -719,7 +710,7 @@ biological_weighting <-
         rank_final,
         desc(-score_pondered_bio)
       ) %>%
-      arrange(as.numeric(!!as.name(feature_id_colname))) %>%
+      arrange(as.numeric(feature_id)) %>%
       ungroup() %>%
       tibble()
 

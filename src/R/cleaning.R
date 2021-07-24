@@ -306,36 +306,6 @@ biological_cleaning <-
 
 #' Title
 #'
-#' @param x
-#'
-#' @return
-#' @export
-#'
-#' @examples
-dirty_jsonlist_transform <- function(x) {
-  x <- paste(gsub(
-    pattern = "\", \"",
-    replacement = "|",
-    x = gsub(
-      pattern = "\")",
-      replacement = "",
-      x = gsub(
-        pattern = "c(\"",
-        replacement = "",
-        x = x,
-        fixed = TRUE
-      ),
-      fixed = TRUE
-    ),
-    fixed = TRUE
-  ))
-  return(x)
-}
-
-###############################################################################
-
-#' Title
-#'
 #' @param annotationTableWeightedChemo
 #' @param structureOrganismPairsTable
 #'
@@ -349,7 +319,7 @@ chemical_cleaning <-
     if (params$ms$annotate == TRUE) {
       cat(
         "filtering top ",
-        params$top_k$candidates$final,
+        params$top_k$final,
         " candidates and keeping only MS1 candidates with minimum \n",
         params$score$biological$order,
         " biological score or \n",
@@ -371,7 +341,7 @@ chemical_cleaning <-
         .keep_all = TRUE
       ) %>%
       mutate(rank_final = (dense_rank(-score_pondered_chemo))) %>%
-      filter(rank_final <= params$top_k$candidates$final) %>%
+      filter(rank_final <= params$top_k$final) %>%
       ungroup()
 
     df11 <- metadata_table_spectral_annotation

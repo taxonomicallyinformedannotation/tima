@@ -10,14 +10,10 @@ require(ggplot2)
 #'
 #' @examples
 plot_histograms <- function(dataframe, label, y = "values") {
-  absolute <- ggplot2::ggplot(
-    dataframe,
-    ggplot2::aes(
-      x = sample,
-      y = get(y),
-      fill = ids
-    )
-  ) +
+  absolute <- ggplot2::ggplot(dataframe,
+                              ggplot2::aes(x = sample,
+                                           y = get(y),
+                                           fill = ids)) +
     ggplot2::geom_col() +
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::scale_fill_manual(
@@ -25,7 +21,7 @@ plot_histograms <- function(dataframe, label, y = "values") {
         as.character(),
       guide = ggplot2::guide_legend(reverse = TRUE, ncol = 1)
     ) +
-    ggplot2::scale_x_discrete(labels = dataframe$species) +
+    ggplot2::scale_x_discrete(labels = levels(dataframe$species)) +
     ggplot2::labs(fill = "Chemical class") +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -35,6 +31,6 @@ plot_histograms <- function(dataframe, label, y = "values") {
     ) +
     ggplot2::xlab(label) +
     ggplot2::ylab("absolute")
-
+  
   return(absolute)
 }

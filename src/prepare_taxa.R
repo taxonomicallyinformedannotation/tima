@@ -6,7 +6,7 @@ source(file = "R/helpers.R")
 source(file = "R/manipulating_taxo_otl.R")
 
 log_debug("This script informs taxonomically features")
-log_debug("Authors: AR, PM-A")
+log_debug("Authors: AR, P-MA")
 log_debug("Contributors: ...")
 log_debug(x = "loading libraries")
 library(docopt)
@@ -40,10 +40,10 @@ taxa_ranks_dictionary <-
 if (params$tool == "gnps") {
   log_debug(x = "loading feature table")
   feature_table <- read_featuretable(id = params$gnps)
-  
+
   log_debug(x = "loading metadata table")
   metadata_table <- read_metadatatable(id = params$gnps)
-  
+
   log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-
     gsub(
@@ -51,13 +51,15 @@ if (params$tool == "gnps") {
       replacement = "",
       x = colnames(feature_table)
     )
-  
+
   log_debug(x = "removing \"row m/z\" and from \"row retention time\" columns")
   feature_table <- feature_table %>%
-    dplyr::select(-"row m/z",
-                  -"row retention time") |>
+    dplyr::select(
+      -"row m/z",
+      -"row retention time"
+    ) |>
     tibble::column_to_rownames(var = "row ID")
-  
+
   log_debug(x = "finding top N intensities per feature")
   top_n <- feature_table |>
     tibble::rownames_to_column() |>
@@ -83,9 +85,11 @@ organism_table <- metadata_table |>
   dplyr::filter(!is.na(dplyr::all_of(params$column_name))) |>
   dplyr::distinct(dplyr::across(dplyr::all_of(params$column_name))) |>
   dplyr::select(organism = all_of(params$column_name)) |>
-  splitstackshape::cSplit(splitCols = "organism",
-                          sep = "|",
-                          direction = "long") |>
+  splitstackshape::cSplit(
+    splitCols = "organism",
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::mutate(organism = gsub(
     pattern = " x ",
     replacement = " ",
@@ -105,9 +109,11 @@ ifelse(
   yes = dir.create(paths$data$interim$taxa$path),
   no = paste(paths$data$interim$taxa$path, "exists")
 )
-readr::write_delim(x = organism_table,
-                   file = paths$data$interim$taxa$original,
-                   quote = "none")
+readr::write_delim(
+  x = organism_table,
+  file = paths$data$interim$taxa$original,
+  quote = "none"
+)
 
 log_debug("submitting to GNVerifier")
 system(command = paste("bash", paths$src$gnverifier))
@@ -188,10 +194,12 @@ metadata_table_joined_summarized <-
   dplyr::mutate_all(as.character)
 
 metadata_table_joined_summarized[] <-
-  lapply(metadata_table_joined_summarized,
-         function(x) {
-           y_as_na(x, y = "")
-         })
+  lapply(
+    metadata_table_joined_summarized,
+    function(x) {
+      y_as_na(x, y = "")
+    }
+  )
 
 log_debug(x = "exporting metadata_table_biological_annotation and parameters used ...")
 log_debug("ensuring directories exist ...")

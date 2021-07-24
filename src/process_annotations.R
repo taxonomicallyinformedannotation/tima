@@ -1,26 +1,26 @@
 start <- Sys.time()
-language <- "r"
 
-source(file = "R/functions/helpers.R")
-log_debug(x = "sourcing files")
-source(file = "paths.md")
+source(file = "R/biological_weighting.R")
+source(file = "R/chemical_weighting.R")
+source(file = "R/cleaning.R")
+source(file = "R/decoration.R")
+source(file = "R/dist_groups.R")
+source(file = "R/helpers.R")
+source(file = "R/ms1.R")
 
-log_debug(x = "loading libraries")
 library(crayon)
 library(data.table)
 library(dplyr)
 library(docopt)
+library(readr)
 library(splitstackshape)
 library(stringr)
 library(tidyr)
 library(yaml)
 
-readChar(
-  con = docopt_annotate_features,
-  nchars = file.info(docopt_annotate_features)$size
-) -> doc
+paths <- parse_yaml_paths()
 
-arguments <- docopt(doc, version = "Taxo_scorer alpha 0.01")
+params <- get_params(step = "process_annotations")
 
 log_debug(
   "This script performs",
@@ -33,61 +33,6 @@ log_debug(
 log_debug("Authors: \n", green("AR, P-MA"))
 log_debug("Contributors: \n", "...")
 
-params <-
-  yaml::read_yaml(file = config_default_annotate, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
-params <-
-  yaml::read_yaml(file = config_params_annotate, handlers = list(
-    seq = function(x) {
-      purrr::flatten(x)
-    }
-  ))
-log_debug("checking command line arguments", "\n")
-if (exists("arguments")) {
-  if (!is.null(arguments$library)) {
-    params$file$library <- arguments$library
-  }
-  if (!is.null(arguments$annotation.file)) {
-    params$file$annotation$interim <- arguments$annotation.file
-  }
-  if (!is.null(arguments$features.file)) {
-    params$file$features$taxed <- arguments$features.file
-  }
-  if (!is.null(arguments$edges.file)) {
-    params$file$edges$interim <- arguments$edges.file
-  }
-  if (!is.null(arguments$directory)) {
-    params$file$annotation$directory <-
-      file.path(params$file$annotation$directory, arguments$directory)
-  } else {
-    params$file$annotation$directory <-
-      file.path(
-        params$file$annotation$directory,
-        format(Sys.time(), "%y%m%d_%H%M%OS")
-      )
-  }
-  if (!is.null(arguments$output)) {
-    params$file$annotation$weighted <- arguments$output
-  }
-  if (!is.null(arguments$mode.ms)) {
-    params$ms$mode <- arguments$mode.ms
-  }
-  if (!is.null(arguments$complement)) {
-    params$ms$annotate <- arguments$complement
-  }
-  if (!is.null(arguments$ppm.tol)) {
-    params$ms$tolerance$ppm <- as.numeric(arguments$ppm.tol)
-  }
-  if (!is.null(arguments$rt.tol)) {
-    params$rt$tolerance$min <- as.numeric(arguments$rt.tol)
-  }
-  if (!is.null(arguments$force)) {
-    params$force <- TRUE
-  }
-}
 stopifnot(
   "Your --ms.mode parameter (in command line arguments or in 'annotate_params.yaml' must be 'pos' or 'neg'" = params$ms$mode %in% c("pos", "neg")
 )
@@ -103,7 +48,7 @@ if (params$force == FALSE) {
       20
   )
   stopifnot(
-    "Your --rt.tolreance.ppm parameter (in command line arguments or in 'annotate_params.yaml' must be lower or equal to 0.1" = params$rt$tolerance$min <=
+    "Your --rt.tolreance.ppm parameter (in command line arguments or in 'annotate_params.yaml' must be lower or equal to 0.1" = params$rt$tolerance$rt <=
       0.1
   )
 }
@@ -112,48 +57,37 @@ if (params$force == FALSE) {
 #  adducts
 # )
 
-log_debug(x = "... functions")
-source(file = "R/biological_weighting.R")
-source(file = "R/chemical.R")
-source(file = "R/cleaning.R")
-source(file = "R//decoration.R")
-source(file = "R/dist_groups.R")
-source(file = "R/features.R")
-source(file = "R/ms1.R")
-
 log_debug(x = "... files ...")
 log_debug(x = "... metadata_table_spectral_annotation")
-metadata_table_spectral_annotation <- data.table::fread(
-  file = params$file$annotation$interim,
-  sep = "\t",
-  colClasses = "character"
-) |>
+metadata_table_spectral_annotation <-
+  readr::read_delim(
+    file = params$annotation,
+    col_types = "c"
+  ) |>
   dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
-taxed_features_table <- data.table::fread(
-  file = params$file$features$taxed,
-  sep = "\t",
-  colClasses = "character"
+taxed_features_table <- readr::read_delim(
+  file = params$taxa,
+  col_types = "c"
 ) |>
-  dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
+  dplyr::mutate_if(is.logical, as.character)
 
 taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
 log_debug(x = "... edges table")
-edges_table <- data.table::fread(
-  file = params$file$edges$interim,
-  sep = "\t"
-)
+edges_table <- readr::read_delim(file = params$edges)
 
 log_debug(x = "... structure-organism pairs table")
 structure_organism_pairs_table <-
-  data.table::fread(
-    file = params$file$library,
-    colClasses = "character"
+  readr::read_delim(
+    file = params$library,
+    col_types = "c"
   ) |>
   dplyr::filter(!is.na(structure_exact_mass)) |>
-  dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric))
+  dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
+  dplyr::mutate_if(is.logical, as.character)
 
 structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
   "notClassified"
@@ -175,58 +109,47 @@ structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
 if (params$ms$annotate == TRUE) {
   log_debug("... single charge adducts table")
   if (params$ms$mode == "pos") {
-    adduct_file <- data_interim_adducts_pos
+    adduct_file <- paths$data$interim$adducts$pos
   }
   if (params$ms$mode == "neg") {
-    adduct_file <- data_interim_adducts_neg
+    adduct_file <- paths$data$interim$adducts$neg
   }
 
-  adductsTable <- data.table::fread(
-    file = adduct_file,
-    sep = "\t"
-  )
+  adductsTable <- readr::read_delim(file = adduct_file)
 
   log_debug("... adducts masses for in source dimers and multicharged")
   adductsMassTable <-
-    data.table::fread(
-      file = data_source_adducts_file,
-      sep = "\t"
-    )
+    readr::read_delim(file = paths$data$source$adducts)
 
   log_debug("... neutral lossses")
   neutral_losses_table <-
-    data.table::fread(
-      file = data_source_neutral_losses_file,
-      sep = "\t"
-    )
+    readr::read_delim(file = paths$data$source$neutral_losses)
 
   adductsM <- adductsMassTable$mass
   names(adductsM) <- adductsMassTable$adduct
 
   if (params$ms$mode == "pos") {
-    adduct_db_file <- data_interim_adducts_db_pos
+    adduct_db_file <-
+      file.path(
+        paths$data$interim$adducts$path,
+        paste0(params$name_adducts, "_pos.tsv.gz")
+      )
   }
   if (params$ms$mode == "neg") {
-    adduct_db_file <- data_interim_adducts_db_neg
+    adduct_db_file <-
+      file.path(
+        paths$data$interim$adducts$path,
+        paste0(params$name_adducts, "_neg.tsv.gz")
+      )
   }
 
   log_debug(x = "... exact masses for MS1 annotation")
   structure_exact_mass_table <-
-    data.table::fread(
-      file = adduct_db_file,
-      sep = "\t"
-    ) |>
+    readr::read_delim(file = adduct_db_file) |>
     dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
   log_debug(x = "performing MS1 annotation")
-  annotation_table_ms1 <-
-    ms1_annotation(
-      annotationTable = metadata_table_spectral_annotation,
-      structureExactMassTable = structure_exact_mass_table,
-      structureOrganismPairsTable = structure_organism_pairs_table,
-      adducts = unlist(params$ms$adducts[[params$ms$mode]]),
-      neutralLosses = neutral_losses_table
-    )
+  annotation_table_ms1 <- ms1_annotation()
 
   ms1_decoration()
 }
@@ -250,61 +173,59 @@ annotation_table_ms1_taxed <-
   )
 
 log_debug(x = "performing taxonomically informed scoring")
-annotation_table_weighted_bio <-
-  biological_weighting(
-    annotationTable = annotation_table_ms1_taxed,
-    structureOrganismPairsTable = structure_organism_pairs_table
-  )
+annotation_table_weighted_bio <- biological_weighting()
 
 taxo_decoration()
 
 log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-annotation_table_weighted_bio_cleaned <-
-  biological_cleaning(
-    annotationTableWeightedBio = annotation_table_weighted_bio,
-    structureOrganismPairsTable = structure_organism_pairs_table,
-    edgesTable = edges_table
-  )
+annotation_table_weighted_bio_cleaned <- biological_cleaning()
 
 log_debug(x = "performing chemically informed scoring")
-annotation_table_weighted_chemo <-
-  chemical_weighting(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned)
+annotation_table_weighted_chemo <- chemical_weighting()
 
 chemical_decoration()
 
 log_debug(x = "cleaning for cytoscape export")
-results2cytoscape <-
-  chemical_cleaning(
-    annotationTableWeightedChemo = annotation_table_weighted_chemo,
-    structureOrganismPairsTable = structure_organism_pairs_table
-  )
+results2cytoscape <- chemical_cleaning()
 
 log_debug(x = "exporting results and parameters used ...")
 log_debug("ensuring directories exist ...")
 ifelse(
-  test = !dir.exists(data_processed),
-  yes = dir.create(data_processed),
-  no = paste(data_processed, "exists")
-)
-ifelse(
-  test = !dir.exists(params$file$annotation$directory),
-  yes = dir.create(params$file$annotation$directory),
-  no = paste(params$file$annotation$directory, "exists")
-)
-log_debug(x = "... results are saved in", crayon::green(params$file$annotation$directory))
-data.table::fwrite(
-  x = results2cytoscape,
-  file = file.path(
-    params$file$annotation$directory,
-    params$file$annotation$weighted
-  ),
-  sep = "\t"
+  test = !dir.exists(paths$data$processed$path),
+  yes = dir.create(paths$data$processed$path),
+  no = paste(paths$data$processed$path, "exists")
 )
 
-log_debug(x = "... parameters used are saved in", crayon::green(params$file$annotation$directory))
+time <- format(Sys.time(), "%y%m%d_%H%M%OS")
+dir_time <- file.path(paths$data$processed$path, time)
+
+ifelse(
+  test = !dir.exists(dir_time),
+  yes = dir.create(dir_time),
+  no = paste(
+    dir_time,
+    "exists"
+  )
+)
+log_debug(
+  x = "... results are saved in",
+  crayon::green(dir_time)
+)
+readr::write_delim(
+  x = results2cytoscape,
+  file = file.path(
+    dir_time,
+    params$output
+  )
+)
+
+log_debug(x = "... parameters used are saved in", crayon::green(dir_time))
 yaml::write_yaml(
   x = params,
-  file = file.path(params$file$annotation$directory, "annotate_params.yaml")
+  file = file.path(
+    dir_time,
+    "process_annotations.yaml"
+  )
 )
 
 end <- Sys.time()

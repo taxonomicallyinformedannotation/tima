@@ -55,9 +55,10 @@ ms1_annotation <-
     df4 <- df3 %>%
       mutate(across(rt, as.numeric)) %>%
       mutate(
-        rt_min = as.numeric(rt - params$rt$tolerance$min),
-        rt_max = as.numeric(rt + params$rt$tolerance$min)
+        rt_min = as.numeric(rt - params$ms$tolerance$rt),
+        rt_max = as.numeric(rt + params$ms$tolerance$rt)
       )
+
     cat("... on the other side (without tolerance) \n")
     df5 <- df3 %>%
       mutate(across(rt, as.numeric)) %>%
@@ -96,8 +97,7 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) -
-              !!as.name(paste("mz", "dest", sep = "_"))
+                mz) - !!as.name(paste("mz", "dest", sep = "_"))
           ),
           no = abs(
             mz + (0.000001 *
@@ -116,8 +116,7 @@ ms1_annotation <-
             mz -
               (0.000001 *
                 params$ms$tolerance$ppm *
-                mz) -
-              !!as.name(paste("mz", "dest", sep = "_"))
+                mz) - !!as.name(paste("mz", "dest", sep = "_"))
           )
         )
       )
@@ -411,8 +410,8 @@ ms1_annotation <-
       mutate(
         mz_min = value - (0.000001 * params$ms$tolerance$ppm * value),
         mz_max = value + (0.000001 * params$ms$tolerance$ppm * value),
-        rt_min = rt - params$rt$tolerance$min,
-        rt_max = rt + params$rt$tolerance$min
+        rt_min = rt - params$ms$tolerance$rt,
+        rt_max = rt + params$ms$tolerance$rt
       ) %>%
       data.table()
 
@@ -519,7 +518,7 @@ ms1_annotation <-
       group_by(feature_id) %>%
       mutate(rank_initial = dense_rank(desc(score_input))) %>%
       ungroup() %>%
-      filter(rank_initial <= params$top_k$candidates$initial) %>%
+      filter(rank_initial <= params$top_k$initial) %>%
       distinct(
         feature_id,
         component_id,
@@ -546,6 +545,7 @@ ms1_annotation <-
 
     cat("adding \"notAnnotated\" \n")
     df26 <- left_join(df25, df24) %>%
+      distinct() |> 
       mutate(across(mz, as.numeric)) |>
       data.frame()
 
@@ -558,7 +558,7 @@ ms1_annotation <-
     df26["mz_error"][is.na(df26["mz_error"])] <-
       666
     df26["rank_initial"][is.na(df26["rank_initial"])] <-
-      params$top_k$candidates$initial
+      params$top_k$initial
 
     df27 <- dplyr::left_join(
       df26,
@@ -605,7 +605,7 @@ non_ms1_annotation <-
       group_by(feature_id) %>%
       mutate(rank_initial = dense_rank(desc(score_input))) %>%
       ungroup() %>%
-      filter(rank_initial <= params$top_k$candidates$initial) %>%
+      filter(rank_initial <= params$top_k$initial) %>%
       select(
         -rt,
         -mz
@@ -624,11 +624,8 @@ non_ms1_annotation <-
       )
 
     cat("adding \"notAnnotated\" \n")
-    df18 <- left_join(df17, df16 |>
-      mutate(across(
-        component_id,
-        as.character
-      ))) %>%
+    df18 <- left_join(df17, df16) |>
+      distinct() |> 
       mutate(across(mz_error, as.numeric)) |>
       data.frame()
 
@@ -641,101 +638,7 @@ non_ms1_annotation <-
     df18["mz_error"][is.na(df18["mz_error"])] <-
       666
     df18["rank_initial"][is.na(df18["rank_initial"])] <-
-      params$top_k$candidates$initial
-
-    df19 <- dplyr::left_join(
-      df18,
-      structure_organism_pairs_table |> distinct(
-        inchikey_2D = structure_inchikey_2D,
-        smiles_2D = structure_smiles_2D,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class
-      )
-    )
-
-    return(df19)
-  }
-
-###############################################################################
-
-#' Title
-#'
-#' @param annotationTable
-#'
-#' @return
-#' @export
-#'
-#' @examples
-non_ms1_annotation_old <-
-  function(annotationTable = metadata_table_spectral_annotation) {
-    cat("formatting \n")
-    df15 <- annotationTable %>%
-      cSplit(inchikey_colname, sep = "|", fixed = TRUE) %>%
-      cSplit(score_input_colname, sep = "|", fixed = TRUE) %>%
-      cSplit(library_name_colname, sep = "|", fixed = TRUE) %>%
-      cSplit(mz_error_colname, sep = "|", fixed = TRUE) %>%
-      group_by(feature_id) %>%
-      pivot_longer(
-        cols = (sum(
-          colnames(.) %in% c(
-            feature_id_colname,
-            component_id_colname,
-            biological_source_colname,
-            retention_time_colname,
-            parent_mass_colname
-          )
-        )[1] + 1):ncol(.),
-        names_to = c(".value", "level"),
-        names_sep = "_[[:digit:]]+$",
-        values_to = "taxonomy",
-        values_drop_na = TRUE
-      ) %>%
-      ungroup() %>%
-      mutate(across(where(is.factor), as.character)) %>%
-      mutate(across(where(is.logical), as.character)) %>%
-      select(-level)
-
-    cat("ranking \n")
-    df16 <- df15 %>%
-      group_by(feature_id) %>%
-      mutate(rank_initial = dense_rank(desc(!!as.name(
-        score_input_colname
-      )))) %>%
-      ungroup() %>%
-      filter(rank_initial <= params$top_k$candidates$initial) %>%
-      select(
-        -all_of(retention_time_colname),
-        -all_of(parent_mass_colname)
-      )
-
-    if (!any(names(annotationTable) == retention_time_colname)) {
-      annotationTable[, retention_time_colname] <- 0
-    }
-
-    df17 <- annotationTable %>%
-      select(
-        all_of(feature_id_colname),
-        all_of(component_id_colname),
-        all_of(retention_time_colname),
-        all_of(parent_mass_colname)
-      )
-
-    cat("adding \"notAnnotated\" \n")
-    df18 <- left_join(df17, df16) %>%
-      mutate(across(all_of(mz_error_colname), as.numeric)) |>
-      data.frame()
-
-    df18[inchikey_colname][is.na(df18[inchikey_colname])] <-
-      "notAnnotated"
-    df18[score_input_colname][is.na(df18[score_input_colname])] <-
-      0
-    df18[library_name_colname][is.na(df18[library_name_colname])] <-
-      "N/A"
-    df18[mz_error_colname][is.na(df18[mz_error_colname])] <-
-      666
-    df18["rank_initial"][is.na(df18["rank_initial"])] <-
-      params$top_k$candidates$initial
+      params$top_k$initial
 
     df19 <- dplyr::left_join(
       df18,

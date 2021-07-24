@@ -33,8 +33,7 @@ lotus <-
   ) |>
   dplyr::distinct()
 
-table <- readr::read_delim(file = params$input) |>
-  dplyr::filter(!is.na(inchikey_2D))
+table <- readr::read_delim(file = params$input)
 
 table_missing_classification <- table |>
   dplyr::filter(
@@ -76,20 +75,16 @@ table_massed_lotus <-
   dplyr::left_join(
     table_missing_mass,
     lotus |>
-      dplyr::distinct(
-        inchikey_2D, smiles_2D,
-        structure_exact_mass
-      )
+      dplyr::distinct(inchikey_2D, smiles_2D,
+                      structure_exact_mass)
   )
 
 table_formuled_lotus <-
   dplyr::left_join(
     table_missing_formula,
     lotus |>
-      dplyr::distinct(
-        inchikey_2D, smiles_2D,
-        molecular_formula
-      )
+      dplyr::distinct(inchikey_2D, smiles_2D,
+                      molecular_formula)
   )
 
 table_classified_lotus_missing <- table_classified_lotus |>
@@ -122,7 +117,14 @@ table_with_formula_lotus <-
 
 table_classified <-
   rbind(
-    table_with_classification,
+    table_with_classification |>
+      dplyr::distinct(
+        inchikey_2D,
+        smiles_2D,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class
+      ),
     table_classified_lotus,
     table_classified_lotus_missing,
     fill = TRUE
@@ -136,37 +138,44 @@ table_classified <-
   )
 
 table_massed <-
-  rbind(table_with_mass,
+  rbind(
+    table_with_mass |> dplyr::distinct(inchikey_2D,
+                                       smiles_2D,
+                                       structure_exact_mass),
     table_massed_lotus,
     table_massed_lotus_missing,
     fill = TRUE
   ) |>
-  dplyr::distinct(
-    inchikey_2D,
-    smiles_2D,
-    structure_exact_mass
-  )
+  dplyr::distinct(inchikey_2D,
+                  smiles_2D,
+                  structure_exact_mass)
 
 table_formuled <-
-  rbind(table_with_formula,
+  rbind(
+    table_with_formula |>
+      dplyr::distinct(inchikey_2D,
+                      smiles_2D,
+                      molecular_formula),
     table_formuled_lotus,
     table_formuled_lotus_missing,
     fill = TRUE
   ) |>
-  dplyr::distinct(
-    inchikey_2D,
-    smiles_2D,
-    molecular_formula
-  )
+  dplyr::distinct(inchikey_2D,
+                  smiles_2D,
+                  molecular_formula)
 
 table_final <- dplyr::left_join(
   table |>
     dplyr::distinct(
       feature_id,
+      component_id,
+      mz,
+      rt,
       inchikey_2D,
       smiles_2D,
       score_input,
-      library
+      library,
+      mz_error
     ),
   table_classified
 ) |>
@@ -174,12 +183,10 @@ table_final <- dplyr::left_join(
   dplyr::left_join(table_massed)
 
 table_final[] <-
-  lapply(
-    table_final,
-    function(x) {
-      y_as_na(x, y = "")
-    }
-  )
+  lapply(table_final,
+         function(x) {
+           y_as_na(x, y = "")
+         })
 
 if (params$quickmode == FALSE) {
   ## add GNPS query steps for formula, exact mass, and classification
@@ -204,28 +211,22 @@ ifelse(
   no = paste(paths$data$interim$config$path, "exists")
 )
 
-log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
-  params$output
-)
+log_debug(x = "... metadata_table_spectral_annotation is saved in",
+          params$output)
 
-readr::write_delim(
-  x = table_final,
-  file = params$output
-)
+readr::write_delim(x = table_final,
+                   file = params$output)
 
 log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_features_classification.yaml",
-      sep = "_"
-    )
-  )
-)
+yaml::write_yaml(x = params,
+                 file = file.path(
+                   paths$data$interim$config$path,
+                   paste(
+                     format(Sys.time(), "%y%m%d_%H%M%OS"),
+                     "prepare_features_classification.yaml",
+                     sep = "_"
+                   )
+                 ))
 
 end <- Sys.time()
 
