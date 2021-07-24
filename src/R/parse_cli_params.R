@@ -8,23 +8,32 @@ parse_cli_params <- function() {
   log_debug("checking command line arguments")
 
   if (exists("arguments")) {
-    if (!is.null(arguments$filter)) {
-      params$filter$mode <- arguments$filter
+    if (!is.null(arguments$components)) {
+      params$components <- arguments$components
     }
     if (!is.null(arguments$gnps)) {
-      params$job$gnps <- arguments$gnps
+      params$gnps <- arguments$gnps
     }
     if (!is.null(arguments$input)) {
-      params$file$input <- arguments$input
+      params$input <- arguments$input
     }
     if (!is.null(arguments$level)) {
-      params$filter$level <- arguments$level
+      params$level <- arguments$level
+    }
+    if (!is.null(arguments$filter)) {
+      params$mode <- arguments$filter
+    }
+    if (!is.null(arguments$mode)) {
+      params$mode <- arguments$mode
     }
     if (!is.null(arguments$nap)) {
-      params$job$nap <- arguments$nap
+      params$nap <- arguments$nap
     }
     if (!is.null(arguments$output)) {
-      params$file$output <- arguments$output
+      params$output <- arguments$output
+    }
+    if (!is.null(arguments$quickmode)) {
+      params$quickmode <- arguments$quickmode
     }
     if (!is.null(arguments$source)) {
       params$source_name <-
