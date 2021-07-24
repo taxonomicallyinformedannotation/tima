@@ -17,8 +17,9 @@ cd src &&
 ## (spectral-lib-matcher, which is only in python. see related repo)
 Rscript prepare_gnps.R && ## optional
 Rscript prepare_isdb.R &&
-## features to do
-Rscript prepare_edges.R
+Rscript prepare_features_components.R &&
+Rscript prepare_features_classification.R &&
+Rscript prepare_edges.R 
 
 ## rest to come
 ```
