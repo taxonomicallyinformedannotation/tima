@@ -14,7 +14,6 @@ library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
-# library(splitstackshape)
 library(yaml)
 
 paths <- parse_yaml_paths()

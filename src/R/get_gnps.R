@@ -1,6 +1,6 @@
 ##########################   Functions - features   ###########################
 
-require(RCurl)
+# require(RCurl)
 require(readr)
 
 # download_featuretable <- function(id, path = "feature_table.csv") {
@@ -29,23 +29,23 @@ require(readr)
 
 ###############################################################################
 
-#' Title
-#'
-#' @param file
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-download_file <- function(file, path = "NULL") {
-  if (is.null(path)) {
-    error("Must enter a path")
-  }
-  f <- RCurl::CFILE(path, mode = "wb")
-  RCurl::curlPerform(url = file, writedata = f@ref)
-  close(f)
-}
+#' #' Title
+#' #'
+#' #' @param file
+#' #' @param path
+#' #'
+#' #' @return
+#' #' @export
+#' #'
+#' #' @examples
+#' download_file <- function(file, path = "NULL") {
+#'   if (is.null(path)) {
+#'     error("Must enter a path")
+#'   }
+#'   f <- RCurl::CFILE(path, mode = "wb")
+#'   RCurl::curlPerform(url = file, writedata = f@ref)
+#'   close(f)
+#' }
 
 ###############################################################################
 

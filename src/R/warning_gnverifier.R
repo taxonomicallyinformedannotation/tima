@@ -1,3 +1,13 @@
+require(dplyr)
+
+#' Title
+#'
+#' @param dataframe 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 warning_gnverifier <- function(dataframe) {
   warning <- dataOrganismVerified |>
     dplyr::filter(!is.na(organism)) |>
