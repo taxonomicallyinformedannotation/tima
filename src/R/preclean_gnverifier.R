@@ -16,12 +16,8 @@ preclean_gnverifier <- function(file) {
       -matchType
     ) |>
     tidyr::unnest(preferredResults, names_repair = "minimal") |>
-    dplyr::filter(dataSourceTitleShort != "IRMNG (old)" &
-      dataSourceTitleShort != "IPNI") |>
-    # filter(!matchedName %in% wrongVerifiedDictionary$wrongOrganismsVerified) |>
-    dplyr::mutate(organismType = "clean") %>%
+    dplyr::filter(dataSourceTitleShort == "Open Tree of Life") |>
     dplyr::select(
-      organismType,
       organismValue = input,
       organismCleaned = currentCanonicalFull,
       organismDbTaxo = dataSourceTitleShort,
@@ -30,10 +26,6 @@ preclean_gnverifier <- function(file) {
       taxonomy = classificationPath,
       rank = classificationRanks
     )
-
-  ## example ID 165 empty, maybe fill later on
-  verified_df$organismDbTaxo <-
-    y_as_na(verified_df$organismDbTaxo, "")
 
   dataOrganismVerified <- dplyr::left_join(organism_table,
     verified_df,
