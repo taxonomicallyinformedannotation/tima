@@ -23,7 +23,7 @@ paths <- parse_yaml_paths()
 params <- get_params(step = "prepare_taxa")
 
 stopifnot(
-  "Your --tool.metadata parameter (in command line arguments or in 'inform_params.yaml' must be either'gnps' or 'manual'" = params$tool %in% c("gnps", "manual")
+  "Your --tool.metadata parameter (in command line arguments or in 'inform_params.yaml' must be either 'gnps' or 'manual'" = params$tool %in% c("gnps", "manual")
 )
 stopifnot(
   "Your --top_k.organism_per_feature parameter (in command line arguments or in 'inform_params.yaml' should be lower or equal to 5" = params$top_k <=
