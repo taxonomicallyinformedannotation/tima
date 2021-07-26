@@ -41,6 +41,15 @@ if (params$tool == "gnps") {
   log_debug(x = "loading metadata table")
   metadata_table <- read_metadata(id = params$gnps)
 
+  log_debug(x = "removing unneceessary columns")
+  log_debug(x = "WARNING: Needs the pattern 'Peak area'")
+  feature_table <- feature_table %>%
+    dplyr::select(
+      `row ID`,
+      matches(" Peak area")
+    ) |>
+    tibble::column_to_rownames(var = "row ID")
+  
   log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-
     gsub(
@@ -48,14 +57,6 @@ if (params$tool == "gnps") {
       replacement = "",
       x = colnames(feature_table)
     )
-
-  log_debug(x = "removing \"row m/z\" and from \"row retention time\" columns")
-  feature_table <- feature_table %>%
-    dplyr::select(
-      -"row m/z",
-      -"row retention time"
-    ) |>
-    tibble::column_to_rownames(var = "row ID")
 
   log_debug(x = "finding top N intensities per feature")
   top_n <- feature_table |>
