@@ -70,7 +70,7 @@ require(readr)
 #' @export
 #'
 #' @examples
-read_featuretable <- function(id) {
+read_features <- function(id) {
   file <-
     paste0(
       "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
@@ -90,7 +90,7 @@ read_featuretable <- function(id) {
 #' @export
 #'
 #' @examples
-read_metadatatable <-
+read_metadata <-
   function(id) {
     file <-
       paste0(
@@ -111,7 +111,7 @@ read_metadatatable <-
 #' @export
 #'
 #' @examples
-read_library_hits <- function(id) {
+read_results <- function(id) {
   file <-
     paste0(
       "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
@@ -133,7 +133,7 @@ read_library_hits <- function(id) {
 #' @export
 #'
 #' @examples
-read_clusterinfo <- function(id) {
+read_clusters <- function(id) {
   file <-
     paste0(
       "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",

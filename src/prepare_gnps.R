@@ -25,7 +25,7 @@ log_debug("loading files ...")
 ## starting it now
 ## will finish later on, when decided if some values will be directly available in GNPS output
 ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-table <- read_library_hits(id = params$gnps) |>
+table <- read_results(id = params$gnps) |>
   select(
     feature_id = `#Scan#`,
     smiles = Smiles,

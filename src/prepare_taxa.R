@@ -36,10 +36,10 @@ taxa_ranks_dictionary <-
 
 if (params$tool == "gnps") {
   log_debug(x = "loading feature table")
-  feature_table <- read_featuretable(id = params$gnps)
+  feature_table <- read_features(id = params$gnps)
 
   log_debug(x = "loading metadata table")
-  metadata_table <- read_metadatatable(id = params$gnps)
+  metadata_table <- read_metadata(id = params$gnps)
 
   log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-

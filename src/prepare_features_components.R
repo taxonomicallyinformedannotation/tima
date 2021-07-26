@@ -27,7 +27,7 @@ log_debug(x = "... cluster table")
 log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
 ## THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC
 components <-
-  read_clusterinfo(id = params$gnps) |>
+  read_clusters(id = params$gnps) |>
   dplyr::select(
     feature_id = `cluster index`,
     component_id = componentindex,
