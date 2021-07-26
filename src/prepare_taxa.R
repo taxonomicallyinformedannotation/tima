@@ -62,11 +62,7 @@ if (params$tool == "gnps") {
   top_n <- feature_table |>
     tibble::rownames_to_column() |>
     tidyr::gather(column, value, -rowname) |>
-    dplyr::mutate(column = gsub(
-      pattern = "^X",
-      replacement = "",
-      x = column
-    )) |>
+    dplyr::filter(value != 0) |> 
     dplyr::group_by(rowname) |>
     dplyr::mutate(rank = rank(-value)) |>
     dplyr::filter(rank <= params$top_k) |>
