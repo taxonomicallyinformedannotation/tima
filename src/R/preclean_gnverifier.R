@@ -16,7 +16,6 @@ preclean_gnverifier <- function(file) {
       -matchType
     ) |>
     tidyr::unnest(preferredResults, names_repair = "minimal") |>
-    dplyr::filter(dataSourceTitleShort == "Open Tree of Life") |>
     dplyr::select(
       organismValue = input,
       organismCleaned = currentCanonicalFull,

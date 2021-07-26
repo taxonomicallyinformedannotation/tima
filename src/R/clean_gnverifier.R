@@ -1,5 +1,4 @@
 source(file = "R/preclean_gnverifier.R")
-source(file = "R/warning_gnverifier.R")
 
 #' Title
 #'
@@ -11,7 +10,23 @@ clean_gnverifier <- function() {
   dataOrganismVerified <<-
     preclean_gnverifier(file = paths$data$interim$taxa$verified)
 
-  warning <- warning_gnverifier(dataframe = dataOrganismVerified)
+  warning <- dataOrganismVerified |>
+    dplyr::filter(!is.na(organism)) |>
+    dplyr::mutate(
+      organismCleaned = ifelse(
+        test = organismDbTaxo == "Open Tree of Life",
+        yes = organismCleaned,
+        no = NA
+      )
+    ) |>
+    dplyr::distinct(organism, organismCleaned) |>
+    dplyr::group_by(organism) |>
+    dplyr::add_count() |>
+    dplyr::ungroup() |>
+    dplyr::filter(n == 1) |>
+    dplyr::select(-n) |>
+    dplyr::filter(is.na(organismCleaned))
+
   if (nrow(warning) != 0) {
     log_debug(
       "Warning:",
@@ -21,46 +36,54 @@ clean_gnverifier <- function() {
     )
 
     organism_table_2 <- dataOrganismVerified |>
-      dplyr::distinct(organism, organismCleaned)
-
-    organism_table_3 <- organism_table_2 |>
+      dplyr::distinct(organism, organismCleaned) |>
+      filter(organism != organismCleaned) |>
       dplyr::distinct(organismCleaned)
 
-    readr::write_delim(
-      x = organism_table_3,
-      file = paths$data$interim$taxa$original_2,
-      quote = "none"
-    )
-
-    log_debug("submitting to GNVerifier")
-    system(command = paste("bash", paths$src$gnverifier_2))
-
-    log_debug("cleaning GNVerifier results")
-    dataOrganismVerified_2 <<-
-      preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
-
-    dataOrganismVerified_3 <-
-      rbind(dataOrganismVerified, dataOrganismVerified_2) |>
-      dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
-      dplyr::distinct()
-
-    warning_2 <-
-      dplyr::left_join(organism_table, dataOrganismVerified_3) %>%
-      dplyr::filter(!is.na(organism)) %>%
-      dplyr::filter(is.na(organismDbTaxo))
-
-    if (nrow(warning_2) != 0) {
-      log_debug(
-        "Warning:",
-        warning_2$organism,
-        "had no translation,check for names at",
-        "https://tree.opentreeoflife.org/"
+    if (nrow(organism_table_2) != 0) {
+      readr::write_delim(
+        x = organism_table_2,
+        file = paths$data$interim$taxa$original_2,
+        quote = "none"
       )
+
+      log_debug("submitting to GNVerifier")
+      system(command = paste("bash", paths$src$gnverifier_2))
+
+      log_debug("cleaning GNVerifier results")
+      dataOrganismVerified_2 <<-
+        preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
+
+      dataOrganismVerified_3 <-
+        rbind(dataOrganismVerified, dataOrganismVerified_2) |>
+        dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
+        dplyr::distinct()
+
+      warning_2 <-
+        dplyr::left_join(organism_table, dataOrganismVerified_3) %>%
+        dplyr::filter(!is.na(organism)) %>%
+        dplyr::filter(is.na(organismDbTaxo))
+
+      if (nrow(warning_2) != 0) {
+        log_debug(
+          "Warning:",
+          warning_2$organism,
+          "had no translation,check for names at",
+          "https://tree.opentreeoflife.org/"
+        )
+      } else {
+        log_debug("Good news, all your organisms were found!")
+      }
     } else {
-      log_debug("Good news, all your organisms were found!")
+      dataOrganismVerified_3 <- dataOrganismVerified |>
+        dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
+        dplyr::distinct()
+      log_debug("We will not find more!")
     }
   } else {
-    dataOrganismVerified_3 <- dataOrganismVerified
+    dataOrganismVerified_3 <- dataOrganismVerified |>
+      dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
+      dplyr::distinct()
     log_debug("Good news, all your organisms were found!")
   }
   return(dataOrganismVerified_3)
