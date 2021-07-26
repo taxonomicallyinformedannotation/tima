@@ -2,7 +2,7 @@ require(dplyr)
 
 #' Title
 #'
-#' @param dataframe 
+#' @param dataframe
 #'
 #' @return
 #' @export

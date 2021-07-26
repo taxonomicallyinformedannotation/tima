@@ -41,11 +41,11 @@ biological_weighting <-
       ) %>%
       mutate(across(score_input, as.numeric)) %>%
       mutate(score_initialNormalized = score_input)
-      ## better not
-      # mutate(score_initialNormalized = (score_input -
-      #   min(score_input)) /
-      #   (max(score_input) -
-      #     min(score_input)))
+    ## better not
+    # mutate(score_initialNormalized = (score_input -
+    #   min(score_input)) /
+    #   (max(score_input) -
+    #     min(score_input)))
 
     sample_domain <- annotationTable %>%
       distinct(

@@ -49,7 +49,7 @@ if (params$tool == "gnps") {
       matches(" Peak area")
     ) |>
     tibble::column_to_rownames(var = "row ID")
-  
+
   log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-
     gsub(
@@ -62,7 +62,7 @@ if (params$tool == "gnps") {
   top_n <- feature_table |>
     tibble::rownames_to_column() |>
     tidyr::gather(column, value, -rowname) |>
-    dplyr::filter(value != 0) |> 
+    dplyr::filter(value != 0) |>
     dplyr::group_by(rowname) |>
     dplyr::mutate(rank = rank(-value)) |>
     dplyr::filter(rank <= params$top_k) |>
