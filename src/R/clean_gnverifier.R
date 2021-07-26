@@ -36,7 +36,7 @@ clean_gnverifier <- function() {
     system(command = paste("bash", paths$src$gnverifier_2))
 
     log_debug("cleaning GNVerifier results")
-    dataOrganismVerified_2 <-
+    dataOrganismVerified_2 <<-
       preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
 
     dataOrganismVerified_3 <-
