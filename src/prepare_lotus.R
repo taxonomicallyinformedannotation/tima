@@ -9,6 +9,7 @@ log_debug(
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(readr)
 
@@ -50,12 +51,13 @@ lotus_prepared <- lotus |>
   ) |>
   dplyr::distinct()
 
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$interim$path),
   yes = dir.create(paths$data$interim$path),
   no = paste(paths$data$interim$path, "exists")
 )
+
 readr::write_delim(
   x = lotus_prepared,
   file = paths$data$interim$libraries$lotus

@@ -1,3 +1,4 @@
+source(file = "R/export_params.R")
 source(file = "R/get_params.R")
 source(file = "R/log_debug.R")
 source(file = "R/parse_cli_params.R")

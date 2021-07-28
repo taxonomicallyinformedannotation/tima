@@ -6,18 +6,19 @@ log_debug("This script prepares features metadata (chemical classes)")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_features_classification"
 paths <- parse_yaml_paths()
+params <- get_params(step = step)
 
-params <- get_params(step = "prepare_features_classification")
-
-log_debug(x = "loading files")
-
+log_debug(x = "Loading files ...")
+log_debug(x = "... library")
 lotus <-
   readr::read_delim(
     file = params$library,
@@ -33,8 +34,11 @@ lotus <-
   ) |>
   dplyr::distinct()
 
+log_debug(x = "... features table")
 table <- readr::read_delim(file = params$input)
 
+log_debug(x = "filtering structures ...")
+log_debug(x = "... missing classification")
 table_missing_classification <- table |>
   dplyr::filter(
     is.na(structure_taxonomy_npclassifier_01pathway) &
@@ -43,14 +47,17 @@ table_missing_classification <- table |>
   ) |>
   dplyr::distinct(inchikey_2D, smiles_2D)
 
+log_debug(x = "... missing masses")
 table_missing_mass <- table |>
   dplyr::filter(is.na(structure_exact_mass)) |>
   dplyr::distinct(inchikey_2D, smiles_2D)
 
+log_debug(x = "... missing formulas")
 table_missing_formula <- table |>
   dplyr::filter(is.na(molecular_formula)) |>
   dplyr::distinct(inchikey_2D, smiles_2D)
 
+log_debug(x = "... keeping the other ones safe")
 table_with_classification <-
   dplyr::anti_join(table, table_missing_classification)
 
@@ -58,6 +65,7 @@ table_with_mass <- dplyr::anti_join(table, table_missing_mass)
 
 table_with_formula <- dplyr::anti_join(table, table_missing_formula)
 
+log_debug(x = "Completing the structures with the library")
 table_classified_lotus <-
   dplyr::left_join(
     table_missing_classification,
@@ -91,6 +99,7 @@ table_formuled_lotus <-
       )
   )
 
+log_debug(x = "Filtering structures again (to calculate this time) ...")
 table_classified_lotus_missing <- table_classified_lotus |>
   dplyr::filter(
     is.na(structure_taxonomy_npclassifier_01pathway) &
@@ -119,6 +128,14 @@ table_with_mass_lotus <-
 table_with_formula_lotus <-
   dplyr::anti_join(table_formuled_lotus, table_formuled_lotus_missing)
 
+## TODO CALCULATION STEPS
+log_debug(x = "Calculation is not performed yet (TODO) ...")
+if (params$quickmode == FALSE) {
+  ## add GNPS query steps for formula, exact mass, and classification
+  ## I'll do it later on
+}
+
+log_debug(x = "Recombining everything back together")
 table_classified <-
   rbind(
     table_with_classification |>
@@ -202,13 +219,7 @@ table_final[] <-
     }
   )
 
-if (params$quickmode == FALSE) {
-  ## add GNPS query steps for formula, exact mass, and classification
-  ## I'll do it later on
-}
-
-log_debug(x = "exporting metadata_table_spectral_annotation and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$interim$path),
   yes = dir.create(paths$data$interim$path),
@@ -226,26 +237,18 @@ ifelse(
 )
 
 log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
+  x = "... path to export is",
   params$output
 )
-
 readr::write_delim(
   x = table_final,
   file = params$output
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_features_classification.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

@@ -3,27 +3,26 @@ start <- Sys.time()
 source(file = "R/helpers.R")
 source(file = "R/get_gnps.R")
 
-
 log_debug("This script takes a list of edges and formats it for later on")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_edges"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "prepare_edges")
+params <- get_params(step = step)
 
 stopifnot(
   "Your --tool parameter (in command line arguments or in 'treat_params.yaml' must be 'manual' or 'gnps" = params$tool %in% c("gnps", "manual")
 )
 
-log_debug(x = "loading files")
-
+log_debug(x = "Loading edge table")
 if (params$tool == "gnps") {
   edges_table <- read_edges(params$gnps)
 }
@@ -33,6 +32,7 @@ if (params$tool == "manual") {
     readr::read_delim(file = params$input)
 }
 
+log_debug(x = "Selecting needed columns")
 edges_table_treated <- edges_table |>
   dplyr::select(
     feature_source = params$source_name,
@@ -40,8 +40,7 @@ edges_table_treated <- edges_table |>
   ) |>
   dplyr::filter(feature_source != feature_target)
 
-log_debug(x = "exporting formatted edge table ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$path),
   yes = dir.create(paths$data$path),
@@ -64,26 +63,18 @@ ifelse(
 )
 
 log_debug(
-  x = "... formatted edge table is saved in",
+  x = "... path to export is",
   params$output
 )
-
 readr::write_delim(
   x = edges_table_treated,
   file = params$output
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_edges.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

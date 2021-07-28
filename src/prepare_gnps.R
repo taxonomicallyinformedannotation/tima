@@ -4,25 +4,24 @@ source(file = "R/helpers.R")
 source(file = "R/get_gnps.R")
 
 log_debug(
-  "This script treats GNPS and NAP results to obtain following file : \n
-    metadata_table_spectral_annotation"
+  "This script treats GNPS (and NAP) results"
 )
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_gnps"
 paths <- parse_yaml_paths()
+params <- get_params(step = step)
 
-params <- get_params(step = "prepare_gnps")
-
-
-log_debug("loading files ...")
-## starting it now
+log_debug("Loading GNPS results")
+## TODO
 ## will finish later on, when decided if some values will be directly available in GNPS output
 ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
 table <- read_results(id = params$gnps) |>
@@ -46,9 +45,9 @@ table <- read_results(id = params$gnps) |>
   )
 
 if (!is.null(params$nap)) {
-  ## look at recent NAP outputs
+  log_debug("Loading NAP results")
+  ## TODO look at recent NAP outputs
   ## might be outdated
-  log_debug(x = "... annotations table")
   table <- read_nap(id = params$nap) |>
     dplyr::select(
       feature_id = cluster.index,
@@ -76,8 +75,7 @@ table[] <-
     }
   )
 
-log_debug(x = "exporting metadata_table_spectral_annotation and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$path),
   yes = dir.create(paths$data$path),
@@ -98,8 +96,9 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
+
 log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
+  x = "... path to export is",
   params$output
 )
 readr::write_delim(
@@ -107,17 +106,10 @@ readr::write_delim(
   file = params$output,
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_gnps.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

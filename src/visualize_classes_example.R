@@ -7,7 +7,7 @@ source(file = "R/prepare-hierarchy_2.R")
 source(file = "R/plot_histograms.R")
 source(file = "R/prepare_plot.R")
 
-log_debug(x = "loading libraries")
+log_debug("Loading packages")
 library(crayon)
 library(docopt)
 library(dplyr)

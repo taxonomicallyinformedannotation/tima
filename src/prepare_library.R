@@ -6,6 +6,7 @@ log_debug("This script prepares a custom library made of all prepared libraries.
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(data.table)
 library(dplyr)
 library(docopt)
@@ -13,9 +14,9 @@ library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_library"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "prepare_library")
+params <- get_params(step = step)
 
 log_debug(x = "loading files")
 
@@ -46,8 +47,7 @@ if (params$filter$mode == TRUE) {
     ))
 }
 
-log_debug("exporting ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$interim$libraries$path),
   yes = dir.create(paths$data$interim$libraries$path),
@@ -58,6 +58,14 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
+
+log_debug(
+  x = "... path to export is",
+  file = file.path(
+    paths$data$interim$libraries$path,
+    params$output
+  )
+)
 readr::write_delim(
   x = custom_library,
   file = file.path(
@@ -66,17 +74,10 @@ readr::write_delim(
   )
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_library.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

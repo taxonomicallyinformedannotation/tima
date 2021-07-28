@@ -8,6 +8,7 @@ source(file = "R/dist_groups.R")
 source(file = "R/helpers.R")
 source(file = "R/ms1.R")
 
+log_debug("Loading packages")
 library(crayon)
 library(data.table)
 library(dplyr)
@@ -18,9 +19,9 @@ library(stringr)
 library(tidyr)
 library(yaml)
 
+step <- "process_annotations"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "process_annotations")
+params <- get_params(step = step)
 
 log_debug(
   "This script performs",
@@ -188,8 +189,7 @@ chemical_decoration()
 log_debug(x = "cleaning for cytoscape export")
 results2cytoscape <- chemical_cleaning()
 
-log_debug(x = "exporting results and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$processed$path),
   yes = dir.create(paths$data$processed$path),
@@ -208,8 +208,13 @@ ifelse(
   )
 )
 log_debug(
-  x = "... results are saved in",
-  crayon::green(dir_time)
+  x = "... path to export is",
+  crayon::green(
+    file.path(
+      dir_time,
+      params$output
+    )
+  )
 )
 readr::write_delim(
   x = results2cytoscape,
@@ -219,7 +224,15 @@ readr::write_delim(
   )
 )
 
-log_debug(x = "... parameters used are saved in", crayon::green(dir_time))
+log_debug(
+  x = "... path to used parameters is",
+  crayon::green(
+    file.path(
+      dir_time,
+      "process_annotations.yaml"
+    )
+  )
+)
 yaml::write_yaml(
   x = params,
   file = file.path(

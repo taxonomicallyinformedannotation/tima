@@ -8,18 +8,18 @@ log_debug("This script creates adducts")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_adducts"
 paths <- parse_yaml_paths()
+params <- get_params(step = step)
 
-params <- get_params(step = "prepare_adducts")
-
-log_debug(x = "loading files")
-
+log_debug(x = "Loading files ...")
 log_debug(x = "... exact masses")
 masses <- readr::read_delim(
   file = params$input,
@@ -31,7 +31,7 @@ masses <- readr::read_delim(
 log_debug(x = "... adducts")
 adducts_table <- readr::read_delim(file = paths$data$source$adducts)
 
-log_debug(x = "preparing adducts")
+log_debug(x = "Treating adducts table")
 adducts_t <- t(adducts_table) |>
   data.frame()
 
@@ -42,33 +42,33 @@ adducts_t <- adducts_t[2, ] |>
 
 masses_adducts <- cbind(masses, adducts_t)
 
-log_debug(x = "calculating adducts ...")
-log_debug(x = "... pos")
+log_debug(x = "Adding adducts to exact masses ...")
+log_debug(x = "... positive")
 adducts_pos <-
   form_adducts_pos(massesTable = masses_adducts, adductsTable = adducts_t)
 
-log_debug(x = "... neg")
+log_debug(x = "... negative")
 adducts_neg <-
   form_adducts_neg(massesTable = masses_adducts, adductsTable = adducts_t)
 
-log_debug(x = "... pure adducts table ...")
+log_debug(x = "... pure adducts masses ...")
 mass_null <-
   cbind(data.frame(exact_mass = 0), adducts_t)
 
-log_debug(x = "... pos")
+log_debug(x = "... positive")
 pure_pos <-
   form_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
   dplyr::filter(grepl(pattern = "pos_1", x = adduct, fixed = TRUE)) |>
   dplyr::select(-exact_mass)
 
-log_debug(x = "... neg")
+log_debug(x = "... negative")
 pure_neg <-
   form_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
   dplyr::filter(grepl(pattern = "neg_1", x = adduct, fixed = TRUE)) |>
   dplyr::select(-exact_mass)
 
-log_debug(x = "exporting ...")
-log_debug(x = "... pos")
+log_debug(x = "Exporting ...")
+log_debug(x = "... structure adducts positive")
 readr::write_delim(
   x = adducts_pos,
   file = file.path(
@@ -77,35 +77,28 @@ readr::write_delim(
   )
 )
 
-log_debug(x = "... neg")
+log_debug(x = "... structure adducts neegative")
 readr::write_delim(
   x = adducts_neg,
   file = file.path(data_processed, paste0(params$output, "_neg.tsv.gz"))
 )
 
-log_debug(x = "... pure pos")
+log_debug(x = "... adducts masses positive")
 readr::write_delim(
   x = pure_pos,
   file = paths$data$interim$adducts$pos,
 )
 
-log_debug(x = "... pure neg")
+log_debug(x = "... adducts masses negative")
 readr::write_delim(
   x = pure_neg,
   file = paths$data$interim$adducts$neg,
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_adducts.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

@@ -9,15 +9,16 @@ log_debug(
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_isdb"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "prepare_isdb")
+params <- get_params(step = step)
 
 log_debug(x = "loading original annotation table")
 
@@ -39,8 +40,7 @@ table <- readr::read_delim(file = params$input) |>
     structure_taxonomy_npclassifier_03class = NA,
   )
 
-log_debug(x = "exporting metadata_table_spectral_annotation and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$path),
   yes = dir.create(paths$data$path),
@@ -61,8 +61,9 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
+
 log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
+  x = "... path to export is",
   params$output
 )
 readr::write_delim(
@@ -70,17 +71,10 @@ readr::write_delim(
   file = params$output,
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_isdb.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

@@ -8,7 +8,7 @@ source(file = "R/visual_to_move/prepare-hierarchy_2.R")
 source(file = "R/visual_to_move/plot_histograms.R")
 source(file = "R/visual_to_move/prepare_plot.R")
 
-log_debug(x = "loading libraries")
+log_debug("Loading packages")
 library(crayon)
 library(data.table)
 library(docopt)

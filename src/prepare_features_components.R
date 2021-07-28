@@ -7,25 +7,24 @@ log_debug("This script fills features metadata (mz, rt and component id)")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_features_components"
 paths <- parse_yaml_paths()
+params <- get_params(step = step)
 
-params <- get_params(step = "prepare_features_components")
-
-log_debug(x = "loading files")
-
-log_debug(x = "loading original annotation table")
-
+log_debug(x = "Loading files ...")
+log_debug(x = "... features table")
 table <- readr::read_delim(file = params$input)
 
 log_debug(x = "... cluster table")
 log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
-## THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC
+## TODO
 components <-
   read_clusters(id = params$gnps) |>
   dplyr::select(
@@ -36,6 +35,7 @@ components <-
   ) |>
   dplyr::distinct()
 
+log_debug(x = "Adding components")
 table_filled <-
   dplyr::left_join(components, table) |>
   dplyr::distinct() |>
@@ -57,6 +57,8 @@ table_filled <-
     structure_taxonomy_npclassifier_03class
   )
 
+log_debug(x = "Calculating mz error")
+## TODO can be improved
 if (params$mode == "pos") {
   table_filled <- table_filled |>
     dplyr::mutate(mz_error = mz - 1.007276 - structure_exact_mass)
@@ -65,8 +67,7 @@ if (params$mode == "pos") {
     dplyr::mutate(mz_error = mz + 1.007276 - structure_exact_mass)
 }
 
-log_debug(x = "exporting metadata_table_spectral_annotation and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$interim$path),
   yes = dir.create(paths$data$interim$path),
@@ -84,26 +85,18 @@ ifelse(
 )
 
 log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
+  x = "... path to export is",
   params$output
 )
-
 readr::write_delim(
   x = table_filled,
   file = params$output
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_features_components.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()

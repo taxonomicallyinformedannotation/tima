@@ -9,21 +9,23 @@ log_debug(
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+log_debug("Loading packages")
 library(dplyr)
 library(docopt)
 library(purrr)
 library(readr)
 library(yaml)
 
+step <- "prepare_dnp"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "prepare_dnp")
+params <- get_params(step = step)
 
 if (file.exists(params$input)) {
-  log_debug(x = "loading files")
+  log_debug(x = "Loading DNP")
   dnp <-
     readr::read_delim(file = params$input)
 
+  log_debug(x = "Selecting needed columns")
   dnp_prepared <- dnp |>
     dplyr::mutate(structure_inchikey_2D = substring(
       text = structure_inchikey,
@@ -56,15 +58,26 @@ if (file.exists(params$input)) {
     dplyr::distinct() |>
     dplyr::mutate(reference_doi = NA)
 
-  log_debug("ensuring directories exist ...")
+  log_debug(x = "Exporting ...")
   ifelse(
     test = !dir.exists(paths$data$interim$path),
     yes = dir.create(paths$data$interim$path),
     no = paste(paths$data$interim$path, "exists")
   )
+
+  log_debug(
+    x = "... path to export is",
+    params$output
+  )
   readr::write_delim(
     x = dnp_prepared,
     file = params$output
+  )
+
+  export_params(
+    parameters = params,
+    directory = paths$data$interim$config$path,
+    step = step
   )
 } else {
   log_debug("Sorry, you do not have access to the DNP")

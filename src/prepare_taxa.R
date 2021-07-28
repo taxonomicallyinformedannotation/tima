@@ -8,7 +8,8 @@ source(file = "R/manipulating_taxo_otl.R")
 log_debug("This script informs taxonomically features")
 log_debug("Authors: AR, P-MA")
 log_debug("Contributors: ...")
-log_debug(x = "loading libraries")
+
+log_debug("Loading packages")
 library(docopt)
 library(dplyr)
 library(jsonlite)
@@ -18,9 +19,9 @@ library(splitstackshape)
 library(tidyr)
 library(yaml)
 
+step <- "prepare_taxa"
 paths <- parse_yaml_paths()
-
-params <- get_params(step = "prepare_taxa")
+params <- get_params(step = step)
 
 stopifnot(
   "Your --tool.metadata parameter (in command line arguments or in 'inform_params.yaml' must be either 'gnps' or 'manual'" = params$tool %in% c("gnps", "manual")
@@ -195,8 +196,7 @@ metadata_table_joined_summarized[] <-
     }
   )
 
-log_debug(x = "exporting metadata_table_biological_annotation and parameters used ...")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting ...")
 ifelse(
   test = !dir.exists(paths$data$path),
   yes = dir.create(paths$data$path),
@@ -217,8 +217,9 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
+
 log_debug(
-  x = "... metadata_table_spectral_annotation is saved in",
+  x = "... path to export is",
   params$output
 )
 readr::write_delim(
@@ -226,17 +227,10 @@ readr::write_delim(
   file = params$output,
 )
 
-log_debug(x = "... parameters used are saved in", paths$data$interim$config$path)
-yaml::write_yaml(
-  x = params,
-  file = file.path(
-    paths$data$interim$config$path,
-    paste(
-      format(Sys.time(), "%y%m%d_%H%M%OS"),
-      "prepare_taxa.yaml",
-      sep = "_"
-    )
-  )
+export_params(
+  parameters = params,
+  directory = paths$data$interim$config$path,
+  step = step
 )
 
 end <- Sys.time()
