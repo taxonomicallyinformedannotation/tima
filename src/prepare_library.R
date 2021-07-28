@@ -18,17 +18,14 @@ step <- "prepare_library"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
-log_debug(x = "loading files")
-
+log_debug(x = "Loading and concatenating prepared libraries")
 files <- list.files(
   path = paths$data$interim$libraries$path,
   pattern = "_prepared.tsv.gz",
   full.names = TRUE,
   recursive = TRUE
 )
-
 libraries <- list()
-
 for (i in seq_along(files)) {
   libraries[[i]] <-
     readr::read_delim(files[[i]])
@@ -37,6 +34,7 @@ for (i in seq_along(files)) {
 custom_library <- data.table::rbindlist(libraries)
 
 if (params$filter$mode == TRUE) {
+  log_debug(x = "Filtering library")
   custom_library <- custom_library |>
     dplyr::filter(grepl(
       x = !!as.name(colnames(custom_library)[grepl(

@@ -32,7 +32,7 @@ if (params$tool == "manual") {
     readr::read_delim(file = params$input)
 }
 
-log_debug(x = "Selecting needed columns")
+log_debug(x = "Formatting edge table")
 edges_table_treated <- edges_table |>
   dplyr::select(
     feature_source = params$source_name,

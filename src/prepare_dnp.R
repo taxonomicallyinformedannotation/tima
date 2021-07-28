@@ -25,7 +25,7 @@ if (file.exists(params$input)) {
   dnp <-
     readr::read_delim(file = params$input)
 
-  log_debug(x = "Selecting needed columns")
+  log_debug(x = "Formatting DNP")
   dnp_prepared <- dnp |>
     dplyr::mutate(structure_inchikey_2D = substring(
       text = structure_inchikey,

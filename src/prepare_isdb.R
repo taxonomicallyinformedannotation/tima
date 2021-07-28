@@ -20,8 +20,7 @@ step <- "prepare_isdb"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
-log_debug(x = "loading original annotation table")
-
+log_debug(x = "Loading and formatting ISDB results")
 table <- readr::read_delim(file = params$input) |>
   dplyr::distinct(
     feature_id,

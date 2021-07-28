@@ -20,7 +20,7 @@ step <- "prepare_gnps"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
-log_debug("Loading GNPS results")
+log_debug("Loading and formatting GNPS results")
 ## TODO
 ## will finish later on, when decided if some values will be directly available in GNPS output
 ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747

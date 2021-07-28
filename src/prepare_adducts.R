@@ -77,7 +77,7 @@ readr::write_delim(
   )
 )
 
-log_debug(x = "... structure adducts neegative")
+log_debug(x = "... structure adducts negative")
 readr::write_delim(
   x = adducts_neg,
   file = file.path(data_processed, paste0(params$output, "_neg.tsv.gz"))

@@ -31,35 +31,32 @@ stopifnot(
     5
 )
 
-log_debug(x = "loading taxa ranks dictionary")
+log_debug(x = "Loading taxa ranks dictionary")
 taxa_ranks_dictionary <-
   readr::read_delim(file = paths$data$source$dictionaries$ranks)
 
 if (params$tool == "gnps") {
-  log_debug(x = "loading feature table")
+  log_debug(x = "Loading feature table")
   feature_table <- read_features(id = params$gnps)
 
-  log_debug(x = "loading metadata table")
+  log_debug(x = "Loading metadata table")
   metadata_table <- read_metadata(id = params$gnps)
 
-  log_debug(x = "removing unneceessary columns")
-  log_debug(x = "WARNING: Needs the pattern 'Peak area'")
+  log_debug(x = "Formatting feaature table ...")
+  log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
   feature_table <- feature_table %>%
     dplyr::select(
       `row ID`,
       matches(" Peak area")
     ) |>
     tibble::column_to_rownames(var = "row ID")
-
-  log_debug(x = "removing \" Peak area\" from column names")
   colnames(feature_table) <-
     gsub(
       pattern = " Peak area",
       replacement = "",
       x = colnames(feature_table)
     )
-
-  log_debug(x = "finding top N intensities per feature")
+  log_debug(x = "... filtering top K intensities per feature")
   top_n <- feature_table |>
     tibble::rownames_to_column() |>
     tidyr::gather(column, value, -rowname) |>
@@ -75,7 +72,7 @@ if (params$tool == "manual") {
     readr::read_delim(file = params$input)
 }
 
-log_debug(x = "selecting source organism column")
+log_debug(x = "Keeping list of organisms to submit to GNVerifier")
 organism_table <- metadata_table |>
   dplyr::filter(!is.na(dplyr::all_of(params$column_name))) |>
   dplyr::distinct(dplyr::across(dplyr::all_of(params$column_name))) |>
@@ -92,8 +89,7 @@ organism_table <- metadata_table |>
   )) |>
   dplyr::distinct()
 
-log_debug(x = "exporting source organism for GNVerifier submission")
-log_debug("ensuring directories exist ...")
+log_debug(x = "Exporting organisms for GNVerifier submission")
 ifelse(
   test = !dir.exists(paths$data$interim$path),
   yes = dir.create(paths$data$interim$path),
@@ -116,10 +112,12 @@ system(command = paste("bash", paths$src$gnverifier))
 log_debug("cleaning GNVerifier results")
 dataOrganismVerified_3 <- clean_gnverifier()
 
+log_debug("Formatting obtained OTL taxonomy")
 organism_cleaned_manipulated <-
   manipulating_taxo_otl(dfsel = dataOrganismVerified_3)
 
 if (params$extension == FALSE) {
+  log_debug("Removing filename extensions")
   metadata_table <- metadata_table |>
     mutate(filename = gsub(
       pattern = ".mzML",
@@ -134,7 +132,7 @@ if (params$extension == FALSE) {
       fixed = TRUE
     ))
 }
-log_debug(x = "joining topN with metadata table")
+log_debug(x = "Joining top K with metadata table")
 if (params$tool == "gnps") {
   metadata_table_joined <-
     dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
@@ -154,7 +152,7 @@ if (params$tool == "manual") {
     )
 }
 
-log_debug(x = "joining with cleaned taxonomy table")
+log_debug(x = "Joining with cleaned taxonomy table")
 metadata_table_joined_summarized <-
   dplyr::left_join(
     metadata_table_joined,
@@ -188,6 +186,7 @@ metadata_table_joined_summarized <-
   dplyr::ungroup() |>
   dplyr::mutate_all(as.character)
 
+log_debug(x = "joining with cleaned taxonomy table")
 metadata_table_joined_summarized[] <-
   lapply(
     metadata_table_joined_summarized,

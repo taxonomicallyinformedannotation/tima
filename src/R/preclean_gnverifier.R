@@ -1,3 +1,5 @@
+source(file = "R/log_debug.R")
+
 #' Title
 #'
 #' @param file
@@ -7,6 +9,7 @@
 #'
 #' @examples
 preclean_gnverifier <- function(file) {
+  log_debug("Loading GNVerifier results")
   verified <-
     jsonlite::stream_in(con = file(file))
 
@@ -25,7 +28,7 @@ preclean_gnverifier <- function(file) {
       taxonomy = classificationPath,
       rank = classificationRanks
     )
-
+  log_debug("Formatting GNVerifier results")
   dataOrganismVerified <- dplyr::left_join(organism_table,
     verified_df,
     by = c("organism" = "organismValue")

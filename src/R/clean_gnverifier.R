@@ -1,3 +1,4 @@
+source(file = "R/log_debug.R")
 source(file = "R/preclean_gnverifier.R")
 
 #' Title
@@ -32,7 +33,7 @@ clean_gnverifier <- function() {
       "Warning:",
       warning$organism,
       "had no translation,",
-      "trying with a more flexible option"
+      "trying with more flexible parameters"
     )
 
     organism_table_2 <- dataOrganismVerified |>
@@ -41,19 +42,20 @@ clean_gnverifier <- function() {
       dplyr::distinct(organismCleaned)
 
     if (nrow(organism_table_2) != 0) {
+      log_debug("Exporting organisms for GNVerifier resubmission")
       readr::write_delim(
         x = organism_table_2,
         file = paths$data$interim$taxa$original_2,
         quote = "none"
       )
 
-      log_debug("submitting to GNVerifier")
+      log_debug("submitting to GNVerifier with more flexible parameters")
       system(command = paste("bash", paths$src$gnverifier_2))
 
-      log_debug("cleaning GNVerifier results")
       dataOrganismVerified_2 <<-
         preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
 
+      log_debug("Joining both results")
       dataOrganismVerified_3 <-
         rbind(dataOrganismVerified, dataOrganismVerified_2) |>
         dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
