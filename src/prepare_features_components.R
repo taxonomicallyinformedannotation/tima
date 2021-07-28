@@ -35,7 +35,7 @@ components <-
   ) |>
   dplyr::distinct()
 
-log_debug(x = "Adding components")
+log_debug(x = "Adding components to features")
 table_filled <-
   dplyr::left_join(components, table) |>
   dplyr::distinct() |>
