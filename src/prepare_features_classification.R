@@ -37,7 +37,7 @@ lotus <-
 log_debug(x = "... features table")
 table <- readr::read_delim(file = params$input)
 
-log_debug(x = "filtering structures ...")
+log_debug(x = "Filtering structures ...")
 log_debug(x = "... missing classification")
 table_missing_classification <- table |>
   dplyr::filter(
@@ -60,9 +60,7 @@ table_missing_formula <- table |>
 log_debug(x = "... keeping the other ones safe")
 table_with_classification <-
   dplyr::anti_join(table, table_missing_classification)
-
 table_with_mass <- dplyr::anti_join(table, table_missing_mass)
-
 table_with_formula <- dplyr::anti_join(table, table_missing_formula)
 
 log_debug(x = "Completing the structures with the library")
