@@ -65,7 +65,7 @@ metadata_table_spectral_annotation <-
     file = params$annotation,
     col_types = "c"
   ) |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 taxed_features_table <- readr::read_delim(
@@ -86,9 +86,9 @@ structure_organism_pairs_table <-
     file = params$library,
     col_types = "c"
   ) |>
-    dplyr::filter(!is.na(structure_exact_mass)) |>
-    dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
-    dplyr::mutate_if(is.logical, as.character)
+  dplyr::filter(!is.na(structure_exact_mass)) |>
+  dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
+  dplyr::mutate_if(is.logical, as.character)
 
 structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
   "notClassified"
@@ -147,7 +147,7 @@ if (params$ms$annotate == TRUE) {
   log_debug(x = "... exact masses for MS1 annotation")
   structure_exact_mass_table <-
     readr::read_delim(file = adduct_db_file) |>
-      dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
+    dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
   log_debug(x = "performing MS1 annotation")
   annotation_table_ms1 <- ms1_annotation()
@@ -163,15 +163,15 @@ if (params$ms$annotate == FALSE) {
 log_debug(x = "adding biological organism metadata")
 annotation_table_ms1_taxed <-
   dplyr::left_join(annotation_table_ms1, taxed_features_table) |>
-    dplyr::left_join(
-      metadata_table_spectral_annotation |> distinct(
-        inchikey_2D,
-        smiles_2D,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class
-      )
+  dplyr::left_join(
+    metadata_table_spectral_annotation |> distinct(
+      inchikey_2D,
+      smiles_2D,
+      structure_taxonomy_npclassifier_01pathway,
+      structure_taxonomy_npclassifier_02superclass,
+      structure_taxonomy_npclassifier_03class
     )
+  )
 
 log_debug(x = "performing taxonomically informed scoring")
 annotation_table_weighted_bio <- biological_weighting()

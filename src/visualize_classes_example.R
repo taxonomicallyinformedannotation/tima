@@ -51,11 +51,11 @@ log_debug(x = "... files ...")
 log_debug(x = "... weighted + ms1 ISDB")
 ms1 <-
   readr::read_delim(file = weighted_ms1_path) |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 no_ms1 <-
   readr::read_delim(file = weighted_path) |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 log_debug(x = "loading feature table")
@@ -64,14 +64,14 @@ feature_table <- read_features(id = params$job$gnps)
 
 ms1 <-
   right_join(ms1,
-             feature_table |> distinct(`row ID`),
-             by = c("feature_id" = "row ID")
+    feature_table |> distinct(`row ID`),
+    by = c("feature_id" = "row ID")
   )
 
 no_ms1 <-
   right_join(no_ms1,
-             feature_table |> distinct(`row ID`),
-             by = c("feature_id" = "row ID")
+    feature_table |> distinct(`row ID`),
+    by = c("feature_id" = "row ID")
   )
 log_debug(x = "loading metadata table")
 metadata_table <- read_metadata(id = params$job$gnps)
@@ -90,7 +90,7 @@ feature_table <- feature_table %>%
     -"row m/z",
     -"row retention time"
   ) |>
-    tibble::column_to_rownames(var = "row ID")
+  tibble::column_to_rownames(var = "row ID")
 
 top_n <- feature_table |>
   tibble::rownames_to_column() |>
@@ -131,15 +131,15 @@ final_table <- prepare_hierarchy(dataframe = ms1)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-                   metadata_table |> mutate(
-                     filename = gsub(
-                       pattern = ".mzML",
-                       replacement = "",
-                       x = filename,
-                       fixed = TRUE
-                     )
-                   ),
-                   by = c("sample" = "filename")
+    metadata_table |> mutate(
+      filename = gsub(
+        pattern = ".mzML",
+        replacement = "",
+        x = filename,
+        fixed = TRUE
+      )
+    ),
+    by = c("sample" = "filename")
   )
 
 final_table_no_ms1 <- prepare_hierarchy(dataframe = no_ms1)

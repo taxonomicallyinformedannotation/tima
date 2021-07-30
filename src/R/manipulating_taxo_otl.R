@@ -14,13 +14,13 @@ manipulating_taxo_otl <- function(dfsel) {
   ## selecting and splitting taxonomy and ranks
   df1 <- dfsel |>
     dplyr::select(organismCleaned,
-                  name = organismCleaned_dbTaxoTaxonomy,
-                  rank = organismCleaned_dbTaxoTaxonRanks,
-                  organismDbTaxo
+      name = organismCleaned_dbTaxoTaxonomy,
+      rank = organismCleaned_dbTaxoTaxonRanks,
+      organismDbTaxo
     ) |>
     dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
     dplyr::distinct(organismCleaned,
-                    .keep_all = TRUE
+      .keep_all = TRUE
     ) |>
     splitstackshape::cSplit(
       splitCols = "name",
@@ -42,13 +42,13 @@ manipulating_taxo_otl <- function(dfsel) {
       values_drop_na = TRUE
     ) |>
     dplyr::distinct(organismCleaned,
-                    level,
-                    .keep_all = TRUE
+      level,
+      .keep_all = TRUE
     )
 
   df2$rank <- ifelse(test = is.na(df2$rank),
-                     yes = "NA",
-                     no = df2$rank
+    yes = "NA",
+    no = df2$rank
   )
 
   df2_a <- df2 |>
@@ -98,8 +98,8 @@ manipulating_taxo_otl <- function(dfsel) {
         values_drop_na = TRUE
       ) |>
       dplyr::distinct(organismCleaned,
-                      rank,
-                      .keep_all = TRUE
+        rank,
+        .keep_all = TRUE
       ) ## because of Open Tree of Life taxonomy
   }
 
@@ -108,8 +108,8 @@ manipulating_taxo_otl <- function(dfsel) {
     df5 <- df4 %>%
       dplyr::group_by(organismCleaned) %>%
       dplyr::distinct(rank,
-                      name,
-                      .keep_all = TRUE
+        name,
+        .keep_all = TRUE
       ) %>%
       tidyr::pivot_wider(
         names_from = rank,

@@ -32,7 +32,7 @@ lotus <-
       structure_taxonomy_npclassifier_03class
     )
   ) |>
-    dplyr::distinct()
+  dplyr::distinct()
 
 log_debug(x = "... features table")
 table <- readr::read_delim(file = params$input)
@@ -148,13 +148,13 @@ table_classified <-
     table_classified_lotus_missing,
     fill = TRUE
   ) |>
-    dplyr::distinct(
-      inchikey_2D,
-      smiles_2D,
-      structure_taxonomy_npclassifier_01pathway,
-      structure_taxonomy_npclassifier_02superclass,
-      structure_taxonomy_npclassifier_03class
-    )
+  dplyr::distinct(
+    inchikey_2D,
+    smiles_2D,
+    structure_taxonomy_npclassifier_01pathway,
+    structure_taxonomy_npclassifier_02superclass,
+    structure_taxonomy_npclassifier_03class
+  )
 
 table_massed <-
   rbind(
@@ -167,11 +167,11 @@ table_massed <-
     table_massed_lotus_missing,
     fill = TRUE
   ) |>
-    dplyr::distinct(
-      inchikey_2D,
-      smiles_2D,
-      structure_exact_mass
-    )
+  dplyr::distinct(
+    inchikey_2D,
+    smiles_2D,
+    structure_exact_mass
+  )
 
 table_formuled <-
   rbind(
@@ -185,11 +185,11 @@ table_formuled <-
     table_formuled_lotus_missing,
     fill = TRUE
   ) |>
-    dplyr::distinct(
-      inchikey_2D,
-      smiles_2D,
-      molecular_formula
-    )
+  dplyr::distinct(
+    inchikey_2D,
+    smiles_2D,
+    molecular_formula
+  )
 
 table_final <- dplyr::left_join(
   table |>

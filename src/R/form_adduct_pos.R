@@ -52,8 +52,8 @@ form_adducts_pos <- function(massesTable, adductsTable) {
     dplyr::select(-colnames(adductsTable)) %>%
     tidyr::pivot_longer(2:ncol(.)) %>%
     dplyr::select(tidyr::everything(),
-                  adduct = name,
-                  adduct_mass = value
+      adduct = name,
+      adduct_mass = value
     )
 
   return(adducts_pos)

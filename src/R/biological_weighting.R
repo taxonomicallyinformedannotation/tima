@@ -271,9 +271,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_01_domain,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_01_domain,
+        score_biological
       )
 
     cat("... kingdom \n")
@@ -297,9 +297,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_02_kingdom,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_02_kingdom,
+        score_biological
       )
 
     cat("... phylum \n")
@@ -323,9 +323,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_03_phylum,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_03_phylum,
+        score_biological
       )
 
     cat("... class \n")
@@ -349,9 +349,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_04_class,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_04_class,
+        score_biological
       )
 
     cat("... order \n")
@@ -375,9 +375,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_05_order,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_05_order,
+        score_biological
       )
 
     # cat("... infraorder \n")
@@ -428,9 +428,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_06_family,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_06_family,
+        score_biological
       )
 
     # cat("... subfamily \n")
@@ -481,9 +481,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_07_tribe,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_07_tribe,
+        score_biological
       )
 
     # cat("... subtribe \n")
@@ -534,9 +534,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_08_genus,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_08_genus,
+        score_biological
       )
 
     # cat("... subgenus \n")
@@ -588,9 +588,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_09_species,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_09_species,
+        score_biological
       )
 
     # cat("... subspecies \n")
@@ -642,9 +642,9 @@ biological_weighting <-
         )
       ) %>%
       distinct(feature_id,
-               inchikey_2D,
-               best_candidate = candidate_organism_10_varietas,
-               score_biological
+        inchikey_2D,
+        best_candidate = candidate_organism_10_varietas,
+        score_biological
       )
 
     cat("keeping best biological score only \n")
@@ -666,8 +666,8 @@ biological_weighting <-
       group_by(feature_id) %>%
       arrange(desc(score_biological)) %>%
       distinct(feature_id,
-               inchikey_2D,
-               .keep_all = TRUE
+        inchikey_2D,
+        .keep_all = TRUE
       ) %>%
       ungroup()
 
@@ -701,8 +701,8 @@ biological_weighting <-
       group_by(feature_id) %>%
       arrange(desc(score_pondered_bio)) %>%
       distinct(feature_id,
-               inchikey_2D,
-               .keep_all = TRUE
+        inchikey_2D,
+        .keep_all = TRUE
       ) %>%
       mutate(
         rank_initial = (dense_rank(-score_initialNormalized)),

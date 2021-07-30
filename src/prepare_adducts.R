@@ -35,9 +35,9 @@ log_debug(x = "Treating adducts table")
 adducts_t <- t(adducts_table) |>
   data.frame()
 
-colnames(adducts_t) <- adducts_t[1,]
+colnames(adducts_t) <- adducts_t[1, ]
 
-adducts_t <- adducts_t[2,] |>
+adducts_t <- adducts_t[2, ] |>
   mutate_all(as.numeric)
 
 masses_adducts <- cbind(masses, adducts_t)
@@ -58,14 +58,14 @@ mass_null <-
 log_debug(x = "... positive")
 pure_pos <-
   form_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
-    dplyr::filter(grepl(pattern = "pos_1", x = adduct, fixed = TRUE)) |>
-    dplyr::select(-exact_mass)
+  dplyr::filter(grepl(pattern = "pos_1", x = adduct, fixed = TRUE)) |>
+  dplyr::select(-exact_mass)
 
 log_debug(x = "... negative")
 pure_neg <-
   form_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
-    dplyr::filter(grepl(pattern = "neg_1", x = adduct, fixed = TRUE)) |>
-    dplyr::select(-exact_mass)
+  dplyr::filter(grepl(pattern = "neg_1", x = adduct, fixed = TRUE)) |>
+  dplyr::select(-exact_mass)
 
 log_debug(x = "Exporting ...")
 log_debug(x = "... structure adducts positive")

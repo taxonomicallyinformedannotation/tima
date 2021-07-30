@@ -54,8 +54,8 @@ dist_groups <- function(d, g) {
   }
   dlabels <- attr(d, "Labels")
   idxs <- utils::combn(dsize, 2)
-  idx1 <- idxs[1,]
-  idx2 <- idxs[2,]
+  idx1 <- idxs[1, ]
+  idx2 <- idxs[2, ]
   level1 <-
     levels(g)[pmin(as.numeric(g[idx1]), as.numeric(g[idx2]))]
   level2 <-

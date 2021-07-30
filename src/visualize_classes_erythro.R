@@ -38,16 +38,12 @@ log_debug("Contributors: ...")
 
 log_debug(x = "loading ...")
 log_debug(x = "... parameters")
-source(file = "paths.md")
 params <- list()
 params$top_k$candidates$initial <- 1
 params$job$gnps <- "60b9945aa3fd4810b178e79870cca905"
 inchikey_colname <- "inchikey_2D"
 score_input_colname <- "score_final"
 clean_xanthones <- TRUE
-
-log_debug(x = "... functions")
-source(file = "R/functions/features.R")
 
 log_debug(x = "... files ...")
 log_debug(x = "... weighted + ms1 ISDB")
@@ -56,15 +52,15 @@ ms1 <-
     file = weighted_ms1_path,
     sep = "\t"
   ) |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 log_debug(x = "loading feature table")
 
-feature_table <- read_featuretable(id = params$job$gnps)
+feature_table <- read_features(id = params$job$gnps)
 
 log_debug(x = "loading metadata table")
-metadata_table <- read_metadatatable(id = params$job$gnps)
+metadata_table <- read_metadata(id = params$job$gnps)
 
 log_debug(x = "removing \" Peak area\" from column names")
 colnames(feature_table) <-
@@ -77,10 +73,10 @@ colnames(feature_table) <-
 log_debug(x = "removing \"row m/z\" and from \"row retention time\" columns")
 feature_table <- feature_table %>%
   dplyr::select(
-    -"row.m.z",
-    -"row.retention.time"
+    -"row m/z",
+    -"row retention time"
   ) |>
-    tibble::column_to_rownames(var = "row.ID")
+  tibble::column_to_rownames(var = "row ID")
 
 top_n <- feature_table |>
   tibble::rownames_to_column() |>
@@ -93,13 +89,13 @@ top_n <- feature_table |>
   dplyr::arrange(rowname, desc(value))
 
 top_m <- dplyr::left_join(top_n |>
-                            dplyr::mutate(column = gsub(
-                              pattern = ".Peak.area",
-                              replacement = "",
-                              x = column
-                            )),
-                          metadata_table,
-                          by = c("column" = "filename")
+  dplyr::mutate(column = gsub(
+    pattern = ".Peak.area",
+    replacement = "",
+    x = column
+  )),
+metadata_table,
+by = c("column" = "filename")
 ) |>
   dplyr::select(
     feature_id = rowname,
@@ -112,15 +108,15 @@ final_table <- prepare_hierarchy(dataframe = ms1)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-                   metadata_table |> mutate(
-                     filename = gsub(
-                       pattern = ".mzML",
-                       replacement = "",
-                       x = filename,
-                       fixed = TRUE
-                     )
-                   ),
-                   by = c("sample" = "filename")
+    metadata_table |> mutate(
+      filename = gsub(
+        pattern = ".mzML",
+        replacement = "",
+        x = filename,
+        fixed = TRUE
+      )
+    ),
+    by = c("sample" = "filename")
   )
 
 nice_colors <- rev(
