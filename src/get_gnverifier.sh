@@ -5,7 +5,7 @@ source src/get_platform.sh
 source src/parse_yaml.sh
 source src/warning.sh
 
-eval $(parse_yaml src/paths.yaml)
+eval $(parse_yaml paths.yaml)
 eval $(parse_yaml config/versions.yaml)
 
 mkdir -p $bin_path
