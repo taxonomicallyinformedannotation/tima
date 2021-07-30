@@ -95,7 +95,8 @@ ms1_annotation <-
           yes = abs(mz -
             (0.000001 *
               params$ms$tolerance$ppm *
-              mz) - mz_dest),
+              mz) -
+            mz_dest),
           no = abs(mz + (0.000001 *
             params$ms$tolerance$ppm *
             mz) - mz_dest)
@@ -108,7 +109,8 @@ ms1_annotation <-
           no = abs(mz -
             (0.000001 *
               params$ms$tolerance$ppm *
-              mz) - mz_dest)
+              mz) -
+            mz_dest)
         )
       )
 
