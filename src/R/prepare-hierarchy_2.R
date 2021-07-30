@@ -12,7 +12,7 @@ require(splitstackshape)
 #' @examples
 prepare_hierarchy_2 <- function(dataframe, pathway) {
   ms1_best_candidate <- dataframe |>
-    dplyr::mutate_all(list(~ gsub(
+    dplyr::mutate_all(list(~gsub(
       pattern = "\\|.*",
       replacement = "",
       x = .
@@ -36,7 +36,7 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
       best_candidate_2,
       best_candidate_3
     ) |>
-    dplyr::mutate_all(list(~ y_as_na(x = ., y = ""))) |>
+    dplyr::mutate_all(list(~y_as_na(x = ., y = ""))) |>
     dplyr::mutate(
       best_candidate_1 = if_else(
         condition = is.na(smiles_2D),
@@ -260,16 +260,16 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
 
   table_3 <-
     dplyr::left_join(table_1_1, children_1, by = c("parents" = "parents")) |>
-    dplyr::group_by(labels.x) |>
-    dplyr::mutate(n = sum(sum)) |>
-    dplyr::mutate(n = if_else(
-      condition = parents == "Other",
-      true = n + 666,
-      false = n + 0
-    )) |>
-    dplyr::select(parents, ids = ids.x, labels = labels.x, sum, n) |>
-    dplyr::ungroup() |>
-    dplyr::distinct()
+      dplyr::group_by(labels.x) |>
+      dplyr::mutate(n = sum(sum)) |>
+      dplyr::mutate(n = if_else(
+        condition = parents == "Other",
+        true = n + 666,
+        false = n + 0
+      )) |>
+      dplyr::select(parents, ids = ids.x, labels = labels.x, sum, n) |>
+      dplyr::ungroup() |>
+      dplyr::distinct()
 
   table_3_1 <- table_3 |>
     dplyr::distinct(parents, n, .keep_all = TRUE) |>
@@ -296,14 +296,14 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
 
   low_medium_table <-
     dplyr::anti_join(table_3, dplyr::bind_rows(table_3_1, top_medium_table)) |>
-    dplyr::select(
-      parents,
-      ids,
-      labels
-    ) |>
-    dplyr::filter(parents != "") |>
-    dplyr::filter(!is.na(parents)) |>
-    dplyr::distinct()
+      dplyr::select(
+        parents,
+        ids,
+        labels
+      ) |>
+      dplyr::filter(parents != "") |>
+      dplyr::filter(!is.na(parents)) |>
+      dplyr::distinct()
 
   low_medium_table_1_a <- low_medium_table |>
     dplyr::filter(parents %in% top_parents) |>
@@ -324,7 +324,7 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
 
   low_medium_table_1 <-
     dplyr::bind_rows(low_medium_table_1_a, low_medium_table_1_b) |>
-    dplyr::distinct()
+      dplyr::distinct()
 
   low_medium_table_2 <- low_medium_table |>
     dplyr::filter(!parents %in% top_parents) |>
@@ -340,7 +340,7 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
       # low_medium_table_2,
       low_medium_table_1
     ) |>
-    dplyr::distinct()
+      dplyr::distinct()
 
   table_next <- genealogy |>
     dplyr::filter(!labels %in% genealogy_new_med$labels) |>
@@ -372,8 +372,8 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
 
   genealogy_new_med_2 <-
     dplyr::bind_rows(genealogy_new_med, table_next) |>
-    dplyr::ungroup() |>
-    dplyr::distinct()
+      dplyr::ungroup() |>
+      dplyr::distinct()
 
   table_new <- ms1_multiple |>
     dplyr::filter(!is.na(species)) |>
@@ -444,7 +444,7 @@ prepare_hierarchy_2 <- function(dataframe, pathway) {
       final_parents_table,
       table_1_1_new
     ) |>
-    dplyr::filter(!is.na(sample))
+      dplyr::filter(!is.na(sample))
 
   return(final_table)
 }

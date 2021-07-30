@@ -1,36 +1,30 @@
 start <- Sys.time()
-language <- "r"
 
-source(file = "R/functions/helpers.R")
-source(file = "R/functions/colors.R")
-source(file = "R/visual_to_move/prepare-hierarchy.R")
-source(file = "R/visual_to_move/prepare-hierarchy_2.R")
-source(file = "R/visual_to_move/plot_histograms.R")
-source(file = "R/visual_to_move/prepare_plot.R")
+source(file = "src/R/colors.R")
+source(file = "src/R/get_gnps.R")
+source(file = "src/R/helpers.R")
+source(file = "src/R/plot_histograms.R")
+source(file = "src/R/prepare-hierarchy.R")
+source(file = "src/R/prepare-hierarchy_2.R")
+source(file = "src/R/prepare_plot.R")
 
 log_debug("Loading packages")
 library(crayon)
-library(data.table)
 library(docopt)
 library(dplyr)
-library(plotly)
-library(splitstackshape)
-
-## new
 library(forcats)
-library(microshades)
 library(ggplot2)
 library(ggpubr)
-
-## beautiful lib
 ## remotes::install_github("KarstensLab/microshades")
 library(microshades)
-## docopt to do
+library(plotly)
+library(readr)
+library(splitstackshape)
 
-## dirty paths here for now
+## TODO docopt
 
 weighted_ms1_path <-
-  "../data/processed/210718_163140/yourFinalFile.tsv.gz"
+  "data/processed/210718_163140/yourFinalFile.tsv.gz"
 
 log_debug(
   "This script performs",
@@ -59,7 +53,7 @@ ms1 <-
     file = weighted_ms1_path,
     sep = "\t"
   ) |>
-  dplyr::mutate(dplyr::across(feature_id, as.numeric))
+    dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 log_debug(x = "loading feature table")
@@ -89,7 +83,7 @@ feature_table <- feature_table %>%
     -neutral.M.mass,
     -Unnamed..64
   ) |>
-  tibble::column_to_rownames(var = "row.ID")
+    tibble::column_to_rownames(var = "row.ID")
 
 top_n <- feature_table |>
   tibble::rownames_to_column() |>
@@ -123,14 +117,14 @@ final_table_terpenoids_taxed <-
     dataframe = ms1,
     pathway = "Terpenoids"
   ) |>
-  dplyr::mutate(species = "Swertia chirayita")
+    dplyr::mutate(species = "Swertia chirayita")
 
 final_table_shikimate_taxed <-
   prepare_hierarchy_2(
     dataframe = ms1,
     pathway = "Shikimates and Phenylpropanoids"
   ) |>
-  dplyr::mutate(species = "Swertia chirayita")
+    dplyr::mutate(species = "Swertia chirayita")
 
 nice_colors <- rev(
   list(

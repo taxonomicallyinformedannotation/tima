@@ -58,18 +58,18 @@ chemical_weighting <-
     cat("... outputting best score \n")
     df3 <-
       dplyr::bind_rows(step_pat, step_sup, step_cla) |>
-      dplyr::mutate(dplyr::across(where(is.logical), as.numeric)) |>
-      dplyr::mutate(score_chemical = ifelse(
-        test = is.na(score_chemical),
-        yes = 0,
-        no = score_chemical
-      )) |>
-      dplyr::select(
-        feature_id,
-        inchikey_2D,
-        smiles_2D,
-        score_chemical
-      )
+        dplyr::mutate(dplyr::across(where(is.logical), as.numeric)) |>
+        dplyr::mutate(score_chemical = ifelse(
+          test = is.na(score_chemical),
+          yes = 0,
+          no = score_chemical
+        )) |>
+        dplyr::select(
+          feature_id,
+          inchikey_2D,
+          smiles_2D,
+          score_chemical
+        )
 
     cat("... joining \n")
     df4 <- dplyr::left_join(df1, df3) |>
@@ -87,8 +87,8 @@ chemical_weighting <-
       dplyr::arrange(desc(score_chemical)) |>
       dplyr::arrange(desc(score_pondered_chemo)) |>
       dplyr::distinct(feature_id,
-        inchikey_2D,
-        .keep_all = TRUE
+                      inchikey_2D,
+                      .keep_all = TRUE
       ) |>
       dplyr::mutate(
         rank_initial = (dplyr::dense_rank(-as.numeric(

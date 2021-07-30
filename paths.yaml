@@ -1,4 +1,4 @@
-base_dir: ../
+base_dir: ./
 bin:
   path: bin
 config:

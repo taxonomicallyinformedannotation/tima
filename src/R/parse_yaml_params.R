@@ -1,7 +1,7 @@
 require(purrr)
 require(yaml)
 
-source(file = "R/log_debug.R")
+source(file = "src/R/log_debug.R")
 
 #' Title
 #'

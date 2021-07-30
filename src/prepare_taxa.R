@@ -1,9 +1,9 @@
 start <- Sys.time()
 
-source(file = "R/clean_gnverifier.R")
-source(file = "R/get_gnps.R")
-source(file = "R/helpers.R")
-source(file = "R/manipulating_taxo_otl.R")
+source(file = "src/R/clean_gnverifier.R")
+source(file = "src/R/get_gnps.R")
+source(file = "src/R/helpers.R")
+source(file = "src/R/manipulating_taxo_otl.R")
 
 log_debug("This script informs taxonomically features")
 log_debug("Authors: AR, P-MA")
@@ -49,7 +49,7 @@ if (params$tool == "gnps") {
       `row ID`,
       matches(" Peak area")
     ) |>
-    tibble::column_to_rownames(var = "row ID")
+      tibble::column_to_rownames(var = "row ID")
   colnames(feature_table) <-
     gsub(
       pattern = " Peak area",
@@ -136,11 +136,11 @@ log_debug(x = "Joining top K with metadata table")
 if (params$tool == "gnps") {
   metadata_table_joined <-
     dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
-    dplyr::select(
-      feature_id := rowname,
-      organismOriginal = dplyr::all_of(params$column_name),
-      dplyr::everything()
-    )
+      dplyr::select(
+        feature_id := rowname,
+        organismOriginal = dplyr::all_of(params$column_name),
+        dplyr::everything()
+      )
 }
 
 if (params$tool == "manual") {
@@ -159,32 +159,32 @@ metadata_table_joined_summarized <-
     organism_cleaned_manipulated,
     by = c("organismOriginal" = "organismCleaned")
   ) |>
-  dplyr::distinct() %>%
-  dplyr::mutate_at(vars(-dplyr::group_cols()), as.character) |>
-  dplyr::select(
-    feature_id,
-    sample_organism_01_domain = organism_01_domain,
-    sample_organism_02_kingdom = organism_02_kingdom,
-    sample_organism_03_phylum = organism_03_phylum,
-    sample_organism_04_class = organism_04_class,
-    sample_organism_05_order = organism_05_order,
-    # sample_organism_05_1_infraorder = organism_05_1_infraorder,
-    sample_organism_06_family = organism_06_family,
-    # sample_organism_06_1_subfamily = organism_06_1_subfamily,
-    sample_organism_07_tribe = organism_07_tribe,
-    # sample_organism_07_1_subtribe = organism_07_1_subtribe,
-    sample_organism_08_genus = organism_08_genus,
-    # sample_organism_08_1_subgenus = organism_08_1_subgenus,
-    sample_organism_09_species = organism_09_species,
-    # sample_organism_09_1_subspecies = organism_09_1_subspecies,
-    sample_organism_10_varietas = organism_10_variety
-  ) |>
-  dplyr::group_by(feature_id) |>
-  dplyr::summarise_all(function(x) {
-    x <- list(paste(unique(x[!is.na(x)]), collapse = "|"))
-  }) |>
-  dplyr::ungroup() |>
-  dplyr::mutate_all(as.character)
+    dplyr::distinct() %>%
+    dplyr::mutate_at(vars(-dplyr::group_cols()), as.character) |>
+      dplyr::select(
+        feature_id,
+        sample_organism_01_domain = organism_01_domain,
+        sample_organism_02_kingdom = organism_02_kingdom,
+        sample_organism_03_phylum = organism_03_phylum,
+        sample_organism_04_class = organism_04_class,
+        sample_organism_05_order = organism_05_order,
+        # sample_organism_05_1_infraorder = organism_05_1_infraorder,
+        sample_organism_06_family = organism_06_family,
+        # sample_organism_06_1_subfamily = organism_06_1_subfamily,
+        sample_organism_07_tribe = organism_07_tribe,
+        # sample_organism_07_1_subtribe = organism_07_1_subtribe,
+        sample_organism_08_genus = organism_08_genus,
+        # sample_organism_08_1_subgenus = organism_08_1_subgenus,
+        sample_organism_09_species = organism_09_species,
+        # sample_organism_09_1_subspecies = organism_09_1_subspecies,
+        sample_organism_10_varietas = organism_10_variety
+      ) |>
+      dplyr::group_by(feature_id) |>
+      dplyr::summarise_all(function(x) {
+        x <- list(paste(unique(x[!is.na(x)]), collapse = "|"))
+      }) |>
+      dplyr::ungroup() |>
+      dplyr::mutate_all(as.character)
 
 log_debug(x = "joining with cleaned taxonomy table")
 metadata_table_joined_summarized[] <-

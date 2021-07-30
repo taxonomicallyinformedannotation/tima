@@ -1,7 +1,7 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
-source(file = "R/get_gnps.R")
+source(file = "src/R/helpers.R")
+source(file = "src/R/get_gnps.R")
 
 log_debug("This script fills features metadata (mz, rt and component id)")
 log_debug("Authors: AR")
@@ -27,35 +27,35 @@ log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC
 ## TODO
 components <-
   read_clusters(id = params$gnps) |>
-  dplyr::select(
-    feature_id = `cluster index`,
-    component_id = componentindex,
-    rt = RTMean,
-    mz = `precursor mass`
-  ) |>
-  dplyr::distinct()
+    dplyr::select(
+      feature_id = `cluster index`,
+      component_id = componentindex,
+      rt = RTMean,
+      mz = `precursor mass`
+    ) |>
+    dplyr::distinct()
 
 log_debug(x = "Adding components to features")
 table_filled <-
   dplyr::left_join(components, table) |>
-  dplyr::distinct() |>
-  dplyr::arrange(desc(score_input)) |>
-  dplyr::arrange(as.numeric(feature_id)) |>
-  dplyr::select(
-    feature_id,
-    component_id,
-    rt,
-    mz,
-    inchikey_2D,
-    smiles_2D,
-    molecular_formula,
-    structure_exact_mass,
-    score_input,
-    library,
-    structure_taxonomy_npclassifier_01pathway,
-    structure_taxonomy_npclassifier_02superclass,
-    structure_taxonomy_npclassifier_03class
-  )
+    dplyr::distinct() |>
+    dplyr::arrange(desc(score_input)) |>
+    dplyr::arrange(as.numeric(feature_id)) |>
+    dplyr::select(
+      feature_id,
+      component_id,
+      rt,
+      mz,
+      inchikey_2D,
+      smiles_2D,
+      molecular_formula,
+      structure_exact_mass,
+      score_input,
+      library,
+      structure_taxonomy_npclassifier_01pathway,
+      structure_taxonomy_npclassifier_02superclass,
+      structure_taxonomy_npclassifier_03class
+    )
 
 log_debug(x = "Calculating mz error")
 ## TODO can be improved

@@ -25,24 +25,24 @@ biological_cleaning <-
     }
     df01 <- annotationTableWeightedBio %>%
       filter(score_initialNormalized > 0 |
-        # those lines are to keep ms1 annotation
-        score_biological >= params$score$biological$order) %>%
+               # those lines are to keep ms1 annotation
+               score_biological >= params$score$biological$order) %>%
       distinct(feature_id,
-        inchikey_2D,
-        .keep_all = TRUE
+               inchikey_2D,
+               .keep_all = TRUE
       )
 
     cat("erasing other MS1 candidates \n")
     df02 <-
       anti_join(
         annotationTableWeightedBio %>% distinct(feature_id,
-          rank_initial,
-          rank_final,
-          .keep_all = TRUE
+                                                rank_initial,
+                                                rank_final,
+                                                .keep_all = TRUE
         ),
         df01
       ) %>%
-      mutate(inchikey_2D = "notAnnotated")
+        mutate(inchikey_2D = "notAnnotated")
 
     df03 <- bind_rows(df01, df02)
 
@@ -95,10 +95,10 @@ biological_cleaning <-
     cat("... among edges... \n")
     df3 <-
       right_join(edgesTable,
-        df1,
-        by = setNames("feature_id", "feature_target")
+                 df1,
+                 by = setNames("feature_id", "feature_target")
       ) %>%
-      filter(!is.na(feature_source))
+        filter(!is.na(feature_source))
 
     cat("... at the pathway level \n")
     freq_pat <- df3 %>%
@@ -119,8 +119,8 @@ biological_cleaning <-
       mutate(rank_final = as.numeric(rank_final)) %>%
       arrange(rank_final) %>%
       distinct(feature_source,
-        candidate_structure_1_pathway,
-        .keep_all = TRUE
+               candidate_structure_1_pathway,
+               .keep_all = TRUE
       ) %>%
       group_by(
         feature_source,
@@ -172,8 +172,8 @@ biological_cleaning <-
       mutate(rank_final = as.numeric(rank_final)) %>%
       arrange(rank_final) %>%
       distinct(feature_source,
-        candidate_structure_2_superclass,
-        .keep_all = TRUE
+               candidate_structure_2_superclass,
+               .keep_all = TRUE
       ) %>%
       group_by(
         feature_source,
@@ -225,8 +225,8 @@ biological_cleaning <-
       mutate(rank_final = as.numeric(rank_final)) %>%
       arrange(rank_final) %>%
       distinct(feature_source,
-        candidate_structure_3_class,
-        .keep_all = TRUE
+               candidate_structure_3_class,
+               .keep_all = TRUE
       ) %>%
       group_by(
         feature_source,
@@ -262,23 +262,23 @@ biological_cleaning <-
     cat("joining all except -1 together \n")
     df4 <-
       left_join(df1,
-        freq_pat,
-        by = setNames("feature_source", "feature_id")
+                freq_pat,
+                by = setNames("feature_source", "feature_id")
       ) %>%
-      left_join(.,
-        freq_sup,
-        by = setNames("feature_source", "feature_id")
-      ) %>%
-      left_join(.,
-        freq_cla,
-        by = setNames("feature_source", "feature_id")
-      ) %>%
-      mutate(component_id = as.numeric(component_id)) %>%
-      select(
-        feature_id,
-        everything()
-      ) %>%
-      tibble()
+        left_join(.,
+                  freq_sup,
+                  by = setNames("feature_source", "feature_id")
+        ) %>%
+        left_join(.,
+                  freq_cla,
+                  by = setNames("feature_source", "feature_id")
+        ) %>%
+        mutate(component_id = as.numeric(component_id)) %>%
+        select(
+          feature_id,
+          everything()
+        ) %>%
+        tibble()
 
     # think about the score
     cat("adding dummy consistency for features with less than 2 neighbors \n")
@@ -338,7 +338,7 @@ chemical_cleaning <-
       ) %>%
       group_by(feature_id) %>%
       distinct(inchikey_2D,
-        .keep_all = TRUE
+               .keep_all = TRUE
       ) %>%
       mutate(rank_final = (dense_rank(-score_pondered_chemo))) %>%
       filter(rank_final <= params$top_k$final) %>%
@@ -390,7 +390,7 @@ chemical_cleaning <-
 
     df3 <- structureOrganismPairsTable %>%
       distinct(structure_inchikey_2D,
-        .keep_all = TRUE
+               .keep_all = TRUE
       ) %>%
       select(
         inchikey_2D = structure_inchikey_2D,
@@ -450,7 +450,7 @@ chemical_cleaning <-
       group_by(feature_id) %>%
       summarise(across(
         colnames(df4a)[3:18],
-        ~ gsub(
+        ~gsub(
           pattern = "\\bNA\\b",
           replacement = "",
           x = paste(.x, collapse = "|")
@@ -488,7 +488,7 @@ chemical_cleaning <-
         arrange(feature_id) %>%
         mutate(across(
           everything(),
-          ~ y_as_na(x = .x, y = "")
+          ~y_as_na(x = .x, y = "")
         )) %>%
         select(
           feature_id,
@@ -559,7 +559,7 @@ chemical_cleaning <-
         arrange(feature_id) %>%
         mutate(across(
           everything(),
-          ~ y_as_na(x = .x, y = "")
+          ~y_as_na(x = .x, y = "")
         )) %>%
         select(
           feature_id,

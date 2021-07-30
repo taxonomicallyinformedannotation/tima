@@ -1,36 +1,33 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
-source(file = "R/colors.R")
-source(file = "R/prepare-hierarchy.R")
-source(file = "R/prepare-hierarchy_2.R")
-source(file = "R/plot_histograms.R")
-source(file = "R/prepare_plot.R")
+source(file = "src/R/colors.R")
+source(file = "src/R/get_gnps.R")
+source(file = "src/R/helpers.R")
+source(file = "src/R/plot_histograms.R")
+source(file = "src/R/prepare-hierarchy.R")
+source(file = "src/R/prepare-hierarchy_2.R")
+source(file = "src/R/prepare_plot.R")
 
 log_debug("Loading packages")
 library(crayon)
 library(docopt)
 library(dplyr)
+library(forcats)
+library(ggplot2)
+library(ggpubr)
+## remotes::install_github("KarstensLab/microshades")
+library(microshades)
 library(plotly)
 library(readr)
 library(splitstackshape)
 
-## new
-library(forcats)
-library(microshades)
-library(ggplot2)
-library(ggpubr)
-
-## beautiful lib
-## remotes::install_github("KarstensLab/microshades")
-library(microshades)
-## docopt to do
+## TODO docopt
 
 weighted_ms1_path <-
-  "../data/processed/210724_164728/FinalResults.tsv.gz"
+  "data/processed/210730_143021/FinalResults.tsv.gz"
 
 weighted_path <-
-  "../data/processed/210724_164510/FinalResults.tsv.gz"
+  "data/processed/210730_143236/FinalResults.tsv.gz"
 
 log_debug(
   "This script performs",
@@ -43,42 +40,41 @@ log_debug(x = "loading ...")
 log_debug(x = "... parameters")
 params <- list()
 params$top_k$candidates$initial <- 1
-params$job$gnps <- "b988e66d1542430cbc6e703be781e49c"
+params$job$gnps <- "db1c51fa29a64892af520698a18783e4"
 inchikey_colname <- "inchikey_2D"
 score_input_colname <- "score_final"
 clean_xanthones <- TRUE
 
 log_debug(x = "... functions")
-source(file = "R/get_gnps.R")
 
 log_debug(x = "... files ...")
 log_debug(x = "... weighted + ms1 ISDB")
 ms1 <-
   readr::read_delim(file = weighted_ms1_path) |>
-  dplyr::mutate(dplyr::across(feature_id, as.numeric))
+    dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 no_ms1 <-
   readr::read_delim(file = weighted_path) |>
-  dplyr::mutate(dplyr::across(feature_id, as.numeric))
+    dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 log_debug(x = "loading feature table")
 
-feature_table <- read_featuretable(id = params$job$gnps)
+feature_table <- read_features(id = params$job$gnps)
 
 ms1 <-
   right_join(ms1,
-    feature_table |> distinct(`row ID`),
-    by = c("feature_id" = "row ID")
+             feature_table |> distinct(`row ID`),
+             by = c("feature_id" = "row ID")
   )
 
 no_ms1 <-
   right_join(no_ms1,
-    feature_table |> distinct(`row ID`),
-    by = c("feature_id" = "row ID")
+             feature_table |> distinct(`row ID`),
+             by = c("feature_id" = "row ID")
   )
 log_debug(x = "loading metadata table")
-metadata_table <- read_metadatatable(id = params$job$gnps)
+metadata_table <- read_metadata(id = params$job$gnps)
 
 log_debug(x = "removing \" Peak area\" from column names")
 colnames(feature_table) <-
@@ -94,7 +90,7 @@ feature_table <- feature_table %>%
     -"row m/z",
     -"row retention time"
   ) |>
-  tibble::column_to_rownames(var = "row ID")
+    tibble::column_to_rownames(var = "row ID")
 
 top_n <- feature_table |>
   tibble::rownames_to_column() |>
@@ -135,15 +131,15 @@ final_table <- prepare_hierarchy(dataframe = ms1)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
-    by = c("sample" = "filename")
+                   metadata_table |> mutate(
+                     filename = gsub(
+                       pattern = ".mzML",
+                       replacement = "",
+                       x = filename,
+                       fixed = TRUE
+                     )
+                   ),
+                   by = c("sample" = "filename")
   )
 
 final_table_no_ms1 <- prepare_hierarchy(dataframe = no_ms1)

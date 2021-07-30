@@ -1,43 +1,60 @@
-## tl;dr:
+## Repo preparation
 
-```
-# repo preparation
+### To run locally:
 
-docker build -t tima . # optional
-docker run -it --rm -v $PWD:/app tima bash # optional
+```shell
 conda env create -f environment.yml &&
-conda activate tima &&
+conda activate tima-python
+```
 
+## Structure-organism pairs library
 
-# get a working structure-organism pairs library
+```shell
+Rscript src/prepare_lotus.R &&
+# Rscript src/prepare_dnp.R && # only if you have access to it
+Rscript src/prepare_library.R &&
+Rscript src/prepare_adducts.R &&
+```
 
-bash src/get-lotus.sh &&
-cd src &&
-Rscript prepare_lotus.R &&
-# Rscript prepare_dnp.R && # only if you have access to it
-Rscript prepare_library.R &&
-Rscript prepare_adducts.R &&
+## Annotations
 
+### Get MS2 annotations
 
-# get spectral matches
+```shell
 # (spectral-lib-matcher, which is only in python. see related repo)
-cd .. &&
-bash src/get_example_isdb.sh && # get an example result from new isdb without python
+# instead we provide an example file coming from the new ISDB.
+# It also works with annotations coming from GNPS (see next steps)
+./src/get_example_isdb.sh
+```
 
+### Format MS2 annotations
 
-# prepare all files for weighting
+```shell
+# depending on the annotation tool you used
 
-bash src/get_gnverifier.sh &&
-cd src &&
 Rscript prepare_gnps.R && # optional
 Rscript prepare_isdb.R &&
-Rscript prepare_features_components.R &&
-Rscript prepare_features_classification.R &&
-Rscript prepare_edges.R && 
-Rscript prepare_taxa.R 
-
-# And finally the graal!
-Rscript process_annotations.R
-
-# NOTE: you can use --help or -h argument for all .R steps to get more info
 ```
+
+### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)
+
+```shell
+Rscript src/prepare_edges.R && 
+Rscript src/prepare_features_components.R &&
+Rscript src/prepare_features_classification.R &&
+```
+
+### Get biological taxonomy information
+
+```shell
+./src/get_gnverifier.sh && 
+Rscript src/prepare_taxa.R 
+```
+
+## And finally the graal!
+
+```shell
+Rscript src/process_annotations.R
+```
+
+NOTE: you can use --help or -h argument for all .R steps to get more info

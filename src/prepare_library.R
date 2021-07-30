@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = "src/R/helpers.R")
 
 log_debug("This script prepares a custom library made of all prepared libraries. \n")
 log_debug("Authors: AR")

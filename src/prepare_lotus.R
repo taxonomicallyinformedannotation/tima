@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = "src/R/helpers.R")
 
 log_debug(
   "This script prepares LOTUS referenced structure-organism pairs \n",
@@ -17,7 +17,7 @@ paths <- parse_yaml_paths()
 
 log_debug(x = "loading files")
 lotus <-
-  readr::read_delim(file = paths$data$source$libraries$lotus, )
+  readr::read_delim(file = paths$data$source$libraries$lotus,)
 
 lotus_prepared <- lotus |>
   dplyr::mutate(structure_inchikey_2D = substring(

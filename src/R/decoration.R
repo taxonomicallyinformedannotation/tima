@@ -1,6 +1,5 @@
 require(crayon)
 require(dplyr)
-require(stringr)
 
 #' Title
 #'
@@ -17,10 +16,7 @@ ms1_decoration <- function() {
           annotation_table_ms1 |>
             dplyr::filter(!is.na(inchikey_2D) |
               inchikey_2D != "notAnnotated") |>
-            dplyr::filter(stringr::str_detect(
-              pattern = unlist(params$ms$adducts[[params$ms$mode]]),
-              string = library
-            ))
+            dplyr::filter(score_input == 0)
         )
       ),
       crayon::green("annotations"),
@@ -30,10 +26,7 @@ ms1_decoration <- function() {
           annotation_table_ms1 |>
             dplyr::filter(!is.na(inchikey_2D) |
               inchikey_2D != "notAnnotated") |>
-            dplyr::filter(str_detect(
-              pattern = unlist(params$ms$adducts[[params$ms$mode]]),
-              string = library
-            )) |>
+            dplyr::filter(score_input == 0) |>
             dplyr::distinct(feature_id)
         )
       ),
@@ -46,11 +39,8 @@ ms1_decoration <- function() {
               !is.na(inchikey_2D) &
                 inchikey_2D != "notAnnotated" &
                 inchikey_2D != ""
-            ) %>%
-            dplyr::filter(stringr::str_detect(
-              pattern = unlist(params$ms$adducts[[params$ms$mode]]),
-              string = library
-            )) |>
+            ) |>
+            dplyr::filter(score_input == 0) |>
             dplyr::distinct(feature_id),
           y = metadata_table_spectral_annotation |>
             dplyr::filter(!is.na(inchikey_2D) &

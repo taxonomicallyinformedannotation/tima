@@ -1,5 +1,5 @@
-source(file = "R/log_debug.R")
-source(file = "R/preclean_gnverifier.R")
+source(file = "src/R/log_debug.R")
+source(file = "src/R/preclean_gnverifier.R")
 
 #' Title
 #'
@@ -58,13 +58,13 @@ clean_gnverifier <- function() {
       log_debug("Joining both results")
       dataOrganismVerified_3 <-
         rbind(dataOrganismVerified, dataOrganismVerified_2) |>
-        dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
-        dplyr::distinct()
+          dplyr::filter(organismDbTaxo == "Open Tree of Life") |>
+          dplyr::distinct()
 
       warning_2 <-
         dplyr::left_join(organism_table, dataOrganismVerified_3) %>%
-        dplyr::filter(!is.na(organism)) %>%
-        dplyr::filter(is.na(organismDbTaxo))
+          dplyr::filter(!is.na(organism)) %>%
+          dplyr::filter(is.na(organismDbTaxo))
 
       if (nrow(warning_2) != 0) {
         log_debug(

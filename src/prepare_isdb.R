@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = "src/R/helpers.R")
 
 log_debug(
   "This script treats ISDB results to obtain following file : \n
