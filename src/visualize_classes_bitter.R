@@ -137,7 +137,7 @@ nice_colors <- rev(
 
 sunburst_colors <- character()
 
-for (i in seq_along(1:length(nice_colors))) {
+for (i in seq_len(length(nice_colors))) {
   sunburst_colors[i] <- rev(nice_colors)[[i]][5]
 }
 

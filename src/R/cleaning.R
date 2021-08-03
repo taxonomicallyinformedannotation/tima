@@ -44,7 +44,7 @@ biological_cleaning <-
       ) %>%
       mutate(inchikey_2D = "notAnnotated")
 
-    df03 <- bind_rows(df01, df02)
+    df03 <- dplyr::bind_rows(df01, df02)
 
     df <- df03 %>%
       distinct(
@@ -297,7 +297,7 @@ biological_cleaning <-
       mutate(component_id = as.numeric(component_id))
 
     cat("binding results together \n")
-    df5 <- bind_rows(df4, dummy_consistency)
+    df5 <- dplyr::bind_rows(df4, dummy_consistency)
 
     return(df5)
   }
