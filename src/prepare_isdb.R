@@ -51,11 +51,6 @@ ifelse(
   no = paste(paths$data$interim$path, "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$edges$path),
-  yes = dir.create(paths$data$interim$edges$path),
-  no = paste(paths$data$interim$edges$path, "exists")
-)
-ifelse(
   test = !dir.exists(paths$data$interim$config$path),
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
@@ -67,7 +62,7 @@ log_debug(
 )
 readr::write_delim(
   x = table,
-  file = params$output,
+  file = params$output
 )
 
 export_params(

@@ -1,0 +1,12 @@
+You can use this script with the following example:
+Rscript prepare_sirius.R --directory '../../20210804_10043' --output 'data/interim/annotations/10043_sirius_pretreated.tsv.gz'
+
+Usage: prepare_isdb.R [--directory=<directory>] [--output=<output>]
+
+Arguments:
+  -d --directory=<directory>    Directory containing SIRIUS results
+  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+
+Options:
+  -h --help         Show this screen.
+  -v --version      Show version.

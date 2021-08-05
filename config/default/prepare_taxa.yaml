@@ -5,3 +5,4 @@ extension: FALSE # is the filename extension present in your feature table?
 column_name: ATTRIBUTE_species  # biological_source
 gnps: db1c51fa29a64892af520698a18783e4 # needed depending on the tool you used
 top_k: 1 # number of organisms per feature
+force:

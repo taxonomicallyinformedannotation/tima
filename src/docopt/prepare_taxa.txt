@@ -6,6 +6,7 @@ Usage: prepare_taxa.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--c
 Options:
   -c --column.name=<column.name>  Name of the column containing the lowest possible taxon in your feature file.
   -e --extension=<extension>      Is the filename extension in your feature table? Boolean
+  -f --force=<force>              Force a single organism. Example -f 'Swertia chirayita'
   -g --gnps=<gnps>                Your GNPS job id. Depending on the annotation tool you used
   -i --input=<input>              File containing your intensity/sample to attribute biological source. Supports compressed files.
   -k --k.top=<k.top>              Number of allowed biological sources per feature. Should not exceed 5.
