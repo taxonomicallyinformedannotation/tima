@@ -19,28 +19,40 @@ params <- get_params(step = step)
 
 log_debug("Loading and formatting SIRIUS results")
 canopus <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "canopus_summary.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "canopus_summary.tsv"
+  ))
 
 canopus_adducts <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "canopus_summary_adducts.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "canopus_summary_adducts.tsv"
+  ))
 
 formula <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "formula_identifications.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "formula_identifications.tsv"
+  ))
 
 formula_adducts <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "formula_identifications_adducts.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "formula_identifications_adducts.tsv"
+  ))
 
 compound <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "compound_identifications.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "compound_identifications.tsv"
+  ))
 
 compound_adducts <-
-  readr::read_delim(file = file.path(params$directory,
-                                     "compound_identifications_adducts.tsv"))
+  readr::read_delim(file = file.path(
+    params$directory,
+    "compound_identifications_adducts.tsv"
+  ))
 
 ## TODO compound classes if npclassifier one day
 canopus_prepared <- canopus |>
@@ -117,7 +129,7 @@ compound_adducts_prepared <- compound_adducts |>
     structure_taxonomy_npclassifier_03class = NA
   )
 
-formula_prepared <-  formula |>
+formula_prepared <- formula |>
   dplyr::mutate(feature_id = gsub(
     pattern = ".*_",
     replacement = "",
@@ -126,7 +138,7 @@ formula_prepared <-  formula |>
   mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
   distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
 
-formula_adducts_prepared <-  formula_adducts |>
+formula_adducts_prepared <- formula_adducts |>
   dplyr::mutate(feature_id = gsub(
     pattern = ".*_",
     replacement = "",
@@ -146,10 +158,12 @@ formulas_prepared <-
 table <- left_join(compounds_prepared, formulas_prepared)
 
 table[] <-
-  lapply(table,
-         function(x) {
-           y_as_na(x, y = "N/A")
-         })
+  lapply(
+    table,
+    function(x) {
+      y_as_na(x, y = "N/A")
+    }
+  )
 
 log_debug(x = "Exporting ...")
 ifelse(
@@ -168,10 +182,14 @@ ifelse(
   no = paste(paths$data$interim$config$path, "exists")
 )
 
-log_debug(x = "... path to export is",
-          params$output)
-readr::write_delim(x = table,
-                   file = params$output)
+log_debug(
+  x = "... path to export is",
+  params$output
+)
+readr::write_delim(
+  x = table,
+  file = params$output
+)
 
 export_params(
   parameters = params,
