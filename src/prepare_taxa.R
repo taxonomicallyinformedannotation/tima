@@ -222,7 +222,7 @@ ifelse(
 log_debug(x = "... path to export is",
           params$output)
 readr::write_delim(x = metadata_table_joined_summarized,
-                   file = params$output,)
+                   file = params$output)
 
 export_params(
   parameters = params,
