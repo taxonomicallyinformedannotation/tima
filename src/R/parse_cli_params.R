@@ -37,15 +37,18 @@ parse_cli_params <- function() {
     if (!is.null(arguments$gnps)) {
       params$gnps <- arguments$gnps
     }
+    if (!is.null(arguments$initial.candidates)) {
+      params$top_k$initial <- as.numeric(arguments$initial.candidates)
+    }
     if (!is.null(arguments$input)) {
       params$input <- arguments$input
     }
     if (!is.null(arguments$k.top)) {
-      params$top_k <-
+      params$top_k$final <-
         as.numeric(arguments$k.top)
     }
     if (!is.null(arguments$level)) {
-      params$filter$level <- arguments$level
+      params$filter$level <- as.numeric(arguments$level)
     }
     if (!is.null(arguments$library)) {
       params$library <- arguments$library
@@ -66,13 +69,13 @@ parse_cli_params <- function() {
       params$output <- arguments$output
     }
     if (!is.null(arguments$ppm)) {
-      params$ms$tolerance$ppm <- arguments$ppm
+      params$ms$tolerance$ppm <- as.numeric(arguments$ppm)
     }
     if (!is.null(arguments$quickmode)) {
       params$quickmode <- arguments$quickmode
     }
     if (!is.null(arguments$rt)) {
-      params$ms$tolerance$rt <- arguments$rt
+      params$ms$tolerance$rt <- as.numeric(arguments$rt)
     }
     if (!is.null(arguments$source)) {
       params$source_name <-

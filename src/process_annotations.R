@@ -93,7 +93,7 @@ structure_organism_pairs_table <-
 structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
   "notClassified"
 
-## for MS1 only
+# # for MS1 only
 # metadata_table_spectral_annotation <-
 #   metadata_table_spectral_annotation |>
 #   dplyr::mutate(
@@ -103,7 +103,7 @@ structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
 #     mz_error = NA
 #   ) |>
 #   dplyr::mutate(across(c(
-#     inchikey, score_input, library_name, mz_error
+#     inchikey_2D, score_input, library, mz_error
 #   ),
 #   as.character))
 
