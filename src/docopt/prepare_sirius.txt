@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript prepare_sirius.R --directory '../../20210804_10043' --output 'data/interim/annotations/10043_sirius_pretreated.tsv.gz'
+Rscript src/prepare_sirius.R --directory '../../20210804_10043' --output 'data/interim/annotations/10043_sirius_pretreated.tsv.gz'
 
 Usage: prepare_isdb.R [--directory=<directory>] [--output=<output>]
 

@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript prepare_dnp.R --input '../lotus-processor/data/processed/210715_dnp_metadata.csv.gz' 
+Rscript src/prepare_dnp.R --input '../lotus-processor/data/processed/210715_dnp_metadata.csv.gz' 
 
 Usage: prepare_dnp.R [--input=<input>] [--output=<output>]
 

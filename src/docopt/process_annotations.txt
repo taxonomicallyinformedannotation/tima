@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript process_annotations.R
+Rscript src/process_annotations.R
 
 Usage: process_annotations.R [--output=<output>] [--annotation=<annotation>] [--complement=<complement>] [--edges=<edges>] [--features=<features>][--initial.candidates=<initial.candidates>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>]
 

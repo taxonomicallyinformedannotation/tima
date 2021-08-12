@@ -51,9 +51,9 @@ Rscript src/prepare_adducts.R &&
 ```shell
 # depending on the annotation tool you used
 
-Rscript prepare_gnps.R && # optional
-Rscript prepare_sirius.R && # optional
-Rscript prepare_isdb.R &&
+Rscript src/prepare_gnps.R && # optional
+Rscript src/prepare_sirius.R && # optional
+Rscript src/prepare_isdb.R &&
 ```
 
 ### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)

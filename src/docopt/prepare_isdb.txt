@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript prepare_isdb.R --input 'data/interim/annotations/example_isdb_result.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz'
+Rscript src/prepare_isdb.R --input 'data/interim/annotations/example_isdb_result.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz'
 
 Usage: prepare_isdb.R [--input=<input>] [--output=<output>]
 
