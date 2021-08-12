@@ -4,10 +4,10 @@ Rscript src/process_annotations.R
 Usage: process_annotations.R [--output=<output>] [--annotation=<annotation>] [--complement=<complement>] [--edges=<edges>] [--features=<features>][--initial.candidates=<initial.candidates>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>]
 
 Options:
-  -a --annotation=<annotation>  The file containing your prepared annotations
+  -a --annotation=<annotation>  The file containing your prepared (filled) annotations
   -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
   -e --edges=<edges>            The file containing your prepared edges
-  -f --features=<features>      The file containing your prepared features
+  -f --features=<features>      The file containing your prepared (taxed) features
   -i --initial.candidates=<initial.candidates>      Number of initial candidates to be considered.
   -k --k.top=<k.top>            Number of final candidates to be considered.
   -l --library=<library>        Library to be used.
