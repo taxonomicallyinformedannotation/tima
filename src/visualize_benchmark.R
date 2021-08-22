@@ -69,7 +69,8 @@ log_debug(x = "... raw ISDB")
 raw <- readr::read_delim(file = raw_path) |>
   distinct(feature_id,
            inchikey_2D = short_inchikey,
-           score = msms_score)
+           score = msms_score,
+           matched_peaks)
 
 log_debug(x = "... raw MS1")
 raw_ms1 <- readr::read_delim(file = raw_ms1_path) |>
@@ -169,6 +170,7 @@ new_ranked <- new |>
   dplyr::distinct(feature_id,
                   inchikey_2D, ## problematic for MS1 with same score at rank 1?
                   rank,
+                  score,
                   .keep_all = TRUE)
 
 raw_results <- left_join(solutions, raw_ranked) |>
@@ -197,44 +199,45 @@ new_results <- left_join(solutions, new_ranked) |>
 
 top_k <- seq_len(params$top_k$initial)
 
-raw <- top_k
+raw_k <- top_k
 for (i in seq_along(top_k)) {
-  raw[[i]] <- nrow(subset(raw_results, rank <= i))
+  raw_k[[i]] <- nrow(subset(raw_results, rank <= i))
 }
 
-raw_ms1 <- top_k
+raw_ms1_k <- top_k
 for (i in seq_along(top_k)) {
-  raw_ms1[[i]] <- nrow(subset(raw_ms1_results, rank <= i))
+  raw_ms1_k[[i]] <- nrow(subset(raw_ms1_results, rank <= i))
 }
 
-wei <- top_k
+wei_k <- top_k
 for (i in seq_along(top_k)) {
-  wei[[i]] <- nrow(subset(wei_results, rank <= i))
+  wei_k[[i]] <- nrow(subset(wei_results, rank <= i))
 }
 
-wei_che <- top_k
+wei_che_k <- top_k
 for (i in seq_along(top_k)) {
-  wei_che[[i]] <- nrow(subset(wei_che_results, rank <= i))
+  wei_che_k[[i]] <- nrow(subset(wei_che_results, rank <= i))
 }
 
-ms1 <- top_k
+ms1_k <- top_k
 for (i in seq_along(top_k)) {
-  ms1[[i]] <- nrow(subset(ms1_results, rank <= i))
+  ms1_k[[i]] <- nrow(subset(ms1_results, rank <= i))
 }
 
-new <- top_k
+new_k <- top_k
 for (i in seq_along(top_k)) {
-  new[[i]] <- nrow(subset(new_results, rank <= i))
+  new_k[[i]] <- nrow(subset(new_results, rank <= i))
 }
 
-ROC <- data.frame(raw, raw_ms1, wei, wei_che, ms1, new) |>
+ROC <-
+  data.frame(raw_k, raw_ms1_k, wei_k, wei_che_k, ms1_k, new_k) |>
   dplyr::mutate(
-    raw = raw / nrow(solutions) * 100,
-    raw_ms1 = raw_ms1 / nrow(solutions) * 100,
-    wei = wei / nrow(solutions) * 100,
-    wei_che = wei_che / nrow(solutions) * 100,
-    ms1 = ms1 / nrow(solutions) * 100,
-    new = new / nrow(solutions) * 100
+    raw_k = raw_k / nrow(solutions) * 100,
+    raw_ms1_k = raw_ms1_k / nrow(solutions) * 100,
+    wei_k = wei_k / nrow(solutions) * 100,
+    wei_che_k = wei_che_k / nrow(solutions) * 100,
+    ms1_k = ms1_k / nrow(solutions) * 100,
+    new_k = new_k / nrow(solutions) * 100
   )
 
 ROC <- rbind(c(0, 0), ROC)
@@ -243,7 +246,7 @@ ROC[1, 7] <- 1
 
 roc <- plotly::plot_ly(ROC, x = ~ x) |>
   plotly::add_trace(
-    y = ~ raw,
+    y = ~ raw_k,
     name = "ms2",
     mode = "lines",
     line = list(shape = "hv",
@@ -252,7 +255,7 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
                   opacity = 0)
   ) |>
   plotly::add_trace(
-    y = ~ raw_ms1,
+    y = ~ raw_ms1_k,
     name = "ms1",
     mode = "lines",
     line = list(shape = "hv",
@@ -261,7 +264,7 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
                   opacity = 0)
   ) |>
   plotly::add_trace(
-    y = ~ wei,
+    y = ~ wei_k,
     name = "ms2 weighted",
     line = list(shape = "hv",
                 color = "#2994D2"),
@@ -269,7 +272,7 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
                   opacity = 0)
   ) |>
   plotly::add_trace(
-    y = ~ wei,
+    y = ~ wei_k,
     name = "ms2 weighted + chemo",
     line = list(shape = "hv",
                 color = "#08589B"),
@@ -277,7 +280,7 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
                   opacity = 0)
   ) |>
   plotly::add_trace(
-    y = ~ ms1,
+    y = ~ ms1_k,
     name = "ms2 + ms1 weighted",
     line = list(shape = "hv",
                 color = "#7CB13F"),
@@ -285,7 +288,7 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
                   opacity = 0)
   ) |>
   plotly::add_trace(
-    y = ~ new,
+    y = ~ new_k,
     name = "ms2 + ms1 weighted + chemo",
     line = list(shape = "hv",
                 color = "#336A2D"),
@@ -314,7 +317,150 @@ roc <- plotly::plot_ly(ROC, x = ~ x) |>
 
 roc
 
-plotly::orca(p = roc, file = roc_path)
+# plotly::orca(p = roc, file = roc_path)
+
+diff <- new_ranked |>
+  left_join(new_results |> mutate(correct = "CORRECT")) |>
+  left_join(raw |> distinct(feature_id, inchikey_2D, matched_peaks)) |>
+  mutate(correct = if_else(
+    condition = is.na(correct),
+    true = "INCORRECT",
+    false = correct
+  ))
+
+diff_wrong <- diff |>
+  filter(correct == "INCORRECT")
+diff_correct <- diff |>
+  filter(correct == "CORRECT")
+
+plotly::plot_ly() |>
+  plotly::add_trace(
+    data = diff_wrong,
+    name = "incorrect hits",
+    x =  ~ rank,
+    y =  ~ score,
+    marker = list(
+      size = 5,
+      color = "#bdbdbd",
+      opacity = 0.2
+    )
+  ) |>
+  plotly::add_trace(
+    data = diff_correct,
+    name = "correct hits",
+    x =  ~ rank,
+    y =  ~ score,
+    color = ~ matched_peaks,
+    marker = list(
+      size = 5,
+      line = list(
+        color = "red",
+        opacity = 0.5,
+        width = 0.2
+      )
+    )
+  ) |>
+  plotly::layout(title = "correct hits repartition (left:ms2 / right: ms2 + ms1 + taxo)",
+                 xaxis = list(range = c(0,
+                                        params$top_k$initial))) |>
+  plotly::toWebGL()
+
+
+diff <- new_ranked |>
+  left_join(new_results |> mutate(correct = "CORRECT")) |>
+  left_join(raw |> distinct(feature_id, inchikey_2D, matched_peaks)) |>
+  mutate(correct = if_else(
+    condition = is.na(correct),
+    true = "INCORRECT",
+    false = correct
+  ))
+
+diff_wrong <- diff |>
+  filter(correct == "INCORRECT")
+diff_correct <- diff |>
+  filter(correct == "CORRECT")
+
+taxo_plot <- plotly::plot_ly() |>
+  plotly::add_trace(
+    data = diff_wrong,
+    name = "incorrect hits",
+    x =  ~ rank,
+    y =  ~ score,
+    marker = list(
+      size = 5,
+      color = "#bdbdbd",
+      opacity = 0.2
+    )
+  ) |>
+  plotly::add_trace(
+    data = diff_correct,
+    name = "correct hits",
+    x =  ~ rank,
+    y =  ~ score,
+    color = ~ matched_peaks,
+    marker = list(
+      size = 5,
+      line = list(
+        color = "red",
+        opacity = 0.5,
+        width = 0.2
+      )
+    )
+  ) |>
+  plotly::layout(title = "correct hits repartition (left: ms2 only / right: ms2 + ms1 + taxo)",
+                 xaxis = list(range = c(0,
+                                        params$top_k$initial))) |>
+  plotly::toWebGL()
+
+diff_ms2 <- raw_ranked |>
+  left_join(raw_results |> mutate(correct = "CORRECT")) |>
+  mutate(correct = if_else(
+    condition = is.na(correct),
+    true = "INCORRECT",
+    false = correct
+  ))
+
+diff_wrong_ms2 <- diff_ms2 |>
+  filter(correct == "INCORRECT")
+diff_correct_ms2 <- diff_ms2 |>
+  filter(correct == "CORRECT")
+
+ms2_plot <- plotly::plot_ly() |>
+  plotly::add_trace(
+    data = diff_wrong_ms2,
+    name = "incorrect hits",
+    x =  ~ rank,
+    y =  ~ score,
+    marker = list(
+      size = 5,
+      color = "#bdbdbd",
+      opacity = 0.2
+    ),
+    showlegend = FALSE
+  ) |>
+  plotly::add_trace(
+    data = diff_correct_ms2,
+    name = "correct hits",
+    x =  ~ rank,
+    y =  ~ score,
+    color = ~ matched_peaks,
+    marker = list(
+      size = 5,
+      line = list(
+        color = "red",
+        opacity = 0.5,
+        width = 0.2
+      )
+    ),
+    showlegend = FALSE
+  ) |>
+  plotly::hide_colorbar() |>
+  plotly::layout(title = "correct hits repartition (ms2 only)",
+                 xaxis = list(range = c(0,
+                                        params$top_k$initial))) |>
+  plotly::toWebGL()
+
+plotly::subplot(ms2_plot, taxo_plot, shareX = TRUE, shareY = TRUE)
 
 end <- Sys.time()
 
