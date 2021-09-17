@@ -543,7 +543,7 @@ ms1_annotation <-
         rt,
         mz,
       ) |>
-      distinct() |> 
+      distinct() |>
       mutate_all(as.numeric)
 
     cat("adding \"notAnnotated\" \n")
@@ -625,7 +625,7 @@ non_ms1_annotation <-
         component_id,
         mz,
         rt,
-      ) |> 
+      ) |>
       distinct()
 
     cat("adding \"notAnnotated\" \n")

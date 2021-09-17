@@ -1,6 +1,8 @@
 # Taxonomically Informed Metabolite Annotation
 
-The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then. The worklow is illustrated in Figure 1.
+The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since
+then. 
+The worklow is illustrated in Figure 1.
 
 ![Figure 1](./img/tima.svg)
 
@@ -9,11 +11,14 @@ This repository contains everything needed to perform **T**axonomically **I**nfo
 It is provided with an example from well-known pharmacopoeia plants.
 
 Here is what you *minimally* need:
+
 - A feature list with *or without* candidate annotations, if you are using GNPS, it can be your GNPS job ID.
-- The source organism of the extract you are annotating, if you are associating metadata within GNPS, it can be your GNPS job ID.
+- The source organism of the extract you are annotating, if you are associating metadata within GNPS, it can be your
+  GNPS job ID.
 - An edge list, if you are using GNPS, it can be your GNPS job ID.
 
 Optionally, you may want to add:
+
 - An in-house structure-organism pairs library (we provide **LOTUS** as starting point for each user)
 - Your own manual or automated annotations (we currently support annotations coming from ISDB and SIRIUS)
 

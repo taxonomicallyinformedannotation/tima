@@ -38,20 +38,22 @@ taxa_ranks_dictionary <-
 if (params$tool == "gnps") {
   log_debug(x = "Loading feature table")
   feature_table <- read_features(id = params$gnps)
-  
+
   if (!is.null(params$force)) {
     log_debug(x = "Forcing all features to given organism")
     metadata_table <- data.frame(params$force)
     colnames(metadata_table) <- params$column_name
-  } else{
+  } else {
     log_debug(x = "Loading metadata table")
     metadata_table <- read_metadata(id = params$gnps)
-    
+
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
     feature_table <- feature_table %>%
-      dplyr::select(`row ID`,
-                    matches(" Peak area")) |>
+      dplyr::select(
+        `row ID`,
+        matches(" Peak area")
+      ) |>
       tibble::column_to_rownames(var = "row ID")
     colnames(feature_table) <-
       gsub(
@@ -70,7 +72,6 @@ if (params$tool == "gnps") {
       dplyr::arrange(rowname, rank)
   }
 }
-}
 
 if (params$tool == "manual") {
   metadata_table <-
@@ -82,9 +83,11 @@ organism_table <- metadata_table |>
   dplyr::filter(!is.na(dplyr::all_of(params$column_name))) |>
   dplyr::distinct(dplyr::across(dplyr::all_of(params$column_name))) |>
   dplyr::select(organism = all_of(params$column_name)) |>
-  splitstackshape::cSplit(splitCols = "organism",
-                          sep = "|",
-                          direction = "long") |>
+  splitstackshape::cSplit(
+    splitCols = "organism",
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::mutate(organism = gsub(
     pattern = " x ",
     replacement = " ",
@@ -120,7 +123,7 @@ organism_cleaned_manipulated <-
   manipulating_taxo_otl(dfsel = dataOrganismVerified_3)
 
 if (is.null(params$force) &
-    params$extension == FALSE) {
+  params$extension == FALSE) {
   log_debug("Removing filename extensions")
   metadata_table <- metadata_table |>
     mutate(filename = gsub(
@@ -143,7 +146,7 @@ if (params$tool == "gnps") {
       feature_table |> mutate(feature_id = `row ID`),
       dataOrganismVerified_3 |> select(organismOriginal = organismCleaned)
     )
-  } else{
+  } else {
     metadata_table_joined <-
       dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
       dplyr::select(
@@ -157,8 +160,9 @@ if (params$tool == "gnps") {
 if (params$tool == "manual") {
   metadata_table_joined <- metadata_table |>
     dplyr::select(feature_id,
-                  organismOriginal = dplyr::all_of(params$column_name),
-                  dplyr::everything())
+      organismOriginal = dplyr::all_of(params$column_name),
+      dplyr::everything()
+    )
 }
 
 log_debug(x = "Joining with cleaned taxonomy table")
@@ -197,10 +201,12 @@ metadata_table_joined_summarized <-
 
 log_debug(x = "joining with cleaned taxonomy table")
 metadata_table_joined_summarized[] <-
-  lapply(metadata_table_joined_summarized,
-         function(x) {
-           y_as_na(x, y = "")
-         })
+  lapply(
+    metadata_table_joined_summarized,
+    function(x) {
+      y_as_na(x, y = "")
+    }
+  )
 
 log_debug(x = "Exporting ...")
 ifelse(
@@ -219,10 +225,14 @@ ifelse(
   no = paste(paths$data$interim$config$path, "exists")
 )
 
-log_debug(x = "... path to export is",
-          params$output)
-readr::write_delim(x = metadata_table_joined_summarized,
-                   file = params$output)
+log_debug(
+  x = "... path to export is",
+  params$output
+)
+readr::write_delim(
+  x = metadata_table_joined_summarized,
+  file = params$output
+)
 
 export_params(
   parameters = params,

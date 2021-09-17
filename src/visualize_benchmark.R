@@ -38,8 +38,10 @@ solutions_path <-
 
 roc_path <- "../images/benchmark.svg"
 
-log_debug("This script performs",
-          crayon::green("result analysis"))
+log_debug(
+  "This script performs",
+  crayon::green("result analysis")
+)
 log_debug("Authors: \n", green("AR"))
 log_debug("Contributors: ...")
 
@@ -59,8 +61,10 @@ log_debug(x = "... files ...")
 
 log_debug(x = "... LOTUS")
 structure_organism_pairs_table <-
-  readr::read_delim(file = params$library,
-                    col_types = "c") |>
+  readr::read_delim(
+    file = params$library,
+    col_types = "c"
+  ) |>
   dplyr::filter(!is.na(structure_exact_mass)) |>
   dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
   dplyr::mutate_if(is.logical, as.character)
@@ -68,39 +72,45 @@ structure_organism_pairs_table <-
 log_debug(x = "... raw ISDB")
 raw <- readr::read_delim(file = raw_path) |>
   distinct(feature_id,
-           inchikey_2D = short_inchikey,
-           score = msms_score,
-           matched_peaks)
+    inchikey_2D = short_inchikey,
+    score = msms_score,
+    matched_peaks
+  )
 
 log_debug(x = "... raw MS1")
 raw_ms1 <- readr::read_delim(file = raw_ms1_path) |>
   distinct(feature_id,
-           inchikey_2D,
-           score = score_final)
+    inchikey_2D,
+    score = score_final
+  )
 
 log_debug(x = "... weighted ISDB")
 wei <- readr::read_delim(file = weighted_path) |>
   distinct(feature_id,
-           inchikey_2D,
-           score = score_final)
+    inchikey_2D,
+    score = score_final
+  )
 
 log_debug(x = "... weighted + chemo new ISDB")
 wei_che <- readr::read_delim(file = weigthed_chemo_path) |>
   distinct(feature_id,
-           inchikey_2D,
-           score = score_final)
+    inchikey_2D,
+    score = score_final
+  )
 
 log_debug(x = "... weighted + ms1 ISDB")
 ms1 <- readr::read_delim(file = weighted_ms1_path) |>
   distinct(feature_id,
-           inchikey_2D,
-           score = score_final)
+    inchikey_2D,
+    score = score_final
+  )
 
 log_debug(x = "... weighted + ms1 + new chemo ISDB")
 new <- readr::read_delim(file = weighted_ms1_chemo_path) |>
   distinct(feature_id,
-           inchikey_2D,
-           score = score_final)
+    inchikey_2D,
+    score = score_final
+  )
 
 log_debug(x = "... solutions")
 solutions <-
@@ -108,70 +118,82 @@ solutions <-
 
 raw_ranked <- raw |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    .keep_all = TRUE
+  )
 
 raw_ms1_ranked <- raw_ms1 |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    .keep_all = TRUE
+  )
 
 wei_ranked <- wei |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    .keep_all = TRUE
+  )
 
 wei_che_ranked <- wei_che |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    .keep_all = TRUE
+  )
 
 ms1_ranked <- ms1 |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    .keep_all = TRUE
+  )
 
 new_ranked <- new |>
   splitstackshape::cSplit(c("inchikey_2D", "score"),
-                          sep = "|",
-                          direction = "long") |>
+    sep = "|",
+    direction = "long"
+  ) |>
   dplyr::group_by(feature_id) |>
   dplyr::mutate(rank = dplyr::dense_rank(desc(score))) |>
   dplyr::distinct(feature_id,
-                  inchikey_2D, ## problematic for MS1 with same score at rank 1?
-                  rank,
-                  score,
-                  .keep_all = TRUE)
+    inchikey_2D, ## problematic for MS1 with same score at rank 1?
+    rank,
+    score,
+    .keep_all = TRUE
+  )
 
 raw_results <- left_join(solutions, raw_ranked) |>
   dplyr::filter(!is.na(rank)) |>
@@ -244,56 +266,80 @@ ROC <- rbind(c(0, 0), ROC)
 ROC$x <- 0:params$top_k$initial
 ROC[1, 7] <- 1
 
-roc <- plotly::plot_ly(ROC, x = ~ x) |>
+roc <- plotly::plot_ly(ROC, x = ~x) |>
   plotly::add_trace(
-    y = ~ raw_k,
+    y = ~raw_k,
     name = "ms2",
     mode = "lines",
-    line = list(shape = "hv",
-                color = "#D71D62"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#D71D62"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::add_trace(
-    y = ~ raw_ms1_k,
+    y = ~raw_ms1_k,
     name = "ms1",
     mode = "lines",
-    line = list(shape = "hv",
-                color = "#861450"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#861450"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::add_trace(
-    y = ~ wei_k,
+    y = ~wei_k,
     name = "ms2 weighted",
-    line = list(shape = "hv",
-                color = "#2994D2"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#2994D2"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::add_trace(
-    y = ~ wei_k,
+    y = ~wei_k,
     name = "ms2 weighted + chemo",
-    line = list(shape = "hv",
-                color = "#08589B"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#08589B"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::add_trace(
-    y = ~ ms1_k,
+    y = ~ms1_k,
     name = "ms2 + ms1 weighted",
-    line = list(shape = "hv",
-                color = "#7CB13F"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#7CB13F"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::add_trace(
-    y = ~ new_k,
+    y = ~new_k,
     name = "ms2 + ms1 weighted + chemo",
-    line = list(shape = "hv",
-                color = "#336A2D"),
-    marker = list(size = 0,
-                  opacity = 0)
+    line = list(
+      shape = "hv",
+      color = "#336A2D"
+    ),
+    marker = list(
+      size = 0,
+      opacity = 0
+    )
   ) |>
   plotly::layout(
     title = "On 22,388 features (some of them with wrong masses)",
@@ -337,8 +383,8 @@ plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_wrong,
     name = "incorrect hits",
-    x =  ~ rank,
-    y =  ~ score,
+    x = ~rank,
+    y = ~score,
     marker = list(
       size = 5,
       color = "#bdbdbd",
@@ -348,9 +394,9 @@ plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_correct,
     name = "correct hits",
-    x =  ~ rank,
-    y =  ~ score,
-    color = ~ matched_peaks,
+    x = ~rank,
+    y = ~score,
+    color = ~matched_peaks,
     marker = list(
       size = 5,
       line = list(
@@ -360,9 +406,13 @@ plotly::plot_ly() |>
       )
     )
   ) |>
-  plotly::layout(title = "correct hits repartition (left:ms2 / right: ms2 + ms1 + taxo)",
-                 xaxis = list(range = c(0,
-                                        params$top_k$initial))) |>
+  plotly::layout(
+    title = "correct hits repartition (left:ms2 / right: ms2 + ms1 + taxo)",
+    xaxis = list(range = c(
+      0,
+      params$top_k$initial
+    ))
+  ) |>
   plotly::toWebGL()
 
 
@@ -384,8 +434,8 @@ taxo_plot <- plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_wrong,
     name = "incorrect hits",
-    x =  ~ rank,
-    y =  ~ score,
+    x = ~rank,
+    y = ~score,
     marker = list(
       size = 5,
       color = "#bdbdbd",
@@ -395,9 +445,9 @@ taxo_plot <- plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_correct,
     name = "correct hits",
-    x =  ~ rank,
-    y =  ~ score,
-    color = ~ matched_peaks,
+    x = ~rank,
+    y = ~score,
+    color = ~matched_peaks,
     marker = list(
       size = 5,
       line = list(
@@ -407,9 +457,13 @@ taxo_plot <- plotly::plot_ly() |>
       )
     )
   ) |>
-  plotly::layout(title = "correct hits repartition (left: ms2 only / right: ms2 + ms1 + taxo)",
-                 xaxis = list(range = c(0,
-                                        params$top_k$initial))) |>
+  plotly::layout(
+    title = "correct hits repartition (left: ms2 only / right: ms2 + ms1 + taxo)",
+    xaxis = list(range = c(
+      0,
+      params$top_k$initial
+    ))
+  ) |>
   plotly::toWebGL()
 
 diff_ms2 <- raw_ranked |>
@@ -429,8 +483,8 @@ ms2_plot <- plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_wrong_ms2,
     name = "incorrect hits",
-    x =  ~ rank,
-    y =  ~ score,
+    x = ~rank,
+    y = ~score,
     marker = list(
       size = 5,
       color = "#bdbdbd",
@@ -441,9 +495,9 @@ ms2_plot <- plotly::plot_ly() |>
   plotly::add_trace(
     data = diff_correct_ms2,
     name = "correct hits",
-    x =  ~ rank,
-    y =  ~ score,
-    color = ~ matched_peaks,
+    x = ~rank,
+    y = ~score,
+    color = ~matched_peaks,
     marker = list(
       size = 5,
       line = list(
@@ -455,9 +509,13 @@ ms2_plot <- plotly::plot_ly() |>
     showlegend = FALSE
   ) |>
   plotly::hide_colorbar() |>
-  plotly::layout(title = "correct hits repartition (ms2 only)",
-                 xaxis = list(range = c(0,
-                                        params$top_k$initial))) |>
+  plotly::layout(
+    title = "correct hits repartition (ms2 only)",
+    xaxis = list(range = c(
+      0,
+      params$top_k$initial
+    ))
+  ) |>
   plotly::toWebGL()
 
 plotly::subplot(ms2_plot, taxo_plot, shareX = TRUE, shareY = TRUE)
