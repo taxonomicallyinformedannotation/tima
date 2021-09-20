@@ -6,12 +6,12 @@ if [ ! -d config ]; then
   exit 1
 fi
 
-./src/get_lotus.sh &&
+bash src/get_lotus.sh &&
 Rscript src/prepare_lotus.R &&
 Rscript src/prepare_library.R &&
 Rscript src/prepare_adducts.R &&
-./src/get_example_isdb.sh &&
-./src/get_gnverifier.sh &&
+bash src/get_example_isdb.sh &&
+bash src/get_gnverifier.sh &&
 Rscript src/prepare_gnps.R &&
 Rscript src/prepare_isdb.R &&
 Rscript src/prepare_edges.R &&
