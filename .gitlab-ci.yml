@@ -6,6 +6,5 @@ stages:
 integration-test-job:
   stage: integration-test
   script:
-    - export PIP_CACHE_DIR="/opt/cache/pip"
     - conda env create -f environment.yml
     - bash tests/integration_test.sh
