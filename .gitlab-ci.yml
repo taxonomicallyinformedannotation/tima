@@ -8,6 +8,8 @@ stages:             # List of stages for jobs, and their order of execution
 build-job:          # This job runs in the build stage, which runs first.
   stage: build
   script:
+    - docker build -t tima .
+    - docker run -it --rm -v $PWD:/app tima
     - conda env create -f environment.yml
     - conda activate tima
 
