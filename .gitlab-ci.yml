@@ -10,6 +10,13 @@ stages:             # List of stages for jobs, and their order of execution
   - process
   - test
 
+variables:
+  CONTAINER_TEST_IMAGE: registry.example.com/my-group/my-project:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: registry.example.com/my-group/my-project:latest
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.example.com
+  
 build-job:          # This job runs in the build stage, which runs first.
   stage: build
   script:
