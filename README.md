@@ -58,7 +58,7 @@ Rscript src/prepare_adducts.R &&
 # (spectral-lib-matcher, which is only in python. see related repo)
 # instead we provide an example file coming from the new ISDB.
 # It also works with annotations coming from GNPS (see next steps)
-./src/get_example_isdb.sh
+bash src/get_example_isdb.sh
 ```
 
 ### Format MS2 annotations
@@ -82,7 +82,7 @@ Rscript src/prepare_features_classification.R &&
 ### Get biological taxonomy information
 
 ```shell
-./src/get_gnverifier.sh && 
+bash src/get_gnverifier.sh && 
 Rscript src/prepare_taxa.R 
 ```
 
