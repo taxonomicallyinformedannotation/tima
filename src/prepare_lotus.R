@@ -57,6 +57,11 @@ ifelse(
   yes = dir.create(paths$data$interim$path),
   no = paste(paths$data$interim$path, "exists")
 )
+ifelse(
+  test = !dir.exists(dirname(paths$data$interim$libraries$lotus)),
+  yes = dir.create(dirname(paths$data$interim$libraries$lotus)),
+  no = paste(dirname(paths$data$interim$libraries$lotus), "exists")
+)
 
 readr::write_delim(
   x = lotus_prepared,
