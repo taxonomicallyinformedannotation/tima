@@ -43,6 +43,7 @@ conda activate tima
 ## Structure-organism pairs library
 
 ```shell
+bash src/get_lotus.sh && 
 Rscript src/prepare_lotus.R &&
 # Rscript src/prepare_dnp.R && # only if you have access to it
 Rscript src/prepare_library.R &&
