@@ -33,7 +33,7 @@ preprocess-job:     # This job runs the preprocessing pipeline.
     - Rscript src/prepare_taxa.R 
 
 process-job:        # This job runs the preprocessing pipeline.
-  stage: processs   # It starts when the job in the preprocess stage completes successfully.
+  stage: process    # It starts when the job in the preprocess stage completes successfully.
   script:
     - Rscript src/process_annotations.R
 
