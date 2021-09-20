@@ -1,4 +1,6 @@
-image: continuumio/miniconda3:latest
+image: 
+  - continuumio/miniconda3:latest
+  - rocker/r-ver:4.1.1
 
 stages:
   - integration-test
