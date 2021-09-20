@@ -1,59 +1,3 @@
-image: docker:git
-
-services:
-- docker:dind
-
-stages:             # List of stages for jobs, and their order of execution
-  - build
-  - gather
-  - preprocess
-  - process
-  - test
-
-variables:
-  CONTAINER_TEST_IMAGE: registry.example.com/my-group/my-project:$CI_BUILD_REF_NAME
-  CONTAINER_RELEASE_IMAGE: registry.example.com/my-group/my-project:latest
-
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.example.com
-  
-build-job:          # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - export PIP_CACHE_DIR="/opt/cache/pip"
-    - docker build -t tima .
-    - docker run -it --rm -v $PWD:/app tima
-
-gather-job:         # This job gathers additional files.
-  stage: gather     # It only starts when the job in the build stage completes successfully.
-  script:
-    - bash src/get_lotus.sh
-    - bash src/get_example_isdb.sh
-    - bash src/get_gnverifier.sh
-
-
-preprocess-job:     # This job runs the preprocessing pipeline.
-  stage: preprocess # It starts when the job in the gather stage completes successfully.
-  script:
-    - Rscript src/prepare_lotus.R
-    - Rscript src/prepare_library.R
-    - Rscript src/prepare_adducts.R
-    - Rscript src/prepare_gnps.R
-    - Rscript src/prepare_isdb.R
-    - Rscript src/prepare_edges.R
-    - Rscript src/prepare_features_components.R
-    - Rscript src/prepare_features_classification.R
-    - Rscript src/prepare_taxa.R 
-
-process-job:        # This job runs the preprocessing pipeline.
-  stage: process    # It starts when the job in the preprocess stage completes successfully.
-  script:
-    - Rscript src/process_annotations.R
-
-test-job:           # This job runs the test.
-  stage: test       # It remains to be done.
-  script:
-    - echo "Looking for some tests..."
 image: continuumio/miniconda3:latest
 
 stages:             # List of stages for jobs, and their order of execution
@@ -66,8 +10,8 @@ stages:             # List of stages for jobs, and their order of execution
 build-job:          # This job runs in the build stage, which runs first.
   stage: build
   script:
+    - export PIP_CACHE_DIR="/opt/cache/pip"
     - conda env create -f environment.yml
-    - conda activate tima
 
 gather-job:         # This job gathers additional files.
   stage: gather     # It only starts when the job in the build stage completes successfully.
@@ -80,20 +24,20 @@ gather-job:         # This job gathers additional files.
 preprocess-job:     # This job runs the preprocessing pipeline.
   stage: preprocess # It starts when the job in the gather stage completes successfully.
   script:
-    - Rscript src/prepare_lotus.R
-    - Rscript src/prepare_library.R
-    - Rscript src/prepare_adducts.R
-    - Rscript src/prepare_gnps.R
-    - Rscript src/prepare_isdb.R
-    - Rscript src/prepare_edges.R
-    - Rscript src/prepare_features_components.R
-    - Rscript src/prepare_features_classification.R
-    - Rscript src/prepare_taxa.R 
+    - conda run -n tima Rscript src/prepare_lotus.R
+    - conda run -n tima Rscript src/prepare_library.R
+    - conda run -n tima Rscript src/prepare_adducts.R
+    - conda run -n tima Rscript src/prepare_gnps.R
+    - conda run -n tima Rscript src/prepare_isdb.R
+    - conda run -n tima Rscript src/prepare_edges.R
+    - conda run -n tima Rscript src/prepare_features_components.R
+    - conda run -n tima Rscript src/prepare_features_classification.R
+    - conda run -n tima Rscript src/prepare_taxa.R 
 
 process-job:        # This job runs the preprocessing pipeline.
   stage: process    # It starts when the job in the preprocess stage completes successfully.
   script:
-    - Rscript src/process_annotations.R
+    - conda run -n tima Rscript src/process_annotations.R
 
 test-job:           # This job runs the test.
   stage: test       # It remains to be done.
