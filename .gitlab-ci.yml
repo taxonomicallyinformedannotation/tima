@@ -1,4 +1,7 @@
-image: continuumio/miniconda3:latest
+image: docker:git
+
+services:
+- docker:dind
 
 stages:             # List of stages for jobs, and their order of execution
   - build
@@ -11,9 +14,9 @@ build-job:          # This job runs in the build stage, which runs first.
   stage: build
   script:
     - export PIP_CACHE_DIR="/opt/cache/pip"
+    - docker build -t tima .
+    - docker run -it --rm -v $PWD:/app tima
     - conda env create -f environment.yml
-    - conda init bash
-    - source ~/.bashrc
     - conda activate tima
 
 gather-job:         # This job gathers additional files.
