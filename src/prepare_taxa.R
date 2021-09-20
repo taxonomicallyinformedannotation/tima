@@ -224,6 +224,11 @@ ifelse(
   yes = dir.create(paths$data$interim$config$path),
   no = paste(paths$data$interim$config$path, "exists")
 )
+ifelse(
+  test = !dir.exists(dirname(params$output)),
+  yes = dir.create(dirname(params$output)),
+  no = paste(dirname(params$output), "exists")
+)
 
 log_debug(
   x = "... path to export is",

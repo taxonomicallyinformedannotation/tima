@@ -68,6 +68,17 @@ pure_neg <-
   dplyr::select(-exact_mass)
 
 log_debug(x = "Exporting ...")
+ifelse(
+  test = !dir.exists(paths$data$interim$adducts$path),
+  yes = dir.create(paths$data$interim$adducts$path),
+  no = paste(paths$data$interim$adducts$path, "exists")
+)
+ifelse(
+  test = !dir.exists(paths$data$interim$config$path),
+  yes = dir.create(paths$data$interim$config$path),
+  no = paste(paths$data$interim$config$path, "exists")
+)
+
 log_debug(x = "... structure adducts positive")
 readr::write_delim(
   x = adducts_pos,
