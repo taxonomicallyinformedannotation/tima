@@ -1,45 +1,11 @@
 image: continuumio/miniconda3:latest
 
-stages:             # List of stages for jobs, and their order of execution
-  - build
-  - gather
-  - preprocess
-  - process
-  - test
+stages:
+  - integration-test
 
-build-job:          # This job runs in the build stage, which runs first.
-  stage: build
+integration-test-job:
+  stage: integration-test
   script:
     - export PIP_CACHE_DIR="/opt/cache/pip"
     - conda env create -f environment.yml
-
-gather-job:         # This job gathers additional files.
-  stage: gather     # It only starts when the job in the build stage completes successfully.
-  script:
-    - bash src/get_lotus.sh
-    - bash src/get_example_isdb.sh
-    - bash src/get_gnverifier.sh
-
-
-preprocess-job:     # This job runs the preprocessing pipeline.
-  stage: preprocess # It starts when the job in the gather stage completes successfully.
-  script:
-    - conda run -n tima Rscript src/prepare_lotus.R
-    - conda run -n tima Rscript src/prepare_library.R
-    - conda run -n tima Rscript src/prepare_adducts.R
-    - conda run -n tima Rscript src/prepare_gnps.R
-    - conda run -n tima Rscript src/prepare_isdb.R
-    - conda run -n tima Rscript src/prepare_edges.R
-    - conda run -n tima Rscript src/prepare_features_components.R
-    - conda run -n tima Rscript src/prepare_features_classification.R
-    - conda run -n tima Rscript src/prepare_taxa.R 
-
-process-job:        # This job runs the preprocessing pipeline.
-  stage: process    # It starts when the job in the preprocess stage completes successfully.
-  script:
-    - conda run -n tima Rscript src/process_annotations.R
-
-test-job:           # This job runs the test.
-  stage: test       # It remains to be done.
-  script:
-    - echo "Looking for some tests..."
+    - bash tests/integration_test.sh
