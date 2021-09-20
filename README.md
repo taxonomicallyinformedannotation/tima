@@ -33,6 +33,13 @@ cd <directory>
 
 If you are using Windows, please install [WSL2](https://docs.microsoft.com/en-us/windows/wsl/compare-versions#whats-new-in-wsl-2)
 
+### To run in docker:
+
+```shell
+docker build -t tima . # optional
+docker run -it --rm -v $PWD:/app tima
+```
+
 ### To run locally:
 
 ```shell
