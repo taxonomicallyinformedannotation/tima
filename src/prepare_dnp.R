@@ -64,7 +64,7 @@ if (file.exists(params$input)) {
     yes = dir.create(paths$data$interim$path),
     no = paste(paths$data$interim$path, "exists")
   )
-  
+
   ifelse(
     test = !dir.exists(dirname(params$output)),
     yes = dir.create(dirname(params$output)),
