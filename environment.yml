@@ -16,3 +16,4 @@ dependencies:
   - r-stringr
   - r-tidyr
   - r-yaml
+  - wget
