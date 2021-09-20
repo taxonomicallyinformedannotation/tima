@@ -7,13 +7,15 @@ if [ ! -d config ]; then
 fi
 
 ./src/get_lotus.sh &&
-python src/prepare_lotus.R &&
-python src/prepare_library.R &&
-python src/prepare_adducts.R &&
+Rscript src/prepare_lotus.R &&
+Rscript src/prepare_library.R &&
+Rscript src/prepare_adducts.R &&
 ./src/get_example_isdb.sh &&
 ./src/get_gnverifier.sh &&
-python src/prepare_gnps.R &&
-python src/prepare_isdb.R &&
-python src/prepare_edges.R &&
-python src/prepare_taxa.R &&
-python src/process_annotations.R
+Rscript src/prepare_gnps.R &&
+Rscript src/prepare_isdb.R &&
+Rscript src/prepare_edges.R &&
+Rscript src/prepare_features_components.R &&
+Rscript src/prepare_features_classification.R &&
+Rscript src/prepare_taxa.R &&
+Rscript src/process_annotations.R
