@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - curl
   - r-base>=4.1.0
   - r-crayon
   - r-data.table
@@ -16,4 +17,3 @@ dependencies:
   - r-stringr
   - r-tidyr
   - r-yaml
-  - wget
