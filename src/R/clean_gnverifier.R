@@ -46,7 +46,8 @@ clean_gnverifier <- function() {
       readr::write_delim(
         x = organism_table_2,
         file = paths$data$interim$taxa$original_2,
-        quote = "none"
+        quote = "none",
+        delim = "\t"
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")

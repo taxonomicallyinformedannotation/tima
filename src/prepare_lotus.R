@@ -65,7 +65,8 @@ ifelse(
 
 readr::write_delim(
   x = lotus_prepared,
-  file = paths$data$interim$libraries$lotus
+  file = paths$data$interim$libraries$lotus,
+  delim = "\t"
 )
 
 end <- Sys.time()

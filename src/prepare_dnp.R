@@ -77,7 +77,8 @@ if (file.exists(params$input)) {
   )
   readr::write_delim(
     x = dnp_prepared,
-    file = params$output
+    file = params$output,
+    delim = "\t"
   )
 
   export_params(

@@ -67,7 +67,8 @@ log_debug(
 )
 readr::write_delim(
   x = table,
-  file = params$output
+  file = params$output,
+  delim = "\t"
 )
 
 export_params(

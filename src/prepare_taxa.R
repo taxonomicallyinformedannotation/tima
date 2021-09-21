@@ -109,7 +109,8 @@ ifelse(
 readr::write_delim(
   x = organism_table,
   file = paths$data$interim$taxa$original,
-  quote = "none"
+  quote = "none",
+  delim = "\t"
 )
 
 log_debug("submitting to GNVerifier")
@@ -236,7 +237,8 @@ log_debug(
 )
 readr::write_delim(
   x = metadata_table_joined_summarized,
-  file = params$output
+  file = params$output,
+  delim = "\t"
 )
 
 export_params(

@@ -74,7 +74,8 @@ readr::write_delim(
   file = file.path(
     paths$data$interim$libraries$path,
     params$output
-  )
+  ),
+  delim = "\t"
 )
 
 export_params(

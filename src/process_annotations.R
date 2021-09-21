@@ -221,7 +221,9 @@ readr::write_delim(
   file = file.path(
     dir_time,
     params$output
-  )
+  ),
+  delim = "\t",
+  na = ""
 )
 
 log_debug(
