@@ -3,7 +3,7 @@
 source src/parse_yaml.sh
 source src/warning.sh
 
-parse_yaml paths.yaml
+eval $(parse_yaml paths.yaml)
 
 mkdir -p $data_interim_path
 mkdir -p $data_interim_annotations_path
