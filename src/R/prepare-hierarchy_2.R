@@ -1,5 +1,5 @@
-require(dplyr)
-require(splitstackshape)
+require(package = dplyr, quietly = TRUE)
+require(package = splitstackshape, quietly = TRUE)
 
 #' Title
 #'

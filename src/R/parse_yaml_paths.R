@@ -1,5 +1,5 @@
-require(purrr)
-require(yaml)
+require(package = purrr, quietly = TRUE)
+require(package = yaml, quietly = TRUE)
 
 source(file = "src/R/log_debug.R")
 

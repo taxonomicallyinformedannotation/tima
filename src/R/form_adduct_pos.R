@@ -1,5 +1,5 @@
-require(dplyr)
-require(tidyr)
+require(package = dplyr, quietly = TRUE)
+require(package = tidyr, quietly = TRUE)
 
 #' Title
 #'

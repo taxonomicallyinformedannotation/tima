@@ -1,7 +1,7 @@
 ###########################   Functions - chemical    #########################
 
-require(dplyr)
-require(stringr)
+require(package = dplyr, quietly = TRUE)
+require(package = stringr, quietly = TRUE)
 
 #' Title
 #'

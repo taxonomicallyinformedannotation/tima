@@ -10,8 +10,8 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(dplyr)
-library(readr)
+library(package = dplyr, quietly = TRUE)
+library(package = readr, quietly = TRUE)
 
 paths <- parse_yaml_paths()
 

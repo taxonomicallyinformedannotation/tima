@@ -1,5 +1,5 @@
-require(crayon)
-require(dplyr)
+require(package = crayon, quietly = TRUE)
+require(package = dplyr, quietly = TRUE)
 
 #' Title
 #'

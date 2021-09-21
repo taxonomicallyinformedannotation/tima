@@ -1,5 +1,5 @@
-require(dplyr)
-require(forcats)
+require(package = dplyr, quietly = TRUE)
+require(package = forcats, quietly = TRUE)
 
 #' Title
 #'

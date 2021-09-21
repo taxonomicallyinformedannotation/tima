@@ -10,11 +10,11 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(dplyr)
-library(docopt)
-library(purrr)
-library(readr)
-library(yaml)
+library(package = dplyr, quietly = TRUE)
+library(package = docopt, quietly = TRUE)
+library(package = purrr, quietly = TRUE)
+library(package = readr, quietly = TRUE)
+library(package = yaml, quietly = TRUE)
 
 step <- "prepare_dnp"
 paths <- parse_yaml_paths()

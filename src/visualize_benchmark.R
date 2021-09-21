@@ -3,13 +3,13 @@ start <- Sys.time()
 source(file = "src/R/helpers.R")
 
 log_debug(x = "loading libraries")
-library(crayon)
-library(data.table)
-library(dplyr)
-library(plotly)
-library(readr)
-library(splitstackshape)
-library(tidyr)
+library(package = crayon, quietly = TRUE)
+library(package = data.table, quietly = TRUE)
+library(package = dplyr, quietly = TRUE)
+library(package = plotly, quietly = TRUE)
+library(package = readr, quietly = TRUE)
+library(package = splitstackshape, quietly = TRUE)
+library(package = tidyr, quietly = TRUE)
 
 ## docopt to do
 

@@ -1,6 +1,6 @@
-require(dplyr)
-require(splitstackshape)
-require(tidyr)
+require(package = dplyr, quietly = TRUE)
+require(package = splitstackshape, quietly = TRUE)
+require(package = tidyr, quietly = TRUE)
 
 #' Title
 #'

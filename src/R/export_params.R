@@ -1,4 +1,4 @@
-require(yaml)
+require(package = yaml, quietly = TRUE)
 
 source(file = "src/R/log_debug.R")
 
