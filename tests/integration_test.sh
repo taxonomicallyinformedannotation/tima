@@ -18,3 +18,4 @@ conda run -n tima Rscript src/prepare_features_components.R &&
 conda run -n tima Rscript src/prepare_features_classification.R &&
 conda run -n tima Rscript src/prepare_taxa.R &&
 conda run -n tima Rscript src/process_annotations.R
+

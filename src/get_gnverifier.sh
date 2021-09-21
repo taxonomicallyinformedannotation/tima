@@ -12,3 +12,4 @@ wget "https://github.com/gnames/gnverifier/releases/download/$gnverifier/gnverif
 tar -xzf bin/gnverifier-$gnverifier-$OS.tar.gz -C bin/
 rm -r bin/gnverifier-$gnverifier-$OS.tar.gz
 chmod +x bin/gnverifier
+

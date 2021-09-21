@@ -25,3 +25,4 @@ case $OS in
 esac
 
 echo Detected OS: $OS
+

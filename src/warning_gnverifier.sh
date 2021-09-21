@@ -8,3 +8,4 @@ else
   echo "Sorry you need to install gnverifier in /usr/bin or ../bin"
   exit 1
 fi
+
