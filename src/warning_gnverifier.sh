@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# -*- coding: utf-8 -*-
 
 if [ -f bin/gnverifier ]; then
   GNVERIFIER=bin/gnverifier

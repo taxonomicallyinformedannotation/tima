@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# -*- coding: utf-8 -*-
 
-. src/parse_yaml.sh
-. src/warning.sh
+source src/parse_yaml.sh
+source src/warning.sh
 
-eval $(parse_yaml paths.yaml)
+parse_yaml paths.yaml
 
 mkdir -p $data_source_libraries_path
 

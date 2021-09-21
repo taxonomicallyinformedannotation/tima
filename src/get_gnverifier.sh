@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# -*- coding: utf-8 -*-
 
-. src/get_platform.sh
-. src/parse_yaml.sh
-. src/warning.sh
+source src/get_platform.sh
+source src/parse_yaml.sh
+source src/warning.sh
 
-eval $(parse_yaml paths.yaml)
-eval $(parse_yaml config/versions.yaml)
+parse_yaml paths.yaml
+parse_yaml config/versions.yaml
 
 mkdir -p $bin_path
 wget "https://github.com/gnames/gnverifier/releases/download/$gnverifier/gnverifier-$gnverifier-$OS.tar.gz" -P bin/
