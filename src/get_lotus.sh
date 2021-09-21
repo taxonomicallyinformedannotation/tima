@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 
-source src/parse_yaml.sh
-source src/warning.sh
+. src/parse_yaml.sh
+. src/warning.sh
 
 eval $(parse_yaml paths.yaml)
 
