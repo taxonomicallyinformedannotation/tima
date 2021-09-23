@@ -19,13 +19,13 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: tima
-          environment-file: environment.yml
+          environment-file: ../environment.yml
           auto-activate-base: false
           miniconda-version: 'latest'
       - name: Run tests
         shell: bash --login {0}
         run: |
-          bash tests/integration_test.sh
+          bash ../tests/integration_test.sh
   publish:
     runs-on: ubuntu-latest
     steps:
