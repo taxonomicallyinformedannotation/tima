@@ -9,18 +9,6 @@ integration-test:
   script:
     - conda env create -f environment.yml
     - bash tests/integration_test.sh
-  rules:
-    - changes:
-      - .gitlab-ci.yml
-      - config
-      - config.mk
-      - Dockerfile
-      - environment.yml
-      - Makefile
-      - paths.mk
-      - R
-      - src
-      - tests
 
 pages:
   stage: deploy
