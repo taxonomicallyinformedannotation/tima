@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ ! -d config ]; then
+  echo "Sorry, you need to run that from where your config is."
+  exit 1
+fi
+
 cp -R config/default config/params &&
 bash src/get_lotus.sh &&
 conda run -n tima Rscript src/prepare_lotus.R &&
