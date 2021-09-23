@@ -16,7 +16,7 @@ integration-test-job:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/HTML.gitlab-ci.yml
 
 # Full project: https://gitlab.com/pages/plain-html
-pages:
+pages-job:
   stage: deploy
   script:
     - mkdir .public
