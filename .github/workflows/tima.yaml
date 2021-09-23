@@ -9,12 +9,18 @@ on:
 jobs:
   tima:
     runs-on: ubuntu-latest
-    container: continuumio/miniconda3
     steps:
-      - name: Build environement
-        shell: bash --login {0}
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+      - name: Install dependencies
         run: |
-          conda env create -f environment.yml
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        $CONDA/bin/conda env update --file environment.yml
+      - name: Run tests
+        run: |
           bash tests/integration_test.sh
   publish:
     runs-on: ubuntu-latest
