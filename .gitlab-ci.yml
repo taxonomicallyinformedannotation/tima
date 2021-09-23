@@ -2,7 +2,7 @@ image: continuumio/miniconda3:latest
 
 stages:
   - integration-test
-  - pages
+  - deploy
 
 integration-test-job:
   stage: integration-test
