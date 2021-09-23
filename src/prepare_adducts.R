@@ -1,8 +1,8 @@
 start <- Sys.time()
 
-source(file = "src/R/helpers.R")
-source(file = "src/R/form_adduct_pos.R")
-source(file = "src/R/form_adduct_neg.R")
+source(file = "R/helpers.R")
+source(file = "R/form_adduct_pos.R")
+source(file = "R/form_adduct_neg.R")
 
 log_debug("This script creates adducts")
 log_debug("Authors: AR")

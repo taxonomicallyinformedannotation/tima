@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# -*- coding: utf-8 -*-
 
 function parse_yaml() {
   local prefix=$2
@@ -16,4 +17,3 @@ function parse_yaml() {
       }
    }'
 }
-

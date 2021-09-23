@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "src/R/helpers.R")
+source(file = "R/helpers.R")
 
 log_debug(
   "This script prepares DNP referenced structure-organism pairs \n",

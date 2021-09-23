@@ -1,9 +1,9 @@
 start <- Sys.time()
 
-source(file = "src/R/clean_gnverifier.R")
-source(file = "src/R/get_gnps.R")
-source(file = "src/R/helpers.R")
-source(file = "src/R/manipulating_taxo_otl.R")
+source(file = "R/clean_gnverifier.R")
+source(file = "R/get_gnps.R")
+source(file = "R/helpers.R")
+source(file = "R/manipulating_taxo_otl.R")
 
 log_debug("This script informs taxonomically features")
 log_debug("Authors: AR, P-MA")

@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "src/R/helpers.R")
+source(file = "R/helpers.R")
 
 log_debug(x = "loading libraries")
 library(package = crayon, quietly = TRUE)

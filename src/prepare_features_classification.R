@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "src/R/helpers.R")
+source(file = "R/helpers.R")
 
 log_debug("This script prepares features metadata (chemical classes)")
 log_debug("Authors: AR")

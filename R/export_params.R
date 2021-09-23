@@ -1,6 +1,6 @@
 require(package = yaml, quietly = TRUE)
 
-source(file = "src/R/log_debug.R")
+source(file = "R/log_debug.R")
 
 #' Title
 #'

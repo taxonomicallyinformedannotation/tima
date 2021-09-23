@@ -1,7 +1,7 @@
 start <- Sys.time()
 
-source(file = "src/R/helpers.R")
-source(file = "src/R/get_gnps.R")
+source(file = "R/helpers.R")
+source(file = "R/get_gnps.R")
 
 log_debug(
   "This script treats GNPS (and NAP) results"

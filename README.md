@@ -3,7 +3,7 @@
 The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then. 
 The worklow is illustrated in Figure 1.
 
-![Figure 1](./img/tima.svg)
+![Figure 1](man/figures/tima.svg)
 
 This repository contains everything needed to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
 

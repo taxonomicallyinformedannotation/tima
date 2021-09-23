@@ -1,5 +1,5 @@
-source(file = "src/R/log_debug.R")
-source(file = "src/R/preclean_gnverifier.R")
+source(file = "R/log_debug.R")
+source(file = "R/preclean_gnverifier.R")
 
 #' Title
 #'
