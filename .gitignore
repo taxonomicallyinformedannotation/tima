@@ -12,9 +12,10 @@ data/source/private/**
 data/source/libraries/**
 data/interim/**
 data/processed/**
+
 .Rproj.user
-docs
 .Rhistory
 .Rdata
+
 .httr-oauth
 .DS_Store
