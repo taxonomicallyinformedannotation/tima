@@ -26,12 +26,6 @@ jobs:
         shell: bash --login {0}
         run: |
           bash tests/integration_test.sh
-
-name: website
-
-on: push
-
-jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
