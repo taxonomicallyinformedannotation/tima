@@ -15,15 +15,16 @@ jobs:
       GITHUB_PULL_REQUEST_SHA: ${{ github.event.pull_request.head.sha }}
       SPELLCHECK: true
     steps:
-      - name: Build and integration test
+      - name: Build environement
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: tima
           environment-file: environment.yml
           auto-activate-base: false
           miniconda-version: 'latest'
+      - name: Run tests
+        shell: bash --login {0}
         run: |
-          conda env create -f environment.yml
           bash tests/integration_test.sh
 
 name: website
