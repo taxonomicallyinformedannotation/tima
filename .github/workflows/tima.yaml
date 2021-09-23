@@ -8,12 +8,8 @@ on:
       - main
 jobs:
   tima:
-    name: tima
     runs-on: ubuntu-latest
     container: continuumio/miniconda3
-    env:
-      GITHUB_PULL_REQUEST_SHA: ${{ github.event.pull_request.head.sha }}
-      SPELLCHECK: true
     steps:
       - name: Build environement
         uses: conda-incubator/setup-miniconda@v2
@@ -45,5 +41,3 @@ jobs:
         with:
           target_branch: gh-pages
           build_dir: public
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
