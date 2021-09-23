@@ -16,7 +16,6 @@ jobs:
       SPELLCHECK: true
     steps:
       - name: Build and integration test
-        shell: bash --login {0}
         run: |
           conda env create -f environment.yml
           bash tests/integration_test.sh
