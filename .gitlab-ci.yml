@@ -9,6 +9,18 @@ integration-test:
   script:
     - conda env create -f environment.yml
     - bash tests/integration_test.sh
+  rules:
+    - changes:
+      - .gitlab-ci.yml
+      - config/**/*
+      - config.mk
+      - Dockerfile
+      - environment.yml
+      - Makefile
+      - paths.mk
+      - R
+      - src/**/*
+      - tests/**/*
 
 # To contribute improvements to CI/CD templates, please follow the Development guide at:
 # https://docs.gitlab.com/ee/development/cicd/templates.html
@@ -27,3 +39,11 @@ pages:
       - public
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - changes:
+      - DESCRIPTION
+      - docs/**/*
+      - LICENSE.md
+      - logo.svg
+      - man/**/*
+      - pkgdown/**/*
+      - vignettes/**/*
