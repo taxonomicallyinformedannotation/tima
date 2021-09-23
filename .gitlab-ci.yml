@@ -12,15 +12,15 @@ integration-test:
   rules:
     - changes:
       - .gitlab-ci.yml
-      - config/**/*
+      - config
       - config.mk
       - Dockerfile
       - environment.yml
       - Makefile
       - paths.mk
       - R
-      - src/**/*
-      - tests/**/*
+      - src
+      - tests
 
 pages:
   stage: deploy
@@ -36,9 +36,9 @@ pages:
     - changes:
       - .gitlab-ci.yml
       - DESCRIPTION
-      - docs/**/*
+      - docs
       - LICENSE.md
       - logo.svg
-      - man/**/*
-      - pkgdown/**/*
-      - vignettes/**/*
+      - man
+      - pkgdown
+      - vignettes
