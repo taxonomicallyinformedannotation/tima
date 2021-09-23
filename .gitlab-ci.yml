@@ -1,11 +1,11 @@
 image: continuumio/miniconda3:latest
 
 stages:
-  - integration-test
+  - integration
   - deploy
 
-integration-test-job:
-  stage: integration-test
+integration-test:
+  stage: integration
   script:
     - conda env create -f environment.yml
     - bash tests/integration_test.sh
@@ -16,7 +16,7 @@ integration-test-job:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/HTML.gitlab-ci.yml
 
 # Full project: https://gitlab.com/pages/plain-html
-pages-job:
+pages:
   stage: deploy
   script:
     - mkdir .public
