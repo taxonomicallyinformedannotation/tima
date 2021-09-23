@@ -16,9 +16,20 @@ jobs:
       SPELLCHECK: true
     steps:
       - name: Build and integration test
+        with:
+          activate-environment: tima
+          environment-file: environment.yml
+          auto-activate-base: false
+          miniconda-version: 'latest'
         run: |
           conda env create -f environment.yml
           bash tests/integration_test.sh
+
+name: website
+
+on: push
+
+jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
@@ -26,7 +37,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Gen dummy page
+        name: Generate page
         run: |
           mkdir public
           cp -r docs .public
