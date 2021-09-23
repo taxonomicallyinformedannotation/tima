@@ -15,7 +15,7 @@ jobs:
         shell: bash --login {0}
         run: |
           conda env create -f environment.yml
-          bash ../tests/integration_test.sh
+          bash tests/integration_test.sh
   publish:
     runs-on: ubuntu-latest
     steps:
