@@ -1,0 +1,49 @@
+name: tima
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  tima:
+    name: tima
+    runs-on: ubuntu-latest
+    container: continuumio/miniconda3
+    env:
+      GITHUB_PULL_REQUEST_SHA: ${{ github.event.pull_request.head.sha }}
+      SPELLCHECK: true
+    steps:
+      - name: Build and integration test
+        shell: bash --login {0}
+        run: |
+          conda env create -f environment.yml
+          bash tests/integration_test.sh
+
+name: website
+
+on: push
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Gen dummy page
+        run: |
+          mkdir public
+          cp -r docs .public
+          mv .public public
+      -
+        name: Deploy to GitHub Pages
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
