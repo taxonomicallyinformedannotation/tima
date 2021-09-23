@@ -1,7 +1,7 @@
 ##########################   Functions - features   ###########################
 
 # require(RCurl)
-require(readr)
+require(package = readr,quietly = TRUE)
 
 # download_featuretable <- function(id, path = "feature_table.csv") {
 #   #file = paste0("http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",id,"&block=main&file=cluster_buckets/") #Old buckettable format

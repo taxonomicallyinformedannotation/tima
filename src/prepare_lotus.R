@@ -10,12 +10,12 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = dplyr, quietly = TRUE)
+library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
 library(package = readr, quietly = TRUE)
 
 paths <- parse_yaml_paths()
 
-log_debug(x = "loading files")
+log_debug(x = "Loading files")
 lotus <-
   readr::read_delim(file = paths$data$source$libraries$lotus, )
 

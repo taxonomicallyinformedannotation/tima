@@ -1,6 +1,6 @@
 ###########################   Functions - chemical    #########################
 
-require(package = dplyr, quietly = TRUE)
+require(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
 require(package = stringr, quietly = TRUE)
 
 #' Title

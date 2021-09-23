@@ -9,7 +9,7 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = dplyr, quietly = TRUE)
+library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
 library(package = docopt, quietly = TRUE)
 library(package = purrr, quietly = TRUE)
 library(package = readr, quietly = TRUE)
