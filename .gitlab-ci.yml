@@ -22,12 +22,6 @@ integration-test:
       - src/**/*
       - tests/**/*
 
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/HTML.gitlab-ci.yml
-
-# Full project: https://gitlab.com/pages/plain-html
 pages:
   stage: deploy
   script:
@@ -36,7 +30,7 @@ pages:
     - mv .public public
   artifacts:
     paths:
-      - public
+      - docs
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - changes:
