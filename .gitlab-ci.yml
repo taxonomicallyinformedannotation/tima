@@ -40,6 +40,7 @@ pages:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - changes:
+      - .gitlab-ci.yml
       - DESCRIPTION
       - docs/**/*
       - LICENSE.md
