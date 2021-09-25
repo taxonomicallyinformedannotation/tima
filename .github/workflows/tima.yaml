@@ -30,6 +30,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
+          unset SUDO_UID SUDO_GID SUDO_USER
           $CONDA/bin/conda env create --file environment.yml
       - name: Run tests
         run: |
@@ -37,6 +38,9 @@ jobs:
   tima-windows:
     runs-on: windows-latest
     steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
@@ -44,7 +48,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda env create --file environment.yml
+          conda env create --file environment.yml
       - name: Run tests
         run: |
           bash tests/integration_test.sh
