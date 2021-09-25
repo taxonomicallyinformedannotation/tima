@@ -71,7 +71,7 @@ jobs:
       - name: Install dependencies
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- source conda env create --file environment.yml
+          conda env create --file environment.yml
       - name: Run tests
         shell: powershell
         run: |
