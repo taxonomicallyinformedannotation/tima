@@ -75,7 +75,7 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- source find . -type f -print0 | xargs -0 dos2unix
+          find . -type f -print0 | xargs -0 dos2unix
           wsl -u root -d Ubuntu-18.04 -- source tests/integration_test.sh
   deploy-doc:
     runs-on: ubuntu-latest
