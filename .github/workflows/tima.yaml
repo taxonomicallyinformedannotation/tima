@@ -62,6 +62,7 @@ jobs:
         shell: wsl-bash {0}
         run: |
           sudo apt-get install dos2unix
+          sudo apt-get update
           dos2unix tests/integration_test.sh
           bash tests/integration_test.sh
   deploy-doc:
