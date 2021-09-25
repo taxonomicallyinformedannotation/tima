@@ -61,8 +61,8 @@ jobs:
       - name: Run tests
         shell: wsl-bash {0}
         run: |
-          sudo apt-get install dos2unix
           sudo apt-get update
+          sudo apt-get install dos2unix
           dos2unix tests/integration_test.sh
           bash tests/integration_test.sh
   deploy-doc:
