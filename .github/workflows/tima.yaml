@@ -67,7 +67,7 @@ jobs:
           .\Ubuntu\ubuntu1804.exe install --root
           wsl -u root -d Ubuntu-18.04 wget wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
-          wsl -u root -d Ubuntu-18.04 PATH=~/anaconda3/bin:$PATH
+          wsl -u root -d Ubuntu-18.04 export PATH=~/anaconda3/bin:$PATH
           wsl -u root -d Ubuntu-18.04 source ~/.bashrc
           wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
