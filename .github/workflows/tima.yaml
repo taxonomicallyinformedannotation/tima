@@ -71,11 +71,11 @@ jobs:
       - name: Install dependencies
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- conda env create --file environment.yml
+          wsl -u root -d Ubuntu-18.04 -- source conda env create --file environment.yml
       - name: Run tests
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- bash tests/integration_test.sh
+          wsl -u root -d Ubuntu-18.04 -- source bash tests/integration_test.sh
   deploy-doc:
     runs-on: ubuntu-latest
     steps:
