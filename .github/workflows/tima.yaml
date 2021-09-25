@@ -56,10 +56,10 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies
-        shell: wsl-bash {0}
         run: |
           conda env create --file environment.yml
       - name: Run tests
+        shell: wsl-bash {0}
         run: |
           bash tests/integration_test.sh
   deploy-doc:
