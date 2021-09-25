@@ -45,14 +45,14 @@ jobs:
   tima-windows:
     runs-on: windows-latest
     steps:
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
       - name: Setup WSL, DOS2UNIX, etc.
         shell: powershell
         run: |
