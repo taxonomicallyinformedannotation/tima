@@ -69,7 +69,6 @@ jobs:
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
           wsl -u root -d Ubuntu-18.04 source ~/.bashrc
           wsl -u root -d Ubuntu-18.04 source ~/miniconda3/etc/profile.d/conda.sh
-          wsl -u root -d Ubuntu-18.04 source ~/anaconda3/etc/profile.d/conda.sh
           wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
         run: |
