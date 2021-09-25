@@ -13,6 +13,7 @@ jobs:
         run: |
           Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
           Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
+          wsl --set-default-version 2
       - name: Set git to use LF
         run: |
           git config --global core.autocrlf false
