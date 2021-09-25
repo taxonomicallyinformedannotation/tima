@@ -45,6 +45,10 @@ jobs:
   tima-windows:
     runs-on: windows-latest
     steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
@@ -53,14 +57,9 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"  
-      - name: Setup WSL, DOS2UNIX, etc.
+      - name: Setup WSL
         shell: powershell
         run: |
-          $url = "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1-win64.zip"
-          $output = ".\dos2unix.zip"
-          (New-Object System.Net.WebClient).DownloadFile($url, $output)
-          Expand-Archive .\dos2unix.zip .\dos2unix
-
           $url = "https://aka.ms/wsl-ubuntu-1804"
           $output = ".\Ubuntu.zip"
           (New-Object System.Net.WebClient).DownloadFile($url, $output)
@@ -74,7 +73,6 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          .\dos2unix\bin\dos2unix.exe **/*
           wsl -u root -d Ubuntu-18.04 -- source tests/integration_test.sh
           
   deploy-doc:
