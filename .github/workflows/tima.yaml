@@ -6,7 +6,7 @@ on:
     branches:
       - main
 jobs:
-  tima:
+  tima-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,14 +20,40 @@ jobs:
       - name: Run tests
         run: |
           bash tests/integration_test.sh
-  publish:
+  tima-macOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          $CONDA/bin/conda env create --file environment.yml
+      - name: Run tests
+        run: |
+          bash tests/integration_test.sh
+  tima-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          $CONDA/bin/conda env create --file environment.yml
+      - name: Run tests
+        run: |
+          bash tests/integration_test.sh
+  deploy-doc:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
         with:
