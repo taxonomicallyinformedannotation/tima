@@ -48,6 +48,11 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
       - name: Setup WSL, DOS2UNIX, etc.
         shell: powershell
         run: |
@@ -63,11 +68,6 @@ jobs:
           Expand-Archive .\Ubuntu.zip .\Ubuntu
           Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
           .\Ubuntu\ubuntu1804.exe install --root
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - name: Install dependencies
         shell: powershell
         run: |
