@@ -65,9 +65,9 @@ jobs:
           Expand-Archive .\Ubuntu.zip .\Ubuntu
           Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
           .\Ubuntu\ubuntu1804.exe install --root
-          wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-          wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
-          wsl -u root -d Ubuntu-18.04 export PATH=/mnt/d/a/tima-r/tima-r/C:Usersrunneradmin/miniconda/bin:$PATH
+          wsl -u root -d Ubuntu-18.04 wget wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+          wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
+          wsl -u root -d Ubuntu-18.04 source ~/.bashrc
           wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
         run: |
