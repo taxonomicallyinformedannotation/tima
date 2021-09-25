@@ -66,16 +66,16 @@ jobs:
           Expand-Archive .\Ubuntu.zip .\Ubuntu
           Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
           .\Ubuntu\ubuntu1804.exe install --root
-          wsl -u root -d Ubuntu-18.04 -- source wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-          wsl -u root -d Ubuntu-18.04 -- source Miniconda3-latest-Linux-x86_64.sh
+          wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+          wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh
       - name: Install dependencies
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- source conda env create --file environment.yml
+          wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
       - name: Run tests
         shell: powershell
         run: |
-          wsl -u root -d Ubuntu-18.04 -- source tests/integration_test.sh
+          wsl -u root -d Ubuntu-18.04 bash tests/integration_test.sh
           
   deploy-doc:
     runs-on: ubuntu-latest
