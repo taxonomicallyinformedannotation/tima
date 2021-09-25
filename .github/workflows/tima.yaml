@@ -23,6 +23,7 @@ jobs:
       - name: Run tests
         run: |
           bash tests/integration_test.sh
+          
   tima-macOS:
     runs-on: macos-latest
     steps:
@@ -40,8 +41,12 @@ jobs:
       - name: Run tests
         run: |
           bash tests/integration_test.sh
+          
   tima-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: wsl-bash {0}
     steps:
       - uses: conda-incubator/setup-miniconda@v2
         with:
