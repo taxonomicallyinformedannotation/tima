@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: Vampire/setup-wsl@v1
       with:
-        distribution: Ubuntu-latest
+        distribution: Ubuntu-20.04
     
     - run: |
           npm ci
