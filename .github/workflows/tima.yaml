@@ -58,7 +58,6 @@ jobs:
         with:
           miniconda-version: "latest"  
       - name: Setup WSL
-        shell: powershell
         run: |
           $url = "https://aka.ms/wsl-ubuntu-1804"
           $output = ".\Ubuntu.zip"
@@ -71,11 +70,9 @@ jobs:
           wsl -u root -d Ubuntu-18.04 source ~/.bashrc
           wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
-        shell: powershell
         run: |
           wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
       - name: Run tests
-        shell: powershell
         run: |
           wsl -u root -d Ubuntu-18.04 bash tests/integration_test.sh
           
