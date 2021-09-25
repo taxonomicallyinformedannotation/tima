@@ -63,7 +63,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install dos2unix
-          dos2unix tests/integration_test.sh
+          find . -type f -print0 | xargs -0 dos2unix
           bash tests/integration_test.sh
   deploy-doc:
     runs-on: ubuntu-latest
