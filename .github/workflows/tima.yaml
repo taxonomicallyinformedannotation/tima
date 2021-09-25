@@ -67,9 +67,8 @@ jobs:
           .\Ubuntu\ubuntu1804.exe install --root
           wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
-          wsl -u root -d Ubuntu-18.04 source ~/.bashrc
-          wsl -u root -d Ubuntu-18.04 export PATH=/home/USER/anaconda3/bin:$PATH
-          wsl -u root -d Ubuntu-18.04 conda init
+          Get-Service LxssManager | Restart-Service
+          wsl -u root -d Ubuntu-18.04 conda list
       - name: Install dependencies
         run: |
           wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
