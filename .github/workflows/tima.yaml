@@ -11,12 +11,11 @@ jobs:
     defaults:
       run:
         shell: wsl-bash {0}
+        
     steps:
     - uses: Vampire/setup-wsl@v1
+    
     - run: |
           npm ci
           npm run build
           npm run package
-    - uses: Vampire/setup-wsl@v1
-    - run: |
-          conda list
