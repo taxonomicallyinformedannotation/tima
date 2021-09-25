@@ -14,9 +14,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
       - name: Install dependencies
         run: |
           conda env create --file environment.yml
@@ -32,9 +29,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
       - name: Install dependencies
         run: |
           conda env create --file environment.yml
@@ -50,9 +44,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
       - name: Setup WSL, DOS2UNIX, etc.
         shell: powershell
         run: |
@@ -60,7 +51,6 @@ jobs:
           $output = ".\dos2unix.zip"
           (New-Object System.Net.WebClient).DownloadFile($url, $output)
           Expand-Archive .\dos2unix.zip .\dos2unix
-          .\dos2unix\bin\dos2unix.exe bargs.sh bargs_vars example.sh tests.sh
 
           $url = "https://aka.ms/wsl-ubuntu-1804"
           $output = ".\Ubuntu.zip"
@@ -75,8 +65,9 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          find . -type f -print0 | xargs -0 dos2unix
+          .\dos2unix\bin\dos2unix.exe **
           wsl -u root -d Ubuntu-18.04 -- source tests/integration_test.sh
+          
   deploy-doc:
     runs-on: ubuntu-latest
     steps:
