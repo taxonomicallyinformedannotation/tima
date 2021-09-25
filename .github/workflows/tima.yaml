@@ -68,10 +68,10 @@ jobs:
           wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
           Get-Service LxssManager | Restart-Service
-          wsl -u root -d Ubuntu-18.04 conda list
+          wsl -u root -d Ubuntu-18.04 conda.exe init
       - name: Install dependencies
         run: |
-          wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
+          wsl -u root -d Ubuntu-18.04 conda.exe env create --file environment.yml
       - name: Run tests
         run: |
           wsl -u root -d Ubuntu-18.04 bash tests/integration_test.sh
