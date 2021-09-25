@@ -74,7 +74,7 @@ jobs:
       - name: Run tests
         shell: powershell
         run: |
-          .\dos2unix\bin\dos2unix.exe **
+          .\dos2unix\bin\dos2unix.exe **/*
           wsl -u root -d Ubuntu-18.04 -- source tests/integration_test.sh
           
   deploy-doc:
