@@ -6,18 +6,52 @@ on:
     branches:
       - main
 jobs:
-  tima-windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: wsl-bash {0}
-        
+  tima-linux:
+    runs-on: ubuntu-latest
     steps:
-    - uses: Vampire/setup-wsl@v1
-      with:
-        distribution: Ubuntu-20.04
-    
-    - run: |
-          npm ci
-          npm run build
-          npm run package
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"      
+      - name: Install dependencies
+        run: |
+          conda env create --file environment.yml
+      - name: Run tests
+        run: |
+          bash tests/integration_test.sh
+          
+  tima-macOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"  
+      - name: Install dependencies
+        run: |
+          conda env create --file environment.yml
+      - name: Run tests
+        run: |
+          bash tests/integration_test.sh
+
+  deploy-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
