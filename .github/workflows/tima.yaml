@@ -6,42 +6,6 @@ on:
     branches:
       - main
 jobs:
-  tima-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"      
-      - name: Install dependencies
-        run: |
-          conda env create --file environment.yml
-      - name: Run tests
-        run: |
-          bash tests/integration_test.sh
-          
-  tima-macOS:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"  
-      - name: Install dependencies
-        run: |
-          conda env create --file environment.yml
-      - name: Run tests
-        run: |
-          bash tests/integration_test.sh
-          
   tima-windows:
     runs-on: windows-latest
     steps:
@@ -67,6 +31,7 @@ jobs:
           .\Ubuntu\ubuntu1804.exe install --root
           wsl -u root -d Ubuntu-18.04 wget wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
+          wsl -u root -d Ubuntu-18.04 Get-Service LxssManager | Restart-Service
           wsl -u root -d Ubuntu-18.04 source ~/.bashrc
           wsl -u root -d Ubuntu-18.04 source ~/miniconda3/etc/profile.d/conda.sh
           wsl -u root -d Ubuntu-18.04 conda init
@@ -76,17 +41,3 @@ jobs:
       - name: Run tests
         run: |
           wsl -u root -d Ubuntu-18.04 bash tests/integration_test.sh
-          
-  deploy-doc:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy to GitHub Pages
-        if: success()
-        uses: crazy-max/ghaction-github-pages@v2
-        with:
-          target_branch: gh-pages
-          build_dir: docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
