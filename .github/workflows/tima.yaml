@@ -8,20 +8,15 @@ on:
 jobs:
   tima-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: wsl-bash {0}
     steps:
-      - name: Enable WSL
-        run: |
-          Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-          Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
-          wsl --set-default-version 2
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          wsl conda env create --file environment.yml
-      - name: Run tests
-        run: |
-          wsl bash tests/integration_test.sh
+    - uses: Vampire/setup-wsl@v1
+    - run: |
+          npm ci
+          npm run build
+          npm run package
+    - uses: Vampire/setup-wsl@v1
+    - run: |
+          conda list
