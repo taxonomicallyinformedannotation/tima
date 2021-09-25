@@ -48,23 +48,34 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
-      - name: Setup WSL
-        uses: Vampire/setup-wsl@v1.1.0
+      - name: Setup WSL, DOS2UNIX, etc.
+        shell: powershell
+        run: |
+          $url = "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1-win64.zip"
+          $output = ".\dos2unix.zip"
+          (New-Object System.Net.WebClient).DownloadFile($url, $output)
+          Expand-Archive .\dos2unix.zip .\dos2unix
+          .\dos2unix\bin\dos2unix.exe bargs.sh bargs_vars example.sh tests.sh
+
+          $url = "https://aka.ms/wsl-ubuntu-1804"
+          $output = ".\Ubuntu.zip"
+          (New-Object System.Net.WebClient).DownloadFile($url, $output)
+          Expand-Archive .\Ubuntu.zip .\Ubuntu
+          Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+          .\Ubuntu\ubuntu1804.exe install --root
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
       - name: Install dependencies
+        shell: powershell
         run: |
-          conda env create --file environment.yml
+          wsl -u root -d Ubuntu-18.04 -- conda env create --file environment.yml
       - name: Run tests
-        shell: wsl-bash {0}
+        shell: powershell
         run: |
-          sudo apt-get update
-          sudo apt-get install dos2unix
-          find . -type f -print0 | xargs -0 dos2unix
-          bash tests/integration_test.sh
+          wsl -u root -d Ubuntu-18.04 -- bash tests/integration_test.sh
   deploy-doc:
     runs-on: ubuntu-latest
     steps:
