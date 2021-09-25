@@ -8,28 +8,19 @@ on:
 jobs:
   tima-windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: wsl-bash {0}
     steps:
-      - name: Setup WSL
-        uses: Vampire/setup-wsl@v1.1.0
+      - name: Enable WSL
+        run: |
+          Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+          Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
       - name: Set git to use LF
-        shell: powershell
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"  
       - name: Install dependencies
         run: |
-          conda env create --file environment.yml
+          wsl conda env create --file environment.yml
       - name: Run tests
         run: |
-          bash tests/integration_test.sh
+          wsl bash tests/integration_test.sh
