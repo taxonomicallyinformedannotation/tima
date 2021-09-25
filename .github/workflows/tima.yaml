@@ -66,13 +66,9 @@ jobs:
           Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
           .\Ubuntu\ubuntu1804.exe install --root
           wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-          wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b
-          wsl -u root -d Ubuntu-18.04 source ~/.bashrc
-          wsl -u root -d Ubuntu-18.04 which python
-          wsl -u root -d Ubuntu-18.04 export PATH=~/miniconda3/bin:$PATH
-          wsl -u root -d Ubuntu-18.04 source ~/.bashrc
-          wsl -u root -d Ubuntu-18.04 which python
-          wsl -u root -d Ubuntu-18.04 conda list
+          wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
+          wsl -u root -d Ubuntu-18.04 eval "$(anaconda/bin/conda shell.bash hook)"
+          wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
         run: |
           wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
