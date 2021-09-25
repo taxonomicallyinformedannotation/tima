@@ -68,7 +68,6 @@ jobs:
           wsl -u root -d Ubuntu-18.04 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
           wsl -u root -d Ubuntu-18.04 bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
           wsl -u root -d Ubuntu-18.04 eval "$(anaconda/bin/conda shell.bash hook)"
-          wsl -u root -d Ubuntu-18.04 conda init
       - name: Install dependencies
         run: |
           wsl -u root -d Ubuntu-18.04 conda env create --file environment.yml
