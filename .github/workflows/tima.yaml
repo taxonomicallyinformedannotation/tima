@@ -19,7 +19,7 @@ jobs:
           miniconda-version: "latest"      
       - name: Install dependencies
         run: |
-          conda env create --file environment.yml
+          conda env create -q --file environment.yml
       - name: Run tests
         run: |
           bash tests/integration_test.sh
@@ -37,7 +37,7 @@ jobs:
           miniconda-version: "latest"  
       - name: Install dependencies
         run: |
-          conda env create --file environment.yml
+          conda env create -q --file environment.yml
       - name: Run tests
         run: |
           bash tests/integration_test.sh
