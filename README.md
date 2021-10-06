@@ -24,8 +24,8 @@ Optionally, you may want to add:
 ## Repo preparation
 
 ```shell
-git clone git@gitlab.com:tima5/tima-r.git <directory>
-cd <directory>
+git clone git@github.com:taxonomicallyinformedannotation/tima-r.git
+cd tima-r
 ```
 
 ### Windows Notice
@@ -48,6 +48,7 @@ conda env create -f environment.yml &&
 conda activate tima
 ```
 
+## Copy initial parameters
 
 ```shell
 # copy the default params to adapat to your data later on
