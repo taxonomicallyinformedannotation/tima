@@ -99,8 +99,8 @@
 <div id="repo-preparation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#repo-preparation" class="anchor"></a>Repo preparation</h2>
-<pre class="shell"><code>git clone git@gitlab.com:tima5/tima-r.git &lt;directory&gt;
-cd &lt;directory&gt;</code></pre>
+<pre class="shell"><code>git clone git@github.com:taxonomicallyinformedannotation/tima-r.git
+cd tima-r</code></pre>
 <div id="windows-notice" class="section level3">
 <h3 class="hasAnchor">
 <a href="#windows-notice" class="anchor"></a>Windows Notice</h3>
@@ -118,9 +118,13 @@ docker run -it --rm -v $PWD:/app tima</code></pre>
 <a href="#to-run-locally" class="anchor"></a>To run locally:</h3>
 <pre class="shell"><code>conda env create -f environment.yml &amp;&amp;
 conda activate tima</code></pre>
+</div>
+</div>
+<div id="copy-initial-parameters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#copy-initial-parameters" class="anchor"></a>Copy initial parameters</h2>
 <pre class="shell"><code># copy the default params to adapat to your data later on
 cp -R config/default config/params</code></pre>
-</div>
 </div>
 <div id="structure-organism-pairs-library" class="section level2">
 <h2 class="hasAnchor">
