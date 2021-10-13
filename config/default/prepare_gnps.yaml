@@ -1,3 +1,3 @@
-output: data/interim/annotations/db1c51fa29a64892af520698a18783e4_gnps_pretreated.tsv.gz
-gnps: db1c51fa29a64892af520698a18783e4
+output: data/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_gnps_pretreated.tsv.gz
+gnps: a177b17ded9f4e01bf343317bfc0372e
 nap: # optional

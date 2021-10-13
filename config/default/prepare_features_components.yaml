@@ -1,6 +1,6 @@
-input: data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz
-output: data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz
+input: data/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_pretreated.tsv.gz
+output: data/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_filled.tsv.gz
 tool: gnps ## or manual
 components: ## if manual 
-gnps: db1c51fa29a64892af520698a18783e4
+gnps: a177b17ded9f4e01bf343317bfc0372e
 mode: pos
