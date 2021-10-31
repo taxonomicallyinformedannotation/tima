@@ -1,5 +1,9 @@
 # Taxonomically Informed Metabolite Annotation
 
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
+<!-- badges: end -->
+
 The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then. 
 The worklow is illustrated in Figure 1.
 
