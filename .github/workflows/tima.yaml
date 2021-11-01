@@ -5,6 +5,9 @@ on:
   pull_request:
     branches:
       - main
+
+name: External Use
+
 jobs:
   tima-linux:
     runs-on: ubuntu-latest
