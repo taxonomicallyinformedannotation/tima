@@ -17,7 +17,6 @@ Authors@R: c(
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
 Depends:
     R (>= 4.1)
-Imports:
     crayon
     data.table
     docopt
