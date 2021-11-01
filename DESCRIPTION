@@ -16,7 +16,7 @@ Authors@R: c(
     )
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
 Depends:
-    R (>= 4.1)
+    R (>= 4.0.4)
     crayon
     data.table
     docopt
