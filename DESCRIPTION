@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 0.0.0.9000
+Version: 0.9.211101
 Authors@R: c(
     person("Adriano", "Rutz", , "adriano.rutz@unige.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -8,7 +8,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
-Description: Taxonomically Informed Metabolite Annotation
+Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima-r,
     https://taxonomicallyinformedannotation.github.io/tima-r
