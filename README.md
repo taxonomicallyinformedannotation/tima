@@ -63,11 +63,11 @@ cp -R config/default config/params
 ## Structure-organism pairs library
 
 ```shell
-bash scripts/get_lotus.sh && 
-Rscript scripts/prepare_lotus.R &&
-# Rscript scripts/prepare_dnp.R && # only if you have access to it
-Rscript scripts/prepare_library.R &&
-Rscript scripts/prepare_adducts.R &&
+bash inst/scripts/get_lotus.sh && 
+Rscript inst/scripts/prepare_lotus.R &&
+# Rscript inst/scripts/prepare_dnp.R && # only if you have access to it
+Rscript inst/scripts/prepare_library.R &&
+Rscript inst/scripts/prepare_adducts.R &&
 ```
 
 ## Annotations
@@ -78,7 +78,7 @@ Rscript scripts/prepare_adducts.R &&
 # (spectral-lib-matcher, which is only in python. see related repo)
 # instead we provide an example file coming from the new ISDB.
 # It also works with annotations coming from GNPS (see next steps)
-bash scripts/get_example_isdb.sh
+bash inst/scripts/get_example_isdb.sh
 ```
 
 ### Format MS2 annotations
@@ -86,30 +86,30 @@ bash scripts/get_example_isdb.sh
 ```shell
 # depending on the annotation tool you used
 
-Rscript scripts/prepare_gnps.R && # optional
-Rscript scripts/prepare_sirius.R && # optional
-Rscript scripts/prepare_isdb.R &&
+Rscript inst/scripts/prepare_gnps.R && # optional
+Rscript inst/scripts/prepare_sirius.R && # optional
+Rscript inst/scripts/prepare_isdb.R &&
 ```
 
 ### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)
 
 ```shell
-Rscript scripts/prepare_edges.R && 
-Rscript scripts/prepare_features_components.R &&
-Rscript scripts/prepare_features_classification.R &&
+Rscript inst/scripts/prepare_edges.R && 
+Rscript inst/scripts/prepare_features_components.R &&
+Rscript inst/scripts/prepare_features_classification.R &&
 ```
 
 ### Get biological taxonomy information
 
 ```shell
-bash scripts/get_gnverifier.sh && 
-Rscript scripts/prepare_taxa.R 
+bash inst/scripts/get_gnverifier.sh && 
+Rscript inst/scripts/prepare_taxa.R 
 ```
 
 ## And finally the graal!
 
 ```shell
-Rscript scripts/process_annotations.R
+Rscript inst/scripts/process_annotations.R
 ```
 
 NOTE: you can use --help or -h argument for all .R steps to get more info

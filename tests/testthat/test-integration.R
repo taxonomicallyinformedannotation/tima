@@ -11,7 +11,7 @@ test_that(desc = "get lotus",
             expect_error(object = system(command = paste0(
               "bash ", file.path(dirname(dirname(test_path(
 
-              ))), "scripts/get_lotus.sh")
+              ))), "inst/scripts/get_lotus.sh")
             )),
             NA)
           })
@@ -19,7 +19,7 @@ test_that(desc = "get lotus",
 test_that(desc = "prepare lotus",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_lotus.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_lotus.R"
             )),
             NA)
           })
@@ -27,7 +27,7 @@ test_that(desc = "prepare lotus",
 test_that(desc = "prepare library",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_library.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_library.R"
             )),
             NA)
           })
@@ -35,7 +35,7 @@ test_that(desc = "prepare library",
 test_that(desc = "prepare adducts",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_adducts.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_adducts.R"
             )),
             NA)
           })
@@ -45,7 +45,7 @@ test_that(desc = "get isdb example",
             expect_error(object = system(command = paste0(
               "bash ", file.path(dirname(dirname(test_path(
 
-              ))), "scripts/get_example_isdb.sh")
+              ))), "inst/scripts/get_example_isdb.sh")
             )),
             NA)
           })
@@ -55,7 +55,7 @@ test_that(desc = "get gnverifier",
             expect_error(object = system(command = paste0(
               "bash ", file.path(dirname(dirname(test_path(
 
-              ))), "scripts/get_gnverifier.sh")
+              ))), "inst/scripts/get_gnverifier.sh")
             )),
             NA)
           })
@@ -63,7 +63,7 @@ test_that(desc = "get gnverifier",
 test_that(desc = "prepare gnps",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_gnps.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_gnps.R"
             )),
             NA)
           })
@@ -71,7 +71,7 @@ test_that(desc = "prepare gnps",
 test_that(desc = "prepare isdb",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_isdb.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_isdb.R"
             )),
             NA)
           })
@@ -79,7 +79,7 @@ test_that(desc = "prepare isdb",
 test_that(desc = "prepare edges",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_edges.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_edges.R"
             )),
             NA)
           })
@@ -87,7 +87,7 @@ test_that(desc = "prepare edges",
 test_that(desc = "prepare components",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_features_components.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_features_components.R"
             )),
             NA)
           })
@@ -96,7 +96,7 @@ test_that(desc = "prepare classification",
           code = {
             expect_error(object = source(file = file.path(
               dirname(dirname(test_path())),
-              "scripts/prepare_features_classification.R"
+              "inst/scripts/prepare_features_classification.R"
             )),
             NA)
           })
@@ -104,7 +104,7 @@ test_that(desc = "prepare classification",
 test_that(desc = "prepare taxa",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/prepare_taxa.R"
+              dirname(dirname(test_path())), "inst/scripts/prepare_taxa.R"
             )),
             NA)
           })
@@ -112,7 +112,7 @@ test_that(desc = "prepare taxa",
 test_that(desc = "process annotations",
           code = {
             expect_error(object = source(file = file.path(
-              dirname(dirname(test_path())), "scripts/process_annotations.R"
+              dirname(dirname(test_path())), "inst/scripts/process_annotations.R"
             )),
             NA)
           })
