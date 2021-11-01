@@ -114,7 +114,7 @@ readr::write_delim(
 )
 
 log_debug("submitting to GNVerifier")
-system(command = paste("bash", paths$src$gnverifier))
+system(command = paste("bash", paths$inst$scripts$gnverifier))
 
 log_debug("cleaning GNVerifier results")
 dataOrganismVerified_3 <- clean_gnverifier()
