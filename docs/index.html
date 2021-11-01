@@ -66,7 +66,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/taxonomicallyinformedannotation/tima-r/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -131,11 +138,11 @@ cp -R config/default config/params</code></pre>
 <div id="structure-organism-pairs-library" class="section level2">
 <h2 class="hasAnchor">
 <a href="#structure-organism-pairs-library" class="anchor"></a>Structure-organism pairs library</h2>
-<pre class="shell"><code>bash src/get_lotus.sh &amp;&amp; 
-Rscript src/prepare_lotus.R &amp;&amp;
-# Rscript src/prepare_dnp.R &amp;&amp; # only if you have access to it
-Rscript src/prepare_library.R &amp;&amp;
-Rscript src/prepare_adducts.R &amp;&amp;</code></pre>
+<pre class="shell"><code>bash scripts/get_lotus.sh &amp;&amp; 
+Rscript scripts/prepare_lotus.R &amp;&amp;
+# Rscript scripts/prepare_dnp.R &amp;&amp; # only if you have access to it
+Rscript scripts/prepare_library.R &amp;&amp;
+Rscript scripts/prepare_adducts.R &amp;&amp;</code></pre>
 </div>
 <div id="annotations" class="section level2">
 <h2 class="hasAnchor">
@@ -146,52 +153,70 @@ Rscript src/prepare_adducts.R &amp;&amp;</code></pre>
 <pre class="shell"><code># (spectral-lib-matcher, which is only in python. see related repo)
 # instead we provide an example file coming from the new ISDB.
 # It also works with annotations coming from GNPS (see next steps)
-bash src/get_example_isdb.sh</code></pre>
+bash scripts/get_example_isdb.sh</code></pre>
 </div>
 <div id="format-ms2-annotations" class="section level3">
 <h3 class="hasAnchor">
 <a href="#format-ms2-annotations" class="anchor"></a>Format MS2 annotations</h3>
 <pre class="shell"><code># depending on the annotation tool you used
 
-Rscript src/prepare_gnps.R &amp;&amp; # optional
-Rscript src/prepare_sirius.R &amp;&amp; # optional
-Rscript src/prepare_isdb.R &amp;&amp;</code></pre>
+Rscript scripts/prepare_gnps.R &amp;&amp; # optional
+Rscript scripts/prepare_sirius.R &amp;&amp; # optional
+Rscript scripts/prepare_isdb.R &amp;&amp;</code></pre>
 </div>
 <div id="complement-ms2-annotations-with-spectral-clusters-and-chemical-taxonomy-of-annotations" class="section level3">
 <h3 class="hasAnchor">
 <a href="#complement-ms2-annotations-with-spectral-clusters-and-chemical-taxonomy-of-annotations" class="anchor"></a>Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)</h3>
-<pre class="shell"><code>Rscript src/prepare_edges.R &amp;&amp; 
-Rscript src/prepare_features_components.R &amp;&amp;
-Rscript src/prepare_features_classification.R &amp;&amp;</code></pre>
+<pre class="shell"><code>Rscript scripts/prepare_edges.R &amp;&amp; 
+Rscript scripts/prepare_features_components.R &amp;&amp;
+Rscript scripts/prepare_features_classification.R &amp;&amp;</code></pre>
 </div>
 <div id="get-biological-taxonomy-information" class="section level3">
 <h3 class="hasAnchor">
 <a href="#get-biological-taxonomy-information" class="anchor"></a>Get biological taxonomy information</h3>
-<pre class="shell"><code>bash src/get_gnverifier.sh &amp;&amp; 
-Rscript src/prepare_taxa.R </code></pre>
+<pre class="shell"><code>bash scripts/get_gnverifier.sh &amp;&amp; 
+Rscript scripts/prepare_taxa.R </code></pre>
 </div>
 </div>
 <div id="and-finally-the-graal" class="section level2">
 <h2 class="hasAnchor">
 <a href="#and-finally-the-graal" class="anchor"></a>And finally the graal!</h2>
-<pre class="shell"><code>Rscript src/process_annotations.R</code></pre>
+<pre class="shell"><code>Rscript scripts/process_annotations.R</code></pre>
 <p>NOTE: you can use –help or -h argument for all .R steps to get more info</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2>Links</h2>
+<ul class="list-unstyled">
+<li>Browse source code at <br><a href="https://github.com/taxonomicallyinformedannotation/tima-r/">https://​github.com/​taxonomicallyinformedannotation/​tima-r/​</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/taxonomicallyinformedannotation/tima-r/issues">
+    https://​github.com/​taxonomicallyinformedannotation/​tima-r/​issues</a>
+</li>
+</ul>
+</div>
+<div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small>GPL (&gt;= 3)</small></li>
 </ul>
 </div>
+<div class="community">
+<h2>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Adriano Rutz <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-0443-9902" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
 
@@ -199,6 +224,7 @@ Rscript src/prepare_taxa.R </code></pre>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://github.com/taxonomicallyinformedannotation/tima-r/actions"><img src="https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 </div>

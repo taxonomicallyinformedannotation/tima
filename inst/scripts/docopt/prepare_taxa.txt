@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript scripts/prepare_taxa.R --output 'data/interim/taxa/db1c51fa29a64892af520698a18783e4_taxed.tsv.gz' --tool gnps --k.top 1 --column.name 'ATTRIBUTE_species' --extension FALSE
+Rscript inst/scripts/prepare_taxa.R --output 'data/interim/taxa/db1c51fa29a64892af520698a18783e4_taxed.tsv.gz' --tool gnps --k.top 1 --column.name 'ATTRIBUTE_species' --extension FALSE
 
 Usage: prepare_taxa.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--column.name=<column.name>] [--gnps=<gnps>] [--k.top=<k.top>]
 

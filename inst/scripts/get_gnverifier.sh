@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-source scripts/get_platform.sh
-source scripts/parse_yaml.sh
-source scripts/warning.sh
+source inst/scripts/get_platform.sh
+source inst/scripts/parse_yaml.sh
+source inst/scripts/warning.sh
 
 eval $(parse_yaml paths.yaml)
 eval $(parse_yaml config/versions.yaml)

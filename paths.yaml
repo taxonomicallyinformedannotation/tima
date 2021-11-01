@@ -51,7 +51,7 @@ doc:
 img:
   path: img
 src:
-  path: src
+  path: inst/scripts
   gnverifier: src/gnverifierScript.sh
   gnverifier_2: src/gnverifierScript_2.sh
   docopt:
