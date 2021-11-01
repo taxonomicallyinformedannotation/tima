@@ -11,8 +11,8 @@ Authors@R: c(
     person(given = "Pierre-Marie",
            family = "Allard",
            role = c("ctb"),
-           email = "adriano.rutz@unige.ch",
-           comment = c(ORCID = "0000-0003-0443-9902")),
+           email = "pierre-marie.allard@unifr.ch",
+           comment = c(ORCID = "0000-0003-3389-2191"))
     )
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
 Depends:
