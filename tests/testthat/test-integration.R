@@ -8,78 +8,111 @@ test_that(desc = "copy params",
 
 test_that(desc = "get lotus",
           code = {
-            expect_error(object = system(command = "bash src/get_lotus.sh"),
-                         NA)
+            expect_error(object = system(command = paste0(
+              "bash ", file.path(dirname(dirname(test_path(
+
+              ))), "src/get_lotus.sh")
+            )),
+            NA)
           })
 
 test_that(desc = "prepare lotus",
           code = {
-            expect_error(object = source(file = "src/prepare_lotus.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_lotus.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare library",
           code = {
-            expect_error(object = source(file = "src/prepare_library.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_library.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare adducts",
           code = {
-            expect_error(object = source(file = "src/prepare_adducts.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_adducts.R"
+            )),
+            NA)
           })
 
 test_that(desc = "get isdb example",
           code = {
-            expect_error(object = system(command = "bash src/get_example_isdb.sh"),
-                         NA)
+            expect_error(object = system(command = paste0(
+              "bash ", file.path(dirname(dirname(test_path(
+
+              ))), "src/get_example_isdb.sh")
+            )),
+            NA)
           })
 
 test_that(desc = "get gnverifier",
           code = {
-            expect_error(object = system(command = "bash src/get_gnverifier.sh"),
-                         NA)
+            expect_error(object = system(command = paste0(
+              "bash ", file.path(dirname(dirname(test_path(
+
+              ))), "src/get_gnverifier.sh")
+            )),
+            NA)
           })
 
 test_that(desc = "prepare gnps",
           code = {
-            expect_error(object = source(file = "src/prepare_gnps.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_gnps.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare isdb",
           code = {
-            expect_error(object = source(file = "src/prepare_isdb.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_isdb.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare edges",
           code = {
-            expect_error(object = source(file = "src/prepare_edges.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_edges.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare components",
           code = {
-            expect_error(object = source(file = "src/prepare_features_components.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_features_components.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare classification",
           code = {
-            expect_error(object = source(file = "src/prepare_features_classification.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())),
+              "src/prepare_features_classification.R"
+            )),
+            NA)
           })
 
 test_that(desc = "prepare taxa",
           code = {
-            expect_error(object = source(file = "src/prepare_taxa.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/prepare_taxa.R"
+            )),
+            NA)
           })
 
 test_that(desc = "process annotations",
           code = {
-            expect_error(object = source(file = "src/process_annotations.R"),
-                         NA)
+            expect_error(object = source(file = file.path(
+              dirname(dirname(test_path())), "src/process_annotations.R"
+            )),
+            NA)
           })

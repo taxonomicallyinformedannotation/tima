@@ -1,43 +1,44 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
 Version: 0.0.0.9000
-Description: Taxonomically Informed Metabolite Annotation
 Authors@R: c(
-    person(given = "Adriano",
-           family = "Rutz",
-           role = c("aut", "cre"),
-           email = "adriano.rutz@unige.ch",
+    person("Adriano", "Rutz", , "adriano.rutz@unige.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
-    person(given = "Pierre-Marie",
-           family = "Allard",
-           role = c("ctb"),
-           email = "pierre-marie.allard@unifr.ch",
+    person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
-    )
+  )
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
+Description: Taxonomically Informed Metabolite Annotation
+License: GPL (>= 3)
+URL: https://github.com/taxonomicallyinformedannotation/tima-r
+BugReports: 
+    https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.1.1)
 Imports:
+    cli,
     crayon,
     data.table,
     docopt,
     dplyr,
+    glue,
     jsonlite,
+    lifecycle,
     purrr,
-    readr,
     R.utils,
+    readr,
+    rlang (>= 0.4.11),
     splitstackshape,
     stringr,
     tidyr,
+    withr,
     yaml
-License: GPL (>= 3)
+Suggests: 
+    roxygen2,
+    covr,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Suggests: 
-    covr,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
-URL: https://github.com/taxonomicallyinformedannotation/tima-r
