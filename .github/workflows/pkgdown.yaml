@@ -23,9 +23,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: 
-            pkgdown
-            rsconnect
+          extra-packages: pkgdown
           needs: website
 
       - name: Deploy package

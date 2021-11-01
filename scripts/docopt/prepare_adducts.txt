@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript src/prepare_adducts.R --input data/interim/libraries/library.tsv.gz --output library
+Rscript scripts/prepare_adducts.R --input data/interim/libraries/library.tsv.gz --output library
 
 Usage: prepare_adducts.R [--input=<input>] [--output=<output>]
 

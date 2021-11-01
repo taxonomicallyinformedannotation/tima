@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript src/process_annotations.R
+Rscript scripts/process_annotations.R
 
 Usage: process_annotations.R [--output=<output>] [--annotation=<annotation>] [--complement=<complement>] [--edges=<edges>] [--features=<features>][--initial.candidates=<initial.candidates>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>]
 
@@ -18,4 +18,4 @@ Options:
   -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
   -h --help                     Show this screen.
   -v --version                  Show version.
-  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at yur own risks. Can crash. 
+  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at yur own risks. Can crash.

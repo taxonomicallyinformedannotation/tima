@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source src/parse_yaml.sh
-source src/warning.sh
+source scripts/parse_yaml.sh
+source scripts/warning.sh
 
 eval $(parse_yaml paths.yaml)
 

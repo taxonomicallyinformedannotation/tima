@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript src/prepare_features_components.R --input 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz' --mode 'pos' --tool 'gnps' --gnps 'db1c51fa29a64892af520698a18783e4'
+Rscript scripts/prepare_features_components.R --input 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_pretreated.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz' --mode 'pos' --tool 'gnps' --gnps 'db1c51fa29a64892af520698a18783e4'
 
 Usage: prepare_features_components.R [--input=<input>] [--output=<output>] [--mode=<mode>]
 

@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript src/prepare_edges.R --input 'data/source/example_edges_manual.csv' --output 'data/interim/edges/db1c51fa29a64892af520698a18783e4_edges.tsv.gz' --tool gnps
+Rscript scripts/prepare_edges.R --input 'data/source/example_edges_manual.csv' --output 'data/interim/edges/db1c51fa29a64892af520698a18783e4_edges.tsv.gz' --tool gnps
 
 Usage: prepare_edges.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--gnps=<gnps>] [-1 | --source=<source>] [-2 | --target=<target>]
 
