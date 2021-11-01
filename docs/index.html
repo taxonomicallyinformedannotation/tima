@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Taxonomically Informed Metabolite Annotation">
-<meta property="og:description" content="Taxonomically Informed Metabolite Annotation">
+<meta property="og:description" content="TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.">
 <meta property="og:image" content="/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">timaR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.211101</span>
       </span>
     </div>
 
@@ -138,11 +138,11 @@ cp -R config/default config/params</code></pre>
 <div id="structure-organism-pairs-library" class="section level2">
 <h2 class="hasAnchor">
 <a href="#structure-organism-pairs-library" class="anchor"></a>Structure-organism pairs library</h2>
-<pre class="shell"><code>bash scripts/get_lotus.sh &amp;&amp; 
-Rscript scripts/prepare_lotus.R &amp;&amp;
-# Rscript scripts/prepare_dnp.R &amp;&amp; # only if you have access to it
-Rscript scripts/prepare_library.R &amp;&amp;
-Rscript scripts/prepare_adducts.R &amp;&amp;</code></pre>
+<pre class="shell"><code>bash inst/scripts/get_lotus.sh &amp;&amp; 
+Rscript inst/scripts/prepare_lotus.R &amp;&amp;
+# Rscript inst/scripts/prepare_dnp.R &amp;&amp; # only if you have access to it
+Rscript inst/scripts/prepare_library.R &amp;&amp;
+Rscript inst/scripts/prepare_adducts.R &amp;&amp;</code></pre>
 </div>
 <div id="annotations" class="section level2">
 <h2 class="hasAnchor">
@@ -153,35 +153,35 @@ Rscript scripts/prepare_adducts.R &amp;&amp;</code></pre>
 <pre class="shell"><code># (spectral-lib-matcher, which is only in python. see related repo)
 # instead we provide an example file coming from the new ISDB.
 # It also works with annotations coming from GNPS (see next steps)
-bash scripts/get_example_isdb.sh</code></pre>
+bash inst/scripts/get_example_isdb.sh</code></pre>
 </div>
 <div id="format-ms2-annotations" class="section level3">
 <h3 class="hasAnchor">
 <a href="#format-ms2-annotations" class="anchor"></a>Format MS2 annotations</h3>
 <pre class="shell"><code># depending on the annotation tool you used
 
-Rscript scripts/prepare_gnps.R &amp;&amp; # optional
-Rscript scripts/prepare_sirius.R &amp;&amp; # optional
-Rscript scripts/prepare_isdb.R &amp;&amp;</code></pre>
+Rscript inst/scripts/prepare_gnps.R &amp;&amp; # optional
+Rscript inst/scripts/prepare_sirius.R &amp;&amp; # optional
+Rscript inst/scripts/prepare_isdb.R &amp;&amp;</code></pre>
 </div>
 <div id="complement-ms2-annotations-with-spectral-clusters-and-chemical-taxonomy-of-annotations" class="section level3">
 <h3 class="hasAnchor">
 <a href="#complement-ms2-annotations-with-spectral-clusters-and-chemical-taxonomy-of-annotations" class="anchor"></a>Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)</h3>
-<pre class="shell"><code>Rscript scripts/prepare_edges.R &amp;&amp; 
-Rscript scripts/prepare_features_components.R &amp;&amp;
-Rscript scripts/prepare_features_classification.R &amp;&amp;</code></pre>
+<pre class="shell"><code>Rscript inst/scripts/prepare_edges.R &amp;&amp; 
+Rscript inst/scripts/prepare_features_components.R &amp;&amp;
+Rscript inst/scripts/prepare_features_classification.R &amp;&amp;</code></pre>
 </div>
 <div id="get-biological-taxonomy-information" class="section level3">
 <h3 class="hasAnchor">
 <a href="#get-biological-taxonomy-information" class="anchor"></a>Get biological taxonomy information</h3>
-<pre class="shell"><code>bash scripts/get_gnverifier.sh &amp;&amp; 
-Rscript scripts/prepare_taxa.R </code></pre>
+<pre class="shell"><code>bash inst/scripts/get_gnverifier.sh &amp;&amp; 
+Rscript inst/scripts/prepare_taxa.R </code></pre>
 </div>
 </div>
 <div id="and-finally-the-graal" class="section level2">
 <h2 class="hasAnchor">
 <a href="#and-finally-the-graal" class="anchor"></a>And finally the graal!</h2>
-<pre class="shell"><code>Rscript scripts/process_annotations.R</code></pre>
+<pre class="shell"><code>Rscript inst/scripts/process_annotations.R</code></pre>
 <p>NOTE: you can use –help or -h argument for all .R steps to get more info</p>
 </div>
 </div>
@@ -212,6 +212,12 @@ Rscript scripts/prepare_taxa.R </code></pre>
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
+<div class="citation">
+<h2>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html">Citing timaR</a></li>
+</ul>
+</div>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
@@ -225,6 +231,7 @@ Rscript scripts/prepare_taxa.R </code></pre>
 <ul class="list-unstyled">
 <li><a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://github.com/taxonomicallyinformedannotation/tima-r/actions"><img src="https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
 </ul>
 </div>
 </div>
