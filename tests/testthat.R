@@ -4,4 +4,4 @@
 Sys.setenv("R_TESTS" = "")
 library(testthat)
 
-test_local()
+# test_local()
