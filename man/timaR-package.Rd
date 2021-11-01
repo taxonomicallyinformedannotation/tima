@@ -12,6 +12,7 @@ Taxonomically Informed Metabolite Annotation
 Useful links:
 \itemize{
   \item \url{https://github.com/taxonomicallyinformedannotation/tima-r}
+  \item \url{https://taxonomicallyinformedannotation.github.io/tima-r}
   \item Report bugs at \url{https://github.com/taxonomicallyinformedannotation/tima-r/issues}
 }
 

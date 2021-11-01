@@ -2,24 +2,7 @@
 % Please edit documentation in R/get_gnps.R
 \name{read_features}
 \alias{read_features}
-\title{#' Title
-#'
-#' @param file
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-download_file <- function(file, path = "NULL") {
-if (is.null(path)) {
-error("Must enter a path")
-}
-f <- RCurl::CFILE(path, mode = "wb")
-RCurl::curlPerform(url = file, writedata = f@ref)
-close(f)
-}
-Title}
+\title{Title}
 \usage{
 read_features(id)
 }
@@ -30,22 +13,5 @@ read_features(id)
 
 }
 \description{
-#' Title
-#'
-#' @param file
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-download_file <- function(file, path = "NULL") {
-if (is.null(path)) {
-error("Must enter a path")
-}
-f <- RCurl::CFILE(path, mode = "wb")
-RCurl::curlPerform(url = file, writedata = f@ref)
-close(f)
-}
 Title
 }
