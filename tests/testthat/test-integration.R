@@ -1,7 +1,5 @@
 library(testthat)
 
-setwd("../..")
-
 test_that(desc = "copy params",
           code = {
             expect_error(object = system(command = "cp -R config/default config/params"),
