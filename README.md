@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
+[![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions)
 <!-- badges: end -->
 
 The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then. 
