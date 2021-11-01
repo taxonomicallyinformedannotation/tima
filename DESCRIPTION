@@ -17,17 +17,18 @@ Authors@R: c(
 Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
 Depends:
     R (>= 4.0.4)
-    crayon
-    data.table
-    docopt
-    dplyr
-    jsonlite
-    purrr
-    readr
-    R.utils
-    splitstackshape
-    stringr
-    tidyr
+Imports:
+    crayon,
+    data.table,
+    docopt,
+    dplyr,
+    jsonlite,
+    purrr,
+    readr,
+    R.utils,
+    splitstackshape,
+    stringr,
+    tidyr,
     yaml
 License: GPL (>= 3)
 Encoding: UTF-8
