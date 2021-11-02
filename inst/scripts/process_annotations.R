@@ -131,17 +131,13 @@ if (params$ms$annotate == TRUE) {
 
   if (params$ms$mode == "pos") {
     adduct_db_file <-
-      file.path(
-        paths$data$interim$adducts$path,
-        paste0(params$name, "_pos.tsv.gz")
-      )
+      file.path(paths$data$interim$adducts$path,
+                paste0(params$name, "_pos.tsv.gz"))
   }
   if (params$ms$mode == "neg") {
     adduct_db_file <-
-      file.path(
-        paths$data$interim$adducts$path,
-        paste0(params$name, "_neg.tsv.gz")
-      )
+      file.path(paths$data$interim$adducts$path,
+                paste0(params$name, "_neg.tsv.gz"))
   }
 
   log_debug(x = "... exact masses for MS1 annotation")
@@ -153,9 +149,7 @@ if (params$ms$annotate == TRUE) {
   annotation_table_ms1 <- ms1_annotation()
 
   ms1_decoration()
-}
-
-if (params$ms$annotate == FALSE) {
+} else {
   annotation_table_ms1 <-
     non_ms1_annotation(annotationTable = metadata_table_spectral_annotation)
 }

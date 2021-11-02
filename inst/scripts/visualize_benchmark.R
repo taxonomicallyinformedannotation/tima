@@ -16,27 +16,27 @@ library(package = tidyr, quietly = TRUE)
 ## dirty paths here for now
 
 raw_path <-
-  "data/interim/annotations/e3fbd467e21b4197859111e8e6751918_isdb_result.tsv.gz"
+  "data/interim/benchmark/benchmark_isdb_result.tsv.gz"
 
 raw_ms1_path <-
-  "data/processed/210812_135814/FinalResults.tsv.gz"
-
-weighted_path <-
-  "data/processed/210812_141528/FinalResults.tsv.gz"
-
-weigthed_chemo_path <-
-  "data/processed/210812_140739/FinalResults.tsv.gz"
-
-weighted_ms1_path <-
-  "data/processed/210812_141314/FinalResults.tsv.gz"
+  "data/processed/211102_154605/FinalResults.tsv"
 
 weighted_ms1_chemo_path <-
-  "data/processed/210812_140330/FinalResults.tsv.gz"
+  "data/processed/211102_155241/FinalResults.tsv"
+
+weigthed_chemo_path <-
+  "data/processed/211102_155807/FinalResults.tsv"
+
+weighted_ms1_path <-
+  "data/processed/211102_160624/FinalResults.tsv"
+
+weighted_path <-
+  "data/processed/211102_161255/FinalResults.tsv"
 
 solutions_path <-
   "data/interim/benchmark_solutions.tsv.gz"
 
-roc_path <- "../images/benchmark.svg"
+roc_path <- "man/figures/benchmark.svg"
 
 log_debug(
   "This script performs",
@@ -52,10 +52,10 @@ params$top_k$initial <- 500
 params$library <- "data/interim/libraries/library.tsv.gz"
 
 log_debug(x = "... functions")
-source(file = "src/R/ms1.R")
-source(file = "src/R/biological_weighting.R")
-source(file = "src/R/chemical_weighting.R")
-source(file = "src/R/cleaning.R")
+source(file = "R/ms1.R")
+source(file = "R/biological_weighting.R")
+source(file = "R/chemical_weighting.R")
+source(file = "R/cleaning.R")
 
 log_debug(x = "... files ...")
 
@@ -363,7 +363,7 @@ roc <- plotly::plot_ly(ROC, x = ~x) |>
 
 roc
 
-# plotly::orca(p = roc, file = roc_path)
+plotly::save_image(p = roc, file = roc_path)
 
 diff <- new_ranked |>
   left_join(new_results |> mutate(correct = "CORRECT")) |>
@@ -414,7 +414,6 @@ plotly::plot_ly() |>
     ))
   ) |>
   plotly::toWebGL()
-
 
 diff <- new_ranked |>
   left_join(new_results |> mutate(correct = "CORRECT")) |>
