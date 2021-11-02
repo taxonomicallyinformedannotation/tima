@@ -3,7 +3,7 @@ start <- Sys.time()
 source(file = "R/helpers.R")
 
 log_debug(
-  "This script prepares DNP referenced structure-organism pairs \n",
+  "This script prepares closed referenced structure-organism pairs \n",
   "for further processing. \n"
 )
 log_debug("Authors: AR")
@@ -16,17 +16,17 @@ library(package = purrr, quietly = TRUE)
 library(package = readr, quietly = TRUE)
 library(package = yaml, quietly = TRUE)
 
-step <- "prepare_dnp"
+step <- "prepare_closed"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
 if (file.exists(params$input)) {
-  log_debug(x = "Loading DNP")
-  dnp <-
+  log_debug(x = "Loading closed resources")
+  closed <-
     readr::read_delim(file = params$input)
 
-  log_debug(x = "Formatting DNP")
-  dnp_prepared <- dnp |>
+  log_debug(x = "Formatting closed resource")
+  closed_prepared <- closed |>
     dplyr::mutate(structure_inchikey_2D = substring(
       text = structure_inchikey,
       first = 1,
@@ -76,7 +76,7 @@ if (file.exists(params$input)) {
     params$output
   )
   readr::write_delim(
-    x = dnp_prepared,
+    x = closed_prepared,
     file = params$output,
     delim = "\t"
   )
@@ -87,7 +87,7 @@ if (file.exists(params$input)) {
     step = step
   )
 } else {
-  log_debug("Sorry, you do not have access to the DNP")
+  log_debug("Sorry, you do not have access to the closed resource")
 }
 
 end <- Sys.time()

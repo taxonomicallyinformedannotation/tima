@@ -66,7 +66,7 @@ cp -R config/default config/params
 ```shell
 bash inst/scripts/get_lotus.sh && 
 Rscript inst/scripts/prepare_lotus.R &&
-# Rscript inst/scripts/prepare_dnp.R && # only if you have access to it
+# Rscript inst/scripts/prepare_closed.R && # only if you have access to it
 Rscript inst/scripts/prepare_library.R &&
 Rscript inst/scripts/prepare_adducts.R &&
 ```

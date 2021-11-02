@@ -1,0 +1,12 @@
+You can use this script with the following example:
+Rscript inst/scripts/prepare_closed.R --input '../lotus-processor/data/processed/210715_dnp_metadata.csv.gz'
+
+Usage: prepare_closed.R [--input=<input>] [--output=<output>]
+
+Arguments:
+  -i --input=<input>    Where your closed resource is located. Cannot be shared
+  -o --output=<output>  Output
+
+Options:
+  -h --help             Show this screen.
+  -V --version          Show version.
