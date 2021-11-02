@@ -51,7 +51,7 @@ clean_gnverifier <- function() {
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")
-      system(command = paste("bash", paths$src$gnverifier_2))
+      system(command = paste("bash", paths$inst$scripts$gnverifier_2))
 
       dataOrganismVerified_2 <<-
         preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
