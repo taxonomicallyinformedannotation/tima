@@ -35,6 +35,22 @@ components <-
   ) |>
   dplyr::distinct()
 
+if (params$tool == "manual") {
+  manual_components <-
+    readr::read_delim(file = params$components) |>
+    dplyr::distinct(feature_id = CLUSTERID1,
+                    component_id = ComponentIndex)
+
+  components <- components |>
+    select(-component_id) |>
+    left_join(manual_components) |>
+    dplyr::mutate(component_id = ifelse(
+      test = is.na(component_id),
+      yes = -1,
+      no = component_id
+    ))
+}
+
 log_debug(x = "Adding components to features")
 table_filled <-
   dplyr::left_join(components, table) |>
