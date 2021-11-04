@@ -1,7 +1,7 @@
 ##########################   Functions - features   ###########################
 
 # require(RCurl)
-require(package = readr,quietly = TRUE)
+require(package = readr, quietly = TRUE)
 
 #' Title
 #'
