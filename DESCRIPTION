@@ -35,6 +35,7 @@ Imports:
     yaml
 Suggests: 
     covr,
+    knitr (>= 1.1.0),
     roxygen2,
     testthat (>= 3.0.0),
     utils
