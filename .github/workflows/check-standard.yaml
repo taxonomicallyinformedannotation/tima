@@ -45,6 +45,13 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
+      
+      - name: Install dependencies
+        run: |
+          bash inst/scripts/get_lotus.sh
+          bash inst/scripts/get_example_isdb.sh
+          bash inst/scripts/get_gnverifier.sh
+        shell: bash
 
       - uses: r-lib/actions/check-r-package@v1
         with:
