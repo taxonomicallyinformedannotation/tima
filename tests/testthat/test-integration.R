@@ -1,5 +1,3 @@
-library(testthat)
-
 if (grepl(pattern = "tests/testthat", x = getwd())) {
   setwd("../..")
 }
