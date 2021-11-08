@@ -1,7 +1,7 @@
 require(package = purrr, quietly = TRUE)
 require(package = yaml, quietly = TRUE)
 
-source(file = "R/log_debug.R")
+source(file = here::here("R", "log_debug.R"))
 
 #' Title
 #'
@@ -12,7 +12,7 @@ source(file = "R/log_debug.R")
 parse_yaml_paths <- function() {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(
-    file = "paths.yaml",
+    file = here::here("paths.yaml"),
     handlers = list(
       seq = function(x) {
         purrr::flatten(x)

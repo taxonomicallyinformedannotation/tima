@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = here::here("R", "helpers.R"))
 
 log_debug(
   "This script prepares LOTUS referenced structure-organism pairs \n",
@@ -10,14 +10,18 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
+library(
+  package = dplyr,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
 library(package = readr, quietly = TRUE)
 
 paths <- parse_yaml_paths()
 
 log_debug(x = "Loading files")
 lotus <-
-  readr::read_delim(file = paths$data$source$libraries$lotus)
+  readr::read_delim(file = here::here(paths$data$source$libraries$lotus))
 
 lotus_prepared <- lotus |>
   dplyr::mutate(structure_inchikey_2D = substring(
@@ -53,19 +57,25 @@ lotus_prepared <- lotus |>
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(paths$data$interim$path),
-  yes = dir.create(paths$data$interim$path),
-  no = paste(paths$data$interim$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$path)),
+  yes = dir.create(here::here(paths$data$interim$path)),
+  no = paste(here::here(paths$data$interim$path), "exists")
 )
 ifelse(
-  test = !dir.exists(dirname(paths$data$interim$libraries$lotus)),
-  yes = dir.create(dirname(paths$data$interim$libraries$lotus)),
-  no = paste(dirname(paths$data$interim$libraries$lotus), "exists")
+  test = !dir.exists(dirname(
+    here::here(paths$data$interim$libraries$lotus)
+  )),
+  yes = dir.create(dirname(
+    here::here(paths$data$interim$libraries$lotus)
+  )),
+  no = paste(dirname(
+    here::here(paths$data$interim$libraries$lotus)
+  ), "exists")
 )
 
 readr::write_delim(
   x = lotus_prepared,
-  file = paths$data$interim$libraries$lotus,
+  file = here::here(paths$data$interim$libraries$lotus),
   delim = "\t"
 )
 

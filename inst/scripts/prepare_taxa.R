@@ -1,9 +1,11 @@
 start <- Sys.time()
 
-source(file = "R/clean_gnverifier.R")
-source(file = "R/get_gnps.R")
-source(file = "R/helpers.R")
-source(file = "R/manipulating_taxo_otl.R")
+setwd(here::here())
+
+source(file = here::here("R", "clean_gnverifier.R"))
+source(file = here::here("R", "get_gnps.R"))
+source(file = here::here("R", "helpers.R"))
+source(file = here::here("R", "manipulating_taxo_otl.R"))
 
 log_debug("This script informs taxonomically features")
 log_debug("Authors: AR, P-MA")
@@ -11,8 +13,16 @@ log_debug("Contributors: ...")
 
 log_debug("Loading packages")
 library(package = docopt, quietly = TRUE)
-library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
-library(package = jsonlite, quietly = TRUE, warn.conflicts = FALSE)
+library(
+  package = dplyr,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
+library(
+  package = jsonlite,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
 library(package = purrr, quietly = TRUE)
 library(package = readr, quietly = TRUE)
 library(package = splitstackshape, quietly = TRUE)
@@ -33,7 +43,7 @@ stopifnot(
 
 log_debug(x = "Loading taxa ranks dictionary")
 taxa_ranks_dictionary <-
-  readr::read_delim(file = paths$data$source$dictionaries$ranks)
+  readr::read_delim(file = here::here(paths$data$source$dictionaries$ranks))
 
 if (params$tool == "gnps") {
   log_debug(x = "Loading feature table")
@@ -75,7 +85,7 @@ if (params$tool == "gnps") {
 
 if (params$tool == "manual") {
   metadata_table <-
-    readr::read_delim(file = params$input)
+    readr::read_delim(file = here::here(params$input))
 }
 
 log_debug(x = "Keeping list of organisms to submit to GNVerifier")
@@ -97,24 +107,24 @@ organism_table <- metadata_table |>
 
 log_debug(x = "Exporting organisms for GNVerifier submission")
 ifelse(
-  test = !dir.exists(paths$data$interim$path),
-  yes = dir.create(paths$data$interim$path),
-  no = paste(paths$data$interim$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$path)),
+  yes = dir.create(here::here(paths$data$interim$path)),
+  no = paste(here::here(paths$data$interim$path), "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$taxa$path),
-  yes = dir.create(paths$data$interim$taxa$path),
-  no = paste(paths$data$interim$taxa$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$taxa$path)),
+  yes = dir.create(here::here(paths$data$interim$taxa$path)),
+  no = paste(here::here(paths$data$interim$taxa$path), "exists")
 )
 readr::write_delim(
   x = organism_table,
-  file = paths$data$interim$taxa$original,
+  file = here::here(paths$data$interim$taxa$original),
   quote = "none",
   delim = "\t"
 )
 
 log_debug("submitting to GNVerifier")
-system(command = paste("bash", paths$inst$scripts$gnverifier))
+system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
 
 log_debug("cleaning GNVerifier results")
 dataOrganismVerified_3 <- clean_gnverifier()
@@ -211,39 +221,39 @@ metadata_table_joined_summarized[] <-
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(paths$data$path),
-  yes = dir.create(paths$data$path),
-  no = paste(paths$data$path, "exists")
+  test = !dir.exists(here::here(paths$data$path)),
+  yes = dir.create(here::here(paths$data$path)),
+  no = paste(here::here(paths$data$path), "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$path),
-  yes = dir.create(paths$data$interim$path),
-  no = paste(paths$data$interim$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$path)),
+  yes = dir.create(here::here(paths$data$interim$path)),
+  no = paste(here::here(paths$data$interim$path), "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$config$path),
-  yes = dir.create(paths$data$interim$config$path),
-  no = paste(paths$data$interim$config$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$config$path)),
+  yes = dir.create(here::here(paths$data$interim$config$path)),
+  no = paste(here::here(paths$data$interim$config$path), "exists")
 )
 ifelse(
-  test = !dir.exists(dirname(params$output)),
-  yes = dir.create(dirname(params$output)),
-  no = paste(dirname(params$output), "exists")
+  test = !dir.exists(dirname(here::here(params$output))),
+  yes = dir.create(dirname(here::here(params$output))),
+  no = paste(dirname(here::here(params$output)), "exists")
 )
 
 log_debug(
   x = "... path to export is",
-  params$output
+  here::here(params$output)
 )
 readr::write_delim(
   x = metadata_table_joined_summarized,
-  file = params$output,
+  file = here::here(params$output),
   delim = "\t"
 )
 
 export_params(
   parameters = params,
-  directory = paths$data$interim$config$path,
+  directory = here::here(paths$data$interim$config$path),
   step = step
 )
 

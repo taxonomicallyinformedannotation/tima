@@ -1,15 +1,19 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
-source(file = "R/form_adduct_pos.R")
-source(file = "R/form_adduct_neg.R")
+source(file = here::here("R", "helpers.R"))
+source(file = here::here("R", "form_adduct_pos.R"))
+source(file = here::here("R", "form_adduct_neg.R"))
 
 log_debug("This script creates adducts")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
+library(
+  package = dplyr,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
 library(package = docopt, quietly = TRUE)
 library(package = purrr, quietly = TRUE)
 library(package = readr, quietly = TRUE)
@@ -22,14 +26,15 @@ params <- get_params(step = step)
 log_debug(x = "Loading files ...")
 log_debug(x = "... exact masses")
 masses <- readr::read_delim(
-  file = params$input,
+  file = here::here(params$input),
   col_select = "structure_exact_mass"
 ) |>
   dplyr::select(exact_mass = structure_exact_mass) |>
   dplyr::distinct()
 
 log_debug(x = "... adducts")
-adducts_table <- readr::read_delim(file = paths$data$source$adducts)
+adducts_table <-
+  readr::read_delim(file = here::here(paths$data$source$adducts))
 
 log_debug(x = "Treating adducts table")
 adducts_t <- t(adducts_table) |>
@@ -69,53 +74,53 @@ pure_neg <-
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(paths$data$interim$adducts$path),
-  yes = dir.create(paths$data$interim$adducts$path),
-  no = paste(paths$data$interim$adducts$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$adducts$path)),
+  yes = dir.create(here::here(paths$data$interim$adducts$path)),
+  no = paste(here::here(paths$data$interim$adducts$path), "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$config$path),
-  yes = dir.create(paths$data$interim$config$path),
-  no = paste(paths$data$interim$config$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$config$path)),
+  yes = dir.create(here::here(paths$data$interim$config$path)),
+  no = paste(here::here(paths$data$interim$config$path), "exists")
 )
 
 log_debug(x = "... structure adducts positive")
 readr::write_delim(
   x = adducts_pos,
-  file = file.path(
+  file = here::here(file.path(
     paths$data$interim$adducts$path,
     paste0(params$output, "_pos.tsv.gz")
-  ),
+  )),
   delim = "\t"
 )
 
 log_debug(x = "... structure adducts negative")
 readr::write_delim(
   x = adducts_neg,
-  file = file.path(
+  file = here::here(file.path(
     paths$data$interim$adducts$path,
     paste0(params$output, "_neg.tsv.gz")
-  ),
+  )),
   delim = "\t"
 )
 
 log_debug(x = "... adducts masses positive")
 readr::write_delim(
   x = pure_pos,
-  file = paths$data$interim$adducts$pos,
+  file = here::here(paths$data$interim$adducts$pos),
   delim = "\t"
 )
 
 log_debug(x = "... adducts masses negative")
 readr::write_delim(
   x = pure_neg,
-  file = paths$data$interim$adducts$neg,
+  file = here::here(paths$data$interim$adducts$neg),
   delim = "\t"
 )
 
 export_params(
   parameters = params,
-  directory = paths$data$interim$config$path,
+  directory = here::here(paths$data$interim$config$path),
   step = step
 )
 

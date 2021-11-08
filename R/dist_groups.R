@@ -1,6 +1,5 @@
 ## credit goes to usedist package
 
-
 #' Title
 #'
 #' @param d

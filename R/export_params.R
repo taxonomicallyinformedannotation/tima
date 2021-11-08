@@ -1,6 +1,6 @@
 require(package = yaml, quietly = TRUE)
 
-source(file = "R/log_debug.R")
+source(file = here::here("R", "log_debug.R"))
 
 #' Title
 #'

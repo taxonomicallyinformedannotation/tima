@@ -7,15 +7,15 @@
 #'
 #' @examples
 get_params <- function(step) {
-  doc_path <<- file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
+  doc_path <<- file.path(here::here(paths$inst$scripts$docopt), paste0(step, ".txt"))
   default_path <<-
-    file.path(paths$config$default$path, paste0(step, ".yaml"))
+    file.path(here::here(paths$config$default$path), paste0(step, ".yaml"))
   params_path <<-
-    file.path(paths$config$params$path, paste0(step, ".yaml"))
+    file.path(here::here(paths$config$params$path), paste0(step, ".yaml"))
 
   doc <<- readChar(
-    con = doc_path,
-    nchars = file.info(doc_path)$size
+    con = here::here(doc_path),
+    nchars = file.info(here::here(doc_path))$size
   )
 
   arguments <<- docopt(doc)

@@ -1,14 +1,22 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = here::here("R", "helpers.R"))
 
 log_debug("This script prepares a custom library made of all prepared libraries. \n")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = data.table, quietly = TRUE, warn.conflicts = FALSE)
-library(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
+library(
+  package = data.table,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
+library(
+  package = dplyr,
+  quietly = TRUE,
+  warn.conflicts = FALSE
+)
 library(package = docopt, quietly = TRUE)
 library(package = purrr, quietly = TRUE)
 library(package = readr, quietly = TRUE)
@@ -20,7 +28,7 @@ params <- get_params(step = step)
 
 log_debug(x = "Loading and concatenating prepared libraries")
 files <- list.files(
-  path = paths$data$interim$libraries$path,
+  path = here::here(paths$data$interim$libraries$path),
   pattern = "_prepared.tsv.gz",
   full.names = TRUE,
   recursive = TRUE
@@ -28,7 +36,7 @@ files <- list.files(
 libraries <- list()
 for (i in seq_along(files)) {
   libraries[[i]] <-
-    readr::read_delim(files[[i]])
+    readr::read_delim(file = files[[i]])
 }
 
 custom_library <- data.table::rbindlist(libraries)
@@ -47,19 +55,19 @@ if (params$filter$mode == TRUE) {
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(paths$data$interim$libraries$path),
-  yes = dir.create(paths$data$interim$libraries$path),
-  no = paste(paths$data$interim$libraries$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$libraries$path)),
+  yes = dir.create(here::here(paths$data$interim$libraries$path)),
+  no = paste(here::here(paths$data$interim$libraries$path), "exists")
 )
 ifelse(
-  test = !dir.exists(paths$data$interim$config$path),
-  yes = dir.create(paths$data$interim$config$path),
-  no = paste(paths$data$interim$config$path, "exists")
+  test = !dir.exists(here::here(paths$data$interim$config$path)),
+  yes = dir.create(here::here(paths$data$interim$config$path)),
+  no = paste(here::here(paths$data$interim$config$path), "exists")
 )
 ifelse(
-  test = !dir.exists(dirname(params$output)),
-  yes = dir.create(dirname(params$output)),
-  no = paste(dirname(params$output), "exists")
+  test = !dir.exists(here::here(dirname(params$output))),
+  yes = dir.create(here::here(dirname(params$output))),
+  no = paste(dirname(here::here(params$output)), "exists")
 )
 
 log_debug(
@@ -71,16 +79,16 @@ log_debug(
 )
 readr::write_delim(
   x = custom_library,
-  file = file.path(
+  file = here::here(file.path(
     paths$data$interim$libraries$path,
     params$output
-  ),
+  )),
   delim = "\t"
 )
 
 export_params(
   parameters = params,
-  directory = paths$data$interim$config$path,
+  directory = here::here(paths$data$interim$config$path),
   step = step
 )
 
