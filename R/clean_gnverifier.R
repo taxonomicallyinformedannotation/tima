@@ -37,9 +37,9 @@ clean_gnverifier <- function() {
     )
 
     organism_table_2_interim <- dataOrganismVerified |>
-      dplyr::distinct(organismValue, organismCleaned) |>
-      filter(organismValue != organismCleaned) |>
-      dplyr::distinct(organismValue, organismCleaned)
+      dplyr::distinct(organism, organismCleaned) |>
+      filter(organism != organismCleaned) |>
+      dplyr::distinct(organism, organismCleaned)
 
     organism_table_2 <- organism_table_2_interim |>
       dplyr::distinct(organismCleaned)
