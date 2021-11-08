@@ -1,5 +1,6 @@
 if (grepl(pattern = "tests/testthat", x = getwd())) {
-  setwd("../..")
+  setwd("../../..")
+  cat(getwd())
 }
 
 test_that(
