@@ -1,19 +1,19 @@
-test_file(here::here("inst", "scripts", "prepare_lotus.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_lotus.R"))
 
-test_file(here::here("inst", "scripts", "prepare_library.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_library.R"))
 
-test_file(here::here("inst", "scripts", "prepare_adducts.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_adducts.R"))
 
-test_file(here::here("inst", "scripts", "prepare_gnps.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_gnps.R"))
 
-test_file(here::here("inst", "scripts", "prepare_isdb.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_isdb.R"))
 
-test_file(here::here("inst", "scripts", "prepare_edges.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_edges.R"))
 
-test_file(here::here("inst", "scripts", "prepare_features_components.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_features_components.R"))
 
-test_file(here::here("inst", "scripts", "prepare_features_classification.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_features_classification.R"))
 
-test_file(here::here("inst", "scripts", "prepare_taxa.R"))
+testthat::test_file(path = here::here("inst", "scripts", "prepare_taxa.R"))
 
-test_file(here::here("inst", "scripts", "process_annotations.R"))
+testthat::test_file(path = here::here("inst", "scripts", "process_annotations.R"))

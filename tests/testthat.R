@@ -1,4 +1,4 @@
 library(testthat)
 library(timaR)
 
-test_check("timaR")
+testthat::test_check(package = "timaR")
