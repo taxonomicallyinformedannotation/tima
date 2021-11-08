@@ -36,9 +36,12 @@ clean_gnverifier <- function() {
       "trying with more flexible parameters"
     )
 
-    organism_table_2 <- dataOrganismVerified |>
-      dplyr::distinct(organism, organismCleaned) |>
-      filter(organism != organismCleaned) |>
+    organism_table_2_interim <- dataOrganismVerified |>
+      dplyr::distinct(organismValue, organismCleaned) |>
+      filter(organismValue != organismCleaned) |>
+      dplyr::distinct(organismValue, organismCleaned)
+
+    organism_table_2 <- organism_table_2_interim |>
       dplyr::distinct(organismCleaned)
 
     if (nrow(organism_table_2) != 0) {
@@ -54,7 +57,9 @@ clean_gnverifier <- function() {
       system(command = paste("bash", paths$inst$scripts$gnverifier_2))
 
       dataOrganismVerified_2 <<-
-        preclean_gnverifier(file = paths$data$interim$taxa$verified_2)
+        preclean_gnverifier(file = paths$data$interim$taxa$verified_2) |>
+        dplyr::select(-organismValue) |>
+        dplyr::left_join(organism_table_2_interim)
 
       log_debug("Joining both results")
       dataOrganismVerified_3 <-
