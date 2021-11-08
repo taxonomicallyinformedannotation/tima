@@ -21,6 +21,13 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
+      - name: Install specific dependencies
+        run: |
+          bash inst/scripts/get_lotus.sh
+          bash inst/scripts/get_example_isdb.sh
+          bash inst/scripts/get_gnverifier.sh
+        shell: bash
+        
       - name: Query dependencies
         run: |
           install.packages('remotes')
