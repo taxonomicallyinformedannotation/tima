@@ -1,3 +1,5 @@
+name: External Use
+
 on:
   push:
     branches:
@@ -5,12 +7,11 @@ on:
   pull_request:
     branches:
       - main
-
-name: External Use
-
+      
 jobs:
-  tima-linux:
-    runs-on: ubuntu-latest
+  tima-test:
+    name: tima-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
@@ -20,24 +21,6 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"      
-      - name: Install dependencies
-        run: |
-          conda env create -q --file environment.yml
-      - name: Run tests
-        run: |
-          bash tests/integration_test.sh
-          
-  tima-macOS:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"  
       - name: Install dependencies
         run: |
           conda env create -q --file environment.yml
