@@ -16,5 +16,5 @@ else
 	wget "https://github.com/gnames/gnverifier/releases/download/$gnverifier/gnverifier-$gnverifier-win-64.zip" -P bin/
 	unzip bin/gnverifier-$gnverifier-win-64.zip -d bin/
 	rm -r bin/gnverifier-$gnverifier-win-64.zip
-	copy bin/gnverifier.exe %USERPROFILE%/bin
+	cp bin/gnverifier.exe %USERPROFILE%/bin
 fi
