@@ -54,10 +54,10 @@ clean_gnverifier <- function() {
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")
-      if (grepl(pattern = "linux|mac", x = osVersion)) {
+      if (.Platform$OS.type == "unix") {
         system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
       } else{
-        shell(command = paste("wsl", here::here(paths$inst$scripts$gnverifier)))
+        shell(paste("wsl", here::here(paths$inst$scripts$gnverifier)))
       }
 
       dataOrganismVerified_2 <<-

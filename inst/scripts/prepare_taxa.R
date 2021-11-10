@@ -124,10 +124,10 @@ readr::write_delim(
 )
 
 log_debug("submitting to GNVerifier")
-if (grepl(pattern = "linux|mac", x = osVersion)) {
+if (.Platform$OS.type == "unix") {
   system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
 } else{
-  shell(command = paste("wsl", here::here(paths$inst$scripts$gnverifier)))
+  shell(paste("wsl", here::here(paths$inst$scripts$gnverifier)))
 }
 
 log_debug("cleaning GNVerifier results")
