@@ -29,11 +29,10 @@ jobs:
         run: |
           conda env create -q --file environment.yml
       - name: Install Windows specific dependencies
+        if: matrix.os == 'windows-latest'
         run: |
-          if [ "$matrix.os" == "windows-latest" ]; then
-              choco install wget
-              choco install unzip
-          fi
+          choco install wget
+          choco install unzip
       - name: Run tests
         run: |
           bash tests/integration_test.sh
