@@ -54,7 +54,7 @@ clean_gnverifier <- function() {
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")
-      system(command = paste("bash", here::here(paths$inst$scripts$gnverifier_2)))
+      system2(command = paste("bash", here::here(paths$inst$scripts$gnverifier_2)))
 
       dataOrganismVerified_2 <<-
         preclean_gnverifier(file = here::here(paths$data$interim$taxa$verified_2)) |>
