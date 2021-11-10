@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-source inst/scripts/parse_yaml.sh
-source inst/scripts/warning_gnverifier.sh
+echo foo
+. inst/scripts/parse_yaml.sh
+. inst/scripts/warning_gnverifier.sh
+echo bar
 
 eval $(parse_yaml paths.yaml)
 
