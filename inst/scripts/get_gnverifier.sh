@@ -17,5 +17,3 @@ else
 	unzip bin/gnverifier-$gnverifier-win-64.zip -d bin/
 	rm -r bin/gnverifier-$gnverifier-win-64.zip
 fi
-
-
