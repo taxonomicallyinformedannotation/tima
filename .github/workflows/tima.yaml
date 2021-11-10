@@ -35,6 +35,7 @@ jobs:
         run: |
           choco install wget
           choco install unzip
+          copy bin\gnverifier.exe %USERPROFILE%\bin
       - name: Run tests
         run: |
           bash tests/integration_test.sh
