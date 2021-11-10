@@ -30,7 +30,7 @@ jobs:
           conda env create -q --file environment.yml
       - name: Install Windows specific dependencies
         run: |
-          if [matrix.os == 'windows-latest']; then
+          if [ "$matrix.os" == "windows-latest" ]; then
               choco install wget
               choco install unzip
           fi
