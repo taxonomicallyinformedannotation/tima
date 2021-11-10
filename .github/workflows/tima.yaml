@@ -33,7 +33,7 @@ jobs:
       - name: Install Windows specific dependencies
         if: matrix.os == 'windows-latest'
         run: |
-          lxrun /install
+          wsl /install
           choco install curl
           choco install gzip
           choco install unzip
