@@ -124,7 +124,11 @@ readr::write_delim(
 )
 
 log_debug("submitting to GNVerifier")
-system2(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
+if (grepl(pattern = "linux|mac", x = osVersion)) {
+  system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
+} else{
+  shell(command = paste("wsl", here::here(paths$inst$scripts$gnverifier)))
+}
 
 log_debug("cleaning GNVerifier results")
 dataOrganismVerified_3 <- clean_gnverifier()

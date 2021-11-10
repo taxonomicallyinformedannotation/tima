@@ -54,7 +54,11 @@ clean_gnverifier <- function() {
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")
-      system2(command = paste("bash", here::here(paths$inst$scripts$gnverifier_2)))
+      if (grepl(pattern = "linux|mac", x = osVersion)) {
+        system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
+      } else{
+        shell(command = paste("wsl", here::here(paths$inst$scripts$gnverifier)))
+      }
 
       dataOrganismVerified_2 <<-
         preclean_gnverifier(file = here::here(paths$data$interim$taxa$verified_2)) |>
