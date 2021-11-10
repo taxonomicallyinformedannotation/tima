@@ -30,10 +30,12 @@ jobs:
       - name: Install dependencies
         run: |
           conda env create -q --file environment.yml
+      - name: Setup WSL
+        if: matrix.os == 'windows-latest'
+        uses: Vampire/setup-wsl@v1.1.0
       - name: Install Windows specific dependencies
         if: matrix.os == 'windows-latest'
         run: |
-          wsl /install
           choco install curl
           choco install gzip
           choco install unzip
