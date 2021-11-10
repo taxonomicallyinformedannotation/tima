@@ -14,6 +14,9 @@ case $OS in
 'WindowsNT')
   OS='unsupported'
   ;;
+'MINGW64_NT-10.0-17763')
+  OS='MINGW64_NT-10.0-17763'
+  ;;
 'Darwin')
   OS='mac'
   ;;
