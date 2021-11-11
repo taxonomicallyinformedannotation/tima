@@ -29,7 +29,6 @@ jobs:
         run: |
           choco install curl
           choco install gzip
-          choco install make
           choco install unzip
           choco install wget
       - uses: conda-incubator/setup-miniconda@v2
