@@ -38,6 +38,17 @@ cd tima-r
 
 If you are using Windows, please install [WSL2](https://docs.microsoft.com/en-us/windows/wsl/compare-versions#whats-new-in-wsl-2)
 
+You will also need to install [Choco](https://chocolatey.org/install).
+
+Then run:
+
+```shell
+choco install curl
+choco install gzip
+choco install unzip
+choco install wget
+```
+
 Please also follow the procedure described [here](https://stackoverflow.com/questions/2517190/how-do-i-force-git-to-use-lf-instead-of-crlf-under-windows/13154031#13154031) to ensure files will be proberly encoded.
 
 ### To run in docker:
