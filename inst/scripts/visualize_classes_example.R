@@ -9,17 +9,84 @@ source(file = "R/prepare-hierarchy_2.R")
 source(file = "R/prepare_plot.R")
 
 log_debug("Loading packages")
-library(package = "crayon", quietly = TRUE)
-library(package = "docopt", quietly = TRUE)
-library(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
-library(package = "forcats", quietly = TRUE)
-library(package = "ggplot2", quietly = TRUE)
-library(package = "ggpubr", quietly = TRUE)
-## remotes::install_github("KarstensLab/microshades")
-library(package = "microshades", quietly = TRUE)
-library(package = "plotly", quietly = TRUE)
-library(package = "readr", quietly = TRUE)
-library(package = "splitstackshape", quietly = TRUE)
+if (!require(crayon)) {
+  install.packages("crayon")
+  require(
+    package = "crayon",
+    quietly = TRUE
+  )
+}
+if (!require(docopt)) {
+  install.packages("docopt")
+  require(
+    package = "docopt",
+    quietly = TRUE
+  )
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(forcats)) {
+  install.packages("forcats")
+  require(
+    package = "forcats",
+    quietly = TRUE
+  )
+}
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+  require(
+    package = "ggplot2",
+    quietly = TRUE
+  )
+}
+if (!require(ggpubr)) {
+  install.packages("ggpubr")
+  require(
+    package = "ggpubr",
+    quietly = TRUE
+  )
+}
+if (!require(remotes)) {
+  install.packages("remotes")
+  require(
+    package = "remotes",
+    quietly = TRUE
+  )
+}
+if (!require(microshades)) {
+  remotes::install_github("KarstensLab/microshades")
+  require(
+    package = "microshades",
+    quietly = TRUE
+  )
+}
+if (!require(plotly)) {
+  install.packages("plotly")
+  require(
+    package = "plotly",
+    quietly = TRUE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  require(
+    package = "readr",
+    quietly = TRUE
+  )
+}
+if (!require(splitstackshape)) {
+  install.packages("splitstackshape")
+  require(
+    package = "splitstackshape",
+    quietly = TRUE
+  )
+}
 
 ## TODO docopt
 

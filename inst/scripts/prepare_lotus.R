@@ -10,12 +10,21 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(
-  package = "dplyr",
-  quietly = TRUE,
-  warn.conflicts = FALSE
-)
-library(package = "readr", quietly = TRUE)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  library(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  library(
+    package = "readr",
+    quietly = TRUE
+  )
+}
 
 paths <- parse_yaml_paths()
 

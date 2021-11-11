@@ -1,4 +1,7 @@
-require(package = "ggplot2", quietly = TRUE)
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+  require(package = "ggplot2", quietly = TRUE)
+}
 
 #' Title
 #'

@@ -1,5 +1,11 @@
-require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
-require(package = "forcats", quietly = TRUE)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+}
+if (!require(forcats)) {
+  install.packages("forcats")
+  require(package = "forcats", quietly = TRUE)
+}
 
 #' Title
 #'

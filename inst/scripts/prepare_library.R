@@ -7,20 +7,50 @@ log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(
-  package = "data.table",
-  quietly = TRUE,
-  warn.conflicts = FALSE
-)
-library(
-  package = "dplyr",
-  quietly = TRUE,
-  warn.conflicts = FALSE
-)
-library(package = "docopt", quietly = TRUE)
-library(package = "purrr", quietly = TRUE)
-library(package = "readr", quietly = TRUE)
-library(package = "yaml", quietly = TRUE)
+if (!require(data.table)) {
+  install.packages("data.table")
+  library(
+    package = "data.table",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(docopt)) {
+  install.packages("docopt")
+  library(
+    package = "docopt",
+    quietly = TRUE
+  )
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  library(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(purrr)) {
+  install.packages("purrr")
+  library(
+    package = "purrr",
+    quietly = TRUE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  library(
+    package = "readr",
+    quietly = TRUE
+  )
+}
+if (!require(yaml)) {
+  install.packages("yaml")
+  library(
+    package = "yaml",
+    quietly = TRUE
+  )
+}
 
 step <- "prepare_library"
 paths <- parse_yaml_paths()

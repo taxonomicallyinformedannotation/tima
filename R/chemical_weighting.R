@@ -1,7 +1,13 @@
 ###########################   Functions - chemical    #########################
 
-require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
-require(package = "stringr", quietly = TRUE)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+}
+if (!require(stringr)) {
+  install.packages("stringr")
+  require(package = "stringr", quietly = TRUE)
+}
 
 #' Title
 #'

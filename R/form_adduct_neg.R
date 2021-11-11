@@ -1,5 +1,11 @@
-require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
-require(package = "tidyr", quietly = TRUE)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+}
+if (!require(tidyr)) {
+  install.packages("tidyr")
+  require(package = "tidyr", quietly = TRUE)
+}
 
 #' Title
 #'

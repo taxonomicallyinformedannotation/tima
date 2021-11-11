@@ -3,13 +3,56 @@ start <- Sys.time()
 source(file = "R/helpers.R")
 
 log_debug(x = "loading libraries")
-library(package = "crayon", quietly = TRUE)
-library(package = "data.table", quietly = TRUE)
-library(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
-library(package = "plotly", quietly = TRUE)
-library(package = "readr", quietly = TRUE)
-library(package = "splitstackshape", quietly = TRUE)
-library(package = "tidyr", quietly = TRUE)
+if (!require(crayon)) {
+  install.packages("crayon")
+  require(
+    package = "crayon",
+    quietly = TRUE
+  )
+}
+if (!require(data.table)) {
+  install.packages("data.table")
+  require(
+    package = "data.table",
+    quietly = TRUE
+  )
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(plotly)) {
+  install.packages("plotly")
+  require(
+    package = "plotly",
+    quietly = TRUE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  require(
+    package = "readr",
+    quietly = TRUE
+  )
+}
+if (!require(splitstackshape)) {
+  install.packages("splitstackshape")
+  require(
+    package = "splitstackshape",
+    quietly = TRUE
+  )
+}
+if (!require(tidyr)) {
+  install.packages("tidyr")
+  require(
+    package = "tidyr",
+    quietly = TRUE
+  )
+}
 
 ## docopt to do
 

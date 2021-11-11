@@ -1,5 +1,11 @@
-require(package = "crayon", quietly = TRUE)
-require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+if (!require(crayon)) {
+  install.packages("crayon")
+  require(package = "crayon", quietly = TRUE)
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+}
 
 #' Title
 #'

@@ -9,23 +9,78 @@ source(file = "R/helpers.R")
 source(file = "R/ms1.R")
 
 log_debug("Loading packages")
-library(package = "crayon", quietly = TRUE)
-library(
-  package = "data.table",
-  quietly = TRUE,
-  warn.conflicts = FALSE
-)
-library(
-  package = "dplyr",
-  quietly = TRUE,
-  warn.conflicts = FALSE
-)
-library(package = "docopt", quietly = TRUE)
-library(package = "readr", quietly = TRUE)
-library(package = "splitstackshape", quietly = TRUE)
-library(package = "stringr", quietly = TRUE)
-library(package = "tidyr", quietly = TRUE)
-library(package = "yaml", quietly = TRUE)
+if (!require(crayon)) {
+  install.packages("crayon")
+  library(
+    package = "crayon",
+    quietly = TRUE
+  )
+}
+if (!require(data.table)) {
+  install.packages("data.table")
+  library(
+    package = "data.table",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(docopt)) {
+  install.packages("docopt")
+  library(
+    package = "docopt",
+    quietly = TRUE
+  )
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  library(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(purrr)) {
+  install.packages("purrr")
+  library(
+    package = "purrr",
+    quietly = TRUE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  library(
+    package = "readr",
+    quietly = TRUE
+  )
+}
+if (!require(splitstackshape)) {
+  install.packages("splitstackshape")
+  library(
+    package = "splitstackshape",
+    quietly = TRUE
+  )
+}
+if (!require(stringr)) {
+  install.packages("stringr")
+  library(
+    package = "stringr",
+    quietly = TRUE
+  )
+}
+if (!require(tidyr)) {
+  install.packages("tidyr")
+  library(
+    package = "tidyr",
+    quietly = TRUE
+  )
+}
+if (!require(yaml)) {
+  install.packages("yaml")
+  library(
+    package = "yaml",
+    quietly = TRUE
+  )
+}
 
 step <- "process_annotations"
 paths <- parse_yaml_paths()

@@ -1,5 +1,11 @@
-require(package = "purrr", quietly = TRUE)
-require(package = "yaml", quietly = TRUE)
+if (!require(purrr)) {
+  install.packages("purrr")
+  require(package = "purrr", quietly = TRUE)
+}
+if (!require(yaml)) {
+  install.packages("yaml")
+  require(package = "yaml", quietly = TRUE)
+}
 
 source(file = "R/log_debug.R")
 
