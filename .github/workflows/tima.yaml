@@ -47,5 +47,6 @@ jobs:
       - name: Run tests (windows)
         if: matrix.os == 'windows-latest'
         run: |
-          dos2unix tests/integration_test.sh
+          git rm --cached -r .
+          git reset --hard
           wsl bash tests/integration_test.sh
