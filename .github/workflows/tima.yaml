@@ -22,15 +22,13 @@ jobs:
         with:
           python-version: 3.8
       - uses: r-lib/actions/setup-r@v1
-        with:
-          r-version: release
       - if: matrix.os == 'windows-latest'
         uses: Vampire/setup-wsl@v1.1.0
         with:
           additional-packages:
             curl
-            dos2unix
             gzip
+            r-base
             unzip
             wget
       - uses: conda-incubator/setup-miniconda@v2
