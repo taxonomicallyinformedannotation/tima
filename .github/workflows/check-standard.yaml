@@ -23,7 +23,7 @@ jobs:
           # - {os: macOS-latest,   r: 'release'}
           # - {os: windows-latest, r: 'release'}
           # - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
+          - { os: ubuntu-latest,   r: 'release' }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
-      
+
       - name: Install specific dependencies
         run: |
           bash inst/scripts/get_lotus.sh

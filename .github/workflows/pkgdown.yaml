@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    tags: ['*']
-    
+    tags: [ '*' ]
+
 name: pkgdown
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
       - name: Install rsconnect
         run: install.packages("rsconnect")
         shell: Rscript {0}
-        
+
       - name: Deploy package
         run: |
           git config --local user.name "$GITHUB_ACTOR"

@@ -4,9 +4,9 @@ author: "Vignette Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+%\VignetteIndexEntry{Vignette Title}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -36,7 +36,7 @@ The `html_vignette` template includes a basic CSS theme. To override this theme 
 
 ## Figures
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+The figure sizes have been customised so that you can easily put two images side-by-side.
 
 ```{r, fig.show='hold'}
 plot(1:10)
