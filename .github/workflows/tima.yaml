@@ -42,5 +42,6 @@ jobs:
           choco install unzip
           choco install wget
       - name: Run tests
+        shell: bash -l {0}
         run: |
           bash tests/integration_test.sh
