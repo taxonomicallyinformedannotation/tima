@@ -26,6 +26,7 @@ jobs:
         with:
           additional-packages:
             curl
+            gcc
             gzip
             make
             r-base
