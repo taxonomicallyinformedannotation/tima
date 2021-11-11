@@ -25,9 +25,21 @@ jobs:
         uses: Vampire/setup-wsl@v1.1.0
         with:
           additional-packages:
+            apt-get
             curl
             gcc
             gzip
+            install
+            libgl1-mesa-glx
+            libegl1-mesa
+            libxrandr2
+            libxrandr2
+            libxss1
+            libxcursor1
+            libxcomposite1
+            libasound2
+            libxi6
+            libxtst6
             make
             r-base
             unzip
@@ -49,4 +61,9 @@ jobs:
       - name: Run tests (windows)
         if: matrix.os == 'windows-latest'
         run: |
-          wsl bash tests/integration_test.sh
+          wsl 
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+          bash ~/miniconda.sh -b -p $HOME/miniconda
+          conda init
+          conda env create -f environment.yml base
+          bash tests/integration_test.sh
