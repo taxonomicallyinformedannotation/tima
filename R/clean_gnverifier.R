@@ -56,7 +56,7 @@ clean_gnverifier <- function() {
       log_debug("submitting to GNVerifier with more flexible parameters")
       if (.Platform$OS.type == "unix") {
         system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
-      } else{
+      } else {
         shell(paste("bash", here::here(paths$inst$scripts$gnverifier)))
       }
 

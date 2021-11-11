@@ -126,7 +126,7 @@ readr::write_delim(
 log_debug("submitting to GNVerifier")
 if (.Platform$OS.type == "unix") {
   system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
-} else{
+} else {
   shell(paste("bash", here::here(paths$inst$scripts$gnverifier)))
 }
 
