@@ -26,6 +26,7 @@ jobs:
         with:
           additional-packages:
             curl
+            dos2unix
             gzip
             unzip
             wget
@@ -46,4 +47,5 @@ jobs:
       - name: Run tests (windows)
         if: matrix.os == 'windows-latest'
         run: |
+          dos2unix tests/integration_test.sh
           wsl bash tests/integration_test.sh
