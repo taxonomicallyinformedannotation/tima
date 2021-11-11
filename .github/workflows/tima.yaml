@@ -47,5 +47,5 @@ jobs:
       - name: Run tests (windows)
         if: matrix.os == 'windows-latest'
         run: |
-          wsl conda env update -f environment.yml
+          wsl conda env update -f environment.yml base
           wsl bash tests/integration_test.sh
