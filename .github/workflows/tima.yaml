@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: 3.8
       - uses: r-lib/actions/setup-r@v1
+        with:
+          extra-repositories:
+            bioconductor
+            git
+      - uses: r-lib/actions/setup-r-dependencies@v1
       - if: matrix.os == 'windows-latest'
         uses: Vampire/setup-wsl@v1.1.0
         with:
