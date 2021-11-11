@@ -8,7 +8,6 @@ dependencies:
   - r-data.table
   - r-docopt
   - r-dplyr
-  - r-here
   - r-jsonlite
   - r-purrr
   - r-readr

@@ -1,5 +1,5 @@
-source(file = here::here("R", "log_debug.R"))
-source(file = here::here("R", "preclean_gnverifier.R"))
+source(file = "R/log_debug.R")
+source(file = "R/preclean_gnverifier.R")
 
 #' Title
 #'
@@ -9,7 +9,7 @@ source(file = here::here("R", "preclean_gnverifier.R"))
 #' @examples
 clean_gnverifier <- function() {
   dataOrganismVerified <<-
-    preclean_gnverifier(file = here::here(paths$data$interim$taxa$verified))
+    preclean_gnverifier(file = paths$data$interim$taxa$verified)
 
   warning <- dataOrganismVerified |>
     dplyr::filter(!is.na(organism)) |>
@@ -48,20 +48,20 @@ clean_gnverifier <- function() {
       log_debug("Exporting organisms for GNVerifier resubmission")
       readr::write_delim(
         x = organism_table_2,
-        file = here::here(paths$data$interim$taxa$original_2),
+        file = paths$data$interim$taxa$original_2,
         quote = "none",
         delim = "\t"
       )
 
       log_debug("submitting to GNVerifier with more flexible parameters")
       if (.Platform$OS.type == "unix") {
-        system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
+        system(command = paste("bash", paths$inst$scripts$gnverifier))
       } else {
-        shell(paste("bash", here::here(paths$inst$scripts$gnverifier)))
+        shell(paste("bash", paths$inst$scripts$gnverifier))
       }
 
       dataOrganismVerified_2 <<-
-        preclean_gnverifier(file = here::here(paths$data$interim$taxa$verified_2)) |>
+        preclean_gnverifier(file = paths$data$interim$taxa$verified_2) |>
         dplyr::select(-organism) |>
         dplyr::left_join(organism_table_2_interim)
 

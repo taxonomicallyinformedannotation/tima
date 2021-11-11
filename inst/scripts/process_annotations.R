@@ -1,12 +1,12 @@
 start <- Sys.time()
 
-source(file = here::here("R", "biological_weighting.R"))
-source(file = here::here("R", "chemical_weighting.R"))
-source(file = here::here("R", "cleaning.R"))
-source(file = here::here("R", "decoration.R"))
-source(file = here::here("R", "dist_groups.R"))
-source(file = here::here("R", "helpers.R"))
-source(file = here::here("R", "ms1.R"))
+source(file = "R/biological_weighting.R")
+source(file = "R/chemical_weighting.R")
+source(file = "R/cleaning.R")
+source(file = "R/decoration.R")
+source(file = "R/dist_groups.R")
+source(file = "R/helpers.R")
+source(file = "R/ms1.R")
 
 log_debug("Loading packages")
 library(package = crayon, quietly = TRUE)
@@ -70,14 +70,14 @@ log_debug(x = "... files ...")
 log_debug(x = "... metadata_table_spectral_annotation")
 metadata_table_spectral_annotation <-
   readr::read_delim(
-    file = here::here(params$annotation),
+    file = params$annotation,
     col_types = "c"
   ) |>
   dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
 log_debug(x = "... metadata_table_biological_annotation")
 taxed_features_table <- readr::read_delim(
-  file = here::here(params$taxa),
+  file = params$taxa,
   col_types = "c"
 ) |>
   dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
@@ -86,12 +86,12 @@ taxed_features_table <- readr::read_delim(
 taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
 log_debug(x = "... edges table")
-edges_table <- readr::read_delim(file = here::here(params$edges))
+edges_table <- readr::read_delim(file = params$edges)
 
 log_debug(x = "... structure-organism pairs table")
 structure_organism_pairs_table <-
   readr::read_delim(
-    file = here::here(params$library),
+    file = params$library,
     col_types = "c"
   ) |>
   dplyr::filter(!is.na(structure_exact_mass)) |>
@@ -118,43 +118,43 @@ structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
 if (params$ms$annotate == TRUE) {
   log_debug("... single charge adducts table")
   if (params$ms$mode == "pos") {
-    adduct_file <- here::here(paths$data$interim$adducts$pos)
+    adduct_file <- paths$data$interim$adducts$pos
   }
   if (params$ms$mode == "neg") {
-    adduct_file <- here::here(paths$data$interim$adducts$neg)
+    adduct_file <- paths$data$interim$adducts$neg
   }
 
-  adductsTable <- readr::read_delim(file = here::here(adduct_file))
+  adductsTable <- readr::read_delim(file = adduct_file)
 
   log_debug("... adducts masses for in source dimers and multicharged")
   adductsMassTable <-
-    readr::read_delim(file = here::here(paths$data$source$adducts))
+    readr::read_delim(file = paths$data$source$adducts)
 
   log_debug("... neutral lossses")
   neutral_losses_table <-
-    readr::read_delim(file = here::here(paths$data$source$neutral_losses))
+    readr::read_delim(file = paths$data$source$neutral_losses)
 
   adductsM <- adductsMassTable$mass
   names(adductsM) <- adductsMassTable$adduct
 
   if (params$ms$mode == "pos") {
     adduct_db_file <-
-      here::here(file.path(
+      file.path(
         paths$data$interim$adducts$path,
         paste0(params$name, "_pos.tsv.gz")
-      ))
+      )
   }
   if (params$ms$mode == "neg") {
     adduct_db_file <-
-      here::here(file.path(
+      file.path(
         paths$data$interim$adducts$path,
         paste0(params$name, "_neg.tsv.gz")
-      ))
+      )
   }
 
   log_debug(x = "... exact masses for MS1 annotation")
   structure_exact_mass_table <-
-    readr::read_delim(file = here::here(adduct_db_file)) |>
+    readr::read_delim(file = adduct_db_file) |>
     dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
   log_debug(x = "performing MS1 annotation")
@@ -197,54 +197,55 @@ results2cytoscape <- chemical_cleaning()
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(here::here(paths$data$processed$path)),
-  yes = dir.create(here::here(paths$data$processed$path)),
-  no = paste(here::here(paths$data$processed$path), "exists")
+  test = !dir.exists(paths$data$processed$path),
+  yes = dir.create(paths$data$processed$path),
+  no = paste(paths$data$processed$path, "exists")
 )
 
+
 time <- format(Sys.time(), "%y%m%d_%H%M%OS")
-dir_time <- here::here(file.path(paths$data$processed$path, time))
+dir_time <- file.path(paths$data$processed$path, time)
 
 ifelse(
-  test = !dir.exists(here::here(dir_time)),
-  yes = dir.create(here::here(dir_time)),
+  test = !dir.exists(dir_time),
+  yes = dir.create(dir_time),
   no = paste(
-    here::here(dir_time),
+    dir_time,
     "exists"
   )
 )
 log_debug(
   x = "... path to export is",
-  crayon::green(here::here(file.path(
+  crayon::green(file.path(
     dir_time,
     params$output
-  )))
+  ))
 )
 readr::write_delim(
   x = results2cytoscape,
-  file = here::here(file.path(
+  file = file.path(
     dir_time,
     params$output
-  )),
+  ),
   delim = "\t",
   na = ""
 )
 
 log_debug(
   x = "... path to used parameters is",
-  crayon::green(here::here(
+  crayon::green(
     file.path(
       dir_time,
       "process_annotations.yaml"
     )
-  ))
+  )
 )
 yaml::write_yaml(
   x = params,
-  file = here::here(file.path(
+  file = file.path(
     dir_time,
     "process_annotations.yaml"
-  ))
+  )
 )
 
 end <- Sys.time()

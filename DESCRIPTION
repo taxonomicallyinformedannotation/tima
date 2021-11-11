@@ -23,7 +23,6 @@ Imports:
     docopt,
     dplyr,
     glue,
-    here,
     jsonlite,
     lifecycle,
     purrr,

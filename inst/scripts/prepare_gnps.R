@@ -1,7 +1,7 @@
 start <- Sys.time()
 
-source(file = here::here("R", "helpers.R"))
-source(file = here::here("R", "get_gnps.R"))
+source(file = "R/helpers.R")
+source(file = "R/get_gnps.R")
 
 log_debug("This script treats GNPS (and NAP) results")
 log_debug("Authors: AR")
@@ -77,39 +77,39 @@ table[] <-
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(here::here(paths$data$path)),
-  yes = dir.create(here::here(paths$data$path)),
-  no = paste(here::here(paths$data$path), "exists")
+  test = !dir.exists(paths$data$path),
+  yes = dir.create(paths$data$path),
+  no = paste(paths$data$path, "exists")
 )
 ifelse(
-  test = !dir.exists(here::here(paths$data$interim$path)),
-  yes = dir.create(here::here(paths$data$interim$path)),
-  no = paste(here::here(paths$data$interim$path), "exists")
+  test = !dir.exists(paths$data$interim$path),
+  yes = dir.create(paths$data$interim$path),
+  no = paste(paths$data$interim$path, "exists")
 )
 ifelse(
-  test = !dir.exists(here::here(paths$data$interim$config$path)),
-  yes = dir.create(here::here(paths$data$interim$config$path)),
-  no = paste(here::here(paths$data$interim$config$path), "exists")
+  test = !dir.exists(paths$data$interim$config$path),
+  yes = dir.create(paths$data$interim$config$path),
+  no = paste(paths$data$interim$config$path, "exists")
 )
 ifelse(
-  test = !dir.exists(dirname(here::here(params$output))),
-  yes = dir.create(dirname(here::here(params$output))),
-  no = paste(dirname(here::here(params$output)), "exists")
+  test = !dir.exists(dirname(params$output)),
+  yes = dir.create(dirname(params$output)),
+  no = paste(dirname(params$output), "exists")
 )
 
 log_debug(
   x = "... path to export is",
-  here::here(params$output)
+  params$output
 )
 readr::write_delim(
   x = table,
-  file = here::here(params$output),
+  file = params$output,
   delim = "\t"
 )
 
 export_params(
   parameters = params,
-  directory = here::here(paths$data$interim$config$path),
+  directory = paths$data$interim$config$path,
   step = step
 )
 

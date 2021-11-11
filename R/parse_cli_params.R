@@ -1,4 +1,4 @@
-source(file = here::here("R", "log_debug.R"))
+source(file = "R/log_debug.R")
 
 #' Title
 #'

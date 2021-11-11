@@ -12,7 +12,7 @@ source(file = here::here("R", "log_debug.R"))
 parse_yaml_paths <- function() {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(
-    file = here::here("paths.yaml"),
+    file = "paths.yaml",
     handlers = list(
       seq = function(x) {
         purrr::flatten(x)

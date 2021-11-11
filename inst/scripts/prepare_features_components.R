@@ -1,7 +1,7 @@
 start <- Sys.time()
 
-source(file = here::here("R", "helpers.R"))
-source(file = here::here("R", "get_gnps.R"))
+source(file = "R/helpers.R")
+source(file = "R/get_gnps.R")
 
 log_debug("This script fills features metadata (mz, rt and component id)")
 log_debug("Authors: AR")
@@ -24,7 +24,7 @@ params <- get_params(step = step)
 
 log_debug(x = "Loading files ...")
 log_debug(x = "... features table")
-table <- readr::read_delim(file = here::here(params$input))
+table <- readr::read_delim(file = params$input)
 
 log_debug(x = "... cluster table")
 log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
@@ -41,7 +41,7 @@ components <-
 
 if (params$tool == "manual") {
   manual_components <-
-    readr::read_delim(file = here::here(params$components)) |>
+    readr::read_delim(file = params$components) |>
     dplyr::distinct(
       feature_id = CLUSTERID1,
       component_id = ComponentIndex
@@ -91,39 +91,39 @@ if (params$mode == "pos") {
 
 log_debug(x = "Exporting ...")
 ifelse(
-  test = !dir.exists(here::here(paths$data$interim$path)),
-  yes = dir.create(here::here(paths$data$interim$path)),
-  no = paste(here::here(paths$data$interim$path), "exists")
+  test = !dir.exists(paths$data$interim$path),
+  yes = dir.create(paths$data$interim$path),
+  no = paste(paths$data$interim$path, "exists")
 )
 ifelse(
-  test = !dir.exists(here::here(paths$data$interim$annotations$path)),
-  yes = dir.create(here::here(paths$data$interim$annotations$path)),
-  no = paste(here::here(paths$data$interim$annotations$path), "exists")
+  test = !dir.exists(paths$data$interim$annotations$path),
+  yes = dir.create(paths$data$interim$annotations$path),
+  no = paste(paths$data$interim$annotations$path, "exists")
 )
 ifelse(
-  test = !dir.exists(here::here(paths$data$interim$config$path)),
-  yes = dir.create(here::here(paths$data$interim$config$path)),
-  no = paste(here::here(paths$data$interim$config$path), "exists")
+  test = !dir.exists(paths$data$interim$config$path),
+  yes = dir.create(paths$data$interim$config$path),
+  no = paste(paths$data$interim$config$path, "exists")
 )
 ifelse(
-  test = !dir.exists(here::here(dirname(params$output))),
-  yes = dir.create(here::here(dirname(params$output))),
-  no = paste(dirname(here::here(params$output)), "exists")
+  test = !dir.exists(dirname(params$output)),
+  yes = dir.create(dirname(params$output)),
+  no = paste(dirname(params$output), "exists")
 )
 
 log_debug(
   x = "... path to export is",
-  here::here(params$output)
+  params$output
 )
 readr::write_delim(
   x = table_filled,
-  file = here::here(params$output),
+  file = params$output,
   delim = "\t"
 )
 
 export_params(
   parameters = params,
-  directory = here::here(paths$data$interim$config$path),
+  directory = paths$data$interim$config$path,
   step = step
 )
 
