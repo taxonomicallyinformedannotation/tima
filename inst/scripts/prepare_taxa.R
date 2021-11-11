@@ -10,22 +10,22 @@ log_debug("Authors: AR, P-MA")
 log_debug("Contributors: ...")
 
 log_debug("Loading packages")
-library(package = docopt, quietly = TRUE)
+library(package = "docopt", quietly = TRUE)
 library(
-  package = dplyr,
+  package = "dplyr",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
 library(
-  package = jsonlite,
+  package = "jsonlite",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
-library(package = purrr, quietly = TRUE)
-library(package = readr, quietly = TRUE)
-library(package = splitstackshape, quietly = TRUE)
-library(package = tidyr, quietly = TRUE)
-library(package = yaml, quietly = TRUE)
+library(package = "purrr", quietly = TRUE)
+library(package = "readr", quietly = TRUE)
+library(package = "splitstackshape", quietly = TRUE)
+library(package = "tidyr", quietly = TRUE)
+library(package = "yaml", quietly = TRUE)
 
 step <- "prepare_taxa"
 paths <- parse_yaml_paths()

@@ -9,23 +9,23 @@ source(file = "R/helpers.R")
 source(file = "R/ms1.R")
 
 log_debug("Loading packages")
-library(package = crayon, quietly = TRUE)
+library(package = "crayon", quietly = TRUE)
 library(
-  package = data.table,
+  package = "data.table",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
 library(
-  package = dplyr,
+  package = "dplyr",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
-library(package = docopt, quietly = TRUE)
-library(package = readr, quietly = TRUE)
-library(package = splitstackshape, quietly = TRUE)
-library(package = stringr, quietly = TRUE)
-library(package = tidyr, quietly = TRUE)
-library(package = yaml, quietly = TRUE)
+library(package = "docopt", quietly = TRUE)
+library(package = "readr", quietly = TRUE)
+library(package = "splitstackshape", quietly = TRUE)
+library(package = "stringr", quietly = TRUE)
+library(package = "tidyr", quietly = TRUE)
+library(package = "yaml", quietly = TRUE)
 
 step <- "process_annotations"
 paths <- parse_yaml_paths()

@@ -1,5 +1,5 @@
-require(package = crayon, quietly = TRUE)
-require(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
+require(package = "crayon", quietly = TRUE)
+require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
 
 #' Title
 #'

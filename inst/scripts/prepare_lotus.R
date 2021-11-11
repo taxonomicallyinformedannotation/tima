@@ -11,11 +11,11 @@ log_debug("Contributors: ...")
 
 log_debug("Loading packages")
 library(
-  package = dplyr,
+  package = "dplyr",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
-library(package = readr, quietly = TRUE)
+library(package = "readr", quietly = TRUE)
 
 paths <- parse_yaml_paths()
 

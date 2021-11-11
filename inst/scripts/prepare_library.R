@@ -8,19 +8,19 @@ log_debug("Contributors: ...")
 
 log_debug("Loading packages")
 library(
-  package = data.table,
+  package = "data.table",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
 library(
-  package = dplyr,
+  package = "dplyr",
   quietly = TRUE,
   warn.conflicts = FALSE
 )
-library(package = docopt, quietly = TRUE)
-library(package = purrr, quietly = TRUE)
-library(package = readr, quietly = TRUE)
-library(package = yaml, quietly = TRUE)
+library(package = "docopt", quietly = TRUE)
+library(package = "purrr", quietly = TRUE)
+library(package = "readr", quietly = TRUE)
+library(package = "yaml", quietly = TRUE)
 
 step <- "prepare_library"
 paths <- parse_yaml_paths()

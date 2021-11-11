@@ -1,4 +1,4 @@
-require(package = ggplot2, quietly = TRUE)
+require(package = "ggplot2", quietly = TRUE)
 
 #' Title
 #'

@@ -1,5 +1,5 @@
-require(package = dplyr, quietly = TRUE, warn.conflicts = FALSE)
-require(package = tidyr, quietly = TRUE)
+require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+require(package = "tidyr", quietly = TRUE)
 
 #' Title
 #'
