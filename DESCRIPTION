@@ -22,6 +22,7 @@ Imports:
     data.table,
     docopt,
     dplyr,
+    forcats,
     ggplot2,
     glue,
     jsonlite,
