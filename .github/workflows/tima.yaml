@@ -27,6 +27,7 @@ jobs:
           additional-packages:
             curl
             gzip
+            make
             r-base
             unzip
             wget
