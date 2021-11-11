@@ -127,7 +127,7 @@ log_debug("submitting to GNVerifier")
 if (.Platform$OS.type == "unix") {
   system(command = paste("bash", here::here(paths$inst$scripts$gnverifier)))
 } else{
-  shell(paste("wsl", here::here(paths$inst$scripts$gnverifier)))
+  shell(paste("bash", here::here(paths$inst$scripts$gnverifier)))
 }
 
 log_debug("cleaning GNVerifier results")
