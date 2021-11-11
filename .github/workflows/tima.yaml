@@ -36,9 +36,9 @@ jobs:
           mamba-version: "*"
           channels: conda-forge, bioconda, defaults
           channel-priority: true
-          activate-environment: tima
+          activate-environment: base
           environment-file: environment.yml
+      - uses: s-weigand/setup-conda@v1
       - name: Run tests
-        shell: bash -l {0} 
         run: |
           bash tests/integration_test.sh
