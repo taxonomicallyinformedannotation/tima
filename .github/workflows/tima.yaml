@@ -35,8 +35,6 @@ jobs:
           auto-update-conda: true
           python-version: 3.8
           mamba-version: "*"
-          channels: conda-forge, bioconda, defaults
-          channel-priority: true
           activate-environment: base
           environment-file: environment.yml
       - uses: s-weigand/setup-conda@v1
