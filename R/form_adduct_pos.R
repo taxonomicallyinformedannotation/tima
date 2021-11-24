@@ -36,7 +36,7 @@ form_adducts_pos <- function(massesTable, adductsTable) {
       pos_1_1proton = exact_mass + proton,
       # pos_1_minus1water1sodium = exact_mass - water + sodium,
       pos_1_1proton1ammonium = exact_mass + proton + ammonium,
-      pos_1_sodium = exact_mass + sodium,
+      pos_1_1sodium = exact_mass + sodium,
       pos_1_1proton1methanol = exact_mass + proton + methanol,
       pos_1_1potassium = exact_mass + potassium,
       pos_1_1proton1acetonitrile = exact_mass + proton + acetonitrile,

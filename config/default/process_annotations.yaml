@@ -58,6 +58,7 @@ ms:
       - pos_1_1sodium1acetonitrile
       - pos_1_1proton1methanol
       - pos_1_1potassium
+      - pos_1_1sodium
       - pos_1_1proton1acetonitrile
       - pos_1_minus1proton2sodium
       - pos_1_1proton1ethylamine
