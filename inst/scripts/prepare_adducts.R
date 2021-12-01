@@ -33,7 +33,7 @@ adducts_t <- t(adducts_table) |>
 colnames(adducts_t) <- adducts_t[1, ]
 
 adducts_t <- adducts_t[2, ] |>
-  mutate_all(as.numeric)
+  dplyr::mutate_all(as.numeric)
 
 masses_adducts <- cbind(masses, adducts_t)
 

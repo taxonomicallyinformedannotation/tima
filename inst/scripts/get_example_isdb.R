@@ -25,4 +25,4 @@ ifelse(
 )
 
 readr::read_tsv(file = paths$links$example_isdb) |>
-  write_tsv(file = paths$data$interim$annotations$example_isdb)
+  readr::write_tsv(file = paths$data$interim$annotations$example_isdb)

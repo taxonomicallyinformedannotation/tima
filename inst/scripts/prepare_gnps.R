@@ -29,7 +29,7 @@ table <- read_results(id = params$gnps) |>
     structure_exact_mass = ExactMass,
     score_input = MQScore
   ) |>
-  mutate(
+  dplyr::mutate(
     library = "GNPS",
     smiles_2D = NA,
     molecular_formula = NA
@@ -45,7 +45,7 @@ if (!is.null(params$nap)) {
       score_input = FusionScore,
       smiles = FusionSMILES
     ) |>
-    mutate(
+    dplyr::mutate(
       library = "GNPS",
       smiles_2D = NA,
       inchikey = NA,

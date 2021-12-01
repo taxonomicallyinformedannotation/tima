@@ -100,14 +100,15 @@ final_table <- prepare_hierarchy(dataframe = ms1)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
+    metadata_table |>
+      dplyr::mutate(
+        filename = gsub(
+          pattern = ".mzML",
+          replacement = "",
+          x = filename,
+          fixed = TRUE
+        )
+      ),
     by = c("sample" = "filename")
   )
 

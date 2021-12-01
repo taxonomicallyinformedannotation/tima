@@ -39,10 +39,10 @@ biological_weighting <-
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class
       ) %>%
-      mutate(across(score_input, as.numeric)) %>%
-      mutate(score_initialNormalized = score_input)
+      dplyr::mutate(across(score_input, as.numeric)) %>%
+      dplyr::mutate(score_initialNormalized = score_input)
     ## better not
-    # mutate(score_initialNormalized = (score_input -
+    # dplyr::mutate(score_initialNormalized = (score_input -
     #   min(score_input)) /
     #   (max(score_input) -
     #     min(score_input)))
@@ -261,7 +261,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_01_domain, string = sample_organism_01_domain)
       ) %>%
-      mutate(score_biological = params$score$biological$domain) %>%
+      dplyr::mutate(score_biological = params$score$biological$domain) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -287,7 +287,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_02_kingdom, string = sample_organism_02_kingdom)
       ) %>%
-      mutate(score_biological = params$score$biological$kingdom) %>%
+      dplyr::mutate(score_biological = params$score$biological$kingdom) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -313,7 +313,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_03_phylum, string = sample_organism_03_phylum)
       ) %>%
-      mutate(score_biological = params$score$biological$phylum) %>%
+      dplyr::mutate(score_biological = params$score$biological$phylum) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -339,7 +339,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_04_class, string = sample_organism_04_class)
       ) %>%
-      mutate(score_biological = params$score$biological$class) %>%
+      dplyr::mutate(score_biological = params$score$biological$class) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -365,7 +365,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_05_order, string = sample_organism_05_order)
       ) %>%
-      mutate(score_biological = params$score$biological$order) %>%
+      dplyr::mutate(score_biological = params$score$biological$order) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -391,7 +391,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_05_1_infraorder, string = sample_organism_05_1_infraorder)
     #   ) %>%
-    #   mutate(score_biological = params$score$biological$infraorder) %>%
+    #   dplyr::mutate(score_biological = params$score$biological$infraorder) %>%
     #   left_join(
     #     .,
     #     metadata %>% distinct(
@@ -418,7 +418,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_06_family, string = sample_organism_06_family)
       ) %>%
-      mutate(score_biological = params$score$biological$family) %>%
+      dplyr::mutate(score_biological = params$score$biological$family) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -444,7 +444,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_06_1_subfamily, string = sample_organism_06_1_subfamily)
     #   ) %>%
-    #   mutate(score_biological = params$score$biological$subfamily) %>%
+    #   dplyr::mutate(score_biological = params$score$biological$subfamily) %>%
     #   left_join(
     #     .,
     #     metadata %>% distinct(
@@ -471,7 +471,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_07_tribe, string = sample_organism_07_tribe)
       ) %>%
-      mutate(score_biological = params$score$biological$tribe) %>%
+      dplyr::mutate(score_biological = params$score$biological$tribe) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -497,7 +497,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_07_1_subtribe, string = sample_organism_07_1_subtribe)
     #   ) %>%
-    #   mutate(score_biological = params$score$biological$subtribe) %>%
+    #   dplyr::mutate(score_biological = params$score$biological$subtribe) %>%
     #   left_join(
     #     .,
     #     metadata %>% distinct(
@@ -524,7 +524,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_08_genus, string = sample_organism_08_genus)
       ) %>%
-      mutate(score_biological = params$score$biological$genus) %>%
+      dplyr::mutate(score_biological = params$score$biological$genus) %>%
       left_join(
         .,
         metadata %>% distinct(
@@ -551,7 +551,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_08_1_subgenus, string = sample_organism_08_1_subgenus)
     #   ) %>%
-    #   mutate(score_biological = params$score$biological$subgenus) %>%
+    #   dplyr::mutate(score_biological = params$score$biological$subgenus) %>%
     #   left_join(
     #     .,
     #     metadata %>% distinct(
@@ -578,7 +578,7 @@ biological_weighting <-
       filter(
         str_detect(pattern = candidate_organism_09_species, string = sample_organism_09_species)
       ) %>%
-      mutate(score_biological = params$score$biological$species) %>%
+      dplyr::mutate(score_biological = params$score$biological$species) %>%
       left_join(
         .,
         metadata %>% distinct(

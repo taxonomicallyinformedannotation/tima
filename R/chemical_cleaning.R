@@ -300,7 +300,7 @@ chemical_cleaning <-
           rt,
           mz
         ) %>%
-        mutate_all(as.numeric)
+        dplyr::mutate_all(as.numeric)
 
       df10 <- left_join(
         df9,

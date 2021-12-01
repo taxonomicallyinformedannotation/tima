@@ -152,7 +152,7 @@ mandle <-
     structure_organism_pairs_table,
     by = c("short_inchikey" = "inchikey_2D")
   ) |>
-  mutate(
+  dplyr::mutate(
     inchikey_2D = short_inchikey,
     smiles_2D = structure_smiles,
     score_biological = score_taxo,
@@ -214,7 +214,7 @@ top_m <- dplyr::left_join(
       x = column
     )),
   metadata_table |>
-    mutate(
+    dplyr::mutate(
       filename = gsub(
         pattern = ".mzML",
         replacement = "",
@@ -235,14 +235,15 @@ final_table <- prepare_hierarchy(dataframe = tima)
 
 final_table_taxed <-
   dplyr::left_join(final_table,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
+    metadata_table |>
+      dplyr::mutate(
+        filename = gsub(
+          pattern = ".mzML",
+          replacement = "",
+          x = filename,
+          fixed = TRUE
+        )
+      ),
     by = c("sample" = "filename")
   )
 
@@ -251,14 +252,15 @@ final_table_mandel <- prepare_hierarchy(dataframe = mandle)
 final_table_mandel <-
   dplyr::left_join(
     final_table_mandel,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
+    metadata_table |>
+      dplyr::mutate(
+        filename = gsub(
+          pattern = ".mzML",
+          replacement = "",
+          x = filename,
+          fixed = TRUE
+        )
+      ),
     by = c("sample" = "filename")
   )
 
@@ -352,28 +354,30 @@ final_table_terpenoids_mandle <-
 final_table_terpenoids_taxed <-
   dplyr::left_join(
     final_table_terpenoids,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
+    metadata_table |>
+      dplyr::mutate(
+        filename = gsub(
+          pattern = ".mzML",
+          replacement = "",
+          x = filename,
+          fixed = TRUE
+        )
+      ),
     by = c("sample" = "filename")
   )
 
 final_table_terpenoids_taxed_mandle <-
   dplyr::left_join(
     final_table_terpenoids_mandle,
-    metadata_table |> mutate(
-      filename = gsub(
-        pattern = ".mzML",
-        replacement = "",
-        x = filename,
-        fixed = TRUE
-      )
-    ),
+    metadata_table |>
+      dplyr::mutate(
+        filename = gsub(
+          pattern = ".mzML",
+          replacement = "",
+          x = filename,
+          fixed = TRUE
+        )
+      ),
     by = c("sample" = "filename")
   )
 

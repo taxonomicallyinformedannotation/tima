@@ -237,7 +237,7 @@ ms1_annotation <-
       ) |>
       mutate(library = adduct) |>
       distinct() %>%
-      mutate_all(~ replace(
+      dplyr::mutate_all(~ replace(
         .,
         . == "NA",
         NA
@@ -541,7 +541,7 @@ ms1_annotation <-
         mz,
       ) |>
       distinct() |>
-      mutate_all(as.numeric)
+      dplyr::mutate_all(as.numeric)
 
     cat("adding \"notAnnotated\" \n")
     df26 <- left_join(df25, df24) |>
@@ -574,8 +574,6 @@ ms1_annotation <-
 
     return(df27)
   }
-
-
 
 
 ###############################################################################
