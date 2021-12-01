@@ -1,2 +1,3 @@
 useurl: https://taxonomicallyinformedannotation.github.io/tima-r
-
+template:
+  bootstrap: 5
