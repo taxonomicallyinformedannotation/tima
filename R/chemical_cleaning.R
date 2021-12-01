@@ -36,7 +36,7 @@ chemical_cleaning <-
       dplyr::distinct(inchikey_2D,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(rank_final = (dense_rank(-score_pondered_chemo))) |>
+      dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
       dplyr::filter(rank_final <= params$top_k$final) |>
       dplyr::ungroup()
 

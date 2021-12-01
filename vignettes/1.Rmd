@@ -23,7 +23,7 @@ This vignette describes how to prepare a structure-organism pairs library in ord
 
 ## LOTUS
 
-As we developed also [LOTUS](https://lotusnprod.github.io/lotus-manuscript) with 
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://lotus.nprod.net/>] with 
 **T**axonomically 
 **I**nformed 
 **M**etabolite 
