@@ -24,6 +24,13 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+          extra-packages: |
+            pkgdown
+            rmarkdown
+          needs: website
+          
       - name: Install specific dependencies
         run: |
           Rscript inst/scripts/get_lotus.R
