@@ -24,9 +24,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: 
-            - pkgdown
-            - rmarkdown
+          extra-packages: |
+            pkgdown
+            rmarkdown
           needs: website
 
       - name: Install rsconnect
