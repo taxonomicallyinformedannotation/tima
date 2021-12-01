@@ -29,7 +29,7 @@ jobs:
           choco install wget
       - name: Run install
         run: |
-         bash install_package.sh
+          bash install_package.sh
       - name: Run tests
         run: |
           bash tests/integration_test.sh
