@@ -227,4 +227,4 @@ yaml::write_yaml(
 
 end <- Sys.time()
 
-log_debug("Script finished in", green(format(end - start)))
+log_debug("Script finished in", crayon::green(format(end - start)))
