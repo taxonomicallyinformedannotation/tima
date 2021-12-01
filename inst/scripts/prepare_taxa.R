@@ -104,8 +104,8 @@ new_matched_otl_exact <- rotl::tnrs_match_names(
 )
 
 new_ott_id <- new_matched_otl_exact |>
-  filter(!is.na(ott_id)) |>
-  distinct(ott_id)
+  dplyr::filter(!is.na(ott_id)) |>
+  dplyr::distinct(ott_id)
 
 otts <- new_ott_id$ott_id
 
@@ -134,12 +134,12 @@ for (i in seq_along(1:length(taxon_lineage))) {
 }
 
 otl <- bind_rows(list_df) |>
-  mutate(ott_id = as.integer(ott_id))
+  dplyr::mutate(ott_id = as.integer(ott_id))
 
 biological_metadata <-
-  left_join(organism_table, new_matched_otl_exact) |>
-  left_join(otl, by = c("ott_id" = "id")) |>
-  filter(
+  dplyr::left_join(organism_table, new_matched_otl_exact) |>
+  dplyr::left_join(otl, by = c("ott_id" = "id")) |>
+  dplyr::filter(
     rank %in% c(
       "domain",
       "kingdom",
@@ -158,16 +158,16 @@ biological_metadata <-
       "varietas"
     )
   ) |>
-  distinct() |>
-  map_df(rev) |>
+  dplyr::distinct() |>
+  purrr::map_df(rev) |>
   ## feeling it is better that way
-  distinct(canonical_name, ott_id, rank, .keep_all = TRUE) |>
+  dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE) |>
   ## canonical_name important for synonyms
-  pivot_wider(
+  tidyr::pivot_wider(
     names_from = "rank",
     values_from = c("name", "unique_name.y", "ott_id.y")
   ) |>
-  select(
+  dplyr::select(
     organism_name = canonical_name,
     organism_taxonomy_ottid = ott_id,
     organism_taxonomy_01domain = dplyr::matches("name_domain"),
@@ -181,20 +181,20 @@ biological_metadata <-
     organism_taxonomy_09species = dplyr::matches("name_species"),
     organism_taxonomy_10varietas = dplyr::matches("name_varietas")
   ) |>
-  map_df(rev) |>
-  coalesce()
+  purrr::map_df(rev) |>
+  dplyr::coalesce()
 
 if (is.null(params$force) &
   params$extension == FALSE) {
   log_debug("Removing filename extensions")
   metadata_table <- metadata_table |>
-    mutate(filename = gsub(
+    dplyr::mutate(filename = gsub(
       pattern = ".mzML",
       replacement = "",
       x = filename,
       fixed = TRUE
     )) |>
-    mutate(filename = gsub(
+    dplyr::mutate(filename = gsub(
       pattern = ".mzxML",
       replacement = "",
       x = filename,
@@ -205,7 +205,7 @@ log_debug(x = "Joining top K with metadata table")
 if (params$tool == "gnps") {
   if (!is.null(params$force)) {
     metadata_table_joined <- cbind(
-      feature_table |> mutate(feature_id = `row ID`),
+      feature_table |> dplyr::mutate(feature_id = `row ID`),
       biological_metadata |>
         dplyr::select(organismOriginal = organism_name)
     )
