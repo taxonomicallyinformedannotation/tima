@@ -216,11 +216,11 @@ chemical_cleaning <-
         )
 
       cat("adding consensus again to droped candidates \n")
-      df8 <- df7 %>%
+      df8 <- df7 |>
         filter(!is.na(inchikey_2D))
 
-      df9 <- df7 %>%
-        filter(is.na(inchikey_2D)) %>%
+      df9 <- df7 |>
+        filter(is.na(inchikey_2D)) |>
         select(
           feature_id,
           component_id,
@@ -230,7 +230,7 @@ chemical_cleaning <-
       df10 <- left_join(
         df9,
         annotationTableWeightedChemo
-      ) %>%
+      ) |>
         select(
           feature_id,
           component_id,
@@ -245,18 +245,18 @@ chemical_cleaning <-
           consistency_structure_sub,
           consensus_structure_par,
           consistency_structure_par
-        ) %>%
+        ) |>
         distinct()
     }
 
 
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
-      df7 <- left_join(df6, df5b) %>%
-        arrange(feature_id) %>%
+      df7 <- left_join(df6, df5b) |>
+        arrange(feature_id) |>
         mutate(across(
           everything(),
           ~ y_as_na(x = .x, y = "")
-        )) %>%
+        )) |>
         select(
           feature_id,
           component_id,
@@ -283,8 +283,8 @@ chemical_cleaning <-
           consistency_structure_cla
         )
 
-      df8 <- df7 %>%
-        filter(!is.na(inchikey_2D)) %>%
+      df8 <- df7 |>
+        filter(!is.na(inchikey_2D)) |>
         mutate(
           feature_id = as.numeric(feature_id),
           component_id = as.numeric(component_id),
@@ -292,20 +292,20 @@ chemical_cleaning <-
           rt = as.numeric(rt)
         )
 
-      df9 <- df7 %>%
-        filter(is.na(inchikey_2D)) %>%
+      df9 <- df7 |>
+        filter(is.na(inchikey_2D)) |>
         select(
           feature_id,
           component_id,
           rt,
           mz
-        ) %>%
+        ) |>
         dplyr::mutate_all(as.numeric)
 
       df10 <- left_join(
         df9,
         annotationTableWeightedChemo
-      ) %>%
+      ) |>
         select(
           feature_id,
           component_id,
@@ -317,11 +317,11 @@ chemical_cleaning <-
           consistency_structure_sup,
           consensus_structure_cla,
           consistency_structure_cla
-        ) %>%
+        ) |>
         distinct()
     }
 
-    df11 <- bind_rows(df8, df10) %>%
+    df11 <- bind_rows(df8, df10) |>
       arrange(as.numeric(feature_id))
 
     # because cytoscape import fails otherwise

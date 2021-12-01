@@ -35,10 +35,10 @@ biological_cleaning <-
       anti_join(
         annotationTableWeightedBio |>
           distinct(feature_id,
-          rank_initial,
-          rank_final,
-          .keep_all = TRUE
-        ),
+            rank_initial,
+            rank_final,
+            .keep_all = TRUE
+          ),
         df01
       ) |>
       mutate(inchikey_2D = "notAnnotated")
@@ -221,16 +221,16 @@ biological_cleaning <-
         feature_target,
         candidate_structure_3_class
       ) |>
-      mutate(rank_final = as.numeric(rank_final)) %>%
-      arrange(rank_final) %>%
+      mutate(rank_final = as.numeric(rank_final)) |>
+      arrange(rank_final) |>
       distinct(feature_source,
         candidate_structure_3_class,
         .keep_all = TRUE
-      ) %>%
+      ) |>
       group_by(
         feature_source,
         candidate_structure_3_class
-      ) %>%
+      ) |>
       mutate(
         rank_avg_cla = ifelse(
           test = candidate_structure_3_class == "notAnnotated" |
@@ -238,18 +238,18 @@ biological_cleaning <-
           yes = params$top_k$candidates$initial / 2,
           no = mean(as.numeric(rank_final))
         )
-      ) %>%
-      mutate(consistency_score_chemical_3_class = consistency_structure_cla / sqrt(rank_avg_cla)) %>%
-      group_by(feature_source) %>%
-      arrange(-consistency_score_chemical_3_class) %>%
-      ungroup() %>%
-      distinct(feature_source, .keep_all = TRUE) %>%
+      ) |>
+      mutate(consistency_score_chemical_3_class = consistency_structure_cla / sqrt(rank_avg_cla)) |>
+      group_by(feature_source) |>
+      arrange(-consistency_score_chemical_3_class) |>
+      ungroup() |>
+      distinct(feature_source, .keep_all = TRUE) |>
       select(
         feature_source,
         consensus_structure_cla = candidate_structure_3_class,
         consistency_structure_cla,
         consistency_score_chemical_3_class
-      ) %>%
+      ) |>
       mutate(
         consensus_structure_cla = ifelse(
           test = consistency_score_chemical_3_class > 0.5,
@@ -263,25 +263,25 @@ biological_cleaning <-
       left_join(df1,
         freq_pat,
         by = setNames("feature_source", "feature_id")
-      ) %>%
+      ) |>
       left_join(.,
         freq_sup,
         by = setNames("feature_source", "feature_id")
-      ) %>%
+      ) |>
       left_join(.,
         freq_cla,
         by = setNames("feature_source", "feature_id")
-      ) %>%
-      mutate(component_id = as.numeric(component_id)) %>%
+      ) |>
+      mutate(component_id = as.numeric(component_id)) |>
       select(
         feature_id,
         everything()
-      ) %>%
+      ) |>
       tibble()
 
     # think about the score
     cat("adding dummy consistency for features with less than 2 neighbors \n")
-    dummy_consistency <- df2 %>%
+    dummy_consistency <- df2 |>
       mutate(
         consensus_structure_pat = "dummy",
         consistency_structure_pat = 1,
@@ -292,7 +292,7 @@ biological_cleaning <-
         consensus_structure_cla = "dummy",
         consistency_structure_cla = 1,
         consistency_score_chemical_3_class = 0
-      ) %>%
+      ) |>
       mutate(component_id = as.numeric(component_id))
 
     cat("binding results together \n")

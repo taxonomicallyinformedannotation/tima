@@ -39,7 +39,7 @@ if (params$tool == "gnps") {
 
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
-    feature_table <- feature_table %>%
+    feature_table <- feature_table |>
       dplyr::select(
         `row ID`,
         matches(" Peak area")
