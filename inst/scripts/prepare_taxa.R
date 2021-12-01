@@ -68,7 +68,7 @@ if (params$tool == "manual") {
     readr::read_delim(file = params$input)
 }
 
-log_debug(x = "Keeping list of organisms to submit to GNVerifier")
+log_debug(x = "Keeping list of organisms to submit to OTL")
 organism_table <- metadata_table |>
   dplyr::filter(!is.na(dplyr::all_of(params$column_name))) |>
   dplyr::distinct(dplyr::across(dplyr::all_of(params$column_name))) |>
@@ -83,39 +83,106 @@ organism_table <- metadata_table |>
     replacement = " ",
     x = organism
   )) |>
-  dplyr::distinct()
+  dplyr::distinct() |>
+  dplyr::mutate(search_string = tolower(organism)) |>
+  dplyr::distinct(
+    organism,
+    search_string
+  ) |>
+  dplyr::select(
+    canonical_name = organism,
+    search_string
+  ) |>
+  data.frame()
 
-log_debug(x = "Exporting organisms for GNVerifier submission")
-ifelse(
-  test = !dir.exists(paths$data$interim$path),
-  yes = dir.create(paths$data$interim$path),
-  no = paste(paths$data$interim$path, "exists")
-)
-ifelse(
-  test = !dir.exists(paths$data$interim$taxa$path),
-  yes = dir.create(paths$data$interim$taxa$path),
-  no = paste(paths$data$interim$taxa$path, "exists")
-)
-readr::write_delim(
-  x = organism_table,
-  file = paths$data$interim$taxa$original,
-  quote = "none",
-  delim = "\t"
+organisms <- organism_table$canonical_name
+
+new_matched_otl_exact <- rotl::tnrs_match_names(
+  names = organisms,
+  do_approximate_matching = FALSE,
+  include_suppressed = FALSE
 )
 
-log_debug("submitting to GNVerifier")
-if (.Platform$OS.type == "unix") {
-  system(command = paste("bash", paths$inst$scripts$gnverifier))
-} else {
-  shell(paste("bash", paths$inst$scripts$gnverifier))
+new_ott_id <- new_matched_otl_exact |>
+  filter(!is.na(ott_id)) |>
+  distinct(ott_id)
+
+otts <- new_ott_id$ott_id
+
+taxon_info <- rotl::taxonomy_taxon_info(
+  ott_ids = otts,
+  include_lineage = TRUE,
+  include_terminal_descendants = TRUE
+)
+
+taxon_lineage <- taxon_info |>
+  rotl::tax_lineage()
+
+list_df <- list()
+
+for (i in seq_along(1:length(taxon_lineage))) {
+  list_df[[i]] <- bind_rows(
+    data.frame(
+      id = otts[i],
+      rank = taxon_info[[i]]$rank,
+      name = taxon_info[[i]]$name,
+      unique_name = taxon_info[[i]]$unique_name,
+      ott_id = as.character(taxon_info[[i]]$ott_id)
+    ),
+    data.frame(id = otts[i], taxon_lineage[[i]])
+  )
 }
 
-log_debug("cleaning GNVerifier results")
-dataOrganismVerified_3 <- clean_gnverifier()
+otl <- bind_rows(list_df) |>
+  mutate(ott_id = as.integer(ott_id))
 
-log_debug("Formatting obtained OTL taxonomy")
-organism_cleaned_manipulated <-
-  manipulating_taxo_otl(dfsel = dataOrganismVerified_3)
+biological_metadata <-
+  left_join(organism_table, new_matched_otl_exact) |>
+  left_join(otl, by = c("ott_id" = "id")) |>
+  filter(
+    rank %in% c(
+      "domain",
+      "kingdom",
+      "phylum",
+      "class",
+      "order",
+      "infraorder",
+      "family",
+      "subfamily",
+      "tribe",
+      "subtribe",
+      "genus",
+      "subgenus",
+      "species",
+      "subspecies",
+      "varietas"
+    )
+  ) |>
+  distinct() |>
+  map_df(rev) |>
+  ## feeling it is better that way
+  distinct(canonical_name, ott_id, rank, .keep_all = TRUE) |>
+  ## canonical_name important for synonyms
+  pivot_wider(
+    names_from = "rank",
+    values_from = c("name", "unique_name.y", "ott_id.y")
+  ) |>
+  select(
+    organism_name = canonical_name,
+    organism_taxonomy_ottid = ott_id,
+    organism_taxonomy_01domain = dplyr::matches("name_domain"),
+    organism_taxonomy_02kingdom = dplyr::matches("name_kingdom"),
+    organism_taxonomy_03phylum = dplyr::matches("name_phylum"),
+    organism_taxonomy_04class = dplyr::matches("name_class"),
+    organism_taxonomy_05order = dplyr::matches("name_order"),
+    organism_taxonomy_06family = dplyr::matches("name_family"),
+    organism_taxonomy_07tribe = dplyr::matches("name_tribe"),
+    organism_taxonomy_08genus = dplyr::matches("name_genus"),
+    organism_taxonomy_09species = dplyr::matches("name_species"),
+    organism_taxonomy_10varietas = dplyr::matches("name_varietas")
+  ) |>
+  map_df(rev) |>
+  coalesce()
 
 if (is.null(params$force) &
   params$extension == FALSE) {
@@ -139,8 +206,8 @@ if (params$tool == "gnps") {
   if (!is.null(params$force)) {
     metadata_table_joined <- cbind(
       feature_table |> mutate(feature_id = `row ID`),
-      dataOrganismVerified_3 |>
-        dplyr::select(organismOriginal = organismCleaned)
+      biological_metadata |>
+        dplyr::select(organismOriginal = organism_name)
     )
   } else {
     metadata_table_joined <-
@@ -165,28 +232,23 @@ log_debug(x = "Joining with cleaned taxonomy table")
 metadata_table_joined_summarized <-
   dplyr::left_join(
     metadata_table_joined,
-    organism_cleaned_manipulated,
-    by = c("organismOriginal" = "organismCleaned")
+    biological_metadata,
+    by = c("organismOriginal" = "organism_name")
   ) |>
-  dplyr::distinct() %>%
+  dplyr::distinct() |>
   dplyr::mutate_at(vars(-dplyr::group_cols()), as.character) |>
   dplyr::select(
     feature_id,
-    sample_organism_01_domain = organism_01_domain,
-    sample_organism_02_kingdom = organism_02_kingdom,
-    sample_organism_03_phylum = organism_03_phylum,
-    sample_organism_04_class = organism_04_class,
-    sample_organism_05_order = organism_05_order,
-    # sample_organism_05_1_infraorder = organism_05_1_infraorder,
-    sample_organism_06_family = organism_06_family,
-    # sample_organism_06_1_subfamily = organism_06_1_subfamily,
-    sample_organism_07_tribe = organism_07_tribe,
-    # sample_organism_07_1_subtribe = organism_07_1_subtribe,
-    sample_organism_08_genus = organism_08_genus,
-    # sample_organism_08_1_subgenus = organism_08_1_subgenus,
-    sample_organism_09_species = organism_09_species,
-    # sample_organism_09_1_subspecies = organism_09_1_subspecies,
-    sample_organism_10_varietas = organism_10_variety
+    sample_organism_01_domain = dplyr::matches("organism_taxonomy_01domain"),
+    sample_organism_02_kingdom = dplyr::matches("organism_taxonomy_02kingdom"),
+    sample_organism_03_phylum = dplyr::matches("organism_taxonomy_03phylum"),
+    sample_organism_04_class = dplyr::matches("organism_taxonomy_04class"),
+    sample_organism_05_order = dplyr::matches("organism_taxonomy_05order"),
+    sample_organism_06_family = dplyr::matches("organism_taxonomy_06family"),
+    sample_organism_07_tribe = dplyr::matches("organism_taxonomy_07tribe"),
+    sample_organism_08_genus = dplyr::matches("organism_taxonomy_08genus"),
+    sample_organism_09_species = dplyr::matches("organism_taxonomy_09species"),
+    sample_organism_10_varietas = dplyr::matches("organism_taxonomy_10varietas")
   ) |>
   dplyr::group_by(feature_id) |>
   dplyr::summarise_all(function(x) {

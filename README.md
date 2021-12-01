@@ -95,7 +95,6 @@ Rscript inst/scripts/prepare_features_classification.R
 #### Get biological taxonomy information
 
 ```shell
-bash inst/scripts/get_gnverifier.sh
 Rscript inst/scripts/prepare_taxa.R
 ```
 

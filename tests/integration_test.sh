@@ -6,7 +6,6 @@ Rscript inst/scripts/prepare_lotus.R
 Rscript inst/scripts/prepare_library.R
 Rscript inst/scripts/prepare_adducts.R
 Rscript inst/scripts/get_example_isdb.R
-bash inst/scripts/get_gnverifier.sh
 Rscript inst/scripts/prepare_gnps.R
 Rscript inst/scripts/prepare_isdb.R
 Rscript inst/scripts/prepare_edges.R

@@ -1,6 +1,4 @@
 base_dir: ./
-bin:
-  path: bin
 config:
   path: config
   default:
@@ -29,10 +27,6 @@ data:
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
-      original: data/interim/taxa/original.tsv
-      original_2: data/interim/taxa/original_2.tsv
-      verified: data/interim/taxa/verified.json
-      verified_2: data/interim/taxa/verified_2.json
   processed:
     path: data/processed
     config:
@@ -55,8 +49,6 @@ inst:
   path: inst
   scripts:
     path: inst/scripts
-    gnverifier: inst/scripts/gnverifierScript.sh
-    gnverifier_2: inst/scripts/gnverifierScript_2.sh
     docopt:
       path: inst/scripts/docopt
 links:

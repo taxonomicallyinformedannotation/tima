@@ -26,7 +26,6 @@ Imports:
     forcats,
     ggplot2,
     glue,
-    jsonlite,
     lifecycle,
     purrr,
     readr,
@@ -53,7 +52,6 @@ Collate:
     'biological_weighting.R'
     'chemical_cleaning.R'
     'chemical_weighting.R'
-    'clean_gnverifier.R'
     'colors.R'
     'decoration.R'
     'dist_groups.R'
@@ -63,14 +61,12 @@ Collate:
     'get_params.R'
     'homemadeShift.R'
     'log_debug.R'
-    'manipulating_taxo_otl.R'
     'ms1_annotation.R'
     'non_ms1_annotation.R'
     'parse_cli_params.R'
     'parse_yaml_params.R'
     'parse_yaml_paths.R'
     'plot_histograms.R'
-    'preclean_gnverifier.R'
     'prepare_plot.R'
     'prepare-hierarchy_2.R'
     'prepare-hierarchy.R'
