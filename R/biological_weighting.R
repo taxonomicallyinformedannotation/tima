@@ -636,7 +636,7 @@ biological_weighting <-
         inchikey_2D,
         .keep_all = TRUE
       ) |>
-      ungroup()
+      dplyr::ungroup()
 
     cat("joining with initial results \n")
     biologically_weighted_full <-
