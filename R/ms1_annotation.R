@@ -20,19 +20,19 @@ ms1_annotation <-
            neutralLosses = neutral_losses_table) {
     cat("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
-      filter(!is.na(exact_mass)) |>
-      filter(adduct %in% adducts) |>
-      mutate(
+      dplyr::filter(!is.na(exact_mass)) |>
+      dplyr::filter(adduct %in% adducts) |>
+      dplyr::mutate(
         value_min = adduct_mass - (0.000001 * params$ms$tolerance$ppm * adduct_mass),
         value_max = adduct_mass + (0.000001 * params$ms$tolerance$ppm * adduct_mass)
       ) |>
-      filter(!is.na(value_min)) |>
-      filter(value_min > 0) |>
-      data.table()
+      dplyr::filter(!is.na(value_min)) |>
+      dplyr::filter(value_min > 0) |>
+      data.table::data.table()
 
     cat("setting to data.table format for faster performance \n")
     df3 <- annotationTable |>
-      mutate(across(
+      dplyr::mutate(dplyr::across(
         c(
           mz,
           component_id,
@@ -40,9 +40,9 @@ ms1_annotation <-
         ),
         as.numeric
       )) |>
-      mutate(mz_2 = mz) |>
-      distinct(feature_id, .keep_all = TRUE) |>
-      data.table()
+      dplyr::mutate(mz_2 = mz) |>
+      dplyr::distinct(feature_id, .keep_all = TRUE) |>
+      data.table::data.table()
 
     if (!any(names(annotationTable) == "rt")) {
       df3[, "rt"] <- df3["feature_id"]
@@ -50,43 +50,43 @@ ms1_annotation <-
 
     cat("adding rt tolerance ... \n")
     df4 <- df3 |>
-      mutate(across(rt, as.numeric)) |>
-      mutate(
+      dplyr::mutate(dplyr::across(rt, as.numeric)) |>
+      dplyr::mutate(
         rt_min = as.numeric(rt - params$ms$tolerance$rt),
         rt_max = as.numeric(rt + params$ms$tolerance$rt)
       )
 
     cat("... on the other side (without tolerance) \n")
     df5 <- df3 |>
-      mutate(across(rt, as.numeric)) |>
-      mutate(
+      dplyr::mutate(dplyr::across(rt, as.numeric)) |>
+      dplyr::mutate(
         rt_1 = as.numeric(rt),
         rt_2 = as.numeric(rt)
       ) |>
-      data.table()
+      data.table::data.table()
 
     cat("setting joining keys \n")
-    setkey(df4, rt_min, rt_max)
-    setkey(df5, rt_1, rt_2)
+    data.table::setkey(df4, rt_min, rt_max)
+    data.table::setkey(df5, rt_1, rt_2)
 
     cat("joining within given rt tolerance \n")
-    df6 <- foverlaps(df4, df5) |>
-      distinct(
+    df6 <- data.table::foverlaps(df4, df5) |>
+      dplyr::distinct(
         feature_id,
         rt,
         mz,
         i.feature_id,
         i.mz
       ) |>
-      dplyr::select(everything(),
+      dplyr::select(dplyr::everything(),
         feature_id_dest = i.feature_id,
         mz_dest = i.mz
       )
 
     cat("adding delta mz tolerance for single charge adducts \n")
     df7 <- df6 |>
-      filter(mz >= mz_dest) |>
-      mutate(
+      dplyr::filter(mz >= mz_dest) |>
+      dplyr::mutate(
         delta_min = ifelse(
           test = mz >= mz_dest,
           yes = abs(mz -
@@ -117,41 +117,41 @@ ms1_annotation <-
         d = dist(adductsTable$adduct_mass),
         g = adductsTable$adduct
       ) |>
-      mutate(Distance_2 = Distance) |>
+      dplyr::mutate(Distance_2 = Distance) |>
       dplyr::select(
         -Item1,
         -Item2,
         -Label
       ) |>
-      data.table()
+      data.table::data.table()
 
     cat("setting joining keys \n")
-    setkey(df7, delta_min, delta_max)
-    setkey(df8, Distance, Distance_2)
+    data.table::setkey(df7, delta_min, delta_max)
+    data.table::setkey(df8, Distance, Distance_2)
 
     cat("neutral losses \n")
     df8_a <- neutralLosses |>
-      mutate(mass_2 = mass) |>
-      data.table()
+      dplyr::mutate(mass_2 = mass) |>
+      data.table::data.table()
 
     cat("setting joining keys \n")
-    setkey(df8_a, mass, mass_2)
+    data.table::setkey(df8_a, mass, mass_2)
 
     cat("joining within given delta mz tolerance (neutral losses) \n")
-    df9_d <- foverlaps(df7, df8_a) |>
-      filter(!is.na(loss)) |>
-      distinct(feature_id, loss, mass)
+    df9_d <- data.table::foverlaps(df7, df8_a) |>
+      dplyr::filter(!is.na(loss)) |>
+      dplyr::distinct(feature_id, loss, mass)
 
     cat("joining within given delta mz tolerance (adducts) \n")
-    df9 <- foverlaps(df7, df8) |>
-      mutate(mz_2 = mz) |>
-      filter(!is.na(Group1)) |>
-      mutate(across(rt, as.character)) |>
-      mutate(
+    df9 <- data.table::foverlaps(df7, df8) |>
+      dplyr::mutate(mz_2 = mz) |>
+      dplyr::filter(!is.na(Group1)) |>
+      dplyr::mutate(dplyr::across(rt, as.character)) |>
+      dplyr::mutate(
         label = as.character(Group1),
         label_dest = as.character(Group2)
       ) |>
-      distinct(
+      dplyr::distinct(
         feature_id,
         label,
         label_dest,
@@ -160,47 +160,50 @@ ms1_annotation <-
 
     cat("keeping initial and destination feature \n")
     df9_a <- df9 |>
-      distinct(feature_id, label)
+      dplyr::distinct(feature_id, label)
 
     df9_b <- df9 |>
-      distinct(!!as.name(paste("feature_id", "dest", sep = "_")), label_dest) |>
-      select(feature_id := !!as.name(paste("feature_id", "dest", sep = "_")),
+      dplyr::distinct(!!as.name(paste("feature_id", "dest", sep = "_")), label_dest) |>
+      dplyr::select(feature_id := !!as.name(paste("feature_id", "dest", sep = "_")),
         label = label_dest
       )
 
     ## always considering [M+H]+ and [M-H]- ions
     df9_ion <- df3 |>
-      distinct(feature_id) |>
-      mutate(label = switch(params$ms$mode,
+      dplyr::distinct(feature_id) |>
+      dplyr::mutate(label = switch(params$ms$mode,
         "pos" = "pos_1_1proton",
         "neg" = "neg_1_1proton"
       ))
 
-    df9_c <- bind_rows(
+    df9_c <- dplyr::bind_rows(
       df9_a,
       df9_b,
       df9_ion
     ) |>
-      distinct()
+      dplyr::distinct()
 
     cat("joining with initial results (adducts) \n")
-    df10 <- left_join(df3 |>
-      distinct(
-        feature_id,
-        component_id,
-        rt,
-        mz,
-        mz_2
-      ), df9_c) |>
-      mutate(
+    df10 <- dplyr::left_join(
+      df3 |>
+        dplyr::distinct(
+          feature_id,
+          component_id,
+          rt,
+          mz,
+          mz_2
+        ),
+      df9_c
+    ) |>
+      dplyr::mutate(
         mz_1 = mz,
         score_input = 0
       ) |>
-      data.table()
+      data.table::data.table()
 
     cat("joining with initial results (neutral losses) \n")
-    df10_a <- left_join(df10, df9_d) |>
-      mutate(
+    df10_a <- dplyr::left_join(df10, df9_d) |>
+      dplyr::mutate(
         mz_1 = ifelse(
           test = !is.na(loss),
           yes = mz_1 + mass,
@@ -214,16 +217,16 @@ ms1_annotation <-
       )
 
     cat("setting joining keys \n")
-    setkey(df2, value_min, value_max)
-    setkey(df10_a, mz_1, mz_2)
+    data.table::setkey(df2, value_min, value_max)
+    data.table::setkey(df10_a, mz_1, mz_2)
 
     cat("joining within given mz tolerance and filtering possible single charge adducts only \n")
-    df11 <- foverlaps(
+    df11 <- data.table::foverlaps(
       df10_a,
       df2
     ) |>
-      mutate(mz_error = adduct_mass - mz_2) |>
-      select(
+      dplyr::mutate(mz_error = adduct_mass - mz_2) |>
+      dplyr::select(
         feature_id,
         component_id,
         rt,
@@ -235,18 +238,18 @@ ms1_annotation <-
         adduct_mass,
         loss
       ) |>
-      mutate(library = adduct) |>
-      distinct() |>
+      dplyr::mutate(library = adduct) |>
+      dplyr::distinct() |>
       dplyr::mutate_all(~ replace(
         .,
         . == "NA",
         NA
       )) |>
-      filter(!is.na(adduct))
+      dplyr::filter(!is.na(adduct))
 
     cat("cleaning results \n")
     df12 <- df11 |>
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         rt,
@@ -256,12 +259,12 @@ ms1_annotation <-
         mz_error,
         exact_mass
       ) |>
-      filter(!is.na(exact_mass))
+      dplyr::filter(!is.na(exact_mass))
 
     cat("keeping unique adducts per exact mass \n")
     df13 <- structureOrganismPairsTable |>
-      filter(!is.na(structure_exact_mass)) |>
-      distinct(
+      dplyr::filter(!is.na(structure_exact_mass)) |>
+      dplyr::distinct(
         structure_exact_mass,
         structure_inchikey_2D,
         structure_smiles_2D
@@ -286,47 +289,47 @@ ms1_annotation <-
     "%ni%" <- Negate("%in%")
 
     cat("joining exact masses with single charge adducts \n")
-    df14 <- left_join(
+    df14 <- dplyr::left_join(
       x = df12,
       y = df13,
       by = setNames("structure_exact_mass", "exact_mass")
     ) |>
-      select(
+      dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         library,
         everything(),
         -exact_mass
       ) |>
-      filter(!is.na(inchikey_2D)) |>
-      filter(library %ni% forbidden_adducts) |>
-      distinct()
+      dplyr::filter(!is.na(inchikey_2D)) |>
+      dplyr::filter(library %ni% forbidden_adducts) |>
+      dplyr::distinct()
 
     cat("adding adduct mass to get back to [M] \n")
     df15 <-
-      left_join(df14, adductsTable, by = setNames("adduct", "library")) |>
-      distinct(feature_id, .keep_all = TRUE) |>
-      select(
+      dplyr::left_join(df14, adductsTable, by = setNames("adduct", "library")) |>
+      dplyr::distinct(feature_id, .keep_all = TRUE) |>
+      dplyr::select(
         feature_id,
         adduct_mass
       ) |>
-      filter(!is.na(adduct_mass))
+      dplyr::filter(!is.na(adduct_mass))
 
     cat("keeping these ions for dimers and multicharged exploration starting from [M] \n")
-    df16 <- inner_join(df3, df15)
+    df16 <- dplyr::inner_join(df3, df15)
 
     cat("calculating multicharged and in source dimers and adding delta mz tolerance \n")
     if (params$ms$mode == "pos") {
       df17 <- df16 |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           rt,
           mz,
           adduct_mass
         ) |>
-        rowwise() |>
-        mutate(
+        dplyr::rowwise() |>
+        dplyr::mutate(
           pos_3_3proton = (mz - adduct_mass + 3 * adductsM["proton"]) / 3,
           pos_3_2proton1sodium = (mz - adduct_mass +
             2 * adductsM["proton"] +
@@ -376,22 +379,26 @@ ms1_annotation <-
             adductsM["acetonitrile"] +
             adductsM["sodium"]
         ) |>
-        select(-adduct_mass) |>
-        ungroup() |>
-        pivot_longer(cols = 5:ncol())
+        dplyr::select(-adduct_mass) |>
+        dplyr::ungroup()
+
+      cols <- ncol(df17)
+
+      df17 <- df17 |>
+        tidyr::pivot_longer(cols = 5:cols)
     }
 
     if (params$ms$mode == "neg") {
       df17 <- df16 |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           rt,
           mz,
           adduct_mass
         ) |>
-        rowwise() |>
-        mutate(
+        dplyr::rowwise() |>
+        dplyr::mutate(
           neg_3_3proton = (mz + adduct_mass - 3 * adductsM["proton"]) / 3,
           neg_2_2proton = ((mz + adduct_mass - 2 * adductsM["proton"]) / 2),
           neg_2MH = 2 * (mz + adduct_mass) - adductsM["proton"],
@@ -399,22 +406,26 @@ ms1_annotation <-
           neg_2MACH = 2 * (mz + adduct_mass) + adductsM["acetic"] - adductsM["proton"],
           neg_3MH = 3 * (mz + adduct_mass) - adductsM["proton"]
         ) |>
-        select(-adduct_mass) |>
-        ungroup() |>
-        pivot_longer(cols = 5:ncol())
+        dplyr::select(-adduct_mass) |>
+        dplyr::ungroup()
+
+      cols <- ncol(df17)
+
+      df17 <- df17 |>
+        tidyr::pivot_longer(cols = 5:cols)
     }
 
     df17 <- df17 |>
-      mutate(
+      dplyr::mutate(
         mz_min = value - (0.000001 * params$ms$tolerance$ppm * value),
         mz_max = value + (0.000001 * params$ms$tolerance$ppm * value),
         rt_min = rt - params$ms$tolerance$rt,
         rt_max = rt + params$ms$tolerance$rt
       ) |>
-      data.table()
+      data.table::data.table()
 
     df19 <- df5 |>
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         rt,
@@ -424,29 +435,29 @@ ms1_annotation <-
       )
 
     cat("setting joining keys \n")
-    setkey(df17, rt_min, rt_max)
-    setkey(df19, rt_1, rt_2)
+    data.table::setkey(df17, rt_min, rt_max)
+    data.table::setkey(df19, rt_1, rt_2)
 
     cat("joining within given rt tolerance \n")
-    df20 <- foverlaps(df17, df19) |>
-      mutate(
+    df20 <- data.table::foverlaps(df17, df19) |>
+      dplyr::mutate(
         delta_min = mz - mz_max,
         delta_max = mz - mz_min
       ) |>
-      filter(delta_max > min(df8_a$mass) |
+      dplyr::filter(delta_max > min(df8_a$mass) |
         (mz >= mz_min & mz <= mz_max))
 
     cat("setting joining keys \n")
-    setkey(df20, delta_min, delta_max)
+    data.table::setkey(df20, delta_min, delta_max)
 
-    df20_a <- foverlaps(df20, df8_a) |>
-      filter(!is.na(loss) | (mz >= mz_min & mz <= mz_max)) |>
-      mutate(name = ifelse(
+    df20_a <- data.table::foverlaps(df20, df8_a) |>
+      dplyr::filter(!is.na(loss) | (mz >= mz_min & mz <= mz_max)) |>
+      dplyr::mutate(name = ifelse(
         test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
         no = name
       )) |>
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         rt,
@@ -458,19 +469,19 @@ ms1_annotation <-
       )
 
     cat("setting joining keys \n")
-    setkey(df20_a, mz_min, mz_max)
-    setkey(df2, value_min, value_max)
+    data.table::setkey(df20_a, mz_min, mz_max)
+    data.table::setkey(df2, value_min, value_max)
 
     cat(
       "joining within given mz tolerance and filtering possible multicharge / dimeric adducts \n"
     )
     df21 <- foverlaps(df20_a, df2) |>
-      filter(str_detect(
+      dplyr::filter(stringr::str_detect(
         pattern = paste(adduct, "", sep = " "),
         string = library_name
       )) |>
-      mutate(mz_error = adduct_mass - adduct_value) |>
-      select(
+      dplyr::mutate(mz_error = adduct_mass - adduct_value) |>
+      dplyr::select(
         feature_id,
         component_id,
         rt,
@@ -482,23 +493,23 @@ ms1_annotation <-
       )
 
     df22 <-
-      left_join(df21, df13, by = setNames("structure_exact_mass", "exact_mass")) |>
-      mutate(score_input = 0) |>
-      select(
+      dplyr::left_join(df21, df13, by = setNames("structure_exact_mass", "exact_mass")) |>
+      dplyr::mutate(score_input = 0) |>
+      dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         library = library_name,
-        everything(),
+        dplyr::everything(),
         -exact_mass,
         -adduct_value
       ) |>
-      filter(!is.na(inchikey_2D)) |>
-      filter(library %ni% forbidden_adducts) |>
-      distinct()
+      dplyr::filter(!is.na(inchikey_2D)) |>
+      dplyr::filter(library %ni% forbidden_adducts) |>
+      dplyr::distinct()
 
     cat("formatting initial results \n")
     df23 <- annotationTable |>
-      mutate(across(
+      dplyr::mutate(dplyr::across(
         c(
           mz_error,
           component_id,
@@ -508,17 +519,17 @@ ms1_annotation <-
         ),
         as.numeric
       )) |>
-      distinct()
+      dplyr::distinct()
 
     cat(
       "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
     )
-    df24 <- bind_rows(df23, df14, df22) |>
-      group_by(feature_id) |>
-      mutate(rank_initial = dense_rank(desc(score_input))) |>
-      ungroup() |>
-      filter(rank_initial <= params$top_k$initial) |>
-      distinct(
+    df24 <- dplyr::bind_rows(df23, df14, df22) |>
+      dplyr::group_by(feature_id) |>
+      dplyr::mutate(rank_initial = dense_rank(desc(score_input))) |>
+      dplyr::ungroup() |>
+      dplyr::filter(rank_initial <= params$top_k$initial) |>
+      dplyr::distinct(
         feature_id,
         component_id,
         score_input,
@@ -534,19 +545,19 @@ ms1_annotation <-
     }
 
     df25 <- annotationTable |>
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         rt,
         mz,
       ) |>
-      distinct() |>
+      dplyr::distinct() |>
       dplyr::mutate_all(as.numeric)
 
     cat("adding \"notAnnotated\" \n")
-    df26 <- left_join(df25, df24) |>
-      distinct() |>
-      mutate(across(mz, as.numeric)) |>
+    df26 <- dplyr::left_join(df25, df24) |>
+      dplyr::distinct() |>
+      dplyr::mutate(dplyr::across(mz, as.numeric)) |>
       data.frame()
 
     df26["inchikey_2D"][is.na(df26["inchikey_2D"])] <-
@@ -563,7 +574,7 @@ ms1_annotation <-
     df27 <- dplyr::left_join(
       df26,
       structureOrganismPairsTable |>
-        distinct(
+        dplyr::distinct(
           inchikey_2D = structure_inchikey_2D,
           smiles_2D = structure_smiles_2D,
           structure_taxonomy_npclassifier_01pathway,

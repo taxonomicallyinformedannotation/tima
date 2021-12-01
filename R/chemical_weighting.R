@@ -100,9 +100,9 @@ chemical_weighting <-
         ))),
         rank_final = (dplyr::dense_rank(-score_pondered_chemo))
       ) |>
-      arrange(rank_final) |>
-      ungroup() |>
-      arrange(as.numeric(feature_id)) |>
+      dplyr::arrange(rank_final) |>
+      dplyr::ungroup() |>
+      dplyr::arrange(as.numeric(feature_id)) |>
       data.frame()
 
     return(df4)

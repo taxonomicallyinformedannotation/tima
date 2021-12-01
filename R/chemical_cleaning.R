@@ -24,7 +24,7 @@ chemical_cleaning <-
       )
     }
     df1 <- annotationTableWeightedChemo |>
-      filter(
+      dplyr::filter(
         score_initialNormalized > 0 |
           # those lines are to keep ms1 annotation
           score_biological >= params$score$biological$order |
@@ -32,13 +32,13 @@ chemical_cleaning <-
           score_chemical >= params$score$chemical$superclass
         # or chemical consistency score is obtained
       ) |>
-      group_by(feature_id) |>
-      distinct(inchikey_2D,
+      dplyr::group_by(feature_id) |>
+      dplyr::distinct(inchikey_2D,
         .keep_all = TRUE
       ) |>
-      mutate(rank_final = (dense_rank(-score_pondered_chemo))) |>
-      filter(rank_final <= params$top_k$final) |>
-      ungroup()
+      dplyr::mutate(rank_final = (dense_rank(-score_pondered_chemo))) |>
+      dplyr::filter(rank_final <= params$top_k$final) |>
+      dplyr::ungroup()
 
     df11 <- metadata_table_spectral_annotation
     if (exists(x = "annotation_table_ms1")) {
@@ -46,12 +46,12 @@ chemical_cleaning <-
     }
 
     df12 <- df11 |>
-      mutate(across(rank_initial, as.numeric)) |>
-      mutate(component_id = as.numeric(component_id))
+      dplyr::mutate(dplyr::across(rank_initial, as.numeric)) |>
+      dplyr::mutate(component_id = as.numeric(component_id))
 
     cat("adding initial metadata (RT, etc.) and simplifying columns \n")
-    df2 <- left_join(df1, df12) |>
-      mutate(
+    df2 <- dplyr::left_join(df1, df12) |>
+      dplyr::mutate(
         best_candidate_structure = paste(
           candidate_structure_1_pathway,
           candidate_structure_2_superclass,
@@ -59,7 +59,7 @@ chemical_cleaning <-
           sep = "§"
         )
       ) |>
-      distinct(
+      dplyr::distinct(
         feature_id,
         component_id,
         rt,
@@ -85,7 +85,7 @@ chemical_cleaning <-
       )
 
     df3 <- structureOrganismPairsTable |>
-      distinct(structure_inchikey_2D,
+      dplyr::distinct(structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
       dplyr::select(
@@ -95,8 +95,8 @@ chemical_cleaning <-
       )
 
     cat("adding structures metaddata \n")
-    df4a <- left_join(df2, df3) |>
-      select(
+    df4a <- dplyr::left_join(df2, df3) |>
+      dplyr::select(
         feature_id,
         component_id,
         molecular_formula,
@@ -115,12 +115,12 @@ chemical_cleaning <-
         mz_error,
         score_interim,
         score_final,
-        everything()
+        dplyr::everything()
       )
 
     cat("selecting columns for cytoscape output \n")
     df4b <- df4a |>
-      select(
+      dplyr::select(
         -component_id,
         -molecular_formula,
         -inchikey_2D,
@@ -139,12 +139,12 @@ chemical_cleaning <-
         -score_interim,
         -score_final
       ) |>
-      distinct()
+      dplyr::distinct()
 
     cat("summarizing results \n")
     df5a <- df4a |>
-      group_by(feature_id) |>
-      summarise(across(
+      dplyr::group_by(feature_id) |>
+      dplyr::summarise(dplyr::across(
         colnames(df4a)[3:18],
         ~ gsub(
           pattern = "\\bNA\\b",
@@ -152,17 +152,17 @@ chemical_cleaning <-
           x = paste(.x, collapse = "|")
         )
       )) |>
-      select(
+      dplyr::select(
         -rt,
         -mz
       )
 
-    df5b <- left_join(df5a, df4b) |>
-      distinct()
+    df5b <- dplyr::left_join(df5a, df4b) |>
+      dplyr::distinct()
 
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
       df6 <- metadata_table_spectral_annotation |>
-        distinct(
+        dplyr::distinct(
           feature_id,
           component_id,
           mz
@@ -171,7 +171,7 @@ chemical_cleaning <-
 
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
       df6 <- metadata_table_spectral_annotation |>
-        distinct(
+        dplyr::distinct(
           feature_id,
           component_id,
           mz,
@@ -180,13 +180,13 @@ chemical_cleaning <-
     }
 
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
-      df7 <- left_join(df6, df5b) |>
-        arrange(feature_id) |>
-        mutate(across(
-          everything(),
+      df7 <- dplyr::left_join(df6, df5b) |>
+        dplyr::arrange(feature_id) |>
+        dplyr::mutate(dplyr::across(
+          dplyr::everything(),
           ~ y_as_na(x = .x, y = "")
         )) |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           mz,
@@ -217,21 +217,21 @@ chemical_cleaning <-
 
       cat("adding consensus again to droped candidates \n")
       df8 <- df7 |>
-        filter(!is.na(inchikey_2D))
+        dplyr::filter(!is.na(inchikey_2D))
 
       df9 <- df7 |>
-        filter(is.na(inchikey_2D)) |>
-        select(
+        dplyr::filter(is.na(inchikey_2D)) |>
+        dplyr::select(
           feature_id,
           component_id,
           mz
         )
 
-      df10 <- left_join(
+      df10 <- dplyr::left_join(
         df9,
         annotationTableWeightedChemo
       ) |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           mz,
@@ -246,18 +246,18 @@ chemical_cleaning <-
           consensus_structure_par,
           consistency_structure_par
         ) |>
-        distinct()
+        dplyr::distinct()
     }
 
 
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
-      df7 <- left_join(df6, df5b) |>
-        arrange(feature_id) |>
-        mutate(across(
-          everything(),
+      df7 <- dplyr::left_join(df6, df5b) |>
+        dplyr::arrange(feature_id) |>
+        dplyr::mutate(dplyr::across(
+          dplyr::everything(),
           ~ y_as_na(x = .x, y = "")
         )) |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           rt,
@@ -284,8 +284,8 @@ chemical_cleaning <-
         )
 
       df8 <- df7 |>
-        filter(!is.na(inchikey_2D)) |>
-        mutate(
+        dplyr::filter(!is.na(inchikey_2D)) |>
+        dplyr::mutate(
           feature_id = as.numeric(feature_id),
           component_id = as.numeric(component_id),
           mz = as.numeric(mz),
@@ -293,8 +293,8 @@ chemical_cleaning <-
         )
 
       df9 <- df7 |>
-        filter(is.na(inchikey_2D)) |>
-        select(
+        dplyr::filter(is.na(inchikey_2D)) |>
+        dplyr::select(
           feature_id,
           component_id,
           rt,
@@ -302,11 +302,11 @@ chemical_cleaning <-
         ) |>
         dplyr::mutate_all(as.numeric)
 
-      df10 <- left_join(
+      df10 <- dplyr::left_join(
         df9,
         annotationTableWeightedChemo
       ) |>
-        select(
+        dplyr::select(
           feature_id,
           component_id,
           rt,
@@ -318,11 +318,11 @@ chemical_cleaning <-
           consensus_structure_cla,
           consistency_structure_cla
         ) |>
-        distinct()
+        dplyr::distinct()
     }
 
-    df11 <- bind_rows(df8, df10) |>
-      arrange(as.numeric(feature_id))
+    df11 <- dplyr::bind_rows(df8, df10) |>
+      dplyr::arrange(as.numeric(feature_id))
 
     # because cytoscape import fails otherwise
     colnames(df11) <-

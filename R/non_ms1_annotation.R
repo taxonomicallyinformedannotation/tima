@@ -12,7 +12,7 @@ non_ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation) {
     cat("formatting \n")
     df15 <- annotationTable |>
-      mutate(across(
+      dplyr::mutate(dplyr::across(
         c(
           mz_error,
           component_id,
@@ -22,14 +22,14 @@ non_ms1_annotation <-
         ),
         as.numeric
       )) |>
-      distinct()
+      dplyr::distinct()
 
     cat("ranking \n")
     df16 <- df15 |>
-      group_by(feature_id) |>
-      mutate(rank_initial = dense_rank(desc(score_input))) |>
-      ungroup() |>
-      filter(rank_initial <= params$top_k$initial) |>
+      dplyr::group_by(feature_id) |>
+      dplyr::mutate(rank_initial = dplyr::dense_rank(desc(score_input))) |>
+      dplyr::ungroup() |>
+      dplyr::filter(rank_initial <= params$top_k$initial) |>
       dplyr::select(
         -rt,
         -mz
@@ -46,12 +46,12 @@ non_ms1_annotation <-
         mz,
         rt,
       ) |>
-      distinct()
+      dplyr::distinct()
 
     cat("adding \"notAnnotated\" \n")
-    df18 <- left_join(df17, df16) |>
-      distinct() |>
-      mutate(across(mz_error, as.numeric)) |>
+    df18 <- dplyr::left_join(df17, df16) |>
+      dplyr::distinct() |>
+      dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
     df18["inchikey_2D"][is.na(df18["inchikey_2D"])] <-
@@ -68,7 +68,7 @@ non_ms1_annotation <-
     df19 <- dplyr::left_join(
       df18,
       structure_organism_pairs_table |>
-        distinct(
+        dplyr::distinct(
           inchikey_2D = structure_inchikey_2D,
           smiles_2D = structure_smiles_2D,
           structure_taxonomy_npclassifier_01pathway,
