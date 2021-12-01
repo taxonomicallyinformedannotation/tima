@@ -378,7 +378,7 @@ ms1_annotation <-
         ) |>
         select(-adduct_mass) |>
         ungroup() |>
-        pivot_longer(cols = 5:ncol(.))
+        pivot_longer(cols = 5:ncol())
     }
 
     if (params$ms$mode == "neg") {
@@ -401,7 +401,7 @@ ms1_annotation <-
         ) |>
         select(-adduct_mass) |>
         ungroup() |>
-        pivot_longer(cols = 5:ncol(.))
+        pivot_longer(cols = 5:ncol())
     }
 
     df17 <- df17 |>

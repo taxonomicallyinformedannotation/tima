@@ -1,6 +1,8 @@
 if (!require(dplyr)) {
   install.packages("dplyr")
-  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+  require(package = "dplyr",
+          quietly = TRUE,
+          warn.conflicts = FALSE)
 }
 if (!require(tidyr)) {
   install.packages("tidyr")
@@ -55,12 +57,15 @@ form_adducts_pos <- function(massesTable, adductsTable) {
       pos_2MHCH3CN = 2 * exact_mass + proton + acetonitrile,
       pos_2MCH3CNNa = 2 * exact_mass + acetonitrile + sodium
     ) |>
-    dplyr::select(-colnames(adductsTable)) |>
-    tidyr::pivot_longer(2:ncol()) |>
+    dplyr::select(-colnames(adductsTable))
+
+  n <- ncol(adducts_pos)
+
+  adducts_pos <- adducts_pos |>
+    tidyr::pivot_longer(2:dplyr::all_of(n)) |>
     dplyr::select(tidyr::everything(),
-      adduct = name,
-      adduct_mass = value
-    )
+                  adduct = name,
+                  adduct_mass = value)
 
   return(adducts_pos)
 }

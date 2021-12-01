@@ -37,8 +37,12 @@ form_adducts_neg <- function(massesTable, adductsTable) {
       neg_2MACH = 2 * exact_mass + acetic - proton,
       neg_3MH = 3 * exact_mass - proton
     ) |>
-    dplyr::select(-colnames(adductsTable)) |>
-    tidyr::pivot_longer(2:ncol()) |>
+    dplyr::select(-colnames(adductsTable))
+
+  n <- ncol(adducts_neg)
+
+  adducts_neg <- adducts_neg |>
+    tidyr::pivot_longer(2:dplyr::all_of(n)) |>
     dplyr::select(tidyr::everything(),
       adduct = name,
       adduct_mass = value

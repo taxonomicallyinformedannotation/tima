@@ -126,7 +126,7 @@ manipulating_taxo_otl <- function(dfsel) {
       ) |>
       dplyr::ungroup() |>
       dplyr::select_if(
-        names(.) %in%
+        names() %in%
           c(
             "organismCleaned",
             "domain",
