@@ -21,7 +21,7 @@ non_ms1_annotation <-
         as.numeric
       )) |>
       distinct()
-    
+
     cat("ranking \n")
     df16 <- df15 %>%
       group_by(feature_id) %>%
@@ -32,11 +32,11 @@ non_ms1_annotation <-
         -rt,
         -mz
       )
-    
+
     if (!any(names(annotationTable) == "rt")) {
       annotationTable[, "rt"] <- 0
     }
-    
+
     df17 <- annotationTable |>
       select(
         feature_id,
@@ -45,13 +45,13 @@ non_ms1_annotation <-
         rt,
       ) |>
       distinct()
-    
+
     cat("adding \"notAnnotated\" \n")
     df18 <- left_join(df17, df16) |>
       distinct() |>
       mutate(across(mz_error, as.numeric)) |>
       data.frame()
-    
+
     df18["inchikey_2D"][is.na(df18["inchikey_2D"])] <-
       "notAnnotated"
     df18["score_input"][is.na(df18["score_input"])] <-
@@ -62,7 +62,7 @@ non_ms1_annotation <-
       666
     df18["rank_initial"][is.na(df18["rank_initial"])] <-
       params$top_k$initial
-    
+
     df19 <- dplyr::left_join(
       df18,
       structure_organism_pairs_table |>
@@ -74,6 +74,6 @@ non_ms1_annotation <-
           structure_taxonomy_npclassifier_03class
         )
     )
-    
+
     return(df19)
   }
