@@ -1,2 +1,3 @@
-Rscript -e 'if(!require(remotes)){install.packages("remotes")}
+Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
 remotes::install_github("taxonomicallyinformedannotation/tima-r")'
+
