@@ -148,13 +148,14 @@ log_debug(x = "adding biological organism metadata")
 annotation_table_ms1_taxed <-
   dplyr::left_join(annotation_table_ms1, taxed_features_table) |>
   dplyr::left_join(
-    metadata_table_spectral_annotation |> distinct(
-      inchikey_2D,
-      smiles_2D,
-      structure_taxonomy_npclassifier_01pathway,
-      structure_taxonomy_npclassifier_02superclass,
-      structure_taxonomy_npclassifier_03class
-    )
+    metadata_table_spectral_annotation |>
+      dplyr::distinct(
+        inchikey_2D,
+        smiles_2D,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class
+      )
   )
 
 log_debug(x = "performing taxonomically informed scoring")
@@ -211,12 +212,10 @@ readr::write_delim(
 
 log_debug(
   x = "... path to used parameters is",
-  crayon::green(
-    file.path(
-      dir_time,
-      "process_annotations.yaml"
-    )
-  )
+  crayon::green(file.path(
+    dir_time,
+    "process_annotations.yaml"
+  ))
 )
 yaml::write_yaml(
   x = params,
