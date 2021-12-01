@@ -1,84 +1,14 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
-log_debug("Loading packages")
-if (!require(crayon)) {
-  install.packages("crayon")
-  require(
-    package = "crayon",
-    quietly = TRUE
-  )
-}
-if (!require(docopt)) {
-  install.packages("docopt")
-  require(
-    package = "docopt",
-    quietly = TRUE
-  )
-}
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  require(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(forcats)) {
-  install.packages("forcats")
-  require(
-    package = "forcats",
-    quietly = TRUE
-  )
-}
-if (!require(ggplot2)) {
-  install.packages("ggplot2")
-  require(
-    package = "ggplot2",
-    quietly = TRUE
-  )
-}
-if (!require(ggpubr)) {
-  install.packages("ggpubr")
-  require(
-    package = "ggpubr",
-    quietly = TRUE
-  )
-}
-if (!require(remotes)) {
-  install.packages("remotes")
-  require(
-    package = "remotes",
-    quietly = TRUE
-  )
-}
 if (!require(microshades)) {
   remotes::install_github("KarstensLab/microshades")
   require(
     package = "microshades",
-    quietly = TRUE
-  )
-}
-if (!require(plotly)) {
-  install.packages("plotly")
-  require(
-    package = "plotly",
-    quietly = TRUE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  require(
-    package = "readr",
-    quietly = TRUE
-  )
-}
-if (!require(splitstackshape)) {
-  install.packages("splitstackshape")
-  require(
-    package = "splitstackshape",
     quietly = TRUE
   )
 }
@@ -90,7 +20,7 @@ weighted_ms1_path <-
 
 log_debug(
   "This script performs",
-  green("extract annotations visualization")
+  crayon::green("extract annotations visualization")
 )
 log_debug("Authors: \n", green("AR"))
 log_debug("Contributors: ...")
@@ -186,14 +116,14 @@ final_table_shikimate_taxed <-
 
 nice_colors <- rev(
   list(
-    microshades_palette("micro_cvd_green", lightest = FALSE),
-    microshades_palette("micro_cvd_orange", lightest = FALSE),
-    microshades_palette("micro_cvd_blue", lightest = FALSE),
-    microshades_palette("micro_cvd_turquoise", lightest = FALSE),
-    microshades_palette("micro_cvd_purple", lightest = FALSE),
-    microshades_palette("micro_cvd_gray", lightest = FALSE),
-    microshades_palette("micro_brown", lightest = FALSE),
-    microshades_palette("micro_purple", lightest = FALSE)
+    microshades::microshades_palette("micro_cvd_green", lightest = FALSE),
+    microshades::microshades_palette("micro_cvd_orange", lightest = FALSE),
+    microshades::microshades_palette("micro_cvd_blue", lightest = FALSE),
+    microshades::microshades_palette("micro_cvd_turquoise", lightest = FALSE),
+    microshades::microshades_palette("micro_cvd_purple", lightest = FALSE),
+    microshades::microshades_palette("micro_cvd_gray", lightest = FALSE),
+    microshades::microshades_palette("micro_brown", lightest = FALSE),
+    microshades::microshades_palette("micro_purple", lightest = FALSE)
   )
 )
 

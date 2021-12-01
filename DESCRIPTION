@@ -19,6 +19,7 @@ Depends:
 Imports:
     cli,
     crayon,
+    curl,
     data.table,
     docopt,
     dplyr,
@@ -60,6 +61,7 @@ Collate:
     'form_adduct_neg.R'
     'form_adduct_pos.R'
     'get_params.R'
+    'get_lotus.R'
     'homemadeShift.R'
     'log_debug.R'
     'manipulating_taxo_otl.R'

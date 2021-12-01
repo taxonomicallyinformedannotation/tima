@@ -1,7 +1,9 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
 log_debug(
   "This script prepares LOTUS referenced structure-organism pairs \n",
@@ -9,23 +11,6 @@ log_debug(
 )
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
-
-log_debug("Loading packages")
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  library(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  library(
-    package = "readr",
-    quietly = TRUE
-  )
-}
 
 paths <- parse_yaml_paths()
 

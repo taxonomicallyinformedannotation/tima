@@ -1,59 +1,9 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
-
-log_debug(x = "loading libraries")
-if (!require(crayon)) {
-  install.packages("crayon")
-  require(
-    package = "crayon",
-    quietly = TRUE
-  )
-}
-if (!require(data.table)) {
-  install.packages("data.table")
-  require(
-    package = "data.table",
-    quietly = TRUE
-  )
-}
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  require(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(plotly)) {
-  install.packages("plotly")
-  require(
-    package = "plotly",
-    quietly = TRUE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  require(
-    package = "readr",
-    quietly = TRUE
-  )
-}
-if (!require(splitstackshape)) {
-  install.packages("splitstackshape")
-  require(
-    package = "splitstackshape",
-    quietly = TRUE
-  )
-}
-if (!require(tidyr)) {
-  install.packages("tidyr")
-  require(
-    package = "tidyr",
-    quietly = TRUE
-  )
-}
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
 ## docopt to do
 

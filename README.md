@@ -6,7 +6,7 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then. 
+The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then.
 The worklow is illustrated in Figure 1.
 
 ![Figure 1](man/figures/tima.svg)
@@ -33,7 +33,8 @@ Optionally, you may want to add:
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 ```shell
-bash install_package.sh
+Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
+remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 ```
 
 or in R directly:
@@ -43,21 +44,6 @@ if(!requireNamespace("remotes", quietly = TRUE))
     install.packages("remotes")
 remotes::install_github("taxonomicallyinformedannotation/tima-r")
 ```
-
-### Windows Notice
-
-If you are using Windows, you will need to install [Choco](https://chocolatey.org/install).
-
-Then run:
-
-```shell
-choco install curl
-choco install gzip
-choco install unzip
-choco install wget
-```
-
-Please also follow the procedure described [here](https://stackoverflow.com/questions/2517190/how-do-i-force-git-to-use-lf-instead-of-crlf-under-windows/13154031#13154031) to ensure files will be proberly encoded.
 
 ## Use
 
@@ -71,11 +57,11 @@ cp -R config/default config/params
 ### Structure-organism pairs library
 
 ```shell
-bash inst/scripts/get_lotus.sh && 
-Rscript inst/scripts/prepare_lotus.R &&
-# Rscript inst/scripts/prepare_closed.R && # only if you have access to it
-Rscript inst/scripts/prepare_library.R &&
-Rscript inst/scripts/prepare_adducts.R &&
+Rscript inst/scripts/get_lotus.R
+Rscript inst/scripts/prepare_lotus.R
+# Rscript inst/scripts/prepare_closed.R # only if you have access to it
+Rscript inst/scripts/prepare_library.R
+Rscript inst/scripts/prepare_adducts.R
 ```
 
 ### Annotations
@@ -83,35 +69,34 @@ Rscript inst/scripts/prepare_adducts.R &&
 #### Get MS2 annotations
 
 ```shell
-# (spectral-lib-matcher, which is only in python. see related repo)
+# (spectral_lib_matcher, which is only in python. see related repo)
 # instead we provide an example file coming from the new ISDB.
 # It also works with annotations coming from GNPS (see next steps)
-bash inst/scripts/get_example_isdb.sh
+Rscript inst/scripts/get_example_isdb.R
 ```
 
 #### Format MS2 annotations
 
 ```shell
 # depending on the annotation tool you used
-
-Rscript inst/scripts/prepare_gnps.R && # optional
-Rscript inst/scripts/prepare_sirius.R && # optional
-Rscript inst/scripts/prepare_isdb.R &&
+Rscript inst/scripts/prepare_gnps.R # optional
+Rscript inst/scripts/prepare_sirius.R # optional
+Rscript inst/scripts/prepare_isdb.R
 ```
 
 #### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)
 
 ```shell
-Rscript inst/scripts/prepare_edges.R && 
-Rscript inst/scripts/prepare_features_components.R &&
-Rscript inst/scripts/prepare_features_classification.R &&
+Rscript inst/scripts/prepare_edges.R
+Rscript inst/scripts/prepare_features_components.R
+Rscript inst/scripts/prepare_features_classification.R
 ```
 
 #### Get biological taxonomy information
 
 ```shell
-bash inst/scripts/get_gnverifier.sh && 
-Rscript inst/scripts/prepare_taxa.R 
+bash inst/scripts/get_gnverifier.sh
+Rscript inst/scripts/prepare_taxa.R
 ```
 
 ### And finally the graal!

@@ -1,0 +1,79 @@
+---
+title: "1 Preparing your structure-organism pairs library"
+author: "Adriano Rutz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 Preparing your structure-organism pairs library}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette describes how to prepare a structure-organism pairs library in order to
+
+* Annotate or complement the annotation of your feature. (*optional*)
+* **Weight your initial annotations**.
+
+## LOTUS
+
+As we developed also [LOTUS](https://lotusnprod.github.io/lotus-manuscript) with 
+**T**axonomically 
+**I**nformed 
+**M**etabolite 
+**A**nnotation in mind, 
+we provide it here as a starting point for your structure-organism pairs library. 
+You are free to complement it with your own structure-organism pairs or to filter it according to your needs. We also provide some hints on how to do it later in this vignette.
+
+
+To download it LOTUS structure-organism pairs locally, just run:
+
+```{r}
+library("timaR")
+setwd(dir = "../") ## adapt it in order to be in timaR root directory
+get_lotus()
+```
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side.
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

@@ -1,7 +1,9 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
 log_debug("Loading packages")
 if (!require(crayon)) {

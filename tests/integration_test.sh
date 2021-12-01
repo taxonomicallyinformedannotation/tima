@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 cp -R config/default config/params
-bash inst/scripts/get_lotus.sh
+Rscript inst/scripts/get_lotus.R
 Rscript inst/scripts/prepare_lotus.R
 Rscript inst/scripts/prepare_library.R
 Rscript inst/scripts/prepare_adducts.R
-bash inst/scripts/get_example_isdb.sh
+Rscript inst/scripts/get_example_isdb.R
 bash inst/scripts/get_gnverifier.sh
 Rscript inst/scripts/prepare_gnps.R
 Rscript inst/scripts/prepare_isdb.R

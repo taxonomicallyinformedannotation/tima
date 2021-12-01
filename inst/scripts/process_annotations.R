@@ -1,96 +1,24 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
-log_debug("Loading packages")
-if (!require(crayon)) {
-  install.packages("crayon")
-  library(
-    package = "crayon",
-    quietly = TRUE
-  )
-}
-if (!require(data.table)) {
-  install.packages("data.table")
-  library(
-    package = "data.table",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(docopt)) {
-  install.packages("docopt")
-  library(
-    package = "docopt",
-    quietly = TRUE
-  )
-}
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  library(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(purrr)) {
-  install.packages("purrr")
-  library(
-    package = "purrr",
-    quietly = TRUE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  library(
-    package = "readr",
-    quietly = TRUE
-  )
-}
-if (!require(splitstackshape)) {
-  install.packages("splitstackshape")
-  library(
-    package = "splitstackshape",
-    quietly = TRUE
-  )
-}
-if (!require(stringr)) {
-  install.packages("stringr")
-  library(
-    package = "stringr",
-    quietly = TRUE
-  )
-}
-if (!require(tidyr)) {
-  install.packages("tidyr")
-  library(
-    package = "tidyr",
-    quietly = TRUE
-  )
-}
-if (!require(yaml)) {
-  install.packages("yaml")
-  library(
-    package = "yaml",
-    quietly = TRUE
-  )
-}
+log_debug(
+  "This script performs",
+  crayon::green("taxonomically informed scoring"),
+  "preceded by",
+  crayon::blue("MS1 annotation"),
+  "and folowed by",
+  crayon::yellow("chemical consistency informed scoring")
+)
+log_debug("Authors: \n", crayon::green("AR, P-MA"))
+log_debug("Contributors: \n", "...")
 
 step <- "process_annotations"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
-
-log_debug(
-  "This script performs",
-  green("taxonomically informed scoring"),
-  "preceded by",
-  blue("MS1 annotation"),
-  "and folowed by",
-  yellow("chemical consistency informed scoring")
-)
-log_debug("Authors: \n", green("AR, P-MA"))
-log_debug("Contributors: \n", "...")
 
 stopifnot(
   "Your --ms.mode parameter (in command line arguments or in 'annotate_params.yaml' must be 'pos' or 'neg'" = params$ms$mode %in% c("pos", "neg")

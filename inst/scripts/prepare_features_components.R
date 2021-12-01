@@ -1,49 +1,13 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
 log_debug("This script fills features metadata (mz, rt and component id)")
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
-
-log_debug("Loading packages")
-if (!require(docopt)) {
-  install.packages("docopt")
-  library(
-    package = "docopt",
-    quietly = TRUE
-  )
-}
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  library(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(purrr)) {
-  install.packages("purrr")
-  library(
-    package = "purrr",
-    quietly = TRUE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  library(
-    package = "readr",
-    quietly = TRUE
-  )
-}
-if (!require(yaml)) {
-  install.packages("yaml")
-  library(
-    package = "yaml",
-    quietly = TRUE
-  )
-}
 
 step <- "prepare_features_components"
 paths <- parse_yaml_paths()
