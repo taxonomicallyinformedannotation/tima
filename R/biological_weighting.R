@@ -14,7 +14,7 @@ biological_weighting <-
            structureOrganismPairsTable = structure_organism_pairs_table) {
     cat("normalizing initial score \n")
     metadata <- annotationTable %>%
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         inchikey_2D,
@@ -143,7 +143,7 @@ biological_weighting <-
     cat("selecting DB columns \n")
     candidates <- structureOrganismPairsTable %>%
       filter(!is.na(structure_inchikey_2D)) %>%
-      select(
+      dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         candidate_organism_01_domain = organism_taxonomy_01domain,
         candidate_organism_02_kingdom = organism_taxonomy_02kingdom,

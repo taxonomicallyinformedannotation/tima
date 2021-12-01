@@ -78,7 +78,7 @@ ms1_annotation <-
         i.feature_id,
         i.mz
       ) |>
-      select(everything(),
+      dplyr::select(everything(),
         feature_id_dest = i.feature_id,
         mz_dest = i.mz
       )
@@ -118,7 +118,7 @@ ms1_annotation <-
         g = adductsTable$adduct
       ) |>
       mutate(Distance_2 = Distance) |>
-      select(
+      dplyr::select(
         -Item1,
         -Item2,
         -Label

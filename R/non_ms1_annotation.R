@@ -30,7 +30,7 @@ non_ms1_annotation <-
       mutate(rank_initial = dense_rank(desc(score_input))) |>
       ungroup() %>%
       filter(rank_initial <= params$top_k$initial) |>
-      select(
+      dplyr::select(
         -rt,
         -mz
       )
@@ -40,7 +40,7 @@ non_ms1_annotation <-
     }
 
     df17 <- annotationTable |>
-      select(
+      dplyr::select(
         feature_id,
         component_id,
         mz,

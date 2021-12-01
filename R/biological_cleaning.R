@@ -74,7 +74,7 @@ biological_cleaning <-
       distinct(feature_id, inchikey_2D, .keep_all = TRUE) %>%
       add_count() %>%
       filter(n >= 3) %>%
-      select(-n)
+      dplyr::select(-n)
 
     cat("keeping clusters with less than 3 features \n")
     df2 <- full_join(
@@ -85,7 +85,7 @@ biological_cleaning <-
         distinct(feature_id, .keep_all = TRUE) %>%
         add_count() %>%
         filter(n <= 2) %>%
-        select(-n)
+        dplyr::select(-n)
     )
 
     cat("calculating chemical consistency features with at least 2 neighbors ... \n")
@@ -137,7 +137,7 @@ biological_cleaning <-
       arrange(-consistency_score_chemical_1_pathway) %>%
       ungroup() %>%
       distinct(feature_source, .keep_all = TRUE) %>%
-      select(
+      dplyr::select(
         feature_source,
         consensus_structure_pat = candidate_structure_1_pathway,
         consistency_structure_pat,
@@ -190,7 +190,7 @@ biological_cleaning <-
       arrange(-consistency_score_chemical_2_superclass) %>%
       ungroup() %>%
       distinct(feature_source, .keep_all = TRUE) %>%
-      select(
+      dplyr::select(
         feature_source,
         consensus_structure_sup = candidate_structure_2_superclass,
         consistency_structure_sup,

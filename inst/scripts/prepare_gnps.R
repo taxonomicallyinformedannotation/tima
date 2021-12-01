@@ -16,7 +16,7 @@ params <- get_params(step = step)
 log_debug("Loading and formatting GNPS results")
 ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
 table <- read_results(id = params$gnps) |>
-  select(
+  dplyr::select(
     feature_id = `#Scan#`,
     smiles = Smiles,
     # smiles_2D, ## not available for now

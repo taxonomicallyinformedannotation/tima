@@ -13,6 +13,20 @@ paths <- parse_yaml_paths()
 
 ifelse(
   test = !dir.exists(dirname(
+    dirname(paths$data$interim$annotations$example_isdb)
+  )),
+  yes = dir.create(dirname(
+    dirname(paths$data$interim$annotations$example_isdb)
+  )),
+  no = paste(
+    dirname(
+      dirname(paths$data$interim$annotations$example_isdb)
+    ),
+    "exists"
+  )
+)
+ifelse(
+  test = !dir.exists(dirname(
     paths$data$interim$annotations$example_isdb
   )),
   yes = dir.create(dirname(

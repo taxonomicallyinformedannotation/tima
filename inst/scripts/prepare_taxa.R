@@ -139,7 +139,8 @@ if (params$tool == "gnps") {
   if (!is.null(params$force)) {
     metadata_table_joined <- cbind(
       feature_table |> mutate(feature_id = `row ID`),
-      dataOrganismVerified_3 |> select(organismOriginal = organismCleaned)
+      dataOrganismVerified_3 |>
+        dplyr::select(organismOriginal = organismCleaned)
     )
   } else {
     metadata_table_joined <-

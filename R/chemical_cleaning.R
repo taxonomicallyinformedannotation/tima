@@ -88,7 +88,7 @@ chemical_cleaning <-
       distinct(structure_inchikey_2D,
         .keep_all = TRUE
       ) %>%
-      select(
+      dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         molecular_formula = structure_molecular_formula

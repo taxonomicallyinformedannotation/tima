@@ -39,7 +39,7 @@ if (params$tool == "manual") {
     )
 
   components <- components |>
-    select(-component_id) |>
+    dplyr::select(-component_id) |>
     left_join(manual_components) |>
     dplyr::mutate(component_id = ifelse(
       test = is.na(component_id),
