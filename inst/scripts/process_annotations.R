@@ -1,12 +1,21 @@
 start <- Sys.time()
 
+source(file = "R/export_params.R")
+source(file = "R/get_params.R")
+source(file = "R/log_debug.R")
+source(file = "R/parse_cli_params.R")
+source(file = "R/parse_yaml_paths.R")
+source(file = "R/parse_yaml_params.R")
+source(file = "R/y_as_na.R")
+
+source(file = "R/biological_cleaning.R")
 source(file = "R/biological_weighting.R")
+source(file = "R/chemical_cleaning.R")
 source(file = "R/chemical_weighting.R")
-source(file = "R/cleaning.R")
 source(file = "R/decoration.R")
 source(file = "R/dist_groups.R")
-source(file = "R/helpers.R")
-source(file = "R/ms1.R")
+source(file = "R/ms1_annotation.R")
+source(file = "R/non_ms1_annotation.R")
 
 log_debug("Loading packages")
 if (!require(crayon)) {

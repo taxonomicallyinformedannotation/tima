@@ -1,5 +1,3 @@
-# colors
-
 ## qualitative
 paired <- c(
   "#a6cee3",

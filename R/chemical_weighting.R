@@ -1,5 +1,3 @@
-###########################   Functions - chemical    #########################
-
 if (!require(dplyr)) {
   install.packages("dplyr")
   require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
@@ -109,5 +107,3 @@ chemical_weighting <-
 
     return(df4)
   }
-
-###############################################################################

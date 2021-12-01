@@ -1,6 +1,12 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
+source(file = "R/export_params.R")
+source(file = "R/get_params.R")
+source(file = "R/log_debug.R")
+source(file = "R/parse_cli_params.R")
+source(file = "R/parse_yaml_paths.R")
+source(file = "R/parse_yaml_params.R")
+source(file = "R/y_as_na.R")
 
 log_debug(x = "loading libraries")
 if (!require(crayon)) {
@@ -94,14 +100,7 @@ params <- list()
 params$top_k$initial <- 500
 params$library <- "data/interim/libraries/library.tsv.gz"
 
-log_debug(x = "... functions")
-source(file = "R/ms1.R")
-source(file = "R/biological_weighting.R")
-source(file = "R/chemical_weighting.R")
-source(file = "R/cleaning.R")
-
 log_debug(x = "... files ...")
-
 log_debug(x = "... LOTUS")
 structure_organism_pairs_table <-
   readr::read_delim(

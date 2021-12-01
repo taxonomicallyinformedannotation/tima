@@ -1,7 +1,15 @@
 start <- Sys.time()
 
-source(file = "R/helpers.R")
-source(file = "R/get_gnps.R")
+source(file = "R/export_params.R")
+source(file = "R/get_params.R")
+source(file = "R/log_debug.R")
+source(file = "R/parse_cli_params.R")
+source(file = "R/parse_yaml_paths.R")
+source(file = "R/parse_yaml_params.R")
+source(file = "R/y_as_na.R")
+
+source(file = "R/read_nap.R")
+source(file = "R/read_results.R")
 
 log_debug("This script treats GNPS (and NAP) results")
 log_debug("Authors: AR")

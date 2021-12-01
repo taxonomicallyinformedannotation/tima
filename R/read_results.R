@@ -1,0 +1,19 @@
+#' Title
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_results <- function(id) {
+  file <-
+    paste0(
+      "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
+      id,
+      "&block=main&file=DB_result/"
+    )
+  return(readr::read_delim(
+    file = file,
+  ))
+}
