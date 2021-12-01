@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-log_debug("This script downloads LOTUS referenced structure-organism pairs. \n")
-log_debug("Authors: AR")
-log_debug("Contributors: ...")
+cat("This script downloads LOTUS referenced structure-organism pairs. \n")
+cat("Authors: AR")
+cat("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
