@@ -7,8 +7,6 @@ if (!require(yaml)) {
   require(package = "yaml", quietly = TRUE)
 }
 
-source(file = "R/log_debug.R")
-
 #' Title
 #'
 #' @return

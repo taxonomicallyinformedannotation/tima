@@ -30,14 +30,7 @@ jobs:
           choco install gzip
           choco install unzip
           choco install wget
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: 3.8
-          mamba-version: "*"
-          activate-environment: base
-          environment-file: environment.yml
-      - uses: s-weigand/setup-conda@v1
       - name: Run tests
         run: |
+          bash install_package.sh
           bash tests/integration_test.sh

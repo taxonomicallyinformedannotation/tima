@@ -1,17 +1,7 @@
 start <- Sys.time()
 
-source(file = "R/export_params.R")
-source(file = "R/get_params.R")
-source(file = "R/log_debug.R")
-source(file = "R/parse_cli_params.R")
-source(file = "R/parse_yaml_paths.R")
-source(file = "R/parse_yaml_params.R")
-source(file = "R/y_as_na.R")
-
-source(file = "R/clean_gnverifier.R")
-source(file = "R/manipulating_taxo_otl.R")
-source(file = "R/read_features.R")
-source(file = "R/read_metadata.R")
+require(package = "timaR",
+        quietly = TRUE)
 
 log_debug("This script informs taxonomically features")
 log_debug("Authors: AR, P-MA")

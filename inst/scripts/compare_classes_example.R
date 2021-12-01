@@ -1,12 +1,7 @@
 start <- Sys.time()
 
-source(file = "R/colors.R")
-source(file = "R/get_gnps.R")
-source(file = "R/helpers.R")
-source(file = "R/plot_histograms.R")
-source(file = "R/prepare-hierarchy.R")
-source(file = "R/prepare-hierarchy_2.R")
-source(file = "R/prepare_plot.R")
+require(package = "timaR",
+        quietly = TRUE)
 
 log_debug("Loading packages")
 if (!require(crayon)) {

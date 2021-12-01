@@ -1,5 +1,3 @@
-source(file = "R/log_debug.R")
-
 #' Title
 #'
 #' @return

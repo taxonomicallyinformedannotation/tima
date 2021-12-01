@@ -27,11 +27,18 @@ Optionally, you may want to add:
 - An in-house structure-organism pairs library (we provide **LOTUS** as starting point for each user)
 - Your own manual or automated annotations (we currently support annotations coming from ISDB and SIRIUS)
 
-## Repo preparation
+## Installation
+
+
+As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 ```shell
-git clone git@github.com:taxonomicallyinformedannotation/tima-r.git
-cd tima-r
+bash install_package.sh
+
+## or in R directly:
+if(!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+devtools::install_github("taxonomicallyinformedannotation/tima-r")
 ```
 
 ### Windows Notice
@@ -49,28 +56,16 @@ choco install wget
 
 Please also follow the procedure described [here](https://stackoverflow.com/questions/2517190/how-do-i-force-git-to-use-lf-instead-of-crlf-under-windows/13154031#13154031) to ensure files will be proberly encoded.
 
-### To run in docker:
+## Use
 
-```shell
-docker build -t tima . # optional
-docker run -it --rm -v $PWD:/app tima
-```
-
-### To run locally:
-
-```shell
-conda env create -f environment.yml &&
-conda activate tima
-```
-
-## Copy initial parameters
+### Copy initial parameters
 
 ```shell
 # copy the default params to adapat to your data later on
 cp -R config/default config/params
 ```
 
-## Structure-organism pairs library
+### Structure-organism pairs library
 
 ```shell
 bash inst/scripts/get_lotus.sh && 
@@ -80,9 +75,9 @@ Rscript inst/scripts/prepare_library.R &&
 Rscript inst/scripts/prepare_adducts.R &&
 ```
 
-## Annotations
+### Annotations
 
-### Get MS2 annotations
+#### Get MS2 annotations
 
 ```shell
 # (spectral-lib-matcher, which is only in python. see related repo)
@@ -91,7 +86,7 @@ Rscript inst/scripts/prepare_adducts.R &&
 bash inst/scripts/get_example_isdb.sh
 ```
 
-### Format MS2 annotations
+#### Format MS2 annotations
 
 ```shell
 # depending on the annotation tool you used
@@ -101,7 +96,7 @@ Rscript inst/scripts/prepare_sirius.R && # optional
 Rscript inst/scripts/prepare_isdb.R &&
 ```
 
-### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)
+#### Complement MS2 annotations (with spectral clusters and chemical taxonomy of annotations)
 
 ```shell
 Rscript inst/scripts/prepare_edges.R && 
@@ -109,14 +104,14 @@ Rscript inst/scripts/prepare_features_components.R &&
 Rscript inst/scripts/prepare_features_classification.R &&
 ```
 
-### Get biological taxonomy information
+#### Get biological taxonomy information
 
 ```shell
 bash inst/scripts/get_gnverifier.sh && 
 Rscript inst/scripts/prepare_taxa.R 
 ```
 
-## And finally the graal!
+### And finally the graal!
 
 ```shell
 Rscript inst/scripts/process_annotations.R
