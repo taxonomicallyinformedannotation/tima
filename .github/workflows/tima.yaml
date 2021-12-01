@@ -29,7 +29,7 @@ jobs:
           choco install wget
       - name: Run install
         run: |
-          Rscript -e 'if(!require(devtools)){install.packages(devtools)}
+          Rscript -e 'if(!require(devtools)){install.packages("devtools")}
           devtools::install_github("taxonomicallyinformedannotation/tima-r")'
       - name: Run tests
         run: |
