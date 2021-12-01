@@ -1,2 +1,2 @@
-Rscript -e 'if(!require(devtools)){install.packages("devtools")}
-devtools::install_github("taxonomicallyinformedannotation/tima-r")'
+Rscript -e 'if(!require(remotes)){install.packages("remotes")}
+remotes::install_github("taxonomicallyinformedannotation/tima-r")'

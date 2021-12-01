@@ -34,11 +34,14 @@ As the package is not (yet) available on CRAN, you will need to install the deve
 
 ```shell
 bash install_package.sh
+```
 
-## or in R directly:
-if(!requireNamespace("devtools", quietly = TRUE))
-    install.packages("devtools")
-devtools::install_github("taxonomicallyinformedannotation/tima-r")
+or in R directly:
+
+```shell
+if(!requireNamespace("remotes", quietly = TRUE))
+    install.packages("remotes")
+remotes::install_github("taxonomicallyinformedannotation/tima-r")
 ```
 
 ### Windows Notice
