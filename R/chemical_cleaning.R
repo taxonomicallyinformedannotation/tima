@@ -32,21 +32,21 @@ chemical_cleaning <-
       ) %>%
       group_by(feature_id) %>%
       distinct(inchikey_2D,
-               .keep_all = TRUE
+        .keep_all = TRUE
       ) %>%
       mutate(rank_final = (dense_rank(-score_pondered_chemo))) %>%
       filter(rank_final <= params$top_k$final) %>%
       ungroup()
-    
+
     df11 <- metadata_table_spectral_annotation
     if (exists(x = "annotation_table_ms1")) {
       df11 <- annotation_table_ms1
     }
-    
+
     df12 <- df11 %>%
       mutate(across(rank_initial, as.numeric)) %>%
       mutate(component_id = as.numeric(component_id))
-    
+
     cat("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- left_join(df1, df12) %>%
       mutate(
@@ -81,17 +81,17 @@ chemical_cleaning <-
         consensus_structure_cla,
         consistency_structure_cla
       )
-    
+
     df3 <- structureOrganismPairsTable %>%
       distinct(structure_inchikey_2D,
-               .keep_all = TRUE
+        .keep_all = TRUE
       ) %>%
       select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         molecular_formula = structure_molecular_formula
       )
-    
+
     cat("adding structures metaddata \n")
     df4a <- left_join(df2, df3) %>%
       select(
@@ -115,7 +115,7 @@ chemical_cleaning <-
         score_final,
         everything()
       )
-    
+
     cat("selecting columns for cytoscape output \n")
     df4b <- df4a %>%
       select(
@@ -138,7 +138,7 @@ chemical_cleaning <-
         -score_final
       ) %>%
       distinct()
-    
+
     cat("summarizing results \n")
     df5a <- df4a %>%
       group_by(feature_id) %>%
@@ -154,10 +154,10 @@ chemical_cleaning <-
         -rt,
         -mz
       )
-    
+
     df5b <- left_join(df5a, df4b) %>%
       distinct()
-    
+
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
       df6 <- metadata_table_spectral_annotation %>%
         distinct(
@@ -166,7 +166,7 @@ chemical_cleaning <-
           mz
         )
     }
-    
+
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
       df6 <- metadata_table_spectral_annotation %>%
         distinct(
@@ -176,7 +176,7 @@ chemical_cleaning <-
           rt
         )
     }
-    
+
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
       df7 <- left_join(df6, df5b) %>%
         arrange(feature_id) %>%
@@ -212,11 +212,11 @@ chemical_cleaning <-
           consensus_structure_par,
           consistency_structure_par
         )
-      
+
       cat("adding consensus again to droped candidates \n")
       df8 <- df7 %>%
         filter(!is.na(inchikey_2D))
-      
+
       df9 <- df7 %>%
         filter(is.na(inchikey_2D)) %>%
         select(
@@ -224,7 +224,7 @@ chemical_cleaning <-
           component_id,
           mz
         )
-      
+
       df10 <- left_join(
         df9,
         annotationTableWeightedChemo
@@ -246,8 +246,8 @@ chemical_cleaning <-
         ) %>%
         distinct()
     }
-    
-    
+
+
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
       df7 <- left_join(df6, df5b) %>%
         arrange(feature_id) %>%
@@ -280,7 +280,7 @@ chemical_cleaning <-
           consensus_structure_cla,
           consistency_structure_cla
         )
-      
+
       df8 <- df7 %>%
         filter(!is.na(inchikey_2D)) %>%
         mutate(
@@ -289,7 +289,7 @@ chemical_cleaning <-
           mz = as.numeric(mz),
           rt = as.numeric(rt)
         )
-      
+
       df9 <- df7 %>%
         filter(is.na(inchikey_2D)) %>%
         select(
@@ -299,7 +299,7 @@ chemical_cleaning <-
           mz
         ) %>%
         mutate_all(as.numeric)
-      
+
       df10 <- left_join(
         df9,
         annotationTableWeightedChemo
@@ -318,10 +318,10 @@ chemical_cleaning <-
         ) %>%
         distinct()
     }
-    
+
     df11 <- bind_rows(df8, df10) %>%
       arrange(as.numeric(feature_id))
-    
+
     # because cytoscape import fails otherwise
     colnames(df11) <-
       gsub(
@@ -330,6 +330,6 @@ chemical_cleaning <-
         x = colnames(df11),
         fixed = TRUE
       )
-    
+
     return(df11)
   }
