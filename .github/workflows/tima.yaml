@@ -32,8 +32,7 @@ jobs:
           R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          Rscript -e 'if(!require(remotes)){install.packages("remotes")}
-          remotes::install_github("taxonomicallyinformedannotation/tima-r")'
+          bash install_package.sh
       - name: Run tests
         run: |
           bash tests/integration_test.sh
