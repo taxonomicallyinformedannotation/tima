@@ -124,9 +124,13 @@ manipulating_taxo_otl <- function(dfsel) {
         names_from = rank,
         values_from = name
       ) |>
-      dplyr::ungroup() |>
+      dplyr::ungroup()
+
+    names <- names(df5)
+
+    df5 <- df5 |>
       dplyr::select_if(
-        names() %in%
+        names %in%
           c(
             "organismCleaned",
             "domain",
