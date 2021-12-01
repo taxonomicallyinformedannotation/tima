@@ -664,7 +664,7 @@ biological_weighting <-
       step_var
     ) |>
       dplyr::group_by(feature_id) |>
-      dplyr::arrange(desc(score_biological)) |>
+      dplyr::arrange(dplyr::desc(score_biological)) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         .keep_all = TRUE
@@ -699,7 +699,7 @@ biological_weighting <-
 
     biologically_weighted_full <- biologically_weighted_full |>
       dplyr::group_by(feature_id) |>
-      dplyr::arrange(desc(score_pondered_bio)) |>
+      dplyr::arrange(dplyr::desc(score_pondered_bio)) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         .keep_all = TRUE
@@ -710,7 +710,7 @@ biological_weighting <-
       ) |>
       dplyr::arrange(
         rank_final,
-        desc(-score_pondered_bio)
+        dplyr::desc(-score_pondered_bio)
       ) |>
       dplyr::arrange(as.numeric(feature_id)) |>
       dplyr::ungroup() |>

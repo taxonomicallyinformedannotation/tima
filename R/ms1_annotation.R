@@ -526,7 +526,7 @@ ms1_annotation <-
     )
     df24 <- dplyr::bind_rows(df23, df14, df22) |>
       dplyr::group_by(feature_id) |>
-      dplyr::mutate(rank_initial = dplyr::dense_rank(desc(score_input))) |>
+      dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
       dplyr::filter(rank_initial <= params$top_k$initial) |>
       dplyr::distinct(

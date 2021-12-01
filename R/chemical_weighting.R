@@ -1,6 +1,10 @@
 if (!require(dplyr)) {
   install.packages("dplyr")
-  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
 }
 if (!require(stringr)) {
   install.packages("stringr")
@@ -88,8 +92,8 @@ chemical_weighting <-
         params$weight$chemical * score_chemical + as.numeric(score_pondered_bio)
       )) |>
       dplyr::group_by(feature_id) |>
-      dplyr::arrange(desc(score_chemical)) |>
-      dplyr::arrange(desc(score_pondered_chemo)) |>
+      dplyr::arrange(dplyr::desc(score_chemical)) |>
+      dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         .keep_all = TRUE
