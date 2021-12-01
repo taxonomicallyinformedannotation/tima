@@ -121,7 +121,7 @@ taxon_lineage <- taxon_info |>
 list_df <- list()
 
 for (i in seq_along(1:length(taxon_lineage))) {
-  list_df[[i]] <- bind_rows(
+  list_df[[i]] <- dplyr::bind_rows(
     data.frame(
       id = otts[i],
       rank = taxon_info[[i]]$rank,
@@ -133,7 +133,7 @@ for (i in seq_along(1:length(taxon_lineage))) {
   )
 }
 
-otl <- bind_rows(list_df) |>
+otl <- dplyr::bind_rows(list_df) |>
   dplyr::mutate(ott_id = as.integer(ott_id))
 
 biological_metadata <-
