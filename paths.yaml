@@ -17,6 +17,7 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
+      example_isdb: data/interim/annotations/example_isdb_result.tsv.gz
     config:
       path: data/interim/config
     edges:
@@ -58,5 +59,8 @@ inst:
     gnverifier_2: inst/scripts/gnverifierScript_2.sh
     docopt:
       path: inst/scripts/docopt
+links:
+  example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
+  lotus: https://osf.io/rheq5/download
 tests:
   path: tests

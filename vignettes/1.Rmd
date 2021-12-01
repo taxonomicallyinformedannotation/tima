@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 This vignette describes how to prepare a structure-organism pairs library in order to
 
-* Annotate or complement the annotation of your feature. (*optional*)
+* Annotate or complement the annotation of your feature. *(optional)*
 * **Weight your initial annotations**.
 
 ## LOTUS
@@ -37,7 +37,7 @@ To download it LOTUS structure-organism pairs locally, just run:
 ```{r}
 library("timaR")
 setwd(dir = "../") ## adapt it in order to be in timaR root directory
-get_lotus()
+source(file = "inst/scripts/get_lotus.R")
 ```
 
 ## Styles

@@ -11,9 +11,18 @@ log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
-input <-
-  "https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz"
+ifelse(
+  test = !dir.exists(dirname(
+    paths$data$interim$annotations$example_isdb
+  )),
+  yes = dir.create(dirname(
+    paths$data$interim$annotations$example_isdb
+  )),
+  no = paste(
+    dirname(paths$data$interim$annotations$example_isdb),
+    "exists"
+  )
+)
 
-output <- "data/interim/annotations/example_isdb_result.tsv.gz"
-readr::read_tsv(file = input) |>
-  write_tsv(file = output)
+readr::read_tsv(file = paths$links$example_isdb) |>
+  write_tsv(file = paths$data$interim$annotations$example_isdb)

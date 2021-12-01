@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-## docopt to do
+## TODO docopt
 
 ## dirty paths here for now
 

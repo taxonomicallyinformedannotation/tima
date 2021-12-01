@@ -18,7 +18,7 @@ get_params <- function(step) {
     nchars = file.info(doc_path)$size
   )
 
-  arguments <<- docopt(doc)
+  arguments <<- docopt::docopt(doc)
 
   params <<- parse_yaml_params()
 
