@@ -13,7 +13,7 @@ biological_weighting <-
   function(annotationTable = annotation_table_ms1_taxed,
            structureOrganismPairsTable = structure_organism_pairs_table) {
     cat("normalizing initial score \n")
-    metadata <- annotationTable %>%
+    metadata <- annotationTable |>
       dplyr::select(
         feature_id,
         component_id,
@@ -38,8 +38,8 @@ biological_weighting <-
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class
-      ) %>%
-      dplyr::mutate(across(score_input, as.numeric)) %>%
+      ) |>
+      dplyr::mutate(across(score_input, as.numeric)) |>
       dplyr::mutate(score_initialNormalized = score_input)
     ## better not
     # dplyr::mutate(score_initialNormalized = (score_input -
@@ -47,92 +47,92 @@ biological_weighting <-
     #   (max(score_input) -
     #     min(score_input)))
 
-    sample_domain <- annotationTable %>%
+    sample_domain <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_01_domain
       )
 
-    sample_kingdom <- annotationTable %>%
+    sample_kingdom <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_02_kingdom
       )
 
-    sample_phylum <- annotationTable %>%
+    sample_phylum <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_03_phylum
       )
 
-    sample_class <- annotationTable %>%
+    sample_class <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_04_class
       )
 
-    sample_order <- annotationTable %>%
+    sample_order <- annotationTable |>
       distinct(
         feature_id,
         inchikey_2D,
         sample_organism_05_order
       )
 
-    # sample_infraorder <- annotationTable %>%
+    # sample_infraorder <- annotationTable |>
     #   distinct(
     #     inchikey_2D,
     #     sample_organism_05_1_infraorder
     #   )
 
-    sample_family <- annotationTable %>%
+    sample_family <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_06_family
       )
 
-    # sample_subfamily <- annotationTable %>%
+    # sample_subfamily <- annotationTable |>
     #   distinct(
     #     inchikey_2D,
     #     sample_organism_06_1_subfamily
     #   )
 
-    sample_tribe <- annotationTable %>%
+    sample_tribe <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_07_tribe
       )
 
-    # sample_subtribe <- annotationTable %>%
+    # sample_subtribe <- annotationTable |>
     #   distinct(
     #     inchikey_2D,
     #     sample_organism_07_1_subtribe
     #   )
 
-    sample_genus <- annotationTable %>%
+    sample_genus <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_08_genus
       )
 
-    # sample_subgenus <- annotationTable %>%
+    # sample_subgenus <- annotationTable |>
     #   distinct(
     #     inchikey_2D,
     #     sample_organism_08_1_subgenus
     #   )
 
-    sample_species <- annotationTable %>%
+    sample_species <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_09_species
       )
 
-    # sample_subspecies <- annotationTable %>%
+    # sample_subspecies <- annotationTable |>
     #   distinct(
     #     inchikey_2D,
     #     sample_organism_09_1_subspecies
     #   )
 
-    sample_varietas <- annotationTable %>%
+    sample_varietas <- annotationTable |>
       distinct(
         inchikey_2D,
         sample_organism_10_varietas
@@ -141,8 +141,8 @@ biological_weighting <-
     rm(annotationTable)
 
     cat("selecting DB columns \n")
-    candidates <- structureOrganismPairsTable %>%
-      filter(!is.na(structure_inchikey_2D)) %>%
+    candidates <- structureOrganismPairsTable |>
+      filter(!is.na(structure_inchikey_2D)) |>
       dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         candidate_organism_01_domain = organism_taxonomy_01domain,
@@ -163,73 +163,73 @@ biological_weighting <-
       )
 
     cat("keeping distinct candidates per taxonomical rank \n")
-    candidate_domain <- candidates %>%
+    candidate_domain <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_01_domain
       )
 
-    candidate_kingdom <- candidates %>%
+    candidate_kingdom <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_02_kingdom
       )
 
-    candidate_phylum <- candidates %>%
+    candidate_phylum <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_03_phylum
       )
 
-    candidate_class <- candidates %>%
+    candidate_class <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_04_class
       )
 
-    candidate_order <- candidates %>%
+    candidate_order <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_05_order
       )
 
-    # candidate_infraorder <- candidates %>%
+    # candidate_infraorder <- candidates |>
     #   distinct(
     #     inchikey_2D,
     #     candidate_organism_05_1_infraorder
     #   )
 
-    candidate_family <- candidates %>%
+    candidate_family <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_06_family
       )
 
-    # candidate_subfamily <- candidates %>%
+    # candidate_subfamily <- candidates |>
     #   distinct(
     #     inchikey_2D,
     #     candidate_organism_06_1_subfamily
     #   )
 
-    candidate_tribe <- candidates %>%
+    candidate_tribe <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_07_tribe
       )
 
-    # candidate_subtribe <- candidates %>%
+    # candidate_subtribe <- candidates |>
     #   distinct(
     #     inchikey_2D,
     #     candidate_organism_07_1_subtribe
     #   )
 
-    candidate_genus <- candidates %>%
+    candidate_genus <- candidates |>
       distinct(
         inchikey_2D,
         candidate_organism_08_genus
       )
 
-    # candidate_subgenus <- candidates %>%
+    # candidate_subgenus <- candidates |>
     #   distinct(
     #     inchikey_2D,
     #     candidate_organism_08_1_subgenus

@@ -32,7 +32,7 @@ preclean_gnverifier <- function(file) {
   dataOrganismVerified <- dplyr::left_join(organism_table,
     verified_df,
     by = c("organism" = "organismValue")
-  ) %>%
+  ) |>
     dplyr::select(
       organism,
       organismCleaned,

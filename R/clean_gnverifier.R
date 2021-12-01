@@ -71,8 +71,8 @@ clean_gnverifier <- function() {
         dplyr::distinct()
 
       warning_2 <-
-        dplyr::left_join(organism_table, dataOrganismVerified_3) %>%
-        dplyr::filter(!is.na(organism)) %>%
+        dplyr::left_join(organism_table, dataOrganismVerified_3) |>
+        dplyr::filter(!is.na(organism)) |>
         dplyr::filter(is.na(organismDbTaxo))
 
       if (nrow(warning_2) != 0) {

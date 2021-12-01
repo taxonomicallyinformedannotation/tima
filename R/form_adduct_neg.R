@@ -17,7 +17,7 @@ if (!require(tidyr)) {
 #'
 #' @examples
 form_adducts_neg <- function(massesTable, adductsTable) {
-  adducts_neg <- massesTable %>%
+  adducts_neg <- massesTable |>
     dplyr::mutate(
       neg_3_3proton = (exact_mass - 3 * proton) / 3,
       neg_2_2proton = ((exact_mass - 2 * proton) / 2),
@@ -36,9 +36,9 @@ form_adducts_neg <- function(massesTable, adductsTable) {
       neg_2MFAH = 2 * exact_mass + formic - proton,
       neg_2MACH = 2 * exact_mass + acetic - proton,
       neg_3MH = 3 * exact_mass - proton
-    ) %>%
-    dplyr::select(-colnames(adductsTable)) %>%
-    tidyr::pivot_longer(2:ncol(.)) %>%
+    ) |>
+    dplyr::select(-colnames(adductsTable)) |>
+    tidyr::pivot_longer(2:ncol()) |>
     dplyr::select(tidyr::everything(),
       adduct = name,
       adduct_mass = value

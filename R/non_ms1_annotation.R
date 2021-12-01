@@ -25,10 +25,10 @@ non_ms1_annotation <-
       distinct()
 
     cat("ranking \n")
-    df16 <- df15 %>%
-      group_by(feature_id) %>%
+    df16 <- df15 |>
+      group_by(feature_id) |>
       mutate(rank_initial = dense_rank(desc(score_input))) |>
-      ungroup() %>%
+      ungroup() |>
       filter(rank_initial <= params$top_k$initial) |>
       dplyr::select(
         -rt,

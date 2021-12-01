@@ -25,7 +25,7 @@ ms1_annotation <-
       mutate(
         value_min = adduct_mass - (0.000001 * params$ms$tolerance$ppm * adduct_mass),
         value_max = adduct_mass + (0.000001 * params$ms$tolerance$ppm * adduct_mass)
-      ) %>%
+      ) |>
       filter(!is.na(value_min)) |>
       filter(value_min > 0) |>
       data.table()
@@ -39,7 +39,7 @@ ms1_annotation <-
           rt
         ),
         as.numeric
-      )) %>%
+      )) |>
       mutate(mz_2 = mz) |>
       distinct(feature_id, .keep_all = TRUE) |>
       data.table()
@@ -49,7 +49,7 @@ ms1_annotation <-
     }
 
     cat("adding rt tolerance ... \n")
-    df4 <- df3 %>%
+    df4 <- df3 |>
       mutate(across(rt, as.numeric)) |>
       mutate(
         rt_min = as.numeric(rt - params$ms$tolerance$rt),
@@ -162,7 +162,7 @@ ms1_annotation <-
     df9_a <- df9 |>
       distinct(feature_id, label)
 
-    df9_b <- df9 %>%
+    df9_b <- df9 |>
       distinct(!!as.name(paste("feature_id", "dest", sep = "_")), label_dest) |>
       select(feature_id := !!as.name(paste("feature_id", "dest", sep = "_")),
         label = label_dest
@@ -236,12 +236,12 @@ ms1_annotation <-
         loss
       ) |>
       mutate(library = adduct) |>
-      distinct() %>%
+      distinct() |>
       dplyr::mutate_all(~ replace(
         .,
         . == "NA",
         NA
-      )) %>%
+      )) |>
       filter(!is.na(adduct))
 
     cat("cleaning results \n")
@@ -317,15 +317,15 @@ ms1_annotation <-
 
     cat("calculating multicharged and in source dimers and adding delta mz tolerance \n")
     if (params$ms$mode == "pos") {
-      df17 <- df16 %>%
+      df17 <- df16 |>
         select(
           feature_id,
           component_id,
           rt,
           mz,
           adduct_mass
-        ) %>%
-        rowwise() %>%
+        ) |>
+        rowwise() |>
         mutate(
           pos_3_3proton = (mz - adduct_mass + 3 * adductsM["proton"]) / 3,
           pos_3_2proton1sodium = (mz - adduct_mass +
@@ -375,22 +375,22 @@ ms1_annotation <-
           pos_2MCH3CNNa = 2 * (mz - adduct_mass) +
             adductsM["acetonitrile"] +
             adductsM["sodium"]
-        ) %>%
-        select(-adduct_mass) %>%
-        ungroup() %>%
+        ) |>
+        select(-adduct_mass) |>
+        ungroup() |>
         pivot_longer(cols = 5:ncol(.))
     }
 
     if (params$ms$mode == "neg") {
-      df17 <- df16 %>%
+      df17 <- df16 |>
         select(
           feature_id,
           component_id,
           rt,
           mz,
           adduct_mass
-        ) %>%
-        rowwise() %>%
+        ) |>
+        rowwise() |>
         mutate(
           neg_3_3proton = (mz + adduct_mass - 3 * adductsM["proton"]) / 3,
           neg_2_2proton = ((mz + adduct_mass - 2 * adductsM["proton"]) / 2),
@@ -398,9 +398,9 @@ ms1_annotation <-
           neg_2MFAH = 2 * (mz + adduct_mass) + adductsM["formic"] - adductsM["proton"],
           neg_2MACH = 2 * (mz + adduct_mass) + adductsM["acetic"] - adductsM["proton"],
           neg_3MH = 3 * (mz + adduct_mass) - adductsM["proton"]
-        ) %>%
-        select(-adduct_mass) %>%
-        ungroup() %>%
+        ) |>
+        select(-adduct_mass) |>
+        ungroup() |>
         pivot_longer(cols = 5:ncol(.))
     }
 

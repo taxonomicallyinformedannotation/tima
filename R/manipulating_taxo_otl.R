@@ -114,17 +114,17 @@ manipulating_taxo_otl <- function(dfsel) {
 
   # pivoting (wide)
   if (nrow(df3) != 0) {
-    df5 <- df4 %>%
-      dplyr::group_by(organismCleaned) %>%
+    df5 <- df4 |>
+      dplyr::group_by(organismCleaned) |>
       dplyr::distinct(rank,
         name,
         .keep_all = TRUE
-      ) %>%
+      ) |>
       tidyr::pivot_wider(
         names_from = rank,
         values_from = name
-      ) %>%
-      dplyr::ungroup() %>%
+      ) |>
+      dplyr::ungroup() |>
       dplyr::select_if(
         names(.) %in%
           c(

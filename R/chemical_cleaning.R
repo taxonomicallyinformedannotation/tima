@@ -23,7 +23,7 @@ chemical_cleaning <-
         "chemical score \n"
       )
     }
-    df1 <- annotationTableWeightedChemo %>%
+    df1 <- annotationTableWeightedChemo |>
       filter(
         score_initialNormalized > 0 |
           # those lines are to keep ms1 annotation
@@ -31,13 +31,13 @@ chemical_cleaning <-
           # only if a good biological
           score_chemical >= params$score$chemical$superclass
         # or chemical consistency score is obtained
-      ) %>%
-      group_by(feature_id) %>%
+      ) |>
+      group_by(feature_id) |>
       distinct(inchikey_2D,
         .keep_all = TRUE
-      ) %>%
-      mutate(rank_final = (dense_rank(-score_pondered_chemo))) %>%
-      filter(rank_final <= params$top_k$final) %>%
+      ) |>
+      mutate(rank_final = (dense_rank(-score_pondered_chemo))) |>
+      filter(rank_final <= params$top_k$final) |>
       ungroup()
 
     df11 <- metadata_table_spectral_annotation
@@ -45,12 +45,12 @@ chemical_cleaning <-
       df11 <- annotation_table_ms1
     }
 
-    df12 <- df11 %>%
-      mutate(across(rank_initial, as.numeric)) %>%
+    df12 <- df11 |>
+      mutate(across(rank_initial, as.numeric)) |>
       mutate(component_id = as.numeric(component_id))
 
     cat("adding initial metadata (RT, etc.) and simplifying columns \n")
-    df2 <- left_join(df1, df12) %>%
+    df2 <- left_join(df1, df12) |>
       mutate(
         best_candidate_structure = paste(
           candidate_structure_1_pathway,
@@ -58,7 +58,7 @@ chemical_cleaning <-
           candidate_structure_3_class,
           sep = "§"
         )
-      ) %>%
+      ) |>
       distinct(
         feature_id,
         component_id,
@@ -84,10 +84,10 @@ chemical_cleaning <-
         consistency_structure_cla
       )
 
-    df3 <- structureOrganismPairsTable %>%
+    df3 <- structureOrganismPairsTable |>
       distinct(structure_inchikey_2D,
         .keep_all = TRUE
-      ) %>%
+      ) |>
       dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
@@ -95,7 +95,7 @@ chemical_cleaning <-
       )
 
     cat("adding structures metaddata \n")
-    df4a <- left_join(df2, df3) %>%
+    df4a <- left_join(df2, df3) |>
       select(
         feature_id,
         component_id,
@@ -119,7 +119,7 @@ chemical_cleaning <-
       )
 
     cat("selecting columns for cytoscape output \n")
-    df4b <- df4a %>%
+    df4b <- df4a |>
       select(
         -component_id,
         -molecular_formula,
@@ -138,12 +138,12 @@ chemical_cleaning <-
         -mz_error,
         -score_interim,
         -score_final
-      ) %>%
+      ) |>
       distinct()
 
     cat("summarizing results \n")
-    df5a <- df4a %>%
-      group_by(feature_id) %>%
+    df5a <- df4a |>
+      group_by(feature_id) |>
       summarise(across(
         colnames(df4a)[3:18],
         ~ gsub(
@@ -151,17 +151,17 @@ chemical_cleaning <-
           replacement = "",
           x = paste(.x, collapse = "|")
         )
-      )) %>%
+      )) |>
       select(
         -rt,
         -mz
       )
 
-    df5b <- left_join(df5a, df4b) %>%
+    df5b <- left_join(df5a, df4b) |>
       distinct()
 
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
-      df6 <- metadata_table_spectral_annotation %>%
+      df6 <- metadata_table_spectral_annotation |>
         distinct(
           feature_id,
           component_id,
@@ -170,7 +170,7 @@ chemical_cleaning <-
     }
 
     if (any(names(metadata_table_spectral_annotation) == "rt")) {
-      df6 <- metadata_table_spectral_annotation %>%
+      df6 <- metadata_table_spectral_annotation |>
         distinct(
           feature_id,
           component_id,
@@ -180,12 +180,12 @@ chemical_cleaning <-
     }
 
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
-      df7 <- left_join(df6, df5b) %>%
-        arrange(feature_id) %>%
+      df7 <- left_join(df6, df5b) |>
+        arrange(feature_id) |>
         mutate(across(
           everything(),
           ~ y_as_na(x = .x, y = "")
-        )) %>%
+        )) |>
         select(
           feature_id,
           component_id,

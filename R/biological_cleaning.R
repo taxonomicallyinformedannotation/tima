@@ -21,10 +21,10 @@ biological_cleaning <-
         " biological score \n"
       )
     }
-    df01 <- annotationTableWeightedBio %>%
+    df01 <- annotationTableWeightedBio |>
       filter(score_initialNormalized > 0 |
         # those lines are to keep ms1 annotation
-        score_biological >= params$score$biological$order) %>%
+        score_biological >= params$score$biological$order) |>
       distinct(feature_id,
         inchikey_2D,
         .keep_all = TRUE
@@ -33,18 +33,19 @@ biological_cleaning <-
     cat("erasing other MS1 candidates \n")
     df02 <-
       anti_join(
-        annotationTableWeightedBio %>% distinct(feature_id,
+        annotationTableWeightedBio |>
+          distinct(feature_id,
           rank_initial,
           rank_final,
           .keep_all = TRUE
         ),
         df01
-      ) %>%
+      ) |>
       mutate(inchikey_2D = "notAnnotated")
 
     df03 <- dplyr::bind_rows(df01, df02)
 
-    df <- df03 %>%
+    df <- df03 |>
       distinct(
         inchikey_2D,
         feature_id,
@@ -68,23 +69,23 @@ biological_cleaning <-
     df[is.character(is.na(df))] <- "notClassified"
 
     cat("keeping clusters with at least 3 features  \n")
-    df1 <- df %>%
-      filter(component_id != -1) %>%
-      group_by(component_id) %>%
-      distinct(feature_id, inchikey_2D, .keep_all = TRUE) %>%
-      add_count() %>%
-      filter(n >= 3) %>%
+    df1 <- df |>
+      filter(component_id != -1) |>
+      group_by(component_id) |>
+      distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
+      add_count() |>
+      filter(n >= 3) |>
       dplyr::select(-n)
 
     cat("keeping clusters with less than 3 features \n")
     df2 <- full_join(
-      x = df %>%
+      x = df |>
         filter(component_id == -1),
-      y = df %>%
-        group_by(component_id) %>%
-        distinct(feature_id, .keep_all = TRUE) %>%
-        add_count() %>%
-        filter(n <= 2) %>%
+      y = df |>
+        group_by(component_id) |>
+        distinct(feature_id, .keep_all = TRUE) |>
+        add_count() |>
+        filter(n <= 2) |>
         dplyr::select(-n)
     )
 
@@ -95,35 +96,35 @@ biological_cleaning <-
       right_join(edgesTable,
         df1,
         by = setNames("feature_id", "feature_target")
-      ) %>%
+      ) |>
       filter(!is.na(feature_source))
 
     cat("... at the pathway level \n")
-    freq_pat <- df3 %>%
+    freq_pat <- df3 |>
       group_by(
         feature_source,
         candidate_structure_1_pathway
-      ) %>%
-      mutate(count_pat = n_distinct(feature_target)) %>%
-      ungroup() %>%
-      group_by(feature_source) %>%
-      mutate(sum = n_distinct(feature_target)) %>%
-      mutate(consistency_structure_pat = count_pat / sum) %>%
-      ungroup() %>%
+      ) |>
+      mutate(count_pat = n_distinct(feature_target)) |>
+      ungroup() |>
+      group_by(feature_source) |>
+      mutate(sum = n_distinct(feature_target)) |>
+      mutate(consistency_structure_pat = count_pat / sum) |>
+      ungroup() |>
       group_by(
         feature_target,
         candidate_structure_1_pathway
-      ) %>%
-      mutate(rank_final = as.numeric(rank_final)) %>%
-      arrange(rank_final) %>%
+      ) |>
+      mutate(rank_final = as.numeric(rank_final)) |>
+      arrange(rank_final) |>
       distinct(feature_source,
         candidate_structure_1_pathway,
         .keep_all = TRUE
-      ) %>%
+      ) |>
       group_by(
         feature_source,
         candidate_structure_1_pathway
-      ) %>%
+      ) |>
       mutate(
         rank_avg_pat = ifelse(
           test = candidate_structure_1_pathway == "notAnnotated" |
@@ -131,18 +132,18 @@ biological_cleaning <-
           yes = params$top_k$candidates$initial / 2,
           no = mean(as.numeric(rank_final))
         )
-      ) %>%
-      mutate(consistency_score_chemical_1_pathway = consistency_structure_pat / sqrt(rank_avg_pat)) %>%
-      group_by(feature_source) %>%
-      arrange(-consistency_score_chemical_1_pathway) %>%
-      ungroup() %>%
-      distinct(feature_source, .keep_all = TRUE) %>%
+      ) |>
+      mutate(consistency_score_chemical_1_pathway = consistency_structure_pat / sqrt(rank_avg_pat)) |>
+      group_by(feature_source) |>
+      arrange(-consistency_score_chemical_1_pathway) |>
+      ungroup() |>
+      distinct(feature_source, .keep_all = TRUE) |>
       dplyr::select(
         feature_source,
         consensus_structure_pat = candidate_structure_1_pathway,
         consistency_structure_pat,
         consistency_score_chemical_1_pathway
-      ) %>%
+      ) |>
       mutate(
         consensus_structure_pat = ifelse(
           test = consistency_score_chemical_1_pathway > 0.5,
@@ -152,31 +153,31 @@ biological_cleaning <-
       )
 
     cat("... at the superclass level \n")
-    freq_sup <- df3 %>%
+    freq_sup <- df3 |>
       group_by(
         feature_source,
         candidate_structure_2_superclass
-      ) %>%
-      mutate(count_sup = n_distinct(feature_target)) %>%
-      ungroup() %>%
-      group_by(feature_source) %>%
-      mutate(sum = n_distinct(feature_target)) %>%
-      mutate(consistency_structure_sup = count_sup / sum) %>%
-      ungroup() %>%
+      ) |>
+      mutate(count_sup = n_distinct(feature_target)) |>
+      ungroup() |>
+      group_by(feature_source) |>
+      mutate(sum = n_distinct(feature_target)) |>
+      mutate(consistency_structure_sup = count_sup / sum) |>
+      ungroup() |>
       group_by(
         feature_target,
         candidate_structure_2_superclass
-      ) %>%
-      mutate(rank_final = as.numeric(rank_final)) %>%
-      arrange(rank_final) %>%
+      ) |>
+      mutate(rank_final = as.numeric(rank_final)) |>
+      arrange(rank_final) |>
       distinct(feature_source,
         candidate_structure_2_superclass,
         .keep_all = TRUE
-      ) %>%
+      ) |>
       group_by(
         feature_source,
         candidate_structure_2_superclass
-      ) %>%
+      ) |>
       mutate(
         rank_avg_sup = ifelse(
           test = candidate_structure_2_superclass == "notAnnotated" |
@@ -184,18 +185,18 @@ biological_cleaning <-
           yes = params$top_k$candidates$initial / 2,
           no = mean(as.numeric(rank_final))
         )
-      ) %>%
-      mutate(consistency_score_chemical_2_superclass = consistency_structure_sup / sqrt(rank_avg_sup)) %>%
-      group_by(feature_source) %>%
-      arrange(-consistency_score_chemical_2_superclass) %>%
-      ungroup() %>%
-      distinct(feature_source, .keep_all = TRUE) %>%
+      ) |>
+      mutate(consistency_score_chemical_2_superclass = consistency_structure_sup / sqrt(rank_avg_sup)) |>
+      group_by(feature_source) |>
+      arrange(-consistency_score_chemical_2_superclass) |>
+      ungroup() |>
+      distinct(feature_source, .keep_all = TRUE) |>
       dplyr::select(
         feature_source,
         consensus_structure_sup = candidate_structure_2_superclass,
         consistency_structure_sup,
         consistency_score_chemical_2_superclass
-      ) %>%
+      ) |>
       mutate(
         consensus_structure_sup = ifelse(
           test = consistency_score_chemical_2_superclass > 0.5,
@@ -205,21 +206,21 @@ biological_cleaning <-
       )
 
     cat("... at the class level \n")
-    freq_cla <- df3 %>%
+    freq_cla <- df3 |>
       group_by(
         feature_source,
         candidate_structure_3_class
-      ) %>%
-      mutate(count_cla = n_distinct(feature_target)) %>%
-      ungroup() %>%
-      group_by(feature_source) %>%
-      mutate(sum = n_distinct(feature_target)) %>%
-      mutate(consistency_structure_cla = count_cla / sum) %>%
-      ungroup() %>%
+      ) |>
+      mutate(count_cla = n_distinct(feature_target)) |>
+      ungroup() |>
+      group_by(feature_source) |>
+      mutate(sum = n_distinct(feature_target)) |>
+      mutate(consistency_structure_cla = count_cla / sum) |>
+      ungroup() |>
       group_by(
         feature_target,
         candidate_structure_3_class
-      ) %>%
+      ) |>
       mutate(rank_final = as.numeric(rank_final)) %>%
       arrange(rank_final) %>%
       distinct(feature_source,

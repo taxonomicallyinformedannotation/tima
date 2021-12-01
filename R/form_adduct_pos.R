@@ -17,7 +17,7 @@ if (!require(tidyr)) {
 #'
 #' @examples
 form_adducts_pos <- function(massesTable, adductsTable) {
-  adducts_pos <- massesTable %>%
+  adducts_pos <- massesTable |>
     dplyr::mutate(
       pos_3_3proton = (exact_mass + 3 * proton) / 3,
       pos_3_2proton1sodium = (exact_mass + 2 * proton + sodium) / 3,
@@ -54,9 +54,9 @@ form_adducts_pos <- function(massesTable, adductsTable) {
       pos_2MK = 2 * exact_mass + potassium,
       pos_2MHCH3CN = 2 * exact_mass + proton + acetonitrile,
       pos_2MCH3CNNa = 2 * exact_mass + acetonitrile + sodium
-    ) %>%
-    dplyr::select(-colnames(adductsTable)) %>%
-    tidyr::pivot_longer(2:ncol(.)) %>%
+    ) |>
+    dplyr::select(-colnames(adductsTable)) |>
+    tidyr::pivot_longer(2:ncol()) |>
     dplyr::select(tidyr::everything(),
       adduct = name,
       adduct_mass = value
