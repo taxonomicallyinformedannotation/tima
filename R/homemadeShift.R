@@ -1,9 +1,9 @@
 #' Title
 #'
-#' @param x
-#' @param n
+#' @param x TODO
+#' @param n TODO
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

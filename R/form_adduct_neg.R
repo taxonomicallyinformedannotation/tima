@@ -9,10 +9,10 @@ if (!require(tidyr)) {
 
 #' Title
 #'
-#' @param massesTable
-#' @param adductsTable
+#' @param massesTable TODO
+#' @param adductsTable TODO
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

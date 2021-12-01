@@ -2,13 +2,13 @@
 
 #' Title
 #'
-#' @param annotationTable
-#' @param structureExactMassTable
-#' @param structureOrganismPairsTable
-#' @param adducts
-#' @param neutralLosses
+#' @param annotationTable TODO
+#' @param structureExactMassTable TODO
+#' @param structureOrganismPairsTable TODO
+#' @param adducts TODO
+#' @param neutralLosses TODO
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

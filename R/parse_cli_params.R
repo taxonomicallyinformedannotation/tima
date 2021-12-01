@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

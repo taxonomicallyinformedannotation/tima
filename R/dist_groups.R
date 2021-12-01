@@ -2,11 +2,11 @@
 
 #' Title
 #'
-#' @param d
-#' @param idx1
-#' @param idx2
+#' @param d TODO
+#' @param idx1 TODO
+#' @param idx2 TODO
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples
@@ -34,10 +34,10 @@ dist_get <- function(d, idx1, idx2) {
 
 #' Title
 #'
-#' @param d
-#' @param g
+#' @param d TODO
+#' @param g TODO
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

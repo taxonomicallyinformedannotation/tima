@@ -9,7 +9,7 @@ if (!require(yaml)) {
 
 #' Title
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples

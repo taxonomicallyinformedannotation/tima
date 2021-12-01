@@ -9,7 +9,7 @@ if (!require(dplyr)) {
 
 #' Title
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples
@@ -64,7 +64,7 @@ ms1_decoration <- function() {
 
 #' Title
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples
@@ -135,7 +135,7 @@ taxo_decoration <- function() {
 
 #' Title
 #'
-#' @return
+#' @return TODO
 #' @export
 #'
 #' @examples
