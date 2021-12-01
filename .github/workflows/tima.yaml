@@ -20,9 +20,6 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - uses: r-lib/actions/setup-r@v1
       - if: matrix.os == 'windows-latest'
         run: |
@@ -30,7 +27,9 @@ jobs:
           choco install gzip
           choco install unzip
           choco install wget
+      - name: Run install
+        run: |
+         bash install_package.sh
       - name: Run tests
         run: |
-          bash install_package.sh
           bash tests/integration_test.sh
