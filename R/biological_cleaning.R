@@ -91,7 +91,7 @@ biological_cleaning <-
 
     cat("calculating chemical consistency features with at least 2 neighbors ... \n")
 
-    cat("... among edges... \n")
+    cat("... among edges ... \n")
     df3 <-
       dplyr::right_join(edgesTable,
         df1,
@@ -267,8 +267,7 @@ biological_cleaning <-
       dplyr::left_join(freq_sup,
         by = setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(.,
-        freq_cla,
+      dplyr::left_join(freq_cla,
         by = setNames("feature_source", "feature_id")
       ) |>
       dplyr::mutate(component_id = as.numeric(component_id)) |>

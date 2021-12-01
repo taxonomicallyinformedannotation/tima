@@ -262,14 +262,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_01_domain, string = sample_organism_01_domain)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$domain) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_01_domain
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_01_domain
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_01_domain,
@@ -288,14 +285,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_02_kingdom, string = sample_organism_02_kingdom)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$kingdom) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_02_kingdom
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_02_kingdom
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_02_kingdom,
@@ -314,14 +308,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_03_phylum, string = sample_organism_03_phylum)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$phylum) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_03_phylum
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_03_phylum
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_03_phylum,
@@ -340,14 +331,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_04_class, string = sample_organism_04_class)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$class) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_04_class
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_04_class
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_04_class,
@@ -366,14 +354,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_05_order, string = sample_organism_05_order)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$order) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_05_order
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_05_order
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_05_order,
@@ -393,7 +378,6 @@ biological_weighting <-
     #   ) |>
     #   dplyr::mutate(score_biological = params$score$biological$infraorder) |>
     #   left_join(
-    #     .,
     #     metadata |> distinct(
     #       feature_id,
     #       inchikey_2D,
@@ -419,14 +403,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_06_family, string = sample_organism_06_family)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$family) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_06_family
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_06_family
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_06_family,
@@ -446,7 +427,6 @@ biological_weighting <-
     #   ) |>
     #   dplyr::mutate(score_biological = params$score$biological$subfamily) |>
     #   left_join(
-    #     .,
     #     metadata |> distinct(
     #       feature_id,
     #       inchikey_2D,
@@ -472,14 +452,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_07_tribe, string = sample_organism_07_tribe)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$tribe) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_07_tribe
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_07_tribe
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_07_tribe,
@@ -499,7 +476,6 @@ biological_weighting <-
     #   ) |>
     #   dplyr::mutate(score_biological = params$score$biological$subtribe) |>
     #   left_join(
-    #     .,
     #     metadata |> distinct(
     #       feature_id,
     #       inchikey_2D,
@@ -525,14 +501,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_08_genus, string = sample_organism_08_genus)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$genus) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_08_genus
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_08_genus
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_08_genus,
@@ -553,7 +526,6 @@ biological_weighting <-
     #   ) |>
     #   dplyr::mutate(score_biological = params$score$biological$subgenus) |>
     #   left_join(
-    #     .,
     #     metadata |> distinct(
     #       feature_id,
     #       inchikey_2D,
@@ -579,14 +551,11 @@ biological_weighting <-
         stringr::str_detect(pattern = candidate_organism_09_species, string = sample_organism_09_species)
       ) |>
       dplyr::mutate(score_biological = params$score$biological$species) |>
-      dplyr::left_join(
-        .,
-        metadata |> dplyr::distinct(
-          feature_id,
-          inchikey_2D,
-          sample_organism_09_species
-        )
-      ) |>
+      dplyr::left_join(metadata |> dplyr::distinct(
+        feature_id,
+        inchikey_2D,
+        sample_organism_09_species
+      )) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         best_candidate = candidate_organism_09_species,
@@ -607,7 +576,6 @@ biological_weighting <-
     #   ) |>
     #   mutate(score_biological = params$score$biological$subspecies) |>
     #   left_join(
-    #     .,
     #     metadata |> distinct(
     #       feature_id,
     #       inchikey_2D,
@@ -634,7 +602,6 @@ biological_weighting <-
       ) |>
       dplyr::mutate(score_biological = params$score$biological$variety) |>
       dplyr::left_join(
-        .,
         metadata |> dplyr::distinct(
           feature_id,
           inchikey_2D,
