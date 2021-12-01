@@ -30,6 +30,7 @@ Imports:
     purrr,
     readr,
     rlang (>= 0.4.11),
+    rotl,
     splitstackshape,
     stringr,
     tidyr,
