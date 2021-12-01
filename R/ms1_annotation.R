@@ -475,7 +475,7 @@ ms1_annotation <-
     cat(
       "joining within given mz tolerance and filtering possible multicharge / dimeric adducts \n"
     )
-    df21 <- foverlaps(df20_a, df2) |>
+    df21 <- data.table::foverlaps(df20_a, df2) |>
       dplyr::filter(stringr::str_detect(
         pattern = paste(adduct, "", sep = " "),
         string = library_name
@@ -526,7 +526,7 @@ ms1_annotation <-
     )
     df24 <- dplyr::bind_rows(df23, df14, df22) |>
       dplyr::group_by(feature_id) |>
-      dplyr::mutate(rank_initial = dense_rank(desc(score_input))) |>
+      dplyr::mutate(rank_initial = dplyr::dense_rank(desc(score_input))) |>
       dplyr::ungroup() |>
       dplyr::filter(rank_initial <= params$top_k$initial) |>
       dplyr::distinct(

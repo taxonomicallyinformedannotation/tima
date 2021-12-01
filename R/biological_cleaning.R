@@ -264,8 +264,7 @@ biological_cleaning <-
         freq_pat,
         by = setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(
-        freq_sup,
+      dplyr::left_join(freq_sup,
         by = setNames("feature_source", "feature_id")
       ) |>
       dplyr::left_join(.,
