@@ -236,7 +236,7 @@ metadata_table_joined_summarized <-
     by = c("organismOriginal" = "organism_name")
   ) |>
   dplyr::distinct() |>
-  dplyr::mutate_at(vars(-dplyr::group_cols()), as.character) |>
+  dplyr::mutate_at(dplyr::vars(-dplyr::group_cols()), as.character) |>
   dplyr::select(
     feature_id,
     sample_organism_01_domain = dplyr::matches("organism_taxonomy_01domain"),
