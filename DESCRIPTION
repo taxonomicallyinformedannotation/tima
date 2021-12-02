@@ -26,6 +26,7 @@ Imports:
     forcats,
     ggplot2,
     glue,
+    jsonlite,
     lifecycle,
     purrr,
     readr,
