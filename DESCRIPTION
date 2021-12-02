@@ -26,7 +26,6 @@ Imports:
     forcats,
     ggplot2,
     glue,
-    jsonlite,
     lifecycle,
     purrr,
     readr,
@@ -61,6 +60,7 @@ Collate:
     'form_adduct_neg.R'
     'form_adduct_pos.R'
     'get_example_isdb.R'
+    'get_lotus.R'
     'get_params.R'
     'homemadeShift.R'
     'log_debug.R'
