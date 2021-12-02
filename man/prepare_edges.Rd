@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 prepare_edges(
-  tool = tool,
+  tool = params$tool,
   gnps_job = params$gnps,
   input = params$input,
   output = params$output,

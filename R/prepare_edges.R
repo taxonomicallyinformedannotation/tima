@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-prepare_edges <- function(tool = tool,
+prepare_edges <- function(tool = params$tool,
                           gnps_job = params$gnps,
                           input = params$input,
                           output = params$output,
