@@ -7,6 +7,8 @@ log_debug("This script downloads an example of spectral_lib_matcher (ISDB) outpu
 log_debug("Authors: AR")
 log_debug("Contributors: ...")
 
+# TODO CLI DOCOPT
+
 get_example_isdb()
 
 end <- Sys.time()

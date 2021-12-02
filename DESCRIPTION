@@ -70,6 +70,7 @@ Collate:
     'parse_yaml_params.R'
     'parse_yaml_paths.R'
     'plot_histograms.R'
+    'prepare_adducts.R'
     'prepare_plot.R'
     'prepare-hierarchy_2.R'
     'prepare-hierarchy.R'
