@@ -42,8 +42,6 @@ They are human-readable and can be used in batches.
 If you do not like YAML, parameters of each steps can also be given as command line arguments.
 They will then be saved as YAML you will be able to share.
 
-TODO EXAMPLE
-
 ## Use
 
 Under construction
@@ -51,17 +49,52 @@ Until it is finished, here are the most relevant commands
 
 ### Copy initial parameters
 
+As mentioned previously, scripts need some parameters to be filled.
+Some pre-defined parameters are given in `config/default` directory.
+Those will help you understanding how the workflow works so you can adapt them later to your own data.
+So first, start by copying them into `config/params` directory.
+To do so:
+
 ```shell
 # copy the default params to adapat to your data later on
 cp -R config/default config/params
 ```
 
+You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
+
 ### Structure-organism pairs library
+
+The first pre-requisite to perform *taxonomically informed metabolite annotation* is to have a *structure-organism pairs* library.
+
+#### LOTUS
+
+As starting point, we provide **LOTUS**.
+To download LOTUS pairs locally, and format them to further use, do:
 
 ```shell
 Rscript inst/scripts/get_lotus.R
 Rscript inst/scripts/prepare_lotus.R
-# Rscript inst/scripts/prepare_closed.R # only if you have access to it
+```
+
+More details can be found ... TODO
+
+#### Other libraries
+
+As we want our tool to be flexible, you can also add your own library to LOTUS.
+You just need to format it in order to be compatible.
+As example, we prepared some ways too format closed, *in house* libraries.
+If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
+
+```shell
+Rscript inst/scripts/prepare_closed.R # only if you have access to it
+```
+
+#### Merging
+
+Once you have all your sub-libraries prepared, you are ready to merge them in a single file that will be used for coming steps.
+An adduct library will also be generated in order to perform MS1 annotation later on.
+
+```shell
 Rscript inst/scripts/prepare_library.R
 Rscript inst/scripts/prepare_adducts.R
 ```
