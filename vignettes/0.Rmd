@@ -45,6 +45,7 @@ They will then be saved as YAML you will be able to share.
 ## Use
 
 Under construction
+Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles). 
 Until it is finished, here are the most relevant commands
 
 ### Copy initial parameters
