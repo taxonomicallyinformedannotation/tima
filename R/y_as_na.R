@@ -8,7 +8,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 y_as_na <- function(x, y) {
   if ("factor" %in% class(x)) {
     x <- as.character(x)

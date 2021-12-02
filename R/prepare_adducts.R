@@ -11,7 +11,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 prepare_adducts <-
   function(adducts_input = params$input,
            adducts_table_input = paths$data$source$adducts,

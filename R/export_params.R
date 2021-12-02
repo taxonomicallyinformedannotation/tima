@@ -14,7 +14,7 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 export_params <- function(parameters, directory, step) {
   ifelse(
     test = !dir.exists(paths$data$interim$path),

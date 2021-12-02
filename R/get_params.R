@@ -12,7 +12,7 @@ if (!require(docopt)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 get_params <- function(step) {
   doc_path <<- file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
   default_path <<-

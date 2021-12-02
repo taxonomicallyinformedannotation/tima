@@ -17,7 +17,7 @@ if (!require(tidyr)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 form_adducts_neg <- function(massesTable, adductsTable) {
   adducts_neg <- massesTable |>
     dplyr::mutate(

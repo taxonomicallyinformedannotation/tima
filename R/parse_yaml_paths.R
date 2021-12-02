@@ -14,7 +14,7 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 parse_yaml_paths <- function() {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(

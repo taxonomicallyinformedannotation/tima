@@ -13,7 +13,7 @@ if (!require(ggplot2)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 plot_histograms <- function(dataframe, label, y = "values") {
   absolute <- ggplot2::ggplot(
     dataframe,

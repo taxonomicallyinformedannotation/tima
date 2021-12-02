@@ -12,7 +12,7 @@ if (!require(readr)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 read_edges <- function(id) {
   file <-
     paste0(

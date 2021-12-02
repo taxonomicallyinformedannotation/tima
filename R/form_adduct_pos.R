@@ -21,7 +21,7 @@ if (!require(tidyr)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 form_adducts_pos <- function(massesTable, adductsTable) {
   adducts_pos <- massesTable |>
     dplyr::mutate(

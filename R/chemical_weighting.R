@@ -20,7 +20,7 @@ if (!require(stringr)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 chemical_weighting <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned) {
     cat("calculating chemical score ... \n")

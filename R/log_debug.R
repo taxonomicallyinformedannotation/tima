@@ -7,7 +7,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 log_debug <- function(...) {
   cat(paste(Sys.time(), ..., "\n"))
 }

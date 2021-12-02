@@ -6,7 +6,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 get_example_isdb <-
   function(link = paths$links$example_isdb,
            export = paths$data$interim$annotations$example_isdb) {

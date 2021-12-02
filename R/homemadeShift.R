@@ -8,7 +8,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 homemadeShift <- function(x, n) {
   c(x[-(seq(n))], rep(NA, n))
 }

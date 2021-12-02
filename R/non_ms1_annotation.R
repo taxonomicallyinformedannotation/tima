@@ -9,7 +9,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 non_ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation) {
     cat("formatting \n")

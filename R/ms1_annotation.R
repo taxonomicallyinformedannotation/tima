@@ -13,7 +13,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,

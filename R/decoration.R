@@ -14,7 +14,7 @@ if (!require(dplyr)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 ms1_decoration <- function() {
   suppressWarnings(
     cat(
@@ -71,7 +71,7 @@ ms1_decoration <- function() {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 taxo_decoration <- function() {
   cat(
     "taxonomically informed scoring led to \n",
@@ -144,7 +144,7 @@ taxo_decoration <- function() {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 chemical_decoration <- function() {
   cat(
     x = paste(

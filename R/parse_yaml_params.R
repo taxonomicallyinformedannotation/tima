@@ -14,7 +14,7 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 parse_yaml_params <- function() {
   log_debug("Loading yaml parameters")
   suppressWarnings(params <-

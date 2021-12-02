@@ -11,7 +11,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 biological_cleaning <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,

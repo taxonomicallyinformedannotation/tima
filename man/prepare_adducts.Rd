@@ -35,6 +35,3 @@ TODO
 \description{
 Title
 }
-\examples{
-TODO
-}

@@ -10,7 +10,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 chemical_cleaning <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
            structureOrganismPairsTable = structure_organism_pairs_table) {

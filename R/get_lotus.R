@@ -6,7 +6,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 get_lotus <-
   function(link = paths$links$lotus,
            export = paths$data$source$libraries$lotus) {

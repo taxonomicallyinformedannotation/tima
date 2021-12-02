@@ -6,7 +6,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 prepare_closed <- function(input = params$input,
                            output = params$output) {
   if (file.exists(input)) {

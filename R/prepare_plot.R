@@ -16,7 +16,7 @@ if (!require(forcats)) {
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 prepare_plot <- function(dataframe, organism = "species") {
   samples <- dataframe |>
     ungroup() |>

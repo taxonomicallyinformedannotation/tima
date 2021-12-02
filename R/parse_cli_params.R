@@ -5,7 +5,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples TODO
+#' @examples
 parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 

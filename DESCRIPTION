@@ -72,6 +72,7 @@ Collate:
     'plot_histograms.R'
     'prepare_adducts.R'
     'prepare_closed.R'
+    'prepare_edges.R'
     'prepare_plot.R'
     'prepare-hierarchy_2.R'
     'prepare-hierarchy.R'
