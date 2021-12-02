@@ -5,13 +5,15 @@ if (!require(ggplot2)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param dataframe TODO
 #' @param label TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 plot_histograms <- function(dataframe, label, y = "values") {
   absolute <- ggplot2::ggplot(
     dataframe,

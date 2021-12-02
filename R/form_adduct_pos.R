@@ -13,13 +13,15 @@ if (!require(tidyr)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param massesTable TODO
 #' @param adductsTable TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 form_adducts_pos <- function(massesTable, adductsTable) {
   adducts_pos <- massesTable |>
     dplyr::mutate(

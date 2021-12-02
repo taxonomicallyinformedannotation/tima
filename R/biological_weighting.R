@@ -2,13 +2,15 @@
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param annotationTable TODO
 #' @param structureOrganismPairsTable TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 biological_weighting <-
   function(annotationTable = annotation_table_ms1_taxed,
            structureOrganismPairsTable = structure_organism_pairs_table) {

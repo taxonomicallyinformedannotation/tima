@@ -9,10 +9,12 @@ if (!require(dplyr)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 ms1_decoration <- function() {
   suppressWarnings(
     cat(
@@ -64,10 +66,12 @@ ms1_decoration <- function() {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 taxo_decoration <- function() {
   cat(
     "taxonomically informed scoring led to \n",
@@ -135,10 +139,12 @@ taxo_decoration <- function() {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 chemical_decoration <- function() {
   cat(
     x = paste(

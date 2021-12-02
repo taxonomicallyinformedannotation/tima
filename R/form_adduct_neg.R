@@ -9,13 +9,15 @@ if (!require(tidyr)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param massesTable TODO
 #' @param adductsTable TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 form_adducts_neg <- function(massesTable, adductsTable) {
   adducts_neg <- massesTable |>
     dplyr::mutate(

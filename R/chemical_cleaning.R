@@ -2,13 +2,15 @@
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param annotationTableWeightedChemo TODO
 #' @param structureOrganismPairsTable TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 chemical_cleaning <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
            structureOrganismPairsTable = structure_organism_pairs_table) {

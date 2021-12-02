@@ -9,10 +9,12 @@ if (!require(yaml)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 parse_yaml_paths <- function() {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(

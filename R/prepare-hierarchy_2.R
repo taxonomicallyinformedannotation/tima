@@ -9,13 +9,15 @@ if (!require(splitstackshape)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param dataframe TODO
 #' @param pathway TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 prepare_hierarchy_2 <- function(dataframe, pathway) {
   ms1_best_candidate <- dataframe |>
     dplyr::mutate_all(list(~ gsub(

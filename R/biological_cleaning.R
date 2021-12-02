@@ -2,6 +2,8 @@
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param annotationTableWeightedBio TODO
 #' @param structureOrganismPairsTable TODO
 #' @param edgesTable TODO
@@ -9,7 +11,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 biological_cleaning <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,

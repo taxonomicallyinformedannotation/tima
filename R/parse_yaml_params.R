@@ -9,10 +9,12 @@ if (!require(yaml)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 parse_yaml_params <- function() {
   log_debug("Loading yaml parameters")
   suppressWarnings(params <-

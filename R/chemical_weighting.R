@@ -13,12 +13,14 @@ if (!require(stringr)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param annotationTableWeightedBioCleaned TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 chemical_weighting <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned) {
     cat("calculating chemical score ... \n")

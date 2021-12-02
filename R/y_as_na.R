@@ -1,12 +1,14 @@
 #' Title
 #'
+#' @noRd
+#'
 #' @param x TODO
 #' @param y TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 y_as_na <- function(x, y) {
   if ("factor" %in% class(x)) {
     x <- as.character(x)

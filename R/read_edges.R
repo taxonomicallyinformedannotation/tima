@@ -5,12 +5,14 @@ if (!require(readr)) {
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param id TODO
 #'
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 read_edges <- function(id) {
   file <-
     paste0(

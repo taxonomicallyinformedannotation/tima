@@ -2,6 +2,8 @@
 
 #' Title
 #'
+#' @noRd
+#'
 #' @param annotationTable TODO
 #' @param structureExactMassTable TODO
 #' @param structureOrganismPairsTable TODO
@@ -11,7 +13,7 @@
 #' @return TODO
 #' @export
 #'
-#' @examples
+#' @examples TODO
 ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,
@@ -585,6 +587,3 @@ ms1_annotation <-
 
     return(df27)
   }
-
-
-###############################################################################
