@@ -1,7 +1,9 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
 log_debug("This script downloads an example of spectral_lib_matcher (ISDB) output. \n")
 log_debug("Authors: AR")

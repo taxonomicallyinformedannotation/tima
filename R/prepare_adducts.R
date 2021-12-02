@@ -22,39 +22,41 @@ prepare_adducts <-
            masses_neg_output_path = paths$data$interim$adducts$neg) {
     log_debug("Loading files ...")
     log_debug("... exact masses")
-    masses <- readr::read_delim(file = adducts_input,
-                                col_select = "structure_exact_mass") |>
+    masses <- readr::read_delim(
+      file = adducts_input,
+      col_select = "structure_exact_mass"
+    ) |>
       dplyr::select(exact_mass = structure_exact_mass) |>
       dplyr::distinct()
-    
+
     log_debug("... adducts")
     adducts_table <-
       readr::read_delim(file = adducts_table_input)
-    
+
     log_debug("Treating adducts table")
     adducts_t <- t(adducts_table) |>
       data.frame()
-    
-    colnames(adducts_t) <- adducts_t[1,]
-    
-    adducts_t <- adducts_t[2,] |>
+
+    colnames(adducts_t) <- adducts_t[1, ]
+
+    adducts_t <- adducts_t[2, ] |>
       dplyr::mutate_all(as.numeric)
-    
+
     masses_adducts <- cbind(masses, adducts_t)
-    
+
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")
     adducts_pos <-
       form_adducts_pos(massesTable = masses_adducts, adductsTable = adducts_t)
-    
+
     log_debug("... negative")
     adducts_neg <-
       form_adducts_neg(massesTable = masses_adducts, adductsTable = adducts_t)
-    
+
     log_debug("... pure adducts masses ...")
     mass_null <-
       cbind(data.frame(exact_mass = 0), adducts_t)
-    
+
     log_debug("... positive")
     pure_pos <-
       form_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
@@ -64,7 +66,7 @@ prepare_adducts <-
         fixed = TRUE
       )) |>
       dplyr::select(-exact_mass)
-    
+
     log_debug("... negative")
     pure_neg <-
       form_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
@@ -74,7 +76,7 @@ prepare_adducts <-
         fixed = TRUE
       )) |>
       dplyr::select(-exact_mass)
-    
+
     log_debug("Exporting ...")
     ifelse(
       test = !dir.exists(adducts_output_path),
@@ -86,34 +88,44 @@ prepare_adducts <-
       yes = dir.create(config_output_path),
       no = paste(config_output_path, "exists")
     )
-    
+
     log_debug("... structure adducts positive")
     readr::write_delim(
       x = adducts_pos,
-      file = file.path(adducts_output_path,
-                       paste0(output_name, "_pos.tsv.gz")),
+      file = file.path(
+        adducts_output_path,
+        paste0(output_name, "_pos.tsv.gz")
+      ),
       delim = "\t"
     )
-    
+
     log_debug("... structure adducts negative")
     readr::write_delim(
       x = adducts_neg,
-      file = file.path(adducts_output_path,
-                       paste0(output_name, "_neg.tsv.gz")),
+      file = file.path(
+        adducts_output_path,
+        paste0(output_name, "_neg.tsv.gz")
+      ),
       delim = "\t"
     )
-    
+
     log_debug("... adducts masses positive")
-    readr::write_delim(x = pure_pos,
-                       file = masses_pos_output_path,
-                       delim = "\t")
-    
+    readr::write_delim(
+      x = pure_pos,
+      file = masses_pos_output_path,
+      delim = "\t"
+    )
+
     log_debug("... adducts masses negative")
-    readr::write_delim(x = pure_neg,
-                       file = masses_neg_output_path,
-                       delim = "\t")
-    
-    export_params(parameters = params,
-                  directory = config_output_path,
-                  step = step)
+    readr::write_delim(
+      x = pure_neg,
+      file = masses_neg_output_path,
+      delim = "\t"
+    )
+
+    export_params(
+      parameters = params,
+      directory = config_output_path,
+      step = step
+    )
   }
