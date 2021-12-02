@@ -70,17 +70,20 @@ Rscript inst/scripts/prepare_adducts.R
 
 #### Get MS2 annotations
 
+Get an example result from [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher), which is only in python. see related repo)
+For the moment, we provide an example file coming from the new ISDB.
+We are working on a better integration.
+It also supports annotations coming from GNPS (see next steps).
+
 ```shell
-# (spectral_lib_matcher, which is only in python. see related repo)
-# instead we provide an example file coming from the new ISDB.
-# It also works with annotations coming from GNPS (see next steps)
 Rscript inst/scripts/get_example_isdb.R
 ```
 
 #### Format MS2 annotations
 
+depending on the annotation tool you used
+
 ```shell
-# depending on the annotation tool you used
 Rscript inst/scripts/prepare_gnps.R # optional
 Rscript inst/scripts/prepare_sirius.R # optional
 Rscript inst/scripts/prepare_isdb.R
