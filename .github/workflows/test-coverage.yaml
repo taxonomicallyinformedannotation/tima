@@ -26,16 +26,11 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
+          cache-version: 2
           extra-packages: |
             pkgdown
             rmarkdown
           needs: website
-          
-      - name: Install specific dependencies
-        run: |
-          Rscript inst/scripts/get_lotus.R
-          Rscript inst/scripts/get_example_isdb.R
-        shell: bash
         
       - name: Cache R packages
         uses: actions/cache@v2

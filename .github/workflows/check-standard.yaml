@@ -44,13 +44,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
+          cache-version: 2
           extra-packages: rcmdcheck
-
-      - name: Install specific dependencies
-        run: |
-          Rscript inst/scripts/get_lotus.R
-          Rscript inst/scripts/get_example_isdb.R
-        shell: bash
 
       - uses: r-lib/actions/check-r-package@v1
         with:
