@@ -84,6 +84,7 @@ Collate:
     'prepare_plot.R'
     'prepare_sirius.R'
     'prepare_taxa.R'
+    'process_annotations.R'
     'read_clusters.R'
     'read_edges.R'
     'read_features.R'

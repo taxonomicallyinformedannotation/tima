@@ -1,10 +1,14 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
-log_debug("This script",
-          crayon::green("formats GNPS (and NAP) results"))
+log_debug(
+  "This script",
+  crayon::green("formats GNPS (and NAP) results")
+)
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 

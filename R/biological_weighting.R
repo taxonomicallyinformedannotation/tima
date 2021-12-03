@@ -2,10 +2,20 @@
 
 #' Title
 #'
-#' @noRd
-#'
 #' @param annotationTable TODO
 #' @param structureOrganismPairsTable TODO
+#' @param weightSpectral TODO
+#' @param weightBiological TODO
+#' @param scoreBiologicalDomain TODO
+#' @param scoreBiologicalKingdom TODO
+#' @param scoreBiologicalPhylum TODO
+#' @param scoreBiologicalClass TODO
+#' @param scoreBiologicalOrder TODO
+#' @param scoreBiologicalFamily TODO
+#' @param scoreBiologicalTribe TODO
+#' @param scoreBiologicalGenus TODO
+#' @param scoreBiologicalSpecies TODO
+#' @param scoreBiologicalVariety TODO
 #'
 #' @return TODO
 #' @export
@@ -13,7 +23,19 @@
 #' @examples
 biological_weighting <-
   function(annotationTable = annotation_table_ms1_taxed,
-           structureOrganismPairsTable = structure_organism_pairs_table) {
+           structureOrganismPairsTable = structure_organism_pairs_table,
+           weightSpectral = weight_spectral,
+           weightBiological = weight_biological,
+           scoreBiologicalDomain = score_biological_domain,
+           scoreBiologicalKingdom = score_biological_kingdom,
+           scoreBiologicalPhylum = score_biological_phylum,
+           scoreBiologicalClass = score_biological_class,
+           scoreBiologicalOrder = score_biological_order,
+           scoreBiologicalFamily = score_biological_family,
+           scoreBiologicalTribe = score_biological_tribe,
+           scoreBiologicalGenus = score_biological_genus,
+           scoreBiologicalSpecies = score_biological_species,
+           scoreBiologicalVariety = score_biological_variety) {
     cat("normalizing initial score \n")
     metadata <- annotationTable |>
       dplyr::select(
@@ -263,7 +285,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_01_domain, string = sample_organism_01_domain)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$domain) |>
+      dplyr::mutate(score_biological = scoreBiologicalDomain) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -286,7 +308,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_02_kingdom, string = sample_organism_02_kingdom)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$kingdom) |>
+      dplyr::mutate(score_biological = scoreBiologicalKingdom) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -309,7 +331,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_03_phylum, string = sample_organism_03_phylum)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$phylum) |>
+      dplyr::mutate(score_biological = scoreBiologicalPhylum) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -332,7 +354,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_04_class, string = sample_organism_04_class)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$class) |>
+      dplyr::mutate(score_biological = scoreBiologicalClass) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -355,7 +377,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_05_order, string = sample_organism_05_order)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$order) |>
+      dplyr::mutate(score_biological = scoreBiologicalOrder) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -378,7 +400,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_05_1_infraorder, string = sample_organism_05_1_infraorder)
     #   ) |>
-    #   dplyr::mutate(score_biological = params$score$biological$infraorder) |>
+    #   dplyr::mutate(score_biological = scoreBiologicalInfraorder) |>
     #   left_join(
     #     metadata |> distinct(
     #       feature_id,
@@ -404,7 +426,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_06_family, string = sample_organism_06_family)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$family) |>
+      dplyr::mutate(score_biological = scoreBiologicalFamily) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -427,7 +449,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_06_1_subfamily, string = sample_organism_06_1_subfamily)
     #   ) |>
-    #   dplyr::mutate(score_biological = params$score$biological$subfamily) |>
+    #   dplyr::mutate(score_biological = scoreBiologicalSubfamily) |>
     #   left_join(
     #     metadata |> distinct(
     #       feature_id,
@@ -453,7 +475,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_07_tribe, string = sample_organism_07_tribe)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$tribe) |>
+      dplyr::mutate(score_biological = scoreBiologicalTribe) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -476,7 +498,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_07_1_subtribe, string = sample_organism_07_1_subtribe)
     #   ) |>
-    #   dplyr::mutate(score_biological = params$score$biological$subtribe) |>
+    #   dplyr::mutate(score_biological = scoreBiologicalSubtribe) |>
     #   left_join(
     #     metadata |> distinct(
     #       feature_id,
@@ -502,7 +524,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_08_genus, string = sample_organism_08_genus)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$genus) |>
+      dplyr::mutate(score_biological = scoreBiologicalGenus) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -526,7 +548,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_08_1_subgenus, string = sample_organism_08_1_subgenus)
     #   ) |>
-    #   dplyr::mutate(score_biological = params$score$biological$subgenus) |>
+    #   dplyr::mutate(score_biological = scoreBiologicalSubgenus) |>
     #   left_join(
     #     metadata |> distinct(
     #       feature_id,
@@ -552,7 +574,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_09_species, string = sample_organism_09_species)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$species) |>
+      dplyr::mutate(score_biological = scoreBiologicalSpecies) |>
       dplyr::left_join(metadata |> dplyr::distinct(
         feature_id,
         inchikey_2D,
@@ -576,7 +598,7 @@ biological_weighting <-
     #   filter(
     #     str_detect(pattern = candidate_organism_09_1_subspecies, string = sample_organism_09_1_subspecies)
     #   ) |>
-    #   mutate(score_biological = params$score$biological$subspecies) |>
+    #   mutate(score_biological = scoreBiologicalSubspecies) |>
     #   left_join(
     #     metadata |> distinct(
     #       feature_id,
@@ -602,7 +624,7 @@ biological_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_organism_10_varietas, string = sample_organism_10_varietas)
       ) |>
-      dplyr::mutate(score_biological = params$score$biological$variety) |>
+      dplyr::mutate(score_biological = scoreBiologicalVariety) |>
       dplyr::left_join(
         metadata |> dplyr::distinct(
           feature_id,
@@ -650,15 +672,11 @@ biological_weighting <-
     biologically_weighted_full <- biologically_weighted_full |>
       dplyr::mutate(
         score_pondered_bio = (
-          (1 / (
-            params$weight$biological + params$weight$spectral
-          )) *
-            params$weight$biological *
+          (1 / (weightBiological + weightSpectral)) *
+            weightBiological *
             score_biological +
-            (1 / (
-              params$weight$biological + params$weight$spectral
-            )) *
-              params$weight$spectral *
+            (1 / (weightBiological + weightSpectral)) *
+              weightSpectral *
               score_initialNormalized
         )
       )

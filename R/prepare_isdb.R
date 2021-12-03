@@ -28,7 +28,7 @@ prepare_isdb <-
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
       )
-    
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),
@@ -50,13 +50,17 @@ prepare_isdb <-
       yes = dir.create(dirname(output)),
       no = paste(dirname(output), "exists")
     )
-    
-    log_debug(x = "... path to export is",
-              output)
-    readr::write_delim(x = table,
-                       file = output,
-                       delim = "\t")
-    
+
+    log_debug(
+      x = "... path to export is",
+      output
+    )
+    readr::write_delim(
+      x = table,
+      file = output,
+      delim = "\t"
+    )
+
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,

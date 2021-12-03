@@ -1,15 +1,21 @@
 start <- Sys.time()
 
-require(package = "timaR",
-        quietly = TRUE)
+require(
+  package = "timaR",
+  quietly = TRUE
+)
 
-log_debug("This script",
-          crayon::green("informs taxonomically features"))
-log_debug("Authors: ",
-          crayon::green("AR"),
-          ",",
-          crayon::blue("PMA"),
-          "\n")
+log_debug(
+  "This script",
+  crayon::green("informs taxonomically features")
+)
+log_debug(
+  "Authors: ",
+  crayon::green("AR"),
+  ",",
+  crayon::blue("PMA"),
+  "\n"
+)
 log_debug("Contributors: ...")
 
 step <- "prepare_taxa"

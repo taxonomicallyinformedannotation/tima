@@ -6,6 +6,9 @@
 #'
 #' @param annotationTableWeightedChemo TODO
 #' @param structureOrganismPairsTable TODO
+#' @param candidatesFinal TODO
+#' @param minimalMs1Bio TODO
+#' @param minimalMs1Chemo TODO
 #'
 #' @return TODO
 #' @export
@@ -13,15 +16,18 @@
 #' @examples
 chemical_cleaning <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
-           structureOrganismPairsTable = structure_organism_pairs_table) {
-    if (params$ms$annotate == TRUE) {
+           structureOrganismPairsTable = structure_organism_pairs_table,
+           candidatesFinal = candidates_final,
+           minimalMs1Bio = minimal_ms1_bio,
+           minimalMs1Chemo = minimal_ms1_chemo) {
+    if (annotate == TRUE) {
       cat(
         "filtering top ",
-        params$top_k$final,
+        candidatesFinal,
         " candidates and keeping only MS1 candidates with minimum \n",
-        params$score$biological$order,
+        minimalMs1Bio,
         " biological score or \n",
-        params$score$chemical$superclass,
+        minimalMs1Chemo,
         "chemical score \n"
       )
     }
@@ -29,9 +35,9 @@ chemical_cleaning <-
       dplyr::filter(
         score_initialNormalized > 0 |
           # those lines are to keep ms1 annotation
-          score_biological >= params$score$biological$order |
+          score_biological >= minimalMs1Bio |
           # only if a good biological
-          score_chemical >= params$score$chemical$superclass
+          score_chemical >= minimalMs1Chemo
         # or chemical consistency score is obtained
       ) |>
       dplyr::group_by(feature_id) |>
@@ -39,7 +45,7 @@ chemical_cleaning <-
         .keep_all = TRUE
       ) |>
       dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
-      dplyr::filter(rank_final <= params$top_k$final) |>
+      dplyr::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
     df11 <- metadata_table_spectral_annotation

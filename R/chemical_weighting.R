@@ -13,16 +13,22 @@ if (!require(stringr)) {
 
 #' Title
 #'
-#' @noRd
-#'
 #' @param annotationTableWeightedBioCleaned TODO
+#' @param WeightChemical TODO
+#' @param scoreChemicalPathway TODO
+#' @param scoreChemicalSuperclass TODO
+#' @param scoreChemicalClass TODO
 #'
 #' @return TODO
 #' @export
 #'
 #' @examples
 chemical_weighting <-
-  function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned) {
+  function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
+           WeightChemical = weight_chemical,
+           scoreChemicalPathway = score_chemical_pathway,
+           scoreChemicalSuperclass = score_chemical_superclass,
+           scoreChemicalClass = score_chemical_class) {
     cat("calculating chemical score ... \n")
     df1 <- annotationTableWeightedBioCleaned
 
@@ -49,21 +55,21 @@ chemical_weighting <-
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_1_pathway, string = consensus_structure_pat)
       ) |>
-      dplyr::mutate(score_chemical = params$score$chemical$pathway)
+      dplyr::mutate(score_chemical = scoreChemicalPathway)
 
     cat("... superclass \n")
     step_sup <- step_pat |>
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_2_superclass, string = consensus_structure_sup)
       ) |>
-      dplyr::mutate(score_chemical = params$score$chemical$superclass)
+      dplyr::mutate(score_chemical = scoreChemicalSuperclass)
 
     cat("... class \n")
     step_cla <- step_sup |>
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_3_class, string = consensus_structure_cla)
       ) |>
-      dplyr::mutate(score_chemical = params$score$chemical$class)
+      dplyr::mutate(score_chemical = scoreChemicalClass)
 
     cat("... outputting best score \n")
     df3 <-
@@ -91,7 +97,7 @@ chemical_weighting <-
     df4 <- df4 |>
       dplyr::rowwise() |>
       dplyr::mutate(score_pondered_chemo = (
-        params$weight$chemical * score_chemical + as.numeric(score_pondered_bio)
+        WeightChemical * score_chemical + as.numeric(score_pondered_bio)
       )) |>
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>

@@ -33,15 +33,17 @@ prepare_gnps <-
         smiles_2D = NA,
         molecular_formula = NA
       )
-    
+
     if (!is.null(nap_job_id)) {
       log_debug("Loading NAP results")
       ## TODO look at recent NAP outputs
       ## might be outdated
       table <- read_nap(id = nap_job_id) |>
-        dplyr::select(feature_id = cluster.index,
-                      score_input = FusionScore,
-                      smiles = FusionSMILES) |>
+        dplyr::select(
+          feature_id = cluster.index,
+          score_input = FusionScore,
+          smiles = FusionSMILES
+        ) |>
         dplyr::mutate(
           library = "GNPS",
           smiles_2D = NA,
@@ -54,13 +56,15 @@ prepare_gnps <-
           structure_exact_mass = NA
         )
     }
-    
+
     table[] <-
-      lapply(table,
-             function(x) {
-               y_as_na(x, y = "N/A")
-             })
-    
+      lapply(
+        table,
+        function(x) {
+          y_as_na(x, y = "N/A")
+        }
+      )
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),
@@ -82,13 +86,17 @@ prepare_gnps <-
       yes = dir.create(dirname(output)),
       no = paste(dirname(output), "exists")
     )
-    
-    log_debug(x = "... path to export is",
-              output)
-    readr::write_delim(x = table,
-                       file = output,
-                       delim = "\t")
-    
+
+    log_debug(
+      x = "... path to export is",
+      output
+    )
+    readr::write_delim(
+      x = table,
+      file = output,
+      delim = "\t"
+    )
+
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,

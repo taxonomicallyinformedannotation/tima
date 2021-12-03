@@ -2,13 +2,15 @@
 
 #' Title
 #'
-#' @noRd
-#'
 #' @param annotationTable TODO
 #' @param structureExactMassTable TODO
 #' @param structureOrganismPairsTable TODO
 #' @param adducts TODO
 #' @param neutralLosses TODO
+#' @param msMode TODO
+#' @param tolerancePpm TODO
+#' @param toleranceRt TODO
+#' @param candidatesInitial TODO
 #'
 #' @return TODO
 #' @export
@@ -18,15 +20,19 @@ ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,
            structureOrganismPairsTable = structure_organism_pairs_table,
-           adducts = unlist(params$ms$adducts[[params$ms$mode]]),
-           neutralLosses = neutral_losses_table) {
+           adducts = unlist(adducts_list[[ms_mode]]),
+           neutralLosses = neutral_losses_table,
+           msMode = ms_mode,
+           tolerancePpm = tolerance_ppm,
+           toleranceRt = tolerance_rt,
+           candidatesInitial = candidates_initial) {
     cat("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
       dplyr::filter(!is.na(exact_mass)) |>
       dplyr::filter(adduct %in% adducts) |>
       dplyr::mutate(
-        value_min = adduct_mass - (0.000001 * params$ms$tolerance$ppm * adduct_mass),
-        value_max = adduct_mass + (0.000001 * params$ms$tolerance$ppm * adduct_mass)
+        value_min = adduct_mass - (0.000001 * tolerancePpm * adduct_mass),
+        value_max = adduct_mass + (0.000001 * tolerancePpm * adduct_mass)
       ) |>
       dplyr::filter(!is.na(value_min)) |>
       dplyr::filter(value_min > 0) |>
@@ -54,8 +60,8 @@ ms1_annotation <-
     df4 <- df3 |>
       dplyr::mutate(dplyr::across(rt, as.numeric)) |>
       dplyr::mutate(
-        rt_min = as.numeric(rt - params$ms$tolerance$rt),
-        rt_max = as.numeric(rt + params$ms$tolerance$rt)
+        rt_min = as.numeric(rt - toleranceRt),
+        rt_max = as.numeric(rt + toleranceRt)
       )
 
     cat("... on the other side (without tolerance) \n")
@@ -93,21 +99,21 @@ ms1_annotation <-
           test = mz >= mz_dest,
           yes = abs(mz -
             (0.000001 *
-              params$ms$tolerance$ppm *
+              tolerancePpm *
               mz) -
             mz_dest),
           no = abs(mz + (0.000001 *
-            params$ms$tolerance$ppm *
+            tolerancePpm *
             mz) - mz_dest)
         ),
         delta_max = ifelse(
           test = mz >= mz_dest,
           yes = abs(mz + (0.000001 *
-            params$ms$tolerance$ppm *
+            tolerancePpm *
             mz) - mz_dest),
           no = abs(mz -
             (0.000001 *
-              params$ms$tolerance$ppm *
+              tolerancePpm *
               mz) -
             mz_dest)
         )
@@ -173,7 +179,7 @@ ms1_annotation <-
     ## always considering [M+H]+ and [M-H]- ions
     df9_ion <- df3 |>
       dplyr::distinct(feature_id) |>
-      dplyr::mutate(label = switch(params$ms$mode,
+      dplyr::mutate(label = switch(msMode,
         "pos" = "pos_1_1proton",
         "neg" = "neg_1_1proton"
       ))
@@ -321,7 +327,7 @@ ms1_annotation <-
     df16 <- dplyr::inner_join(df3, df15)
 
     cat("calculating multicharged and in source dimers and adding delta mz tolerance \n")
-    if (params$ms$mode == "pos") {
+    if (msMode == "pos") {
       df17 <- df16 |>
         dplyr::select(
           feature_id,
@@ -390,7 +396,7 @@ ms1_annotation <-
         tidyr::pivot_longer(cols = 5:cols)
     }
 
-    if (params$ms$mode == "neg") {
+    if (msMode == "neg") {
       df17 <- df16 |>
         dplyr::select(
           feature_id,
@@ -419,10 +425,10 @@ ms1_annotation <-
 
     df17 <- df17 |>
       dplyr::mutate(
-        mz_min = value - (0.000001 * params$ms$tolerance$ppm * value),
-        mz_max = value + (0.000001 * params$ms$tolerance$ppm * value),
-        rt_min = rt - params$ms$tolerance$rt,
-        rt_max = rt + params$ms$tolerance$rt
+        mz_min = value - (0.000001 * tolerancePpm * value),
+        mz_max = value + (0.000001 * tolerancePpm * value),
+        rt_min = rt - toleranceRt,
+        rt_max = rt + toleranceRt
       ) |>
       data.table::data.table()
 
@@ -530,7 +536,7 @@ ms1_annotation <-
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
-      dplyr::filter(rank_initial <= params$top_k$initial) |>
+      dplyr::filter(rank_initial <= candidatesInitial) |>
       dplyr::distinct(
         feature_id,
         component_id,
@@ -571,7 +577,7 @@ ms1_annotation <-
     df26["mz_error"][is.na(df26["mz_error"])] <-
       666
     df26["rank_initial"][is.na(df26["rank_initial"])] <-
-      params$top_k$initial
+      candidatesInitial
 
     df27 <- dplyr::left_join(
       df26,

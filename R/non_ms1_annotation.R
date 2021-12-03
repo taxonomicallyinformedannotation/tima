@@ -2,16 +2,16 @@
 
 #' Title
 #'
-#' @noRd
-#'
 #' @param annotationTable TODO
+#' @param candidatesInitial TODO
 #'
 #' @return TODO
 #' @export
 #'
 #' @examples
 non_ms1_annotation <-
-  function(annotationTable = metadata_table_spectral_annotation) {
+  function(annotationTable = metadata_table_spectral_annotation,
+           candidatesInitial = candidates_initial) {
     cat("formatting \n")
     df15 <- annotationTable |>
       dplyr::mutate(dplyr::across(
@@ -31,7 +31,7 @@ non_ms1_annotation <-
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
-      dplyr::filter(rank_initial <= params$top_k$initial) |>
+      dplyr::filter(rank_initial <= candidatesInitial) |>
       dplyr::select(
         -rt,
         -mz
@@ -65,7 +65,7 @@ non_ms1_annotation <-
     df18["mz_error"][is.na(df18["mz_error"])] <-
       666
     df18["rank_initial"][is.na(df18["rank_initial"])] <-
-      params$top_k$initial
+      candidatesInitial
 
     df19 <- dplyr::left_join(
       df18,

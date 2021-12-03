@@ -29,15 +29,15 @@ prepare_taxa <-
       "Your --top_k.organism_per_feature parameter (in command line arguments or in 'inform_params.yaml' should be lower or equal to 5" = top_k <=
         5
     )
-    
+
     log_debug(x = "Loading taxa ranks dictionary")
     taxa_ranks_dictionary <-
       readr::read_delim(file = paths$data$source$dictionaries$ranks)
-    
+
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-      
+
       if (!is.null(force)) {
         log_debug(x = "Forcing all features to given organism")
         metadata_table <- data.frame(force)
@@ -45,12 +45,14 @@ prepare_taxa <-
       } else {
         log_debug(x = "Loading metadata table")
         metadata_table <- read_metadata(id = gnps_job_id)
-        
+
         log_debug(x = "Formatting feature table ...")
         log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
         feature_table <- feature_table |>
-          dplyr::select(`row ID`,
-                        matches(" Peak area")) |>
+          dplyr::select(
+            `row ID`,
+            matches(" Peak area")
+          ) |>
           tibble::column_to_rownames(var = "row ID")
         colnames(feature_table) <-
           gsub(
@@ -69,20 +71,22 @@ prepare_taxa <-
           dplyr::arrange(rowname, rank)
       }
     }
-    
+
     if (tool == "manual") {
       metadata_table <-
         readr::read_delim(file = input)
     }
-    
+
     log_debug(x = "Keeping list of organisms to submit to OTL")
     organism_table <- metadata_table |>
       dplyr::filter(!is.na(dplyr::all_of(colname))) |>
       dplyr::distinct(dplyr::across(dplyr::all_of(colname))) |>
       dplyr::select(organism = all_of(colname)) |>
-      splitstackshape::cSplit(splitCols = "organism",
-                              sep = "|",
-                              direction = "long") |>
+      splitstackshape::cSplit(
+        splitCols = "organism",
+        sep = "|",
+        direction = "long"
+      ) |>
       dplyr::mutate(organism = gsub(
         pattern = " x ",
         replacement = " ",
@@ -90,37 +94,41 @@ prepare_taxa <-
       )) |>
       dplyr::distinct() |>
       dplyr::mutate(search_string = tolower(organism)) |>
-      dplyr::distinct(organism,
-                      search_string) |>
-      dplyr::select(canonical_name = organism,
-                    search_string) |>
+      dplyr::distinct(
+        organism,
+        search_string
+      ) |>
+      dplyr::select(
+        canonical_name = organism,
+        search_string
+      ) |>
       data.frame()
-    
+
     organisms <- organism_table$canonical_name
-    
+
     new_matched_otl_exact <- rotl::tnrs_match_names(
       names = organisms,
       do_approximate_matching = FALSE,
       include_suppressed = FALSE
     )
-    
+
     new_ott_id <- new_matched_otl_exact |>
       dplyr::filter(!is.na(ott_id)) |>
       dplyr::distinct(ott_id)
-    
+
     otts <- new_ott_id$ott_id
-    
+
     taxon_info <- rotl::taxonomy_taxon_info(
       ott_ids = otts,
       include_lineage = TRUE,
       include_terminal_descendants = TRUE
     )
-    
+
     taxon_lineage <- taxon_info |>
       rotl::tax_lineage()
-    
+
     list_df <- list()
-    
+
     for (i in seq_along(1:length(taxon_lineage))) {
       list_df[[i]] <- dplyr::bind_rows(
         data.frame(
@@ -133,10 +141,10 @@ prepare_taxa <-
         data.frame(id = otts[i], taxon_lineage[[i]])
       )
     }
-    
+
     otl <- dplyr::bind_rows(list_df) |>
       dplyr::mutate(ott_id = as.integer(ott_id))
-    
+
     biological_metadata <-
       dplyr::left_join(organism_table, new_matched_otl_exact) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>
@@ -184,7 +192,7 @@ prepare_taxa <-
       ) |>
       purrr::map_df(rev) |>
       dplyr::coalesce()
-    
+
     if (nrow(biological_metadata) != 0) {
       biological_metadata[dplyr::setdiff(
         x = c(
@@ -204,9 +212,9 @@ prepare_taxa <-
         y = names(biological_metadata)
       )] <- NA
     }
-    
+
     if (is.null(force) &
-        extension == FALSE) {
+      extension == FALSE) {
       log_debug("Removing filename extensions")
       metadata_table <- metadata_table |>
         dplyr::mutate(filename = gsub(
@@ -240,14 +248,15 @@ prepare_taxa <-
           )
       }
     }
-    
+
     if (tool == "manual") {
       metadata_table_joined <- metadata_table |>
         dplyr::select(feature_id,
-                      organismOriginal = dplyr::all_of(colname),
-                      dplyr::everything())
+          organismOriginal = dplyr::all_of(colname),
+          dplyr::everything()
+        )
     }
-    
+
     log_debug(x = "Joining with cleaned taxonomy table")
     metadata_table_joined_summarized <-
       dplyr::left_join(
@@ -276,14 +285,16 @@ prepare_taxa <-
       }) |>
       dplyr::ungroup() |>
       dplyr::mutate_all(as.character)
-    
+
     log_debug(x = "joining with cleaned taxonomy table")
     metadata_table_joined_summarized[] <-
-      lapply(metadata_table_joined_summarized,
-             function(x) {
-               y_as_na(x, y = "")
-             })
-    
+      lapply(
+        metadata_table_joined_summarized,
+        function(x) {
+          y_as_na(x, y = "")
+        }
+      )
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),
@@ -305,13 +316,17 @@ prepare_taxa <-
       yes = dir.create(dirname(output)),
       no = paste(dirname(output), "exists")
     )
-    
-    log_debug(x = "... path to export is",
-              output)
-    readr::write_delim(x = metadata_table_joined_summarized,
-                       file = output,
-                       delim = "\t")
-    
+
+    log_debug(
+      x = "... path to export is",
+      output
+    )
+    readr::write_delim(
+      x = metadata_table_joined_summarized,
+      file = output,
+      delim = "\t"
+    )
+
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,

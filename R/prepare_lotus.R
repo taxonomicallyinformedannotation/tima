@@ -13,7 +13,7 @@ prepare_lotus <-
     log_debug(x = "Loading files")
     lotus <-
       readr::read_delim(file = input)
-    
+
     lotus_prepared <- lotus |>
       dplyr::mutate(structure_inchikey_2D = substring(
         text = structure_inchikey,
@@ -45,7 +45,7 @@ prepare_lotus <-
         # reference_title
       ) |>
       dplyr::distinct()
-    
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(dirname(dirname(output))),
@@ -57,8 +57,10 @@ prepare_lotus <-
       yes = dir.create(dirname(output)),
       no = paste(dirname(output), "exists")
     )
-    
-    readr::write_delim(x = lotus_prepared,
-                       file = output,
-                       delim = "\t")
+
+    readr::write_delim(
+      x = lotus_prepared,
+      file = output,
+      delim = "\t"
+    )
   }

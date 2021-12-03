@@ -7,6 +7,8 @@
 #' @param annotationTableWeightedBio TODO
 #' @param structureOrganismPairsTable TODO
 #' @param edgesTable TODO
+#' @param aNnOtAtE TODO
+#' @param minimalMs1Bio TODO
 #'
 #' @return TODO
 #' @export
@@ -15,18 +17,21 @@
 biological_cleaning <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,
-           edgesTable = edges_table) {
-    if (params$ms$annotate == TRUE) {
+           edgesTable = edges_table,
+           aNnOtAtE = annotate,
+           candidatesInitial = candidates_initial,
+           minimalMs1Bio = minimal_ms1_bio) {
+    if (aNnOtAtE == TRUE) {
       cat(
         "keeping only MS1 candidates with minimum \n",
-        params$score$biological$order,
+        minimalMs1Bio,
         " biological score \n"
       )
     }
     df01 <- annotationTableWeightedBio |>
       dplyr::filter(score_initialNormalized > 0 |
         # those lines are to keep ms1 annotation
-        score_biological >= params$score$biological$order) |>
+        score_biological >= minimalMs1Bio) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
         .keep_all = TRUE
@@ -131,7 +136,7 @@ biological_cleaning <-
         rank_avg_pat = ifelse(
           test = candidate_structure_1_pathway == "notAnnotated" |
             candidate_structure_1_pathway == "notClassified",
-          yes = params$top_k$candidates$initial / 2,
+          yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>
@@ -184,7 +189,7 @@ biological_cleaning <-
         rank_avg_sup = ifelse(
           test = candidate_structure_2_superclass == "notAnnotated" |
             candidate_structure_2_superclass == "notClassified",
-          yes = params$top_k$candidates$initial / 2,
+          yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>
@@ -237,7 +242,7 @@ biological_cleaning <-
         rank_avg_cla = ifelse(
           test = candidate_structure_3_class == "notAnnotated" |
             candidate_structure_3_class == "notClassified",
-          yes = params$top_k$candidates$initial / 2,
+          yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>

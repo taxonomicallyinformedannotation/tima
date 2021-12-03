@@ -77,49 +77,49 @@ taxo_decoration <- function() {
     "taxonomically informed scoring led to \n",
     crayon::silver(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$kingdom)
+        dplyr::filter(score_biological >= score_biological_kingdom)
     )),
     "annotations reranked at the",
     crayon::silver("kingdom"),
     "level, \n",
     crayon::white(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$phylum)
+        dplyr::filter(score_biological >= score_biological_phylum)
     )),
     "annotations reranked at the",
     crayon::white("phylum"),
     "level, \n",
     crayon::cyan(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$class)
+        dplyr::filter(score_biological >= score_biological_class)
     )),
     "annotations reranked at the",
     crayon::cyan("class"),
     "level, \n",
     crayon::magenta(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$order)
+        dplyr::filter(score_biological >= score_biological_order)
     )),
     "annotations reranked at the",
     crayon::magenta("order"),
     "level, \n",
     crayon::blue(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$family)
+        dplyr::filter(score_biological >= score_biological_family)
     )),
     "annotations reranked at the",
     crayon::blue("family"),
     "level, \n",
     crayon::yellow(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$genus)
+        dplyr::filter(score_biological >= score_biological_genus)
     )),
     "annotations reranked at the",
     crayon::yellow("genus"),
     "level, \n",
     crayon::green(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$species)
+        dplyr::filter(score_biological >= score_biological_species)
     )),
     "annotations reranked at the",
     crayon::green("species"),
@@ -127,7 +127,7 @@ taxo_decoration <- function() {
     "and",
     crayon::red(nrow(
       annotation_table_weighted_bio |>
-        dplyr::filter(score_biological >= params$score$biological$variety)
+        dplyr::filter(score_biological >= score_biological_variety)
     )),
     "annotations reranked at the",
     crayon::red("variety"),
@@ -157,7 +157,7 @@ chemical_decoration <- function() {
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_pat != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= params$score$chemical$pathway)
+            dplyr::filter(score_chemical >= score_chemical_pathway)
         )
       ),
       "annotations reranked at the",
@@ -171,7 +171,7 @@ chemical_decoration <- function() {
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_sup != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= params$score$chemical$superclass)
+            dplyr::filter(score_chemical >= score_chemical_superclass)
         )
       ),
       "annotations reranked at the",
@@ -185,7 +185,7 @@ chemical_decoration <- function() {
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_cla != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= params$score$chemical$class)
+            dplyr::filter(score_chemical >= score_chemical_class)
         )
       ),
       "annotations reranked at the",

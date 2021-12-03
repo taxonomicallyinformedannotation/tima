@@ -12,29 +12,41 @@ prepare_sirius <-
            output = params$output) {
     log_debug("Loading and formatting SIRIUS results")
     canopus <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "canopus_summary.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "canopus_summary.tsv"
+      ))
+
     canopus_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "canopus_summary_adducts.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "canopus_summary_adducts.tsv"
+      ))
+
     formula <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "formula_identifications.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "formula_identifications.tsv"
+      ))
+
     formula_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "formula_identifications_adducts.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "formula_identifications_adducts.tsv"
+      ))
+
     compound <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "compound_identifications.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "compound_identifications.tsv"
+      ))
+
     compound_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "compound_identifications_adducts.tsv"))
-    
+      readr::read_delim(file = file.path(
+        input_directory,
+        "compound_identifications_adducts.tsv"
+      ))
+
     ## TODO compound classes if npclassifier one day
     canopus_prepared <- canopus |>
       dplyr::mutate(feature_id = gsub(
@@ -42,7 +54,7 @@ prepare_sirius <-
         replacement = "",
         x = name
       ))
-    
+
     ## TODO compound classes if npclassifier one day
     canopus_adducts_prepared <- canopus_adducts |>
       dplyr::mutate(feature_id = gsub(
@@ -50,7 +62,7 @@ prepare_sirius <-
         replacement = "",
         x = name
       ))
-    
+
     ## TODO score not optimal
     compound_prepared <- compound |>
       dplyr::mutate(
@@ -80,7 +92,7 @@ prepare_sirius <-
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA
       )
-    
+
     compound_adducts_prepared <- compound_adducts |>
       dplyr::mutate(
         feature_id = gsub(
@@ -109,7 +121,7 @@ prepare_sirius <-
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA
       )
-    
+
     formula_prepared <- formula |>
       dplyr::mutate(feature_id = gsub(
         pattern = ".*_",
@@ -118,7 +130,7 @@ prepare_sirius <-
       )) |>
       mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
       distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
-    
+
     formula_adducts_prepared <- formula_adducts |>
       dplyr::mutate(feature_id = gsub(
         pattern = ".*_",
@@ -127,23 +139,25 @@ prepare_sirius <-
       )) |>
       mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
       distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
-    
+
     compounds_prepared <-
       rbind(compound_prepared, compound_adducts_prepared) |>
       distinct()
-    
+
     formulas_prepared <-
       rbind(formula_prepared, formula_adducts_prepared) |>
       distinct()
-    
+
     table <- left_join(compounds_prepared, formulas_prepared)
-    
+
     table[] <-
-      lapply(table,
-             function(x) {
-               y_as_na(x, y = "N/A")
-             })
-    
+      lapply(
+        table,
+        function(x) {
+          y_as_na(x, y = "N/A")
+        }
+      )
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),
@@ -165,13 +179,17 @@ prepare_sirius <-
       yes = dir.create(dirname(output)),
       no = paste(dirname(output), "exists")
     )
-    
-    log_debug(x = "... path to export is",
-              output)
-    readr::write_delim(x = table,
-                       file = output,
-                       delim = "\t")
-    
+
+    log_debug(
+      x = "... path to export is",
+      output
+    )
+    readr::write_delim(
+      x = table,
+      file = output,
+      delim = "\t"
+    )
+
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,
