@@ -6,10 +6,10 @@ require(
 )
 
 log_debug(
-  "This script prepares LOTUS referenced structure-organism pairs \n",
-  "for further processing. \n"
+  "This script",
+  crayon::green("prepares LOTUS referenced structure-organism pairs \n")
 )
-log_debug("Authors: AR")
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
@@ -76,4 +76,4 @@ readr::write_delim(
 
 end <- Sys.time()
 
-log_debug("Script finished in", format(end - start))
+log_debug("Script finished in", crayon::green(format(end - start)))

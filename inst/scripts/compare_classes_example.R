@@ -95,9 +95,9 @@ weighted_mandelbrot_path <-
 
 log_debug(
   "This script performs",
-  green("extract annotations visualization")
+  crayon::green("extract annotations visualization")
 )
-log_debug("Authors: \n", green("AR"))
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 log_debug(x = "loading ...")
@@ -406,4 +406,4 @@ ggpubr::ggarrange(absolute_terpenoids_mandle,
 
 end <- Sys.time()
 
-log_debug("Script finished in", green(format(end - start)))
+log_debug("Script finished in", crayon::green(format(end - start)))

@@ -6,10 +6,10 @@ require(
 )
 
 log_debug(
-  "This script prepares closed referenced structure-organism pairs \n",
-  "for further processing. \n"
+  "This script",
+  crayon::green("prepares closed referenced structure-organism pairs \n")
 )
-log_debug("Authors: AR")
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 step <- "prepare_closed"
@@ -20,4 +20,4 @@ prepare_closed()
 
 end <- Sys.time()
 
-log_debug("Script finished in", format(end - start))
+log_debug("Script finished in", crayon::green(format(end - start)))

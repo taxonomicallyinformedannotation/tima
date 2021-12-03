@@ -6,10 +6,10 @@ require(
 )
 
 log_debug(
-  "This script treats ISDB results to obtain following file : \n
-    metadata_table_spectral_annotation"
+  "This script",
+  crayon::green("formats ISDB results")
 )
-log_debug("Authors: AR")
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 step <- "prepare_isdb"
@@ -75,4 +75,4 @@ export_params(
 
 end <- Sys.time()
 
-log_debug("Script finished in", format(end - start))
+log_debug("Script finished in", crayon::green(format(end - start)))

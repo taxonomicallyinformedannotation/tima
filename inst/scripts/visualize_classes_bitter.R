@@ -22,7 +22,7 @@ log_debug(
   "This script performs",
   crayon::green("extract annotations visualization")
 )
-log_debug("Authors: \n", green("AR"))
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 log_debug(x = "loading ...")
@@ -175,4 +175,4 @@ plotly::plot_ly(
 
 end <- Sys.time()
 
-log_debug("Script finished in", green(format(end - start)))
+log_debug("Script finished in", crayon::green(format(end - start)))

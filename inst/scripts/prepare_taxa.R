@@ -5,8 +5,17 @@ require(
   quietly = TRUE
 )
 
-log_debug("This script informs taxonomically features")
-log_debug("Authors: AR, P-MA")
+log_debug(
+  "This script",
+  crayon::green("informs taxonomically features")
+)
+log_debug(
+  "Authors: ",
+  crayon::green("AR"),
+  ",",
+  crayon::blue("PMA"),
+  "\n"
+)
 log_debug("Contributors: ...")
 
 step <- "prepare_taxa"
@@ -326,4 +335,4 @@ export_params(
 
 end <- Sys.time()
 
-log_debug("Script finished in", format(end - start))
+log_debug("Script finished in", crayon::green(format(end - start)))

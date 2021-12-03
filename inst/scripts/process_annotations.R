@@ -13,8 +13,14 @@ log_debug(
   "and folowed by",
   crayon::yellow("chemical consistency informed scoring")
 )
-log_debug("Authors: \n", crayon::green("AR, P-MA"))
-log_debug("Contributors: \n", "...")
+log_debug(
+  "Authors: ",
+  crayon::green("AR"),
+  ",",
+  crayon::blue("PMA"),
+  "\n"
+)
+log_debug("Contributors: ...")
 
 step <- "process_annotations"
 paths <- parse_yaml_paths()

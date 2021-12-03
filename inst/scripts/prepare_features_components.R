@@ -5,8 +5,11 @@ require(
   quietly = TRUE
 )
 
-log_debug("This script fills features metadata (mz, rt and component id)")
-log_debug("Authors: AR")
+log_debug(
+  "This script",
+  crayon::green("prepares features metadata (mz, rt and component id)")
+)
+log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 step <- "prepare_features_components"
@@ -120,4 +123,4 @@ export_params(
 
 end <- Sys.time()
 
-log_debug("Script finished in", format(end - start))
+log_debug("Script finished in", crayon::green(format(end - start)))
