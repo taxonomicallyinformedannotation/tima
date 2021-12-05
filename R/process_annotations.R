@@ -105,7 +105,7 @@ process_annotations <- function(library = params$library,
   #  adducts
   # )
 
-  vars <- ls(all = TRUE)
+  vars <- ls(all.names = TRUE)
   for (i in 1:length(vars)) {
     assign(vars[i], get(vars[i]), envir = .GlobalEnv)
   }
