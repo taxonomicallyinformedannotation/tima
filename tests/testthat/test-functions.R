@@ -1,5 +1,3 @@
-setwd("../..")
-
 # test log_debug
 
 testthat::test_that("parsing YAML path works", {
