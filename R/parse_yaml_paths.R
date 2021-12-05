@@ -11,14 +11,16 @@ if (!require(yaml)) {
 #'
 #' @noRd
 #'
+#' @param file TODO
+#'
 #' @return TODO
 #' @export
 #'
 #' @examples
-parse_yaml_paths <- function() {
+parse_yaml_paths <- function(file = "paths.yaml") {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(
-    file = "paths.yaml",
+    file = file,
     handlers = list(
       seq = function(x) {
         purrr::flatten(x)
