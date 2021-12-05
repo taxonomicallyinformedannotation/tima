@@ -93,6 +93,7 @@ Collate:
     'read_results.R'
     'timaR-package.R'
     'utils-tidy-eval.R'
+    'with_dir.R'
     'y_as_na.R'
 VignetteBuilder: 
     knitr
