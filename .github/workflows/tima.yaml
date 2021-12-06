@@ -28,4 +28,5 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v1
       - name: Run tests
         run: |
-          bash tests/integration_test.sh
+          cp -R config/default config/params
+          Rscript inst/scripts/tima.R
