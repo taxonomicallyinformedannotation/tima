@@ -1,3 +1,5 @@
 url: https://taxonomicallyinformedannotation.github.io/tima-r
 template:
   bootstrap: 5
+  params: 
+    google_site_verification: Fe0z7JtTjEHmeT7EoW7FJJ6nDwqvp_3pV_7mgdYwpEU
