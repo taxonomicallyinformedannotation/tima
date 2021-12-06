@@ -46,6 +46,15 @@ jobs:
         with:
           extra-packages: rcmdcheck
 
+      - name: Additional step for tests to run
+        run: |
+          cp -R paths.yaml tests/testthat/paths.yaml
+          cp -R config tests/testthat/config
+          cp -R data tests/testthat/data
+          cp -R inst tests/testthat/inst
+
+        shell: bash
+
       - uses: r-lib/actions/check-r-package@v1
         with:
           error-on: '"error"'

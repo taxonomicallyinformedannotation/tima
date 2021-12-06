@@ -73,7 +73,7 @@ prepare_closed <- function(input = params$input,
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,
-      step = step
+      step = "prepare-closed"
     )
   } else {
     log_debug("Sorry, you do not have access to the closed resource")

@@ -126,6 +126,6 @@ prepare_adducts <-
     export_params(
       parameters = params,
       directory = config_output_path,
-      step = step
+      step = "prepare_adducts"
     )
   }

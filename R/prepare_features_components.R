@@ -119,6 +119,6 @@ prepare_features_components <- function(input = params$input,
   export_params(
     parameters = params,
     directory = paths$data$interim$config$path,
-    step = step
+    step = "prepare_features_components"
   )
 }

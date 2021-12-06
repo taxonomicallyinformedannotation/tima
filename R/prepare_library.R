@@ -43,6 +43,11 @@ prepare_library <-
 
     log_debug(x = "Exporting ...")
     ifelse(
+      test = !dir.exists(dirname(paths$data$interim$libraries$path)),
+      yes = dir.create(dirname(paths$data$interim$libraries$path)),
+      no = paste(dirname(paths$data$interim$libraries$path), "exists")
+    )
+    ifelse(
       test = !dir.exists(paths$data$interim$libraries$path),
       yes = dir.create(paths$data$interim$libraries$path),
       no = paste(paths$data$interim$libraries$path, "exists")
@@ -77,6 +82,6 @@ prepare_library <-
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,
-      step = step
+      step = "prepare_library"
     )
   }

@@ -79,6 +79,6 @@ prepare_edges <- function(tool = params$tool,
   export_params(
     parameters = params,
     directory = paths$data$interim$config$path,
-    step = step
+    step = "prepare_edges"
   )
 }

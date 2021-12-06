@@ -100,6 +100,6 @@ prepare_gnps <-
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,
-      step = step
+      step = "prepare_gnps"
     )
   }

@@ -24,7 +24,6 @@ Imports:
     docopt,
     dplyr,
     forcats,
-    ggplot2,
     glue,
     lifecycle,
     purrr,
@@ -53,7 +52,6 @@ Collate:
     'biological_weighting.R'
     'chemical_cleaning.R'
     'chemical_weighting.R'
-    'colors.R'
     'decoration.R'
     'dist_groups.R'
     'export_params.R'
@@ -62,26 +60,21 @@ Collate:
     'get_example_isdb.R'
     'get_lotus.R'
     'get_params.R'
-    'homemadeShift.R'
     'log_debug.R'
     'ms1_annotation.R'
     'non_ms1_annotation.R'
     'parse_cli_params.R'
     'parse_yaml_params.R'
     'parse_yaml_paths.R'
-    'plot_histograms.R'
     'prepare_adducts.R'
     'prepare_closed.R'
     'prepare_edges.R'
     'prepare_features_classification.R'
     'prepare_features_components.R'
     'prepare_gnps.R'
-    'prepare_hierarchy_2.R'
-    'prepare_hierarchy.R'
     'prepare_isdb.R'
     'prepare_library.R'
     'prepare_lotus.R'
-    'prepare_plot.R'
     'prepare_sirius.R'
     'prepare_taxa.R'
     'process_annotations.R'
@@ -93,7 +86,6 @@ Collate:
     'read_results.R'
     'timaR-package.R'
     'utils-tidy-eval.R'
-    'with_dir.R'
     'y_as_na.R'
 VignetteBuilder: 
     knitr

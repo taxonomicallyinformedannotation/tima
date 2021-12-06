@@ -45,6 +45,13 @@ jobs:
           remotes::install_cran("covr")
         shell: Rscript {0}
 
+      - name: Additional step for tests to run
+        run: |
+          cp -R paths.yaml tests/testthat/paths.yaml
+          cp -R config tests/testthat/config
+          cp -R data tests/testthat/data
+          cp -R inst tests/testthat/inst
+        
       - name: Test coverage
         run: covr::codecov()
         shell: Rscript {0}
