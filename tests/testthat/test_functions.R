@@ -73,7 +73,8 @@ testthat::test_that("processing annotations", {
   ## 4.5
   step <- "process_annotations"
   params <- get_params(step = step)
-  process_annotations()
+  process_annotations(annotate = TRUE)
+  process_annotations(annotate = FALSE)
   succeed()
 })
 
