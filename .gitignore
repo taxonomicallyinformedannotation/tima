@@ -8,10 +8,10 @@ bin/**
 
 config/params/**
 
-data/source/private/**
-data/source/libraries/**
-data/interim/**
-data/processed/**
+inst/extdata/source/private
+inst/extdata/source/libraries
+inst/extdata/interim
+inst/extdata/processed
 
 .Rproj.user
 .Rhistory

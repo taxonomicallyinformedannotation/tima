@@ -6,41 +6,41 @@ config:
   params:
     path: config/params
 data:
-  path: data
+  path: inst/extdata
   interim:
-    path: data/interim
+    path: inst/extdata/interim
     adducts:
-      path: data/interim/adducts
-      neg: data/interim/adducts/adducts_neg.tsv.gz
-      pos: data/interim/adducts/adducts_pos.tsv.gz
+      path: inst/extdata/interim/adducts
+      neg: inst/extdata/interim/adducts/adducts_neg.tsv.gz
+      pos: inst/extdata/interim/adducts/adducts_pos.tsv.gz
     annotations:
-      path: data/interim/annotations
-      example_isdb: data/interim/annotations/example_isdb_result.tsv.gz
+      path: inst/extdata/interim/annotations
+      example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
     config:
-      path: data/interim/config
+      path: inst/extdata/interim/config
     edges:
-      path: data/interim/edges
+      path: inst/extdata/interim/edges
     features:
-      path: data/interim/features
+      path: inst/extdata/interim/features
     libraries:
-      path: data/interim/libraries
-      lotus: data/interim/libraries/lotus_prepared.tsv.gz
+      path: inst/extdata/interim/libraries
+      lotus: inst/extdata/interim/libraries/lotus_prepared.tsv.gz
     taxa:
-      path: data/interim/taxa
+      path: inst/extdata/interim/taxa
   processed:
-    path: data/processed
+    path: inst/extdata/processed
     config:
-      path: data/processed/config
+      path: inst/extdata/processed/config
   source:
-    path: data/source
-    adducts: data/source/adducts.tsv
+    path: inst/extdata/source
+    adducts: inst/extdata/source/adducts.tsv
     dictionaries:
-      path: data/source/dictionaries
-      ranks: data/source/dictionaries/ranks.tsv
+      path: inst/extdata/source/dictionaries
+      ranks: inst/extdata/source/dictionaries/ranks.tsv
     libraries:
-      path: data/source/libraries
-      lotus: data/source/libraries/lotus.csv.gz
-    neutral_losses: data/source/neutral_losses.tsv
+      path: inst/extdata/source/libraries
+      lotus: inst/extdata/source/libraries/lotus.csv.gz
+    neutral_losses: inst/extdata/source/neutral_losses.tsv
 doc:
   path: doc
 img:

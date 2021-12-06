@@ -1,2 +1,2 @@
 directory: ../../20210804_10043
-output: data/interim/annotations/10043_sirius_pretreated.tsv.gz
+output: inst/extdata/interim/annotations/10043_sirius_pretreated.tsv.gz

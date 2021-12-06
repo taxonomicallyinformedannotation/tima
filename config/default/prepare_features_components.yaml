@@ -1,5 +1,5 @@
-input: data/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_pretreated.tsv.gz
-output: data/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_filled.tsv.gz
+input: inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_pretreated.tsv.gz
+output: inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_filled.tsv.gz
 tool: gnps ## or manual
 components: ## if manual 
 gnps: a177b17ded9f4e01bf343317bfc0372e
