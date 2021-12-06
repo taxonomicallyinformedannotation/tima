@@ -82,6 +82,7 @@ chemical_cleaning <-
         score_interim = score_pondered_bio,
         score_chemical,
         score_final = score_pondered_chemo,
+        lowest_candidate_organism = organism_name,
         best_candidate_organism = best_candidate,
         best_candidate_structure,
         consensus_structure_pat,
@@ -93,16 +94,21 @@ chemical_cleaning <-
       )
 
     df3 <- structureOrganismPairsTable |>
+      dplyr::arrange(reference_doi) |>
       dplyr::distinct(structure_inchikey_2D,
+        organism_name,
+        reference_doi,
         .keep_all = TRUE
       ) |>
       dplyr::select(
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
-        molecular_formula = structure_molecular_formula
+        molecular_formula = structure_molecular_formula,
+        lowest_candidate_organism = organism_name,
+        reference_doi
       )
 
-    cat("adding structures metaddata \n")
+    cat("adding structures metadata \n")
     df4a <- dplyr::left_join(df2, df3) |>
       dplyr::select(
         feature_id,
@@ -123,6 +129,7 @@ chemical_cleaning <-
         mz_error,
         score_interim,
         score_final,
+        reference_doi,
         dplyr::everything()
       )
 
@@ -153,7 +160,7 @@ chemical_cleaning <-
     df5a <- df4a |>
       dplyr::group_by(feature_id) |>
       dplyr::summarise(dplyr::across(
-        colnames(df4a)[3:18],
+        colnames(df4a)[3:19],
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
@@ -220,7 +227,8 @@ chemical_cleaning <-
           consensus_structure_sub,
           consistency_structure_sub,
           consensus_structure_par,
-          consistency_structure_par
+          consistency_structure_par,
+          reference_doi
         )
 
       cat("adding consensus again to droped candidates \n")
@@ -288,7 +296,8 @@ chemical_cleaning <-
           consensus_structure_sup,
           consistency_structure_sup,
           consensus_structure_cla,
-          consistency_structure_cla
+          consistency_structure_cla,
+          reference_doi
         )
 
       df8 <- df7 |>
