@@ -55,7 +55,7 @@ Those will help you understanding how the workflow works so you can adapt them l
 So first, start by copying them into `config/params` directory.
 To do so:
 
-```{shell}
+```{bash}
 cp -R config/default config/params
 ```
 
