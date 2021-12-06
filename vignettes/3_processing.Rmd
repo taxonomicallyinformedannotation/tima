@@ -1,0 +1,35 @@
+---
+title: "3 Performing Taxonomically Informed Metabolite Annotation"
+author: "Adriano Rutz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3 Performing Taxonomically Informed Metabolite Annotation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = '..')
+```
+
+This vignette describes how to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
+If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
+
+```{r}
+library("timaR")
+```
+
+Before running the corresponding code, do not forget to modify `config/params/process_annotations.yaml`.
+
+```{r}
+source(file = "inst/scripts/process_annotations.R")
+```
+
+We hope you enjoyed using **TIMA** and are pleased to hear from you! 
+
+For any remark or suggestion, please  [fill an issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues) or feel free to contact us directly.

@@ -1,0 +1,93 @@
+---
+title: "1 Preparing your structure-organism pairs library"
+author: "Adriano Rutz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1 Preparing your structure-organism pairs library}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = '..')
+```
+
+This vignette describes how to get and prepare a structure-organism pairs library in order to
+
+* Annotate or complement the annotation of your feature. *(optional)*
+* **Weight your initial annotations**.
+
+## LOTUS
+
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://lotus.nprod.net/>] with 
+**T**axonomically 
+**I**nformed 
+**M**etabolite 
+**A**nnotation in mind, 
+we provide it here as a starting point for your structure-organism pairs library. 
+You are free to complement it with your own structure-organism pairs or to filter it according to your needs. We also provide some hints on how to do it later in this vignette.
+
+### download
+
+To download it LOTUS structure-organism pairs locally, just run:
+
+```{r}
+library("timaR")
+```
+
+```{r}
+source(file = "inst/scripts/get_lotus.R")
+```
+
+### preparation
+
+Then, **LOTUS** structure-organism pairs can be prepared to the right format for further processing:
+```{r}
+source(file = "inst/scripts/prepare_lotus.R")
+```
+
+For these two first steps, you do not need to change any parameters as they are implemented *by default*. 
+
+## Other libraries
+
+As we want our tool to be flexible, you can also add your own library to LOTUS.
+You just need to format it in order to be compatible.
+As example, we prepared some ways too format closed, *in house* libraries.
+If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
+
+Before running the corresponding code, do not forget to modify `config/params/prepare_closed.yaml`
+
+```{r}
+source(file = "inst/scripts/prepare_closed.R")
+```
+
+## Merging
+
+Once you have all your sub-libraries prepared, you are ready to merge them in a single file that will be used for the next steps.
+
+Before running the corresponding code, do not forget to modify `config/params/prepare_library.yaml`.
+
+At this step, if you want to, you can restrict your library to specific taxa only.
+We do not advise doing so, but we offer you the possibility to do it.
+
+```{r}
+source(file = "inst/scripts/prepare_library.R")
+```
+
+## Adducts library
+
+As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS1 annotation later on.
+
+Before running the corresponding code, do not forget to modify `config/params/prepare_adducts.yaml`.
+
+```{r}
+source(file = "inst/scripts/prepare_adducts.R")
+```
+
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/2_formatting.html).
+

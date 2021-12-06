@@ -1,0 +1,64 @@
+---
+title: "0 General comments about the infrastructure"
+author: "Adriano Rutz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{0 General comments about the infrastructure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = '..')
+```
+
+This vignette describes the philosophy behind the infrastructure of **TIMA**.
+
+It is currently under construction. 
+
+## Philosophy
+
+Our main goals were **flexibility** and **reproducibility**. 
+
+### Flexibility
+
+To ensure flexibility, we tried to split the process in as much tiny parts as needed.
+So you can decide whether to skip an optional part, add your own processing, etc.
+We tried to cover most use cases, but of course they are not exhaustive. 
+If you feel like something useful to other users is missing, please fill an [issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues).
+
+### Reproducibility
+
+After some time using TIMA, you will probably wonder: 
+"*What was the parameters I used to generate this file?*" ...
+Or a collaborator might ask you to share your data and parameters.
+Writing them down each time might be time consuming and not really in line with modern computational approaches.
+Therefore, we chose to implement all parameters of all steps (almost...) as YAML files.
+They are human-readable and can be used in batches.
+If you do not like YAML, parameters of each steps can also be given as command line arguments.
+They will then be saved as YAML you will be able to share.
+
+## Use
+
+Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles). 
+
+### Copy initial parameters
+
+As mentioned previously, scripts need some parameters to be filled.
+Some pre-defined parameters are given in `config/default` directory.
+Those will help you understanding how the workflow works so you can adapt them later to your own data.
+So first, start by copying them into `config/params` directory.
+To do so:
+
+```shell
+cp -R config/default config/params
+```
+
+You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
+
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/1_library.html).
