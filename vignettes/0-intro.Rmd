@@ -59,4 +59,4 @@ cp -R config/default config/params
 
 You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/1_library.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/1-library.html).
