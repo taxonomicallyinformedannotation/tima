@@ -19,8 +19,6 @@ knitr::opts_knit$set(root.dir = '..')
 
 This vignette describes the philosophy behind the infrastructure of **TIMA**.
 
-It is currently under construction. 
-
 ## Philosophy
 
 Our main goals were **flexibility** and **reproducibility**. 
