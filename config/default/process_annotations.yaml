@@ -16,6 +16,7 @@ scores:
     pathway: 0.333
     superclass: 0.666
     class: 1.000
+    minimal: 0.666
   biological:
     domain: 0.1
     kingdom: 0.2
@@ -31,7 +32,8 @@ scores:
     subgenus: 0.85
     species: 0.9
     subspecies: 0.95
-    variety: 1.000
+    variety: 1.0
+    minimal: 0.5
 ms:
   mode: pos
   level: 1 # currently only 1, not a real parameter... for now

@@ -40,8 +40,8 @@ process_annotations(
   tolerance_ppm = params$ms$tolerance$ppm,
   tolerance_rt = params$ms$tolerance$rt,
   adducts_list = params$ms$adducts,
-  minimal_ms1_bio = params$scores$biological$order,
-  minimal_ms1_chemo = params$scores$chemical$superclass,
+  minimal_ms1_bio = params$scores$biological$minimal,
+  minimal_ms1_chemo = params$scores$chemical$minimal,
   force = params$force
 )
 }

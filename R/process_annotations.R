@@ -78,8 +78,8 @@ process_annotations <- function(library = params$library,
                                 tolerance_ppm = params$ms$tolerance$ppm,
                                 tolerance_rt = params$ms$tolerance$rt,
                                 adducts_list = params$ms$adducts,
-                                minimal_ms1_bio = params$scores$biological$order,
-                                minimal_ms1_chemo = params$scores$chemical$superclass,
+                                minimal_ms1_bio = params$scores$biological$minimal,
+                                minimal_ms1_chemo = params$scores$chemical$minimal,
                                 force = params$force) {
   stopifnot(
     "Your --ms.mode parameter (in command line arguments or in 'annotate_params.yaml' must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg")
