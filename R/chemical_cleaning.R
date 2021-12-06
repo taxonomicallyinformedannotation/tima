@@ -64,7 +64,7 @@ chemical_cleaning <-
           candidate_structure_1_pathway,
           candidate_structure_2_superclass,
           candidate_structure_3_class,
-          sep = "§"
+          sep = "\u00a7"
         )
       ) |>
       dplyr::distinct(
