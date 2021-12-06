@@ -4,9 +4,11 @@
 *.DS_Store
 *.Rhistory
 
-bin/**
+bin
 
-config/params/**
+config/params
+
+docs
 
 inst/extdata/source/private
 inst/extdata/source/libraries
@@ -20,4 +22,3 @@ inst/extdata/processed
 .httr-oauth
 .DS_Store
 
-docs
