@@ -5,7 +5,7 @@
 #' @param tool TODO
 #' @param components TODO
 #' @param gnps_job_id TODO
-#' @param mode TODO
+#' @param ms_mode TODO
 #'
 #' @return TODO
 #' @export
@@ -16,7 +16,7 @@ prepare_features_components <- function(input = params$input,
                                         tool = params$tool,
                                         components = params$components,
                                         gnps_job_id = params$gnps,
-                                        mode = params$mode) {
+                                        ms_mode = params$mode) {
   if (tool == "gnps") {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
   } else {
@@ -84,7 +84,7 @@ prepare_features_components <- function(input = params$input,
 
   log_debug(x = "Calculating mz error")
   ## TODO can be improved
-  if (mode == "pos") {
+  if (ms_mode == "pos") {
     table_filled <- table_filled |>
       dplyr::mutate(mz_error = mz - 1.007276 - structure_exact_mass)
   } else {

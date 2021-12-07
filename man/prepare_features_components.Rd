@@ -10,7 +10,7 @@ prepare_features_components(
   tool = params$tool,
   components = params$components,
   gnps_job_id = params$gnps,
-  mode = params$mode
+  ms_mode = params$mode
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ prepare_features_components(
 
 \item{gnps_job_id}{TODO}
 
-\item{mode}{TODO}
+\item{ms_mode}{TODO}
 }
 \value{
 TODO
