@@ -12,6 +12,11 @@ prepare_gnps <-
   function(gnps_job_id = params$gnps,
            nap_job_id = params$nap,
            output = params$output) {
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+    if (!is.null(nap_job_id)) {
+      stopifnot("Your NAP job ID is invalid" = stringr::str_length(nap_job_id) == 32)
+    }
+
     log_debug("Loading and formatting GNPS results")
     ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- read_results(id = gnps_job_id) |>

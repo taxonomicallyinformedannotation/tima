@@ -14,6 +14,8 @@ if (!require(readr)) {
 #'
 #' @examples
 read_nap <- function(id) {
+  stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
+
   file <-
     paste0(
       "https://proteomics2.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",

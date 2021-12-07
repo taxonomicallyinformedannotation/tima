@@ -10,6 +10,8 @@
 prepare_sirius <-
   function(input_directory = params$directory,
            output = params$output) {
+    stopifnot("Your input directory does not exist" = dir.exists(input_directory))
+
     log_debug("Loading and formatting SIRIUS results")
     canopus <-
       readr::read_delim(file = file.path(

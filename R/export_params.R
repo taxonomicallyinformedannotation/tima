@@ -15,20 +15,20 @@ if (!require(yaml)) {
 #' @export
 #'
 #' @examples
-export_params <- function(parameters, directory, step) {
+export_params <- function(parameters = params, directory = paths$data$interim$config$path, step) {
   ifelse(
-    test = !dir.exists(paths$data$interim$path),
-    yes = dir.create(paths$data$interim$path),
-    no = paste(paths$data$interim$path, "exists")
+    test = !dir.exists(dirname(directory)),
+    yes = dir.create(dirname(directory)),
+    no = paste(dirname(directory), "exists")
   )
   ifelse(
-    test = !dir.exists(paths$data$interim$config$path),
-    yes = dir.create(paths$data$interim$config$path),
-    no = paste(paths$data$interim$config$path, "exists")
+    test = !dir.exists(directory),
+    yes = dir.create(directory),
+    no = paste(directory, "exists")
   )
   log_debug(
     x = "... path to used parameters is",
-    paths$data$interim$config$path
+    directory
   )
 
   yaml::write_yaml(

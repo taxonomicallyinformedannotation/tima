@@ -18,8 +18,13 @@ prepare_edges <- function(tool = params$tool,
                           name_source = params$source_name,
                           name_target = params$target_name) {
   stopifnot(
-    "Your --tool parameter (in command line arguments or in 'treat_params.yaml' must be 'manual' or 'gnps" = tool %in% c("gnps", "manual")
+    "Your tool must be 'manual' or 'gnps" = tool %in% c("gnps", "manual")
   )
+  if (tool == "gnps") {
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+  } else {
+    stopifnot("Your input file does not exist" = file.exists(input))
+  }
 
   log_debug(x = "Loading edge table")
   if (tool == "gnps") {

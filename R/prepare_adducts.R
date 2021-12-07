@@ -20,6 +20,8 @@ prepare_adducts <-
            output_name = params$output,
            masses_pos_output_path = paths$data$interim$adducts$pos,
            masses_neg_output_path = paths$data$interim$adducts$neg) {
+    stopifnot("Your input file does not exist" = file.exists(adducts_input))
+
     log_debug("Loading files ...")
     log_debug("... exact masses")
     masses <- readr::read_delim(

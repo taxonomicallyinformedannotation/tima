@@ -14,6 +14,10 @@ prepare_features_classification <-
            input = params$input,
            output = params$output,
            quickmode = params$quickmode) {
+    stopifnot("Your input file does not exist" = file.exists(input))
+    stopifnot("Your library file does not exist" = file.exists(library))
+    stopifnot("Quickmode must be 'true' or 'false'" = quickmode %in% c(TRUE, FALSE))
+
     log_debug(x = "Loading files ...")
     log_debug(x = "... library")
     lotus <-

@@ -14,7 +14,36 @@ if (!require(docopt)) {
 #'
 #' @examples
 get_params <- function(step) {
-  doc_path <<- file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
+  stopifnot(
+    "Your step does not exist. Valid steps are:
+    'prepare_adducts',
+    'prepare_closed',
+    'prepare_edges',
+    'prepare_features_classification',
+    'prepare_features_components',
+    'prepare_gnps',
+    'prepare_isdb',
+    'prepare_library',
+    'prepare_sirius',
+    'prepare_taxa',
+    'process_annotations'
+    " = step %in% c(
+      "prepare_adducts",
+      "prepare_closed",
+      "prepare_edges",
+      "prepare_features_classification",
+      "prepare_features_components",
+      "prepare_gnps",
+      "prepare_isdb",
+      "prepare_library",
+      "prepare_sirius",
+      "prepare_taxa",
+      "process_annotations"
+    )
+  )
+
+  doc_path <<-
+    file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
   default_path <<-
     file.path(paths$config$default$path, paste0(step, ".yaml"))
   params_path <<-

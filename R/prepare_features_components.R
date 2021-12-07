@@ -17,6 +17,14 @@ prepare_features_components <- function(input = params$input,
                                         components = params$components,
                                         gnps_job_id = params$gnps,
                                         mode = params$mode) {
+  if (tool == "gnps") {
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+  } else {
+    stopifnot("Your input file does not exist" = file.exists(input))
+    stopifnot("Your components file does not exist" = file.exists(components))
+  }
+  stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
+
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
   table <- readr::read_delim(file = input)

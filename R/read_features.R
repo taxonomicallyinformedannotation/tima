@@ -14,6 +14,8 @@ if (!require(readr)) {
 #'
 #' @examples
 read_features <- function(id) {
+  stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
+
   file <-
     paste0(
       "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",

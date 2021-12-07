@@ -81,24 +81,19 @@ process_annotations <- function(library = params$library,
                                 minimal_ms1_bio = params$scores$biological$minimal,
                                 minimal_ms1_chemo = params$scores$chemical$minimal,
                                 force = params$force) {
-  stopifnot(
-    "Your --ms.mode parameter (in command line arguments or in 'annotate_params.yaml' must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg")
-  )
-  stopifnot(
-    "Your --ms.level parameter (in command line arguments or in 'annotate_params.yaml' must be 1" = ms_level == 1
-  )
-  stopifnot(
-    "Your --ms.annotate parameter (in command line arguments or in 'annotate_params.yaml' must be TRUE or FALSE" = annotate %in% c(TRUE, FALSE)
-  )
+  stopifnot("Your library file does not exist." = file.exists(library))
+  ## add name
+  stopifnot("Your annotation file does not exist." = file.exists(annotation))
+  stopifnot("Your taxa file does not exist." = file.exists(taxa))
+  stopifnot("Your edges file does not exist." = file.exists(edges))
+  stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
+  stopifnot("Your ms_level parameter must be 1" = ms_level == 1)
+  stopifnot("Your ms_annotate parameter must be 'true' or 'false'" = annotate %in% c(TRUE, FALSE))
   if (force == FALSE) {
-    stopifnot(
-      "Your --ms.tolreance.ppm parameter (in command line arguments or in 'annotate_params.yaml' must be lower or equal to 20" = tolerance_ppm <=
-        20
-    )
-    stopifnot(
-      "Your --rt.tolreance.ppm parameter (in command line arguments or in 'annotate_params.yaml' must be lower or equal to 0.1" = tolerance_rt <=
-        0.1
-    )
+    stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
+      20)
+    stopifnot("Your rt tolerance must be lower or equal to 0.1" = tolerance_rt <=
+      0.1)
   }
   ## for later on
   # stopifnot(

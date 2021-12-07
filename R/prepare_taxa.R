@@ -22,13 +22,14 @@ prepare_taxa <-
            top_k = params$top_k,
            output = params$output,
            force = params$force) {
-    stopifnot(
-      "Your --tool.metadata parameter (in command line arguments or in 'inform_params.yaml' must be either 'gnps' or 'manual'" = tool %in% c("gnps", "manual")
-    )
-    stopifnot(
-      "Your --top_k.organism_per_feature parameter (in command line arguments or in 'inform_params.yaml' should be lower or equal to 5" = top_k <=
-        5
-    )
+    stopifnot("Your tool must be either 'gnps' or 'manual'" = tool %in% c("gnps", "manual"))
+    if (tool == "gnps") {
+      stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+    } else {
+      stopifnot("Your input file does not exist" = file.exists(input))
+    }
+    stopifnot("Your top k organisms parameter should be lower or equal to 5" = top_k <=
+      5)
 
     log_debug(x = "Loading taxa ranks dictionary")
     taxa_ranks_dictionary <-

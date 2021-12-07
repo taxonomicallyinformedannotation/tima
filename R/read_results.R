@@ -14,13 +14,13 @@ if (!require(readr)) {
 #'
 #' @examples
 read_results <- function(id) {
+  stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
+
   file <-
     paste0(
       "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
       id,
       "&block=main&file=DB_result/"
     )
-  return(readr::read_delim(
-    file = file,
-  ))
+  return(readr::read_delim(file = file, ))
 }

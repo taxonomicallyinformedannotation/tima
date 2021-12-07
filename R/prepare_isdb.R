@@ -10,6 +10,8 @@
 prepare_isdb <-
   function(input = params$input,
            output = params$output) {
+    stopifnot("Your input file does not exist" = file.exists(input))
+
     log_debug(x = "Loading and formatting ISDB results")
     table <- readr::read_delim(file = input) |>
       dplyr::distinct(
