@@ -30,6 +30,9 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 source(file = "inst/scripts/process_annotations.R")
 ```
 
+
+The final exported file is formatted in order to be easily imported in [Cytoscape](https://cytoscape.org/) to further explore your data!
+
 We hope you enjoyed using **TIMA** and are pleased to hear from you! 
 
 For any remark or suggestion, please  [fill an issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues) or feel free to contact us directly.
