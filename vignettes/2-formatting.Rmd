@@ -21,7 +21,8 @@ This vignette describes how to format all your files.
 
 ## Structural annotations of your features
 
-For the moment, we support annotations coming from 3 different annotation tools: GNPS, SIRIUS, and our *in lab* developed tool, **ISDB**.
+For the moment, we support annotations coming from 2 different annotation tools: GNPS and our *in lab* developed tool, **ISDB**.
+We hope to soon implement SIRIUS support.
 
 In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following repository: [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher)
 
