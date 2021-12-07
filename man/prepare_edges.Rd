@@ -6,7 +6,7 @@
 \usage{
 prepare_edges(
   tool = params$tool,
-  gnps_job = params$gnps,
+  gnps_job_id = params$gnps,
   input = params$input,
   output = params$output,
   name_source = params$source_name,
@@ -16,7 +16,7 @@ prepare_edges(
 \arguments{
 \item{tool}{TODO}
 
-\item{gnps_job}{TODO}
+\item{gnps_job_id}{TODO}
 
 \item{input}{TODO}
 

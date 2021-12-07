@@ -1,7 +1,7 @@
 #' Title
 #'
 #' @param tool TODO
-#' @param gnps_job TODO
+#' @param gnps_job_id TODO
 #' @param input TODO
 #' @param output TODO
 #' @param name_source TODO
@@ -12,7 +12,7 @@
 #'
 #' @examples
 prepare_edges <- function(tool = params$tool,
-                          gnps_job = params$gnps,
+                          gnps_job_id = params$gnps,
                           input = params$input,
                           output = params$output,
                           name_source = params$source_name,
@@ -28,7 +28,7 @@ prepare_edges <- function(tool = params$tool,
 
   log_debug(x = "Loading edge table")
   if (tool == "gnps") {
-    edges_table <- read_edges(gnps_job)
+    edges_table <- read_edges(gnps_job_id)
   }
 
   if (tool == "manual") {
