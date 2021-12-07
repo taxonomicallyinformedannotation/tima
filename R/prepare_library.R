@@ -14,7 +14,7 @@ prepare_library <-
            level = params$filter$level,
            value = params$filter$value,
            output = params$output) {
-    stopifnot("Your filter parameter must be 'true' or 'false'" = annotate %in% c(TRUE, FALSE))
+    stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
     if (isTRUE(filter)) {
       stopifnot(
         "Your level parameter must be one of
