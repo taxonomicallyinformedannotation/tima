@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_gnps.R -o 'data/interim/db1c51fa29a64892af520698a18783e4_gnps_pretreated.tsv.gz' -g db1c51fa29a64892af520698a18783e4
+Rscript inst/scripts/prepare_gnps.R -o 'inst/extdata/interim/a177b17ded9f4e01bf343317bfc0372e_gnps_pretreated.tsv.gz' -g a177b17ded9f4e01bf343317bfc0372e
 
 Usage: prepare_gnps.R [--output=<output>] [--nap=<nap>] [--gnps=<gnps>]
 

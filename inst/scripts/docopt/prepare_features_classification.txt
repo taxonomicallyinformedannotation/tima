@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_features_classification.R --input 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_filled.tsv.gz' --output 'data/interim/annotations/db1c51fa29a64892af520698a18783e4_isdb_treated.tsv.gz' --library 'data/interim/libraries/library.tsv.gz' --quickmode TRUE
+Rscript inst/scripts/prepare_features_classification.R --input 'inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_filled.tsv.gz' --output 'inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_treated.tsv.gz' --library 'inst/extdata/interim/libraries/library.tsv.gz' --quickmode TRUE
 
 Usage: prepare_features_classification.R [--input=<input>] [--output=<output>] [--library=<library>]
 
