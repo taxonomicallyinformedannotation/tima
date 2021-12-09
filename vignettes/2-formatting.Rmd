@@ -21,7 +21,7 @@ This vignette describes how to format all your files.
 
 ## Structural annotations of your features
 
-For the moment, we support annotations coming from 2 different annotation tools: GNPS and our *in lab* developed tool, **ISDB**.
+For the moment, we support annotations coming from 3 different annotation tools: [GNPS](https://gnps.ucsd.edu), [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius) and our *in lab* developed tool, **[ISDB](https://github.com/mandelbrot-project/spectral_lib_matcher)**.
 We hope to soon implement SIRIUS support.
 
 In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following repository: [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher)
@@ -44,6 +44,16 @@ library("timaR")
 source(file = "inst/scripts/get_example_isdb.R")
 ```
 
+#### SIRIUS
+As, given its size, it is not easy to share a complete SIRIUS job, we prepared an example containing only summary files.
+We also generated the npc classes as in https://github.com/kaibioinfo/canopus_treemap.
+They have to be stored in the same folder under the name 'canopus_npc_summary.csv'.
+
+You can get the example running:
+```{r}
+source(file = "inst/scripts/get_example_sirius.R")
+```
+
 #### GNPS
 
 We also provide an example GNPS job id, which is: `a177b17ded9f4e01bf343317bfc0372e`
@@ -55,13 +65,19 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 Depending on the annotation tool you used, you can format its results using: 
 
 ```{r}
+source(file = "inst/scripts/prepare_gnps.R")
+```
+
+or 
+
+```{r}
 source(file = "inst/scripts/prepare_isdb.R")
 ```
 
 or 
 
 ```{r}
-source(file = "inst/scripts/prepare_gnps.R")
+source(file = "inst/scripts/prepare_sirius.R")
 ```
 
 You now have your annotations well prepared and can keep on formatting the rest of your metadata

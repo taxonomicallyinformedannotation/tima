@@ -25,7 +25,7 @@ Here is what you *minimally* need:
 Optionally, you may want to add:
 
 - An in-house structure-organism pairs library (we provide **[LOTUS](https://lotusnprod.github.io/lotus-manuscript)** as starting point for each user)
-- Your own manual or automated annotations (we currently support annotations coming from ISDB and soon SIRIUS)
+- Your own manual or automated annotations (we currently support annotations coming from ISDB and SIRIUS (with some limitations))
 
 ## Installation
 

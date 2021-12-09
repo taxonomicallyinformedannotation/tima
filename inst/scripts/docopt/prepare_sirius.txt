@@ -1,10 +1,11 @@
 You can use this script with the following example:
 Rscript inst/scripts/prepare_sirius.R --directory 'inst/extdata/interim/annotations/sirius_example' --output 'inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_sirius_pretreated.tsv.gz'
 
-Usage: prepare_isdb.R [--directory=<directory>] [--output=<output>]
+Usage: prepare_isdb.R [--directory=<directory>] [--npc=<npc>] [--output=<output>]
 
 Arguments:
   -d --directory=<directory>    Directory containing SIRIUS results
+  -n --npc=<npc>                Has npc_summary been computed?
   -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
 
 Options:

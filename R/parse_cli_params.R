@@ -96,6 +96,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$value)) {
       params$filter$value <- arguments$value
     }
+    if (!is.null(arguments$npc)) {
+      params$npc <- arguments$npc
+    }
   }
 
   return(params)

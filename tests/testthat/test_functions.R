@@ -32,8 +32,11 @@ testthat::test_that("processing annotations", {
   params <- get_params(step = step)
   prepare_adducts()
 
-  ## 2
+  ## 2.a
   get_example_isdb()
+
+  ## 2.b
+  get_example_sirius()
 
   ## 3.a
   step <- "prepare_isdb"
@@ -41,14 +44,14 @@ testthat::test_that("processing annotations", {
   prepare_isdb()
 
   ## 3.b
+  step <- "prepare_sirius"
+  params <- get_params(step = step)
+  prepare_sirius()
+
+  # 3.c
   step <- "prepare_gnps"
   params <- get_params(step = step)
   prepare_gnps()
-
-  ## 3.c
-  # step <- "prepare_sirius"
-  # params <- get_params()
-  # prepare_sirius()
 
   ## 4.1
   step <- "prepare_edges"

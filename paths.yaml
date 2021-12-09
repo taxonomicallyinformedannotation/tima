@@ -16,6 +16,7 @@ data:
     annotations:
       path: inst/extdata/interim/annotations
       example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
+      example_sirius: inst/extdata/interim/annotations/sirius_example
     config:
       path: inst/extdata/interim/config
     edges:
@@ -53,6 +54,7 @@ inst:
       path: inst/scripts/docopt
 links:
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
+  example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
   lotus: https://osf.io/rheq5/download
 tests:
   path: tests

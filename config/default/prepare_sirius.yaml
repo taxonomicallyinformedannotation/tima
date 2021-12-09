@@ -1,2 +1,3 @@
-directory: ../../20210804_10043
-output: inst/extdata/interim/annotations/10043_sirius_pretreated.tsv.gz
+directory: inst/extdata/interim/annotations/sirius_example
+npc: true
+output: inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_sirius_pretreated.tsv.gz
