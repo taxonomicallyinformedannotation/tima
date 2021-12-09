@@ -4,10 +4,16 @@
 \alias{prepare_sirius}
 \title{Title}
 \usage{
-prepare_sirius(input_directory = params$directory, output = params$output)
+prepare_sirius(
+  input_directory = params$directory,
+  npc = params$npc,
+  output = params$output
+)
 }
 \arguments{
 \item{input_directory}{TODO}
+
+\item{npc}{TODO}
 
 \item{output}{TODO}
 }
