@@ -206,6 +206,6 @@ prepare_sirius <-
     export_params(
       parameters = params,
       directory = paths$data$interim$config$path,
-      step = step
+      step = "prepare_sirius"
     )
   }
