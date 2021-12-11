@@ -1,12 +1,10 @@
 name: "Tag latest release of action tagger :zap:"
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  release:
+    types:
+      - published
+      - edited
 
 jobs:
   run-tag-latest:
