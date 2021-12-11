@@ -1,6 +1,6 @@
 tool: gnps # manual
-gnps: a177b17ded9f4e01bf343317bfc0372e # only needed if gnps
+gnps: 96fa7c88200e4a03bee4644e581e3fb0 # only needed if gnps
 input: inst/extdata/source/example_edges_manual.csv # input only needed if manual
-output: inst/extdata/interim/edges/a177b17ded9f4e01bf343317bfc0372e_edges.tsv.gz
+output: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 source_name: CLUSTERID1
 target_name: CLUSTERID2

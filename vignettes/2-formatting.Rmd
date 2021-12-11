@@ -56,7 +56,7 @@ source(file = "inst/scripts/get_example_sirius.R")
 
 #### GNPS
 
-We also provide an example GNPS job id, which is: `a177b17ded9f4e01bf343317bfc0372e`
+We also provide an example GNPS job id, which is: `96fa7c88200e4a03bee4644e581e3fb0`
 
 ### Formatting
 

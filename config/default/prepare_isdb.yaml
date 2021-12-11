@@ -1,2 +1,2 @@
 input: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
-output: inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_pretreated.tsv.gz
+output: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz

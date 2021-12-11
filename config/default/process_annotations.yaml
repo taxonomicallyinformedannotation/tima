@@ -1,8 +1,8 @@
 library: inst/extdata/interim/libraries/library.tsv.gz # Library file prepared with previous steps
 name: library # Adducts library file prepared with previous steps
-annotation: inst/extdata/interim/annotations/a177b17ded9f4e01bf343317bfc0372e_isdb_treated.tsv.gz # Annotation file prepared with previous steps
-taxa: inst/extdata/interim/taxa/a177b17ded9f4e01bf343317bfc0372e_taxed.tsv.gz # Taxed features file prepared with previous steps
-edges: inst/extdata/interim/edges/a177b17ded9f4e01bf343317bfc0372e_edges.tsv.gz # Edges file prepared with previous steps
+annotation: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz # Annotation file prepared with previous steps
+taxa: inst/extdata/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz # Taxed features file prepared with previous steps
+edges: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz # Edges file prepared with previous steps
 output: FinalResults.tsv
 top_k:
   initial: 50
