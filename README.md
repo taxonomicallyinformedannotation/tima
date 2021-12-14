@@ -56,8 +56,6 @@ Once installed, you are ready to go through our [documentation](https://taxonomi
 If you want to test an example:
 
 ```shell
-Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
-remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 cp -R config/default config/params
 Rscript inst/scripts/tima.R
 ```
