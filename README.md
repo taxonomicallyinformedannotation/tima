@@ -31,9 +31,16 @@ Optionally, you may want to add:
 
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
+On UNIX systems:
 ```shell
 Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
 remotes::install_github("taxonomicallyinformedannotation/tima-r")'
+```
+
+On Windows:
+```shell
+Rscript -e "if(!requireNamespace('remotes')){install.packages('remotes')}
+remotes::install_github('taxonomicallyinformedannotation/tima-r')"
 ```
 
 or in R directly:
