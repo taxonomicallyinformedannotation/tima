@@ -53,9 +53,21 @@ remotes::install_github("taxonomicallyinformedannotation/tima-r")
 
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
-If you want to test an example:
+Do not forget to clone the repository (it will allow you to access default architecture, files, and parameters):
+
+```shell
+git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
+cd tima-r
+```
+
+Then, copy the defaut parameters:
 
 ```shell
 cp -R config/default config/params
+```
+
+Once done, you can start with an example using:
+
+```shell
 Rscript inst/scripts/tima.R
 ```

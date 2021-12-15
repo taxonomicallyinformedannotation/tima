@@ -45,6 +45,13 @@ They will then be saved as YAML you will be able to share.
 
 Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles). 
 
+All coming steps admit you already cloned the repository and went to its root:
+```
+git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
+cd tima-r
+```
+
+
 ### Copy initial parameters
 
 As mentioned previously, scripts need some parameters to be filled.
