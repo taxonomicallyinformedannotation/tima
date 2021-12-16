@@ -25,7 +25,6 @@ jobs:
         shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v1
-          needs: website
         
       - name: Cache R packages
         uses: actions/cache@v2
