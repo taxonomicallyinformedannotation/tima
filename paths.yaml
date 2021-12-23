@@ -55,6 +55,6 @@ inst:
 links:
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
   example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
-  lotus: https://osf.io/8wh9y/download
+  lotus: https://zenodo.org/record/5794107/files/211220_frozen_metadata.csv.gz?download=1
 tests:
   path: tests
