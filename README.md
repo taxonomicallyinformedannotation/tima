@@ -63,7 +63,7 @@ cd tima-r
 Then, copy the defaut parameters:
 
 ```shell
-cp -R config/default config/params
+rsync -a --delete config/default/ config/params
 ```
 
 Once done, you can start with an example using:

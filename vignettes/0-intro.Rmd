@@ -61,7 +61,7 @@ So first, start by copying them into `config/params` directory.
 To do so:
 
 ```{bash}
-cp -R config/default config/params
+rsync -a --delete config/default/ config/params
 ```
 
 You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
