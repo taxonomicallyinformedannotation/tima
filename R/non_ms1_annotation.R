@@ -48,7 +48,8 @@ non_ms1_annotation <-
         mz,
         rt,
       ) |>
-      dplyr::distinct()
+      dplyr::distinct() |>
+      dplyr::mutate_all(as.numeric)
 
     cat("adding \"notAnnotated\" \n")
     df18 <- dplyr::left_join(df17, df16) |>

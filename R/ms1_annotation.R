@@ -565,7 +565,7 @@ ms1_annotation <-
     cat("adding \"notAnnotated\" \n")
     df26 <- dplyr::left_join(df25, df24) |>
       dplyr::distinct() |>
-      dplyr::mutate(dplyr::across(mz, as.numeric)) |>
+      dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
     df26["inchikey_2D"][is.na(df26["inchikey_2D"])] <-
