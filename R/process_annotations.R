@@ -112,6 +112,11 @@ process_annotations <- function(library = params$library,
       file = annotation,
       col_types = "c"
     ) |>
+      dplyr::mutate_all(list(~ gsub(
+        pattern = "\\|",
+        replacement = " or ",
+        x = .x
+      ))) |>
     dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
   log_debug(x = "... metadata_table_biological_annotation")
@@ -134,6 +139,11 @@ process_annotations <- function(library = params$library,
       col_types = "c"
     ) |>
     dplyr::filter(!is.na(structure_exact_mass)) |>
+      dplyr::mutate_all(list(~ gsub(
+        pattern = "\\|",
+        replacement = " or ",
+        x = .x
+      ))) |>
     dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
     dplyr::mutate_if(is.logical, as.character)
 
