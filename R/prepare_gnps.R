@@ -18,18 +18,18 @@ prepare_gnps <-
     }
 
     log_debug("Loading and formatting GNPS results")
-    ## see https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
+    ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- read_results(id = gnps_job_id) |>
       dplyr::select(
         feature_id = `#Scan#`,
         smiles = Smiles,
-        # smiles_2D, ## not available for now
+        # smiles_2D, #' Not available for now
         inchikey = InChIKey,
         inchikey_2D = `InChIKey-Planar`,
         structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
         structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
         structure_taxonomy_npclassifier_03class = npclassifier_class,
-        # molecular_formula, ## not available for now
+        # molecular_formula, # Not available for now
         structure_exact_mass = ExactMass,
         score_input = MQScore
       ) |>
@@ -42,7 +42,7 @@ prepare_gnps <-
     if (!is.null(nap_job_id)) {
       log_debug("Loading NAP results")
       ## TODO look at recent NAP outputs
-      ## might be outdated
+      ## Might be outdated
       table <- read_nap(id = nap_job_id) |>
         dplyr::select(
           feature_id = cluster.index,

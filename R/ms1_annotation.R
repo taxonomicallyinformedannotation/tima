@@ -1,4 +1,4 @@
-# require(...)
+## TODO require(...)
 
 #' Title
 #'
@@ -176,7 +176,7 @@ ms1_annotation <-
         label = label_dest
       )
 
-    ## always considering [M+H]+ and [M-H]- ions
+    ## Always considering [M+H]+ and [M-H]- ions by default
     df9_ion <- df3 |>
       dplyr::distinct(feature_id) |>
       dplyr::mutate(label = switch(msMode,
@@ -278,7 +278,7 @@ ms1_annotation <-
         structure_smiles_2D
       )
 
-    # this will then be externalized somehow
+    ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
       "pos_1_1proton1acetonitrile - NH3",
       "pos_1_1proton1ammonium - NH3",

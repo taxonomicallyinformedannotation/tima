@@ -1,4 +1,4 @@
-# require(...)
+#' TODO require(...)
 
 #' Title
 #'
@@ -30,7 +30,7 @@ biological_cleaning <-
     }
     df01 <- annotationTableWeightedBio |>
       dplyr::filter(score_initialNormalized > 0 |
-        # those lines are to keep ms1 annotation
+        #' Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
@@ -284,7 +284,7 @@ biological_cleaning <-
       ) |>
       dplyr::tibble()
 
-    # think about the score
+    #' Think about better scoring option
     cat("adding dummy consistency for features with less than 2 neighbors \n")
     dummy_consistency <- df2 |>
       dplyr::mutate(

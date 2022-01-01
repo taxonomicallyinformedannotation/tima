@@ -22,8 +22,10 @@ prepare_sirius <-
     log_debug("Loading and formatting SIRIUS results")
     if (npc == TRUE) {
       canopus <-
-        readr::read_delim(file = file.path(input_directory,
-                                           "canopus_npc_summary.csv"))
+        readr::read_delim(file = file.path(
+          input_directory,
+          "canopus_npc_summary.csv"
+        ))
     } else {
       cat(
         "Please compute NPClassifier Canopus summary file, we do not support Classyfire anymore"
@@ -31,24 +33,34 @@ prepare_sirius <-
     }
 
     canopus_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "canopus_summary_adducts.tsv"))
+      readr::read_delim(file = file.path(
+        input_directory,
+        "canopus_summary_adducts.tsv"
+      ))
 
     formula <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "formula_identifications.tsv"))
+      readr::read_delim(file = file.path(
+        input_directory,
+        "formula_identifications.tsv"
+      ))
 
     formula_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "formula_identifications_adducts.tsv"))
+      readr::read_delim(file = file.path(
+        input_directory,
+        "formula_identifications_adducts.tsv"
+      ))
 
     compound <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "compound_identifications.tsv"))
+      readr::read_delim(file = file.path(
+        input_directory,
+        "compound_identifications.tsv"
+      ))
 
     compound_adducts <-
-      readr::read_delim(file = file.path(input_directory,
-                                         "compound_identifications_adducts.tsv"))
+      readr::read_delim(file = file.path(
+        input_directory,
+        "compound_identifications_adducts.tsv"
+      ))
 
     ## TODO compound classes if npclassifier one day
     canopus_prepared <- canopus |>
@@ -96,9 +108,11 @@ prepare_sirius <-
         molecular_formula = molecularFormula,
         score_input
       ) |>
-      dplyr::mutate(library = "SIRIUS",
-                    inchikey = NA,
-                    smiles_2D = smiles)
+      dplyr::mutate(
+        library = "SIRIUS",
+        inchikey = NA,
+        smiles_2D = smiles
+      )
 
     compound_adducts_prepared <- compound_adducts |>
       dplyr::mutate(
@@ -120,9 +134,11 @@ prepare_sirius <-
         molecular_formula = molecularFormula,
         score_input
       ) |>
-      dplyr::mutate(library = "SIRIUS",
-                    inchikey = NA,
-                    smiles_2D = smiles)
+      dplyr::mutate(
+        library = "SIRIUS",
+        inchikey = NA,
+        smiles_2D = smiles
+      )
 
     formula_prepared <- formula |>
       dplyr::mutate(feature_id = gsub(
@@ -155,11 +171,12 @@ prepare_sirius <-
       dplyr::left_join(canopus_prepared) |>
       dplyr::distinct()
 
-    table[] <-
-      lapply(table,
-             function(x) {
-               y_as_na(x, y = "N/A")
-             })
+    table[] <- lapply(
+      table,
+      function(x) {
+        y_as_na(x, y = "N/A")
+      }
+    )
 
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(
@@ -197,11 +214,15 @@ prepare_sirius <-
       no = paste(dirname(output), "exists")
     )
 
-    log_debug(x = "... path to export is",
-              output)
-    readr::write_delim(x = table,
-                       file = output,
-                       delim = "\t")
+    log_debug(
+      x = "... path to export is",
+      output
+    )
+    readr::write_delim(
+      x = table,
+      file = output,
+      delim = "\t"
+    )
 
     export_params(
       parameters = params,

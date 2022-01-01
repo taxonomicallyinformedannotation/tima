@@ -1,4 +1,4 @@
-## credit goes to usedist package
+#' Credit goes to usedist package
 
 #' Title
 #'

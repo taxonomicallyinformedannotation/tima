@@ -18,7 +18,7 @@ read_results <- function(id) {
 
   file <-
     paste0(
-      "http://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
+      "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
       id,
       "&block=main&file=DB_result/"
     )

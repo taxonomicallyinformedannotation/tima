@@ -82,7 +82,7 @@ process_annotations <- function(library = params$library,
                                 minimal_ms1_chemo = params$scores$chemical$minimal,
                                 force = params$force) {
   stopifnot("Your library file does not exist." = file.exists(library))
-  ## add name
+  ## TODO add name
   stopifnot("Your annotation file does not exist." = file.exists(annotation))
   stopifnot("Your taxa file does not exist." = file.exists(taxa))
   stopifnot("Your edges file does not exist." = file.exists(edges))
@@ -95,9 +95,9 @@ process_annotations <- function(library = params$library,
     stopifnot("Your rt tolerance must be lower or equal to 0.1" = tolerance_rt <=
       0.1)
   }
-  ## for later on
+  ## TODO for later on
   # stopifnot(
-  #  adducts
+  #  adducts ...
   # )
 
   vars <- ls(all.names = TRUE)
@@ -112,11 +112,11 @@ process_annotations <- function(library = params$library,
       file = annotation,
       col_types = "c"
     ) |>
-      dplyr::mutate_all(list(~ gsub(
-        pattern = "\\|",
-        replacement = " or ",
-        x = .x
-      ))) |>
+    dplyr::mutate_all(list(~ gsub(
+      pattern = "\\|",
+      replacement = " or ",
+      x = .x
+    ))) |>
     dplyr::mutate(dplyr::across(feature_id, as.numeric))
 
   log_debug(x = "... metadata_table_biological_annotation")
@@ -139,18 +139,18 @@ process_annotations <- function(library = params$library,
       col_types = "c"
     ) |>
     dplyr::filter(!is.na(structure_exact_mass)) |>
-      dplyr::mutate_all(list(~ gsub(
-        pattern = "\\|",
-        replacement = " or ",
-        x = .x
-      ))) |>
+    dplyr::mutate_all(list(~ gsub(
+      pattern = "\\|",
+      replacement = " or ",
+      x = .x
+    ))) |>
     dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
     dplyr::mutate_if(is.logical, as.character)
 
   structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
     "notClassified"
 
-  # # for MS1 only
+  ## For MS1 only
   # metadata_table_spectral_annotation <-
   #   metadata_table_spectral_annotation |>
   #   dplyr::mutate(

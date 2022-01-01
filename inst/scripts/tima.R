@@ -14,66 +14,66 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
-## 1.1
+#' 1.1
 get_lotus()
 
-## 1.2
+#' 1.2
 prepare_lotus()
 
-## 1.3
+#' 1.3
 step <- "prepare_closed"
 params <- get_params(step = step)
 prepare_closed()
 
-## 1.4
+#' 1.4
 step <- "prepare_library"
 params <- get_params(step = step)
 prepare_library()
 
-## 1.5
+#' 1.5
 step <- "prepare_adducts"
 params <- get_params(step = step)
 prepare_adducts()
 
-## 2
+#' 2
 get_example_isdb()
 
-## 3.a
+#' 3.1
 step <- "prepare_isdb"
 params <- get_params(step = step)
 prepare_isdb()
 
-## 3.b
+#' 3.2
 step <- "prepare_gnps"
 params <- get_params(step = step)
 prepare_gnps()
 
-## 3.c
+#' 3.3
 # step <- "prepare_sirius"
 # params <- get_params()
 # prepare_sirius()
 
-## 4.1
+#' 4.1
 step <- "prepare_edges"
 params <- get_params(step = step)
 prepare_edges()
 
-## 4.2
+#' 4.2
 step <- "prepare_features_components"
 params <- get_params(step = step)
 prepare_features_components()
 
-## 4.3
+#' 4.3
 step <- "prepare_features_classification"
 params <- get_params(step = step)
 prepare_features_classification()
 
-## 4.4
+#' 4.4
 step <- "prepare_taxa"
 params <- get_params(step = step)
 prepare_taxa()
 
-## 4.5
+#' 5
 step <- "process_annotations"
 params <- get_params(step = step)
 process_annotations()
