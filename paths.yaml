@@ -35,6 +35,9 @@ data:
   source:
     path: inst/extdata/source
     adducts: inst/extdata/source/adducts.tsv
+    benchmark:
+      path: inst/extdata/source/benchmark
+      set: inst/extdata/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
     dictionaries:
       path: inst/extdata/source/dictionaries
       ranks: inst/extdata/source/dictionaries/ranks.tsv
@@ -53,6 +56,7 @@ inst:
     docopt:
       path: inst/scripts/docopt
 links:
+  benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
   example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
   lotus: https://zenodo.org/record/5794107/files/211220_frozen_metadata.csv.gz?download=1
