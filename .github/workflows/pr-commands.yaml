@@ -1,14 +1,14 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   issue_comment:
-    types: [ created ]
+    types: [created]
 
 name: Commands
 
 jobs:
   document:
-    if: startsWith(github.event.comment.body, '/document')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
     name: document
     runs-on: ubuntu-latest
     env:
@@ -26,7 +26,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: roxygen2
+          extra-packages: any::roxygen2
+          needs: pr-document
 
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise()'
@@ -43,7 +44,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   style:
-    if: startsWith(github.event.comment.body, '/style')
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/style') }}
     name: style
     runs-on: ubuntu-latest
     env:
