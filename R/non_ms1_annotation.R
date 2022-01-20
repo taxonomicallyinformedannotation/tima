@@ -12,8 +12,8 @@
 non_ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {
-    cat("formatting \n")
-    df15 <- annotationTable |>
+    cat("formatting initial results \n")
+    df23 <- annotationTable |>
       dplyr::mutate(dplyr::across(
         c(
           mz_error,
@@ -27,21 +27,28 @@ non_ms1_annotation <-
       dplyr::distinct()
 
     cat("ranking \n")
-    df16 <- df15 |>
+    df24 <- df23 |>
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
       dplyr::filter(rank_initial <= candidatesInitial) |>
-      dplyr::select(
-        -rt,
-        -mz
+      dplyr::distinct(
+        feature_id,
+        component_id,
+        score_input,
+        library,
+        mz_error,
+        molecular_formula,
+        inchikey_2D,
+        smiles_2D,
+        rank_initial
       )
 
     if (!any(names(annotationTable) == "rt")) {
       annotationTable[, "rt"] <- 0
     }
 
-    df17 <- annotationTable |>
+    df25 <- annotationTable |>
       dplyr::select(
         feature_id,
         component_id,
@@ -52,24 +59,24 @@ non_ms1_annotation <-
       dplyr::mutate_all(as.numeric)
 
     cat("adding \"notAnnotated\" \n")
-    df18 <- dplyr::left_join(df17, df16) |>
+    df26 <- dplyr::left_join(df25, df24) |>
       dplyr::distinct() |>
       dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
-    df18["inchikey_2D"][is.na(df18["inchikey_2D"])] <-
+    df26["inchikey_2D"][is.na(df26["inchikey_2D"])] <-
       "notAnnotated"
-    df18["score_input"][is.na(df18["score_input"])] <-
+    df26["score_input"][is.na(df26["score_input"])] <-
       0
-    df18["library"][is.na(df18["library"])] <-
+    df26["library"][is.na(df26["library"])] <-
       "N/A"
-    df18["mz_error"][is.na(df18["mz_error"])] <-
+    df26["mz_error"][is.na(df26["mz_error"])] <-
       666
-    df18["rank_initial"][is.na(df18["rank_initial"])] <-
+    df26["rank_initial"][is.na(df26["rank_initial"])] <-
       candidatesInitial
 
-    df19 <- dplyr::left_join(
-      df18,
+    df27 <- dplyr::left_join(
+      df26,
       structure_organism_pairs_table |>
         dplyr::distinct(
           inchikey_2D = structure_inchikey_2D,
@@ -80,5 +87,5 @@ non_ms1_annotation <-
         )
     )
 
-    return(df19)
+    return(df27)
   }

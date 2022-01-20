@@ -274,6 +274,7 @@ ms1_annotation <-
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::distinct(
         structure_exact_mass,
+        structure_molecular_formula,
         structure_inchikey_2D,
         structure_smiles_2D
       )
@@ -303,6 +304,7 @@ ms1_annotation <-
       by = setNames("structure_exact_mass", "exact_mass")
     ) |>
       dplyr::select(
+        molecular_formula = structure_molecular_formula,
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         library,
@@ -489,7 +491,7 @@ ms1_annotation <-
         string = library_name
       )) |>
       dplyr::mutate(mz_error = adduct_mass - adduct_value) |>
-      dplyr::select(
+      dplyr::distinct(
         feature_id,
         component_id,
         rt,
@@ -504,6 +506,7 @@ ms1_annotation <-
       dplyr::left_join(df21, df13, by = setNames("structure_exact_mass", "exact_mass")) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
+        molecular_formula = structure_molecular_formula,
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         library = library_name,
@@ -543,6 +546,7 @@ ms1_annotation <-
         score_input,
         library,
         mz_error,
+        molecular_formula,
         inchikey_2D,
         smiles_2D,
         rank_initial

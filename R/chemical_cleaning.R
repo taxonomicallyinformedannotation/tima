@@ -54,8 +54,17 @@ chemical_cleaning <-
     }
 
     df12 <- df11 |>
-      dplyr::mutate(dplyr::across(rank_initial, as.numeric)) |>
-      dplyr::mutate(component_id = as.numeric(component_id))
+      dplyr::distinct(
+        feature_id,
+        component_id,
+        rt,
+        mz,
+        molecular_formula,
+        inchikey_2D,
+        smiles_2D,
+        library,
+        mz_error
+      )
 
     cat("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- dplyr::left_join(df1, df12) |>
@@ -72,7 +81,9 @@ chemical_cleaning <-
         component_id,
         rt,
         mz,
+        molecular_formula,
         inchikey_2D,
+        smiles_2D,
         library,
         mz_error,
         rank_initial,
@@ -95,15 +106,8 @@ chemical_cleaning <-
 
     df3 <- structureOrganismPairsTable |>
       dplyr::arrange(reference_doi) |>
-      dplyr::distinct(structure_inchikey_2D,
-        organism_name,
-        reference_doi,
-        .keep_all = TRUE
-      ) |>
-      dplyr::select(
+      dplyr::distinct(
         inchikey_2D = structure_inchikey_2D,
-        smiles_2D = structure_smiles_2D,
-        molecular_formula = structure_molecular_formula,
         lowest_candidate_organism = organism_name,
         reference_doi
       )

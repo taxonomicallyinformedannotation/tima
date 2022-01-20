@@ -243,7 +243,7 @@ process_annotations <- function(library = params$library,
   chemical_decoration()
 
   log_debug(x = "cleaning for cytoscape export")
-  results2cytoscape <- chemical_cleaning()
+  results2cytoscape <<- chemical_cleaning()
 
   log_debug(x = "Exporting ...")
   ifelse(

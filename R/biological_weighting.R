@@ -41,6 +41,7 @@ biological_weighting <-
       dplyr::select(
         feature_id,
         component_id,
+        molecular_formula,
         inchikey_2D,
         smiles_2D,
         score_input,
