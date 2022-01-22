@@ -14,7 +14,7 @@ parse_cli_params <- function() {
       params$annotations <- arguments$annotations
     }
     if (!is.null(arguments$biological)) {
-      params$weights$biological <- arguments$biological
+      params$weights$biological <- as.numeric(arguments$biological)
     }
     if (!is.null(arguments$column.name)) {
       params$column_name <- arguments$column.name
@@ -38,7 +38,7 @@ parse_cli_params <- function() {
       params$force <- arguments$force
     }
     if (!is.null(arguments$gemical)) {
-      params$weights$chemical <- arguments$gemical
+      params$weights$chemical <- as.numeric(arguments$gemical)
     }
     if (!is.null(arguments$gnps)) {
       params$gnps <- arguments$gnps
@@ -88,7 +88,7 @@ parse_cli_params <- function() {
         arguments$source
     }
     if (!is.null(arguments$spectral)) {
-      params$weights$spectral <- arguments$spectral
+      params$weights$spectral <- as.numeric(arguments$spectral)
     }
     if (!is.null(arguments$target)) {
       params$target_name <-
