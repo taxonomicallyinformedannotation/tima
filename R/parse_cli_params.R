@@ -10,8 +10,8 @@ parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {
-    if (!is.null(arguments$annotations)) {
-      params$annotations <- arguments$annotations
+    if (!is.null(arguments$annotation)) {
+      params$annotation <- arguments$annotation
     }
     if (!is.null(arguments$biological)) {
       params$weights$biological <- as.numeric(arguments$biological)
@@ -30,6 +30,10 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$extension)) {
       params$extension <- arguments$extension
+    }
+    if (!is.null(arguments$features)) {
+      params$taxa <-
+        arguments$features
     }
     if (!is.null(arguments$filter)) {
       params$filter$mode <- arguments$filter
@@ -93,10 +97,6 @@ parse_cli_params <- function() {
     if (!is.null(arguments$target)) {
       params$target_name <-
         arguments$target
-    }
-    if (!is.null(arguments$taxa)) {
-      params$taxa <-
-        arguments$taxa
     }
     if (!is.null(arguments$tool)) {
       params$tool <-
