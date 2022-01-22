@@ -108,6 +108,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$npc)) {
       params$npc <- arguments$npc
     }
+    if (!is.null(arguments$zbim)) {
+      params$ms$ms1only <- arguments$zbim
+    }
   }
 
   return(params)
