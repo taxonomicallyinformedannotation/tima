@@ -42,6 +42,7 @@ process_annotations(
   adducts_list = params$ms$adducts,
   minimal_ms1_bio = params$scores$biological$minimal,
   minimal_ms1_chemo = params$scores$chemical$minimal,
+  ms1_only = params$ms$ms1only,
   force = params$force
 )
 }
@@ -119,6 +120,8 @@ process_annotations(
 \item{minimal_ms1_bio}{TODO}
 
 \item{minimal_ms1_chemo}{TODO}
+
+\item{ms1_only}{TODO}
 
 \item{force}{TODO}
 }

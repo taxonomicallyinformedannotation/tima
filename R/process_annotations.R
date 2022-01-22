@@ -38,6 +38,7 @@
 #' @param adducts_list TODO
 #' @param minimal_ms1_bio TODO
 #' @param minimal_ms1_chemo TODO
+#' @param ms1_only TODO
 #'
 #' @return TODO
 #' @export
@@ -80,6 +81,7 @@ process_annotations <- function(library = params$library,
                                 adducts_list = params$ms$adducts,
                                 minimal_ms1_bio = params$scores$biological$minimal,
                                 minimal_ms1_chemo = params$scores$chemical$minimal,
+                                ms1_only = params$ms$ms1only,
                                 force = params$force) {
   stopifnot("Your library file does not exist." = file.exists(library))
   ## TODO add name
@@ -150,19 +152,20 @@ process_annotations <- function(library = params$library,
   structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
     "notClassified"
 
-  ## For MS1 only
-  # metadata_table_spectral_annotation <-
-  #   metadata_table_spectral_annotation |>
-  #   dplyr::mutate(
-  #     inchikey_2D = NA,
-  #     score_input = NA,
-  #     library = NA,
-  #     mz_error = NA
-  #   ) |>
-  #   dplyr::mutate(across(c(
-  #     inchikey_2D, score_input, library, mz_error
-  #   ),
-  #   as.character))
+  if (ms1_only == TRUE){
+  metadata_table_spectral_annotation <-
+    metadata_table_spectral_annotation |>
+    dplyr::mutate(
+      inchikey_2D = NA,
+      score_input = NA,
+      library = NA,
+      mz_error = NA
+    ) |>
+    dplyr::mutate(across(c(
+      inchikey_2D, score_input, library, mz_error
+    ),
+    as.character))
+  }
 
   if (annotate == TRUE) {
     log_debug("... single charge adducts table")

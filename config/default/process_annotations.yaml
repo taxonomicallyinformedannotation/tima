@@ -38,6 +38,7 @@ ms:
   mode: pos
   level: 1 # currently only 1, not a real parameter... for now
   annotate: TRUE
+  ms1only: FALSE
   tolerance:
     ppm: 10
     rt: 0.05
