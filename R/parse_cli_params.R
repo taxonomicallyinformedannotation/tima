@@ -13,6 +13,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$annotations)) {
       params$annotations <- arguments$annotations
     }
+    if (!is.null(arguments$biological)) {
+      params$weights$biological <- arguments$biological
+    }
     if (!is.null(arguments$column.name)) {
       params$column_name <- arguments$column.name
     }
@@ -33,6 +36,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$force)) {
       params$force <- arguments$force
+    }
+    if (!is.null(arguments$gemical)) {
+      params$weights$chemical <- arguments$gemical
     }
     if (!is.null(arguments$gnps)) {
       params$gnps <- arguments$gnps
@@ -80,6 +86,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$source)) {
       params$source_name <-
         arguments$source
+    }
+    if (!is.null(arguments$spectral)) {
+      params$weights$spectral <- arguments$spectral
     }
     if (!is.null(arguments$target)) {
       params$target_name <-
