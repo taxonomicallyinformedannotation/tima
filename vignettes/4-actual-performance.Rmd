@@ -7,6 +7,9 @@ vignette: >
   %\VignetteIndexEntry{4 Actual Performance}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+resource_files:
+  - benchmark_full.svg
+  - benchmark_zoomed.svg
 ---
 
 ```{r setup, include = FALSE}
