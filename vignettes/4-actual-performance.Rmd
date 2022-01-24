@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 knitr::opts_knit$set(root.dir = '..')
-knitr::opts_chunk$set(fig.path = "man/figures/")
+knitr::opts_chunk$set(dev = "svg")
+# knitr::opts_chunk$set(fig.path = "man/figures/")
 ```
 
 This vignette simply shows the actual performance of TIMA.
