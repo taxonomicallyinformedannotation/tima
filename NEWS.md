@@ -1,5 +1,8 @@
 # timaR
 
+## Changes in 2.2.1
+- Minor version name fixes
+
 ## Changes in 2.2.0
 - Various fixes
 - Added benchmark ([here](https://taxonomicallyinformedannotation.github.io/tima-r/articles/4-actual-performance.html))
