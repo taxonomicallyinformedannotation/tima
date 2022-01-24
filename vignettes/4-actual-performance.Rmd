@@ -24,7 +24,7 @@ The benchmarking dataset was built using https://zenodo.org/record/5186176.
 It contains positive MS2 spectra of multiple ion species ([M+H]+, [M+Na]+, [M+NH4]+, ...) coming from different mass spectrometers.
 
 ## Best 500 candidates
-![benchmark](benchmark_full.svg)\
+![benchmark](man/figures/benchmark_full.svg)\
 
 ## Best 25 candidates (zoomed)
-![benchmark_zoomed](benchmark_zoomed.svg)\
+![benchmark_zoomed](man/figures/benchmark_zoomed.svg)\
