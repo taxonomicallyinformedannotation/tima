@@ -14,19 +14,20 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = '..')
-knitr::opts_chunk$set(dev = "svg")
-# knitr::opts_chunk$set(fig.path = "man/figures/")
 ```
 
 This vignette simply shows the actual performance of TIMA.
 
-The benchmarking dataset was built using https://zenodo.org/record/5186176.
+The benchmarking dataset was built using [https://zenodo.org/record/5186176](https://zenodo.org/record/5186176).
 
 It contains positive MS2 spectra of multiple ion species ([M+H]+, [M+Na]+, [M+NH4]+, ...) coming from different mass spectrometers.
 
 ## Best 500 candidates
-![benchmark](benchmark_full.svg)\
+```{r, echo=FALSE}
+knitr::include_graphics("benchmark_full.svg")
+```
 
 ## Best 25 candidates (zoomed)
-![benchmark_zoomed](benchmark_zoomed.svg)\
+```{r, echo=FALSE}
+knitr::include_graphics("benchmark_zoomed.svg")
+```
