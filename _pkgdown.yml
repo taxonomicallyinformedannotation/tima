@@ -12,3 +12,5 @@ template:
     twitter:
       creator: "@adafede"
 url: https://taxonomicallyinformedannotation.github.io/tima-r
+figure:
+  fig.ext: svg
