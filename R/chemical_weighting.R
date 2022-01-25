@@ -104,14 +104,13 @@ chemical_weighting <-
         (1 / (weightChemical + weightBiological + weightSpectral)) *
           weightChemical *
           score_chemical +
-        (1 / (weightChemical + weightBiological + weightSpectral)) *
-          weightBiological *
-          score_biological +
           (1 / (weightChemical + weightBiological + weightSpectral)) *
-          weightSpectral *
-          score_initialNormalized
-      )
-      ) |>
+            weightBiological *
+            score_biological +
+          (1 / (weightChemical + weightBiological + weightSpectral)) *
+            weightSpectral *
+            score_initialNormalized
+      )) |>
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
