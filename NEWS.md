@@ -1,5 +1,9 @@
 # timaR
 
+## Changes in 2.2.2
+- Minor fixes 
+- Additional benchmark figure ([Correct hits repartition](https://taxonomicallyinformedannotation.github.io/tima-r/articles/4-actual-performance.html#correct-hits-repartition))
+
 ## Changes in 2.2.1
 - Minor version name fixes
 
