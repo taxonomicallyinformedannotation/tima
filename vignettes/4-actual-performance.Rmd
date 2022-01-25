@@ -10,6 +10,7 @@ vignette: >
 resource_files:
   - benchmark_full.svg
   - benchmark_zoomed.svg
+  - benchmark_comparison.svg
 ---
 
 ```{r setup, include = FALSE}
@@ -33,4 +34,9 @@ knitr::include_graphics("benchmark_full.svg")
 ## Best 25 candidates (zoomed)
 ```{r, echo=FALSE}
 knitr::include_graphics("benchmark_zoomed.svg")
+```
+
+## Correct hits repartition
+```{r, echo=FALSE}
+knitr::include_graphics("benchmark_comparison.svg")
 ```
