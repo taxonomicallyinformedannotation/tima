@@ -14,7 +14,9 @@ if (!require(stringr)) {
 #' Title
 #'
 #' @param annotationTableWeightedBioCleaned TODO
-#' @param WeightChemical TODO
+#' @param weightSpectral TODO
+#' @param weightBiological TODO
+#' @param weightChemical TODO
 #' @param scoreChemicalPathway TODO
 #' @param scoreChemicalSuperclass TODO
 #' @param scoreChemicalClass TODO
@@ -25,7 +27,9 @@ if (!require(stringr)) {
 #' @examples
 chemical_weighting <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
-           WeightChemical = weight_chemical,
+           weightSpectral = weight_spectral,
+           weightBiological = weight_biological,
+           weightChemical = weight_chemical,
            scoreChemicalPathway = score_chemical_pathway,
            scoreChemicalSuperclass = score_chemical_superclass,
            scoreChemicalClass = score_chemical_class) {
@@ -97,8 +101,17 @@ chemical_weighting <-
     df4 <- df4 |>
       dplyr::rowwise() |>
       dplyr::mutate(score_pondered_chemo = (
-        WeightChemical * score_chemical + as.numeric(score_pondered_bio)
-      )) |>
+        (1 / (weightChemical + weightBiological + weightSpectral)) *
+          weightChemical *
+          score_chemical +
+        (1 / (weightChemical + weightBiological + weightSpectral)) *
+          weightBiological *
+          score_biological +
+          (1 / (weightChemical + weightBiological + weightSpectral)) *
+          weightSpectral *
+          score_initialNormalized
+      )
+      ) |>
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
