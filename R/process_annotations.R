@@ -152,19 +152,21 @@ process_annotations <- function(library = params$library,
   structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
     "notClassified"
 
-  if (ms1_only == TRUE){
-  metadata_table_spectral_annotation <-
-    metadata_table_spectral_annotation |>
-    dplyr::mutate(
-      inchikey_2D = NA,
-      score_input = NA,
-      library = NA,
-      mz_error = NA
-    ) |>
-    dplyr::mutate(across(c(
-      inchikey_2D, score_input, library, mz_error
-    ),
-    as.character))
+  if (ms1_only == TRUE) {
+    metadata_table_spectral_annotation <-
+      metadata_table_spectral_annotation |>
+      dplyr::mutate(
+        inchikey_2D = NA,
+        score_input = NA,
+        library = NA,
+        mz_error = NA
+      ) |>
+      dplyr::mutate(across(
+        c(
+          inchikey_2D, score_input, library, mz_error
+        ),
+        as.character
+      ))
   }
 
   if (annotate == TRUE) {
