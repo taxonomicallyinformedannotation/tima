@@ -85,10 +85,10 @@ prepare_features_components <- function(input = params$input,
   log_debug(x = "Calculating mz error")
   ## TODO can be improved
   if (ms_mode == "pos") {
-    table_filled <- table_filled |>
+    table_filled <<- table_filled |>
       dplyr::mutate(mz_error = mz - 1.007276 - structure_exact_mass)
   } else {
-    table_filled <- table_filled |>
+    table_filled <<- table_filled |>
       dplyr::mutate(mz_error = mz + 1.007276 - structure_exact_mass)
   }
 

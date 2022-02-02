@@ -298,7 +298,7 @@ prepare_taxa <-
       dplyr::mutate_all(as.character)
 
     log_debug(x = "joining with cleaned taxonomy table")
-    metadata_table_joined_summarized[] <-
+    metadata_table_joined_summarized[] <<-
       lapply(
         metadata_table_joined_summarized,
         function(x) {

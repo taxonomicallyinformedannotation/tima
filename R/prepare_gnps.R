@@ -62,7 +62,7 @@ prepare_gnps <-
         )
     }
 
-    table[] <-
+    table[] <<-
       lapply(
         table,
         function(x) {

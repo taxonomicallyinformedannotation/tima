@@ -48,11 +48,11 @@ prepare_adducts <-
 
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")
-    adducts_pos <-
+    adducts_pos <<-
       form_adducts_pos(massesTable = masses_adducts, adductsTable = adducts_t)
 
     log_debug("... negative")
-    adducts_neg <-
+    adducts_neg <<-
       form_adducts_neg(massesTable = masses_adducts, adductsTable = adducts_t)
 
     log_debug("... pure adducts masses ...")
@@ -60,7 +60,7 @@ prepare_adducts <-
       cbind(data.frame(exact_mass = 0), adducts_t)
 
     log_debug("... positive")
-    pure_pos <-
+    pure_pos <<-
       form_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
       dplyr::filter(grepl(
         pattern = "pos_1",
@@ -70,7 +70,7 @@ prepare_adducts <-
       dplyr::select(-exact_mass)
 
     log_debug("... negative")
-    pure_neg <-
+    pure_neg <<-
       form_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
       dplyr::filter(grepl(
         pattern = "neg_1",

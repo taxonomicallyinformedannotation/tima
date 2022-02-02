@@ -15,7 +15,7 @@ prepare_closed <- function(input = params$input,
       readr::read_delim(file = input)
 
     log_debug(x = "Formatting closed resource")
-    closed_prepared <- closed |>
+    closed_prepared <<- closed |>
       dplyr::mutate(structure_inchikey_2D = substring(
         text = structure_inchikey,
         first = 1,
