@@ -14,7 +14,7 @@ prepare_lotus <-
     lotus <-
       readr::read_delim(file = input)
 
-    lotus_prepared <<- lotus |>
+    lotus_prepared <- lotus |>
       dplyr::mutate(structure_inchikey_2D = substring(
         text = structure_inchikey,
         first = 1,

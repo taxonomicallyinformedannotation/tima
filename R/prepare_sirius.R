@@ -171,14 +171,12 @@ prepare_sirius <-
       dplyr::left_join(canopus_prepared) |>
       dplyr::distinct()
 
-    table[] <<- lapply(
+    table[] <- lapply(
       table,
       function(x) {
         y_as_na(x, y = "N/A")
       }
     )
-
-    table <<- table
 
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(

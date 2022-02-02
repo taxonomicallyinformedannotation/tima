@@ -211,15 +211,13 @@ prepare_features_classification <-
       dplyr::left_join(table_formuled) |>
       dplyr::left_join(table_massed)
 
-    table_final[] <<-
+    table_final[] <-
       lapply(
         table_final,
         function(x) {
           y_as_na(x, y = "")
         }
       )
-
-    table_final <<- table_final
 
     log_debug(x = "Exporting ...")
     ifelse(

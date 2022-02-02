@@ -62,15 +62,13 @@ prepare_gnps <-
         )
     }
 
-    table[] <<-
+    table[] <-
       lapply(
         table,
         function(x) {
           y_as_na(x, y = "N/A")
         }
       )
-
-    table <<- table
 
     log_debug(x = "Exporting ...")
     ifelse(

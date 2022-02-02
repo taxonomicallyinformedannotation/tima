@@ -298,15 +298,13 @@ prepare_taxa <-
       dplyr::mutate_all(as.character)
 
     log_debug(x = "joining with cleaned taxonomy table")
-    metadata_table_joined_summarized[] <<-
+    metadata_table_joined_summarized[] <-
       lapply(
         metadata_table_joined_summarized,
         function(x) {
           y_as_na(x, y = "")
         }
       )
-
-    metadata_table_joined_summarized <<- metadata_table_joined_summarized
 
     log_debug(x = "Exporting ...")
     ifelse(

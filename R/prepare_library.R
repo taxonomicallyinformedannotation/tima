@@ -56,11 +56,11 @@ prepare_library <-
         readr::read_delim(file = files[[i]])
     }
 
-    custom_library <<- data.table::rbindlist(libraries)
+    custom_library <- data.table::rbindlist(libraries)
 
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
-      custom_library <<- custom_library |>
+      custom_library <- custom_library |>
         dplyr::filter(grepl(
           x = !!as.name(colnames(custom_library)[grepl(
             pattern = level,
