@@ -10,6 +10,7 @@ prepare_taxa(
   extension = params$extension,
   colname = params$column_name,
   gnps_job_id = params$gnps,
+  metadata = params$metadata,
   top_k = params$top_k,
   output = params$output,
   force = params$force
@@ -25,6 +26,8 @@ prepare_taxa(
 \item{colname}{TODO}
 
 \item{gnps_job_id}{TODO}
+
+\item{metadata}{TODO}
 
 \item{top_k}{TODO}
 

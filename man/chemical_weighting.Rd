@@ -6,7 +6,9 @@
 \usage{
 chemical_weighting(
   annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
-  WeightChemical = weight_chemical,
+  weightSpectral = weight_spectral,
+  weightBiological = weight_biological,
+  weightChemical = weight_chemical,
   scoreChemicalPathway = score_chemical_pathway,
   scoreChemicalSuperclass = score_chemical_superclass,
   scoreChemicalClass = score_chemical_class
@@ -15,7 +17,11 @@ chemical_weighting(
 \arguments{
 \item{annotationTableWeightedBioCleaned}{TODO}
 
-\item{WeightChemical}{TODO}
+\item{weightSpectral}{TODO}
+
+\item{weightBiological}{TODO}
+
+\item{weightChemical}{TODO}
 
 \item{scoreChemicalPathway}{TODO}
 
