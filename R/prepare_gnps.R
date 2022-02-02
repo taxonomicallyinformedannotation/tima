@@ -70,6 +70,8 @@ prepare_gnps <-
         }
       )
 
+    table <<- table
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),

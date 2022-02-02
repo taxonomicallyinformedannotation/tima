@@ -306,6 +306,8 @@ prepare_taxa <-
         }
       )
 
+    metadata_table_joined_summarized <<- metadata_table_joined_summarized
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$path),

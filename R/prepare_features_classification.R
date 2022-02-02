@@ -219,6 +219,8 @@ prepare_features_classification <-
         }
       )
 
+    table_final <<- table_final
+
     log_debug(x = "Exporting ...")
     ifelse(
       test = !dir.exists(paths$data$interim$path),

@@ -178,6 +178,8 @@ prepare_sirius <-
       }
     )
 
+    table <<- table
+
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(
         "Warning:",
