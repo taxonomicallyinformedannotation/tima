@@ -63,6 +63,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$library)) {
       params$library <- arguments$library
     }
+    if (!is.null(arguments$metadata)) {
+      params$metadata <- arguments$metadata
+    }
     if (!is.null(arguments$mode)) {
       params$mode <- arguments$mode
     }
@@ -107,6 +110,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$npc)) {
       params$npc <- arguments$npc
+    }
+    if (!is.null(arguments$workflow)) {
+      params$workflow <- arguments$workflow
     }
     if (!is.null(arguments$zbim)) {
       params$ms$ms1only <- arguments$zbim
