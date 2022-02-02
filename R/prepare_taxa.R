@@ -5,6 +5,7 @@
 #' @param extension TODO
 #' @param colname TODO
 #' @param gnps_job_id TODO
+#' @param metadata TODO
 #' @param top_k TODO
 #' @param output TODO
 #' @param force TODO
@@ -19,15 +20,20 @@ prepare_taxa <-
            extension = params$extension,
            colname = params$column_name,
            gnps_job_id = params$gnps,
+           metadata = params$metadata,
            top_k = params$top_k,
            output = params$output,
            force = params$force) {
-    stopifnot("Your tool must be either 'gnps' or 'manual'" = tool %in% c("gnps", "manual"))
+    stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
     if (tool == "gnps") {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
     } else {
+      if (tool == "manual") {
+        stopifnot("Your metadata file does not exist" = file.exists(metadata))
+      }
       stopifnot("Your input file does not exist" = file.exists(input))
     }
+
     stopifnot("Your top k organisms parameter should be lower or equal to 5" = top_k <=
       5)
 
@@ -38,44 +44,50 @@ prepare_taxa <-
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-
-      if (!is.null(force)) {
-        log_debug(x = "Forcing all features to given organism")
-        metadata_table <- data.frame(force)
-        colnames(metadata_table) <- colname
-      } else {
-        log_debug(x = "Loading metadata table")
-        metadata_table <- read_metadata(id = gnps_job_id)
-
-        log_debug(x = "Formatting feature table ...")
-        log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
-        feature_table <- feature_table |>
-          dplyr::select(
-            `row ID`,
-            matches(" Peak area")
-          ) |>
-          tibble::column_to_rownames(var = "row ID")
-        colnames(feature_table) <-
-          gsub(
-            pattern = " Peak area",
-            replacement = "",
-            x = colnames(feature_table)
-          )
-        log_debug(x = "... filtering top K intensities per feature")
-        top_n <- feature_table |>
-          tibble::rownames_to_column() |>
-          tidyr::gather(column, value, -rowname) |>
-          dplyr::filter(value != 0) |>
-          dplyr::group_by(rowname) |>
-          dplyr::mutate(rank = rank(-value)) |>
-          dplyr::filter(rank <= top_k) |>
-          dplyr::arrange(rowname, rank)
-      }
+      log_debug(x = "Loading metadata table")
+      metadata_table <- read_metadata(id = gnps_job_id)
     }
 
     if (tool == "manual") {
+      log_debug(x = "Loading feature table")
+      feature_table <- readr::read_delim(file = input)
+      log_debug(x = "Loading metadata table")
+      metadata_table <- readr::read_delim(file = metadata)
+    }
+
+    if (tool != "ready") {
+      log_debug(x = "Formatting feature table ...")
+      log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
+      feature_table <- feature_table |>
+        dplyr::select(
+          `row ID`,
+          matches(" Peak area")
+        ) |>
+        tibble::column_to_rownames(var = "row ID")
+      colnames(feature_table) <-
+        gsub(
+          pattern = " Peak area",
+          replacement = "",
+          x = colnames(feature_table)
+        )
+      log_debug(x = "... filtering top K intensities per feature")
+      top_n <- feature_table |>
+        tibble::rownames_to_column() |>
+        tidyr::gather(column, value, -rowname) |>
+        dplyr::filter(value != 0) |>
+        dplyr::group_by(rowname) |>
+        dplyr::mutate(rank = rank(-value)) |>
+        dplyr::filter(rank <= top_k) |>
+        dplyr::arrange(rowname, rank)
+    } else {
       metadata_table <-
         readr::read_delim(file = input)
+    }
+
+    if (!is.null(force)) {
+      log_debug(x = "Forcing all features to given organism")
+      metadata_table <- data.frame(force)
+      colnames(metadata_table) <- colname
     }
 
     log_debug(x = "Keeping list of organisms to submit to OTL")
@@ -232,7 +244,7 @@ prepare_taxa <-
         ))
     }
     log_debug(x = "Joining top K with metadata table")
-    if (tool == "gnps") {
+    if (tool != "ready") {
       if (!is.null(force)) {
         metadata_table_joined <- cbind(
           feature_table |> dplyr::mutate(feature_id = `row ID`),
@@ -248,9 +260,7 @@ prepare_taxa <-
             dplyr::everything()
           )
       }
-    }
-
-    if (tool == "manual") {
+    } else {
       metadata_table_joined <- metadata_table |>
         dplyr::select(feature_id,
           organismOriginal = dplyr::all_of(colname),

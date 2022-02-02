@@ -10,7 +10,8 @@ Options:
   -g --gnps=<gnps>                Your GNPS job id. Depending on the annotation tool you used
   -i --input=<input>              File containing your intensity/sample to attribute biological source. Supports compressed files.
   -k --k.top=<k.top>              Number of allowed biological sources per feature. Should not exceed 5.
+  -m --metadata=<metadata>        File containing the metadata of your sample(s) (here taxa).
   -o --output=<output>            Path and filename for the output. If you specify .gz file will be compressed.
-  -t --tool=<tool>                Tool you used for your metadata organization ('gnps' and 'manual' currently supported)
+  -t --tool=<tool>                Tool you used for your metadata organization ('gnps' and 'manual' or 'ready' currently supported). Difference between 'ready' and 'manual' is that 'ready' is a ready table with 'feature_id' and 'organism' as column that you attributed as you wanted, 'manual' takes an mzmine feature table and a sample <-> organism correspondance table.
   -h --help                       Show this screen.
   -v --version                    Show version.
