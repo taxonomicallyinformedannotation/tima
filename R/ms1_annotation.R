@@ -348,34 +348,43 @@ ms1_annotation <-
             adductsM["proton"] +
             2 * adductsM["sodium"]) / 3,
           pos_3_3sodium = (mz - adduct_mass + 3 * adductsM["sodium"]) / 3,
-          pos_2_2proton = ((mz - adduct_mass + 2 * adductsM["proton"]) / 2),
-          pos_2_2proton1ammonium = ((
+          pos_2_2proton = (mz - adduct_mass + 2 * adductsM["proton"]) / 2,
+          pos_2_2proton1ammonium = (
             mz - adduct_mass +
               2 * adductsM["proton"] +
               adductsM["ammonium"]
-          ) / 2),
-          pos_2_1proton1sodium = ((mz - adduct_mass +
+          ) / 2,
+          pos_2_1proton1sodium = (mz - adduct_mass +
             adductsM["proton"] +
-            adductsM["sodium"]) / 2),
-          pos_2_1proton1potassium = ((mz - adduct_mass +
+            adductsM["sodium"]) / 2,
+          pos_2_1magnesium = (mz - adduct_mass +
+            adductsM["magnesium"]) / 2,
+          pos_2_1proton1potassium = (mz - adduct_mass +
             adductsM["proton"] +
-            adductsM["potassium"]) / 2),
-          pos_2_2proton1acetonitrile = ((
+            adductsM["potassium"]) / 2,
+          pos_2_1calcium = (mz - adduct_mass +
+            adductsM["calcium"]) / 2,
+          pos_2_2proton1acetonitrile = (
             mz - adduct_mass +
               2 * adductsM["proton"] +
               adductsM["acetonitrile"]
-          ) / 2),
-          pos_2_2sodium = ((mz - adduct_mass + 2 * adductsM["sodium"]) / 2),
-          pos_2_2proton2acetonitrile = ((
+          ) / 2,
+          pos_2_2sodium = (mz - adduct_mass + 2 * adductsM["sodium"]) / 2,
+          pos_2_1iron = (mz - adduct_mass +
+            adductsM["iron"]) / 2,
+          pos_2_2proton2acetonitrile = (
             mz - adduct_mass +
               2 * adductsM["proton"] +
               2 * adductsM["acetonitrile"]
-          ) / 2),
-          pos_2_2proton3acetonitrile = ((
+          ) / 2,
+          pos_2_2proton3acetonitrile = (
             mz - adduct_mass +
               2 * adductsM["proton"] +
               3 * adductsM["acetonitrile"]
-          ) / 2),
+          ) / 2,
+          pos_2MMg = (2 * (mz - adduct_mass) + adductsM["magnesium"]) / 2,
+          pos_2MCa = (2 * (mz - adduct_mass) + adductsM["calcium"]) / 2,
+          pos_2MFe = (2 * (mz - adduct_mass) + adductsM["iron"]) / 2,
           pos_2MH = 2 * (mz - adduct_mass) + adductsM["proton"],
           pos_2MHNH3 = 2 * (mz - adduct_mass) +
             adductsM["proton"] +
