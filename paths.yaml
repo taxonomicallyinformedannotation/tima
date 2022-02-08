@@ -59,6 +59,6 @@ links:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
   example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
-  lotus: https://zenodo.org/record/5794107/files/211220_frozen_metadata.csv.gz?download=1
+  lotus: https://zenodo.org/record/6007029/files/220208_frozen_metadata.csv.gz?download=1
 tests:
   path: tests
