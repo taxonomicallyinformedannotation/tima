@@ -28,10 +28,12 @@ prepare_taxa <-
     if (tool == "gnps") {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
     } else {
-      if (tool == "manual") {
-        stopifnot("Your metadata file does not exist" = file.exists(metadata))
+      if (is.null(force)) {
+        if (tool == "manual") {
+          stopifnot("Your metadata file does not exist" = file.exists(metadata))
+        }
+        stopifnot("Your input file does not exist" = file.exists(input))
       }
-      stopifnot("Your input file does not exist" = file.exists(input))
     }
 
     stopifnot("Your top k organisms parameter should be lower or equal to 5" = top_k <=
@@ -44,8 +46,10 @@ prepare_taxa <-
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-      log_debug(x = "Loading metadata table")
-      metadata_table <- read_metadata(id = gnps_job_id)
+      if (is.null(force)) {
+        log_debug(x = "Loading metadata table")
+        metadata_table <- read_metadata(id = gnps_job_id)
+      }
     }
 
     if (tool == "manual") {
@@ -248,7 +252,7 @@ prepare_taxa <-
     if (tool != "ready") {
       if (!is.null(force)) {
         metadata_table_joined <- cbind(
-          feature_table |> dplyr::mutate(feature_id = `row ID`),
+          feature_table |> dplyr::mutate(feature_id = dplyr::row_number()),
           biological_metadata |>
             dplyr::select(organismOriginal = organism_name)
         )
