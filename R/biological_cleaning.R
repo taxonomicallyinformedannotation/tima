@@ -31,15 +31,7 @@ biological_cleaning <-
     df01 <- annotationTableWeightedBio |>
       dplyr::filter(score_initialNormalized > 0 |
         #' Those lines are to keep ms1 annotation
-        score_biological >= minimalMs1Bio) |>
-      dplyr::distinct(feature_id,
-        inchikey_2D,
-        smiles_2D,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class,
-        .keep_all = TRUE
-      )
+        score_biological >= minimalMs1Bio)
 
     cat("erasing other MS1 candidates \n")
     df02 <-
@@ -47,8 +39,7 @@ biological_cleaning <-
         annotationTableWeightedBio |>
           dplyr::distinct(
             feature_id,
-            rank_initial,
-            rank_final,
+            inchikey_2D,
             .keep_all = TRUE
           ),
         df01
@@ -86,13 +77,9 @@ biological_cleaning <-
       dplyr::group_by(component_id) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
-        smiles_2D,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class,
         .keep_all = TRUE
       ) |>
-      dplyr::add_count(inchikey_2D) |>
+      dplyr::add_count() |>
       dplyr::filter(n >= 3) |>
       dplyr::select(-n)
 
