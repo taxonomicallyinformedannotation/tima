@@ -51,23 +51,32 @@ ms:
       - pos_2_2proton
       - pos_2_2proton1ammonium
       - pos_2_1proton1sodium
+      - pos_2_1magnesium
       - pos_2_1proton1potassium
+      - pos_2_1calcium
       - pos_2_2proton1acetonitrile
-      - pos_2_pos_2_2sodium
+      - pos_2_2sodium
+      - pos_2_1iron
       - pos_2_2proton2acetonitrile
       - pos_2_2proton3acetonitrile
       - pos_1_1proton
       - pos_1_1proton1ammonium
-      - pos_1_1sodium1acetonitrile
+      - pos_1_1sodium
+      - pos_1_minus1proton1magnesium
       - pos_1_1proton1methanol
       - pos_1_1potassium
-      - pos_1_1sodium
+      - pos_1_minus1proton1calcium
       - pos_1_1proton1acetonitrile
       - pos_1_minus1proton2sodium
       - pos_1_1proton1ethylamine
+      - pos_1_minus1proton1iron
       - pos_1_1sodium1acetonitrile
       - pos_1_minus1proton2potassium
+      - pos_1_1proton1dmso
       - pos_1_1proton2acetonitrile
+      - pos_2MMg
+      - pos_2MCa
+      - pos_2MFe
       - pos_2MH
       - pos_2MHNH3
       - pos_2MNa
@@ -78,7 +87,7 @@ ms:
       - neg_3_3proton
       - neg_2_2proton
       - neg_1_minus1proton
-      - neg_1_minus2proton1sodium1formic
+      - neg_1_minus2proton1sodium
       - neg_1_1chlorine
       - neg_1_minus2proton1potassium
       - neg_1_minus1proton1formic
