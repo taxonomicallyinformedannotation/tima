@@ -115,6 +115,7 @@ prepare_taxa <-
         canonical_name = organism,
         search_string
       ) |>
+      dplyr::filter(!is.na(canonical_name)) |>
       data.frame()
 
     organisms <- organism_table$canonical_name
