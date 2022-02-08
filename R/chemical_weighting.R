@@ -88,6 +88,9 @@ chemical_weighting <-
         feature_id,
         inchikey_2D,
         smiles_2D,
+        candidate_structure_1_pathway,
+        candidate_structure_2_superclass,
+        candidate_structure_3_class,
         score_chemical
       )
 
@@ -116,6 +119,10 @@ chemical_weighting <-
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
+        smiles_2D,
+        candidate_structure_1_pathway,
+        candidate_structure_2_superclass,
+        candidate_structure_3_class,
         .keep_all = TRUE
       ) |>
       dplyr::mutate(

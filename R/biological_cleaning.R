@@ -34,6 +34,10 @@ biological_cleaning <-
         score_biological >= minimalMs1Bio) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
+        smiles_2D,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class,
         .keep_all = TRUE
       )
 
@@ -41,7 +45,8 @@ biological_cleaning <-
     df02 <-
       dplyr::anti_join(
         annotationTableWeightedBio |>
-          dplyr::distinct(feature_id,
+          dplyr::distinct(
+            feature_id,
             rank_initial,
             rank_final,
             .keep_all = TRUE
@@ -79,8 +84,15 @@ biological_cleaning <-
     df1 <- df |>
       dplyr::filter(component_id != -1) |>
       dplyr::group_by(component_id) |>
-      dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-      dplyr::add_count() |>
+      dplyr::distinct(feature_id,
+        inchikey_2D,
+        smiles_2D,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class,
+        .keep_all = TRUE
+      ) |>
+      dplyr::add_count(inchikey_2D) |>
       dplyr::filter(n >= 3) |>
       dplyr::select(-n)
 

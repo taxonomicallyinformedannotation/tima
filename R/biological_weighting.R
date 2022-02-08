@@ -795,6 +795,10 @@ biological_weighting <-
       dplyr::arrange(dplyr::desc(score_pondered_bio)) |>
       dplyr::distinct(feature_id,
         inchikey_2D,
+        smiles_2D,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class,
         .keep_all = TRUE
       ) |>
       dplyr::mutate(
