@@ -1,25 +1,28 @@
 You can use this script with the following example:
 Rscript inst/scripts/process_annotations.R
 
-Usage: process_annotations.R [--output=<output>] [--annotation=<annotation>] [--complement=<complement>] [--edges=<edges>] [--features=<features>][--initial.candidates=<initial.candidates>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>] [--zbim=<zbim>] [--biological=<biological>] [--gemical=<gemical>] [--spectral=<spectral>]
+Usage: process_annotations.R [--output=<output>] [--isdb=<isdb>] [--complement=<complement>] [--edges=<edges>] [--features=<features>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>] [--xbim=<xbim>] [--zirius=<zirius>] [--biological=<biological>] [--qemical=<qemical>] [--spectral=<spectral>]
 
 Options:
-  -a --annotation=<annotation>  The file containing your prepared (filled) annotations
   -b --biological=<biological>  Biological weight
   -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
   -e --edges=<edges>            The file containing your prepared edges
   -f --features=<features>      The file containing your prepared (taxed) features
-  -g --gemical=<gemical>        Chemical weight (yeah funny)
-  -i --initial.candidates=<initial.candidates>      Number of initial candidates to be considered.
+  -g --gnps=<gnps>              The file containing your prepared (GNPS) annotations
+  -i --isdb=<isdb>              The file containing your prepared (ISDB) annotations
+  -j --j.top=<j.top>            Number of initial candidates to be considered.
   -k --k.top=<k.top>            Number of final candidates to be considered.
   -l --library=<library>        Library to be used.
   -m --ms=<ms>                  MS mode used ('pos' or 'neg')
   -n --name=<name>              Name given to the adducted library.
   -o --output=<output>          Filename for the output. Can be .gz.
   -p --ppm=<ppm>                Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
+  -q --qemical=<qemical>        Chemical weight (yeah funny)
   -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
   -s --spectral==<spectral>     Spectral weight
   -h --help                     Show this screen.
   -v --version                  Show version.
-  -z --zbim=<zbim>              Functionality to erase MS2 results
-  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at yur own risks. Can crash.
+  -x --xbim=<xbim>              Functionality to erase MS2 results
+  -z --zirius=<zirius>          The file containing your prepared (SIRIUS) annotations
+  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters.
+ Use it at yur own risks. Can crash.

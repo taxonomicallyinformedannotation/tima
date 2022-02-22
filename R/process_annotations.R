@@ -2,7 +2,9 @@
 #'
 #' @param library TODO
 #' @param name TODO
-#' @param annotation TODO
+#' @param gnps TODO
+#' @param isdb TODO
+#' @param sirius TODO
 #' @param taxa TODO
 #' @param edges TODO
 #' @param output TODO
@@ -46,7 +48,9 @@
 #' @examples
 process_annotations <- function(library = params$library,
                                 name = params$name,
-                                annotation = params$annotation,
+                                gnps = params$annotation$gnps,
+                                isdb = params$annotation$isdb,
+                                sirius = params$annotation$sirius,
                                 taxa = params$taxa,
                                 edges = params$edges,
                                 output = params$output,
@@ -85,7 +89,21 @@ process_annotations <- function(library = params$library,
                                 force = params$force) {
   stopifnot("Your library file does not exist." = file.exists(library))
   ## TODO add name
-  stopifnot("Your annotation file does not exist." = file.exists(annotation))
+  stopifnot("Your GNPS file does not exist." = if (is.null(gnps)) {
+    TRUE
+  } else{
+    file.exists(gnps)
+  })
+  stopifnot("Your ISDB file does not exist." = if (is.null(isdb)) {
+    TRUE
+  } else{
+    file.exists(isdb)
+  })
+  stopifnot("Your SIRIUS file does not exist." = if (is.null(sirius)) {
+    TRUE
+  } else{
+    file.exists(sirius)
+  })
   stopifnot("Your taxa file does not exist." = file.exists(taxa))
   stopifnot("Your edges file does not exist." = file.exists(edges))
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
@@ -108,18 +126,23 @@ process_annotations <- function(library = params$library,
   }
 
   log_debug(x = "... files ...")
-  log_debug(x = "... metadata_table_spectral_annotation")
-  metadata_table_spectral_annotation <<-
-    readr::read_delim(
-      file = annotation,
-      col_types = "c"
-    ) |>
-    dplyr::mutate_all(list(~ gsub(
-      pattern = "\\|",
-      replacement = " or ",
-      x = .x
-    ))) |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric))
+  log_debug(x = "... annotations")
+  metadata_table_spectral_annotation <<- lapply(
+    X = c(gnps,isdb,sirius),
+    FUN = function(x) {
+      readr::read_delim(
+        file = x,
+        col_types = "c"
+        ) |>
+        dplyr::mutate_all(list(~ gsub(
+          pattern = "\\|",
+          replacement = " or ",
+          x = .x
+          ))) |>
+        dplyr::mutate(dplyr::across(feature_id, as.numeric))}) |>
+    dplyr::bind_rows() |>
+    dplyr::distinct() |>
+    dplyr::arrange(feature_id)
 
   log_debug(x = "... metadata_table_biological_annotation")
   taxed_features_table <<- readr::read_delim(

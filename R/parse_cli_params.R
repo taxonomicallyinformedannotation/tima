@@ -10,8 +10,14 @@ parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {
-    if (!is.null(arguments$annotation)) {
-      params$annotation <- arguments$annotation
+    if (!is.null(arguments$gnps)) {
+      params$annotation$gnps <- arguments$gnps
+    }
+    if (!is.null(arguments$isdb)) {
+      params$annotation$isdb <- arguments$isdb
+    }
+    if (!is.null(arguments$zirius)) {
+      params$annotation$sirius <- arguments$zirius
     }
     if (!is.null(arguments$biological)) {
       params$weights$biological <- as.numeric(arguments$biological)
@@ -41,14 +47,14 @@ parse_cli_params <- function() {
     if (!is.null(arguments$force)) {
       params$force <- arguments$force
     }
-    if (!is.null(arguments$gemical)) {
-      params$weights$chemical <- as.numeric(arguments$gemical)
+    if (!is.null(arguments$qemical)) {
+      params$weights$chemical <- as.numeric(arguments$qemical)
     }
     if (!is.null(arguments$gnps)) {
       params$gnps <- arguments$gnps
     }
-    if (!is.null(arguments$initial.candidates)) {
-      params$top_k$initial <- as.numeric(arguments$initial.candidates)
+    if (!is.null(arguments$j.top)) {
+      params$top_k$initial <- as.numeric(arguments$j.top)
     }
     if (!is.null(arguments$input)) {
       params$input <- arguments$input
@@ -114,8 +120,8 @@ parse_cli_params <- function() {
     if (!is.null(arguments$workflow)) {
       params$workflow <- arguments$workflow
     }
-    if (!is.null(arguments$zbim)) {
-      params$ms$ms1only <- arguments$zbim
+    if (!is.null(arguments$xbim)) {
+      params$ms$ms1only <- arguments$xbim
     }
   }
 

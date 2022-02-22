@@ -7,7 +7,9 @@
 process_annotations(
   library = params$library,
   name = params$name,
-  annotation = params$annotation,
+  gnps = params$annotation$gnps,
+  isdb = params$annotation$isdb,
+  sirius = params$annotation$sirius,
   taxa = params$taxa,
   edges = params$edges,
   output = params$output,
@@ -51,7 +53,11 @@ process_annotations(
 
 \item{name}{TODO}
 
-\item{annotation}{TODO}
+\item{gnps}{TODO}
+
+\item{isdb}{TODO}
+
+\item{sirius}{TODO}
 
 \item{taxa}{TODO}
 
