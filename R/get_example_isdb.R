@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param link TODO
+#' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
@@ -8,7 +8,7 @@
 #'
 #' @examples
 get_example_isdb <-
-  function(link = paths$links$example_isdb,
+  function(url = paths$urls$example_isdb,
            export = paths$data$interim$annotations$example_isdb) {
     paths <- parse_yaml_paths()
 
@@ -29,6 +29,6 @@ get_example_isdb <-
       )
     )
 
-    readr::read_tsv(file = link) |>
+    readr::read_tsv(file = url) |>
       readr::write_tsv(file = export)
   }

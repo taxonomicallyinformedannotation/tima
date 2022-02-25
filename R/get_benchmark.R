@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param link TODO
+#' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
@@ -8,7 +8,7 @@
 #'
 #' @examples
 get_benchmark <-
-  function(link = paths$links$benchmarking_set,
+  function(url = paths$urls$benchmarking_set,
            export = paths$data$source$benchmark$set) {
     paths <- parse_yaml_paths()
 
@@ -29,6 +29,6 @@ get_benchmark <-
       )
     )
 
-    readr::read_csv(file = curl::curl_download(url = link, destfile = tempfile())) |>
+    readr::read_csv(file = curl::curl_download(url = url, destfile = tempfile())) |>
       readr::write_csv(file = export)
   }

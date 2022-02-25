@@ -5,12 +5,12 @@
 \title{Title}
 \usage{
 get_benchmark(
-  link = paths$links$benchmarking_set,
+  url = paths$urls$benchmarking_set,
   export = paths$data$source$benchmark$set
 )
 }
 \arguments{
-\item{link}{TODO}
+\item{url}{TODO}
 
 \item{export}{TODO}
 }

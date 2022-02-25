@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param link TODO
+#' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
@@ -8,7 +8,7 @@
 #'
 #' @examples
 get_example_sirius <-
-  function(link = paths$links$example_sirius,
+  function(url = paths$url$example_sirius,
            export = paths$data$interim$annotations$example_sirius) {
     paths <- parse_yaml_paths()
 
@@ -49,16 +49,16 @@ get_example_sirius <-
       )
     )
 
-    readr::read_csv(file = file.path(link, canopus_npc)) |>
+    readr::read_csv(file = file.path(url, canopus_npc)) |>
       readr::write_csv(file = file.path(export, canopus_npc))
-    readr::read_tsv(file = file.path(link, canopus_adducts)) |>
+    readr::read_tsv(file = file.path(url, canopus_adducts)) |>
       readr::write_tsv(file = file.path(export, canopus_adducts))
-    readr::read_tsv(file = file.path(link, compound)) |>
+    readr::read_tsv(file = file.path(url, compound)) |>
       readr::write_tsv(file = file.path(export, compound))
-    readr::read_tsv(file = file.path(link, compound_adducts)) |>
+    readr::read_tsv(file = file.path(url, compound_adducts)) |>
       readr::write_tsv(file = file.path(export, compound_adducts))
-    readr::read_tsv(file = file.path(link, formula)) |>
+    readr::read_tsv(file = file.path(url, formula)) |>
       readr::write_tsv(file = file.path(export, formula))
-    readr::read_tsv(file = file.path(link, formula_adducts)) |>
+    readr::read_tsv(file = file.path(url, formula_adducts)) |>
       readr::write_tsv(file = file.path(export, formula_adducts))
   }

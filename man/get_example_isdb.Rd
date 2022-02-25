@@ -5,12 +5,12 @@
 \title{Title}
 \usage{
 get_example_isdb(
-  link = paths$links$example_isdb,
+  url = paths$urls$example_isdb,
   export = paths$data$interim$annotations$example_isdb
 )
 }
 \arguments{
-\item{link}{TODO}
+\item{url}{TODO}
 
 \item{export}{TODO}
 }

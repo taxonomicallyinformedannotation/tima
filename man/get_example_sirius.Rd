@@ -5,12 +5,12 @@
 \title{Title}
 \usage{
 get_example_sirius(
-  link = paths$links$example_sirius,
+  url = paths$url$example_sirius,
   export = paths$data$interim$annotations$example_sirius
 )
 }
 \arguments{
-\item{link}{TODO}
+\item{url}{TODO}
 
 \item{export}{TODO}
 }

@@ -4,10 +4,10 @@
 \alias{get_lotus}
 \title{Title}
 \usage{
-get_lotus(link = paths$links$lotus, export = paths$data$source$libraries$lotus)
+get_lotus(url = paths$urls$lotus, export = paths$data$source$libraries$lotus)
 }
 \arguments{
-\item{link}{TODO}
+\item{url}{TODO}
 
 \item{export}{TODO}
 }
