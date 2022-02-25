@@ -13,6 +13,14 @@ get_lotus <-
     paths <- parse_yaml_paths()
 
     ifelse(
+      test = !dir.exists(dirname(dirname(dirname(export)))),
+      yes = dir.create(dirname(dirname(dirname(export)))),
+      no = paste(
+        dirname(dirname(dirname(export))),
+        "exists"
+      )
+    )
+    ifelse(
       test = !dir.exists(dirname(dirname(export))),
       yes = dir.create(dirname(dirname(export))),
       no = paste(
