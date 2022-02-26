@@ -91,17 +91,17 @@ process_annotations <- function(library = params$library,
   ## TODO add name
   stopifnot("Your GNPS file does not exist." = if (is.null(gnps)) {
     TRUE
-  } else{
+  } else {
     file.exists(gnps)
   })
   stopifnot("Your ISDB file does not exist." = if (is.null(isdb)) {
     TRUE
-  } else{
+  } else {
     file.exists(isdb)
   })
   stopifnot("Your SIRIUS file does not exist." = if (is.null(sirius)) {
     TRUE
-  } else{
+  } else {
     file.exists(sirius)
   })
   stopifnot("Your taxa file does not exist." = file.exists(taxa))
@@ -128,18 +128,20 @@ process_annotations <- function(library = params$library,
   log_debug(x = "... files ...")
   log_debug(x = "... annotations")
   metadata_table_spectral_annotation <<- lapply(
-    X = c(gnps,isdb,sirius),
+    X = c(gnps, isdb, sirius),
     FUN = function(x) {
       readr::read_delim(
         file = x,
         col_types = "c"
-        ) |>
+      ) |>
         dplyr::mutate_all(list(~ gsub(
           pattern = "\\|",
           replacement = " or ",
           x = .x
-          ))) |>
-        dplyr::mutate(dplyr::across(feature_id, as.numeric))}) |>
+        ))) |>
+        dplyr::mutate(dplyr::across(feature_id, as.numeric))
+    }
+  ) |>
     dplyr::bind_rows() |>
     dplyr::distinct() |>
     dplyr::arrange(feature_id)
