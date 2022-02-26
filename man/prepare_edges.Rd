@@ -10,7 +10,8 @@ prepare_edges(
   input = params$input,
   output = params$output,
   name_source = params$source_name,
-  name_target = params$target_name
+  name_target = params$target_name,
+  network = params$network
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ prepare_edges(
 \item{name_source}{TODO}
 
 \item{name_target}{TODO}
+
+\item{network}{TODO}
 }
 \value{
 TODO

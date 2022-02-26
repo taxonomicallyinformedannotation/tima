@@ -5,3 +5,4 @@ components: ## if manual
 gnps: 96fa7c88200e4a03bee4644e581e3fb0
 workflow: fbmn ## or classical
 mode: pos
+network: TRUE
