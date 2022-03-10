@@ -2,8 +2,7 @@
 #'
 #' @param input TODO
 #' @param output TODO
-#' @param name_source TODO
-#' @param name_target TODO
+#' @param name_feature TODO
 #'
 #' @return TODO
 #' @export
@@ -11,14 +10,13 @@
 #' @examples
 fake_edges <- function(input = params$input,
                        output = params$output,
-                       name_source = params$source_name,
-                       name_target = params$target_name) {
+                       name_feature = params$feature) {
   stopifnot("Your input file does not exist" = file.exists(input))
 
   edges_table_treated <- readr::read_delim(file = input) |>
     dplyr::select(
-      feature_source = name_source,
-      feature_target = name_source
+      feature_source = name_feature,
+      feature_target = name_feature
     )
 
   log_debug(x = "Exporting ...")

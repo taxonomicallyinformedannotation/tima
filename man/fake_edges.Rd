@@ -7,8 +7,7 @@
 fake_edges(
   input = params$input,
   output = params$output,
-  name_source = params$source_name,
-  name_target = params$target_name
+  name_feature = params$feature
 )
 }
 \arguments{
@@ -16,9 +15,7 @@ fake_edges(
 
 \item{output}{TODO}
 
-\item{name_source}{TODO}
-
-\item{name_target}{TODO}
+\item{name_feature}{TODO}
 }
 \value{
 TODO

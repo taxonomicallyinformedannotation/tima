@@ -96,6 +96,10 @@ parse_cli_params <- function() {
     if (!is.null(arguments$rt)) {
       params$ms$tolerance$rt <- as.numeric(arguments$rt)
     }
+    if (!is.null(arguments$features)) {
+      params$feature_name <-
+        arguments$features
+    }
     if (!is.null(arguments$rt)) {
       params$rt_name <-
         arguments$rt
