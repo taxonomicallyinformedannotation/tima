@@ -62,6 +62,7 @@ Collate:
     'form_adduct_neg.R'
     'form_adduct_pos.R'
     'get_benchmark.R'
+    'get_example_feature_table.R'
     'get_example_isdb.R'
     'get_example_sirius.R'
     'get_lotus.R'

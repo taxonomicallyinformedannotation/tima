@@ -38,6 +38,9 @@ testthat::test_that("processing annotations", {
   ## 2.b
   get_example_sirius()
 
+  ## 2.c
+  get_example_feature_table()
+
   ## 3.a
   step <- "prepare_isdb"
   params <- get_params(step = step)

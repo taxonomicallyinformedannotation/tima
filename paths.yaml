@@ -15,6 +15,7 @@ data:
       pos: inst/extdata/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: inst/extdata/interim/annotations
+      example_feature_table: inst/extdata/interim/annotations/example_feature_table.tsv.gz
       example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
       example_sirius: inst/extdata/interim/annotations/sirius_example
     config:
@@ -59,6 +60,7 @@ tests:
   path: tests
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
+  example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
   example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
   lotus: https://zenodo.org/record/6299673/files/220226_frozen_metadata.csv.gz?download=1
