@@ -57,6 +57,8 @@ Collate:
     'decoration.R'
     'dist_groups.R'
     'export_params.R'
+    'fake_edges.R'
+    'fake_features_components.R'
     'form_adduct_neg.R'
     'form_adduct_pos.R'
     'get_benchmark.R'
