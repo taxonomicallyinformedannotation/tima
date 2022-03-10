@@ -16,6 +16,8 @@ if (!require(docopt)) {
 get_params <- function(step) {
   stopifnot(
     "Your step does not exist. Valid steps are:
+    'fake_edges',
+    'fake_features_components',
     'prepare_adducts',
     'prepare_closed',
     'prepare_edges',
@@ -28,6 +30,8 @@ get_params <- function(step) {
     'prepare_taxa',
     'process_annotations'
     " = step %in% c(
+      "fake_edges",
+      "fake_features_components",
       "prepare_adducts",
       "prepare_closed",
       "prepare_edges",

@@ -1,0 +1,4 @@
+input: inst/extdata/source/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz # A file containing your feature ids
+output: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
+source_name: CLUSTERID1
+target_name: CLUSTERID2

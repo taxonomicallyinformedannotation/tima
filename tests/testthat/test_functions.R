@@ -53,15 +53,25 @@ testthat::test_that("processing annotations", {
   params <- get_params(step = step)
   prepare_gnps()
 
-  ## 4.1
+  ## 4.1.a
   step <- "prepare_edges"
   params <- get_params(step = step)
   prepare_edges()
 
-  ## 4.2
+  ## 4.1.b
+  step <- "fake_edges"
+  params <- get_params(step = step)
+  fake_edges()
+
+  ## 4.2.a
   step <- "prepare_features_components"
   params <- get_params(step = step)
   prepare_features_components()
+
+  ## 4.2.b
+  step <- "fake_features_components"
+  params <- get_params(step = step)
+  fake_features_components()
 
   ## 4.3
   step <- "prepare_features_classification"

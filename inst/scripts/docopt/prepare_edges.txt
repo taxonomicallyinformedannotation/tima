@@ -1,12 +1,11 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_edges.R--gnps 96fa7c88200e4a03bee4644e581e3fb0 --output 'inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz' --tool gnps
+Rscript inst/scripts/prepare_edges.R --gnps '96fa7c88200e4a03bee4644e581e3fb0' --output 'inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz' --tool gnps
 
-Usage: prepare_edges.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--network=<network>] [--gnps=<gnps>] [-1 | --source=<source>] [-2 | --target=<target>]
+Usage: prepare_edges.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--gnps=<gnps>] [-1 | --source=<source>] [-2 | --target=<target>]
 
 Options:
   -i --input=<input>                    If manual, your file containing list of edges between features. Supports compressed files.
   -g --gnps=<gnps>                      Your GNPS job id. Depending on the annotation tool you used
-  -n --network=<network>                Boolean. `FALSE` to skip this part if no network.
   -o --output=<output>                  Path and filename for the output. If you specify .gz file will be compressed.
   -t --tool=<tool>                      Tool you used for edge generation ('gnps' or 'manual')
   -1 --source=<source>                  The column name of your source feature

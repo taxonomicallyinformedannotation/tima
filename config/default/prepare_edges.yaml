@@ -4,4 +4,3 @@ input: inst/extdata/source/example_edges_manual.csv # input only needed if manua
 output: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 source_name: CLUSTERID1
 target_name: CLUSTERID2
-network: TRUE

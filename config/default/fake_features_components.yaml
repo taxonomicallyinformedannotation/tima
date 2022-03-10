@@ -1,0 +1,6 @@
+input: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+features: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz # your table containing feature_id, rt, mz
+output: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_faked_filled.tsv.gz
+mode: pos
+rt_name: rt # column name of your rt
+precursor_name: mz # column name of your mz

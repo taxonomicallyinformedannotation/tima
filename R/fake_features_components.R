@@ -1,70 +1,45 @@
 #' Title
 #'
 #' @param input TODO
+#' @param features TODO
 #' @param output TODO
-#' @param tool TODO
-#' @param components TODO
-#' @param gnps_job_id TODO
 #' @param ms_mode TODO
+#' @param name_rt TODO
+#' @param name_mz TODO
 #'
 #' @return TODO
 #' @export
 #'
 #' @examples
-prepare_features_components <- function(input = params$input,
-                                        output = params$output,
-                                        tool = params$tool,
-                                        components = params$components,
-                                        gnps_job_id = params$gnps,
-                                        ms_mode = params$mode) {
-  if (tool == "gnps") {
-    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
-  } else {
-    stopifnot("Your input file does not exist" = file.exists(input))
-    stopifnot("Your components file does not exist" = file.exists(components))
-  }
+fake_features_components <- function(input = params$input,
+                                     features = params$features,
+                                     output = params$output,
+                                     ms_mode = params$mode,
+                                     name_rt = params$rt_name,
+                                     name_mz = params$precursor_name) {
+  stopifnot("Your input file does not exist" = file.exists(input))
+  stopifnot("Your features file does not exist" = file.exists(features))
   stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
   table <- readr::read_delim(file = input)
+  features <- readr::read_delim(file = features)
 
-  log_debug(x = "... cluster table")
-  log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
-  ## TODO
+  components <- table |>
+    dplyr::mutate(component_id = -1)
 
-  components <-
-    read_clusters(id = gnps_job_id) |>
+  features_meta <- features |>
     dplyr::select(
-      feature_id = `cluster index`,
-      component_id = componentindex,
-      rt = RTMean,
-      mz = `precursor mass`
-    ) |>
-    dplyr::distinct()
-
-  if (tool == "manual") {
-    manual_components <-
-      readr::read_delim(file = components) |>
-      dplyr::distinct(
-        feature_id = CLUSTERID1,
-        component_id = ComponentIndex
-      )
-
-    components <- components |>
-      dplyr::select(-component_id) |>
-      left_join(manual_components) |>
-      dplyr::mutate(component_id = ifelse(
-        test = is.na(component_id),
-        yes = -1,
-        no = component_id
-      ))
-  }
-
+      feature_id,
+      rt := !!as.name(name_rt),
+      mz := !!as.name(name_mz)
+    )
 
   log_debug(x = "Adding components to features")
   table_filled <-
     dplyr::left_join(components, table) |>
+    dplyr::left_join(features_meta) |>
     dplyr::distinct() |>
     dplyr::arrange(desc(score_input)) |>
     dplyr::arrange(as.numeric(feature_id)) |>

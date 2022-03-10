@@ -1,0 +1,16 @@
+You can use this script with the following example:
+Rscript inst/scripts/prepare_features_components.R --input 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz' --features 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz' --output 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_faked_filled.tsv.gz' --mode 'pos'
+
+Usage: prepare_features_components.R [--input=<input>] [--features=<features>] [--output=<output>] [--mode=<mode>] [--precursor=<precursor>] [--rt=<rt>]
+
+Arguments:
+  -i --input=<input>            Your isdb result file. Supports compressed files.
+  -f --features=<features>      Your file containing features info. Supports compressed files.
+  -m --mode=<mode>              MS mode used. Can be "pos" or "neg"
+  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+  -p --precursor=<precursor>    The column name of your precursors (mz)
+  -r --rt=<rt>                  The column name of your retention times (rt)
+
+Options:
+  -h --help                     Show this screen.
+  -v --version                  Show version.

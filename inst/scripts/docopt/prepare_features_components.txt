@@ -1,14 +1,13 @@
 You can use this script with the following example:
 Rscript inst/scripts/prepare_features_components.R --input 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz' --output 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz' --mode 'pos' --tool 'gnps' --gnps '96fa7c88200e4a03bee4644e581e3fb0' --workflow 'fbmn'
 
-Usage: prepare_features_components.R [--input=<input>] [--output=<output>] [--mode=<mode>] [--network=<network>]
+Usage: prepare_features_components.R [--input=<input>] [--output=<output>] [--mode=<mode>]
 
 Arguments:
   -c --components=<components>  If your tool is manual, the file containing your component_ids
   -g --gnps=<gnps>              GNPS job ID.
   -i --input=<input>            Your isdb result file. Supports compressed files.
   -m --mode=<mode>              MS mode used. Can be "pos" or "neg"
-  -n --network=<network>        Boolean. `FALSE` to skip this part if no network.
   -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
   -t --tool=<tool>              Tool used for generating the component ids, currently only GNPS
   -w --workflow=<workflow>      The workflow used. Currently only 'fbmn' or 'classical'
