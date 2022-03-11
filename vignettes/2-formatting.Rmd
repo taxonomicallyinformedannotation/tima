@@ -92,15 +92,20 @@ All steps can take both manual inputs or GNPS metadata directly from your GNPS j
 
 We are currently also working on CANOPUS integration for chemical class annotation but this implies way heavier computations and we want to offer our users a **fast** solution.
 
+#### Case when no network available
+If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps. 
+This will mimic a false network that allows to proceed to the next steps. 
+However, this will not help chemical weighting.
+
+If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
+
+```{r}
+source(file = "inst/scripts/get_example_feature_table.R")
+```
+
 ### Formatting
 
 Before running the corresponding code, do not forget to modify `config/params/prepare_edges.yaml`, `config/params/prepare_features_components.yaml`, and `config/params/prepare_features_classification.yaml` accordingly.
-
-#### Case when no network available
-If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps. This will mimic a false network that allows to proceed to the next steps. 
-If needed, you can get an example of what your minimal feature table should look like by running `get_example_feature_table.R`.
-
-However, this will not help chemical weighting.
 
 ```{r}
 source(file = "inst/scripts/prepare_edges.R")
