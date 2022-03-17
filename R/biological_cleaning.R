@@ -281,6 +281,8 @@ biological_cleaning <-
         feature_id,
         dplyr::everything()
       ) |>
+      #' In case there are no consensus at all because no network
+      dplyr::mutate(dplyr::across(where(is.logical), as.character)) |>
       dplyr::tibble()
 
     #' Think about better scoring option
