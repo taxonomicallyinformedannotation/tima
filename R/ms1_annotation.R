@@ -44,7 +44,6 @@ ms1_annotation <-
         c(
           mz,
           component_id,
-          rt
         ),
         as.numeric
       )) |>
@@ -52,7 +51,11 @@ ms1_annotation <-
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
       data.table::data.table()
 
-    if (!any(names(annotationTable) == "rt")) {
+    if (any(names(annotationTable) == "rt")) {
+      df3 <- annotationTable |>
+        dplyr::mutate(dplyr::across(c(rt),
+                                    as.numeric))
+    } else {
       df3[, "rt"] <- df3["feature_id"]
     }
 
