@@ -124,5 +124,7 @@ parse_cli_params <- function() {
     }
   }
 
-  return(params)
+  if (exists("params")) {
+    return(params)
+  }
 }
