@@ -28,7 +28,7 @@ prepare_library <-
         'genus',
         'species',
         'varietas'
-        " = annotate %in% c(
+        " = level %in% c(
           "domain",
           "kingdom",
           "phylum",
