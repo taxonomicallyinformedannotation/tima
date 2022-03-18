@@ -84,15 +84,13 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   fake_features_components()
 
-  ## 4.2.c
+  ## 4.3
+  step <- "prepare_features_classification"
+  params <- get_params(step = step)
   fake_no_rt(
     input = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz",
     output = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz"
   )
-
-  ## 4.3
-  step <- "prepare_features_classification"
-  params <- get_params(step = step)
   prepare_features_classification(
     input = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz",
     output = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz"

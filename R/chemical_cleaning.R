@@ -186,9 +186,7 @@ chemical_cleaning <-
           component_id,
           mz
         )
-    }
-
-    if (any(names(metadata_table_spectral_annotation) == "rt")) {
+    } else {
       df6 <- metadata_table_spectral_annotation |>
         dplyr::distinct(
           feature_id,
@@ -220,24 +218,25 @@ chemical_cleaning <-
           score_final,
           rank_initial,
           rank_final,
-          candidate_organism_short_taxonomy,
-          candidate_structure_short_taxonomy,
-          consensus_structure_kin,
-          consistency_structure_kin,
+          best_candidate_organism,
+          best_candidate_structure,
+          consensus_structure_pat,
+          consistency_structure_pat,
           consensus_structure_sup,
           consistency_structure_sup,
           consensus_structure_cla,
           consistency_structure_cla,
-          consensus_structure_sub,
-          consistency_structure_sub,
-          consensus_structure_par,
-          consistency_structure_par,
           reference_doi
         )
 
       cat("adding consensus again to droped candidates \n")
       df8 <- df7 |>
-        dplyr::filter(!is.na(inchikey_2D))
+        dplyr::filter(!is.na(inchikey_2D)) |>
+        dplyr::mutate(
+          feature_id = as.numeric(feature_id),
+          component_id = as.numeric(component_id),
+          mz = as.numeric(mz)
+        )
 
       df9 <- df7 |>
         dplyr::filter(is.na(inchikey_2D)) |>
@@ -245,7 +244,8 @@ chemical_cleaning <-
           feature_id,
           component_id,
           mz
-        )
+        ) |>
+        dplyr::mutate_all(as.numeric)
 
       df10 <- dplyr::left_join(
         df9,
@@ -255,22 +255,15 @@ chemical_cleaning <-
           feature_id,
           component_id,
           mz,
-          consensus_structure_kin,
-          consistency_structure_kin,
+          consensus_structure_pat,
+          consistency_structure_pat,
           consensus_structure_sup,
           consistency_structure_sup,
           consensus_structure_cla,
-          consistency_structure_cla,
-          consensus_structure_sub,
-          consistency_structure_sub,
-          consensus_structure_par,
-          consistency_structure_par
+          consistency_structure_cla
         ) |>
         dplyr::distinct()
-    }
-
-
-    if (any(names(metadata_table_spectral_annotation) == "rt")) {
+    } else {
       df7 <- dplyr::left_join(df6, df5b) |>
         dplyr::arrange(feature_id) |>
         dplyr::mutate(dplyr::across(

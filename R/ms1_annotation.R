@@ -528,18 +528,32 @@ ms1_annotation <-
       dplyr::distinct()
 
     cat("formatting initial results \n")
-    df23 <- annotationTable |>
-      dplyr::mutate(dplyr::across(
-        c(
-          mz_error,
-          component_id,
-          mz,
-          rt,
-          score_input
-        ),
-        as.numeric
-      )) |>
-      dplyr::distinct()
+    if (any(names(annotationTable) == "rt")) {
+      df23 <- annotationTable |>
+        dplyr::mutate(dplyr::across(
+          c(
+            mz_error,
+            component_id,
+            mz,
+            rt,
+            score_input
+          ),
+          as.numeric
+        )) |>
+        dplyr::distinct()
+    } else {
+      df23 <- annotationTable |>
+        dplyr::mutate(dplyr::across(
+          c(
+            mz_error,
+            component_id,
+            mz,
+            score_input
+          ),
+          as.numeric
+        )) |>
+        dplyr::distinct()
+    }
 
     cat(
       "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
