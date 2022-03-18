@@ -104,13 +104,19 @@ chemical_weighting <-
     df4 <- df4 |>
       dplyr::rowwise() |>
       dplyr::mutate(score_pondered_chemo = (
-        (1 / (weightChemical + weightBiological + weightSpectral)) *
+        (1 / (weightChemical +
+          weightBiological +
+          weightSpectral)) *
           weightChemical *
           score_chemical +
-          (1 / (weightChemical + weightBiological + weightSpectral)) *
+          (1 / (weightChemical +
+            weightBiological +
+            weightSpectral)) *
             weightBiological *
             score_biological +
-          (1 / (weightChemical + weightBiological + weightSpectral)) *
+          (1 / (weightChemical +
+            weightBiological +
+            weightSpectral)) *
             weightSpectral *
             score_initialNormalized
       )) |>

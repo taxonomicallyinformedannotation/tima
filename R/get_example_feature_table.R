@@ -9,7 +9,11 @@
 #' @examples
 get_example_feature_table <-
   function(url = paths$urls$example_feature_table,
-           export = paths$data$interim$annotations$example_feature_table) {
+           export = paths$
+             data$
+             interim$
+             annotations$
+             example_feature_table) {
     paths <- parse_yaml_paths()
 
     ifelse(

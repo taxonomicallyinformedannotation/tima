@@ -97,31 +97,25 @@ parse_cli_params <- function() {
       params$ms$tolerance$rt <- as.numeric(arguments$rt)
     }
     if (!is.null(arguments$features)) {
-      params$feature_name <-
-        arguments$features
+      params$feature_name <- arguments$features
     }
     if (!is.null(arguments$rt)) {
-      params$rt_name <-
-        arguments$rt
+      params$rt_name <- arguments$rt
     }
     if (!is.null(arguments$precursor)) {
-      params$precursor_name <-
-        arguments$precursor
+      params$precursor_name <- arguments$precursor
     }
     if (!is.null(arguments$source)) {
-      params$source_name <-
-        arguments$source
+      params$source_name <- arguments$source
     }
     if (!is.null(arguments$spectral)) {
       params$weights$spectral <- as.numeric(arguments$spectral)
     }
     if (!is.null(arguments$target)) {
-      params$target_name <-
-        arguments$target
+      params$target_name <- arguments$target
     }
     if (!is.null(arguments$tool)) {
-      params$tool <-
-        arguments$tool
+      params$tool <- arguments$tool
     }
     if (!is.null(arguments$value)) {
       params$filter$value <- arguments$value
