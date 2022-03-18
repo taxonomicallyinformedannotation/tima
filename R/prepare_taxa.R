@@ -231,22 +231,23 @@ prepare_taxa <-
       )] <- NA
     }
 
-    if (is.null(force) &
-      extension == FALSE) {
-      log_debug("Removing filename extensions")
-      metadata_table <- metadata_table |>
-        dplyr::mutate(filename = gsub(
-          pattern = ".mzML",
-          replacement = "",
-          x = filename,
-          fixed = TRUE
-        )) |>
-        dplyr::mutate(filename = gsub(
-          pattern = ".mzxML",
-          replacement = "",
-          x = filename,
-          fixed = TRUE
-        ))
+    if (is.null(force)) {
+      if (extension == FALSE) {
+        log_debug("Removing filename extensions")
+        metadata_table <- metadata_table |>
+          dplyr::mutate(filename = gsub(
+            pattern = ".mzML",
+            replacement = "",
+            x = filename,
+            fixed = TRUE
+          )) |>
+          dplyr::mutate(filename = gsub(
+            pattern = ".mzxML",
+            replacement = "",
+            x = filename,
+            fixed = TRUE
+          ))
+      }
     }
     log_debug(x = "Joining top K with metadata table")
     if (tool != "ready") {

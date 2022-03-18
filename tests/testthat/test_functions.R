@@ -17,6 +17,9 @@ testthat::test_that("Whole process", {
   ## 1.1.a
   get_isdb()
 
+  ## 1.1.b
+  get_benchmark()
+
   ## 1.2
   prepare_lotus()
 
@@ -109,6 +112,11 @@ testthat::test_that("Whole process", {
   process_annotations(
     isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
     annotate = FALSE
+  )
+  process_annotations(
+    isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    ms_mode = "neg",
+    ms1_only = TRUE
   )
   succeed()
 })
