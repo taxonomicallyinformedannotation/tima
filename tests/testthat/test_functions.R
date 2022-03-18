@@ -15,7 +15,7 @@ testthat::test_that("Whole process", {
   get_lotus()
 
   ## 1.1.a
- adding test get_isdb()
+  get_isdb()
 
   ## 1.2
   prepare_lotus()
@@ -27,16 +27,12 @@ testthat::test_that("Whole process", {
 
   ## 1.4
   step <- "prepare_library"
-
-  ## 1.4.a
   params <- get_params(step = step)
-  params$filter$mode <- TRUE
-  params$filter$level <- "family"
-  params$filter$level <- "Simaroubaceae|Gentianaceae"
-  prepare_library()
-
-  ## 1.4.b
-  params <- get_params(step = step)
+  prepare_library(
+    filter = TRUE,
+    level = "family",
+    value = "Simaroubaceae|Gentianaceae"
+  )
   prepare_library()
 
   ## 1.5
@@ -88,9 +84,16 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   fake_features_components()
 
+  ## 4.2.c
+  fake_no_rt()
+
   ## 4.3
   step <- "prepare_features_classification"
   params <- get_params(step = step)
+  prepare_features_classification(
+    input = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz",
+    output = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz"
+  )
   prepare_features_classification()
 
   ## 4.4
@@ -102,7 +105,10 @@ testthat::test_that("Whole process", {
   step <- "process_annotations"
   params <- get_params(step = step)
   process_annotations(annotate = TRUE)
-  process_annotations(annotate = FALSE)
+  process_annotations(
+    isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    annotate = FALSE
+  )
   succeed()
 })
 
