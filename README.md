@@ -71,3 +71,36 @@ Once done, you can start with an example using:
 ```shell
 Rscript inst/scripts/tima.R
 ```
+
+## Mains Citations
+
+According to which steps you used, please give credit to the authors of the tools/resources used.
+
+### TIMA 
+General: [https://doi.org/10.3389/fpls.2019.01329](https://doi.org/10.3389/fpls.2019.01329)
+
+⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5797920](https://doi.org/10.5281/zenodo.5797920) 
+
+### LOTUS
+General: [https://doi.org/10.1101/2021.02.28.433265](https://doi.org/10.1101/2021.02.28.433265)
+
+⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5794106](https://doi.org/10.5281/zenodo.5794106) 
+
+### ISDB
+General: [https://doi.org/10.1021/ACS.ANALCHEM.5B04804](https://doi.org/10.1021/ACS.ANALCHEM.5B04804)
+
+⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5607185](https://doi.org/10.5281/zenodo.5607185) 
+
+### GNPS
+General: [https://dx.doi.org/10.1038%2Fnbt.3597](https://dx.doi.org/10.1038%2Fnbt.3597)
+
+### SIRIUS
+General: [https://doi.org/10.1038/s41592-019-0344-8](https://doi.org/10.1038/s41592-019-0344-8)
+  - *CSI:FingerId*: [http://dx.doi.org/10.1073/pnas.1509788112](http://dx.doi.org/10.1073/pnas.1509788112)
+  - *ZODIAC*: [https://doi.org/10.1038/s42256-020-00234-6](https://doi.org/10.1038/s42256-020-00234-6)
+  - *CANOPUS*: [https://doi.org/10.1038/s41587-020-0740-8](https://doi.org/10.1038/s41587-020-0740-8)
+  - *COSMIC*: [https://doi.org/10.1038/s41587-021-01045-9](https://doi.org/10.1038/s41587-021-01045-9)
+
+### Others
+- NPClassifier: [https://doi.org/10.1021/acs.jnatprod.1c00399](https://doi.org/10.1021/acs.jnatprod.1c00399)
+- ROTL: [https://doi.org/10.1111/2041-210X.12593](https://doi.org/10.1111/2041-210X.12593) 
