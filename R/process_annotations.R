@@ -314,14 +314,22 @@ process_annotations <- function(library = params$library,
     x = "... path to used parameters is",
     crayon::green(file.path(
       dir_time,
-      "process_annotations.yaml"
+      paste("tima",
+        paths$version,
+        "process_annotations.yaml",
+        sep = "_"
+      )
     ))
   )
   yaml::write_yaml(
     x = params,
     file = file.path(
       dir_time,
-      "process_annotations.yaml"
+      paste("tima",
+        paths$version,
+        "process_annotations.yaml",
+        sep = "_"
+      )
     )
   )
 }

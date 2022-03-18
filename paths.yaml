@@ -44,6 +44,9 @@ data:
       ranks: inst/extdata/source/dictionaries/ranks.tsv
     libraries:
       path: inst/extdata/source/libraries
+      isdb: 
+        pos: inst/extdata/source/libraries/isdb_pos.mgf
+        neg:
       lotus: inst/extdata/source/libraries/lotus.csv.gz
     neutral_losses: inst/extdata/source/neutral_losses.tsv
 doc:
@@ -63,4 +66,8 @@ urls:
   example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
   example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
   example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example
+  isdb: 
+    pos: https://zenodo.org/record/5607264/files/MultiSources_ISDB_pos.mgf?download=1
+    neg: 
   lotus: https://zenodo.org/record/6299673/files/220226_frozen_metadata.csv.gz?download=1
+version: 2.2.2

@@ -38,6 +38,9 @@ export_params <- function(parameters = params, directory = paths$data$interim$co
       paste0(
         format(Sys.time(), "%y%m%d_%H%M%OS"),
         "_",
+        "tima",
+        paths$version,
+        "_",
         step,
         ".yaml"
       )
