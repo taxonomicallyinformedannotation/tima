@@ -1,43 +1,48 @@
 # test log_debug
-testthat::test_that("parsing CLI arguments", {
-  arguments <- list()
-  arguments$biological <- "test"
-  arguments$column.name <- "test"
-  arguments$complement <- "test"
-  arguments$components <- "test"
-  arguments$edges <- "test"
-  arguments$extension <- "test"
-  arguments$features <- "test"
-  arguments$filter <- "test"
-  arguments$force <- "test"
-  arguments$gnps <- "test"
-  arguments$isdb <- "test"
-  arguments$j.top <- "test"
-  arguments$k.top <- "test"
-  arguments$level <- "test"
-  arguments$library <- "test"
-  arguments$metadata <- "test"
-  arguments$mode <- "test"
-  arguments$ms <- "test"
-  arguments$name <- "test"
-  arguments$nap <- "test"
-  arguments$npc <- "test"
-  arguments$output <- "test"
-  arguments$ppm <- "test"
-  arguments$precursor <- "test"
-  arguments$qemical <- "test"
-  arguments$quickmode <- "test"
-  arguments$rt <- "test"
-  arguments$source <- "test"
-  arguments$spectral <- "test"
-  arguments$target <- "test"
-  arguments$tool <- "test"
-  arguments$value <- "test"
-  arguments$workflow <- "test"
-  arguments$xbim <- "test"
-  arguments$zirius <- "test"
+arguments <- list()
+arguments$biological <- 1
+arguments$column.name <- "test"
+arguments$complement <- "test"
+arguments$components <- "test"
+arguments$edges <- "test"
+arguments$extension <- "test"
+arguments$features <- "test"
+arguments$filter <- "test"
+arguments$force <- "test"
+arguments$gnps <- "test"
+arguments$isdb <- "test"
+arguments$j.top <- 1
+arguments$k.top <- 1
+arguments$level <- 1
+arguments$library <- "test"
+arguments$metadata <- "test"
+arguments$mode <- "test"
+arguments$ms <- "test"
+arguments$name <- "test"
+arguments$nap <- "test"
+arguments$npc <- "test"
+arguments$output <- "test"
+arguments$ppm <- 1
+arguments$precursor <- "test"
+arguments$qemical <- 1
+arguments$quickmode <- "test"
+arguments$rt <- 1
+arguments$source <- "test"
+arguments$spectral <- 1
+arguments$target <- "test"
+arguments$tool <- "test"
+arguments$value <- "test"
+arguments$workflow <- "test"
+arguments$xbim <- "test"
+arguments$zirius <- "test"
+params <- list()
 
+testthat::test_that("parsing CLI arguments", {
   params <- parse_cli_params()
+  vars <- ls(all.names = TRUE)
+  for (i in 1:length(vars)) {
+    assign(vars[i], get(vars[i]), envir = .GlobalEnv)
+  }
   testthat::succeed()
 })
 
