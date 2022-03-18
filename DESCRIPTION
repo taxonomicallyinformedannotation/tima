@@ -59,6 +59,7 @@ Collate:
     'export_params.R'
     'fake_edges.R'
     'fake_features_components.R'
+    'fake_no_rt.R'
     'form_adduct_neg.R'
     'form_adduct_pos.R'
     'get_benchmark.R'

@@ -36,7 +36,18 @@ prepare_features_classification <-
       dplyr::distinct()
 
     log_debug(x = "... features table")
-    table <- readr::read_delim(file = input)
+    table <- readr::read_delim(file = input) |>
+      dplyr::distinct(
+        feature_id,
+        component_id,
+        mz,
+        inchikey_2D,
+        smiles_2D,
+        score_input,
+        library,
+        mz_error,
+        .keep_all = TRUE
+      )
 
     log_debug(x = "Filtering structures ...")
     log_debug(x = "... missing classification")
@@ -194,18 +205,7 @@ prepare_features_classification <-
       )
 
     table_final <- dplyr::left_join(
-      table |>
-        dplyr::distinct(
-          feature_id,
-          component_id,
-          mz,
-          rt,
-          inchikey_2D,
-          smiles_2D,
-          score_input,
-          library,
-          mz_error
-        ),
+      table,
       table_classified
     ) |>
       dplyr::left_join(table_formuled) |>

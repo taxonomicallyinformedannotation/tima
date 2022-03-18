@@ -16,7 +16,9 @@ data:
     annotations:
       path: inst/extdata/interim/annotations
       example_feature_table: inst/extdata/interim/annotations/example_feature_table.tsv.gz
+      example_feature_table_no_rt: inst/extdata/interim/annotations/example_feature_table_no_rt.tsv.gz
       example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
+      example_isdb_no_rt: inst/extdata/interim/annotations/example_isdb_result_no_rt.tsv.gz
       example_sirius: inst/extdata/interim/annotations/sirius_example
     config:
       path: inst/extdata/interim/config
