@@ -12,6 +12,7 @@ parse_cli_params <- function() {
   if (exists("arguments")) {
     if (!is.null(arguments$gnps)) {
       params$annotation$gnps <- arguments$gnps
+      params$gnps <- arguments$gnps
     }
     if (!is.null(arguments$isdb)) {
       params$annotation$isdb <- arguments$isdb
@@ -38,8 +39,8 @@ parse_cli_params <- function() {
       params$extension <- arguments$extension
     }
     if (!is.null(arguments$features)) {
-      params$taxa <-
-        arguments$features
+      params$taxa <- arguments$features
+      params$feature_name <- arguments$features
     }
     if (!is.null(arguments$filter)) {
       params$filter$mode <- arguments$filter
@@ -49,9 +50,6 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$qemical)) {
       params$weights$chemical <- as.numeric(arguments$qemical)
-    }
-    if (!is.null(arguments$gnps)) {
-      params$gnps <- arguments$gnps
     }
     if (!is.null(arguments$j.top)) {
       params$top_k$initial <- as.numeric(arguments$j.top)
@@ -95,11 +93,6 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$rt)) {
       params$ms$tolerance$rt <- as.numeric(arguments$rt)
-    }
-    if (!is.null(arguments$features)) {
-      params$feature_name <- arguments$features
-    }
-    if (!is.null(arguments$rt)) {
       params$rt_name <- arguments$rt
     }
     if (!is.null(arguments$precursor)) {
