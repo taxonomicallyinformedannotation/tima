@@ -52,7 +52,7 @@ ms1_annotation <-
       data.table::data.table()
 
     if (any(names(annotationTable) == "rt")) {
-      df3 <- annotationTable |>
+      df3 <- df3 |>
         dplyr::mutate(dplyr::across(c(rt),
                                     as.numeric))
     } else {
