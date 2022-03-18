@@ -92,11 +92,11 @@ General: [https://doi.org/10.1021/ACS.ANALCHEM.5B04804](https://doi.org/10.1021/
 ⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5607185](https://doi.org/10.5281/zenodo.5607185) 
 
 ### GNPS
-General: [https://dx.doi.org/10.1038%2Fnbt.3597](https://dx.doi.org/10.1038%2Fnbt.3597)
+General: [https://doi.org/10.1038/nbt.3597](https://doi.org/10.1038/nbt.3597)
 
 ### SIRIUS
 General: [https://doi.org/10.1038/s41592-019-0344-8](https://doi.org/10.1038/s41592-019-0344-8)
-  - *CSI:FingerId*: [http://dx.doi.org/10.1073/pnas.1509788112](http://dx.doi.org/10.1073/pnas.1509788112)
+  - *CSI:FingerId*: [https://doi.org/10.1073/pnas.1509788112](https://doi.org/10.1073/pnas.1509788112)
   - *ZODIAC*: [https://doi.org/10.1038/s42256-020-00234-6](https://doi.org/10.1038/s42256-020-00234-6)
   - *CANOPUS*: [https://doi.org/10.1038/s41587-020-0740-8](https://doi.org/10.1038/s41587-020-0740-8)
   - *COSMIC*: [https://doi.org/10.1038/s41587-021-01045-9](https://doi.org/10.1038/s41587-021-01045-9)
