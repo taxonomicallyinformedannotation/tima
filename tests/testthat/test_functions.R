@@ -15,7 +15,8 @@ testthat::test_that("Whole process", {
   get_lotus()
 
   ## 1.1.a
-  get_isdb()
+  get_isdb(url_pos = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/spectral_lib.mgf")
+  get_isdb(url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/spectral_lib.mgf")
 
   ## 1.1.b
   get_benchmark()
