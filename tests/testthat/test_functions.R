@@ -1,4 +1,45 @@
 # test log_debug
+testthat::test_that("parsing CLI arguments", {
+  arguments <- list()
+  arguments$biological <- "test"
+  arguments$column.name <- "test"
+  arguments$complement <- "test"
+  arguments$components <- "test"
+  arguments$edges <- "test"
+  arguments$extension <- "test"
+  arguments$features <- "test"
+  arguments$filter <- "test"
+  arguments$force <- "test"
+  arguments$gnps <- "test"
+  arguments$isdb <- "test"
+  arguments$j.top <- "test"
+  arguments$k.top <- "test"
+  arguments$level <- "test"
+  arguments$library <- "test"
+  arguments$metadata <- "test"
+  arguments$mode <- "test"
+  arguments$ms <- "test"
+  arguments$name <- "test"
+  arguments$nap <- "test"
+  arguments$npc <- "test"
+  arguments$output <- "test"
+  arguments$ppm <- "test"
+  arguments$precursor <- "test"
+  arguments$qemical <- "test"
+  arguments$quickmode <- "test"
+  arguments$rt <- "test"
+  arguments$source <- "test"
+  arguments$spectral <- "test"
+  arguments$target <- "test"
+  arguments$tool <- "test"
+  arguments$value <- "test"
+  arguments$workflow <- "test"
+  arguments$xbim <- "test"
+  arguments$zirius <- "test"
+
+  params <- parse_cli_params()
+  testthat::succeed()
+})
 
 testthat::test_that("parsing YAML path", {
   paths <- parse_yaml_paths()
@@ -16,9 +57,11 @@ testthat::test_that("Whole process", {
 
   ## 1.1.a
   get_isdb(url_pos = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf")
-  get_isdb(url_pos = NULL,
-           url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf",
-           export_neg = "inst/extdata/source/libraries/isdb_neg.mgf")
+  get_isdb(
+    url_pos = NULL,
+    url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf",
+    export_neg = "inst/extdata/source/libraries/isdb_neg.mgf"
+  )
 
   ## 1.1.b
   get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp")
