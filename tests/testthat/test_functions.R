@@ -6,7 +6,7 @@ testthat::test_that("parsing YAML path", {
   for (i in 1:length(vars)) {
     assign(vars[i], get(vars[i]), envir = .GlobalEnv)
   }
-  succeed()
+  testthat::succeed()
 })
 
 ## need to do all in one because of outputs needed in the same temp dir
@@ -24,6 +24,15 @@ testthat::test_that("processing annotations", {
 
   ## 1.4
   step <- "prepare_library"
+
+  ## 1.4.a
+  params <- get_params(step = step)
+  params$filter$mode <- TRUE
+  params$filter$level <- "family"
+  params$filter$level <- "Simaroubaceae|Gentianaceae"
+  prepare_library()
+
+  ## 1.4.b
   params <- get_params(step = step)
   prepare_library()
 
