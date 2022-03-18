@@ -53,8 +53,10 @@ ms1_annotation <-
 
     if (any(names(annotationTable) == "rt")) {
       df3 <- df3 |>
-        dplyr::mutate(dplyr::across(c(rt),
-                                    as.numeric))
+        dplyr::mutate(dplyr::across(
+          c(rt),
+          as.numeric
+        ))
     } else {
       df3[, "rt"] <- df3["feature_id"]
     }
