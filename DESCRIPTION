@@ -65,6 +65,7 @@ Collate:
     'get_example_feature_table.R'
     'get_example_isdb.R'
     'get_example_sirius.R'
+    'get_isdb.R'
     'get_lotus.R'
     'get_params.R'
     'log_debug.R'
