@@ -21,7 +21,7 @@ testthat::test_that("Whole process", {
            export_neg = "inst/extdata/source/libraries/isdb_neg.mgf")
 
   ## 1.1.b
-  get_benchmark()
+  get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp")
 
   ## 1.2
   prepare_lotus()
