@@ -1,5 +1,15 @@
 # timaR
 
+# timaR 2.3.0
+* Minor fixes 
+* Added support for annotation without MN (#28)
+* Added support for multi tool annotations (#27)
+* Added suport for classical MN GNPS jobs (#25)
+* Added support for new version of LOTUS
+* General improvements for manual inputs
+* Updated adducts
+* Improved tests code coverage
+
 # timaR 2.2.2
 * Minor fixes 
 * Additional benchmark figure ([Correct hits repartition](https://taxonomicallyinformedannotation.github.io/tima-r/articles/4-actual-performance.html#correct-hits-repartition))
