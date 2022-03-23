@@ -71,5 +71,5 @@ urls:
   isdb: 
     pos: https://zenodo.org/record/5607264/files/MultiSources_ISDB_pos.mgf?download=1
     neg: 
-  lotus: https://zenodo.org/record/6299673/files/220226_frozen_metadata.csv.gz?download=1
+  lotus: https://zenodo.org/record/6378204/files/220318_frozen_metadata.csv.gz?download=1
 version: 2.3.0
