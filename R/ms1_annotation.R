@@ -424,7 +424,7 @@ ms1_annotation <-
         dplyr::rowwise() |>
         dplyr::mutate(
           neg_3_3proton = (mz + adduct_mass - 3 * adductsM["proton"]) / 3,
-          neg_2_2proton = ((mz + adduct_mass - 2 * adductsM["proton"]) / 2),
+          neg_2_2proton = (mz + adduct_mass - 2 * adductsM["proton"]) / 2,
           neg_2MH = 2 * (mz + adduct_mass) - adductsM["proton"],
           neg_2MFAH = 2 * (mz + adduct_mass) + adductsM["formic"] - adductsM["proton"],
           neg_2MACH = 2 * (mz + adduct_mass) + adductsM["acetic"] - adductsM["proton"],
