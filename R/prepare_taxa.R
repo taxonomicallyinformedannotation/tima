@@ -46,10 +46,8 @@ prepare_taxa <-
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-      if (is.null(force)) {
-        log_debug(x = "Loading metadata table")
-        metadata_table <- read_metadata(id = gnps_job_id)
-      }
+      log_debug(x = "Loading metadata table")
+      metadata_table <- read_metadata(id = gnps_job_id)
     }
 
     if (tool == "manual") {
@@ -98,7 +96,7 @@ prepare_taxa <-
     organism_table <- metadata_table |>
       dplyr::filter(!is.na(dplyr::all_of(colname))) |>
       dplyr::distinct(dplyr::across(dplyr::all_of(colname))) |>
-      dplyr::select(organism = all_of(colname)) |>
+      dplyr::select(organism = dplyr::all_of(colname)) |>
       splitstackshape::cSplit(
         splitCols = "organism",
         sep = "|",
