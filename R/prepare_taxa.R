@@ -46,8 +46,10 @@ prepare_taxa <-
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-      log_debug(x = "Loading metadata table")
-      metadata_table <- read_metadata(id = gnps_job_id)
+      if (is.null(force)) {
+        log_debug(x = "Loading metadata table")
+        metadata_table <- read_metadata(id = gnps_job_id)
+      }
     }
 
     if (tool == "manual") {
