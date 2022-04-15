@@ -108,6 +108,11 @@ chemical_cleaning <-
       dplyr::arrange(reference_doi) |>
       dplyr::distinct(
         inchikey_2D = structure_inchikey_2D,
+        structure_name = structure_nameTraditional,
+        structure_xlogp,
+        structure_01pathway = structure_taxonomy_npclassifier_01pathway,
+        structure_02superclass = structure_taxonomy_npclassifier_02superclass,
+        structure_03class = structure_taxonomy_npclassifier_03class,
         lowest_candidate_organism = organism_name,
         reference_doi
       )
@@ -117,23 +122,29 @@ chemical_cleaning <-
       dplyr::select(
         feature_id,
         component_id,
+        rt,
+        mz,
         molecular_formula,
         inchikey_2D,
         smiles_2D,
+        structure_name,
+        structure_xlogp,
+        structure_01pathway,
+        structure_02superclass,
+        structure_03class,
         score_initialNormalized,
         score_biological,
-        rank_initial,
-        rank_final,
-        best_candidate_organism,
-        best_candidate_structure,
         score_chemical,
-        rt,
-        mz,
         library,
         mz_error,
         score_interim,
         score_final,
         reference_doi,
+        rank_initial,
+        rank_final,
+        best_candidate_organism,
+        best_candidate_structure,
+        lowest_candidate_organism,
         dplyr::everything()
       )
 
@@ -149,22 +160,38 @@ chemical_cleaning <-
         -rank_initial,
         -rank_final,
         -best_candidate_structure,
+        -best_candidate_organism,
+        -lowest_candidate_organism,
         -score_chemical,
         -rt,
         -mz,
         -library,
-        -best_candidate_structure,
         -mz_error,
         -score_interim,
-        -score_final
+        -score_final,
+        -structure_name,
+        -structure_xlogp,
+        -structure_01pathway,
+        -structure_02superclass,
+        -structure_03class,
+        -reference_doi
       ) |>
       dplyr::distinct()
 
     cat("summarizing results \n")
     df5a <- df4a |>
+      dplyr::group_by(dplyr::across(c(-reference_doi,-structure_name,-structure_01pathway,-structure_02superclass,-structure_03class))) |>
+      dplyr::summarise(dplyr::across(
+        c(reference_doi,structure_name,structure_01pathway,structure_02superclass,structure_03class),
+        ~ gsub(
+          pattern = "\\bNA\\b",
+          replacement = "",
+          x = paste(.x, collapse = "§")
+        )
+      )) |>
       dplyr::group_by(feature_id) |>
       dplyr::summarise(dplyr::across(
-        colnames(df4a)[3:19],
+        colnames(df4a)[3:25],
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
