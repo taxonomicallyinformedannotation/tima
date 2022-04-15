@@ -1,5 +1,11 @@
 # timaR
 
+# timaR 2.4.0
+* Minor fixes 
+* Improved output (#34)
+* Added chemical names and xlogp to output (#33)
+* Added support for case when no consensus is found (#30)
+
 # timaR 2.3.0
 * Minor fixes 
 * Added support for annotation without MN (#28)
