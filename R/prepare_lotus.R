@@ -21,12 +21,12 @@ prepare_lotus <-
         last = 14
       )) |>
       dplyr::select(
-        # structure_name,
+        structure_nameTraditional,
         structure_inchikey_2D,
         structure_smiles_2D,
         structure_molecular_formula,
         structure_exact_mass,
-        # structure_xlogp,
+        structure_xlogp,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class,
@@ -42,7 +42,6 @@ prepare_lotus <-
         organism_taxonomy_09species,
         organism_taxonomy_10varietas,
         reference_doi
-        # reference_title
       ) |>
       dplyr::distinct()
 
