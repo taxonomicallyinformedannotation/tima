@@ -22,6 +22,7 @@ ms1_decoration <- function() {
       crayon::green(
         nrow(
           annotation_table_ms1 |>
+            dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
             dplyr::filter(!is.na(inchikey_2D) |
               inchikey_2D != "notAnnotated") |>
             dplyr::filter(score_input == 0)
@@ -77,6 +78,7 @@ taxo_decoration <- function() {
     "taxonomically informed scoring led to \n",
     crayon::silver(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_kingdom)
     )),
     "annotations reranked at the",
@@ -84,6 +86,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::white(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_phylum)
     )),
     "annotations reranked at the",
@@ -91,6 +94,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::cyan(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_class)
     )),
     "annotations reranked at the",
@@ -98,6 +102,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::magenta(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_order)
     )),
     "annotations reranked at the",
@@ -105,6 +110,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::blue(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_family)
     )),
     "annotations reranked at the",
@@ -112,6 +118,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::yellow(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_genus)
     )),
     "annotations reranked at the",
@@ -119,6 +126,7 @@ taxo_decoration <- function() {
     "level, \n",
     crayon::green(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_species)
     )),
     "annotations reranked at the",
@@ -127,6 +135,7 @@ taxo_decoration <- function() {
     "and",
     crayon::red(nrow(
       annotation_table_weighted_bio |>
+        dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
         dplyr::filter(score_biological >= score_biological_variety)
     )),
     "annotations reranked at the",
