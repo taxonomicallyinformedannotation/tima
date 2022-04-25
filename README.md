@@ -82,7 +82,7 @@ General: [https://doi.org/10.3389/fpls.2019.01329](https://doi.org/10.3389/fpls.
 ⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5797920](https://doi.org/10.5281/zenodo.5797920) 
 
 ### LOTUS
-General: [https://doi.org/10.1101/2021.02.28.433265](https://doi.org/10.1101/2021.02.28.433265)
+General: [https://doi.org/10.7554/eLife.70780](https://doi.org/10.7554/eLife.70780)
 
 ⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5794106](https://doi.org/10.5281/zenodo.5794106) 
 
