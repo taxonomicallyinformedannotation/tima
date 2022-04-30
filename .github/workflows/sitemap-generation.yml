@@ -2,7 +2,7 @@ name: Generate sitemap
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, gh-pages]
     paths: [ '**.html' ]
   pull_request:
     branches: [ main ]
