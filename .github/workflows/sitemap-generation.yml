@@ -22,7 +22,7 @@ jobs:
       id: sitemap
       uses: cicirello/generate-sitemap@v1
       with:
-        base-url-path: https://taxonomicallyinformedannotation.github.io/tima-r/index.html
+        base-url-path: https://taxonomicallyinformedannotation.github.io/tima-r/
     
     - name: Output stats
       run: |
