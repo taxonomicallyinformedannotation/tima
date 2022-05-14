@@ -81,6 +81,7 @@ prepare_taxa <-
         dplyr::filter(value != 0) |>
         dplyr::group_by(rowname) |>
         dplyr::mutate(rank = rank(-value)) |>
+        dplyr::ungroup() |>
         dplyr::filter(rank <= top_k) |>
         dplyr::arrange(rowname, rank)
     } else {
