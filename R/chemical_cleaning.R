@@ -190,6 +190,7 @@ chemical_cleaning <-
         )
       )) |>
       dplyr::group_by(feature_id) |>
+      dplyr::arrange(dplyr::desc(score_final)) |>
       dplyr::summarise(dplyr::across(
         colnames(df4a)[3:25],
         ~ gsub(
