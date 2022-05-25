@@ -12,7 +12,7 @@ name: pkgdown
 jobs:
   pkgdown:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.fork == false
-    runs-on: mac-latest
+    runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
