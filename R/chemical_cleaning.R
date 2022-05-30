@@ -180,9 +180,23 @@ chemical_cleaning <-
 
     cat("summarizing results \n")
     df5a <- df4a |>
-      dplyr::group_by(dplyr::across(c(-reference_doi,-structure_name,-structure_01pathway,-structure_02superclass,-structure_03class))) |>
+      dplyr::group_by(dplyr::across(
+        c(
+          -reference_doi,
+          -structure_name,
+          -structure_01pathway,
+          -structure_02superclass,
+          -structure_03class
+        )
+      )) |>
       dplyr::summarise(dplyr::across(
-        c(reference_doi,structure_name,structure_01pathway,structure_02superclass,structure_03class),
+        c(
+          reference_doi,
+          structure_name,
+          structure_01pathway,
+          structure_02superclass,
+          structure_03class
+        ),
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
