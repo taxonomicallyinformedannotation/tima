@@ -1,5 +1,8 @@
 # timaR
 
+# timaR 2.5.1
+* Improved support for SIRIUS (with new summaries)
+
 # timaR 2.5.0
 * Minor fixes 
 * LOTUS update
