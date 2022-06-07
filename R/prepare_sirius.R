@@ -14,29 +14,35 @@ prepare_sirius <-
            output = params$output) {
     stopifnot("Your input directory does not exist" = dir.exists(input_directory))
     stopifnot("NPC must be 'true' or 'false" = npc %in% c(TRUE, FALSE))
-    stopifnot("Your npc summary file must be named 'canopus_npc_summary.csv" = file.exists(file.path(
-      input_directory,
-      "canopus_npc_summary.csv"
-    )))
+    stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
+      file.path(
+        input_directory,
+        "canopus_compound_summary.tsv"
+      )
+    ))
+    stopifnot(
+      "You must generate the summaries before submission. \n
+              Please do `sirius -i $WORKSPACE write-summaries -o $WORKSPACE_SUMMARIES.zip -c --digits 3" = length(
+        list.files(
+          path = input_directory,
+          pattern = "structure_candidates.tsv",
+          recursive = TRUE
+        )
+      ) != 0
+    )
 
     log_debug("Loading and formatting SIRIUS results")
     if (npc == TRUE) {
       canopus <-
         readr::read_delim(file = file.path(
           input_directory,
-          "canopus_npc_summary.csv"
+          "canopus_compound_summary.tsv"
         ))
     } else {
       cat(
         "Please compute NPClassifier Canopus summary file, we do not support Classyfire anymore"
       )
     }
-
-    canopus_adducts <-
-      readr::read_delim(file = file.path(
-        input_directory,
-        "canopus_summary_adducts.tsv"
-      ))
 
     formula <-
       readr::read_delim(file = file.path(
@@ -62,43 +68,96 @@ prepare_sirius <-
         "compound_identifications_adducts.tsv"
       ))
 
-    ## TODO compound classes if npclassifier one day
-    canopus_prepared <- canopus |>
-      dplyr::mutate(feature_id = gsub(
-        pattern = ".*_",
-        replacement = "",
-        x = name
-      )) |>
+    compound_summary <- lapply(
+      X = list.files(
+        path = input_directory,
+        pattern = "structure_candidates.tsv",
+        full.names = TRUE,
+        recursive = TRUE
+      ),
+      FUN = readr::read_delim,
+      col_types = "c",
+      col_select = c(
+        "ConfidenceScore",
+        "CSI:FingerIDScore",
+        "molecularFormula",
+        "adduct",
+        "InChIkey2D",
+        "InChI",
+        "name",
+        "smiles",
+        "xlogp"
+      )
+    )
+
+    #' Title
+    #'
+    #' @param x
+    #'
+    #' @return
+    #' @export
+    #'
+    #' @examples
+    pretreat_names_sirius <- function(x) {
+      y <- x |>
+        gsub(
+          pattern = "/.*",
+          replacement = ""
+        )
+      return(y)
+    }
+
+    #' Title
+    #'
+    #' @param x
+    #'
+    #' @return
+    #' @export
+    #'
+    #' @examples
+    treat_names_sirius <- function(x) {
+      y <- x |>
+        gsub(
+          pattern = ".*_",
+          replacement = ""
+        )
+      # |>gsub(pattern = "adduct",
+      #      replacement = "")
+      return(y)
+    }
+
+    names(compound_summary) <- list.files(
+      path = input_directory,
+      pattern = "structure_candidates.tsv",
+      recursive = TRUE
+    ) |>
+      pretreat_names_sirius() |>
+      treat_names_sirius()
+
+
+    compound_summary_ready <-
+      lapply(compound_summary, FUN = dplyr::mutate_all, as.character) |>
+      dplyr::bind_rows(.id = "feature_id")
+
+    canopus_npc_prepared <- canopus |>
+      dplyr::mutate(feature_id = treat_names_sirius(id)) |>
       dplyr::select(
         feature_id,
-        structure_taxonomy_npclassifier_01pathway = pathway,
-        pathwayProbability,
-        structure_taxonomy_npclassifier_02superclass = superclass,
-        superclassProbability,
-        structure_taxonomy_npclassifier_03class = class,
-        classProbability
+        structure_taxonomy_npclassifier_01pathway = `NPC#pathway`,
+        `NPC#pathway Probability`,
+        structure_taxonomy_npclassifier_02superclass = `NPC#superclass`,
+        `NPC#superclass Probability`,
+        structure_taxonomy_npclassifier_03class = `NPC#class`,
+        `NPC#class Probability`
       )
 
-    ## TODO compound classes if npclassifier one day
-    canopus_adducts_prepared <- canopus_adducts |>
-      dplyr::mutate(feature_id = gsub(
-        pattern = ".*_",
-        replacement = "",
-        x = name
-      ))
-
     ## TODO score not optimal
-    compound_prepared <- compound |>
+    compound_prepared <- compound_summary_ready |>
       dplyr::mutate(
-        feature_id = gsub(
-          pattern = ".*_",
-          replacement = "",
-          x = id
-        ),
         score_input = ifelse(
           test = ConfidenceScore != "N/A",
           yes = ConfidenceScore,
-          no = -10 / `CSI:FingerIDScore`
+          no = -10 / as.numeric(`CSI:FingerIDScore`)
         )
       ) |>
       dplyr::select(
@@ -116,11 +175,7 @@ prepare_sirius <-
 
     compound_adducts_prepared <- compound_adducts |>
       dplyr::mutate(
-        feature_id = gsub(
-          pattern = ".*_",
-          replacement = "",
-          x = id
-        ),
+        feature_id = treat_names_sirius(id),
         score_input = ifelse(
           test = ConfidenceScore != "N/A",
           yes = ConfidenceScore,
@@ -141,20 +196,12 @@ prepare_sirius <-
       )
 
     formula_prepared <- formula |>
-      dplyr::mutate(feature_id = gsub(
-        pattern = ".*_",
-        replacement = "",
-        x = id
-      )) |>
+      dplyr::mutate(feature_id = treat_names_sirius(id)) |>
       dplyr::mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
       dplyr::distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
 
     formula_adducts_prepared <- formula_adducts |>
-      dplyr::mutate(feature_id = gsub(
-        pattern = ".*_",
-        replacement = "",
-        x = id
-      )) |>
+      dplyr::mutate(feature_id = treat_names_sirius(id)) |>
       dplyr::mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
       dplyr::distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
 
@@ -168,7 +215,7 @@ prepare_sirius <-
 
     table <- compounds_prepared |>
       dplyr::left_join(formulas_prepared) |>
-      dplyr::left_join(canopus_prepared) |>
+      dplyr::left_join(canopus_npc_prepared) |>
       dplyr::distinct()
 
     table[] <- lapply(
@@ -177,6 +224,16 @@ prepare_sirius <-
         y_as_na(x, y = "N/A")
       }
     )
+
+    #' temp CASMI fix
+    table <- table |>
+      dplyr::mutate(
+        feature_id = gsub(
+          pattern = "adduct",
+          replacement = "0000",
+          x = feature_id
+        )
+      )
 
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(
@@ -188,9 +245,6 @@ prepare_sirius <-
         "This is somehow unexpected and under investigation."
       )
     }
-
-    log_debug(x = "Sirius weighting is still not optimal given the input candidate list ...")
-    log_debug(x = "See https://github.com/boecker-lab/sirius/issues/50 for more info...")
 
     log_debug(x = "Exporting ...")
     ifelse(
