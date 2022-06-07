@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.5.0
+Version: 2.5.1
 Authors@R: c(
     person("Adriano", "Rutz", , "adriano.rutz@unige.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -48,7 +48,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Collate:
     'biological_cleaning.R'
     'biological_weighting.R'
@@ -86,6 +86,7 @@ Collate:
     'prepare_lotus.R'
     'prepare_sirius.R'
     'prepare_taxa.R'
+    'pretreat_names_sirius.R'
     'process_annotations.R'
     'read_clusters.R'
     'read_edges.R'
@@ -94,6 +95,7 @@ Collate:
     'read_nap.R'
     'read_results.R'
     'timaR-package.R'
+    'treat_names_sirius.R'
     'utils-tidy-eval.R'
     'y_as_na.R'
 VignetteBuilder: 

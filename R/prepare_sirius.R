@@ -1,3 +1,6 @@
+source("R/pretreat_names_sirius.R")
+source("R/treat_names_sirius.R")
+
 #' Title
 #'
 #' @param input_directory TODO
@@ -89,42 +92,6 @@ prepare_sirius <-
         "xlogp"
       )
     )
-
-    #' Title
-    #'
-    #' @param x
-    #'
-    #' @return
-    #' @export
-    #'
-    #' @examples
-    pretreat_names_sirius <- function(x) {
-      y <- x |>
-        gsub(
-          pattern = "/.*",
-          replacement = ""
-        )
-      return(y)
-    }
-
-    #' Title
-    #'
-    #' @param x
-    #'
-    #' @return
-    #' @export
-    #'
-    #' @examples
-    treat_names_sirius <- function(x) {
-      y <- x |>
-        gsub(
-          pattern = ".*_",
-          replacement = ""
-        )
-      # |>gsub(pattern = "adduct",
-      #      replacement = "")
-      return(y)
-    }
 
     names(compound_summary) <- list.files(
       path = input_directory,
