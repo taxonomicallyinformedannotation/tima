@@ -1,5 +1,3 @@
-options(timeout = 600)
-
 #' Title
 #'
 #' @param url TODO
@@ -12,6 +10,9 @@ options(timeout = 600)
 get_example_sirius <-
   function(url = paths$url$example_sirius,
            export = paths$data$interim$annotations$example_sirius) {
+    options(timeout = 600)
+    message("Timeout for download is ", getOption("timeout"), " seconds")
+
     paths <- parse_yaml_paths()
 
     ifelse(
