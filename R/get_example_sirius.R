@@ -17,20 +17,28 @@ get_example_sirius <-
     ifelse(
       test = !dir.exists(dirname(dirname(export))),
       yes = dir.create(dirname(dirname(export))),
-      no = paste(dirname(dirname(export)),
-                 "exists")
+      no = paste(
+        dirname(dirname(export)),
+        "exists"
+      )
     )
     ifelse(
       test = !dir.exists(dirname(export)),
       yes = dir.create(dirname(export)),
-      no = paste(dirname(export),
-                 "exists")
+      no = paste(
+        dirname(export),
+        "exists"
+      )
     )
 
     message("Downloading")
-    download.file(url = url,
-                  destfile = export)
+    download.file(
+      url = url,
+      destfile = export
+    )
     message("Unzipping")
-    unzip(zipfile = export,
-          exdir = dirname(export))
+    unzip(
+      zipfile = export,
+      exdir = dirname(export)
+    )
   }
