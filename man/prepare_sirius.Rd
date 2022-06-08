@@ -23,6 +23,3 @@ TODO
 \description{
 Title
 }
-\examples{
-temp CASMI fix
-}
