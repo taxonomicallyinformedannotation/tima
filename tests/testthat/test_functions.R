@@ -94,12 +94,12 @@ testthat::test_that("Whole process", {
   step <- "prepare_features_classification"
   params <- get_params(step = step)
   fake_no_rt(
-    input = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz",
-    output = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz"
+    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz",
+    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz"
   )
   prepare_features_classification(
-    input = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz",
-    output = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz"
+    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz",
+    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz"
   )
   prepare_features_classification()
 
@@ -113,11 +113,11 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   process_annotations(annotate = TRUE)
   process_annotations(
-    isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
     annotate = FALSE
   )
   process_annotations(
-    isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
     ms_mode = "neg",
     ms1_only = TRUE
   )
