@@ -12,18 +12,6 @@ get_example_sirius <-
            export = paths$data$interim$annotations$example_sirius) {
     paths <- parse_yaml_paths()
 
-    canopus_npc <- "canopus_npc_summary.csv"
-
-    canopus_adducts <- "canopus_summary_adducts.tsv"
-
-    compound <- "compound_identifications.tsv"
-
-    compound_adducts <- "compound_identifications_adducts.tsv"
-
-    formula <- "formula_identifications.tsv"
-
-    formula_adducts <- "formula_identifications_adducts.tsv"
-
     ifelse(
       test = !dir.exists(dirname(dirname(export))),
       yes = dir.create(dirname(dirname(export))),
@@ -49,16 +37,13 @@ get_example_sirius <-
       )
     )
 
-    readr::read_csv(file = file.path(url, canopus_npc)) |>
-      readr::write_csv(file = file.path(export, canopus_npc))
-    readr::read_tsv(file = file.path(url, canopus_adducts)) |>
-      readr::write_tsv(file = file.path(export, canopus_adducts))
-    readr::read_tsv(file = file.path(url, compound)) |>
-      readr::write_tsv(file = file.path(export, compound))
-    readr::read_tsv(file = file.path(url, compound_adducts)) |>
-      readr::write_tsv(file = file.path(export, compound_adducts))
-    readr::read_tsv(file = file.path(url, formula)) |>
-      readr::write_tsv(file = file.path(export, formula))
-    readr::read_tsv(file = file.path(url, formula_adducts)) |>
-      readr::write_tsv(file = file.path(export, formula_adducts))
+    message("Timeout set to 300 seconds")
+    options(timeout = 300)
+    message("Downloading")
+    download.file(url = url, destfile = export)
+    message("Unzipping")
+    unzip(
+      zipfile = export,
+      exdir = dirname(export)
+    )
   }
