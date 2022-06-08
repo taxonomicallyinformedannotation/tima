@@ -57,8 +57,8 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          args: 'c("--ignore-vignettes")'
-          build_args: 'c("--no-build-vignettes", "--keep-empty-dirs")'
+          args: 'c("--as-cran", "--ignore-vignettes","--no-manual","--no-examples","--no-tests")'
+          build_args: 'c("--no-build-vignettes", "--no-manual")'
           error-on: '"error"'
 
       - name: Show testthat output

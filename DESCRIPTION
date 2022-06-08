@@ -11,7 +11,7 @@ Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
 Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima-r,
-    https://taxonomicallyinformedannotation.github.io/tima-r
+    https://taxonomicallyinformedannotation.github.io/tima-r/
 BugReports: 
     https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
