@@ -1,5 +1,7 @@
 #' Title
 #'
+#' @noRd
+#'
 #' @param x
 #'
 #' @return

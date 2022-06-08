@@ -200,7 +200,7 @@ chemical_cleaning <-
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
-          x = paste(.x, collapse = "§")
+          x = paste(.x, collapse = "$")
         )
       )) |>
       dplyr::group_by(feature_id) |>

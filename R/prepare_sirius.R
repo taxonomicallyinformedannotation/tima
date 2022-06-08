@@ -192,16 +192,6 @@ prepare_sirius <-
       }
     )
 
-    #' temp CASMI fix
-    table <- table |>
-      dplyr::mutate(
-        feature_id = gsub(
-          pattern = "adduct",
-          replacement = "0000",
-          x = feature_id
-        )
-      )
-
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(
         "Warning:",
