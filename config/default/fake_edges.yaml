@@ -1,3 +1,3 @@
-input: data/interim/annotations/example_feature_table.tsv.gz # A file containing your feature ids
-output: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
+input: inst/extdata/interim/annotations/example_feature_table.tsv.gz # A file containing your feature ids
+output: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
 feature_name: feature_id

@@ -1,4 +1,4 @@
-input: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
-output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
-library: data/interim/libraries/library.tsv.gz
+input: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+output: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+library: inst/extdata/interim/libraries/library.tsv.gz
 quickmode: TRUE

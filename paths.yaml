@@ -8,33 +8,33 @@ config:
 data:
   path: data
   interim:
-    path: data/interim
+    path: inst/extdata/interim
     adducts:
-      path: data/interim/adducts
-      neg: data/interim/adducts/adducts_neg.tsv.gz
-      pos: data/interim/adducts/adducts_pos.tsv.gz
+      path: inst/extdata/interim/adducts
+      neg: inst/extdata/interim/adducts/adducts_neg.tsv.gz
+      pos: inst/extdata/interim/adducts/adducts_pos.tsv.gz
     annotations:
-      path: data/interim/annotations
-      example_feature_table: data/interim/annotations/example_feature_table.tsv.gz
-      example_feature_table_no_rt: data/interim/annotations/example_feature_table_no_rt.tsv.gz
-      example_isdb: data/interim/annotations/example_isdb_result.tsv.gz
-      example_isdb_no_rt: data/interim/annotations/example_isdb_result_no_rt.tsv.gz
-      example_sirius: data/interim/annotations/sirius_example.zip
+      path: inst/extdata/interim/annotations
+      example_feature_table: inst/extdata/interim/annotations/example_feature_table.tsv.gz
+      example_feature_table_no_rt: inst/extdata/interim/annotations/example_feature_table_no_rt.tsv.gz
+      example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
+      example_isdb_no_rt: inst/extdata/interim/annotations/example_isdb_result_no_rt.tsv.gz
+      example_sirius: inst/extdata/interim/annotations/sirius_example.zip
     config:
-      path: data/interim/config
+      path: inst/extdata/interim/config
     edges:
-      path: data/interim/edges
+      path: inst/extdata/interim/edges
     features:
-      path: data/interim/features
+      path: inst/extdata/interim/features
     libraries:
-      path: data/interim/libraries
-      lotus: data/interim/libraries/lotus_prepared.tsv.gz
+      path: inst/extdata/interim/libraries
+      lotus: inst/extdata/interim/libraries/lotus_prepared.tsv.gz
     taxa:
-      path: data/interim/taxa
+      path: inst/extdata/interim/taxa
   processed:
-    path: data/processed
+    path: inst/extdata/processed
     config:
-      path: data/processed/config
+      path: inst/extdata/processed/config
   source:
     path: inst/extdata/source
     adducts: inst/extdata/source/adducts.tsv

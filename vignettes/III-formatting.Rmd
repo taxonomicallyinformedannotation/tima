@@ -58,7 +58,7 @@ These parameters were not optimized and were only used to give an example output
 Then, the summaries have been generated using:
 
 `
-sirius -i data/annotations/sirius_example/ write-summaries -c --digits 3
+sirius -i inst/extdata/interim/annotations/sirius_example/ write-summaries -c --digits 3
 `
 
 You can get the example running:
