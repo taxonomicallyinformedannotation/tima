@@ -1,5 +1,8 @@
 # timaR
 
+# timaR 2.5.2
+* Packaging improvements
+
 # timaR 2.5.1
 * Improved support for SIRIUS (with new summaries)
 
