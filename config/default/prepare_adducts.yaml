@@ -1,2 +1,2 @@
-input: inst/extdata/interim/libraries/library.tsv.gz
+input: data/interim/libraries/library.tsv.gz
 output: library

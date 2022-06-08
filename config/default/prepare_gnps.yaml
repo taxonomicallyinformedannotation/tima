@@ -1,4 +1,4 @@
-output: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
+output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
 gnps: 96fa7c88200e4a03bee4644e581e3fb0
 workflow: fbmn ## or classical
 nap: # optional

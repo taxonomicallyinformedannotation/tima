@@ -8,6 +8,8 @@ bin
 
 config/params
 
+data
+
 docs
 
 inst/extdata/source/benchmark
