@@ -50,7 +50,7 @@ prepare_gnps()
 
 #' 3.3
 # step <- "prepare_sirius"
-# params <- get_params()
+# params <- get_params(step = step)
 # prepare_sirius()
 
 #' 4.1
