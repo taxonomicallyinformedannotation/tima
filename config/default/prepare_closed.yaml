@@ -1,2 +1,2 @@
-input: ../lotus-processor/data/processed/220525_closed_metadata.csv.gz ## will only work if you have it
+input: ../lotus-processor/data/processed/220701_closed_metadata.csv.gz ## will only work if you have it
 output: inst/extdata/interim/libraries/closed_prepared.tsv.gz
