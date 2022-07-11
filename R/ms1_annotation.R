@@ -17,6 +17,7 @@
 #' @importFrom dplyr across bind_rows dense_rank desc distinct everything
 #' @importFrom dplyr filter group_by inner_join left_join mutate mutate_all
 #' @importFrom dplyr rowwise select ungroup
+#' @importFrom stats dist setNames
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer
 #'
@@ -63,7 +64,7 @@ ms1_annotation <-
           as.numeric
         ))
     } else {
-      df3[, "rt"] <- df3["feature_id"]
+      df3[, "rt"] <- df3[, "feature_id"]
     }
 
     cat("adding rt tolerance ... \n")
@@ -132,7 +133,7 @@ ms1_annotation <-
     cat("calculating delta mz for single charge adducts \n")
     df8 <-
       dist_groups(
-        d = dist(adductsTable$adduct_mass),
+        d = stats::dist(adductsTable$adduct_mass),
         g = adductsTable$adduct
       ) |>
       dplyr::mutate(Distance_2 = Distance) |>

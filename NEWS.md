@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.5.3
+* Imports improvements
+* LOTUS update
+
 # timaR 2.5.2
 * Packaging improvements
 

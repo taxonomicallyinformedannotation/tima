@@ -14,6 +14,7 @@
 #' @importFrom dplyr add_count anti_join arrange bind_rows distinct filter
 #' @importFrom dplyr full_join group_by mutate n_distinct right_join select
 #' @importFrom dplyr tibble ungroup
+#' @importFrom stats setNames
 #'
 #' @examples
 biological_cleaning <-
@@ -103,7 +104,7 @@ biological_cleaning <-
     df3 <-
       dplyr::right_join(edgesTable,
         df1,
-        by = setNames("feature_id", "feature_target")
+        by = stats::setNames("feature_id", "feature_target")
       ) |>
       dplyr::filter(!is.na(feature_source))
 
@@ -270,13 +271,13 @@ biological_cleaning <-
     df4 <-
       dplyr::left_join(df1,
         freq_pat,
-        by = setNames("feature_source", "feature_id")
+        by = stats::setNames("feature_source", "feature_id")
       ) |>
       dplyr::left_join(freq_sup,
-        by = setNames("feature_source", "feature_id")
+        by = stats::setNames("feature_source", "feature_id")
       ) |>
       dplyr::left_join(freq_cla,
-        by = setNames("feature_source", "feature_id")
+        by = stats::setNames("feature_source", "feature_id")
       ) |>
       dplyr::mutate(component_id = as.numeric(component_id)) |>
       dplyr::select(
