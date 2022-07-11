@@ -1,16 +1,3 @@
-if (!require(curl)) {
-  install.packages("curl")
-  require(
-    package = "curl",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  require(package = "readr", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @param url_pos TODO

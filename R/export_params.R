@@ -1,8 +1,3 @@
-if (!require(yaml)) {
-  install.packages("yaml")
-  require(package = "yaml", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @noRd

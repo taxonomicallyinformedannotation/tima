@@ -10,6 +10,10 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr filter select
+#' @importFrom readr read_delim write_delim
+#' @importFrom stringr str_length
+#'
 #' @examples
 prepare_edges <- function(tool = params$tool,
                           gnps_job_id = params$gnps,

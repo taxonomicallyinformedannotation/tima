@@ -7,6 +7,10 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr bind_rows distinct filter left_join mutate mutate_all
+#' @importFrom dplyr select
+#' @importFrom readr read_delim write_delim
+#'
 #' @examples
 prepare_sirius <-
   function(input_directory = params$directory,

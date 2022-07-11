@@ -1,16 +1,3 @@
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  require(
-    package = "dplyr",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  require(package = "readr", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @param input TODO

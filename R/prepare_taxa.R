@@ -13,6 +13,18 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr across all_of arrange bind_rows coalesce distinct
+#' @importFrom dplyr everything filter group_by group_cols left_join matches
+#' @importFrom dplyr mutate mutate_all mutate_at row_number select setdiff
+#' @importFrom dplyr summarise_all ungroup vars
+#' @importFrom purrr map_df
+#' @importFrom readr read_delim write_delim
+#' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
+#' @importFrom splitstackshape cSplit
+#' @importFrom stringr str_length
+#' @importFrom tibble column_to_rownames rownames_to_column
+#' @importFrom tidyr gather pivot_wider
+#'
 #' @examples
 prepare_taxa <-
   function(input = params$input,
@@ -65,7 +77,7 @@ prepare_taxa <-
       feature_table <- feature_table |>
         dplyr::select(
           `row ID`,
-          matches(" Peak area")
+          dplyr::matches(" Peak area")
         ) |>
         tibble::column_to_rownames(var = "row ID")
       colnames(feature_table) <-

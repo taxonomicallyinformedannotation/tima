@@ -1,12 +1,3 @@
-if (!require(purrr)) {
-  install.packages("purrr")
-  require(package = "purrr", quietly = TRUE)
-}
-if (!require(yaml)) {
-  install.packages("yaml")
-  require(package = "yaml", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @noRd
@@ -14,7 +5,6 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
-#' @importFrom purrr flatten
 #' @importFrom yaml read_yaml
 #'
 #' @examples
@@ -23,13 +13,13 @@ parse_yaml_params <- function() {
   suppressWarnings(params <-
     yaml::read_yaml(file = default_path, handlers = list(
       seq = function(x) {
-        purrr::flatten(x)
+        flatten(x)
       }
     )))
   suppressWarnings(params <-
     yaml::read_yaml(file = params_path, handlers = list(
       seq = function(x) {
-        purrr::flatten(x)
+        flatten(x)
       }
     )))
   return(params)

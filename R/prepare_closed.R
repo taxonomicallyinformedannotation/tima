@@ -6,6 +6,9 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr distinct mutate select
+#' @importFrom readr read_delim write_delim
+#'
 #' @examples
 prepare_closed <- function(input = params$input,
                            output = params$output) {

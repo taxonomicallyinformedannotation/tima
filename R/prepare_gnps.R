@@ -7,6 +7,10 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr mutate select
+#' @importFrom readr read_delim write_delim
+#' @importFrom stringr str_length
+#'
 #' @examples
 prepare_gnps <-
   function(gnps_job_id = params$gnps,

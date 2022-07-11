@@ -1,16 +1,3 @@
-if (!require(curl)) {
-  install.packages("curl")
-  require(
-    package = "curl",
-    quietly = TRUE,
-    warn.conflicts = FALSE
-  )
-}
-if (!require(readr)) {
-  install.packages("readr")
-  require(package = "readr", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @param url TODO
@@ -21,6 +8,7 @@ if (!require(readr)) {
 #'
 #' @importFrom curl curl_download
 #' @importFrom readr read_csv write_csv
+#'
 #' @examples
 get_lotus <-
   function(url = paths$urls$lotus,

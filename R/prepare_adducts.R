@@ -11,6 +11,9 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr distinct filter mutate_all select
+#' @importFrom readr read_delim write_delim
+#'
 #' @examples
 prepare_adducts <-
   function(adducts_input = params$input,

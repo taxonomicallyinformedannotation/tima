@@ -1,13 +1,3 @@
-if (!require(readr)) {
-  install.packages("readr")
-  require(package = "readr", quietly = TRUE)
-}
-
-if (!require(stringr)) {
-  install.packages("stringr")
-  require(package = "stringr", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @noRd

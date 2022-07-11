@@ -10,6 +10,10 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr arrange desc distinct left_join mutate select
+#' @importFrom readr read_delim write_delim
+#' @importFrom stringr str_length
+#'
 #' @examples
 prepare_features_components <- function(input = params$input,
                                         output = params$output,
@@ -53,7 +57,7 @@ prepare_features_components <- function(input = params$input,
 
     components <- components |>
       dplyr::select(-component_id) |>
-      left_join(manual_components) |>
+      dplyr::left_join(manual_components) |>
       dplyr::mutate(component_id = ifelse(
         test = is.na(component_id),
         yes = -1,
@@ -66,7 +70,7 @@ prepare_features_components <- function(input = params$input,
   table_filled <-
     dplyr::left_join(components, table) |>
     dplyr::distinct() |>
-    dplyr::arrange(desc(score_input)) |>
+    dplyr::arrange(dplyr::desc(score_input)) |>
     dplyr::arrange(as.numeric(feature_id)) |>
     dplyr::select(
       feature_id,

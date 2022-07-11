@@ -1,5 +1,3 @@
-## TODO require(...)
-
 #' Title
 #'
 #' @param annotationTable TODO
@@ -14,6 +12,13 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom data.table data.table foverlaps setkey
+#' @importFrom dplyr across bind_rows dense_rank desc distinct everything
+#' @importFrom dplyr filter group_by inner_join left_join mutate mutate_all
+#' @importFrom dplyr rowwise select ungroup
+#' @importFrom stringr str_detect
+#' @importFrom tidyr pivot_longer
 #'
 #' @examples
 ms1_annotation <-
@@ -306,14 +311,14 @@ ms1_annotation <-
     df14 <- dplyr::left_join(
       x = df12,
       y = df13,
-      by = setNames("structure_exact_mass", "exact_mass")
+      by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
       dplyr::select(
         molecular_formula = structure_molecular_formula,
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D,
         library,
-        everything(),
+        dplyr::everything(),
         -exact_mass
       ) |>
       dplyr::filter(!is.na(inchikey_2D)) |>
@@ -322,7 +327,7 @@ ms1_annotation <-
 
     cat("adding adduct mass to get back to [M] \n")
     df15 <-
-      dplyr::left_join(df14, adductsTable, by = setNames("adduct", "library")) |>
+      dplyr::left_join(df14, adductsTable, by = stats::setNames("adduct", "library")) |>
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
       dplyr::select(
         feature_id,
@@ -517,7 +522,7 @@ ms1_annotation <-
       )
 
     df22 <-
-      dplyr::left_join(df21, df13, by = setNames("structure_exact_mass", "exact_mass")) |>
+      dplyr::left_join(df21, df13, by = stats::setNames("structure_exact_mass", "exact_mass")) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
         molecular_formula = structure_molecular_formula,

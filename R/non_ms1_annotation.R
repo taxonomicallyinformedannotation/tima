@@ -1,5 +1,3 @@
-## TODO require(...)
-
 #' Title
 #'
 #' @param annotationTable TODO
@@ -7,6 +5,9 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr across dense_rank desc group_by distinct filter left_join
+#' @importFrom dplyr mutate mutate_all select ungroup
 #'
 #' @examples
 non_ms1_annotation <-

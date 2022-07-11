@@ -1,8 +1,3 @@
-if (!require(docopt)) {
-  install.packages("docopt")
-  require(package = "docopt", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @noRd

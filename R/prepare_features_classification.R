@@ -8,6 +8,9 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr anti_join distinct filter left_join select
+#' @importFrom readr read_delim write_delim
+#'
 #' @examples
 prepare_features_classification <-
   function(library = params$library,

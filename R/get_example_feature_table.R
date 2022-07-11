@@ -1,8 +1,3 @@
-if (!require(readr)) {
-  install.packages("readr")
-  require(package = "readr", quietly = TRUE)
-}
-
 #' Title
 #'
 #' @param url TODO

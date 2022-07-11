@@ -45,6 +45,12 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom crayon green
+#' @importFrom dplyr across arrange bind_rows distinct filter select left_join
+#' @importFrom dplyr mutate mutate_all mutate_if
+#' @importFrom readr read_delim write_delim
+#' @importFrom yaml write_yaml
+#'
 #' @examples
 process_annotations <- function(library = params$library,
                                 name = params$name,
@@ -186,10 +192,8 @@ process_annotations <- function(library = params$library,
         library = NA,
         mz_error = NA
       ) |>
-      dplyr::mutate(across(
-        c(
-          inchikey_2D, score_input, library, mz_error
-        ),
+      dplyr::mutate(dplyr::across(
+        c(inchikey_2D, score_input, library, mz_error),
         as.character
       ))
   }
