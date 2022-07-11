@@ -1,6 +1,3 @@
-source("R/pretreat_names_sirius.R")
-source("R/treat_names_sirius.R")
-
 #' Title
 #'
 #' @param input_directory TODO

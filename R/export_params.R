@@ -14,6 +14,8 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom yaml write_yaml
+#'
 #' @examples
 export_params <- function(parameters = params, directory = paths$data$interim$config$path, step) {
   ifelse(

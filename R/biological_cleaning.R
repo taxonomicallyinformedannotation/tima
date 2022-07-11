@@ -1,4 +1,11 @@
-#' TODO require(...)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
 
 #' Title
 #'
@@ -12,6 +19,10 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr add_count anti_join arrange bind_rows distinct filter
+#' @importFrom dplyr full_join group_by mutate n_distinct right_join select
+#' @importFrom dplyr tibble ungroup
 #'
 #' @examples
 biological_cleaning <-

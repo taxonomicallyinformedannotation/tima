@@ -24,6 +24,10 @@ if (!require(stringr)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
+#' @importFrom dplyr group_by left_join mutate rowwise select ungroup
+#' @importFrom stringr str_detect
+#'
 #' @examples
 chemical_weighting <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
@@ -103,27 +107,36 @@ chemical_weighting <-
     cat("... cleaning \n")
     df4 <- df4 |>
       dplyr::rowwise() |>
-      dplyr::mutate(score_pondered_chemo = (
-        (1 / (weightChemical +
-          weightBiological +
-          weightSpectral)) *
-          weightChemical *
-          score_chemical +
-          (1 / (weightChemical +
-            weightBiological +
-            weightSpectral)) *
-            weightBiological *
-            score_biological +
-          (1 / (weightChemical +
-            weightBiological +
-            weightSpectral)) *
-            weightSpectral *
-            score_initialNormalized
-      )) |>
+      dplyr::mutate(
+        score_pondered_chemo = (
+          (1 / (
+            weightChemical +
+              weightBiological +
+              weightSpectral
+          )) *
+            weightChemical *
+            score_chemical +
+            (1 / (
+              weightChemical +
+                weightBiological +
+                weightSpectral
+            )) *
+              weightBiological *
+              score_biological +
+            (1 / (
+              weightChemical +
+                weightBiological +
+                weightSpectral
+            )) *
+              weightSpectral *
+              score_initialNormalized
+        )
+      ) |>
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
-      dplyr::distinct(feature_id,
+      dplyr::distinct(
+        feature_id,
         inchikey_2D,
         smiles_2D,
         candidate_structure_1_pathway,

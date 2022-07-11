@@ -33,12 +33,12 @@ get_example_sirius <-
     )
 
     message("Downloading")
-    download.file(
+    utils::download.file(
       url = url,
       destfile = export
     )
     message("Unzipping")
-    unzip(
+    utils::unzip(
       zipfile = export,
       exdir = dirname(export)
     )

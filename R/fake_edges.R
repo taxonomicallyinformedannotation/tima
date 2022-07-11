@@ -1,3 +1,8 @@
+if (!require(readr)) {
+  install.packages("readr")
+  require(package = "readr", quietly = TRUE)
+}
+
 #' Title
 #'
 #' @param input TODO
@@ -7,17 +12,22 @@
 #' @return TODO
 #' @export
 #'
+#' @importFrom readr read_delim write_delim
+#'
 #' @examples
 fake_edges <- function(input = params$input,
                        output = params$output,
                        name_feature = params$feature) {
   stopifnot("Your input file does not exist" = file.exists(input))
 
-  edges_table_treated <- readr::read_delim(file = input) |>
-    dplyr::select(
-      feature_source = name_feature,
-      feature_target = name_feature
-    )
+  edges_table_treated <- readr::read_delim(
+    file = input,
+    col_select =
+      c(
+        feature_source = name_feature,
+        feature_target = name_feature
+      )
+  )
 
   log_debug(x = "Exporting ...")
   ifelse(

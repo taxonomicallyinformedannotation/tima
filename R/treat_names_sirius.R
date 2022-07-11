@@ -14,7 +14,7 @@ treat_names_sirius <- function(x) {
       pattern = ".*_",
       replacement = ""
     )
-  # |>gsub(pattern = "adduct",
+  # |> gsub(pattern = "adduct",
   #      replacement = "")
   return(y)
 }

@@ -12,6 +12,8 @@ if (!require(docopt)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom docopt docopt
+#'
 #' @examples
 get_params <- function(step) {
   stopifnot(

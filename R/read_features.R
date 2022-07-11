@@ -3,6 +3,11 @@ if (!require(readr)) {
   require(package = "readr", quietly = TRUE)
 }
 
+if (!require(stringr)) {
+  install.packages("stringr")
+  require(package = "stringr", quietly = TRUE)
+}
+
 #' Title
 #'
 #' @noRd
@@ -11,6 +16,9 @@ if (!require(readr)) {
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom readr read_delim
+#' @importFrom stringr str_length
 #'
 #' @examples
 read_features <- function(id) {

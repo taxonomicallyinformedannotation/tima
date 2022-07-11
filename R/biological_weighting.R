@@ -1,4 +1,15 @@
-## TODO require(...)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(stringr)) {
+  install.packages("stringr")
+  require(package = "stringr", quietly = TRUE)
+}
 
 #' Title
 #'
@@ -19,6 +30,10 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
+#' @importFrom dplyr full_join group_by left_join mutate select tibble ungroup
+#' @importFrom stringr str_detect
 #'
 #' @examples
 biological_weighting <-

@@ -14,6 +14,8 @@ if (!require(dplyr)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom crayon blue cyan green magenta red silver white yellow
+#' @importFrom dplyr anti_join distinct filter
 #' @examples
 ms1_decoration <- function() {
   suppressWarnings(

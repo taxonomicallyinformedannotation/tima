@@ -16,6 +16,9 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom purrr flatten
+#' @importFrom yaml read_yaml
+#'
 #' @examples
 parse_yaml_paths <- function(file = "paths.yaml") {
   log_debug("Loading paths")

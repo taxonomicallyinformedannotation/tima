@@ -1,3 +1,16 @@
+if (!require(curl)) {
+  install.packages("curl")
+  require(
+    package = "curl",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  require(package = "readr", quietly = TRUE)
+}
+
 #' Title
 #'
 #' @param url TODO
@@ -5,6 +18,9 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom curl curl_download
+#' @importFrom readr read_csv write_csv
 #'
 #' @examples
 get_benchmark <-

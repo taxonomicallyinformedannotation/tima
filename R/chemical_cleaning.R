@@ -1,4 +1,11 @@
-#' TODO require(...)
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
 
 #' Title
 #'
@@ -12,6 +19,10 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr across arrange bind_rows dense_rank desc distinct
+#' @importFrom dplyr everything filter group_by left_join mutate mutate_all
+#' @importFrom dplyr select summarise ungroup
 #'
 #' @examples
 chemical_cleaning <-

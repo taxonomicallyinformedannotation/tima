@@ -14,6 +14,9 @@ if (!require(yaml)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom purrr flatten
+#' @importFrom yaml read_yaml
+#'
 #' @examples
 parse_yaml_params <- function() {
   log_debug("Loading yaml parameters")

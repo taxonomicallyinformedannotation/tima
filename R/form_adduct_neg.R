@@ -1,6 +1,10 @@
 if (!require(dplyr)) {
   install.packages("dplyr")
-  require(package = "dplyr", quietly = TRUE, warn.conflicts = FALSE)
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
 }
 if (!require(tidyr)) {
   install.packages("tidyr")
@@ -16,6 +20,9 @@ if (!require(tidyr)) {
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr all_of everything mutate select
+#' @importFrom tidyr pivot_longer
 #'
 #' @examples
 form_adducts_neg <- function(massesTable, adductsTable) {
@@ -45,7 +52,7 @@ form_adducts_neg <- function(massesTable, adductsTable) {
 
   adducts_neg <- adducts_neg |>
     tidyr::pivot_longer(2:dplyr::all_of(n)) |>
-    dplyr::select(tidyr::everything(),
+    dplyr::select(dplyr::everything(),
       adduct = name,
       adduct_mass = value
     )

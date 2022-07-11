@@ -1,3 +1,8 @@
+if (!require(readr)) {
+  install.packages("readr")
+  require(package = "readr", quietly = TRUE)
+}
+
 #' Title
 #'
 #' @param url TODO
@@ -5,6 +10,8 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom readr read_tsv write_tsv
 #'
 #' @examples
 get_example_isdb <-

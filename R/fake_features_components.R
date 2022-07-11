@@ -1,3 +1,16 @@
+if (!require(dplyr)) {
+  install.packages("dplyr")
+  require(
+    package = "dplyr",
+    quietly = TRUE,
+    warn.conflicts = FALSE
+  )
+}
+if (!require(readr)) {
+  install.packages("readr")
+  require(package = "readr", quietly = TRUE)
+}
+
 #' Title
 #'
 #' @param input TODO
@@ -9,6 +22,9 @@
 #'
 #' @return TODO
 #' @export
+#'
+#' @importFrom dplyr arrange desc distinct left_join mutate select
+#' @importFrom readr read_delim write_delim
 #'
 #' @examples
 fake_features_components <- function(input = params$input,
@@ -41,7 +57,7 @@ fake_features_components <- function(input = params$input,
     dplyr::left_join(components, table) |>
     dplyr::left_join(features_meta) |>
     dplyr::distinct() |>
-    dplyr::arrange(desc(score_input)) |>
+    dplyr::arrange(dplyr::desc(score_input)) |>
     dplyr::arrange(as.numeric(feature_id)) |>
     dplyr::select(
       feature_id,

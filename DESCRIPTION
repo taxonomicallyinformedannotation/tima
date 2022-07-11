@@ -32,7 +32,6 @@ Imports:
     rotl,
     splitstackshape,
     stringr,
-    tibble,
     tidyr,
     yaml
 Suggests: 

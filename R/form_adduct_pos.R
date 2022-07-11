@@ -21,6 +21,9 @@ if (!require(tidyr)) {
 #' @return TODO
 #' @export
 #'
+#' @importFrom dplyr all_of everything mutate select
+#' @importFrom tidyr pivot_longer
+#'
 #' @examples
 form_adducts_pos <- function(massesTable, adductsTable) {
   adducts_pos <- massesTable |>
@@ -76,7 +79,7 @@ form_adducts_pos <- function(massesTable, adductsTable) {
 
   adducts_pos <- adducts_pos |>
     tidyr::pivot_longer(2:dplyr::all_of(n)) |>
-    dplyr::select(tidyr::everything(),
+    dplyr::select(dplyr::everything(),
       adduct = name,
       adduct_mass = value
     )
