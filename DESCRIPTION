@@ -17,13 +17,11 @@ BugReports:
 Depends:
     R (>= 4.1.0)
 Imports:
-    cli,
     crayon,
     curl,
     data.table,
     docopt,
     dplyr,
-    forcats,
     glue,
     lifecycle,
     purrr,
