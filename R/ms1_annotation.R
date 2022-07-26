@@ -415,7 +415,7 @@ ms1_annotation <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidyr::pivot_longer(cols = dplyr::all_of(5:cols))
+        tidyr::pivot_longer(cols = 5:cols)
     }
 
     if (msMode == "neg") {
@@ -442,7 +442,7 @@ ms1_annotation <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidyr::pivot_longer(cols = dplyr::all_of(5:cols))
+        tidyr::pivot_longer(cols = 5:cols)
     }
 
     df17 <- df17 |>
