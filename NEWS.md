@@ -1,5 +1,10 @@
 # timaR
 
+# timaR 2.5.4
+* Minor fixes
+* Metadata completion improvement
+* Molecular formula and adducts formalism improvement
+
 # timaR 2.5.3
 * Imports improvements
 * LOTUS update
