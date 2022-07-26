@@ -217,8 +217,8 @@ process_annotations <- function(library = params$library,
     neutral_losses_table <<-
       readr::read_delim(file = paths$data$source$neutral_losses)
 
-    adductsM <<- adductsMassTable$mass
-    names(adductsM) <<- adductsMassTable$adduct
+    adductsM <- adductsMassTable$mass
+    names(adductsM) <- adductsMassTable$adduct
 
     if (ms_mode == "pos") {
       adduct_db_file <<-
