@@ -41,7 +41,8 @@ prepare_gnps <-
         library = "GNPS",
         smiles_2D = NA,
         molecular_formula = NA
-      )
+      ) |>
+      complement_metadata()
 
     if (!is.null(nap_job_id)) {
       log_debug("Loading NAP results")

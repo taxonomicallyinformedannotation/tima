@@ -46,12 +46,13 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Collate:
     'biological_cleaning.R'
     'biological_weighting.R'
     'chemical_cleaning.R'
     'chemical_weighting.R'
+    'complement_metadata.R'
     'decoration.R'
     'dist_groups.R'
     'export_params.R'

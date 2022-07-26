@@ -184,7 +184,8 @@ prepare_sirius <-
     table <- compounds_prepared |>
       dplyr::left_join(formulas_prepared) |>
       dplyr::left_join(canopus_npc_prepared) |>
-      dplyr::distinct()
+      dplyr::distinct() |>
+      complement_metadata()
 
     table[] <- lapply(
       table,

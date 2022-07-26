@@ -32,7 +32,8 @@ prepare_isdb <-
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
-      )
+      ) |>
+      complement_metadata()
 
     log_debug(x = "Exporting ...")
     ifelse(
