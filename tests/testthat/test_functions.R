@@ -1,16 +1,12 @@
-testthat::test_that("parsing YAML path", {
+#' need to do all in one because of outputs needed in the same temp dir
+testthat::test_that("Whole process", {
+
+  ## 0.1
   paths <- parse_yaml_paths()
   vars <- ls(all.names = TRUE)
   for (i in 1:length(vars)) {
     assign(vars[i], get(vars[i]), envir = .GlobalEnv)
   }
-  testthat::succeed()
-})
-
-#' need to do all in one because of outputs needed in the same temp dir
-testthat::test_that("Whole process", {
-
-  ## 0.1
   step <- "prepare_params"
   params <- get_params(step = step)
   prepare_params()
