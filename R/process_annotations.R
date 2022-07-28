@@ -95,17 +95,17 @@ process_annotations <- function(library = params$library,
                                 force = params$force) {
   stopifnot("Your library file does not exist." = file.exists(library))
   ## TODO add name
-  stopifnot("Your GNPS file does not exist." = if (is.null(gnps)) {
+  stopifnot("Your GNPS file does not exist." = if (length(gnps) == 0) {
     TRUE
   } else {
     file.exists(gnps)
   })
-  stopifnot("Your ISDB file does not exist." = if (is.null(isdb)) {
+  stopifnot("Your ISDB file does not exist." = if (length(isdb) == 0) {
     TRUE
   } else {
     file.exists(isdb)
   })
-  stopifnot("Your SIRIUS file does not exist." = if (is.null(sirius)) {
+  stopifnot("Your SIRIUS file does not exist." = if (length(sirius) == 0) {
     TRUE
   } else {
     file.exists(sirius)

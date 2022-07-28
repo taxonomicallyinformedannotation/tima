@@ -1,9 +1,9 @@
 library: inst/extdata/interim/libraries/library.tsv.gz # Library file prepared with previous steps
 name: library # Adducts library file prepared with previous steps
 annotation: 
-  gnps: # inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
+  gnps: [] # inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
   isdb: inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz # Annotation file prepared with previous steps
-  sirius: # inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
+  sirius: [] # inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
 taxa: inst/extdata/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz # Taxed features file prepared with previous steps
 edges: inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz # Edges file prepared with previous steps
 output: FinalResults.tsv
@@ -40,8 +40,8 @@ scores:
 ms:
   mode: pos
   level: 1 # currently only 1, not a real parameter... for now
-  annotate: TRUE
-  ms1only: FALSE
+  annotate: yes
+  ms1only: no
   tolerance:
     ppm: 10
     rt: 0.05
@@ -102,4 +102,4 @@ ms:
       - neg_2MFAH
       - neg_2MACH
       - neg_3MH
-force: FALSE
+force: yes

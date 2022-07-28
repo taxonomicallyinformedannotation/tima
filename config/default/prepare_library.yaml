@@ -1,5 +1,5 @@
 output: library.tsv.gz
 filter:
-  mode: FALSE
+  mode: no
   level: kingdom # domain, phylum, class, order, family, tribe, genus, species, varietas
   value: Streptophyta # OR can be used as "|" example: Simaroubaceae|Gentianaceae

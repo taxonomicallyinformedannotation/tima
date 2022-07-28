@@ -36,7 +36,6 @@ jobs:
       - name: Additional step for tests to run
         run: |
           cp -R paths.yaml tests/testthat/paths.yaml
-          cp -R config/default config/params
           cp -R config tests/testthat/config
           cp -R inst tests/testthat/inst
           

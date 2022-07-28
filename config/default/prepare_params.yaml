@@ -9,8 +9,8 @@ weights:
   biological: 0.666
 ms:
   mode: pos
-  annotate: TRUE
+  annotate: yes
   tolerance:
     ppm: 10
     rt: 0.05
-force: FALSE
+force: no

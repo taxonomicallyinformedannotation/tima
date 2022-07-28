@@ -53,11 +53,11 @@ prepare_params <- function(filename = params$filename,
     gsub(pattern = "config/default/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
 
-  yamls_default <- lapply(
+  yamls_default <<- lapply(
     X = yaml_files,
     FUN = yaml::read_yaml
   )
-  names(yamls_default) <- yaml_names
+  names(yamls_default) <<- yaml_names
 
   yamls_params <- yamls_default
 
