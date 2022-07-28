@@ -11,6 +11,8 @@ testthat::test_that("parsing YAML path", {
 testthat::test_that("Whole process", {
 
   ## 0.1
+  step <- "prepare_params"
+  params <- get_params(step = step)
   prepare_params()
 
   ## 1.1
