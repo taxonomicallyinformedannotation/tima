@@ -9,6 +9,10 @@ testthat::test_that("parsing YAML path", {
 
 #' need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Whole process", {
+
+  ## 0.1
+  prepare_params()
+
   ## 1.1
   get_lotus()
 

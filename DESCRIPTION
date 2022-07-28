@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.5.4
+Version: 2.5.5
 Authors@R: c(
     person("Adriano", "Rutz", , "adriano.rutz@unige.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -83,6 +83,7 @@ Collate:
     'prepare_isdb.R'
     'prepare_library.R'
     'prepare_lotus.R'
+    'prepare_params.R'
     'prepare_sirius.R'
     'prepare_taxa.R'
     'pretreat_names_sirius.R'
@@ -93,6 +94,7 @@ Collate:
     'read_metadata.R'
     'read_nap.R'
     'read_results.R'
+    'replace_gnps_job_id.R'
     'timaR-package.R'
     'treat_names_sirius.R'
     'utils-tidy-eval.R'

@@ -46,7 +46,7 @@ They will then be saved as YAML you will be able to share.
 Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles). 
 
 All coming steps admit you already cloned the repository and went to its root:
-```
+```{bash}
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
@@ -61,9 +61,11 @@ So first, start by copying them into `config/params` directory.
 To do so:
 
 ```{bash}
-rsync -a --delete config/default/ config/params
+Rscript inst/scripts/prepare_params.R
 ```
 
 You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
+This command can be adapted to automatically change the main parameters of the whole workflow.
+If you are interested into this feature, you'll probably find out how.
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/1-library.html).

@@ -1,0 +1,16 @@
+filename: example
+gnps: 96fa7c88200e4a03bee4644e581e3fb0
+top_k:
+  initial: 50
+  final: 3
+weights:
+  spectral: 0.166
+  chemical: 0.166
+  biological: 0.666
+ms:
+  mode: pos
+  annotate: TRUE
+  tolerance:
+    ppm: 10
+    rt: 0.05
+force: FALSE

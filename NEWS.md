@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.5.5
+* Minor fixes
+* Automation and parameters improvement
+
 # timaR 2.5.4
 * Minor fixes
 * Metadata completion improvement

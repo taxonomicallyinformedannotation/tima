@@ -60,11 +60,14 @@ git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
-Then, copy the defaut parameters:
+Then, to copy the defaut parameters:
 
 ```shell
-rsync -a --delete config/default/ config/params
+Rscript inst/scripts/prepare_params.R
 ```
+
+This command will also be useful in case you want to automate your workflow.
+More details are given in the [General comments about the infrastructure](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-intro.html)
 
 Once done, you can start with an example using:
 

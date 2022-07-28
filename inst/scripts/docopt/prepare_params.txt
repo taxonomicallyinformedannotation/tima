@@ -1,0 +1,21 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_params.R
+
+Usage: prepare_params.R  [--biological=<biological>] [--complement=<complement>] [--filename=<filename>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--ms=<ms>] [--ppm=<ppm>] [--qemical=<qemical>] [--rt=<rt>] [--taxon=<taxon>] [--spectral=<spectral>]
+
+Options:
+  -b --biological=<biological>  Biological weight
+  -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
+  -f --filename=<filename>      The name of your raw file if you used it to name sirius/isdb outputs (if not, you should).
+  -g --gnps=<gnps>              Your GNPS job id.
+  -j --j.top=<j.top>            Number of initial candidates to be considered.
+  -k --k.top=<k.top>            Number of final candidates to be considered.
+  -m --ms=<ms>                  MS mode used ('pos' or 'neg')
+  -p --ppm=<ppm>                Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
+  -q --qemical=<qemical>        Chemical weight (yeah funny)
+  -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
+  -s --spectral==<spectral>     Spectral weight
+  -t --taxon==<taxon>           Force a single organism. Example -t 'Swertia chirayita'.
+  -h --help                     Show this screen.
+  -v --version                  Show version.
+  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters.

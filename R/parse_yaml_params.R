@@ -16,11 +16,13 @@ parse_yaml_params <- function() {
         flatten(x)
       }
     )))
-  suppressWarnings(params <-
-    yaml::read_yaml(file = params_path, handlers = list(
-      seq = function(x) {
-        flatten(x)
-      }
-    )))
+  if (file.exists(params_path)) {
+    suppressWarnings(params <-
+      yaml::read_yaml(file = params_path, handlers = list(
+        seq = function(x) {
+          flatten(x)
+        }
+      )))
+  }
   return(params)
 }

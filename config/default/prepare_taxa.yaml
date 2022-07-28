@@ -6,4 +6,4 @@ extension: TRUE # is the filename extension present in your feature table?
 column_name: ATTRIBUTE_species  # biological_source
 gnps: 96fa7c88200e4a03bee4644e581e3fb0 # needed depending on the tool you used
 top_k: 1 # number of organisms per feature
-force:
+taxon: # manually force all features to a given taxon (if you do not have formatted metadata)

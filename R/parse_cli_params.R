@@ -42,6 +42,9 @@ parse_cli_params <- function() {
       params$taxa <- arguments$features
       params$feature_name <- arguments$features
     }
+    if (!is.null(arguments$filename)) {
+      params$filename <- arguments$filename
+    }
     if (!is.null(arguments$filter)) {
       params$filter$mode <- arguments$filter
     }
@@ -106,6 +109,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$target)) {
       params$target_name <- arguments$target
+    }
+    if (!is.null(arguments$taxon)) {
+      params$taxon <- arguments$taxon
     }
     if (!is.null(arguments$tool)) {
       params$tool <- arguments$tool

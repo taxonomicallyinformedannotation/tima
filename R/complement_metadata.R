@@ -13,7 +13,7 @@ complement_metadata <- function(df) {
   log_debug("Trying to look for already computed metadata")
   metadata <-
     readr::read_delim(
-      #' Suboptimal for now
+      # Suboptimal for now
       file = "https://zenodo.org/record/6786307/files/structure_metadata.tsv.gz",
       col_select = c(
         "inchikey_2D" = "structureCleaned_inchikey2D",
@@ -43,9 +43,11 @@ complement_metadata <- function(df) {
         no = structure_exact_mass_2
       )
     ) |>
-    dplyr::select(-smiles_2D_2,
-                  -molecular_formula_2,
-                  -structure_exact_mass_2)
+    dplyr::select(
+      -smiles_2D_2,
+      -molecular_formula_2,
+      -structure_exact_mass_2
+    )
 
   return(df_new)
 }

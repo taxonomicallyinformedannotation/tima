@@ -8,7 +8,7 @@
 #' @param metadata TODO
 #' @param top_k TODO
 #' @param output TODO
-#' @param force TODO
+#' @param taxon TODO
 #'
 #' @return TODO
 #' @export
@@ -35,12 +35,12 @@ prepare_taxa <-
            metadata = params$metadata,
            top_k = params$top_k,
            output = params$output,
-           force = params$force) {
+           taxon = params$taxon) {
     stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
     if (tool == "gnps") {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
     } else {
-      if (is.null(force)) {
+      if (is.null(taxon)) {
         if (tool == "manual") {
           stopifnot("Your metadata file does not exist" = file.exists(metadata))
         }
@@ -58,7 +58,7 @@ prepare_taxa <-
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
       feature_table <- read_features(id = gnps_job_id)
-      if (is.null(force)) {
+      if (is.null(taxon)) {
         log_debug(x = "Loading metadata table")
         metadata_table <- read_metadata(id = gnps_job_id)
       }
@@ -101,9 +101,9 @@ prepare_taxa <-
         readr::read_delim(file = input)
     }
 
-    if (!is.null(force)) {
+    if (!is.null(taxon)) {
       log_debug(x = "Forcing all features to given organism")
-      metadata_table <- data.frame(force)
+      metadata_table <- data.frame(taxon)
       colnames(metadata_table) <- colname
     }
 
@@ -244,7 +244,7 @@ prepare_taxa <-
       )] <- NA
     }
 
-    if (is.null(force)) {
+    if (is.null(taxon)) {
       if (extension == FALSE) {
         log_debug("Removing filename extensions")
         metadata_table <- metadata_table |>
@@ -264,7 +264,7 @@ prepare_taxa <-
     }
     log_debug(x = "Joining top K with metadata table")
     if (tool != "ready") {
-      if (!is.null(force)) {
+      if (!is.null(taxon)) {
         metadata_table_joined <- cbind(
           feature_table |> dplyr::mutate(feature_id = dplyr::row_number()),
           biological_metadata |>

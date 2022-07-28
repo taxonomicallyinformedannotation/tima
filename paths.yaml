@@ -16,10 +16,10 @@ data:
     annotations:
       path: inst/extdata/interim/annotations
       example_feature_table: inst/extdata/interim/annotations/example_feature_table.tsv.gz
-      example_feature_table_no_rt: inst/extdata/interim/annotations/example_feature_table_no_rt.tsv.gz
-      example_isdb: inst/extdata/interim/annotations/example_isdb_result.tsv.gz
-      example_isdb_no_rt: inst/extdata/interim/annotations/example_isdb_result_no_rt.tsv.gz
-      example_sirius: inst/extdata/interim/annotations/sirius_example.zip
+      example_feature_table_no_rt: inst/extdata/interim/annotations/example_no_rt_feature_table.tsv.gz
+      example_isdb: inst/extdata/interim/annotations/example_isdb.tsv.gz
+      example_isdb_no_rt: inst/extdata/interim/annotations/example_no_rt_isdb.tsv.gz
+      example_sirius: inst/extdata/interim/annotations/example_sirius.zip
     config:
       path: inst/extdata/interim/config
     edges:
@@ -46,7 +46,7 @@ data:
       ranks: inst/extdata/source/dictionaries/ranks.tsv
     libraries:
       path: inst/extdata/source/libraries
-      isdb: 
+      isdb:
         pos: inst/extdata/source/libraries/isdb_pos.mgf
         neg:
       lotus: inst/extdata/source/libraries/lotus.csv.gz
@@ -66,10 +66,10 @@ tests:
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
-  example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb_result.tsv.gz
-  example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/sirius_example.zip
-  isdb: 
+  example_isdb: https://metabo-store.nprod.net/tima_example_files/interim/example_isdb.tsv.gz
+  example_sirius: https://metabo-store.nprod.net/tima_example_files/interim/example_sirius.zip
+  isdb:
     pos: https://zenodo.org/record/5607264/files/MultiSources_ISDB_pos.mgf?download=1
-    neg: 
+    neg:
   lotus: https://zenodo.org/record/6786314/files/220701_frozen_metadata.csv.gz?download=1
-version: 2.5.4
+version: 2.5.5

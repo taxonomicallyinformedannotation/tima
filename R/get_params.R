@@ -23,6 +23,7 @@ get_params <- function(step) {
     'prepare_gnps',
     'prepare_isdb',
     'prepare_library',
+    'prepare_params',
     'prepare_sirius',
     'prepare_taxa',
     'process_annotations'
@@ -37,6 +38,7 @@ get_params <- function(step) {
       "prepare_gnps",
       "prepare_isdb",
       "prepare_library",
+      "prepare_params",
       "prepare_sirius",
       "prepare_taxa",
       "process_annotations"

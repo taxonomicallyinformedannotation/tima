@@ -13,7 +13,7 @@ prepare_taxa(
   metadata = params$metadata,
   top_k = params$top_k,
   output = params$output,
-  force = params$force
+  taxon = params$taxon
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ prepare_taxa(
 
 \item{output}{TODO}
 
-\item{force}{TODO}
+\item{taxon}{TODO}
 }
 \value{
 TODO
