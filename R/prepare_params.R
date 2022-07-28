@@ -122,10 +122,10 @@ prepare_params <- function(filename = params$filename,
   yamls_params$process_annotations$annotation$sirius <-
     yamls_params$process_annotations$annotation$sirius |>
     replace_gnps_job_id()
-  yamls_params$process_annotations$taxa <-
-    yamls_params$process_annotations$taxa |>
-    replace_gnps_job_id()
   yamls_params$process_annotations$edges <-
+    yamls_params$process_annotations$edges |>
+    replace_gnps_job_id()
+  yamls_params$process_annotations$taxa <-
     yamls_params$process_annotations$taxa |>
     replace_gnps_job_id()
   yamls_params$process_annotations$top_k$initial <-

@@ -113,7 +113,7 @@ testthat::test_that("Whole process", {
   ## 4.5
   step <- "process_annotations"
   params <- get_params(step = step)
-  process_annotations(annotate = TRUE)
+  process_annotations()
   process_annotations(
     isdb = "inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
     annotate = FALSE
