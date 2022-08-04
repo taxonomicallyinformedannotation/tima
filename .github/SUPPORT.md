@@ -26,7 +26,7 @@ Armed with your reprex, the next step is to figure out [where to ask](https://ww
 Before opening a new issue, be sure to [search issues and pull requests](https://github.com/taxonomicallyinformedannotation/tima-r/issues) 
 to make sure the bug hasn't been reported and/or already fixed in the development version. 
 By default, the search will be pre-populated with `is:issue is:open`. 
-You can [edit the qualifiers](https://help.github.com/articles/searching-issues-and-pull-requests/)  (e.g. `is:pr`
+You can [edit the qualifiers](https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests)  (e.g. `is:pr`
 , `is:closed`) as needed. 
 For example, you'd simply remove `is:open` to search _all_ issues in the repo, open or closed.
 

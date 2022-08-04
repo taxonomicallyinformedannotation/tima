@@ -90,7 +90,7 @@ General: [https://doi.org/10.7554/eLife.70780](https://doi.org/10.7554/eLife.707
 ⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5794106](https://doi.org/10.5281/zenodo.5794106) 
 
 ### ISDB
-General: [https://doi.org/10.1021/ACS.ANALCHEM.5B04804](https://doi.org/10.1021/ACS.ANALCHEM.5B04804)
+General: [https://doi.org/10.1021/acs.analchem.5b04804](https://doi.org/10.1021/acs.analchem.5b04804)
 
 ⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5607185](https://doi.org/10.5281/zenodo.5607185) 
 
@@ -100,11 +100,11 @@ General: [https://doi.org/10.1038/nbt.3597](https://doi.org/10.1038/nbt.3597)
 ### SIRIUS
 General: [https://doi.org/10.1038/s41592-019-0344-8](https://doi.org/10.1038/s41592-019-0344-8)
 
-  - *CSI:FingerId*: [https://doi.org/10.1073/pnas.1509788112](https://doi.org/10.1073/pnas.1509788112)
+  - *CSI:FingerId*: [https://doi.org/10.1073/pnas.1509788112](https://www.pnas.org/doi/full/10.1073/pnas.1509788112)
   - *ZODIAC*: [https://doi.org/10.1038/s42256-020-00234-6](https://doi.org/10.1038/s42256-020-00234-6)
   - *CANOPUS*: [https://doi.org/10.1038/s41587-020-0740-8](https://doi.org/10.1038/s41587-020-0740-8)
   - *COSMIC*: [https://doi.org/10.1038/s41587-021-01045-9](https://doi.org/10.1038/s41587-021-01045-9)
 
 ### Others
-- NPClassifier: [https://doi.org/10.1021/acs.jnatprod.1c00399](https://doi.org/10.1021/acs.jnatprod.1c00399)
-- ROTL: [https://doi.org/10.1111/2041-210X.12593](https://doi.org/10.1111/2041-210X.12593) 
+- NPClassifier: [https://doi.org/10.1021/acs.jnatprod.1c00399](https://pubs.acs.org/doi/10.1021/acs.jnatprod.1c00399)
+- ROTL: [https://doi.org/10.1111/2041-210X.12593](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12593) 
