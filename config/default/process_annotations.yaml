@@ -11,9 +11,9 @@ top_k:
   initial: 50
   final: 3
 weights:
-  spectral: 0.166
+  spectral: 0.333
   chemical: 0.166
-  biological: 0.666
+  biological: 0.500
 scores:
   chemical:
     pathway: 0.333

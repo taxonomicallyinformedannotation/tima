@@ -36,7 +36,7 @@ prepare_features_components <- function(input = params$input,
   log_debug(x = "... cluster table")
   log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
   ## TODO
-
+  if (tool == "gnps") {
   components <-
     read_clusters(id = gnps_job_id) |>
     dplyr::select(
@@ -46,16 +46,19 @@ prepare_features_components <- function(input = params$input,
       mz = `precursor mass`
     ) |>
     dplyr::distinct()
+  }
 
   if (tool == "manual") {
     manual_components <-
       readr::read_delim(file = components) |>
       dplyr::distinct(
         feature_id = CLUSTERID1,
-        component_id = ComponentIndex
+        component_id = ComponentIndex,
+        rt = rt,
+        mz = mz
       )
 
-    components <- components |>
+    components <- manual_components |>
       dplyr::select(-component_id) |>
       dplyr::left_join(manual_components) |>
       dplyr::mutate(component_id = ifelse(
