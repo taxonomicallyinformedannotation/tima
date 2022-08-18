@@ -6,8 +6,6 @@
 \alias{timaR-package}
 \title{timaR: Taxonomically Informed Metabolite Annotation}
 \description{
-\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
-
 TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 }
 \seealso{
