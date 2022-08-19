@@ -38,7 +38,7 @@ knitr::include_graphics("benchmark_full.svg")
 knitr::include_graphics("benchmark_zoomed.svg")
 ```
 
-## Correct hits repartition
+## Candidates distribution
 ```{r, echo=FALSE}
 knitr::include_graphics("benchmark_comparison.svg")
 ```
