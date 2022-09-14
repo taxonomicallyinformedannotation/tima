@@ -20,10 +20,9 @@
 #' @importFrom purrr map_df
 #' @importFrom readr read_delim write_delim
 #' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
-#' @importFrom splitstackshape cSplit
 #' @importFrom stringr str_length
 #' @importFrom tibble column_to_rownames rownames_to_column
-#' @importFrom tidyr gather pivot_wider
+#' @importFrom tidyr gather pivot_wider separate_rows
 #'
 #' @examples
 prepare_taxa <-
@@ -112,10 +111,9 @@ prepare_taxa <-
       dplyr::filter(!is.na(dplyr::all_of(colname))) |>
       dplyr::distinct(dplyr::across(dplyr::all_of(colname))) |>
       dplyr::select(organism = dplyr::all_of(colname)) |>
-      splitstackshape::cSplit(
-        splitCols = "organism",
-        sep = "|",
-        direction = "long"
+      tidyr::separate_rows(
+        organism,
+        sep = "\\|",
       ) |>
       dplyr::mutate(organism = gsub(
         pattern = " x ",
