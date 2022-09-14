@@ -28,7 +28,6 @@ Imports:
     readr,
     rlang (>= 0.4.11),
     rotl,
-    splitstackshape,
     stringr,
     tibble,
     tidyr,
