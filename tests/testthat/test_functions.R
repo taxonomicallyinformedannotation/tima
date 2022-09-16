@@ -15,12 +15,8 @@ testthat::test_that("Whole process", {
   get_lotus()
 
   ## 1.1.a
-  get_isdb(url_pos = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf")
-  get_isdb(
-    url_pos = NULL,
-    url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf",
-    export_neg = "inst/extdata/source/libraries/isdb_neg.mgf"
-  )
+  get_isdb(url_pos = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf",
+           url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf")
 
   ## 1.1.b
   get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp")
