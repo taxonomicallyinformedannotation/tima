@@ -48,7 +48,7 @@ data:
       path: inst/extdata/source/libraries
       isdb:
         pos: inst/extdata/source/libraries/isdb_pos.mgf
-        neg:
+        neg: inst/extdata/source/libraries/isdb_neg.mgf
       lotus: inst/extdata/source/libraries/lotus.csv.gz
     neutral_losses: inst/extdata/source/neutral_losses.tsv
 doc:
