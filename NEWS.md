@@ -1,5 +1,10 @@
 # timaR
 
+# timaR 2.5.6
+* Minor fixes
+* Partial functions cleanup
+* Dependencies removal (e.g. metabo-store)
+
 # timaR 2.5.5
 * Minor fixes
 * Automation and parameters improvement
