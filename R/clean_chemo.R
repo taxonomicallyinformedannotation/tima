@@ -1,4 +1,4 @@
-#' @title Chemical cleaning
+#' @title Clean chemo
 #'
 #' @noRd
 #'
@@ -17,7 +17,7 @@
 #' @importFrom dplyr na_if select summarise ungroup
 #'
 #' @examples TODO
-chemical_cleaning <-
+clean_chemo <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
            structureOrganismPairsTable = structure_organism_pairs_table,
            candidatesFinal = candidates_final,

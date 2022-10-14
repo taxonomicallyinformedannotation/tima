@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.5.5
+Version: 2.5.6
 Authors@R: c(
     person("Adriano", "Rutz", , "adriano.rutz@unige.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -43,12 +43,12 @@ ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Collate:
-    'biological_cleaning.R'
-    'biological_weighting.R'
-    'chemical_cleaning.R'
-    'chemical_weighting.R'
+    'annotate_ms1.R'
+    'annotate_non_ms1.R'
+    'clean_bio.R'
+    'clean_chemo.R'
     'complement_metadata.R'
-    'decoration.R'
+    'decorate.R'
     'dist_groups.R'
     'export_params.R'
     'fake_edges.R'
@@ -64,8 +64,6 @@ Collate:
     'get_lotus.R'
     'get_params.R'
     'log_debug.R'
-    'ms1_annotation.R'
-    'non_ms1_annotation.R'
     'parse_cli_params.R'
     'parse_yaml_params.R'
     'parse_yaml_paths.R'
@@ -91,5 +89,7 @@ Collate:
     'read_results.R'
     'replace_gnps_job_id.R'
     'treat_names_sirius.R'
+    'weight_bio.R'
+    'weight_chemo.R'
 VignetteBuilder: 
     knitr

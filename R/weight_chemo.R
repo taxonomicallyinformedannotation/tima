@@ -1,4 +1,4 @@
-#' @title Chemical Weighting
+#' @title Weight chemo
 #'
 #' @param annotationTableWeightedBioCleaned TODO
 #' @param weightSpectral TODO
@@ -17,7 +17,7 @@
 #' @importFrom stringr str_detect
 #'
 #' @examples TODO
-chemical_weighting <-
+weight_chemo <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
            weightSpectral = weight_spectral,
            weightBiological = weight_biological,

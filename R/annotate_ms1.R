@@ -1,4 +1,4 @@
-#' @title MS1 annotation
+#' @title Annotate MS1
 #'
 #' @param annotationTable TODO
 #' @param structureExactMassTable TODO
@@ -23,7 +23,7 @@
 #' @importFrom tidyr pivot_longer
 #'
 #' @examples TODO
-ms1_annotation <-
+annotate_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,
            structureOrganismPairsTable = structure_organism_pairs_table,

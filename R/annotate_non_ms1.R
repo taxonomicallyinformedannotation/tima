@@ -1,4 +1,4 @@
-#' @title Non MS1 annotation
+#' @title Annotate non MS1
 #'
 #' @param annotationTable TODO
 #' @param candidatesInitial TODO
@@ -11,7 +11,7 @@
 #' @importFrom dplyr mutate mutate_all select ungroup
 #'
 #' @examples TODO
-non_ms1_annotation <-
+annotate_non_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {
     cat("formatting initial results \n")

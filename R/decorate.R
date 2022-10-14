@@ -1,4 +1,4 @@
-#' @title Decoration
+#' @title Decorate MS1
 #'
 #' @noRd
 #'
@@ -10,7 +10,7 @@
 #' @importFrom dplyr anti_join distinct filter
 #'
 #' @examples TODO
-ms1_decoration <- function() {
+decorate_ms1 <- function() {
   suppressWarnings(
     cat(
       "MS1 annotation led to \n",
@@ -60,7 +60,7 @@ ms1_decoration <- function() {
 
 ###############################################################################
 
-#' @title Taxo decoration
+#' @title Decorate bio
 #'
 #' @noRd
 #'
@@ -69,7 +69,7 @@ ms1_decoration <- function() {
 #' @export
 #'
 #' @examples TODO
-taxo_decoration <- function() {
+decorate_bio <- function() {
   cat(
     "taxonomically informed scoring led to \n",
     crayon::silver(
@@ -158,7 +158,7 @@ taxo_decoration <- function() {
 
 ###############################################################################
 
-#' @title chemical_decoration
+#' @title Decorate chemo
 #'
 #' @noRd
 #'
@@ -167,7 +167,7 @@ taxo_decoration <- function() {
 #' @export
 #'
 #' @examples TODO
-chemical_decoration <- function() {
+decorate_chemo <- function() {
   cat(
     x = paste(
       "chemically informed scoring led to \n",

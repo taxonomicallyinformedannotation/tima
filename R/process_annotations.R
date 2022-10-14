@@ -242,12 +242,12 @@ process_annotations <- function(library = params$library,
       dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
     log_debug(x = "performing MS1 annotation")
-    annotation_table_ms1 <<- ms1_annotation()
+    annotation_table_ms1 <<- annotate_ms1()
 
-    ms1_decoration()
+    decorate_ms1()
   } else {
     annotation_table_ms1 <<-
-      non_ms1_annotation(annotationTable = metadata_table_spectral_annotation)
+      annotate_non_ms1(annotationTable = metadata_table_spectral_annotation)
   }
 
   log_debug(x = "adding biological organism metadata")
@@ -265,20 +265,20 @@ process_annotations <- function(library = params$library,
     )
 
   log_debug(x = "performing taxonomically informed scoring")
-  annotation_table_weighted_bio <<- biological_weighting()
+  annotation_table_weighted_bio <<- weight_bio()
 
-  taxo_decoration()
+  decorate_bio()
 
   log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-  annotation_table_weighted_bio_cleaned <<- biological_cleaning()
+  annotation_table_weighted_bio_cleaned <<- clean_bio()
 
   log_debug(x = "performing chemically informed scoring")
-  annotation_table_weighted_chemo <<- chemical_weighting()
+  annotation_table_weighted_chemo <<- weight_chemo()
 
-  chemical_decoration()
+  decorate_chemo()
 
   log_debug(x = "cleaning for cytoscape export")
-  results2cytoscape <<- chemical_cleaning()
+  results2cytoscape <<- clean_chemo()
 
   log_debug(x = "Exporting ...")
   ifelse(

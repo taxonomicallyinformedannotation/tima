@@ -1,4 +1,4 @@
-#' @title Biological Weighting
+#' @title Weight bio
 #'
 #' @param annotationTable TODO
 #' @param structureOrganismPairsTable TODO
@@ -24,7 +24,7 @@
 #' @importFrom stringr str_detect
 #'
 #' @examples TODO
-biological_weighting <-
+weight_bio <-
   function(annotationTable = annotation_table_ms1_taxed,
            structureOrganismPairsTable = structure_organism_pairs_table,
            weightSpectral = weight_spectral,

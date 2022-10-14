@@ -1,4 +1,4 @@
-#' @title Biological cleaning
+#' @title Clean bio
 #'
 #' @noRd
 #'
@@ -18,7 +18,7 @@
 #' @importFrom stats setNames
 #'
 #' @examples TODO
-biological_cleaning <-
+clean_bio <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,
            edgesTable = edges_table,
