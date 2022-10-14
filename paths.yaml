@@ -72,4 +72,4 @@ urls:
     pos: https://zenodo.org/record/6939173/files/isdb_pos.mgf?download=1
     neg: https://zenodo.org/record/6939173/files/isdb_neg.mgf?download=1
   lotus: https://zenodo.org/record/7085063/files/220916_frozen_metadata.csv.gz?download=1
-version: 2.5.5
+version: 2.5.6
