@@ -1,22 +1,24 @@
-#' Title
+#' @title Parse YAML paths
 #'
 #' @noRd
 #'
 #' @param file TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
+#' @importFrom purrr flatten
 #' @importFrom yaml read_yaml
 #'
-#' @examples
+#' @examples TODO
 parse_yaml_paths <- function(file = "paths.yaml") {
   log_debug("Loading paths")
   suppressWarnings(paths <- yaml::read_yaml(
     file = file,
     handlers = list(
       seq = function(x) {
-        flatten(x)
+        purrr::flatten(x)
       }
     )
   ))

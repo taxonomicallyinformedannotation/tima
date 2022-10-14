@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_benchmark.R
 \name{get_benchmark}
 \alias{get_benchmark}
-\title{Title}
+\title{Get benchmark}
 \usage{
 get_benchmark(
   url = paths$urls$benchmarking_set,
@@ -18,5 +18,8 @@ get_benchmark(
 TODO
 }
 \description{
-Title
+Get benchmark
+}
+\examples{
+TODO
 }

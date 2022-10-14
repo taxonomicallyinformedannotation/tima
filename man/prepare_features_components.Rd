@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_features_components.R
 \name{prepare_features_components}
 \alias{prepare_features_components}
-\title{Title}
+\title{Prepare features components}
 \usage{
 prepare_features_components(
   input = params$input,
@@ -30,5 +30,8 @@ prepare_features_components(
 TODO
 }
 \description{
-Title
+Prepare features components
+}
+\examples{
+TODO
 }

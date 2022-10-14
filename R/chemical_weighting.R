@@ -1,4 +1,4 @@
-#' Title
+#' @title Chemical Weighting
 #'
 #' @param annotationTableWeightedBioCleaned TODO
 #' @param weightSpectral TODO
@@ -9,13 +9,14 @@
 #' @param scoreChemicalClass TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
 #' @importFrom dplyr group_by left_join mutate rowwise select ungroup
 #' @importFrom stringr str_detect
 #'
-#' @examples
+#' @examples TODO
 chemical_weighting <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
            weightSpectral = weight_spectral,

@@ -22,11 +22,8 @@ Imports:
     data.table,
     docopt,
     dplyr,
-    glue,
-    lifecycle,
     purrr,
     readr,
-    rlang (>= 0.4.11),
     rotl,
     stringr,
     tibble,
@@ -38,8 +35,7 @@ Suggests:
     pkgdown,
     roxygen2,
     rmarkdown,
-    testthat (>= 3.0.0),
-    utils
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
@@ -58,8 +54,8 @@ Collate:
     'fake_edges.R'
     'fake_features_components.R'
     'fake_no_rt.R'
-    'form_adduct_neg.R'
-    'form_adduct_pos.R'
+    'form_adducts_neg.R'
+    'form_adducts_pos.R'
     'get_benchmark.R'
     'get_example_feature_table.R'
     'get_example_isdb.R'
@@ -94,9 +90,6 @@ Collate:
     'read_nap.R'
     'read_results.R'
     'replace_gnps_job_id.R'
-    'timaR-package.R'
     'treat_names_sirius.R'
-    'utils-tidy-eval.R'
-    'y_as_na.R'
 VignetteBuilder: 
     knitr

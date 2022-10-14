@@ -1,15 +1,16 @@
-#' Title
+#' @title Prepare ISDB
 #'
 #' @param input TODO
 #' @param output TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr distinct mutate
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_isdb <-
   function(input = params$input,
            output = params$output) {

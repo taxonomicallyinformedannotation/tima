@@ -1,13 +1,14 @@
-#' Title
+#' @title Pretreat names sirius
 #'
 #' @noRd
 #'
 #' @param x
 #'
-#' @return
+#' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 pretreat_names_sirius <- function(x) {
   y <- x |>
     gsub(

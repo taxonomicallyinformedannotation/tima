@@ -2,7 +2,7 @@
 % Please edit documentation in R/non_ms1_annotation.R
 \name{non_ms1_annotation}
 \alias{non_ms1_annotation}
-\title{Title}
+\title{Non MS1 annotation}
 \usage{
 non_ms1_annotation(
   annotationTable = metadata_table_spectral_annotation,
@@ -18,5 +18,8 @@ non_ms1_annotation(
 TODO
 }
 \description{
-Title
+Non MS1 annotation
+}
+\examples{
+TODO
 }

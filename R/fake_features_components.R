@@ -1,4 +1,4 @@
-#' Title
+#' @title Fake features components
 #'
 #' @param input TODO
 #' @param features TODO
@@ -8,12 +8,13 @@
 #' @param name_mz TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 fake_features_components <- function(input = params$input,
                                      features = params$features,
                                      output = params$output,

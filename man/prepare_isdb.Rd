@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_isdb.R
 \name{prepare_isdb}
 \alias{prepare_isdb}
-\title{Title}
+\title{Prepare ISDB}
 \usage{
 prepare_isdb(input = params$input, output = params$output)
 }
@@ -15,5 +15,8 @@ prepare_isdb(input = params$input, output = params$output)
 TODO
 }
 \description{
-Title
+Prepare ISDB
+}
+\examples{
+TODO
 }

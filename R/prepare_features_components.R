@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare features components
 #'
 #' @param input TODO
 #' @param output TODO
@@ -8,13 +8,14 @@
 #' @param ms_mode TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples
+#' @examples TODO
 prepare_features_components <- function(input = params$input,
                                         output = params$output,
                                         tool = params$tool,

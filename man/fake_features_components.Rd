@@ -2,7 +2,7 @@
 % Please edit documentation in R/fake_features_components.R
 \name{fake_features_components}
 \alias{fake_features_components}
-\title{Title}
+\title{Fake features components}
 \usage{
 fake_features_components(
   input = params$input,
@@ -30,5 +30,8 @@ fake_features_components(
 TODO
 }
 \description{
-Title
+Fake features components
+}
+\examples{
+TODO
 }

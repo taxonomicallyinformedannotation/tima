@@ -2,7 +2,7 @@
 % Please edit documentation in R/fake_no_rt.R
 \name{fake_no_rt}
 \alias{fake_no_rt}
-\title{Title}
+\title{Fake no retention time}
 \usage{
 fake_no_rt(
   input = paths$data$interim$annotations$example_feature_table,
@@ -18,5 +18,8 @@ fake_no_rt(
 TODO
 }
 \description{
-Title
+Fake no retention time
+}
+\examples{
+TODO
 }

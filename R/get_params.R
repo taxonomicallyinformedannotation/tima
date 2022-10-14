@@ -1,15 +1,16 @@
-#' Title
+#' @title Get parameters
 #'
 #' @noRd
 #'
 #' @param step TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom docopt docopt
 #'
-#' @examples
+#' @examples TODO
 get_params <- function(step) {
   stopifnot(
     "Your step does not exist. Valid steps are:

@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_lotus.R
 \name{prepare_lotus}
 \alias{prepare_lotus}
-\title{Title}
+\title{Prepare LOTUS}
 \usage{
 prepare_lotus(
   input = paths$data$source$libraries$lotus,
@@ -18,5 +18,8 @@ prepare_lotus(
 TODO
 }
 \description{
-Title
+Prepare LOTUS
+}
+\examples{
+TODO
 }

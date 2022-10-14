@@ -2,7 +2,7 @@
 % Please edit documentation in R/biological_weighting.R
 \name{biological_weighting}
 \alias{biological_weighting}
-\title{Title}
+\title{Biological Weighting}
 \usage{
 biological_weighting(
   annotationTable = annotation_table_ms1_taxed,
@@ -54,5 +54,8 @@ biological_weighting(
 TODO
 }
 \description{
-Title
+Biological Weighting
+}
+\examples{
+TODO
 }

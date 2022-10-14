@@ -1,13 +1,14 @@
-#' Title
+#' @title Replace GNPS job ID
 #'
 #' @noRd
 #'
 #' @param x TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 replace_gnps_job_id <- function(x) {
   x <- x |>
     gsub(

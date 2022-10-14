@@ -1,4 +1,4 @@
-#' Title
+#' @title Fake adducts negative
 #'
 #' @noRd
 #'
@@ -6,12 +6,13 @@
 #' @param adductsTable TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr all_of everything mutate select
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples
+#' @examples TODO
 form_adducts_neg <- function(massesTable, adductsTable) {
   adducts_neg <- massesTable |>
     dplyr::mutate(

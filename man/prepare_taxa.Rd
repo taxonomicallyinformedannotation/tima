@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_taxa.R
 \name{prepare_taxa}
 \alias{prepare_taxa}
-\title{Title}
+\title{Prepare taxa}
 \usage{
 prepare_taxa(
   input = params$input,
@@ -39,5 +39,8 @@ prepare_taxa(
 TODO
 }
 \description{
-Title
+Prepare taxa
+}
+\examples{
+TODO
 }

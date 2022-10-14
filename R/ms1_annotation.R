@@ -1,4 +1,4 @@
-#' Title
+#' @title MS1 annotation
 #'
 #' @param annotationTable TODO
 #' @param structureExactMassTable TODO
@@ -11,6 +11,7 @@
 #' @param candidatesInitial TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom data.table data.table foverlaps setkey
@@ -21,7 +22,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples
+#' @examples TODO
 ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,

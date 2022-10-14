@@ -2,7 +2,7 @@
 % Please edit documentation in R/ms1_annotation.R
 \name{ms1_annotation}
 \alias{ms1_annotation}
-\title{Title}
+\title{MS1 annotation}
 \usage{
 ms1_annotation(
   annotationTable = metadata_table_spectral_annotation,
@@ -39,5 +39,8 @@ ms1_annotation(
 TODO
 }
 \description{
-Title
+MS1 annotation
+}
+\examples{
+TODO
 }

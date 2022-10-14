@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_adducts.R
 \name{prepare_adducts}
 \alias{prepare_adducts}
-\title{Title}
+\title{Prepare adducts}
 \usage{
 prepare_adducts(
   adducts_input = params$input,
@@ -33,5 +33,8 @@ prepare_adducts(
 TODO
 }
 \description{
-Title
+Prepare adducts
+}
+\examples{
+TODO
 }

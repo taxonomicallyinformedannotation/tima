@@ -1,4 +1,4 @@
-#' Title
+#' @title Biological cleaning
 #'
 #' @noRd
 #'
@@ -9,6 +9,7 @@
 #' @param minimalMs1Bio TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr add_count anti_join arrange bind_rows distinct filter
@@ -16,7 +17,7 @@
 #' @importFrom dplyr tibble ungroup
 #' @importFrom stats setNames
 #'
-#' @examples
+#' @examples TODO
 biological_cleaning <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,

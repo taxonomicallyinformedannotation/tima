@@ -1,13 +1,15 @@
-#' Title
+#' @title Decoration
 #'
 #' @noRd
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom crayon blue cyan green magenta red silver white yellow
 #' @importFrom dplyr anti_join distinct filter
-#' @examples
+#'
+#' @examples TODO
 ms1_decoration <- function() {
   suppressWarnings(
     cat(
@@ -58,14 +60,15 @@ ms1_decoration <- function() {
 
 ###############################################################################
 
-#' Title
+#' @title Taxo decoration
 #'
 #' @noRd
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 taxo_decoration <- function() {
   cat(
     "taxonomically informed scoring led to \n",
@@ -155,14 +158,15 @@ taxo_decoration <- function() {
 
 ###############################################################################
 
-#' Title
+#' @title chemical_decoration
 #'
 #' @noRd
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 chemical_decoration <- function() {
   cat(
     x = paste(

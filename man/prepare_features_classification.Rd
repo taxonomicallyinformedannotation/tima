@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_features_classification.R
 \name{prepare_features_classification}
 \alias{prepare_features_classification}
-\title{Title}
+\title{Prepare features classification}
 \usage{
 prepare_features_classification(
   library = params$library,
@@ -24,5 +24,8 @@ prepare_features_classification(
 TODO
 }
 \description{
-Title
+Prepare features classification
+}
+\examples{
+TODO
 }

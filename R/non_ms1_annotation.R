@@ -1,15 +1,16 @@
-#' Title
+#' @title Non MS1 annotation
 #'
 #' @param annotationTable TODO
 #' @param candidatesInitial TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr across dense_rank desc group_by distinct filter left_join
 #' @importFrom dplyr mutate mutate_all select ungroup
 #'
-#' @examples
+#' @examples TODO
 non_ms1_annotation <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {

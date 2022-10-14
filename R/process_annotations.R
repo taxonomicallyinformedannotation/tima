@@ -1,4 +1,4 @@
-#' Title
+#' @title Process annotations
 #'
 #' @param library TODO
 #' @param name TODO
@@ -43,6 +43,7 @@
 #' @param ms1_only TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom crayon green
@@ -51,7 +52,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom yaml write_yaml
 #'
-#' @examples
+#' @examples TODO
 process_annotations <- function(library = params$library,
                                 name = params$name,
                                 gnps = params$annotation$gnps,

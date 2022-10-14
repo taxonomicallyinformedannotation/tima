@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_annotations.R
 \name{process_annotations}
 \alias{process_annotations}
-\title{Title}
+\title{Process annotations}
 \usage{
 process_annotations(
   library = params$library,
@@ -135,5 +135,8 @@ process_annotations(
 TODO
 }
 \description{
-Title
+Process annotations
+}
+\examples{
+TODO
 }

@@ -1,11 +1,12 @@
-#' Title
+#' @title Parse CLI parameters
 #'
 #' @noRd
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 

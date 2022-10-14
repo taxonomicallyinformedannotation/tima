@@ -1,15 +1,16 @@
-#' Title
+#' @title Prepare closed
 #'
 #' @param input TODO
 #' @param output TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr distinct mutate select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_closed <- function(input = params$input,
                            output = params$output) {
   if (file.exists(input)) {

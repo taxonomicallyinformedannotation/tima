@@ -1,13 +1,14 @@
-#' Title
+#' @title Log debug
 #'
 #' @noRd
 #'
 #' @param ... TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 log_debug <- function(...) {
   cat(paste(Sys.time(), ..., "\n"))
 }

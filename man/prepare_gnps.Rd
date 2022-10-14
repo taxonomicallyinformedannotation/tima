@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_gnps.R
 \name{prepare_gnps}
 \alias{prepare_gnps}
-\title{Title}
+\title{Prepare GNPS}
 \usage{
 prepare_gnps(
   gnps_job_id = params$gnps,
@@ -21,5 +21,8 @@ prepare_gnps(
 TODO
 }
 \description{
-Title
+Prepare GNPS
+}
+\examples{
+TODO
 }

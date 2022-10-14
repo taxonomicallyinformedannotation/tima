@@ -1,17 +1,18 @@
-#' Title
+#' @title Prepare GNPS
 #'
 #' @param gnps_job_id TODO
 #' @param nap_job_id TODO
 #' @param output TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @importFrom dplyr mutate select
+#' @importFrom dplyr mutate mutate_all na_if select
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples
+#' @examples TODO
 prepare_gnps <-
   function(gnps_job_id = params$gnps,
            nap_job_id = params$nap,
@@ -67,13 +68,8 @@ prepare_gnps <-
         )
     }
 
-    table[] <-
-      lapply(
-        table,
-        function(x) {
-          y_as_na(x, y = "N/A")
-        }
-      )
+    table <- table |>
+      dplyr::mutate_all(dplyr::na_if, "N/A")
 
     log_debug(x = "Exporting ...")
     ifelse(

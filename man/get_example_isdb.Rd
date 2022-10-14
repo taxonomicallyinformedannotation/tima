@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_example_isdb.R
 \name{get_example_isdb}
 \alias{get_example_isdb}
-\title{Title}
+\title{Get example ISDB}
 \usage{
 get_example_isdb(
   url = paths$urls$example_isdb,
@@ -18,5 +18,8 @@ get_example_isdb(
 TODO
 }
 \description{
-Title
+Get example ISDB
+}
+\examples{
+TODO
 }

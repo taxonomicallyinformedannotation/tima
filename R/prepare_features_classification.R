@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare features classification
 #'
 #' @param library TODO
 #' @param input TODO
@@ -6,12 +6,13 @@
 #' @param quickmode TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @importFrom dplyr anti_join distinct filter left_join select
+#' @importFrom dplyr anti_join distinct filter left_join mutate_all na_if select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_features_classification <-
   function(library = params$library,
            input = params$input,
@@ -212,15 +213,8 @@ prepare_features_classification <-
       table_classified
     ) |>
       dplyr::left_join(table_formuled) |>
-      dplyr::left_join(table_massed)
-
-    table_final[] <-
-      lapply(
-        table_final,
-        function(x) {
-          y_as_na(x, y = "")
-        }
-      )
+      dplyr::left_join(table_massed) |>
+      dplyr::mutate_all(dplyr::na_if, "")
 
     log_debug(x = "Exporting ...")
     ifelse(

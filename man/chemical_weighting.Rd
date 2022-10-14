@@ -2,7 +2,7 @@
 % Please edit documentation in R/chemical_weighting.R
 \name{chemical_weighting}
 \alias{chemical_weighting}
-\title{Title}
+\title{Chemical Weighting}
 \usage{
 chemical_weighting(
   annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
@@ -33,5 +33,8 @@ chemical_weighting(
 TODO
 }
 \description{
-Title
+Chemical Weighting
+}
+\examples{
+TODO
 }

@@ -1,14 +1,15 @@
-#' Title
+#' @title Get example ISDB
 #'
 #' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom readr read_tsv write_tsv
 #'
-#' @examples
+#' @examples TODO
 get_example_isdb <-
   function(url = paths$urls$example_isdb,
            export = paths$data$interim$annotations$example_isdb) {

@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare taxa
 #'
 #' @param input TODO
 #' @param tool TODO
@@ -11,12 +11,13 @@
 #' @param taxon TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr across all_of arrange bind_rows coalesce distinct
 #' @importFrom dplyr everything filter group_by group_cols left_join matches
-#' @importFrom dplyr mutate mutate_all mutate_at row_number select setdiff
-#' @importFrom dplyr summarise_all ungroup vars
+#' @importFrom dplyr mutate mutate_all mutate_at na_if row_number select
+#' @importFrom dplyr setdiff summarise_all ungroup vars
 #' @importFrom purrr map_df
 #' @importFrom readr read_delim write_delim
 #' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
@@ -24,7 +25,7 @@
 #' @importFrom tibble column_to_rownames rownames_to_column
 #' @importFrom tidyr gather pivot_wider separate_rows
 #'
-#' @examples
+#' @examples TODO
 prepare_taxa <-
   function(input = params$input,
            tool = params$tool,
@@ -312,16 +313,8 @@ prepare_taxa <-
         x <- list(paste(unique(x[!is.na(x)]), collapse = "|"))
       }) |>
       dplyr::ungroup() |>
-      dplyr::mutate_all(as.character)
-
-    log_debug(x = "joining with cleaned taxonomy table")
-    metadata_table_joined_summarized[] <-
-      lapply(
-        metadata_table_joined_summarized,
-        function(x) {
-          y_as_na(x, y = "")
-        }
-      )
+      dplyr::mutate_all(as.character) |>
+      dplyr::mutate_all(dplyr::na_if, "")
 
     log_debug(x = "Exporting ...")
     ifelse(

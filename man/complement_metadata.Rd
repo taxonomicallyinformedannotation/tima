@@ -2,7 +2,7 @@
 % Please edit documentation in R/complement_metadata.R
 \name{complement_metadata}
 \alias{complement_metadata}
-\title{Title}
+\title{Complement metadata}
 \usage{
 complement_metadata(df)
 }
@@ -13,5 +13,8 @@ complement_metadata(df)
 TODO
 }
 \description{
-Title
+Complement metadata
+}
+\examples{
+TODO
 }

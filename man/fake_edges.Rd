@@ -2,7 +2,7 @@
 % Please edit documentation in R/fake_edges.R
 \name{fake_edges}
 \alias{fake_edges}
-\title{Title}
+\title{Fake edges}
 \usage{
 fake_edges(
   input = params$input,
@@ -21,5 +21,8 @@ fake_edges(
 TODO
 }
 \description{
-Title
+Fake edges
+}
+\examples{
+TODO
 }

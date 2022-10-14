@@ -1,6 +1,6 @@
 #' Credit goes to usedist package
 
-#' Title
+#' @title Dist get
 #'
 #' @noRd
 #'
@@ -9,9 +9,10 @@
 #' @param idx2 TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 dist_get <- function(d, idx1, idx2) {
   d <- stats::as.dist(d)
   if (is.character(idx1)) {
@@ -34,7 +35,7 @@ dist_get <- function(d, idx1, idx2) {
   ifelse(i == j, 0, d[idx])
 }
 
-#' Title
+#' @title Dist groups
 #'
 #' @noRd
 #'
@@ -42,9 +43,10 @@ dist_get <- function(d, idx1, idx2) {
 #' @param g TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
-#' @examples
+#' @examples TODO
 dist_groups <- function(d, g) {
   d <- stats::as.dist(d)
   g <- as.factor(g)

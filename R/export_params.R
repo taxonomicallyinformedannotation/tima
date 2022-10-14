@@ -1,4 +1,4 @@
-#' Title
+#' @title Export parameters
 #'
 #' @noRd
 #'
@@ -7,11 +7,12 @@
 #' @param step TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom yaml write_yaml
 #'
-#' @examples
+#' @examples TODO
 export_params <- function(parameters = params, directory = paths$data$interim$config$path, step) {
   ifelse(
     test = !dir.exists(dirname(directory)),

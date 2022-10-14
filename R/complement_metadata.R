@@ -1,14 +1,15 @@
-#' Title
+#' @title Complement metadata
 #'
 #' @param df
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom readr read_delim
 #' @importFrom dplyr distinct left_join mutate select
 #'
-#' @examples
+#' @examples TODO
 complement_metadata <- function(df) {
   log_debug("Trying to look for already computed metadata")
   metadata <-

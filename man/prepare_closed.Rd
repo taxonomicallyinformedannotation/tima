@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_closed.R
 \name{prepare_closed}
 \alias{prepare_closed}
-\title{Title}
+\title{Prepare closed}
 \usage{
 prepare_closed(input = params$input, output = params$output)
 }
@@ -15,5 +15,8 @@ prepare_closed(input = params$input, output = params$output)
 TODO
 }
 \description{
-Title
+Prepare closed
+}
+\examples{
+TODO
 }

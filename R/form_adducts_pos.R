@@ -1,4 +1,4 @@
-#' Title
+#' @title Fake adducts positive
 #'
 #' @noRd
 #'
@@ -6,12 +6,13 @@
 #' @param adductsTable TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr all_of everything mutate select
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples
+#' @examples TODO
 form_adducts_pos <- function(massesTable, adductsTable) {
   adducts_pos <- massesTable |>
     dplyr::mutate(

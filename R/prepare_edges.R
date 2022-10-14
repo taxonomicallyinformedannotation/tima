@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare edges
 #'
 #' @param tool TODO
 #' @param gnps_job_id TODO
@@ -8,13 +8,14 @@
 #' @param name_target TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr filter select
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples
+#' @examples TODO
 prepare_edges <- function(tool = params$tool,
                           gnps_job_id = params$gnps,
                           input = params$input,

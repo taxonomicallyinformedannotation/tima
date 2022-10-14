@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_params.R
 \name{prepare_params}
 \alias{prepare_params}
-\title{Title}
+\title{Prepare parameters}
 \usage{
 prepare_params(
   filename = params$filename,
@@ -49,5 +49,8 @@ prepare_params(
 TODO
 }
 \description{
-Title
+Prepare parameters
+}
+\examples{
+TODO
 }

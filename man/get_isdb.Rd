@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_isdb.R
 \name{get_isdb}
 \alias{get_isdb}
-\title{Title}
+\title{Get ISDB}
 \usage{
 get_isdb(
   url_pos = paths$urls$isdb$pos,
@@ -24,5 +24,8 @@ get_isdb(
 TODO
 }
 \description{
-Title
+Get ISDB
+}
+\examples{
+TODO
 }

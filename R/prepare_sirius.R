@@ -1,17 +1,18 @@
-#' Title
+#' @title Prepare sirius
 #'
 #' @param input_directory TODO
 #' @param npc TODO
 #' @param output TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr bind_rows distinct filter left_join mutate mutate_all
-#' @importFrom dplyr select
+#' @importFrom dplyr na_if select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_sirius <-
   function(input_directory = params$directory,
            npc = params$npc,
@@ -185,14 +186,8 @@ prepare_sirius <-
       dplyr::left_join(formulas_prepared) |>
       dplyr::left_join(canopus_npc_prepared) |>
       dplyr::distinct() |>
-      complement_metadata()
-
-    table[] <- lapply(
-      table,
-      function(x) {
-        y_as_na(x, y = "N/A")
-      }
-    )
+      complement_metadata() |>
+      dplyr::mutate_all(dplyr::na_if, "N/A")
 
     if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
       cat(

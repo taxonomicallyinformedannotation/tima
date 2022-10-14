@@ -1,4 +1,4 @@
-#' Title
+#' @title Biological Weighting
 #'
 #' @param annotationTable TODO
 #' @param structureOrganismPairsTable TODO
@@ -16,13 +16,14 @@
 #' @param scoreBiologicalVariety TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
 #' @importFrom dplyr full_join group_by left_join mutate select tibble ungroup
 #' @importFrom stringr str_detect
 #'
-#' @examples
+#' @examples TODO
 biological_weighting <-
   function(annotationTable = annotation_table_ms1_taxed,
            structureOrganismPairsTable = structure_organism_pairs_table,

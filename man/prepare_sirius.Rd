@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_sirius.R
 \name{prepare_sirius}
 \alias{prepare_sirius}
-\title{Title}
+\title{Prepare sirius}
 \usage{
 prepare_sirius(
   input_directory = params$directory,
@@ -21,5 +21,8 @@ prepare_sirius(
 TODO
 }
 \description{
-Title
+Prepare sirius
+}
+\examples{
+TODO
 }

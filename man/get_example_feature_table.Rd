@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_example_feature_table.R
 \name{get_example_feature_table}
 \alias{get_example_feature_table}
-\title{Title}
+\title{Get example feature table}
 \usage{
 get_example_feature_table(
   url = paths$urls$example_feature_table,
@@ -18,5 +18,8 @@ get_example_feature_table(
 TODO
 }
 \description{
-Title
+Get example feature table
+}
+\examples{
+TODO
 }

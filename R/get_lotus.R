@@ -1,15 +1,16 @@
-#' Title
+#' @title Get LOTUS
 #'
 #' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom curl curl_download
 #' @importFrom readr read_csv write_csv
 #'
-#' @examples
+#' @examples TODO
 get_lotus <-
   function(url = paths$urls$lotus,
            export = paths$data$source$libraries$lotus) {

@@ -1,16 +1,17 @@
-#' Title
+#' @title Read features
 #'
 #' @noRd
 #'
 #' @param id TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples
+#' @examples TODO
 read_features <- function(id) {
   stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
 

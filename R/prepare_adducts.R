@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare adducts
 #'
 #' @param adducts_input TODO
 #' @param adducts_table_input TODO
@@ -9,12 +9,13 @@
 #' @param masses_neg_output_path TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr distinct filter mutate_all select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_adducts <-
   function(adducts_input = params$input,
            adducts_table_input = paths$data$source$adducts,

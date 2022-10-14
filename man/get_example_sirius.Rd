@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_example_sirius.R
 \name{get_example_sirius}
 \alias{get_example_sirius}
-\title{Title}
+\title{Get example sirius}
 \usage{
 get_example_sirius(
   url = paths$url$example_sirius,
@@ -18,5 +18,8 @@ get_example_sirius(
 TODO
 }
 \description{
-Title
+Get example sirius
+}
+\examples{
+TODO
 }

@@ -1,4 +1,4 @@
-#' Title
+#' @title Prepare library
 #'
 #' @param filter TODO
 #' @param level TODO
@@ -6,13 +6,14 @@
 #' @param output TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom data.table rbindlist
 #' @importFrom dplyr filter
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 prepare_library <-
   function(filter = params$filter$mode,
            level = params$filter$level,

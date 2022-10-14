@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_lotus.R
 \name{get_lotus}
 \alias{get_lotus}
-\title{Title}
+\title{Get LOTUS}
 \usage{
 get_lotus(url = paths$urls$lotus, export = paths$data$source$libraries$lotus)
 }
@@ -15,5 +15,8 @@ get_lotus(url = paths$urls$lotus, export = paths$data$source$libraries$lotus)
 TODO
 }
 \description{
-Title
+Get LOTUS
+}
+\examples{
+TODO
 }

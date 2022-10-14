@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_edges.R
 \name{prepare_edges}
 \alias{prepare_edges}
-\title{Title}
+\title{Prepare edges}
 \usage{
 prepare_edges(
   tool = params$tool,
@@ -30,5 +30,8 @@ prepare_edges(
 TODO
 }
 \description{
-Title
+Prepare edges
+}
+\examples{
+TODO
 }

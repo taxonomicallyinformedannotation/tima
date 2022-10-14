@@ -1,15 +1,16 @@
-#' Title
+#' @title Fake edges
 #'
 #' @param input TODO
 #' @param output TODO
 #' @param name_feature TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples
+#' @examples TODO
 fake_edges <- function(input = params$input,
                        output = params$output,
                        name_feature = params$feature) {

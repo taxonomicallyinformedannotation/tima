@@ -1,15 +1,16 @@
-#' Title
+#' @title Get benchmark
 #'
 #' @param url TODO
 #' @param export TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom curl curl_download
 #' @importFrom readr read_csv write_csv
 #'
-#' @examples
+#' @examples TODO
 get_benchmark <-
   function(url = paths$urls$benchmarking_set,
            export = paths$data$source$benchmark$set) {

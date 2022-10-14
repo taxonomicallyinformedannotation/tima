@@ -1,4 +1,4 @@
-#' Title
+#' @title Chemical cleaning
 #'
 #' @noRd
 #'
@@ -9,13 +9,14 @@
 #' @param minimalMs1Chemo TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom dplyr across arrange bind_rows dense_rank desc distinct
 #' @importFrom dplyr everything filter group_by left_join mutate mutate_all
-#' @importFrom dplyr select summarise ungroup
+#' @importFrom dplyr na_if select summarise ungroup
 #'
-#' @examples
+#' @examples TODO
 chemical_cleaning <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
            structureOrganismPairsTable = structure_organism_pairs_table,
@@ -243,10 +244,7 @@ chemical_cleaning <-
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
       df7 <- dplyr::left_join(df6, df5b) |>
         dplyr::arrange(feature_id) |>
-        dplyr::mutate(dplyr::across(
-          dplyr::everything(),
-          ~ y_as_na(x = .x, y = "")
-        )) |>
+        dplyr::mutate_all(dplyr::na_if, "") |>
         dplyr::select(
           feature_id,
           component_id,
@@ -310,10 +308,7 @@ chemical_cleaning <-
     } else {
       df7 <- dplyr::left_join(df6, df5b) |>
         dplyr::arrange(feature_id) |>
-        dplyr::mutate(dplyr::across(
-          dplyr::everything(),
-          ~ y_as_na(x = .x, y = "")
-        )) |>
+        dplyr::mutate_all(dplyr::na_if, "") |>
         dplyr::select(
           feature_id,
           component_id,
@@ -382,7 +377,7 @@ chemical_cleaning <-
     df11 <- dplyr::bind_rows(df8, df10) |>
       dplyr::arrange(as.numeric(feature_id))
 
-    #' Because cytoscape import fails otherwise
+    ## Because cytoscape import fails otherwise
     colnames(df11) <-
       gsub(
         pattern = "_structure",

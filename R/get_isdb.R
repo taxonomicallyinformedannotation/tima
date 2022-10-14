@@ -1,4 +1,4 @@
-#' Title
+#' @title Get ISDB
 #'
 #' @param url_pos TODO
 #' @param url_neg TODO
@@ -6,12 +6,13 @@
 #' @param export_neg TODO
 #'
 #' @return TODO
+#'
 #' @export
 #'
 #' @importFrom curl curl_download
 #' @importFrom readr read_file write_file
 #'
-#' @examples
+#' @examples TODO
 get_isdb <-
   function(url_pos = paths$urls$isdb$pos,
            url_neg = paths$urls$isdb$neg,

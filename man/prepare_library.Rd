@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_library.R
 \name{prepare_library}
 \alias{prepare_library}
-\title{Title}
+\title{Prepare library}
 \usage{
 prepare_library(
   filter = params$filter$mode,
@@ -24,5 +24,8 @@ prepare_library(
 TODO
 }
 \description{
-Title
+Prepare library
+}
+\examples{
+TODO
 }
