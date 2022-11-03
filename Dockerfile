@@ -66,8 +66,13 @@ RUN Rscript -e 'options(download.file.method= "libcurl"); \
                 AnVIL::install(pkgs = deps,  ask = FALSE); \
                 deps_left <- deps[!deps %in% rownames(installed.packages())]; \
                 if(length(deps_left)>0) devtools::install_dev_deps(dependencies = TRUE, upgrade = "never");'
+# Copy directories
+COPY paths.yaml paths.yaml
+COPY ./config/default /config/params
+COPY ./config /tests/testhat/config
+COPY ./inst /tests/testhat/inst
 # Run R CMD check - will fail with any errors or warnings
-Run Rscript -e 'devtools::check()'
+RUN Rscript -e 'devtools::check()'
 # Run Bioconductor's BiocCheck (optional)
 #ARG BIOC
 #RUN if [ "$BIOC" = "true" ]; then \
