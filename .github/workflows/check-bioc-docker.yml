@@ -66,10 +66,10 @@ jobs:
       RGL_USE_NULL: TRUE 
       ## Can save variable as GitHub Secret, or manually enter DockerHub 
       ## username here 
-      DOCKER_USERNAME: "bschilder"
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       ## Can save variable as GitHub Secret, or manually enter DockerHub 
-      ## organization name (or simply username) here (e.g. "neurogenomicslab").
-      DOCKER_ORG: "neurogenomicslab" 
+      ## organization name (or simply username) here.
+      DOCKER_ORG: ${{ secrets.DOCKER_ORG }}
       
     steps:
       ## Set the R library to the directory matching the
@@ -258,22 +258,20 @@ jobs:
           }, error = function(x){utils::sessionInfo()})
         shell: Rscript {0}
 
-      - name: Run CMD check
-        env:
-          _R_CHECK_CRAN_INCOMING_: false
-          DISPLAY: 99.0
-          AS_CRAN: ${{ env.run_crancheck }}
+      - name: Additional step for tests to run
         run: |
-          options(crayon.enabled = TRUE)
-          if(!require("sessioninfo")) install.packages("rcmdcheck")
-          as_cran <- if(Sys.getenv("AS_CRAN")=='true') "--as-cran" else NULL
-          rcmdcheck::rcmdcheck(
-              args = c("--no-manual", "--timings", as_cran),
-              build_args = c("--no-manual", "--keep-empty-dirs", "--no-resave-data"),
-              error_on = "warning",
-              check_dir = "check"
-          )
-        shell: Rscript {0}
+          cp -R paths.yaml tests/testthat/paths.yaml
+          cp -R config/default config/params
+          cp -R config tests/testthat/config
+          cp -R inst tests/testthat/inst
+
+      - name: Run CMD check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--as-cran", "--ignore-vignettes","--no-manual","--no-examples","--no-tests")'
+          build_args: 'c("--no-build-vignettes", "--no-manual")'
+          check-dir: '"check"'
+          error-on: '"error"'
 
       ## Might need an to add this to the if:  && runner.os == 'Linux'
       - name: Reveal testthat details
