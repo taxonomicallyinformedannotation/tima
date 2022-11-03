@@ -20,7 +20,14 @@
 ## * GHA: GitHub Action
 ## * OS: operating system
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 name: R-CMD-check-bioc
 
