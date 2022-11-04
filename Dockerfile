@@ -1,5 +1,5 @@
 # Dockerfile generated using
-# remotes::install_github("colinfay/dockerfiler")
+# install.packages("dockerfiler")
 # my_dock <- dockerfiler::dock_from_desc("DESCRIPTION")
 # my_dock$write()
 FROM rocker/r-ver:4.2.2
