@@ -1,3 +1,7 @@
+# Dockerfile generated using
+# remotes::install_github("colinfay/dockerfiler")
+# my_dock <- dockerfiler::dock_from_desc("DESCRIPTION")
+# my_dock$write()
 FROM rocker/r-ver:4.2.2
 RUN apt-get update && apt-get install -y  libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libicu-dev libpng-dev libssl-dev libtiff-dev libxml2-dev make pandoc zlib1g-dev && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
