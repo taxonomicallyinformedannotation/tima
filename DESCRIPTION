@@ -7,7 +7,7 @@ Authors@R: c(
     person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
-Maintainer: Adriano Rutz <adriano.rutz@unige.ch>
+Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
 Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima-r,
