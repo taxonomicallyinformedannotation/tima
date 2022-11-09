@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  prepare_params:
+    build: "."
+    volumes:
+        - "./config:/config"
+    command: Rscript inst/scripts/prepare_params.R
+
+  tima:
+    build: "."
+    volumes:
+        - "./config:/config"
+        - "./inst:/inst"
+    command: Rscript inst/scripts/tima.R
+
+# other smaller services not implemented yet

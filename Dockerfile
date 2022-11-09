@@ -1,19 +1,18 @@
-FROM rocker/r-ver:latest
+# Small image with multiple arch available
+FROM r-base:latest
 
-# R install
-RUN mkdir /build_dir
-ADD . /build_dir
-WORKDIR /build_dir
-RUN R -e 'install.packages(c("remotes"))'
-RUN R -e 'remotes::install_local(dependencies=TRUE, upgrade=TRUE)'
-RUN rm -rf /build_dir
+# Missing (kudos dockerfiller)
+RUN apt-get update && apt-get install -y  libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libicu-dev libpng-dev libssl-dev libtiff-dev libxml2-dev make pandoc zlib1g-dev && rm -rf /var/lib/apt/lists/*
 
-# Copy needed files
-RUN mkdir /work_dir
-COPY inst /inst
-COPY config/default /config/default
-COPY config/default /config/params
+RUN R -e 'install.packages(c("BiocManager","remotes"))'
+# This fails, don't know why
+COPY DESCRIPTION .
+RUN R -e 'remotes::install_local(dependencies=TRUE, upgrade=TRUE, repos=BiocManager::repositories())'
+# Using this instead
+RUN R -e 'remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 
-WORKDIR /work_dir
+COPY paths.yaml ./paths.yaml
+COPY inst ./inst
+COPY config/default ./config/default
 
 #CMD ["--help"]
