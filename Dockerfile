@@ -5,9 +5,9 @@ FROM r-base:latest
 RUN apt-get update && apt-get install -y  libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libicu-dev libpng-dev libssl-dev libtiff-dev libxml2-dev make pandoc zlib1g-dev && rm -rf /var/lib/apt/lists/*
 
 RUN R -e 'install.packages(c("BiocManager","remotes"))'
-# This fails, don't know why
 COPY DESCRIPTION .
-RUN R -e 'remotes::install_local(dependencies=TRUE, upgrade=TRUE, repos=BiocManager::repositories())'
+# This gets stuck, don't know why
+# RUN R -e 'remotes::install_local(dependencies=TRUE, upgrade=TRUE, repos=BiocManager::repositories())'
 # Using this instead
 RUN R -e 'remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 
