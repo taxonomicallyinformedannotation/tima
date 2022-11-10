@@ -6,10 +6,11 @@ RUN apt-get update && apt-get install -y  libcurl4-openssl-dev libfribidi-dev li
 
 RUN R -e 'install.packages(c("remotes"))'
 COPY DESCRIPTION .
-RUN R -e 'remotes::install_local(dependencies="hard", upgrade="always")'
+RUN R -e 'remotes::install_local()'
 
 COPY paths.yaml ./paths.yaml
 COPY inst ./inst
 COPY config/default ./config/default
+COPY data ./data
 
 #CMD ["--help"]

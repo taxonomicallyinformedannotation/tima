@@ -1,27 +1,11 @@
+.DS_Store
+.httr-oauth
 .idea
-.vscode
-
-*.DS_Store
-*.Rhistory
-
-bin
-
-config/params
-
-docs
-
-inst/extdata/source/benchmark
-inst/extdata/source/private
-inst/extdata/source/libraries
-inst/extdata/interim
-inst/extdata/processed
-
-python
-
 .Rproj.user
 .Rhistory
 .Rdata
+.vscode
 
-.httr-oauth
-.DS_Store
+docs
 
+python
