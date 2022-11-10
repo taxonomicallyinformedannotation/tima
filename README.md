@@ -75,6 +75,21 @@ Once done, you can start with an example using:
 Rscript inst/scripts/tima.R
 ```
 
+### Docker
+
+A container is also available, together with a small compose.
+Main commands are below:
+
+```shell
+docker build . -t tima-r 
+```
+
+```shell
+docker compose up prepare_params
+docker compose up tima
+```
+
+
 ## Main Citations
 
 According to which steps you used, please give credit to the authors of the tools/resources used.
