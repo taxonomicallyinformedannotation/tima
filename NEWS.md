@@ -1,5 +1,10 @@
 # timaR
 
+# timaR 2.6.0
+* Added Docker container
+* Changed data architecture
+* Minor fixes
+
 # timaR 2.5.6
 * Minor fixes
 * Partial functions cleanup
