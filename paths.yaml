@@ -8,55 +8,56 @@ config:
 data:
   path: data
   interim:
-    path: inst/extdata/interim
+    path: data/interim
     adducts:
-      path: inst/extdata/interim/adducts
-      neg: inst/extdata/interim/adducts/adducts_neg.tsv.gz
-      pos: inst/extdata/interim/adducts/adducts_pos.tsv.gz
+      path: data/interim/adducts
+      neg: data/interim/adducts/adducts_neg.tsv.gz
+      pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
-      path: inst/extdata/interim/annotations
-      example_feature_table: inst/extdata/interim/annotations/example_feature_table.tsv.gz
-      example_feature_table_no_rt: inst/extdata/interim/annotations/example_no_rt_feature_table.tsv.gz
-      example_isdb: inst/extdata/interim/annotations/example_isdb.tsv.gz
-      example_isdb_no_rt: inst/extdata/interim/annotations/example_no_rt_isdb.tsv.gz
-      example_sirius: inst/extdata/interim/annotations/example_sirius.zip
+      path: data/interim/annotations
+      example_feature_table: data/interim/annotations/example_feature_table.tsv.gz
+      example_feature_table_no_rt: data/interim/annotations/example_no_rt_feature_table.tsv.gz
+      example_isdb: data/interim/annotations/example_isdb.tsv.gz
+      example_isdb_no_rt: data/interim/annotations/example_no_rt_isdb.tsv.gz
+      example_sirius: data/interim/annotations/example_sirius.zip
     config:
-      path: inst/extdata/interim/config
+      path: data/interim/config
     edges:
-      path: inst/extdata/interim/edges
+      path: data/interim/edges
     features:
-      path: inst/extdata/interim/features
+      path: data/interim/features
     libraries:
-      path: inst/extdata/interim/libraries
-      lotus: inst/extdata/interim/libraries/lotus_prepared.tsv.gz
+      path: data/interim/libraries
+      lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
-      path: inst/extdata/interim/taxa
+      path: data/interim/taxa
   processed:
-    path: inst/extdata/processed
+    path: data/processed
     config:
-      path: inst/extdata/processed/config
+      path: data/processed/config
   source:
-    path: inst/extdata/source
-    adducts: inst/extdata/source/adducts.tsv
+    path: data/source
+    adducts: inst/extdata/adducts.tsv
     benchmark:
-      path: inst/extdata/source/benchmark
-      set: inst/extdata/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
+      path: data/source/benchmark
+      set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
     dictionaries:
-      path: inst/extdata/source/dictionaries
-      ranks: inst/extdata/source/dictionaries/ranks.tsv
+      path: data/source/dictionaries
+      ranks: inst/extdata/ranks.tsv
     libraries:
-      path: inst/extdata/source/libraries
+      path: data/source/libraries
       isdb:
-        pos: inst/extdata/source/libraries/isdb_pos.mgf
-        neg: inst/extdata/source/libraries/isdb_neg.mgf
-      lotus: inst/extdata/source/libraries/lotus.csv.gz
-    neutral_losses: inst/extdata/source/neutral_losses.tsv
+        pos: data/source/libraries/isdb_pos.mgf
+        neg: data/source/libraries/isdb_neg.mgf
+      lotus: data/source/libraries/lotus.csv.gz
+    neutral_losses: inst/extdata/neutral_losses.tsv
 doc:
   path: doc
 img:
   path: img
 inst:
   path: inst
+  extdata: inst/extdata
   scripts:
     path: inst/scripts
     docopt:

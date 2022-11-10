@@ -1,6 +1,7 @@
 ^timaR\.Rproj$
 ^\.Rproj\.user$
 ^_pkgdown\.yml$
+^data$
 ^docs$
 ^pkgdown$
 ^LICENSE\.md$
