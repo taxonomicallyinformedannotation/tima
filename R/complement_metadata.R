@@ -1,6 +1,6 @@
 #' @title Complement metadata
 #'
-#' @param df
+#' @param df TODO
 #'
 #' @return TODO
 #'

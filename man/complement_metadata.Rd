@@ -7,7 +7,7 @@
 complement_metadata(df)
 }
 \arguments{
-\item{df}{}
+\item{df}{TODO}
 }
 \value{
 TODO

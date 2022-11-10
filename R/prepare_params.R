@@ -9,6 +9,7 @@
 #' @param weight_spectral TODO
 #' @param ms_mode TODO
 #' @param annotate TODO
+#' @param taxon TODO
 #' @param tolerance_ppm TODO
 #' @param tolerance_rt TODO
 #' @param force TODO
