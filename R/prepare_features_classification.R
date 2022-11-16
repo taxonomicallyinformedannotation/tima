@@ -218,5 +218,5 @@ prepare_features_classification <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_classification")
-    export_output(x = table_final)
+    export_output(x = table_final, file = output)
   }

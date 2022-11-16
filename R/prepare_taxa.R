@@ -317,5 +317,5 @@ prepare_taxa <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_taxa")
-    export_output(x = metadata_table_joined_summarized)
+    export_output(x = metadata_table_joined_summarized, file = output)
   }

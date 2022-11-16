@@ -104,5 +104,5 @@ prepare_features_components <- function(input = params$input,
 
   log_debug(x = "Exporting ...")
   export_params(step = "prepare_features_components")
-  export_output(x = table_filled)
+  export_output(x = table_filled, file = output)
 }

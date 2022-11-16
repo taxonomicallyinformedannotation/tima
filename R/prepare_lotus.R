@@ -50,5 +50,5 @@ prepare_lotus <-
       dplyr::distinct()
 
     log_debug(x = "Exporting ...")
-    export_output(x = lotus_prepared)
+    export_output(x = lotus_prepared, file = output)
   }

@@ -52,7 +52,7 @@ prepare_closed <- function(input = params$input,
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_closed")
-    export_output(x = closed_prepared)
+    export_output(x = closed_prepared, file = output)
   } else {
     log_debug("Sorry, you do not have access to the closed resource")
   }
