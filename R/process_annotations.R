@@ -281,60 +281,18 @@ process_annotations <- function(library = params$library,
   results2cytoscape <<- clean_chemo()
 
   log_debug(x = "Exporting ...")
-  ifelse(
-    test = !dir.exists(paths$data$processed$path),
-    yes = dir.create(paths$data$processed$path),
-    no = paste(paths$data$processed$path, "exists")
-  )
-
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(paths$data$processed$path, time)
-
-  ifelse(
-    test = !dir.exists(dir_time),
-    yes = dir.create(dir_time),
-    no = paste(
-      dir_time,
-      "exists"
-    )
+  final_output <- file.path(
+    dir_time,
+    output
   )
-  log_debug(
-    x = "... path to export is",
-    crayon::green(file.path(
-      dir_time,
-      output
-    ))
+  export_params(
+    directory = dir_time,
+    step = "process_annotations"
   )
-  readr::write_delim(
+  export_output(
     x = results2cytoscape,
-    file = file.path(
-      dir_time,
-      output
-    ),
-    delim = "\t",
-    na = ""
-  )
-
-  log_debug(
-    x = "... path to used parameters is",
-    crayon::green(file.path(
-      dir_time,
-      paste("tima",
-        paths$version,
-        "process_annotations.yaml",
-        sep = "_"
-      )
-    ))
-  )
-  yaml::write_yaml(
-    x = params,
-    file = file.path(
-      dir_time,
-      paste("tima",
-        paths$version,
-        "process_annotations.yaml",
-        sep = "_"
-      )
-    )
+    file = final_output
   )
 }

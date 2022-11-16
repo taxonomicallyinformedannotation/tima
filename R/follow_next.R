@@ -1,7 +1,7 @@
 #' @title Follow next
 #'
 #' @noRd
-#' 
+#'
 #' @param session TODO
 #' @param text TODO
 #' @param ...

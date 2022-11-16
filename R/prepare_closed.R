@@ -51,33 +51,8 @@ prepare_closed <- function(input = params$input,
       dplyr::mutate(reference_doi = NA)
 
     log_debug(x = "Exporting ...")
-    ifelse(
-      test = !dir.exists(paths$data$interim$path),
-      yes = dir.create(paths$data$interim$path),
-      no = paste(paths$data$interim$path, "exists")
-    )
-
-    ifelse(
-      test = !dir.exists(dirname(output)),
-      yes = dir.create(dirname(output)),
-      no = paste(dirname(output), "exists")
-    )
-
-    log_debug(
-      x = "... path to export is",
-      output
-    )
-    readr::write_delim(
-      x = closed_prepared,
-      file = output,
-      delim = "\t"
-    )
-
-    export_params(
-      parameters = params,
-      directory = paths$data$interim$config$path,
-      step = "prepare-closed"
-    )
+    export_params(step = "prepare_closed")
+    export_output(x = closed_prepared)
   } else {
     log_debug("Sorry, you do not have access to the closed resource")
   }

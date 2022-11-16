@@ -169,11 +169,8 @@ prepare_params <- function(filename = params$filename,
 
   log_debug(x = "Exporting params ...")
   log_debug(x = "... checking directory")
-  ifelse(
-    test = !dir.exists(dirname(yaml_export[[1]])),
-    yes = dir.create(dirname(yaml_export[[1]])),
-    no = paste(dirname(yaml_export[[1]]), "exists")
-  )
+  create_dir(export = yaml_export[[1]])
+
   log_debug(x = "Exporting")
   lapply(
     X = seq_along(yamls_params),

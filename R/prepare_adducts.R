@@ -84,54 +84,15 @@ prepare_adducts <-
       dplyr::select(-exact_mass)
 
     log_debug("Exporting ...")
-    ifelse(
-      test = !dir.exists(adducts_output_path),
-      yes = dir.create(adducts_output_path),
-      no = paste(adducts_output_path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(config_output_path),
-      yes = dir.create(config_output_path),
-      no = paste(config_output_path, "exists")
-    )
-
-    log_debug("... structure adducts positive")
-    readr::write_delim(
-      x = adducts_pos,
-      file = file.path(
-        adducts_output_path,
-        paste0(output_name, "_pos.tsv.gz")
-      ),
-      delim = "\t"
-    )
-
-    log_debug("... structure adducts negative")
-    readr::write_delim(
-      x = adducts_neg,
-      file = file.path(
-        adducts_output_path,
-        paste0(output_name, "_neg.tsv.gz")
-      ),
-      delim = "\t"
-    )
-
-    log_debug("... adducts masses positive")
-    readr::write_delim(
-      x = pure_pos,
-      file = masses_pos_output_path,
-      delim = "\t"
-    )
-
-    log_debug("... adducts masses negative")
-    readr::write_delim(
-      x = pure_neg,
-      file = masses_neg_output_path,
-      delim = "\t"
-    )
-
-    export_params(
-      parameters = params,
-      directory = config_output_path,
-      step = "prepare_adducts"
-    )
+    export_params(step = "prepare_adducts")
+    export_output(x = adducts_pod, file = file.path(
+      adducts_output_path,
+      paste0(output_name, "_pos.tsv.gz")
+    ))
+    export_output(x = adducts_neg, file = file.path(
+      adducts_output_path,
+      paste0(output_name, "_neg.tsv.gz")
+    ))
+    export_output(x = pure_pos, file = masses_pos_output_path)
+    export_output(x = pure_neg, file = masses_neg_output_path)
   }

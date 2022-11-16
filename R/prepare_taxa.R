@@ -112,8 +112,7 @@ prepare_taxa <-
       dplyr::filter(!is.na(dplyr::all_of(colname))) |>
       dplyr::distinct(dplyr::across(dplyr::all_of(colname))) |>
       dplyr::select(organism = dplyr::all_of(colname)) |>
-      tidyr::separate_rows(
-        organism,
+      tidyr::separate_rows(organism,
         sep = "\\|",
       ) |>
       dplyr::mutate(organism = gsub(
@@ -317,40 +316,6 @@ prepare_taxa <-
       dplyr::mutate_all(dplyr::na_if, "")
 
     log_debug(x = "Exporting ...")
-    ifelse(
-      test = !dir.exists(paths$data$path),
-      yes = dir.create(paths$data$path),
-      no = paste(paths$data$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(paths$data$interim$path),
-      yes = dir.create(paths$data$interim$path),
-      no = paste(paths$data$interim$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(paths$data$interim$config$path),
-      yes = dir.create(paths$data$interim$config$path),
-      no = paste(paths$data$interim$config$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(dirname(output)),
-      yes = dir.create(dirname(output)),
-      no = paste(dirname(output), "exists")
-    )
-
-    log_debug(
-      x = "... path to export is",
-      output
-    )
-    readr::write_delim(
-      x = metadata_table_joined_summarized,
-      file = output,
-      delim = "\t"
-    )
-
-    export_params(
-      parameters = params,
-      directory = paths$data$interim$config$path,
-      step = "prepare_taxa"
-    )
+    export_params(step = "prepare_taxa")
+    export_output(x = metadata_table_joined_summarized)
   }

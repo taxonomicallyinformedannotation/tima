@@ -50,25 +50,5 @@ prepare_lotus <-
       dplyr::distinct()
 
     log_debug(x = "Exporting ...")
-    ifelse(
-      test = !dir.exists(dirname(dirname(dirname(output)))),
-      yes = dir.create(dirname(dirname(dirname(output)))),
-      no = paste(dirname(dirname(dirname(output))), "exists")
-    )
-    ifelse(
-      test = !dir.exists(dirname(dirname(output))),
-      yes = dir.create(dirname(dirname(output))),
-      no = paste(dirname(dirname(output)), "exists")
-    )
-    ifelse(
-      test = !dir.exists(dirname(output)),
-      yes = dir.create(dirname(output)),
-      no = paste(dirname(output), "exists")
-    )
-
-    readr::write_delim(
-      x = lotus_prepared,
-      file = output,
-      delim = "\t"
-    )
+    export_output(x = lotus_prepared)
   }

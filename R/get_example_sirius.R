@@ -16,22 +16,7 @@ get_example_sirius <-
 
     paths <- parse_yaml_paths()
 
-    ifelse(
-      test = !dir.exists(dirname(dirname(export))),
-      yes = dir.create(dirname(dirname(export))),
-      no = paste(
-        dirname(dirname(export)),
-        "exists"
-      )
-    )
-    ifelse(
-      test = !dir.exists(dirname(export)),
-      yes = dir.create(dirname(export)),
-      no = paste(
-        dirname(export),
-        "exists"
-      )
-    )
+    create_dir(export = export)
 
     message("Downloading")
     utils::download.file(

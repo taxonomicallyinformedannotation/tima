@@ -23,36 +23,7 @@ get_isdb <-
     if (!is.null(url_pos)) {
       log_debug("Downloading positive mode ISDB ...")
 
-      ifelse(
-        test = !dir.exists(dirname(dirname(
-          dirname(export_pos)
-        ))),
-        yes = dir.create(dirname(dirname(
-          dirname(export_pos)
-        ))),
-        no = paste(
-          dirname(dirname(
-            dirname(export_pos)
-          )),
-          "exists"
-        )
-      )
-      ifelse(
-        test = !dir.exists(dirname(dirname(export_pos))),
-        yes = dir.create(dirname(dirname(export_pos))),
-        no = paste(
-          dirname(dirname(export_pos)),
-          "exists"
-        )
-      )
-      ifelse(
-        test = !dir.exists(dirname(export_pos)),
-        yes = dir.create(dirname(export_pos)),
-        no = paste(
-          dirname(export_pos),
-          "exists"
-        )
-      )
+      create_dir(export = export_pos)
 
       readr::read_file(file = curl::curl_download(url = url_pos, destfile = tempfile())) |>
         readr::write_file(file = export_pos)
@@ -60,36 +31,7 @@ get_isdb <-
     if (!is.null(url_neg)) {
       log_debug("Downloading negative mode ISDB ...")
 
-      ifelse(
-        test = !dir.exists(dirname(dirname(
-          dirname(export_neg)
-        ))),
-        yes = dir.create(dirname(dirname(
-          dirname(export_neg)
-        ))),
-        no = paste(
-          dirname(dirname(
-            dirname(export_neg)
-          )),
-          "exists"
-        )
-      )
-      ifelse(
-        test = !dir.exists(dirname(dirname(export_neg))),
-        yes = dir.create(dirname(dirname(export_neg))),
-        no = paste(
-          dirname(dirname(export_neg)),
-          "exists"
-        )
-      )
-      ifelse(
-        test = !dir.exists(dirname(export_neg)),
-        yes = dir.create(dirname(export_neg)),
-        no = paste(
-          dirname(export_neg),
-          "exists"
-        )
-      )
+      create_dir(export = export_neg)
 
       readr::read_file(file = curl::curl_download(url = url_neg, destfile = tempfile())) |>
         readr::write_file(file = export_neg)

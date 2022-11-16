@@ -15,22 +15,7 @@ get_example_isdb <-
            export = paths$data$interim$annotations$example_isdb) {
     paths <- parse_yaml_paths()
 
-    ifelse(
-      test = !dir.exists(dirname(dirname(export))),
-      yes = dir.create(dirname(dirname(export))),
-      no = paste(
-        dirname(dirname(export)),
-        "exists"
-      )
-    )
-    ifelse(
-      test = !dir.exists(dirname(export)),
-      yes = dir.create(dirname(export)),
-      no = paste(
-        dirname(export),
-        "exists"
-      )
-    )
+    create_dir(export = export)
 
     readr::read_tsv(file = url) |>
       readr::write_tsv(file = export)

@@ -48,45 +48,6 @@ prepare_edges <- function(tool = params$tool,
     dplyr::filter(feature_source != feature_target)
 
   log_debug(x = "Exporting ...")
-  ifelse(
-    test = !dir.exists(paths$data$path),
-    yes = dir.create(paths$data$path),
-    no = paste(paths$data$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$path),
-    yes = dir.create(paths$data$interim$path),
-    no = paste(paths$data$interim$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$edges$path),
-    yes = dir.create(paths$data$interim$edges$path),
-    no = paste(paths$data$interim$edges$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$config$path),
-    yes = dir.create(paths$data$interim$config$path),
-    no = paste(paths$data$interim$config$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(dirname(output)),
-    yes = dir.create(dirname(output)),
-    no = paste(dirname(output), "exists")
-  )
-
-  log_debug(
-    x = "... path to export is",
-    output
-  )
-  readr::write_delim(
-    x = edges_table_treated,
-    file = output,
-    delim = "\t"
-  )
-
-  export_params(
-    parameters = params,
-    directory = paths$data$interim$config$path,
-    step = "prepare_edges"
-  )
+  export_params(step = "prepare_edges")
+  export_output(x = edges_table_treated)
 }

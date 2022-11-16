@@ -201,40 +201,6 @@ prepare_sirius <-
     }
 
     log_debug(x = "Exporting ...")
-    ifelse(
-      test = !dir.exists(paths$data$path),
-      yes = dir.create(paths$data$path),
-      no = paste(paths$data$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(paths$data$interim$path),
-      yes = dir.create(paths$data$interim$path),
-      no = paste(paths$data$interim$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(paths$data$interim$config$path),
-      yes = dir.create(paths$data$interim$config$path),
-      no = paste(paths$data$interim$config$path, "exists")
-    )
-    ifelse(
-      test = !dir.exists(dirname(output)),
-      yes = dir.create(dirname(output)),
-      no = paste(dirname(output), "exists")
-    )
-
-    log_debug(
-      x = "... path to export is",
-      output
-    )
-    readr::write_delim(
-      x = table,
-      file = output,
-      delim = "\t"
-    )
-
-    export_params(
-      parameters = params,
-      directory = paths$data$interim$config$path,
-      step = "prepare_sirius"
-    )
+    export_params(step = "prepare_sirius")
+    export_output(x = table)
   }
