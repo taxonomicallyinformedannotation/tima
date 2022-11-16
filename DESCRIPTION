@@ -25,23 +25,24 @@ Imports:
     purrr,
     readr,
     rotl,
+    rvest,
     stringr,
     tibble,
     tidyr,
     yaml
 Suggests: 
-    covr,
-    knitr (>= 1.1.0),
-    pkgdown,
-    roxygen2,
-    rmarkdown,
-    testthat (>= 3.0.0)
+    # covr,
+    # knitr (>= 1.1.0),
+    # pkgdown,
+    # roxygen2,
+    # rmarkdown,
+    # testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Collate:
     'annotate_ms1.R'
     'annotate_non_ms1.R'
@@ -54,6 +55,7 @@ Collate:
     'fake_edges.R'
     'fake_features_components.R'
     'fake_no_rt.R'
+    'follow_next.R'
     'form_adducts_neg.R'
     'form_adducts_pos.R'
     'get_benchmark.R'
@@ -61,6 +63,7 @@ Collate:
     'get_example_isdb.R'
     'get_example_sirius.R'
     'get_isdb.R'
+    'get_last_version_from_zenodo.R'
     'get_lotus.R'
     'get_params.R'
     'log_debug.R'
