@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = '..')
+knitr::opts_knit$set(root.dir = "..")
 ```
 
 This vignette describes how to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
@@ -32,6 +32,6 @@ source(file = "inst/scripts/process_annotations.R")
 
 The final exported file is formatted in order to be easily imported in [Cytoscape](https://cytoscape.org/) to further explore your data!
 
-We hope you enjoyed using **TIMA** and are pleased to hear from you! 
+We hope you enjoyed using **TIMA** and are pleased to hear from you!
 
 For any remark or suggestion, please  [fill an issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues) or feel free to contact us directly.

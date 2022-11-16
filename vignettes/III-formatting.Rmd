@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = '..')
+knitr::opts_knit$set(root.dir = "..")
 ```
 
 This vignette describes how to format all your files.
@@ -33,7 +33,7 @@ For Sirius and GNPS, please follow their own documentation.
 #### ISDB
 
 As [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher) is only in python, for the moment, we provide an example output coming from the new ISDB.
-We are working on a better integration. 
+We are working on a better integration.
 As this comes by default, you do not need to modify any parameters
 
 ```{r}
@@ -74,19 +74,19 @@ We also provide an example GNPS job id, which is: `96fa7c88200e4a03bee4644e581e3
 
 Before running the corresponding code, do not forget to modify `config/params/prepare_*yourAnnotationTool*.yaml`.
 
-Depending on the annotation tool you used, you can format its results using: 
+Depending on the annotation tool you used, you can format its results using:
 
 ```{r}
 source(file = "inst/scripts/prepare_gnps.R")
 ```
 
-or 
+or
 
 ```{r}
 source(file = "inst/scripts/prepare_isdb.R")
 ```
 
-or 
+or
 
 ```{r}
 source(file = "inst/scripts/prepare_sirius.R")
@@ -105,8 +105,8 @@ All steps can take both manual inputs or GNPS metadata directly from your GNPS j
 We are currently also working on CANOPUS integration for chemical class annotation but this implies way heavier computations and we want to offer our users a **fast** solution.
 
 #### Case when no network available
-If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps. 
-This will mimic a false network that allows to proceed to the next steps. 
+If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps.
+This will mimic a false network that allows to proceed to the next steps.
 However, this will not help chemical weighting.
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):

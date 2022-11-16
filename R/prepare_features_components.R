@@ -38,15 +38,15 @@ prepare_features_components <- function(input = params$input,
   log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
   ## TODO
   if (tool == "gnps") {
-  components <-
-    read_clusters(id = gnps_job_id) |>
-    dplyr::select(
-      feature_id = `cluster index`,
-      component_id = componentindex,
-      rt = RTMean,
-      mz = `precursor mass`
-    ) |>
-    dplyr::distinct()
+    components <-
+      read_clusters(id = gnps_job_id) |>
+      dplyr::select(
+        feature_id = `cluster index`,
+        component_id = componentindex,
+        rt = RTMean,
+        mz = `precursor mass`
+      ) |>
+      dplyr::distinct()
   }
 
   if (tool == "manual") {

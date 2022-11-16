@@ -1,9 +1,9 @@
 library: data/interim/libraries/library.tsv.gz # Library file prepared with previous steps
 name: library # Adducts library file prepared with previous steps
-annotation: 
-  gnps: [] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
+annotation:
+  gnps: [ ] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
   isdb: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz # Annotation file prepared with previous steps
-  sirius: [] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
+  sirius: [ ] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
 taxa: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz # Taxed features file prepared with previous steps
 edges: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz # Edges file prepared with previous steps
 output: FinalResults.tsv

@@ -5,16 +5,16 @@ services:
     build: "."
     image: adafede/tima-r
     volumes:
-        - "./config:/config"
+      - "./config:/config"
     command: Rscript inst/scripts/prepare_params.R
 
   tima:
     build: "."
     image: adafede/tima-r
     volumes:
-        - "./config:/config"
-        - "./inst:/inst"
-        - ".data:/data"
+      - "./config:/config"
+      - "./inst:/inst"
+      - ".data:/data"
     command: Rscript inst/scripts/tima.R
 
 # other smaller services not implemented yet

@@ -14,25 +14,25 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = '..')
+knitr::opts_knit$set(root.dir = "..")
 ```
 
 This vignette describes the philosophy behind the infrastructure of **TIMA**.
 
 ## Philosophy
 
-Our main goals were **flexibility** and **reproducibility**. 
+Our main goals were **flexibility** and **reproducibility**.
 
 ### Flexibility
 
 To ensure flexibility, we tried to split the process in as much tiny parts as needed.
 So you can decide whether to skip an optional part, add your own processing, etc.
-We tried to cover most use cases, but of course they are not exhaustive. 
+We tried to cover most use cases, but of course they are not exhaustive.
 If you feel like something useful to other users is missing, please fill an [issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues).
 
 ### Reproducibility
 
-After some time using TIMA, you will probably wonder: 
+After some time using TIMA, you will probably wonder:
 "*What was the parameters I used to generate this file?*" ...
 Or a collaborator might ask you to share your data and parameters.
 Writing them down each time might be time consuming and not really in line with modern computational approaches.
@@ -43,7 +43,7 @@ They will then be saved as YAML you will be able to share.
 
 ## Use
 
-Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles). 
+Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles).
 
 All coming steps admit you already cloned the repository and went to its root:
 ```

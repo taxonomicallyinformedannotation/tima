@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = '..')
+knitr::opts_knit$set(root.dir = "..")
 ```
 
 This vignette describes how to get and prepare a structure-organism pairs library in order to
@@ -24,12 +24,12 @@ This vignette describes how to get and prepare a structure-organism pairs librar
 
 ## LOTUS
 
-As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://lotus.nprod.net/>] with 
-**T**axonomically 
-**I**nformed 
-**M**etabolite 
-**A**nnotation in mind, 
-we provide it here as a starting point for your structure-organism pairs library. 
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://lotus.nprod.net/>] with
+**T**axonomically
+**I**nformed
+**M**etabolite
+**A**nnotation in mind,
+we provide it here as a starting point for your structure-organism pairs library.
 You are free to complement it with your own structure-organism pairs or to filter it according to your needs. We also provide some hints on how to do it later in this vignette.
 
 ### download
@@ -51,7 +51,7 @@ Then, **LOTUS** structure-organism pairs can be prepared to the right format for
 source(file = "inst/scripts/prepare_lotus.R")
 ```
 
-For these two first steps, you do not need to change any parameters as they are implemented *by default*. 
+For these two first steps, you do not need to change any parameters as they are implemented *by default*.
 
 ## Other libraries
 

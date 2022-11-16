@@ -68,11 +68,19 @@ prepare_params <- function(filename = params$filename,
   yamls_params$prepare_edges$output <-
     yamls_params$prepare_edges$output |>
     replace_gnps_job_id()
-  yamls_params$prepare_features_classification$input <-
-    yamls_params$prepare_features_classification$input |>
+  yamls_params$
+    prepare_features_classification$
+    input <-
+    yamls_params$
+    prepare_features_classification$
+    input |>
     replace_gnps_job_id()
-  yamls_params$prepare_features_classification$output <-
-    yamls_params$prepare_features_classification$output |>
+  yamls_params$
+    prepare_features_classification$
+    output <-
+    yamls_params$
+    prepare_features_classification$
+    output |>
     replace_gnps_job_id()
   yamls_params$prepare_features_components$input <-
     yamls_params$prepare_features_components$input |>
@@ -121,8 +129,14 @@ prepare_params <- function(filename = params$filename,
   yamls_params$process_annotations$annotation$isdb <-
     yamls_params$process_annotations$annotation$isdb |>
     replace_gnps_job_id()
-  yamls_params$process_annotations$annotation$sirius <-
-    yamls_params$process_annotations$annotation$sirius |>
+  yamls_params$
+    process_annotations$
+    annotation$
+    sirius <-
+    yamls_params$
+    process_annotations$
+    annotation$
+    sirius |>
     replace_gnps_job_id()
   yamls_params$process_annotations$edges <-
     yamls_params$process_annotations$edges |>
@@ -133,7 +147,10 @@ prepare_params <- function(filename = params$filename,
   yamls_params$process_annotations$top_k$initial <-
     params$top_k$initial
   yamls_params$process_annotations$top_k$final <- params$top_k$final
-  yamls_params$process_annotations$weights$biological <-
+  yamls_params$
+    process_annotations$
+    weights$
+    biological <-
     params$weights$biological
   yamls_params$process_annotations$weights$chemical <-
     params$weights$chemical

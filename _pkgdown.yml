@@ -3,7 +3,7 @@ home:
   description: Taxonomically Informed Metabolite Annotation
 template:
   bootstrap: 5
-  params: 
+  params:
     google_site_verification: Bt77rpBuC_R-0p62TWtA_ba5rvx-PuSEMv4LHg1UsOo
   opengraph:
     image:

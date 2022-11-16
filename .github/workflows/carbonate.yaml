@@ -1,8 +1,8 @@
 on:
   issue_comment:
-    types: [created]
+    types: [ created ]
   issues:
-    types: [opened]
+    types: [ opened ]
 
 jobs:
   carbonate:
