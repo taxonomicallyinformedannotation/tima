@@ -85,7 +85,7 @@ prepare_adducts <-
 
     log_debug("Exporting ...")
     export_params(step = "prepare_adducts")
-    export_output(x = adducts_pod, file = file.path(
+    export_output(x = adducts_pos, file = file.path(
       adducts_output_path,
       paste0(output_name, "_pos.tsv.gz")
     ))
