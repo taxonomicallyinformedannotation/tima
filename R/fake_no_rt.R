@@ -30,5 +30,5 @@ fake_no_rt <-
     )
 
     log_debug(x = "Exporting ...")
-    export_output(x = feature_table)
+    export_output(x = feature_table, file = output)
   }

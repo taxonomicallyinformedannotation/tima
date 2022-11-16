@@ -49,5 +49,5 @@ prepare_edges <- function(tool = params$tool,
 
   log_debug(x = "Exporting ...")
   export_params(step = "prepare_edges")
-  export_output(x = edges_table_treated)
+  export_output(x = edges_table_treated, file = output)
 }

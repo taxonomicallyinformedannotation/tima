@@ -38,5 +38,5 @@ prepare_isdb <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_isdb")
-    export_output(x = table)
+    export_output(x = table, file = output)
   }

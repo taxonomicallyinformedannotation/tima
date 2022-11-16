@@ -28,15 +28,15 @@ prepare_gnps <-
       dplyr::select(
         feature_id = `#Scan#`,
         smiles = Smiles,
-        # smiles_2D, #' Not available for now
+        score_input = MQScore,
+        # smiles_2D, ## Not available for now
         inchikey = InChIKey,
         inchikey_2D = `InChIKey-Planar`,
         structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
         structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
         structure_taxonomy_npclassifier_03class = npclassifier_class,
-        # molecular_formula, # Not available for now
-        structure_exact_mass = ExactMass,
-        score_input = MQScore
+        # molecular_formula, ## Not available for now
+        structure_exact_mass = ExactMass
       ) |>
       dplyr::mutate(
         library = "GNPS",
@@ -47,25 +47,30 @@ prepare_gnps <-
 
     if (!is.null(nap_job_id)) {
       log_debug("Loading NAP results")
-      ## TODO look at recent NAP outputs
-      ## Might be outdated
-      table <- read_nap(id = nap_job_id) |>
+      ## TODO look at recent NAP outputs... failing for now
+      table_nap <- read_nap(id = nap_job_id) |>
         dplyr::select(
           feature_id = cluster.index,
-          score_input = FusionScore,
-          smiles = FusionSMILES
+          smiles = FusionSMILES,
+          score_input = FusionScore
         ) |>
         dplyr::mutate(
-          library = "GNPS",
-          smiles_2D = NA,
           inchikey = NA,
           inchikey_2D = NA,
-          molecular_formula = NA,
           structure_taxonomy_npclassifier_01pathway = NA,
           structure_taxonomy_npclassifier_02superclass = NA,
           structure_taxonomy_npclassifier_03class = NA,
           structure_exact_mass = NA
-        )
+        ) |>
+        dplyr::mutate(
+          library = "GNPS (NAP)",
+          smiles_2D = NA,
+          molecular_formula = NA
+        ) |>
+        complement_metadata()
+
+      table <- table |>
+        dplyr::bind_rows(table_nap)
     }
 
     table <- table |>
@@ -73,5 +78,5 @@ prepare_gnps <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_gnps")
-    export_output(x = table)
+    export_output(x = table, file = output)
   }
