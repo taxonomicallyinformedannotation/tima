@@ -30,13 +30,6 @@ Imports:
     tibble,
     tidyr,
     yaml
-Suggests: 
-    # covr,
-    # knitr (>= 1.1.0),
-    # pkgdown,
-    # roxygen2,
-    # rmarkdown,
-    # testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
