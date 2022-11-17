@@ -121,7 +121,7 @@ testthat::test_that("Whole process", {
 
   ## 5
   ## CLI
-  arguments <- list()
+  arguments <- character()
   arguments$biological <- "x"
   arguments$column.name <- "x"
   arguments$complement <- "x"
@@ -159,7 +159,7 @@ testthat::test_that("Whole process", {
   arguments$xbim <- "x"
   arguments$zirius <- "x"
   arguments$force <- "x"
-  
+
   parse_cli_params()
 
   succeed()
