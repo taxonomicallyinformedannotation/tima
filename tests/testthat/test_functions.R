@@ -120,7 +120,49 @@ testthat::test_that("Whole process", {
   )
 
   ## 5
-  ## WIP
-  system(command = "Rscript inst/scripts/fake_edges.R -h")
+  ## CLI
+  system(
+    command = paste(
+      "Rscript R/parse_cli_params.R",
+      "--biological x",
+      "--column.name x",
+      "--complement x",
+      "--components x",
+      "--directory x",
+      "--edges x",
+      "--extension x",
+      "--features x",
+      "--filter x",
+      "--gnps x",
+      "--input x",
+      "--isdb x",
+      "--j.top x",
+      "--k.top x",
+      "--level x",
+      "--library x",
+      "--mode x",
+      "--ms x",
+      "--name x",
+      "--nap x",
+      "--npc x",
+      "--output x",
+      "--ppm x",
+      "--precursor x",
+      "--qemical x",
+      "--quickmode x",
+      "--rt x",
+      "--source x",
+      "--spectral x",
+      "--target x",
+      "--taxon x",
+      "--tool x",
+      "--value x",
+      "--workflow x",
+      "--xbim x",
+      "--zirius x",
+      "--force x"
+    )
+  )
+
   succeed()
 })

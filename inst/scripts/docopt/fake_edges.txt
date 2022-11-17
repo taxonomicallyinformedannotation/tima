@@ -1,7 +1,9 @@
 You can use this script with the following example:
 Rscript inst/scripts/fake_edges.R --input 'inst/extdata/interim/annotations/example_feature_table.tsv.gz' --output 'inst/extdata/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz'
 
-Usage: prepare_edges.R [--input=<input>] [--output=<output>] [--features=<features>]
+Usage: 
+  fake_edges.R [--input=<input>] [--output=<output>] [--features=<features>]
+
 Options:
   -i --input=<input>                    A file containing your feature ids.
   -o --output=<output>                  Path and filename for the output. If you specify .gz file will be compressed.

@@ -1,7 +1,8 @@
 You can use this script with the following example:
 Rscript inst/scripts/process_annotations.R
 
-Usage: process_annotations.R [--output=<output>] [--isdb=<isdb>] [--complement=<complement>] [--edges=<edges>] [--features=<features>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>] [--xbim=<xbim>] [--zirius=<zirius>] [--biological=<biological>] [--qemical=<qemical>] [--spectral=<spectral>]
+Usage: 
+  process_annotations.R [--output=<output>] [--isdb=<isdb>] [--complement=<complement>] [--edges=<edges>] [--features=<features>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>] [--xbim=<xbim>] [--zirius=<zirius>] [--biological=<biological>] [--qemical=<qemical>] [--spectral=<spectral>]
 
 Options:
   -b --biological=<biological>  Biological weight

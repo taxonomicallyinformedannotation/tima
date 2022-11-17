@@ -1,7 +1,8 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_params.R
 
-Usage: prepare_params.R  [--biological=<biological>] [--complement=<complement>] [--filename=<filename>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--ms=<ms>] [--ppm=<ppm>] [--qemical=<qemical>] [--rt=<rt>] [--taxon=<taxon>] [--spectral=<spectral>]
+Usage: 
+  prepare_params.R  [--biological=<biological>] [--complement=<complement>] [--filename=<filename>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--ms=<ms>] [--ppm=<ppm>] [--qemical=<qemical>] [--rt=<rt>] [--taxon=<taxon>] [--spectral=<spectral>]
 
 Options:
   -b --biological=<biological>  Biological weight

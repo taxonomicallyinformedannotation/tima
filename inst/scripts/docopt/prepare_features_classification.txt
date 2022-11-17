@@ -1,7 +1,8 @@
 You can use this script with the following example:
 Rscript inst/scripts/prepare_features_classification.R --input 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz' --output 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz' --library 'inst/extdata/interim/libraries/library.tsv.gz' --quickmode TRUE
 
-Usage: prepare_features_classification.R [--input=<input>] [--output=<output>] [--library=<library>]
+Usage: 
+  prepare_features_classification.R [--input=<input>] [--output=<output>] [--library=<library>]
 
 Arguments:
   -i --input=<input>            Your isdb result file. Supports compressed files.

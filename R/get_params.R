@@ -12,38 +12,11 @@
 #'
 #' @examples TODO
 get_params <- function(step) {
+  steps <- list.files(path = file.path(paths$inst$scripts$docopt)) |>
+    gsub(pattern = ".txt", replacement = "")
+
   stopifnot(
-    "Your step does not exist. Valid steps are:
-    'fake_edges',
-    'fake_features_components',
-    'prepare_adducts',
-    'prepare_closed',
-    'prepare_edges',
-    'prepare_features_classification',
-    'prepare_features_components',
-    'prepare_gnps',
-    'prepare_isdb',
-    'prepare_library',
-    'prepare_params',
-    'prepare_sirius',
-    'prepare_taxa',
-    'process_annotations'
-    " = step %in% c(
-      "fake_edges",
-      "fake_features_components",
-      "prepare_adducts",
-      "prepare_closed",
-      "prepare_edges",
-      "prepare_features_classification",
-      "prepare_features_components",
-      "prepare_gnps",
-      "prepare_isdb",
-      "prepare_library",
-      "prepare_params",
-      "prepare_sirius",
-      "prepare_taxa",
-      "process_annotations"
-    )
+    "Your step does not exist." = step %in% steps
   )
 
   doc_path <<-
@@ -58,7 +31,7 @@ get_params <- function(step) {
     nchars = file.info(doc_path)$size
   )
 
-  arguments <<- docopt::docopt(doc)
+  arguments <<- docopt::docopt(doc, version = paths$version)
 
   params <<- parse_yaml_params()
 

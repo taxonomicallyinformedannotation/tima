@@ -1,7 +1,8 @@
 You can use this script with the following example:
 Rscript inst/scripts/prepare_sirius.R --directory 'inst/extdata/interim/annotations/sirius_example' --output 'inst/extdata/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz'
 
-Usage: prepare_isdb.R [--directory=<directory>] [--npc=<npc>] [--output=<output>]
+Usage: 
+  prepare_isdb.R [--directory=<directory>] [--npc=<npc>] [--output=<output>]
 
 Arguments:
   -d --directory=<directory>    Directory containing SIRIUS results
