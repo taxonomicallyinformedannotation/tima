@@ -63,6 +63,7 @@ get_last_version_from_zenodo <-
         ),
         ")\n"
       )
+      create_dir(export = path)
       curl::curl_download(url = fileurl, destfile = path)
     } else {
       message("A file with the same size is already present. Skipping")
