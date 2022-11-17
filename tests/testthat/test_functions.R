@@ -11,12 +11,10 @@ testthat::test_that("Whole process", {
   prepare_params()
 
   ## 1.1
-  get_lotus()
-
-  ## 1.1.a
-  get_isdb(
-    url_pos = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf",
-    url_neg = "https://github.com/mandelbrot-project/spectral_lib_matcher/raw/main/data/query.mgf"
+  get_last_version_from_zenodo(
+    doi = paths$url$lotus$doi,
+    pattern = paths$urls$lotus$pattern,
+    path = paths$data$source$libraries$lotus
   )
 
   ## 1.1.b

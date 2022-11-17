@@ -12,9 +12,13 @@ cat(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-#' TODO CLI DOCOPT
+paths <- parse_yaml_paths()
 
-get_lotus()
+get_last_version_from_zenodo(
+  doi = paths$url$lotus$doi,
+  pattern = paths$urls$lotus$pattern,
+  path = paths$data$source$libraries$lotus
+)
 
 end <- Sys.time()
 

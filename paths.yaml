@@ -69,8 +69,13 @@ urls:
   example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
   example_isdb: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_isdb.tsv.gz
   example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
-  isdb:
-    pos: https://zenodo.org/record/6939173/files/isdb_pos.mgf?download=1
-    neg: https://zenodo.org/record/6939173/files/isdb_neg.mgf?download=1
-  lotus: https://zenodo.org/record/7085063/files/220916_frozen_metadata.csv.gz?download=1
-version: 2.6.0
+  hmdb: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+  isdb: 
+    doi: 10.5281/zenodo.5607185
+    pattern:
+      pos: isdb_pos.mgf
+      neg: isdb_neg.mgf
+  lotus: 
+    doi: 10.5281/zenodo.5794106
+    pattern: frozen_metadata.csv.gz
+version: 2.6.1

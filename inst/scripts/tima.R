@@ -16,7 +16,11 @@ paths <- parse_yaml_paths()
 
 #' 1.1
 log_debug("Getting LOTUS")
-get_lotus()
+get_last_version_from_zenodo(
+  doi = paths$url$lotus$doi,
+  pattern = paths$urls$lotus$pattern,
+  path = paths$data$source$libraries$lotus
+)
 
 #' 1.2
 log_debug("Preparing LOTUS")
@@ -40,7 +44,7 @@ step <- "prepare_adducts"
 params <- get_params(step = step)
 prepare_adducts()
 
-#' 2
+#' 2.1
 log_debug("Getting ISDB example")
 get_example_isdb()
 

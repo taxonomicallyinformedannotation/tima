@@ -4,20 +4,20 @@
 \alias{get_last_version_from_zenodo}
 \title{Get last version from Zenodo}
 \usage{
-get_last_version_from_zenodo(url, pattern, delim = ",")
+get_last_version_from_zenodo(doi, pattern, path)
 }
 \arguments{
-\item{url}{TODO}
+\item{doi}{TODO}
 
 \item{pattern}{TODO}
 
-\item{delim}{TODO}
+\item{path}{TODO}
 }
 \value{
 TODO
 }
 \description{
-Get last version from Zenodo
+Credit goes to partially to https://inbo.github.io/inborutils/
 }
 \examples{
 TODO

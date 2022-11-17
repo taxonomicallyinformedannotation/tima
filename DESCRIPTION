@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.6.0
+Version: 2.6.1
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -22,10 +22,11 @@ Imports:
     data.table,
     docopt,
     dplyr,
+    jsonlite,
     purrr,
     readr,
     rotl,
-    rvest,
+    stats,
     stringr,
     tibble,
     tidyr,
@@ -50,16 +51,13 @@ Collate:
     'fake_edges.R'
     'fake_features_components.R'
     'fake_no_rt.R'
-    'follow_next.R'
     'form_adducts_neg.R'
     'form_adducts_pos.R'
     'get_benchmark.R'
     'get_example_feature_table.R'
     'get_example_isdb.R'
     'get_example_sirius.R'
-    'get_isdb.R'
     'get_last_version_from_zenodo.R'
-    'get_lotus.R'
     'get_params.R'
     'log_debug.R'
     'parse_cli_params.R'
