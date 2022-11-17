@@ -121,48 +121,46 @@ testthat::test_that("Whole process", {
 
   ## 5
   ## CLI
-  system(
-    command = paste(
-      "Rscript R/parse_cli_params.R",
-      "--biological x",
-      "--column.name x",
-      "--complement x",
-      "--components x",
-      "--directory x",
-      "--edges x",
-      "--extension x",
-      "--features x",
-      "--filter x",
-      "--gnps x",
-      "--input x",
-      "--isdb x",
-      "--j.top x",
-      "--k.top x",
-      "--level x",
-      "--library x",
-      "--mode x",
-      "--ms x",
-      "--name x",
-      "--nap x",
-      "--npc x",
-      "--output x",
-      "--ppm x",
-      "--precursor x",
-      "--qemical x",
-      "--quickmode x",
-      "--rt x",
-      "--source x",
-      "--spectral x",
-      "--target x",
-      "--taxon x",
-      "--tool x",
-      "--value x",
-      "--workflow x",
-      "--xbim x",
-      "--zirius x",
-      "--force x"
-    )
-  )
+  arguments <- list()
+  arguments$biological <- "x"
+  arguments$column.name <- "x"
+  arguments$complement <- "x"
+  arguments$components <- "x"
+  arguments$directory <- "x"
+  arguments$edges <- "x"
+  arguments$extension <- "x"
+  arguments$features <- "x"
+  arguments$filter <- "x"
+  arguments$gnps <- "x"
+  arguments$input <- "x"
+  arguments$isdb <- "x"
+  arguments$j.top <- "x"
+  arguments$k.top <- "x"
+  arguments$level <- "x"
+  arguments$library <- "x"
+  arguments$mode <- "x"
+  arguments$ms <- "x"
+  arguments$name <- "x"
+  arguments$nap <- "x"
+  arguments$npc <- "x"
+  arguments$output <- "x"
+  arguments$ppm <- "x"
+  arguments$precursor <- "x"
+  arguments$qemical <- "x"
+  arguments$quickmode <- "x"
+  arguments$rt <- "x"
+  arguments$source <- "x"
+  arguments$spectral <- "x"
+  arguments$target <- "x"
+  arguments$taxon <- "x"
+  arguments$tool <- "x"
+  arguments$value <- "x"
+  arguments$workflow <- "x"
+  arguments$xbim <- "x"
+  arguments$zirius <- "x"
+  arguments$force <- "x"
+  
+  parse_cli_params()
 
   succeed()
 })
