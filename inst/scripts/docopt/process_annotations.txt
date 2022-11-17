@@ -24,5 +24,4 @@ Options:
   -v --version                  Show version.
   -x --xbim=<xbim>              Functionality to erase MS2 results
   -z --zirius=<zirius>          The file containing your prepared (SIRIUS) annotations
-  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters.
- Use it at yur own risks. Can crash.
+  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at your own risks. Can crash.
