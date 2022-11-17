@@ -44,6 +44,10 @@ prepare_adducts()
 log_debug("Getting ISDB example")
 get_example_isdb()
 
+#' 2.2
+log_debug("Getting SIRIUS example")
+get_example_sirius()
+
 #' 3.1
 log_debug("Preparing ISDB")
 step <- "prepare_isdb"
@@ -58,9 +62,9 @@ prepare_gnps()
 
 #' 3.3
 # log_debug("Preparing SIRIUS")
-# step <- "prepare_sirius"
-# params <- get_params(step = step)
-# prepare_sirius()
+step <- "prepare_sirius"
+params <- get_params(step = step)
+prepare_sirius()
 
 #' 4.1
 log_debug("Preparing edges")
