@@ -118,7 +118,7 @@ testthat::test_that("Whole process", {
     ms_mode = "neg",
     ms1_only = TRUE
   )
-  
+
   ## 5
   ## WIP
   system(command = "Rscript inst/scripts/fake_edges.R -h")
