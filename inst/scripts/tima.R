@@ -26,19 +26,17 @@ get_last_version_from_zenodo(
 log_debug("Preparing LOTUS")
 prepare_lotus()
 
-#' 1.3
-log_debug("Preparing closed")
-step <- "prepare_closed"
-params <- get_params(step = step)
-prepare_closed()
+#' 1.2.1
+# log_debug("Preparing closed")
+# source(file = "inst/scripts/prepare_closed.R")
 
-#' 1.4
+#' 1.3
 log_debug("Preparing library")
 step <- "prepare_library"
 params <- get_params(step = step)
 prepare_library()
 
-#' 1.5
+#' 1.4
 log_debug("Preparing adducts")
 step <- "prepare_adducts"
 params <- get_params(step = step)

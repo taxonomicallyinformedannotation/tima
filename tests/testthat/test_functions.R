@@ -23,12 +23,11 @@ testthat::test_that("Whole process", {
   ## 1.2
   prepare_lotus()
 
-  ## 1.3
-  step <- "prepare_closed"
-  params <- get_params(step = step)
-  prepare_closed()
+  ## 1.2.1
+  # source(file = "inst/scripts/prepare_closed.R")
+  
 
-  ## 1.4
+  ## 1.3
   step <- "prepare_library"
   params <- get_params(step = step)
   prepare_library(
@@ -38,7 +37,7 @@ testthat::test_that("Whole process", {
   )
   prepare_library()
 
-  ## 1.5
+  ## 1.4
   step <- "prepare_adducts"
   params <- get_params(step = step)
   prepare_adducts()
