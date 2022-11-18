@@ -25,7 +25,6 @@ testthat::test_that("Whole process", {
 
   ## 1.2.1
   # source(file = "inst/scripts/prepare_closed.R")
-  
 
   ## 1.3
   step <- "prepare_library"

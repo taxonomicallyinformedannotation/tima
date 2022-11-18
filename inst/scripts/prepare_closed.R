@@ -24,7 +24,7 @@ prepare_closed <- function(input = params$input,
     log_debug(x = "Loading closed resources")
     closed <-
       readr::read_delim(file = input)
-    
+
     log_debug(x = "Formatting closed resource")
     closed_prepared <- closed |>
       dplyr::mutate(structure_inchikey_2D = substring(
@@ -56,7 +56,7 @@ prepare_closed <- function(input = params$input,
       ) |>
       dplyr::distinct() |>
       dplyr::mutate(reference_doi = NA)
-    
+
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_closed")
     export_output(x = closed_prepared, file = output)
