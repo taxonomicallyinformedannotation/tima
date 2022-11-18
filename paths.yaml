@@ -28,6 +28,7 @@ data:
       path: data/interim/features
     libraries:
       path: data/interim/libraries
+      hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
@@ -46,6 +47,7 @@ data:
       ranks: inst/extdata/ranks.tsv
     libraries:
       path: data/source/libraries
+      hmdb: data/source/libraries/hmdb_metabolites.zip
       isdb:
         pos: data/source/libraries/isdb_pos.mgf
         neg: data/source/libraries/isdb_neg.mgf
