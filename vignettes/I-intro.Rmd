@@ -68,4 +68,4 @@ You now have all parameters copied in `config/params` directory, so you can star
 This command can be adapted to automatically change the main parameters of the whole workflow.
 If you are interested into this feature, you'll probably find out how.
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/1-library.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-library.html).

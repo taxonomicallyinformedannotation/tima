@@ -141,4 +141,4 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 source(file = "inst/scripts/prepare_taxa.R")
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/3-processing.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/IV-processing.html).
