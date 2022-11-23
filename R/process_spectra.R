@@ -1,7 +1,5 @@
 #' @title Process spectra
 #'
-#' @noRd
-#'
 #' @param input TODO
 #' @param library TODO
 #' @param output TODO
