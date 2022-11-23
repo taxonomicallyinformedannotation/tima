@@ -14,7 +14,23 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
-#' 1.1
+## Get all files
+
+### Benchmark
+# get_benchmark()
+
+### Examples
+
+#### ISDB
+# get_example_isdb()
+
+#### MGF
+get_example_mgf()
+
+### SIRIUS
+# get_example_sirius()
+
+### LOTUS
 log_debug("Getting LOTUS")
 get_last_version_from_zenodo(
   doi = paths$url$lotus$doi,
@@ -22,77 +38,99 @@ get_last_version_from_zenodo(
   path = paths$data$source$libraries$lotus
 )
 
-#' 1.2
+### HMDB
+# get_hmdb()
+
+### ISDB
+log_debug("Getting ISDB...")
+log_debug("... positive")
+get_last_version_from_zenodo(
+  doi = paths$url$isdb$doi,
+  pattern = paths$urls$isdb$pattern$pos,
+  path = paths$data$source$libraries$isdb$pos
+)
+log_debug("... negative")
+get_last_version_from_zenodo(
+  doi = paths$url$isdb$doi,
+  pattern = paths$urls$isdb$pattern$neg,
+  path = paths$data$source$libraries$isdb$neg
+)
+
+## Prepare all files
+### LOTUS
 log_debug("Preparing LOTUS")
 prepare_lotus()
 
-#' 1.2.1
-# log_debug("Preparing closed")
-# source(file = "inst/scripts/prepare_closed.R")
+### HMDB
+# TODO
+# log_debug("Preparing HMDB")
+# prepare_hmdb()
 
-#' 1.3
-log_debug("Preparing library")
+### Closed
+# log_debug("Preparing closed")
+# prepare_closed()
+
+### Structural library
+log_debug("Preparing structural library")
 step <- "prepare_library"
 params <- get_params(step = step)
 prepare_library()
 
-#' 1.4
+### Adducts
 log_debug("Preparing adducts")
 step <- "prepare_adducts"
 params <- get_params(step = step)
 prepare_adducts()
 
-#' 2.1
-log_debug("Getting ISDB example")
-get_example_isdb()
+## Performing MS2 annotation
+log_debug("Performing MS2 annotation")
+step <- "process_spectra"
+params <- get_params(step = step)
+process_spectra()
 
-#' 2.2
-log_debug("Getting SIRIUS example")
-# get_example_sirius()
-
-#' 3.1
+### ISDB results
 log_debug("Preparing ISDB")
 step <- "prepare_isdb"
 params <- get_params(step = step)
 prepare_isdb()
 
-#' 3.2
+### GNPS results
 log_debug("Preparing GNPS")
 step <- "prepare_gnps"
 params <- get_params(step = step)
 prepare_gnps()
 
-#' 3.3
+### SIRIUS results
 # log_debug("Preparing SIRIUS")
 # step <- "prepare_sirius"
 # params <- get_params(step = step)
 # prepare_sirius()
 
-#' 4.1
+### Edges
 log_debug("Preparing edges")
 step <- "prepare_edges"
 params <- get_params(step = step)
 prepare_edges()
 
-#' 4.2
+### Features components
 log_debug("Preparing features components")
 step <- "prepare_features_components"
 params <- get_params(step = step)
 prepare_features_components()
 
-#' 4.3
+### Features classification
 log_debug("Preparing features classification")
 step <- "prepare_features_classification"
 params <- get_params(step = step)
 prepare_features_classification()
 
-#' 4.4
+### Taxa
 log_debug("Preparing taxa")
 step <- "prepare_taxa"
 params <- get_params(step = step)
 prepare_taxa()
 
-#' 5
+## Perform TIMA
 log_debug("Processing annotations")
 step <- "process_annotations"
 params <- get_params(step = step)

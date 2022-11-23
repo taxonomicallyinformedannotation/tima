@@ -1,0 +1,15 @@
+input: data/source/example.mgf
+library: data/source/libraries/isdb_pos.mgf
+output: data/interim/annotations/example_isdb_2.tsv.gz
+ms:
+  similarity:
+    method: gnps
+    threshold: 0.2
+  tolerance:
+    ppm: 10
+    dalton: 0.01
+  peaks:
+    absolute: 6
+    ratio: 0.2
+  condition: OR
+quickmode: yes

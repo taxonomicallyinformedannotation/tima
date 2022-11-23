@@ -11,16 +11,6 @@ parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {
-    if (!is.null(arguments$gnps)) {
-      params$annotation$gnps <- arguments$gnps
-      params$gnps <- arguments$gnps
-    }
-    if (!is.null(arguments$isdb)) {
-      params$annotation$isdb <- arguments$isdb
-    }
-    if (!is.null(arguments$zirius)) {
-      params$annotation$sirius <- arguments$zirius
-    }
     if (!is.null(arguments$biological)) {
       params$weights$biological <- as.numeric(arguments$biological)
     }
@@ -32,6 +22,15 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$components)) {
       params$components <- arguments$components
+    }
+    if (!is.null(arguments$condition)) {
+      params$ms$condition <- arguments$condition
+    }
+    if (!is.null(arguments$dalton)) {
+      params$dalton <- arguments$dalton
+    }
+    if (!is.null(arguments$directory)) {
+      params$directory <- arguments$directory
     }
     if (!is.null(arguments$edges)) {
       params$edges <- arguments$edges
@@ -52,14 +51,18 @@ parse_cli_params <- function() {
     if (!is.null(arguments$force)) {
       params$force <- arguments$force
     }
-    if (!is.null(arguments$qemical)) {
-      params$weights$chemical <- as.numeric(arguments$qemical)
+    if (!is.null(arguments$gnps)) {
+      params$annotation$gnps <- arguments$gnps
+      params$gnps <- arguments$gnps
     }
-    if (!is.null(arguments$j.top)) {
-      params$top_k$initial <- as.numeric(arguments$j.top)
+    if (!is.null(arguments$isdb)) {
+      params$annotation$isdb <- arguments$isdb
     }
     if (!is.null(arguments$input)) {
       params$input <- arguments$input
+    }
+    if (!is.null(arguments$j.top)) {
+      params$top_k$initial <- as.numeric(arguments$j.top)
     }
     if (!is.null(arguments$k.top)) {
       params$top_k$final <-
@@ -74,6 +77,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$metadata)) {
       params$metadata <- arguments$metadata
     }
+    if (!is.null(arguments$method)) {
+      params$ms$similarity$method <- arguments$method
+    }
     if (!is.null(arguments$mode)) {
       params$mode <- arguments$mode
     }
@@ -86,21 +92,36 @@ parse_cli_params <- function() {
     if (!is.null(arguments$nap)) {
       params$nap <- arguments$nap
     }
+    if (!is.null(arguments$npc)) {
+      params$npc <- arguments$npc
+    }
+    if (!is.null(arguments$npeaks)) {
+      params$ms$peaks$absolute <- arguments$npeaks
+    }
     if (!is.null(arguments$output)) {
       params$output <- arguments$output
     }
     if (!is.null(arguments$ppm)) {
       params$ms$tolerance$ppm <- as.numeric(arguments$ppm)
     }
+    if (!is.null(arguments$precursor)) {
+      params$precursor_name <- arguments$precursor
+    }
+    if (!is.null(arguments$qemical)) {
+      params$weights$chemical <- as.numeric(arguments$qemical)
+    }
     if (!is.null(arguments$quickmode)) {
       params$quickmode <- arguments$quickmode
+    }
+    if (!is.null(arguments$rpeaks)) {
+      params$ms$peaks$ratio <- arguments$rpeaks
     }
     if (!is.null(arguments$rt)) {
       params$ms$tolerance$rt <- as.numeric(arguments$rt)
       params$rt_name <- arguments$rt
     }
-    if (!is.null(arguments$precursor)) {
-      params$precursor_name <- arguments$precursor
+    if (!is.null(arguments$similarity)) {
+      params$ms$similarity <- arguments$similarity
     }
     if (!is.null(arguments$source)) {
       params$source_name <- arguments$source
@@ -117,17 +138,20 @@ parse_cli_params <- function() {
     if (!is.null(arguments$tool)) {
       params$tool <- arguments$tool
     }
+    if (!is.null(arguments$threshold)) {
+      params$ms$similarity$threshold <- arguments$threshold
+    }
     if (!is.null(arguments$value)) {
       params$filter$value <- arguments$value
-    }
-    if (!is.null(arguments$npc)) {
-      params$npc <- arguments$npc
     }
     if (!is.null(arguments$workflow)) {
       params$workflow <- arguments$workflow
     }
     if (!is.null(arguments$xbim)) {
       params$ms$ms1only <- arguments$xbim
+    }
+    if (!is.null(arguments$zirius)) {
+      params$annotation$sirius <- arguments$zirius
     }
   }
 

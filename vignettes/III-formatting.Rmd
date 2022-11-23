@@ -31,7 +31,13 @@ In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**as
 
 ### ISDB
 
-TODO
+```{r}
+library("timaR")
+```
+
+```{r}
+source(file = "inst/scripts/process_spectra.R")
+```
 
 In case, a python implementation of the spectral matching steps is also available at: <https://github.com/mandelbrot-project/spectral_lib_matcher>.
 The python version also includes more elaborated similarity measures.
@@ -40,22 +46,6 @@ The python version also includes more elaborated similarity measures.
 
 For Sirius and GNPS, please follow their own documentation.
 If you have some annotations coming from a different tool, please format them as the provided examples.
-
-### Get some example(s)
-
-#### ISDB
-
-As [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher) is only in python, for the moment, we provide an example output coming from the new ISDB.
-We are working on a better integration.
-As this comes by default, you do not need to modify any parameters
-
-```{r}
-library("timaR")
-```
-
-```{r}
-source(file = "inst/scripts/get_example_isdb.R")
-```
 
 #### SIRIUS
 

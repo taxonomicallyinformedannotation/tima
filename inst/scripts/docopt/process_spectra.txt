@@ -1,0 +1,22 @@
+You can use this script with the following example:
+Rscript inst/scripts/process_spectra.R --input 'data/source/example.mgf' --library 'data/source/libraries/isdb_pos.mgf' --output 'data/interim/annotations/example_isdb_result.tsv.gz' --dalton 0.02 --ppm 10 --method 'gnps' --threshold 0.2 --npeaks 6 --rpeaks 0.2 --condition OR --quickmode true
+
+Usage: 
+  process_spectra.R [--input=<input>] [--library=<library>] [--output=<output>] [--dalton=<dalton>] [--ppm=<ppm>] [--method=<method>] [--threshold=<threshold>] [--condition=<condition>] [--quickmode=<quickmode>]
+
+Arguments:
+  -c --condition=<condition>    Condition used for thresholding (AND or OR)
+  -d --dalton=<dalton>          Tolerance for matching. Should not exceed 0.05 Da.
+  -i --input=<input>            Your isdb result file. Supports compressed files.
+  -l --library=<library>        Your MS2 library file (MGF).
+  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+  -n --npeaks=<npeaks>          Minimum number of peaks to match (absolute)
+  -m --method=<method>          Similarity measure method to be used.
+  -p --ppm=<ppm>                Tolerance for matching. Should not exceed 50 ppm.
+  -q --quickmode=<quickmode>    If skipping slow parts. Boolean.
+  -r --rpeaks=<rpeaks>          Minimum ratio of peaks to match (absolute)
+  -t -threshold=<threshold>     Minimum similarity score
+
+Options:
+  -h --help         Show this screen.
+  -v --version      Show version.
