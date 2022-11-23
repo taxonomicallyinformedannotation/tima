@@ -146,7 +146,7 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 
 In order to get it:
 
-```{r eval=FALSE, include=TRUE}
+```{r}
 source(file = "inst/scripts/get_isdb.R")
 ```
 
