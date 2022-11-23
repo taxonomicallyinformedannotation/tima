@@ -1,10 +1,10 @@
 ---
-title: "2 Formatting all inputs"
+title: "3 Formatting all inputs"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2 Formatting all inputs}
+  %\VignetteIndexEntry{3 Formatting all inputs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,14 +21,27 @@ This vignette describes how to format all your files.
 
 ## Structural annotations of your features
 
-For the moment, we support annotations coming from 3 different annotation tools: [GNPS](https://gnps.ucsd.edu), [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius) and our *in lab* developed tool, **[ISDB](https://github.com/mandelbrot-project/spectral_lib_matcher)**.
-We hope to soon implement SIRIUS support.
+For the moment, we support annotations coming from 3 different annotation tools: 
 
-In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following repository: [spectral_lib_matcher](https://github.com/mandelbrot-project/spectral_lib_matcher)
+* [GNPS](https://gnps.ucsd.edu)
+* [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
+* Formatted results of **ISDB** annotation.
+
+In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following steps. 
+
+### ISDB
+
+TODO
+
+In case, a python implementation of the spectral matching steps is also available at: <https://github.com/mandelbrot-project/spectral_lib_matcher>.
+The python version also includes more elaborated similarity measures.
+
+### Sirius, GNPS, and others
 
 For Sirius and GNPS, please follow their own documentation.
+If you have some annotations coming from a different tool, please format them as the provided examples.
 
-### Get an example
+### Get some example(s)
 
 #### ISDB
 
@@ -49,19 +62,20 @@ source(file = "inst/scripts/get_example_isdb.R")
 As SIRIUS jobs are long to perform, we provide an already computed SIRIUS Workspace.
 It has beeen generated on the same MGF as the GNPS and ISDB jobs with the following command:
 
-`
+```{shell eval=FALSE, include=TRUE}
 config --IsotopeSettings.filter true --FormulaSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC --Timeout.secondsPerTree 0 --FormulaSettings.enforced HCNOP --Timeout.secondsPerInstance 0 --AdductSettings.detectable [[M + H3N + H]+, [M - H2O + H]+, [M + K]+, [M - H4O2 + H]+, [M + H]+, [M + Na]+] --UseHeuristic.mzToUseHeuristicOnly 650 --AlgorithmProfile orbitrap --IsotopeMs2Settings IGNORE --MS2MassDeviation.allowedMassDeviation 5.0ppm --NumberOfCandidatesPerIon 1 --UseHeuristic.mzToUseHeuristic 300 --FormulaSettings.detectable B,Cl,Br,Se,S --NumberOfCandidates 10 --ZodiacNumberOfConsideredCandidatesAt300Mz 10 --ZodiacRunInTwoSteps true --ZodiacEdgeFilterThresholds.minLocalConnections 10 --ZodiacEdgeFilterThresholds.thresholdFilter 0.95 --ZodiacEpochs.burnInPeriod 2000 --ZodiacEpochs.numberOfMarkovChains 10 --ZodiacNumberOfConsideredCandidatesAt800Mz 50 --ZodiacEpochs.iterations 20000 --AdductSettings.enforced , --AdductSettings.fallback [[M + K]+, [M + H]+, [M + Na]+] --FormulaResultThreshold true --InjectElGordoCompounds true --StructureSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC --RecomputeResults false formula zodiac fingerprint structure canopus
-`
+```
 
 These parameters were not optimized and were only used to give an example output.
 
 Then, the summaries have been generated using:
 
-`
+```{shell eval=FALSE, include=TRUE}
 sirius -i inst/extdata/interim/annotations/sirius_example/ write-summaries -c --digits 3
-`
+```
 
 You can get the example running:
+
 ```{r}
 source(file = "inst/scripts/get_example_sirius.R")
 ```
@@ -80,19 +94,19 @@ Depending on the annotation tool you used, you can format its results using:
 source(file = "inst/scripts/prepare_gnps.R")
 ```
 
-or
+and/or
 
 ```{r}
 source(file = "inst/scripts/prepare_isdb.R")
 ```
 
-or
+and/or
 
 ```{r}
 source(file = "inst/scripts/prepare_sirius.R")
 ```
 
-You now have your annotations well prepared and can keep on formatting the rest of your metadata
+You now have your annotations well prepared and can keep on formatting the rest of your metadata.
 
 ## Chemical class annotation of your features
 
@@ -104,7 +118,8 @@ All steps can take both manual inputs or GNPS metadata directly from your GNPS j
 
 We are currently also working on CANOPUS integration for chemical class annotation but this implies way heavier computations and we want to offer our users a **fast** solution.
 
-#### Case when no network available
+### Case when no network available
+
 If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps.
 This will mimic a false network that allows to proceed to the next steps.
 However, this will not help chemical weighting.

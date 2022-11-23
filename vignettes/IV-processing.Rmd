@@ -1,10 +1,10 @@
 ---
-title: "3 Performing Taxonomically Informed Metabolite Annotation"
+title: "4 Performing Taxonomically Informed Metabolite Annotation"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3 Performing Taxonomically Informed Metabolite Annotation}
+  %\VignetteIndexEntry{4 Performing Taxonomically Informed Metabolite Annotation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

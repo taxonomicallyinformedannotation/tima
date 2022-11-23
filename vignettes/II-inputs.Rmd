@@ -1,10 +1,10 @@
 ---
-title: "1 Preparing your structure-organism pairs library"
+title: "2 Inputs: Getting everything you need"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1 Preparing your structure-organism pairs library}
+  %\VignetteIndexEntry{2 Inputs: Getting everything you need}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,14 +17,19 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = "..")
 ```
 
-This vignette describes how to get and prepare a structure-organism pairs library in order to
+This vignette describes how to get and/or prepare:
+
+* A structure-organism pairs library
+* *In silico* generated spectral library(ies) *(optional)*
+
+in order to:
 
 * Annotate or complement the annotation of your feature. *(optional)*
 * **Weight your initial annotations**.
 
-## LOTUS
+## Structure-organism pairs libraries
 
-As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://lotus.nprod.net/>] with
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://doi.org/10.7554/eLife.70780>] with
 **T**axonomically
 **I**nformed
 **M**etabolite
@@ -32,7 +37,7 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 You are free to complement it with your own structure-organism pairs or to filter it according to your needs. We also provide some hints on how to do it later in this vignette.
 
-### download
+### Download
 
 To download it LOTUS structure-organism pairs locally, just run:
 
@@ -40,20 +45,40 @@ To download it LOTUS structure-organism pairs locally, just run:
 library("timaR")
 ```
 
+#### LOTUS
+
 ```{r}
 source(file = "inst/scripts/get_lotus.R")
 ```
 
-### preparation
+#### HMDB
+
+If you want, you can also complement LOTUS pairs with the ones coming from HMDB (not running by default as quite long):
+
+```{r eval=FALSE, include=TRUE}
+source(file = "inst/scripts/get_hmdb.R")
+```
+
+### Preparation
+
+#### LOTUS
 
 Then, **LOTUS** structure-organism pairs can be prepared to the right format for further processing:
 ```{r}
 source(file = "inst/scripts/prepare_lotus.R")
 ```
 
-For these two first steps, you do not need to change any parameters as they are implemented *by default*.
+#### HMDB
 
-## Other libraries
+As previously:
+
+```{r eval=FALSE, include=TRUE}
+source(file = "inst/scripts/prepare_hmdb.R")
+```
+
+For these first steps, you do not need to change any parameters as they are implemented *by default*.
+
+#### Other libraries
 
 As we want our tool to be flexible, you can also add your own library to LOTUS.
 You just need to format it in order to be compatible.
@@ -66,7 +91,7 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 source(file = "inst/scripts/prepare_closed.R")
 ```
 
-## Merging
+### Merging
 
 Once you have all your sub-libraries prepared, you are ready to merge them in a single file that will be used for the next steps.
 
@@ -89,5 +114,46 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 source(file = "inst/scripts/prepare_adducts.R")
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).
+## Adducts library
 
+As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS1 annotation later on.
+
+Before running the corresponding code, do not forget to modify `config/params/prepare_adducts.yaml`.
+
+```{r}
+source(file = "inst/scripts/prepare_adducts.R")
+```
+
+## Spectral libraries
+
+### Experimental
+
+You can of course use your own experimental spectral library to perform MS2 annotation.
+We currently only support spectral libraries in MGF format.
+
+To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
+
+```{r}
+source(file = "inst/scripts/get_example_mgf.R")
+```
+
+### *In silico*
+
+#### LOTUS
+
+We generated an *in silico* spectral library of the structures found in LOTUS using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465).
+For more info, see <https://doi.org/10.5281/zenodo.5607185>.
+
+In order to get it:
+
+```{r eval=FALSE, include=TRUE}
+source(file = "inst/scripts/get_isdb.R")
+```
+
+#### HMDB
+
+TODO
+
+We are working on it...
+
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).

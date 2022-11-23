@@ -1,10 +1,10 @@
 ---
-title: "0 General comments about the infrastructure"
+title: "1 General comments about the infrastructure"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{0 General comments about the infrastructure}
+  %\VignetteIndexEntry{1 General comments about the infrastructure}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -46,7 +46,8 @@ They will then be saved as YAML you will be able to share.
 Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles).
 
 All coming steps admit you already cloned the repository and went to its root:
-```
+
+```{shell eval=FALSE, include=TRUE}
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
@@ -60,7 +61,7 @@ Those will help you understanding how the workflow works so you can adapt them l
 So first, start by copying them into `config/params` directory.
 To do so:
 
-```
+```{shell eval=FALSE, include=TRUE}
 Rscript inst/scripts/prepare_params.R
 ```
 
@@ -68,4 +69,4 @@ You now have all parameters copied in `config/params` directory, so you can star
 This command can be adapted to automatically change the main parameters of the whole workflow.
 If you are interested into this feature, you'll probably find out how.
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-library.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-inputs.html).

@@ -1,10 +1,10 @@
 ---
-title: "4 Actual Performance"
+title: "5 Actual Performance"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{4 Actual Performance}
+  %\VignetteIndexEntry{5 Actual Performance}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 resource_files:
