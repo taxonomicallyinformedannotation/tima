@@ -127,7 +127,7 @@ process_spectra <- function(input = params$input,
     dplyr::select(
       feature_id = query_idx,
       target_id = target_idx,
-      score_input = score
+      msms_score = score
     )
 
   if (quickmode != TRUE) {
@@ -159,19 +159,19 @@ process_spectra <- function(input = params$input,
 
   target_id <-
     seq_along(1:length(spectral_library@backend@spectraData$FILENAME))
-  inchikey_2D <- spectral_library@backend@spectraData$FILENAME
+  short_inchikey <- spectral_library@backend@spectraData$FILENAME
   smiles <- spectral_library@backend@spectraData$SMILES
   molecular_formula <-
     spectral_library@backend@spectraData$MOLECULAR_FORMULA
-  structure_exact_mass <-
+  exact_mass <-
     spectral_library@backend@spectraData$EXACTMASS
 
   df_meta <- data.frame(
     target_id,
-    inchikey_2D,
+    short_inchikey,
     smiles,
     molecular_formula,
-    structure_exact_mass
+    exact_mass
   )
 
   df_final <- df_similarity |>
