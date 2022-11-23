@@ -42,12 +42,10 @@ testthat::test_that("Whole process", {
   # get_hmdb()
 
   #### ISDB
-  ## TODO make it smaller for testing, as for benchmark
-  ## redundant but needed for perform ms2 annotation step
-  get_last_version_from_zenodo(
-    doi = paths$url$isdb$doi,
-    pattern = paths$urls$isdb$pattern$pos,
-    path = paths$data$source$libraries$isdb$pos
+  ## smaller version for testing
+  utils::download.file(
+    url = paths$url$example_spectral_lib,
+    destfile = paths$data$source$libraries$isdb$pos
   )
 
   ## Prepare all files
@@ -77,9 +75,15 @@ testthat::test_that("Whole process", {
   prepare_adducts()
 
   ## Performing MS2 annotation
+  ### Normal
   step <- "process_spectra"
   params <- get_params(step = step)
   process_spectra()
+  ### Long
+  process_spectra(
+    condition = "AND",
+    quickmode = FALSE
+  )
 
   ### ISDB results
   step <- "prepare_isdb"
