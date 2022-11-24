@@ -28,8 +28,8 @@ testthat::test_that("Whole process", {
   get_example_mgf()
 
   #### SIRIUS
-  ## TODO make it smaller for testing, as for benchmark
-  get_example_sirius()
+  ## mini version for tests
+  get_example_sirius(url = paths$urls$example_sirius_mini)
 
   #### LOTUS
   get_last_version_from_zenodo(

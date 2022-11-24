@@ -74,6 +74,8 @@ urls:
   example_isdb: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_isdb.tsv.gz
   example_mgf: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example.mgf
   example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
+  example_sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
+  example_spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
   hmdb: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
   isdb: 
     doi: 10.5281/zenodo.5607185

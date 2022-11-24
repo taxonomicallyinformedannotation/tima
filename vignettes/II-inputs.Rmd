@@ -146,7 +146,30 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 
 In order to get it:
 
-```{r}
+```{r include=FALSE}
+## download smaller ISDB to fasten build
+file <- "paths.yaml"
+paths <- yaml::read_yaml(
+    file = file,
+    handlers = list(
+      seq = function(x) {
+        purrr::flatten(x)
+      }
+    ))
+
+utils::download.file(
+      url = paths$urls$example_spectral_lib,
+      destfile = paths$data$source$libraries$isdb$pos
+    )
+utils::download.file(
+      url = paths$urls$example_spectral_lib,
+      destfile = paths$data$source$libraries$isdb$neg
+    )
+paths$urls$isdb$pattern$pos <- "bla"
+yaml::write_yaml(x = paths,file = file)
+```
+
+```{r eval=FALSE, include=TRUE}
 source(file = "inst/scripts/get_isdb.R")
 ```
 
