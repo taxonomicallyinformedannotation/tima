@@ -26,11 +26,13 @@ testthat::test_that("Whole process", {
 
   #### MGF
   ## mini version for tests
-  get_example_mgf(url = paths$url$example_mgf_mini)
+  # get_example_mgf(url = paths$url$example_mgf_mini)
+  get_example_mgf()
 
   #### SIRIUS
   ## mini version for tests
-  get_example_sirius(url = paths$urls$example_sirius_mini)
+  # get_example_sirius(url = paths$urls$example_sirius_mini)
+  get_example_sirius()
 
   #### LOTUS
   get_last_version_from_zenodo(
@@ -49,6 +51,7 @@ testthat::test_that("Whole process", {
     url = paths$url$example_spectral_lib,
     destfile = paths$data$source$libraries$isdb$pos
   )
+  
 
   ## Prepare all files
   ### LOTUS
