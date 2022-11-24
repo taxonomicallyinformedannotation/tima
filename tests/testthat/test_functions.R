@@ -44,6 +44,7 @@ testthat::test_that("Whole process", {
 
   #### ISDB
   ## smaller version for testing
+  create_dir(paths$data$source$libraries$isdb$pos)
   utils::download.file(
     url = paths$url$example_spectral_lib,
     destfile = paths$data$source$libraries$isdb$pos
