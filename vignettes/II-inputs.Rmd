@@ -135,7 +135,13 @@ To get an example of an MGF file (corresponding to the spectra to annotate, not 
 
 ```{r include=FALSE}
 ## download smaller MGF to fasten build
-paths <- parse_yaml_paths()
+paths <- yaml::read_yaml(
+    file = "paths.yaml",
+    handlers = list(
+      seq = function(x) {
+        purrr::flatten(x)
+      }
+    ))
 create_dir(export = paths$data$source$example$mgf)
 utils::download.file(url = paths$url$example_mgf_mini,
                      destfile = paths$data$source$example$mgf)
@@ -156,15 +162,13 @@ In order to get it:
 
 ```{r include=FALSE}
 ## download smaller ISDB to fasten build
-file <- "paths.yaml"
 paths <- yaml::read_yaml(
-    file = file,
+    file = "paths.yaml",
     handlers = list(
       seq = function(x) {
         purrr::flatten(x)
       }
     ))
-
 utils::download.file(
       url = paths$urls$example_spectral_lib,
       destfile = paths$data$source$libraries$isdb$pos
@@ -173,8 +177,6 @@ utils::download.file(
       url = paths$urls$example_spectral_lib,
       destfile = paths$data$source$libraries$isdb$neg
     )
-paths$urls$isdb$pattern$pos <- "bla"
-yaml::write_yaml(x = paths,file = file)
 ```
 
 ```{r eval=FALSE, include=TRUE}
