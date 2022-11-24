@@ -12,10 +12,15 @@
 #' @examples TODO
 complement_metadata <- function(df) {
   log_debug("Trying to look for already computed metadata")
+  get_last_version_from_zenodo(
+    doi = paths$url$lotus$metadata_doi,
+    pattern = paths$urls$lotus$metadata_pattern$structures,
+    path = paths$data$source$libraries$structure_metadata
+  )
+  
   metadata <-
     readr::read_delim(
-      # Suboptimal for now
-      file = "https://zenodo.org/record/6786307/files/structure_metadata.tsv.gz",
+      file = paths$data$source$libraries$structure_metadata,
       col_select = c(
         "inchikey_2D" = "structureCleaned_inchikey2D",
         "smiles_2D_2" = "structureCleaned_smiles2D",

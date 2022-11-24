@@ -54,6 +54,7 @@ data:
         pos: data/source/libraries/isdb_pos.mgf
         neg: data/source/libraries/isdb_neg.mgf
       lotus: data/source/libraries/lotus.csv.gz
+      structure_metadata: data/source/libraries/structure_metadata.tsv.gz
     neutral_losses: inst/extdata/neutral_losses.tsv
 doc:
   path: doc
@@ -73,6 +74,7 @@ urls:
   example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
   example_isdb: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_isdb.tsv.gz
   example_mgf: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example.mgf
+  example_mgf_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_mini.mgf
   example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
   example_sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
   example_spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
@@ -85,4 +87,9 @@ urls:
   lotus: 
     doi: 10.5281/zenodo.5794106
     pattern: frozen_metadata.csv.gz
+    metadata_doi: 10.5281/zenodo.6378223
+    metadata_pattern:
+      organisms: organism_metadata.tsv.gz
+      references: reference:metadata.tsv.gz
+      structures: structure_metadata.tsv.gz
 version: 2.6.1

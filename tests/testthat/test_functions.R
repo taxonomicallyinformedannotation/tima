@@ -25,7 +25,8 @@ testthat::test_that("Whole process", {
   # get_example_isdb()
 
   #### MGF
-  get_example_mgf()
+  ## mini version for tests
+  get_example_mgf(url = paths$url$example_mgf_mini)
 
   #### SIRIUS
   ## mini version for tests

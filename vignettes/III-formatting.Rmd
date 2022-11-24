@@ -126,7 +126,13 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 
 ```{r}
 source(file = "inst/scripts/prepare_edges.R")
+```
+
+```{r}
 source(file = "inst/scripts/prepare_features_components.R")
+```
+
+```{r}
 source(file = "inst/scripts/prepare_features_classification.R")
 ```
 

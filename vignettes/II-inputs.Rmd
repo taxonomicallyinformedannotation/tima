@@ -133,7 +133,15 @@ We currently only support spectral libraries in MGF format.
 
 To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
 
-```{r}
+```{r include=FALSE}
+## download smaller MGF to fasten build
+paths <- parse_yaml_paths()
+create_dir(export = paths$data$source$example$mgf)
+utils::download.file(url = paths$url$example_mgf_mini,
+                     destfile = paths$data$source$example$mgf)
+```
+
+```{r eval=FALSE, include=TRUE}
 source(file = "inst/scripts/get_example_mgf.R")
 ```
 
