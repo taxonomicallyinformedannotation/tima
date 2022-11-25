@@ -25,9 +25,11 @@ paths <- parse_yaml_paths()
 # get_example_isdb()
 
 #### MGF
-get_example_mgf()
+get_example_mgf(url = paths$url$example_mgf_mini)
+# get_example_mgf()
 
 ### SIRIUS
+get_example_sirius(url = paths$urls$example_sirius_mini)
 # get_example_sirius()
 
 ### LOTUS
@@ -62,7 +64,6 @@ log_debug("Preparing LOTUS")
 prepare_lotus()
 
 ### HMDB
-# TODO
 # log_debug("Preparing HMDB")
 # prepare_hmdb()
 
@@ -101,10 +102,10 @@ params <- get_params(step = step)
 prepare_gnps()
 
 ### SIRIUS results
-# log_debug("Preparing SIRIUS")
-# step <- "prepare_sirius"
-# params <- get_params(step = step)
-# prepare_sirius()
+log_debug("Preparing SIRIUS")
+step <- "prepare_sirius"
+params <- get_params(step = step)
+prepare_sirius()
 
 ### Edges
 log_debug("Preparing edges")

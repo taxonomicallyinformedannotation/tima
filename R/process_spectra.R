@@ -152,7 +152,7 @@ process_spectra <- function(input = params$input,
 
   if (condition == "AND") {
     df_similarity <- df_similarity |>
-      dplyr::filter(score_input >= threshold &
+      dplyr::filter(msms_score >= threshold &
         peaks_abs >= npeaks &
         peaks_rel >= rpeaks)
   }
