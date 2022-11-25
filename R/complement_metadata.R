@@ -17,7 +17,7 @@ complement_metadata <- function(df) {
     pattern = paths$urls$lotus$metadata_pattern$structures,
     path = paths$data$source$libraries$structure_metadata
   )
-  
+
   metadata <-
     readr::read_delim(
       file = paths$data$source$libraries$structure_metadata,
