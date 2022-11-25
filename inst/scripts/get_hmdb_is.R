@@ -12,7 +12,7 @@ cat(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-#' @title Get HMDB
+#' @title Get HMDB In Silico
 #'
 #' @param url TODO
 #' @param export TODO
@@ -24,9 +24,9 @@ log_debug("Contributors: ...")
 #' @importFrom curl curl_download write_csv
 #'
 #' @examples TODO
-get_hmdb <-
-  function(url = paths$urls$hmdb$metabolites,
-           export = paths$data$source$libraries$hmdb) {
+get_hmdb_is <-
+  function(url = paths$urls$hmdb$spectra$predicted,
+           export = paths$data$source$libraries$hmdb_isdb) {
     paths <- parse_yaml_paths()
 
     ## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)
@@ -36,6 +36,6 @@ get_hmdb <-
     curl::curl_download(url = url, destfile = export)
   }
 
-get_hmdb()
+get_hmdb_is()
 
 log_debug("Script finished in", crayon::green(format(end - start)))

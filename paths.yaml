@@ -29,6 +29,8 @@ data:
     libraries:
       path: data/interim/libraries
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
+      hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
+      hmdb_isdb: data/interim/libraries/hmdb_isdb.mgf
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
@@ -50,6 +52,7 @@ data:
     libraries:
       path: data/source/libraries
       hmdb: data/source/libraries/hmdb_metabolites.zip
+      hmdb_isdb: data/source/libraries/hmdb_predicted_msms_peak_lists.zip
       isdb:
         pos: data/source/libraries/isdb_pos.mgf
         neg: data/source/libraries/isdb_neg.mgf
@@ -78,7 +81,10 @@ urls:
   example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
   example_sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
   example_spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
-  hmdb: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+  hmdb: 
+    metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+    spectra:
+      predicted: https://hmdb.ca/system/downloads/current/spectral_data/peak_lists_txt/hmdb_predicted_msms_peak_lists.zip
   isdb: 
     doi: 10.5281/zenodo.5607185
     pattern:
