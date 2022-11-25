@@ -20,10 +20,6 @@ testthat::test_that("Whole process", {
   #### Feature table
   get_example_feature_table()
 
-  #### ISDB
-  ## TODO remove when working
-  # get_example_isdb()
-
   #### MGF
   ## mini version for tests
   get_example_mgf(url = paths$url$example_mgf_mini)
@@ -51,7 +47,6 @@ testthat::test_that("Whole process", {
     url = paths$url$example_spectral_lib,
     destfile = paths$data$source$libraries$isdb$pos
   )
-  
 
   ## Prepare all files
   ### LOTUS

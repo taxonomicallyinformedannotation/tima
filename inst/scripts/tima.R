@@ -21,9 +21,6 @@ paths <- parse_yaml_paths()
 
 ### Examples
 
-#### ISDB
-# get_example_isdb()
-
 #### MGF
 get_example_mgf(url = paths$url$example_mgf_mini)
 # get_example_mgf()

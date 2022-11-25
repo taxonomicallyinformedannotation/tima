@@ -59,7 +59,6 @@ Collate:
     'form_adducts_pos.R'
     'get_benchmark.R'
     'get_example_feature_table.R'
-    'get_example_isdb.R'
     'get_example_mgf.R'
     'get_example_sirius.R'
     'get_last_version_from_zenodo.R'
