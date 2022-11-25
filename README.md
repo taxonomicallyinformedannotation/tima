@@ -1,4 +1,4 @@
-# Taxonomically Informed Metabolite Annotation <img src='man/figures/logo.svg' align="right" height="108" />
+# Taxonomically Informed Metabolite Annotation <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/logo.svg' align="right" height="108" />
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
@@ -10,7 +10,7 @@
 The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, and many improvements have been made since then.
 The workflow is illustrated below.
 
-![Workflow](man/figures/tima.svg)
+![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/tima.svg)
 
 This repository contains everything needed to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
 
