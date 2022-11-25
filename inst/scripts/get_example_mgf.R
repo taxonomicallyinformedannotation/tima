@@ -12,8 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-#' TODO CLI DOCOPT
-
 get_example_mgf()
 
 end <- Sys.time()

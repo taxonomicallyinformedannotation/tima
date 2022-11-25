@@ -5,6 +5,17 @@ require(
   quietly = TRUE
 )
 
+log_debug(
+  "This script",
+  crayon::green("prepares closed referenced structure-organism pairs \n")
+)
+log_debug("Authors: ", crayon::green("AR"), "\n")
+log_debug("Contributors: ...")
+
+step <- "prepare_closed"
+paths <- parse_yaml_paths()
+params <- get_params(step = step)
+
 #' @title Prepare closed
 #'
 #' @param input TODO
@@ -24,7 +35,7 @@ prepare_closed <- function(input = params$input,
     log_debug(x = "Loading closed resources")
     closed <-
       readr::read_delim(file = input)
-
+    
     log_debug(x = "Formatting closed resource")
     closed_prepared <- closed |>
       dplyr::mutate(structure_inchikey_2D = substring(
@@ -56,7 +67,7 @@ prepare_closed <- function(input = params$input,
       ) |>
       dplyr::distinct() |>
       dplyr::mutate(reference_doi = NA)
-
+    
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_closed")
     export_output(x = closed_prepared, file = output)
@@ -64,18 +75,6 @@ prepare_closed <- function(input = params$input,
     log_debug("Sorry, you do not have access to the closed resource")
   }
 }
-
-
-log_debug(
-  "This script",
-  crayon::green("prepares closed referenced structure-organism pairs \n")
-)
-log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ...")
-
-step <- "prepare_closed"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
 
 prepare_closed()
 
