@@ -7,7 +7,7 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-The initial work is available at https://doi.org/10.3389/fpls.2019.01329, and many improvements have been made since then.
+The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, and many improvements have been made since then.
 The workflow is illustrated below.
 
 ![Workflow](man/figures/tima.svg)
@@ -122,7 +122,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   - *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
-- The *RforMassSpectrometry* packages suite for MS2 matching: [https://doi.org/10.3390/metabo12020173>
+- The *RforMassSpectrometry* packages suite for MS2 matching: <https://doi.org/10.3390/metabo12020173>
 - HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
 - ROTL: <https://doi.org/10.1111/2041-210X.12593>
