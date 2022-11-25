@@ -47,7 +47,7 @@ Each step is detailed in the related [vignettes](https://taxonomicallyinformedan
 
 All coming steps admit you already cloned the repository and went to its root:
 
-```{r eval=FALSE, include=TRUE}
+```{bash eval=FALSE, include=TRUE}
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
@@ -60,7 +60,7 @@ Those will help you understanding how the workflow works so you can adapt them l
 So first, start by copying them into `config/params` directory.
 To do so:
 
-```{r eval=FALSE, include=TRUE}
+```{bash eval=FALSE, include=TRUE}
 Rscript inst/scripts/prepare_params.R
 ```
 
