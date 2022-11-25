@@ -185,8 +185,6 @@ source(file = "inst/scripts/get_isdb.R")
 
 #### HMDB
 
-TODO
-
 We are working on it...
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).

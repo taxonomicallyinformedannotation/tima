@@ -33,20 +33,20 @@ Optionally, you may want to add:
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 On *nix systems:
-```shell
+```{bash eval=FALSE, include=TRUE}
 Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
 remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 ```
 
 On Windows:
-```shell
+```{bash eval=FALSE, include=TRUE}
 Rscript -e "if(!requireNamespace('remotes')){install.packages('remotes')}
 remotes::install_github('taxonomicallyinformedannotation/tima-r')"
 ```
 
 or in R directly:
 
-```shell
+```{r eval=FALSE, include=TRUE}
 if(!requireNamespace("remotes", quietly = TRUE))
     install.packages("remotes")
 remotes::install_github("taxonomicallyinformedannotation/tima-r")
@@ -56,14 +56,14 @@ Once installed, you are ready to go through our [documentation](https://taxonomi
 
 Do not forget to clone the repository (it will allow you to access default architecture, files, and parameters):
 
-```shell
+```{bash eval=FALSE, include=TRUE}
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
 Then, to copy the defaut parameters:
 
-```shell
+```{bash eval=FALSE, include=TRUE}
 Rscript inst/scripts/prepare_params.R
 ```
 
@@ -72,7 +72,7 @@ More details are given in the [General comments about the infrastructure](https:
 
 Once done, you can start with an example using:
 
-```shell
+```{bash eval=FALSE, include=TRUE}
 Rscript inst/scripts/tima.R
 ```
 
@@ -81,11 +81,11 @@ Rscript inst/scripts/tima.R
 A container is also available, together with a small compose.
 Main commands are below:
 
-```shell
+```{bash eval=FALSE, include=TRUE}
 docker build . -t tima-r 
 ```
 
-```shell
+```{bash eval=FALSE, include=TRUE}
 docker compose up prepare_params
 docker compose up tima
 ```
@@ -96,31 +96,33 @@ docker compose up tima
 According to which steps you used, please give credit to the authors of the tools/resources used.
 
 ### TIMA 
-General: [https://doi.org/10.3389/fpls.2019.01329](https://doi.org/10.3389/fpls.2019.01329)
+General: <https://doi.org/10.3389/fpls.2019.01329>
 
-⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5797920](https://doi.org/10.5281/zenodo.5797920) 
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5797920>
 
 ### LOTUS
-General: [https://doi.org/10.7554/eLife.70780](https://doi.org/10.7554/eLife.70780)
+General: <https://doi.org/10.7554/eLife.70780>
 
-⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5794106](https://doi.org/10.5281/zenodo.5794106) 
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5794106>
 
 ### ISDB
-General: [https://doi.org/10.1021/acs.analchem.5b04804](https://doi.org/10.1021/acs.analchem.5b04804)
+General: <https://doi.org/10.1021/acs.analchem.5b04804>
 
-⚠️ Do not forget to cite which version you used: [https://doi.org/10.5281/zenodo.5607185](https://doi.org/10.5281/zenodo.5607185) 
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5607185>
 
 ### GNPS
-General: [https://doi.org/10.1038/nbt.3597](https://doi.org/10.1038/nbt.3597)
+General: <https://doi.org/10.1038/nbt.3597>
 
 ### SIRIUS
-General: [https://doi.org/10.1038/s41592-019-0344-8](https://doi.org/10.1038/s41592-019-0344-8)
+General: <https://doi.org/10.1038/s41592-019-0344-8>
 
-  - *CSI:FingerId*: [https://doi.org/10.1073/pnas.1509788112](https://www.pnas.org/doi/full/10.1073/pnas.1509788112)
-  - *ZODIAC*: [https://doi.org/10.1038/s42256-020-00234-6](https://doi.org/10.1038/s42256-020-00234-6)
-  - *CANOPUS*: [https://doi.org/10.1038/s41587-020-0740-8](https://doi.org/10.1038/s41587-020-0740-8)
-  - *COSMIC*: [https://doi.org/10.1038/s41587-021-01045-9](https://doi.org/10.1038/s41587-021-01045-9)
+  - *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
+  - *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
+  - *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
+  - *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
-- NPClassifier: [https://doi.org/10.1021/acs.jnatprod.1c00399](https://pubs.acs.org/doi/10.1021/acs.jnatprod.1c00399)
-- ROTL: [https://doi.org/10.1111/2041-210X.12593](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12593) 
+- The *RforMassSpectrometry* packages suite for MS2 matching: [https://doi.org/10.3390/metabo12020173>
+- HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
+- NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+- ROTL: <https://doi.org/10.1111/2041-210X.12593>
