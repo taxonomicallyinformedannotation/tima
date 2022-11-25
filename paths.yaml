@@ -30,7 +30,9 @@ data:
       path: data/interim/libraries
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
       hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
-      hmdb_isdb: data/interim/libraries/hmdb_isdb.mgf
+      hmdb_isdb:
+        pos: data/interim/libraries/hmdb_isdb_pos.mgf
+        neg: data/interim/libraries/hmdb_isdb_neg.mgf
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
     taxa:
       path: data/interim/taxa
@@ -52,7 +54,7 @@ data:
     libraries:
       path: data/source/libraries
       hmdb: data/source/libraries/hmdb_metabolites.zip
-      hmdb_isdb: data/source/libraries/hmdb_predicted_msms_peak_lists.zip
+      hmdb_isdb: data/source/libraries/hmdb_predicted_msms_spectra.zip
       isdb:
         pos: data/source/libraries/isdb_pos.mgf
         neg: data/source/libraries/isdb_neg.mgf
@@ -65,7 +67,11 @@ img:
   path: img
 inst:
   path: inst
-  extdata: inst/extdata
+  extdata: 
+    path: inst/extdata
+    adducts: inst/extdata/adducts.tsv
+    neutral_losses: inst/extdata/neutral_losses.tsv
+    ranks: inst/extdata/ranks.tsv
   scripts:
     path: inst/scripts
     docopt:
@@ -84,7 +90,7 @@ urls:
   hmdb: 
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
-      predicted: https://hmdb.ca/system/downloads/current/spectral_data/peak_lists_txt/hmdb_predicted_msms_peak_lists.zip
+      predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
   isdb: 
     doi: 10.5281/zenodo.5607185
     pattern:
@@ -98,4 +104,4 @@ urls:
       organisms: organism_metadata.tsv.gz
       references: reference:metadata.tsv.gz
       structures: structure_metadata.tsv.gz
-version: 2.6.1
+version: 2.7.0

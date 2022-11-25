@@ -1,5 +1,11 @@
 # timaR
 
+# timaR 2.7.0
+
+* Added MS2 annotation capability (kudos @jorainer for the awesome *Spectra* suite)
+* Added HMDB helpers for both taxo and ISDB
+* Minor fixes
+
 # timaR 2.6.0
 
 * Added Docker container
