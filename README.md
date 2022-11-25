@@ -33,20 +33,20 @@ Optionally, you may want to add:
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 On *nix systems:
-```{bash eval=FALSE, include=TRUE}
+```
 Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
 remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 ```
 
 On Windows:
-```{bash eval=FALSE, include=TRUE}
+```
 Rscript -e "if(!requireNamespace('remotes')){install.packages('remotes')}
 remotes::install_github('taxonomicallyinformedannotation/tima-r')"
 ```
 
 or in R directly:
 
-```{r eval=FALSE, include=TRUE}
+```
 if(!requireNamespace("remotes", quietly = TRUE))
     install.packages("remotes")
 remotes::install_github("taxonomicallyinformedannotation/tima-r")
@@ -56,14 +56,14 @@ Once installed, you are ready to go through our [documentation](https://taxonomi
 
 Do not forget to clone the repository (it will allow you to access default architecture, files, and parameters):
 
-```{bash eval=FALSE, include=TRUE}
+```
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
 Then, to copy the defaut parameters:
 
-```{bash eval=FALSE, include=TRUE}
+```
 Rscript inst/scripts/prepare_params.R
 ```
 
@@ -72,7 +72,7 @@ More details are given in the [General comments about the infrastructure](https:
 
 Once done, you can start with an example using:
 
-```{bash eval=FALSE, include=TRUE}
+```
 Rscript inst/scripts/tima.R
 ```
 
@@ -81,11 +81,11 @@ Rscript inst/scripts/tima.R
 A container is also available, together with a small compose.
 Main commands are below:
 
-```{bash eval=FALSE, include=TRUE}
+```
 docker build . -t tima-r 
 ```
 
-```{bash eval=FALSE, include=TRUE}
+```
 docker compose up prepare_params
 docker compose up tima
 ```
