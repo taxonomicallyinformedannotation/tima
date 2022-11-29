@@ -14,7 +14,7 @@ log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
-#' @title Convert HMDB In Silico DataBase
+#' @title Prepare HMDB In Silico DataBase
 #'
 #' @param input TODO
 #' @param metadata TODO
@@ -26,17 +26,20 @@ paths <- parse_yaml_paths()
 #' @export
 #'
 #' @importFrom CompoundDb msms_spectra_hmdb
-#' @importFrom dplyr left_join mutate
+#' @importFrom dplyr distinct filter left_join mutate pull select
 #' @importFrom MsBackendMgf MsBackendMgf
-#' @importFrom readr read_lines read_tsv write_tsv
+#' @importFrom readr read_tsv
 #' @importFrom Spectra export Spectra
 #'
 #' @examples TODO
-convert_hmdb_isdb <-
+prepare_hmdb_isdb <-
   function(input = paths$data$source$libraries$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
            output_pos = paths$data$interim$libraries$hmdb_isdb$pos,
            output_neg = paths$data$interim$libraries$hmdb_isdb$neg) {
+    log_debug("Loading standardization function (temp)")
+    source(file = "inst/scripts/standardize.R")
+
     log_debug("Loading proton mass")
     proton <- readr::read_tsv(file = paths$inst$extdata$adducts) |>
       dplyr::filter(adduct == "proton") |>
@@ -61,14 +64,12 @@ convert_hmdb_isdb <-
     log_debug("Adding metadata")
     spctra_enhanced <- spctra |>
       dplyr::left_join(
-        y = df_meta |>
-          dplyr::mutate(inchikey_2D = gsub(
-            pattern = "-.*",
-            replacement = "",
-            x = inchikey
-          )),
+        y = df_meta,
         by = c("compound_id" = "accession")
       ) |>
+      dplyr::filter(!is.na(smiles)) |>
+      dplyr::select(-original_spectrum_id, -spectrum_id) |>
+      dplyr::distinct() |>
       dplyr::mutate(
         precursor_mz = ifelse(
           test = polarity == 1,
@@ -79,22 +80,33 @@ convert_hmdb_isdb <-
           test = polarity == 1,
           yes = "POSITIVE",
           no = "NEGATIVE"
+        ),
+        precursor_charge = ifelse(
+          test = polarity == 1,
+          yes = 1L,
+          no = -1L
         )
-      ) |> 
-      dplyr::filter(!is.na(inchikey_2D))
+      )
+
+    log_debug("Standardizing 2D chemical structures")
+    smiles <- unique(spctra_enhanced$smiles)
+    df_clean <- lapply(X = smiles, FUN = standardize_smiles) |>
+      dplyr::bind_rows()
+    spctra_enhanced <- spctra_enhanced |>
+      dplyr::left_join(df_clean)
 
     log_debug("Formatting")
     spd <- data.frame(
       precursorMz = spctra_enhanced$precursor_mz,
-      precursorCharge = 1L,
+      precursorCharge = spctra_enhanced$precursor_charge,
       FILENAME = spctra_enhanced$inchikey_2D,
       MOLECULAR_FORMULA = spctra_enhanced$chemical_formula,
       SEQ = "*..*",
       IONMODE = spctra_enhanced$ionmode,
       EXACTMASS = spctra_enhanced$monisotopic_molecular_weight,
       NAME = spctra_enhanced$inchikey_2D,
-      SMILES = spctra_enhanced$smiles,
-      INCHI = spctra_enhanced$inchi,
+      SMILES = spctra_enhanced$smiles_2D,
+      INCHI = spctra_enhanced$inchi_2D,
       LIBRARYQUALITY = "PREDICTED",
       SPLASH = spctra_enhanced$splash,
       COLLISION_ENERGY = spctra_enhanced$collision_energy
@@ -112,6 +124,7 @@ convert_hmdb_isdb <-
     spd_neg <- spd |>
       dplyr::filter(IONMODE == "NEGATIVE")
 
+    log_debug("Exporting")
     sps_pos <- Spectra::Spectra(object = spd_pos) |>
       Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_pos)
 
@@ -122,7 +135,7 @@ convert_hmdb_isdb <-
     unlink(newdir, recursive = TRUE)
   }
 
-convert_hmdb_isdb()
+prepare_hmdb_isdb()
 
 end <- Sys.time()
 
