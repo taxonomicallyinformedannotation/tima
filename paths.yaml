@@ -34,6 +34,9 @@ data:
         pos: data/interim/libraries/hmdb_isdb_pos.mgf
         neg: data/interim/libraries/hmdb_isdb_neg.mgf
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
+      mona_isdb:
+        pos: data/interim/libraries/mona_isdb_pos.mgf
+        neg: data/interim/libraries/mona_isdb_neg.mgf
     taxa:
       path: data/interim/taxa
   processed:
@@ -59,6 +62,7 @@ data:
         pos: data/source/libraries/isdb_pos.mgf
         neg: data/source/libraries/isdb_neg.mgf
       lotus: data/source/libraries/lotus.csv.gz
+      mona_lcmsms: data/source/libraries/MoNA-export-LC-MS-MS_Spectra.sdf
       structure_metadata: data/source/libraries/structure_metadata.tsv.gz
     neutral_losses: inst/extdata/neutral_losses.tsv
 doc:
