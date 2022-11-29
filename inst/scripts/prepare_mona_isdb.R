@@ -35,6 +35,10 @@ prepare_mona_isdb <-
   function(input = paths$data$source$libraries$mona_lcmsms,
            output_pos = paths$data$interim$libraries$mona_isdb$pos,
            output_neg = paths$data$interim$libraries$mona_isdb$neg) {
+    
+    log_debug("Loading standardization function (temp)")
+    source(file = "inst/scripts/standardize.R")
+    
     ## SDF import from zip not working
     log_debug("Loading spectra (might take long)")
     mona_data <- CompoundDb::import_mona_sdf(x = input, nonStop = TRUE)
