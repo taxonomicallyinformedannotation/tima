@@ -41,7 +41,26 @@ prepare_adducts <-
 
     log_debug("Treating adducts table")
     adducts_t <- t(adducts_table) |>
-      data.frame()
+      data.frame() |>
+      dplyr::mutate_all(.funs = trimws) |>
+      dplyr::mutate_all(
+        .funs = function(x) {
+          gsub(
+            pattern = ".*\\(",
+            replacement = "",
+            x = x
+          )
+        }
+      ) |>
+      dplyr::mutate_all(
+        .funs = function(x) {
+          gsub(
+            pattern = "\\)",
+            replacement = "",
+            x = x
+          )
+        }
+      )
 
     colnames(adducts_t) <- adducts_t[1, ]
 
@@ -85,14 +104,20 @@ prepare_adducts <-
 
     log_debug("Exporting ...")
     export_params(step = "prepare_adducts")
-    export_output(x = adducts_pos, file = file.path(
-      adducts_output_path,
-      paste0(output_name, "_pos.tsv.gz")
-    ))
-    export_output(x = adducts_neg, file = file.path(
-      adducts_output_path,
-      paste0(output_name, "_neg.tsv.gz")
-    ))
+    export_output(
+      x = adducts_pos,
+      file = file.path(
+        adducts_output_path,
+        paste0(output_name, "_pos.tsv.gz")
+      )
+    )
+    export_output(
+      x = adducts_neg,
+      file = file.path(
+        adducts_output_path,
+        paste0(output_name, "_neg.tsv.gz")
+      )
+    )
     export_output(x = pure_pos, file = masses_pos_output_path)
     export_output(x = pure_neg, file = masses_neg_output_path)
   }

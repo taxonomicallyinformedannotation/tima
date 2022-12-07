@@ -42,7 +42,7 @@ prepare_hmdb_isdb <-
 
     log_debug("Loading proton mass")
     proton <- readr::read_tsv(file = paths$inst$extdata$adducts) |>
-      dplyr::filter(adduct == "proton") |>
+      dplyr::filter(adduct == "H (proton)") |>
       dplyr::pull("mass")
 
     log_debug("Loading metadata")

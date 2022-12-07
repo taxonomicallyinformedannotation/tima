@@ -1,19 +1,19 @@
 adduct	mass
-proton	1.00728
-ammonium	17.02655
-water	18.01056
-sodium	22.98977
-magnesium	23.98504
-methanol	32.02621
-chlorine	34.96885
-potassium	38.96371
-calcium	39.96259
-acetonitrile	41.02655
-ethylamine	45.05785
-formic	46.00548
-iron	55.93494
-acetic	60.02113
-isopropanol	60.05751
-dmso	78.01394
-bromine	78.91834
-tfa	113.99286
+H (proton)	1.00728
+NH4 (ammonium)	17.02655
+H2O (water)	18.01056
+Na (sodium)	22.98977
+Mg (magnesium)	23.98504
+CH4O (methanol)	32.02621
+Cl (chlorine)	34.96885
+K (potassium)	38.96371
+Ca (calcium)	39.96259
+C2H3N (acetonitrile)	41.02655
+C2H7N (ethylamine)	45.05785
+CH2O2 (formic)	46.00548
+Fe (iron)	55.93494
+C2H4O2 (acetic)	60.02113
+C3H8O (isopropanol)	60.05751
+C2H6OS (dmso)	78.01394
+Br (bromine)	78.91834
+C2HF3O2 (tfa)	113.99286
