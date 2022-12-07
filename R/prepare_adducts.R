@@ -46,16 +46,7 @@ prepare_adducts <-
       dplyr::mutate_all(
         .funs = function(x) {
           gsub(
-            pattern = ".*\\(",
-            replacement = "",
-            x = x
-          )
-        }
-      ) |>
-      dplyr::mutate_all(
-        .funs = function(x) {
-          gsub(
-            pattern = "\\)",
+            pattern = " \\(.*",
             replacement = "",
             x = x
           )
