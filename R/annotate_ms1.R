@@ -352,63 +352,63 @@ annotate_ms1 <-
         ) |>
         dplyr::rowwise() |>
         dplyr::mutate(
-          pos_3_3proton = (mz - adduct_mass + 3 * adductsM["proton"]) / 3,
+          pos_3_3proton = (mz - adduct_mass + 3 * adductsM["H (proton)"]) / 3,
           pos_3_2proton1sodium = (mz - adduct_mass +
-            2 * adductsM["proton"] +
-            adductsM["sodium"]) / 3,
+            2 * adductsM["H (proton)"] +
+            adductsM["Na (sodium)"]) / 3,
           pos_3_1proton2sodium = (mz - adduct_mass +
-            adductsM["proton"] +
-            2 * adductsM["sodium"]) / 3,
-          pos_3_3sodium = (mz - adduct_mass + 3 * adductsM["sodium"]) / 3,
-          pos_2_2proton = (mz - adduct_mass + 2 * adductsM["proton"]) / 2,
+            adductsM["H (proton)"] +
+            2 * adductsM["Na (sodium)"]) / 3,
+          pos_3_3sodium = (mz - adduct_mass + 3 * adductsM["Na (sodium)"]) / 3,
+          pos_2_2proton = (mz - adduct_mass + 2 * adductsM["H (proton)"]) / 2,
           pos_2_2proton1ammonium = (
             mz - adduct_mass +
-              2 * adductsM["proton"] +
-              adductsM["ammonium"]
+              2 * adductsM["H (proton)"] +
+              adductsM["NH4 (ammonium)"]
           ) / 2,
           pos_2_1proton1sodium = (mz - adduct_mass +
-            adductsM["proton"] +
-            adductsM["sodium"]) / 2,
+            adductsM["H (proton)"] +
+            adductsM["Na (sodium)"]) / 2,
           pos_2_1magnesium = (mz - adduct_mass +
-            adductsM["magnesium"]) / 2,
+            adductsM["Mg (magnesium)"]) / 2,
           pos_2_1proton1potassium = (mz - adduct_mass +
-            adductsM["proton"] +
-            adductsM["potassium"]) / 2,
+            adductsM["H (proton)"] +
+            adductsM["K (potassium)"]) / 2,
           pos_2_1calcium = (mz - adduct_mass +
-            adductsM["calcium"]) / 2,
+            adductsM["Ca (calcium)"]) / 2,
           pos_2_2proton1acetonitrile = (
             mz - adduct_mass +
-              2 * adductsM["proton"] +
-              adductsM["acetonitrile"]
+              2 * adductsM["H (proton)"] +
+              adductsM["C2H3N (acetonitrile)"]
           ) / 2,
-          pos_2_2sodium = (mz - adduct_mass + 2 * adductsM["sodium"]) / 2,
+          pos_2_2sodium = (mz - adduct_mass + 2 * adductsM["Na (sodium)"]) / 2,
           pos_2_1iron = (mz - adduct_mass +
-            adductsM["iron"]) / 2,
+            adductsM["Fe (iron)"]) / 2,
           pos_2_2proton2acetonitrile = (
             mz - adduct_mass +
-              2 * adductsM["proton"] +
-              2 * adductsM["acetonitrile"]
+              2 * adductsM["H (proton)"] +
+              2 * adductsM["C2H3N (acetonitrile)"]
           ) / 2,
           pos_2_2proton3acetonitrile = (
             mz - adduct_mass +
-              2 * adductsM["proton"] +
-              3 * adductsM["acetonitrile"]
+              2 * adductsM["H (proton)"] +
+              3 * adductsM["C2H3N (acetonitrile)"]
           ) / 2,
-          pos_2MMg = (2 * (mz - adduct_mass) + adductsM["magnesium"]) / 2,
-          pos_2MCa = (2 * (mz - adduct_mass) + adductsM["calcium"]) / 2,
-          pos_2MFe = (2 * (mz - adduct_mass) + adductsM["iron"]) / 2,
-          pos_2MH = 2 * (mz - adduct_mass) + adductsM["proton"],
+          pos_2MMg = (2 * (mz - adduct_mass) + adductsM["Mg (magnesium)"]) / 2,
+          pos_2MCa = (2 * (mz - adduct_mass) + adductsM["Ca (calcium)"]) / 2,
+          pos_2MFe = (2 * (mz - adduct_mass) + adductsM["Fe (iron)"]) / 2,
+          pos_2MH = 2 * (mz - adduct_mass) + adductsM["H (proton)"],
           pos_2MHNH3 = 2 * (mz - adduct_mass) +
-            adductsM["proton"] +
-            adductsM["ammonium"],
-          pos_2MNa = 2 * (mz - adduct_mass) + adductsM["sodium"],
-          pos_2MK = 2 * (mz - -adductsM["proton"]) + adductsM["potassium"],
+            adductsM["H (proton)"] +
+            adductsM["NH4 (ammonium)"],
+          pos_2MNa = 2 * (mz - adduct_mass) + adductsM["Na (sodium)"],
+          pos_2MK = 2 * (mz - -adductsM["H (proton)"]) + adductsM["K (potassium)"],
           pos_2MHCH3CN = 2 * (mz - adduct_mass) +
-            adductsM["proton"] +
-            adductsM["acetonitrile"],
+            adductsM["H (proton)"] +
+            adductsM["C2H3N (acetonitrile)"],
           pos_2MCH3CNNa = 2 * (mz - adduct_mass) +
-            adductsM["acetonitrile"] +
-            adductsM["sodium"]
+            adductsM["C2H3N (acetonitrile)"] +
+            adductsM["Na (sodium)"]
         ) |>
         dplyr::select(-adduct_mass) |>
         dplyr::ungroup()
@@ -430,12 +430,12 @@ annotate_ms1 <-
         ) |>
         dplyr::rowwise() |>
         dplyr::mutate(
-          neg_3_3proton = (mz + adduct_mass - 3 * adductsM["proton"]) / 3,
-          neg_2_2proton = (mz + adduct_mass - 2 * adductsM["proton"]) / 2,
-          neg_2MH = 2 * (mz + adduct_mass) - adductsM["proton"],
-          neg_2MFAH = 2 * (mz + adduct_mass) + adductsM["formic"] - adductsM["proton"],
-          neg_2MACH = 2 * (mz + adduct_mass) + adductsM["acetic"] - adductsM["proton"],
-          neg_3MH = 3 * (mz + adduct_mass) - adductsM["proton"]
+          neg_3_3proton = (mz + adduct_mass - 3 * adductsM["H (proton)"]) / 3,
+          neg_2_2proton = (mz + adduct_mass - 2 * adductsM["H (proton)"]) / 2,
+          neg_2MH = 2 * (mz + adduct_mass) - adductsM["H (proton)"],
+          neg_2MFAH = 2 * (mz + adduct_mass) + adductsM["CH2O2 (formic)"] - adductsM["H (proton)"],
+          neg_2MACH = 2 * (mz + adduct_mass) + adductsM["C2H4O2 (acetic)"] - adductsM["H (proton)"],
+          neg_3MH = 3 * (mz + adduct_mass) - adductsM["H (proton)"]
         ) |>
         dplyr::select(-adduct_mass) |>
         dplyr::ungroup()
