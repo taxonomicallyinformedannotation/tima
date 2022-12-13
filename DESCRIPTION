@@ -10,10 +10,8 @@ Authors@R: c(
 Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
 Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
-URL: https://github.com/taxonomicallyinformedannotation/tima-r,
-    https://taxonomicallyinformedannotation.github.io/tima-r/
-BugReports: 
-    https://github.com/taxonomicallyinformedannotation/tima-r/issues
+URL: https://github.com/taxonomicallyinformedannotation/tima-r, https://taxonomicallyinformedannotation.github.io/tima-r/
+BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.1.0)
 Imports:
@@ -95,3 +93,4 @@ Collate:
     'weight_chemo.R'
 VignetteBuilder: 
     knitr
+X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
