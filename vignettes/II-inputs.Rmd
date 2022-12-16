@@ -176,11 +176,11 @@ paths <- yaml::read_yaml(
 )
 utils::download.file(
   url = paths$urls$example_spectral_lib,
-  destfile = paths$data$source$libraries$isdb$pos
+  destfile = paths$data$source$spectra$lotus_isdb$pos
 )
 utils::download.file(
   url = paths$urls$example_spectral_lib,
-  destfile = paths$data$source$libraries$isdb$neg
+  destfile = paths$data$source$spectra$lotus_isdb$neg
 )
 ```
 

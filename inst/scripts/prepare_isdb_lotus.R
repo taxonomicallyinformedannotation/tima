@@ -31,7 +31,7 @@ prepare_isdb_lotus <-
            input_neg = paths$data$source$spectra$lotus_isdb$neg,
            output_pos = paths$data$interim$spectra$lotus_isdb$pos,
            output_neg = paths$data$interim$spectra$lotus_isdb$neg) {
-    cat("TODO")
+    cat("TODO mgf sql conversion")
   }
 
 prepare_isdb_lotus()

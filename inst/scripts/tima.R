@@ -38,22 +38,32 @@ get_last_version_from_zenodo(
 )
 
 ### HMDB
+# log_debug("Getting HMDB")
 # get_hmdb()
 
-### ISDB
-log_debug("Getting ISDB...")
+### LOTUS ISDB
+log_debug("Getting LOTUS ISDB...")
 log_debug("... positive")
 get_last_version_from_zenodo(
-  doi = paths$url$isdb$doi,
-  pattern = paths$urls$isdb$pattern$pos,
-  path = paths$data$source$libraries$isdb$pos
+  doi = paths$url$lotus_isdb$doi,
+  pattern = paths$urls$lotus_isdb$pattern$pos,
+  path = paths$data$source$spectra$lotus_isdb$pos
 )
 log_debug("... negative")
 get_last_version_from_zenodo(
-  doi = paths$url$isdb$doi,
-  pattern = paths$urls$isdb$pattern$neg,
-  path = paths$data$source$libraries$isdb$neg
+  doi = paths$url$lotus_isdb$doi,
+  pattern = paths$urls$lotus_isdb$pattern$neg,
+  path = paths$data$source$spectra$lotus_isdb$neg
 )
+
+### HMDB ISDB
+# log_debug("Getting HMDB ISDB...")
+# get_isdb_hmdb()
+
+### MONA
+# log_debug("Getting MONA spectra ..")
+# get_mona() ## not available actually
+
 
 ## Prepare all files
 ### LOTUS
@@ -73,6 +83,18 @@ log_debug("Preparing structural library")
 step <- "prepare_library"
 params <- get_params(step = step)
 prepare_library()
+
+### ISDB LOTUS
+# log_debug("Preparing ISDB LOTUS")
+# prepare_isdb_lotus()
+
+### ISDB HMDB
+# log_debug("Preparing ISDB HMDB")
+# prepare_isdb_hmdb()
+
+### MONA
+# log_debug("Preparing MONA")
+# prepare_mona()
 
 ### Adducts
 log_debug("Preparing adducts")

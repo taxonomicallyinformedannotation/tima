@@ -124,11 +124,13 @@ prepare_isdb_hmdb <-
     spd_neg <- spd |>
       dplyr::filter(IONMODE == "NEGATIVE")
 
+    cat("TODO mgf sql conversion")
+
     log_debug("Exporting")
-    sps_pos <- Spectra::Spectra(object = spd_pos) |>
+    Spectra::Spectra(object = spd_pos) |>
       Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_pos)
 
-    sps_neg <- Spectra::Spectra(object = spd_neg) |>
+    Spectra::Spectra(object = spd_neg) |>
       Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_neg)
 
     log_debug("Deleting unzipped directory")
