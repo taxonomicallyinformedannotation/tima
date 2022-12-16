@@ -20,6 +20,7 @@ knitr::opts_knit$set(root.dir = "..")
 This vignette describes how to get and/or prepare:
 
 * A structure-organism pairs library
+* *Experimental* spectral library(ies) *(optional)*
 * *In silico* generated spectral library(ies) *(optional)*
 
 in order to:
@@ -184,11 +185,20 @@ utils::download.file(
 ```
 
 ```{r eval=FALSE, include=TRUE}
-source(file = "inst/scripts/get_isdb.R")
+source(file = "inst/scripts/get_isdb_lotus.R")
 ```
 
 #### HMDB
 
-We are working on it...
+```{r eval=FALSE, include=TRUE}
+source(file = "inst/scripts/get_isdb_hmdb.R")
+```
+
+#### MONA (MassBank Of North America)
+
+Some helpers are available.
+However, programmatic download of MONA is currently not supported.
+MONA developers are refactoring the backend so we'll wait until then.
+Please download it manually, helpers to format it later on are available.
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).
