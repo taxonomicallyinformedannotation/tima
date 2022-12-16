@@ -70,7 +70,7 @@ testthat::test_that("Whole process", {
 
   ## Prepare spectra
   ### LOTUS
-  prepare_isdb_lotus()
+  # prepare_isdb_lotus()
 
   ### HMDB
   # prepare_isdb_hmdb()
