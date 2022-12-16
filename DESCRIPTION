@@ -39,7 +39,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Collate:
     'annotate_ms1.R'
     'annotate_non_ms1.R'
@@ -51,6 +51,8 @@ Collate:
     'dist_groups.R'
     'export_output.R'
     'export_params.R'
+    'export_spectra.R'
+    'extract_spectra.R'
     'fake_edges.R'
     'fake_features_components.R'
     'fake_no_rt.R'
@@ -62,6 +64,7 @@ Collate:
     'get_example_sirius.R'
     'get_last_version_from_zenodo.R'
     'get_params.R'
+    'import_spectra.R'
     'log_debug.R'
     'ms2_matching_peaks.R'
     'parse_cli_params.R'
