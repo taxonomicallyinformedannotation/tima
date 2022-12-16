@@ -1,8 +1,8 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_isdb.R --input 'data/interim/annotations/example_isdb_result.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz'
+Rscript inst/scripts/prepare_spectral_matches.R --input 'data/interim/annotations/example_isdb_result.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz'
 
 Usage: 
-  prepare_isdb.R [--input=<input>] [--output=<output>]
+  prepare_spectral_matches.R [--input=<input>] [--output=<output>]
 
 Arguments:
   -i --input=<input>    Your isdb result file. Supports compressed files.

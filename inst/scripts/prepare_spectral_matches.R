@@ -12,11 +12,11 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-step <- "prepare_isdb"
+step <- "prepare_spectral_matches"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
-prepare_isdb()
+prepare_spectral_matches()
 
 end <- Sys.time()
 

@@ -1,4 +1,4 @@
-#' @title Prepare ISDB
+#' @title Prepare spectral matches
 #'
 #' @param input TODO
 #' @param output TODO
@@ -11,12 +11,12 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples TODO
-prepare_isdb <-
+prepare_spectral_matches <-
   function(input = params$input,
            output = params$output) {
     stopifnot("Your input file does not exist" = file.exists(input))
 
-    log_debug(x = "Loading and formatting ISDB results")
+    log_debug(x = "Loading and formatting spectral matches")
     table <- readr::read_delim(file = input) |>
       dplyr::distinct(
         feature_id,
@@ -37,6 +37,6 @@ prepare_isdb <-
       complement_metadata()
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_isdb")
+    export_params(step = "prepare_spectral_matches")
     export_output(x = table, file = output)
   }
