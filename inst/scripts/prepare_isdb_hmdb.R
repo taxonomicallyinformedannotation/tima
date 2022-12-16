@@ -32,7 +32,7 @@ paths <- parse_yaml_paths()
 #' @importFrom Spectra export Spectra
 #'
 #' @examples TODO
-prepare_hmdb_isdb <-
+prepare_isdb_hmdb <-
   function(input = paths$data$source$libraries$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
            output_pos = paths$data$interim$libraries$hmdb_isdb$pos,
@@ -135,7 +135,7 @@ prepare_hmdb_isdb <-
     unlink(newdir, recursive = TRUE)
   }
 
-prepare_hmdb_isdb()
+prepare_isdb_hmdb()
 
 end <- Sys.time()
 

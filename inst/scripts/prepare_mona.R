@@ -15,7 +15,7 @@ log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
-#' @title Prepare MONA In Silico DataBase
+#' @title Prepare MONA
 #'
 #' @param input TODO
 #' @param output_pos TODO
@@ -31,7 +31,7 @@ paths <- parse_yaml_paths()
 #' @importFrom Spectra export Spectra
 #'
 #' @examples TODO
-prepare_mona_isdb <-
+prepare_mona <-
   function(input = paths$data$source$libraries$mona_lcmsms,
            output_pos = paths$data$interim$libraries$mona_isdb$pos,
            output_neg = paths$data$interim$libraries$mona_isdb$neg) {
@@ -185,7 +185,7 @@ prepare_mona_isdb <-
       Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_neg)
   }
 
-prepare_mona_isdb()
+prepare_mona()
 
 end <- Sys.time()
 

@@ -24,7 +24,7 @@ log_debug("Contributors: ...")
 #' @importFrom curl curl_download write_csv
 #'
 #' @examples TODO
-get_hmdb_is <-
+get_isdb_hmdb <-
   function(url = paths$urls$hmdb$spectra$predicted,
            export = paths$data$source$libraries$hmdb_isdb) {
     paths <- parse_yaml_paths()
@@ -36,6 +36,6 @@ get_hmdb_is <-
     curl::curl_download(url = url, destfile = export)
   }
 
-get_hmdb_is()
+get_isdb_hmdb()
 
 log_debug("Script finished in", crayon::green(format(end - start)))
