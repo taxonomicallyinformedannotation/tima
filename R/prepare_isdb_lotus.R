@@ -12,8 +12,8 @@
 #'
 #' @examples TODO
 prepare_isdb_lotus <-
-  function(input_pos = paths$data$source$spectra$lotus_isdb$pos,
-           input_neg = paths$data$source$spectra$lotus_isdb$neg,
+  function(input_pos = paths$data$source$spectra$lotus$pos,
+           input_neg = paths$data$source$spectra$lotus$neg,
            output_pos = paths$data$interim$spectra$lotus$pos,
            output_neg = paths$data$interim$spectra$lotus$neg,
            export_sqlite = TRUE) {
