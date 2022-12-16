@@ -108,11 +108,11 @@ step <- "process_spectra"
 params <- get_params(step = step)
 process_spectra()
 
-### ISDB results
-log_debug("Preparing ISDB")
-step <- "prepare_isdb"
+### Spectral matches results
+log_debug("Preparing spectral matches")
+step <- "prepare_spectral_matches"
 params <- get_params(step = step)
-prepare_isdb()
+prepare_spectral_matches()
 
 ### GNPS results
 log_debug("Preparing GNPS")
