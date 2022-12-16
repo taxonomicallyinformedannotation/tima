@@ -18,9 +18,7 @@
 #'
 #' @importFrom dplyr full_join left_join select
 #' @importFrom MetaboAnnotation CompareSpectraParam matchSpectra
-#' @importFrom MsBackendMgf readMgf
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
-#' @importFrom Spectra Spectra
 #'
 #' @examples TODO
 process_spectra <- function(input = params$input,
@@ -50,14 +48,26 @@ process_spectra <- function(input = params$input,
 
   log_debug("Loading spectra")
   spectra <- input |>
-    MsBackendMgf::readMgf() |>
-    Spectra::Spectra()
+    import_spectra()
 
   log_debug("Loading spectral library (Can take long)")
+  if (file.exists(library |>
+    gsub(
+      pattern = ".mgf",
+      replacement = ".sqlite",
+      fixed = TRUE
+    ))) {
+    library <- library |>
+      gsub(
+        pattern = ".mgf",
+        replacement = ".sqlite",
+        fixed = TRUE
+      )
+  }
+
   ## COMMENT (AR): TODO Try HDF5 formatted?
   spectral_library <- library |>
-    MsBackendMgf::readMgf() |>
-    Spectra::Spectra()
+    import_spectra()
 
   sim_fun <- switch(
     EXPR = method,

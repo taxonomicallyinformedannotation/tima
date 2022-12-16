@@ -68,7 +68,7 @@ data:
     spectra:
       path: data/source/spectra
       hmdb_isdb: data/source/spectra/hmdb_predicted_msms_spectra.zip
-      lotus_isdb:
+      lotus:
         pos: data/source/spectra/isdb_pos.mgf
         neg: data/source/spectra/isdb_neg.mgf
       mona_lcmsms: data/source/spectra/MoNA-export-LC-MS-MS_Spectra.sdf

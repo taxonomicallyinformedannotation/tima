@@ -75,6 +75,7 @@ Collate:
     'prepare_features_classification.R'
     'prepare_features_components.R'
     'prepare_gnps.R'
+    'prepare_isdb_lotus.R'
     'prepare_library.R'
     'prepare_lotus.R'
     'prepare_params.R'

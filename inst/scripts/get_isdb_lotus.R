@@ -17,13 +17,13 @@ paths <- parse_yaml_paths()
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$pos,
-  path = paths$data$source$spectra$lotus_isdb$pos
+  path = paths$data$source$spectra$lotus$pos
 )
 
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$neg,
-  path = paths$data$source$spectra$lotus_isdb$neg
+  path = paths$data$source$spectra$lotus$neg
 )
 
 end <- Sys.time()

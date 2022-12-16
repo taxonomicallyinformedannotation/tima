@@ -86,7 +86,7 @@ prepare_library()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
-# prepare_isdb_lotus()
+prepare_isdb_lotus()
 
 ### ISDB HMDB
 # log_debug("Preparing ISDB HMDB")

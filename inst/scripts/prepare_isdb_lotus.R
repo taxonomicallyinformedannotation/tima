@@ -14,25 +14,7 @@ log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
-#' @title Prepare LOTUS In Silico DataBase
-#'
-#' @param input_pos TODO
-#' @param input_neg TODO
-#' @param output_pos TODO
-#' @param output_neg TODO
-#'
-#' @return TODO
-#'
-#' @export
-#'
-#' @examples TODO
-prepare_isdb_lotus <-
-  function(input_pos = paths$data$source$spectra$lotus_isdb$pos,
-           input_neg = paths$data$source$spectra$lotus_isdb$neg,
-           output_pos = paths$data$interim$spectra$lotus_isdb$pos,
-           output_neg = paths$data$interim$spectra$lotus_isdb$neg) {
-    cat("TODO mgf sql conversion")
-  }
+##  TODO CLI DOCOPT
 
 prepare_isdb_lotus()
 
