@@ -26,7 +26,7 @@ log_debug("Contributors: ...")
 #' @examples TODO
 get_isdb_hmdb <-
   function(url = paths$urls$hmdb$spectra$predicted,
-           export = paths$data$source$libraries$hmdb_isdb) {
+           export = paths$data$source$spectra$hmdb_isdb) {
     paths <- parse_yaml_paths()
 
     ## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)

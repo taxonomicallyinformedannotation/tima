@@ -33,10 +33,10 @@ paths <- parse_yaml_paths()
 #'
 #' @examples TODO
 prepare_isdb_hmdb <-
-  function(input = paths$data$source$libraries$hmdb_isdb,
+  function(input = paths$data$source$spectra$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
-           output_pos = paths$data$interim$libraries$hmdb_isdb$pos,
-           output_neg = paths$data$interim$libraries$hmdb_isdb$neg) {
+           output_pos = paths$data$interim$spectra$hmdb$pos,
+           output_neg = paths$data$interim$spectra$hmdb$neg) {
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 

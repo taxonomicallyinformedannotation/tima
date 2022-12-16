@@ -15,15 +15,15 @@ log_debug("Contributors: ...")
 paths <- parse_yaml_paths()
 
 get_last_version_from_zenodo(
-  doi = paths$url$isdb$doi,
-  pattern = paths$urls$isdb$pattern$pos,
-  path = paths$data$source$libraries$isdb$pos
+  doi = paths$url$lotus_isdb$doi,
+  pattern = paths$urls$lotus_isdb$pattern$pos,
+  path = paths$data$source$spectra$lotus_isdb$pos
 )
 
 get_last_version_from_zenodo(
-  doi = paths$url$isdb$doi,
-  pattern = paths$urls$isdb$pattern$neg,
-  path = paths$data$source$libraries$isdb$neg
+  doi = paths$url$lotus_isdb$doi,
+  pattern = paths$urls$lotus_isdb$pattern$neg,
+  path = paths$data$source$spectra$lotus_isdb$neg
 )
 
 end <- Sys.time()

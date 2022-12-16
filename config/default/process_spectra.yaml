@@ -1,5 +1,5 @@
 input: data/source/example.mgf
-library: data/source/libraries/isdb_pos.mgf
+library: data/source/spectra/isdb_pos.mgf
 output: data/interim/annotations/example_isdb.tsv.gz
 ms:
   similarity:

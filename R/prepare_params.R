@@ -94,17 +94,17 @@ prepare_params <- function(filename = params$filename,
     yamls_params$prepare_gnps$output |>
     replace_gnps_job_id()
   yamls_params$prepare_gnps$gnps <- params$gnps
-  yamls_params$prepare_isdb$input <-
-    yamls_params$prepare_isdb$input |>
+  yamls_params$prepare_spectral_matches$input <-
+    yamls_params$prepare_spectral_matches$input |>
     gsub(
-      pattern = yamls_default$prepare_isdb$input,
+      pattern = yamls_default$prepare_spectral_matches$input,
       replacement = file.path(
         paths$data$interim$annotations$path,
         paste(params$filename, "isdb.tsv.gz", sep = "_")
       )
     )
-  yamls_params$prepare_isdb$output <-
-    yamls_params$prepare_isdb$output |>
+  yamls_params$prepare_spectral_matches$output <-
+    yamls_params$prepare_spectral_matches$output |>
     replace_gnps_job_id()
   yamls_params$prepare_sirius$directory <-
     yamls_params$prepare_sirius$directory |>

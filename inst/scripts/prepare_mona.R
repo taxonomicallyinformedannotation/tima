@@ -32,9 +32,9 @@ paths <- parse_yaml_paths()
 #'
 #' @examples TODO
 prepare_mona <-
-  function(input = paths$data$source$libraries$mona_lcmsms,
-           output_pos = paths$data$interim$libraries$mona_isdb$pos,
-           output_neg = paths$data$interim$libraries$mona_isdb$neg) {
+  function(input = paths$data$source$spectra$mona_lcmsms,
+           output_pos = paths$data$interim$spectra$mona$pos,
+           output_neg = paths$data$interim$spectra$mona$neg) {
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 

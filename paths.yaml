@@ -16,9 +16,9 @@ data:
     annotations:
       path: data/interim/annotations
       example_feature_table: data/interim/annotations/example_feature_table.tsv.gz
-      example_feature_table_no_rt: data/interim/annotations/example_no_rt_feature_table.tsv.gz
+      example_feature_table_no_rt: data/interim/annotations/example_feature_table_no_rt.tsv.gz
       example_isdb: data/interim/annotations/example_isdb.tsv.gz
-      example_isdb_no_rt: data/interim/annotations/example_no_rt_isdb.tsv.gz
+      example_isdb_no_rt: data/interim/annotations/example_isdb_no_rt.tsv.gz
       example_sirius: data/interim/annotations/example_sirius.zip
     config:
       path: data/interim/config
@@ -30,13 +30,18 @@ data:
       path: data/interim/libraries
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
       hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
-      hmdb_isdb:
-        pos: data/interim/libraries/hmdb_isdb_pos.mgf
-        neg: data/interim/libraries/hmdb_isdb_neg.mgf
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
-      mona_isdb:
-        pos: data/interim/libraries/mona_isdb_pos.mgf
-        neg: data/interim/libraries/mona_isdb_neg.mgf
+    spectra:
+      path: data/interim/spectra
+      hmdb:
+        pos: data/interim/spectra/isdb_hmdb_pos.mgf
+        neg: data/interim/spectra/isdb_hmdb_neg.mgf
+      lotus:
+        pos: data/interim/spectra/isdb_lotus_pos.mgf
+        neg: data/interim/spectra/isdb_lotus_neg.mgf
+      mona:
+        pos: data/interim/spectra/mona_pos.mgf
+        neg: data/interim/spectra/mona_neg.mgf
     taxa:
       path: data/interim/taxa
   processed:
@@ -57,14 +62,17 @@ data:
     libraries:
       path: data/source/libraries
       hmdb: data/source/libraries/hmdb_metabolites.zip
-      hmdb_isdb: data/source/libraries/hmdb_predicted_msms_spectra.zip
-      isdb:
-        pos: data/source/libraries/isdb_pos.mgf
-        neg: data/source/libraries/isdb_neg.mgf
       lotus: data/source/libraries/lotus.csv.gz
-      mona_lcmsms: data/source/libraries/MoNA-export-LC-MS-MS_Spectra.sdf
       structure_metadata: data/source/libraries/structure_metadata.tsv.gz
     neutral_losses: inst/extdata/neutral_losses.tsv
+    spectra:
+      path: data/source/spectra
+      hmdb_isdb: data/source/spectra/hmdb_predicted_msms_spectra.zip
+      lotus_isdb:
+        pos: data/source/spectra/isdb_pos.mgf
+        neg: data/source/spectra/isdb_neg.mgf
+      mona_lcmsms: data/source/spectra/MoNA-export-LC-MS-MS_Spectra.sdf
+
 doc:
   path: doc
 img:
@@ -95,17 +103,17 @@ urls:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
       predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
-  isdb: 
-    doi: 10.5281/zenodo.5607185
-    pattern:
-      pos: isdb_pos.mgf
-      neg: isdb_neg.mgf
   lotus: 
     doi: 10.5281/zenodo.5794106
     pattern: frozen_metadata.csv.gz
     metadata_doi: 10.5281/zenodo.6378223
     metadata_pattern:
       organisms: organism_metadata.tsv.gz
-      references: reference:metadata.tsv.gz
+      references: reference_metadata.tsv.gz
       structures: structure_metadata.tsv.gz
+  lotus_isdb: 
+    doi: 10.5281/zenodo.5607185
+    pattern:
+      pos: isdb_pos.mgf
+      neg: isdb_neg.mgf
 version: 2.7.0

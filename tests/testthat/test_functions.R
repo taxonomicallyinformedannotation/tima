@@ -42,13 +42,13 @@ testthat::test_that("Whole process", {
 
   #### ISDB
   ## smaller version for testing
-  create_dir(paths$data$source$libraries$isdb$pos)
+  create_dir(paths$data$source$spectra$lotus_isdb$pos)
   utils::download.file(
     url = paths$url$example_spectral_lib,
-    destfile = paths$data$source$libraries$isdb$pos
+    destfile = paths$data$source$spectra$lotus_isdb$pos
   )
 
-  ## Prepare all files
+  ## Prepare libraries
   ### LOTUS
   prepare_lotus()
 
@@ -68,6 +68,16 @@ testthat::test_that("Whole process", {
   )
   prepare_library()
 
+  ## Prepare spectra
+  ### LOTUS
+  prepare_isdb_lotus()
+
+  ### HMDB
+  # prepare_isdb_hmdb()
+
+  ### Closed
+  # prepare_mona()
+
   ### Adducts
   step <- "prepare_adducts"
   params <- get_params(step = step)
@@ -85,9 +95,9 @@ testthat::test_that("Whole process", {
   )
 
   ### ISDB results
-  step <- "prepare_isdb"
+  step <- "prepare_spectral_matches"
   params <- get_params(step = step)
-  prepare_isdb()
+  prepare_spectral_matches()
 
   ### GNPS results
   step <- "prepare_gnps"
