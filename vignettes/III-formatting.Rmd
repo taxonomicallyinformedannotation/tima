@@ -87,7 +87,7 @@ source(file = "inst/scripts/prepare_gnps.R")
 and/or
 
 ```{r}
-source(file = "inst/scripts/prepare_isdb.R")
+source(file = "inst/scripts/prepare_spectral_matches.R")
 ```
 
 and/or
