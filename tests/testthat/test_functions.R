@@ -47,6 +47,10 @@ testthat::test_that("Whole process", {
     url = paths$url$example_spectral_lib,
     destfile = paths$data$source$spectra$lotus_isdb$pos
   )
+  utils::download.file(
+    url = paths$url$example_spectral_lib,
+    destfile = paths$data$source$spectra$lotus_isdb$neg
+  )
 
   ## Prepare libraries
   ### LOTUS
