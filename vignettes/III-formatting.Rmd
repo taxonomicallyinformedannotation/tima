@@ -36,6 +36,10 @@ library("timaR")
 ```
 
 ```{r}
+source(file = "inst/scripts/prepare_isdb_lotus.R")
+```
+
+```{r}
 source(file = "inst/scripts/process_spectra.R")
 ```
 

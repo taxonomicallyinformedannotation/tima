@@ -42,14 +42,14 @@ testthat::test_that("Whole process", {
 
   #### ISDB
   ## smaller version for testing
-  create_dir(paths$data$source$spectra$lotus_isdb$pos)
+  create_dir(paths$data$source$spectra$lotus$pos)
   utils::download.file(
     url = paths$url$example_spectral_lib,
-    destfile = paths$data$source$spectra$lotus_isdb$pos
+    destfile = paths$data$source$spectra$lotus$pos
   )
   utils::download.file(
     url = paths$url$example_spectral_lib,
-    destfile = paths$data$source$spectra$lotus_isdb$neg
+    destfile = paths$data$source$spectra$lotus$neg
   )
 
   ## Prepare libraries
