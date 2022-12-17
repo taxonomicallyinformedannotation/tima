@@ -9,7 +9,7 @@ prepare_isdb_lotus(
   input_neg = paths$data$source$spectra$lotus$neg,
   output_pos = paths$data$interim$spectra$lotus$pos,
   output_neg = paths$data$interim$spectra$lotus$neg,
-  export_sqlite = FALSE
+  export_sqlite = TRUE
 )
 }
 \arguments{

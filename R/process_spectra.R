@@ -167,14 +167,13 @@ process_spectra <- function(input = params$input,
         peaks_rel >= rpeaks)
   }
 
-  target_id <-
-    seq_along(1:length(spectral_library@backend@spectraData$FILENAME))
-  short_inchikey <- spectral_library@backend@spectraData$FILENAME
-  smiles <- spectral_library@backend@spectraData$SMILES
-  molecular_formula <-
-    spectral_library@backend@spectraData$MOLECULAR_FORMULA
-  exact_mass <-
-    spectral_library@backend@spectraData$EXACTMASS
+  spectral_library_extracted <- spectral_library |>
+    extract_spectra()
+  target_id <- seq_along(1:length(spectral_library_extracted$NAME))
+  short_inchikey <- spectral_library_extracted$NAME
+  smiles <- spectral_library_extracted$SMILES
+  molecular_formula <- spectral_library_extracted$MOLECULAR_FORMULA
+  exact_mass <- spectral_library_extracted$EXACTMASS
 
   df_meta <- data.frame(
     target_id,
