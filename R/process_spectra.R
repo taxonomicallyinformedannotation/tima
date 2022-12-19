@@ -36,6 +36,19 @@ process_spectra <- function(input = params$input,
                             quickmode = params$quickmode,
                             parallel = params$parallel) {
   stopifnot("Your input file does not exist." = file.exists(input))
+  if (file.exists(library |>
+    gsub(
+      pattern = ".mgf",
+      replacement = ".sqlite",
+      fixed = TRUE
+    ))) {
+    library <- library |>
+      gsub(
+        pattern = ".mgf",
+        replacement = ".sqlite",
+        fixed = TRUE
+      )
+  }
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot(
     "Your similarity is not supported, supported similarities are 'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" = method %in%
@@ -59,20 +72,6 @@ process_spectra <- function(input = params$input,
     import_spectra()
 
   log_debug("Loading spectral library (Can take long)")
-  if (file.exists(library |>
-    gsub(
-      pattern = ".mgf",
-      replacement = ".sqlite",
-      fixed = TRUE
-    ))) {
-    library <- library |>
-      gsub(
-        pattern = ".mgf",
-        replacement = ".sqlite",
-        fixed = TRUE
-      )
-  }
-
   ## COMMENT (AR): TODO Try HDF5 formatted?
   spectral_library <- library |>
     import_spectra()
