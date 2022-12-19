@@ -64,6 +64,7 @@ Collate:
     'get_example_sirius.R'
     'get_last_version_from_zenodo.R'
     'get_params.R'
+    'harmonize_spectra.R'
     'import_spectra.R'
     'log_debug.R'
     'ms2_matching_peaks.R'

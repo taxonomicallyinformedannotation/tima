@@ -14,6 +14,7 @@
 #' @importFrom curl curl_fetch_memory
 #' @importFrom dplyr mutate rename select
 #' @importFrom jsonlite fromJSON
+#' @importFrom tidyr drop_na
 #'
 #' @examples TODO
 prepare_isdb_lotus <-
@@ -30,13 +31,15 @@ prepare_isdb_lotus <-
     spectra_neg <- input_neg |>
       import_spectra()
 
-    log_debug("Extracting ...")
+    log_debug("Harmonizing ...")
     log_debug("... positive spectra")
-    spectra_extracted_pos <- spectra_pos |>
-      extract_spectra()
+    spectra_harmonized_pos <- spectra_pos |>
+      extract_spectra() |>
+      harmonize_spectra()
     log_debug("... negative spectra")
-    spectra_extracted_neg <- spectra_neg |>
-      extract_spectra()
+    spectra_harmonized_neg <- spectra_neg |>
+      extract_spectra() |>
+      harmonize_spectra(mode = "neg")
 
     log_debug("Exporting ...")
     create_dir(export = output_pos)
@@ -60,78 +63,48 @@ prepare_isdb_lotus <-
       )
 
       log_debug("... positive spectra")
-      spectra_extracted_pos <- spectra_extracted_pos |>
-        dplyr::rename(compound_id = FILENAME) |>
-        dplyr::mutate(spectrum_id = dplyr::row_number())
-      cmps_pos <- spectra_extracted_pos |>
-        dplyr::mutate(
-          exactmass = as.numeric(EXACTMASS),
-          synonyms = NA_character_
-        ) |>
-        dplyr::select(
-          compound_id = compound_id,
-          name = compound_id,
-          inchi = INCHI,
-          ## Not ideal
-          inchikey = compound_id,
-          formula = MOLECULAR_FORMULA,
-          exactmass,
-          synonyms,
-          smiles = SMILES
-        )
+      if (nrow(spectra_harmonized_pos[[1]] |>
+               tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_pos[[1]] |>
+          export_spectra(
+            file = output_pos |>
+              gsub(
+                pattern = ".mgf",
+                replacement = ".sqlite",
+                fixed = TRUE
+              ),
+            cmps = spectra_harmonized_pos[[2]],
+            metad = metad
+          )
+      }
 
       log_debug("... negative spectra")
-      spectra_extracted_neg <- spectra_extracted_neg |>
-        dplyr::rename(compound_id = FILENAME) |>
-        dplyr::mutate(spectrum_id = dplyr::row_number())
-      cmps_neg <- spectra_extracted_neg |>
-        dplyr::mutate(
-          exactmass = as.numeric(EXACTMASS),
-          synonyms = NA_character_
-        ) |>
-        dplyr::select(
-          compound_id = compound_id,
-          name = compound_id,
-          inchi = INCHI,
-          ## Not ideal
-          inchikey = compound_id,
-          formula = MOLECULAR_FORMULA,
-          exactmass,
-          synonyms,
-          smiles = SMILES
-        )
-
-      log_debug("... positive spectra")
-      spectra_extracted_pos |>
-        export_spectra(
-          file = output_pos |>
-            gsub(
-              pattern = ".mgf",
-              replacement = ".sqlite",
-              fixed = TRUE
-            ),
-          cmps = cmps_pos,
-          metad = metad
-        )
-
-      log_debug("... negative spectra")
-      spectra_extracted_neg |>
-        export_spectra(
-          file = output_neg |>
-            gsub(
-              pattern = ".mgf",
-              replacement = ".sqlite",
-              fixed = TRUE
-            ),
-          cmps = cmps_neg,
-          metad = metad
-        )
+      if (nrow(spectra_harmonized_neg[[1]] |>
+               tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_neg[[1]] |>
+          export_spectra(
+            file = output_neg |>
+              gsub(
+                pattern = ".mgf",
+                replacement = ".sqlite",
+                fixed = TRUE
+              ),
+            cmps = spectra_harmonized_neg[[2]],
+            metad = metad
+          )
+      }
     }
     log_debug("... positive spectra")
-    spectra_extracted_pos |>
-      export_spectra(file = output_pos)
+    if (nrow(spectra_harmonized_pos[[1]] |>
+             tidyr::drop_na(compound_id)) != 0) {
+      spectra_harmonized_pos[[1]] |>
+        export_spectra(file = output_pos)
+    }
 
     log_debug("... negative spectra")
-    spectra_extracted_neg |>
-      export_spectra(file = output_neg)
+    if (nrow(spectra_harmonized_neg[[1]] |>
+             tidyr::drop_na(compound_id)) != 0) {
+      spectra_harmonized_neg[[1]] |>
+        export_spectra(file = output_neg)
+    }
   }
