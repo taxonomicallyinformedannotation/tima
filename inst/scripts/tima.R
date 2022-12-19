@@ -15,8 +15,10 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 paths <- parse_yaml_paths()
 
 arguments <- commandArgs(trailingOnly = TRUE)
-mode <- if (!is.null(arguments)) {
+if (!is.null(arguments)) {
   mode <- arguments
+} else {
+  mode <- "full"
 }
 
 ## Get all files

@@ -49,7 +49,7 @@ prepare_lotus <-
         dplyr::distinct()
 
       log_debug(x = "Exporting ...")
-      export_output(x = lotus_prepared, file = output)
+      export_output(x = lotus_prepared)
     } else {
       log_debug(
         "There is already a library with the same name existing, to avoid any conflict please remove it."
