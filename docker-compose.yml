@@ -15,6 +15,6 @@ services:
       - "./config:/config"
       - "./inst:/inst"
       - ".data:/data"
-    command: Rscript inst/scripts/tima.R
+    command: Rscript inst/scripts/tima_full.R
 
 # other smaller services not implemented yet
