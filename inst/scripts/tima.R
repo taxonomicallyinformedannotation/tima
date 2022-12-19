@@ -10,9 +10,9 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
-arguments <- commandArgs(trailingOnly = TRUE)
-if (length(arguments) != 0) {
-  mode <- arguments
+cli <- commandArgs(trailingOnly = TRUE)
+if (length(cli) != 0) {
+  mode <- cli
 } else {
   mode <- "full"
 }
