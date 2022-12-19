@@ -10,13 +10,6 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
-cli <- commandArgs(trailingOnly = TRUE)
-if (length(cli) != 0) {
-  m0d3 <- cli
-} else {
-  m0d3 <- "full"
-}
-
 ## Get all files
 
 ### Benchmark
@@ -25,14 +18,13 @@ if (length(cli) != 0) {
 ### Examples
 
 #### MGF
-if (m0d3 == "mini") {
-  get_example_mgf(url = paths$url$example_mgf_mini)
-}
+## Comment when not running example
+get_example_mgf(url = paths$url$example_mgf_mini)
+
 
 ### SIRIUS
-if (m0d3 == "mini") {
-  get_example_sirius(url = paths$urls$example_sirius_mini)
-}
+## Comment when not running example
+get_example_sirius(url = paths$urls$example_sirius_mini)
 
 ### LOTUS
 log_debug("Getting LOTUS")
@@ -48,30 +40,29 @@ get_last_version_from_zenodo(
 
 ### LOTUS ISDB
 log_debug("Getting LOTUS ISDB...")
-if (m0d3 == "mini") {
-  create_dir(paths$data$source$spectra$lotus$pos)
-  utils::download.file(
-    url = paths$url$example_spectral_lib,
-    destfile = paths$data$source$spectra$lotus$pos
-  )
-  utils::download.file(
-    url = paths$url$example_spectral_lib,
-    destfile = paths$data$source$spectra$lotus$neg
-  )
-} else {
-  log_debug("... positive")
-  get_last_version_from_zenodo(
-    doi = paths$url$lotus_isdb$doi,
-    pattern = paths$urls$lotus_isdb$pattern$pos,
-    path = paths$data$source$spectra$lotus$pos
-  )
-  log_debug("... negative")
-  get_last_version_from_zenodo(
-    doi = paths$url$lotus_isdb$doi,
-    pattern = paths$urls$lotus_isdb$pattern$neg,
-    path = paths$data$source$spectra$lotus$neg
-  )
-}
+## Comment when not running example
+create_dir(paths$data$source$spectra$lotus$pos)
+utils::download.file(
+  url = paths$url$example_spectral_lib,
+  destfile = paths$data$source$spectra$lotus$pos
+)
+utils::download.file(
+  url = paths$url$example_spectral_lib,
+  destfile = paths$data$source$spectra$lotus$neg
+)
+## Uncomment when not running example
+# log_debug("... positive")
+# get_last_version_from_zenodo(
+#   doi = paths$url$lotus_isdb$doi,
+#   pattern = paths$urls$lotus_isdb$pattern$pos,
+#   path = paths$data$source$spectra$lotus$pos
+# )
+# log_debug("... negative")
+# get_last_version_from_zenodo(
+#   doi = paths$url$lotus_isdb$doi,
+#   pattern = paths$urls$lotus_isdb$pattern$neg,
+#   path = paths$data$source$spectra$lotus$neg
+# )
 
 ### HMDB ISDB
 # log_debug("Getting HMDB ISDB...")
@@ -80,7 +71,6 @@ if (m0d3 == "mini") {
 ### MONA
 # log_debug("Getting MONA spectra ..")
 # get_mona() ## not available actually
-
 
 ## Prepare all files
 ### LOTUS
