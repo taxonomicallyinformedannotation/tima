@@ -1,5 +1,13 @@
 # timaR
 
+# timaR 2.7.1
+
+* Added parallelization on process_spectra
+* Added sqlite storing for spectra
+* Added MONA helpers
+* Improved testing time
+* Minor fixes
+
 # timaR 2.7.0
 
 * Added MS2 annotation capability (kudos @jorainer for the awesome *Spectra* suite)
