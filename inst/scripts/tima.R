@@ -12,9 +12,9 @@ paths <- parse_yaml_paths()
 
 cli <- commandArgs(trailingOnly = TRUE)
 if (length(cli) != 0) {
-  mode <- cli
+  m0d3 <- cli
 } else {
-  mode <- "full"
+  m0d3 <- "full"
 }
 
 ## Get all files
@@ -25,12 +25,12 @@ if (length(cli) != 0) {
 ### Examples
 
 #### MGF
-if (mode == "mini") {
+if (m0d3 == "mini") {
   get_example_mgf(url = paths$url$example_mgf_mini)
 }
 
 ### SIRIUS
-if (mode == "mini") {
+if (m0d3 == "mini") {
   get_example_sirius(url = paths$urls$example_sirius_mini)
 }
 
@@ -48,7 +48,7 @@ get_last_version_from_zenodo(
 
 ### LOTUS ISDB
 log_debug("Getting LOTUS ISDB...")
-if (mode == "mini") {
+if (m0d3 == "mini") {
   create_dir(paths$data$source$spectra$lotus$pos)
   utils::download.file(
     url = paths$url$example_spectral_lib,
