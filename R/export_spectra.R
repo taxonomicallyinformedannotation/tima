@@ -126,3 +126,35 @@ export_spectra <- function(file,
     }
   )
 }
+
+#' @title Export spectra 2
+#'
+#' @param file TODO
+#' @param spectra TODO
+#' @param metad TODO
+#'
+#' @return TODO
+#'
+#' @export
+#'
+#' @importFrom tidyr drop_na
+#'
+#' @examples TODO
+export_spectra_2 <- function(file,
+                             spectra,
+                             meta) {
+  log_debug("Exporting")
+  create_dir(export = file)
+  if (nrow(spectra |>
+    tidyr::drop_na(compound_id)) != 0) {
+    spectra |>
+      export_spectra(
+        file = file,
+        metad = meta
+      )
+  } else {
+    log_debug(
+      "There is already a negative library with the same name existing, to avoid any conflict please remove it."
+    )
+  }
+}

@@ -20,6 +20,7 @@ paths <- parse_yaml_paths()
 #' @param metadata TODO
 #' @param output_pos TODO
 #' @param output_neg TODO
+#' @param export_sqlite TODO
 #'
 #' @return TODO
 #'
@@ -36,7 +37,22 @@ prepare_isdb_hmdb <-
   function(input = paths$data$source$spectra$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
            output_pos = paths$data$interim$spectra$hmdb$pos,
-           output_neg = paths$data$interim$spectra$hmdb$neg) {
+           output_neg = paths$data$interim$spectra$hmdb$neg,
+           export_sqlite = TRUE) {
+    if (export_sqlite == TRUE) {
+      output_pos <- output_pos |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+      output_neg <- output_neg |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+    }
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 
@@ -96,42 +112,66 @@ prepare_isdb_hmdb <-
       dplyr::left_join(df_clean)
 
     log_debug("Formatting")
-    spd <- data.frame(
-      precursorMz = spctra_enhanced$precursor_mz,
-      precursorCharge = spctra_enhanced$precursor_charge,
-      FILENAME = spctra_enhanced$inchikey_2D,
-      MOLECULAR_FORMULA = spctra_enhanced$chemical_formula,
-      SEQ = "*..*",
-      IONMODE = spctra_enhanced$ionmode,
-      EXACTMASS = spctra_enhanced$monisotopic_molecular_weight,
-      NAME = spctra_enhanced$inchikey_2D,
-      SMILES = spctra_enhanced$smiles_2D,
-      INCHI = spctra_enhanced$inchi_2D,
-      LIBRARYQUALITY = "PREDICTED",
-      SPLASH = spctra_enhanced$splash,
-      COLLISION_ENERGY = spctra_enhanced$collision_energy
-      # msLevel = 2L
+    colnames_hmdb <- c(
+      colname_compound_id = NA,
+      colname_exact_mass = "monisotopic_molecular_weight",
+      colname_formula = "chemical_formula",
+      colname_inchi = "inchi_2D",
+      colname_inchikey = "inchikey_2D",
+      colname_mode = "ionmode",
+      colname_name = "inchikey_2D",
+      colname_precursorMz = "precursor_mz",
+      colname_precursorCharge = "precursor_charge",
+      colname_smiles = "smiles_2D",
+      colname_spectrum_id = NA,
+      colname_synonyms = NA
     )
 
-    spd$mz <- spctra_enhanced$mz
-    spd$intensity <- spctra_enhanced$intensity
+    log_debug("Positive")
+    spectra_harmonized_pos <- spctra_enhanced |>
+      harmonize_spectra(
+        colnames = colnames_hmdb,
+        mode = "pos"
+      ) |>
+      dplyr::left_join(
+        spctra_enhanced |>
+          dplyr::distinct(
+            inchikey,
+            splash,
+            collision_energy,
+            mz,
+            intensity
+          )
+      )
 
-    log_debug("Filtering positive")
-    spd_pos <- spd |>
-      dplyr::filter(IONMODE == "POSITIVE")
-
-    log_debug("Filtering negative")
-    spd_neg <- spd |>
-      dplyr::filter(IONMODE == "NEGATIVE")
-
-    cat("TODO mgf sql conversion")
+    log_debug("Negative")
+    spectra_harmonized_neg <- spctra_enhanced |>
+      harmonize_spectra(
+        colnames = colnames_hmdb,
+        mode = "neg"
+      ) |>
+      dplyr::left_join(
+        spctra_enhanced |>
+          dplyr::distinct(
+            inchikey,
+            splash,
+            collision_energy,
+            mz,
+            intensity
+          )
+      )
 
     log_debug("Exporting")
-    Spectra::Spectra(object = spd_pos) |>
-      Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_pos)
-
-    Spectra::Spectra(object = spd_neg) |>
-      Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_neg)
+    export_spectra_2(
+      file = output_pos,
+      spectra = spectra_harmonized_pos,
+      meta = NULL
+    )
+    export_spectra_2(
+      file = output_neg,
+      spectra = spectra_harmonized_neg,
+      meta = NULL
+    )
 
     log_debug("Deleting unzipped directory")
     unlink(newdir, recursive = TRUE)

@@ -21,6 +21,8 @@ harmonize_spectra <- function(spectra,
                                 colname_inchikey = "NAME",
                                 colname_mode = "IONMODE",
                                 colname_name = "NAME",
+                                colname_precursorMz = "precursorMz",
+                                colname_precursorCharge = "precursorCharge",
                                 colname_smiles = "SMILES",
                                 colname_spectrum_id = NA,
                                 colname_synonyms = NA
@@ -50,8 +52,6 @@ harmonize_spectra <- function(spectra,
     )) |>
     dplyr::select(
       dplyr::any_of(c(colnames_full)),
-      precursorMz,
-      precursorCharge,
       ## TODO
       # rtime
       mz,
@@ -74,11 +74,11 @@ harmonize_spectra <- function(spectra,
       inchi := !!as.name(colnames["colname_inchi"]),
       inchikey := !!as.name(colnames["colname_inchikey"]),
       name := !!as.name(colnames["colname_name"]),
+      precursorMz := !!as.name(colnames["colname_precursorMz"]),
+      precursorCharge := !!as.name(colnames["colname_precursorCharge"]),
       smiles := !!as.name(colnames["colname_smiles"]),
       spectrum_id := !!as.name(colnames["colname_spectrum_id"]),
       synonyms := !!as.name(colnames["colname_synonyms"]),
-      precursorMz,
-      precursorCharge,
       ## TODO
       # rtime
       mz,

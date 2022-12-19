@@ -71,18 +71,10 @@ prepare_isdb_lotus <-
         harmonize_spectra()
 
       log_debug("Exporting")
-      create_dir(export = output_pos)
-      if (nrow(spectra_harmonized_pos |>
-        tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_pos |>
-          export_spectra(
-            file = output_pos,
-            metad = metad
-          )
-      }
-    } else {
-      log_debug(
-        "There is already a positive library with the same name existing, to avoid any conflict please remove it."
+      export_spectra_2(
+        file = output_pos,
+        spectra = spectra_harmonized_pos,
+        meta = metad
       )
     }
     if (!file.exists(output_neg)) {
@@ -97,18 +89,10 @@ prepare_isdb_lotus <-
         harmonize_spectra(mode = "neg")
 
       log_debug("Exporting")
-      create_dir(export = output_neg)
-      if (nrow(spectra_harmonized_neg |>
-        tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_neg |>
-          export_spectra(
-            file = output_neg,
-            metad = metad
-          )
-      }
-    } else {
-      log_debug(
-        "There is already a negative library with the same name existing, to avoid any conflict please remove it."
+      export_spectra_2(
+        file = output_neg,
+        spectra = spectra_harmonized_neg,
+        meta = metad
       )
     }
   }

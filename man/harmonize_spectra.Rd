@@ -8,8 +8,9 @@ harmonize_spectra(
   spectra,
   colnames = c(colname_compound_id = NA, colname_exact_mass = "EXACTMASS",
     colname_formula = "MOLECULAR_FORMULA", colname_inchi = "INCHI", colname_inchikey =
-    "NAME", colname_mode = "IONMODE", colname_name = "NAME", colname_smiles = "SMILES",
-    colname_spectrum_id = NA, colname_synonyms = NA),
+    "NAME", colname_mode = "IONMODE", colname_name = "NAME", colname_precursorMz =
+    "precursorMz", colname_precursorCharge = "precursorCharge", colname_smiles =
+    "SMILES", colname_spectrum_id = NA, colname_synonyms = NA),
   mode = "pos"
 )
 }
