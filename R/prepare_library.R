@@ -1,52 +1,87 @@
-#' @title Prepare LOTUS
+#' @title Prepare library
 #'
-#' @param input TODO
+#' @param filter TODO
+#' @param level TODO
+#' @param value TODO
 #' @param output TODO
 #'
 #' @return TODO
 #'
 #' @export
 #'
-#' @importFrom dplyr distinct mutate select
+#' @importFrom data.table rbindlist
+#' @importFrom dplyr filter
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples TODO
-prepare_lotus <-
-  function(input = paths$data$source$libraries$lotus,
-           output = paths$data$interim$libraries$lotus) {
-    log_debug(x = "Loading and preparing LOTUS")
-    lotus_prepared <- input |>
-      readr::read_csv() |>
-      dplyr::mutate(structure_inchikey_2D = substring(
-        text = structure_inchikey,
-        first = 1,
-        last = 14
-      )) |>
-      dplyr::select(
-        structure_nameTraditional,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class,
-        organism_name,
-        organism_taxonomy_01domain,
-        organism_taxonomy_02kingdom,
-        organism_taxonomy_03phylum,
-        organism_taxonomy_04class,
-        organism_taxonomy_05order,
-        organism_taxonomy_06family,
-        organism_taxonomy_07tribe,
-        organism_taxonomy_08genus,
-        organism_taxonomy_09species,
-        organism_taxonomy_10varietas,
-        reference_doi
-      ) |>
-      dplyr::distinct()
+prepare_library <-
+  function(filter = params$filter$mode,
+           level = params$filter$level,
+           value = params$filter$value,
+           output = params$output) {
+    stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
+    if (isTRUE(filter)) {
+      stopifnot(
+        "Your level parameter must be one of
+        'domain',
+        'kingdom',
+        'phylum',
+        'class',
+        'order',
+        'family',
+        'tribe',
+        'genus',
+        'species',
+        'varietas'
+        " = level %in% c(
+          "domain",
+          "kingdom",
+          "phylum",
+          "class",
+          "order",
+          "family",
+          "tribe",
+          "genus",
+          "species",
+          "varietas"
+        )
+      )
+    }
+
+    log_debug(x = "Loading and concatenating prepared libraries")
+    files <- list.files(
+      path = paths$data$interim$libraries$path,
+      pattern = "_prepared.tsv.gz",
+      full.names = TRUE,
+      recursive = TRUE
+    )
+    libraries <- list()
+    for (i in seq_along(files)) {
+      libraries[[i]] <-
+        readr::read_delim(file = files[[i]])
+    }
+
+    custom_library <- data.table::rbindlist(libraries)
+
+    if (filter == TRUE) {
+      log_debug(x = "Filtering library")
+      custom_library <- custom_library |>
+        dplyr::filter(grepl(
+          x = !!as.name(colnames(custom_library)[grepl(
+            pattern = level,
+            x = colnames(custom_library)
+          )]),
+          pattern = value
+        ))
+    }
 
     log_debug(x = "Exporting ...")
-    export_output(x = lotus_prepared, file = output)
+    export_params(step = "prepare_library")
+    export_output(
+      x = custom_library,
+      file = file.path(
+        paths$data$interim$libraries$path,
+        output
+      )
+    )
   }
