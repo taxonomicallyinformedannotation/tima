@@ -60,15 +60,17 @@ process_spectra <- function(input = params$input,
 
   log_debug("Loading spectral library (Can take long)")
   if (file.exists(library |>
-                  gsub(
-                    pattern = ".mgf",
-                    replacement = ".sqlite",
-                    fixed = TRUE
-                  ))) {
+    gsub(
+      pattern = ".mgf",
+      replacement = ".sqlite",
+      fixed = TRUE
+    ))) {
     library <- library |>
-      gsub(pattern = ".mgf",
-           replacement = ".sqlite",
-           fixed = TRUE)
+      gsub(
+        pattern = ".mgf",
+        replacement = ".sqlite",
+        fixed = TRUE
+      )
   }
 
   ## COMMENT (AR): TODO Try HDF5 formatted?
@@ -119,25 +121,33 @@ process_spectra <- function(input = params$input,
   ## Can be very slow otherwise
 
   log_debug("Performing spectral comparison")
-  matches_sim <- MetaboAnnotation::matchSpectra(query = spectra,
-                                                target = spectra,
-                                                param = params_sim)
+  matches_sim <- MetaboAnnotation::matchSpectra(
+    query = spectra,
+    target = spectra,
+    param = params_sim
+  )
 
   if (quickmode != TRUE) {
     log_debug("Performing peak matching (long)")
-    matches_abs <- MetaboAnnotation::matchSpectra(query = spectra,
-                                                  target = spectra,
-                                                  param = params_abs)
-    matches_rel <- MetaboAnnotation::matchSpectra(query = spectra,
-                                                  target = spectra,
-                                                  param = params_rel)
+    matches_abs <- MetaboAnnotation::matchSpectra(
+      query = spectra,
+      target = spectra,
+      param = params_abs
+    )
+    matches_rel <- MetaboAnnotation::matchSpectra(
+      query = spectra,
+      target = spectra,
+      param = params_rel
+    )
   }
 
   log_debug("Formatting results")
   df_similarity <- matches_sim@matches |>
-    dplyr::select(feature_id = query_idx,
-                  target_id = target_idx,
-                  msms_score = score)
+    dplyr::select(
+      feature_id = query_idx,
+      target_id = target_idx,
+      msms_score = score
+    )
 
   if (quickmode != TRUE) {
     df_similarity <- df_similarity |>
@@ -162,8 +172,8 @@ process_spectra <- function(input = params$input,
   if (condition == "AND") {
     df_similarity <- df_similarity |>
       dplyr::filter(msms_score >= threshold &
-                      peaks_abs >= npeaks &
-                      peaks_rel >= rpeaks)
+        peaks_abs >= npeaks &
+        peaks_rel >= rpeaks)
   }
 
   spectral_library_extracted <- spectral_library |>
@@ -174,11 +184,13 @@ process_spectra <- function(input = params$input,
   molecular_formula <- spectral_library_extracted$formula
   exact_mass <- spectral_library_extracted$exactmass
 
-  df_meta <- data.frame(target_id,
-                        short_inchikey,
-                        smiles,
-                        molecular_formula,
-                        exact_mass)
+  df_meta <- data.frame(
+    target_id,
+    short_inchikey,
+    smiles,
+    molecular_formula,
+    exact_mass
+  )
 
   df_final <- df_similarity |>
     dplyr::left_join(df_meta)
