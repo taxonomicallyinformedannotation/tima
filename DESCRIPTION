@@ -13,23 +13,25 @@ License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima-r, https://taxonomicallyinformedannotation.github.io/tima-r/
 BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.1.0),
+    methods,
+    Biobase
 Imports:
-    bioc::BiocParallel,
-    bioc::CompoundDb,
+    BiocParallel,
+    CompoundDb,
     crayon,
     curl,
     data.table,
     docopt,
     dplyr,
     jsonlite,
-    bioc::MetaboAnnotation,
-    bioc::MsBackendMgf,
-    bioc::MsCoreUtils,
+    MetaboAnnotation,
+    MsBackendMgf,
+    MsCoreUtils,
     purrr,
     readr,
     rotl,
-    bioc::Spectra,
+    Spectra,
     stats,
     stringr,
     tibble,
