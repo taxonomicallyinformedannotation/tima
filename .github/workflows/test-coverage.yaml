@@ -28,6 +28,7 @@ jobs:
           install.packages(c("remotes"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("covr")
+          remotes::install_cran("testthat")
         shell: Rscript {0}
 
       - name: Additional step for tests to run

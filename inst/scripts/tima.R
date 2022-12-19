@@ -1,21 +1,17 @@
 start <- Sys.time()
 
-require(
-  package = "timaR",
-  quietly = TRUE
-)
+require(package = "timaR",
+        quietly = TRUE)
 
-cat(
-  "This script",
-  crayon::green("does everything you ever dreamt of. \n")
-)
+cat("This script",
+    crayon::green("does everything you ever dreamt of. \n"))
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
 arguments <- commandArgs(trailingOnly = TRUE)
-if (!is.null(arguments)) {
+if (length(arguments) != 0) {
   mode <- arguments
 } else {
   mode <- "full"
