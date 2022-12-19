@@ -199,6 +199,7 @@ testthat::test_that("Whole process", {
   arguments$npc <<- "x"
   arguments$npeaks <<- "x"
   arguments$output <<- "x"
+  arguments$parallel <<- "x"
   arguments$ppm <<- "x"
   arguments$precursor <<- "x"
   arguments$qemical <<- "x"

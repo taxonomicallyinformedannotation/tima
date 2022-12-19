@@ -11,11 +11,13 @@
 #' @param rpeaks TODO
 #' @param condition TODO
 #' @param quickmode TODO
+#' @param parallel TODO
 #'
 #' @return TODO
 #'
 #' @export
 #'
+#' @importFrom BiocParallel MulticoreParam SerialParam
 #' @importFrom dplyr full_join left_join select
 #' @importFrom MetaboAnnotation CompareSpectraParam matchSpectra
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
@@ -31,7 +33,8 @@ process_spectra <- function(input = params$input,
                             npeaks = params$ms$peaks$absolute,
                             rpeaks = params$ms$peaks$ratio,
                             condition = params$ms$condition,
-                            quickmode = params$quickmode) {
+                            quickmode = params$quickmode,
+                            parallel = params$parallel) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot(
@@ -45,6 +48,11 @@ process_spectra <- function(input = params$input,
       )
   )
   ## Not checking for ppm and Da limits, everyone is free.
+  par <- if (parallel) {
+    BiocParallel::MulticoreParam()
+  } else {
+    BiocParallel::SerialParam()
+  }
 
   log_debug("Loading spectra")
   spectra <- input |>
@@ -52,17 +60,15 @@ process_spectra <- function(input = params$input,
 
   log_debug("Loading spectral library (Can take long)")
   if (file.exists(library |>
-    gsub(
-      pattern = ".mgf",
-      replacement = ".sqlite",
-      fixed = TRUE
-    ))) {
+                  gsub(
+                    pattern = ".mgf",
+                    replacement = ".sqlite",
+                    fixed = TRUE
+                  ))) {
     library <- library |>
-      gsub(
-        pattern = ".mgf",
-        replacement = ".sqlite",
-        fixed = TRUE
-      )
+      gsub(pattern = ".mgf",
+           replacement = ".sqlite",
+           fixed = TRUE)
   }
 
   ## COMMENT (AR): TODO Try HDF5 formatted?
@@ -105,40 +111,33 @@ process_spectra <- function(input = params$input,
     requirePrecursor = TRUE,
     THRESHFUN = function(x) {
       which(x >= rpeaks)
-    }
+    },
+    BPPARAM = par
   )
 
   ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
   ## Can be very slow otherwise
 
   log_debug("Performing spectral comparison")
-  matches_sim <- MetaboAnnotation::matchSpectra(
-    query = spectra,
-    target = spectra,
-    param = params_sim
-  )
+  matches_sim <- MetaboAnnotation::matchSpectra(query = spectra,
+                                                target = spectra,
+                                                param = params_sim)
 
   if (quickmode != TRUE) {
     log_debug("Performing peak matching (long)")
-    matches_abs <- MetaboAnnotation::matchSpectra(
-      query = spectra,
-      target = spectra,
-      param = params_abs
-    )
-    matches_rel <- MetaboAnnotation::matchSpectra(
-      query = spectra,
-      target = spectra,
-      param = params_rel
-    )
+    matches_abs <- MetaboAnnotation::matchSpectra(query = spectra,
+                                                  target = spectra,
+                                                  param = params_abs)
+    matches_rel <- MetaboAnnotation::matchSpectra(query = spectra,
+                                                  target = spectra,
+                                                  param = params_rel)
   }
 
   log_debug("Formatting results")
   df_similarity <- matches_sim@matches |>
-    dplyr::select(
-      feature_id = query_idx,
-      target_id = target_idx,
-      msms_score = score
-    )
+    dplyr::select(feature_id = query_idx,
+                  target_id = target_idx,
+                  msms_score = score)
 
   if (quickmode != TRUE) {
     df_similarity <- df_similarity |>
@@ -163,25 +162,23 @@ process_spectra <- function(input = params$input,
   if (condition == "AND") {
     df_similarity <- df_similarity |>
       dplyr::filter(msms_score >= threshold &
-        peaks_abs >= npeaks &
-        peaks_rel >= rpeaks)
+                      peaks_abs >= npeaks &
+                      peaks_rel >= rpeaks)
   }
 
   spectral_library_extracted <- spectral_library |>
     extract_spectra()
-  target_id <- seq_along(1:length(spectral_library_extracted$NAME))
-  short_inchikey <- spectral_library_extracted$NAME
-  smiles <- spectral_library_extracted$SMILES
-  molecular_formula <- spectral_library_extracted$MOLECULAR_FORMULA
-  exact_mass <- spectral_library_extracted$EXACTMASS
+  target_id <- seq_along(1:length(spectral_library_extracted$name))
+  short_inchikey <- spectral_library_extracted$name
+  smiles <- spectral_library_extracted$smiles
+  molecular_formula <- spectral_library_extracted$formula
+  exact_mass <- spectral_library_extracted$exactmass
 
-  df_meta <- data.frame(
-    target_id,
-    short_inchikey,
-    smiles,
-    molecular_formula,
-    exact_mass
-  )
+  df_meta <- data.frame(target_id,
+                        short_inchikey,
+                        smiles,
+                        molecular_formula,
+                        exact_mass)
 
   df_final <- df_similarity |>
     dplyr::left_join(df_meta)

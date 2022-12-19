@@ -101,6 +101,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$output)) {
       params$output <- arguments$output
     }
+    if (!is.null(arguments$parallel)) {
+      params$parallel <- arguments$parallel
+    }
     if (!is.null(arguments$ppm)) {
       params$ms$tolerance$ppm <- as.numeric(arguments$ppm)
     }

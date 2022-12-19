@@ -15,7 +15,8 @@ process_spectra(
   npeaks = params$ms$peaks$absolute,
   rpeaks = params$ms$peaks$ratio,
   condition = params$ms$condition,
-  quickmode = params$quickmode
+  quickmode = params$quickmode,
+  parallel = params$parallel
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ process_spectra(
 \item{condition}{TODO}
 
 \item{quickmode}{TODO}
+
+\item{parallel}{TODO}
 }
 \value{
 TODO

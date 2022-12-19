@@ -13,3 +13,4 @@ ms:
     ratio: 0.2
   condition: OR
 quickmode: yes
+parallel: yes
