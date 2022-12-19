@@ -98,11 +98,6 @@ testthat::test_that("Whole process", {
     quickmode = FALSE
   )
 
-  ### ISDB results
-  step <- "prepare_spectral_matches"
-  params <- get_params(step = step)
-  prepare_spectral_matches()
-
   ### GNPS results
   step <- "prepare_gnps"
   params <- get_params(step = step)
@@ -112,6 +107,11 @@ testthat::test_that("Whole process", {
   step <- "prepare_sirius"
   params <- get_params(step = step)
   prepare_sirius()
+
+  ### ISDB results
+  step <- "prepare_spectral_matches"
+  params <- get_params(step = step)
+  prepare_spectral_matches()
 
   ### Edges
   step <- "prepare_edges"

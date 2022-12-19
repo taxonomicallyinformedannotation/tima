@@ -14,6 +14,13 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 
+arguments <- commandArgs(trailingOnly = TRUE)
+mode <- if (!is.null(arguments)) {
+  mode <- arguments
+} else {
+  "full"
+}
+
 ## Get all files
 
 ### Benchmark
@@ -22,12 +29,14 @@ paths <- parse_yaml_paths()
 ### Examples
 
 #### MGF
-get_example_mgf(url = paths$url$example_mgf_mini)
-# get_example_mgf()
+if (mode == "mini") {
+  get_example_mgf(url = paths$url$example_mgf_mini)
+}
 
 ### SIRIUS
-get_example_sirius(url = paths$urls$example_sirius_mini)
-# get_example_sirius()
+if (mode == "mini") {
+  get_example_sirius(url = paths$urls$example_sirius_mini)
+}
 
 ### LOTUS
 log_debug("Getting LOTUS")
@@ -43,18 +52,30 @@ get_last_version_from_zenodo(
 
 ### LOTUS ISDB
 log_debug("Getting LOTUS ISDB...")
-log_debug("... positive")
-get_last_version_from_zenodo(
-  doi = paths$url$lotus_isdb$doi,
-  pattern = paths$urls$lotus_isdb$pattern$pos,
-  path = paths$data$source$spectra$lotus$pos
-)
-log_debug("... negative")
-get_last_version_from_zenodo(
-  doi = paths$url$lotus_isdb$doi,
-  pattern = paths$urls$lotus_isdb$pattern$neg,
-  path = paths$data$source$spectra$lotus$neg
-)
+if (mode == "mini") {
+  create_dir(paths$data$source$spectra$lotus$pos)
+  utils::download.file(
+    url = paths$url$example_spectral_lib,
+    destfile = paths$data$source$spectra$lotus$pos
+  )
+  utils::download.file(
+    url = paths$url$example_spectral_lib,
+    destfile = paths$data$source$spectra$lotus$neg
+  )
+} else {
+  log_debug("... positive")
+  get_last_version_from_zenodo(
+    doi = paths$url$lotus_isdb$doi,
+    pattern = paths$urls$lotus_isdb$pattern$pos,
+    path = paths$data$source$spectra$lotus$pos
+  )
+  log_debug("... negative")
+  get_last_version_from_zenodo(
+    doi = paths$url$lotus_isdb$doi,
+    pattern = paths$urls$lotus_isdb$pattern$neg,
+    path = paths$data$source$spectra$lotus$neg
+  )
+}
 
 ### HMDB ISDB
 # log_debug("Getting HMDB ISDB...")
@@ -108,12 +129,6 @@ step <- "process_spectra"
 params <- get_params(step = step)
 process_spectra()
 
-### Spectral matches results
-log_debug("Preparing spectral matches")
-step <- "prepare_spectral_matches"
-params <- get_params(step = step)
-prepare_spectral_matches()
-
 ### GNPS results
 log_debug("Preparing GNPS")
 step <- "prepare_gnps"
@@ -125,6 +140,12 @@ log_debug("Preparing SIRIUS")
 step <- "prepare_sirius"
 params <- get_params(step = step)
 prepare_sirius()
+
+### Spectral matches results
+log_debug("Preparing spectral matches")
+step <- "prepare_spectral_matches"
+params <- get_params(step = step)
+prepare_spectral_matches()
 
 ### Edges
 log_debug("Preparing edges")

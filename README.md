@@ -73,6 +73,14 @@ More details are given in the [General comments about the infrastructure](https:
 Once done, you can start with an example using:
 
 ```
+Rscript inst/scripts/tima.R mini
+```
+
+This will launch a 'mini' example where small example files will be given.
+This is to illustrate what the expected inputs are.
+For the next iterations, simply remove the 'mini' examples and argument:
+
+```
 Rscript inst/scripts/tima.R
 ```
 

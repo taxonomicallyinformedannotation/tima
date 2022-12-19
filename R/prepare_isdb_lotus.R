@@ -23,27 +23,23 @@ prepare_isdb_lotus <-
            output_pos = paths$data$interim$spectra$lotus$pos,
            output_neg = paths$data$interim$spectra$lotus$neg,
            export_sqlite = TRUE) {
-    log_debug("Importing ...")
-    log_debug("... positive spectra")
-    spectra_pos <- input_pos |>
-      import_spectra()
-    log_debug("... negative spectra")
-    spectra_neg <- input_neg |>
-      import_spectra()
-
-    log_debug("Harmonizing ...")
-    log_debug("... positive spectra")
-    spectra_harmonized_pos <- spectra_pos |>
-      extract_spectra() |>
-      harmonize_spectra()
-    log_debug("... negative spectra")
-    spectra_harmonized_neg <- spectra_neg |>
-      extract_spectra() |>
-      harmonize_spectra(mode = "neg")
-
-    log_debug("Exporting ...")
-    create_dir(export = output_pos)
     if (export_sqlite == TRUE) {
+      output_pos <- output_pos |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+      output_neg <- output_neg |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+    }
+
+    if (!file.exists(output_pos) ||
+      !file.exists(output_neg)) {
       log_debug("Generating metadata ...")
       ## Probably better to store it before
       req <-
@@ -61,49 +57,58 @@ prepare_isdb_lotus <-
         source_date = content[["metadata"]][["publication_date"]],
         organism = "Life"
       )
+    }
 
-      log_debug("... positive spectra")
+    if (!file.exists(output_pos)) {
+      log_debug("Positive mode")
+      log_debug("Importing")
+      spectra_pos <- input_pos |>
+        import_spectra()
+
+      log_debug("Harmonizing")
+      spectra_harmonized_pos <- spectra_pos |>
+        extract_spectra() |>
+        harmonize_spectra()
+
+      log_debug("Exporting")
+      create_dir(export = output_pos)
       if (nrow(spectra_harmonized_pos |>
         tidyr::drop_na(compound_id)) != 0) {
         spectra_harmonized_pos |>
           export_spectra(
-            file = output_pos |>
-              gsub(
-                pattern = ".mgf",
-                replacement = ".sqlite",
-                fixed = TRUE
-              ),
-            metad = metad
-          )
-      }
-
-      log_debug("... negative spectra")
-      if (nrow(spectra_harmonized_neg |>
-        tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_neg |>
-          export_spectra(
-            file = output_neg |>
-              gsub(
-                pattern = ".mgf",
-                replacement = ".sqlite",
-                fixed = TRUE
-              ),
+            file = output_pos,
             metad = metad
           )
       }
     } else {
-      log_debug("... positive spectra")
-      if (nrow(spectra_harmonized_pos |>
-        tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_pos |>
-          export_spectra(file = output_pos)
-      }
+      log_debug(
+        "There is already a positive library with the same name existing, to avoid any conflict please remove it."
+      )
+    }
+    if (!file.exists(output_neg)) {
+      log_debug("Negative mode")
+      log_debug("Importing")
+      spectra_neg <- input_neg |>
+        import_spectra()
 
-      log_debug("... negative spectra")
+      log_debug("Harmonizing")
+      spectra_harmonized_neg <- spectra_neg |>
+        extract_spectra() |>
+        harmonize_spectra(mode = "neg")
+
+      log_debug("Exporting")
+      create_dir(export = output_neg)
       if (nrow(spectra_harmonized_neg |>
         tidyr::drop_na(compound_id)) != 0) {
         spectra_harmonized_neg |>
-          export_spectra(file = output_neg)
+          export_spectra(
+            file = output_neg,
+            metad = metad
+          )
       }
+    } else {
+      log_debug(
+        "There is already a negative library with the same name existing, to avoid any conflict please remove it."
+      )
     }
   }
