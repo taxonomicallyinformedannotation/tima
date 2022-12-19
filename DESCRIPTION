@@ -15,15 +15,21 @@ BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.1.0)
 Imports:
+    BiocParallel,
+    CompoundDb,
     crayon,
     curl,
     data.table,
     docopt,
     dplyr,
     jsonlite,
+    MetaboAnnotation,
+    MsBackendMgf,
+    MsCoreUtils,
     purrr,
     readr,
     rotl,
+    Spectra,
     stats,
     stringr,
     tibble,
@@ -100,4 +106,5 @@ Collate:
     'weight_chemo.R'
 VignetteBuilder: 
     knitr
+biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
 X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
