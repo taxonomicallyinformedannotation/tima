@@ -13,7 +13,6 @@ jobs:
     name: tima-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [
           'ubuntu-latest',
@@ -36,4 +35,4 @@ jobs:
       - name: Run tests
         run: |
           cp -R config/default config/params
-          Rscript inst/scripts/tima.R mini
+          Rscript inst/scripts/tima_mini.R
