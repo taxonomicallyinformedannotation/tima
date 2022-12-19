@@ -19,7 +19,10 @@ prepare_library <-
            level = params$filter$level,
            value = params$filter$value,
            output = params$output) {
-    if (!file.exists(output)) {
+    if (!file.exists(file.path(
+      paths$data$interim$libraries$path,
+      output
+    ))) {
       stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
       if (isTRUE(filter)) {
         stopifnot(
