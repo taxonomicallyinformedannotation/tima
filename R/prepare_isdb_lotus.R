@@ -63,9 +63,9 @@ prepare_isdb_lotus <-
       )
 
       log_debug("... positive spectra")
-      if (nrow(spectra_harmonized_pos[[1]] |>
-               tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_pos[[1]] |>
+      if (nrow(spectra_harmonized_pos |>
+        tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_pos |>
           export_spectra(
             file = output_pos |>
               gsub(
@@ -73,15 +73,14 @@ prepare_isdb_lotus <-
                 replacement = ".sqlite",
                 fixed = TRUE
               ),
-            cmps = spectra_harmonized_pos[[2]],
             metad = metad
           )
       }
 
       log_debug("... negative spectra")
-      if (nrow(spectra_harmonized_neg[[1]] |>
-               tidyr::drop_na(compound_id)) != 0) {
-        spectra_harmonized_neg[[1]] |>
+      if (nrow(spectra_harmonized_neg |>
+        tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_neg |>
           export_spectra(
             file = output_neg |>
               gsub(
@@ -89,22 +88,22 @@ prepare_isdb_lotus <-
                 replacement = ".sqlite",
                 fixed = TRUE
               ),
-            cmps = spectra_harmonized_neg[[2]],
             metad = metad
           )
       }
-    }
-    log_debug("... positive spectra")
-    if (nrow(spectra_harmonized_pos[[1]] |>
-             tidyr::drop_na(compound_id)) != 0) {
-      spectra_harmonized_pos[[1]] |>
-        export_spectra(file = output_pos)
-    }
+    } else {
+      log_debug("... positive spectra")
+      if (nrow(spectra_harmonized_pos |>
+        tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_pos |>
+          export_spectra(file = output_pos)
+      }
 
-    log_debug("... negative spectra")
-    if (nrow(spectra_harmonized_neg[[1]] |>
-             tidyr::drop_na(compound_id)) != 0) {
-      spectra_harmonized_neg[[1]] |>
-        export_spectra(file = output_neg)
+      log_debug("... negative spectra")
+      if (nrow(spectra_harmonized_neg |>
+        tidyr::drop_na(compound_id)) != 0) {
+        spectra_harmonized_neg |>
+          export_spectra(file = output_neg)
+      }
     }
   }

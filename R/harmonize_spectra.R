@@ -31,12 +31,16 @@ harmonize_spectra <- function(spectra,
     as.character()
   colnames_missing <- colnames[is.na(colnames)] |>
     names() |>
-    gsub(pattern = "colname_",
-         replacement = "")
+    gsub(
+      pattern = "colname_",
+      replacement = ""
+    )
   colnames[is.na(colnames)] <- colnames[is.na(colnames)] |>
     names() |>
-    gsub(pattern = "colname_",
-         replacement = "")
+    gsub(
+      pattern = "colname_",
+      replacement = ""
+    )
 
   spectra_filtered <- spectra |>
     dplyr::filter(grepl(
@@ -44,13 +48,15 @@ harmonize_spectra <- function(spectra,
       x = !!as.name(colnames["colname_mode"]),
       ignore.case = TRUE
     )) |>
-    dplyr::select(dplyr::any_of(c(colnames_full)),
-                  precursorMz,
-                  precursorCharge,
-                  ## TODO
-                  # rtime
-                  mz,
-                  intensity) |>
+    dplyr::select(
+      dplyr::any_of(c(colnames_full)),
+      precursorMz,
+      precursorCharge,
+      ## TODO
+      # rtime
+      mz,
+      intensity
+    ) |>
     dplyr::mutate(join = "x")
 
   spectra_missing <- colnames_missing |>
@@ -92,15 +98,5 @@ harmonize_spectra <- function(spectra,
       )
     )
 
-  compounds_harmonized <- spectra_harmonized |>
-    dplyr::select(compound_id,
-                  name,
-                  inchi,
-                  inchikey,
-                  formula,
-                  exactmass,
-                  synonyms,
-                  smiles)
-
-  return(list(spectra_harmonized, compounds_harmonized))
+  return(spectra_harmonized)
 }
