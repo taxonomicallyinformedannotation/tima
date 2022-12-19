@@ -17,8 +17,6 @@ paths <- parse_yaml_paths()
 arguments <- commandArgs(trailingOnly = TRUE)
 mode <- if (!is.null(arguments)) {
   mode <- arguments
-} else {
-  "full"
 }
 
 ## Get all files

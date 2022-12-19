@@ -15,11 +15,9 @@ prepare_lotus <-
   function(input = paths$data$source$libraries$lotus,
            output = paths$data$interim$libraries$lotus) {
     if (!file.exists(output)) {
-      log_debug(x = "Loading files")
-      lotus <-
-        readr::read_delim(file = input)
-
-      lotus_prepared <- lotus |>
+      log_debug(x = "Loading and preparing LOTUS")
+      lotus_prepared <- input |>
+        readr::read_delim() |>
         dplyr::mutate(structure_inchikey_2D = substring(
           text = structure_inchikey,
           first = 1,
