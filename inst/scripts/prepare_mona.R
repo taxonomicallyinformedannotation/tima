@@ -20,6 +20,7 @@ paths <- parse_yaml_paths()
 #' @param input TODO
 #' @param output_pos TODO
 #' @param output_neg TODO
+#' @param export_sqlite TODO
 #'
 #' @return TODO
 #'
@@ -34,7 +35,22 @@ paths <- parse_yaml_paths()
 prepare_mona <-
   function(input = paths$data$source$spectra$mona_lcmsms,
            output_pos = paths$data$interim$spectra$mona$pos,
-           output_neg = paths$data$interim$spectra$mona$neg) {
+           output_neg = paths$data$interim$spectra$mona$neg,
+           export_sqlite = TRUE) {
+    if (export_sqlite == TRUE) {
+      output_pos <- output_pos |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+      output_neg <- output_neg |>
+        gsub(
+          pattern = ".mgf",
+          replacement = ".sqlite",
+          fixed = TRUE
+        )
+    }
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 
@@ -147,44 +163,52 @@ prepare_mona <-
       spctra_enhanced_3,
       spctra_enhanced_4,
       spctra_enhanced_5
+    ) |>
+      dplyr::filter(!is.na(inchikey_2D))
+
+    log_debug("Formatting")
+    colnames_mona <- c(
+      colname_collision_energy = "collision_energy",
+      colname_compound_id = NA,
+      colname_exact_mass = "exactmass",
+      colname_formula = "formula",
+      colname_inchi = "inchi_2D",
+      colname_inchikey = "inchikey_2D",
+      colname_mode = "ionmode",
+      colname_name = "inchikey_2D",
+      colname_precursorMz = "precursor_mz",
+      colname_precursorCharge = "precursorCharge",
+      colname_smiles = "smiles_2D",
+      colname_spectrum_id = NA,
+      colname_splash = NA,
+      colname_synonyms = NA
     )
 
-    spd <- data.frame(
-      precursorMz = spctra_enhanced_final$precursor_mz,
-      precursorCharge = spctra_enhanced_final$precursorCharge,
-      FILENAME = spctra_enhanced_final$inchikey_2D,
-      MOLECULAR_FORMULA = spctra_enhanced_final$formula,
-      SEQ = "*..*",
-      IONMODE = spctra_enhanced_final$ionmode,
-      EXACTMASS = spctra_enhanced_final$exactmass,
-      NAME = spctra_enhanced_final$inchikey_2D,
-      SMILES = spctra_enhanced_final$smiles_2D,
-      INCHI = spctra_enhanced_final$inchi_2D,
-      # LIBRARYQUALITY = "PREDICTED",
-      # SPLASH = spctra_enhanced_final$splash,
-      COLLISION_ENERGY = spctra_enhanced_final$collision_energy
-      # msLevel = 2L
-    )
+    log_debug("Positive")
+    spectra_harmonized_pos <- spctra_enhanced_final |>
+      harmonize_spectra(
+        colnames = colnames_mona,
+        mode = "pos"
+      )
 
-    spd$mz <- spctra_enhanced_final$mz
-    spd$intensity <- spctra_enhanced_final$intensity
-
-    log_debug("Filtering positive")
-    spd_pos <- spd |>
-      dplyr::filter(IONMODE == "POSITIVE")
-
-    log_debug("Filtering negative")
-    spd_neg <- spd |>
-      dplyr::filter(IONMODE == "NEGATIVE")
-
-    cat("TODO mgf sql conversion")
+    log_debug("Negative")
+    spectra_harmonized_neg <- spctra_enhanced_final |>
+      harmonize_spectra(
+        colnames = colnames_mona,
+        mode = "neg"
+      )
 
     log_debug("Exporting")
-    Spectra::Spectra(object = spd_pos) |>
-      Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_pos)
-
-    Spectra::Spectra(object = spd_neg) |>
-      Spectra::export(backend = MsBackendMgf::MsBackendMgf(), file = output_neg)
+    export_spectra_2(
+      file = output_pos,
+      spectra = spectra_harmonized_pos,
+      meta = NULL
+    )
+    export_spectra_2(
+      file = output_neg,
+      spectra = spectra_harmonized_neg,
+      meta = NULL
+    )
   }
 
 prepare_mona()

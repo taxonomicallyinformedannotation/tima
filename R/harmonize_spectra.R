@@ -14,6 +14,7 @@
 #' @examples TODO
 harmonize_spectra <- function(spectra,
                               colnames = c(
+                                colname_collision_energy = NA,
                                 colname_compound_id = NA,
                                 colname_exact_mass = "EXACTMASS",
                                 colname_formula = "MOLECULAR_FORMULA",
@@ -25,6 +26,7 @@ harmonize_spectra <- function(spectra,
                                 colname_precursorCharge = "precursorCharge",
                                 colname_smiles = "SMILES",
                                 colname_spectrum_id = NA,
+                                colname_splash = NA,
                                 colname_synonyms = NA
                               ),
                               mode = "pos") {
@@ -68,6 +70,7 @@ harmonize_spectra <- function(spectra,
   spectra_harmonized <- spectra_filtered |>
     dplyr::full_join(spectra_missing) |>
     dplyr::select(
+      collision_energy := !!as.name(colnames["colname_collision_energy"]),
       compound_id := !!as.name(colnames["colname_compound_id"]),
       exactmass := !!as.name(colnames["colname_exact_mass"]),
       formula := !!as.name(colnames["colname_formula"]),
@@ -78,6 +81,7 @@ harmonize_spectra <- function(spectra,
       precursorCharge := !!as.name(colnames["colname_precursorCharge"]),
       smiles := !!as.name(colnames["colname_smiles"]),
       spectrum_id := !!as.name(colnames["colname_spectrum_id"]),
+      splash := !!as.name(colnames["colname_splash"]),
       synonyms := !!as.name(colnames["colname_synonyms"]),
       ## TODO
       # rtime

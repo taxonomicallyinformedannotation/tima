@@ -113,6 +113,7 @@ prepare_isdb_hmdb <-
 
     log_debug("Formatting")
     colnames_hmdb <- c(
+      colname_collision_energy = "collision_energy",
       colname_compound_id = NA,
       colname_exact_mass = "monisotopic_molecular_weight",
       colname_formula = "chemical_formula",
@@ -124,6 +125,7 @@ prepare_isdb_hmdb <-
       colname_precursorCharge = "precursor_charge",
       colname_smiles = "smiles_2D",
       colname_spectrum_id = NA,
+      colname_splash = "splash",
       colname_synonyms = NA
     )
 
@@ -132,16 +134,6 @@ prepare_isdb_hmdb <-
       harmonize_spectra(
         colnames = colnames_hmdb,
         mode = "pos"
-      ) |>
-      dplyr::left_join(
-        spctra_enhanced |>
-          dplyr::distinct(
-            inchikey,
-            splash,
-            collision_energy,
-            mz,
-            intensity
-          )
       )
 
     log_debug("Negative")
@@ -149,16 +141,6 @@ prepare_isdb_hmdb <-
       harmonize_spectra(
         colnames = colnames_hmdb,
         mode = "neg"
-      ) |>
-      dplyr::left_join(
-        spctra_enhanced |>
-          dplyr::distinct(
-            inchikey,
-            splash,
-            collision_energy,
-            mz,
-            intensity
-          )
       )
 
     log_debug("Exporting")
