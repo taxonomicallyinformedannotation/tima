@@ -76,9 +76,9 @@ Once done, you can start with an example using:
 Rscript inst/scripts/tima_mini.R 
 ```
 
-This will launch a 'mini' example where small example files will be given.
+This will launch a `mini` example where small example files will be given.
 This is to illustrate what the expected inputs are.
-For the next iterations, simply change from the 'mini' examples and use:
+For the next iterations, simply change from the `mini` examples and use:
 
 ```
 Rscript inst/scripts/tima_full.R
