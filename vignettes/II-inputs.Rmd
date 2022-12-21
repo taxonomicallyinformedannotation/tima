@@ -140,7 +140,7 @@ paths <- yaml::read_yaml(
   file = "paths.yaml",
   handlers = list(
     seq = function(x) {
-      purrr::flatten(x)
+      purrr::list_flatten(x)
     }
   )
 )

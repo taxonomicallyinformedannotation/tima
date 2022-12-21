@@ -8,7 +8,7 @@
 #'
 #' @export
 #'
-#' @importFrom purrr flatten
+#' @importFrom purrr list_flatten
 #' @importFrom yaml read_yaml
 #'
 #' @examples TODO
@@ -18,7 +18,7 @@ parse_yaml_paths <- function(file = "paths.yaml") {
     file = file,
     handlers = list(
       seq = function(x) {
-        purrr::flatten(x)
+        purrr::list_flatten(x)
       }
     )
   ))

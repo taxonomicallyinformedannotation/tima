@@ -6,7 +6,7 @@
 #'
 #' @export
 #'
-#' @importFrom purrr flatten
+#' @importFrom purrr list_flatten
 #' @importFrom yaml read_yaml
 #'
 #' @examples TODO
@@ -15,14 +15,14 @@ parse_yaml_params <- function() {
   suppressWarnings(params <-
     yaml::read_yaml(file = default_path, handlers = list(
       seq = function(x) {
-        purrr::flatten(x)
+        purrr::list_flatten(x)
       }
     )))
   if (file.exists(params_path)) {
     suppressWarnings(params <-
       yaml::read_yaml(file = params_path, handlers = list(
         seq = function(x) {
-          purrr::flatten(x)
+          purrr::list_flatten(x)
         }
       )))
   }
