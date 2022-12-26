@@ -5,17 +5,17 @@
 \title{Replace GNPS job ID}
 \usage{
 replace_gnps_job_id(
-  x,
+  job,
   default = yamls_default$prepare_params$gnps,
-  params = params$gnps
+  repl = params$gnps
 )
 }
 \arguments{
-\item{x}{a character string containing a GNPS job ID}
+\item{job}{a character string containing a GNPS job ID}
 
 \item{default}{a default values for a GNPS job ID}
 
-\item{params}{a user-specified values for a GNPS job ID}
+\item{repl}{a user-specified values for a GNPS job ID}
 }
 \value{
 a character string with the GNPS job ID modified according to the rules specified in the function
@@ -24,5 +24,5 @@ a character string with the GNPS job ID modified according to the rules specifie
 Replace GNPS job ID
 }
 \examples{
-replaced_job_id <- replace_gnps_job_id("MyGNPSJobID", yamls_default, params)
+replaced_job_id <- replace_gnps_job_id("MyGNPSJobID", yamls_default, user)
 }
