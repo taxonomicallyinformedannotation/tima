@@ -9,11 +9,11 @@
 #' @importFrom CompoundDb CompDb Spectra
 #' @importFrom MsBackendMgf readMgf
 #' @importFrom Spectra Spectra
-#' @importFrom stringr fixed str_remove
+#' @importFrom stringr str_remove
 #'
 #' @examples TODO
 import_spectra <- function(file) {
-  file_ext <- stringr::str_remove(string = file, pattern = stringr::fixed(".*\\."))
+  file_ext <- stringr::str_remove(string = file, pattern = ".*\\.")
 
   switch(
     EXPR = file_ext,
