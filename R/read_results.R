@@ -1,5 +1,7 @@
 #' @title Read results
 #'
+#' @description TODO
+#'
 #' @param id a character string containing the job ID of the GNPS task
 #' @param workflow a character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'
 #'
@@ -10,7 +12,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples read_results("abcdefghijklmnopqrstuvwxyz1234", workflow = "fbmn")
+#' @examples NULL
 read_results <- function(id, workflow = params$workflow) {
   # Check that the workflow parameter is either 'fbmn' or 'classical'
   stopifnot(

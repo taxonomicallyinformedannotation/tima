@@ -1,10 +1,12 @@
 #' @title Prepare GNPS
 #'
-#' @param gnps_job_id TODO
-#' @param nap_job_id TODO
-#' @param output TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param gnps_job_id GNPS job ID
+#' @param nap_job_id NAP job ID
+#' @param output Output file
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -12,7 +14,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_gnps <-
   function(gnps_job_id = params$gnps,
            nap_job_id = params$nap,

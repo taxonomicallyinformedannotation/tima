@@ -1,5 +1,7 @@
 #' @title Parse YAML paths
 #'
+#' @description TODO
+#'
 #' @param file The file name of the YAML file containing the paths (default is "paths.yaml")
 #'
 #' @return A list containing the paths specified in the YAML file
@@ -9,7 +11,7 @@
 #' @importFrom purrr list_flatten
 #' @importFrom yaml read_yaml
 #'
-#' @examples paths <- parse_yaml_paths()
+#' @examples NULL
 parse_yaml_paths <- function(file = "paths.yaml") {
   # Read the YAML file containing the paths
   log_debug("Loading paths")

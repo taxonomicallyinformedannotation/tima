@@ -14,24 +14,21 @@ prepare_edges(
 )
 }
 \arguments{
-\item{tool}{TODO}
+\item{tool}{Tool used to generate the edges}
 
-\item{gnps_job_id}{TODO}
+\item{gnps_job_id}{GNPS job ID, if the tool was 'gnps'}
 
-\item{input}{TODO}
+\item{input}{Input file if 'manual'}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{name_source}{TODO}
+\item{name_source}{Name of the source features column}
 
-\item{name_target}{TODO}
-}
-\value{
-TODO
+\item{name_target}{Name of the target features column}
 }
 \description{
-Prepare edges
+TODO
 }
 \examples{
-TODO
+NULL
 }

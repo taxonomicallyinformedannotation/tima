@@ -21,8 +21,8 @@ replace_gnps_job_id(
 a character string with the GNPS job ID modified according to the rules specified in the function
 }
 \description{
-Replace GNPS job ID
+TODO
 }
 \examples{
-replaced_job_id <- replace_gnps_job_id("MyGNPSJobID", yamls_default, user)
+replaced_job_id <- replace_gnps_job_id(job = "MyGNPSJobIDXXX", default = "XXX", repl = "Foo")
 }

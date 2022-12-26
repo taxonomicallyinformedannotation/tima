@@ -1,10 +1,12 @@
 #' @title Harmonize spectra
 #'
-#' @param spectra TODO
-#' @param colnames TODO
-#' @param mode TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param spectra Spectra object to be harmonized
+#' @param colnames Names of the different columns corresponding to standardized headers
+#' @param mode MS ionization mode. Must contain 'pos' or 'neg'
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -12,7 +14,7 @@
 #' @importFrom stringr fixed str_remove
 #' @importFrom tidyr pivot_wider
 #'
-#' @examples TODO
+#' @examples NULL
 harmonize_spectra <- function(spectra,
                               colnames = c(
                                 colname_collision_energy = NA,

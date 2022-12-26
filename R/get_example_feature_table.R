@@ -1,7 +1,9 @@
 #' @title Get example feature table
 #'
-#' @param url the URL of the example feature table file
-#' @param export the file path to where the example feature table should be saved
+#' @description TODO
+#'
+#' @param url URL of the example feature table file
+#' @param export File path to where the example feature table should be saved
 #'
 #' @return NULL
 #'
@@ -9,7 +11,7 @@
 #'
 #' @importFrom readr read_tsv write_tsv
 #'
-#' @examples get_example_feature_table(url = "https://myurl.com/features.csv", export = "directory/table.tsv")
+#' @examples NULL
 get_example_feature_table <-
   function(url = paths$urls$example_feature_table,
            export = paths$data$interim$annotations$example_feature_table) {

@@ -1,14 +1,16 @@
 #' @title Prepare adducts
 #'
-#' @param adducts_input TODO
-#' @param adducts_table_input TODO
-#' @param config_output_path TODO
-#' @param adducts_output_path TODO
-#' @param output_name TODO
-#' @param masses_pos_output_path TODO
-#' @param masses_neg_output_path TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param adducts_input List of adducts taken as input
+#' @param adducts_table_input Table of adducts taken as input
+#' @param config_output_path Path where the configuration will be saved
+#' @param adducts_output_path Path where the adducts will be saved
+#' @param output_name Name of the file where adducts will be saved
+#' @param masses_pos_output_path Path where positive adducts masses will be saved
+#' @param masses_neg_output_path Path where negative adducts masses will be saved
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -16,7 +18,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_remove
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_adducts <-
   function(adducts_input = params$input,
            adducts_table_input = paths$data$source$adducts,

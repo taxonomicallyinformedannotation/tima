@@ -1,5 +1,7 @@
 #' @title Process annotations
 #'
+#' @description TODO
+#'
 #' @param library TODO
 #' @param name TODO
 #' @param gnps TODO
@@ -42,7 +44,7 @@
 #' @param minimal_ms1_chemo TODO
 #' @param ms1_only TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -52,7 +54,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom yaml write_yaml
 #'
-#' @examples TODO
+#' @examples NULL
 process_annotations <- function(library = params$library,
                                 name = params$name,
                                 gnps = params$annotation$gnps,

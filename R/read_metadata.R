@@ -1,5 +1,7 @@
 #' @title Read metadata
 #'
+#' @description TODO
+#'
 #' @param id a character string containing a GNPS job ID
 #'
 #' @return a data frame containing the metadata for the specified GNPS job
@@ -9,7 +11,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples metadata <- read_metadata("abcdefghijklmnopqrstuvwxyz123456")
+#' @examples NULL
 read_metadata <- function(id) {
   # Check if the input is a valid GNPS job ID
   stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)

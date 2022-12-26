@@ -13,8 +13,8 @@ read_metadata(id)
 a data frame containing the metadata for the specified GNPS job
 }
 \description{
-Read metadata
+TODO
 }
 \examples{
-metadata <- read_metadata("abcdefghijklmnopqrstuvwxyz123456")
+NULL
 }

@@ -13,8 +13,8 @@ read_nap(id)
 a data frame containing the node attributes table for the specified GNPS job
 }
 \description{
-Read NAP
+TODO
 }
 \examples{
-nap_df <- read_nap(id = "1234567890abcdefghijklmnopqrstu")
+NULL
 }

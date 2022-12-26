@@ -16,18 +16,15 @@ harmonize_spectra(
 )
 }
 \arguments{
-\item{spectra}{TODO}
+\item{spectra}{Spectra object to be harmonized}
 
-\item{colnames}{TODO}
+\item{colnames}{Names of the different columns corresponding to standardized headers}
 
-\item{mode}{TODO}
-}
-\value{
-TODO
+\item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
 }
 \description{
-Harmonize spectra
+TODO
 }
 \examples{
-TODO
+NULL
 }

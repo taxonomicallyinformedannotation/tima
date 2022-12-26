@@ -10,16 +10,13 @@ prepare_lotus(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{Input file}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{Output file}
 }
 \description{
-Prepare LOTUS
+TODO
 }
 \examples{
-TODO
+NULL
 }

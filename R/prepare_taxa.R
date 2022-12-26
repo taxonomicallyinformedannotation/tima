@@ -1,5 +1,7 @@
 #' @title Prepare taxa
 #'
+#' @description TODO
+#'
 #' @param input TODO
 #' @param tool TODO
 #' @param extension TODO
@@ -10,7 +12,7 @@
 #' @param output TODO
 #' @param taxon TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -25,7 +27,7 @@
 #' @importFrom tibble column_to_rownames rownames_to_column
 #' @importFrom tidyr gather pivot_wider separate_rows
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_taxa <-
   function(input = params$input,
            tool = params$tool,

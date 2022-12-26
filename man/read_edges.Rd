@@ -13,8 +13,8 @@ read_edges(id)
 a data frame containing the network edges for the specified GNPS job
 }
 \description{
-Read edges
+TODO
 }
 \examples{
-edges <- read_edges("1234567890abcdef1234567890abcdef")
+NULL
 }

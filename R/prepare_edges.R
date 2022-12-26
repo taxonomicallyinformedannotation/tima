@@ -1,13 +1,15 @@
 #' @title Prepare edges
 #'
-#' @param tool TODO
-#' @param gnps_job_id TODO
-#' @param input TODO
-#' @param output TODO
-#' @param name_source TODO
-#' @param name_target TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param tool Tool used to generate the edges
+#' @param gnps_job_id GNPS job ID, if the tool was 'gnps'
+#' @param input Input file if 'manual'
+#' @param output Output file
+#' @param name_source Name of the source features column
+#' @param name_target Name of the target features column
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -15,7 +17,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_edges <- function(tool = params$tool,
                           gnps_job_id = params$gnps,
                           input = params$input,

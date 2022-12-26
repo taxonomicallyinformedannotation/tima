@@ -1,16 +1,18 @@
 #' @title Prepare spectral matches
 #'
-#' @param input TODO
-#' @param output TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param input Input file
+#' @param output Output file
+#'
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom dplyr distinct mutate
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_spectral_matches <-
   function(input = params$input,
            output = params$output) {

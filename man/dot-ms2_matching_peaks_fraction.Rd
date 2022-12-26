@@ -12,11 +12,11 @@
 \item{...}{...}
 }
 \value{
-a numeric value indicating the fraction of matching peaks between x and y
+Numeric value indicating the fraction of matching peaks between x and y
 }
 \description{
-Calculate the fraction of matching peaks in two spectra
+TODO
 }
 \examples{
-.ms2_matching_peaks_fraction(x, ...)
+NULL
 }

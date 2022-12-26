@@ -1,11 +1,13 @@
 #' @title Prepare library
 #'
-#' @param filter TODO
-#' @param level TODO
-#' @param value TODO
-#' @param output TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param filter Boolean. TRUE or FALSE if you want to filter the library
+#' @param level Biological rank to be filtered. Kingdom, phylum, family, genus, ...
+#' @param value Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'
+#' @param output Output file
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -13,7 +15,7 @@
 #' @importFrom dplyr filter
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_library <- function(filter = params$filter$mode,
                             level = params$filter$level,
                             value = params$filter$value,

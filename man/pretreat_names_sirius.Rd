@@ -13,7 +13,7 @@ pretreat_names_sirius(x)
 a character string with the name modified according to the rules specified in the function
 }
 \description{
-Pretreat names sirius
+TODO
 }
 \examples{
 pretreated_name <- pretreat_names_sirius("My name/suffix")

@@ -13,8 +13,8 @@ read_features(id)
 a data frame containing the features for the specified GNPS job
 }
 \description{
-Read features
+TODO
 }
 \examples{
-features <- read_features(id = "abcdefghijklmnopqrstuvwxyz123456")
+NULL
 }

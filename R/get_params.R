@@ -1,15 +1,17 @@
 #' @title Get parameters
 #'
-#' @param step TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param step Name of the step being performed
+#'
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom docopt docopt
 #' @importFrom stringr fixed str_remove
 #'
-#' @examples TODO
+#' @examples NULL
 get_params <- function(step) {
   steps <- list.files(path = file.path(paths$inst$scripts$docopt)) |>
     stringr::str_remove(pattern = stringr::fixed(".txt"))

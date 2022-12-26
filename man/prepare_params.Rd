@@ -47,12 +47,9 @@ prepare_params(
 
 \item{force}{TODO}
 }
-\value{
-TODO
-}
 \description{
-Prepare parameters
+TODO
 }
 \examples{
-TODO
+NULL
 }

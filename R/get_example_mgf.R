@@ -1,7 +1,9 @@
 #' @title Get example MGF
 #'
-#' @param url the URL of the MGF file to be downloaded
-#' @param export the file path where the MGF file should be saved
+#' @description TODO
+#'
+#' @param url URL of the MGF file to be downloaded
+#' @param export File path where the MGF file should be saved
 #'
 #' @return NULL
 #'
@@ -9,7 +11,7 @@
 #'
 #' @importFrom utils download.file
 #'
-#' @examples TODO
+#' @examples NULL
 get_example_mgf <-
   function(url = paths$url$example_mgf,
            export = paths$data$source$example$mgf) {

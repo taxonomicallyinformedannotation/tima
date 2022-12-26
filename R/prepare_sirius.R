@@ -1,10 +1,12 @@
 #' @title Prepare sirius
 #'
-#' @param input_directory TODO
-#' @param npc TODO
-#' @param output TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param input_directory Directory containing the Sirius results
+#' @param npc Boolean. NPClassifier classes computed. TRUE or FALSE
+#' @param output Output where to save prepared results
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -12,7 +14,7 @@
 #' @importFrom dplyr na_if select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_sirius <-
   function(input_directory = params$directory,
            npc = params$npc,

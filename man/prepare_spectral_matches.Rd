@@ -7,16 +7,13 @@
 prepare_spectral_matches(input = params$input, output = params$output)
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{Input file}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{Output file}
 }
 \description{
-Prepare spectral matches
+TODO
 }
 \examples{
-TODO
+NULL
 }

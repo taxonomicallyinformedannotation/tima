@@ -1,12 +1,14 @@
 #' @title Prepare LOTUS In Silico DataBase
 #'
-#' @param input_pos TODO
-#' @param input_neg TODO
-#' @param output_pos TODO
-#' @param output_neg TODO
-#' @param export_sqlite TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param input_pos File containing positive ionization LOTUS ISDB
+#' @param input_neg File containing negative ionization LOTUS ISDB
+#' @param output_pos Output for positive mode
+#' @param output_neg Output for negative mode
+#' @param export_sqlite Boolean. Export to SQLite? TRUE or FALSE
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -16,7 +18,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr drop_na
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_isdb_lotus <-
   function(input_pos = paths$data$source$spectra$lotus$pos,
            input_neg = paths$data$source$spectra$lotus$neg,

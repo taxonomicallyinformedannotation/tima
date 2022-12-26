@@ -1,5 +1,7 @@
 #' @title Weight bio
 #'
+#' @description TODO
+#'
 #' @param annotationTable TODO
 #' @param structureOrganismPairsTable TODO
 #' @param weightSpectral TODO
@@ -15,7 +17,7 @@
 #' @param scoreBiologicalSpecies TODO
 #' @param scoreBiologicalVariety TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -23,7 +25,7 @@
 #' @importFrom dplyr full_join group_by left_join mutate select tibble ungroup
 #' @importFrom stringr str_detect
 #'
-#' @examples TODO
+#' @examples NULL
 weight_bio <-
   function(annotationTable = annotation_table_ms1_taxed,
            structureOrganismPairsTable = structure_organism_pairs_table,

@@ -15,26 +15,23 @@ prepare_adducts(
 )
 }
 \arguments{
-\item{adducts_input}{TODO}
+\item{adducts_input}{List of adducts taken as input}
 
-\item{adducts_table_input}{TODO}
+\item{adducts_table_input}{Table of adducts taken as input}
 
-\item{config_output_path}{TODO}
+\item{config_output_path}{Path where the configuration will be saved}
 
-\item{adducts_output_path}{TODO}
+\item{adducts_output_path}{Path where the adducts will be saved}
 
-\item{output_name}{TODO}
+\item{output_name}{Name of the file where adducts will be saved}
 
-\item{masses_pos_output_path}{TODO}
+\item{masses_pos_output_path}{Path where positive adducts masses will be saved}
 
-\item{masses_neg_output_path}{TODO}
-}
-\value{
-TODO
+\item{masses_neg_output_path}{Path where negative adducts masses will be saved}
 }
 \description{
-Prepare adducts
+TODO
 }
 \examples{
-TODO
+NULL
 }

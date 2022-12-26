@@ -2,16 +2,18 @@
 
 #' @title Calculate the number of matching peaks in two spectra
 #'
+#' @description TODO
+#'
 #' @param x a matrix with two columns: m/z and intensity values for the first spectrum
 #' @param y a matrix with two columns: m/z and intensity values for the first spectrum
 #' @param ... ...
 #' @param cutoff a numeric value indicating the minimum intensity required for a peak to be considered
 #'
-#' @return an integer indicating the number of matching peaks between x and y
+#' @return Integer indicating the number of matching peaks between x and y
 #'
 #' @export
 #'
-#' @examples .ms2_matching_peaks(x, y, cutoff = 0)
+#' @examples NULL
 .ms2_matching_peaks <- function(x, y, ..., cutoff = 0) {
   # Select only the peaks with intensity greater than the cutoff
   x <- x[x[, 2] > cutoff, 1]
@@ -24,14 +26,16 @@
 
 #' @title Calculate the fraction of matching peaks in two spectra
 #'
+#' @description TODO
+#'
 #' @param x a matrix with two columns: m/z and intensity values for the first spectrum
 #' @param ... ...
 #'
-#' @return a numeric value indicating the fraction of matching peaks between x and y
+#' @return Numeric value indicating the fraction of matching peaks between x and y
 #'
 #' @export
 #'
-#' @examples .ms2_matching_peaks_fraction(x, ...)
+#' @examples NULL
 .ms2_matching_peaks_fraction <- function(x, ...) {
   # Calculate the number of matching peaks
   matching_peaks <- .ms2_matching_peaks(x, ...)

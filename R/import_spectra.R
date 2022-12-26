@@ -1,8 +1,10 @@
 #' @title Import spectra
 #'
-#' @param file the file path of the spectrum file to be imported
+#' @description TODO
 #'
-#' @return a Spectra object containing the imported spectra
+#' @param file File path of the spectrum file to be imported
+#'
+#' @return Spectra object containing the imported spectra
 #'
 #' @export
 #'
@@ -11,7 +13,7 @@
 #' @importFrom Spectra Spectra
 #' @importFrom stringr str_remove
 #'
-#' @examples TODO
+#' @examples NULL
 import_spectra <- function(file) {
   file_ext <- stringr::str_remove(string = file, pattern = ".*\\.")
 

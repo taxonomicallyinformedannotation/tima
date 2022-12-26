@@ -12,20 +12,17 @@ prepare_library(
 )
 }
 \arguments{
-\item{filter}{TODO}
+\item{filter}{Boolean. TRUE or FALSE if you want to filter the library}
 
-\item{level}{TODO}
+\item{level}{Biological rank to be filtered. Kingdom, phylum, family, genus, ...}
 
-\item{value}{TODO}
+\item{value}{Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{Output file}
 }
 \description{
-Prepare library
+TODO
 }
 \examples{
-TODO
+NULL
 }

@@ -44,12 +44,9 @@ process_spectra(
 
 \item{parallel}{TODO}
 }
-\value{
-TODO
-}
 \description{
-Process spectra
+TODO
 }
 \examples{
-TODO
+NULL
 }

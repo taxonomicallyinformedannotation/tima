@@ -14,24 +14,21 @@ prepare_features_components(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{Input file if tool == 'manual'}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{tool}{TODO}
+\item{tool}{Tool used to generate components}
 
-\item{components}{TODO}
+\item{components}{File containing the components if tool == 'manual'}
 
-\item{gnps_job_id}{TODO}
+\item{gnps_job_id}{GNPS job ID}
 
-\item{ms_mode}{TODO}
-}
-\value{
-TODO
+\item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 }
 \description{
-Prepare features components
+TODO
 }
 \examples{
-TODO
+NULL
 }

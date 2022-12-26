@@ -7,14 +7,14 @@
 import_spectra(file)
 }
 \arguments{
-\item{file}{the file path of the spectrum file to be imported}
+\item{file}{File path of the spectrum file to be imported}
 }
 \value{
-a Spectra object containing the imported spectra
+Spectra object containing the imported spectra
 }
 \description{
-Import spectra
+TODO
 }
 \examples{
-TODO
+NULL
 }

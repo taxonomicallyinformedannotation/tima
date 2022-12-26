@@ -10,13 +10,13 @@ get_example_mgf(
 )
 }
 \arguments{
-\item{url}{the URL of the MGF file to be downloaded}
+\item{url}{URL of the MGF file to be downloaded}
 
-\item{export}{the file path where the MGF file should be saved}
+\item{export}{File path where the MGF file should be saved}
 }
 \description{
-Get example MGF
+TODO
 }
 \examples{
-TODO
+NULL
 }

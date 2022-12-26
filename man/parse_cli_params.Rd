@@ -6,12 +6,9 @@
 \usage{
 parse_cli_params()
 }
-\value{
-TODO
-}
 \description{
-Parse CLI parameters
+TODO
 }
 \examples{
-TODO
+NULL
 }

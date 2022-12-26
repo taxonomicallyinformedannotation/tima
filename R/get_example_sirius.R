@@ -1,7 +1,9 @@
 #' @title Get example sirius
 #'
-#' @param url the URL of the example sirius file to be downloaded
-#' @param export the file path where the downloaded sirius file should be saved
+#' @description TODO
+#'
+#' @param url URL of the example sirius file to be downloaded
+#' @param export File path where the downloaded sirius file should be saved
 #'
 #' @return NULL
 #'
@@ -9,7 +11,7 @@
 #'
 #' @importFrom utils download.file unzip
 #'
-#' @examples TODO
+#' @examples NULL
 get_example_sirius <-
   function(url = paths$url$example_sirius,
            export = paths$data$interim$annotations$example_sirius) {

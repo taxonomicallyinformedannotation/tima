@@ -12,20 +12,17 @@ prepare_features_classification(
 )
 }
 \arguments{
-\item{library}{TODO}
+\item{library}{Library to be used to classify features}
 
-\item{input}{TODO}
+\item{input}{Input file}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{quickmode}{TODO}
-}
-\value{
-TODO
+\item{quickmode}{Boolean. If TRUE, runs fast but does not complete missing data}
 }
 \description{
-Prepare features classification
+TODO
 }
 \examples{
-TODO
+NULL
 }

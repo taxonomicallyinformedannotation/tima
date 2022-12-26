@@ -1,18 +1,20 @@
 #' @title Prepare features classification
 #'
-#' @param library TODO
-#' @param input TODO
-#' @param output TODO
-#' @param quickmode TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param library Library to be used to classify features
+#' @param input Input file
+#' @param output Output file
+#' @param quickmode Boolean. If TRUE, runs fast but does not complete missing data
+#'
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom dplyr anti_join distinct filter left_join mutate_all na_if select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_features_classification <-
   function(library = params$library,
            input = params$input,

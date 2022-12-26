@@ -1,8 +1,10 @@
 #' @title Log debug
 #'
+#' @description Simple helper for debugging
+#'
 #' @param ... one or more values to be logged
 #'
-#' @return NULL
+#' @return Message for debugging
 #'
 #' @export
 #'

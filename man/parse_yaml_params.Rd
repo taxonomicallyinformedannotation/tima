@@ -10,8 +10,8 @@ parse_yaml_params()
 A list containing the parameters specified in the YAML files
 }
 \description{
-Parse YAML parameters
+TODO
 }
 \examples{
-params <- parse_yaml_params()
+NULL
 }

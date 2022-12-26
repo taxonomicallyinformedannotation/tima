@@ -16,11 +16,14 @@
 \item{cutoff}{a numeric value indicating the minimum intensity required for a peak to be considered}
 }
 \value{
-an integer indicating the number of matching peaks between x and y
+Integer indicating the number of matching peaks between x and y
 }
 \description{
+TODO
+}
+\details{
 Courtesy of Michele Stravs (ORCID = "0000-0002-1426-8572")
 }
 \examples{
-.ms2_matching_peaks(x, y, cutoff = 0)
+NULL
 }

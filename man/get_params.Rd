@@ -7,14 +7,11 @@
 get_params(step)
 }
 \arguments{
-\item{step}{TODO}
-}
-\value{
-TODO
+\item{step}{Name of the step being performed}
 }
 \description{
-Get parameters
+TODO
 }
 \examples{
-TODO
+NULL
 }

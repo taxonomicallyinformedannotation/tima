@@ -1,5 +1,7 @@
 #' @title Read clusters
 #'
+#' @description TODO
+#'
 #' @param id A character string of length 32 representing the job ID
 #' @param workflow A character string indicating the type of workflow, either "fbmn" or "classical"
 #'
@@ -10,7 +12,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples TODO
+#' @examples NULL
 read_clusters <- function(id, workflow = params$workflow) {
   # Check if the given workflow is supported
   stopifnot("Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical"))

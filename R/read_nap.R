@@ -1,5 +1,7 @@
 #' @title Read NAP
 #'
+#' @description TODO
+#'
 #' @param id a character string containing a GNPS job ID
 #'
 #' @return a data frame containing the node attributes table for the specified GNPS job
@@ -9,7 +11,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples nap_df <- read_nap(id = "1234567890abcdefghijklmnopqrstu")
+#' @examples NULL
 read_nap <- function(id) {
   # Check that the ID is a valid GNPS job ID (32 characters long)
   stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)

@@ -13,7 +13,7 @@ treat_names_sirius(x)
 a character string with the name modified according to the rules specified in the function
 }
 \description{
-Treat names sirius
+TODO
 }
 \examples{
 treated_name <- treat_names_sirius("My_name")

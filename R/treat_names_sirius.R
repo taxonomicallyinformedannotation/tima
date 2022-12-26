@@ -1,5 +1,7 @@
 #' @title Treat names sirius
 #'
+#' @description TODO
+#'
 #' @param x a character string containing a name
 #'
 #' @return a character string with the name modified according to the rules specified in the function

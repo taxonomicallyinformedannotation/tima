@@ -11,18 +11,15 @@ prepare_sirius(
 )
 }
 \arguments{
-\item{input_directory}{TODO}
+\item{input_directory}{Directory containing the Sirius results}
 
-\item{npc}{TODO}
+\item{npc}{Boolean. NPClassifier classes computed. TRUE or FALSE}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{Output where to save prepared results}
 }
 \description{
-Prepare sirius
+TODO
 }
 \examples{
-TODO
+NULL
 }

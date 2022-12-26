@@ -15,8 +15,8 @@ read_results(id, workflow = params$workflow)
 a data frame containing the results of the GNPS task
 }
 \description{
-Read results
+TODO
 }
 \examples{
-read_results("abcdefghijklmnopqrstuvwxyz1234", workflow = "fbmn")
+NULL
 }

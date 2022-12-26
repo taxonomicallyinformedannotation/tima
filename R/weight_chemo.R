@@ -1,5 +1,7 @@
 #' @title Weight chemo
 #'
+#' @description NULL
+#'
 #' @param annotationTableWeightedBioCleaned TODO
 #' @param weightSpectral TODO
 #' @param weightBiological TODO
@@ -8,7 +10,7 @@
 #' @param scoreChemicalSuperclass TODO
 #' @param scoreChemicalClass TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -17,7 +19,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyselect where
 #'
-#' @examples TODO
+#' @examples NULL
 weight_chemo <-
   function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
            weightSpectral = weight_spectral,

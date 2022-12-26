@@ -1,13 +1,15 @@
 #' @title Prepare features components
 #'
-#' @param input TODO
-#' @param output TODO
-#' @param tool TODO
-#' @param components TODO
-#' @param gnps_job_id TODO
-#' @param ms_mode TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param input Input file if tool == 'manual'
+#' @param output Output file
+#' @param tool Tool used to generate components
+#' @param components File containing the components if tool == 'manual'
+#' @param gnps_job_id GNPS job ID
+#' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -15,7 +17,7 @@
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_features_components <- function(input = params$input,
                                         output = params$output,
                                         tool = params$tool,

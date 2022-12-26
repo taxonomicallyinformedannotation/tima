@@ -7,18 +7,18 @@
 get_last_version_from_zenodo(doi, pattern, path)
 }
 \arguments{
-\item{doi}{TODO}
+\item{doi}{DOI of the Zenodo record}
 
-\item{pattern}{TODO}
+\item{pattern}{Pattern to identify the file to download}
 
-\item{path}{TODO}
-}
-\value{
-TODO
+\item{path}{Path to save the file to}
 }
 \description{
+TODO
+}
+\details{
 Credit goes to partially to https://inbo.github.io/inborutils/
 }
 \examples{
-TODO
+NULL
 }

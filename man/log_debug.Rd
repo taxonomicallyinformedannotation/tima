@@ -9,8 +9,11 @@ log_debug(...)
 \arguments{
 \item{...}{one or more values to be logged}
 }
+\value{
+Message for debugging
+}
 \description{
-Log debug
+Simple helper for debugging
 }
 \examples{
 log_debug("This is a debug message")

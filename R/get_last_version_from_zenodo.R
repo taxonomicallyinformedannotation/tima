@@ -2,11 +2,13 @@
 
 #' @title Get last version from Zenodo
 #'
-#' @param doi TODO
-#' @param pattern TODO
-#' @param path TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param doi DOI of the Zenodo record
+#' @param pattern Pattern to identify the file to download
+#' @param path Path to save the file to
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -14,7 +16,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom stringr fixed str_match str_remove
 #'
-#' @examples TODO
+#' @examples NULL
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
     # Remove the prefix from the DOI

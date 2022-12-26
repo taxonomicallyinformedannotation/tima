@@ -1,5 +1,7 @@
 #' @title Prepare parameters
 #'
+#' @description TODO
+#'
 #' @param filename TODO
 #' @param gnps_job_id TODO
 #' @param candidates_initial TODO
@@ -14,14 +16,14 @@
 #' @param tolerance_rt TODO
 #' @param force TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom stringr str_length
 #' @importFrom yaml read_yaml write_yaml
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_params <- function(filename = params$filename,
                            gnps_job_id = params$gnps,
                            candidates_initial = params$top_k$initial,

@@ -1,5 +1,7 @@
 #' @title Read features
 #'
+#' @description TODO
+#'
 #' @param id a character string containing a GNPS job ID
 #'
 #' @return a data frame containing the features for the specified GNPS job
@@ -9,7 +11,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples features <- read_features(id = "abcdefghijklmnopqrstuvwxyz123456")
+#' @examples NULL
 read_features <- function(id) {
   # Check if the length of the ID is 32 characters
   stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)

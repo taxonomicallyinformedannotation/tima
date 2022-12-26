@@ -1,16 +1,18 @@
 #' @title Prepare LOTUS
 #'
-#' @param input TODO
-#' @param output TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param input Input file
+#' @param output Output file
+#'
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom dplyr distinct mutate select
 #' @importFrom readr read_csv
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_lotus <-
   function(input = paths$data$source$libraries$lotus,
            output = paths$data$interim$libraries$lotus) {

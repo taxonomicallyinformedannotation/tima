@@ -11,18 +11,15 @@ prepare_gnps(
 )
 }
 \arguments{
-\item{gnps_job_id}{TODO}
+\item{gnps_job_id}{GNPS job ID}
 
-\item{nap_job_id}{TODO}
+\item{nap_job_id}{NAP job ID}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{Output file}
 }
 \description{
-Prepare GNPS
+TODO
 }
 \examples{
-TODO
+NULL
 }

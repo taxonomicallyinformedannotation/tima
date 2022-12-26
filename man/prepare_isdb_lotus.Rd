@@ -13,22 +13,19 @@ prepare_isdb_lotus(
 )
 }
 \arguments{
-\item{input_pos}{TODO}
+\item{input_pos}{File containing positive ionization LOTUS ISDB}
 
-\item{input_neg}{TODO}
+\item{input_neg}{File containing negative ionization LOTUS ISDB}
 
-\item{output_pos}{TODO}
+\item{output_pos}{Output for positive mode}
 
-\item{output_neg}{TODO}
+\item{output_neg}{Output for negative mode}
 
-\item{export_sqlite}{TODO}
-}
-\value{
-TODO
+\item{export_sqlite}{Boolean. Export to SQLite? TRUE or FALSE}
 }
 \description{
-Prepare LOTUS In Silico DataBase
+TODO
 }
 \examples{
-TODO
+NULL
 }

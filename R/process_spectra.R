@@ -1,5 +1,7 @@
 #' @title Process spectra
 #'
+#' @description TODO
+#'
 #' @param input TODO
 #' @param library TODO
 #' @param output TODO
@@ -13,7 +15,7 @@
 #' @param quickmode TODO
 #' @param parallel TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -22,7 +24,7 @@
 #' @importFrom MetaboAnnotation CompareSpectraParam matchSpectra
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
 #'
-#' @examples TODO
+#' @examples NULL
 process_spectra <- function(input = params$input,
                             library = params$library,
                             output = params$output,

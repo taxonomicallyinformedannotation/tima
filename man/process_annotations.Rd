@@ -131,12 +131,9 @@ process_annotations(
 
 \item{force}{TODO}
 }
-\value{
-TODO
-}
 \description{
-Process annotations
+TODO
 }
 \examples{
-TODO
+NULL
 }

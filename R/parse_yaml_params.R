@@ -1,5 +1,7 @@
 #' @title Parse YAML parameters
 #'
+#' @description TODO
+#'
 #' @return A list containing the parameters specified in the YAML files
 #'
 #' @export
@@ -7,7 +9,7 @@
 #' @importFrom purrr list_flatten
 #' @importFrom yaml read_yaml
 #'
-#' @examples params <- parse_yaml_params()
+#' @examples NULL
 parse_yaml_params <- function() {
   # Initialize an empty list to store the parameters
   params <- list()

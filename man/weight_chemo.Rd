@@ -29,12 +29,9 @@ weight_chemo(
 
 \item{scoreChemicalClass}{TODO}
 }
-\value{
-TODO
-}
 \description{
 Weight chemo
 }
 \examples{
-TODO
+NULL
 }

@@ -50,12 +50,9 @@ weight_bio(
 
 \item{scoreBiologicalVariety}{TODO}
 }
-\value{
-TODO
-}
 \description{
-Weight bio
+TODO
 }
 \examples{
-TODO
+NULL
 }

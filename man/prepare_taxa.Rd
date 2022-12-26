@@ -35,12 +35,9 @@ prepare_taxa(
 
 \item{taxon}{TODO}
 }
-\value{
-TODO
-}
 \description{
-Prepare taxa
+TODO
 }
 \examples{
-TODO
+NULL
 }
