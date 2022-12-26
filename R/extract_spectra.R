@@ -23,10 +23,7 @@ extract_spectra <- function(object) {
   ## Extract peaks data and transform it into a data frame
   peaks <- object |>
     Spectra::peaksData() |>
-    data.frame()
-
-  ## Group peaks by 'group' and summarize all columns
-  peaks <- peaks |>
+    data.frame() |>
     dplyr::group_by(group) |>
     dplyr::summarize_all(list)
 
@@ -39,13 +36,13 @@ extract_spectra <- function(object) {
   spectra$mz <- peaks$mz
   spectra$intensity <- peaks$intensity
 
-  ## Group spectra data by all columns except 'synonym', and summarize the remaining columns as character vectors
+  ## Synonyms issue
   spectra <- spectra |>
     dplyr::group_by(dplyr::across(c(-dplyr::any_of("synonym")))) |>
     dplyr::summarize(dplyr::across(.cols = where(is.list), .fns = as.character)) |>
     dplyr::ungroup()
 
-  ## Convert columns specified in 'incoherent_logical' and 'incoherent_integer' to logical and integer, respectively
+  ## Columns types issue
   spectra <- spectra |>
     dplyr::mutate(dplyr::across(
       .cols = dplyr::any_of(incoherent_logical),
