@@ -13,8 +13,7 @@
 #' @importFrom crayon green
 #' @importFrom yaml write_yaml
 #'
-#' @examples
-#' export_params(parameters = params, directory = paths$data$interim$config$path, step = "step1")
+#' @examples export_params(parameters = list(), directory = ".", step = "step")
 export_params <- function(parameters = params, directory = paths$data$interim$config$path, step) {
   # Create directory if it does not exist
   create_dir(export = directory)

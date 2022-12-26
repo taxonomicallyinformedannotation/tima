@@ -1,13 +1,15 @@
 #' @title Clean bio
 #'
-#' @param annotationTableWeightedBio TODO
-#' @param structureOrganismPairsTable TODO
-#' @param edgesTable TODO
-#' @param aNnOtAtE TODO
-#' @param candidatesInitial TODO
-#' @param minimalMs1Bio TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param annotationTableWeightedBio Table containing your biologically weighted annotation
+#' @param structureOrganismPairsTable Table containing the structure - organism pairs
+#' @param edgesTable Table containing the edges between features
+#' @param aNnOtAtE Boolean parameter indicating if you performed MS1 annotation completion
+#' @param candidatesInitial Number of initial candidates to keep
+#' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
+#'
+#' @return A table containing the biologically weighted annotation where only a given number of initial candidates are kept
 #'
 #' @export
 #'
@@ -17,7 +19,7 @@
 #' @importFrom stats setNames
 #' @importFrom tidyselect where
 #'
-#' @examples TODO
+#' @examples NULL
 clean_bio <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            structureOrganismPairsTable = structure_organism_pairs_table,

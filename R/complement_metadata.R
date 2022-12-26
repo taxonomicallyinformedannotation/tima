@@ -1,19 +1,18 @@
 #' @title Complement metadata
 #'
 #' @description This function fetches the metadata from Zenodo and joins it with the input data frame.
-#' @description It also renames and removes unnecessary columns.
+#'    It also renames and removes unnecessary columns.
 #'
-#' @param df data frame with metadata to be complemented
+#' @param df Data frame with metadata to be complemented
 #'
-#' @return data frame with complemented metadata
+#' @return Data frame with complemented metadata
 #'
 #' @export
 #'
 #' @importFrom readr read_delim
 #' @importFrom dplyr coalesce distinct left_join mutate select
 #'
-#' @examples
-#' complement_metadata(df)
+#' @examples NULL
 complement_metadata <- function(df) {
   # Fetch metadata from Zenodo
   log_debug("Trying to look for already computed metadata")

@@ -1,8 +1,10 @@
 #' @title Fake edges
 #'
-#' @param input TODO
-#' @param output TODO
-#' @param name_feature TODO
+#' @description TODO
+#'
+#' @param input Input file
+#' @param output Output file
+#' @param name_feature Name of the features column
 #'
 #' @return NULL
 #'
@@ -10,7 +12,7 @@
 #'
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 fake_edges <- function(input = params$input,
                        output = params$output,
                        name_feature = params$feature) {

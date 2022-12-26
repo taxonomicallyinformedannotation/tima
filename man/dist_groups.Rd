@@ -18,8 +18,8 @@ the group labels for each observation, and the distance between the observations
 The label column indicates whether the distance is within a group or between groups.
 }
 \description{
-Dist groups
+TODO
 }
 \examples{
-TODO
+NULL
 }

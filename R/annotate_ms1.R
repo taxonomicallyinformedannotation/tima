@@ -1,16 +1,18 @@
 #' @title Annotate MS1
 #'
-#' @param annotationTable TODO
-#' @param structureExactMassTable TODO
-#' @param structureOrganismPairsTable TODO
-#' @param adducts TODO
-#' @param neutralLosses TODO
-#' @param msMode TODO
-#' @param tolerancePpm TODO
-#' @param toleranceRt TODO
-#' @param candidatesInitial TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param annotationTable Table containing your previous annotation to complement
+#' @param structureExactMassTable Table containing the structure - exact mass pairs to perform annotation
+#' @param structureOrganismPairsTable Table containing the structure - organism pairs
+#' @param adducts List of adducts to be used
+#' @param neutralLosses List of neutral losses to be used
+#' @param msMode Ionization mode. Must be 'pos' or 'neg'
+#' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
+#' @param toleranceRt Tolerance to perform adduct attribution. Should be lower than 0.1min
+#' @param candidatesInitial Number of initial candidates to keep
+#'
+#' @return A table containing the initial annotation complemented by additional MS1 annotations based on exact mass
 #'
 #' @export
 #'
@@ -22,7 +24,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples TODO
+#' @examples NULL
 annotate_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            structureExactMassTable = structure_exact_mass_table,

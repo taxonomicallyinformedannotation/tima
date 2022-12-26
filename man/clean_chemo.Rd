@@ -13,22 +13,22 @@ clean_chemo(
 )
 }
 \arguments{
-\item{annotationTableWeightedChemo}{TODO}
+\item{annotationTableWeightedChemo}{Table containing your chemically weighted annotation}
 
-\item{structureOrganismPairsTable}{TODO}
+\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
-\item{candidatesFinal}{TODO}
+\item{candidatesFinal}{Number of final candidates to keep}
 
-\item{minimalMs1Bio}{TODO}
+\item{minimalMs1Bio}{Minimal biological score to keep MS1 based annotation}
 
-\item{minimalMs1Chemo}{TODO}
+\item{minimalMs1Chemo}{Minimal chemical score to keep MS1 based annotation}
 }
 \value{
-TODO
+A table containing the chemically weighted annotation where only a given number of initial candidates are kept
 }
 \description{
-Clean chemo
+TODO
 }
 \examples{
-TODO
+NULL
 }

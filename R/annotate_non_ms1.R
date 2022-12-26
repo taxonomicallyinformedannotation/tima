@@ -1,16 +1,18 @@
 #' @title Annotate non MS1
 #'
-#' @param annotationTable TODO
-#' @param candidatesInitial TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param annotationTable Table containing your previous annotation
+#' @param candidatesInitial Number of initial candidates to keep
+#'
+#' @return A table containing the initial annotation where only part of initial candidates are kept
 #'
 #' @export
 #'
 #' @importFrom dplyr across dense_rank desc group_by distinct filter left_join
 #' @importFrom dplyr mutate mutate_all select ungroup
 #'
-#' @examples TODO
+#' @examples NULL
 annotate_non_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {

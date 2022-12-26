@@ -1,12 +1,14 @@
 #' @title Export spectra
 #'
-#' @param file TODO
-#' @param spectra TODO
-#' @param dir TODO
-#' @param cmps TODO
-#' @param metad TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
+#' @param spectra The spectra object where spectra are stored
+#' @param dir Directory for export
+#' @param cmps Optional. Compounds data frame as in 'CompoundDb' package
+#' @param metad Optional. Metadata as in 'CompoundDb' package
+#'
+#' @return NULL
 #'
 #' @export
 #'
@@ -14,7 +16,7 @@
 #' @importFrom MsBackendMgf MsBackendMgf
 #' @importFrom Spectra export Spectra
 #'
-#' @examples TODO
+#' @examples NULL
 export_spectra <- function(file,
                            spectra,
                            dir = ".",
@@ -129,17 +131,19 @@ export_spectra <- function(file,
 
 #' @title Export spectra 2
 #'
-#' @param file TODO
-#' @param spectra TODO
-#' @param meta TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
+#' @param spectra The spectra object where spectra are stored
+#' @param meta Optional. Metadata as in 'CompoundDb' package
+#'
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom tidyr drop_na
 #'
-#' @examples TODO
+#' @examples NULL
 export_spectra_2 <- function(file,
                              spectra,
                              meta) {

@@ -7,11 +7,11 @@
 decorate_chemo()
 }
 \value{
-TODO
+Message indicating the number of annotations weighted at each chemical level
 }
 \description{
-Decorate chemo
+TODO
 }
 \examples{
-TODO
+NULL
 }

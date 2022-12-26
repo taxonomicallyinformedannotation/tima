@@ -14,21 +14,21 @@ fake_features_components(
 )
 }
 \arguments{
-\item{input}{path to the file containing the input data}
+\item{input}{Path to the file containing the input data}
 
-\item{features}{path to the file containing the features data}
+\item{features}{Path to the file containing the features data}
 
-\item{output}{path to the file to export the merged data to}
+\item{output}{Path to the file to export the merged data to}
 
-\item{ms_mode}{mode of mass spectrometry, either "pos" or "neg"}
+\item{ms_mode}{Mode of mass spectrometry, either "pos" or "neg"}
 
-\item{name_rt}{name of the retention time column in the features data}
+\item{name_rt}{Name of the retention time column in the features data}
 
-\item{name_mz}{name of the m/z column in the features data}
+\item{name_mz}{Name of the m/z column in the features data}
 }
 \description{
-Fake features components
+TODO
 }
 \examples{
-TODO
+NULL
 }

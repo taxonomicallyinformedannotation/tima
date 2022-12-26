@@ -1,7 +1,9 @@
 #' @title Form adducts positive
 #'
-#' @param massesTable TODO
-#' @param adductsTable TODO
+#' @description TODO
+#'
+#' @param massesTable Table containing the masses of the adducts
+#' @param adductsTable Table containing the adducts
 #'
 #' @return TODO
 #'
@@ -10,8 +12,9 @@
 #' @importFrom dplyr all_of everything mutate select
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples TODO
+#' @examples NULL
 form_adducts_pos <- function(massesTable, adductsTable) {
+  ## Calculate the masses for various positive adducts
   adducts_pos <- massesTable |>
     dplyr::mutate(
       pos_3_3proton = (exact_mass + 3 * proton) / 3,
@@ -63,6 +66,7 @@ form_adducts_pos <- function(massesTable, adductsTable) {
 
   n <- ncol(adducts_pos)
 
+  ## Pivot the adducts_pos table to get a long format with adduct and adduct mass as columns
   adducts_pos <- adducts_pos |>
     tidyr::pivot_longer(2:dplyr::all_of(n)) |>
     dplyr::select(dplyr::everything(),

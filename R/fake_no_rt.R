@@ -1,7 +1,9 @@
 #' @title Fake no retention time
 #'
-#' @param input the file path of the input feature table
-#' @param output the file path of the output feature table with no retention time column
+#' @description TODO
+#'
+#' @param input File path of the input feature table
+#' @param output File path of the output feature table with no retention time column
 #'
 #' @return NULL
 #'
@@ -9,7 +11,7 @@
 #'
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 fake_no_rt <- function(input = paths$data$interim$annotations$example_feature_table,
                        output = paths$data$interim$annotations$example_feature_table_no_rt) {
   # Check if input file exists

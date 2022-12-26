@@ -7,16 +7,16 @@
 form_adducts_pos(massesTable, adductsTable)
 }
 \arguments{
-\item{massesTable}{TODO}
+\item{massesTable}{Table containing the masses of the adducts}
 
-\item{adductsTable}{TODO}
+\item{adductsTable}{Table containing the adducts}
 }
 \value{
 TODO
 }
 \description{
-Form adducts positive
+TODO
 }
 \examples{
-TODO
+NULL
 }

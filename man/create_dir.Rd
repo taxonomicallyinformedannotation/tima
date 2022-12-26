@@ -7,14 +7,14 @@
 create_dir(export)
 }
 \arguments{
-\item{export}{path to the directory to be created}
+\item{export}{Path to the directory to be created}
 }
 \value{
-message indicating the status of directory creation
+Message indicating the status of directory creation
 }
 \description{
 This function creates a directory at the specified path if it does not already exist.
 }
 \examples{
-create_dir(export = "path/to/directory")
+create_dir(export = "path/to/directory_of_file")
 }

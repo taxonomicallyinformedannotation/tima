@@ -1,12 +1,14 @@
 #' @title Clean chemo
 #'
-#' @param annotationTableWeightedChemo TODO
-#' @param structureOrganismPairsTable TODO
-#' @param candidatesFinal TODO
-#' @param minimalMs1Bio TODO
-#' @param minimalMs1Chemo TODO
+#' @description TODO
 #'
-#' @return TODO
+#' @param annotationTableWeightedChemo Table containing your chemically weighted annotation
+#' @param structureOrganismPairsTable Table containing the structure - organism pairs
+#' @param candidatesFinal Number of final candidates to keep
+#' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
+#' @param minimalMs1Chemo Minimal chemical score to keep MS1 based annotation
+#'
+#' @return A table containing the chemically weighted annotation where only a given number of initial candidates are kept
 #'
 #' @export
 #'
@@ -14,7 +16,7 @@
 #' @importFrom dplyr everything filter group_by left_join mutate mutate_all
 #' @importFrom dplyr na_if select summarise ungroup
 #'
-#' @examples TODO
+#' @examples NULL
 clean_chemo <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
            structureOrganismPairsTable = structure_organism_pairs_table,

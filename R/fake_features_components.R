@@ -1,11 +1,13 @@
 #' @title Fake features components
 #'
-#' @param input path to the file containing the input data
-#' @param features path to the file containing the features data
-#' @param output path to the file to export the merged data to
-#' @param ms_mode mode of mass spectrometry, either "pos" or "neg"
-#' @param name_rt name of the retention time column in the features data
-#' @param name_mz name of the m/z column in the features data
+#' @description TODO
+#'
+#' @param input Path to the file containing the input data
+#' @param features Path to the file containing the features data
+#' @param output Path to the file to export the merged data to
+#' @param ms_mode Mode of mass spectrometry, either "pos" or "neg"
+#' @param name_rt Name of the retention time column in the features data
+#' @param name_mz Name of the m/z column in the features data
 #'
 #' @return NULL
 #'
@@ -14,7 +16,7 @@
 #' @importFrom dplyr arrange desc distinct left_join mutate select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 fake_features_components <- function(input = params$input,
                                      features = params$features,
                                      output = params$output,
@@ -26,7 +28,7 @@ fake_features_components <- function(input = params$input,
   stopifnot("Your features file does not exist" = file.exists(features))
 
   # Check that ms_mode is valid
-  stopifnot("Your mode must be 'pos' or 'neg'"=ms_mode %in% c("pos", "neg"))
+  stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   # Read input and features files
   log_debug("Loading files ...")

@@ -10,13 +10,13 @@ get_benchmark(
 )
 }
 \arguments{
-\item{url}{a character string containing the URL of the benchmarking set}
+\item{url}{Character string containing the URL of the benchmarking set}
 
-\item{export}{a character string containing the file path where the benchmarking set should be exported}
+\item{export}{Character string containing the file path where the benchmarking set should be exported}
 }
 \description{
-Get benchmark
+TODO
 }
 \examples{
-get_benchmark(url = "https://myurl.com/benchmark.csv", export = "data/source/benchmark/set.csv")
+get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp", export = "data/source/benchmark/set.csv")
 }

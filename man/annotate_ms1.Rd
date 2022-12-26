@@ -17,30 +17,30 @@ annotate_ms1(
 )
 }
 \arguments{
-\item{annotationTable}{TODO}
+\item{annotationTable}{Table containing your previous annotation to complement}
 
-\item{structureExactMassTable}{TODO}
+\item{structureExactMassTable}{Table containing the structure - exact mass pairs to perform annotation}
 
-\item{structureOrganismPairsTable}{TODO}
+\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
-\item{adducts}{TODO}
+\item{adducts}{List of adducts to be used}
 
-\item{neutralLosses}{TODO}
+\item{neutralLosses}{List of neutral losses to be used}
 
-\item{msMode}{TODO}
+\item{msMode}{Ionization mode. Must be 'pos' or 'neg'}
 
-\item{tolerancePpm}{TODO}
+\item{tolerancePpm}{Tolerance to perform annotation. Should be lower than 10 ppm}
 
-\item{toleranceRt}{TODO}
+\item{toleranceRt}{Tolerance to perform adduct attribution. Should be lower than 0.1min}
 
-\item{candidatesInitial}{TODO}
+\item{candidatesInitial}{Number of initial candidates to keep}
 }
 \value{
-TODO
+A table containing the initial annotation complemented by additional MS1 annotations based on exact mass
 }
 \description{
-Annotate MS1
+TODO
 }
 \examples{
-TODO
+NULL
 }

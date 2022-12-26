@@ -10,16 +10,16 @@ annotate_non_ms1(
 )
 }
 \arguments{
-\item{annotationTable}{TODO}
+\item{annotationTable}{Table containing your previous annotation}
 
-\item{candidatesInitial}{TODO}
+\item{candidatesInitial}{Number of initial candidates to keep}
 }
 \value{
-TODO
+A table containing the initial annotation where only part of initial candidates are kept
 }
 \description{
-Annotate non MS1
+TODO
 }
 \examples{
-TODO
+NULL
 }

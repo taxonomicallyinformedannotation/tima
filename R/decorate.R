@@ -1,13 +1,15 @@
 #' @title Decorate MS1
 #'
-#' @return TODO
+#' @description TODO
+#'
+#' @return Message indicating the number of annotations obtained by MS1
 #'
 #' @export
 #'
 #' @importFrom crayon blue cyan green magenta red silver white yellow
 #' @importFrom dplyr anti_join distinct filter
 #'
-#' @examples TODO
+#' @examples NULL
 decorate_ms1 <- function() {
   suppressWarnings(
     cat(
@@ -56,15 +58,19 @@ decorate_ms1 <- function() {
   )
 }
 
-###############################################################################
 
 #' @title Decorate bio
 #'
-#' @return TODO
+#' @description TODO
+#'
+#' @return Message indicating the number of annotations weighted at each biological level
 #'
 #' @export
 #'
-#' @examples TODO
+#' @importFrom crayon blue cyan green magenta red silver white yellow
+#' @importFrom dplyr distinct filter
+#'
+#' @examples NULL
 decorate_bio <- function() {
   cat(
     "taxonomically informed scoring led to \n",
@@ -152,15 +158,19 @@ decorate_bio <- function() {
   )
 }
 
-###############################################################################
 
 #' @title Decorate chemo
 #'
-#' @return TODO
+#' @description TODO
+#'
+#' @return Message indicating the number of annotations weighted at each chemical level
+#'
+#' @importFrom crayon blue green yellow
+#' @importFrom dplyr filter
 #'
 #' @export
 #'
-#' @examples TODO
+#' @examples NULL
 decorate_chemo <- function() {
   cat(
     x = paste(

@@ -2,16 +2,17 @@
 
 #' @title Get the distance between two elements in a distance matrix
 #'
-#' @param d distance matrix
-#' @param idx1 index of the first element
-#' @param idx2 index of the second element
+#' @description TODO
 #'
-#' @return distance between the two elements
+#' @param d Distance matrix
+#' @param idx1 Index of the first element
+#' @param idx2 Index of the second element
+#'
+#' @return Distance between the two elements
 #'
 #' @export
 #'
-#' @examples
-#' dist_get(d, idx1, idx2)
+#' @examples NULL
 dist_get <- function(d, idx1, idx2) {
   # Convert input to distance matrix
   d <- stats::as.dist(d)
@@ -47,6 +48,8 @@ dist_get <- function(d, idx1, idx2) {
 
 #' @title Dist groups
 #'
+#' @description TODO
+#'
 #' @param d A distance object
 #' @param g A grouping vector for the distance object
 #'
@@ -59,7 +62,7 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @importFrom utils combn
 #'
-#' @examples TODO
+#' @examples NULL
 dist_groups <- function(d, g) {
   # Convert d to a dist object
   d <- stats::as.dist(d)

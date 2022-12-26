@@ -7,11 +7,11 @@
 decorate_bio()
 }
 \value{
-TODO
+Message indicating the number of annotations weighted at each biological level
 }
 \description{
-Decorate bio
+TODO
 }
 \examples{
-TODO
+NULL
 }

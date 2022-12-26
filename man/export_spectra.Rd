@@ -7,22 +7,19 @@
 export_spectra(file, spectra, dir = ".", cmps = NULL, metad = NULL)
 }
 \arguments{
-\item{file}{TODO}
+\item{file}{File where spectra will be exported. Can be '.mgf' or '.sqlite'}
 
-\item{spectra}{TODO}
+\item{spectra}{The spectra object where spectra are stored}
 
-\item{dir}{TODO}
+\item{dir}{Directory for export}
 
-\item{cmps}{TODO}
+\item{cmps}{Optional. Compounds data frame as in 'CompoundDb' package}
 
-\item{metad}{TODO}
-}
-\value{
-TODO
+\item{metad}{Optional. Metadata as in 'CompoundDb' package}
 }
 \description{
-Export spectra
+TODO
 }
 \examples{
-TODO
+NULL
 }

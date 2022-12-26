@@ -14,24 +14,24 @@ clean_bio(
 )
 }
 \arguments{
-\item{annotationTableWeightedBio}{TODO}
+\item{annotationTableWeightedBio}{Table containing your biologically weighted annotation}
 
-\item{structureOrganismPairsTable}{TODO}
+\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
-\item{edgesTable}{TODO}
+\item{edgesTable}{Table containing the edges between features}
 
-\item{aNnOtAtE}{TODO}
+\item{aNnOtAtE}{Boolean parameter indicating if you performed MS1 annotation completion}
 
-\item{candidatesInitial}{TODO}
+\item{candidatesInitial}{Number of initial candidates to keep}
 
-\item{minimalMs1Bio}{TODO}
+\item{minimalMs1Bio}{Minimal biological score to keep MS1 based annotation}
 }
 \value{
-TODO
+A table containing the biologically weighted annotation where only a given number of initial candidates are kept
 }
 \description{
-Clean bio
+TODO
 }
 \examples{
-TODO
+NULL
 }

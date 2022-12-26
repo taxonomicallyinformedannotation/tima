@@ -7,18 +7,15 @@
 export_spectra_2(file, spectra, meta)
 }
 \arguments{
-\item{file}{TODO}
+\item{file}{File where spectra will be exported. Can be '.mgf' or '.sqlite'}
 
-\item{spectra}{TODO}
+\item{spectra}{The spectra object where spectra are stored}
 
-\item{meta}{TODO}
-}
-\value{
-TODO
+\item{meta}{Optional. Metadata as in 'CompoundDb' package}
 }
 \description{
-Export spectra 2
+TODO
 }
 \examples{
-TODO
+NULL
 }

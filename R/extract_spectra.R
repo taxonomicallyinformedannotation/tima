@@ -1,5 +1,7 @@
 #' @title Extract spectra from a Spectra object
 #'
+#' @description TODO
+#'
 #' @param object Object of class Spectra
 #'
 #' @return Data frame containing spectra data
@@ -9,8 +11,7 @@
 #' @importFrom dplyr across any_of group_by mutate rename select summarize summarize_all ungroup
 #' @importFrom Spectra peaksData spectraData
 #'
-#' @examples
-#' extract_spectra(object)
+#' @examples NULL
 extract_spectra <- function(object) {
   ## issues
   incoherent_colnames <- c(

@@ -1,7 +1,9 @@
 #' @title Get benchmark
 #'
-#' @param url a character string containing the URL of the benchmarking set
-#' @param export a character string containing the file path where the benchmarking set should be exported
+#' @description TODO
+#'
+#' @param url Character string containing the URL of the benchmarking set
+#' @param export Character string containing the file path where the benchmarking set should be exported
 #'
 #' @return NULL
 #'
@@ -10,7 +12,7 @@
 #' @importFrom curl curl_download
 #' @importFrom readr read_csv write_csv
 #'
-#' @examples get_benchmark(url = "https://myurl.com/benchmark.csv", export = "data/source/benchmark/set.csv")
+#' @examples get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp", export = "data/source/benchmark/set.csv")
 get_benchmark <- function(url = paths$urls$benchmarking_set,
                           export = paths$data$source$benchmark$set) {
   ## Create the directory where the benchmarking set will be exported

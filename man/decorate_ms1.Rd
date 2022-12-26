@@ -7,11 +7,11 @@
 decorate_ms1()
 }
 \value{
-TODO
+Message indicating the number of annotations obtained by MS1
 }
 \description{
-Decorate MS1
+TODO
 }
 \examples{
-TODO
+NULL
 }

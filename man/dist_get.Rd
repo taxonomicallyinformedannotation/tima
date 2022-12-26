@@ -7,18 +7,21 @@
 dist_get(d, idx1, idx2)
 }
 \arguments{
-\item{d}{distance matrix}
+\item{d}{Distance matrix}
 
-\item{idx1}{index of the first element}
+\item{idx1}{Index of the first element}
 
-\item{idx2}{index of the second element}
+\item{idx2}{Index of the second element}
 }
 \value{
-distance between the two elements
+Distance between the two elements
 }
 \description{
+TODO
+}
+\details{
 Credit goes to usedist package
 }
 \examples{
-dist_get(d, idx1, idx2)
+NULL
 }

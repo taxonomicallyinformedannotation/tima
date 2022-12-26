@@ -11,15 +11,15 @@ fake_edges(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{Input file}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{name_feature}{TODO}
+\item{name_feature}{Name of the features column}
 }
 \description{
-Fake edges
+TODO
 }
 \examples{
-TODO
+NULL
 }

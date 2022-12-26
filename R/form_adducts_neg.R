@@ -1,7 +1,9 @@
 #' @title Form adducts negative
 #'
-#' @param massesTable TODO
-#' @param adductsTable TODO
+#' @description TODO
+#'
+#' @param massesTable Table containing the masses of the adducts
+#' @param adductsTable Table containing the adducts
 #'
 #' @return TODO
 #'
@@ -10,7 +12,7 @@
 #' @importFrom dplyr all_of everything mutate select
 #' @importFrom tidyr pivot_longer
 #'
-#' @examples TODO
+#' @examples NULL
 form_adducts_neg <- function(massesTable, adductsTable) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
