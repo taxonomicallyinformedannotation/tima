@@ -11,7 +11,7 @@
 #' @importFrom stringr str_length
 #'
 #' @examples read_results("abcdefghijklmnopqrstuvwxyz1234", workflow = "fbmn")
-read_results <- function(id, workflow) {
+read_results <- function(id, workflow = params$workflow) {
   # Check that the workflow parameter is either 'fbmn' or 'classical'
   stopifnot(
     "Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical")

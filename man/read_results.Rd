@@ -4,7 +4,7 @@
 \alias{read_results}
 \title{Read results}
 \usage{
-read_results(id, workflow)
+read_results(id, workflow = params$workflow)
 }
 \arguments{
 \item{id}{a character string containing the job ID of the GNPS task}
