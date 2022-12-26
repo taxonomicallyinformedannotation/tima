@@ -14,7 +14,7 @@
 fake_edges <- function(input = params$input,
                        output = params$output,
                        name_feature = params$feature) {
-  stopifnot(file.exists(input), "Your input file does not exist")
+  stopifnot("Your input file does not exist" = file.exists(input))
 
   edges_table_treated <- readr::read_delim(
     file = input,

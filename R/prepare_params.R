@@ -35,7 +35,7 @@ prepare_params <- function(filename = params$filename,
                            tolerance_rt = params$ms$tolerance$rt,
                            taxon = params$taxon,
                            force = params$force) {
-  stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+  stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
   stopifnot("Your ms_annotate parameter must be 'true' or 'false'" = annotate %in% c(TRUE, FALSE))
   if (force == FALSE) {

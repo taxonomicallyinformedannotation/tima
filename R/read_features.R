@@ -12,7 +12,7 @@
 #' @examples features <- read_features(id = "abcdefghijklmnopqrstuvwxyz123456")
 read_features <- function(id) {
   # Check if the length of the ID is 32 characters
-  stopifnot(stringr::str_length(id) == 32, "Your job ID is invalid")
+  stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)
 
   # Construct the URL for the features file
   file <- paste0(

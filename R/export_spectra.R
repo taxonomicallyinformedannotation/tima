@@ -154,7 +154,7 @@ export_spectra_2 <- function(file,
       )
   } else {
     log_debug(
-      "There is already a negative library with the same name existing, to avoid any conflict please remove it."
+      "There is already a library with the same name existing, to avoid any conflict please remove it."
     )
   }
 }

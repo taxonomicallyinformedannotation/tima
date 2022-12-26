@@ -23,7 +23,7 @@ prepare_features_components <- function(input = params$input,
                                         gnps_job_id = params$gnps,
                                         ms_mode = params$mode) {
   if (tool == "gnps") {
-    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {
     stopifnot("Your input file does not exist" = file.exists(input))
     stopifnot("Your components file does not exist" = file.exists(components))

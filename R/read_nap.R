@@ -12,7 +12,7 @@
 #' @examples nap_df <- read_nap(id = "1234567890abcdefghijklmnopqrstu")
 read_nap <- function(id) {
   # Check that the ID is a valid GNPS job ID (32 characters long)
-  stopifnot(stringr::str_length(id) == 32, "Your job ID is invalid")
+  stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)
 
   # Construct the URL for the node attributes table file
   file <- paste0(

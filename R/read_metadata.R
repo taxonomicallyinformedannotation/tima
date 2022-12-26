@@ -12,7 +12,7 @@
 #' @examples metadata <- read_metadata("abcdefghijklmnopqrstuvwxyz123456")
 read_metadata <- function(id) {
   # Check if the input is a valid GNPS job ID
-  stopifnot(stringr::str_length(id) == 32, "Your job ID is invalid")
+  stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)
 
   # Construct the URL for the metadata file
   file <-

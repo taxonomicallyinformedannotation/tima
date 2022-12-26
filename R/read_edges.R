@@ -13,7 +13,7 @@
 read_edges <- function(id) {
   # Check if the provided ID is a valid GNPS job ID
   # (32 characters long)
-  stopifnot(stringr::str_length(id) == 32, "Your job ID is invalid")
+  stopifnot("Your job ID is invalid" = stringr::str_length(string = id) == 32)
 
   # Construct the URL for the network edges file for the specified GNPS job
   file <- paste0(

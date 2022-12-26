@@ -27,7 +27,7 @@ prepare_edges <- function(tool = params$tool,
 
   ## Check that input is valid
   if (tool == "gnps") {
-    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {
     stopifnot("Your input file does not exist" = file.exists(input))
   }
@@ -35,7 +35,7 @@ prepare_edges <- function(tool = params$tool,
   ## Load edges table
   log_debug(x = "Loading edge table")
   if (tool == "gnps") {
-    edges_table <- read_edges(gnps_job_id)
+    edges_table <- read_edges(id = gnps_job_id)
   } else {
     edges_table <- readr::read_delim(file = input)
   }

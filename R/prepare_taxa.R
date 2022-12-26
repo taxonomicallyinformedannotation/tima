@@ -38,7 +38,7 @@ prepare_taxa <-
            taxon = params$taxon) {
     stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
     if (tool == "gnps") {
-      stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+      stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
     } else {
       if (is.null(taxon)) {
         if (tool == "manual") {
@@ -82,8 +82,8 @@ prepare_taxa <-
         tibble::column_to_rownames(var = "row ID")
       colnames(feature_table) <-
         stringr::str_remove(
-          pattern = stringr::fixed(pattern = " Peak area"),
-          x = colnames(feature_table)
+          string = colnames(feature_table),
+          pattern = stringr::fixed(pattern = " Peak area")
         )
       log_debug(x = "... filtering top K intensities per feature")
       top_n <- feature_table |>
@@ -115,8 +115,8 @@ prepare_taxa <-
         sep = "\\|",
       ) |>
       dplyr::mutate(organism = stringr::str_remove(
-        pattern = stringr::fixed(pattern = " x "),
-        x = organism
+        string = organism,
+        pattern = stringr::fixed(pattern = " x ")
       )) |>
       dplyr::distinct() |>
       dplyr::mutate(search_string = tolower(organism)) |>
@@ -245,12 +245,12 @@ prepare_taxa <-
         log_debug("Removing filename extensions")
         metadata_table <- metadata_table |>
           dplyr::mutate(filename = stringr::str_remove(
-            pattern = stringr::fixed(pattern = ".mzML"),
-            x = filename
+            string = filename,
+            pattern = stringr::fixed(pattern = ".mzML")
           )) |>
           dplyr::mutate(filename = stringr::str_remove(
-            pattern = stringr::fixed(pattern = ".mzxML"),
-            x = filename
+            string = filename,
+            pattern = stringr::fixed(pattern = ".mzxML")
           ))
       }
     }

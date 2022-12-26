@@ -22,11 +22,11 @@ fake_features_components <- function(input = params$input,
                                      name_rt = params$rt_name,
                                      name_mz = params$precursor_name) {
   # Check that input and features files exist
-  stopifnot(file.exists(input), "Your input file does not exist")
-  stopifnot(file.exists(features), "Your features file does not exist")
+  stopifnot("Your input file does not exist" = file.exists(input))
+  stopifnot("Your features file does not exist" = file.exists(features))
 
   # Check that ms_mode is valid
-  stopifnot(ms_mode %in% c("pos", "neg"), "Your mode must be 'pos' or 'neg'")
+  stopifnot("Your mode must be 'pos' or 'neg'"=ms_mode %in% c("pos", "neg"))
 
   # Read input and features files
   log_debug("Loading files ...")

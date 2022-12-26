@@ -17,9 +17,9 @@ prepare_gnps <-
   function(gnps_job_id = params$gnps,
            nap_job_id = params$nap,
            output = params$output) {
-    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(gnps_job_id) == 32)
+    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
     if (!is.null(nap_job_id)) {
-      stopifnot("Your NAP job ID is invalid" = stringr::str_length(nap_job_id) == 32)
+      stopifnot("Your NAP job ID is invalid" = stringr::str_length(string = nap_job_id) == 32)
     }
 
     log_debug("Loading and formatting GNPS results")
