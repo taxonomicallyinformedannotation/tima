@@ -1,16 +1,21 @@
 #' @title Complement metadata
 #'
-#' @param df TODO
+#' @description This function fetches the metadata from Zenodo and joins it with the input data frame.
+#' @description It also renames and removes unnecessary columns.
 #'
-#' @return TODO
+#' @param df data frame with metadata to be complemented
+#'
+#' @return data frame with complemented metadata
 #'
 #' @export
 #'
 #' @importFrom readr read_delim
-#' @importFrom dplyr distinct left_join mutate select
+#' @importFrom dplyr coalesce distinct left_join mutate select
 #'
-#' @examples TODO
+#' @examples
+#' complement_metadata(df)
 complement_metadata <- function(df) {
+  # Fetch metadata from Zenodo
   log_debug("Trying to look for already computed metadata")
   get_last_version_from_zenodo(
     doi = paths$url$lotus$metadata_doi,
@@ -18,6 +23,7 @@ complement_metadata <- function(df) {
     path = paths$data$source$libraries$structure_metadata
   )
 
+  # Read metadata from file and keep only distinct rows
   metadata <-
     readr::read_delim(
       file = paths$data$source$libraries$structure_metadata,
@@ -30,24 +36,13 @@ complement_metadata <- function(df) {
     ) |>
     dplyr::distinct()
 
+  # Join metadata to df, rename columns, and remove unnecessary columns
   df_new <- df |>
     dplyr::left_join(metadata) |>
     dplyr::mutate(
-      smiles_2D = ifelse(
-        test = !is.na(smiles_2D),
-        yes = smiles_2D,
-        no = smiles_2D_2
-      ),
-      molecular_formula = ifelse(
-        test = !is.na(molecular_formula),
-        yes = molecular_formula,
-        no = molecular_formula_2
-      ),
-      structure_exact_mass = ifelse(
-        test = !is.na(structure_exact_mass),
-        yes = structure_exact_mass,
-        no = structure_exact_mass_2
-      )
+      smiles_2D = dplyr::coalesce(smiles_2D, smiles_2D_2),
+      molecular_formula = dplyr::coalesce(molecular_formula, molecular_formula_2),
+      structure_exact_mass = dplyr::coalesce(structure_exact_mass, structure_exact_mass_2)
     ) |>
     dplyr::select(
       -smiles_2D_2,

@@ -1,6 +1,4 @@
-#' @title Fake adducts positive
-#'
-#' @noRd
+#' @title Form adducts positive
 #'
 #' @param massesTable TODO
 #' @param adductsTable TODO

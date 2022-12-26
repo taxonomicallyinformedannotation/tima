@@ -1,7 +1,5 @@
 #' @title Parse CLI parameters
 #'
-#' @noRd
-#'
 #' @return TODO
 #'
 #' @export

@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @importFrom dplyr any_of filter full_join mutate row_number select
+#' @importFrom stringr fixed str_remove
 #' @importFrom tidyr pivot_wider
 #'
 #' @examples TODO
@@ -35,15 +36,13 @@ harmonize_spectra <- function(spectra,
     as.character()
   colnames_missing <- colnames[is.na(colnames)] |>
     names() |>
-    gsub(
-      pattern = "colname_",
-      replacement = ""
+    stringr::str_remove(
+      pattern = stringr::fixed(pattern = "colname_")
     )
   colnames[is.na(colnames)] <- colnames[is.na(colnames)] |>
     names() |>
-    gsub(
-      pattern = "colname_",
-      replacement = ""
+    stringr::str_remove(
+      pattern = stringr::fixed(pattern = "colname_")
     )
 
   spectra_filtered <- spectra |>

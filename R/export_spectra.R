@@ -131,7 +131,7 @@ export_spectra <- function(file,
 #'
 #' @param file TODO
 #' @param spectra TODO
-#' @param metad TODO
+#' @param meta TODO
 #'
 #' @return TODO
 #'

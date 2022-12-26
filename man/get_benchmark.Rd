@@ -10,16 +10,13 @@ get_benchmark(
 )
 }
 \arguments{
-\item{url}{TODO}
+\item{url}{a character string containing the URL of the benchmarking set}
 
-\item{export}{TODO}
-}
-\value{
-TODO
+\item{export}{a character string containing the file path where the benchmarking set should be exported}
 }
 \description{
 Get benchmark
 }
 \examples{
-TODO
+get_benchmark(url = "https://myurl.com/benchmark.csv", export = "data/source/benchmark/set.csv")
 }

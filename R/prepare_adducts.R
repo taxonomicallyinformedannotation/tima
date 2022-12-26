@@ -14,6 +14,7 @@
 #'
 #' @importFrom dplyr distinct filter mutate_all select
 #' @importFrom readr read_delim write_delim
+#' @importFrom stringr str_remove
 #'
 #' @examples TODO
 prepare_adducts <-
@@ -45,19 +46,17 @@ prepare_adducts <-
       dplyr::mutate_all(.funs = trimws) |>
       dplyr::mutate_all(
         .funs = function(x) {
-          gsub(
-            pattern = ".* \\(",
-            replacement = "",
-            x = x
+          stringr::str_remove(
+            string = x,
+            pattern = ".* \\("
           )
         }
       ) |>
       dplyr::mutate_all(
         .funs = function(x) {
-          gsub(
-            pattern = "\\)",
-            replacement = "",
-            x = x
+          stringr::str_remove(
+            string = x,
+            pattern = "\\)"
           )
         }
       )

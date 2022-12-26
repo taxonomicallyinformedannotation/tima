@@ -7,14 +7,16 @@
 complement_metadata(df)
 }
 \arguments{
-\item{df}{TODO}
+\item{df}{data frame with metadata to be complemented}
 }
 \value{
-TODO
+data frame with complemented metadata
 }
 \description{
-Complement metadata
+This function fetches the metadata from Zenodo and joins it with the input data frame.
+
+It also renames and removes unnecessary columns.
 }
 \examples{
-TODO
+complement_metadata(df)
 }

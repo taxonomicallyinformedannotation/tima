@@ -14,9 +14,11 @@
 prepare_spectral_matches <-
   function(input = params$input,
            output = params$output) {
+    # Check if input file exists
     stopifnot("Your input file does not exist" = file.exists(input))
 
     log_debug(x = "Loading and formatting spectral matches")
+    # Read input file and select specific columns
     table <- readr::read_delim(file = input) |>
       dplyr::distinct(
         feature_id,
@@ -26,6 +28,7 @@ prepare_spectral_matches <-
         structure_exact_mass = exact_mass,
         score_input = msms_score
       ) |>
+      # Add new columns
       dplyr::mutate(
         library = "ISDB",
         inchikey = NA,
@@ -34,9 +37,11 @@ prepare_spectral_matches <-
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
       ) |>
+      # Call complement_metadata function on the modified data frame
       complement_metadata()
 
     log_debug(x = "Exporting ...")
+    # Call export_params and export_output functions
     export_params(step = "prepare_spectral_matches")
     export_output(x = table, file = output)
   }

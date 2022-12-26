@@ -1,7 +1,5 @@
 #' @title Get parameters
 #'
-#' @noRd
-#'
 #' @param step TODO
 #'
 #' @return TODO
@@ -9,11 +7,12 @@
 #' @export
 #'
 #' @importFrom docopt docopt
+#' @importFrom stringr fixed str_remove
 #'
 #' @examples TODO
 get_params <- function(step) {
   steps <- list.files(path = file.path(paths$inst$scripts$docopt)) |>
-    gsub(pattern = ".txt", replacement = "")
+    stringr::str_remove(pattern = stringr::fixed(".txt"))
 
   stopifnot(
     "Your step does not exist." = step %in% steps

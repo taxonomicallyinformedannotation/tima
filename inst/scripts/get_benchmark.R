@@ -12,7 +12,7 @@ cat(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-#' TODO CLI DOCOPT
+paths <- parse_yaml_paths()
 
 get_benchmark()
 

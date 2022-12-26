@@ -1,15 +1,16 @@
-#' @title Extract spectra
+#' @title Extract spectra from a Spectra object
 #'
-#' @param object TODO
+#' @param object Object of class Spectra
 #'
-#' @return TODO
+#' @return Data frame containing spectra data
 #'
 #' @export
 #'
 #' @importFrom dplyr across any_of group_by mutate rename select summarize summarize_all ungroup
 #' @importFrom Spectra peaksData spectraData
 #'
-#' @examples TODO
+#' @examples
+#' extract_spectra(object)
 extract_spectra <- function(object) {
   ## issues
   incoherent_colnames <- c(
@@ -18,26 +19,33 @@ extract_spectra <- function(object) {
   )
   incoherent_logical <- c("predicted")
   incoherent_integer <- c("spectrum_id")
-  ##
 
+  ## Extract peaks data and transform it into a data frame
   peaks <- object |>
     Spectra::peaksData() |>
-    data.frame() |>
+    data.frame()
+
+  ## Group peaks by 'group' and summarize all columns
+  peaks <- peaks |>
     dplyr::group_by(group) |>
     dplyr::summarize_all(list)
+
+  ## Extract spectra data and transform it into a data frame
   spectra <- object |>
     Spectra::spectraData() |>
     data.frame()
+
+  ## Add 'mz' and 'intensity' columns from peaks data
   spectra$mz <- peaks$mz
   spectra$intensity <- peaks$intensity
 
-  ## synonyms issue
+  ## Group spectra data by all columns except 'synonym', and summarize the remaining columns as character vectors
   spectra <- spectra |>
     dplyr::group_by(dplyr::across(c(-dplyr::any_of("synonym")))) |>
     dplyr::summarize(dplyr::across(.cols = where(is.list), .fns = as.character)) |>
     dplyr::ungroup()
 
-  ## columns types issue
+  ## Convert columns specified in 'incoherent_logical' and 'incoherent_integer' to logical and integer, respectively
   spectra <- spectra |>
     dplyr::mutate(dplyr::across(
       .cols = dplyr::any_of(incoherent_logical),
@@ -48,7 +56,7 @@ extract_spectra <- function(object) {
       .fns = as.integer
     ))
 
-  ## columns names issue
+  ## Select all columns except those specified in 'incoherent_colnames', and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
     dplyr::select(-c(dplyr::any_of(incoherent_colnames))) |>
     dplyr::rename(dplyr::any_of(incoherent_colnames))

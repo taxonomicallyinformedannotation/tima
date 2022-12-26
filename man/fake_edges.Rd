@@ -17,9 +17,6 @@ fake_edges(
 
 \item{name_feature}{TODO}
 }
-\value{
-TODO
-}
 \description{
 Fake edges
 }

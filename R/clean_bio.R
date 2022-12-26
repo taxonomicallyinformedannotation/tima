@@ -1,11 +1,10 @@
 #' @title Clean bio
 #'
-#' @noRd
-#'
 #' @param annotationTableWeightedBio TODO
 #' @param structureOrganismPairsTable TODO
 #' @param edgesTable TODO
 #' @param aNnOtAtE TODO
+#' @param candidatesInitial TODO
 #' @param minimalMs1Bio TODO
 #'
 #' @return TODO
@@ -16,6 +15,7 @@
 #' @importFrom dplyr full_join group_by mutate n_distinct right_join select
 #' @importFrom dplyr tibble ungroup
 #' @importFrom stats setNames
+#' @importFrom tidyselect where
 #'
 #' @examples TODO
 clean_bio <-
@@ -34,7 +34,7 @@ clean_bio <-
     }
     df01 <- annotationTableWeightedBio |>
       dplyr::filter(score_initialNormalized > 0 |
-        #' Those lines are to keep ms1 annotation
+        # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
     cat("erasing other MS1 candidates \n")
@@ -285,11 +285,11 @@ clean_bio <-
         feature_id,
         dplyr::everything()
       ) |>
-      #' In case there are no consensus at all because no network
-      dplyr::mutate(dplyr::across(where(is.logical), as.character)) |>
+      # In case there are no consensus at all because no network
+      dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.character)) |>
       dplyr::tibble()
 
-    #' Think about better scoring option
+    # Think about better scoring option
     cat("adding dummy consistency for features with less than 2 neighbors \n")
     dummy_consistency <- df2 |>
       dplyr::mutate(

@@ -1,11 +1,9 @@
 #' @title Read clusters
 #'
-#' @noRd
+#' @param id A character string of length 32 representing the job ID
+#' @param workflow A character string indicating the type of workflow, either "fbmn" or "classical"
 #'
-#' @param id TODO
-#' @param workflow TODO
-#'
-#' @return TODO
+#' @return A data frame containing cluster information
 #'
 #' @export
 #'
@@ -14,16 +12,22 @@
 #'
 #' @examples TODO
 read_clusters <- function(id, workflow = params$workflow) {
+  # Check if the given workflow is supported
   stopifnot("Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical"))
+
+  # Check if the given job ID is valid
   stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
-  file <-
-    paste0(
-      "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
-      id,
-      switch(workflow,
-        "fbmn" = "&block=main&file=clusterinfo_summary/",
-        "classical" = "&block=main&file=clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
-      )
+
+  # Construct the file URL based on the workflow type
+  file <- paste0(
+    "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
+    id,
+    switch(workflow,
+      "fbmn" = "&block=main&file=clusterinfo_summary/",
+      "classical" = "&block=main&file=clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
     )
+  )
+
+  # Read and return the cluster information from the file
   return(readr::read_delim(file = file))
 }

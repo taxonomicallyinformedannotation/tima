@@ -1,7 +1,5 @@
 #' @title Decorate MS1
 #'
-#' @noRd
-#'
 #' @return TODO
 #'
 #' @export
@@ -61,8 +59,6 @@ decorate_ms1 <- function() {
 ###############################################################################
 
 #' @title Decorate bio
-#'
-#' @noRd
 #'
 #' @return TODO
 #'
@@ -159,8 +155,6 @@ decorate_bio <- function() {
 ###############################################################################
 
 #' @title Decorate chemo
-#'
-#' @noRd
 #'
 #' @return TODO
 #'

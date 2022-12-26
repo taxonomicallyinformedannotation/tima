@@ -1,11 +1,13 @@
 #' @title Get example sirius
 #'
-#' @param url TODO
-#' @param export TODO
+#' @param url the URL of the example sirius file to be downloaded
+#' @param export the file path where the downloaded sirius file should be saved
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
+#'
+#' @importFrom utils download.file unzip
 #'
 #' @examples TODO
 get_example_sirius <-

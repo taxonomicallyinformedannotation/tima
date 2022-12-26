@@ -15,6 +15,7 @@
 #' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
 #' @importFrom dplyr group_by left_join mutate rowwise select ungroup
 #' @importFrom stringr str_detect
+#' @importFrom tidyselect where
 #'
 #' @examples TODO
 weight_chemo <-
@@ -70,7 +71,7 @@ weight_chemo <-
     cat("... outputting best score \n")
     df3 <-
       dplyr::bind_rows(step_pat, step_sup, step_cla) |>
-      dplyr::mutate(dplyr::across(where(is.logical), as.numeric)) |>
+      dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
       dplyr::mutate(score_chemical = ifelse(
         test = is.na(score_chemical),
         yes = 0,

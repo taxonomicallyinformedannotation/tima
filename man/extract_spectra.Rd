@@ -2,19 +2,19 @@
 % Please edit documentation in R/extract_spectra.R
 \name{extract_spectra}
 \alias{extract_spectra}
-\title{Extract spectra}
+\title{Extract spectra from a Spectra object}
 \usage{
 extract_spectra(object)
 }
 \arguments{
-\item{object}{TODO}
+\item{object}{Object of class Spectra}
 }
 \value{
-TODO
+Data frame containing spectra data
 }
 \description{
-Extract spectra
+Extract spectra from a Spectra object
 }
 \examples{
-TODO
+extract_spectra(object)
 }

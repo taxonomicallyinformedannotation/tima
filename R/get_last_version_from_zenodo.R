@@ -12,11 +12,12 @@
 #'
 #' @importFrom curl curl_download curl_fetch_memory
 #' @importFrom jsonlite fromJSON
-#' @importFrom stringr str_match str_remove
+#' @importFrom stringr fixed str_match str_remove
 #'
 #' @examples TODO
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
+    # Remove the prefix from the DOI
     record <-
       stringr::str_remove(
         string = doi,
@@ -28,26 +29,25 @@ get_last_version_from_zenodo <-
     req <- curl::curl_fetch_memory(url = paste0(base_url, record))
     content <- jsonlite::fromJSON(txt = rawToChar(req$content))
 
-    # extract individual file names and urls
+    # Extract individual file names and urls
     fileurls <- content$files$links$self
     filenames <- stringr::str_match(
       string = fileurls,
       pattern = ".+/([^/]+)"
     )[, 2]
 
+    # Select the file URL and name matching the given pattern
     fileurl <- fileurls[grepl(pattern = pattern, x = fileurls)]
     filename <- filenames[grepl(pattern = pattern, x = filenames)]
 
-    # check size and not md5 as we rename the file
+    # Check size and not md5 as we rename the file
     # a bit hacky
     zenodo_size <-
       content$files$size[grepl(pattern = pattern, x = filenames)]
-
     local_size <- file.size(path)
 
-    if (is.na(local_size) ||
-      zenodo_size != local_size) {
-      # download files
+    # If the local file does not exist or the sizes are different, download the file from Zenodo
+    if (is.na(local_size) || zenodo_size != local_size) {
       message(
         "Downloading ",
         filename,

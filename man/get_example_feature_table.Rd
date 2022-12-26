@@ -10,16 +10,13 @@ get_example_feature_table(
 )
 }
 \arguments{
-\item{url}{TODO}
+\item{url}{the URL of the example feature table file}
 
-\item{export}{TODO}
-}
-\value{
-TODO
+\item{export}{the file path to where the example feature table should be saved}
 }
 \description{
 Get example feature table
 }
 \examples{
-TODO
+get_example_feature_table(url = "https://myurl.com/features.csv", export = "directory/table.tsv")
 }

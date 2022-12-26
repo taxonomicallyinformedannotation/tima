@@ -1,36 +1,30 @@
 #' @title Create directory
 #'
-#' @noRd
+#' @description This function creates a directory at the specified path if it does not already exist.
 #'
-#' @param export TODO
+#' @param export path to the directory to be created
 #'
-#' @return TODO
+#' @return message indicating the status of directory creation
 #'
 #' @export
 #'
-#' @examples TODO
+#' @examples
+#' create_dir(export = "path/to/directory")
 create_dir <- function(export) {
-  if (grepl(
-    pattern = ".",
-    x = export,
-    fixed = TRUE
-  )) {
+  # Check if the export path includes a file name
+  if (grepl(pattern = ".", x = export, fixed = TRUE)) {
+    # Create the directory at the specified path if it does not exist
     ifelse(
       test = !dir.exists(paths = dirname(path = export)),
       yes = dir.create(path = dirname(path = export), recursive = TRUE),
-      no = paste(
-        dirname(path = export),
-        "exists"
-      )
+      no = paste(dirname(path = export), "exists")
     )
   } else {
+    # Create the directory at the specified path if it does not exist
     ifelse(
       test = !dir.exists(paths = export),
       yes = dir.create(path = export, recursive = TRUE),
-      no = paste(
-        export,
-        "exists"
-      )
+      no = paste(export, "exists")
     )
   }
 }

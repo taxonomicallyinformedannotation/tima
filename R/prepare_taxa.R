@@ -21,7 +21,7 @@
 #' @importFrom purrr map_df
 #' @importFrom readr read_delim write_delim
 #' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
-#' @importFrom stringr str_length
+#' @importFrom stringr fixed str_length str_remove
 #' @importFrom tibble column_to_rownames rownames_to_column
 #' @importFrom tidyr gather pivot_wider separate_rows
 #'
@@ -81,9 +81,8 @@ prepare_taxa <-
         ) |>
         tibble::column_to_rownames(var = "row ID")
       colnames(feature_table) <-
-        gsub(
-          pattern = " Peak area",
-          replacement = "",
+        stringr::str_remove(
+          pattern = stringr::fixed(pattern = " Peak area"),
           x = colnames(feature_table)
         )
       log_debug(x = "... filtering top K intensities per feature")
@@ -115,9 +114,8 @@ prepare_taxa <-
       tidyr::separate_rows(organism,
         sep = "\\|",
       ) |>
-      dplyr::mutate(organism = gsub(
-        pattern = " x ",
-        replacement = " ",
+      dplyr::mutate(organism = stringr::str_remove(
+        pattern = stringr::fixed(pattern = " x "),
         x = organism
       )) |>
       dplyr::distinct() |>
@@ -246,17 +244,13 @@ prepare_taxa <-
       if (extension == FALSE) {
         log_debug("Removing filename extensions")
         metadata_table <- metadata_table |>
-          dplyr::mutate(filename = gsub(
-            pattern = ".mzML",
-            replacement = "",
-            x = filename,
-            fixed = TRUE
+          dplyr::mutate(filename = stringr::str_remove(
+            pattern = stringr::fixed(pattern = ".mzML"),
+            x = filename
           )) |>
-          dplyr::mutate(filename = gsub(
-            pattern = ".mzxML",
-            replacement = "",
-            x = filename,
-            fixed = TRUE
+          dplyr::mutate(filename = stringr::str_remove(
+            pattern = stringr::fixed(pattern = ".mzxML"),
+            x = filename
           ))
       }
     }

@@ -10,12 +10,9 @@ fake_no_rt(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{the file path of the input feature table}
 
-\item{output}{TODO}
-}
-\value{
-TODO
+\item{output}{the file path of the output feature table with no retention time column}
 }
 \description{
 Fake no retention time

@@ -10,12 +10,9 @@ get_example_sirius(
 )
 }
 \arguments{
-\item{url}{TODO}
+\item{url}{the URL of the example sirius file to be downloaded}
 
-\item{export}{TODO}
-}
-\value{
-TODO
+\item{export}{the file path where the downloaded sirius file should be saved}
 }
 \description{
 Get example sirius

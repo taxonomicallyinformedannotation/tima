@@ -1,23 +1,23 @@
 #' @title Get benchmark
 #'
-#' @param url TODO
-#' @param export TODO
+#' @param url a character string containing the URL of the benchmarking set
+#' @param export a character string containing the file path where the benchmarking set should be exported
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom curl curl_download
 #' @importFrom readr read_csv write_csv
 #'
-#' @examples TODO
-get_benchmark <-
-  function(url = paths$urls$benchmarking_set,
-           export = paths$data$source$benchmark$set) {
-    paths <- parse_yaml_paths()
+#' @examples get_benchmark(url = "https://myurl.com/benchmark.csv", export = "data/source/benchmark/set.csv")
+get_benchmark <- function(url = paths$urls$benchmarking_set,
+                          export = paths$data$source$benchmark$set) {
+  ## Create the directory where the benchmarking set will be exported
+  create_dir(export = export)
 
-    create_dir(export = export)
-
-    readr::read_csv(file = curl::curl_download(url = url, destfile = tempfile())) |>
-      readr::write_csv(file = export)
-  }
+  ## Download the benchmarking set and write it to the specified export path
+  curl::curl_download(url = url, destfile = tempfile()) |>
+    readr::read_csv() |>
+    readr::write_csv(file = export)
+}

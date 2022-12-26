@@ -12,6 +12,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
+paths <- parse_yaml_paths()
+
 get_example_mgf()
 
 end <- Sys.time()

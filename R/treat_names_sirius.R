@@ -1,21 +1,19 @@
 #' @title Treat names sirius
 #'
-#' @noRd
+#' @param x a character string containing a name
 #'
-#' @param x
-#'
-#' @return TODO
+#' @return a character string with the name modified according to the rules specified in the function
 #'
 #' @export
 #'
-#' @examples TODO
+#' @examples treated_name <- treat_names_sirius("My_name")
 treat_names_sirius <- function(x) {
-  y <- x |>
-    gsub(
-      pattern = ".*_",
-      replacement = ""
-    )
-  # |> gsub(pattern = "adduct",
-  #      replacement = "")
-  return(y)
+  # Remove everything up to and including the last underscore from the name
+  treated_name <- gsub(
+    pattern = ".*_",
+    replacement = "",
+    x = x
+  )
+
+  return(treated_name)
 }

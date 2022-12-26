@@ -1,7 +1,5 @@
 #' @title Clean chemo
 #'
-#' @noRd
-#'
 #' @param annotationTableWeightedChemo TODO
 #' @param structureOrganismPairsTable TODO
 #' @param candidatesFinal TODO
@@ -37,11 +35,11 @@ clean_chemo <-
     df1 <- annotationTableWeightedChemo |>
       dplyr::filter(
         score_initialNormalized > 0 |
-          #' Those lines are to keep ms1 annotation
+          # Those lines are to keep ms1 annotation
           score_biological >= minimalMs1Bio |
-          #' Only if a good biological
+          # Only if a good biological
           score_chemical >= minimalMs1Chemo
-        #' Or chemical consistency score is obtained
+        # Or chemical consistency score is obtained
       ) |>
       dplyr::group_by(feature_id) |>
       dplyr::distinct(inchikey_2D,
@@ -379,11 +377,9 @@ clean_chemo <-
 
     ## Because cytoscape import fails otherwise
     colnames(df11) <-
-      gsub(
-        pattern = "_structure",
-        replacement = "",
-        x = colnames(df11),
-        fixed = TRUE
+      stringr::str_remove(
+        string = colnames(df11),
+        pattern = stringr::fixed(pattern = "_structure")
       )
 
     return(df11)

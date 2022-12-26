@@ -1,22 +1,26 @@
 #' @title Read results
 #'
-#' @noRd
+#' @param id a character string containing the job ID of the GNPS task
+#' @param workflow a character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'
 #'
-#' @param id TODO
-#' @param workflow TODO
-#'
-#' @return TODO
+#' @return a data frame containing the results of the GNPS task
 #'
 #' @export
 #'
 #' @importFrom readr read_delim
 #' @importFrom stringr str_length
 #'
-#' @examples TODO
-read_results <- function(id, workflow = params$workflow) {
-  stopifnot("Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical"))
+#' @examples read_results("abcdefghijklmnopqrstuvwxyz1234", workflow = "fbmn")
+read_results <- function(id, workflow) {
+  # Check that the workflow parameter is either 'fbmn' or 'classical'
+  stopifnot(
+    "Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical")
+  )
+
+  # Check that the id parameter is a 32 character string
   stopifnot("Your job ID is invalid" = stringr::str_length(id) == 32)
 
+  # Construct the URL for downloading the results file
   file <-
     paste0(
       "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=",
@@ -26,5 +30,7 @@ read_results <- function(id, workflow = params$workflow) {
         "classical" = "&block=main&file=result_specnets_DB/"
       )
     )
+
+  # Read the results file from the URL and return it as a data frame
   return(readr::read_delim(file = file))
 }

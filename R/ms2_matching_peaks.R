@@ -1,40 +1,41 @@
 #' Courtesy of Michele Stravs (ORCID = "0000-0002-1426-8572")
 
-#' @title .ms2 matching peaks
+#' @title Calculate the number of matching peaks in two spectra
 #'
-#' @noRd
+#' @param x a matrix with two columns: m/z and intensity values for the first spectrum
+#' @param y a matrix with two columns: m/z and intensity values for the first spectrum
+#' @param ... ...
+#' @param cutoff a numeric value indicating the minimum intensity required for a peak to be considered
 #'
-#' @param x TODO
-#' @param y TODO
-#' @param ... TODO
-#' @param cutoff TODO
-#'
-#' @return TODO
+#' @return an integer indicating the number of matching peaks between x and y
 #'
 #' @export
 #'
-#' @importFrom tidyr replace_na
-#'
-#' @examples TODO
+#' @examples .ms2_matching_peaks(x, y, cutoff = 0)
 .ms2_matching_peaks <- function(x, y, ..., cutoff = 0) {
-  sum((tidyr::replace_na(
-    data = x[, 2L] > cutoff, replace = 0
-  )) &
-    tidyr::replace_na(data = y[, 2L] > cutoff, replace = 0))
+  # Select only the peaks with intensity greater than the cutoff
+  x <- x[x[, 2] > cutoff, 1]
+  y <- y[y[, 2] > cutoff, 1]
+
+  # Count the number of peaks that are present in both x and y
+  sum(x %in% y)
 }
 
-#' @title .ms2 matching peaks fraction
+
+#' @title Calculate the fraction of matching peaks in two spectra
 #'
-#' @noRd
+#' @param x a matrix with two columns: m/z and intensity values for the first spectrum
+#' @param ... ...
 #'
-#' @param x TODO
-#' @param ... TODO
-#'
-#' @return TODO
+#' @return a numeric value indicating the fraction of matching peaks between x and y
 #'
 #' @export
 #'
-#' @examples TODO
+#' @examples .ms2_matching_peaks_fraction(x, ...)
 .ms2_matching_peaks_fraction <- function(x, ...) {
-  .ms2_matching_peaks(x, ...) / nrow(x)
+  # Calculate the number of matching peaks
+  matching_peaks <- .ms2_matching_peaks(x, ...)
+
+  # Calculate the fraction of matching peaks by dividing the number of matching peaks by the number of peaks in x
+  matching_peaks / nrow(x)
 }

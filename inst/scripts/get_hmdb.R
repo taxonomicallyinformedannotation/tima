@@ -12,6 +12,8 @@ cat(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
+paths <- parse_yaml_paths()
+
 #' @title Get HMDB
 #'
 #' @param url TODO
@@ -27,8 +29,6 @@ log_debug("Contributors: ...")
 get_hmdb <-
   function(url = paths$urls$hmdb$metabolites,
            export = paths$data$source$libraries$hmdb) {
-    paths <- parse_yaml_paths()
-
     ## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)
     create_dir(export = export)
 

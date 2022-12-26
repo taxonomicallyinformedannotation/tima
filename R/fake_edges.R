@@ -4,7 +4,7 @@
 #' @param output TODO
 #' @param name_feature TODO
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -14,46 +14,23 @@
 fake_edges <- function(input = params$input,
                        output = params$output,
                        name_feature = params$feature) {
-  stopifnot("Your input file does not exist" = file.exists(input))
+  stopifnot(file.exists(input), "Your input file does not exist")
 
   edges_table_treated <- readr::read_delim(
     file = input,
-    col_select =
-      c(
-        feature_source = name_feature,
-        feature_target = name_feature
-      )
+    col_select = c(
+      feature_source = name_feature,
+      feature_target = name_feature
+    )
   )
 
-  log_debug(x = "Exporting ...")
-  ifelse(
-    test = !dir.exists(paths$data$path),
-    yes = dir.create(paths$data$path),
-    no = paste(paths$data$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$path),
-    yes = dir.create(paths$data$interim$path),
-    no = paste(paths$data$interim$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$edges$path),
-    yes = dir.create(paths$data$interim$edges$path),
-    no = paste(paths$data$interim$edges$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(paths$data$interim$config$path),
-    yes = dir.create(paths$data$interim$config$path),
-    no = paste(paths$data$interim$config$path, "exists")
-  )
-  ifelse(
-    test = !dir.exists(dirname(output)),
-    yes = dir.create(dirname(output)),
-    no = paste(dirname(output), "exists")
-  )
+  log_debug("Exporting ...")
+  create_dir(paths$data$interim$edges$path)
+  create_dir(paths$data$interim$config$path)
+  create_dir(output)
 
   log_debug(
-    x = "... path to export is",
+    "... path to export is",
     output
   )
   readr::write_delim(

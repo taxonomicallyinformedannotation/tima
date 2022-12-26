@@ -1,6 +1,4 @@
-#' @title Fake adducts negative
-#'
-#' @noRd
+#' @title Form adducts negative
 #'
 #' @param massesTable TODO
 #' @param adductsTable TODO
@@ -14,6 +12,7 @@
 #'
 #' @examples TODO
 form_adducts_neg <- function(massesTable, adductsTable) {
+  ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
     dplyr::mutate(
       neg_3_3proton = (exact_mass - 3 * proton) / 3,
@@ -36,8 +35,8 @@ form_adducts_neg <- function(massesTable, adductsTable) {
     ) |>
     dplyr::select(-colnames(adductsTable))
 
+  ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
   n <- ncol(adducts_neg)
-
   adducts_neg <- adducts_neg |>
     tidyr::pivot_longer(2:dplyr::all_of(n)) |>
     dplyr::select(dplyr::everything(),

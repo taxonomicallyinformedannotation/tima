@@ -11,7 +11,7 @@ export_spectra_2(file, spectra, meta)
 
 \item{spectra}{TODO}
 
-\item{metad}{TODO}
+\item{meta}{TODO}
 }
 \value{
 TODO

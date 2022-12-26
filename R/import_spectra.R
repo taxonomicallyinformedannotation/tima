@@ -1,31 +1,28 @@
 #' @title Import spectra
 #'
-#' @param file TODO
+#' @param file the file path of the spectrum file to be imported
 #'
-#' @return TODO
+#' @return a Spectra object containing the imported spectra
 #'
 #' @export
 #'
 #' @importFrom CompoundDb CompDb Spectra
 #' @importFrom MsBackendMgf readMgf
 #' @importFrom Spectra Spectra
+#' @importFrom stringr fixed str_remove
 #'
 #' @examples TODO
 import_spectra <- function(file) {
+  file_ext <- stringr::str_remove(string = file, pattern = stringr::fixed(".*\\."))
+
   switch(
-    EXPR = gsub(
-      pattern = ".*\\.",
-      replacement = "",
-      x = file
-    ),
+    EXPR = file_ext,
     "mgf" = {
-      file |>
-        MsBackendMgf::readMgf() |>
+      MsBackendMgf::readMgf(file) |>
         Spectra::Spectra()
     },
     "sqlite" = {
-      file |>
-        CompoundDb::CompDb() |>
+      CompoundDb::CompDb(file) |>
         CompoundDb::Spectra()
     }
   )

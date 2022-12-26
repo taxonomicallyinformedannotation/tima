@@ -1,13 +1,13 @@
 #' @title Fake features components
 #'
-#' @param input TODO
-#' @param features TODO
-#' @param output TODO
-#' @param ms_mode TODO
-#' @param name_rt TODO
-#' @param name_mz TODO
+#' @param input path to the file containing the input data
+#' @param features path to the file containing the features data
+#' @param output path to the file to export the merged data to
+#' @param ms_mode mode of mass spectrometry, either "pos" or "neg"
+#' @param name_rt name of the retention time column in the features data
+#' @param name_mz name of the m/z column in the features data
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -21,32 +21,41 @@ fake_features_components <- function(input = params$input,
                                      ms_mode = params$mode,
                                      name_rt = params$rt_name,
                                      name_mz = params$precursor_name) {
-  stopifnot("Your input file does not exist" = file.exists(input))
-  stopifnot("Your features file does not exist" = file.exists(features))
-  stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
+  # Check that input and features files exist
+  stopifnot(file.exists(input), "Your input file does not exist")
+  stopifnot(file.exists(features), "Your features file does not exist")
 
-  log_debug(x = "Loading files ...")
-  log_debug(x = "... features table")
+  # Check that ms_mode is valid
+  stopifnot(ms_mode %in% c("pos", "neg"), "Your mode must be 'pos' or 'neg'")
+
+  # Read input and features files
+  log_debug("Loading files ...")
+  log_debug("... features table")
   table <- readr::read_delim(file = input)
   features <- readr::read_delim(file = features)
 
-  components <- table |>
-    dplyr::mutate(component_id = -1)
+  # Initialize components data frame
+  components <- dplyr::mutate(table, component_id = -1)
 
-  features_meta <- features |>
+  # Select relevant columns from features data frame
+  features_meta <-
     dplyr::select(
+      features,
       feature_id,
       rt := !!as.name(name_rt),
       mz := !!as.name(name_mz)
     )
 
-  log_debug(x = "Adding components to features")
+  # Merge data frames and remove duplicate rows
+  log_debug("Adding components to features")
   table_filled <-
-    dplyr::left_join(components, table) |>
-    dplyr::left_join(features_meta) |>
-    dplyr::distinct() |>
-    dplyr::arrange(dplyr::desc(score_input)) |>
-    dplyr::arrange(as.numeric(feature_id)) |>
+    dplyr::arrange(
+      dplyr::distinct(dplyr::left_join(
+        dplyr::left_join(components, table), features_meta
+      )),
+      dplyr::desc(score_input),
+      as.numeric(feature_id)
+    ) |>
     dplyr::select(
       feature_id,
       component_id,

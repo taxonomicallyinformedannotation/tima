@@ -12,6 +12,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
+paths <- parse_yaml_paths()
+
 #' @title Get example ISDB
 #'
 #' @param url TODO
@@ -27,8 +29,6 @@ log_debug("Contributors: ...")
 get_example_isdb <-
   function(url = paths$urls$example_isdb,
            export = paths$data$interim$annotations$example_isdb) {
-    paths <- parse_yaml_paths()
-
     create_dir(export = export)
 
     readr::read_tsv(file = url) |>
