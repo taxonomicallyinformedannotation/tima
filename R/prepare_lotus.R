@@ -1,6 +1,6 @@
 #' @title Prepare LOTUS
 #'
-#' @description TODO
+#' @description This function prepares the LOTUS structure-organism pairs
 #'
 #' @param input Input file
 #' @param output Output file

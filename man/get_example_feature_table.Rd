@@ -15,7 +15,7 @@ get_example_feature_table(
 \item{export}{File path to where the example feature table should be saved}
 }
 \description{
-TODO
+This function gets an example feature table to work with
 }
 \examples{
 NULL

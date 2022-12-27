@@ -10,7 +10,7 @@ decorate_ms1()
 Message indicating the number of annotations obtained by MS1
 }
 \description{
-TODO
+This function outputs informations about MS1 annotation
 }
 \examples{
 NULL

@@ -21,7 +21,7 @@ prepare_features_classification(
 \item{quickmode}{Boolean. If TRUE, runs fast but does not complete missing data}
 }
 \description{
-TODO
+This function prepares the features chemical classes for further use
 }
 \examples{
 NULL

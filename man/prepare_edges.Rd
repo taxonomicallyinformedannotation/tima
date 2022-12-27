@@ -27,7 +27,7 @@ prepare_edges(
 \item{name_target}{Name of the target features column}
 }
 \description{
-TODO
+This function prepares edges for further use
 }
 \examples{
 NULL

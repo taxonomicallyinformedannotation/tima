@@ -13,7 +13,7 @@ import_spectra(file)
 Spectra object containing the imported spectra
 }
 \description{
-TODO
+This function imports spectra from a file (.mgf or .sqlite)
 }
 \examples{
 NULL

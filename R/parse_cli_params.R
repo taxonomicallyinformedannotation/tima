@@ -1,6 +1,6 @@
 #' @title Parse CLI parameters
 #'
-#' @description TODO
+#' @description This function parses command line parameters
 #'
 #' @return NULL
 #'

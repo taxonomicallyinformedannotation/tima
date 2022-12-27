@@ -18,7 +18,7 @@ prepare_sirius(
 \item{output}{Output where to save prepared results}
 }
 \description{
-TODO
+This function prepares Sirius results to make them compatible
 }
 \examples{
 NULL

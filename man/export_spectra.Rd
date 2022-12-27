@@ -18,7 +18,7 @@ export_spectra(file, spectra, dir = ".", cmps = NULL, metad = NULL)
 \item{metad}{Optional. Metadata as in 'CompoundDb' package}
 }
 \description{
-TODO
+This function prepares spectra for export
 }
 \examples{
 NULL

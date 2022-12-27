@@ -27,8 +27,11 @@ clean_chemo(
 A table containing the chemically weighted annotation where only a given number of initial candidates are kept
 }
 \description{
-TODO
+This function cleans the results obtained after chemical weighting
 }
 \examples{
 NULL
+}
+\seealso{
+weight_chemo
 }

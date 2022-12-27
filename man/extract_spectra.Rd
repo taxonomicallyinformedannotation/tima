@@ -13,7 +13,7 @@ extract_spectra(object)
 Data frame containing spectra data
 }
 \description{
-TODO
+This function extracts spectra from a \code{Spectra}object
 }
 \examples{
 NULL

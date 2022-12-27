@@ -1,10 +1,10 @@
 #' @title Treat names sirius
 #'
-#' @description TODO
+#' @description This function cleans the names of Sirius outputs to make them compatible
 #'
-#' @param x a character string containing a name
+#' @param x Character string containing a name
 #'
-#' @return a character string with the name modified according to the rules specified in the function
+#' @return Character string with the name modified according to the rules specified in the function
 #'
 #' @export
 #'

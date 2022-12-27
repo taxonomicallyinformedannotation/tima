@@ -1,6 +1,6 @@
 #' @title Get example sirius
 #'
-#' @description TODO
+#' @description This function gets an example of Sirius results
 #'
 #' @param url URL of the example sirius file to be downloaded
 #' @param export File path where the downloaded sirius file should be saved

@@ -27,7 +27,7 @@ prepare_features_components(
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 }
 \description{
-TODO
+This function prepares the components (clusters in molecular network) for further use
 }
 \examples{
 NULL

@@ -1,19 +1,25 @@
 #' @title Process spectra
 #'
-#' @description TODO
+#' @description This function performs spectral matching.
 #'
-#' @param input TODO
-#' @param library TODO
-#' @param output TODO
-#' @param method TODO
-#' @param threshold TODO
-#' @param ppm TODO
-#' @param dalton TODO
-#' @param npeaks TODO
-#' @param rpeaks TODO
-#' @param condition TODO
-#' @param quickmode TODO
-#' @param parallel TODO
+#' @details It takes two files as input. A query file that will be matched against a library file.
+#'    Multiple comparison distances are available
+#'    ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
+#'    Number of matched peaks and their ratio are also available if using 'quickmode=FALSE'.
+#'    Parallel processing is also made available.
+#'
+#' @param input Query file containing spectra. Currently an '.mgf' file
+#' @param library Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)
+#' @param output Output file.
+#' @param method Method to be used to perform spectral comparison
+#' @param threshold Minimal similarity to report
+#' @param ppm Relative ppm tolerance to be used
+#' @param dalton Absolute Dalton tolerance to be used
+#' @param npeaks Absolute minimum number of peaks to be matched
+#' @param rpeaks Relative minimum number of peaks to be matched
+#' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
+#' @param quickmode Boolean. Quick mode goes faster but does not output matched peaks and ratios.
+#' @param parallel Boolean. Process in parallel
 #'
 #' @return NULL
 #'

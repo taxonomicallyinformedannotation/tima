@@ -15,7 +15,7 @@ prepare_lotus(
 \item{output}{Output file}
 }
 \description{
-TODO
+This function prepares the LOTUS structure-organism pairs
 }
 \examples{
 NULL

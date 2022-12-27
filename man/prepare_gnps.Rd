@@ -18,7 +18,7 @@ prepare_gnps(
 \item{output}{Output file}
 }
 \description{
-TODO
+This function prepares GNPS obtained annotations for further use
 }
 \examples{
 NULL

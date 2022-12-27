@@ -15,7 +15,7 @@ get_example_mgf(
 \item{export}{File path where the MGF file should be saved}
 }
 \description{
-TODO
+This function gets an example mgf file to work with
 }
 \examples{
 NULL

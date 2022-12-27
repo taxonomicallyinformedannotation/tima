@@ -1,6 +1,6 @@
 #' @title Import spectra
 #'
-#' @description TODO
+#' @description This function imports spectra from a file (.mgf or .sqlite)
 #'
 #' @param file File path of the spectrum file to be imported
 #'

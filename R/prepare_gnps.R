@@ -1,6 +1,6 @@
 #' @title Prepare GNPS
 #'
-#' @description TODO
+#' @description This function prepares GNPS obtained annotations for further use
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param nap_job_id NAP job ID

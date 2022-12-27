@@ -1,23 +1,23 @@
 #' @title Weight bio
 #'
-#' @description TODO
+#' @description This function weights the eventually MS1 complemented annotations according their biological source
 #'
-#' @param annotationTable TODO
-#' @param structureOrganismPairsTable TODO
-#' @param weightSpectral TODO
-#' @param weightBiological TODO
-#' @param scoreBiologicalDomain TODO
-#' @param scoreBiologicalKingdom TODO
-#' @param scoreBiologicalPhylum TODO
-#' @param scoreBiologicalClass TODO
-#' @param scoreBiologicalOrder TODO
-#' @param scoreBiologicalFamily TODO
-#' @param scoreBiologicalTribe TODO
-#' @param scoreBiologicalGenus TODO
-#' @param scoreBiologicalSpecies TODO
-#' @param scoreBiologicalVariety TODO
+#' @param annotationTable Table containing the initial annotation eventually complemented by additional MS1 annotations
+#' @param structureOrganismPairsTable Table containing the structure - organism pairs
+#' @param weightSpectral Weight for the spectral score
+#' @param weightBiological Weight for the biological score
+#' @param scoreBiologicalDomain Score for a `domain` match (should be lower than `kingdom`)
+#' @param scoreBiologicalKingdom Score for a `kingdom` match (should be lower than `phylum`)
+#' @param scoreBiologicalPhylum Score for a `phylum` match (should be lower than `class`)
+#' @param scoreBiologicalClass Score for a `class` match (should be lower than `order`)
+#' @param scoreBiologicalOrder Score for a `order` match (should be lower than `family`)
+#' @param scoreBiologicalFamily Score for a `family` match (should be lower than `tribe`)
+#' @param scoreBiologicalTribe Score for a `tribe` match (should be lower than `genus`)
+#' @param scoreBiologicalGenus Score for a `genus` match (should be lower than `species`)
+#' @param scoreBiologicalSpecies Score for a `species` match (should be lower than `variety`)
+#' @param scoreBiologicalVariety Score for a `variety` match (should be the highest)
 #'
-#' @return NULL
+#' @return A table containing the biologically weighted annotation
 #'
 #' @export
 #'

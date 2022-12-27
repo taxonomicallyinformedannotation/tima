@@ -7,15 +7,15 @@
 read_results(id, workflow = params$workflow)
 }
 \arguments{
-\item{id}{a character string containing the job ID of the GNPS task}
+\item{id}{Character string containing the job ID of the GNPS task}
 
-\item{workflow}{a character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'}
+\item{workflow}{Character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'}
 }
 \value{
-a data frame containing the results of the GNPS task
+Data frame containing the results of the GNPS task
 }
 \description{
-TODO
+This function reads GNPS results table
 }
 \examples{
 NULL

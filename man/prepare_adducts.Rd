@@ -30,7 +30,7 @@ prepare_adducts(
 \item{masses_neg_output_path}{Path where negative adducts masses will be saved}
 }
 \description{
-TODO
+This function prepares adducts for further use
 }
 \examples{
 NULL

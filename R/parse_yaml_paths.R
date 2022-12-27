@@ -1,6 +1,6 @@
 #' @title Parse YAML paths
 #'
-#' @description TODO
+#' @description This function parses YAML paths
 #'
 #' @param file The file name of the YAML file containing the paths (default is "paths.yaml")
 #'

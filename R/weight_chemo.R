@@ -1,16 +1,16 @@
 #' @title Weight chemo
 #'
-#' @description NULL
+#' @description This function weights the biologically weigthed annotations according their chemical consistency
 #'
-#' @param annotationTableWeightedBioCleaned TODO
-#' @param weightSpectral TODO
-#' @param weightBiological TODO
-#' @param weightChemical TODO
-#' @param scoreChemicalPathway TODO
-#' @param scoreChemicalSuperclass TODO
-#' @param scoreChemicalClass TODO
+#' @param annotationTableWeightedBioCleaned Table containing the biologically weighted annotation
+#' @param weightSpectral Weight for the spectral score
+#' @param weightBiological Weight for the biological score
+#' @param weightChemical Weight for the chemical consistency score
+#' @param scoreChemicalPathway Score for a `pathway` match (should be lower than `superclass`)
+#' @param scoreChemicalSuperclass Score for a `superclass` match (should be lower than `class`)
+#' @param scoreChemicalClass Score for a `class` match (should be the highest)
 #'
-#' @return NULL
+#' @return A table containing the chemically weighted annotation
 #'
 #' @export
 #'

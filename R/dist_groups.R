@@ -2,7 +2,7 @@
 
 #' @title Get the distance between two elements in a distance matrix
 #'
-#' @description TODO
+#' @description This function calculates the distance between two elements in a distance matrix
 #'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element
@@ -48,7 +48,7 @@ dist_get <- function(d, idx1, idx2) {
 
 #' @title Dist groups
 #'
-#' @description TODO
+#' @description This function gets distances per group
 #'
 #' @param d A distance object
 #' @param g A grouping vector for the distance object

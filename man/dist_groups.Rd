@@ -18,7 +18,7 @@ the group labels for each observation, and the distance between the observations
 The label column indicates whether the distance is within a group or between groups.
 }
 \description{
-TODO
+This function gets distances per group
 }
 \examples{
 NULL

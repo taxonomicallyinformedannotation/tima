@@ -7,15 +7,15 @@
 read_clusters(id, workflow = params$workflow)
 }
 \arguments{
-\item{id}{A character string of length 32 representing the job ID}
+\item{id}{Character string of length 32 representing the job ID}
 
-\item{workflow}{A character string indicating the type of workflow, either "fbmn" or "classical"}
+\item{workflow}{Character string indicating the type of workflow, either "fbmn" or "classical"}
 }
 \value{
 A data frame containing cluster information
 }
 \description{
-TODO
+This function reads the clusters table from GNPS
 }
 \examples{
 NULL

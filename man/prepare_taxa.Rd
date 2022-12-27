@@ -17,26 +17,31 @@ prepare_taxa(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{File containing your features intensities}
 
-\item{tool}{TODO}
+\item{tool}{Tool from which your file comes from ('manual', 'gnps' or 'ready')}
 
-\item{extension}{TODO}
+\item{extension}{Does your colun names contain the file extension? (MZmine mainly)}
 
-\item{colname}{TODO}
+\item{colname}{Name of the column containing biological source information}
 
-\item{gnps_job_id}{TODO}
+\item{gnps_job_id}{If your tool is 'gnps', corresponding GNPS job ID}
 
-\item{metadata}{TODO}
+\item{metadata}{File containing your metadata including biological source}
 
-\item{top_k}{TODO}
+\item{top_k}{Number of organisms to be retained per feature top intensities}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{taxon}{TODO}
+\item{taxon}{If you want to enforce all features to a given taxon, put its name here.}
 }
 \description{
-TODO
+This function performs taxon name preparation to match the Open Tree of Life taxonomy
+}
+\details{
+Depending if the features are aligned between samples originating from various organisms or not,
+It can either attribute all features to a single organism, or attribute them to multiple ones,
+according to their relative intensities among the samples.
 }
 \examples{
 NULL

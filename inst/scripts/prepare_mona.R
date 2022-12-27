@@ -17,12 +17,12 @@ paths <- parse_yaml_paths()
 
 #' @title Prepare MONA
 #'
-#' @param input TODO
-#' @param output_pos TODO
-#' @param output_neg TODO
-#' @param export_sqlite TODO
+#' @param input Input file
+#' @param output_pos Output for positive spectra
+#' @param output_neg Output for negative spectra
+#' @param export_sqlite Boolean. Save as sqlite instead of mgf
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -31,7 +31,7 @@ paths <- parse_yaml_paths()
 #' @importFrom MsBackendMgf MsBackendMgf
 #' @importFrom Spectra export Spectra
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_mona <-
   function(input = paths$data$source$spectra$mona_lcmsms,
            output_pos = paths$data$interim$spectra$mona$pos,

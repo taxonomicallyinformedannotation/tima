@@ -1,6 +1,6 @@
 #' @title Prepare features classification
 #'
-#' @description TODO
+#' @description This function prepares the features chemical classes for further use
 #'
 #' @param library Library to be used to classify features
 #' @param input Input file

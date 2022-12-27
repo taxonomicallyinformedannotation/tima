@@ -1,6 +1,6 @@
 #' @title Annotate non MS1
 #'
-#' @description TODO
+#' @description This function filters MS2 results in case no MS1 annotation was performed
 #'
 #' @param annotationTable Table containing your previous annotation
 #' @param candidatesInitial Number of initial candidates to keep
@@ -11,6 +11,8 @@
 #'
 #' @importFrom dplyr across dense_rank desc group_by distinct filter left_join
 #' @importFrom dplyr mutate mutate_all select ungroup
+#'
+#' @seealso annotate_ms1
 #'
 #' @examples NULL
 annotate_non_ms1 <-

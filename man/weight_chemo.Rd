@@ -15,22 +15,25 @@ weight_chemo(
 )
 }
 \arguments{
-\item{annotationTableWeightedBioCleaned}{TODO}
+\item{annotationTableWeightedBioCleaned}{Table containing the biologically weighted annotation}
 
-\item{weightSpectral}{TODO}
+\item{weightSpectral}{Weight for the spectral score}
 
-\item{weightBiological}{TODO}
+\item{weightBiological}{Weight for the biological score}
 
-\item{weightChemical}{TODO}
+\item{weightChemical}{Weight for the chemical consistency score}
 
-\item{scoreChemicalPathway}{TODO}
+\item{scoreChemicalPathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
 
-\item{scoreChemicalSuperclass}{TODO}
+\item{scoreChemicalSuperclass}{Score for a \code{superclass} match (should be lower than \code{class})}
 
-\item{scoreChemicalClass}{TODO}
+\item{scoreChemicalClass}{Score for a \code{class} match (should be the highest)}
+}
+\value{
+A table containing the chemically weighted annotation
 }
 \description{
-Weight chemo
+This function weights the biologically weigthed annotations according their chemical consistency
 }
 \examples{
 NULL

@@ -1,6 +1,6 @@
 #' @title Get example MGF
 #'
-#' @description TODO
+#' @description This function gets an example mgf file to work with
 #'
 #' @param url URL of the MGF file to be downloaded
 #' @param export File path where the MGF file should be saved

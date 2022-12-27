@@ -24,7 +24,7 @@ prepare_isdb_lotus(
 \item{export_sqlite}{Boolean. Export to SQLite? TRUE or FALSE}
 }
 \description{
-TODO
+This function prepares the LOTUS in silico generated spectra to be used for spectral matching
 }
 \examples{
 NULL

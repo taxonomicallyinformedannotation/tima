@@ -1,11 +1,11 @@
-#' Courtesy of Michele Stravs (ORCID = "0000-0002-1426-8572")
-
 #' @title Calculate the number of matching peaks in two spectra
 #'
-#' @description TODO
+#' @author Courtesy of Michele Stravs ([0000-0002-1426-8572](https://orcid.org/0000-0002-1426-8572))
 #'
-#' @param x a matrix with two columns: m/z and intensity values for the first spectrum
-#' @param y a matrix with two columns: m/z and intensity values for the first spectrum
+#' @description This function calculates the absolute number of matching peaks in two spectra
+#'
+#' @param x a matrix with two columns: \emph{m/z} and intensity values for the first spectrum
+#' @param y a matrix with two columns: \emph{m/z} and intensity values for the first spectrum
 #' @param ... ...
 #' @param cutoff a numeric value indicating the minimum intensity required for a peak to be considered
 #'
@@ -26,7 +26,9 @@
 
 #' @title Calculate the fraction of matching peaks in two spectra
 #'
-#' @description TODO
+#' @author Courtesy of Michele Stravs ([0000-0002-1426-8572](https://orcid.org/0000-0002-1426-8572))
+#'
+#' @description This function calculates the relative number (ratio) of matching peaks in two spectra
 #'
 #' @param x a matrix with two columns: m/z and intensity values for the first spectrum
 #' @param ... ...

@@ -1,6 +1,6 @@
 #' @title Fake edges
 #'
-#' @description TODO
+#' @description This function fakes edges in case none are given
 #'
 #' @param input Input file
 #' @param output Output file

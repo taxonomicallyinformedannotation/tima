@@ -21,34 +21,34 @@ prepare_params(
 )
 }
 \arguments{
-\item{filename}{TODO}
+\item{filename}{Name of the file}
 
-\item{gnps_job_id}{TODO}
+\item{gnps_job_id}{GNPS job ID}
 
-\item{candidates_initial}{TODO}
+\item{candidates_initial}{Initial candidates to keep}
 
-\item{candidates_final}{TODO}
+\item{candidates_final}{Final candidates to keep}
 
-\item{weight_biological}{TODO}
+\item{weight_biological}{Weight for biological score}
 
-\item{weight_chemical}{TODO}
+\item{weight_chemical}{Weight for chemical consistency score}
 
-\item{weight_spectral}{TODO}
+\item{weight_spectral}{Weight for spectral score}
 
-\item{ms_mode}{TODO}
+\item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 
-\item{annotate}{TODO}
+\item{annotate}{Perform additional MS1 based annotation}
 
-\item{tolerance_ppm}{TODO}
+\item{tolerance_ppm}{Ppm tolerance for MS1 annotation}
 
-\item{tolerance_rt}{TODO}
+\item{tolerance_rt}{Retention time tolerance for adducts attribution in MS1 annotation}
 
-\item{taxon}{TODO}
+\item{taxon}{Name of a taxon you want to enforce}
 
-\item{force}{TODO}
+\item{force}{If you want to force unusual parameters. Use it at your own risk}
 }
 \description{
-TODO
+This function prepares main parameters
 }
 \examples{
 NULL

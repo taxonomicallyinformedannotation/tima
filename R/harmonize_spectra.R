@@ -1,6 +1,6 @@
 #' @title Harmonize spectra
 #'
-#' @description TODO
+#' @description This function harmonizes spectra headers
 #'
 #' @param spectra Spectra object to be harmonized
 #' @param colnames Names of the different columns corresponding to standardized headers

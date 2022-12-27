@@ -1,6 +1,6 @@
 #' @title Parse YAML parameters
 #'
-#' @description TODO
+#' @description This function parses YAML parameters
 #'
 #' @return A list containing the parameters specified in the YAML files
 #'

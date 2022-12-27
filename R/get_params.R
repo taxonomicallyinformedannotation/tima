@@ -1,6 +1,6 @@
 #' @title Get parameters
 #'
-#' @description TODO
+#' @description This function gets the parameters for the job. Combination of cli and yaml parameters
 #'
 #' @param step Name of the step being performed
 #'

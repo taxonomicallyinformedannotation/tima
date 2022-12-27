@@ -14,7 +14,7 @@ export_spectra_2(file, spectra, meta)
 \item{meta}{Optional. Metadata as in 'CompoundDb' package}
 }
 \description{
-TODO
+This function export spectra.
 }
 \examples{
 NULL

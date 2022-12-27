@@ -18,17 +18,17 @@ params <- get_params(step = step)
 
 #' @title Prepare closed
 #'
-#' @param input TODO
-#' @param output TODO
+#' @param input Input file
+#' @param output Output file
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom dplyr distinct mutate select
 #' @importFrom readr read_delim write_delim
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_closed <- function(input = params$input,
                            output = params$output) {
   if (file.exists(input)) {

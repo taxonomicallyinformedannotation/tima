@@ -49,91 +49,94 @@ process_annotations(
 )
 }
 \arguments{
-\item{library}{TODO}
+\item{library}{Library to be used to perform MS1 annotation}
 
-\item{name}{TODO}
+\item{name}{Name of the adducts}
 
-\item{gnps}{TODO}
+\item{gnps}{GNPS annotation results}
 
-\item{isdb}{TODO}
+\item{isdb}{ISDB annotation results}
 
-\item{sirius}{TODO}
+\item{sirius}{SIRIUS annotation results}
 
-\item{taxa}{TODO}
+\item{taxa}{Prepared taxed features file}
 
-\item{edges}{TODO}
+\item{edges}{Prepared edges file}
 
-\item{output}{TODO}
+\item{output}{Output file}
 
-\item{candidates_initial}{TODO}
+\item{candidates_initial}{Number of initial candidates to keep}
 
-\item{candidates_final}{TODO}
+\item{candidates_final}{Number of final candidates to keep}
 
-\item{weight_spectral}{TODO}
+\item{weight_spectral}{Weight for the spectral score}
 
-\item{weight_chemical}{TODO}
+\item{weight_chemical}{Weight for the biological score}
 
-\item{weight_biological}{TODO}
+\item{weight_biological}{Weight for the chemical consistency score}
 
-\item{score_chemical_pathway}{TODO}
+\item{score_chemical_pathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
 
-\item{score_chemical_superclass}{TODO}
+\item{score_chemical_superclass}{Score for a \code{superclass} match (should be lower than \code{class})}
 
-\item{score_chemical_class}{TODO}
+\item{score_chemical_class}{Score for a \code{class} match (should be the highest)}
 
-\item{score_biological_domain}{TODO}
+\item{score_biological_domain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
 
-\item{score_biological_kingdom}{TODO}
+\item{score_biological_kingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
 
-\item{score_biological_phylum}{TODO}
+\item{score_biological_phylum}{Score for a \code{phylum} match (should be lower than \code{class})}
 
-\item{score_biological_class}{TODO}
+\item{score_biological_class}{Score for a \code{class} match (should be lower than \code{order})}
 
-\item{score_biological_order}{TODO}
+\item{score_biological_order}{Score for a \code{order} match (should be lower than \code{infraorder})}
 
-\item{score_biological_infraorder}{TODO}
+\item{score_biological_infraorder}{Score for a \code{infraorder} match (should be lower than \code{order})}
 
-\item{score_biological_family}{TODO}
+\item{score_biological_family}{Score for a \code{family} match (should be lower than \code{subfamily})}
 
-\item{score_biological_subfamily}{TODO}
+\item{score_biological_subfamily}{Score for a \code{subfamily} match (should be lower than \code{family})}
 
-\item{score_biological_tribe}{TODO}
+\item{score_biological_tribe}{Score for a \code{tribe} match (should be lower than \code{subtribe})}
 
-\item{score_biological_subtribe}{TODO}
+\item{score_biological_subtribe}{Score for a \code{subtribe} match (should be lower than \code{genus})}
 
-\item{score_biological_genus}{TODO}
+\item{score_biological_genus}{Score for a \code{genus} match (should be lower than \code{subgenus})}
 
-\item{score_biological_subgenus}{TODO}
+\item{score_biological_subgenus}{Score for a \code{subgenus} match (should be lower than \code{species})}
 
-\item{score_biological_species}{TODO}
+\item{score_biological_species}{Score for a \code{species} match (should be lower than \code{subspecies})}
 
-\item{score_biological_subspecies}{TODO}
+\item{score_biological_subspecies}{Score for a \code{subspecies} match (should be lower than \code{variety})}
 
-\item{score_biological_variety}{TODO}
+\item{score_biological_variety}{Score for a \code{variety} match (should be the highest)}
 
-\item{ms_mode}{TODO}
+\item{ms_mode}{MS ionization mode. Should be 'pos' or 'neg'}
 
-\item{ms_level}{TODO}
+\item{ms_level}{1}
 
-\item{annotate}{TODO}
+\item{annotate}{Boolean. Perform MS1 annotation completion or not}
 
-\item{tolerance_ppm}{TODO}
+\item{tolerance_ppm}{Tolerance in ppm for MS1 annotation}
 
-\item{tolerance_rt}{TODO}
+\item{tolerance_rt}{Tolerance in retention time (minute) for adducts attribution}
 
-\item{adducts_list}{TODO}
+\item{adducts_list}{Adducts list}
 
-\item{minimal_ms1_bio}{TODO}
+\item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 
-\item{minimal_ms1_chemo}{TODO}
+\item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
-\item{ms1_only}{TODO}
+\item{ms1_only}{Boolean. Keep only MS1 annotations}
 
-\item{force}{TODO}
+\item{force}{Force parameters. Use it at your own risk}
 }
 \description{
-TODO
+This function weights and eventually complements initial annotations.
 }
 \examples{
 NULL
+}
+\seealso{
+annotate_ms1 weight_bio weight_chemo
 }

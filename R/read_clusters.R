@@ -1,9 +1,9 @@
 #' @title Read clusters
 #'
-#' @description TODO
+#' @description This function reads the clusters table from GNPS
 #'
-#' @param id A character string of length 32 representing the job ID
-#' @param workflow A character string indicating the type of workflow, either "fbmn" or "classical"
+#' @param id Character string of length 32 representing the job ID
+#' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
 #'
 #' @return A data frame containing cluster information
 #'

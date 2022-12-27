@@ -1,6 +1,6 @@
 #' @title Fake no retention time
 #'
-#' @description TODO
+#' @description This function fakes retention times in case none are given
 #'
 #' @param input File path of the input feature table
 #' @param output File path of the output feature table with no retention time column

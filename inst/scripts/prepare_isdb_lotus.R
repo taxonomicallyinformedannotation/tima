@@ -14,8 +14,6 @@ log_debug("Contributors: ...")
 
 paths <- parse_yaml_paths()
 
-##  TODO CLI DOCOPT
-
 prepare_isdb_lotus()
 
 end <- Sys.time()

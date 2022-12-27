@@ -16,16 +16,16 @@ paths <- parse_yaml_paths()
 
 #' @title Get HMDB
 #'
-#' @param url TODO
-#' @param export TODO
+#' @param url URL to HMDB
+#' @param export Output file
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom curl curl_download write_csv
 #'
-#' @examples TODO
+#' @examples NULL
 get_hmdb <-
   function(url = paths$urls$hmdb$metabolites,
            export = paths$data$source$libraries$hmdb) {

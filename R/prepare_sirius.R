@@ -1,6 +1,6 @@
 #' @title Prepare sirius
 #'
-#' @description TODO
+#' @description This function prepares Sirius results to make them compatible
 #'
 #' @param input_directory Directory containing the Sirius results
 #' @param npc Boolean. NPClassifier classes computed. TRUE or FALSE

@@ -18,10 +18,10 @@ replace_gnps_job_id(
 \item{repl}{a user-specified values for a GNPS job ID}
 }
 \value{
-a character string with the GNPS job ID modified according to the rules specified in the function
+Character string with the GNPS job ID modified according to the rules specified in the function
 }
 \description{
-TODO
+This function replaces the default GNPS job ID given in the example by a user-specified one
 }
 \examples{
 replaced_job_id <- replace_gnps_job_id(job = "MyGNPSJobIDXXX", default = "XXX", repl = "Foo")

@@ -1,6 +1,6 @@
 #' @title Export spectra
 #'
-#' @description TODO
+#' @description This function prepares spectra for export
 #'
 #' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
 #' @param spectra The spectra object where spectra are stored
@@ -131,7 +131,7 @@ export_spectra <- function(file,
 
 #' @title Export spectra 2
 #'
-#' @description TODO
+#' @description This function export spectra.
 #'
 #' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
 #' @param spectra The spectra object where spectra are stored

@@ -7,13 +7,13 @@
 treat_names_sirius(x)
 }
 \arguments{
-\item{x}{a character string containing a name}
+\item{x}{Character string containing a name}
 }
 \value{
-a character string with the name modified according to the rules specified in the function
+Character string with the name modified according to the rules specified in the function
 }
 \description{
-TODO
+This function cleans the names of Sirius outputs to make them compatible
 }
 \examples{
 treated_name <- treat_names_sirius("My_name")

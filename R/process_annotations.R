@@ -1,48 +1,48 @@
 #' @title Process annotations
 #'
-#' @description TODO
+#' @description This function weights and eventually complements initial annotations.
 #'
-#' @param library TODO
-#' @param name TODO
-#' @param gnps TODO
-#' @param isdb TODO
-#' @param sirius TODO
-#' @param taxa TODO
-#' @param edges TODO
-#' @param output TODO
-#' @param candidates_initial TODO
-#' @param candidates_final TODO
-#' @param weight_spectral TODO
-#' @param weight_chemical TODO
-#' @param weight_biological TODO
-#' @param score_chemical_pathway TODO
-#' @param score_chemical_superclass TODO
-#' @param score_chemical_class TODO
-#' @param score_biological_domain TODO
-#' @param score_biological_kingdom TODO
-#' @param score_biological_phylum TODO
-#' @param score_biological_class TODO
-#' @param score_biological_order TODO
-#' @param score_biological_infraorder TODO
-#' @param score_biological_family TODO
-#' @param score_biological_subfamily TODO
-#' @param score_biological_tribe TODO
-#' @param score_biological_subtribe TODO
-#' @param score_biological_genus TODO
-#' @param score_biological_subgenus TODO
-#' @param score_biological_species TODO
-#' @param score_biological_subspecies TODO
-#' @param score_biological_variety TODO
-#' @param ms_mode TODO
-#' @param ms_level TODO
-#' @param annotate TODO
-#' @param tolerance_ppm TODO
-#' @param tolerance_rt TODO
-#' @param force TODO
-#' @param adducts_list TODO
-#' @param minimal_ms1_bio TODO
-#' @param minimal_ms1_chemo TODO
-#' @param ms1_only TODO
+#' @param library Library to be used to perform MS1 annotation
+#' @param name Name of the adducts
+#' @param gnps GNPS annotation results
+#' @param isdb ISDB annotation results
+#' @param sirius SIRIUS annotation results
+#' @param taxa Prepared taxed features file
+#' @param edges Prepared edges file
+#' @param output Output file
+#' @param candidates_initial Number of initial candidates to keep
+#' @param candidates_final Number of final candidates to keep
+#' @param weight_spectral Weight for the spectral score
+#' @param weight_chemical Weight for the biological score
+#' @param weight_biological Weight for the chemical consistency score
+#' @param score_chemical_pathway Score for a `pathway` match (should be lower than `superclass`)
+#' @param score_chemical_superclass Score for a `superclass` match (should be lower than `class`)
+#' @param score_chemical_class Score for a `class` match (should be the highest)
+#' @param score_biological_domain Score for a `domain` match (should be lower than `kingdom`)
+#' @param score_biological_kingdom Score for a `kingdom` match (should be lower than `phylum`)
+#' @param score_biological_phylum Score for a `phylum` match (should be lower than `class`)
+#' @param score_biological_class Score for a `class` match (should be lower than `order`)
+#' @param score_biological_order Score for a `order` match (should be lower than `infraorder`)
+#' @param score_biological_infraorder Score for a `infraorder` match (should be lower than `order`)
+#' @param score_biological_family Score for a `family` match (should be lower than `subfamily`)
+#' @param score_biological_subfamily Score for a `subfamily` match (should be lower than `family`)
+#' @param score_biological_tribe Score for a `tribe` match (should be lower than `subtribe`)
+#' @param score_biological_subtribe Score for a `subtribe` match (should be lower than `genus`)
+#' @param score_biological_genus Score for a `genus` match (should be lower than `subgenus`)
+#' @param score_biological_subgenus Score for a `subgenus` match (should be lower than `species`)
+#' @param score_biological_species Score for a `species` match (should be lower than `subspecies`)
+#' @param score_biological_subspecies Score for a `subspecies` match (should be lower than `variety`)
+#' @param score_biological_variety Score for a `variety` match (should be the highest)
+#' @param ms_mode MS ionization mode. Should be 'pos' or 'neg'
+#' @param ms_level 1
+#' @param annotate Boolean. Perform MS1 annotation completion or not
+#' @param tolerance_ppm Tolerance in ppm for MS1 annotation
+#' @param tolerance_rt Tolerance in retention time (minute) for adducts attribution
+#' @param force Force parameters. Use it at your own risk
+#' @param adducts_list Adducts list
+#' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
+#' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
+#' @param ms1_only Boolean. Keep only MS1 annotations
 #'
 #' @return NULL
 #'
@@ -53,6 +53,8 @@
 #' @importFrom dplyr mutate mutate_all mutate_if
 #' @importFrom readr read_delim write_delim
 #' @importFrom yaml write_yaml
+#'
+#' @seealso annotate_ms1 weight_bio weight_chemo
 #'
 #' @examples NULL
 process_annotations <- function(library = params$library,

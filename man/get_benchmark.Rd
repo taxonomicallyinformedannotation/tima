@@ -15,7 +15,7 @@ get_benchmark(
 \item{export}{Character string containing the file path where the benchmarking set should be exported}
 }
 \description{
-TODO
+This function gets the spectra used for the benchmark
 }
 \examples{
 get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp", export = "data/source/benchmark/set.csv")

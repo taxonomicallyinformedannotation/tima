@@ -20,32 +20,39 @@ process_spectra(
 )
 }
 \arguments{
-\item{input}{TODO}
+\item{input}{Query file containing spectra. Currently an '.mgf' file}
 
-\item{library}{TODO}
+\item{library}{Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)}
 
-\item{output}{TODO}
+\item{output}{Output file.}
 
-\item{method}{TODO}
+\item{method}{Method to be used to perform spectral comparison}
 
-\item{threshold}{TODO}
+\item{threshold}{Minimal similarity to report}
 
-\item{ppm}{TODO}
+\item{ppm}{Relative ppm tolerance to be used}
 
-\item{dalton}{TODO}
+\item{dalton}{Absolute Dalton tolerance to be used}
 
-\item{npeaks}{TODO}
+\item{npeaks}{Absolute minimum number of peaks to be matched}
 
-\item{rpeaks}{TODO}
+\item{rpeaks}{Relative minimum number of peaks to be matched}
 
-\item{condition}{TODO}
+\item{condition}{Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).}
 
-\item{quickmode}{TODO}
+\item{quickmode}{Boolean. Quick mode goes faster but does not output matched peaks and ratios.}
 
-\item{parallel}{TODO}
+\item{parallel}{Boolean. Process in parallel}
 }
 \description{
-TODO
+This function performs spectral matching.
+}
+\details{
+It takes two files as input. A query file that will be matched against a library file.
+Multiple comparison distances are available
+('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
+Number of matched peaks and their ratio are also available if using 'quickmode=FALSE'.
+Parallel processing is also made available.
 }
 \examples{
 NULL

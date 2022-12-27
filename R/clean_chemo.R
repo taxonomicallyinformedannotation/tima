@@ -1,6 +1,6 @@
 #' @title Clean chemo
 #'
-#' @description TODO
+#' @description This function cleans the results obtained after chemical weighting
 #'
 #' @param annotationTableWeightedChemo Table containing your chemically weighted annotation
 #' @param structureOrganismPairsTable Table containing the structure - organism pairs
@@ -15,6 +15,8 @@
 #' @importFrom dplyr across arrange bind_rows dense_rank desc distinct
 #' @importFrom dplyr everything filter group_by left_join mutate mutate_all
 #' @importFrom dplyr na_if select summarise ungroup
+#'
+#' @seealso weight_chemo
 #'
 #' @examples NULL
 clean_chemo <-

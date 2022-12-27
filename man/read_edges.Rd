@@ -7,13 +7,13 @@
 read_edges(id)
 }
 \arguments{
-\item{id}{a character string containing a GNPS job ID}
+\item{id}{Character string containing a GNPS job ID}
 }
 \value{
-a data frame containing the network edges for the specified GNPS job
+Data frame containing the network edges for the specified GNPS job
 }
 \description{
-TODO
+This function reads the edges table from GNPS
 }
 \examples{
 NULL

@@ -1,6 +1,6 @@
 #' @title Annotate MS1
 #'
-#' @description TODO
+#' @description This function complements MS2 results with MS1 annotation and filters the final results.
 #'
 #' @param annotationTable Table containing your previous annotation to complement
 #' @param structureExactMassTable Table containing the structure - exact mass pairs to perform annotation
@@ -23,6 +23,8 @@
 #' @importFrom stats dist setNames
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_longer
+#'
+#' @seealso annotate_non_ms1
 #'
 #' @examples NULL
 annotate_ms1 <-

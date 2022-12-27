@@ -23,7 +23,7 @@ harmonize_spectra(
 \item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
 }
 \description{
-TODO
+This function harmonizes spectra headers
 }
 \examples{
 NULL

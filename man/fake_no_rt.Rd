@@ -15,7 +15,7 @@ fake_no_rt(
 \item{output}{File path of the output feature table with no retention time column}
 }
 \description{
-TODO
+This function fakes retention times in case none are given
 }
 \examples{
 NULL

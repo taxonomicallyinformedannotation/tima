@@ -1,6 +1,6 @@
 #' @title Prepare spectral matches
 #'
-#' @description TODO
+#' @description This function prepares the spectral matches obtained previously to make them compatible
 #'
 #' @param input Input file
 #' @param output Output file

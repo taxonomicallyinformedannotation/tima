@@ -14,7 +14,7 @@ get_last_version_from_zenodo(doi, pattern, path)
 \item{path}{Path to save the file to}
 }
 \description{
-TODO
+This function gets the last version of a file from a Zenodo record
 }
 \details{
 Credit goes to partially to https://inbo.github.io/inborutils/

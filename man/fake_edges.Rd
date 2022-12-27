@@ -18,7 +18,7 @@ fake_edges(
 \item{name_feature}{Name of the features column}
 }
 \description{
-TODO
+This function fakes edges in case none are given
 }
 \examples{
 NULL

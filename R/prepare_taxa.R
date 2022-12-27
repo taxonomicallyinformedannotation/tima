@@ -1,16 +1,20 @@
 #' @title Prepare taxa
 #'
-#' @description TODO
+#' @description This function performs taxon name preparation to match the Open Tree of Life taxonomy
 #'
-#' @param input TODO
-#' @param tool TODO
-#' @param extension TODO
-#' @param colname TODO
-#' @param gnps_job_id TODO
-#' @param metadata TODO
-#' @param top_k TODO
-#' @param output TODO
-#' @param taxon TODO
+#' @details Depending if the features are aligned between samples originating from various organisms or not,
+#'    It can either attribute all features to a single organism, or attribute them to multiple ones,
+#'    according to their relative intensities among the samples.
+#'
+#' @param input File containing your features intensities
+#' @param tool Tool from which your file comes from ('manual', 'gnps' or 'ready')
+#' @param extension Does your colun names contain the file extension? (MZmine mainly)
+#' @param colname Name of the column containing biological source information
+#' @param gnps_job_id If your tool is 'gnps', corresponding GNPS job ID
+#' @param metadata File containing your metadata including biological source
+#' @param top_k Number of organisms to be retained per feature top intensities
+#' @param output Output file
+#' @param taxon If you want to enforce all features to a given taxon, put its name here.
 #'
 #' @return NULL
 #'

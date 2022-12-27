@@ -15,7 +15,7 @@ get_example_sirius(
 \item{export}{File path where the downloaded sirius file should be saved}
 }
 \description{
-TODO
+This function gets an example of Sirius results
 }
 \examples{
 NULL

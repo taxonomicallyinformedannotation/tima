@@ -1,12 +1,12 @@
 #' @title Replace GNPS job ID
 #'
-#' @description TODO
+#' @description This function replaces the default GNPS job ID given in the example by a user-specified one
 #'
 #' @param job a character string containing a GNPS job ID
 #' @param default a default values for a GNPS job ID
 #' @param repl a user-specified values for a GNPS job ID
 #'
-#' @return a character string with the GNPS job ID modified according to the rules specified in the function
+#' @return Character string with the GNPS job ID modified according to the rules specified in the function
 #'
 #' @export
 #'

@@ -10,7 +10,7 @@ decorate_bio()
 Message indicating the number of annotations weighted at each biological level
 }
 \description{
-TODO
+This function outputs informations about biological weighting
 }
 \examples{
 NULL

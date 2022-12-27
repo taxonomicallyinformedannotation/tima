@@ -1,6 +1,6 @@
 #' @title Get example feature table
 #'
-#' @description TODO
+#' @description This function gets an example feature table to work with
 #'
 #' @param url URL of the example feature table file
 #' @param export File path to where the example feature table should be saved

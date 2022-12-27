@@ -15,8 +15,11 @@
 Numeric value indicating the fraction of matching peaks between x and y
 }
 \description{
-TODO
+This function calculates the relative number (ratio) of matching peaks in two spectra
 }
 \examples{
 NULL
+}
+\author{
+Courtesy of Michele Stravs (\href{https://orcid.org/0000-0002-1426-8572}{0000-0002-1426-8572})
 }

@@ -1,10 +1,10 @@
 #' @title Read NAP
 #'
-#' @description TODO
+#' @description This function read NAP results table
 #'
-#' @param id a character string containing a GNPS job ID
+#' @param id Character string containing a GNPS job ID
 #'
-#' @return a data frame containing the node attributes table for the specified GNPS job
+#' @return Data frame containing the node attributes table for the specified GNPS job
 #'
 #' @export
 #'

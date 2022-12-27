@@ -16,11 +16,11 @@ paths <- parse_yaml_paths()
 
 #' @title Prepare HMDB
 #'
-#' @param input TODO
-#' @param output TODO
-#' @param output_minimal TODO
+#' @param input Input file
+#' @param output Output file
+#' @param output_minimal Output of the minimal file
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -28,7 +28,7 @@ paths <- parse_yaml_paths()
 #' @importFrom readr read_tsv write_tsv
 #' @importFrom XML xmlParse xmlValue xpathSApply
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_hmdb <- function(input = paths$data$source$libraries$hmdb,
                          output = paths$data$interim$libraries$hmdb,
                          output_minimal = paths$data$interim$libraries$hmdb_minimal) {

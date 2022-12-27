@@ -30,8 +30,11 @@ clean_bio(
 A table containing the biologically weighted annotation where only a given number of initial candidates are kept
 }
 \description{
-TODO
+This function cleans the results obtained after biological weighting
 }
 \examples{
 NULL
+}
+\seealso{
+weight_bio
 }

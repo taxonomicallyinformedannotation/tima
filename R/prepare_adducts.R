@@ -1,6 +1,6 @@
 #' @title Prepare adducts
 #'
-#' @description TODO
+#' @description This function prepares adducts for further use
 #'
 #' @param adducts_input List of adducts taken as input
 #' @param adducts_table_input Table of adducts taken as input

@@ -11,11 +11,8 @@ form_adducts_pos(massesTable, adductsTable)
 
 \item{adductsTable}{Table containing the adducts}
 }
-\value{
-TODO
-}
 \description{
-TODO
+This function forms positive adducts
 }
 \examples{
 NULL

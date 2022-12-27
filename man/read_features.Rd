@@ -7,13 +7,13 @@
 read_features(id)
 }
 \arguments{
-\item{id}{a character string containing a GNPS job ID}
+\item{id}{Character string containing a GNPS job ID}
 }
 \value{
-a data frame containing the features for the specified GNPS job
+Data frame containing the features for the specified GNPS job
 }
 \description{
-TODO
+This function reads the features table from GNPS
 }
 \examples{
 NULL

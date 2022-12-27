@@ -22,36 +22,39 @@ weight_bio(
 )
 }
 \arguments{
-\item{annotationTable}{TODO}
+\item{annotationTable}{Table containing the initial annotation eventually complemented by additional MS1 annotations}
 
-\item{structureOrganismPairsTable}{TODO}
+\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
-\item{weightSpectral}{TODO}
+\item{weightSpectral}{Weight for the spectral score}
 
-\item{weightBiological}{TODO}
+\item{weightBiological}{Weight for the biological score}
 
-\item{scoreBiologicalDomain}{TODO}
+\item{scoreBiologicalDomain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
 
-\item{scoreBiologicalKingdom}{TODO}
+\item{scoreBiologicalKingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
 
-\item{scoreBiologicalPhylum}{TODO}
+\item{scoreBiologicalPhylum}{Score for a \code{phylum} match (should be lower than \code{class})}
 
-\item{scoreBiologicalClass}{TODO}
+\item{scoreBiologicalClass}{Score for a \code{class} match (should be lower than \code{order})}
 
-\item{scoreBiologicalOrder}{TODO}
+\item{scoreBiologicalOrder}{Score for a \code{order} match (should be lower than \code{family})}
 
-\item{scoreBiologicalFamily}{TODO}
+\item{scoreBiologicalFamily}{Score for a \code{family} match (should be lower than \code{tribe})}
 
-\item{scoreBiologicalTribe}{TODO}
+\item{scoreBiologicalTribe}{Score for a \code{tribe} match (should be lower than \code{genus})}
 
-\item{scoreBiologicalGenus}{TODO}
+\item{scoreBiologicalGenus}{Score for a \code{genus} match (should be lower than \code{species})}
 
-\item{scoreBiologicalSpecies}{TODO}
+\item{scoreBiologicalSpecies}{Score for a \code{species} match (should be lower than \code{variety})}
 
-\item{scoreBiologicalVariety}{TODO}
+\item{scoreBiologicalVariety}{Score for a \code{variety} match (should be the highest)}
+}
+\value{
+A table containing the biologically weighted annotation
 }
 \description{
-TODO
+This function weights the eventually MS1 complemented annotations according their biological source
 }
 \examples{
 NULL

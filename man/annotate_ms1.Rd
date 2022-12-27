@@ -39,8 +39,11 @@ annotate_ms1(
 A table containing the initial annotation complemented by additional MS1 annotations based on exact mass
 }
 \description{
-TODO
+This function complements MS2 results with MS1 annotation and filters the final results.
 }
 \examples{
 NULL
+}
+\seealso{
+annotate_non_ms1
 }

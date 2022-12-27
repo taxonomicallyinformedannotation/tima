@@ -1,6 +1,6 @@
 #' @title Get benchmark
 #'
-#' @description TODO
+#' @description This function gets the spectra used for the benchmark
 #'
 #' @param url Character string containing the URL of the benchmarking set
 #' @param export Character string containing the file path where the benchmarking set should be exported

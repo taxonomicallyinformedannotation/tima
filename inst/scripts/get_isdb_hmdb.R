@@ -14,16 +14,16 @@ log_debug("Contributors: ...")
 
 #' @title Get HMDB In Silico
 #'
-#' @param url TODO
-#' @param export TODO
+#' @param url URL to HMDB in silico predicted spectra
+#' @param export Output file
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom curl curl_download write_csv
 #'
-#' @examples TODO
+#' @examples NULL
 get_isdb_hmdb <-
   function(url = paths$urls$hmdb$spectra$predicted,
            export = paths$data$source$spectra$hmdb_isdb) {

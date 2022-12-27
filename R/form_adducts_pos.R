@@ -1,11 +1,11 @@
 #' @title Form adducts positive
 #'
-#' @description TODO
+#' @description This function forms positive adducts
 #'
 #' @param massesTable Table containing the masses of the adducts
 #' @param adductsTable Table containing the adducts
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'

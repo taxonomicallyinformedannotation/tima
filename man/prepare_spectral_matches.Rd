@@ -12,7 +12,7 @@ prepare_spectral_matches(input = params$input, output = params$output)
 \item{output}{Output file}
 }
 \description{
-TODO
+This function prepares the spectral matches obtained previously to make them compatible
 }
 \examples{
 NULL

@@ -7,13 +7,13 @@
 pretreat_names_sirius(x)
 }
 \arguments{
-\item{x}{a character string containing a name}
+\item{x}{Character string containing a name}
 }
 \value{
-a character string with the name modified according to the rules specified in the function
+Character string with the name modified according to the rules specified in the function
 }
 \description{
-TODO
+This function pretreats Sirius names to make them compatible
 }
 \examples{
 pretreated_name <- pretreat_names_sirius("My name/suffix")

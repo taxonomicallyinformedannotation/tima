@@ -1,10 +1,10 @@
 #' @title Pretreat names sirius
 #'
-#' @description TODO
+#' @description This function pretreats Sirius names to make them compatible
 #'
-#' @param x a character string containing a name
+#' @param x Character string containing a name
 #'
-#' @return a character string with the name modified according to the rules specified in the function
+#' @return Character string with the name modified according to the rules specified in the function
 #'
 #' @export
 #'

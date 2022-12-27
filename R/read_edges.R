@@ -1,10 +1,10 @@
 #' @title Read edges
 #'
-#' @description TODO
+#' @description This function reads the edges table from GNPS
 #'
-#' @param id a character string containing a GNPS job ID
+#' @param id Character string containing a GNPS job ID
 #'
-#' @return a data frame containing the network edges for the specified GNPS job
+#' @return Data frame containing the network edges for the specified GNPS job
 #'
 #' @export
 #'

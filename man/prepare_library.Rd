@@ -21,7 +21,10 @@ prepare_library(
 \item{output}{Output file}
 }
 \description{
-TODO
+This function prepares the library made of all sub-libraries containing structure-organism pairs
+}
+\details{
+It can be restricted to specific taxa to have more biologically meaningful annotation.
 }
 \examples{
 NULL

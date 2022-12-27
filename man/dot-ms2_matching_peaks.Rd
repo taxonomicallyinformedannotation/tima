@@ -7,9 +7,9 @@
 .ms2_matching_peaks(x, y, ..., cutoff = 0)
 }
 \arguments{
-\item{x}{a matrix with two columns: m/z and intensity values for the first spectrum}
+\item{x}{a matrix with two columns: \emph{m/z} and intensity values for the first spectrum}
 
-\item{y}{a matrix with two columns: m/z and intensity values for the first spectrum}
+\item{y}{a matrix with two columns: \emph{m/z} and intensity values for the first spectrum}
 
 \item{...}{...}
 
@@ -19,11 +19,11 @@
 Integer indicating the number of matching peaks between x and y
 }
 \description{
-TODO
-}
-\details{
-Courtesy of Michele Stravs (ORCID = "0000-0002-1426-8572")
+This function calculates the absolute number of matching peaks in two spectra
 }
 \examples{
 NULL
+}
+\author{
+Courtesy of Michele Stravs (\href{https://orcid.org/0000-0002-1426-8572}{0000-0002-1426-8572})
 }

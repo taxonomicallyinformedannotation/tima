@@ -13,7 +13,7 @@ parse_yaml_paths(file = "paths.yaml")
 A list containing the paths specified in the YAML file
 }
 \description{
-TODO
+This function parses YAML paths
 }
 \examples{
 NULL

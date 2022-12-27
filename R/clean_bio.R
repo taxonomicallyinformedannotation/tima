@@ -1,6 +1,6 @@
 #' @title Clean bio
 #'
-#' @description TODO
+#' @description This function cleans the results obtained after biological weighting
 #'
 #' @param annotationTableWeightedBio Table containing your biologically weighted annotation
 #' @param structureOrganismPairsTable Table containing the structure - organism pairs
@@ -18,6 +18,8 @@
 #' @importFrom dplyr tibble ungroup
 #' @importFrom stats setNames
 #' @importFrom tidyselect where
+#'
+#' @seealso weight_bio
 #'
 #' @examples NULL
 clean_bio <-

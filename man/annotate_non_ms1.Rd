@@ -18,8 +18,11 @@ annotate_non_ms1(
 A table containing the initial annotation where only part of initial candidates are kept
 }
 \description{
-TODO
+This function filters MS2 results in case no MS1 annotation was performed
 }
 \examples{
 NULL
+}
+\seealso{
+annotate_ms1
 }

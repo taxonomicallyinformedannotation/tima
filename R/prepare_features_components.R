@@ -1,6 +1,6 @@
 #' @title Prepare features components
 #'
-#' @description TODO
+#' @description This function prepares the components (clusters in molecular network) for further use
 #'
 #' @param input Input file if tool == 'manual'
 #' @param output Output file

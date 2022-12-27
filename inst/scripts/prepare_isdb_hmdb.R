@@ -16,13 +16,13 @@ paths <- parse_yaml_paths()
 
 #' @title Prepare HMDB In Silico DataBase
 #'
-#' @param input TODO
-#' @param metadata TODO
-#' @param output_pos TODO
-#' @param output_neg TODO
-#' @param export_sqlite TODO
+#' @param input Input file
+#' @param metadata Metadata
+#' @param output_pos Output for positive spectra
+#' @param output_neg Output for negative spectra
+#' @param export_sqlite Boolean. Save as sqlite instead of mgf
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
@@ -32,7 +32,7 @@ paths <- parse_yaml_paths()
 #' @importFrom readr read_tsv
 #' @importFrom Spectra export Spectra
 #'
-#' @examples TODO
+#' @examples NULL
 prepare_isdb_hmdb <-
   function(input = paths$data$source$spectra$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,

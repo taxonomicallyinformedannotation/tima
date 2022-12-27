@@ -7,7 +7,7 @@
 parse_cli_params()
 }
 \description{
-TODO
+This function parses command line parameters
 }
 \examples{
 NULL

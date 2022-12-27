@@ -1,6 +1,6 @@
 #' @title Extract spectra from a Spectra object
 #'
-#' @description TODO
+#' @description This function extracts spectra from a `Spectra`object
 #'
 #' @param object Object of class Spectra
 #'

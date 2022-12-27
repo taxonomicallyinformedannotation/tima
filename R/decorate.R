@@ -1,6 +1,6 @@
 #' @title Decorate MS1
 #'
-#' @description TODO
+#' @description This function outputs informations about MS1 annotation
 #'
 #' @return Message indicating the number of annotations obtained by MS1
 #'
@@ -61,7 +61,7 @@ decorate_ms1 <- function() {
 
 #' @title Decorate bio
 #'
-#' @description TODO
+#' @description This function outputs informations about biological weighting
 #'
 #' @return Message indicating the number of annotations weighted at each biological level
 #'
@@ -161,7 +161,7 @@ decorate_bio <- function() {
 
 #' @title Decorate chemo
 #'
-#' @description TODO
+#' @description This function outputs informations about chemical weighting
 #'
 #' @return Message indicating the number of annotations weighted at each chemical level
 #'

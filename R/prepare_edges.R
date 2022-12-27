@@ -1,6 +1,6 @@
 #' @title Prepare edges
 #'
-#' @description TODO
+#' @description This function prepares edges for further use
 #'
 #' @param tool Tool used to generate the edges
 #' @param gnps_job_id GNPS job ID, if the tool was 'gnps'

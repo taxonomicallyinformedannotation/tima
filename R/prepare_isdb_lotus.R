@@ -1,6 +1,6 @@
 #' @title Prepare LOTUS In Silico DataBase
 #'
-#' @description TODO
+#' @description This function prepares the LOTUS in silico generated spectra to be used for spectral matching
 #'
 #' @param input_pos File containing positive ionization LOTUS ISDB
 #' @param input_neg File containing negative ionization LOTUS ISDB

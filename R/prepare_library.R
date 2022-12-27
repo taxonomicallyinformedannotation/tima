@@ -1,6 +1,8 @@
 #' @title Prepare library
 #'
-#' @description TODO
+#' @description This function prepares the library made of all sub-libraries containing structure-organism pairs
+#'
+#' @details It can be restricted to specific taxa to have more biologically meaningful annotation.
 #'
 #' @param filter Boolean. TRUE or FALSE if you want to filter the library
 #' @param level Biological rank to be filtered. Kingdom, phylum, family, genus, ...

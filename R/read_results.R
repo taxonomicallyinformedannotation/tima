@@ -1,11 +1,11 @@
 #' @title Read results
 #'
-#' @description TODO
+#' @description This function reads GNPS results table
 #'
-#' @param id a character string containing the job ID of the GNPS task
-#' @param workflow a character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'
+#' @param id Character string containing the job ID of the GNPS task
+#' @param workflow Character string indicating the type of workflow used in the GNPS task. Supported values are 'fbmn' and 'classical'
 #'
-#' @return a data frame containing the results of the GNPS task
+#' @return Data frame containing the results of the GNPS task
 #'
 #' @export
 #'

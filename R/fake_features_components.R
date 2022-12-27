@@ -1,6 +1,6 @@
 #' @title Fake features components
 #'
-#' @description TODO
+#' @description This function fakes features components in case none are given
 #'
 #' @param input Path to the file containing the input data
 #' @param features Path to the file containing the features data

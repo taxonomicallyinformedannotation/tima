@@ -1,20 +1,20 @@
 #' @title Prepare parameters
 #'
-#' @description TODO
+#' @description This function prepares main parameters
 #'
-#' @param filename TODO
-#' @param gnps_job_id TODO
-#' @param candidates_initial TODO
-#' @param candidates_final TODO
-#' @param weight_biological TODO
-#' @param weight_chemical TODO
-#' @param weight_spectral TODO
-#' @param ms_mode TODO
-#' @param annotate TODO
-#' @param taxon TODO
-#' @param tolerance_ppm TODO
-#' @param tolerance_rt TODO
-#' @param force TODO
+#' @param filename Name of the file
+#' @param gnps_job_id GNPS job ID
+#' @param candidates_initial Initial candidates to keep
+#' @param candidates_final Final candidates to keep
+#' @param weight_biological Weight for biological score
+#' @param weight_chemical Weight for chemical consistency score
+#' @param weight_spectral Weight for spectral score
+#' @param ms_mode MS ionization mode. 'pos' or 'neg'
+#' @param annotate Perform additional MS1 based annotation
+#' @param taxon Name of a taxon you want to enforce
+#' @param tolerance_ppm Ppm tolerance for MS1 annotation
+#' @param tolerance_rt Retention time tolerance for adducts attribution in MS1 annotation
+#' @param force If you want to force unusual parameters. Use it at your own risk
 #'
 #' @return NULL
 #'

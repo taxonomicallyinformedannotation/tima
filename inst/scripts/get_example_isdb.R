@@ -16,16 +16,16 @@ paths <- parse_yaml_paths()
 
 #' @title Get example ISDB
 #'
-#' @param url TODO
-#' @param export TODO
+#' @param url URL to the example ISDB
+#' @param export Output file
 #'
-#' @return TODO
+#' @return NULL
 #'
 #' @export
 #'
 #' @importFrom readr read_tsv write_tsv
 #'
-#' @examples TODO
+#' @examples NULL
 get_example_isdb <-
   function(url = paths$urls$example_isdb,
            export = paths$data$interim$annotations$example_isdb) {

@@ -10,7 +10,7 @@ decorate_chemo()
 Message indicating the number of annotations weighted at each chemical level
 }
 \description{
-TODO
+This function outputs informations about chemical weighting
 }
 \examples{
 NULL

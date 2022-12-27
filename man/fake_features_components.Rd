@@ -27,7 +27,7 @@ fake_features_components(
 \item{name_mz}{Name of the m/z column in the features data}
 }
 \description{
-TODO
+This function fakes features components in case none are given
 }
 \examples{
 NULL
