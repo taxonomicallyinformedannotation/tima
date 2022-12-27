@@ -6,6 +6,7 @@
 * Added sqlite storing for spectra
 * Added MONA helpers
 * Improved testing time
+* Improved code documentation
 * Minor fixes
 
 # timaR 2.7.0
