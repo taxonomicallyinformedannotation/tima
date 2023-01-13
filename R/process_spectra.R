@@ -100,7 +100,8 @@ process_spectra <- function(input = params$input,
     requirePrecursor = TRUE,
     THRESHFUN = function(x) {
       which(x >= threshold)
-    }
+    },
+    BPPARAM = par
   )
 
   params_abs <- MetaboAnnotation::CompareSpectraParam(
@@ -110,7 +111,8 @@ process_spectra <- function(input = params$input,
     requirePrecursor = TRUE,
     THRESHFUN = function(x) {
       which(x >= npeaks)
-    }
+    },
+    BPPARAM = par
   )
 
   params_rel <- MetaboAnnotation::CompareSpectraParam(

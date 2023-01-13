@@ -13,14 +13,15 @@
 #'
 #' @export
 #'
+#' @importFrom tidyr replace_na
+#'
 #' @examples NULL
 .ms2_matching_peaks <- function(x, y, ..., cutoff = 0) {
   # Select only the peaks with intensity greater than the cutoff
-  x <- x[x[, 2] > cutoff, 1]
-  y <- y[y[, 2] > cutoff, 1]
-
-  # Count the number of peaks that are present in both x and y
-  sum(x %in% y)
+  sum((tidyr::replace_na(
+    data = x[, 2L] > cutoff, replace = 0
+  )) &
+    tidyr::replace_na(data = y[, 2L] > cutoff, replace = 0))
 }
 
 
