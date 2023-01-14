@@ -1,5 +1,5 @@
 # Small image with multiple arch available
-FROM r-base:latest
+FROM ghcr.io/bioconductor/bioconductor:RELEASE_3_16
 
 # Copy files
 COPY paths.yaml ./paths.yaml
