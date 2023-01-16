@@ -116,17 +116,6 @@ process_spectra <- function(input = params$input,
     BPPARAM = par
   )
 
-  params_right <- MetaboAnnotation::CompareSpectraParam(
-    ppm = ppm,
-    tolerance = dalton,
-    FUN = function(x, y, ...) {
-      nrow(x)
-    },
-    type = "right",
-    requirePrecursor = FALSE,
-    BPPARAM = par
-  )
-
   params_inner <- MetaboAnnotation::CompareSpectraParam(
     ppm = ppm,
     tolerance = dalton,
@@ -158,23 +147,13 @@ process_spectra <- function(input = params$input,
     dplyr::rename(msms_score = score)
 
   log_debug("Counting fragments")
-  fragments_left <- MetaboAnnotation::matchSpectra(
+  peaks_query <- MetaboAnnotation::matchSpectra(
     query = spectra,
     target = spectral_library,
     param = params_left
   )
-  fragments_right <- MetaboAnnotation::matchSpectra(
-    query = spectra,
-    target = spectral_library,
-    param = params_right
-  )
-  fragments <- fragments_left@matches |>
-    dplyr::rename(fragments_query = score) |>
-    dplyr::full_join(fragments_right@matches |>
-      dplyr::rename(fragments_target = score)) |>
-    dplyr::rowwise() |>
-    dplyr::mutate(peaks_min = min(fragments_query, fragments_target)) |>
-    dplyr::select(-fragments_query, -fragments_target)
+  df_query <- peaks_query@matches |>
+    dplyr::rename(peaks_query = score)
 
   log_debug("Performing fragments comparison")
   matches_inner <- MetaboAnnotation::matchSpectra(
@@ -184,11 +163,14 @@ process_spectra <- function(input = params$input,
   )
   df_peaks <- matches_inner@matches |>
     dplyr::rename(peaks_abs = score) |>
-    dplyr::full_join(fragments) |>
-    dplyr::mutate(peaks_rel = peaks_abs / peaks_min) |>
-    dplyr::filter(peaks_rel >= rpeaks) |>
+    dplyr::full_join(df_query) |>
+    dplyr::mutate(peaks_rel = peaks_abs / peaks_query) |>
     dplyr::select(-peaks_min)
 
+  if (condition == "AND") {
+    df_peaks <- df_peaks |>
+      dplyr::filter(peaks_rel >= rpeaks)
+  }
 
   log_debug("Formatting results")
   df_full <- df_similarity |>
@@ -224,6 +206,23 @@ process_spectra <- function(input = params$input,
     dplyr::left_join(df_meta) |>
     dplyr::rename(feature_id = query_idx) |>
     dplyr::select(-target_idx)
+
+  log_debug(
+    nrow(df_final),
+    "Candidates were annotated on",
+    nrow(df_final |>
+      dplyr::distinct(feature_id)),
+    "features, with at least",
+    threshold,
+    "similarity score",
+    condition,
+    "at least",
+    npeaks,
+    "(absolute)",
+    condition,
+    rpeaks,
+    "(relative) matched peaks."
+  )
 
   export_output(x = df_final, file = output)
 }
