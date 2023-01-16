@@ -165,7 +165,7 @@ process_spectra <- function(input = params$input,
     dplyr::rename(peaks_abs = score) |>
     dplyr::full_join(df_query) |>
     dplyr::mutate(peaks_rel = peaks_abs / peaks_query) |>
-    dplyr::select(-peaks_min)
+    dplyr::select(-peaks_query)
 
   if (condition == "AND") {
     df_peaks <- df_peaks |>
