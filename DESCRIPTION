@@ -73,7 +73,6 @@ Collate:
     'harmonize_spectra.R'
     'import_spectra.R'
     'log_debug.R'
-    'ms2_matching_peaks.R'
     'parse_cli_params.R'
     'parse_yaml_params.R'
     'parse_yaml_paths.R'

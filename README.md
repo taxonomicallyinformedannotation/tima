@@ -90,12 +90,13 @@ A container is also available, together with a small compose.
 Main commands are below:
 
 ```
-docker build . -t tima-r 
+docker build . -t adafede/tima-r 
 ```
 
 ```
 docker compose up prepare_params
-docker compose up tima
+docker compose up tests
+docker compose up tests
 ```
 
 

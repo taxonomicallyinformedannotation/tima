@@ -15,7 +15,7 @@ process_spectra(
   npeaks = params$ms$peaks$absolute,
   rpeaks = params$ms$peaks$ratio,
   condition = params$ms$condition,
-  quickmode = params$quickmode,
+  qutoff = params$qutoff,
   parallel = params$parallel
 )
 }
@@ -40,7 +40,7 @@ process_spectra(
 
 \item{condition}{Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).}
 
-\item{quickmode}{Boolean. Quick mode goes faster but does not output matched peaks and ratios.}
+\item{qutoff}{Intensity under which ms2 fragments will be removed previous to comparison.}
 
 \item{parallel}{Boolean. Process in parallel}
 }
@@ -51,7 +51,7 @@ This function performs spectral matching.
 It takes two files as input. A query file that will be matched against a library file.
 Multiple comparison distances are available
 ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
-Number of matched peaks and their ratio are also available if using 'quickmode=FALSE'.
+Number of matched peaks and their ratio are also available.
 Parallel processing is also made available.
 }
 \examples{

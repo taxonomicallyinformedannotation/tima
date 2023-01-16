@@ -12,5 +12,5 @@ ms:
     absolute: 6
     ratio: 0.2
   condition: OR
-quickmode: yes
+qutoff: 0
 parallel: yes

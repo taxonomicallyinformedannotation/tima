@@ -5,7 +5,7 @@
 #' @details It takes two files as input. A query file that will be matched against a library file.
 #'    Multiple comparison distances are available
 #'    ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
-#'    Number of matched peaks and their ratio are also available if using 'quickmode=FALSE'.
+#'    Number of matched peaks and their ratio are also available.
 #'    Parallel processing is also made available.
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
@@ -18,7 +18,7 @@
 #' @param npeaks Absolute minimum number of peaks to be matched
 #' @param rpeaks Relative minimum number of peaks to be matched
 #' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
-#' @param quickmode Boolean. Quick mode goes faster but does not output matched peaks and ratios.
+#' @param qutoff Intensity under which ms2 fragments will be removed previous to comparison.
 #' @param parallel Boolean. Process in parallel
 #'
 #' @return NULL
@@ -29,6 +29,7 @@
 #' @importFrom dplyr full_join left_join select
 #' @importFrom MetaboAnnotation CompareSpectraParam matchSpectra
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
+#' @importFrom Spectra filterIntensity
 #'
 #' @examples NULL
 process_spectra <- function(input = params$input,
@@ -41,7 +42,7 @@ process_spectra <- function(input = params$input,
                             npeaks = params$ms$peaks$absolute,
                             rpeaks = params$ms$peaks$ratio,
                             condition = params$ms$condition,
-                            quickmode = params$quickmode,
+                            qutoff = params$qutoff,
                             parallel = params$parallel) {
   stopifnot("Your input file does not exist." = file.exists(input))
   if (file.exists(library |>
@@ -97,31 +98,45 @@ process_spectra <- function(input = params$input,
     ppm = ppm,
     tolerance = dalton,
     FUN = sim_fun,
-    requirePrecursor = TRUE,
+    requirePrecursor = FALSE,
     THRESHFUN = function(x) {
       which(x >= threshold)
     },
     BPPARAM = par
   )
 
-  params_abs <- MetaboAnnotation::CompareSpectraParam(
+  params_left <- MetaboAnnotation::CompareSpectraParam(
     ppm = ppm,
     tolerance = dalton,
-    FUN = .ms2_matching_peaks,
-    requirePrecursor = TRUE,
-    THRESHFUN = function(x) {
-      which(x >= npeaks)
+    FUN = function(x, y, ...) {
+      nrow(x)
     },
+    type = "left",
+    requirePrecursor = FALSE,
     BPPARAM = par
   )
 
-  params_rel <- MetaboAnnotation::CompareSpectraParam(
+  params_right <- MetaboAnnotation::CompareSpectraParam(
     ppm = ppm,
     tolerance = dalton,
-    FUN = .ms2_matching_peaks_fraction,
-    requirePrecursor = TRUE,
+    FUN = function(x, y, ...) {
+      nrow(x)
+    },
+    type = "right",
+    requirePrecursor = FALSE,
+    BPPARAM = par
+  )
+
+  params_inner <- MetaboAnnotation::CompareSpectraParam(
+    ppm = ppm,
+    tolerance = dalton,
+    FUN = function(x, y, ...) {
+      nrow(x)
+    },
+    type = "inner",
+    requirePrecursor = FALSE,
     THRESHFUN = function(x) {
-      which(x >= rpeaks)
+      which(x >= npeaks)
     },
     BPPARAM = par
   )
@@ -129,79 +144,83 @@ process_spectra <- function(input = params$input,
   ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
   ## Can be very slow otherwise
 
+  log_debug("Applying initial intensity filter to query spectra")
+  spectra <- spectra |>
+    Spectra::filterIntensity(intensity = c(qutoff, Inf))
+
   log_debug("Performing spectral comparison")
   matches_sim <- MetaboAnnotation::matchSpectra(
     query = spectra,
-    target = spectra,
+    target = spectral_library,
     param = params_sim
   )
+  df_similarity <- matches_sim@matches |>
+    dplyr::rename(msms_score = score)
 
-  if (quickmode != TRUE) {
-    log_debug("Performing peak matching (long)")
-    matches_abs <- MetaboAnnotation::matchSpectra(
-      query = spectra,
-      target = spectra,
-      param = params_abs
-    )
-    matches_rel <- MetaboAnnotation::matchSpectra(
-      query = spectra,
-      target = spectra,
-      param = params_rel
-    )
-  }
+  log_debug("Counting fragments")
+  fragments_left <- MetaboAnnotation::matchSpectra(
+    query = spectra,
+    target = spectral_library,
+    param = params_left
+  )
+  fragments_right <- MetaboAnnotation::matchSpectra(
+    query = spectra,
+    target = spectral_library,
+    param = params_right
+  )
+  fragments <- fragments_left@matches |>
+    dplyr::rename(fragments_query = score) |>
+    dplyr::full_join(fragments_right@matches |>
+      dplyr::rename(fragments_target = score)) |>
+    dplyr::rowwise() |>
+    dplyr::mutate(peaks_min = min(fragments_query, fragments_target)) |>
+    dplyr::select(-fragments_query, -fragments_target)
+
+  log_debug("Performing fragments comparison")
+  matches_inner <- MetaboAnnotation::matchSpectra(
+    query = spectra,
+    target = spectral_library,
+    param = params_inner
+  )
+  df_peaks <- matches_inner@matches |>
+    dplyr::rename(peaks_abs = score) |>
+    dplyr::full_join(fragments) |>
+    dplyr::mutate(peaks_rel = peaks_abs / peaks_min) |>
+    dplyr::filter(peaks_rel >= rpeaks) |>
+    dplyr::select(-peaks_min)
+
 
   log_debug("Formatting results")
-  df_similarity <- matches_sim@matches |>
-    dplyr::select(
-      feature_id = query_idx,
-      target_id = target_idx,
-      msms_score = score
-    )
-
-  if (quickmode != TRUE) {
-    df_similarity <- df_similarity |>
-      dplyr::full_join(
-        matches_abs@matches |>
-          dplyr::select(
-            feature_id = query_idx,
-            target_id = target_idx,
-            peaks_abs = score
-          )
-      ) |>
-      dplyr::full_join(
-        matches_rel@matches |>
-          dplyr::select(
-            feature_id = query_idx,
-            target_id = target_idx,
-            peaks_rel = score
-          )
-      )
-  }
+  df_full <- df_similarity |>
+    dplyr::full_join(df_peaks)
 
   if (condition == "AND") {
-    df_similarity <- df_similarity |>
+    df_full <- df_full |>
       dplyr::filter(msms_score >= threshold &
         peaks_abs >= npeaks &
         peaks_rel >= rpeaks)
   }
 
+  ## COMMENT AR: Not doing it because of thresholding
+  # df_full[is.na(df_full)] <- 0
+
   spectral_library_extracted <- spectral_library |>
     extract_spectra()
-  target_id <- seq_along(1:length(spectral_library_extracted$name))
+  target_idx <- seq_along(1:length(spectral_library_extracted$name))
   short_inchikey <- spectral_library_extracted$name
   smiles <- spectral_library_extracted$smiles
   molecular_formula <- spectral_library_extracted$formula
   exact_mass <- spectral_library_extracted$exactmass
 
   df_meta <- data.frame(
-    target_id,
+    target_idx,
     short_inchikey,
     smiles,
     molecular_formula,
     exact_mass
   )
 
-  df_final <- df_similarity |>
+  df_final <- df_full |>
     dplyr::left_join(df_meta)
 
   export_output(x = df_final, file = output)

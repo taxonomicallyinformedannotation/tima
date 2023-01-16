@@ -1,8 +1,8 @@
 You can use this script with the following example:
-Rscript inst/scripts/process_spectra.R --input 'data/source/example.mgf' --library 'data/interim/spectra/isdb_lotus_pos.mgf' --output 'data/interim/annotations/example_isdb.tsv.gz' --dalton 0.02 --ppm 10 --method 'gnps' --threshold 0.2 --npeaks 6 --rpeaks 0.2 --condition OR --quickmode true --parallel true
+Rscript inst/scripts/process_spectra.R --input 'data/source/example.mgf' --library 'data/interim/spectra/isdb_lotus_pos.mgf' --output 'data/interim/annotations/example_isdb.tsv.gz' --dalton 0.02 --ppm 10 --method 'gnps' --threshold 0.2 --npeaks 6 --rpeaks 0.2 --condition 'OR' --qutoff 0 --parallel true
 
 Usage: 
-  process_spectra.R [--input=<input>] [--library=<library>] [--output=<output>] [--dalton=<dalton>] [--ppm=<ppm>] [--method=<method>] [--threshold=<threshold>] [--condition=<condition>] [--quickmode=<quickmode>]
+  process_spectra.R [--input=<input>] [--library=<library>] [--output=<output>] [--dalton=<dalton>] [--ppm=<ppm>] [--method=<method>] [--threshold=<threshold>] [--condition=<condition>] [--qutoff=<qutoff>]
 
 Arguments:
   -b --parallel=<parallel>      Perform parallel processing (Boolean)
@@ -14,7 +14,7 @@ Arguments:
   -n --npeaks=<npeaks>          Minimum number of peaks to match (absolute)
   -m --method=<method>          Similarity measure method to be used.
   -p --ppm=<ppm>                Tolerance for matching. Should not exceed 50 ppm.
-  -q --quickmode=<quickmode>    If skipping slow parts. Boolean.
+  -q --qutoff=<qutoff>          Cutting peaks with intensities lower than qutoff.
   -r --rpeaks=<rpeaks>          Minimum ratio of peaks to match (absolute)
   -t -threshold=<threshold>     Minimum similarity score
 

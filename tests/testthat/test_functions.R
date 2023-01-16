@@ -205,6 +205,7 @@ testthat::test_that("Whole process", {
   arguments$precursor <<- "x"
   arguments$qemical <<- "x"
   arguments$quickmode <<- "x"
+  arguments$qutoff <<- "x"
   arguments$rpeaks <<- "x"
   arguments$rt <<- "x"
   arguments$similarity <<- "x"

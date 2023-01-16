@@ -8,6 +8,15 @@ services:
       - "./config:/config"
     command: Rscript inst/scripts/prepare_params.R
 
+  tests:
+    build: "."
+    image: adafede/tima-r
+    volumes:
+      - "./config:/config"
+      - "./inst:/inst"
+      - ".data:/data"
+    command: Rscript inst/scripts/tima_mini.R
+
   tima:
     build: "."
     image: adafede/tima-r

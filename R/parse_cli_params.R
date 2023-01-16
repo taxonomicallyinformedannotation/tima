@@ -116,6 +116,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$quickmode)) {
       params$quickmode <- arguments$quickmode
     }
+    if (!is.null(arguments$qutoff)) {
+      params$qutoff <- arguments$qutoff
+    }
     if (!is.null(arguments$rpeaks)) {
       params$ms$peaks$ratio <- arguments$rpeaks
     }
