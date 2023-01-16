@@ -221,7 +221,9 @@ process_spectra <- function(input = params$input,
   )
 
   df_final <- df_full |>
-    dplyr::left_join(df_meta)
+    dplyr::left_join(df_meta) |>
+    dplyr::rename(feature_id = query_idx) |>
+    dplyr::select(-target_idx)
 
   export_output(x = df_final, file = output)
 }
