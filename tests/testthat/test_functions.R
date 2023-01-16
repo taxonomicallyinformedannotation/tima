@@ -93,10 +93,9 @@ testthat::test_that("Whole process", {
   step <- "process_spectra"
   params <- get_params(step = step)
   process_spectra()
-  ### Long
+  ### Variant
   process_spectra(
-    condition = "AND",
-    quickmode = FALSE
+    condition = "AND"
   )
 
   ### GNPS results
