@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @importFrom curl curl_download
-#' @importFrom readr read_csv write_csv
+#' @importFrom readr read_lines write_lines
 #'
 #' @examples get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp", export = "data/source/benchmark/set.csv")
 get_benchmark <- function(url = paths$urls$benchmarking_set,
@@ -20,6 +20,6 @@ get_benchmark <- function(url = paths$urls$benchmarking_set,
 
   ## Download the benchmarking set and write it to the specified export path
   curl::curl_download(url = url, destfile = tempfile()) |>
-    readr::read_csv() |>
-    readr::write_csv(file = export)
+    readr::read_lines() |>
+    readr::write_lines(file = export)
 }

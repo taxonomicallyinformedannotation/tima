@@ -33,8 +33,10 @@ fake_features_components <- function(input = params$input,
   # Read input and features files
   log_debug("Loading files ...")
   log_debug("... features table")
-  table <- readr::read_delim(file = input)
-  features <- readr::read_delim(file = features)
+  table <- readr::read_delim(file = input) |>
+    dplyr::mutate(feature_id = as.numeric(feature_id))
+  features <- readr::read_delim(file = features) |>
+    dplyr::mutate(feature_id = as.numeric(feature_id))
 
   # Initialize components data frame
   components <- dplyr::mutate(table, component_id = -1)
