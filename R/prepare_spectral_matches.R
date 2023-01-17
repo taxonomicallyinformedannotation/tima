@@ -38,6 +38,7 @@ prepare_spectral_matches <-
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
+        structure_exact_mass = as.numeric(structure_exact_mass)
       ) |>
       # Call complement_metadata function on the modified data frame
       complement_metadata()

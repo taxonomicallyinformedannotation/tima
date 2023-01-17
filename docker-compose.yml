@@ -14,7 +14,7 @@ services:
     volumes:
       - "./config:/config"
       - "./inst:/inst"
-      - ".data:/data"
+      - "./data:/data"
     command: Rscript inst/scripts/tima_mini.R
 
   tima:
@@ -23,7 +23,7 @@ services:
     volumes:
       - "./config:/config"
       - "./inst:/inst"
-      - ".data:/data"
+      - "./data:/data"
     command: Rscript inst/scripts/tima_full.R
 
 # other smaller services not implemented yet
