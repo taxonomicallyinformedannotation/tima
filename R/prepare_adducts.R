@@ -68,7 +68,7 @@ prepare_adducts <-
     adducts_t <- adducts_t[2, ] |>
       dplyr::mutate_all(as.numeric)
 
-    masses_adducts <- cbind(masses, adducts_t)
+    masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
 
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")

@@ -114,9 +114,9 @@ prepare_taxa <-
 
     log_debug(x = "Keeping list of organisms to submit to OTL")
     organism_table <- metadata_table |>
-      dplyr::filter(!is.na(dplyr::all_of(colname))) |>
-      dplyr::distinct(dplyr::across(dplyr::all_of(colname))) |>
-      dplyr::select(organism = dplyr::all_of(colname)) |>
+      dplyr::filter(!is.na(!!as.name(colname))) |>
+      dplyr::distinct(!!as.name(colname)) |>
+      dplyr::select(organism = !!as.name(colname)) |>
       tidyr::separate_rows(organism,
         sep = "\\|",
       ) |>
