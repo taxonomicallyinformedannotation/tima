@@ -96,7 +96,7 @@ docker build . -t adafede/tima-r
 ```
 docker compose up prepare_params
 docker compose up tests
-docker compose up tests
+docker compose up tima
 ```
 
 
