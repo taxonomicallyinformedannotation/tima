@@ -21,8 +21,8 @@ fake_edges <- function(input = params$input,
   edges_table_treated <- readr::read_delim(
     file = input,
     col_select = c(
-      feature_source = name_feature,
-      feature_target = name_feature
+      feature_source = !!as.name(name_feature),
+      feature_target = !!as.name(name_feature)
     )
   )
 

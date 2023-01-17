@@ -72,7 +72,6 @@ prepare_features_components <- function(input = params$input,
       ))
   }
 
-
   log_debug(x = "Adding components to features")
   table_filled <-
     dplyr::left_join(components, table) |>
@@ -99,10 +98,10 @@ prepare_features_components <- function(input = params$input,
   ## TODO can be improved
   if (ms_mode == "pos") {
     table_filled <- table_filled |>
-      dplyr::mutate(mz_error = mz - 1.007276 - structure_exact_mass)
+      dplyr::mutate(mz_error = mz - 1.007276 - as.numeric(structure_exact_mass))
   } else {
     table_filled <- table_filled |>
-      dplyr::mutate(mz_error = mz + 1.007276 - structure_exact_mass)
+      dplyr::mutate(mz_error = mz + 1.007276 - as.numeric(structure_exact_mass))
   }
 
   log_debug(x = "Exporting ...")
