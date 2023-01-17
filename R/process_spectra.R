@@ -116,6 +116,17 @@ process_spectra <- function(input = params$input,
     BPPARAM = par
   )
 
+  params_right <- MetaboAnnotation::CompareSpectraParam(
+    ppm = ppm,
+    tolerance = dalton,
+    FUN = function(x, y, ...) {
+      nrow(x)
+    },
+    type = "right",
+    requirePrecursor = FALSE,
+    BPPARAM = par
+  )
+
   params_inner <- MetaboAnnotation::CompareSpectraParam(
     ppm = ppm,
     tolerance = dalton,
@@ -152,8 +163,18 @@ process_spectra <- function(input = params$input,
     target = spectral_library,
     param = params_left
   )
-  df_query <- peaks_query@matches |>
-    dplyr::rename(peaks_query = score)
+  peaks_target <- MetaboAnnotation::matchSpectra(
+    query = spectra,
+    target = spectral_library,
+    param = params_right
+  )
+  df_count <- peaks_query@matches |>
+    dplyr::rename(peaks_query = score) |>
+    dplyr::full_join(peaks_target@matches |>
+      dplyr::rename(peaks_target = score)) |>
+    dplyr::rowwise() |>
+    dplyr::mutate(peaks = max(peaks_query, peaks_target)) |>
+    dplyr::select(-peaks_query, -peaks_target)
 
   log_debug("Performing fragments comparison")
   matches_inner <- MetaboAnnotation::matchSpectra(
@@ -163,9 +184,9 @@ process_spectra <- function(input = params$input,
   )
   df_peaks <- matches_inner@matches |>
     dplyr::rename(peaks_abs = score) |>
-    dplyr::full_join(df_query) |>
-    dplyr::mutate(peaks_rel = peaks_abs / peaks_query) |>
-    dplyr::select(-peaks_query)
+    dplyr::inner_join(df_count) |>
+    dplyr::mutate(peaks_rel = peaks_abs / peaks) |>
+    dplyr::select(-peaks)
 
   if (condition == "AND") {
     df_peaks <- df_peaks |>
@@ -223,6 +244,6 @@ process_spectra <- function(input = params$input,
     rpeaks,
     "(relative) matched peaks."
   )
-
+  MetaboAnnotation::validateMatchedSpectra(matches_sim)
   export_output(x = df_final, file = output)
 }
