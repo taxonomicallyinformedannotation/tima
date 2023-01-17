@@ -7,7 +7,7 @@ require(
 
 log_debug(
   "This script",
-  crayon::green("downloads HMDB structures. \n")
+  crayon::green("downloads HMDB structures in silico fragmented. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
