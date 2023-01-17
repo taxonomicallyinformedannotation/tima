@@ -244,6 +244,6 @@ process_spectra <- function(input = params$input,
     rpeaks,
     "(relative) matched peaks."
   )
-  MetaboAnnotation::validateMatchedSpectra(matches_sim)
+  
   export_output(x = df_final, file = output)
 }
