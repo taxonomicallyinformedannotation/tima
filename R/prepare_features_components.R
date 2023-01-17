@@ -34,10 +34,11 @@ prepare_features_components <- function(input = params$input,
 
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
-  table <- readr::read_delim(file = input)
+  table <- readr::read_delim(file = input) |>
+    dplyr::mutate(feature_id = as.numeric(feature_id))
 
   log_debug(x = "... cluster table")
-  log_debug(x = "THIS STEP CAN BE IMPROVED BY CALCULATING THE CLUSTERS WITHIN SPEC2VEC")
+  log_debug(x = "THIS STEP COULD BE IMPROVED BY CALCULATING THE CLUSTERS DIRECTLY")
   ## TODO
   if (tool == "gnps") {
     components <-

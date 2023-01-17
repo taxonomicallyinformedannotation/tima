@@ -46,8 +46,8 @@ prepare_edges <- function(tool = params$tool,
   log_debug(x = "Formatting edge table")
   edges_table_treated <- edges_table |>
     dplyr::select(
-      feature_source = name_source,
-      feature_target = name_target
+      feature_source = !!as.name(name_source),
+      feature_target = !!as.name(name_target)
     ) |>
     dplyr::filter(feature_source != feature_target)
 
