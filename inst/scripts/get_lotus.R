@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-cat(
+log_debug(
   "This script",
   crayon::green("downloads LOTUS referenced structure-organism pairs. \n")
 )

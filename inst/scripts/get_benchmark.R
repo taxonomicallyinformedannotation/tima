@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-cat(
+log_debug(
   "This script",
   crayon::green("downloads benchmarking set from matchms work on GNPS dataset. \n")
 )

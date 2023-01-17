@@ -41,7 +41,7 @@ weight_bio <-
            scoreBiologicalGenus = score_biological_genus,
            scoreBiologicalSpecies = score_biological_species,
            scoreBiologicalVariety = score_biological_variety) {
-    cat("normalizing initial score \n")
+    log_debug("normalizing initial score \n")
     metadata <- annotationTable |>
       dplyr::select(
         feature_id,
@@ -170,7 +170,7 @@ weight_bio <-
 
     rm(annotationTable)
 
-    cat("selecting DB columns \n")
+    log_debug("selecting DB columns \n")
     candidates <- structureOrganismPairsTable |>
       dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::select(
@@ -193,7 +193,7 @@ weight_bio <-
         candidate_organism_10_varietas = organism_taxonomy_10varietas
       )
 
-    cat("keeping distinct candidates per taxonomical rank \n")
+    log_debug("keeping distinct candidates per taxonomical rank \n")
 
     candidate_domain_full <- candidates |>
       dplyr::filter(!is.na(candidate_organism_01_domain)) |>
@@ -385,9 +385,9 @@ weight_bio <-
         candidate_organism_10_varietas
       )
 
-    cat("calculating biological scores ... \n")
+    log_debug("calculating biological scores ... \n")
 
-    cat("... domain \n")
+    log_debug("... domain \n")
     step_dom <- dplyr::left_join(sample_domain, candidate_domain) |>
       dplyr::filter(candidate_organism_01_domain != "notClassified") |>
       dplyr::filter(
@@ -407,7 +407,7 @@ weight_bio <-
         score_biological
       )
 
-    cat("... kingdom \n")
+    log_debug("... kingdom \n")
     step_kin <- dplyr::full_join(step_dom, sample_kingdom) |>
       dplyr::distinct(
         inchikey_2D,
@@ -432,7 +432,7 @@ weight_bio <-
         score_biological
       )
 
-    cat("... phylum \n")
+    log_debug("... phylum \n")
     step_phy <- dplyr::full_join(step_kin, sample_phylum) |>
       dplyr::distinct(
         inchikey_2D,
@@ -457,7 +457,7 @@ weight_bio <-
         score_biological
       )
 
-    cat("... class \n")
+    log_debug("... class \n")
     step_cla <- dplyr::full_join(step_phy, sample_class) |>
       dplyr::distinct(
         inchikey_2D,
@@ -482,7 +482,7 @@ weight_bio <-
         score_biological
       )
 
-    cat("... order \n")
+    log_debug("... order \n")
     step_ord <- dplyr::full_join(step_cla, sample_order) |>
       dplyr::distinct(
         inchikey_2D,
@@ -507,7 +507,7 @@ weight_bio <-
         score_biological
       )
 
-    # cat("... infraorder \n")
+    # log_debug("... infraorder \n")
     # step_ord2 <- dplyr::full_join(step_ord, sample_infraorder) |>
     #   dplyr::distinct(inchikey_2D,
     #                   sample_organism_05_1_infraorder)
@@ -530,7 +530,7 @@ weight_bio <-
     #                   organism_name,
     #                   score_biological)
 
-    cat("... family \n")
+    log_debug("... family \n")
     step_fam <- dplyr::full_join(step_ord, sample_family) |>
       dplyr::distinct(
         inchikey_2D,
@@ -555,7 +555,7 @@ weight_bio <-
         score_biological
       )
 
-    # cat("... subfamily \n")
+    # log_debug("... subfamily \n")
     # step_fam2 <- dplyr::full_join(step_fam, sample_subfamily) |>
     #   dplyr::distinct(inchikey_2D,
     #                   sample_organism_06_1_subfamily)
@@ -577,7 +577,7 @@ weight_bio <-
     #                   organism_name,
     #                   score_biological)
 
-    cat("... tribe \n")
+    log_debug("... tribe \n")
     step_tri <- dplyr::full_join(step_fam, sample_tribe) |>
       dplyr::distinct(
         inchikey_2D,
@@ -602,7 +602,7 @@ weight_bio <-
         score_biological
       )
 
-    # cat("... subtribe \n")
+    # log_debug("... subtribe \n")
     # step_tri2 <- dplyr::full_join(step_tri, sample_subtribe) |>
     #   dplyr::distinct(
     #     inchikey_2D,
@@ -626,7 +626,7 @@ weight_bio <-
     #                   organism_name,
     #                   score_biological)
 
-    cat("... genus \n")
+    log_debug("... genus \n")
     step_gen <- dplyr::full_join(step_tri, sample_genus) |>
       dplyr::distinct(
         inchikey_2D,
@@ -651,7 +651,7 @@ weight_bio <-
         score_biological
       )
 
-    # cat("... subgenus \n")
+    # log_debug("... subgenus \n")
     # step_gen2 <- dplyr::full_join(step_gen, sample_subgenus) |>
     #   dplyr::distinct(inchikey_2D,
     #                   sample_organism_08_1_subgenus)
@@ -674,7 +674,7 @@ weight_bio <-
     #                   organism_name,
     #                   score_biological)
 
-    cat("... species \n")
+    log_debug("... species \n")
     step_spe <- dplyr::full_join(step_gen, sample_species) |>
       dplyr::distinct(
         inchikey_2D,
@@ -699,7 +699,7 @@ weight_bio <-
         score_biological
       )
 
-    # cat("... subspecies \n")
+    # log_debug("... subspecies \n")
     # step_spe2 <- dplyr::full_join(step_spe, sample_subspecies) |>
     #   dplyr::distinct(inchikey_2D,
     #                   sample_organism_09_1_subspecies)
@@ -722,7 +722,7 @@ weight_bio <-
     #                   organism_name,
     #                   score_biological)
 
-    cat("... varietas \n")
+    log_debug("... varietas \n")
     step_var <- dplyr::full_join(step_spe, sample_varietas) |>
       dplyr::distinct(
         inchikey_2D,
@@ -749,7 +749,7 @@ weight_bio <-
         score_biological
       )
 
-    cat("keeping best biological score only \n")
+    log_debug("keeping best biological score only \n")
     biologically_weighted <- dplyr::bind_rows(
       step_dom,
       step_kin,
@@ -773,7 +773,7 @@ weight_bio <-
       ) |>
       dplyr::ungroup()
 
-    cat("joining with initial results \n")
+    log_debug("joining with initial results \n")
     biologically_weighted_full <-
       dplyr::left_join(metadata, biologically_weighted)
 
@@ -818,7 +818,7 @@ weight_bio <-
       dplyr::ungroup() |>
       dplyr::tibble()
 
-    cat("adding \"notClassified\" \n")
+    log_debug("adding \"notClassified\" \n")
     biologically_weighted_full[, sapply(biologically_weighted_full, class) == "character"][is.na(biologically_weighted_full[, sapply(biologically_weighted_full, class) == "character"])] <-
       "notClassified"
 

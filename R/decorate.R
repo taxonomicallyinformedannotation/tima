@@ -12,7 +12,7 @@
 #' @examples NULL
 decorate_ms1 <- function() {
   suppressWarnings(
-    cat(
+    log_debug(
       "MS1 annotation led to \n",
       crayon::green(
         nrow(
@@ -72,7 +72,7 @@ decorate_ms1 <- function() {
 #'
 #' @examples NULL
 decorate_bio <- function() {
-  cat(
+  log_debug(
     "taxonomically informed scoring led to \n",
     crayon::silver(
       nrow(
@@ -172,7 +172,7 @@ decorate_bio <- function() {
 #'
 #' @examples NULL
 decorate_chemo <- function() {
-  cat(
+  log_debug(
     x = paste(
       "chemically informed scoring led to \n",
       crayon::blue(

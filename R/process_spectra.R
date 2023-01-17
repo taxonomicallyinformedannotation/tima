@@ -244,6 +244,6 @@ process_spectra <- function(input = params$input,
     rpeaks,
     "(relative) matched peaks."
   )
-  
+
   export_output(x = df_final, file = output)
 }

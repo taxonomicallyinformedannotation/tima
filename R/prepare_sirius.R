@@ -46,7 +46,7 @@ prepare_sirius <-
           "canopus_compound_summary.tsv"
         ))
     } else {
-      cat(
+      log_debug(
         "Please compute NPClassifier Canopus summary file, we do not support Classyfire anymore"
       )
     }
@@ -191,8 +191,9 @@ prepare_sirius <-
       complement_metadata() |>
       dplyr::mutate_all(dplyr::na_if, "N/A")
 
-    if (nrow(table |> dplyr::filter(is.na(structure_exact_mass))) > 0) {
-      cat(
+    if (nrow(table |>
+      dplyr::filter(is.na(structure_exact_mass))) > 0) {
+      log_debug(
         "Warning:",
         nrow(table |> dplyr::filter(is.na(
           structure_exact_mass

@@ -28,10 +28,10 @@ weight_chemo <-
            scoreChemicalPathway = score_chemical_pathway,
            scoreChemicalSuperclass = score_chemical_superclass,
            scoreChemicalClass = score_chemical_class) {
-    cat("calculating chemical score ... \n")
+    log_debug("calculating chemical score ... \n")
     df1 <- annotationTableWeightedBioCleaned
 
-    cat("... adding metadata \n")
+    log_debug("... adding metadata \n")
     df2 <- df1 |>
       dplyr::distinct(
         feature_id,
@@ -49,28 +49,28 @@ weight_chemo <-
         consistency_score_chemical_3_class
       )
 
-    cat("... pathway \n")
+    log_debug("... pathway \n")
     step_pat <- df2 |>
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_1_pathway, string = consensus_structure_pat)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalPathway)
 
-    cat("... superclass \n")
+    log_debug("... superclass \n")
     step_sup <- step_pat |>
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_2_superclass, string = consensus_structure_sup)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalSuperclass)
 
-    cat("... class \n")
+    log_debug("... class \n")
     step_cla <- step_sup |>
       dplyr::filter(
         stringr::str_detect(pattern = candidate_structure_3_class, string = consensus_structure_cla)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClass)
 
-    cat("... outputting best score \n")
+    log_debug("... outputting best score \n")
     df3 <-
       dplyr::bind_rows(step_pat, step_sup, step_cla) |>
       dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
@@ -89,13 +89,13 @@ weight_chemo <-
         score_chemical
       )
 
-    cat("... joining \n")
+    log_debug("... joining \n")
     df4 <- dplyr::left_join(df1, df3) |>
       data.frame()
 
     df4$score_chemical[is.na(df4$score_chemical)] <- 0
 
-    cat("... cleaning \n")
+    log_debug("... cleaning \n")
     df4 <- df4 |>
       dplyr::rowwise() |>
       dplyr::mutate(

@@ -37,7 +37,7 @@ annotate_ms1 <-
            tolerancePpm = tolerance_ppm,
            toleranceRt = tolerance_rt,
            candidatesInitial = candidates_initial) {
-    cat("filtering desired adducts and adding mz tolerance \n")
+    log_debug("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
       dplyr::filter(!is.na(exact_mass)) |>
       dplyr::filter(adduct %in% adducts) |>
@@ -49,7 +49,7 @@ annotate_ms1 <-
       dplyr::filter(value_min > 0) |>
       data.table::data.table()
 
-    cat("setting to data.table format for faster performance \n")
+    log_debug("setting to data.table format for faster performance \n")
     df3 <- annotationTable |>
       dplyr::mutate(dplyr::across(
         c(
@@ -72,7 +72,7 @@ annotate_ms1 <-
       df3[, "rt"] <- df3[, "feature_id"]
     }
 
-    cat("adding rt tolerance ... \n")
+    log_debug("adding rt tolerance ... \n")
     df4 <- df3 |>
       dplyr::mutate(dplyr::across(rt, as.numeric)) |>
       dplyr::mutate(
@@ -80,7 +80,7 @@ annotate_ms1 <-
         rt_max = as.numeric(rt + toleranceRt)
       )
 
-    cat("... on the other side (without tolerance) \n")
+    log_debug("... on the other side (without tolerance) \n")
     df5 <- df3 |>
       dplyr::mutate(dplyr::across(rt, as.numeric)) |>
       dplyr::mutate(
@@ -89,11 +89,11 @@ annotate_ms1 <-
       ) |>
       data.table::data.table()
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df4, rt_min, rt_max)
     data.table::setkey(df5, rt_1, rt_2)
 
-    cat("joining within given rt tolerance \n")
+    log_debug("joining within given rt tolerance \n")
     df6 <- data.table::foverlaps(df4, df5) |>
       dplyr::distinct(
         feature_id,
@@ -107,7 +107,7 @@ annotate_ms1 <-
         mz_dest = i.mz
       )
 
-    cat("adding delta mz tolerance for single charge adducts \n")
+    log_debug("adding delta mz tolerance for single charge adducts \n")
     df7 <- df6 |>
       dplyr::filter(mz >= mz_dest) |>
       dplyr::mutate(
@@ -135,7 +135,7 @@ annotate_ms1 <-
         )
       )
 
-    cat("calculating delta mz for single charge adducts \n")
+    log_debug("calculating delta mz for single charge adducts \n")
     df8 <-
       dist_groups(
         d = stats::dist(adductsTable$adduct_mass),
@@ -149,24 +149,24 @@ annotate_ms1 <-
       ) |>
       data.table::data.table()
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df7, delta_min, delta_max)
     data.table::setkey(df8, Distance, Distance_2)
 
-    cat("neutral losses \n")
+    log_debug("neutral losses \n")
     df8_a <- neutralLosses |>
       dplyr::mutate(mass_2 = mass) |>
       data.table::data.table()
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df8_a, mass, mass_2)
 
-    cat("joining within given delta mz tolerance (neutral losses) \n")
+    log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df9_d <- data.table::foverlaps(df7, df8_a) |>
       dplyr::filter(!is.na(loss)) |>
       dplyr::distinct(feature_id, loss, mass)
 
-    cat("joining within given delta mz tolerance (adducts) \n")
+    log_debug("joining within given delta mz tolerance (adducts) \n")
     df9 <- data.table::foverlaps(df7, df8) |>
       dplyr::mutate(mz_2 = mz) |>
       dplyr::filter(!is.na(Group1)) |>
@@ -182,7 +182,7 @@ annotate_ms1 <-
         !!as.name(paste("feature_id", "dest", sep = "_"))
       )
 
-    cat("keeping initial and destination feature \n")
+    log_debug("keeping initial and destination feature \n")
     df9_a <- df9 |>
       dplyr::distinct(feature_id, label)
 
@@ -207,7 +207,7 @@ annotate_ms1 <-
     ) |>
       dplyr::distinct()
 
-    cat("joining with initial results (adducts) \n")
+    log_debug("joining with initial results (adducts) \n")
     df10 <- dplyr::left_join(
       df3 |>
         dplyr::distinct(
@@ -225,7 +225,7 @@ annotate_ms1 <-
       ) |>
       data.table::data.table()
 
-    cat("joining with initial results (neutral losses) \n")
+    log_debug("joining with initial results (neutral losses) \n")
     df10_a <- dplyr::left_join(df10, df9_d) |>
       dplyr::mutate(
         mz_1 = ifelse(
@@ -240,11 +240,11 @@ annotate_ms1 <-
         )
       )
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df2, value_min, value_max)
     data.table::setkey(df10_a, mz_1, mz_2)
 
-    cat("joining within given mz tolerance and filtering possible single charge adducts only \n")
+    log_debug("joining within given mz tolerance and filtering possible single charge adducts only \n")
     df11 <- data.table::foverlaps(
       df10_a,
       df2
@@ -271,7 +271,7 @@ annotate_ms1 <-
       )) |>
       dplyr::filter(!is.na(adduct))
 
-    cat("cleaning results \n")
+    log_debug("cleaning results \n")
     df12 <- df11 |>
       dplyr::select(
         feature_id,
@@ -285,7 +285,7 @@ annotate_ms1 <-
       ) |>
       dplyr::filter(!is.na(exact_mass))
 
-    cat("keeping unique adducts per exact mass \n")
+    log_debug("keeping unique adducts per exact mass \n")
     df13 <- structureOrganismPairsTable |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::distinct(
@@ -313,7 +313,7 @@ annotate_ms1 <-
 
     "%ni%" <- Negate("%in%")
 
-    cat("joining exact masses with single charge adducts \n")
+    log_debug("joining exact masses with single charge adducts \n")
     df14 <- dplyr::left_join(
       x = df12,
       y = df13,
@@ -331,7 +331,7 @@ annotate_ms1 <-
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
 
-    cat("adding adduct mass to get back to [M] \n")
+    log_debug("adding adduct mass to get back to [M] \n")
     df15 <-
       dplyr::left_join(df14, adductsTable, by = stats::setNames("adduct", "library")) |>
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
@@ -341,10 +341,10 @@ annotate_ms1 <-
       ) |>
       dplyr::filter(!is.na(adduct_mass))
 
-    cat("keeping these ions for dimers and multicharged exploration starting from [M] \n")
+    log_debug("keeping these ions for dimers and multicharged exploration starting from [M] \n")
     df16 <- dplyr::inner_join(df3, df15)
 
-    cat("calculating multicharged and in source dimers and adding delta mz tolerance \n")
+    log_debug("calculating multicharged and in source dimers and adding delta mz tolerance \n")
     if (msMode == "pos") {
       df17 <- df16 |>
         dplyr::select(
@@ -469,11 +469,11 @@ annotate_ms1 <-
         rt_2
       )
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df17, rt_min, rt_max)
     data.table::setkey(df19, rt_1, rt_2)
 
-    cat("joining within given rt tolerance \n")
+    log_debug("joining within given rt tolerance \n")
     df20 <- data.table::foverlaps(df17, df19) |>
       dplyr::mutate(
         delta_min = mz - mz_max,
@@ -482,7 +482,7 @@ annotate_ms1 <-
       dplyr::filter(delta_max > min(df8_a$mass) |
         (mz >= mz_min & mz <= mz_max))
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df20, delta_min, delta_max)
 
     df20_a <- data.table::foverlaps(df20, df8_a) |>
@@ -503,11 +503,11 @@ annotate_ms1 <-
         mz_max
       )
 
-    cat("setting joining keys \n")
+    log_debug("setting joining keys \n")
     data.table::setkey(df20_a, mz_min, mz_max)
     data.table::setkey(df2, value_min, value_max)
 
-    cat(
+    log_debug(
       "joining within given mz tolerance and filtering possible multicharge / dimeric adducts \n"
     )
     df21 <- data.table::foverlaps(df20_a, df2) |>
@@ -543,7 +543,7 @@ annotate_ms1 <-
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
 
-    cat("formatting initial results \n")
+    log_debug("formatting initial results \n")
     if (any(names(annotationTable) == "rt")) {
       df23 <- annotationTable |>
         dplyr::mutate(dplyr::across(
@@ -571,7 +571,7 @@ annotate_ms1 <-
         dplyr::distinct()
     }
 
-    cat(
+    log_debug(
       "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
     )
     df24 <- dplyr::bind_rows(df23, df14, df22) |>
@@ -605,7 +605,7 @@ annotate_ms1 <-
       dplyr::distinct() |>
       dplyr::mutate_all(as.numeric)
 
-    cat("adding \"notAnnotated\" \n")
+    log_debug("adding \"notAnnotated\" \n")
     df26 <- dplyr::left_join(df25, df24) |>
       dplyr::distinct() |>
       dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>

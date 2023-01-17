@@ -18,7 +18,7 @@
 annotate_non_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {
-    cat("formatting initial results \n")
+    log_debug("formatting initial results \n")
     if (any(names(annotationTable) == "rt")) {
       df23 <- annotationTable |>
         dplyr::mutate(dplyr::across(
@@ -46,7 +46,7 @@ annotate_non_ms1 <-
         dplyr::distinct()
     }
 
-    cat("ranking \n")
+    log_debug("ranking \n")
     df24 <- df23 |>
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
@@ -78,7 +78,7 @@ annotate_non_ms1 <-
       dplyr::distinct() |>
       dplyr::mutate_all(as.numeric)
 
-    cat("adding \"notAnnotated\" \n")
+    log_debug("adding \"notAnnotated\" \n")
     df26 <- dplyr::left_join(df25, df24) |>
       dplyr::distinct() |>
       dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>

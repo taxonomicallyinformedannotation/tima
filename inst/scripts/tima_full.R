@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-cat(
+log_debug(
   "This script",
   crayon::green("does everything you ever dreamt of. \n")
 )

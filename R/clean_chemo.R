@@ -26,7 +26,7 @@ clean_chemo <-
            minimalMs1Bio = minimal_ms1_bio,
            minimalMs1Chemo = minimal_ms1_chemo) {
     if (annotate == TRUE) {
-      cat(
+      log_debug(
         "filtering top ",
         candidatesFinal,
         " candidates and keeping only MS1 candidates with minimum \n",
@@ -71,7 +71,7 @@ clean_chemo <-
         mz_error
       )
 
-    cat("adding initial metadata (RT, etc.) and simplifying columns \n")
+    log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- dplyr::left_join(df1, df12) |>
       dplyr::mutate(
         best_candidate_structure = paste(
@@ -122,7 +122,7 @@ clean_chemo <-
         reference_doi
       )
 
-    cat("adding structures metadata \n")
+    log_debug("adding structures metadata \n")
     df4a <- dplyr::left_join(df2, df3) |>
       dplyr::select(
         feature_id,
@@ -153,7 +153,7 @@ clean_chemo <-
         dplyr::everything()
       )
 
-    cat("selecting columns for cytoscape output \n")
+    log_debug("selecting columns for cytoscape output \n")
     df4b <- df4a |>
       dplyr::select(
         -component_id,
@@ -183,7 +183,7 @@ clean_chemo <-
       ) |>
       dplyr::distinct()
 
-    cat("summarizing results \n")
+    log_debug("summarizing results \n")
     df5a <- df4a |>
       dplyr::group_by(dplyr::across(
         c(
@@ -273,7 +273,7 @@ clean_chemo <-
           reference_doi
         )
 
-      cat("adding consensus again to droped candidates \n")
+      log_debug("adding consensus again to droped candidates \n")
       df8 <- df7 |>
         dplyr::filter(!is.na(inchikey_2D)) |>
         dplyr::mutate(

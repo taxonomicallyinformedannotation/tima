@@ -30,7 +30,7 @@ clean_bio <-
            candidatesInitial = candidates_initial,
            minimalMs1Bio = minimal_ms1_bio) {
     if (aNnOtAtE == TRUE) {
-      cat(
+      log_debug(
         "keeping only MS1 candidates with minimum \n",
         minimalMs1Bio,
         " biological score \n"
@@ -41,7 +41,7 @@ clean_bio <-
         # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
-    cat("erasing other MS1 candidates \n")
+    log_debug("erasing other MS1 candidates \n")
     df02 <-
       dplyr::anti_join(
         annotationTableWeightedBio |>
@@ -68,7 +68,7 @@ clean_bio <-
         .keep_all = TRUE
       )
 
-    cat("adding \"notAnnotated\" \n")
+    log_debug("adding \"notAnnotated\" \n")
     df$candidate_structure_1_pathway[df["inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
     df$candidate_structure_2_superclass[df["inchikey_2D"] == "notAnnotated"] <-
@@ -76,10 +76,10 @@ clean_bio <-
     df$candidate_structure_3_class[df["inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
 
-    cat("adding \"notClassified\" \n")
+    log_debug("adding \"notClassified\" \n")
     df[is.character(is.na(df))] <- "notClassified"
 
-    cat("keeping clusters with at least 3 features  \n")
+    log_debug("keeping clusters with at least 3 features  \n")
     df1 <- df |>
       dplyr::filter(component_id != -1) |>
       dplyr::group_by(component_id) |>
@@ -91,7 +91,7 @@ clean_bio <-
       dplyr::filter(n >= 3) |>
       dplyr::select(-n)
 
-    cat("keeping clusters with less than 3 features \n")
+    log_debug("keeping clusters with less than 3 features \n")
     df2 <- dplyr::full_join(
       x = df |>
         dplyr::filter(component_id == -1),
@@ -103,9 +103,9 @@ clean_bio <-
         dplyr::select(-n)
     )
 
-    cat("calculating chemical consistency features with at least 2 neighbors ... \n")
+    log_debug("calculating chemical consistency features with at least 2 neighbors ... \n")
 
-    cat("... among edges ... \n")
+    log_debug("... among edges ... \n")
     df3 <-
       dplyr::right_join(edgesTable,
         df1,
@@ -113,7 +113,7 @@ clean_bio <-
       ) |>
       dplyr::filter(!is.na(feature_source))
 
-    cat("... at the pathway level \n")
+    log_debug("... at the pathway level \n")
     freq_pat <- df3 |>
       dplyr::group_by(
         feature_source,
@@ -166,7 +166,7 @@ clean_bio <-
         )
       )
 
-    cat("... at the superclass level \n")
+    log_debug("... at the superclass level \n")
     freq_sup <- df3 |>
       dplyr::group_by(
         feature_source,
@@ -219,7 +219,7 @@ clean_bio <-
         )
       )
 
-    cat("... at the class level \n")
+    log_debug("... at the class level \n")
     freq_cla <- df3 |>
       dplyr::group_by(
         feature_source,
@@ -272,7 +272,7 @@ clean_bio <-
         )
       )
 
-    cat("joining all except -1 together \n")
+    log_debug("joining all except -1 together \n")
     df4 <-
       dplyr::left_join(df1,
         freq_pat,
@@ -294,7 +294,7 @@ clean_bio <-
       dplyr::tibble()
 
     # Think about better scoring option
-    cat("adding dummy consistency for features with less than 2 neighbors \n")
+    log_debug("adding dummy consistency for features with less than 2 neighbors \n")
     dummy_consistency <- df2 |>
       dplyr::mutate(
         consensus_structure_pat = "dummy",
@@ -309,7 +309,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(component_id = as.numeric(component_id))
 
-    cat("binding results together \n")
+    log_debug("binding results together \n")
     df5 <- dplyr::bind_rows(df4, dummy_consistency)
 
     return(df5)
