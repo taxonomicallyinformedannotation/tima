@@ -189,7 +189,8 @@ process_annotations <- function(library = params$library,
     "notClassified"
 
   if (ms1_only == TRUE) {
-    metadata_table_spectral_annotation <-
+    log_debug(x = "Erasing MS2 results")
+    metadata_table_spectral_annotation <<-
       metadata_table_spectral_annotation |>
       dplyr::mutate(
         inchikey_2D = NA,
