@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_taxa.R --output 'data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz' --tool 'gnps' --k.top 1 --column.name 'ATTRIBUTE_species' --extension FALSE
 
 Usage: 
-  prepare_taxa.R [--input=<input>] [--output=<output>] [--tool=<tool>] [--column.name=<column.name>] [--gnps=<gnps>] [--k.top=<k.top>]
+  prepare_taxa.R [-i | --input=<input>] [-o | --output=<output>] [-t | --tool=<tool>] [-c | --column.name=<column.name>] [-g | --gnps=<gnps>] [-k | --k.top=<k.top>] [-e | --extension=<extension>] [-m | --metadata=<metadata>] [-0 | --taxon=<taxon>]
 
 Options:
   -c --column.name=<column.name>  Name of the column containing the lowest possible taxon in your feature file.

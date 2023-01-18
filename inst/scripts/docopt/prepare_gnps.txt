@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_gnps.R -o 'data/interim/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz' -g '96fa7c88200e4a03bee4644e581e3fb0' -w 'fbmn'
 
 Usage: 
-  prepare_gnps.R [--output=<output>] [--nap=<nap>] [--gnps=<gnps>] [--workflow=<workflow>]
+  prepare_gnps.R [-o | --output=<output>] [-n | --nap=<nap>] [-g | --gnps=<gnps>] [-w | --workflow=<workflow>]
 
 Arguments:
   -o --output=<output>  Path and filename for the output. If you specify .gz file will be compressed.

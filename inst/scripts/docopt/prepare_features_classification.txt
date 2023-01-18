@@ -2,13 +2,13 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_features_classification.R --input 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz' --library 'data/interim/libraries/library.tsv.gz' --quickmode TRUE
 
 Usage: 
-  prepare_features_classification.R [--input=<input>] [--output=<output>] [--library=<library>]
+  prepare_features_classification.R [-i | --input=<input>] [-o | --output=<output>] [-l | --library=<library>] [-q | --quickmode=<quickmode>]
 
 Arguments:
   -i --input=<input>            Your isdb result file. Supports compressed files.
   -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+  -l --library=<library>        Library to be used for metadata completion.
   -q --quickmode=<quickmode>    Boolean. Do you want to classify only with LOTUS (quick) or submit to GNPS (long)?
-  -t --tool=<tool>              Tool used for generating the component ids, currently only GNPS
 
 Options:
   -h --help                     Show this screen.

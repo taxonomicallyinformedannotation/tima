@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/process_spectra.R --input 'data/source/example.mgf' --library 'data/interim/spectra/isdb_lotus_pos.mgf' --output 'data/interim/annotations/example_isdb.tsv.gz' --dalton 0.02 --ppm 10 --method 'gnps' --threshold 0.2 --npeaks 6 --rpeaks 0.2 --condition 'OR' --qutoff 0 --parallel true
 
 Usage: 
-  process_spectra.R [--input=<input>] [--library=<library>] [--output=<output>] [--dalton=<dalton>] [--ppm=<ppm>] [--method=<method>] [--threshold=<threshold>] [--condition=<condition>] [--qutoff=<qutoff>]
+  process_spectra.R [-i | --input=<input>] [-l | --library=<library>] [-o | --output=<output>] [-d | --dalton=<dalton>] [-p | --ppm=<ppm>] [-m | --method=<method>] [-t | --threshold=<threshold>] [-c | --condition=<condition>] [-q | --qutoff=<qutoff>]
 
 Arguments:
   -b --parallel=<parallel>      Perform parallel processing (Boolean)

@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/process_annotations.R
 
 Usage: 
-  process_annotations.R [--output=<output>] [--isdb=<isdb>] [--complement=<complement>] [--edges=<edges>] [--features=<features>] [--gnps=<gnps>] [--j.top=<j.top>] [--k.top=<k.top>] [--library=<library>] [--ms=<ms>] [--name=<name>] [--ppm=<ppm>] [--rt=<rt>] [--force=<force>] [--xbim=<xbim>] [--zirius=<zirius>] [--biological=<biological>] [--qemical=<qemical>] [--spectral=<spectral>]
+  process_annotations.R [-o | --output=<output>] [-i | --isdb=<isdb>] [-c | --complement=<complement>] [-e | --edges=<edges>] [-f | --features=<features>] [-g | --gnps=<gnps>] [-j | --j.top=<j.top>] [-k | --k.top=<k.top>] [-l | --library=<library>] [-m | --ms=<ms>] [-n | --name=<name>] [-p | --ppm=<ppm>] [-r | --rt=<rt>] [-0 | --force=<force>] [-x | --xbim=<xbim>] [-z | --zirius=<zirius>] [-b | --biological=<biological>] [-q | --qemical=<qemical>] [-s | --spectral=<spectral>]
 
 Options:
   -b --biological=<biological>  Biological weight

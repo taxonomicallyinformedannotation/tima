@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_adducts.R --input 'data/interim/libraries/library.tsv.gz' --output 'library'
 
 Usage: 
-  prepare_adducts.R [--input=<input>] [--output=<output>]
+  prepare_adducts.R [-i | --input=<input>] [-o | --output=<output>]
 
 Arguments:
   -i --input=<input>    Path to the input. Starting from root of the directory
