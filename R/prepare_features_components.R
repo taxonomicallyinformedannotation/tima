@@ -56,7 +56,7 @@ prepare_features_components <- function(input = params$input,
     manual_components <-
       readr::read_delim(file = components) |>
       dplyr::distinct(
-        feature_id = CLUSTERID1,
+        feature_id = feature_id,
         component_id = ComponentIndex,
         rt = rt,
         mz = mz
