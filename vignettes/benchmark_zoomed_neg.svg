@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='702.00pt' height='439.00pt' viewBox='0 0 702.00 439.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MDIuMDB8MC4wMHw0MzkuMDA='>
+    <rect x='0.00' y='0.00' width='702.00' height='439.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MDIuMDB8MC4wMHw0MzkuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMuMzB8NDMxLjc1fDUuNDh8NDA3LjIx'>
+    <rect x='33.30' y='5.48' width='398.45' height='401.73' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMuMzB8NDMxLjc1fDUuNDh8NDA3LjIx)'>
+<polyline points='51.41,388.95 65.90,388.95 65.90,315.14 80.39,315.14 80.39,280.34 94.87,280.34 94.87,257.76 109.36,257.76 109.36,240.85 123.85,240.85 123.85,228.24 138.34,228.24 138.34,217.10 152.83,217.10 152.83,206.25 167.32,206.25 167.32,198.13 181.81,198.13 181.81,190.80 196.30,190.80 196.30,185.03 210.79,185.03 210.79,179.46 225.28,179.46 225.28,174.28 239.77,174.28 239.77,169.69 254.26,169.69 254.26,164.90 268.74,164.90 268.74,161.28 283.23,161.28 283.23,158.05 297.72,158.05 297.72,154.53 312.21,154.53 312.21,150.72 326.70,150.72 326.70,148.28 341.19,148.28 341.19,145.64 355.68,145.64 355.68,143.10 370.17,143.10 370.17,141.14 384.66,141.14 384.66,139.19 399.15,139.19 399.15,137.43 413.64,137.43 413.64,135.67 ' style='stroke-width: 1.07; stroke: #A6CEE3; stroke-linecap: butt;' />
+<polyline points='51.41,388.95 65.90,388.95 65.90,176.33 80.39,176.33 80.39,138.31 94.87,138.31 94.87,127.16 109.36,127.16 109.36,120.22 123.85,120.22 123.85,114.06 138.34,114.06 138.34,111.43 152.83,111.43 152.83,108.30 167.32,108.30 167.32,105.27 181.81,105.27 181.81,104.09 196.30,104.09 196.30,102.92 210.79,102.92 210.79,100.97 225.28,100.97 225.28,99.60 239.77,99.60 239.77,98.62 254.26,98.62 254.26,97.84 268.74,97.84 268.74,96.37 283.23,96.37 283.23,95.69 297.72,95.69 297.72,95.20 312.21,95.20 312.21,94.81 326.70,94.81 326.70,94.32 341.19,94.32 341.19,93.54 355.68,93.54 355.68,93.05 370.17,93.05 370.17,92.17 384.66,92.17 384.66,91.58 399.15,91.58 399.15,91.09 413.64,91.09 413.64,90.41 ' style='stroke-width: 1.07; stroke: #1F78B4; stroke-linecap: butt;' />
+<polyline points='51.41,388.95 65.90,388.95 65.90,149.16 80.39,149.16 80.39,107.51 94.87,107.51 94.87,95.00 109.36,95.00 109.36,88.06 123.85,88.06 123.85,82.29 138.34,82.29 138.34,78.78 152.83,78.78 152.83,75.65 167.32,75.65 167.32,72.71 181.81,72.71 181.81,70.66 196.30,70.66 196.30,69.39 210.79,69.39 210.79,67.34 225.28,67.34 225.28,65.58 239.77,65.58 239.77,64.70 254.26,64.70 254.26,63.72 268.74,63.72 268.74,62.74 283.23,62.74 283.23,61.86 297.72,61.86 297.72,61.08 312.21,61.08 312.21,60.79 326.70,60.79 326.70,60.30 341.19,60.30 341.19,59.62 355.68,59.62 355.68,59.22 370.17,59.22 370.17,58.25 384.66,58.25 384.66,57.76 399.15,57.76 399.15,57.46 413.64,57.46 413.64,56.59 ' style='stroke-width: 1.07; stroke: #B2DF8A; stroke-linecap: butt;' />
+<polyline points='51.41,388.95 65.90,388.95 65.90,105.46 80.39,105.46 80.39,63.53 94.87,63.53 94.87,53.07 109.36,53.07 109.36,47.10 123.85,47.10 123.85,43.49 138.34,43.49 138.34,41.34 152.83,41.34 152.83,38.99 167.32,38.99 167.32,37.72 181.81,37.72 181.81,37.13 196.30,37.13 196.30,36.55 210.79,36.55 210.79,35.57 225.28,35.57 225.28,34.69 239.77,34.69 239.77,33.81 254.26,33.81 254.26,33.03 268.74,33.03 268.74,32.54 283.23,32.54 283.23,32.05 297.72,32.05 297.72,31.66 312.21,31.66 312.21,31.56 326.70,31.56 326.70,31.46 341.19,31.46 341.19,31.27 355.68,31.27 355.68,31.17 370.17,31.17 370.17,30.88 384.66,30.88 384.66,30.78 399.15,30.78 399.15,30.58 413.64,30.58 413.64,30.39 ' style='stroke-width: 1.07; stroke: #33A02C; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MDIuMDB8MC4wMHw0MzkuMDA=)'>
+<text x='28.36' y='392.12' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='4.90px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='28.36' y='319.07' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='28.36' y='246.03' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>20</text>
+<text x='28.36' y='172.99' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>30</text>
+<text x='28.36' y='99.95' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>40</text>
+<text x='28.36' y='26.91' text-anchor='end' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>50</text>
+<text x='51.41' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='4.90px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='123.85' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='4.90px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='196.30' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='268.74' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>15</text>
+<text x='341.19' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>20</text>
+<text x='413.64' y='418.48' text-anchor='middle' style='font-size: 8.80px; font-weight: bold;fill: #4D4D4D; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>25</text>
+<text x='232.52' y='431.09' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "Arial";' textLength='26.90px' lengthAdjust='spacingAndGlyphs'>Rank</text>
+<text transform='translate(13.40,206.34) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "Arial";' textLength='119.84px' lengthAdjust='spacingAndGlyphs'>Correct candidates [%]</text>
+<text x='448.18' y='173.00' style='font-size: 11.00px; font-weight: bold; font-family: "Arial";' textLength='28.74px' lengthAdjust='spacingAndGlyphs'>name</text>
+<line x1='449.91' y1='188.34' x2='463.74' y2='188.34' style='stroke-width: 1.07; stroke: #A6CEE3; stroke-linecap: butt;' />
+<line x1='449.91' y1='205.62' x2='463.74' y2='205.62' style='stroke-width: 1.07; stroke: #1F78B4; stroke-linecap: butt;' />
+<line x1='449.91' y1='222.90' x2='463.74' y2='222.90' style='stroke-width: 1.07; stroke: #B2DF8A; stroke-linecap: butt;' />
+<line x1='449.91' y1='240.18' x2='463.74' y2='240.18' style='stroke-width: 1.07; stroke: #33A02C; stroke-linecap: butt;' />
+<text x='470.94' y='191.51' style='font-size: 8.80px; font-weight: bold; font-family: "Arial";' textLength='38.63px' lengthAdjust='spacingAndGlyphs'>MS2 only</text>
+<text x='470.94' y='208.79' style='font-size: 8.80px; font-weight: bold; font-family: "Arial";' textLength='78.72px' lengthAdjust='spacingAndGlyphs'>MS2 taxo informed</text>
+<text x='470.94' y='226.07' style='font-size: 8.80px; font-weight: bold; font-family: "Arial";' textLength='156.23px' lengthAdjust='spacingAndGlyphs'>MS2 taxo informed + MS1 completion</text>
+<text x='470.94' y='243.35' style='font-size: 8.80px; font-weight: bold; font-family: "Arial";' textLength='220.10px' lengthAdjust='spacingAndGlyphs'>MS2 taxo informed + MS1 completion + larger library</text>
+</g>
+</svg>
