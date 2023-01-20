@@ -1,4 +1,12 @@
+#' The path of the output file. STRING
 output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
+
+#' The gnps job ID. STRING
 gnps: 96fa7c88200e4a03bee4644e581e3fb0
-workflow: fbmn ## or classical
-nap: ~ # optional
+
+#' The name of the workflow used within GNPS. 
+#' Currently 'fbmn' or 'classical' supported. STRING
+workflow: fbmn
+
+#' OPTIONAL. If exists. The nap job ID. STRING
+nap: ~

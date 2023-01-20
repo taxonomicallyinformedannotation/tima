@@ -1,5 +1,18 @@
+#' The path of the output file. STRING
 output: library.tsv.gz
+
+#' If library has to be filtered to restrict it to a portion of organisms only.
 filter:
+
+  #' Apply the filter. BOOLEAN
   mode: no
-  level: kingdom # domain, phylum, class, order, family, tribe, genus, species, varietas
-  value: Streptophyta # OR can be used as "|" example: Simaroubaceae|Gentianaceae
+
+  #' Level at which the library will be filtered. 
+  #' Must be one of "domain", "phylum", "class", "order", 
+  #' "family", "tribe", "genus", "species", "varietas" . STRING
+  level: kingdom
+  
+  #' Value to be applied for filtering. 
+  #' "OR" can be used as "|".
+  # Example: "Simaroubaceae|Gentianaceae". STRING
+  value: Streptophyta

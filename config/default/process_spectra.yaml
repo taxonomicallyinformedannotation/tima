@@ -1,16 +1,51 @@
+#' The path of the input file. STRING
 input: data/source/example.mgf
+
+#' The path of the spectral library used to perform annotation. STRING
 library: data/interim/spectra/isdb_lotus_pos.mgf
+
+#' The path of the output file. STRING
 output: data/interim/annotations/example_isdb.tsv.gz
+
+#' Parameters related to the MS part.
 ms:
+  
+  #' Parameters related to the similarity part.
   similarity:
+
+    #' The MS similarity method to be used to compare spectra.
+    #' Currently "gnps", "navdist", "ndotproduct", 
+    # "neuclidean", "nspectraangle" supported. STRING
     method: gnps
+
+    #' Threshold for similarity. FLOAT
     threshold: 0.2
+
+  #' Tolerances to be used for MS2 annotation.
   tolerance:
+
+    #' Relative tolerance for exact mass. In ppm. FLOAT
     ppm: 10
+
+    #' Absolute tolerance for exact mass. In Dalton. FLOAT
     dalton: 0.01
+
+  #' Minimal shared peaks.
   peaks:
+
+    #' Minimal shared peaks (absolute). INTEGER
     absolute: 6
+
+    #' Minimal shared peaks (ratio). FLOAT
     ratio: 0.2
+
+  #' Condition to be used to retain candidates.
+  #' Must be "OR" or "AND". 
+  #' Example: Minimum 0.2 similarity AND 6 peaks. STRING
   condition: OR
+
+#' Minimal intensity for MS2 peaks. FLOAT
 qutoff: 0
+
+#' Execute processes in parallel? BOOLEAN
 parallel: yes

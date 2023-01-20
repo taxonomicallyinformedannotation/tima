@@ -1,6 +1,18 @@
-tool: gnps # manual
-gnps: 96fa7c88200e4a03bee4644e581e3fb0 # only needed if gnps
-input: data/source/example_edges_manual.csv # input only needed if manual
+#' The name of the tool used to generate edges. 
+#' Currently "gnps" or "manual" supported. STRING
+tool: gnps
+
+#' The gnps job ID. STRING
+gnps: 96fa7c88200e4a03bee4644e581e3fb0
+
+#' The path of the input file. STRING
+input: data/source/example_edges_manual.csv
+
+#' The path of the output file. STRING
 output: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+
+#' The name of the column containing the "source IDs". STRING
 source_name: CLUSTERID1
+
+#' The name of the column containing the "target IDs". STRING
 target_name: CLUSTERID2

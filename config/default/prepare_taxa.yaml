@@ -1,9 +1,29 @@
-tool: gnps # manual or ready
-input: data/interim/example_mzmine_manual.csv # your mzmine feature table if manual
-metadata: data/interim/example_metadata_manual.csv # if you have a manual metadata table
+#' The path of the input file. STRING
+input: data/interim/example_mzmine_manual.csv
+
+#' The path of the output file. STRING
 output: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
-extension: yes # is the filename extension present in your feature table?
-column_name: ATTRIBUTE_species  # biological_source
-gnps: 96fa7c88200e4a03bee4644e581e3fb0 # needed depending on the tool you used
-top_k: 1 # number of organisms per feature
-taxon: ~ # manually force all features to a given taxon (if you do not have formatted metadata)
+
+#' The name of the tool used to retrieve metadata. 
+#' Currently "gnps" or "manual" supported. STRING
+tool: gnps
+
+#' OPTIONAL. If tool is "manual". 
+#' The path of the file containing the biological origin metadata. STRING
+metadata: data/interim/example_metadata_manual.csv
+
+#' Is the file(s) extension present in the column name of the sample's intensity? BOOLEAN
+extension: yes
+
+#' The name of the column name containing the taxon name(s). STRING
+column_name: ATTRIBUTE_species
+
+#' The gnps job ID. STRING
+gnps: 96fa7c88200e4a03bee4644e581e3fb0
+
+#' The number of organisms to keep per feature. INTEGER
+top_k: 1
+
+#' OPTIONAL. Force all features to be attributed to given taxon.
+#' Example: "Homo sapiens". STRING
+taxon: ~

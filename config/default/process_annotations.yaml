@@ -1,105 +1,206 @@
-library: data/interim/libraries/library.tsv.gz # Library file prepared with previous steps
-name: library # Adducts library file prepared with previous steps
+#' The path of the prepared structure-pairs library used to perform weighting. STRING
+library: data/interim/libraries/library.tsv.gz
+
+#' The name of the prepared adducts library for MS1 annotation. STRING
+name: library
+
+#' The path of the different prepared annotation files.
 annotation:
-  gnps: [ ] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
-  isdb: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz # Annotation file prepared with previous steps
-  sirius: [ ] # data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
-taxa: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz # Taxed features file prepared with previous steps
-edges: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz # Edges file prepared with previous steps
+
+  #' The path of the prepared GNPS annotation file. STRING
+  gnps: []
+
+  #' The path of the prepared ISDB annotation file. STRING
+  isdb: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+  
+  #' The path of the prepared SIRIUS annotation file. STRING
+  sirius: []
+
+#' The path of the prepared features informed taxonomically file. STRING
+taxa: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+
+#' The path of the prepared edges file. STRING
+edges: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+
+#' The path of the output file. STRING
 output: FinalResults.tsv
+
+#' The number of candidates.
 top_k:
+
+  #' The number of initial candidates. INTEGER
   initial: 50
+
+  #' The number of final candidates. INTEGER
   final: 3
+
+#' The weights to apply to each part of the final score.
 weights:
+
+  #' The weight to apply to the spectral part. FLOAT
   spectral: 0.333
+
+  #' The weight to apply to the chemical consistency part. FLOAT
   chemical: 0.166
+
+  #' The weight to apply to the biological part. FLOAT
   biological: 0.500
+
+#' Scores to be used for each subscore.
 scores:
+
+  #' Scores related to the chemical part.
   chemical:
+
+    #' Score for a chemical pathway match. FLOAT
     pathway: 0.333
+
+    #' Score for a chemical superclass match. FLOAT
     superclass: 0.666
+
+    #' Score for a chemical class match. FLOAT
     class: 1.000
+
+    #' Minimal score to keep MS1 only annotation. FLOAT
     minimal: 0.666
+
+  #' Scores related to the biological part.
   biological:
+    
+    #' Score for a biological domain match. FLOAT
     domain: 0.1
+
+    #' Score for a biological kingdom match. FLOAT
     kingdom: 0.2
+
+    #' Score for a biological phylum match. FLOAT
     phylum: 0.3
+
+    #' Score for a biological class match. FLOAT
     class: 0.4
+
+    #' Score for a biological order match. FLOAT
     order: 0.5
+
+    #' Score for a biological infraorder match. FLOAT
     infraorder: 0.55
+
+    #' Score for a biological family match. FLOAT
     family: 0.6
+
+    #' Score for a biological subfamily match. FLOAT
     subfamily: 0.65
+
+    #' Score for a biological tribe match. FLOAT
     tribe: 0.7
+
+    #' Score for a biological subtribe match. FLOAT
     subtribe: 0.7
+
+    #' Score for a biological genus match. FLOAT
     genus: 0.8
+
+    #' Score for a biological subgenus match. FLOAT
     subgenus: 0.85
+
+    #' Score for a biological species match. FLOAT
     species: 0.9
+
+    #' Score for a biological subspecies match. FLOAT
     subspecies: 0.95
+
+    #' Score for a biological variety match. FLOAT
     variety: 1.0
+
+    #' Minimal score to keep MS1 only annotation. FLOAT
     minimal: 0.5
+
+#' Parameters related to the MS part.
 ms:
+
+  #' The MS mode used. Must be "pos" or "neg". STRING
   mode: pos
-  level: 1 # currently only 1, not a real parameter... for now
+
+  #' Old parameter. Will be removed. Do not touch. INTEGER
+  level: 1
+
+  #' Perform MS1 annotation. BOOLEAN
   annotate: yes
+
+  #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: no
+
+  #' Tolerances to be used for MS1 annotation.
   tolerance:
+
+    #' Tolerance for exact mass. In ppm. FLOAT
     ppm: 10
+
+    #' Tolerance for retention time. In minutes. FLOAT
     rt: 0.05
+
+  #' List of adducts to be used.
   adducts:
+
+    #' List of adducts to be used in positive mode. STRING
     pos:
-      - pos_3_3proton
-      - pos_3_2proton1sodium
-      - pos_3_1proton2sodium
-      - pos_3_3sodium
-      - pos_2_2proton
-      - pos_2_2proton1ammonium
-      - pos_2_1proton1sodium
-      - pos_2_1magnesium
-      - pos_2_1proton1potassium
-      - pos_2_1calcium
-      - pos_2_2proton1acetonitrile
-      - pos_2_2sodium
-      - pos_2_1iron
-      - pos_2_2proton2acetonitrile
-      - pos_2_2proton3acetonitrile
-      - pos_1_1proton
-      - pos_1_1proton1ammonium
-      - pos_1_1sodium
-      - pos_1_minus1proton1magnesium
-      - pos_1_1proton1methanol
-      - pos_1_1potassium
-      - pos_1_minus1proton1calcium
-      - pos_1_1proton1acetonitrile
-      - pos_1_minus1proton2sodium
-      - pos_1_1proton1ethylamine
-      - pos_1_minus1proton1iron
-      - pos_1_1sodium1acetonitrile
-      - pos_1_minus1proton2potassium
-      - pos_1_1proton1dmso
-      - pos_1_1proton2acetonitrile
-      - pos_2MMg
-      - pos_2MCa
-      - pos_2MFe
-      - pos_2MH
-      - pos_2MHNH3
-      - pos_2MNa
-      - pos_2MK
-      - pos_2MHCH3CN
-      - pos_2MCH3CNNa
+    - pos_3_3proton
+    - pos_3_2proton1sodium
+    - pos_3_1proton2sodium
+    - pos_3_3sodium
+    - pos_2_2proton
+    - pos_2_2proton1ammonium
+    - pos_2_1proton1sodium
+    - pos_2_1magnesium
+    - pos_2_1proton1potassium
+    - pos_2_1calcium
+    - pos_2_2proton1acetonitrile
+    - pos_2_2sodium
+    - pos_2_1iron
+    - pos_2_2proton2acetonitrile
+    - pos_2_2proton3acetonitrile
+    - pos_1_1proton
+    - pos_1_1proton1ammonium
+    - pos_1_1sodium
+    - pos_1_minus1proton1magnesium
+    - pos_1_1proton1methanol
+    - pos_1_1potassium
+    - pos_1_minus1proton1calcium
+    - pos_1_1proton1acetonitrile
+    - pos_1_minus1proton2sodium
+    - pos_1_1proton1ethylamine
+    - pos_1_minus1proton1iron
+    - pos_1_1sodium1acetonitrile
+    - pos_1_minus1proton2potassium
+    - pos_1_1proton1dmso
+    - pos_1_1proton2acetonitrile
+    - pos_2MMg
+    - pos_2MCa
+    - pos_2MFe
+    - pos_2MH
+    - pos_2MHNH3
+    - pos_2MNa
+    - pos_2MK
+    - pos_2MHCH3CN
+    - pos_2MCH3CNNa
+
+    #' List of adducts to be used in negative mode. STRING
     neg:
-      - neg_3_3proton
-      - neg_2_2proton
-      - neg_1_minus1proton
-      - neg_1_minus2proton1sodium
-      - neg_1_1chlorine
-      - neg_1_minus2proton1potassium
-      - neg_1_minus1proton1formic
-      - neg_1_minus1proton1acetic
-      - neg_1_minus2proton1sodium1formic
-      - neg_1_1bromine
-      - neg_1_minus1proton1tfa
-      - neg_2MH
-      - neg_2MFAH
-      - neg_2MACH
-      - neg_3MH
-force: yes
+    - neg_3_3proton
+    - neg_2_2proton
+    - neg_1_minus1proton
+    - neg_1_minus2proton1sodium
+    - neg_1_1chlorine
+    - neg_1_minus2proton1potassium
+    - neg_1_minus1proton1formic
+    - neg_1_minus1proton1acetic
+    - neg_1_minus2proton1sodium1formic
+    - neg_1_1bromine
+    - neg_1_minus1proton1tfa
+    - neg_2MH
+    - neg_2MFAH
+    - neg_2MACH
+    - neg_3MH
+
+#' Do not use it.
+force: no

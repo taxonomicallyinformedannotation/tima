@@ -1,16 +1,47 @@
+#' The input filename. STRING
 filename: example
+
+#' The gnps job ID. STRING
 gnps: 96fa7c88200e4a03bee4644e581e3fb0
+
+#' The number of candidates.
 top_k:
+
+  #' The number of initial candidates. INTEGER
   initial: 50
+
+  #' The number of final candidates. INTEGER
   final: 3
+
+#' The weights to apply to each part of the final score.
 weights:
+
+  #' The weight to apply to the spectral part. FLOAT
   spectral: 0.166
+
+  #' The weight to apply to the chemical consistency part. FLOAT
   chemical: 0.166
+
+  #' The weight to apply to the biological part. FLOAT
   biological: 0.666
+
+#' Parameters related to the MS part.
 ms:
+
+  #' The MS mode used. Must be "pos" or "neg". STRING
   mode: pos
+
+  #' Perform MS1 annotation. BOOLEAN
   annotate: yes
+
+  #' Tolerances to be used for MS1 annotation.
   tolerance:
+
+    #' Tolerance for exact mass. In ppm. FLOAT
     ppm: 10
+
+    #' Tolerance for retention time. In minutes. FLOAT
     rt: 0.05
+
+#' Do not use it.
 force: no

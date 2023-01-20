@@ -1,2 +1,5 @@
+#' The path of the input file. STRING
 input: data/interim/annotations/example_isdb.tsv.gz
+
+#' The path of the output file. STRING
 output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz

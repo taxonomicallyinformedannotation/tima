@@ -1,2 +1,5 @@
+#' The path of the input file. STRING
 input: data/interim/libraries/library.tsv.gz
+
+#' The path of the output file. STRING
 output: library

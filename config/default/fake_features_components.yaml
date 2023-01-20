@@ -1,6 +1,17 @@
+#' The path of the input file. STRING
 input: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
-features: data/interim/annotations/example_feature_table.tsv.gz # your table containing feature_id, rt, mz
+
+#' The path of the file containing the feature table. STRING
+features: data/interim/annotations/example_feature_table.tsv.gz
+
+#' The path of the output file. STRING
 output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_faked_filled.tsv.gz
+
+#' The MS mode used. Must be "pos" or "neg". STRING
 mode: pos
-rt_name: rt # column name of your rt
-precursor_name: mz # column name of your mz
+
+#' The name of the column containing the "retention time" in the input file. STRING
+rt_name: rt
+
+#' The name of the column containing the "precursor m/z" in the input file. STRING
+precursor_name: mz

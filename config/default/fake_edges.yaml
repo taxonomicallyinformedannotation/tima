@@ -1,3 +1,8 @@
-input: data/interim/annotations/example_feature_table.tsv.gz # A file containing your feature ids
+#' The path of the input file. STRING
+input: data/interim/annotations/example_feature_table.tsv.gz
+
+#' The path of the output file. STRING
 output: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
+
+#' The name of the column containing the "feature IDs" in the input file. STRING
 feature_name: feature_id

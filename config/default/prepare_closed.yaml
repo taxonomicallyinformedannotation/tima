@@ -1,2 +1,5 @@
-input: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz ## will only work if you have it
+#' The path of the input file. STRING
+input: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+
+#' The path of the output file. STRING
 output: data/interim/libraries/closed_prepared.tsv.gz

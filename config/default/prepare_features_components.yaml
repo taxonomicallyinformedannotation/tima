@@ -1,7 +1,23 @@
+#' The path of the input file. STRING
 input: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+
+#' The path of the output file. STRING
 output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
-tool: gnps ## or manual
-components: ## if manual 
+
+#' The name of the tool used to generate components. 
+#' Currently "gnps" or "manual" supported. STRING
+tool: gnps
+
+#' OPTIONAL. If tool is "manual". 
+#' The path of the file containing the components. STRING
+components: ~
+
+#' The gnps job ID. STRING
 gnps: 96fa7c88200e4a03bee4644e581e3fb0
-workflow: fbmn ## or classical
+
+#' The name of the workflow used within GNPS. 
+#' Currently "fbmn" or "classical" supported. STRING
+workflow: fbmn
+
+#' The MS mode used. Must be "pos" or "neg". STRING
 mode: pos
