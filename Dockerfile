@@ -12,7 +12,7 @@ COPY inst ./inst
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 
 # R dependencies
-RUN R -e 'remotes::install_local(upgrade = "always", build_vignettes = FALSE)'
+RUN R -e 'remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", upgrade = "always", build_vignettes = FALSE)'
 
 COPY . ./
 
