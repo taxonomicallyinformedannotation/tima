@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.7.1
+Version: 2.7.2
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),

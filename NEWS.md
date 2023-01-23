@@ -1,5 +1,13 @@
 # timaR
 
+# timaR 2.7.2
+
+* Benchmark update (including negative mode)
+* Spectral comparison + intensity filtering update
+* Switched r-base Docker image to bioconductor with ARM support
+* Improved parameters documentation
+* Minor fixes
+
 # timaR 2.7.1
 
 * Added parallelization on process_spectra
