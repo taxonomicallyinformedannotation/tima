@@ -76,7 +76,8 @@ prepare_gnps <-
     }
 
     table <- table |>
-      dplyr::mutate_all(dplyr::na_if, "N/A")
+    dplyr::mutate_all(as.character) |> 
+    dplyr::mutate_all(dplyr::na_if, "N/A")
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_gnps")
