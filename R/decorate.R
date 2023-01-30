@@ -17,10 +17,10 @@ decorate_ms1 <- function() {
       crayon::green(
         nrow(
           annotation_table_ms1 |>
-            dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
+            dplyr::filter(score_input == 0) |>
             dplyr::filter(!is.na(inchikey_2D) |
               inchikey_2D != "notAnnotated") |>
-            dplyr::filter(score_input == 0)
+            dplyr::distinct(inchikey_2D)
         )
       ),
       crayon::green("annotations"),
@@ -28,9 +28,9 @@ decorate_ms1 <- function() {
       crayon::blue(
         nrow(
           annotation_table_ms1 |>
+            dplyr::filter(score_input == 0) |>
             dplyr::filter(!is.na(inchikey_2D) |
               inchikey_2D != "notAnnotated") |>
-            dplyr::filter(score_input == 0) |>
             dplyr::distinct(feature_id)
         )
       ),
@@ -39,12 +39,12 @@ decorate_ms1 <- function() {
       crayon::yellow(nrow(suppressMessages(
         dplyr::anti_join(
           x = annotation_table_ms1 |>
+            dplyr::filter(score_input == 0) |>
             dplyr::filter(
               !is.na(inchikey_2D) &
                 inchikey_2D != "notAnnotated" &
                 inchikey_2D != ""
             ) |>
-            dplyr::filter(score_input == 0) |>
             dplyr::distinct(feature_id),
           y = metadata_table_spectral_annotation |>
             dplyr::filter(!is.na(inchikey_2D) &
@@ -77,8 +77,8 @@ decorate_bio <- function() {
     crayon::silver(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_kingdom)
+          dplyr::filter(score_biological >= score_biological_kingdom) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -87,8 +87,8 @@ decorate_bio <- function() {
     crayon::white(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_phylum)
+          dplyr::filter(score_biological >= score_biological_phylum) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -97,8 +97,8 @@ decorate_bio <- function() {
     crayon::cyan(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_class)
+          dplyr::filter(score_biological >= score_biological_class) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -107,8 +107,8 @@ decorate_bio <- function() {
     crayon::magenta(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_order)
+          dplyr::filter(score_biological >= score_biological_order) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -117,8 +117,8 @@ decorate_bio <- function() {
     crayon::blue(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_family)
+          dplyr::filter(score_biological >= score_biological_family) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -127,8 +127,8 @@ decorate_bio <- function() {
     crayon::yellow(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_genus)
+          dplyr::filter(score_biological >= score_biological_genus) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -137,8 +137,8 @@ decorate_bio <- function() {
     crayon::green(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_species)
+          dplyr::filter(score_biological >= score_biological_species) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -148,8 +148,8 @@ decorate_bio <- function() {
     crayon::red(
       nrow(
         annotation_table_weighted_bio |>
-          dplyr::distinct(feature_id, inchikey_2D, .keep_all = TRUE) |>
-          dplyr::filter(score_biological >= score_biological_variety)
+          dplyr::filter(score_biological >= score_biological_variety) |>
+          dplyr::distinct(inchikey_2D)
       )
     ),
     "annotations reranked at the",
@@ -178,12 +178,13 @@ decorate_chemo <- function() {
       crayon::blue(
         nrow(
           annotation_table_weighted_chemo |>
+            dplyr::filter(score_chemical >= score_chemical_pathway) |>
             dplyr::filter(
               consensus_structure_pat != "notAnnotated" &
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_pat != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= score_chemical_pathway)
+            dplyr::distinct(inchikey_2D)
         )
       ),
       "annotations reranked at the",
@@ -192,12 +193,13 @@ decorate_chemo <- function() {
       crayon::yellow(
         nrow(
           annotation_table_weighted_chemo |>
+            dplyr::filter(score_chemical >= score_chemical_superclass) |>
             dplyr::filter(
               consensus_structure_sup != "notAnnotated" &
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_sup != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= score_chemical_superclass)
+            dplyr::distinct(inchikey_2D)
         )
       ),
       "annotations reranked at the",
@@ -206,12 +208,13 @@ decorate_chemo <- function() {
       crayon::green(
         nrow(
           annotation_table_weighted_chemo |>
+            dplyr::filter(score_chemical >= score_chemical_class) |>
             dplyr::filter(
               consensus_structure_cla != "notAnnotated" &
                 consensus_structure_cla != "notConsistent" &
                 consensus_structure_cla != "dummy"
             ) |>
-            dplyr::filter(score_chemical >= score_chemical_class)
+            dplyr::distinct(inchikey_2D)
         )
       ),
       "annotations reranked at the",
