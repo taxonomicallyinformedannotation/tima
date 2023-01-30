@@ -246,6 +246,7 @@ clean_chemo <-
     if (!any(names(metadata_table_spectral_annotation) == "rt")) {
       df7 <- dplyr::left_join(df6, df5b) |>
         dplyr::arrange(feature_id) |>
+        dplyr::mutate_all(as.character) |>
         dplyr::mutate_all(dplyr::na_if, "") |>
         dplyr::select(
           feature_id,
@@ -275,25 +276,15 @@ clean_chemo <-
 
       log_debug("adding consensus again to droped candidates \n")
       df8 <- df7 |>
-        dplyr::filter(!is.na(inchikey_2D)) |>
-        dplyr::mutate(
-          feature_id = as.numeric(feature_id),
-          component_id = as.numeric(component_id),
-          mz = as.numeric(mz)
-        )
+        dplyr::filter(!is.na(inchikey_2D))
 
       df9 <- df7 |>
-        dplyr::filter(is.na(inchikey_2D)) |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          mz
-        ) |>
-        dplyr::mutate_all(as.numeric)
+        dplyr::filter(is.na(inchikey_2D))
 
       df10 <- dplyr::left_join(
         df9,
-        annotationTableWeightedChemo
+        annotationTableWeightedChemo |> 
+          dplyr::mutate_all(as.character)
       ) |>
         dplyr::select(
           feature_id,
@@ -310,6 +301,7 @@ clean_chemo <-
     } else {
       df7 <- dplyr::left_join(df6, df5b) |>
         dplyr::arrange(feature_id) |>
+        dplyr::mutate_all(as.character) |>
         dplyr::mutate_all(dplyr::na_if, "") |>
         dplyr::select(
           feature_id,
@@ -339,27 +331,15 @@ clean_chemo <-
         )
 
       df8 <- df7 |>
-        dplyr::filter(!is.na(inchikey_2D)) |>
-        dplyr::mutate(
-          feature_id = as.numeric(feature_id),
-          component_id = as.numeric(component_id),
-          mz = as.numeric(mz),
-          rt = as.numeric(rt)
-        )
+        dplyr::filter(!is.na(inchikey_2D))
 
       df9 <- df7 |>
-        dplyr::filter(is.na(inchikey_2D)) |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          rt,
-          mz
-        ) |>
-        dplyr::mutate_all(as.numeric)
+        dplyr::filter(is.na(inchikey_2D))
 
       df10 <- dplyr::left_join(
         df9,
-        annotationTableWeightedChemo
+        annotationTableWeightedChemo |> 
+          dplyr::mutate_all(as.character)
       ) |>
         dplyr::select(
           feature_id,
