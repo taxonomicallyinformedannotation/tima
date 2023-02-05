@@ -283,7 +283,7 @@ clean_chemo <-
 
       df10 <- dplyr::left_join(
         df9,
-        annotationTableWeightedChemo |> 
+        annotationTableWeightedChemo |>
           dplyr::mutate_all(as.character)
       ) |>
         dplyr::select(
@@ -338,7 +338,7 @@ clean_chemo <-
 
       df10 <- dplyr::left_join(
         df9,
-        annotationTableWeightedChemo |> 
+        annotationTableWeightedChemo |>
           dplyr::mutate_all(as.character)
       ) |>
         dplyr::select(

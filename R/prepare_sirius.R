@@ -189,7 +189,7 @@ prepare_sirius <-
       dplyr::left_join(canopus_npc_prepared) |>
       dplyr::distinct() |>
       complement_metadata() |>
-      dplyr::mutate_all(as.character) |> 
+      dplyr::mutate_all(as.character) |>
       dplyr::mutate_all(dplyr::na_if, "N/A")
 
     if (nrow(table |>

@@ -216,7 +216,7 @@ prepare_features_classification <-
     ) |>
       dplyr::left_join(table_formuled) |>
       dplyr::left_join(table_massed) |>
-      dplyr::mutate_all(as.character) |> 
+      dplyr::mutate_all(as.character) |>
       dplyr::mutate_all(dplyr::na_if, "")
 
     log_debug(x = "Exporting ...")
