@@ -19,32 +19,20 @@ annotate_non_ms1 <-
   function(annotationTable = metadata_table_spectral_annotation,
            candidatesInitial = candidates_initial) {
     log_debug("formatting initial results \n")
-    if (any(names(annotationTable) == "rt")) {
-      df23 <- annotationTable |>
-        dplyr::mutate(dplyr::across(
+    df23 <- annotationTable |>
+      dplyr::mutate(dplyr::across(
+        dplyr::any_of(
           c(
-            mz_error,
-            component_id,
-            mz,
-            rt,
-            score_input
-          ),
-          as.numeric
-        )) |>
-        dplyr::distinct()
-    } else {
-      df23 <- annotationTable |>
-        dplyr::mutate(dplyr::across(
-          c(
-            mz_error,
-            component_id,
-            mz,
-            score_input
-          ),
-          as.numeric
-        )) |>
-        dplyr::distinct()
-    }
+            "mz_error",
+            "component_id",
+            "mz",
+            "rt",
+            "score_input"
+          )
+        ),
+        as.numeric
+      )) |>
+      dplyr::distinct()
 
     log_debug("ranking \n")
     df24 <- df23 |>

@@ -262,7 +262,7 @@ annotate_ms1 <-
         adduct_mass,
         loss
       ) |>
-      dplyr::mutate(library = adduct) |>
+      dplyr::mutate(library = as.character(adduct)) |>
       dplyr::distinct() |>
       dplyr::mutate_all(~ replace(
         .,
@@ -544,32 +544,20 @@ annotate_ms1 <-
       dplyr::distinct()
 
     log_debug("formatting initial results \n")
-    if (any(names(annotationTable) == "rt")) {
-      df23 <- annotationTable |>
-        dplyr::mutate(dplyr::across(
+    df23 <- annotationTable |>
+      dplyr::mutate(dplyr::across(
+        dplyr::any_of(
           c(
-            mz_error,
-            component_id,
-            mz,
-            rt,
-            score_input
-          ),
-          as.numeric
-        )) |>
-        dplyr::distinct()
-    } else {
-      df23 <- annotationTable |>
-        dplyr::mutate(dplyr::across(
-          c(
-            mz_error,
-            component_id,
-            mz,
-            score_input
-          ),
-          as.numeric
-        )) |>
-        dplyr::distinct()
-    }
+            "mz_error",
+            "component_id",
+            "mz",
+            "rt",
+            "score_input"
+          )
+        ),
+        as.numeric
+      )) |>
+      dplyr::distinct()
 
     log_debug(
       "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
