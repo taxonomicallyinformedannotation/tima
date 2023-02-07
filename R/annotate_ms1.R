@@ -541,6 +541,7 @@ annotate_ms1 <-
       ) |>
       dplyr::filter(!is.na(inchikey_2D)) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
+      dplyr::mutate(library = as.character(library)) |>
       dplyr::distinct()
 
     log_debug("formatting initial results \n")
