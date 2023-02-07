@@ -180,7 +180,9 @@ process_annotations <- function(library = params$library,
     dplyr::mutate(dplyr::across(c(
       "structure_exact_mass",
       "structure_xlogp"
-    ), ~ round(as.numeric(.x), digits = 5))) |>
+    ), as.numeric)) |>
+    ## COMMENT AR: else some redundancy because of reals
+    dplyr::mutate(structure_xlogp = round(structure_xlogp, digits = 5)) |>
     dplyr::mutate(dplyr::across(
       tidyr::matches("taxonomy"),
       ~ tidyr::replace_na(.x, "notClassified")
