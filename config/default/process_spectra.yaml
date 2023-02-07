@@ -49,3 +49,9 @@ qutoff: 0
 
 #' Execute processes in parallel? BOOLEAN
 parallel: yes
+
+#' Execute process faster without peaks matching? BOOLEAN
+fast: yes
+
+#' Execute approximative matching without precursor matching? BOOLEAN
+approx: no

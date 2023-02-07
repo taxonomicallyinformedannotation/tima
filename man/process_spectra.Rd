@@ -16,7 +16,9 @@ process_spectra(
   rpeaks = params$ms$peaks$ratio,
   condition = params$ms$condition,
   qutoff = params$qutoff,
-  parallel = params$parallel
+  parallel = params$parallel,
+  fast = params$fast,
+  approx = params$approx
 )
 }
 \arguments{
@@ -51,7 +53,7 @@ This function performs spectral matching.
 It takes two files as input. A query file that will be matched against a library file.
 Multiple comparison distances are available
 ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
-Number of matched peaks and their ratio are also available.
+Number of matched peaks and their ratio are also available (See MatchForwardReverseParam for details).
 Parallel processing is also made available.
 }
 \examples{

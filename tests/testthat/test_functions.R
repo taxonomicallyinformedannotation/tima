@@ -173,6 +173,7 @@ testthat::test_that("Whole process", {
 
   ## CLI arguments check
   arguments <<- character()
+  arguments$approx <<- "x"
   arguments$biological <<- "x"
   arguments$column.name <<- "x"
   arguments$complement <<- "x"
@@ -182,6 +183,7 @@ testthat::test_that("Whole process", {
   arguments$directory <<- "x"
   arguments$edges <<- "x"
   arguments$extension <<- "x"
+  arguments$fast <<- "x"
   arguments$features <<- "x"
   arguments$filter <<- "x"
   arguments$gnps <<- "x"

@@ -11,6 +11,9 @@ parse_cli_params <- function() {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {
+    if (!is.null(arguments$approx)) {
+      params$approx <- arguments$approx
+    }
     if (!is.null(arguments$biological)) {
       params$weights$biological <- as.numeric(arguments$biological)
     }
@@ -37,6 +40,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$extension)) {
       params$extension <- arguments$extension
+    }
+    if (!is.null(arguments$fast)) {
+      params$fast <- arguments$fast
     }
     if (!is.null(arguments$features)) {
       params$taxa <- arguments$features
