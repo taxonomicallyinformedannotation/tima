@@ -53,7 +53,8 @@ decorate_ms1 <- function() {
         )
       ))),
       "were",
-      crayon::yellow("not previously annotated. \n")
+      crayon::yellow("not previously annotated"),
+      ". \n"
     )
   )
 }
