@@ -95,6 +95,7 @@ testthat::test_that("Whole process", {
   process_spectra()
   ### Variant
   process_spectra(
+    fast = FALSE,
     condition = "AND"
   )
 
