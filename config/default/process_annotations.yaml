@@ -8,13 +8,13 @@ name: library
 annotation:
 
   #' The path of the prepared GNPS annotation file. STRING
-  gnps: []
+  gnps: [ ]
 
   #' The path of the prepared ISDB annotation file. STRING
   isdb: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
   
   #' The path of the prepared SIRIUS annotation file. STRING
-  sirius: []
+  sirius: [ ]
 
 #' The path of the prepared features informed taxonomically file. STRING
 taxa: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
@@ -144,63 +144,63 @@ ms:
 
     #' List of adducts to be used in positive mode. STRING
     pos:
-    - pos_3_3proton
-    - pos_3_2proton1sodium
-    - pos_3_1proton2sodium
-    - pos_3_3sodium
-    - pos_2_2proton
-    - pos_2_2proton1ammonium
-    - pos_2_1proton1sodium
-    - pos_2_1magnesium
-    - pos_2_1proton1potassium
-    - pos_2_1calcium
-    - pos_2_2proton1acetonitrile
-    - pos_2_2sodium
-    - pos_2_1iron
-    - pos_2_2proton2acetonitrile
-    - pos_2_2proton3acetonitrile
-    - pos_1_1proton
-    - pos_1_1proton1ammonium
-    - pos_1_1sodium
-    - pos_1_minus1proton1magnesium
-    - pos_1_1proton1methanol
-    - pos_1_1potassium
-    - pos_1_minus1proton1calcium
-    - pos_1_1proton1acetonitrile
-    - pos_1_minus1proton2sodium
-    - pos_1_1proton1ethylamine
-    - pos_1_minus1proton1iron
-    - pos_1_1sodium1acetonitrile
-    - pos_1_minus1proton2potassium
-    - pos_1_1proton1dmso
-    - pos_1_1proton2acetonitrile
-    - pos_2MMg
-    - pos_2MCa
-    - pos_2MFe
-    - pos_2MH
-    - pos_2MHNH3
-    - pos_2MNa
-    - pos_2MK
-    - pos_2MHCH3CN
-    - pos_2MCH3CNNa
+      - pos_3_3proton
+      - pos_3_2proton1sodium
+      - pos_3_1proton2sodium
+      - pos_3_3sodium
+      - pos_2_2proton
+      - pos_2_2proton1ammonium
+      - pos_2_1proton1sodium
+      - pos_2_1magnesium
+      - pos_2_1proton1potassium
+      - pos_2_1calcium
+      - pos_2_2proton1acetonitrile
+      - pos_2_2sodium
+      - pos_2_1iron
+      - pos_2_2proton2acetonitrile
+      - pos_2_2proton3acetonitrile
+      - pos_1_1proton
+      - pos_1_1proton1ammonium
+      - pos_1_1sodium
+      - pos_1_minus1proton1magnesium
+      - pos_1_1proton1methanol
+      - pos_1_1potassium
+      - pos_1_minus1proton1calcium
+      - pos_1_1proton1acetonitrile
+      - pos_1_minus1proton2sodium
+      - pos_1_1proton1ethylamine
+      - pos_1_minus1proton1iron
+      - pos_1_1sodium1acetonitrile
+      - pos_1_minus1proton2potassium
+      - pos_1_1proton1dmso
+      - pos_1_1proton2acetonitrile
+      - pos_2MMg
+      - pos_2MCa
+      - pos_2MFe
+      - pos_2MH
+      - pos_2MHNH3
+      - pos_2MNa
+      - pos_2MK
+      - pos_2MHCH3CN
+      - pos_2MCH3CNNa
 
     #' List of adducts to be used in negative mode. STRING
     neg:
-    - neg_3_3proton
-    - neg_2_2proton
-    - neg_1_minus1proton
-    - neg_1_minus2proton1sodium
-    - neg_1_1chlorine
-    - neg_1_minus2proton1potassium
-    - neg_1_minus1proton1formic
-    - neg_1_minus1proton1acetic
-    - neg_1_minus2proton1sodium1formic
-    - neg_1_1bromine
-    - neg_1_minus1proton1tfa
-    - neg_2MH
-    - neg_2MFAH
-    - neg_2MACH
-    - neg_3MH
+      - neg_3_3proton
+      - neg_2_2proton
+      - neg_1_minus1proton
+      - neg_1_minus2proton1sodium
+      - neg_1_1chlorine
+      - neg_1_minus2proton1potassium
+      - neg_1_minus1proton1formic
+      - neg_1_minus1proton1acetic
+      - neg_1_minus2proton1sodium1formic
+      - neg_1_1bromine
+      - neg_1_minus1proton1tfa
+      - neg_2MH
+      - neg_2MFAH
+      - neg_2MACH
+      - neg_3MH
 
 #' Do not use it.
 force: no

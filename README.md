@@ -7,7 +7,7 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, and many improvements have been made since then.
+The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.
 The workflow is illustrated below.
 
 ![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/tima.svg)
@@ -33,12 +33,14 @@ Optionally, you may want to add:
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 On *nix systems:
+
 ```
 Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
 remotes::install_github("taxonomicallyinformedannotation/tima-r")'
 ```
 
 On Windows:
+
 ```
 Rscript -e "if(!requireNamespace('remotes')){install.packages('remotes')}
 remotes::install_github('taxonomicallyinformedannotation/tima-r')"
@@ -104,25 +106,30 @@ docker compose up tima
 
 According to which steps you used, please give credit to the authors of the tools/resources used.
 
-### TIMA 
+### TIMA
+
 General: <https://doi.org/10.3389/fpls.2019.01329>
 
 ⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5797920>
 
 ### LOTUS
+
 General: <https://doi.org/10.7554/eLife.70780>
 
 ⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5794106>
 
 ### ISDB
+
 General: <https://doi.org/10.1021/acs.analchem.5b04804>
 
 ⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5607185>
 
 ### GNPS
+
 General: <https://doi.org/10.1038/nbt.3597>
 
 ### SIRIUS
+
 General: <https://doi.org/10.1038/s41592-019-0344-8>
 
   - *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
@@ -131,6 +138,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   - *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
+
 - The *RforMassSpectrometry* packages suite for MS2 matching: <https://doi.org/10.3390/metabo12020173>
 - HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>

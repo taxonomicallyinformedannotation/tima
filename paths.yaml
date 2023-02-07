@@ -79,7 +79,7 @@ img:
   path: img
 inst:
   path: inst
-  extdata: 
+  extdata:
     path: inst/extdata
     adducts: inst/extdata/adducts.tsv
     neutral_losses: inst/extdata/neutral_losses.tsv
@@ -99,11 +99,11 @@ urls:
   example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
   example_sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
   example_spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
-  hmdb: 
+  hmdb:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
       predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
-  lotus: 
+  lotus:
     doi: 10.5281/zenodo.5794106
     pattern: frozen_metadata.csv.gz
     metadata_doi: 10.5281/zenodo.6378223
@@ -111,7 +111,7 @@ urls:
       organisms: organism_metadata.tsv.gz
       references: reference_metadata.tsv.gz
       structures: structure_metadata.tsv.gz
-  lotus_isdb: 
+  lotus_isdb:
     doi: 10.5281/zenodo.5607185
     pattern:
       pos: isdb_pos.mgf
