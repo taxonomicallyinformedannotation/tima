@@ -189,6 +189,7 @@ clean_chemo <-
         c(
           -reference_doi,
           -structure_name,
+          -structure_xlogp,
           -structure_01pathway,
           -structure_02superclass,
           -structure_03class
@@ -198,6 +199,7 @@ clean_chemo <-
         c(
           reference_doi,
           structure_name,
+          structure_xlogp,
           structure_01pathway,
           structure_02superclass,
           structure_03class
@@ -205,7 +207,7 @@ clean_chemo <-
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
-          x = paste(.x, collapse = "$")
+          x = paste(unique(.x), collapse = "$")
         )
       )) |>
       dplyr::group_by(feature_id) |>
@@ -218,143 +220,80 @@ clean_chemo <-
           x = paste(.x, collapse = "|")
         )
       )) |>
-      dplyr::select(
-        -rt,
-        -mz
-      )
+      dplyr::select(-rt, -mz)
 
     df5b <- dplyr::left_join(df5a, df4b) |>
       dplyr::distinct()
 
-    if (!any(names(metadata_table_spectral_annotation) == "rt")) {
-      df6 <- metadata_table_spectral_annotation |>
-        dplyr::distinct(
-          feature_id,
-          component_id,
-          mz
+    df6 <- metadata_table_spectral_annotation |>
+      dplyr::select(dplyr::any_of(c(
+        "feature_id",
+        "component_id",
+        "mz",
+        "rt"
+      ))) |>
+      dplyr::distinct()
+
+    df7 <- dplyr::left_join(df6, df5b) |>
+      dplyr::arrange(feature_id) |>
+      dplyr::mutate_all(as.character) |>
+      dplyr::mutate_all(dplyr::na_if, "") |>
+      dplyr::select(dplyr::any_of(
+        c(
+          "feature_id",
+          "component_id",
+          "mz",
+          "rt",
+          "molecular_formula",
+          "mz_error",
+          "library",
+          "smiles_2D",
+          "inchikey_2D",
+          "score_initialNormalized",
+          "score_biological",
+          "score_chemical",
+          "score_final",
+          "rank_initial",
+          "rank_final",
+          "best_candidate_organism",
+          "best_candidate_structure",
+          "consensus_structure_pat",
+          "consistency_structure_pat",
+          "consensus_structure_sup",
+          "consistency_structure_sup",
+          "consensus_structure_cla",
+          "consistency_structure_cla",
+          "reference_doi"
         )
-    } else {
-      df6 <- metadata_table_spectral_annotation |>
-        dplyr::distinct(
-          feature_id,
-          component_id,
-          mz,
-          rt
+      ))
+
+    log_debug("adding consensus again to droped candidates \n")
+    df8 <- df7 |>
+      dplyr::filter(!is.na(inchikey_2D))
+
+    df9 <- df7 |>
+      dplyr::filter(is.na(inchikey_2D))
+
+    df10 <- dplyr::left_join(
+      df9,
+      annotationTableWeightedChemo |>
+        dplyr::mutate_all(as.character)
+    ) |>
+      dplyr::select(dplyr::any_of(
+        c(
+          "feature_id",
+          "component_id",
+          "mz",
+          "rt",
+          "consensus_structure_pat",
+          "consistency_structure_pat",
+          "consensus_structure_sup",
+          "consistency_structure_sup",
+          "consensus_structure_cla",
+          "consistency_structure_cla"
         )
-    }
-
-    if (!any(names(metadata_table_spectral_annotation) == "rt")) {
-      df7 <- dplyr::left_join(df6, df5b) |>
-        dplyr::arrange(feature_id) |>
-        dplyr::mutate_all(as.character) |>
-        dplyr::mutate_all(dplyr::na_if, "") |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          mz,
-          molecular_formula,
-          mz_error,
-          library,
-          smiles_2D,
-          inchikey_2D,
-          score_initialNormalized,
-          score_biological,
-          score_chemical,
-          score_final,
-          rank_initial,
-          rank_final,
-          best_candidate_organism,
-          best_candidate_structure,
-          consensus_structure_pat,
-          consistency_structure_pat,
-          consensus_structure_sup,
-          consistency_structure_sup,
-          consensus_structure_cla,
-          consistency_structure_cla,
-          reference_doi
-        )
-
-      log_debug("adding consensus again to droped candidates \n")
-      df8 <- df7 |>
-        dplyr::filter(!is.na(inchikey_2D))
-
-      df9 <- df7 |>
-        dplyr::filter(is.na(inchikey_2D))
-
-      df10 <- dplyr::left_join(
-        df9,
-        annotationTableWeightedChemo |>
-          dplyr::mutate_all(as.character)
-      ) |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          mz,
-          consensus_structure_pat,
-          consistency_structure_pat,
-          consensus_structure_sup,
-          consistency_structure_sup,
-          consensus_structure_cla,
-          consistency_structure_cla
-        ) |>
-        dplyr::distinct()
-    } else {
-      df7 <- dplyr::left_join(df6, df5b) |>
-        dplyr::arrange(feature_id) |>
-        dplyr::mutate_all(as.character) |>
-        dplyr::mutate_all(dplyr::na_if, "") |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          rt,
-          mz,
-          molecular_formula,
-          mz_error,
-          library,
-          smiles_2D,
-          inchikey_2D,
-          score_initialNormalized,
-          score_biological,
-          score_chemical,
-          score_final,
-          rank_initial,
-          rank_final,
-          best_candidate_organism,
-          best_candidate_structure,
-          consensus_structure_pat,
-          consistency_structure_pat,
-          consensus_structure_sup,
-          consistency_structure_sup,
-          consensus_structure_cla,
-          consistency_structure_cla,
-          reference_doi
-        )
-
-      df8 <- df7 |>
-        dplyr::filter(!is.na(inchikey_2D))
-
-      df9 <- df7 |>
-        dplyr::filter(is.na(inchikey_2D))
-
-      df10 <- dplyr::left_join(
-        df9,
-        annotationTableWeightedChemo |>
-          dplyr::mutate_all(as.character)
-      ) |>
-        dplyr::select(
-          feature_id,
-          component_id,
-          rt,
-          mz,
-          consensus_structure_pat,
-          consistency_structure_pat,
-          consensus_structure_sup,
-          consistency_structure_sup,
-          consensus_structure_cla,
-          consistency_structure_cla
-        ) |>
-        dplyr::distinct()
-    }
+      )) |>
+      dplyr::distinct()
 
     df11 <- dplyr::bind_rows(df8, df10) |>
       dplyr::arrange(as.numeric(feature_id))

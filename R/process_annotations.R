@@ -177,16 +177,14 @@ process_annotations <- function(library = params$library,
       col_types = "c"
     ) |>
     dplyr::filter(!is.na(structure_exact_mass)) |>
-    dplyr::mutate_all(list(~ gsub(
-      pattern = "\\|",
-      replacement = " or ",
-      x = .x
-    ))) |>
-    dplyr::mutate(dplyr::across(structure_exact_mass, as.numeric)) |>
-    dplyr::mutate_if(is.logical, as.character)
-
-  structure_organism_pairs_table[is.na(structure_organism_pairs_table)] <-
-    "notClassified"
+    dplyr::mutate(dplyr::across(c(
+      "structure_exact_mass",
+      "structure_xlogp"
+    ), ~ round(as.numeric(.x), digits = 5))) |>
+    dplyr::mutate(dplyr::across(
+      tidyr::matches("taxonomy"),
+      ~ tidyr::replace_na(.x, "notClassified")
+    ))
 
   if (ms1_only == TRUE) {
     log_debug(x = "Erasing MS2 results")
@@ -282,8 +280,8 @@ process_annotations <- function(library = params$library,
 
   decorate_chemo()
 
-  log_debug(x = "cleaning for cytoscape export")
-  results2cytoscape <<- clean_chemo()
+  log_debug(x = "cleaning for export")
+  results <<- clean_chemo()
 
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
@@ -297,7 +295,7 @@ process_annotations <- function(library = params$library,
     step = "process_annotations"
   )
   export_output(
-    x = results2cytoscape,
+    x = results,
     file = final_output
   )
 }
