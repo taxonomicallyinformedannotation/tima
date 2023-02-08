@@ -8,13 +8,13 @@ name: library
 annotation:
 
   #' The path of the prepared GNPS annotation file. STRING
-  gnps: [ ]
+  gnps: ~
 
   #' The path of the prepared ISDB annotation file. STRING
   isdb: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
   
   #' The path of the prepared SIRIUS annotation file. STRING
-  sirius: [ ]
+  sirius: ~
 
 #' The path of the prepared features informed taxonomically file. STRING
 taxa: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz

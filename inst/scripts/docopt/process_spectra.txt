@@ -17,7 +17,7 @@ Arguments:
   -m --method=<method>          Similarity measure method to be used.
   -p --ppm=<ppm>                Tolerance for matching. Should not exceed 50 ppm.
   -q --qutoff=<qutoff>          Cutting peaks with intensities lower than qutoff.
-  -r --rpeaks=<rpeaks>          Minimum ratio of peaks to match (absolute)
+  -r --rpeaks=<rpeaks>          Minimum ratio of peaks to match (relative)
   -t -threshold=<threshold>     Minimum similarity score
 
 Options:

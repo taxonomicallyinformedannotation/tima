@@ -29,7 +29,7 @@
 #' @importFrom dplyr full_join left_join select
 #' @importFrom MetaboAnnotation CompareSpectraParam MatchForwardReverseParam matchSpectra
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
-#' @importFrom Spectra filterIntensity
+#' @importFrom Spectra filterIntensity joinPeaksGnps
 #'
 #' @examples NULL
 process_spectra <- function(input = params$input,
