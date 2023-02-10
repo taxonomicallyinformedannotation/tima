@@ -15,8 +15,6 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
-      example_feature_table: data/interim/annotations/example_feature_table.tsv.gz
-      example_feature_table_no_rt: data/interim/annotations/example_feature_table_no_rt.tsv.gz
       example_isdb: data/interim/annotations/example_isdb.tsv.gz
       example_isdb_no_rt: data/interim/annotations/example_isdb_no_rt.tsv.gz
       example_sirius: data/interim/annotations/example_sirius.zip
@@ -26,6 +24,8 @@ data:
       path: data/interim/edges
     features:
       path: data/interim/features
+      example_feature_table: data/interim/features/example_feature_table.tsv.gz
+      example_feature_table_no_rt: data/interim/features/example_feature_table_no_rt.tsv.gz
     libraries:
       path: data/interim/libraries
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
