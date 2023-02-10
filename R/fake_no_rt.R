@@ -12,8 +12,8 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-fake_no_rt <- function(input = paths$data$interim$annotations$example_feature_table,
-                       output = paths$data$interim$annotations$example_feature_table_no_rt) {
+fake_no_rt <- function(input = paths$data$interim$features$example_feature_table,
+                       output = paths$data$interim$features$example_feature_table_no_rt) {
   # Check if input file exists
   stopifnot("Your input file does not exist" = file.exists(input))
 

@@ -14,7 +14,7 @@
 #' @examples NULL
 get_example_feature_table <-
   function(url = paths$urls$example_feature_table,
-           export = paths$data$interim$annotations$example_feature_table) {
+           export = paths$data$interim$features$example_feature_table) {
     # Create the export directory if it does not exist
     create_dir(export = export)
 

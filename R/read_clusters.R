@@ -13,7 +13,7 @@
 #' @importFrom stringr str_length
 #'
 #' @examples NULL
-read_clusters <- function(id, workflow = params$workflow) {
+read_clusters <- function(id, workflow = params$gnps$workflow) {
   # Check if the given workflow is supported
   stopifnot("Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical"))
 
