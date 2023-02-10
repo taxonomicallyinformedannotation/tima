@@ -5,6 +5,8 @@ require(
   quietly = TRUE
 )
 
+paths <- parse_yaml_paths()
+
 log_debug(
   "This script",
   crayon::green("downloads HMDB structures in silico fragmented. \n")
@@ -27,8 +29,6 @@ log_debug("Contributors: ...")
 get_isdb_hmdb <-
   function(url = paths$urls$hmdb$spectra$predicted,
            export = paths$data$source$spectra$hmdb_isdb) {
-    paths <- parse_yaml_paths()
-
     ## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)
     create_dir(export = export)
 

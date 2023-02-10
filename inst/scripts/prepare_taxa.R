@@ -5,6 +5,10 @@ require(
   quietly = TRUE
 )
 
+step <- "prepare_taxa"
+paths <- parse_yaml_paths()
+params <- get_params(step = step)
+
 log_debug(
   "This script",
   crayon::green("informs taxonomically features")
@@ -17,10 +21,6 @@ log_debug(
   "\n"
 )
 log_debug("Contributors: ...")
-
-step <- "prepare_taxa"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
 
 prepare_taxa()
 

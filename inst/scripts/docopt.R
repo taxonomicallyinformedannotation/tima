@@ -5,18 +5,16 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_spectral_matches"
+step <- "params"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
 log_debug(
   "This script",
-  crayon::green("formats ISDB results")
+  crayon::green("is a test script")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
-
-prepare_spectral_matches()
 
 end <- Sys.time()
 

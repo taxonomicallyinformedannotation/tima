@@ -5,6 +5,10 @@ require(
   quietly = TRUE
 )
 
+step <- "prepare_params"
+paths <- parse_yaml_paths()
+params <- get_params(step = step)
+
 log_debug(
   "This script",
   crayon::green("prepares parameters")
@@ -14,10 +18,6 @@ log_debug(
   crayon::green("AR")
 )
 log_debug("Contributors: ...")
-
-step <- "prepare_params"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
 
 prepare_params()
 

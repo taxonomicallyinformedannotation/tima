@@ -5,14 +5,14 @@ require(
   quietly = TRUE
 )
 
+paths <- parse_yaml_paths()
+
 log_debug(
   "This script",
   crayon::green("downloads benchmarking set from matchms work on GNPS dataset. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
-
-paths <- parse_yaml_paths()
 
 get_benchmark()
 

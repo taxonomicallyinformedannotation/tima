@@ -5,14 +5,14 @@ require(
   quietly = TRUE
 )
 
+paths <- parse_yaml_paths()
+
 log_debug(
   "This script",
   crayon::green("downloads LOTUS referenced structure-organism pairs. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
-
-paths <- parse_yaml_paths()
 
 get_last_version_from_zenodo(
   doi = paths$url$lotus$doi,

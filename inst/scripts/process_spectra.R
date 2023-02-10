@@ -5,16 +5,16 @@ require(
   quietly = TRUE
 )
 
+step <- "process_spectra"
+paths <- parse_yaml_paths()
+params <- get_params(step = step)
+
 log_debug(
   "This script",
   crayon::green("performs spectral similarity calculation. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
-
-step <- "process_spectra"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
 
 process_spectra()
 

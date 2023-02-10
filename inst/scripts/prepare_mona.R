@@ -5,6 +5,8 @@ require(
   quietly = TRUE
 )
 
+paths <- parse_yaml_paths()
+
 log_debug(
   "This script",
   crayon::green("Prepares spectra from MONA (MassBank of North America) \n"),
@@ -12,8 +14,6 @@ log_debug(
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
-
-paths <- parse_yaml_paths()
 
 #' @title Prepare MONA
 #'
