@@ -1,57 +1,116 @@
-#' The path of the input file. STRING
-input: data/source/example.mgf
+#' Annotations related parameters.
+annotations:
 
-#' The path of the spectral library used to perform annotation. STRING
-library: data/interim/spectra/isdb_lotus_pos.mgf
+  #' MS2 annotation related parameters.
+  ms2:
 
-#' The path of the output file. STRING
-output: data/interim/annotations/example_isdb.tsv.gz
+    #' Execute approximative matching without precursor matching? BOOLEAN
+    approx: no
 
-#' Parameters related to the MS part.
-ms:
-  
-  #' Parameters related to the similarity part.
-  similarity:
-
-    #' The MS similarity method to be used to compare spectra.
+    #' Similarity method to be used to compare spectra.
     #' Currently "gnps", "navdist", "ndotproduct", 
     # "neuclidean", "nspectraangle" supported. STRING
     method: gnps
+      
+    #' Thresholds
+    thresholds: 
 
-    #' Threshold for similarity. FLOAT
-    threshold: 0.2
+      #' Condition to be used to retain candidates.
+      #' Must be "OR" or "AND".
+      #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
+      condition: OR
 
-  #' Tolerances to be used for MS2 annotation.
-  tolerance:
+      #' For peaks.
+      peaks:
 
-    #' Relative tolerance for exact mass. In ppm. FLOAT
-    ppm: 10
+        #' Minimal shared peaks (absolute). INTEGER
+        absolute: 6
 
-    #' Absolute tolerance for exact mass. In Dalton. FLOAT
-    dalton: 0.01
+        #' Minimal shared peaks (ratio). FLOAT
+        ratio: 0.2
 
-  #' Minimal shared peaks.
-  peaks:
+      #' Similarity threhsold. FLOAT
+      similarity: 0.2
 
-    #' Minimal shared peaks (absolute). INTEGER
-    absolute: 6
 
-    #' Minimal shared peaks (ratio). FLOAT
-    ratio: 0.2
+#' Files.
+files:
 
-  #' Condition to be used to retain candidates.
-  #' Must be "OR" or "AND". 
-  #' Example: Minimum 0.2 similarity AND 6 peaks. STRING
-  condition: OR
+  #' Annotation files.
+  annotations:
 
-#' Minimal intensity for MS2 peaks. FLOAT
-qutoff: 0
+    #' Raw annotation files.
+    raw:
 
-#' Execute processes in parallel? BOOLEAN
-parallel: yes
+      #' List of spectral matching results. STRING
+      spectral:
+        - data/interim/annotations/example_isdb.tsv.gz
 
-#' Execute process faster without peaks matching? BOOLEAN
-fast: yes
+  #' Libraries files.
+  libraries:
 
-#' Execute approximative matching without precursor matching? BOOLEAN
-approx: no
+    #' Spectral libraries. STRING
+    spectral:
+
+      #' List of negative spectral libraries. STRING
+      neg:
+        - data/interim/spectra/isdb_lotus_neg.mgf
+
+      #' List of positive spectral libraries. STRING
+      pos:
+        - data/interim/spectra/isdb_lotus_pos.mgf
+
+  #' Spectral files. STRING
+  spectral:
+
+    #' Raw spectral file. STRING
+    raw: data/source/example.mgf
+
+
+#' MS related parameters.
+ms:
+
+  #' Intensity related parameters.
+  intensity:
+
+    #' Thresholds related parameters.
+    thresholds:
+
+      #' Intensity threshold for MS2. INTEGER
+      ms2: 0
+
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+  #' Tolerances.
+  tolerances:
+
+    #' For mass.
+    mass:
+
+      #' Relative in ppm.
+      ppm: 
+
+        #' Relative mass tolerance for MS2 in ppm. FLOAT
+        ms2: 10
+
+      #' Absolute in Dalton.
+      dalton:
+
+        #' Absolute mass tolerance for MS2 in Dalton. FLOAT
+        ms2: 0.01
+
+    #' For retention time.
+    rt:
+
+      #' Retention time tolerance in minutes. FLOAT
+      minutes: 0.05
+
+#' Options.
+options:
+
+  #' Skip time-consuming steps. BOOLEAN
+  fast: yes
+
+  #' Execute processes in parallel when available. BOOLEAN
+  parallel: yes

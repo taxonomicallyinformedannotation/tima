@@ -1,23 +1,57 @@
-#' The path of the input file. STRING
-input: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+#' Files.
+files:
 
-#' The path of the output file. STRING
-output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+  #' Annotation files.
+  annotations:
 
-#' The name of the tool used to generate components. 
-#' Currently "gnps" or "manual" supported. STRING
-tool: gnps
+    #' List of pretreated annotations. STRING
+    pretreated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+    
+    #' List of filled annotations. STRING
+    filled:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
 
-#' OPTIONAL. If tool is "manual". 
-#' The path of the file containing the components. STRING
-components: ~
+  #' Networks files.
+  networks:
 
-#' The gnps job ID. STRING
-gnps: 96fa7c88200e4a03bee4644e581e3fb0
+    #' Spectral networks files.
+    spectral:
 
-#' The name of the workflow used within GNPS. 
-#' Currently "fbmn" or "classical" supported. STRING
-workflow: fbmn
+      #' Components files.
+      components:
 
-#' The MS mode used. Must be "pos" or "neg". STRING
-mode: pos
+        #' Raw components file. STRING
+        raw: ~
+
+
+#' GNPS related parameters.
+gnps: 
+  
+  #' GNPS job ID. STRING
+  id: 96fa7c88200e4a03bee4644e581e3fb0
+  
+  #' Workflow used within GNPS.
+  #' Currently "fbmn" or "classical" supported. STRING
+  workflow: fbmn
+
+
+#' MS related parameters.
+ms:
+
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+
+#' Tools used for each step.
+tools:
+
+  #' Networks related parameters.
+  networks:
+
+    #' Spectral networks related parameters.
+    spectral:
+
+      #' Tool used to generate components.
+      #' Currently "gnps" or "manual" supported. STRING
+      components: gnps

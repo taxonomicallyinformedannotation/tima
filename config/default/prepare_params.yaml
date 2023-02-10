@@ -17,13 +17,13 @@ top_k:
 weights:
 
   #' The weight to apply to the spectral part. FLOAT
-  spectral: 0.166
+  spectral: 0.333
 
   #' The weight to apply to the chemical consistency part. FLOAT
   chemical: 0.166
 
   #' The weight to apply to the biological part. FLOAT
-  biological: 0.666
+  biological: 0.500
 
 #' Parameters related to the MS part.
 ms:

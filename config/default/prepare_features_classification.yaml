@@ -1,11 +1,29 @@
-#' The path of the input file. STRING
-input: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+#' Files.
+files:
 
-#' The path of the output file. STRING
-output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+  #' Annotation files.
+  annotations:
 
-#' The path of the library file used for metadata completion. STRING
-library: data/interim/libraries/library.tsv.gz
+    #' List of filled annotations. STRING
+    filled:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+    
+    #' List of treated annotations. STRING
+    treated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
 
-#' Skip extensive metadata completion by filling with pre-computed values only. BOOLEAN
-quickmode: yes
+  #' Libraries files.
+  libraries:
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/library.tsv.gz
+
+
+#' Options.
+options:
+
+  #' Skip time-consuming steps. BOOLEAN
+  fast: yes

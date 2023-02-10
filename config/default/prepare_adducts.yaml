@@ -1,5 +1,17 @@
-#' The path of the input file. STRING
-input: data/interim/libraries/library.tsv.gz
+#' Files.
+files:
 
-#' The path of the output file. STRING
-output: library
+  #' Libraries files.
+  libraries:
+
+    #' Adducts libraries.
+    adducts:
+
+      #' Prepared adducts library. STRING
+      processed: library
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/library.tsv.gz

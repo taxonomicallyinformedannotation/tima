@@ -1,8 +1,26 @@
-#' The path to the directory containing the sirius results. STRING
-directory: data/interim/annotations/example_sirius/
+#' Files.
+files:
 
-#' Use NPClassifier classes instead of Classyfire ones. BOOLEAN
-npc: yes
+  #' Annotation files.
+  annotations:
 
-#' The path of the output file. STRING
-output: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
+    #' Raw annotation files.
+    raw:
+
+      #' Directory containing the sirius results. STRING
+      sirius: data/interim/annotations/example_sirius/
+
+    #' List of pretreated annotations. STRING
+    pretreated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
+
+
+#' Tools used for each step.
+tools:
+
+  #' Taxonomies related parameters.
+  taxonomies: 
+
+    #' Chemical taxonomy used for matching.
+    #' Currently only "npc" or supported. STRING
+    chemical: npc

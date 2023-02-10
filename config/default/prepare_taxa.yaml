@@ -1,29 +1,53 @@
+#' Files.
+files:
+
+  #' Taxa files.
+  taxa:
+
+    #' OPTIONAL. If tool is "manual".
+    #' Biological origin metadata file. STRING
+    raw: data/interim/example_metadata_manual.csv
+
+    #' Taxonomically informed features file. STRING
+    processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+
+
+#' GNPS related parameters.
+gnps: 
+  
+  #' GNPS job ID. STRING
+  id: 96fa7c88200e4a03bee4644e581e3fb0
+
+
+#' Names of the different variables in the input files.
+names:
+
+  #' The file(s) extension is present in the sample name. BOOLEAN
+  extension: yes
+
+  #' Name of the "taxon name" variable in the input. STRING
+  taxon: ATTRIBUTE_species
+
+
+#' Organisms related parameters.
+organisms:
+
+  #' Number of organisms to keep per feature. INTEGER
+  candidates: 1
+
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
+  taxon: ~
+
+
+#' Tools used for each step.
+tools:
+
+  #' Tool used to store metadata.
+  #' Currently "gnps" or "manual" supported. STRING
+  metadata: gnps
+
+# TODO
+
 #' The path of the input file. STRING
 input: data/interim/example_mzmine_manual.csv
-
-#' The path of the output file. STRING
-output: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
-
-#' The name of the tool used to retrieve metadata. 
-#' Currently "gnps" or "manual" supported. STRING
-tool: gnps
-
-#' OPTIONAL. If tool is "manual". 
-#' The path of the file containing the biological origin metadata. STRING
-metadata: data/interim/example_metadata_manual.csv
-
-#' Is the file(s) extension present in the column name of the sample's intensity? BOOLEAN
-extension: yes
-
-#' The name of the column name containing the taxon name(s). STRING
-column_name: ATTRIBUTE_species
-
-#' The gnps job ID. STRING
-gnps: 96fa7c88200e4a03bee4644e581e3fb0
-
-#' The number of organisms to keep per feature. INTEGER
-top_k: 1
-
-#' OPTIONAL. Force all features to be attributed to given taxon.
-#' Example: "Homo sapiens". STRING
-taxon: ~

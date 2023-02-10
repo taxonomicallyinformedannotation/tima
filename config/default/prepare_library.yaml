@@ -1,18 +1,31 @@
-#' The path of the output file. STRING
-output: library.tsv.gz
+#' Files.
+files:
 
-#' If library has to be filtered to restrict it to a portion of organisms only.
-filter:
+  #' Libraries files.
+  libraries:
 
-  #' Apply the filter. BOOLEAN
-  mode: no
+    #' Structure organism pairs libraries.
+    sop:
 
-  #' Level at which the library will be filtered. 
-  #' Must be one of "domain", "phylum", "class", "order", 
-  #' "family", "tribe", "genus", "species", "varietas" . STRING
-  level: kingdom
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/library.tsv.gz
+
+
+#' Organisms related parameters.
+organisms:
+
+  #' Organisms filter related parameters.
+  filter:
+
+    #' Filter library to restrict it to a portion of organisms only.. BOOLEAN
+    mode: no
+
+    #' Level at which the library will be filtered.
+    #' Must be one of "domain", "phylum", "class", "order", 
+    #' "family", "tribe", "genus", "species", "varietas" . STRING
+    level: kingdom
   
-  #' Value to be applied for filtering. 
-  #' "OR" can be used as "|".
-  # Example: "Simaroubaceae|Gentianaceae". STRING
-  value: Streptophyta
+    #' Value to be applied for filtering.
+    #' "OR" can be used as "|".
+    # Example: "Simaroubaceae|Gentianaceae". STRING
+    value: Streptophyta

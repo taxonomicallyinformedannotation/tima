@@ -1,0 +1,488 @@
+#' Annotations related parameters.
+annotations:
+
+  #' Number of candidates to keep per feature.
+  candidates:
+
+    #' Number of initial candidates. INTEGER
+    initial: 50
+
+    #' Number of final candidates. INTEGER
+    final: 3
+
+  #' Erase MS2 results and keep MS1 only. BOOLEAN
+  ms1only: no
+  
+  #' MS1 annotation related parameters.
+  ms1:
+
+    #' Perform MS1 annotation. BOOLEAN
+    annotate: yes
+
+    #' Thresholds related parameters.
+    thresholds:
+
+      #' Minimal biological score to keep MS1 only annotation. FLOAT
+      biological: 0.5
+
+      #' Minimal chemical score to keep MS1 only annotation. FLOAT
+      chemical: 0.666
+
+      #' Condition to be used to retain candidates.
+      #' Must be "OR" or "AND".
+      #' Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+      condition: OR
+
+  #' MS2 annotation related parameters.
+  ms2:
+
+    #' Execute approximative matching without precursor matching? BOOLEAN
+    approx: no
+
+    #' Similarity method to be used to compare spectra.
+    #' Currently "gnps", "navdist", "ndotproduct", 
+    # "neuclidean", "nspectraangle" supported. STRING
+    method: gnps
+      
+    #' Thresholds
+    thresholds: 
+
+      #' Condition to be used to retain candidates.
+      #' Must be "OR" or "AND".
+      #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
+      condition: OR
+      
+      #' For peaks.
+      peaks:
+
+        #' Minimal shared peaks (absolute). INTEGER
+        absolute: 6
+
+        #' Minimal shared peaks (ratio). FLOAT
+        ratio: 0.2
+
+      #' For similarity. FLOAT
+      similarity: 0.2
+
+
+#' Files.
+files:
+
+  #' Annotation files.
+  annotations:
+
+    #' Raw annotation files.
+    raw:
+
+      #' List of spectral matching results. STRING
+      spectral:
+        - data/interim/annotations/example_isdb.tsv.gz
+
+      #' Directory containing the sirius results. STRING
+      sirius: data/interim/annotations/example_sirius/
+
+    #' List of pretreated annotations. STRING
+    pretreated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
+    
+    #' List of filled annotations. STRING
+    filled:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_filled.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_filled.tsv.gz
+    
+    #' List of treated annotations. STRING
+    treated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
+    
+    #' Final results file. STRING
+    processed: FinalResults.tsv
+
+  #' Features files.
+  features: 
+
+    #' Raw features file. STRING
+    raw: data/interim/features/example_feature_table.tsv.gz
+
+  #' Libraries files.
+  libraries:
+
+    #' Adducts libraries.
+    adducts:
+
+      #' Prepared adducts library. STRING
+      processed: library
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Raw structure organism pairs libraries.
+      raw:
+
+        #' Closed structure organism pairs library. STRING
+        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+
+        #' Lotus raw structure organism pairs library. STRING
+        lotus: ~
+
+      #' List of prepared structure organism pairs libraries. STRING
+      processed: 
+        - data/interim/libraries/lotus_prepared.tsv.gz
+        - data/interim/libraries/closed_prepared.tsv.gz
+
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/library.tsv.gz
+
+    #' Spectral libraries. STRING
+    spectral:
+
+      #' List of negative spectral libraries. STRING
+      neg:
+        - data/interim/spectra/isdb_lotus_neg.mgf
+
+      #' List of positive spectral libraries. STRING
+      pos:
+        - data/interim/spectra/isdb_lotus_pos.mgf
+
+  #' Networks files.
+  networks:
+
+    #' Spectral networks files.
+    spectral:
+
+      #' Edges files.
+      edges:
+
+        #' Raw edges file. STRING
+        raw: data/source/example_edges_manual.csv
+
+        #' Prepared edges file. STRING
+        processed: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+
+      #' Components files.
+      components:
+
+        #' Raw components file. STRING
+        raw: ~
+
+  #' Taxa files.
+  taxa:
+
+    #' OPTIONAL. If tool is "manual".
+    #' Biological origin metadata file. STRING
+    raw: data/interim/example_metadata_manual.csv
+
+    #' Taxonomically informed features file. STRING
+    processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+
+  #' Spectral files. STRING
+  spectral:
+
+    #' Raw spectral file. STRING
+    raw: data/source/example.mgf
+
+
+#' GNPS related parameters.
+gnps: 
+  
+  #' GNPS job ID. STRING
+  id: 96fa7c88200e4a03bee4644e581e3fb0
+
+  #' OPTIONAL. If exists. NAP job ID. STRING
+  nap: ~
+
+  #' Workflow used within GNPS.
+  #' Currently "fbmn" or "classical" supported. STRING
+  workflow: fbmn
+
+
+
+#' MS related parameters.
+ms:
+
+  #' List of adducts to be used.
+  adducts:
+
+    #' List of adducts to be used in negative. STRING
+    neg:
+      - neg_3_3proton
+      - neg_2_2proton
+      - neg_1_minus1proton
+      - neg_1_minus2proton1sodium
+      - neg_1_1chlorine
+      - neg_1_minus2proton1potassium
+      - neg_1_minus1proton1formic
+      - neg_1_minus1proton1acetic
+      - neg_1_minus2proton1sodium1formic
+      - neg_1_1bromine
+      - neg_1_minus1proton1tfa
+      - neg_2MH
+      - neg_2MFAH
+      - neg_2MACH
+      - neg_3MH
+
+    #' List of adducts to be used in positive. STRING
+    pos:
+      - pos_3_3proton
+      - pos_3_2proton1sodium
+      - pos_3_1proton2sodium
+      - pos_3_3sodium
+      - pos_2_2proton
+      - pos_2_2proton1ammonium
+      - pos_2_1proton1sodium
+      - pos_2_1magnesium
+      - pos_2_1proton1potassium
+      - pos_2_1calcium
+      - pos_2_2proton1acetonitrile
+      - pos_2_2sodium
+      - pos_2_1iron
+      - pos_2_2proton2acetonitrile
+      - pos_2_2proton3acetonitrile
+      - pos_1_1proton
+      - pos_1_1proton1ammonium
+      - pos_1_1sodium
+      - pos_1_minus1proton1magnesium
+      - pos_1_1proton1methanol
+      - pos_1_1potassium
+      - pos_1_minus1proton1calcium
+      - pos_1_1proton1acetonitrile
+      - pos_1_minus1proton2sodium
+      - pos_1_1proton1ethylamine
+      - pos_1_minus1proton1iron
+      - pos_1_1sodium1acetonitrile
+      - pos_1_minus1proton2potassium
+      - pos_1_1proton1dmso
+      - pos_1_1proton2acetonitrile
+      - pos_2MMg
+      - pos_2MCa
+      - pos_2MFe
+      - pos_2MH
+      - pos_2MHNH3
+      - pos_2MNa
+      - pos_2MK
+      - pos_2MHCH3CN
+      - pos_2MCH3CNNa
+
+  #' Intensity related parameters.
+  intensity:
+
+    #' Thresholds related parameters.
+    thresholds:
+
+      #' Intensity threshold for MS1. INTEGER
+      ms1: 1000000
+
+      #' Intensity threshold for MS2. INTEGER
+      ms2: 0
+
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+  #' Tolerances.
+  tolerances:
+
+    #' For mass.
+    mass:
+
+      #' Relative in ppm.
+      ppm: 
+
+        #' Relative mass tolerance for MS1 in ppm. FLOAT
+        ms1: 10
+
+        #' Relative mass tolerance for MS2 in ppm. FLOAT
+        ms2: 10
+
+      #' Absolute in Dalton.
+      dalton:
+
+        #' Absolute mass tolerance for MS1 in Dalton. FLOAT
+        ms1: 0.01
+
+        #' Absolute mass tolerance for MS2 in Dalton. FLOAT
+        ms2: 0.01
+
+    #' For retention time.
+    rt:
+
+      #' Retention time tolerance in minutes. FLOAT
+      minutes: 0.05
+
+
+#' Names of the different variables in the input files.
+names:
+
+  #' The file(s) extension is present in the sample name. BOOLEAN
+  extension: yes
+
+  #' Name of "feature IDs" variable in the input. STRING
+  features: feature_id
+
+  #' Name of "precursor m/z" variable in the input. STRING
+  precursor: mz
+
+  #' Name of "retention time" variable in the input. STRING
+  rt: rt
+
+  #' Name of "source IDs" variable in the input. STRING
+  source: CLUSTERID1
+
+  #' Name of "target IDs" variable in the input. STRING
+  target: CLUSTERID2
+
+  #' Name of the "taxon name" variable in the input. STRING
+  taxon: ATTRIBUTE_species
+
+
+
+#' Organisms related parameters.
+organisms:
+
+  #' Number of organisms to keep per feature. INTEGER
+  candidates: 1
+
+  #' Organisms filter related parameters.
+  filter:
+
+    #' Filter library to restrict it to a portion of organisms only.. BOOLEAN
+    mode: no
+
+    #' Level at which the library will be filtered.
+    #' Must be one of "domain", "phylum", "class", "order", 
+    #' "family", "tribe", "genus", "species", "varietas" . STRING
+    level: kingdom
+  
+    #' Value to be applied for filtering.
+    #' "OR" can be used as "|".
+    # Example: "Simaroubaceae|Gentianaceae". STRING
+    value: Streptophyta
+
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
+  taxon: ~
+
+
+#' Tools used for each step.
+tools:
+
+  #' Tool used to store metadata.
+  #' Currently "gnps" or "manual" supported. STRING
+  metadata: gnps
+
+  #' Networks related parameters.
+  networks:
+
+    #' Spectral networks related parameters.
+    spectral:
+
+      #' Tool used to generate components.
+      #' Currently "gnps" or "manual" supported. STRING
+      components: gnps
+
+      #' Tool used to generate edges.
+      #' Currently "gnps" or "manual" supported. STRING
+      edges: gnps
+
+  #' Taxonomies related parameters.
+  taxonomies: 
+
+    #' Biological taxonomy used for matching.
+    #' Currently only "otl" supported. STRING
+    biological: otl
+
+    #' Chemical taxonomy used for matching.
+    #' Currently only "npc" or supported. STRING
+    chemical: npc
+
+
+#' Weights to apply to each part of the final score.
+weights:
+
+  #' Global weights.
+  global:
+
+    #' Weight for the biological part. FLOAT
+    biological: 0.500
+
+    #' Weight for the chemical part. FLOAT
+    chemical: 0.166
+
+    #' Weight for the spectral part. FLOAT
+    spectral: 0.333
+    
+  #' Weights for the biological part.
+  biological: 
+
+    #' Score for a biological domain match. FLOAT
+    domain: 0.1
+
+    #' Score for a biological kingdom match. FLOAT
+    kingdom: 0.2
+
+    #' Score for a biological phylum match. FLOAT
+    phylum: 0.3
+
+    #' Score for a biological class match. FLOAT
+    class: 0.4
+
+    #' Score for a biological order match. FLOAT
+    order: 0.5
+
+    #' Score for a biological infraorder match. FLOAT
+    infraorder: 0.55
+
+    #' Score for a biological family match. FLOAT
+    family: 0.6
+
+    #' Score for a biological subfamily match. FLOAT
+    subfamily: 0.65
+
+    #' Score for a biological tribe match. FLOAT
+    tribe: 0.7
+
+    #' Score for a biological subtribe match. FLOAT
+    subtribe: 0.7
+
+    #' Score for a biological genus match. FLOAT
+    genus: 0.8
+
+    #' Score for a biological subgenus match. FLOAT
+    subgenus: 0.85
+
+    #' Score for a biological species match. FLOAT
+    species: 0.9
+
+    #' Score for a biological subspecies match. FLOAT
+    subspecies: 0.95
+
+    #' Score for a biological variety match. FLOAT
+    variety: 1.0
+
+  #' Weights for the chemical part.
+  chemical: 
+    
+    #' Score for a chemical pathway match. FLOAT
+    pathway: 0.333
+
+    #' Score for a chemical superclass match. FLOAT
+    superclass: 0.666
+
+    #' Score for a chemical class match. FLOAT
+    class: 1.000
+
+
+#' Options.
+options:
+
+  #' Skip time-consuming steps. BOOLEAN
+  fast: yes
+
+  #' Do not use it. BOOLEAN
+  force: no
+
+  #' Execute processes in parallel when available. BOOLEAN
+  parallel: yes

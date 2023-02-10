@@ -1,8 +1,26 @@
-#' The path of the input file. STRING
-input: data/interim/annotations/example_feature_table.tsv.gz
+#' Files.
+files:
 
-#' The path of the output file. STRING
-output: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
+  #' Features files.
+  features: 
 
-#' The name of the column containing the "feature IDs" in the input file. STRING
-feature_name: feature_id
+    #' Raw features file. STRING
+    raw: data/interim/features/example_feature_table.tsv.gz
+
+  #' Networks files.
+  networks:
+
+    #' Spectral networks files.
+    spectral:
+
+      #' Edges files.
+      edges:
+
+        #' Prepared edges file. STRING
+        processed: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz
+
+#' Names of the different variables in the input files.
+names:
+
+  #' Name of "feature IDs" variable in the input. STRING
+  features: feature_id
