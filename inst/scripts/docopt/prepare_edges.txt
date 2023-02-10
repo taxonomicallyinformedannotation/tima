@@ -1,15 +1,20 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_edges.R --gnps '96fa7c88200e4a03bee4644e581e3fb0' --output 'data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz' --tool gnps
+  Rscript inst/scripts/prepare_edges.R --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --fil-net-spe-edg-pro data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz --too-net-spe-edg gnps
 
 Usage: 
-  prepare_edges.R [-i | --input=<input>] [-o | --output=<output>] [-t | --tool=<tool>] [-g | --gnps=<gnps>] [-1 | --source=<source>] [-2 | --target=<target>]
+  prepare_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--gnps-id=<gnps-id>] [--names-source=<names-source>] [--names-target=<names-target>] [--too-net-spe-edg=<too-net-spe-edg>]
+
+Arguments:
+  fil-net-spe-edg-raw        Raw edges file. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+
+  gnps-id                    GNPS job ID. STRING
+
+  names-source               Name of "source IDs" variable in the input. STRING
+  names-target               Name of "target IDs" variable in the input. STRING
+
+  too-net-spe-edg            Tool used to generate edges. Currently "gnps" or "manual" supported. STRING
 
 Options:
-  -i --input=<input>                    If manual, your file containing list of edges between features. Supports compressed files.
-  -g --gnps=<gnps>                      Your GNPS job id. Depending on the annotation tool you used
-  -o --output=<output>                  Path and filename for the output. If you specify .gz file will be compressed.
-  -t --tool=<tool>                      Tool you used for edge generation ('gnps' or 'manual')
-  -1 --source=<source>                  The column name of your source feature
-  -2 --target=<target>                  The column name of your target feature
-  -h --help                             Show this screen.
-  -v --version                          Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

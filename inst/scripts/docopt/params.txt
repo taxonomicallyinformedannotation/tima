@@ -1,0 +1,132 @@
+You can use this script with the following example:
+Rscript inst/scripts/docopt.R --help
+
+Usage: 
+  docopt.R
+
+Arguments:
+  ann-can-ini                Number of initial candidates. INTEGER
+  ann-can-fin                Number of final candidates. INTEGER
+
+  ann-ms1only                Erase MS2 results and keep MS1 only. BOOLEAN
+
+  ann-ms1-ann                Perform MS1 annotation. BOOLEAN
+  ann-ms1-thr-bio            Minimal biological score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+  
+  ann-ms2-app                Execute approximative matching without precursor matching? BOOLEAN
+  ann-ms2-met                The MS similarity method to be used to compare spectra. Currently "gnps", "navdist", "ndotproduct", "neuclidean", "nspectraangle" supported. STRING
+  ann-ms2-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 6 peaks AND 0.2 similarity. STRING
+  ann-ms2-thr-pea-abs        Minimal shared peaks (absolute). INTEGER
+  ann-ms2-thr-pea-rat        Minimal shared peaks (ratio). FLOAT
+  ann-ms2-thr-sim            Similarity threhsold. FLOAT
+
+
+  fil-ann-raw-spe            List of spectral matching results. STRING
+  fil-ann-raw-sir            Directory containing the sirius results. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
+  fil-ann-fil                List of filled annotations. STRING
+  fil-ann-tre                List of pretreated annotations. STRING
+  fil-ann-pro                Final results file. STRING
+
+  fil-fea-raw                Raw features file. STRING
+
+  fil-lib-add-pro            Prepared adducts library. STRING
+  fil-lib-sop-raw-clo        Closed raw structure organism pairs library. STRING
+  fil-lib-sop-raw-lot        Lotus raw structure organism pairs library. STRING
+  fil-lib-sop-pro            List of prepared structure organism pairs libraries. STRING
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
+  fil-lib-spe-neg            List of negative spectral libraries. STRING
+  fil-lib-spe-pos            List of positive spectral libraries. STRING
+
+  fil-net-spe-edg-raw        Raw edges file. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+  fil-net-spe-com-raw        Raw components file. STRING
+
+  fil-tax-raw                OPTIONAL. If tool is "manual". Biological origin metadata file. STRING
+  fil-tax-pro                Taxonomically informed features file. STRING
+
+  fil-spe-raw                Raw spectral file. STRING
+
+
+  gnps-id                    GNPS job ID. STRING
+  gnps-nap                   OPTIONAL. If exists. NAP job ID. STRING  gnps-workflow              Workflow used within GNPS. Currently "fbmn" or "classical" supported. STRING
+
+
+
+  ms-add-neg                 List of adducts to be used in negative. STRING
+  ms-add-pos                 List of adducts to be used in positive. STRING
+
+  ms-int-thr-ms1             Intensity threshold for MS1. INTEGER
+  ms-int-thr-ms2             Intensity threshold for MS2. INTEGER
+
+  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+
+  ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT
+  ms-tol-mas-ppm-ms2         Relative mass tolerance for MS2 in ppm. FLOAT
+  ms-tol-mas-dal-ms1         Absolute mass tolerance for MS1 in Dalton. FLOAT
+  ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
+
+  ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
+
+
+  names-extension            The file(s) extension is present in the sample name. BOOLEAN
+  names-features             Name of "feature IDs" variable in the input. STRING
+  names-precursor            Name of "precursor m/z" variable in the input. STRING
+  names-rt                   Name of "retention time" variable in the input. STRING
+  names-source               Name of "source IDs" variable in the input. STRING
+  names-target               Name of "target IDs" variable in the input. STRING
+  names-taxon                Name of the "taxon name" variable in the input. STRING
+
+
+  org-can                    Number of organisms to keep per feature. INTEGER
+  
+  org-fil-mod                Filter library to restrict it to a portion of organisms only. BOOLEAN
+  org-fil-lev                Level at which the library will be filtered. Must be one of "domain", "phylum", "class", "order", "family", "tribe", "genus", "species", "varietas" . STRING
+  org-fil-val                Value to be applied for filtering. "OR" can be used as "|". Example: "Simaroubaceae|Gentianaceae". STRING
+
+  org-tax                    OPTIONAL. Force all features to be attributed to given taxon. Example: "Homo sapiens". STRING
+
+
+  too-met                    Tool used to store metadata. Currently "gnps" or "manual" supported. STRING
+
+  too-net-spe-com            Tool used to generate components. Currently "gnps" or "manual" supported. STRING
+  too-net-spe-edg            Tool used to generate edges. Currently "gnps" or "manual" supported. STRING
+
+  too-tax-bio                Biological taxonomy used for matching. Currently only "otl" supported. STRING
+  too-tax-che                Chemical taxonomy used for matching. Currently only "npc" supported. STRING
+
+  
+  wei-glo-bio                Weight for the biological part. FLOAT
+  wei-glo-che                Weight for the chemical part. FLOAT
+  wei-glo-spe                Weight for the spectral part. FLOAT
+
+  wei-bio-01                 Score for a biological domain match. FLOAT
+  wei-bio-02                 Score for a biological kingdom match. FLOAT
+  wei-bio-03                 Score for a biological phylum match. FLOAT
+  wei-bio-04                 Score for a biological class match. FLOAT
+  wei-bio-05                 Score for a biological order match. FLOAT
+  wei-bio-06                 Score for a biological infraorder match. FLOAT
+  wei-bio-07                 Score for a biological family match. FLOAT
+  wei-bio-08                 Score for a biological subfamily match. FLOAT
+  wei-bio-09                 Score for a biological tribe match. FLOAT
+  wei-bio-10                 Score for a biological subtribe match. FLOAT
+  wei-bio-11                 Score for a biological genus match. FLOAT
+  wei-bio-12                 Score for a biological subgenus match. FLOAT
+  wei-bio-13                 Score for a biological species match. FLOAT
+  wei-bio-14                 Score for a biological subspecies match. FLOAT
+  wei-bio-15                 Score for a biological variety match. FLOAT
+
+  wei-che-01                 Score for a chemical pathway match. FLOAT
+  wei-che-02                 Score for a chemical superclass match. FLOAT
+  wei-che-03                 Score for a chemical class match. FLOAT
+
+
+Options:
+  --fast                     Skip time-consuming steps. BOOLEAN
+  --force                    Do not use it. BOOLEAN
+  --parallel                 Execute processes in parallel when available. BOOLEAN
+
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

@@ -1,14 +1,15 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_sirius.R --directory 'data/interim/annotations/sirius_example' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz'
+  Rscript inst/scripts/prepare_sirius.R --fil-ann-raw-sir data/interim/annotations/sirius_example --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
 
 Usage: 
-  prepare_isdb.R [-d | --directory=<directory>] [-n | --npc=<npc>] [-o | --output=<output>]
+  prepare_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre=<fil-ann-pre>] [--too-tax-che=<too-tax-che>]
 
 Arguments:
-  -d --directory=<directory>    Directory containing SIRIUS results
-  -n --npc=<npc>                Has npc_summary been computed?
-  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
+  fil-ann-raw-sir            Directory containing the sirius results. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
+  
+  too-tax-che                Chemical taxonomy used for matching. Currently only "npc" supported. STRING
 
 Options:
-  -h --help         Show this screen.
-  -v --version      Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

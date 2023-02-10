@@ -1,15 +1,16 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_library.R --output 'bitter_db.tsv.gz' --filter TRUE --level 'family' --value 'Simaroubaceae|Gentianaceae'
+  Rscript inst/scripts/prepare_library.R --fil-lib-sop-mer bitter_db.tsv.gz --org-fil-mod TRUE --org-fil-lev family --org-fil-val 'Simaroubaceae|Gentianaceae'
 
 Usage: 
-  prepare_library.R [-o | --output=<output>] [-f | --filter=<filter>] [-l | --level=<level>] [-v | --value=<value>]
+  prepare_library.R [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--org-fil-mod=<org-fil-mod>] [--org-fil-lev=<org-fil-lev>] [--org-fil-val=<org-fil-val>]
 
 Arguments:
-  -f --filter=<filter>  Boolean. If you want to filter your library for specific organisms
-  -l --level=<level>    The taxonomic level you want to filter. Must be one of {domain, kingdom, phylum, class, order, family, tribe, genus, species, varietas}
-  -v --value=<value>    The value of your filter. (eg. "Gentianaceae", can be OR in form of "Simaroubaceae|Gentianaceae")
-  -o --output=<output>  Filename for the output.
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
+  
+  org-fil-mod                Filter library to restrict it to a portion of organisms only. BOOLEAN
+  org-fil-lev                Level at which the library will be filtered. Must be one of "domain", "phylum", "class", "order", "family", "tribe", "genus", "species", "varietas" . STRING
+  org-fil-val                Value to be applied for filtering. "OR" can be used as "|". Example: "Simaroubaceae|Gentianaceae". STRING
 
 Options:
-  -h --help         Show this screen.
-  -V --version      Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

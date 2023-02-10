@@ -1,13 +1,13 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_spectral_matches.R --input 'data/interim/annotations/example_isdb.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz'
+Rscript inst/scripts/prepare_spectral_matches.R --fil-ann-raw-spe data/interim/annotations/example_isdb.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
 
 Usage: 
-  prepare_spectral_matches.R [-i | --input=<input>] [-o | --output=<output>]
+  prepare_spectral_matches.R [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-ann-pre=<fil-ann-pre>]
 
 Arguments:
-  -i --input=<input>    Your isdb result file. Supports compressed files.
-  -o --output=<output>  Path and filename for the output. If you specify .gz file will be compressed.
+  fil-ann-raw-spe            List of spectral matching results. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
 
 Options:
-  -h --help         Show this screen.
-  -v --version      Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

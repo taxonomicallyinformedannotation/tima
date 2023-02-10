@@ -1,15 +1,15 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_features_classification.R --input 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz' --library 'data/interim/libraries/library.tsv.gz' --quickmode TRUE
+  Rscript inst/scripts/prepare_features_classification.R --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz --fil-ann-tre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz --fil-lib-sop-mer data/interim/libraries/library.tsv.gz --fast
 
 Usage: 
-  prepare_features_classification.R [-i | --input=<input>] [-o | --output=<output>] [-l | --library=<library>] [-q | --quickmode=<quickmode>]
+  prepare_features_classification.R [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-tre=<fil-ann-tre>] [--fil-lib-sop-mer=<fil-lib-sop-mer>]
 
 Arguments:
-  -i --input=<input>            Your isdb result file. Supports compressed files.
-  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
-  -l --library=<library>        Library to be used for metadata completion.
-  -q --quickmode=<quickmode>    Boolean. Do you want to classify only with LOTUS (quick) or submit to GNPS (long)?
+  fil-ann-fil                List of filled annotations. STRING
+  fil-ann-tre                List of pretreated annotations. STRING
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
 
 Options:
-  -h --help                     Show this screen.
-  -v --version                  Show version.
+  --fast                     Skip time-consuming steps. BOOLEAN
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

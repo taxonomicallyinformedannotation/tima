@@ -1,13 +1,13 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_adducts.R --input 'data/interim/libraries/library.tsv.gz' --output 'library'
+  Rscript inst/scripts/prepare_adducts.R --fil-lib-sop-mer data/interim/libraries/library.tsv.gz --fil-lib-add-pro library
 
 Usage: 
-  prepare_adducts.R [-i | --input=<input>] [-o | --output=<output>]
+  prepare_adducts.R [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-pro=<fil-lib-add-pro>]
 
 Arguments:
-  -i --input=<input>    Path to the input. Starting from root of the directory
-  -o --output=<output>  Filename for the outputs. "_pos" and "_neg" will be appended.
+  fil-lib-add-pro            Prepared adducts library. STRING
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
 
 Options:
-  -h --help         Show this screen.
-  -V --version      Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

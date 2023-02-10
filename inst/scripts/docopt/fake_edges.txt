@@ -1,12 +1,15 @@
 You can use this script with the following example:
-Rscript inst/scripts/fake_edges.R --input 'data/interim/annotations/example_feature_table.tsv.gz' --output 'data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz'
+  Rscript inst/scripts/fake_edges.R --fil-fea-raw data/interim/annotations/example_feature_table.tsv.gz --fil-net-spe-edg-pro data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz --names-features feature_id
 
 Usage: 
-  fake_edges.R [-i | --input=<input>] [-o | --output=<output>] [-f | --features=<features>]
+  fake_edges.R [--fil-fea-raw=<fil-fea-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--names-features=<names-features>]
+
+Arguments:
+  fil-fea-raw                Raw features file. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+
+  names-features             Name of "feature IDs" variable in the input. STRING
 
 Options:
-  -i --input=<input>                    A file containing your feature ids.
-  -o --output=<output>                  Path and filename for the output. If you specify .gz file will be compressed.
-  -f --features=<features>                The column name of your features
-  -h --help                             Show this screen.
-  -v --version                          Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

@@ -1,28 +1,58 @@
 You can use this script with the following example:
-Rscript inst/scripts/process_annotations.R
+  Rscript inst/scripts/process_annotations.R
 
 Usage: 
-  process_annotations.R [-o | --output=<output>] [-i | --isdb=<isdb>] [-c | --complement=<complement>] [-e | --edges=<edges>] [-f | --features=<features>] [-g | --gnps=<gnps>] [-j | --j.top=<j.top>] [-k | --k.top=<k.top>] [-l | --library=<library>] [-m | --ms=<ms>] [-n | --name=<name>] [-p | --ppm=<ppm>] [-r | --rt=<rt>] [-0 | --force=<force>] [-x | --xbim=<xbim>] [-z | --zirius=<zirius>] [-b | --biological=<biological>] [-q | --qemical=<qemical>] [-s | --spectral=<spectral>]
+  process_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-ann=<ann-ms1-ann>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-tre=<fil-ann-tre>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-int-thr-ms1=<ms-int-thr-ms1>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>]
+
+Arguments:
+  ann-can-ini                Number of initial candidates. INTEGER
+  ann-can-fin                Number of final candidates. INTEGER
+  ann-ms1only                Erase MS2 results and keep MS1 only. BOOLEAN
+  ann-ms1-ann                Perform MS1 annotation. BOOLEAN
+  ann-ms1-thr-bio            Minimal biological score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+  
+  fil-ann-tre                List of pretreated annotations. STRING
+  fil-ann-pro                Final results file. STRING
+  fil-lib-add-pro            Prepared adducts library. STRING
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+  fil-tax-pro                Taxonomically informed features file. STRING
+
+  ms-add-neg                 List of adducts to be used in negative. STRING
+  ms-add-pos                 List of adducts to be used in positive. STRING
+  ms-int-thr-ms1             Intensity threshold for MS1. INTEGER
+  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+  ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT
+  ms-tol-mas-dal-ms1         Absolute mass tolerance for MS1 in Dalton. FLOAT
+  ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
+
+  wei-glo-bio                Weight for the biological part. FLOAT
+  wei-glo-che                Weight for the chemical part. FLOAT
+  wei-glo-spe                Weight for the spectral part. FLOAT
+
+  wei-bio-01                 Score for a biological domain match. FLOAT
+  wei-bio-02                 Score for a biological kingdom match. FLOAT
+  wei-bio-03                 Score for a biological phylum match. FLOAT
+  wei-bio-04                 Score for a biological class match. FLOAT
+  wei-bio-05                 Score for a biological order match. FLOAT
+  wei-bio-06                 Score for a biological infraorder match. FLOAT
+  wei-bio-07                 Score for a biological family match. FLOAT
+  wei-bio-08                 Score for a biological subfamily match. FLOAT
+  wei-bio-09                 Score for a biological tribe match. FLOAT
+  wei-bio-10                 Score for a biological subtribe match. FLOAT
+  wei-bio-11                 Score for a biological genus match. FLOAT
+  wei-bio-12                 Score for a biological subgenus match. FLOAT
+  wei-bio-13                 Score for a biological species match. FLOAT
+  wei-bio-14                 Score for a biological subspecies match. FLOAT
+  wei-bio-15                 Score for a biological variety match. FLOAT
+
+  wei-che-01                 Score for a chemical pathway match. FLOAT
+  wei-che-02                 Score for a chemical superclass match. FLOAT
+  wei-che-03                 Score for a chemical class match. FLOAT
 
 Options:
-  -b --biological=<biological>  Biological weight
-  -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
-  -e --edges=<edges>            The file containing your prepared edges
-  -f --features=<features>      The file containing your prepared (taxed) features
-  -g --gnps=<gnps>              The file containing your prepared (GNPS) annotations
-  -i --isdb=<isdb>              The file containing your prepared (ISDB) annotations
-  -j --j.top=<j.top>            Number of initial candidates to be considered.
-  -k --k.top=<k.top>            Number of final candidates to be considered.
-  -l --library=<library>        Library to be used.
-  -m --ms=<ms>                  MS mode used ('pos' or 'neg')
-  -n --name=<name>              Name given to the adducted library.
-  -o --output=<output>          Filename for the output. Can be .gz.
-  -p --ppm=<ppm>                Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
-  -q --qemical=<qemical>        Chemical weight (yeah funny)
-  -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
-  -s --spectral==<spectral>     Spectral weight
-  -h --help                     Show this screen.
-  -v --version                  Show version.
-  -x --xbim=<xbim>              Functionality to erase MS2 results
-  -z --zirius=<zirius>          The file containing your prepared (SIRIUS) annotations
-  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters. Use it at your own risks. Can crash.
+  --force                    Do not use it. BOOLEAN
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

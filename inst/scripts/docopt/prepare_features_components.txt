@@ -1,18 +1,21 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_features_components.R --input 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz' --mode 'pos' --tool 'gnps' --gnps '96fa7c88200e4a03bee4644e581e3fb0' --workflow 'fbmn'
+  Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz --ms-pol pos --too-net-spe-com gnps --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --gnps-workflow fbmn
 
 Usage: 
-  prepare_features_components.R [-i | --input=<input>] [-o | --output=<output>] [-m | --mode=<mode>] [-c | --components=<components>] [-g | --gnps=<gnps>] [-t | --tool=<tool>] [-w | --workflow=<workflow>]
+  prepare_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>] [--ms-pol=<ms-pol>] [--too-net-spe-com=<too-net-spe-com>]
 
 Arguments:
-  -c --components=<components>  If your tool is manual, the file containing your component_ids
-  -g --gnps=<gnps>              GNPS job ID.
-  -i --input=<input>            Your isdb result file. Supports compressed files.
-  -m --mode=<mode>              MS mode used. Can be "pos" or "neg"
-  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
-  -t --tool=<tool>              Tool used for generating the component ids, currently only GNPS
-  -w --workflow=<workflow>      The workflow used. Currently only 'fbmn' or 'classical'
+  fil-ann-pre                List of pretreated annotations. STRING
+  fil-ann-fil                List of filled annotations. STRING
+  fil-net-spe-com-raw        Raw components file. STRING
+
+  gnps-id                    GNPS job ID. STRING
+  gnps-workflow              Workflow used within GNPS. Currently "fbmn" or "classical" supported. STRING
+
+  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+
+  too-net-spe-com            Tool used to generate components. Currently "gnps" or "manual" supported. STRING
 
 Options:
-  -h --help                     Show this screen.
-  -v --version                  Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

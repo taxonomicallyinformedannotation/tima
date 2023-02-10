@@ -1,17 +1,19 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_features_components.R --input 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz' --features 'data/interim/annotations/example_feature_table.tsv.gz' --output 'data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_faked_filled.tsv.gz' --mode 'pos'
+  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-fea-raw data/interim/annotations/example_feature_table.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_faked_filled.tsv.gz --ms-pol pos --names-precursor mz --names-rt rt
 
 Usage: 
-  prepare_features_components.R [-i | --input=<input>] [-f | --features=<features>] [-o | --output=<output>] [-m | --mode=<mode>] [-p | --precursor=<precursor>] [-r | --rt=<rt>]
+  fake_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-fea-raw=<fil-fea-raw>] [--ms-pol=<ms-pol>] [--names-precursor=<names-precursor>] [--names-rt=<names-rt>]
 
 Arguments:
-  -i --input=<input>            Your isdb result file. Supports compressed files.
-  -f --features=<features>      Your file containing features info. Supports compressed files.
-  -m --mode=<mode>              MS mode used. Can be "pos" or "neg"
-  -o --output=<output>          Path and filename for the output. If you specify .gz file will be compressed.
-  -p --precursor=<precursor>    The column name of your precursors (mz)
-  -r --rt=<rt>                  The column name of your retention times (rt)
+  fil-ann-pre                List of pretreated annotations. STRING
+  fil-ann-fil                List of filled annotations. STRING
+  fil-fea-raw                Raw features file. STRING
+
+  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+
+  names-precursor            Name of "precursor m/z" variable in the input. STRING
+  names-rt                   Name of "retention time" variable in the input. STRING
 
 Options:
-  -h --help                     Show this screen.
-  -v --version                  Show version.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.
