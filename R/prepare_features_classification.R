@@ -16,10 +16,10 @@
 #'
 #' @examples NULL
 prepare_features_classification <-
-  function(library = params$library,
-           input = params$input,
-           output = params$output,
-           quickmode = params$quickmode) {
+  function(library = params$files$libraries$sop$merged,
+           input = params$files$annotations$filled,
+           output = params$files$annotations$treated,
+           quickmode = params$options$fast) {
     stopifnot("Your input file does not exist" = file.exists(input))
     stopifnot("Your library file does not exist" = file.exists(library))
     stopifnot("Quickmode must be 'true' or 'false'" = quickmode %in% c(TRUE, FALSE))

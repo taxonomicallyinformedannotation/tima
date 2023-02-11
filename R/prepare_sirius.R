@@ -16,9 +16,9 @@
 #'
 #' @examples NULL
 prepare_sirius <-
-  function(input_directory = params$directory,
-           npc = params$npc,
-           output = params$output) {
+  function(input_directory = params$files$annotations$raw$sirius,
+           npc = params$tools$taxonomies$chemical,
+           output = params$files$annotations$pretreated) {
     stopifnot("Your input directory does not exist" = dir.exists(input_directory))
     stopifnot("NPC must be 'true' or 'false" = npc %in% c(TRUE, FALSE))
     stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(

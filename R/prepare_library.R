@@ -18,10 +18,10 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-prepare_library <- function(filter = params$filter$mode,
-                            level = params$filter$level,
-                            value = params$filter$value,
-                            output = params$output) {
+prepare_library <- function(filter = params$organisms$filter$mode,
+                            level = params$organisms$filter$level,
+                            value = params$organisms$filter$value,
+                            output = params$files$libraries$sop$merged) {
   # Check if the filter parameter is valid
   stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
 

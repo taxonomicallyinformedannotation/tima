@@ -18,12 +18,12 @@
 #' @importFrom stringr str_length
 #'
 #' @examples NULL
-prepare_edges <- function(tool = params$tool,
-                          gnps_job_id = params$gnps,
-                          input = params$input,
-                          output = params$output,
-                          name_source = params$source_name,
-                          name_target = params$target_name) {
+prepare_edges <- function(tool = params$tools$networks$spectral$edges,
+                          gnps_job_id = params$gnps$id,
+                          input = params$files$networks$spectral$edges$raw,
+                          output = params$files$networks$spectral$edges$processed,
+                          name_source = params$names$source,
+                          name_target = params$names$target) {
   ## Check that tool is valid
   stopifnot("Your tool must be 'manual' or 'gnps" = tool %in% c("gnps", "manual"))
 

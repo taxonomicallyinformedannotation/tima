@@ -14,8 +14,8 @@
 #'
 #' @examples NULL
 prepare_spectral_matches <-
-  function(input = params$input,
-           output = params$output) {
+  function(input = params$files$annotations$raw$spectral,
+           output = params$files$annotations$pretreated) {
     # Check if input file exists
     stopifnot("Your input file does not exist" = file.exists(input))
 

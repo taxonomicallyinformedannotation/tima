@@ -18,12 +18,12 @@
 #' @importFrom stringr str_length
 #'
 #' @examples NULL
-prepare_features_components <- function(input = params$input,
-                                        output = params$output,
-                                        tool = params$tool,
-                                        components = params$components,
-                                        gnps_job_id = params$gnps,
-                                        ms_mode = params$mode) {
+prepare_features_components <- function(input = params$files$annotations$pretreated,
+                                        output = params$files$annotations$filled,
+                                        tool = params$tools$networks$spectral$components,
+                                        components = params$files$networks$spectral$components$raw,
+                                        gnps_job_id = params$gnps$id,
+                                        ms_mode = params$ms$polarity) {
   if (tool == "gnps") {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {

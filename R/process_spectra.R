@@ -32,20 +32,20 @@
 #' @importFrom Spectra filterIntensity joinPeaksGnps
 #'
 #' @examples NULL
-process_spectra <- function(input = params$input,
-                            library = params$library,
-                            output = params$output,
-                            method = params$ms$similarity$method,
-                            threshold = params$ms$similarity$threshold,
-                            ppm = params$ms$tolerance$ppm,
-                            dalton = params$ms$tolerance$dalton,
-                            npeaks = params$ms$peaks$absolute,
-                            rpeaks = params$ms$peaks$ratio,
-                            condition = params$ms$condition,
-                            qutoff = params$qutoff,
-                            parallel = params$parallel,
-                            fast = params$fast,
-                            approx = params$approx) {
+process_spectra <- function(input = params$files$spectral$raw,
+                            library = params$files$libraries$spectral,
+                            output = params$files$annotations$raw$spectral,
+                            method = params$annotations$ms2$method,
+                            threshold = params$annotations$ms2$thresholds$similarity,
+                            ppm = params$ms$tolerances$mass$ppm$ms2,
+                            dalton = params$ms$tolerances$mass$dalton$ms2,
+                            npeaks = params$annotations$ms2$thresholds$peaks$absolute,
+                            rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
+                            condition = params$annotations$ms2$thresholds$condition,
+                            qutoff = params$ms$intensity$thresholds$ms2,
+                            parallel = params$options$parallel,
+                            fast = params$options$fast,
+                            approx = params$annotations$ms2$approx) {
   stopifnot("Your input file does not exist." = file.exists(input))
   if (file.exists(library |>
     gsub(

@@ -33,15 +33,15 @@
 #'
 #' @examples NULL
 prepare_taxa <-
-  function(input = params$input,
-           tool = params$tool,
-           extension = params$extension,
-           colname = params$column_name,
-           gnps_job_id = params$gnps,
-           metadata = params$metadata,
-           top_k = params$top_k,
-           output = params$output,
-           taxon = params$taxon) {
+  function(input = params$files$features$raw,
+           tool = params$tools$metadata,
+           extension = params$names$extension,
+           colname = params$names$taxon,
+           gnps_job_id = params$gnps$id,
+           metadata = params$files$taxa$raw,
+           top_k = params$organisms$candidates,
+           output = params$files$taxa$processed,
+           taxon = params$organisms$taxon) {
     stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
     if (tool == "gnps") {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)

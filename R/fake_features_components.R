@@ -17,12 +17,12 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-fake_features_components <- function(input = params$input,
-                                     features = params$features,
-                                     output = params$output,
-                                     ms_mode = params$mode,
-                                     name_rt = params$rt_name,
-                                     name_mz = params$precursor_name) {
+fake_features_components <- function(input = params$files$annotations$pretreated,
+                                     features = params$files$features$raw,
+                                     output = params$files$annotations$filled,
+                                     ms_mode = params$ms$polarity,
+                                     name_rt = params$names$rt,
+                                     name_mz = params$names$precursor) {
   # Check that input and features files exist
   stopifnot("Your input file does not exist" = file.exists(input))
   stopifnot("Your features file does not exist" = file.exists(features))
