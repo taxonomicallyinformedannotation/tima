@@ -1,5 +1,11 @@
 #' Files.
 files:
+  
+  #' Features files.
+  features: 
+
+    #' Raw features file. STRING
+    raw: data/interim/features/example_feature_table.tsv.gz
 
   #' Taxa files.
   taxa:
@@ -46,8 +52,3 @@ tools:
   #' Tool used to store metadata.
   #' Currently "gnps" or "manual" supported. STRING
   metadata: gnps
-
-# TODO
-
-#' The path of the input file. STRING
-input: data/interim/example_mzmine_manual.csv
