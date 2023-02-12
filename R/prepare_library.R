@@ -87,9 +87,6 @@ prepare_library <- function(filter = params$organisms$filter$mode,
   export_params(step = "prepare_library")
   export_output(
     x = custom_library,
-    file = file.path(
-      paths$data$interim$libraries$path,
-      output
-    )
+    file = output
   )
 }
