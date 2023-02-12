@@ -4,9 +4,7 @@
 #'
 #' @param library Library to be used to perform MS1 annotation
 #' @param name Name of the adducts
-#' @param gnps GNPS annotation results
-#' @param isdb ISDB annotation results
-#' @param sirius SIRIUS annotation results
+#' @param annotations Prepared annotations file
 #' @param taxa Prepared taxed features file
 #' @param edges Prepared edges file
 #' @param output Output file
@@ -34,7 +32,6 @@
 #' @param score_biological_subspecies Score for a `subspecies` match (should be lower than `variety`)
 #' @param score_biological_variety Score for a `variety` match (should be the highest)
 #' @param ms_mode MS ionization mode. Should be 'pos' or 'neg'
-#' @param ms_level 1
 #' @param annotate Boolean. Perform MS1 annotation completion or not
 #' @param tolerance_ppm Tolerance in ppm for MS1 annotation
 #' @param tolerance_rt Tolerance in retention time (minute) for adducts attribution
@@ -59,9 +56,7 @@
 #' @examples NULL
 process_annotations <- function(library = params$files$libraries$sop$merged,
                                 name = params$files$libraries$adducts$processed,
-                                gnps = params$files$annotations$processed,
-                                isdb = params$files$annotations$processed, ## TODO ADAPT
-                                sirius = params$files$annotations$processed,
+                                annotations = params$files$annotations$processed,
                                 taxa = params$files$taxa$processed,
                                 edges = params$files$networks$spectral$edges$processed,
                                 output = params$files$annotations$processed,
@@ -89,36 +84,20 @@ process_annotations <- function(library = params$files$libraries$sop$merged,
                                 score_biological_subspecies = params$weights$biological$subspecies,
                                 score_biological_variety = params$weights$biological$variety,
                                 ms_mode = params$ms$polarity,
-                                ms_level = params$ms$level, ## TODO REMOVE
                                 annotate = params$annotations$ms1$annotate,
                                 tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
                                 tolerance_rt = params$ms$tolerances$rt$minutes,
-                                adducts_list = params$ms$adducts, # TODO ADAPT
+                                adducts_list = params$ms$adducts,
                                 minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
-                                minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,  # TODO ADD CONDITION
+                                minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical, # TODO ADD CONDITION
                                 ms1_only = params$annotations$ms1only,
                                 force = params$options$force) {
   stopifnot("Your library file does not exist." = file.exists(library))
   ## TODO add name
-  stopifnot("Your GNPS file does not exist." = if (length(gnps) == 0) {
-    TRUE
-  } else {
-    file.exists(gnps)
-  })
-  stopifnot("Your ISDB file does not exist." = if (length(isdb) == 0) {
-    TRUE
-  } else {
-    file.exists(isdb)
-  })
-  stopifnot("Your SIRIUS file does not exist." = if (length(sirius) == 0) {
-    TRUE
-  } else {
-    file.exists(sirius)
-  })
+  stopifnot("Your annotations file does not exist." = file.exists(annotations))
   stopifnot("Your taxa file does not exist." = file.exists(taxa))
   stopifnot("Your edges file does not exist." = file.exists(edges))
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
-  stopifnot("Your ms_level parameter must be 1" = ms_level == 1)
   stopifnot("Your ms_annotate parameter must be 'true' or 'false'" = annotate %in% c(TRUE, FALSE))
   if (force == FALSE) {
     stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
@@ -138,21 +117,17 @@ process_annotations <- function(library = params$files$libraries$sop$merged,
 
   log_debug(x = "... files ...")
   log_debug(x = "... annotations")
-  metadata_table_spectral_annotation <<- lapply(
-    X = c(gnps, isdb, sirius),
-    FUN = function(x) {
-      readr::read_delim(
-        file = x,
-        col_types = "c"
-      ) |>
-        dplyr::mutate_all(list(~ gsub(
-          pattern = "\\|",
-          replacement = " or ",
-          x = .x
-        ))) |>
-        dplyr::mutate(dplyr::across(feature_id, as.numeric))
-    }
-  ) |>
+  metadata_table_spectral_annotation <<-
+    readr::read_delim(
+      file = annotations,
+      col_types = "c"
+    ) |>
+    dplyr::mutate_all(list(~ gsub(
+      pattern = "\\|",
+      replacement = " or ",
+      x = .x
+    ))) |>
+    dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
     dplyr::bind_rows() |>
     dplyr::distinct() |>
     dplyr::arrange(feature_id)
