@@ -29,8 +29,8 @@ log_debug("Contributors: ...")
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-prepare_closed <- function(input = params$input,
-                           output = params$output) {
+prepare_closed <- function(input = params$files$libraries$sop$raw$closed,
+                           output = params$files$libraries$sop$processed) {
   if (file.exists(input)) {
     log_debug(x = "Loading closed resources")
     closed <-

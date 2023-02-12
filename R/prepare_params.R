@@ -93,8 +93,8 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$prepare_taxa$files$taxa$processed <-
     yamls_params$prepare_taxa$files$taxa$processed |>
     replace_gnps_job_id()
-  yamls_params$process_annotations$files$networks$spectral$edges <-
-    yamls_params$process_annotations$files$networks$spectral$edges |>
+  yamls_params$process_annotations$files$networks$spectral$edges$processed <-
+    yamls_params$process_annotations$files$networks$spectral$edges$processed |>
     replace_gnps_job_id()
   yamls_params$process_annotations$files$taxa$processed <-
     yamls_params$process_annotations$files$taxa$processed |>
