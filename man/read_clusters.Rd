@@ -4,7 +4,7 @@
 \alias{read_clusters}
 \title{Read clusters}
 \usage{
-read_clusters(id, workflow = params$workflow)
+read_clusters(id, workflow = params$gnps$workflow)
 }
 \arguments{
 \item{id}{Character string of length 32 representing the job ID}

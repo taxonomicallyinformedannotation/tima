@@ -5,9 +5,9 @@
 \title{Prepare GNPS}
 \usage{
 prepare_gnps(
-  gnps_job_id = params$gnps,
-  nap_job_id = params$nap,
-  output = params$output
+  gnps_job_id = params$gnps$id,
+  nap_job_id = params$gnps$nap,
+  output = params$files$annotations$treated
 )
 }
 \arguments{

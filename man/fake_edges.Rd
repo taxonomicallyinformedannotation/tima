@@ -5,9 +5,9 @@
 \title{Fake edges}
 \usage{
 fake_edges(
-  input = params$input,
-  output = params$output,
-  name_feature = params$feature
+  input = params$files$features$raw,
+  output = params$files$networks$spectral$edges$processed,
+  name_feature = params$names$features
 )
 }
 \arguments{

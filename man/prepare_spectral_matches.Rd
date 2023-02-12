@@ -4,7 +4,10 @@
 \alias{prepare_spectral_matches}
 \title{Prepare spectral matches}
 \usage{
-prepare_spectral_matches(input = params$input, output = params$output)
+prepare_spectral_matches(
+  input = params$files$annotations$raw$spectral,
+  output = params$files$annotations$pretreated
+)
 }
 \arguments{
 \item{input}{Input file}

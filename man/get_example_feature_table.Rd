@@ -6,7 +6,7 @@
 \usage{
 get_example_feature_table(
   url = paths$urls$example_feature_table,
-  export = paths$data$interim$annotations$example_feature_table
+  export = paths$data$interim$features$example_feature_table
 )
 }
 \arguments{

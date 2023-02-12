@@ -5,12 +5,12 @@
 \title{Fake features components}
 \usage{
 fake_features_components(
-  input = params$input,
-  features = params$features,
-  output = params$output,
-  ms_mode = params$mode,
-  name_rt = params$rt_name,
-  name_mz = params$precursor_name
+  input = params$files$annotations$pretreated,
+  features = params$files$features$raw,
+  output = params$files$annotations$filled,
+  ms_mode = params$ms$polarity,
+  name_rt = params$names$rt,
+  name_mz = params$names$precursor
 )
 }
 \arguments{

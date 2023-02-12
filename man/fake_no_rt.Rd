@@ -5,8 +5,8 @@
 \title{Fake no retention time}
 \usage{
 fake_no_rt(
-  input = paths$data$interim$annotations$example_feature_table,
-  output = paths$data$interim$annotations$example_feature_table_no_rt
+  input = paths$data$interim$features$example_feature_table,
+  output = paths$data$interim$features$example_feature_table_no_rt
 )
 }
 \arguments{

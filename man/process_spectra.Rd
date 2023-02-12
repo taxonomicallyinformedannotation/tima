@@ -5,26 +5,29 @@
 \title{Process spectra}
 \usage{
 process_spectra(
-  input = params$input,
-  library = params$library,
-  output = params$output,
-  method = params$ms$similarity$method,
-  threshold = params$ms$similarity$threshold,
-  ppm = params$ms$tolerance$ppm,
-  dalton = params$ms$tolerance$dalton,
-  npeaks = params$ms$peaks$absolute,
-  rpeaks = params$ms$peaks$ratio,
-  condition = params$ms$condition,
-  qutoff = params$qutoff,
-  parallel = params$parallel,
-  fast = params$fast,
-  approx = params$approx
+  input = params$files$spectral$raw,
+  library = params$files$libraries$spectral,
+  polarity = params$ms$polarity,
+  output = params$files$annotations$raw$spectral,
+  method = params$annotations$ms2$method,
+  threshold = params$annotations$ms2$thresholds$similarity,
+  ppm = params$ms$tolerances$mass$ppm$ms2,
+  dalton = params$ms$tolerances$mass$dalton$ms2,
+  npeaks = params$annotations$ms2$thresholds$peaks$absolute,
+  rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
+  condition = params$annotations$ms2$thresholds$condition,
+  qutoff = params$ms$intensity$thresholds$ms2,
+  parallel = params$options$parallel,
+  fast = params$options$fast,
+  approx = params$annotations$ms2$approx
 )
 }
 \arguments{
 \item{input}{Query file containing spectra. Currently an '.mgf' file}
 
 \item{library}{Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)}
+
+\item{polarity}{MS polarity. Must be 'pos' or 'neg'.}
 
 \item{output}{Output file.}
 

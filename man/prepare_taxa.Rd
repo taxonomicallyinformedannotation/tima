@@ -5,15 +5,15 @@
 \title{Prepare taxa}
 \usage{
 prepare_taxa(
-  input = params$input,
-  tool = params$tool,
-  extension = params$extension,
-  colname = params$column_name,
-  gnps_job_id = params$gnps,
-  metadata = params$metadata,
-  top_k = params$top_k,
-  output = params$output,
-  taxon = params$taxon
+  input = params$files$features$raw,
+  tool = params$tools$metadata,
+  extension = params$names$extension,
+  colname = params$names$taxon,
+  gnps_job_id = params$gnps$id,
+  metadata = params$files$taxa$raw,
+  top_k = params$organisms$candidates,
+  output = params$files$taxa$processed,
+  taxon = params$organisms$taxon
 )
 }
 \arguments{

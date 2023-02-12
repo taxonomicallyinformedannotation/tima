@@ -5,12 +5,12 @@
 \title{Prepare features components}
 \usage{
 prepare_features_components(
-  input = params$input,
-  output = params$output,
-  tool = params$tool,
-  components = params$components,
-  gnps_job_id = params$gnps,
-  ms_mode = params$mode
+  input = params$files$annotations$pretreated,
+  output = params$files$annotations$filled,
+  tool = params$tools$networks$spectral$components,
+  components = params$files$networks$spectral$components$raw,
+  gnps_job_id = params$gnps$id,
+  ms_mode = params$ms$polarity
 )
 }
 \arguments{

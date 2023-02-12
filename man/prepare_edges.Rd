@@ -5,12 +5,12 @@
 \title{Prepare edges}
 \usage{
 prepare_edges(
-  tool = params$tool,
-  gnps_job_id = params$gnps,
-  input = params$input,
-  output = params$output,
-  name_source = params$source_name,
-  name_target = params$target_name
+  tool = params$tools$networks$spectral$edges,
+  gnps_job_id = params$gnps$id,
+  input = params$files$networks$spectral$edges$raw,
+  output = params$files$networks$spectral$edges$processed,
+  name_source = params$names$source,
+  name_target = params$names$target
 )
 }
 \arguments{

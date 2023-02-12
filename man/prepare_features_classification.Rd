@@ -5,10 +5,10 @@
 \title{Prepare features classification}
 \usage{
 prepare_features_classification(
-  library = params$library,
-  input = params$input,
-  output = params$output,
-  quickmode = params$quickmode
+  library = params$files$libraries$sop$merged,
+  input = params$files$annotations$filled,
+  output = params$files$annotations$treated,
+  quickmode = params$options$fast
 )
 }
 \arguments{

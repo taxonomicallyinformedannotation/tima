@@ -5,9 +5,9 @@
 \title{Prepare sirius}
 \usage{
 prepare_sirius(
-  input_directory = params$directory,
-  npc = params$npc,
-  output = params$output
+  input_directory = params$files$annotations$raw$sirius,
+  npc = params$tools$taxonomies$chemical,
+  output = params$files$annotations$pretreated
 )
 }
 \arguments{

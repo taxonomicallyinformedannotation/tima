@@ -5,10 +5,10 @@
 \title{Prepare library}
 \usage{
 prepare_library(
-  filter = params$filter$mode,
-  level = params$filter$level,
-  value = params$filter$value,
-  output = params$output
+  filter = params$organisms$filter$mode,
+  level = params$organisms$filter$level,
+  value = params$organisms$filter$value,
+  output = params$files$libraries$sop$merged
 )
 }
 \arguments{
