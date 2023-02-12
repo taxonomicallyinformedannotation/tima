@@ -20,7 +20,7 @@ prepare_sirius <-
            npc = params$tools$taxonomies$chemical,
            output = params$files$annotations$pretreated) {
     stopifnot("Your input directory does not exist" = dir.exists(input_directory))
-    stopifnot("NPC must be 'true' or 'false" = npc %in% c(TRUE, FALSE))
+    stopifnot("Chemical class must be 'npc'." = npc %in% c("npc"))
     stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
       file.path(
         input_directory,
@@ -39,7 +39,7 @@ prepare_sirius <-
     )
 
     log_debug("Loading and formatting SIRIUS results")
-    if (npc == TRUE) {
+    if (npc == "npc") {
       canopus <-
         readr::read_delim(file = file.path(
           input_directory,
@@ -206,5 +206,5 @@ prepare_sirius <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_sirius")
-    export_output(x = table, file = output)
+    export_output(x = table, file = output[[1]])
   }

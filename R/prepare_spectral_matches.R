@@ -17,11 +17,15 @@ prepare_spectral_matches <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$pretreated) {
     # Check if input file exists
-    stopifnot("Your input file does not exist" = file.exists(input))
-
+    stopifnot(
+      "Input file(s) do(es) not exist" =
+        rep(TRUE, length(input)) ==
+        lapply(X = input, file.exists)
+    )
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
-    table <- readr::read_delim(file = input) |>
+    table <- lapply(X = input,FUN = readr::read_delim) |>
+      dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
         inchikey_2D = short_inchikey,
@@ -46,5 +50,5 @@ prepare_spectral_matches <-
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions
     export_params(step = "prepare_spectral_matches")
-    export_output(x = table, file = output)
+    export_output(x = table, file = output[[1]])
   }

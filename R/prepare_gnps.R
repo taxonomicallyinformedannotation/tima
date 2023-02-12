@@ -18,7 +18,7 @@
 prepare_gnps <-
   function(gnps_job_id = params$gnps$id,
            nap_job_id = params$gnps$nap,
-           output = params$files$annotations$treated) {
+           output = params$files$annotations$pretreated) {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
     if (!is.null(nap_job_id)) {
       stopifnot("Your NAP job ID is invalid" = stringr::str_length(string = nap_job_id) == 32)
@@ -81,5 +81,5 @@ prepare_gnps <-
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_gnps")
-    export_output(x = table, file = output)
+    export_output(x = table, file = output[[1]])
   }
