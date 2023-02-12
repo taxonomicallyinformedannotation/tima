@@ -1,12 +1,12 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz --ms-pol pos --too-net-spe-com gnps --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --gnps-workflow fbmn
+  Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz --ms-pol pos --too-net-spe-com gnps --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --gnps-workflow fbmn
 
 Usage: 
   prepare_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>] [--ms-pol=<ms-pol>] [--too-net-spe-com=<too-net-spe-com>]
 
 Arguments:
   fil-ann-pre                List of pretreated annotations. STRING
-  fil-ann-fil                List of filled annotations. STRING
+  fil-ann-fil                Filled annotations file. STRING
   fil-net-spe-com-raw        Raw components file. STRING
 
   gnps-id                    GNPS job ID. STRING

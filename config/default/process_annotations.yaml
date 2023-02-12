@@ -40,9 +40,8 @@ files:
   #' Annotation files.
   annotations:
 
-    #' List of treated annotations. STRING
-    treated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+    #' Treated annotations file. STRING
+    treated: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated.tsv.gz
     
     #' Final results file. STRING
     processed: FinalResults.tsv

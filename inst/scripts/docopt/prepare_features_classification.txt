@@ -1,12 +1,12 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_features_classification.R --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz --fil-ann-tre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz --fil-lib-sop-mer data/interim/libraries/library.tsv.gz --fast
+  Rscript inst/scripts/prepare_features_classification.R --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz --fil-ann-tre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated.tsv.gz --fil-lib-sop-mer data/interim/libraries/library.tsv.gz --fast
 
 Usage: 
   prepare_features_classification.R [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-tre=<fil-ann-tre>] [--fil-lib-sop-mer=<fil-lib-sop-mer>]
 
 Arguments:
-  fil-ann-fil                List of filled annotations. STRING
-  fil-ann-tre                List of pretreated annotations. STRING
+  fil-ann-fil                Filled annotations file. STRING
+  fil-ann-tre                Treated annotations file. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
 
 Options:

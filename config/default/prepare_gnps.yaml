@@ -4,9 +4,9 @@ files:
   #' Annotation files.
   annotations:
 
-    #' List of treated annotations. STRING
-    treated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
+    #' List of pretreated annotations. STRING
+    pretreated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
 
 
 #' GNPS related parameters.

@@ -4,13 +4,11 @@ files:
   #' Annotation files.
   annotations:
 
-    #' List of filled annotations. STRING
-    filled:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
+    #' Filled annotations file. STRING
+    filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
     
-    #' List of treated annotations. STRING
-    treated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
+    #' Treated annotation file. STRING
+    treated: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated.tsv.gz
 
   #' Libraries files.
   libraries:

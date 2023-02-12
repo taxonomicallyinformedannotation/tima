@@ -13,7 +13,7 @@ Arguments:
   ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
   ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
   
-  fil-ann-tre                List of pretreated annotations. STRING
+  fil-ann-tre                Treated annotations file. STRING
   fil-ann-pro                Final results file. STRING
   fil-lib-add-pro            Prepared adducts library. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING

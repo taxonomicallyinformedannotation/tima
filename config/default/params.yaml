@@ -87,17 +87,11 @@ files:
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
     
-    #' List of filled annotations. STRING
-    filled:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_filled.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_filled.tsv.gz
+    #' Filled annotations file. STRING
+    filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
     
-    #' List of treated annotations. STRING
-    treated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_treated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_treated.tsv.gz
+    #' Treated annotations file. STRING
+    treated: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated.tsv.gz
     
     #' Final results file. STRING
     processed: FinalResults.tsv

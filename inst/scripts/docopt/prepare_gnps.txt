@@ -1,11 +1,11 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_gnps.R --fil-ann-tre data/interim/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --gnps-workflow fbmn
+  Rscript inst/scripts/prepare_gnps.R --fil-ann-pre data/interim/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --gnps-workflow fbmn
 
 Usage: 
-  prepare_gnps.R [--=fil-ann-tre<fil-ann-tre>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>] [--gnps-nap=<gnps-nap>]
+  prepare_gnps.R [--=fil-ann-pre<fil-ann-pre>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>] [--gnps-nap=<gnps-nap>]
 
 Arguments:
-  fil-ann-tre                List of pretreated annotations. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
   
   gnps-id                    GNPS job ID. STRING
   gnps-workflow              Workflow used within GNPS. Currently "fbmn" or "classical" supported. STRING
