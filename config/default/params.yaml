@@ -67,6 +67,9 @@ annotations:
 
 #' Files.
 files:
+  
+  #' Pattern to identify the files. STRING
+  pattern: example
 
   #' Annotation files.
   annotations:

@@ -1,47 +1,24 @@
-#' The input filename. STRING
-filename: example
+#' Files.
+files:
 
-#' The gnps job ID. STRING
-gnps: 96fa7c88200e4a03bee4644e581e3fb0
+  #' Pattern to identify the files. STRING
+  pattern: example
 
-#' The number of candidates.
-top_k:
+#' GNPS related parameters.
+gnps: 
+  
+  #' GNPS job ID. STRING
+  id: 96fa7c88200e4a03bee4644e581e3fb0
 
-  #' The number of initial candidates. INTEGER
-  initial: 50
-
-  #' The number of final candidates. INTEGER
-  final: 3
-
-#' The weights to apply to each part of the final score.
-weights:
-
-  #' The weight to apply to the spectral part. FLOAT
-  spectral: 0.333
-
-  #' The weight to apply to the chemical consistency part. FLOAT
-  chemical: 0.166
-
-  #' The weight to apply to the biological part. FLOAT
-  biological: 0.500
-
-#' Parameters related to the MS part.
+#' MS related parameters.
 ms:
 
-  #' The MS mode used. Must be "pos" or "neg". STRING
-  mode: pos
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
 
-  #' Perform MS1 annotation. BOOLEAN
-  annotate: yes
+#' Organisms related parameters.
+organisms:
 
-  #' Tolerances to be used for MS1 annotation.
-  tolerance:
-
-    #' Tolerance for exact mass. In ppm. FLOAT
-    ppm: 10
-
-    #' Tolerance for retention time. In minutes. FLOAT
-    rt: 0.05
-
-#' Do not use it.
-force: no
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
+  taxon: ~

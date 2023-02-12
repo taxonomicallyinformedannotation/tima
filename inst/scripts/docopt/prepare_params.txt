@@ -2,21 +2,14 @@ You can use this script with the following example:
   Rscript inst/scripts/prepare_params.R
 
 Usage: 
-  prepare_params.R  [-b | --biological=<biological>] [-c | --complement=<complement>] [-f | --filename=<filename>] [-g | --gnps=<gnps>] [-j | --j.top=<j.top>] [-k | --k.top=<k.top>] [-m | --ms=<ms>] [-p | --ppm=<ppm>] [-q | --qemical=<qemical>] [-r | --rt=<rt>] [-s --spectral=<spectral>] [-t | --taxon=<taxon>] [-0 | --force=<force>]
+  prepare_params.R  [--fil-pat=<fil-pat>] [--gnps-id=<gnps-id>] [--ms-pol=<ms-pol>] [--org-tax=<org-tax>]
+
+Arguments:
+  fil-pat                    Pattern to identify the files. STRING
+  gnps-id                    GNPS job ID. STRING
+  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+  org-tax                    OPTIONAL. Force all features to be attributed to given taxon. Example: "Homo sapiens". STRING
 
 Options:
-  -b --biological=<biological>  Biological weight
-  -c --complement=<complement>  Logical: TRUE to complement with MS1 annotation, FALSE not to.
-  -f --filename=<filename>      The name of your raw file if you used it to name sirius/isdb outputs (if not, you should).
-  -g --gnps=<gnps>              Your GNPS job id.
-  -j --j.top=<j.top>            Number of initial candidates to be considered.
-  -k --k.top=<k.top>            Number of final candidates to be considered.
-  -m --ms=<ms>                  MS mode used ('pos' or 'neg')
-  -p --ppm=<ppm>                Tolerance for MS1 annotation complement. Should not exceed 20 ppm.
-  -q --qemical=<qemical>        Chemical weight (yeah funny)
-  -r --rt=<rt>                  Tolerance for adduct attriubtion. Should not exceed 0.1 min.
-  -s --spectral==<spectral>     Spectral weight
-  -t --taxon==<taxon>           Force a single organism. Example -t 'Swertia chirayita'.
-  -h --help                     Show this screen.
-  -v --version                  Show version.
-  -0 --force=<force>            Logical: TRUE to force running with non-recommended parameters.
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

@@ -50,6 +50,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$ann_ms2_thr_sim)) {
       params$annotations$ms2$thresholds$similarity <- as.numeric(arguments$ann_ms2_thr_sim)
     }
+    if (!is.null(arguments$fil_pat)) {
+      params$files$pattern <- as.character(arguments$fil_pat)
+    }
     if (!is.null(arguments$fil_ann_raw_spe)) {
       params$files$annotations$raw$spectral <- as.character(arguments$fil_ann_raw_spe)
     }

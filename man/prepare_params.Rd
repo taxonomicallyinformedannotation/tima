@@ -5,19 +5,10 @@
 \title{Prepare parameters}
 \usage{
 prepare_params(
-  filename = params$filename,
-  gnps_job_id = params$gnps,
-  candidates_initial = params$top_k$initial,
-  candidates_final = params$top_k$final,
-  weight_biological = params$weights$biological,
-  weight_chemical = params$weights$chemical,
-  weight_spectral = params$weights$spectral,
-  ms_mode = params$ms$mode,
-  annotate = params$ms$annotate,
-  tolerance_ppm = params$ms$tolerance$ppm,
-  tolerance_rt = params$ms$tolerance$rt,
-  taxon = params$taxon,
-  force = params$force
+  filename = params$files$pattern,
+  gnps_job_id = params$gnps$id,
+  ms_mode = params$ms$polarity,
+  taxon = params$organisms$taxon
 )
 }
 \arguments{
@@ -25,27 +16,9 @@ prepare_params(
 
 \item{gnps_job_id}{GNPS job ID}
 
-\item{candidates_initial}{Initial candidates to keep}
-
-\item{candidates_final}{Final candidates to keep}
-
-\item{weight_biological}{Weight for biological score}
-
-\item{weight_chemical}{Weight for chemical consistency score}
-
-\item{weight_spectral}{Weight for spectral score}
-
 \item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 
-\item{annotate}{Perform additional MS1 based annotation}
-
-\item{tolerance_ppm}{Ppm tolerance for MS1 annotation}
-
-\item{tolerance_rt}{Retention time tolerance for adducts attribution in MS1 annotation}
-
 \item{taxon}{Name of a taxon you want to enforce}
-
-\item{force}{If you want to force unusual parameters. Use it at your own risk}
 }
 \description{
 This function prepares main parameters

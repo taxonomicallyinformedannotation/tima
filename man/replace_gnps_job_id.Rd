@@ -7,7 +7,7 @@
 replace_gnps_job_id(
   job,
   default = yamls_default$prepare_params$gnps,
-  repl = params$gnps
+  repl = params$gnps$id
 )
 }
 \arguments{

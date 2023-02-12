@@ -187,6 +187,7 @@ testthat::test_that("Whole process", {
   arguments$ann_ms2_thr_pea_abs <<- "x"
   arguments$ann_ms2_thr_pea_rat <<- "x"
   arguments$ann_ms2_thr_sim <<- "x"
+  arguments$fil_pat <<- "x"
   arguments$fil_ann_raw_spe <<- "x"
   arguments$fil_ann_raw_sir <<- "x"
   arguments$fil_ann_pre <<- "x"

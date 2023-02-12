@@ -23,6 +23,8 @@ Arguments:
   ann-ms2-thr-sim            Similarity threhsold. FLOAT
 
 
+  fil-pat                    Pattern to identify the files. STRING
+
   fil-ann-raw-spe            List of spectral matching results. STRING
   fil-ann-raw-sir            Directory containing the sirius results. STRING
   fil-ann-pre                List of pretreated annotations. STRING
