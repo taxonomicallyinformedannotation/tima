@@ -7,7 +7,7 @@
 process_annotations(
   library = params$files$libraries$sop$merged,
   name = params$files$libraries$adducts$processed,
-  annotations = params$files$annotations$processed,
+  annotations = params$files$annotations$treated,
   taxa = params$files$taxa$processed,
   edges = params$files$networks$spectral$edges$processed,
   output = params$files$annotations$processed,

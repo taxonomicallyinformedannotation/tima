@@ -7,7 +7,7 @@
 prepare_gnps(
   gnps_job_id = params$gnps$id,
   nap_job_id = params$gnps$nap,
-  output = params$files$annotations$treated
+  output = params$files$annotations$pretreated
 )
 }
 \arguments{

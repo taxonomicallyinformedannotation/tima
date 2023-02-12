@@ -56,7 +56,7 @@
 #' @examples NULL
 process_annotations <- function(library = params$files$libraries$sop$merged,
                                 name = params$files$libraries$adducts$processed,
-                                annotations = params$files$annotations$processed,
+                                annotations = params$files$annotations$treated,
                                 taxa = params$files$taxa$processed,
                                 edges = params$files$networks$spectral$edges$processed,
                                 output = params$files$annotations$processed,
@@ -128,7 +128,6 @@ process_annotations <- function(library = params$files$libraries$sop$merged,
       x = .x
     ))) |>
     dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
-    dplyr::bind_rows() |>
     dplyr::distinct() |>
     dplyr::arrange(feature_id)
 

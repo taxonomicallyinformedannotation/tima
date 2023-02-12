@@ -20,11 +20,11 @@ prepare_spectral_matches <-
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
-        lapply(X = input, file.exists)
+          lapply(X = input, file.exists)
     )
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
-    table <- lapply(X = input,FUN = readr::read_delim) |>
+    table <- lapply(X = input, FUN = readr::read_delim) |>
       dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
