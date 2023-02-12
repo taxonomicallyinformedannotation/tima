@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
+#' @importFrom purrr map
 #' @importFrom readr read_delim write_delim
 #' @importFrom stringr str_length
 #'
@@ -42,8 +43,8 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
     X = input,
     FUN = readr::read_delim
   ) |>
+    purrr::map(.f = mutate_all, as.character) |>
     dplyr::bind_rows() |>
-    dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
     dplyr::mutate(feature_id = as.numeric(feature_id))
 
   log_debug(x = "... cluster table")

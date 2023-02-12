@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
+#' @importFrom purrr map
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
@@ -41,8 +42,8 @@ fake_features_components <-
       X = input,
       FUN = readr::read_delim
     ) |>
+      purrr::map(.f = mutate_all, as.character) |>
       dplyr::bind_rows() |>
-      dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
       dplyr::mutate(feature_id = as.numeric(feature_id))
 
     log_debug("... features table")
