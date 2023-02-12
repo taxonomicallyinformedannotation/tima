@@ -27,14 +27,23 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   if (tool == "gnps") {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {
-    stopifnot("Your input file does not exist" = file.exists(input))
+    stopifnot(
+      "Input file(s) do(es) not exist" =
+        rep(TRUE, length(input)) ==
+          lapply(X = input, file.exists)
+    )
     stopifnot("Your components file does not exist" = file.exists(components))
   }
   stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
-  table <- readr::read_delim(file = input) |>
+  table <- lapply(
+    X = input,
+    FUN = readr::read_delim
+  ) |>
+    dplyr::bind_rows() |>
+    dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
     dplyr::mutate(feature_id = as.numeric(feature_id))
 
   log_debug(x = "... cluster table")

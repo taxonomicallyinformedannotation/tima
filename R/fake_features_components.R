@@ -17,78 +17,89 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-fake_features_components <- function(input = params$files$annotations$pretreated,
-                                     features = params$files$features$raw,
-                                     output = params$files$annotations$filled,
-                                     ms_mode = params$ms$polarity,
-                                     name_rt = params$names$rt,
-                                     name_mz = params$names$precursor) {
-  # Check that input and features files exist
-  stopifnot("Your input file does not exist" = file.exists(input))
-  stopifnot("Your features file does not exist" = file.exists(features))
-
-  # Check that ms_mode is valid
-  stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
-
-  # Read input and features files
-  log_debug("Loading files ...")
-  log_debug("... features table")
-  table <- readr::read_delim(file = input) |>
-    dplyr::mutate(feature_id = as.numeric(feature_id))
-  features <- readr::read_delim(file = features) |>
-    dplyr::mutate(feature_id = as.numeric(feature_id))
-
-  # Initialize components data frame
-  components <- dplyr::mutate(table, component_id = -1)
-
-  # Select relevant columns from features data frame
-  features_meta <-
-    dplyr::select(
-      features,
-      feature_id,
-      rt := !!as.name(name_rt),
-      mz := !!as.name(name_mz)
+fake_features_components <-
+  function(input = params$files$annotations$pretreated,
+           features = params$files$features$raw,
+           output = params$files$annotations$filled,
+           ms_mode = params$ms$polarity,
+           name_rt = params$names$rt,
+           name_mz = params$names$precursor) {
+    # Check that input and features files exist
+    stopifnot(
+      "Input file(s) do(es) not exist" =
+        rep(TRUE, length(input)) ==
+          lapply(X = input, file.exists)
     )
+    stopifnot("Your features file does not exist" = file.exists(features))
 
-  # Merge data frames and remove duplicate rows
-  log_debug("Adding components to features")
-  table_filled <-
-    dplyr::arrange(
-      dplyr::distinct(dplyr::left_join(
-        dplyr::left_join(components, table), features_meta
-      )),
-      dplyr::desc(score_input),
-      as.numeric(feature_id)
+    # Check that ms_mode is valid
+    stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
+
+    # Read input and features files
+    log_debug("Loading files ...")
+    table <- lapply(
+      X = input,
+      FUN = readr::read_delim
     ) |>
-    dplyr::select(
-      feature_id,
-      component_id,
-      rt,
-      mz,
-      inchikey_2D,
-      smiles_2D,
-      molecular_formula,
-      structure_exact_mass,
-      score_input,
-      library,
-      structure_taxonomy_npclassifier_01pathway,
-      structure_taxonomy_npclassifier_02superclass,
-      structure_taxonomy_npclassifier_03class
-    )
+      dplyr::bind_rows() |>
+      dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
+      dplyr::mutate(feature_id = as.numeric(feature_id))
 
-  log_debug(x = "Calculating mz error")
-  ## TODO can be improved
-  if (ms_mode == "pos") {
-    table_filled <- table_filled |>
-      dplyr::mutate(mz_error = as.numeric(mz) -
-        1.007276 -
-        as.numeric(structure_exact_mass))
-  } else {
-    table_filled <- table_filled |>
-      dplyr::mutate(mz_error = as.numeric(mz) + 1.007276 - as.numeric(structure_exact_mass))
+    log_debug("... features table")
+    features <- readr::read_delim(file = features) |>
+      dplyr::mutate(feature_id = as.numeric(feature_id))
+
+    # Initialize components data frame
+    components <- dplyr::mutate(table, component_id = -1)
+
+    # Select relevant columns from features data frame
+    features_meta <-
+      dplyr::select(
+        features,
+        feature_id,
+        rt := !!as.name(name_rt),
+        mz := !!as.name(name_mz)
+      )
+
+    # Merge data frames and remove duplicate rows
+    log_debug("Adding components to features")
+    table_filled <-
+      dplyr::arrange(
+        dplyr::distinct(dplyr::left_join(
+          dplyr::left_join(components, table), features_meta
+        )),
+        dplyr::desc(score_input),
+        as.numeric(feature_id)
+      ) |>
+      dplyr::select(
+        feature_id,
+        component_id,
+        rt,
+        mz,
+        inchikey_2D,
+        smiles_2D,
+        molecular_formula,
+        structure_exact_mass,
+        score_input,
+        library,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class
+      )
+
+    log_debug(x = "Calculating mz error")
+    ## TODO can be improved
+    if (ms_mode == "pos") {
+      table_filled <- table_filled |>
+        dplyr::mutate(mz_error = as.numeric(mz) -
+          1.007276 -
+          as.numeric(structure_exact_mass))
+    } else {
+      table_filled <- table_filled |>
+        dplyr::mutate(mz_error = as.numeric(mz) + 1.007276 - as.numeric(structure_exact_mass))
+    }
+
+    log_debug(x = "Exporting ...")
+    export_params(step = "prepare_features_components")
+    export_output(x = table_filled, file = output)
   }
-
-  log_debug(x = "Exporting ...")
-  export_params(step = "prepare_features_components")
-  export_output(x = table_filled, file = output)
-}
