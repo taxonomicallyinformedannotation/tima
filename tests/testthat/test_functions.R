@@ -139,13 +139,13 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   #### Fake no RT
   fake_no_rt(
-    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled.tsv.gz",
-    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz"
+    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz",
+    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled_no_rt.tsv.gz"
   )
   #### Fake no RT classification
   prepare_features_classification(
-    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_filled_no_rt.tsv.gz",
-    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz"
+    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled_no_rt.tsv.gz",
+    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz"
   )
   #### Normal
   prepare_features_classification()
@@ -162,66 +162,103 @@ testthat::test_that("Whole process", {
   process_annotations()
   ### No MS1
   process_annotations(
-    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz",
     annotate = FALSE
   )
   ### Only MS1
   process_annotations(
-    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_treated_no_rt.tsv.gz",
+    isdb = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz",
     ms_mode = "neg",
     ms1_only = TRUE
   )
 
   ## CLI arguments check
   arguments <<- character()
-  arguments$approx <<- "x"
-  arguments$biological <<- "x"
-  arguments$column.name <<- "x"
-  arguments$complement <<- "x"
-  arguments$components <<- "x"
-  arguments$condition <<- "x"
-  arguments$dalton <<- "x"
-  arguments$directory <<- "x"
-  arguments$edges <<- "x"
-  arguments$extension <<- "x"
+  arguments$ann_can_ini <<- "x"
+  arguments$ann_can_fin <<- "x"
+  arguments$ann_ms1only <<- "x"
+  arguments$ann_ms1_ann <<- "x"
+  arguments$ann_ms1_thr_bio <<- "x"
+  arguments$ann_ms1_thr_che <<- "x"
+  arguments$ann_ms1_thr_con <<- "x"
+  arguments$ann_ms2_app <<- "x"
+  arguments$ann_ms2_met <<- "x"
+  arguments$ann_ms2_thr_con <<- "x"
+  arguments$ann_ms2_thr_pea_abs <<- "x"
+  arguments$ann_ms2_thr_pea_rat <<- "x"
+  arguments$ann_ms2_thr_sim <<- "x"
+  arguments$fil_ann_raw_spe <<- "x"
+  arguments$fil_ann_raw_sir <<- "x"
+  arguments$fil_ann_pre <<- "x"
+  arguments$fil_ann_fil <<- "x"
+  arguments$fil_ann_tre <<- "x"
+  arguments$fil_ann_pro <<- "x"
+  arguments$fil_fea_raw <<- "x"
+  arguments$fil_lib_add_pro <<- "x"
+  arguments$fil_lib_sop_raw_clo <<- "x"
+  arguments$fil_lib_sop_raw_lot <<- "x"
+  arguments$fil_lib_sop_pro <<- "x"
+  arguments$fil_lib_sop_mer <<- "x"
+  arguments$fil_lib_spe_neg <<- "x"
+  arguments$fil_lib_spe_pos <<- "x"
+  arguments$fil_net_spe_edg_raw <<- "x"
+  arguments$fil_net_spe_edg_pro <<- "x"
+  arguments$fil_net_spe_com_raw <<- "x"
+  arguments$fil_tax_raw <<- "x"
+  arguments$fil_tax_pro <<- "x"
+  arguments$fil_spe_raw <<- "x"
+  arguments$gnps_id <<- "x"
+  arguments$gnps_nap <<- "x"
+  arguments$gnps_workflow <<- "x"
+  arguments$ms_add_neg <<- "x"
+  arguments$ms_add_pos <<- "x"
+  arguments$ms_int_thr_ms1 <<- "x"
+  arguments$ms_int_thr_ms2 <<- "x"
+  arguments$ms_pol <<- "x"
+  arguments$ms_tol_mas_ppm_ms1 <<- "x"
+  arguments$ms_tol_mas_ppm_ms2 <<- "x"
+  arguments$ms_tol_mas_dal_ms1 <<- "x"
+  arguments$ms_tol_mas_dal_ms2 <<- "x"
+  arguments$ms_tol_rt_min <<- "x"
+  arguments$names_extension <<- "x"
+  arguments$names_features <<- "x"
+  arguments$names_precursor <<- "x"
+  arguments$names_rt <<- "x"
+  arguments$names_source <<- "x"
+  arguments$names_target <<- "x"
+  arguments$names_taxon <<- "x"
+  arguments$org_can <<- "x"
+  arguments$org_fil_mod <<- "x"
+  arguments$org_fil_lev <<- "x"
+  arguments$org_fil_val <<- "x"
+  arguments$org_tax <<- "x"
+  arguments$too_met <<- "x"
+  arguments$too_net_spe_com <<- "x"
+  arguments$too_net_spe_edg <<- "x"
+  arguments$wei_glo_bio <<- "x"
+  arguments$wei_glo_che <<- "x"
+  arguments$wei_glo_spe <<- "x"
+  arguments$wei_bio_01 <<- "x"
+  arguments$wei_bio_02 <<- "x"
+  arguments$wei_bio_03 <<- "x"
+  arguments$wei_bio_04 <<- "x"
+  arguments$wei_bio_05 <<- "x"
+  arguments$wei_bio_06 <<- "x"
+  arguments$wei_bio_07 <<- "x"
+  arguments$wei_bio_08 <<- "x"
+  arguments$wei_bio_09 <<- "x"
+  arguments$wei_bio_10 <<- "x"
+  arguments$wei_bio_11 <<- "x"
+  arguments$wei_bio_12 <<- "x"
+  arguments$wei_bio_13 <<- "x"
+  arguments$wei_bio_14 <<- "x"
+  arguments$wei_bio_15 <<- "x"
+  arguments$wei_che_01 <<- "x"
+  arguments$wei_che_02 <<- "x"
+  arguments$wei_che_03 <<- "x"
   arguments$fast <<- "x"
-  arguments$features <<- "x"
-  arguments$filter <<- "x"
-  arguments$gnps <<- "x"
-  arguments$input <<- "x"
-  arguments$isdb <<- "x"
-  arguments$j.top <<- "x"
-  arguments$k.top <<- "x"
-  arguments$level <<- "x"
-  arguments$library <<- "x"
-  arguments$method <<- "x"
-  arguments$mode <<- "x"
-  arguments$ms <<- "x"
-  arguments$name <<- "x"
-  arguments$nap <<- "x"
-  arguments$npc <<- "x"
-  arguments$npeaks <<- "x"
-  arguments$output <<- "x"
-  arguments$parallel <<- "x"
-  arguments$ppm <<- "x"
-  arguments$precursor <<- "x"
-  arguments$qemical <<- "x"
-  arguments$quickmode <<- "x"
-  arguments$qutoff <<- "x"
-  arguments$rpeaks <<- "x"
-  arguments$rt <<- "x"
-  arguments$similarity <<- "x"
-  arguments$source <<- "x"
-  arguments$spectral <<- "x"
-  arguments$target <<- "x"
-  arguments$taxon <<- "x"
-  arguments$threshold <<- "x"
-  arguments$tool <<- "x"
-  arguments$value <<- "x"
-  arguments$workflow <<- "x"
-  arguments$xbim <<- "x"
-  arguments$zirius <<- "x"
   arguments$force <<- "x"
+  arguments$parallel <<- "x"
 
   parse_cli_params()
 
