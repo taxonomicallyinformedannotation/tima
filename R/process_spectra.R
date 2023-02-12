@@ -10,6 +10,7 @@
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param library Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)
+#' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
 #' @param method Method to be used to perform spectral comparison
 #' @param threshold Minimal similarity to report
@@ -34,6 +35,7 @@
 #' @examples NULL
 process_spectra <- function(input = params$files$spectral$raw,
                             library = params$files$libraries$spectral,
+                            polarity = params$ms$polarity,
                             output = params$files$annotations$raw$spectral,
                             method = params$annotations$ms2$method,
                             threshold = params$annotations$ms2$thresholds$similarity,
@@ -47,6 +49,8 @@ process_spectra <- function(input = params$files$spectral$raw,
                             fast = params$options$fast,
                             approx = params$annotations$ms2$approx) {
   stopifnot("Your input file does not exist." = file.exists(input))
+  stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
+  library <- library[[polarity]]
   if (file.exists(library |>
     gsub(
       pattern = ".mgf",
