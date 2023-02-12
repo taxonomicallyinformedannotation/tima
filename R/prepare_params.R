@@ -34,8 +34,10 @@ prepare_params <- function(filename = params$files$pattern,
     gsub(pattern = "config/default/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
 
-  yamls_default <<- lapply(X = yaml_files,
-                           FUN = yaml::read_yaml)
+  yamls_default <<- lapply(
+    X = yaml_files,
+    FUN = yaml::read_yaml
+  )
   names(yamls_default) <<- yaml_names
 
   yamls_params <- yamls_default
@@ -115,8 +117,10 @@ prepare_params <- function(filename = params$files$pattern,
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {
-      yaml::write_yaml(x = yamls_params[[x]],
-                       file = yaml_export[x])
+      yaml::write_yaml(
+        x = yamls_params[[x]],
+        file = yaml_export[x]
+      )
     }
   )
 }
