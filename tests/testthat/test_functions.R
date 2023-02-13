@@ -44,11 +44,11 @@ testthat::test_that("Whole process", {
   ## smaller version for testing
   create_dir(paths$data$source$spectra$lotus$pos)
   utils::download.file(
-    url = paths$url$example_spectral_lib,
+    url = paths$url$examples$spectral_lib,
     destfile = paths$data$source$spectra$lotus$pos
   )
   utils::download.file(
-    url = paths$url$example_spectral_lib,
+    url = paths$url$examples$spectral_lib,
     destfile = paths$data$source$spectra$lotus$neg
   )
 
