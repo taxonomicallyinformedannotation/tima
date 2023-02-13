@@ -65,6 +65,11 @@ prepare_closed <- function(input = params$files$libraries$sop$raw$closed,
         organism_taxonomy_09species,
         organism_taxonomy_10varietas
       ) |>
+      # Round to 5 digits to avoid small discrepancies
+      dplyr::mutate(
+        structure_exact_mass = round(structure_exact_mass, digits = 5),
+        structure_xlogp = round(structure_xlogp, digits = 5)
+      ) |>
       dplyr::distinct() |>
       dplyr::mutate(reference_doi = NA)
 

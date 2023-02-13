@@ -74,6 +74,11 @@ prepare_lotus <-
         organism_taxonomy_10varietas,
         reference_doi
       ) |>
+      # Round to 5 digits to avoid small discrepancies
+      dplyr::mutate(
+        structure_exact_mass = round(structure_exact_mass, digits = 5),
+        structure_xlogp = round(structure_xlogp, digits = 5)
+      ) |>
       # Keep only unique rows
       dplyr::distinct()
 

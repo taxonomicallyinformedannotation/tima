@@ -116,6 +116,11 @@ prepare_hmdb <- function(input = paths$data$source$libraries$hmdb,
       organism_taxonomy_09species = "Homo sapiens",
       organism_taxonomy_10varietas = NA_character_
     ) |>
+    # Round to 5 digits to avoid small discrepancies
+    dplyr::mutate(
+      structure_exact_mass = round(structure_exact_mass, digits = 5),
+      structure_xlogp = round(structure_xlogp, digits = 5)
+    ) |>
     dplyr::distinct() |>
     dplyr::mutate(reference_doi = NA)
 
