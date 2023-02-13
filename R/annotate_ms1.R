@@ -142,11 +142,7 @@ annotate_ms1 <-
         g = adductsTable$adduct
       ) |>
       dplyr::mutate(Distance_2 = Distance) |>
-      dplyr::select(
-        -Item1,
-        -Item2,
-        -Label
-      ) |>
+      dplyr::select(-Item1, -Item2, -Label) |>
       data.table::data.table()
 
     log_debug("setting joining keys \n")
@@ -178,8 +174,7 @@ annotate_ms1 <-
       dplyr::distinct(
         feature_id,
         label,
-        label_dest,
-        !!as.name(paste("feature_id", "dest", sep = "_"))
+        label_dest, !!as.name(paste("feature_id", "dest", sep = "_"))
       )
 
     log_debug("keeping initial and destination feature \n")
@@ -290,10 +285,17 @@ annotate_ms1 <-
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::distinct(
         structure_exact_mass,
-        structure_molecular_formula,
-        structure_inchikey_2D,
-        structure_smiles_2D
+        structure_molecular_formula
       )
+    df13_b <- structureOrganismPairsTable |>
+      dplyr::filter(!is.na(structure_exact_mass)) |>
+      dplyr::distinct(
+        structure_exact_mass,
+        molecular_formula = structure_molecular_formula,
+        inchikey_2D = structure_inchikey_2D,
+        smiles_2D = structure_smiles_2D
+      ) |>
+      dplyr::mutate_all(as.character)
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
@@ -321,13 +323,9 @@ annotate_ms1 <-
     ) |>
       dplyr::select(
         molecular_formula = structure_molecular_formula,
-        inchikey_2D = structure_inchikey_2D,
-        smiles_2D = structure_smiles_2D,
         library,
-        dplyr::everything(),
-        -exact_mass
+        dplyr::everything(), -exact_mass
       ) |>
-      dplyr::filter(!is.na(inchikey_2D)) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
 
@@ -365,11 +363,9 @@ annotate_ms1 <-
             2 * adductsM["Na (sodium)"]) / 3,
           pos_3_3sodium = (mz - adduct_mass + 3 * adductsM["Na (sodium)"]) / 3,
           pos_2_2proton = (mz - adduct_mass + 2 * adductsM["H (proton)"]) / 2,
-          pos_2_2proton1ammonium = (
-            mz - adduct_mass +
-              2 * adductsM["H (proton)"] +
-              adductsM["NH4 (ammonium)"]
-          ) / 2,
+          pos_2_2proton1ammonium = (mz - adduct_mass +
+            2 * adductsM["H (proton)"] +
+            adductsM["NH4 (ammonium)"]) / 2,
           pos_2_1proton1sodium = (mz - adduct_mass +
             adductsM["H (proton)"] +
             adductsM["Na (sodium)"]) / 2,
@@ -380,24 +376,18 @@ annotate_ms1 <-
             adductsM["K (potassium)"]) / 2,
           pos_2_1calcium = (mz - adduct_mass +
             adductsM["Ca (calcium)"]) / 2,
-          pos_2_2proton1acetonitrile = (
-            mz - adduct_mass +
-              2 * adductsM["H (proton)"] +
-              adductsM["C2H3N (acetonitrile)"]
-          ) / 2,
+          pos_2_2proton1acetonitrile = (mz - adduct_mass +
+            2 * adductsM["H (proton)"] +
+            adductsM["C2H3N (acetonitrile)"]) / 2,
           pos_2_2sodium = (mz - adduct_mass + 2 * adductsM["Na (sodium)"]) / 2,
           pos_2_1iron = (mz - adduct_mass +
             adductsM["Fe (iron)"]) / 2,
-          pos_2_2proton2acetonitrile = (
-            mz - adduct_mass +
-              2 * adductsM["H (proton)"] +
-              2 * adductsM["C2H3N (acetonitrile)"]
-          ) / 2,
-          pos_2_2proton3acetonitrile = (
-            mz - adduct_mass +
-              2 * adductsM["H (proton)"] +
-              3 * adductsM["C2H3N (acetonitrile)"]
-          ) / 2,
+          pos_2_2proton2acetonitrile = (mz - adduct_mass +
+            2 * adductsM["H (proton)"] +
+            2 * adductsM["C2H3N (acetonitrile)"]) / 2,
+          pos_2_2proton3acetonitrile = (mz - adduct_mass +
+            2 * adductsM["H (proton)"] +
+            3 * adductsM["C2H3N (acetonitrile)"]) / 2,
           pos_2MMg = (2 * (mz - adduct_mass) + adductsM["Mg (magnesium)"]) / 2,
           pos_2MCa = (2 * (mz - adduct_mass) + adductsM["Ca (calcium)"]) / 2,
           pos_2MFe = (2 * (mz - adduct_mass) + adductsM["Fe (iron)"]) / 2,
@@ -528,18 +518,16 @@ annotate_ms1 <-
       )
 
     df22 <-
-      dplyr::left_join(df21, df13, by = stats::setNames("structure_exact_mass", "exact_mass")) |>
+      dplyr::left_join(df21,
+        df13,
+        by = stats::setNames("structure_exact_mass", "exact_mass")
+      ) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
         molecular_formula = structure_molecular_formula,
-        inchikey_2D = structure_inchikey_2D,
-        smiles_2D = structure_smiles_2D,
         library = library_name,
-        dplyr::everything(),
-        -exact_mass,
-        -adduct_value
+        dplyr::everything(), -exact_mass, -adduct_value
       ) |>
-      dplyr::filter(!is.na(inchikey_2D)) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
       dplyr::distinct()
@@ -563,7 +551,14 @@ annotate_ms1 <-
     log_debug(
       "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
     )
-    df24 <- dplyr::bind_rows(df23, df14, df22) |>
+    df24 <- dplyr::bind_rows(
+      df23,
+      df14 |>
+        dplyr::left_join(df13_b),
+      df22 |>
+        dplyr::left_join(df13_b)
+    ) |>
+      dplyr::filter(!is.na(inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
