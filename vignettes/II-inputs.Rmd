@@ -115,16 +115,6 @@ Before running the corresponding code, do not forget to modify `config/params/pr
 source(file = "inst/scripts/prepare_adducts.R")
 ```
 
-## Adducts library
-
-As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS1 annotation later on.
-
-Before running the corresponding code, do not forget to modify `config/params/prepare_adducts.yaml`.
-
-```{r}
-source(file = "inst/scripts/prepare_adducts.R")
-```
-
 ## Spectral libraries
 
 ### Experimental

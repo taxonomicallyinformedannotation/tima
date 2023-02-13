@@ -43,7 +43,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
     X = input,
     FUN = readr::read_delim
   ) |>
-    purrr::map(.f = mutate_all, as.character) |>
+    purrr::map(.f = dplyr::mutate_all, as.character) |>
     dplyr::bind_rows() |>
     dplyr::mutate(feature_id = as.numeric(feature_id))
 
