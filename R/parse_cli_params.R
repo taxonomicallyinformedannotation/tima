@@ -116,9 +116,6 @@ parse_cli_params <- function() {
     if (!is.null(arguments$gnps_id)) {
       params$gnps$id <- as.character(arguments$gnps_id)
     }
-    if (!is.null(arguments$gnps_nap)) {
-      params$gnps$nap <- as.character(arguments$gnps_nap)
-    }
     if (!is.null(arguments$gnps_workflow)) {
       params$gnps$workflow <- as.character(arguments$gnps_workflow)
     }

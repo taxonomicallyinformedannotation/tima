@@ -11,7 +11,7 @@ params <- get_params(step = step)
 
 log_debug(
   "This script",
-  crayon::green("formats GNPS (and NAP) results")
+  crayon::green("formats GNPS results")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")

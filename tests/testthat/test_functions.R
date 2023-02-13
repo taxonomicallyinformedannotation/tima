@@ -209,7 +209,6 @@ testthat::test_that("Whole process", {
   arguments$fil_tax_pro <<- "x"
   arguments$fil_spe_raw <<- "x"
   arguments$gnps_id <<- "x"
-  arguments$gnps_nap <<- "x"
   arguments$gnps_workflow <<- "x"
   arguments$ms_add_neg <<- "x"
   arguments$ms_add_pos <<- "x"

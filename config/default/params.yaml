@@ -189,9 +189,6 @@ gnps:
   #' GNPS job ID. STRING
   id: 96fa7c88200e4a03bee4644e581e3fb0
 
-  #' OPTIONAL. If exists. NAP job ID. STRING
-  nap: ~
-
   #' Workflow used within GNPS.
   #' Currently "fbmn" or "classical" supported. STRING
   workflow: fbmn

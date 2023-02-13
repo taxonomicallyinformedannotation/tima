@@ -3,7 +3,6 @@
 #' @description This function prepares GNPS obtained annotations for further use
 #'
 #' @param gnps_job_id GNPS job ID
-#' @param nap_job_id NAP job ID
 #' @param output Output file
 #'
 #' @return NULL
@@ -17,12 +16,8 @@
 #' @examples NULL
 prepare_gnps <-
   function(gnps_job_id = params$gnps$id,
-           nap_job_id = params$gnps$nap,
            output = params$files$annotations$pretreated) {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
-    if (!is.null(nap_job_id)) {
-      stopifnot("Your NAP job ID is invalid" = stringr::str_length(string = nap_job_id) == 32)
-    }
 
     log_debug("Loading and formatting GNPS results")
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
@@ -45,37 +40,7 @@ prepare_gnps <-
         smiles_2D = NA,
         molecular_formula = NA
       ) |>
-      complement_metadata()
-
-    if (!is.null(nap_job_id)) {
-      log_debug("Loading NAP results")
-      ## TODO look at recent NAP outputs... failing for now
-      table_nap <- read_nap(id = nap_job_id) |>
-        dplyr::select(
-          feature_id = cluster.index,
-          smiles = FusionSMILES,
-          score_input = FusionScore
-        ) |>
-        dplyr::mutate(
-          inchikey = NA,
-          inchikey_2D = NA,
-          structure_taxonomy_npclassifier_01pathway = NA,
-          structure_taxonomy_npclassifier_02superclass = NA,
-          structure_taxonomy_npclassifier_03class = NA,
-          structure_exact_mass = NA
-        ) |>
-        dplyr::mutate(
-          library = "GNPS (NAP)",
-          smiles_2D = NA,
-          molecular_formula = NA
-        ) |>
-        complement_metadata()
-
-      table <- table |>
-        dplyr::bind_rows(table_nap)
-    }
-
-    table <- table |>
+      complement_metadata() |>
       dplyr::mutate_all(as.character) |>
       dplyr::mutate_all(dplyr::na_if, "N/A")
 

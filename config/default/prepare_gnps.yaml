@@ -18,6 +18,3 @@ gnps:
   #' Workflow used within GNPS.
   #' Currently "fbmn" or "classical" supported. STRING
   workflow: fbmn
-  
-  #' OPTIONAL. If exists. NAP job ID. STRING
-  nap: ~

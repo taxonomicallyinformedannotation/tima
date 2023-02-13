@@ -15,7 +15,6 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
-      example_isdb_no_rt: data/interim/annotations/example_isdb_no_rt.tsv.gz
       example_sirius: data/interim/annotations/example_sirius.zip
     config:
       path: data/interim/config
@@ -54,7 +53,6 @@ data:
     examples:
       path: data/source/examples
       features: data/source/examples/features.tsv.gz
-      features_no_rt: data/source/examples/features_no_rt.tsv.gz
       spectra: data/source/examples/example.mgf
     libraries:
       path: data/source/libraries
