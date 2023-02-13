@@ -13,7 +13,7 @@
 #'
 #' @examples NULL
 get_example_sirius <-
-  function(url = paths$url$example_sirius,
+  function(url = paths$url$examples$sirius,
            export = paths$data$interim$annotations$example_sirius) {
     options(timeout = 600)
     message("Timeout for download is ", getOption("timeout"), " seconds")

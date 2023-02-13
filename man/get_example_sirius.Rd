@@ -5,7 +5,7 @@
 \title{Get example sirius}
 \usage{
 get_example_sirius(
-  url = paths$url$example_sirius,
+  url = paths$url$examples$sirius,
   export = paths$data$interim$annotations$example_sirius
 )
 }

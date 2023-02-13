@@ -295,6 +295,13 @@ annotate_ms1 <-
         inchikey_2D = structure_inchikey_2D,
         smiles_2D = structure_smiles_2D
       ) |>
+      # Avoid SMILES redundancy
+      dplyr::distinct(
+        inchikey_2D,
+        molecular_formula,
+        structure_exact_mass,
+        .keep_all = TRUE
+      ) |>
       dplyr::mutate_all(as.character)
 
     ## TODO This will then be externalized somehow
