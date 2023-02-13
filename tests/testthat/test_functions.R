@@ -153,6 +153,11 @@ testthat::test_that("Whole process", {
   ### Taxa
   step <- "prepare_taxa"
   params <- get_params(step = step)
+  ## Forcing all features to a single source organism
+  prepare_taxa(taxon = "Homo sapiens")
+  ## Without file extension in the column names
+  prepare_taxa(extension = FALSE)
+  ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
 
   ## Perform TIMA
