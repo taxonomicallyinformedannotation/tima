@@ -6,14 +6,11 @@
 \usage{
 prepare_gnps(
   gnps_job_id = params$gnps$id,
-  nap_job_id = params$gnps$nap,
   output = params$files$annotations$pretreated
 )
 }
 \arguments{
 \item{gnps_job_id}{GNPS job ID}
-
-\item{nap_job_id}{NAP job ID}
 
 \item{output}{Output file}
 }

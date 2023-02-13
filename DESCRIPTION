@@ -95,7 +95,6 @@ Collate:
     'read_edges.R'
     'read_features.R'
     'read_metadata.R'
-    'read_nap.R'
     'read_results.R'
     'replace_gnps_job_id.R'
     'treat_names_sirius.R'
