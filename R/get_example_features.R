@@ -1,4 +1,4 @@
-#' @title Get example feature table
+#' @title Get example features
 #'
 #' @description This function gets an example feature table to work with
 #'
@@ -12,7 +12,7 @@
 #' @importFrom readr read_tsv write_tsv
 #'
 #' @examples NULL
-get_example_feature_table <-
+get_example_features <-
   function(url = paths$urls$examples$features,
            export = paths$data$source$examples$features) {
     # Create the export directory if it does not exist
