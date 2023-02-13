@@ -146,7 +146,7 @@ paths <- yaml::read_yaml(
 )
 create_dir(export = paths$data$source$example$mgf)
 utils::download.file(
-  url = paths$url$example_mgf_mini,
+  url = paths$url$examples$mgf_mini,
   destfile = paths$data$source$example$mgf
 )
 ```

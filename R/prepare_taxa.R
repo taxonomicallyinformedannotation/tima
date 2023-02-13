@@ -59,7 +59,7 @@ prepare_taxa <-
 
     log_debug(x = "Loading taxa ranks dictionary")
     taxa_ranks_dictionary <-
-      readr::read_delim(file = paths$data$source$dictionaries$ranks)
+      readr::read_delim(file = paths$inst$extdata$ranks)
 
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")
