@@ -5,8 +5,8 @@
 \title{Get example feature table}
 \usage{
 get_example_feature_table(
-  url = paths$urls$example_feature_table,
-  export = paths$data$interim$features$example_feature_table
+  url = paths$urls$examples$features,
+  export = paths$data$source$examples$features
 )
 }
 \arguments{

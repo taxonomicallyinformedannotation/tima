@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz --fil-fea-raw data/interim/annotations/example_feature_table.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_faked_filled.tsv.gz --ms-pol pos --names-precursor mz --names-rt rt
+  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz --fil-fea-raw data/source/examples/features.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_faked_filled.tsv.gz --ms-pol pos --names-precursor mz --names-rt rt
 
 Usage: 
   fake_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-fea-raw=<fil-fea-raw>] [--ms-pol=<ms-pol>] [--names-precursor=<names-precursor>] [--names-rt=<names-rt>]

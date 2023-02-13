@@ -17,10 +17,10 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 ## Get all files
 
 #### MGF
-get_example_mgf(url = paths$url$example_mgf_mini)
+get_example_mgf(url = paths$url$examples$mgf_mini)
 
 ### SIRIUS
-get_example_sirius(url = paths$urls$example_sirius_mini)
+get_example_sirius(url = paths$urls$examples$sirius_mini)
 
 ### LOTUS
 log_debug("Getting LOTUS")

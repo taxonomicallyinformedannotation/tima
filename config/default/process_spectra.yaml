@@ -64,7 +64,7 @@ files:
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/example.mgf
+    raw: data/source/examples/example.mgf
 
 
 #' MS related parameters.

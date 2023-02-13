@@ -5,7 +5,7 @@ files:
   features: 
 
     #' Raw features file. STRING
-    raw: data/interim/features/example_feature_table.tsv.gz
+    raw: data/source/examples/features.tsv.gz
 
   #' Networks files.
   networks:

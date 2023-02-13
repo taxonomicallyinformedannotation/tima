@@ -15,7 +15,6 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
-      example_isdb: data/interim/annotations/example_isdb.tsv.gz
       example_isdb_no_rt: data/interim/annotations/example_isdb_no_rt.tsv.gz
       example_sirius: data/interim/annotations/example_sirius.zip
     config:
@@ -24,8 +23,6 @@ data:
       path: data/interim/edges
     features:
       path: data/interim/features
-      example_feature_table: data/interim/features/example_feature_table.tsv.gz
-      example_feature_table_no_rt: data/interim/features/example_feature_table_no_rt.tsv.gz
     libraries:
       path: data/interim/libraries
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
@@ -54,11 +51,11 @@ data:
     benchmark:
       path: data/source/benchmark
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
-    dictionaries:
-      path: data/source/dictionaries
-      ranks: inst/extdata/ranks.tsv
-    example:
-      mgf: data/source/example.mgf
+    examples:
+      path: data/source/examples
+      features: data/source/examples/features.tsv.gz
+      features_no_rt: data/source/examples/features_no_rt.tsv.gz
+      spectra: data/source/examples/example.mgf
     libraries:
       path: data/source/libraries
       hmdb: data/source/libraries/hmdb_metabolites.zip
@@ -92,13 +89,13 @@ tests:
   path: tests
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
-  example_feature_table: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
-  example_isdb: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_isdb.tsv.gz
-  example_mgf: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example.mgf
-  example_mgf_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_mini.mgf
-  example_sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
-  example_sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
-  example_spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
+  examples:
+    features: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
+    mgf: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example.mgf
+    mgf_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_mini.mgf
+    sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
+    sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
+    spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
   hmdb:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:

@@ -13,8 +13,8 @@
 #'
 #' @examples NULL
 get_example_mgf <-
-  function(url = paths$url$example_mgf,
-           export = paths$data$source$example$mgf) {
+  function(url = paths$url$examples$mgf,
+           export = paths$data$source$examples$spectra) {
     ## Set the timeout for download to 600 seconds
     options(timeout = 600)
     message("Timeout for download is ", getOption("timeout"), " seconds")

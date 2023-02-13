@@ -5,8 +5,8 @@
 \title{Get example MGF}
 \usage{
 get_example_mgf(
-  url = paths$url$example_mgf,
-  export = paths$data$source$example$mgf
+  url = paths$url$examples$mgf,
+  export = paths$data$source$examples$spectra
 )
 }
 \arguments{
