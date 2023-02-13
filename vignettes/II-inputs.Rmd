@@ -144,10 +144,10 @@ paths <- yaml::read_yaml(
     }
   )
 )
-create_dir(export = paths$data$source$example$mgf)
+create_dir(export = paths$data$source$examples$spectra)
 utils::download.file(
   url = paths$url$examples$mgf_mini,
-  destfile = paths$data$source$example$mgf
+  destfile = paths$data$source$examples$spectra
 )
 ```
 
