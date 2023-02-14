@@ -1,5 +1,13 @@
 # timaR
 
+# timaR 2.7.3
+
+* [Targets](https://books.ropensci.org/targets/) implementation
+* Parameters refactoring
+* Improved calculations over redundant formulas
+* Spectral matching update (see <https://github.com/rformassspectrometry/MetaboAnnotation/issues/93>)
+* Minor fixes
+
 # timaR 2.7.2
 
 * Benchmark update (including negative mode)

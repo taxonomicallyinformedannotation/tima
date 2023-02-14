@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima-r",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -275,6 +275,18 @@
     },
     "19": {
       "@type": "SoftwareApplication",
+      "identifier": "targets",
+      "name": "targets",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=targets"
+    },
+    "20": {
+      "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
       "provider": {
@@ -285,7 +297,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "20": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -297,7 +309,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "21": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -309,12 +321,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "22": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -329,7 +341,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2354.051KB",
+  "fileSize": "2417.263KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
