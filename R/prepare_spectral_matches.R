@@ -27,7 +27,7 @@ prepare_spectral_matches <-
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
-    table <- lapply(X = input, FUN = readr::read_delim) |>
+    table <- lapply(X = input, FUN = readr::read_delim, col_types = readr::cols(.default = "c")) |>
       dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
