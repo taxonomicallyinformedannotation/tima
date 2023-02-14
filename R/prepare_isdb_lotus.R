@@ -2,10 +2,9 @@
 #'
 #' @description This function prepares the LOTUS in silico generated spectra to be used for spectral matching
 #'
-#' @param input_pos File containing positive ionization LOTUS ISDB
-#' @param input_neg File containing negative ionization LOTUS ISDB
-#' @param output_pos Output for positive mode
-#' @param output_neg Output for negative mode
+#' @param input File containing LOTUS ISDB
+#' @param output Output file
+#' @param polarity MS polarity
 #' @param export_sqlite Boolean. Export to SQLite? TRUE or FALSE
 #'
 #' @return NULL
@@ -20,19 +19,12 @@
 #'
 #' @examples NULL
 prepare_isdb_lotus <-
-  function(input_pos = paths$data$source$spectra$lotus$pos,
-           input_neg = paths$data$source$spectra$lotus$neg,
-           output_pos = paths$data$interim$spectra$lotus$pos,
-           output_neg = paths$data$interim$spectra$lotus$neg,
+  function(input = paths$data$source$spectra$lotus$pos,
+           output = paths$data$interim$spectra$lotus$pos,
+           polarity = "pos",
            export_sqlite = TRUE) {
     if (export_sqlite == TRUE) {
-      output_pos <- output_pos |>
-        gsub(
-          pattern = ".mgf",
-          replacement = ".sqlite",
-          fixed = TRUE
-        )
-      output_neg <- output_neg |>
+      output <- output |>
         gsub(
           pattern = ".mgf",
           replacement = ".sqlite",
@@ -40,8 +32,7 @@ prepare_isdb_lotus <-
         )
     }
 
-    if (!file.exists(output_pos) ||
-      !file.exists(output_neg)) {
+    if (!file.exists(output)) {
       log_debug("Generating metadata ...")
       ## Probably better to store it before
       req <-
@@ -61,40 +52,23 @@ prepare_isdb_lotus <-
       )
     }
 
-    if (!file.exists(output_pos)) {
-      log_debug("Positive mode")
+    if (!file.exists(output)) {
       log_debug("Importing")
-      spectra_pos <- input_pos |>
+      spectra <- input |>
         import_spectra()
 
       log_debug("Harmonizing")
-      spectra_harmonized_pos <- spectra_pos |>
+      spectra_harmonized <- spectra |>
         extract_spectra() |>
-        harmonize_spectra()
+        harmonize_spectra(mode = polarity)
 
       log_debug("Exporting")
       export_spectra_2(
-        file = output_pos,
-        spectra = spectra_harmonized_pos,
+        file = output,
+        spectra = spectra_harmonized,
         meta = metad
       )
     }
-    if (!file.exists(output_neg)) {
-      log_debug("Negative mode")
-      log_debug("Importing")
-      spectra_neg <- input_neg |>
-        import_spectra()
 
-      log_debug("Harmonizing")
-      spectra_harmonized_neg <- spectra_neg |>
-        extract_spectra() |>
-        harmonize_spectra(mode = "neg")
-
-      log_debug("Exporting")
-      export_spectra_2(
-        file = output_neg,
-        spectra = spectra_harmonized_neg,
-        meta = metad
-      )
-    }
+    return(output)
   }

@@ -13,6 +13,7 @@
 #'
 #' @examples NULL
 get_params <- function(step) {
+  paths <- parse_yaml_paths()
   steps <- list.files(path = file.path(paths$inst$scripts$docopt)) |>
     stringr::str_remove(pattern = stringr::fixed(".txt"))
 

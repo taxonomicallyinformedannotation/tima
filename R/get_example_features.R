@@ -23,4 +23,6 @@ get_example_features <-
     # Write the resulting dataframe to the export path in tsv format
     readr::read_tsv(file = url, col_select = c(feature_id = `cluster index`, rt = RTMean, mz = `precursor mass`)) |>
       readr::write_tsv(file = export)
+
+    return(export)
   }

@@ -207,4 +207,6 @@ prepare_sirius <-
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_sirius")
     export_output(x = table, file = output[[1]])
+
+    return(output[[1]])
   }

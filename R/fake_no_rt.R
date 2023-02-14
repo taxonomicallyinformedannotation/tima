@@ -23,4 +23,6 @@ fake_no_rt <- function(input = paths$data$source$example$feature_table,
   # Export the modified data
   log_debug(x = "Exporting ...")
   export_output(x = feature_table, file = output)
+
+  return(output)
 }

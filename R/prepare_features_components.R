@@ -8,6 +8,7 @@
 #' @param components File containing the components if tool == 'manual'
 #' @param gnps_job_id GNPS job ID
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
+#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -24,7 +25,8 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
                                         tool = params$tools$networks$spectral$components,
                                         components = params$files$networks$spectral$components$raw,
                                         gnps_job_id = params$gnps$id,
-                                        ms_mode = params$ms$polarity) {
+                                        ms_mode = params$ms$polarity,
+                                        parameters = params) {
   if (tool == "gnps") {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {
@@ -37,6 +39,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   }
   stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
+  params <<- parameters
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
   table <- lapply(
@@ -119,4 +122,6 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   log_debug(x = "Exporting ...")
   export_params(step = "prepare_features_components")
   export_output(x = table_filled, file = output)
+
+  return(output)
 }

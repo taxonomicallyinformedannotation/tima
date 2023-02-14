@@ -6,6 +6,7 @@
 #' @param input Input file
 #' @param output Output file
 #' @param quickmode Boolean. If TRUE, runs fast but does not complete missing data
+#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -19,11 +20,13 @@ prepare_features_classification <-
   function(library = params$files$libraries$sop$merged,
            input = params$files$annotations$filled,
            output = params$files$annotations$treated,
-           quickmode = params$options$fast) {
+           quickmode = params$options$fast,
+           parameters = params) {
     stopifnot("Your input file does not exist" = file.exists(input))
     stopifnot("Your library file does not exist" = file.exists(library))
     stopifnot("Quickmode must be 'true' or 'false'" = quickmode %in% c(TRUE, FALSE))
 
+    params <<- parameters
     log_debug(x = "Loading files ...")
     log_debug(x = "... library")
     lotus <-
@@ -222,4 +225,6 @@ prepare_features_classification <-
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_classification")
     export_output(x = table_final, file = output)
+
+    return(output)
   }

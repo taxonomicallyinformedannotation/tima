@@ -28,4 +28,6 @@ get_example_spectra <-
       url = url,
       destfile = export
     )
+
+    return(export)
   }

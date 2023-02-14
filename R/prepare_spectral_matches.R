@@ -4,6 +4,7 @@
 #'
 #' @param input Input file
 #' @param output Output file
+#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -15,13 +16,15 @@
 #' @examples NULL
 prepare_spectral_matches <-
   function(input = params$files$annotations$raw$spectral,
-           output = params$files$annotations$pretreated) {
+           output = params$files$annotations$pretreated,
+           parameters = params) {
     # Check if input file exists
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
           lapply(X = input, file.exists)
     )
+    params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
     table <- lapply(X = input, FUN = readr::read_delim) |>
@@ -51,4 +54,6 @@ prepare_spectral_matches <-
     # Call export_params and export_output functions
     export_params(step = "prepare_spectral_matches")
     export_output(x = table, file = output[[1]])
+
+    return(output[[1]])
   }

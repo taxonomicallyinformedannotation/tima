@@ -4,6 +4,7 @@
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param output Output file
+#' @param parameters Parameters
 #'
 #' @return NULL
 #'
@@ -16,9 +17,10 @@
 #' @examples NULL
 prepare_gnps <-
   function(gnps_job_id = params$gnps$id,
-           output = params$files$annotations$pretreated) {
+           output = params$files$annotations$pretreated,
+           parameters = params) {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
-
+    params <<- parameters
     log_debug("Loading and formatting GNPS results")
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- read_results(id = gnps_job_id) |>
@@ -47,4 +49,6 @@ prepare_gnps <-
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_gnps")
     export_output(x = table, file = output[[1]])
+
+    return(output[[1]])
   }

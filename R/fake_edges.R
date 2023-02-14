@@ -46,4 +46,6 @@ fake_edges <- function(input = params$files$features$raw,
     directory = paths$data$interim$config$path,
     step = "prepare_edges"
   )
+
+  return(output)
 }
