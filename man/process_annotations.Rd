@@ -42,7 +42,8 @@ process_annotations(
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
-  force = params$options$force
+  force = params$options$force,
+  parameters = params
 )
 }
 \arguments{
@@ -121,6 +122,8 @@ process_annotations(
 \item{ms1_only}{Boolean. Keep only MS1 annotations}
 
 \item{force}{Force parameters. Use it at your own risk}
+
+\item{parameters}{Params}
 }
 \description{
 This function weights and eventually complements initial annotations.

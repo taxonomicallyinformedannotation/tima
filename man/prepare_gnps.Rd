@@ -6,13 +6,16 @@
 \usage{
 prepare_gnps(
   gnps_job_id = params$gnps$id,
-  output = params$files$annotations$pretreated
+  output = params$files$annotations$pretreated,
+  parameters = params
 )
 }
 \arguments{
 \item{gnps_job_id}{GNPS job ID}
 
 \item{output}{Output file}
+
+\item{parameters}{Parameters}
 }
 \description{
 This function prepares GNPS obtained annotations for further use

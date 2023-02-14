@@ -11,7 +11,8 @@ prepare_adducts(
   adducts_output_path = paths$data$interim$adducts$path,
   output_name = params$files$libraries$adducts$processed,
   masses_pos_output_path = paths$data$interim$adducts$pos,
-  masses_neg_output_path = paths$data$interim$adducts$neg
+  masses_neg_output_path = paths$data$interim$adducts$neg,
+  parameters = params
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ prepare_adducts(
 \item{masses_pos_output_path}{Path where positive adducts masses will be saved}
 
 \item{masses_neg_output_path}{Path where negative adducts masses will be saved}
+
+\item{parameters}{Parameters}
 }
 \description{
 This function prepares adducts for further use

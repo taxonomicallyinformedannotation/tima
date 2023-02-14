@@ -5,13 +5,17 @@
 \title{Prepare library}
 \usage{
 prepare_library(
+  files = params$files$libraries$sop$processed,
   filter = params$organisms$filter$mode,
   level = params$organisms$filter$level,
   value = params$organisms$filter$value,
-  output = params$files$libraries$sop$merged
+  output = params$files$libraries$sop$merged,
+  parameters = params
 )
 }
 \arguments{
+\item{files}{List of libraries to be merged}
+
 \item{filter}{Boolean. TRUE or FALSE if you want to filter the library}
 
 \item{level}{Biological rank to be filtered. Kingdom, phylum, family, genus, ...}
@@ -19,6 +23,8 @@ prepare_library(
 \item{value}{Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'}
 
 \item{output}{Output file}
+
+\item{parameters}{Param}
 }
 \description{
 This function prepares the library made of all sub-libraries containing structure-organism pairs

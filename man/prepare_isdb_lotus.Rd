@@ -5,21 +5,18 @@
 \title{Prepare LOTUS In Silico DataBase}
 \usage{
 prepare_isdb_lotus(
-  input_pos = paths$data$source$spectra$lotus$pos,
-  input_neg = paths$data$source$spectra$lotus$neg,
-  output_pos = paths$data$interim$spectra$lotus$pos,
-  output_neg = paths$data$interim$spectra$lotus$neg,
+  input = paths$data$source$spectra$lotus$pos,
+  output = paths$data$interim$spectra$lotus$pos,
+  polarity = "pos",
   export_sqlite = TRUE
 )
 }
 \arguments{
-\item{input_pos}{File containing positive ionization LOTUS ISDB}
+\item{input}{File containing LOTUS ISDB}
 
-\item{input_neg}{File containing negative ionization LOTUS ISDB}
+\item{output}{Output file}
 
-\item{output_pos}{Output for positive mode}
-
-\item{output_neg}{Output for negative mode}
+\item{polarity}{MS polarity}
 
 \item{export_sqlite}{Boolean. Export to SQLite? TRUE or FALSE}
 }

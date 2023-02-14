@@ -10,7 +10,8 @@ prepare_edges(
   input = params$files$networks$spectral$edges$raw,
   output = params$files$networks$spectral$edges$processed,
   name_source = params$names$source,
-  name_target = params$names$target
+  name_target = params$names$target,
+  parameters = params
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ prepare_edges(
 \item{name_source}{Name of the source features column}
 
 \item{name_target}{Name of the target features column}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares edges for further use

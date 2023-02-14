@@ -13,7 +13,8 @@ prepare_taxa(
   metadata = params$files$taxa$raw,
   top_k = params$organisms$candidates,
   output = params$files$taxa$processed,
-  taxon = params$organisms$taxon
+  taxon = params$organisms$taxon,
+  parameters = params
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ prepare_taxa(
 \item{output}{Output file}
 
 \item{taxon}{If you want to enforce all features to a given taxon, put its name here.}
+
+\item{parameters}{Params}
 }
 \description{
 This function performs taxon name preparation to match the Open Tree of Life taxonomy

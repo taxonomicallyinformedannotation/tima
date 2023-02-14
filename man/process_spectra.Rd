@@ -19,7 +19,8 @@ process_spectra(
   qutoff = params$ms$intensity$thresholds$ms2,
   parallel = params$options$parallel,
   fast = params$options$fast,
-  approx = params$annotations$ms2$approx
+  approx = params$annotations$ms2$approx,
+  parameters = params
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ process_spectra(
 \item{qutoff}{Intensity under which ms2 fragments will be removed previous to comparison.}
 
 \item{parallel}{Boolean. Process in parallel}
+
+\item{parameters}{Params}
 }
 \description{
 This function performs spectral matching.
