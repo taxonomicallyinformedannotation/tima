@@ -339,7 +339,8 @@ list(
   tar_file(name = features_components_prepared,
            command = {
              prepare_features_components(
-               input = spectral_matches_prepared,
+               # input = list(spectral_matches_prepared,gnps_prepared),
+               input = list(spectral_matches_prepared),
                output = params_features_components$files$annotations$filled,
                tool = params_features_components$tools$networks$spectral$components,
                components = params_features_components$files$networks$spectral$components$raw,
