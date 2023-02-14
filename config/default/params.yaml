@@ -129,7 +129,6 @@ files:
       #' List of prepared structure organism pairs libraries. STRING
       processed: 
         - data/interim/libraries/lotus_prepared.tsv.gz
-        - data/interim/libraries/closed_prepared.tsv.gz
 
       #' Merged structure organism pairs library. STRING
       merged: data/interim/libraries/library.tsv.gz
