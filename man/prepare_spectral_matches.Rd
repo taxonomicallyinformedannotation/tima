@@ -6,13 +6,16 @@
 \usage{
 prepare_spectral_matches(
   input = params$files$annotations$raw$spectral,
-  output = params$files$annotations$pretreated
+  output = params$files$annotations$pretreated,
+  parameters = params
 )
 }
 \arguments{
 \item{input}{Input file}
 
 \item{output}{Output file}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares the spectral matches obtained previously to make them compatible

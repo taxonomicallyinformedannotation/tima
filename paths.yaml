@@ -111,4 +111,4 @@ urls:
     pattern:
       pos: isdb_pos.mgf
       neg: isdb_neg.mgf
-version: 2.7.2
+version: 2.7.3

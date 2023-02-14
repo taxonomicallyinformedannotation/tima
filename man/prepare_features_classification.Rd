@@ -8,7 +8,8 @@ prepare_features_classification(
   library = params$files$libraries$sop$merged,
   input = params$files$annotations$filled,
   output = params$files$annotations$treated,
-  quickmode = params$options$fast
+  quickmode = params$options$fast,
+  parameters = params
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ prepare_features_classification(
 \item{output}{Output file}
 
 \item{quickmode}{Boolean. If TRUE, runs fast but does not complete missing data}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares the features chemical classes for further use

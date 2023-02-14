@@ -121,7 +121,7 @@ However, this will not help chemical weighting.
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
 
 ```{r}
-source(file = "inst/scripts/get_example_feature_table.R")
+source(file = "inst/scripts/get_example_features.R")
 ```
 
 ### Formatting

@@ -9,12 +9,12 @@ paths <- parse_yaml_paths()
 
 log_debug(
   "This script",
-  crayon::green("downloads an example of prepared MGF file. \n")
+  crayon::green("downloads an example of minimal feature table \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_example_mgf()
+get_example_features()
 
 end <- Sys.time()
 

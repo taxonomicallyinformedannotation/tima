@@ -1,4 +1,4 @@
-#' @title Get example feature table
+#' @title Get example features
 #'
 #' @description This function gets an example feature table to work with
 #'
@@ -12,7 +12,7 @@
 #' @importFrom readr read_tsv write_tsv
 #'
 #' @examples NULL
-get_example_feature_table <-
+get_example_features <-
   function(url = paths$urls$examples$features,
            export = paths$data$source$examples$features) {
     # Create the export directory if it does not exist
@@ -23,4 +23,6 @@ get_example_feature_table <-
     # Write the resulting dataframe to the export path in tsv format
     readr::read_tsv(file = url, col_select = c(feature_id = `cluster index`, rt = RTMean, mz = `precursor mass`)) |>
       readr::write_tsv(file = export)
+
+    return(export)
   }

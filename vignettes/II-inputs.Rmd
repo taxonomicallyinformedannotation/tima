@@ -142,7 +142,7 @@ utils::download.file(
 ```
 
 ```{r eval=FALSE, include=TRUE}
-source(file = "inst/scripts/get_example_mgf.R")
+source(file = "inst/scripts/get_example_spectra.R")
 ```
 
 ### *In silico*

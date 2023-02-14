@@ -1,4 +1,4 @@
-#' @title Get example MGF
+#' @title Get example spectra
 #'
 #' @description This function gets an example mgf file to work with
 #'
@@ -12,7 +12,7 @@
 #' @importFrom utils download.file
 #'
 #' @examples NULL
-get_example_mgf <-
+get_example_spectra <-
   function(url = paths$url$examples$mgf,
            export = paths$data$source$examples$spectra) {
     ## Set the timeout for download to 600 seconds
@@ -28,4 +28,6 @@ get_example_mgf <-
       url = url,
       destfile = export
     )
+
+    return(export)
   }

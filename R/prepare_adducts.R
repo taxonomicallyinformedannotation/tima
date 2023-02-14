@@ -9,6 +9,7 @@
 #' @param output_name Name of the file where adducts will be saved
 #' @param masses_pos_output_path Path where positive adducts masses will be saved
 #' @param masses_neg_output_path Path where negative adducts masses will be saved
+#' @param parameters Parameters
 #'
 #' @return NULL
 #'
@@ -26,9 +27,10 @@ prepare_adducts <-
            adducts_output_path = paths$data$interim$adducts$path,
            output_name = params$files$libraries$adducts$processed,
            masses_pos_output_path = paths$data$interim$adducts$pos,
-           masses_neg_output_path = paths$data$interim$adducts$neg) {
+           masses_neg_output_path = paths$data$interim$adducts$neg,
+           parameters = params) {
     stopifnot("Your input file does not exist" = file.exists(adducts_input))
-
+    params <<- parameters
     log_debug("Loading files ...")
     log_debug("... exact masses")
     masses <- readr::read_delim(
@@ -105,20 +107,24 @@ prepare_adducts <-
 
     log_debug("Exporting ...")
     export_params(step = "prepare_adducts")
+    output_pos <- file.path(
+      adducts_output_path,
+      paste0(output_name, "_pos.tsv.gz")
+    )
+    output_neg <- file.path(
+      adducts_output_path,
+      paste0(output_name, "_neg.tsv.gz")
+    )
     export_output(
       x = adducts_pos,
-      file = file.path(
-        adducts_output_path,
-        paste0(output_name, "_pos.tsv.gz")
-      )
+      file = output_pos
     )
     export_output(
       x = adducts_neg,
-      file = file.path(
-        adducts_output_path,
-        paste0(output_name, "_neg.tsv.gz")
-      )
+      file = output_neg
     )
     export_output(x = pure_pos, file = masses_pos_output_path)
     export_output(x = pure_neg, file = masses_neg_output_path)
+
+    return(c("pos" = output_pos, "neg" = output_neg))
   }

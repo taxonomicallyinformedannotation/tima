@@ -17,14 +17,13 @@
 import_spectra <- function(file) {
   file_ext <- stringr::str_remove(string = file, pattern = ".*\\.")
 
-  switch(
-    EXPR = file_ext,
+  switch(EXPR = file_ext,
     "mgf" = {
-      MsBackendMgf::readMgf(file) |>
+      MsBackendMgf::readMgf(f = file, msLevel = 2) |>
         Spectra::Spectra()
     },
     "sqlite" = {
-      CompoundDb::CompDb(file) |>
+      CompoundDb::CompDb(x = file) |>
         CompoundDb::Spectra()
     }
   )

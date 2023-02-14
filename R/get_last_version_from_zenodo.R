@@ -70,4 +70,5 @@ get_last_version_from_zenodo <-
     } else {
       message("A file with the same size is already present. Skipping")
     }
+    return(path)
   }

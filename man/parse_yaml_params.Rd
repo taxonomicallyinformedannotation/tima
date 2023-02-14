@@ -4,7 +4,12 @@
 \alias{parse_yaml_params}
 \title{Parse YAML parameters}
 \usage{
-parse_yaml_params()
+parse_yaml_params(def = default_path, par = params_path)
+}
+\arguments{
+\item{def}{Default path}
+
+\item{par}{Param path}
 }
 \value{
 A list containing the parameters specified in the YAML files

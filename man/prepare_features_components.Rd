@@ -10,7 +10,8 @@ prepare_features_components(
   tool = params$tools$networks$spectral$components,
   components = params$files$networks$spectral$components$raw,
   gnps_job_id = params$gnps$id,
-  ms_mode = params$ms$polarity
+  ms_mode = params$ms$polarity,
+  parameters = params
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ prepare_features_components(
 \item{gnps_job_id}{GNPS job ID}
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares the components (clusters in molecular network) for further use

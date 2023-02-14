@@ -22,4 +22,6 @@ get_benchmark <- function(url = paths$urls$benchmarking_set,
   curl::curl_download(url = url, destfile = tempfile()) |>
     readr::read_lines() |>
     readr::write_lines(file = export)
+
+  return(export)
 }

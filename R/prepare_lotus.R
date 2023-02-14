@@ -85,4 +85,6 @@ prepare_lotus <-
     log_debug(x = "Exporting ...")
     # Write modified data frame to output file
     export_output(x = lotus_prepared, file = output)
+
+    return(output)
   }

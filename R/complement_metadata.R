@@ -14,6 +14,7 @@
 #'
 #' @examples NULL
 complement_metadata <- function(df) {
+  paths <- parse_yaml_paths()
   # Fetch metadata from Zenodo
   log_debug("Trying to look for already computed metadata")
   get_last_version_from_zenodo(

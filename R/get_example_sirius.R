@@ -32,4 +32,6 @@ get_example_sirius <-
       zipfile = export,
       exdir = dirname(export)
     )
+
+    return(export)
   }
