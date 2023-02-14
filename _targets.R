@@ -20,11 +20,18 @@ options(clustermq.scheduler = "multicore")
 tar_source()
 
 # Replace the target list below with your own:
+## TODO ADD ALL FILES (input + config)
 list(
+  tar_file(
+    name = file_paths,
+    command = {
+      "paths.yaml"
+    }
+  ),
   tar_target(
     name = paths,
     command = {
-      parse_yaml_paths()
+      parse_yaml_paths(file = file_paths)
     }
   ),
   tar_target(

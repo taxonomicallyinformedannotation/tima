@@ -54,7 +54,7 @@ process_spectra <- function(input = params$files$spectral$raw,
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   params <<- parameters
   if (length(library) > 1) {
-    library <- library[polarity] |> as.character()
+    library <- library[polarity][[1]] |> as.character()
   }
   if (file.exists(library |>
     gsub(
