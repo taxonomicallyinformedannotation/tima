@@ -13,7 +13,7 @@
 #' @importFrom yaml read_yaml
 #'
 #' @examples NULL
-parse_yaml_params <- function(def = default_path ,par = params_path) {
+parse_yaml_params <- function(def = default_path, par = params_path) {
   # Initialize an empty list to store the parameters
   params <- list()
 

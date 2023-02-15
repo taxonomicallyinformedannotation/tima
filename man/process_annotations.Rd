@@ -39,6 +39,8 @@ process_annotations(
   tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
   tolerance_rt = params$ms$tolerances$rt$minutes,
   adducts_list = params$ms$adducts,
+  adducts_masses_list = paths$inst$extdata$adducts,
+  neutral_losses_list = paths$inst$extdata$neutral_losses,
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,

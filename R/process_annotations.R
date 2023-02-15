@@ -90,9 +90,11 @@ process_annotations <-
            tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
            tolerance_rt = params$ms$tolerances$rt$minutes,
            adducts_list = params$ms$adducts,
+           adducts_masses_list = paths$inst$extdata$adducts,
+           neutral_losses_list = paths$inst$extdata$neutral_losses,
            minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
-           # TODO ADD CONDITION
+           # TODO ADD CONDITION,
            ms1_only = params$annotations$ms1only,
            force = params$options$force,
            parameters = params) {
@@ -162,7 +164,10 @@ process_annotations <-
         "structure_xlogp"
       ), as.numeric)) |>
       ## COMMENT AR: else some redundancy because of reals
-      dplyr::mutate(structure_xlogp = round(structure_xlogp, digits = 5)) |>
+      dplyr::mutate(
+        structure_exact_mass = round(structure_exact_mass, digits = 5),
+        structure_xlogp = round(structure_xlogp, digits = 5)
+      ) |>
       dplyr::mutate(dplyr::across(
         tidyr::matches("taxonomy"),
         ~ tidyr::replace_na(.x, "notClassified")
@@ -197,11 +202,11 @@ process_annotations <-
 
       log_debug("... adducts masses for in source dimers and multicharged")
       adductsMassTable <<-
-        readr::read_delim(file = paths$inst$extdata$adducts)
+        readr::read_delim(file = adducts_masses_list)
 
       log_debug("... neutral lossses")
       neutral_losses_table <<-
-        readr::read_delim(file = paths$inst$extdata$neutral_losses)
+        readr::read_delim(file = neutral_losses_list)
 
       adductsM <<- adductsMassTable$mass
       names(adductsM) <<- adductsMassTable$adduct

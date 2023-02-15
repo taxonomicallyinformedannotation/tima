@@ -27,6 +27,7 @@ prepare_params <- function(filename = params$files$pattern,
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   params <<- parameters
+  paths <- parse_yaml_paths()
   log_debug(x = "Loading default params")
   yaml_files <- list.files(
     path = file.path(paths$config$default),

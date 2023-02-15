@@ -10,8 +10,8 @@ config:
       adducts: config/default/prepare_adducts.yaml
       closed: config/default/prepare_closed.yaml
       edges: config/default/prepare_edges.yaml
-      features_classification: config/default/features_classification.yaml
-      features_compontents: config/default/features_compontents.yaml
+      features_classification: config/default/prepare_features_classification.yaml
+      features_components: config/default/prepare_features_components.yaml
       gnps: config/default/prepare_gnps.yaml
       library: config/default/prepare_library.yaml
       params: config/default/prepare_params.yaml
@@ -30,8 +30,8 @@ config:
       adducts: config/params/prepare_adducts.yaml
       closed: config/params/prepare_closed.yaml
       edges: config/params/prepare_edges.yaml
-      features_classification: config/params/features_classification.yaml
-      features_compontents: config/params/features_compontents.yaml
+      features_classification: config/params/prepare_features_classification.yaml
+      features_components: config/params/prepare_features_components.yaml
       gnps: config/params/prepare_gnps.yaml
       library: config/params/prepare_library.yaml
       params: config/params/prepare_params.yaml
