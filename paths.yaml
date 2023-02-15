@@ -3,8 +3,44 @@ config:
   path: config
   default:
     path: config/default
+    fake:
+      edges: config/default/fake_edges.yaml
+      features_components: config/default/features_components.yaml
+    prepare:
+      adducts: config/default/prepare_adducts.yaml
+      closed: config/default/prepare_closed.yaml
+      edges: config/default/prepare_edges.yaml
+      features_classification: config/default/features_classification.yaml
+      features_compontents: config/default/features_compontents.yaml
+      gnps: config/default/prepare_gnps.yaml
+      library: config/default/prepare_library.yaml
+      params: config/default/prepare_params.yaml
+      sirius: config/default/prepare_sirius.yaml
+      spectral_matches: config/default/prepare_spectral_matches.yaml
+      taxa: config/default/prepare_taxa.yaml
+    process:
+      annotations: config/default/process_annotations.yaml
+      spectra: config/default/process_spectra.yaml
   params:
     path: config/params
+    fake:
+      edges: config/params/fake_edges.yaml
+      features_components: config/params/features_components.yaml
+    prepare:
+      adducts: config/params/prepare_adducts.yaml
+      closed: config/params/prepare_closed.yaml
+      edges: config/params/prepare_edges.yaml
+      features_classification: config/params/features_classification.yaml
+      features_compontents: config/params/features_compontents.yaml
+      gnps: config/params/prepare_gnps.yaml
+      library: config/params/prepare_library.yaml
+      params: config/params/prepare_params.yaml
+      sirius: config/params/prepare_sirius.yaml
+      spectral_matches: config/params/prepare_spectral_matches.yaml
+      taxa: config/params/prepare_taxa.yaml
+    process:
+      annotations: config/params/process_annotations.yaml
+      spectra: config/params/process_spectra.yaml
 data:
   path: data
   interim:
