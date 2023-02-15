@@ -7,7 +7,8 @@
 prepare_sirius(
   input_directory = params$files$annotations$raw$sirius,
   npc = params$tools$taxonomies$chemical,
-  output = params$files$annotations$pretreated
+  output = params$files$annotations$pretreated,
+  parameters = params
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ prepare_sirius(
 \item{npc}{Boolean. NPClassifier classes computed. TRUE or FALSE}
 
 \item{output}{Output where to save prepared results}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares Sirius results to make them compatible

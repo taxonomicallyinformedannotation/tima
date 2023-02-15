@@ -5,6 +5,7 @@
 #' @param input_directory Directory containing the Sirius results
 #' @param npc Boolean. NPClassifier classes computed. TRUE or FALSE
 #' @param output Output where to save prepared results
+#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -18,7 +19,8 @@
 prepare_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            npc = params$tools$taxonomies$chemical,
-           output = params$files$annotations$pretreated) {
+           output = params$files$annotations$pretreated,
+           parameters = params) {
     stopifnot("Your input directory does not exist" = dir.exists(input_directory))
     stopifnot("Chemical class must be 'npc'." = npc %in% c("npc"))
     stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
@@ -37,7 +39,7 @@ prepare_sirius <-
         )
       ) != 0
     )
-
+    params <<- parameters
     log_debug("Loading and formatting SIRIUS results")
     if (npc == "npc") {
       canopus <-

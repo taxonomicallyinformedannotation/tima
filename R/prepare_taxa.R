@@ -15,6 +15,7 @@
 #' @param top_k Number of organisms to be retained per feature top intensities
 #' @param output Output file
 #' @param taxon If you want to enforce all features to a given taxon, put its name here.
+#' @param dictionary Taxa ranks dictionary
 #' @param parameters Params
 #'
 #' @return NULL
@@ -43,6 +44,7 @@ prepare_taxa <-
            top_k = params$organisms$candidates,
            output = params$files$taxa$processed,
            taxon = params$organisms$taxon,
+           dictionary = paths$inst$extdata$ranks,
            parameters = params) {
     stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
     if (tool == "gnps") {
@@ -62,8 +64,8 @@ prepare_taxa <-
     params <<- parameters
     paths <- parse_yaml_paths()
     log_debug(x = "Loading taxa ranks dictionary")
-    taxa_ranks_dictionary <-
-      readr::read_delim(file = paths$inst$extdata$ranks)
+    taxa_ranks_dictionary <- dictionary |>
+      readr::read_delim()
 
     if (tool == "gnps") {
       log_debug(x = "Loading feature table")

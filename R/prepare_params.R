@@ -6,6 +6,7 @@
 #' @param gnps_job_id GNPS job ID
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
+#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -18,12 +19,14 @@
 prepare_params <- function(filename = params$files$pattern,
                            gnps_job_id = params$gnps$id,
                            ms_mode = params$ms$polarity,
-                           taxon = params$organisms$taxon) {
+                           taxon = params$organisms$taxon,
+                           parameters = params) {
   ## TODO Filename actually not taken into account
 
   stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
+  params <<- parameters
   log_debug(x = "Loading default params")
   yaml_files <- list.files(
     path = file.path(paths$config$default),
@@ -108,12 +111,14 @@ prepare_params <- function(filename = params$files$pattern,
 
   yaml_export <- yaml_files |>
     gsub(pattern = "default", replacement = "params")
+  names(yaml_export) <- yaml_names
 
   log_debug(x = "Exporting params ...")
   log_debug(x = "... checking directory")
   create_dir(export = yaml_export[[1]])
 
   log_debug(x = "Exporting")
+  export_params(step = "prepare_params")
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {
@@ -123,4 +128,5 @@ prepare_params <- function(filename = params$files$pattern,
       )
     }
   )
+  return(yaml_export)
 }

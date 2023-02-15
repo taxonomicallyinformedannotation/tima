@@ -8,7 +8,8 @@ prepare_params(
   filename = params$files$pattern,
   gnps_job_id = params$gnps$id,
   ms_mode = params$ms$polarity,
-  taxon = params$organisms$taxon
+  taxon = params$organisms$taxon,
+  parameters = params
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ prepare_params(
 \item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 
 \item{taxon}{Name of a taxon you want to enforce}
+
+\item{parameters}{Params}
 }
 \description{
 This function prepares main parameters

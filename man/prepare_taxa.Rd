@@ -14,6 +14,7 @@ prepare_taxa(
   top_k = params$organisms$candidates,
   output = params$files$taxa$processed,
   taxon = params$organisms$taxon,
+  dictionary = paths$inst$extdata$ranks,
   parameters = params
 )
 }
@@ -35,6 +36,8 @@ prepare_taxa(
 \item{output}{Output file}
 
 \item{taxon}{If you want to enforce all features to a given taxon, put its name here.}
+
+\item{dictionary}{Taxa ranks dictionary}
 
 \item{parameters}{Params}
 }
