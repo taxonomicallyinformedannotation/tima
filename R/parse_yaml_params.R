@@ -3,7 +3,7 @@
 #' @description This function parses YAML parameters
 #'
 #' @param def Default path
-#' @param par Param path
+#' @param usr User path
 #'
 #' @return A list containing the parameters specified in the YAML files
 #'
@@ -13,7 +13,7 @@
 #' @importFrom yaml read_yaml
 #'
 #' @examples NULL
-parse_yaml_params <- function(def = default_path, par = params_path) {
+parse_yaml_params <- function(def = default_path, usr = user_path) {
   # Initialize an empty list to store the parameters
   params <- list()
 
@@ -27,9 +27,9 @@ parse_yaml_params <- function(def = default_path, par = params_path) {
     )))
 
   # If a user-specified YAML file exists, read it and overwrite the default values with the user-specified ones
-  if (file.exists(par)) {
+  if (file.exists(usr)) {
     suppressWarnings(params <-
-      yaml::read_yaml(file = par, handlers = list(
+      yaml::read_yaml(file = usr, handlers = list(
         seq = function(x) {
           purrr::list_flatten(x)
         }

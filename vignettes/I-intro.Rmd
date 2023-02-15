@@ -57,14 +57,14 @@ cd tima-r
 As mentioned previously, scripts need some parameters to be filled.
 Some pre-defined parameters are given in `config/default` directory.
 Those will help you understanding how the workflow works so you can adapt them later to your own data.
-So first, start by copying them into `config/params` directory.
+So first, start by copying them into `config/user` directory.
 To do so:
 
 ```{bash eval=FALSE, include=TRUE}
 Rscript inst/scripts/prepare_params.R
 ```
 
-You now have all parameters copied in `config/params` directory, so you can start modifying them according to your own data.
+You now have all parameters copied in `config/user` directory, so you can start modifying them according to your own data.
 This command can be adapted to automatically change the main parameters of the whole workflow.
 If you are interested into this feature, you'll probably find out how.
 

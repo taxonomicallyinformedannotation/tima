@@ -80,7 +80,7 @@ We also provide an example GNPS job id, which is: `96fa7c88200e4a03bee4644e581e3
 
 ### Formatting
 
-Before running the corresponding code, do not forget to modify `config/params/prepare_*yourAnnotationTool*.yaml`.
+Before running the corresponding code, do not forget to modify `config/user/prepare_*yourAnnotationTool*.yaml`.
 
 Depending on the annotation tool you used, you can format its results using:
 
@@ -126,7 +126,7 @@ source(file = "inst/scripts/get_example_features.R")
 
 ### Formatting
 
-Before running the corresponding code, do not forget to modify `config/params/prepare_edges.yaml`, `config/params/prepare_features_components.yaml`, and `config/params/prepare_features_classification.yaml` accordingly.
+Before running the corresponding code, do not forget to modify `config/user/prepare_edges.yaml`, `config/user/prepare_features_components.yaml`, and `config/user/prepare_features_classification.yaml` accordingly.
 
 ```{r}
 source(file = "inst/scripts/prepare_edges.R")
@@ -150,7 +150,7 @@ If all your features come from a single extract, it will attribute the biologica
 If you have multiple extracts aligned, it will take the *n* (according to your parameters) highest intensities of your aligned feature table and attribute the biological source of corresponding extracts.
 It can take both manual inputs or GNPS metadata directly from your GNPS job ID.
 
-Before running the corresponding code, do not forget to modify `config/params/prepare_taxa.yaml`.
+Before running the corresponding code, do not forget to modify `config/user/prepare_taxa.yaml`.
 
 ```{r}
 source(file = "inst/scripts/prepare_taxa.R")

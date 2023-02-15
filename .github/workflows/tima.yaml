@@ -34,5 +34,5 @@ jobs:
         run: R CMD INSTALL .
       - name: Run tests
         run: |
-          cp -R config/default config/params
+          cp -R config/default config/user
           Rscript inst/scripts/tima_mini.R

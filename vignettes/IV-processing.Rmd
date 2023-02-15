@@ -24,7 +24,7 @@ If you followed all previous steps successfully, this should be a piece of cake,
 library("timaR")
 ```
 
-Before running the corresponding code, do not forget to modify `config/params/process_annotations.yaml`.
+Before running the corresponding code, do not forget to modify `config/user/process_annotations.yaml`.
 
 ```{r, message=FALSE}
 source(file = "inst/scripts/process_annotations.R")
