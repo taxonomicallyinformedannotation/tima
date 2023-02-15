@@ -197,11 +197,11 @@ process_annotations <-
 
       log_debug("... adducts masses for in source dimers and multicharged")
       adductsMassTable <<-
-        readr::read_delim(file = paths$data$source$adducts)
+        readr::read_delim(file = paths$inst$extdata$adducts)
 
       log_debug("... neutral lossses")
       neutral_losses_table <<-
-        readr::read_delim(file = paths$data$source$neutral_losses)
+        readr::read_delim(file = paths$inst$extdata$neutral_losses)
 
       adductsM <<- adductsMassTable$mass
       names(adductsM) <<- adductsMassTable$adduct

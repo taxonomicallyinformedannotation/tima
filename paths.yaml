@@ -46,7 +46,6 @@ data:
       path: data/processed/config
   source:
     path: data/source
-    adducts: inst/extdata/adducts.tsv
     benchmark:
       path: data/source/benchmark
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
@@ -59,7 +58,6 @@ data:
       hmdb: data/source/libraries/hmdb_metabolites.zip
       lotus: data/source/libraries/lotus.csv.gz
       structure_metadata: data/source/libraries/structure_metadata.tsv.gz
-    neutral_losses: inst/extdata/neutral_losses.tsv
     spectra:
       path: data/source/spectra
       hmdb_isdb: data/source/spectra/hmdb_predicted_msms_spectra.zip

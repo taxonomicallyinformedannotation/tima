@@ -6,7 +6,7 @@
 \usage{
 prepare_adducts(
   adducts_input = params$files$libraries$sop$merged,
-  adducts_table_input = paths$data$source$adducts,
+  adducts_table_input = paths$inst$extdata$adducts,
   config_output_path = paths$data$interim$config$path,
   adducts_output_path = paths$data$interim$adducts$path,
   output_name = params$files$libraries$adducts$processed,
