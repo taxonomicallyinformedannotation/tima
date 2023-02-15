@@ -80,6 +80,9 @@ prepare_library <-
           )]),
           pattern = value
         ))
+      if (nrow(custom_library) == 0) {
+        stop("Your filter led to no entries, try to change it.")
+      }
     }
 
     # Export the library

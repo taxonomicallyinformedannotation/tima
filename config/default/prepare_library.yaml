@@ -27,7 +27,7 @@ organisms:
     #' Level at which the library will be filtered.
     #' Must be one of "domain", "phylum", "class", "order", 
     #' "family", "tribe", "genus", "species", "varietas" . STRING
-    level: kingdom
+    level: phylum
   
     #' Value to be applied for filtering.
     #' "OR" can be used as "|".
