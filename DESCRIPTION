@@ -78,6 +78,7 @@ Collate:
     'parse_yaml_params.R'
     'parse_yaml_paths.R'
     'prepare_adducts.R'
+    'prepare_closed.R'
     'prepare_config.R'
     'prepare_features_classification.R'
     'prepare_features_components.R'

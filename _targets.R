@@ -70,10 +70,12 @@ list(
           config_default_adducts <- paths$config$default$prepare$adducts
         }
       ),
-      # tar_file(name = config_default_closed,
-      #          command = {
-      #            config_default_closed <- paths$config$default$prepare$closed
-      #          }),
+      tar_file(
+        name = config_default_closed,
+        command = {
+          config_default_closed <- paths$config$default$prepare$closed
+        }
+      ),
       tar_file(
         name = config_default_features_classification,
         command = {
@@ -167,18 +169,20 @@ list(
             )
         }
       ),
-      # tar_file(name = config_user_closed,
-      #          command = {
-      #            config_user_closed <-
-      #              prepare_config(
-      #                filename = params_config$files$pattern,
-      #                gnps_job_id = params_config$gnps$id,
-      #                ms_mode = params_config$ms$polarity,
-      #                taxon = params_config$organisms$taxon,
-      #                parameters = params_config,
-      #                step = "prepare_closed"
-      #              )
-      #          }),
+      tar_file(
+        name = config_user_closed,
+        command = {
+          config_user_closed <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_closed"
+            )
+        }
+      ),
       tar_file(
         name = config_user_features_classification,
         command = {
@@ -328,12 +332,16 @@ list(
             )
         }
       ),
-      # tar_target(name = params_closed,
-      #            command = {
-      #              params_closed <-
-      #                parse_yaml_params(def = config_default_closed,
-      #                                  usr = config_user_closed[1])
-      #            }),
+      tar_target(
+        name = params_closed,
+        command = {
+          params_closed <-
+            parse_yaml_params(
+              def = config_default_closed,
+              usr = config_user_closed[1]
+            )
+        }
+      ),
       tar_target(
         name = params_features_classification,
         command = {
@@ -436,10 +444,16 @@ list(
   ## libraries
   list(
     ## Structure organism pairs
-    list( ## Raw
+    list(
+      ## Raw
       list(
-        ## TODO ADD CLOSED,
-        ## TODO ADD PREPARE HMDB,
+        tar_file(
+          name = library_sop_closed,
+          command = {
+            library_sop_closed <- paths$data$source$libraries$closed
+          }
+        ),
+        ## TODO ADD HMDB,
         tar_file(
           name = library_sop_lotus,
           command = {
@@ -453,7 +467,17 @@ list(
       ),
       ## Prepared
       list(
-        ## TODO ADD CLOSED PREPARED,
+        tar_file(
+          name = library_sop_closed_prepared,
+          command = {
+            library_sop_closed_prepared <-
+              prepare_closed(
+                input = library_sop_closed,
+                output = paths$data$interim$libraries$closed,
+                parameters = params_closed
+              )
+          }
+        ),
         ## TODO ADD HMDB PREPARED,
         tar_file(
           name = library_sop_lotus_prepared,
@@ -467,21 +491,19 @@ list(
         )
       ),
       ## Merged
-      list(
-        tar_file(
-          name = library_sop_merged,
-          command = {
-            library_sop_merged <- prepare_library(
-              files = c(library_sop_lotus_prepared),
-              filter = params_library$organisms$filter$mode,
-              level = params_library$organisms$filter$level,
-              value = params_library$organisms$filter$value,
-              output = params_library$files$libraries$sop$merged,
-              parameters = params_library
-            )
-          }
-        )
-      )
+      list(tar_file(
+        name = library_sop_merged,
+        command = {
+          library_sop_merged <- prepare_library(
+            files = c(library_sop_closed_prepared, library_sop_lotus_prepared),
+            filter = params_library$organisms$filter$mode,
+            level = params_library$organisms$filter$level,
+            value = params_library$organisms$filter$value,
+            output = params_library$files$libraries$sop$merged,
+            parameters = params_library
+          )
+        }
+      ))
     ),
     ## Adducts
     list(tar_file(

@@ -57,6 +57,7 @@ data:
       path: data/interim/features
     libraries:
       path: data/interim/libraries
+      closed: data/interim/libraries/closed_prepared.tsv.gz
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
       hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
@@ -88,6 +89,7 @@ data:
       spectra: data/source/examples/example.mgf
     libraries:
       path: data/source/libraries
+      closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
       hmdb: data/source/libraries/hmdb_metabolites.zip
       lotus: data/source/libraries/lotus.csv.gz
       structure_metadata: data/source/libraries/structure_metadata.tsv.gz
