@@ -60,6 +60,8 @@ testthat::test_that("Whole process", {
   # prepare_hmdb()
 
   ### Closed
+  step <- "prepare_closed"
+  params <- get_params(step = step)
   prepare_closed()
 
   ### Structural library

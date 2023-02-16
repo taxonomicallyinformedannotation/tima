@@ -67,8 +67,10 @@ prepare_lotus()
 # prepare_hmdb()
 
 ### Closed
-# log_debug("Preparing closed")
-# prepare_closed()
+log_debug("Preparing closed")
+step <- "prepare_closed"
+params <- get_params(step = step)
+prepare_closed()
 
 ### Structural library
 log_debug("Preparing structural library")

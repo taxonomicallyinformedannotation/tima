@@ -33,6 +33,7 @@ Imports:
     stats,
     stringr,
     targets,
+    tarchetypes,
     tibble,
     tidyr,
     tidyselect,
