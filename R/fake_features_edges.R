@@ -27,7 +27,6 @@ fake_features_edges <- function(input = params$files$features$raw,
   )
 
   log_debug("Exporting ...")
-  create_dir(paths$data$interim$edges$path)
   create_dir(paths$data$interim$config$path)
   create_dir(output)
 

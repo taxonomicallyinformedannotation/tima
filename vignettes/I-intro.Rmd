@@ -41,6 +41,9 @@ They are human-readable and can be used in batches.
 If you do not like YAML, parameters of each steps can also be given as command line arguments.
 They will then be saved as YAML you will be able to share.
 
+To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
+Each step of the whole pipeline will be described here after.
+
 ## Use
 
 Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles).
@@ -51,21 +54,5 @@ All coming steps admit you already cloned the repository and went to its root:
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
-
-### Copy initial parameters
-
-As mentioned previously, scripts need some parameters to be filled.
-Some pre-defined parameters are given in `config/default` directory.
-Those will help you understanding how the workflow works so you can adapt them later to your own data.
-So first, start by copying them into `config/user` directory.
-To do so:
-
-```{bash eval=FALSE, include=TRUE}
-Rscript inst/scripts/prepare_config.R
-```
-
-You now have all parameters copied in `config/user` directory, so you can start modifying them according to your own data.
-This command can be adapted to automatically change the main parameters of the whole workflow.
-If you are interested into this feature, you'll probably find out how.
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-inputs.html).

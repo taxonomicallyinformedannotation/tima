@@ -19,7 +19,7 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-prepare_config()
+targets::tar_make(names = starts_with("config"))
 
 end <- Sys.time()
 
