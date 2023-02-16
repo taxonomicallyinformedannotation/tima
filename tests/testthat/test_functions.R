@@ -115,14 +115,14 @@ testthat::test_that("Whole process", {
   prepare_spectral_matches()
 
   ### Edges
-  step <- "prepare_edges"
+  step <- "prepare_features_edges"
   params <- get_params(step = step)
-  prepare_edges()
+  prepare_features_edges()
 
   ### Fake edges
-  step <- "fake_edges"
+  step <- "fake_features_edges"
   params <- get_params(step = step)
-  fake_edges()
+  fake_features_edges()
 
   ### Features components
   step <- "prepare_features_components"

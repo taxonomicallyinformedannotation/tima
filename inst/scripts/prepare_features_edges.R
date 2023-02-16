@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_edges"
+step <- "prepare_features_edges"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
@@ -16,7 +16,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-prepare_edges()
+prepare_features_edges()
 
 end <- Sys.time()
 

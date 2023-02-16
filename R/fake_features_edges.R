@@ -13,9 +13,9 @@
 #' @importFrom readr read_delim write_delim
 #'
 #' @examples NULL
-fake_edges <- function(input = params$files$features$raw,
-                       output = params$files$networks$spectral$edges$processed,
-                       name_feature = params$names$features) {
+fake_features_edges <- function(input = params$files$features$raw,
+                                output = params$files$networks$spectral$edges$processed,
+                                name_feature = params$names$features) {
   stopifnot("Your input file does not exist" = file.exists(input))
 
   edges_table_treated <- readr::read_delim(
@@ -44,7 +44,7 @@ fake_edges <- function(input = params$files$features$raw,
   export_params(
     parameters = params,
     directory = paths$data$interim$config$path,
-    step = "prepare_edges"
+    step = "prepare_features_edges"
   )
 
   return(output)

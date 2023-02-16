@@ -157,7 +157,7 @@ files:
         raw: data/source/example_edges_manual.csv
 
         #' Prepared edges file. STRING
-        processed: data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 
       #' Components files.
       components:

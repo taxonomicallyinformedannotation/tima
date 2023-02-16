@@ -114,7 +114,7 @@ We are currently also working on CANOPUS integration for chemical class annotati
 
 ### Case when no network available
 
-If no network was generated, simply use the `fake_edges` and `fake_features_components` steps instead of the `prepare_edges` and `prepare_features_components` steps.
+If no network was generated, simply use the `fake_features_edges` and `fake_features_components` steps instead of the `prepare_features_edges` and `prepare_features_components` steps.
 This will mimic a false network that allows to proceed to the next steps.
 However, this will not help chemical weighting.
 
@@ -126,10 +126,10 @@ source(file = "inst/scripts/get_example_features.R")
 
 ### Formatting
 
-Before running the corresponding code, do not forget to modify `config/user/prepare_edges.yaml`, `config/user/prepare_features_components.yaml`, and `config/user/prepare_features_classification.yaml` accordingly.
+Before running the corresponding code, do not forget to modify `config/user/prepare_features_edges.yaml`, `config/user/prepare_features_components.yaml`, and `config/user/prepare_features_classification.yaml` accordingly.
 
 ```{r}
-source(file = "inst/scripts/prepare_edges.R")
+source(file = "inst/scripts/prepare_features_edges.R")
 ```
 
 ```{r}

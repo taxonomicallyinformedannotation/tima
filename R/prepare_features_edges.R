@@ -19,7 +19,7 @@
 #' @importFrom stringr str_length
 #'
 #' @examples NULL
-prepare_edges <-
+prepare_features_edges <-
   function(tool = params$tools$networks$spectral$edges,
            gnps_job_id = params$gnps$id,
            input = params$files$networks$spectral$edges$raw,
@@ -56,7 +56,7 @@ prepare_edges <-
 
     ## Export edges table
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_edges")
+    export_params(step = "prepare_features_edges")
     export_output(x = edges_table_treated, file = output)
 
     return(output)

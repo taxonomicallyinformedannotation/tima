@@ -4,14 +4,14 @@ config:
   default:
     path: config/default
     fake:
-      edges: config/default/fake_edges.yaml
       features_components: config/default/features_components.yaml
+      features_edges: config/default/fake_features_edges.yaml
     prepare:
       adducts: config/default/prepare_adducts.yaml
       closed: config/default/prepare_closed.yaml
-      edges: config/default/prepare_edges.yaml
       features_classification: config/default/prepare_features_classification.yaml
       features_components: config/default/prepare_features_components.yaml
+      features_edges: config/default/prepare_features_edges.yaml
       gnps: config/default/prepare_gnps.yaml
       library: config/default/prepare_library.yaml
       params: config/default/prepare_params.yaml
@@ -24,14 +24,14 @@ config:
   user:
     path: config/user
     fake:
-      edges: config/user/fake_edges.yaml
       features_components: config/user/features_components.yaml
+      features_edges: config/user/fake_features_edges.yaml
     prepare:
       adducts: config/user/prepare_adducts.yaml
       closed: config/user/prepare_closed.yaml
-      edges: config/user/prepare_edges.yaml
       features_classification: config/user/prepare_features_classification.yaml
       features_components: config/user/prepare_features_components.yaml
+      features_edges: config/user/prepare_features_edges.yaml
       gnps: config/user/prepare_gnps.yaml
       library: config/user/prepare_library.yaml
       params: config/user/prepare_params.yaml
@@ -54,8 +54,6 @@ data:
       example_sirius: data/interim/annotations/example_sirius.zip
     config:
       path: data/interim/config
-    edges:
-      path: data/interim/edges
     features:
       path: data/interim/features
     libraries:

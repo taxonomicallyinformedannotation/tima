@@ -47,12 +47,12 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params <- yamls_default
 
   log_debug(x = "Changing params")
-  yamls_params$prepare_edges$gnps$id <- gnps_job_id
+  yamls_params$prepare_features_edges$gnps$id <- gnps_job_id
   yamls_params$prepare_gnps$gnps$id <- gnps_job_id
   yamls_params$prepare_taxa$gnps$id <- gnps_job_id
 
-  yamls_params$prepare_edges$files$networks$spectral$edges$processed <-
-    yamls_params$prepare_edges$files$networks$spectral$edges$processed |>
+  yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
+    yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
     replace_gnps_job_id()
   yamls_params$prepare_features_classification$files$annotations$filled <-
     yamls_params$prepare_features_classification$files$annotations$filled |>

@@ -1,8 +1,8 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_edges.R --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --fil-net-spe-edg-pro data/interim/edges/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz --too-net-spe-edg gnps
+  Rscript inst/scripts/prepare_features_edges.R --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --fil-net-spe-edg-pro data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz --too-net-spe-edg gnps
 
 Usage: 
-  prepare_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--gnps-id=<gnps-id>] [--names-source=<names-source>] [--names-target=<names-target>] [--too-net-spe-edg=<too-net-spe-edg>]
+  prepare_features_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--gnps-id=<gnps-id>] [--names-source=<names-source>] [--names-target=<names-target>] [--too-net-spe-edg=<too-net-spe-edg>]
 
 Arguments:
   fil-net-spe-edg-raw        Raw edges file. STRING

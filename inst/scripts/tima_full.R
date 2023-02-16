@@ -114,9 +114,9 @@ prepare_spectral_matches()
 
 ### Edges
 log_debug("Preparing edges")
-step <- "prepare_edges"
+step <- "prepare_features_edges"
 params <- get_params(step = step)
-prepare_edges()
+prepare_features_edges()
 
 ### Features components
 log_debug("Preparing features components")

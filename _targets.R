@@ -21,550 +21,620 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
-  ## Architecture files
-  tar_file(
-    name = file_paths,
-    command = {
-      file_paths <- "paths.yaml"
-    }
-  ),
-  tar_target(
-    name = paths,
-    command = {
-      paths <- parse_yaml_paths(file = file_paths)
-    }
-  ),
-  tar_file(
-    name = file_adducts,
-    command = {
-      file_adducts <- paths$inst$extdata$adducts
-    }
-  ),
-  tar_file(
-    name = file_neutral_losses,
-    command = {
-      file_neutral_losses <- paths$inst$extdata$neutral_losses
-    }
-  ),
-  tar_file(
-    name = file_ranks,
-    command = {
-      file_ranks <- paths$inst$extdata$ranks
-    }
-  ),
-  ## Default files
-  tar_file(
-    name = config_default_adducts,
-    command = {
-      config_default_adducts <- paths$config$default$prepare$adducts
-    }
-  ),
-  # tar_file(name = config_default_closed,
-  #          command = {
-  #            config_default_closed <- paths$config$default$prepare$closed
-  #          }),
-  tar_file(
-    name = config_default_edges,
-    command = {
-      config_default_edges <- paths$config$default$prepare$edges
-    }
-  ),
-  tar_file(
-    name = config_default_features_classification,
-    command = {
-      config_default_features_classification <-
-        paths$config$default$prepare$features_classification
-    }
-  ),
-  tar_file(
-    name = config_default_features_components,
-    command = {
-      config_default_features_components <-
-        paths$config$default$prepare$features_components
-    }
-  ),
-  # tar_file(name = config_default_gnps,
-  #          command = {
-  #            config_default_gnps <- paths$config$default$prepare$gnps
-  #          }),
-  tar_file(
-    name = config_default_library,
-    command = {
-      config_default_library <- paths$config$default$prepare$library
-    }
-  ),
-  tar_file(
-    name = config_default_params,
-    command = {
-      config_default_params <- paths$config$default$prepare$params
-    }
-  ),
-  # tar_file(name = config_default_sirius,
-  #          command = {
-  #            config_default_sirius <- paths$config$default$prepare$sirius
-  #          }),
-  tar_file(
-    name = config_default_spectral_matches,
-    command = {
-      config_default_spectral_matches <-
-        paths$config$default$prepare$spectral_matches
-    }
-  ),
-  tar_file(
-    name = config_default_taxa,
-    command = {
-      config_default_taxa <- paths$config$default$prepare$taxa
-    }
-  ),
-  tar_file(
-    name = config_default_annotations,
-    command = {
-      config_default_annotations <-
-        paths$config$default$process$annotations
-    }
-  ),
-  tar_file(
-    name = config_default_spectra,
-    command = {
-      config_default_spectra <- paths$config$default$process$spectra
-    }
-  ),
-  ## User files
-  tar_file(
-    name = config_user_adducts,
-    command = {
-      config_user_adducts <- paths$config$user$prepare$adducts
-    }
-  ),
-  # tar_file(name = config_user_closed,
-  #          command = {
-  #            config_user_closed <- paths$config$user$prepare$closed
-  #          }),
-  tar_file(
-    name = config_user_edges,
-    command = {
-      config_user_edges <- paths$config$user$prepare$edges
-    }
-  ),
-  tar_file(
-    name = config_user_features_classification,
-    command = {
-      config_user_features_classification <-
-        paths$config$user$prepare$features_classification
-    }
-  ),
-  tar_file(
-    name = config_user_features_components,
-    command = {
-      config_user_features_components <-
-        paths$config$user$prepare$features_components
-    }
-  ),
-  # tar_file(name = config_user_gnps,
-  #          command = {
-  #            config_user_gnps <- paths$config$user$prepare$gnps
-  #          }),
-  tar_file(
-    name = config_user_library,
-    command = {
-      config_user_library <- paths$config$user$prepare$library
-    }
-  ),
-  tar_file(
-    name = config_user_params,
-    command = {
-      config_user_params <- paths$config$user$prepare$params
-    }
-  ),
-  # tar_file(name = config_user_sirius,
-  #          command = {
-  #            config_user_sirius <- paths$config$user$prepare$sirius
-  #          }),
-  tar_file(
-    name = config_user_spectral_matches,
-    command = {
-      config_user_spectral_matches <-
-        paths$config$user$prepare$spectral_matches
-    }
-  ),
-  tar_file(
-    name = config_user_taxa,
-    command = {
-      config_user_taxa <- paths$config$user$prepare$taxa
-    }
-  ),
-  tar_file(
-    name = config_user_annotations,
-    command = {
-      config_user_annotations <-
-        paths$config$user$process$annotations
-    }
-  ),
-  tar_file(
-    name = config_user_spectra,
-    command = {
-      config_user_spectra <- paths$config$user$process$spectra
-    }
-  ),
-  ## Prepared parameters
-  tar_target(
-    name = params_prepared,
-    command = {
-      params_prepared <-
-        prepare_params(
-          filename = params_params$files$pattern,
-          gnps_job_id = params_params$gnps$id,
-          ms_mode = params_params$ms$polarity,
-          taxon = params_params$organisms$taxon,
-          parameters = params_params
-        )
-    }
-  ),
-  ## Final parameters
-  tar_target(
-    name = params_adducts,
-    command = {
-      params_adducts <-
-        parse_yaml_params(
-          def = config_default_adducts,
-          usr = config_user_adducts
-        )
-    }
-  ),
-  # tar_target(name = params_closed,
-  #            command = {
-  #              params_closed <-
-  #                parse_yaml_params(def = config_default_closed,
-  #                                  usr = config_user_closed)
-  #            }),
-  tar_target(
-    name = params_edges,
-    command = {
-      params_edges <-
-        parse_yaml_params(
-          def = config_default_edges,
-          usr = config_user_edges
-        )
-    }
-  ),
-  tar_target(
-    name = params_features_classification,
-    command = {
-      params_features_classification <-
-        parse_yaml_params(
-          def = config_default_features_classification,
-          usr = config_user_features_classification
-        )
-    }
-  ),
-  tar_target(
-    name = params_features_components,
-    command = {
-      params_features_components <-
-        parse_yaml_params(
-          def = config_default_features_components,
-          usr = config_user_features_components
-        )
-    }
-  ),
-  # tar_target(name = params_gnps,
-  #            command = {
-  #              params_gnps <-
-  #                parse_yaml_params(def = config_default_gnps,
-  #                                  usr = config_user_gnps)
-  #            }),
-  ## TODO ADD PARAMS HMDB,
-  tar_target(
-    name = params_library,
-    command = {
-      params_library <-
-        parse_yaml_params(
-          def = config_default_library,
-          usr = config_user_library
-        )
-    }
-  ),
-  tar_target(
-    name = params_params,
-    command = {
-      params_params <- parse_yaml_params(
-        def = config_default_params,
-        usr = config_user_params
+  ## Architecture
+  list(
+    ## Paths
+    list(
+      tar_file(
+        name = yaml_paths,
+        command = {
+          yaml_paths <- "paths.yaml"
+        }
+      ),
+      tar_target(
+        name = paths,
+        command = {
+          paths <- parse_yaml_paths(file = yaml_paths)
+        }
       )
-    }
+    ),
+    ## Dictionaries
+    list(
+      tar_file(
+        name = dic_adducts,
+        command = {
+          dic_adducts <- paths$inst$extdata$adducts
+        }
+      ),
+      tar_file(
+        name = dic_neutral_losses,
+        command = {
+          dic_neutral_losses <- paths$inst$extdata$neutral_losses
+        }
+      ),
+      tar_file(
+        name = dic_ranks,
+        command = {
+          dic_ranks <- paths$inst$extdata$ranks
+        }
+      )
+    )
   ),
-  # tar_target(name = params_sirius,
-  #            command = {
-  #              params_sirius <-
-  #                parse_yaml_params(def = config_default_sirius,
-  #                                  usr = config_user_sirius)
-  #            }),
-  tar_target(
-    name = params_spectral_matches,
-    command = {
-      params_spectral_matches <-
-        parse_yaml_params(
-          def = config_default_spectral_matches,
-          usr = config_user_spectral_matches
-        )
-    }
+  ## Config
+  list(
+    ## Default
+    list(
+      tar_file(
+        name = config_default_adducts,
+        command = {
+          config_default_adducts <- paths$config$default$prepare$adducts
+        }
+      ),
+      # tar_file(name = config_default_closed,
+      #          command = {
+      #            config_default_closed <- paths$config$default$prepare$closed
+      #          }),
+      tar_file(
+        name = config_default_features_classification,
+        command = {
+          config_default_features_classification <-
+            paths$config$default$prepare$features_classification
+        }
+      ),
+      tar_file(
+        name = config_default_features_components,
+        command = {
+          config_default_features_components <-
+            paths$config$default$prepare$features_components
+        }
+      ),
+      tar_file(
+        name = config_default_features_edges,
+        command = {
+          config_default_features_edges <-
+            paths$config$default$prepare$features_edges
+        }
+      ),
+      # tar_file(name = config_default_gnps,
+      #          command = {
+      #            config_default_gnps <- paths$config$default$prepare$gnps
+      #          }),
+      tar_file(
+        name = config_default_library,
+        command = {
+          config_default_library <- paths$config$default$prepare$library
+        }
+      ),
+      tar_file(
+        name = config_default_params,
+        command = {
+          config_default_params <- paths$config$default$prepare$params
+        }
+      ),
+      # tar_file(name = config_default_sirius,
+      #          command = {
+      #            config_default_sirius <- paths$config$default$prepare$sirius
+      #          }),
+      tar_file(
+        name = config_default_spectral_matches,
+        command = {
+          config_default_spectral_matches <-
+            paths$config$default$prepare$spectral_matches
+        }
+      ),
+      tar_file(
+        name = config_default_taxa,
+        command = {
+          config_default_taxa <- paths$config$default$prepare$taxa
+        }
+      ),
+      tar_file(
+        name = config_default_annotations,
+        command = {
+          config_default_annotations <-
+            paths$config$default$process$annotations
+        }
+      ),
+      tar_file(
+        name = config_default_spectra,
+        command = {
+          config_default_spectra <- paths$config$default$process$spectra
+        }
+      )
+    ),
+    ## User
+    list(
+      tar_file(
+        name = config_user_adducts,
+        command = {
+          config_user_adducts <- paths$config$user$prepare$adducts
+        }
+      ),
+      # tar_file(name = config_user_closed,
+      #          command = {
+      #            config_user_closed <- paths$config$user$prepare$closed
+      #          }),
+      tar_file(
+        name = config_user_features_classification,
+        command = {
+          config_user_features_classification <-
+            paths$config$user$prepare$features_classification
+        }
+      ),
+      tar_file(
+        name = config_user_features_components,
+        command = {
+          config_user_features_components <-
+            paths$config$user$prepare$features_components
+        }
+      ),
+      tar_file(
+        name = config_user_features_edges,
+        command = {
+          config_user_features_edges <-
+            paths$config$user$prepare$features_edges
+        }
+      ),
+      # tar_file(name = config_user_gnps,
+      #          command = {
+      #            config_user_gnps <- paths$config$user$prepare$gnps
+      #          }),
+      tar_file(
+        name = config_user_library,
+        command = {
+          config_user_library <- paths$config$user$prepare$library
+        }
+      ),
+      tar_file(
+        name = config_user_params,
+        command = {
+          config_user_params <- paths$config$user$prepare$params
+        }
+      ),
+      # tar_file(name = config_user_sirius,
+      #          command = {
+      #            config_user_sirius <- paths$config$user$prepare$sirius
+      #          }),
+      tar_file(
+        name = config_user_spectral_matches,
+        command = {
+          config_user_spectral_matches <-
+            paths$config$user$prepare$spectral_matches
+        }
+      ),
+      tar_file(
+        name = config_user_taxa,
+        command = {
+          config_user_taxa <- paths$config$user$prepare$taxa
+        }
+      ),
+      tar_file(
+        name = config_user_annotations,
+        command = {
+          config_user_annotations <-
+            paths$config$user$process$annotations
+        }
+      ),
+      tar_file(
+        name = config_user_spectra,
+        command = {
+          config_user_spectra <- paths$config$user$process$spectra
+        }
+      ),
+      ## Prepared parameters
+      tar_target(
+        name = params_prepared,
+        command = {
+          params_prepared <-
+            prepare_params(
+              filename = params_params$files$pattern,
+              gnps_job_id = params_params$gnps$id,
+              ms_mode = params_params$ms$polarity,
+              taxon = params_params$organisms$taxon,
+              parameters = params_params
+            )
+        }
+      )
+    ),
+    ## Final
+    list(
+      tar_target(
+        name = params_adducts,
+        command = {
+          params_adducts <-
+            parse_yaml_params(
+              def = config_default_adducts,
+              usr = config_user_adducts
+            )
+        }
+      ),
+      # tar_target(name = params_closed,
+      #            command = {
+      #              params_closed <-
+      #                parse_yaml_params(def = config_default_closed,
+      #                                  usr = config_user_closed)
+      #            }),
+      tar_target(
+        name = params_features_classification,
+        command = {
+          params_features_classification <-
+            parse_yaml_params(
+              def = config_default_features_classification,
+              usr = config_user_features_classification
+            )
+        }
+      ),
+      tar_target(
+        name = params_features_components,
+        command = {
+          params_features_components <-
+            parse_yaml_params(
+              def = config_default_features_components,
+              usr = config_user_features_components
+            )
+        }
+      ),
+      tar_target(
+        name = params_features_edges,
+        command = {
+          params_features_edges <-
+            parse_yaml_params(
+              def = config_default_features_edges,
+              usr = config_user_features_edges
+            )
+        }
+      ),
+      # tar_target(name = params_gnps,
+      #            command = {
+      #              params_gnps <-
+      #                parse_yaml_params(def = config_default_gnps,
+      #                                  usr = config_user_gnps)
+      #            }),
+      ## TODO ADD PARAMS HMDB,
+      tar_target(
+        name = params_library,
+        command = {
+          params_library <-
+            parse_yaml_params(
+              def = config_default_library,
+              usr = config_user_library
+            )
+        }
+      ),
+      tar_target(
+        name = params_params,
+        command = {
+          params_params <- parse_yaml_params(
+            def = config_default_params,
+            usr = config_user_params
+          )
+        }
+      ),
+      # tar_target(name = params_sirius,
+      #            command = {
+      #              params_sirius <-
+      #                parse_yaml_params(def = config_default_sirius,
+      #                                  usr = config_user_sirius)
+      #            }),
+      tar_target(
+        name = params_spectral_matches,
+        command = {
+          params_spectral_matches <-
+            parse_yaml_params(
+              def = config_default_spectral_matches,
+              usr = config_user_spectral_matches
+            )
+        }
+      ),
+      tar_target(
+        name = params_taxa,
+        command = {
+          params_taxa <-
+            parse_yaml_params(
+              def = config_default_taxa,
+              usr = config_user_taxa
+            )
+        }
+      ),
+      tar_target(
+        name = params_annotations,
+        command = {
+          params_annotations <-
+            parse_yaml_params(
+              def = config_default_annotations,
+              usr = config_user_annotations
+            )
+        }
+      ),
+      tar_target(
+        name = params_spectra,
+        command = {
+          params_spectra <-
+            parse_yaml_params(
+              def = config_default_spectra,
+              usr = config_user_spectra
+            )
+        }
+      )
+    )
   ),
-  tar_target(
-    name = params_taxa,
-    command = {
-      params_taxa <-
-        parse_yaml_params(
-          def = config_default_taxa,
-          usr = config_user_taxa
-        )
-    }
-  ),
-  tar_target(
-    name = params_annotations,
-    command = {
-      params_annotations <-
-        parse_yaml_params(
-          def = config_default_annotations,
-          usr = config_user_annotations
-        )
-    }
-  ),
-  tar_target(
-    name = params_spectra,
-    command = {
-      params_spectra <-
-        parse_yaml_params(
-          def = config_default_spectra,
-          usr = config_user_spectra
-        )
-    }
-  ),
+  ## LIST INPUT
+
   ## TODO ADD INITIAL MGF
-  tar_file(
-    name = lotus,
-    command = {
-      lotus <- get_last_version_from_zenodo(
-        doi = paths$url$lotus$doi,
-        pattern = paths$urls$lotus$pattern,
-        path = paths$data$source$libraries$lotus
+
+  ## libraries
+  list(
+    ## Structure organism pairs
+    list( ## Raw
+      list(
+        ## TODO ADD CLOSED,
+        ## TODO ADD PREPARE HMDB,
+        tar_file(
+          name = library_sop_lotus,
+          command = {
+            library_sop_lotus <- get_last_version_from_zenodo(
+              doi = paths$url$lotus$doi,
+              pattern = paths$urls$lotus$pattern,
+              path = paths$data$source$libraries$lotus
+            )
+          }
+        )
+      ),
+      ## Prepared
+      list(
+        ## TODO ADD CLOSED PREPARED,
+        ## TODO ADD HMDB PREPARED,
+        tar_file(
+          name = library_sop_lotus_prepared,
+          command = {
+            library_sop_lotus_prepared <-
+              prepare_lotus(
+                input = library_sop_lotus,
+                output = paths$data$interim$libraries$lotus
+              )
+          }
+        )
+      ),
+      ## Merged
+      list(
+        tar_file(
+          name = library_sop_merged,
+          command = {
+            library_sop_merged <- prepare_library(
+              files = c(library_sop_lotus_prepared),
+              filter = params_library$organisms$filter$mode,
+              level = params_library$organisms$filter$level,
+              value = params_library$organisms$filter$value,
+              output = params_library$files$libraries$sop$merged,
+              parameters = params_library
+            )
+          }
+        )
       )
-    }
-  ),
-  tar_file(
-    name = isdb_lotus_pos,
-    command = {
-      isdb_lotus_pos <- get_last_version_from_zenodo(
-        doi = paths$url$lotus_isdb$doi,
-        pattern = paths$urls$lotus_isdb$pattern$pos,
-        path = paths$data$source$spectra$lotus$pos
-      )
-    }
-  ),
-  tar_file(
-    name = isdb_lotus_neg,
-    command = {
-      isdb_lotus_neg <- get_last_version_from_zenodo(
-        doi = paths$url$lotus_isdb$doi,
-        pattern = paths$urls$lotus_isdb$pattern$neg,
-        path = paths$data$source$spectra$lotus$neg
-      )
-    }
-  ),
-  tar_file(
-    name = lotus_prepared,
-    command = {
-      lotus_prepared <- prepare_lotus(
-        input = lotus,
-        output = paths$data$interim$libraries$lotus
-      )
-    }
-  ),
-  ## TODO ADD PREPARE CLOSED,
-  ## TODO ADD PREPARE HMDB,
-  tar_file(
-    name = library_prepared,
-    command = {
-      library_prepared <- prepare_library(
-        files = lotus_prepared,
-        filter = params_library$organisms$filter$mode,
-        level = params_library$organisms$filter$level,
-        value = params_library$organisms$filter$value,
-        output = params_library$files$libraries$sop$merged,
-        parameters = params_library
-      )
-    }
-  ),
-  tar_file(
-    name = adducts_prepared,
-    command = {
-      adducts_prepared <- prepare_adducts(
-        adducts_input = library_prepared,
-        adducts_table_input = paths$inst$extdata$adducts,
-        config_output_path = paths$data$interim$config$path,
-        adducts_output_path = paths$data$interim$adducts$path,
-        output_name = params_adducts$files$libraries$adducts$processed,
-        masses_pos_output_path = paths$data$interim$adducts$pos,
-        masses_neg_output_path = paths$data$interim$adducts$neg,
-        parameters = params_adducts
-      )
-    }
-  ),
-  tar_file(
-    name = isdb_lotus_prepared_pos,
-    command = {
-      isdb_lotus_prepared_pos <- prepare_isdb_lotus(
-        input = isdb_lotus_pos,
-        output = paths$data$interim$spectra$lotus$pos,
-        polarity = "pos",
-        export_sqlite = TRUE
-      )
-    }
-  ),
-  tar_file(
-    name = isdb_lotus_prepared_neg,
-    command = {
-      isdb_lotus_prepared_neg <- prepare_isdb_lotus(
-        input = isdb_lotus_neg,
-        output = paths$data$interim$spectra$lotus$pos,
-        polarity = "neg",
-        export_sqlite = TRUE
-      )
-    }
-  ),
-  ## TODO ADD ISDB HMDB,
-  ## TODO ADD MONA,
-  ## TODO improve polarity handling, suboptimal
-  spectra_processed_pos <- tar_file(
-    name = spectra_processed_pos,
-    command = {
-      spectra_processed_pos <- process_spectra(
-        input = params_spectra$files$spectral$raw,
-        library = isdb_lotus_prepared_pos,
-        polarity = "pos",
-        output = gsub(
-          pattern = ".tsv.gz",
-          replacement = "_pos.tsv.gz",
-          x = params_spectra$files$annotations$raw$spectral,
-          fixed = TRUE
+    ),
+    ## Adducts
+    list(tar_file(
+      name = library_adducts,
+      command = {
+        library_adducts <- prepare_adducts(
+          adducts_input = library_sop_merged,
+          adducts_table_input = paths$inst$extdata$adducts,
+          config_output_path = paths$data$interim$config$path,
+          adducts_output_path = paths$data$interim$adducts$path,
+          output_name = params_adducts$files$libraries$adducts$processed,
+          masses_pos_output_path = paths$data$interim$adducts$pos,
+          masses_neg_output_path = paths$data$interim$adducts$neg,
+          parameters = params_adducts
+        )
+      }
+    )),
+    ## Spectra
+    list( ## In silico
+      list( ## Raw
+        list(
+          ## TODO ADD ISDB HMDB,
+          tar_file(
+            name = library_spectra_is_lotus_pos,
+            command = {
+              library_spectra_is_lotus_pos <- get_last_version_from_zenodo(
+                doi = paths$url$lotus_isdb$doi,
+                pattern = paths$urls$lotus_isdb$pattern$pos,
+                path = paths$data$source$spectra$lotus$pos
+              )
+            }
+          ),
+          tar_file(
+            name = library_spectra_is_lotus_neg,
+            command = {
+              library_spectra_is_lotus_neg <- get_last_version_from_zenodo(
+                doi = paths$url$lotus_isdb$doi,
+                pattern = paths$urls$lotus_isdb$pattern$neg,
+                path = paths$data$source$spectra$lotus$neg
+              )
+            }
+          )
+        )
+      ),
+      ## Prepared
+      list(
+        ## TODO ADD ISDB HMDB PREPARED,
+        tar_file(
+          name = library_spectra_is_lotus_pos_prepared,
+          command = {
+            library_spectra_is_lotus_pos_prepared <- prepare_isdb_lotus(
+              input = library_spectra_is_lotus_pos,
+              output = paths$data$interim$spectra$lotus$pos,
+              polarity = "pos",
+              export_sqlite = TRUE
+            )
+          }
         ),
-        method = params_spectra$annotations$ms2$method,
-        threshold = params_spectra$annotations$ms2$thresholds$similarity,
-        ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
-        dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
-        npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
-        rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
-        condition = params_spectra$annotations$ms2$thresholds$condition,
-        qutoff = params_spectra$ms$intensity$thresholds$ms2,
-        parallel = params_spectra$options$parallel,
-        fast = params_spectra$options$fast,
-        approx = params_spectra$annotations$ms2$approx,
-        parameters = params_spectra
+        tar_file(
+          name = library_spectra_is_lotus_neg_prepared,
+          command = {
+            library_spectra_is_lotus_neg_prepared <- prepare_isdb_lotus(
+              input = library_spectra_is_lotus_neg,
+              output = paths$data$interim$spectra$lotus$pos,
+              polarity = "neg",
+              export_sqlite = TRUE
+            )
+          }
+        )
+      ),
+      ## Experimental
+      list( ## RAW
+        list(),
+        ## Prepared
+        list()
       )
-    }
+    )
   ),
-  spectra_processed_neg <- tar_file(
-    name = spectra_processed_neg,
-    command = {
-      spectra_processed_neg <- process_spectra(
-        input = params_spectra$files$spectral$raw,
-        library = isdb_lotus_prepared_neg,
-        polarity = "neg",
-        output = gsub(
-          pattern = ".tsv.gz",
-          replacement = "_neg.tsv.gz",
-          x = params_spectra$files$annotations$raw$spectral,
-          fixed = TRUE
+  ## Annotations
+  list(
+    ## Spectral
+    list(
+      ## TODO Extend to other libraries
+      ## TODO improve polarity handling, suboptimal
+      annotations_spectral_is_lotus_pos <-
+        tar_file(
+          name = annotations_spectral_is_lotus_pos,
+          command = {
+            annotations_spectral_is_lotus_pos <- process_spectra(
+              input = params_spectra$files$spectral$raw,
+              library = library_spectra_is_lotus_pos_prepared,
+              polarity = "pos",
+              output = gsub(
+                pattern = ".tsv.gz",
+                replacement = "_pos.tsv.gz",
+                x = params_spectra$files$annotations$raw$spectral,
+                fixed = TRUE
+              ),
+              method = params_spectra$annotations$ms2$method,
+              threshold = params_spectra$annotations$ms2$thresholds$similarity,
+              ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+              dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+              npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+              condition = params_spectra$annotations$ms2$thresholds$condition,
+              qutoff = params_spectra$ms$intensity$thresholds$ms2,
+              parallel = params_spectra$options$parallel,
+              fast = params_spectra$options$fast,
+              approx = params_spectra$annotations$ms2$approx,
+              parameters = params_spectra
+            )
+          }
         ),
-        method = params_spectra$annotations$ms2$method,
-        threshold = params_spectra$annotations$ms2$thresholds$similarity,
-        ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
-        dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
-        npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
-        rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
-        condition = params_spectra$annotations$ms2$thresholds$condition,
-        qutoff = params_spectra$ms$intensity$thresholds$ms2,
-        parallel = params_spectra$options$parallel,
-        fast = params_spectra$options$fast,
-        approx = params_spectra$annotations$ms2$approx,
-        parameters = params_spectra
+      # tar_file(name = annotations_spectral_gnps_prepared,
+      #          command = {
+      #            annotations_spectral_gnps_prepared <-
+      #              prepare_gnps(
+      #                gnps_job_id = params_gnps$gnps$id,
+      #                output = params_gnps$files$annotations$pretreated,
+      #                parameters = params_gnps
+      #              )
+      #          }),
+      annotations_spectral_is_lotus_neg <-
+        tar_file(
+          name = annotations_spectral_is_lotus_neg,
+          command = {
+            annotations_spectral_is_lotus_neg <- process_spectra(
+              input = params_spectra$files$spectral$raw,
+              library = library_spectra_is_lotus_neg_prepared,
+              polarity = "neg",
+              output = gsub(
+                pattern = ".tsv.gz",
+                replacement = "_neg.tsv.gz",
+                x = params_spectra$files$annotations$raw$spectral,
+                fixed = TRUE
+              ),
+              method = params_spectra$annotations$ms2$method,
+              threshold = params_spectra$annotations$ms2$thresholds$similarity,
+              ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+              dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+              npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+              condition = params_spectra$annotations$ms2$thresholds$condition,
+              qutoff = params_spectra$ms$intensity$thresholds$ms2,
+              parallel = params_spectra$options$parallel,
+              fast = params_spectra$options$fast,
+              approx = params_spectra$annotations$ms2$approx,
+              parameters = params_spectra
+            )
+          }
+        ),
+      tar_combine(
+        name = annotations_spectral_merged,
+        annotations_spectral_is_lotus_pos,
+        annotations_spectral_is_lotus_neg,
+        command = list(!!!.x)
+      ),
+      tar_file(
+        name = annotations_spectral_prepared,
+        command = {
+          annotations_spectral_prepared <- prepare_spectral_matches(
+            input = annotations_spectral_merged,
+            output = params_spectral_matches$files$annotations$pretreated,
+            parameters = params_spectral_matches
+          )
+        }
       )
-    }
+    ),
+    ## SIRIUS
+    # tar_file(name = annotations_sirius_prepared,
+    #          command = {
+    #            annotations_sirius_prepared <-
+    #              prepare_sirius(
+    #                input_directory = params_sirius$files$annotations$raw$sirius,
+    #                npc = params_sirius$tools$taxonomies$chemical,
+    #                output = params_sirius$files$annotations$pretreated,
+    #                parameters = params_sirius
+    #              )
+    #          }),
+    list()
   ),
-  # tar_file(name = gnps_prepared,
-  #          command = {
-  #            gnps_prepared <-
-  #              prepare_gnps(
-  #                gnps_job_id = params_gnps$gnps$id,
-  #                output = params_gnps$files$annotations$pretreated,
-  #                parameters = params_gnps
-  #              )
-  #          }),
-  # tar_file(name = sirius_prepared,
-  #          command = {
-  #            sirius_prepared <-
-  #              prepare_sirius(
-  #                input_directory = params_sirius$files$annotations$raw$sirius,
-  #                npc = params_sirius$tools$taxonomies$chemical,
-  #                output = params_sirius$files$annotations$pretreated,
-  #                parameters = params_sirius
-  #              )
-  #          }),
-  tar_combine(
-    name = spectra_processed,
-    spectra_processed_pos,
-    spectra_processed_neg,
-    command = list(!!!.x)
-  ),
-  tar_file(
-    name = spectral_matches_prepared,
-    command = {
-      spectral_matches_prepared <- prepare_spectral_matches(
-        input = spectra_processed,
-        output = params_spectral_matches$files$annotations$pretreated,
-        parameters = params_spectral_matches
-      )
-    }
-  ),
-  tar_file(
-    name = edges_prepared,
-    command = {
-      edges_prepared <- prepare_edges(
-        tool = params_edges$tools$networks$spectral$edges,
-        gnps_job_id = params_edges$gnps$id,
-        input = params_edges$files$networks$spectral$edges$raw,
-        output = params_edges$files$networks$spectral$edges$processed,
-        name_source = params_edges$names$source,
-        name_target = params_edges$names$target,
-        parameters = params_edges
-      )
-    }
-  ),
-  tar_file(
-    name = features_components_prepared,
-    command = {
-      features_components_prepared <- prepare_features_components(
-        # input = list(spectral_matches_prepared, gnps_prepared, sirius_prepared),
-        input = list(spectral_matches_prepared),
-        output = params_features_components$files$annotations$filled,
-        tool = params_features_components$tools$networks$spectral$components,
-        components = params_features_components$files$networks$spectral$components$raw,
-        gnps_job_id = params_features_components$gnps$id,
-        ms_mode = params_features_components$ms$polarity,
-        parameters = params_features_components
-      )
-    }
-  ),
-  tar_file(
-    name = features_classification_prepared,
-    command = {
-      features_classification_prepared <- prepare_features_classification(
-        library = library_prepared,
-        input = features_components_prepared,
-        output = params_features_classification$files$annotations$treated,
-        quickmode = params_features_classification$options$fast,
-        parameters = params_features_classification
-      )
-    }
+  ## Features
+  list(
+    tar_file(
+      name = features_edges_prepared,
+      command = {
+        features_edges_prepared <- prepare_features_edges(
+          tool = params_features_edges$tools$networks$spectral$edges,
+          gnps_job_id = params_features_edges$gnps$id,
+          input = params_features_edges$files$networks$spectral$edges$raw,
+          output = params_features_edges$files$networks$spectral$edges$processed,
+          name_source = params_features_edges$names$source,
+          name_target = params_features_edges$names$target,
+          parameters = params_features_edges
+        )
+      }
+    ),
+    tar_file(
+      name = features_components_prepared,
+      command = {
+        features_components_prepared <- prepare_features_components(
+          # input = list(annotations_spectral_prepared, sirius_prepared),
+          input = list(annotations_spectral_prepared),
+          output = params_features_components$files$annotations$filled,
+          tool = params_features_components$tools$networks$spectral$components,
+          components = params_features_components$files$networks$spectral$components$raw,
+          gnps_job_id = params_features_components$gnps$id,
+          ms_mode = params_features_components$ms$polarity,
+          parameters = params_features_components
+        )
+      }
+    ),
+    tar_file(
+      name = features_classification_prepared,
+      command = {
+        features_classification_prepared <- prepare_features_classification(
+          library = library_sop_merged,
+          input = features_components_prepared,
+          output = params_features_classification$files$annotations$treated,
+          quickmode = params_features_classification$options$fast,
+          parameters = params_features_classification
+        )
+      }
+    )
   ),
   tar_file(
     name = taxa_prepared,
@@ -579,7 +649,7 @@ list(
         top_k = params_taxa$organisms$candidates,
         output = params_taxa$files$taxa$processed,
         taxon = params_taxa$organisms$taxon,
-        dictionary = file_ranks,
+        dictionary = dic_ranks,
         parameters = params_taxa
       )
     }
@@ -588,11 +658,11 @@ list(
     name = annotations_processed,
     command = {
       annotations_processed <- process_annotations(
-        library = library_prepared,
-        name = adducts_prepared[params_annotations$ms$polarity],
+        library = library_sop_merged,
+        name = library_adducts[params_annotations$ms$polarity],
         annotations = features_classification_prepared,
         taxa = taxa_prepared,
-        edges = edges_prepared,
+        edges = features_edges_prepared,
         output = params_annotations$files$annotations$processed,
         candidates_initial = params_annotations$annotations$candidates$initial,
         candidates_final = params_annotations$annotations$candidates$final,
@@ -622,8 +692,8 @@ list(
         tolerance_ppm = params_annotations$ms$tolerances$mass$ppm$ms1,
         tolerance_rt = params_annotations$ms$tolerances$rt$minutes,
         adducts_list = params_annotations$ms$adducts,
-        adducts_masses_list = file_adducts,
-        neutral_losses_list = file_neutral_losses,
+        adducts_masses_list = dic_adducts,
+        neutral_losses_list = dic_neutral_losses,
         minimal_ms1_bio = params_annotations$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = params_annotations$annotations$ms1$thresholds$chemical,
         # TODO ADD CONDITION
