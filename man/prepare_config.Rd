@@ -9,7 +9,8 @@ prepare_config(
   gnps_job_id = params$gnps$id,
   ms_mode = params$ms$polarity,
   taxon = params$organisms$taxon,
-  parameters = params
+  parameters = params,
+  step = NA
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ prepare_config(
 \item{taxon}{Name of a taxon you want to enforce}
 
 \item{parameters}{Params}
+
+\item{step}{Step}
 }
 \description{
 This function prepares main config
