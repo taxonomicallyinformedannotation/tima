@@ -6,7 +6,7 @@
 \usage{
 replace_gnps_job_id(
   job,
-  default = yamls_default$prepare_params$gnps,
+  default = yamls_default$`config/prepare_config`$gnps$id,
   repl = params$gnps$id
 )
 }

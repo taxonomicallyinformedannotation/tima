@@ -61,7 +61,7 @@ So first, start by copying them into `config/user` directory.
 To do so:
 
 ```{bash eval=FALSE, include=TRUE}
-Rscript inst/scripts/prepare_params.R
+Rscript inst/scripts/prepare_config.R
 ```
 
 You now have all parameters copied in `config/user` directory, so you can start modifying them according to your own data.

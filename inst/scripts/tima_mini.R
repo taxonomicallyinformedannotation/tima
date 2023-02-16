@@ -5,8 +5,6 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
-
 log_debug(
   "This script",
   crayon::green("does everything you ever dreamt of. \n")
@@ -14,8 +12,13 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
-## Get all files
+## Prepare params
+paths <- parse_yaml_paths()
+step <- "prepare_config"
+params <- get_params(step = step)
+prepare_config()
 
+## Get all files
 #### MGF
 get_example_spectra(url = paths$url$examples$mgf_mini)
 

@@ -1,12 +1,13 @@
-#' @title Prepare parameters
+#' @title Prepare config
 #'
-#' @description This function prepares main parameters
+#' @description This function prepares main config
 #'
 #' @param filename Name of the file
 #' @param gnps_job_id GNPS job ID
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
 #' @param parameters Params
+#' @param step Step
 #'
 #' @return NULL
 #'
@@ -16,11 +17,12 @@
 #' @importFrom yaml read_yaml write_yaml
 #'
 #' @examples NULL
-prepare_params <- function(filename = params$files$pattern,
+prepare_config <- function(filename = params$files$pattern,
                            gnps_job_id = params$gnps$id,
                            ms_mode = params$ms$polarity,
                            taxon = params$organisms$taxon,
-                           parameters = params) {
+                           parameters = params,
+                           step = NA) {
   ## TODO Filename actually not taken into account
 
   stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
@@ -29,11 +31,15 @@ prepare_params <- function(filename = params$files$pattern,
   params <<- parameters
   paths <- parse_yaml_paths()
   log_debug(x = "Loading default params")
-  yaml_files <- list.files(
-    path = file.path(paths$config$default),
-    pattern = ".yaml",
-    full.names = TRUE
+  yaml_files <- c(
+    list.files(
+      path = file.path(paths$config$default),
+      pattern = ".yaml",
+      full.names = TRUE
+    ),
+    paths$config$prepare_config
   )
+
   yaml_names <- yaml_files |>
     gsub(pattern = "config/default/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
@@ -111,15 +117,22 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$prepare_taxa$organisms$taxon <- taxon
 
   yaml_export <- yaml_files |>
-    gsub(pattern = "default", replacement = "params")
+    gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
+
+  if (!is.na(step)) {
+    yamls_params <-
+      yamls_params[grepl(pattern = step, x = names(yamls_params))]
+    yaml_export <-
+      yaml_export[grepl(pattern = step, x = yaml_export)]
+  }
 
   log_debug(x = "Exporting params ...")
   log_debug(x = "... checking directory")
   create_dir(export = yaml_export[[1]])
 
   log_debug(x = "Exporting")
-  export_params(step = "prepare_params")
+  export_params(step = "prepare_config")
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {

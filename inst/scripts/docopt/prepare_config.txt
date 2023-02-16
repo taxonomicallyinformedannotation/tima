@@ -1,8 +1,8 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_params.R
+  Rscript inst/scripts/prepare_config.R
 
 Usage: 
-  prepare_params.R  [--fil-pat=<fil-pat>] [--gnps-id=<gnps-id>] [--ms-pol=<ms-pol>] [--org-tax=<org-tax>]
+  prepare_config.R  [--fil-pat=<fil-pat>] [--gnps-id=<gnps-id>] [--ms-pol=<ms-pol>] [--org-tax=<org-tax>]
 
 Arguments:
   fil-pat                    Pattern to identify the files. STRING

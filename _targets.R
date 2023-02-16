@@ -105,12 +105,6 @@ list(
           config_default_library <- paths$config$default$prepare$library
         }
       ),
-      tar_file(
-        name = config_default_params,
-        command = {
-          config_default_params <- paths$config$default$prepare$params
-        }
-      ),
       # tar_file(name = config_default_sirius,
       #          command = {
       #            config_default_sirius <- paths$config$default$prepare$sirius
@@ -142,96 +136,182 @@ list(
         }
       )
     ),
-    ## User
+    ## User prepared
     list(
+      tar_file(
+        name = config_prepare_config,
+        command = {
+          config_prepare_config <- paths$config$prepare_config
+        }
+      ),
+      tar_target(
+        name = params_config,
+        command = {
+          params_config <- parse_yaml_params(
+            def = config_prepare_config,
+            usr = config_prepare_config
+          )
+        }
+      ),
       tar_file(
         name = config_user_adducts,
         command = {
-          config_user_adducts <- paths$config$user$prepare$adducts
+          config_user_adducts <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_adducts"
+            )
         }
       ),
       # tar_file(name = config_user_closed,
       #          command = {
-      #            config_user_closed <- paths$config$user$prepare$closed
+      #            config_user_closed <-
+      #              prepare_config(
+      #                filename = params_config$files$pattern,
+      #                gnps_job_id = params_config$gnps$id,
+      #                ms_mode = params_config$ms$polarity,
+      #                taxon = params_config$organisms$taxon,
+      #                parameters = params_config,
+      #                step = "prepare_closed"
+      #              )
       #          }),
       tar_file(
         name = config_user_features_classification,
         command = {
           config_user_features_classification <-
-            paths$config$user$prepare$features_classification
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_features_classification"
+            )
         }
       ),
       tar_file(
         name = config_user_features_components,
         command = {
           config_user_features_components <-
-            paths$config$user$prepare$features_components
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_features_components"
+            )
         }
       ),
       tar_file(
         name = config_user_features_edges,
         command = {
           config_user_features_edges <-
-            paths$config$user$prepare$features_edges
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_features_edges"
+            )
         }
       ),
       # tar_file(name = config_user_gnps,
       #          command = {
-      #            config_user_gnps <- paths$config$user$prepare$gnps
+      #            config_user_gnps <-
+      #              prepare_config(
+      #                filename = params_config$files$pattern,
+      #                gnps_job_id = params_config$gnps$id,
+      #                ms_mode = params_config$ms$polarity,
+      #                taxon = params_config$organisms$taxon,
+      #                parameters = params_config,
+      #                step = "prepare_gnps"
+      #              )
       #          }),
       tar_file(
         name = config_user_library,
         command = {
-          config_user_library <- paths$config$user$prepare$library
-        }
-      ),
-      tar_file(
-        name = config_user_params,
-        command = {
-          config_user_params <- paths$config$user$prepare$params
+          config_user_library <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_library"
+            )
         }
       ),
       # tar_file(name = config_user_sirius,
       #          command = {
-      #            config_user_sirius <- paths$config$user$prepare$sirius
+      #            config_user_sirius <-
+      #              prepare_config(
+      #                filename = params_config$files$pattern,
+      #                gnps_job_id = params_config$gnps$id,
+      #                ms_mode = params_config$ms$polarity,
+      #                taxon = params_config$organisms$taxon,
+      #                parameters = params_config,
+      #                step = "prepare_sirius"
+      #              )
       #          }),
       tar_file(
         name = config_user_spectral_matches,
         command = {
           config_user_spectral_matches <-
-            paths$config$user$prepare$spectral_matches
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_spectral_matches"
+            )
         }
       ),
       tar_file(
         name = config_user_taxa,
         command = {
-          config_user_taxa <- paths$config$user$prepare$taxa
+          config_user_taxa <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_taxa"
+            )
         }
       ),
       tar_file(
         name = config_user_annotations,
         command = {
           config_user_annotations <-
-            paths$config$user$process$annotations
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "process_annotations"
+            )
         }
       ),
       tar_file(
         name = config_user_spectra,
         command = {
-          config_user_spectra <- paths$config$user$process$spectra
-        }
-      ),
-      ## Prepared parameters
-      tar_target(
-        name = params_prepared,
-        command = {
-          params_prepared <-
-            prepare_params(
-              filename = params_params$files$pattern,
-              gnps_job_id = params_params$gnps$id,
-              ms_mode = params_params$ms$polarity,
-              taxon = params_params$organisms$taxon,
-              parameters = params_params
+          config_user_spectra <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "process_spectra"
             )
         }
       )
@@ -244,7 +324,7 @@ list(
           params_adducts <-
             parse_yaml_params(
               def = config_default_adducts,
-              usr = config_user_adducts
+              usr = config_user_adducts[1]
             )
         }
       ),
@@ -252,7 +332,7 @@ list(
       #            command = {
       #              params_closed <-
       #                parse_yaml_params(def = config_default_closed,
-      #                                  usr = config_user_closed)
+      #                                  usr = config_user_closed[1])
       #            }),
       tar_target(
         name = params_features_classification,
@@ -260,7 +340,7 @@ list(
           params_features_classification <-
             parse_yaml_params(
               def = config_default_features_classification,
-              usr = config_user_features_classification
+              usr = config_user_features_classification[1]
             )
         }
       ),
@@ -270,7 +350,7 @@ list(
           params_features_components <-
             parse_yaml_params(
               def = config_default_features_components,
-              usr = config_user_features_components
+              usr = config_user_features_components[1]
             )
         }
       ),
@@ -280,7 +360,7 @@ list(
           params_features_edges <-
             parse_yaml_params(
               def = config_default_features_edges,
-              usr = config_user_features_edges
+              usr = config_user_features_edges[1]
             )
         }
       ),
@@ -288,7 +368,7 @@ list(
       #            command = {
       #              params_gnps <-
       #                parse_yaml_params(def = config_default_gnps,
-      #                                  usr = config_user_gnps)
+      #                                  usr = config_user_gnps[1])
       #            }),
       ## TODO ADD PARAMS HMDB,
       tar_target(
@@ -297,24 +377,15 @@ list(
           params_library <-
             parse_yaml_params(
               def = config_default_library,
-              usr = config_user_library
+              usr = config_user_library[1]
             )
-        }
-      ),
-      tar_target(
-        name = params_params,
-        command = {
-          params_params <- parse_yaml_params(
-            def = config_default_params,
-            usr = config_user_params
-          )
         }
       ),
       # tar_target(name = params_sirius,
       #            command = {
       #              params_sirius <-
       #                parse_yaml_params(def = config_default_sirius,
-      #                                  usr = config_user_sirius)
+      #                                  usr = config_user_sirius[1])
       #            }),
       tar_target(
         name = params_spectral_matches,
@@ -322,7 +393,7 @@ list(
           params_spectral_matches <-
             parse_yaml_params(
               def = config_default_spectral_matches,
-              usr = config_user_spectral_matches
+              usr = config_user_spectral_matches[1]
             )
         }
       ),
@@ -332,7 +403,7 @@ list(
           params_taxa <-
             parse_yaml_params(
               def = config_default_taxa,
-              usr = config_user_taxa
+              usr = config_user_taxa[1]
             )
         }
       ),
@@ -342,7 +413,7 @@ list(
           params_annotations <-
             parse_yaml_params(
               def = config_default_annotations,
-              usr = config_user_annotations
+              usr = config_user_annotations[1]
             )
         }
       ),
@@ -352,7 +423,7 @@ list(
           params_spectra <-
             parse_yaml_params(
               def = config_default_spectra,
-              usr = config_user_spectra
+              usr = config_user_spectra[1]
             )
         }
       )

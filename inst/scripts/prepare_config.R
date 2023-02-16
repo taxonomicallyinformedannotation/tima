@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_params"
+step <- "prepare_config"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
@@ -19,7 +19,7 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-prepare_params()
+prepare_config()
 
 end <- Sys.time()
 

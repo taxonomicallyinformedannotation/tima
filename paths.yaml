@@ -4,7 +4,7 @@ config:
   default:
     path: config/default
     fake:
-      features_components: config/default/features_components.yaml
+      features_components: config/default/fake_features_components.yaml
       features_edges: config/default/fake_features_edges.yaml
     prepare:
       adducts: config/default/prepare_adducts.yaml
@@ -14,17 +14,17 @@ config:
       features_edges: config/default/prepare_features_edges.yaml
       gnps: config/default/prepare_gnps.yaml
       library: config/default/prepare_library.yaml
-      params: config/default/prepare_params.yaml
       sirius: config/default/prepare_sirius.yaml
       spectral_matches: config/default/prepare_spectral_matches.yaml
       taxa: config/default/prepare_taxa.yaml
     process:
       annotations: config/default/process_annotations.yaml
       spectra: config/default/process_spectra.yaml
+  prepare_config: config/prepare_config.yaml
   user:
     path: config/user
     fake:
-      features_components: config/user/features_components.yaml
+      features_components: config/user/fake_features_components.yaml
       features_edges: config/user/fake_features_edges.yaml
     prepare:
       adducts: config/user/prepare_adducts.yaml
@@ -34,7 +34,6 @@ config:
       features_edges: config/user/prepare_features_edges.yaml
       gnps: config/user/prepare_gnps.yaml
       library: config/user/prepare_library.yaml
-      params: config/user/prepare_params.yaml
       sirius: config/user/prepare_sirius.yaml
       spectral_matches: config/user/prepare_spectral_matches.yaml
       taxa: config/user/prepare_taxa.yaml
