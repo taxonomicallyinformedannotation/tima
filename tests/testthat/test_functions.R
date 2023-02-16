@@ -6,9 +6,9 @@ testthat::test_that("Whole process", {
   for (i in 1:length(vars)) {
     assign(vars[i], get(vars[i]), envir = .GlobalEnv)
   }
-  step <- "prepare_params"
+  step <- "prepare_config"
   params <- get_params(step = step)
-  prepare_params()
+  prepare_config()
 
   ## Get all files
 

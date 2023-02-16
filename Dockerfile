@@ -4,7 +4,7 @@ FROM ghcr.io/bioconductor/bioconductor:RELEASE_3_16
 # Copy files
 COPY DESCRIPTION ./DESCRIPTION
 COPY paths.yaml ./paths.yaml
-COPY config/default ./config/default
+COPY config ./config
 COPY data ./data
 COPY inst ./inst
 
