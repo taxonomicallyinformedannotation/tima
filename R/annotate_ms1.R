@@ -94,7 +94,7 @@ annotate_ms1 <-
     data.table::setkey(df5, rt_1, rt_2)
 
     log_debug("joining within given rt tolerance \n")
-    df6 <- data.table::foverlaps(df4, df5) |>
+    df7 <- data.table::foverlaps(df4, df5) |>
       dplyr::distinct(
         feature_id,
         rt,
@@ -105,10 +105,8 @@ annotate_ms1 <-
       dplyr::select(dplyr::everything(),
         feature_id_dest = i.feature_id,
         mz_dest = i.mz
-      )
-
-    log_debug("adding delta mz tolerance for single charge adducts \n")
-    df7 <- df6 |>
+      ) |>
+      log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       dplyr::filter(mz >= mz_dest) |>
       dplyr::mutate(
         delta_min = ifelse(

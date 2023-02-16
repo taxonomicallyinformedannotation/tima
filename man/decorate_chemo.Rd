@@ -4,13 +4,27 @@
 \alias{decorate_chemo}
 \title{Decorate chemo}
 \usage{
-decorate_chemo()
+decorate_chemo(
+  df = annotation_table_weighted_chemo,
+  sc_pat = score_chemical_pathway,
+  sc_sup = score_chemical_superclass,
+  sc_cla = score_chemical_class
+)
+}
+\arguments{
+\item{df}{Table to decorate}
+
+\item{sc_pat}{Pathway score}
+
+\item{sc_sup}{Superclass score}
+
+\item{sc_cla}{Class score}
 }
 \value{
 Message indicating the number of annotations weighted at each chemical level
 }
 \description{
-This function outputs informations about chemical weighting
+This function outputs information about chemical weighting
 }
 \examples{
 NULL

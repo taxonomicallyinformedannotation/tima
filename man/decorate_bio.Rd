@@ -4,13 +4,42 @@
 \alias{decorate_bio}
 \title{Decorate bio}
 \usage{
-decorate_bio()
+decorate_bio(
+  df = annotation_table_weighted_bio,
+  sc_kin = score_biological_kingdom,
+  sc_phy = score_biological_phylum,
+  sc_cla = score_biological_class,
+  sc_ord = score_biological_order,
+  sc_fam = score_biological_family,
+  sc_gen = score_biological_genus,
+  sc_spe = score_biological_species,
+  sc_var = score_biological_variety
+)
+}
+\arguments{
+\item{df}{Table to decorate}
+
+\item{sc_kin}{Kingdom score}
+
+\item{sc_phy}{Phylum score}
+
+\item{sc_cla}{Class score}
+
+\item{sc_ord}{Order score}
+
+\item{sc_fam}{Family score}
+
+\item{sc_gen}{Genus score}
+
+\item{sc_spe}{Species score}
+
+\item{sc_var}{Variety score}
 }
 \value{
 Message indicating the number of annotations weighted at each biological level
 }
 \description{
-This function outputs informations about biological weighting
+This function outputs information about biological weighting
 }
 \examples{
 NULL

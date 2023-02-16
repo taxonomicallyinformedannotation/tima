@@ -4,13 +4,16 @@
 \alias{decorate_ms1}
 \title{Decorate MS1}
 \usage{
-decorate_ms1()
+decorate_ms1(df = annotation_table_ms1)
+}
+\arguments{
+\item{df}{Table to decorate}
 }
 \value{
 Message indicating the number of annotations obtained by MS1
 }
 \description{
-This function outputs informations about MS1 annotation
+This function outputs information about MS1 annotation
 }
 \examples{
 NULL
