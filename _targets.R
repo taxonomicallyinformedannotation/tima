@@ -554,11 +554,21 @@ list(
           tar_file(
             name = library_spectra_is_lotus_pos,
             command = {
-              library_spectra_is_lotus_pos <- get_last_version_from_zenodo(
-                doi = paths$url$lotus_isdb$doi,
-                pattern = paths$urls$lotus_isdb$pattern$pos,
-                path = paths$data$source$spectra$lotus$pos
-              )
+              library_spectra_is_lotus_pos <-
+                if (paths$tests$mode == FALSE) {
+                  get_last_version_from_zenodo(
+                    doi = paths$url$lotus_isdb$doi,
+                    pattern = paths$urls$lotus_isdb$pattern$pos,
+                    path = paths$data$source$spectra$lotus$pos
+                  )
+                } else {
+                  create_dir(paths$data$source$spectra$lotus$pos)
+                  utils::download.file(
+                    url = paths$urls$examples$spectral_lib,
+                    destfile = paths$data$source$spectra$lotus$pos
+                  )
+                  return(paths$data$source$spectra$lotus$pos)
+                }
             },
             ## To always check if a newest version is available
             cue = tar_cue(mode = "always")
@@ -566,11 +576,21 @@ list(
           tar_file(
             name = library_spectra_is_lotus_neg,
             command = {
-              library_spectra_is_lotus_neg <- get_last_version_from_zenodo(
-                doi = paths$url$lotus_isdb$doi,
-                pattern = paths$urls$lotus_isdb$pattern$neg,
-                path = paths$data$source$spectra$lotus$neg
-              )
+              library_spectra_is_lotus_neg <-
+                if (paths$tests$mode == FALSE) {
+                  get_last_version_from_zenodo(
+                    doi = paths$url$lotus_isdb$doi,
+                    pattern = paths$urls$lotus_isdb$pattern$neg,
+                    path = paths$data$source$spectra$lotus$neg
+                  )
+                } else {
+                  create_dir(paths$data$source$spectra$lotus$neg)
+                  utils::download.file(
+                    url = paths$urls$examples$spectral_lib,
+                    destfile = paths$data$source$spectra$lotus$neg
+                  )
+                  return(paths$data$source$spectra$lotus$neg)
+                }
             },
             ## To always check if a newest version is available
             cue = tar_cue(mode = "always")

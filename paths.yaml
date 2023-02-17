@@ -117,6 +117,7 @@ inst:
     docopt:
       path: inst/scripts/docopt
 tests:
+  mode: no
   path: tests
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1

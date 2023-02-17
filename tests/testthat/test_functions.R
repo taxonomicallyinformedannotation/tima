@@ -79,9 +79,16 @@ testthat::test_that("Whole process", {
 
   ## Prepare spectra
   ### LOTUS
-  prepare_isdb_lotus()
-  prepare_isdb_lotus(polarity = "neg")
+  ## Without sqlite
   prepare_isdb_lotus(export_sqlite = FALSE)
+  ## Pos
+  prepare_isdb_lotus()
+  ## Neg
+  prepare_isdb_lotus(
+    input = paths$data$source$spectra$lotus$neg,
+    output = paths$data$interim$spectra$lotus$neg,
+    polarity = "neg"
+  )
 
   ### HMDB
   # prepare_isdb_hmdb()
