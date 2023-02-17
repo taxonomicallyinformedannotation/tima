@@ -84,7 +84,7 @@ Before running the corresponding code, do not forget to modify `config/user/prep
 
 Depending on the annotation tool you used, you can format its results using:
 
-```{r}
+```{r eval=FALSE, include=TRUE}
 source(file = "inst/scripts/prepare_gnps.R")
 ```
 
@@ -96,7 +96,7 @@ source(file = "inst/scripts/prepare_spectral_matches.R")
 
 and/or
 
-```{r}
+```{r eval=FALSE, include=TRUE}
 source(file = "inst/scripts/prepare_sirius.R")
 ```
 
