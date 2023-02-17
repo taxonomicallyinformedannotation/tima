@@ -564,7 +564,7 @@ list(
                 } else {
                   create_dir(paths$data$source$spectra$lotus$pos)
                   utils::download.file(
-                    url = paths$urls$examples$spectral_lib,
+                    url = paths$urls$examples$spectral_lib$pos,
                     destfile = paths$data$source$spectra$lotus$pos
                   )
                   return(paths$data$source$spectra$lotus$pos)
@@ -586,7 +586,7 @@ list(
                 } else {
                   create_dir(paths$data$source$spectra$lotus$neg)
                   utils::download.file(
-                    url = paths$urls$examples$spectral_lib,
+                    url = paths$urls$examples$spectral_lib$neg,
                     destfile = paths$data$source$spectra$lotus$neg
                   )
                   return(paths$data$source$spectra$lotus$neg)
