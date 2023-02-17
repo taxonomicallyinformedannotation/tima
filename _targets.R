@@ -97,20 +97,24 @@ list(
             paths$config$default$prepare$features_edges
         }
       ),
-      # tar_file(name = config_default_gnps,
-      #          command = {
-      #            config_default_gnps <- paths$config$default$prepare$gnps
-      #          }),
+      tar_file(
+        name = config_default_gnps,
+        command = {
+          config_default_gnps <- paths$config$default$prepare$gnps
+        }
+      ),
       tar_file(
         name = config_default_library,
         command = {
           config_default_library <- paths$config$default$prepare$library
         }
       ),
-      # tar_file(name = config_default_sirius,
-      #          command = {
-      #            config_default_sirius <- paths$config$default$prepare$sirius
-      #          }),
+      tar_file(
+        name = config_default_sirius,
+        command = {
+          config_default_sirius <- paths$config$default$prepare$sirius
+        }
+      ),
       tar_file(
         name = config_default_spectral_matches,
         command = {
@@ -225,18 +229,20 @@ list(
             )
         }
       ),
-      # tar_file(name = config_user_gnps,
-      #          command = {
-      #            config_user_gnps <-
-      #              prepare_config(
-      #                filename = params_config$files$pattern,
-      #                gnps_job_id = params_config$gnps$id,
-      #                ms_mode = params_config$ms$polarity,
-      #                taxon = params_config$organisms$taxon,
-      #                parameters = params_config,
-      #                step = "prepare_gnps"
-      #              )
-      #          }),
+      tar_file(
+        name = config_user_gnps,
+        command = {
+          config_user_gnps <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_gnps"
+            )
+        }
+      ),
       tar_file(
         name = config_user_library,
         command = {
@@ -251,18 +257,20 @@ list(
             )
         }
       ),
-      # tar_file(name = config_user_sirius,
-      #          command = {
-      #            config_user_sirius <-
-      #              prepare_config(
-      #                filename = params_config$files$pattern,
-      #                gnps_job_id = params_config$gnps$id,
-      #                ms_mode = params_config$ms$polarity,
-      #                taxon = params_config$organisms$taxon,
-      #                parameters = params_config,
-      #                step = "prepare_sirius"
-      #              )
-      #          }),
+      tar_file(
+        name = config_user_sirius,
+        command = {
+          config_user_sirius <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_sirius"
+            )
+        }
+      ),
       tar_file(
         name = config_user_spectral_matches,
         command = {
@@ -372,12 +380,16 @@ list(
             )
         }
       ),
-      # tar_target(name = params_gnps,
-      #            command = {
-      #              params_gnps <-
-      #                parse_yaml_params(def = config_default_gnps,
-      #                                  usr = config_user_gnps[1])
-      #            }),
+      tar_target(
+        name = params_gnps,
+        command = {
+          params_gnps <-
+            parse_yaml_params(
+              def = config_default_gnps,
+              usr = config_user_gnps[1]
+            )
+        }
+      ),
       ## TODO ADD PARAMS HMDB,
       tar_target(
         name = params_library,
@@ -389,12 +401,16 @@ list(
             )
         }
       ),
-      # tar_target(name = params_sirius,
-      #            command = {
-      #              params_sirius <-
-      #                parse_yaml_params(def = config_default_sirius,
-      #                                  usr = config_user_sirius[1])
-      #            }),
+      tar_target(
+        name = params_sirius,
+        command = {
+          params_sirius <-
+            parse_yaml_params(
+              def = config_default_sirius,
+              usr = config_user_sirius[1]
+            )
+        }
+      ),
       tar_target(
         name = params_spectral_matches,
         command = {
@@ -630,15 +646,17 @@ list(
             )
           }
         ),
-      # tar_file(name = annotations_spectral_gnps_prepared,
-      #          command = {
-      #            annotations_spectral_gnps_prepared <-
-      #              prepare_gnps(
-      #                gnps_job_id = params_gnps$gnps$id,
-      #                output = params_gnps$files$annotations$pretreated,
-      #                parameters = params_gnps
-      #              )
-      #          }),
+      tar_file(
+        name = annotations_spectral_gnps_prepared,
+        command = {
+          annotations_spectral_gnps_prepared <-
+            prepare_gnps(
+              gnps_job_id = params_gnps$gnps$id,
+              output = params_gnps$files$annotations$pretreated,
+              parameters = params_gnps
+            )
+        }
+      ),
       annotations_spectral_is_lotus_2 <-
         tar_file(
           name = annotations_spectral_is_lotus_neg,
@@ -685,17 +703,19 @@ list(
         }
       )
     ),
-    ## SIRIUS
-    # tar_file(name = annotations_sirius_prepared,
-    #          command = {
-    #            annotations_sirius_prepared <-
-    #              prepare_sirius(
-    #                input_directory = params_sirius$files$annotations$raw$sirius,
-    #                npc = params_sirius$tools$taxonomies$chemical,
-    #                output = params_sirius$files$annotations$pretreated,
-    #                parameters = params_sirius
-    #              )
-    #          }),
+    # SIRIUS
+    tar_file(
+      name = annotations_sirius_prepared,
+      command = {
+        annotations_sirius_prepared <-
+          prepare_sirius(
+            input_directory = params_sirius$files$annotations$raw$sirius,
+            npc = params_sirius$tools$taxonomies$chemical,
+            output = params_sirius$files$annotations$pretreated,
+            parameters = params_sirius
+          )
+      }
+    ),
     list()
   ),
   ## Features
@@ -718,8 +738,11 @@ list(
       name = features_components_prepared,
       command = {
         features_components_prepared <- prepare_features_components(
-          # input = list(annotations_spectral_prepared, sirius_prepared),
-          input = list(annotations_spectral_prepared),
+          input = list(
+            annotations_spectral_prepared,
+            annotations_spectral_gnps_prepared,
+            annotations_sirius_prepared
+          ),
           output = params_features_components$files$annotations$filled,
           tool = params_features_components$tools$networks$spectral$components,
           components = params_features_components$files$networks$spectral$components$raw,
@@ -810,3 +833,5 @@ list(
     }
   )
 )
+
+## TODO Add benchmark

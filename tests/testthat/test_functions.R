@@ -62,6 +62,9 @@ testthat::test_that("Whole process", {
   ### Closed
   step <- "prepare_closed"
   params <- get_params(step = step)
+  ## To fake there is an input
+  prepare_closed(input = paths$data$source$libraries$lotus)
+  ## When there is no input
   prepare_closed()
 
   ### Structural library
@@ -104,11 +107,15 @@ testthat::test_that("Whole process", {
   ### GNPS results
   step <- "prepare_gnps"
   params <- get_params(step = step)
+  prepare_gnps(gnps_job_id = NULL)
   prepare_gnps()
 
   ### SIRIUS results
   step <- "prepare_sirius"
   params <- get_params(step = step)
+  ## To fake there is no input
+  prepare_sirius(input_directory = "randomDirThatDoesNotExist")
+  ## When there is an input
   prepare_sirius()
 
   ### ISDB results
