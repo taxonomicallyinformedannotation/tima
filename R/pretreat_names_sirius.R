@@ -14,7 +14,7 @@
 pretreat_names_sirius <- function(x) {
   # Remove any characters after and including the '/' character from the name
   y <- x |>
-    str_remove(pattern = stringr::fixed(pattern = "/.*"))
+    stringr::str_remove(pattern = stringr::fixed(pattern = "/.*"))
 
   return(y)
 }
