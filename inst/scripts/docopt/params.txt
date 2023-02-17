@@ -124,11 +124,11 @@ Arguments:
   wei-che-02                 Score for a chemical superclass match. FLOAT
   wei-che-03                 Score for a chemical class match. FLOAT
 
+  fast                       Skip time-consuming steps. BOOLEAN
+  force                      Do not use it. BOOLEAN
+  parallel                   Execute processes in parallel when available. BOOLEAN
 
 Options:
-  --fast                     Skip time-consuming steps. BOOLEAN
-  --force                    Do not use it. BOOLEAN
-  --parallel                 Execute processes in parallel when available. BOOLEAN
 
   -h --help                  Shows this screen.
   -v --version               Shows version.

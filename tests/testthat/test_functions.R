@@ -94,15 +94,20 @@ testthat::test_that("Whole process", {
   prepare_adducts()
 
   ## Performing MS2 annotation
-  ### Normal
   step <- "process_spectra"
   params <- get_params(step = step)
-  process_spectra()
-  ### Variant
+  ### Negative
+  process_spectra(
+    polarity = "neg",
+    parallel = FALSE
+  )
+  ### Slow
   process_spectra(
     fast = FALSE,
     condition = "AND"
   )
+  ### Normal
+  process_spectra()
 
   ### GNPS results
   step <- "prepare_gnps"
