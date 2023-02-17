@@ -80,6 +80,7 @@ testthat::test_that("Whole process", {
   ## Prepare spectra
   ### LOTUS
   prepare_isdb_lotus()
+  prepare_isdb_lotus(polarity = "neg")
   prepare_isdb_lotus(export_sqlite = FALSE)
 
   ### HMDB
