@@ -41,11 +41,11 @@ get_last_version_from_zenodo(
 log_debug("Getting LOTUS ISDB...")
 create_dir(paths$data$source$spectra$lotus$pos)
 utils::download.file(
-  url = paths$url$examples$spectral_lib,
+  url = paths$url$examples$spectral_lib$pos,
   destfile = paths$data$source$spectra$lotus$pos
 )
 utils::download.file(
-  url = paths$url$examples$spectral_lib,
+  url = paths$url$examples$spectral_lib$neg,
   destfile = paths$data$source$spectra$lotus$neg
 )
 

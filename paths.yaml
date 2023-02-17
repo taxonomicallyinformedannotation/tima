@@ -126,7 +126,9 @@ urls:
     mgf_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_mini.mgf
     sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
     sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
-    spectral_lib: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib.mgf
+    spectral_lib: 
+      neg: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib_neg.mgf
+      pos: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib_pos.mgf
   hmdb:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
