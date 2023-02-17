@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_closed"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "prepare_closed"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
@@ -16,7 +16,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-targets::tar_make(names = starts_with("config"))
+# prepare_closed()
+targets::tar_make(names = matches("library_sop_closed_prepared"))
 
 end <- Sys.time()
 

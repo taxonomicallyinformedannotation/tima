@@ -437,10 +437,15 @@ list(
       )
     )
   ),
-  ## LIST INPUT
-
-  ## TODO ADD INITIAL MGF
-
+  ## inputs
+  list( ## TODO ADD Input Features
+    tar_file(
+      name = input_spectra,
+      command = {
+        input_spectra <- params_spectra$files$spectral$raw
+      }
+    )
+  ),
   ## libraries
   list(
     ## Structure organism pairs
@@ -462,7 +467,9 @@ list(
               pattern = paths$urls$lotus$pattern,
               path = paths$data$source$libraries$lotus
             )
-          }
+          },
+          ## To always check if a newest version is available
+          cue = tar_cue(mode = "always")
         )
       ),
       ## Prepared
@@ -534,7 +541,9 @@ list(
                 pattern = paths$urls$lotus_isdb$pattern$pos,
                 path = paths$data$source$spectra$lotus$pos
               )
-            }
+            },
+            ## To always check if a newest version is available
+            cue = tar_cue(mode = "always")
           ),
           tar_file(
             name = library_spectra_is_lotus_neg,
@@ -544,7 +553,9 @@ list(
                 pattern = paths$urls$lotus_isdb$pattern$neg,
                 path = paths$data$source$spectra$lotus$neg
               )
-            }
+            },
+            ## To always check if a newest version is available
+            cue = tar_cue(mode = "always")
           )
         )
       ),
@@ -552,9 +563,9 @@ list(
       list(
         ## TODO ADD ISDB HMDB PREPARED,
         tar_file(
-          name = library_spectra_is_lotus_pos_prepared,
+          name = library_spectra_is_lotus_prepared_pos,
           command = {
-            library_spectra_is_lotus_pos_prepared <- prepare_isdb_lotus(
+            library_spectra_is_lotus_prepared_pos <- prepare_isdb_lotus(
               input = library_spectra_is_lotus_pos,
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "pos",
@@ -563,9 +574,9 @@ list(
           }
         ),
         tar_file(
-          name = library_spectra_is_lotus_neg_prepared,
+          name = library_spectra_is_lotus_prepared_neg,
           command = {
-            library_spectra_is_lotus_neg_prepared <- prepare_isdb_lotus(
+            library_spectra_is_lotus_prepared_neg <- prepare_isdb_lotus(
               input = library_spectra_is_lotus_neg,
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "neg",
@@ -588,13 +599,13 @@ list(
     list(
       ## TODO Extend to other libraries
       ## TODO improve polarity handling, suboptimal
-      annotations_spectral_is_lotus_pos <-
+      annotations_spectral_is_lotus_1 <-
         tar_file(
           name = annotations_spectral_is_lotus_pos,
           command = {
             annotations_spectral_is_lotus_pos <- process_spectra(
-              input = params_spectra$files$spectral$raw,
-              library = library_spectra_is_lotus_pos_prepared,
+              input = input_spectra,
+              library = library_spectra_is_lotus_prepared_pos,
               polarity = "pos",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -626,13 +637,13 @@ list(
       #                parameters = params_gnps
       #              )
       #          }),
-      annotations_spectral_is_lotus_neg <-
+      annotations_spectral_is_lotus_2 <-
         tar_file(
           name = annotations_spectral_is_lotus_neg,
           command = {
             annotations_spectral_is_lotus_neg <- process_spectra(
-              input = params_spectra$files$spectral$raw,
-              library = library_spectra_is_lotus_neg_prepared,
+              input = input_spectra,
+              library = library_spectra_is_lotus_prepared_neg,
               polarity = "neg",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -657,8 +668,8 @@ list(
         ),
       tar_combine(
         name = annotations_spectral_merged,
-        annotations_spectral_is_lotus_pos,
-        annotations_spectral_is_lotus_neg,
+        annotations_spectral_is_lotus_1,
+        annotations_spectral_is_lotus_2,
         command = list(!!!.x)
       ),
       tar_file(

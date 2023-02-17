@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-step <- "process_annotations"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "process_annotations"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script performs",
@@ -26,7 +26,8 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-process_annotations()
+# process_annotations()
+targets::tar_make(names = matches("annotations_processed"))
 
 end <- Sys.time()
 

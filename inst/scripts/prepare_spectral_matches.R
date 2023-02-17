@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_spectral_matches"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "prepare_spectral_matches"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
@@ -16,7 +16,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-prepare_spectral_matches()
+# prepare_spectral_matches()
+targets::tar_make(names = matches("annotations_spectral_prepared"))
 
 end <- Sys.time()
 

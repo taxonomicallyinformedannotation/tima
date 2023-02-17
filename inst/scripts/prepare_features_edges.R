@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_features_edges"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "prepare_features_edges"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
@@ -16,7 +16,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-prepare_features_edges()
+# prepare_feeatures_edges()
+targets::tar_make(names = matches("features_edges_prepared"))
 
 end <- Sys.time()
 

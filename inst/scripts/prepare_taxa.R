@@ -5,9 +5,9 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_taxa"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "prepare_taxa"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
@@ -22,7 +22,8 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-prepare_taxa()
+# prepare_taxa()
+targets::tar_make(names = matches("taxa_prepared"))
 
 end <- Sys.time()
 

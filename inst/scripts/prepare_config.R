@@ -5,20 +5,18 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_config"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "prepare_config"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
   crayon::green("prepares parameters")
 )
-log_debug(
-  "Authors: ",
-  crayon::green("AR")
-)
+log_debug("Authors: ", crayon::green("AR"))
 log_debug("Contributors: ...")
 
+# prepare_config()
 targets::tar_make(names = starts_with("config"))
 
 end <- Sys.time()

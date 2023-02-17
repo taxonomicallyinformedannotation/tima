@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
+# paths <- parse_yaml_paths()
 
 log_debug(
   "This script",
@@ -14,11 +14,12 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_last_version_from_zenodo(
-  doi = paths$url$lotus$doi,
-  pattern = paths$urls$lotus$pattern,
-  path = paths$data$source$libraries$lotus
-)
+# get_last_version_from_zenodo(
+#   doi = paths$url$lotus$doi,
+#   pattern = paths$urls$lotus$pattern,
+#   path = paths$data$source$libraries$lotus
+# )
+targets::tar_make(names = matches("library_sop_lotus"))
 
 end <- Sys.time()
 

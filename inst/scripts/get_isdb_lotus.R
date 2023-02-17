@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
+# paths <- parse_yaml_paths()
 
 log_debug(
   "This script",
@@ -14,17 +14,18 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_last_version_from_zenodo(
-  doi = paths$url$lotus_isdb$doi,
-  pattern = paths$urls$lotus_isdb$pattern$pos,
-  path = paths$data$source$spectra$lotus$pos
-)
-
-get_last_version_from_zenodo(
-  doi = paths$url$lotus_isdb$doi,
-  pattern = paths$urls$lotus_isdb$pattern$neg,
-  path = paths$data$source$spectra$lotus$neg
-)
+# get_last_version_from_zenodo(
+#   doi = paths$url$lotus_isdb$doi,
+#   pattern = paths$urls$lotus_isdb$pattern$pos,
+#   path = paths$data$source$spectra$lotus$pos
+# )
+#
+# get_last_version_from_zenodo(
+#   doi = paths$url$lotus_isdb$doi,
+#   pattern = paths$urls$lotus_isdb$pattern$neg,
+#   path = paths$data$source$spectra$lotus$neg
+# )
+targets::tar_make(names = starts_with("library_spectra_is_lotus"))
 
 end <- Sys.time()
 
