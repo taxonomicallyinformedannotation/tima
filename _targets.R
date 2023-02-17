@@ -452,12 +452,14 @@ list(
     list(
       ## Raw
       list(
-        tar_file(
-          name = library_sop_closed,
-          command = {
-            library_sop_closed <- paths$data$source$libraries$closed
-          }
-        ),
+        ## This does not work as it forces the file to exist.
+        ## So targets will not check if the input file changed automatically.
+        # tar_file(
+        #   name = library_sop_closed,
+        #   command = {
+        #     library_sop_closed <- paths$data$source$libraries$closed
+        #   }
+        # ),
         ## TODO ADD HMDB,
         tar_file(
           name = library_sop_lotus,
@@ -479,7 +481,7 @@ list(
           command = {
             library_sop_closed_prepared <-
               prepare_closed(
-                input = library_sop_closed,
+                input = paths$data$source$libraries$closed,
                 output = paths$data$interim$libraries$closed,
                 parameters = params_closed
               )
