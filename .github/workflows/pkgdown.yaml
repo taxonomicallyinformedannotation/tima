@@ -30,7 +30,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown, local::., any::visNetwork
           needs: website
           pak-version: devel # See https://github.com/r-lib/actions/issues/559
 
