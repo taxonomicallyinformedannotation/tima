@@ -569,9 +569,9 @@ list(
                   )
                   return(paths$data$source$spectra$lotus$pos)
                 }
-            },
+            }
             ## To always check if a newest version is available
-            cue = tar_cue(mode = "always")
+            # ,cue = tar_cue(mode = "always")
           ),
           tar_file(
             name = library_spectra_is_lotus_neg,
@@ -591,9 +591,9 @@ list(
                   )
                   return(paths$data$source$spectra$lotus$neg)
                 }
-            },
+            }
             ## To always check if a newest version is available
-            cue = tar_cue(mode = "always")
+            # ,cue = tar_cue(mode = "always")
           )
         )
       ),
@@ -666,7 +666,7 @@ list(
             )
           }
         ),
-      tar_file(
+      annotations_spectral_gnps_p <- tar_file(
         name = annotations_spectral_gnps_prepared,
         command = {
           annotations_spectral_gnps_prepared <-
@@ -707,20 +707,26 @@ list(
           }
         ),
       tar_combine(
-        name = annotations_spectral_merged,
+        name = annotations_spectral_is_merged,
         annotations_spectral_is_lotus_1,
         annotations_spectral_is_lotus_2,
         command = list(!!!.x)
       ),
-      tar_file(
-        name = annotations_spectral_prepared,
+      annotations_spectral_is_p <- tar_file(
+        name = annotations_spectral_is_prepared,
         command = {
-          annotations_spectral_prepared <- prepare_spectral_matches(
-            input = annotations_spectral_merged,
+          annotations_spectral_is_prepared <- prepare_spectral_matches(
+            input = annotations_spectral_is_merged,
             output = params_spectral_matches$files$annotations$pretreated,
             parameters = params_spectral_matches
           )
         }
+      ),
+      tar_combine(
+        name = annotations_spectral_prepared,
+        annotations_spectral_gnps_p,
+        annotations_spectral_is_p,
+        command = list(!!!.x)
       )
     ),
     # SIRIUS
@@ -760,7 +766,6 @@ list(
         features_components_prepared <- prepare_features_components(
           input = list(
             annotations_spectral_prepared,
-            annotations_spectral_gnps_prepared,
             annotations_sirius_prepared
           ),
           output = params_features_components$files$annotations$filled,
