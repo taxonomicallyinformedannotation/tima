@@ -100,7 +100,6 @@ data:
         pos: data/source/spectra/isdb_pos.mgf
         neg: data/source/spectra/isdb_neg.mgf
       mona_lcmsms: data/source/spectra/MoNA-export-LC-MS-MS_Spectra.sdf
-
 doc:
   path: doc
 img:

@@ -80,7 +80,7 @@ The values you adapted in `config/prepare_config.yaml` were automatically propag
 And everything is stored in case you re-perform it, the beauty of `{targets}`!
 
 ```{r}
-source(file = "tima-r/inst/scripts/prepare_config.R")
+source(file = "inst/scripts/prepare_config.R")
 ```
 
 You can easily fine tune all parameters in each file and only the steps impacted by these modifications will run!
