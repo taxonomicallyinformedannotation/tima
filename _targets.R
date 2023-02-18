@@ -509,7 +509,11 @@ list(
           command = {
             library_sop_lotus_prepared <-
               prepare_lotus(
-                input = library_sop_lotus,
+                input = if (paths$tests$mode == FALSE) {
+                  library_sop_lotus
+                } else {
+                  paths$data$source$libraries$lotus
+                },
                 output = paths$data$interim$libraries$lotus
               )
           }
@@ -571,7 +575,7 @@ list(
                 }
             }
             ## To always check if a newest version is available
-            # ,cue = tar_cue(mode = "always")
+            , cue = tar_cue(mode = "always")
           ),
           tar_file(
             name = library_spectra_is_lotus_neg,
@@ -593,7 +597,7 @@ list(
                 }
             }
             ## To always check if a newest version is available
-            # ,cue = tar_cue(mode = "always")
+            , cue = tar_cue(mode = "always")
           )
         )
       ),
@@ -604,7 +608,11 @@ list(
           name = library_spectra_is_lotus_prepared_pos,
           command = {
             library_spectra_is_lotus_prepared_pos <- prepare_isdb_lotus(
-              input = library_spectra_is_lotus_pos,
+              input = if (paths$tests$mode == FALSE) {
+                library_spectra_is_lotus_pos
+              } else {
+                paths$data$source$spectra$lotus$pos
+              },
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "pos",
               export_sqlite = TRUE
@@ -615,7 +623,11 @@ list(
           name = library_spectra_is_lotus_prepared_neg,
           command = {
             library_spectra_is_lotus_prepared_neg <- prepare_isdb_lotus(
-              input = library_spectra_is_lotus_neg,
+              input = if (paths$tests$mode == FALSE) {
+                library_spectra_is_lotus_neg
+              } else {
+                paths$data$source$spectra$lotus$neg
+              },
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "neg",
               export_sqlite = TRUE
@@ -765,7 +777,8 @@ list(
       command = {
         features_components_prepared <- prepare_features_components(
           input = list(
-            annotations_spectral_prepared,
+            annotations_spectral_prepared |>
+              unlist(),
             annotations_sirius_prepared
           ),
           output = params_features_components$files$annotations$filled,

@@ -191,6 +191,20 @@ prepare_sirius <-
         dplyr::left_join(canopus_npc_prepared) |>
         dplyr::distinct() |>
         complement_metadata() |>
+        dplyr::select(
+          feature_id,
+          inchikey,
+          inchikey_2D,
+          smiles,
+          smiles_2D,
+          molecular_formula,
+          structure_exact_mass,
+          library,
+          score_input,
+          structure_taxonomy_npclassifier_01pathway,
+          structure_taxonomy_npclassifier_02superclass,
+          structure_taxonomy_npclassifier_03class
+        ) |>
         dplyr::mutate_all(as.character) |>
         dplyr::mutate_all(dplyr::na_if, "N/A")
 
@@ -215,8 +229,8 @@ prepare_sirius <-
         smiles_2D = NA,
         molecular_formula = NA,
         structure_exact_mass = NA,
-        score_input = NA,
         library = NA,
+        score_input = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA

@@ -51,7 +51,7 @@ source(file = "inst/scripts/prepare_spectral_matches.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("annotations_spectral_is"),targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("annotations_spectral_is"), targets_only = TRUE, degree_from = 8)
 ```
 
 #### GNPS
@@ -69,7 +69,7 @@ source(file = "inst/scripts/prepare_gnps.R")
 You now have all your spectral annotations:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("annotations_spectral"),targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("annotations_spectral"), targets_only = TRUE, degree_from = 8)
 ```
 
 ### Fingerprint-based
@@ -104,7 +104,7 @@ source(file = "inst/scripts/prepare_sirius.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("annotations_s"),targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("annotations_s"), targets_only = TRUE, degree_from = 8)
 ```
 
 You now have your annotations well prepared and can keep on formatting the rest of your metadata.
@@ -166,7 +166,7 @@ source(file = "inst/scripts/prepare_taxa.R")
 You are almost there! See already all the steps accomplished!
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("features"),targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("features"), targets_only = TRUE, degree_from = 8)
 ```
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/IV-processing.html).

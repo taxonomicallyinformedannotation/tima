@@ -48,7 +48,21 @@ prepare_spectral_matches <-
         structure_exact_mass = as.numeric(structure_exact_mass)
       ) |>
       # Call complement_metadata function on the modified data frame
-      complement_metadata()
+      complement_metadata() |>
+      dplyr::select(
+        feature_id,
+        inchikey,
+        inchikey_2D,
+        smiles,
+        smiles_2D,
+        molecular_formula,
+        structure_exact_mass,
+        library,
+        score_input,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_npclassifier_03class
+      )
 
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions
