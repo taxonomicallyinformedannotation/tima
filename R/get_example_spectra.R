@@ -15,6 +15,7 @@
 get_example_spectra <-
   function(url = paths$url$examples$mgf,
            export = paths$data$source$examples$spectra) {
+    paths <- parse_yaml_paths()
     ## Set the timeout for download to 600 seconds
     options(timeout = 600)
     message("Timeout for download is ", getOption("timeout"), " seconds")

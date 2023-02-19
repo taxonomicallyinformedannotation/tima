@@ -647,96 +647,102 @@ list(
   list(
     ## Spectral
     list(
-      ## TODO Extend to other libraries
-      ## TODO improve polarity handling, suboptimal
-      annotations_spectral_is_lotus_1 <-
-        tar_file(
-          name = annotations_spectral_is_lotus_pos,
+      ## Experimental
+      list(
+        ## TODO Extend to other libraries
+        annotations_spectral_exp_gnps_p <- tar_file(
+          name = annotations_spectral_exp_gnps_prepared,
           command = {
-            annotations_spectral_is_lotus_pos <- process_spectra(
-              input = input_spectra,
-              library = library_spectra_is_lotus_prepared_pos,
-              polarity = "pos",
-              output = gsub(
-                pattern = ".tsv.gz",
-                replacement = "_pos.tsv.gz",
-                x = params_spectra$files$annotations$raw$spectral,
-                fixed = TRUE
-              ),
-              method = params_spectra$annotations$ms2$method,
-              threshold = params_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_spectra$options$parallel,
-              fast = params_spectra$options$fast,
-              approx = params_spectra$annotations$ms2$approx,
-              parameters = params_spectra
+            annotations_spectral_exp_gnps_prepared <-
+              prepare_gnps(
+                gnps_job_id = params_gnps$gnps$id,
+                output = params_gnps$files$annotations$pretreated,
+                parameters = params_gnps
+              )
+          }
+        )
+      ),
+      ## In silico
+      list(
+        ## TODO improve polarity handling, suboptimal
+        annotations_spectral_is_lotus_1 <-
+          tar_file(
+            name = annotations_spectral_is_lotus_pos,
+            command = {
+              annotations_spectral_is_lotus_pos <- process_spectra(
+                input = input_spectra,
+                library = library_spectra_is_lotus_prepared_pos,
+                polarity = "pos",
+                output = gsub(
+                  pattern = ".tsv.gz",
+                  replacement = "_pos.tsv.gz",
+                  x = params_spectra$files$annotations$raw$spectral,
+                  fixed = TRUE
+                ),
+                method = params_spectra$annotations$ms2$method,
+                threshold = params_spectra$annotations$ms2$thresholds$similarity,
+                ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+                dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+                npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+                rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+                condition = params_spectra$annotations$ms2$thresholds$condition,
+                qutoff = params_spectra$ms$intensity$thresholds$ms2,
+                parallel = params_spectra$options$parallel,
+                fast = params_spectra$options$fast,
+                approx = params_spectra$annotations$ms2$approx,
+                parameters = params_spectra
+              )
+            }
+          ),
+        annotations_spectral_is_lotus_2 <-
+          tar_file(
+            name = annotations_spectral_is_lotus_neg,
+            command = {
+              annotations_spectral_is_lotus_neg <- process_spectra(
+                input = input_spectra,
+                library = library_spectra_is_lotus_prepared_neg,
+                polarity = "neg",
+                output = gsub(
+                  pattern = ".tsv.gz",
+                  replacement = "_neg.tsv.gz",
+                  x = params_spectra$files$annotations$raw$spectral,
+                  fixed = TRUE
+                ),
+                method = params_spectra$annotations$ms2$method,
+                threshold = params_spectra$annotations$ms2$thresholds$similarity,
+                ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+                dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+                npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+                rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+                condition = params_spectra$annotations$ms2$thresholds$condition,
+                qutoff = params_spectra$ms$intensity$thresholds$ms2,
+                parallel = params_spectra$options$parallel,
+                fast = params_spectra$options$fast,
+                approx = params_spectra$annotations$ms2$approx,
+                parameters = params_spectra
+              )
+            }
+          ),
+        tar_combine(
+          name = annotations_spectral_is_merged,
+          annotations_spectral_is_lotus_1,
+          annotations_spectral_is_lotus_2,
+          command = list(!!!.x)
+        ),
+        annotations_spectral_is_p <- tar_file(
+          name = annotations_spectral_is_prepared,
+          command = {
+            annotations_spectral_is_prepared <- prepare_spectral_matches(
+              input = annotations_spectral_is_merged,
+              output = params_spectral_matches$files$annotations$pretreated,
+              parameters = params_spectral_matches
             )
           }
-        ),
-      annotations_spectral_gnps_p <- tar_file(
-        name = annotations_spectral_gnps_prepared,
-        command = {
-          annotations_spectral_gnps_prepared <-
-            prepare_gnps(
-              gnps_job_id = params_gnps$gnps$id,
-              output = params_gnps$files$annotations$pretreated,
-              parameters = params_gnps
-            )
-        }
-      ),
-      annotations_spectral_is_lotus_2 <-
-        tar_file(
-          name = annotations_spectral_is_lotus_neg,
-          command = {
-            annotations_spectral_is_lotus_neg <- process_spectra(
-              input = input_spectra,
-              library = library_spectra_is_lotus_prepared_neg,
-              polarity = "neg",
-              output = gsub(
-                pattern = ".tsv.gz",
-                replacement = "_neg.tsv.gz",
-                x = params_spectra$files$annotations$raw$spectral,
-                fixed = TRUE
-              ),
-              method = params_spectra$annotations$ms2$method,
-              threshold = params_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_spectra$options$parallel,
-              fast = params_spectra$options$fast,
-              approx = params_spectra$annotations$ms2$approx,
-              parameters = params_spectra
-            )
-          }
-        ),
-      tar_combine(
-        name = annotations_spectral_is_merged,
-        annotations_spectral_is_lotus_1,
-        annotations_spectral_is_lotus_2,
-        command = list(!!!.x)
-      ),
-      annotations_spectral_is_p <- tar_file(
-        name = annotations_spectral_is_prepared,
-        command = {
-          annotations_spectral_is_prepared <- prepare_spectral_matches(
-            input = annotations_spectral_is_merged,
-            output = params_spectral_matches$files$annotations$pretreated,
-            parameters = params_spectral_matches
-          )
-        }
+        )
       ),
       tar_combine(
         name = annotations_spectral_prepared,
-        annotations_spectral_gnps_p,
+        annotations_spectral_exp_gnps_p,
         annotations_spectral_is_p,
         command = list(!!!.x)
       )

@@ -66,6 +66,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "visNetwork",
+      "name": "visNetwork",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     }
   ],
   "softwareRequirements": {
@@ -287,6 +299,18 @@
     },
     "20": {
       "@type": "SoftwareApplication",
+      "identifier": "tarchetypes",
+      "name": "tarchetypes",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tarchetypes"
+    },
+    "21": {
+      "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
       "provider": {
@@ -297,7 +321,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "21": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -309,7 +333,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "22": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -321,12 +345,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -341,7 +365,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2428.479KB",
+  "fileSize": "2416.201KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
