@@ -17,6 +17,7 @@ prepare_lotus <-
   function(input = paths$data$source$libraries$lotus,
            output = paths$data$interim$libraries$lotus) {
     log_debug(x = "Loading and preparing LOTUS")
+    paths <- parse_yaml_paths()
     # Read input file and select specific columns
     lotus_prepared <- input |>
       readr::read_csv(

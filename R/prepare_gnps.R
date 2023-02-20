@@ -54,7 +54,7 @@ prepare_gnps <-
         complement_metadata() |>
         dplyr::select(
           feature_id,
-          # structure_name,
+          structure_name,
           inchikey,
           inchikey_2D,
           smiles,
@@ -79,7 +79,7 @@ prepare_gnps <-
       log_debug("No GNPS job ID provided, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
-        # structure_name = NA,
+        structure_name = NA,
         inchikey = NA,
         inchikey_2D = NA,
         smiles = NA,
