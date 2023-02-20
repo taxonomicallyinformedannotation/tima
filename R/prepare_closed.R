@@ -63,7 +63,7 @@ prepare_closed <-
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- data.frame(
-        structure_nameTraditional = NA,
+        structure_name = NA,
         structure_inchikey_2D = NA,
         structure_smiles_2D = NA,
         structure_molecular_formula = NA,
