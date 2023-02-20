@@ -30,7 +30,7 @@ complement_metadata <- function(df) {
           col_select = c(
             "inchikey_2D" = "structureCleaned_inchikey2D",
             "smiles_2D_2" = "structureCleaned_smiles2D",
-            "structure_name_2" = "structureCleaned_nameTraditional",
+            # "structure_name_2" = "structureCleaned_nameTraditional",
             "molecular_formula_2" = "structureCleaned_molecularFormula",
             "structure_exact_mass_2" = "structureCleaned_exactMass",
             "structure_xlogp_2" = "structureCleaned_xlogp"
@@ -39,14 +39,14 @@ complement_metadata <- function(df) {
           dplyr::distinct()
       ) |>
       dplyr::mutate(
-        structure_name = dplyr::coalesce(structure_name, structure_name_2),
+        # structure_name = dplyr::coalesce(structure_name, structure_name_2),
         smiles_2D = dplyr::coalesce(smiles_2D, smiles_2D_2),
         molecular_formula = dplyr::coalesce(molecular_formula, molecular_formula_2),
         structure_exact_mass = dplyr::coalesce(structure_exact_mass, structure_exact_mass_2),
         structure_xlogp = dplyr::coalesce(structure_xlogp, structure_xlogp_2)
       ) |>
       dplyr::select(
-        -structure_name_2,
+        # -structure_name_2,
         -smiles_2D_2,
         -molecular_formula_2,
         -structure_exact_mass_2,
