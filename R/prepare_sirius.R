@@ -131,10 +131,12 @@ prepare_sirius <-
             test = ConfidenceScore != "N/A",
             yes = ConfidenceScore,
             no = -10 / as.numeric(`CSI:FingerIDScore`)
-          )
+          ),
+          structure_xlogp = as.numeric(xlogp)
         ) |>
         dplyr::select(
           feature_id,
+          structure_name = name,
           smiles,
           inchikey_2D = InChIkey2D,
           molecular_formula = molecularFormula,
@@ -157,15 +159,23 @@ prepare_sirius <-
         ) |>
         dplyr::select(
           feature_id,
+          structure_name = name,
           smiles,
           inchikey_2D = InChIkey2D,
           molecular_formula = molecularFormula,
+          structure_xlogp = xlogp,
           score_input
         ) |>
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
-          smiles_2D = smiles
+          smiles_2D = smiles,
+          ## TODO until better
+          structure_taxonomy_classyfire_chemontid = NA,
+          structure_taxonomy_classyfire_01kingdom = NA,
+          structure_taxonomy_classyfire_02superclass = NA,
+          structure_taxonomy_classyfire_03class = NA,
+          structure_taxonomy_classyfire_04directparent = NA
         )
 
       formula_prepared <- formula |>
@@ -193,17 +203,25 @@ prepare_sirius <-
         complement_metadata() |>
         dplyr::select(
           feature_id,
+          structure_name,
           inchikey,
           inchikey_2D,
           smiles,
           smiles_2D,
           molecular_formula,
           structure_exact_mass,
+          structure_xlogp,
           library,
           score_input,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class
+          structure_taxonomy_npclassifier_03class,
+          ## TODO until better
+          structure_taxonomy_classyfire_chemontid,
+          structure_taxonomy_classyfire_01kingdom,
+          structure_taxonomy_classyfire_02superclass,
+          structure_taxonomy_classyfire_03class,
+          structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate_all(as.character) |>
         dplyr::mutate_all(dplyr::na_if, "N/A")
@@ -223,17 +241,24 @@ prepare_sirius <-
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
+        structure_name = NA,
         inchikey = NA,
         inchikey_2D = NA,
         smiles = NA,
         smiles_2D = NA,
         molecular_formula = NA,
         structure_exact_mass = NA,
+        structure_xlogp = NA,
         library = NA,
         score_input = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
-        structure_taxonomy_npclassifier_03class = NA
+        structure_taxonomy_npclassifier_03class = NA,
+        structure_taxonomy_classyfire_chemontid = NA,
+        structure_taxonomy_classyfire_01kingdom = NA,
+        structure_taxonomy_classyfire_02superclass = NA,
+        structure_taxonomy_classyfire_03class = NA,
+        structure_taxonomy_classyfire_04directparent = NA
       )
     }
     log_debug(x = "Exporting ...")

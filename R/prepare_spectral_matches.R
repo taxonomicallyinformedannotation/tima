@@ -40,28 +40,43 @@ prepare_spectral_matches <-
       # Add new columns
       dplyr::mutate(
         library = "ISDB",
+        structure_name = NA,
         inchikey = NA,
         smiles_2D = smiles,
+        structure_exact_mass = as.numeric(structure_exact_mass),
+        structure_xlogp = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
-        structure_exact_mass = as.numeric(structure_exact_mass)
+        structure_taxonomy_classyfire_chemontid = NA,
+        structure_taxonomy_classyfire_01kingdom = NA,
+        structure_taxonomy_classyfire_02superclass = NA,
+        structure_taxonomy_classyfire_03class = NA,
+        structure_taxonomy_classyfire_04directparent = NA
       ) |>
       # Call complement_metadata function on the modified data frame
       complement_metadata() |>
       dplyr::select(
         feature_id,
+        structure_name,
         inchikey,
         inchikey_2D,
         smiles,
         smiles_2D,
         molecular_formula,
         structure_exact_mass,
+        structure_xlogp,
         library,
         score_input,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class
+        structure_taxonomy_npclassifier_03class,
+        ## TODO until better
+        structure_taxonomy_classyfire_chemontid,
+        structure_taxonomy_classyfire_01kingdom,
+        structure_taxonomy_classyfire_02superclass,
+        structure_taxonomy_classyfire_03class,
+        structure_taxonomy_classyfire_04directparent
       )
 
     log_debug(x = "Exporting ...")

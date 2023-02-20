@@ -27,6 +27,7 @@ prepare_gnps <-
       table <- read_results(id = gnps_job_id) |>
         dplyr::select(
           feature_id = `#Scan#`,
+          structure_name = Compound_Name,
           smiles = Smiles,
           score_input = MQScore,
           # smiles_2D, ## Not available for now
@@ -41,22 +42,36 @@ prepare_gnps <-
         dplyr::mutate(
           library = "GNPS",
           smiles_2D = NA,
-          molecular_formula = NA
+          molecular_formula = NA,
+          structure_xlogp = NA,
+          ## Only partially present
+          structure_taxonomy_classyfire_chemontid = NA,
+          structure_taxonomy_classyfire_01kingdom = NA,
+          structure_taxonomy_classyfire_02superclass = NA,
+          structure_taxonomy_classyfire_03class = NA,
+          structure_taxonomy_classyfire_04directparent = NA
         ) |>
         complement_metadata() |>
         dplyr::select(
           feature_id,
+          structure_name,
           inchikey,
           inchikey_2D,
           smiles,
           smiles_2D,
           molecular_formula,
           structure_exact_mass,
+          structure_xlogp,
           library,
           score_input,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class
+          structure_taxonomy_npclassifier_03class,
+          structure_taxonomy_classyfire_chemontid,
+          structure_taxonomy_classyfire_01kingdom,
+          structure_taxonomy_classyfire_02superclass,
+          structure_taxonomy_classyfire_03class,
+          structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate_all(as.character) |>
         dplyr::mutate_all(dplyr::na_if, "N/A")
@@ -64,17 +79,24 @@ prepare_gnps <-
       log_debug("No GNPS job ID provided, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
+        structure_name = NA,
         inchikey = NA,
         inchikey_2D = NA,
         smiles = NA,
         smiles_2D = NA,
         molecular_formula = NA,
         structure_exact_mass = NA,
+        structure_xlogp = NA,
         library = NA,
         score_input = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
-        structure_taxonomy_npclassifier_03class = NA
+        structure_taxonomy_npclassifier_03class = NA,
+        structure_taxonomy_classyfire_chemontid = NA,
+        structure_taxonomy_classyfire_01kingdom = NA,
+        structure_taxonomy_classyfire_02superclass = NA,
+        structure_taxonomy_classyfire_03class = NA,
+        structure_taxonomy_classyfire_04directparent = NA
       )
     }
     log_debug(x = "Exporting ...")

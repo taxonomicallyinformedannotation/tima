@@ -31,7 +31,7 @@ prepare_closed <-
           last = 14
         )) |>
         dplyr::select(
-          structure_nameTraditional,
+          structure_name = structure_nameTraditional,
           structure_inchikey_2D,
           structure_smiles_2D,
           structure_molecular_formula,
@@ -40,6 +40,11 @@ prepare_closed <-
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
+          structure_taxonomy_classyfire_chemontid,
+          structure_taxonomy_classyfire_01kingdom,
+          structure_taxonomy_classyfire_02superclass,
+          structure_taxonomy_classyfire_03class,
+          structure_taxonomy_classyfire_04directparent,
           organism_name,
           organism_taxonomy_01domain,
           organism_taxonomy_02kingdom,
@@ -52,11 +57,7 @@ prepare_closed <-
           organism_taxonomy_09species,
           organism_taxonomy_10varietas
         ) |>
-        # Round to 5 digits to avoid small discrepancies
-        dplyr::mutate(
-          structure_exact_mass = round(structure_exact_mass, digits = 5),
-          structure_xlogp = round(structure_xlogp, digits = 5)
-        ) |>
+        round_reals() |>
         dplyr::distinct() |>
         dplyr::mutate(reference_doi = NA)
     } else {
@@ -71,6 +72,11 @@ prepare_closed <-
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
+        structure_taxonomy_classyfire_chemontid = NA,
+        structure_taxonomy_classyfire_01kingdom = NA,
+        structure_taxonomy_classyfire_02superclass = NA,
+        structure_taxonomy_classyfire_03class = NA,
+        structure_taxonomy_classyfire_04directparent = NA,
         organism_name = NA,
         organism_taxonomy_01domain = NA,
         organism_taxonomy_02kingdom = NA,

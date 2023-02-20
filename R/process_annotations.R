@@ -163,11 +163,7 @@ process_annotations <-
         "structure_exact_mass",
         "structure_xlogp"
       ), as.numeric)) |>
-      ## COMMENT AR: else some redundancy because of reals
-      dplyr::mutate(
-        structure_exact_mass = round(structure_exact_mass, digits = 5),
-        structure_xlogp = round(structure_xlogp, digits = 5)
-      ) |>
+      round_reals() |>
       dplyr::mutate(dplyr::across(
         tidyr::matches("taxonomy"),
         ~ tidyr::replace_na(.x, "notClassified")
