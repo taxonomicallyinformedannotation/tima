@@ -58,7 +58,7 @@ prepare_spectral_matches <-
       complement_metadata() |>
       dplyr::select(
         feature_id,
-        structure_name,
+        # structure_name,
         inchikey,
         inchikey_2D,
         smiles,
