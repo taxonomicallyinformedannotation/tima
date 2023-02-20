@@ -113,7 +113,7 @@ clean_chemo <-
       dplyr::arrange(reference_doi) |>
       dplyr::distinct(
         inchikey_2D = structure_inchikey_2D,
-        structure_name = structure_name,
+        structure_name,
         structure_xlogp,
         structure_01pathway = structure_taxonomy_npclassifier_01pathway,
         structure_02superclass = structure_taxonomy_npclassifier_02superclass,
