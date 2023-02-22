@@ -5,7 +5,7 @@
 \title{Get example spectra}
 \usage{
 get_example_spectra(
-  url = paths$url$examples$mgf,
+  url = paths$url$examples$spectra,
   export = paths$data$source$examples$spectra
 )
 }

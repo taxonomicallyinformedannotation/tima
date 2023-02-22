@@ -6,6 +6,7 @@
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
 #' @param ms_mode Mode of mass spectrometry, either "pos" or "neg"
+#' @param name_features Name of the features column in the features data
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
 #'
@@ -23,6 +24,7 @@ fake_features_components <-
            features = params$files$features$raw,
            output = params$files$annotations$filled,
            ms_mode = params$ms$polarity,
+           name_features = params$names$features,
            name_rt = params$names$rt,
            name_mz = params$names$precursor) {
     # Check that input and features files exist
@@ -48,7 +50,7 @@ fake_features_components <-
 
     log_debug("... features table")
     features <- readr::read_delim(file = features) |>
-      dplyr::mutate(feature_id = as.numeric(feature_id))
+      dplyr::mutate(feature_id := as.numeric(!!as.name(name_features)))
 
     # Initialize components data frame
     components <- dplyr::mutate(table, component_id = -1)

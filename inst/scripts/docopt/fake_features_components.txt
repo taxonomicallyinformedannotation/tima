@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz --fil-fea-raw data/source/examples/features.tsv.gz --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_faked_filled.tsv.gz --ms-pol pos --names-precursor mz --names-rt rt
+  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz --fil-fea-raw data/source/examples/features.csv --fil-ann-fil data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_faked_filled.tsv.gz --ms-pol pos --names-features 'row ID' --names-precursor 'row m/z' --names-rt 'row retention time'
 
 Usage: 
   fake_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-fea-raw=<fil-fea-raw>] [--ms-pol=<ms-pol>] [--names-precursor=<names-precursor>] [--names-rt=<names-rt>]
@@ -11,6 +11,7 @@ Arguments:
 
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
 
+  names-features             Name of "feature IDs" variable in the input. STRING
   names-precursor            Name of "precursor m/z" variable in the input. STRING
   names-rt                   Name of "retention time" variable in the input. STRING
 
