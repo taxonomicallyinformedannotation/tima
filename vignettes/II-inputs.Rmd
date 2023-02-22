@@ -47,8 +47,6 @@ Those will help you understanding how the workflow works so you can adapt them l
 So first, let's have a look at the structure of the parameters:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-library(targets)
-Sys.setenv(TAR_WARN = "false")
 targets::tar_visnetwork(names = starts_with("config_default"), targets_only = TRUE, degree_from = 8)
 ```
 

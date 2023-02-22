@@ -142,7 +142,7 @@ source(file = "inst/scripts/prepare_features_edges.R")
 ```
 
 ```{r}
-# source(file = "inst/scripts/prepare_features_components.R")
+source(file = "inst/scripts/prepare_features_components.R")
 ```
 
 ## Biological source annotation

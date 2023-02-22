@@ -42,7 +42,29 @@ If you do not like YAML, parameters of each steps can also be given as command l
 They will then be saved as YAML you will be able to share.
 
 To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
-Each step of the whole pipeline will be described here after.
+Each step of the whole pipeline will be described next.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+library(targets)
+Sys.setenv(TAR_WARN = "false")
+targets::tar_visnetwork(
+  names = starts_with("annotations"),
+  exclude = c(
+    contains("config"),
+    contains("input"),
+    contains("paths"),
+    contains("params"),
+    contains("_pos"),
+    contains("_neg"),
+    contains("library_sop_lotus"),
+    contains("library_sop_closed")
+  ),
+  targets_only = TRUE,
+  degree_from = 8,
+  level_separation = 200
+)
+```
 
 ## Use
 
