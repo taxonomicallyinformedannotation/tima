@@ -74,9 +74,9 @@ prepare_closed()
 
 ### Structural library
 log_debug("Preparing structural library")
-step <- "prepare_library"
+step <- "prepare_libraries"
 params <- get_params(step = step)
-prepare_library()
+prepare_libraries()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")

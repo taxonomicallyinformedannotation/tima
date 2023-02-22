@@ -68,14 +68,14 @@ testthat::test_that("Whole process", {
   prepare_closed()
 
   ### Structural library
-  step <- "prepare_library"
+  step <- "prepare_libraries"
   params <- get_params(step = step)
-  prepare_library(
+  prepare_libraries(
     filter = TRUE,
     level = "family",
     value = "Simaroubaceae|Gentianaceae"
   )
-  prepare_library()
+  prepare_libraries()
 
   ## Prepare spectra
   ### LOTUS
