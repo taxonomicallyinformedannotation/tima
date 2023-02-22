@@ -140,8 +140,8 @@ urls:
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra.mgf
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra_mini.mgf
     spectral_lib_mini: 
-      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_neg.mgf
-      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_pos.mgf
+      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_neg.mgf
+      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_pos.mgf
   hmdb:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
