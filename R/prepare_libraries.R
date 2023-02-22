@@ -1,5 +1,3 @@
-# TODO
-
 #' @title Prepare libraries
 #'
 #' @description This function prepares the libraries made of all sub-libraries containing structure-organism pairs
@@ -24,7 +22,7 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr anti_join bind_rows distinct filter left_join
+#' @importFrom dplyr anti_join bind_rows distinct filter left_join mutate_all
 #' @importFrom readr cols read_delim write_delim
 #'
 #' @examples NULL
@@ -79,8 +77,10 @@ prepare_libraries <-
     params <<- parameters
     libraries <- list()
     for (i in seq_along(files)) {
-      libraries[[i]] <- readr::read_delim(file = files[[i]],
-                                          col_types = readr::cols(.default = "c"))
+      libraries[[i]] <- readr::read_delim(
+        file = files[[i]],
+        col_types = readr::cols(.default = "c")
+      )
     }
 
     tables <- dplyr::bind_rows(libraries) |>
@@ -102,9 +102,11 @@ prepare_libraries <-
       table_organisms_taxonomy_ott_full <-
         table_organisms_taxonomy_ott_2 |>
         get_organism_taxonomy_ott()
+
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
-        dplyr::bind_rows(table_organisms_taxonomy_ott_full)
+        dplyr::bind_rows(table_organisms_taxonomy_ott_full |>
+          dplyr::mutate_all(as.character))
     }
 
     log_debug(x = "Keeping structures")

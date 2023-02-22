@@ -1,5 +1,3 @@
-# TODO
-
 #' @title Prepare LOTUS
 #'
 #' @description This function prepares the LOTUS structure-organism pairs
