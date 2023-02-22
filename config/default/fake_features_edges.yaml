@@ -5,7 +5,7 @@ files:
   features: 
 
     #' Raw features file. STRING
-    raw: data/source/examples/features.tsv.gz
+    raw: data/source/examples/features.csv
 
   #' Networks files.
   networks:
@@ -23,4 +23,4 @@ files:
 names:
 
   #' Name of "feature IDs" variable in the input. STRING
-  features: feature_id
+  features: 'row ID'

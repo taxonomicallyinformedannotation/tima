@@ -30,10 +30,10 @@ ms:
 #' Names of the different variables in the input files.
 names:
 
-  features: "row ID"
+  features: 'row ID'
 
   #' Name of "precursor m/z" variable in the input. STRING
-  precursor: "row m/z"
+  precursor: 'row m/z'
 
   #' Name of "retention time" variable in the input. STRING
-  rt: "row retention time"
+  rt: 'row retention time'
