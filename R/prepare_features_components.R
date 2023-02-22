@@ -7,6 +7,7 @@
 #' @param tool Tool used to generate components
 #' @param components File containing the components if tool == 'manual'
 #' @param gnps_job_id GNPS job ID
+#' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param parameters Params
 #'
@@ -25,6 +26,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
                                         tool = params$tools$networks$spectral$components,
                                         components = params$files$networks$spectral$components$raw,
                                         gnps_job_id = params$gnps$id,
+                                        workflow = params$gnps$workflow,
                                         ms_mode = params$ms$polarity,
                                         parameters = params) {
   params <<- parameters
@@ -55,7 +57,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   ## TODO
   if (tool == "gnps") {
     components <-
-      read_clusters(id = gnps_job_id) |>
+      read_clusters(id = gnps_job_id,workflow = workflow) |>
       dplyr::select(
         feature_id = `cluster index`,
         component_id = componentindex,

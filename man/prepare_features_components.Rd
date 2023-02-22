@@ -10,6 +10,7 @@ prepare_features_components(
   tool = params$tools$networks$spectral$components,
   components = params$files$networks$spectral$components$raw,
   gnps_job_id = params$gnps$id,
+  workflow = params$gnps$workflow,
   ms_mode = params$ms$polarity,
   parameters = params
 )
@@ -24,6 +25,8 @@ prepare_features_components(
 \item{components}{File containing the components if tool == 'manual'}
 
 \item{gnps_job_id}{GNPS job ID}
+
+\item{workflow}{Character string indicating the type of workflow, either "fbmn" or "classical"}
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
