@@ -27,6 +27,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
                                         gnps_job_id = params$gnps$id,
                                         ms_mode = params$ms$polarity,
                                         parameters = params) {
+  params <<- parameters
   if (tool == "gnps") {
     stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   } else {
@@ -39,7 +40,6 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   }
   stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
-  params <<- parameters
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
   table <- lapply(
