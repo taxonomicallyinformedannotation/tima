@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_sirius.R --fil-ann-raw-sir data/interim/annotations/sirius/ --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
+  Rscript inst/scripts/prepare_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
 
 Usage: 
   prepare_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre=<fil-ann-pre>] [--too-tax-che=<too-tax-che>]

@@ -8,7 +8,7 @@ files:
     raw:
 
       #' Directory containing the sirius results. STRING
-      sirius: data/interim/annotations/sirius/
+      sirius: data/interim/annotations/example_sirius/
 
     #' List of pretreated annotations. STRING
     pretreated:

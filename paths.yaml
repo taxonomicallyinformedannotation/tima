@@ -48,7 +48,7 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
-      example_sirius: data/interim/annotations/sirius.zip
+      example_sirius: data/interim/annotations/example_sirius.zip
     config:
       path: data/interim/config
     features:
@@ -135,8 +135,8 @@ urls:
   examples:
     features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/features.csv
     metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv
-    sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/sirius.zip
-    sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/sirius_mini.zip
+    sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius.zip
+    sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_mini.zip
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra.mgf
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra_mini.mgf
     spectral_lib_mini: 
