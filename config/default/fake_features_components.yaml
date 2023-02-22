@@ -10,7 +10,6 @@ files:
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
 
-    
     #' Filled annotations file. STRING
     filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_faked_filled.tsv.gz
     

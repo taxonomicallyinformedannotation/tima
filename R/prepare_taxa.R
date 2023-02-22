@@ -193,7 +193,7 @@ prepare_taxa <-
       ) |>
       dplyr::group_by(feature_id) |>
       dplyr::summarise_all(function(x) {
-        x <- list(paste(unique(x[!is.na(x)]), collapse = "|"))
+        x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }) |>
       dplyr::ungroup() |>
       dplyr::mutate_all(as.character) |>

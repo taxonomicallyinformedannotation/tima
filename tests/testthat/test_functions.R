@@ -173,12 +173,10 @@ testthat::test_that("Whole process", {
   process_annotations()
   ### No MS1
   process_annotations(
-    annotations = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz",
     annotate = FALSE
   )
   ### Only MS1
   process_annotations(
-    annotations = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz",
     ms_mode = "neg",
     ms1_only = TRUE
   )
