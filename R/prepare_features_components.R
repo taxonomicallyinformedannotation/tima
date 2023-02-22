@@ -57,7 +57,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   ## TODO
   if (tool == "gnps") {
     components <-
-      read_clusters(id = gnps_job_id,workflow = workflow) |>
+      read_clusters(id = gnps_job_id, workflow = workflow) |>
       dplyr::select(
         feature_id = `cluster index`,
         component_id = componentindex,

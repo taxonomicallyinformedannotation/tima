@@ -30,10 +30,11 @@ testthat::test_that("Whole process", {
 
   #### SIRIUS
   ## mini version for tests
-  get_example_sirius(url = paths$urls$examples$sirius_mini,
-                     export = paths$data$interim$annotations$example_sirius |>
-                       gsub(pattern = ".zip",replacement ="_mini.zip")
-                     )
+  get_example_sirius(
+    url = paths$urls$examples$sirius_mini,
+    export = paths$data$interim$annotations$example_sirius |>
+      gsub(pattern = ".zip", replacement = "_mini.zip")
+  )
   # get_example_sirius()
 
   #### LOTUS
@@ -136,7 +137,7 @@ testthat::test_that("Whole process", {
   prepare_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
   prepare_sirius(input_directory = params$files$annotations$raw$sirius |>
-    gsub(pattern = "sirius",replacement ="sirius_mini"))
+    gsub(pattern = "sirius", replacement = "sirius_mini"))
 
   ### ISDB results
   step <- "prepare_spectral_matches"
@@ -171,9 +172,11 @@ testthat::test_that("Whole process", {
   ## Without file extension in the column names
   prepare_taxa(extension = FALSE)
   ## With manual file
-  prepare_taxa(input = paths$data$source$examples$features,
-               metadata = paths$data$source$examples$metadata,
-               tool = "manual")
+  prepare_taxa(
+    input = paths$data$source$examples$features,
+    metadata = paths$data$source$examples$metadata,
+    tool = "manual"
+  )
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
 

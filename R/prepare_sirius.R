@@ -30,6 +30,7 @@ prepare_sirius <-
            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            parameters = params) {
+    params <<- parameters
     if (file.exists(input_directory)) {
       stopifnot("Chemical class must be 'npc'." = npc %in% c("npc"))
       stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
@@ -48,7 +49,6 @@ prepare_sirius <-
           )
         ) != 0
       )
-      params <<- parameters
       log_debug("Loading and formatting SIRIUS results")
       if (npc == "npc") {
         canopus <-
