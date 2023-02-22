@@ -204,7 +204,7 @@ files:
 
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
-    raw: data/interim/example_metadata_manual.csv
+    raw: data/examples/metadata.tsv
 
     #' Taxonomically informed features file. STRING
     processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
