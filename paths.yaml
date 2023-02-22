@@ -98,7 +98,7 @@ data:
       path: data/source/examples
       features: data/source/examples/features.csv
       metadata: data/source/examples/metadata.tsv
-      spectra: data/source/examples/example.mgf
+      spectra: data/source/examples/spectra.mgf
     libraries:
       path: data/source/libraries
       closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz

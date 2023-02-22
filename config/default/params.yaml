@@ -213,7 +213,7 @@ files:
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/examples/example.mgf
+    raw: data/source/examples/spectra.mgf
 
 
 #' GNPS related parameters.
