@@ -20,9 +20,12 @@ testthat::test_that("Whole process", {
   #### Feature table
   get_example_features()
 
+  #### Metadata table
+  get_example_metadata()
+
   #### MGF
   ## mini version for tests
-  get_example_spectra(url = paths$url$examples$mgf_mini)
+  get_example_spectra(url = paths$url$examples$spectra_mini)
   # get_example_spectra()
 
   #### SIRIUS

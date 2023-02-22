@@ -48,7 +48,7 @@ data:
       pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
-      example_sirius: data/interim/annotations/example_sirius.zip
+      example_sirius: data/interim/annotations/sirius.zip
     config:
       path: data/interim/config
     features:
@@ -96,7 +96,8 @@ data:
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
     examples:
       path: data/source/examples
-      features: data/source/examples/features.tsv.gz
+      features: data/source/examples/features.csv
+      metadata: data/source/examples/metadata.tsv
       spectra: data/source/examples/example.mgf
     libraries:
       path: data/source/libraries
@@ -132,14 +133,15 @@ tests:
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   examples:
-    features: https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=96fa7c88200e4a03bee4644e581e3fb0&block=main&file=clusterinfo_summary/
-    mgf: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example.mgf
-    mgf_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_mini.mgf
-    sirius: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius.zip
-    sirius_mini: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_sirius_mini.zip
-    spectral_lib: 
-      neg: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib_neg.mgf
-      pos: https://github.com/taxonomicallyinformedannotation/demo-files/raw/main/example_spectral_lib_pos.mgf
+    features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/features.csv
+    metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv
+    sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/sirius.zip
+    sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/sirius_mini.zip
+    spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra.mgf
+    spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra_mini.mgf
+    spectral_lib_mini: 
+      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_neg.mgf
+      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_pos.mgf
   hmdb:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:

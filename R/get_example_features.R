@@ -9,20 +9,26 @@
 #'
 #' @export
 #'
-#' @importFrom readr read_tsv write_tsv
+#' @importFrom utils download.file
 #'
 #' @examples NULL
 get_example_features <-
   function(url = paths$urls$examples$features,
            export = paths$data$source$examples$features) {
-    # Create the export directory if it does not exist
+    paths <- parse_yaml_paths()
+    ## Set the timeout for download to 600 seconds
+    options(timeout = 600)
+    message("Timeout for download is ", getOption("timeout"), " seconds")
+
+    ## Create the export directory if it does not exist
     create_dir(export = export)
 
-    # Read the tsv file from the given url
-    # Select only the columns "cluster index" as "feature_id", "RTMean" as "rt" and "precursor mass" as "mz"
-    # Write the resulting dataframe to the export path in tsv format
-    readr::read_tsv(file = url, col_select = c(feature_id = `cluster index`, rt = RTMean, mz = `precursor mass`)) |>
-      readr::write_tsv(file = export)
+    ## Download the file from the given URL and save it to the specified location
+    message("Downloading")
+    utils::download.file(
+      url = url,
+      destfile = export
+    )
 
     return(export)
   }

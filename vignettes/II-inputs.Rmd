@@ -33,7 +33,7 @@ paths <- yaml::read_yaml(
 )
 
 paths$tests$mode <- "yes"
-paths$urls$examples$mgf <- paths$urls$examples$mgf_mini
+paths$urls$examples$spectra <- paths$urls$examples$spectra_mini
 
 yaml::write_yaml(x = paths, file = "paths.yaml")
 ```
