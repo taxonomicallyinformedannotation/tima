@@ -18,7 +18,7 @@ round_reals <- function(df, dig = 5) {
         "structure_exact_mass",
         "structure_xlogp"
       )),
-      .fns = \(x) round(x,
+      .fns = \(x) round(as.numeric(x),
         digits = dig
       )
     ))

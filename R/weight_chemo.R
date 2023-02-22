@@ -36,8 +36,8 @@ weight_chemo <-
       dplyr::distinct(
         feature_id,
         component_id,
-        inchikey_2D,
-        smiles_2D,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         candidate_structure_1_pathway,
         candidate_structure_2_superclass,
         candidate_structure_3_class,
@@ -81,8 +81,8 @@ weight_chemo <-
       )) |>
       dplyr::select(
         feature_id,
-        inchikey_2D,
-        smiles_2D,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         candidate_structure_1_pathway,
         candidate_structure_2_superclass,
         candidate_structure_3_class,
@@ -128,8 +128,8 @@ weight_chemo <-
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
       dplyr::distinct(
         feature_id,
-        inchikey_2D,
-        smiles_2D,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         candidate_structure_1_pathway,
         candidate_structure_2_superclass,
         candidate_structure_3_class,

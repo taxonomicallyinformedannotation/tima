@@ -4,6 +4,10 @@
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param output Output file
+#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_met File containing structures metadata
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param parameters Parameters
 #'
 #' @return NULL
@@ -18,6 +22,11 @@
 prepare_gnps <-
   function(gnps_job_id = params$gnps$id,
            output = params$files$annotations$pretreated,
+           str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+           str_met = paths$data$interim$libraries$merged$structures$metadata,
+           str_nam = paths$data$interim$libraries$merged$structures$names,
+           str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            parameters = params) {
     if (!is.null(gnps_job_id)) {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
@@ -28,11 +37,11 @@ prepare_gnps <-
         dplyr::select(
           feature_id = `#Scan#`,
           structure_name = Compound_Name,
-          smiles = Smiles,
+          # structure_smiles = Smiles,
           score_input = MQScore,
           # smiles_2D, ## Not available for now
-          inchikey = InChIKey,
-          inchikey_2D = `InChIKey-Planar`,
+          structure_inchikey = InChIKey,
+          structure_inchikey_2D = `InChIKey-Planar`,
           structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
           structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
           structure_taxonomy_npclassifier_03class = npclassifier_class,
@@ -41,8 +50,8 @@ prepare_gnps <-
         ) |>
         dplyr::mutate(
           library = "GNPS",
-          smiles_2D = NA,
-          molecular_formula = NA,
+          structure_smiles_2D = NA,
+          structure_molecular_formula = NA,
           structure_xlogp = NA,
           ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
@@ -51,15 +60,14 @@ prepare_gnps <-
           structure_taxonomy_classyfire_03class = NA,
           structure_taxonomy_classyfire_04directparent = NA
         ) |>
-        complement_metadata() |>
         dplyr::select(
           feature_id,
           structure_name,
-          inchikey,
-          inchikey_2D,
-          smiles,
-          smiles_2D,
-          molecular_formula,
+          # structure_inchikey,
+          structure_inchikey_2D,
+          # structure_smiles,
+          structure_smiles_2D,
+          structure_molecular_formula,
           structure_exact_mass,
           structure_xlogp,
           library,
@@ -74,17 +82,20 @@ prepare_gnps <-
           structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate_all(as.character) |>
-        dplyr::mutate_all(dplyr::na_if, "N/A")
+        dplyr::mutate_all(dplyr::na_if, "N/A") |>
+        dplyr::mutate_all(dplyr::na_if, "null") |>
+        round_reals() |>
+        complement_structures_metadata()
     } else {
       log_debug("No GNPS job ID provided, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
         structure_name = NA,
-        inchikey = NA,
-        inchikey_2D = NA,
-        smiles = NA,
-        smiles_2D = NA,
-        molecular_formula = NA,
+        # structure_inchikey = NA,
+        structure_inchikey_2D = NA,
+        # structure_smiles = NA,
+        structure_smiles_2D = NA,
+        structure_molecular_formula = NA,
         structure_exact_mass = NA,
         structure_xlogp = NA,
         library = NA,

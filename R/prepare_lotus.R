@@ -1,3 +1,5 @@
+# TODO
+
 #' @title Prepare LOTUS
 #'
 #' @description This function prepares the LOTUS structure-organism pairs
@@ -18,12 +20,13 @@ prepare_lotus <-
            output = paths$data$interim$libraries$lotus) {
     log_debug(x = "Loading and preparing LOTUS")
     paths <- parse_yaml_paths()
-    # Read input file and select specific columns
+
     lotus_prepared <- input |>
       readr::read_csv(
         col_select = c(
           structure_nameTraditional,
           structure_inchikey,
+          structure_smiles,
           structure_smiles_2D,
           structure_molecular_formula,
           structure_exact_mass,
@@ -37,6 +40,7 @@ prepare_lotus <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent,
           organism_name,
+          organism_taxonomy_ottid,
           organism_taxonomy_01domain,
           organism_taxonomy_02kingdom,
           organism_taxonomy_03phylum,
@@ -50,15 +54,15 @@ prepare_lotus <-
           reference_doi
         )
       ) |>
-      # Create new column by extracting substring from structure_inchikey column
       dplyr::mutate(structure_inchikey_2D = substring(
         text = structure_inchikey,
         first = 1,
         last = 14
       )) |>
-      # Select specific columns
       dplyr::select(
         structure_name = structure_nameTraditional,
+        structure_inchikey,
+        structure_smiles,
         structure_inchikey_2D,
         structure_smiles_2D,
         structure_molecular_formula,
@@ -73,6 +77,7 @@ prepare_lotus <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent,
         organism_name,
+        organism_taxonomy_ottid,
         organism_taxonomy_01domain,
         organism_taxonomy_02kingdom,
         organism_taxonomy_03phylum,
@@ -86,7 +91,6 @@ prepare_lotus <-
         reference_doi
       ) |>
       round_reals() |>
-      # Keep only unique rows
       dplyr::distinct()
 
     log_debug(x = "Exporting ...")

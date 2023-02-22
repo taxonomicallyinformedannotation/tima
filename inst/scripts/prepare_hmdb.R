@@ -83,15 +83,21 @@ prepare_hmdb <- function(input = paths$data$source$libraries$hmdb,
   hmdb_prepared <- hmdb_df |>
     dplyr::mutate_all(dplyr::na_if, "") |>
     dplyr::filter(!is.na(inchikey)) |>
-    dplyr::mutate(structure_inchikey_2D = substring(
-      text = inchikey,
-      first = 1,
-      last = 14
-    )) |>
+    dplyr::mutate(
+      structure_inchikey_2D = substring(
+        text = inchikey,
+        first = 1,
+        last = 14
+      ),
+      structure_smiles_2D = NA_character_,
+      monisotopic_molecular_weight = as.numeric(monisotopic_molecular_weight)
+    ) |>
     dplyr::select(
       structure_name = name,
+      structure_inchikey = inchikey,
+      structure_smiles = smiles,
       structure_inchikey_2D,
-      structure_smiles_2D = smiles,
+      structure_smiles_2D,
       ## COMMENT (AR): To improve!
       structure_molecular_formula = chemical_formula,
       structure_exact_mass = monisotopic_molecular_weight
@@ -110,6 +116,7 @@ prepare_hmdb <- function(input = paths$data$source$libraries$hmdb,
     ) |>
     dplyr::mutate(
       organism_name = "Homo sapiens",
+      organism_taxonomy_ottid = 770315,
       organism_taxonomy_01domain = "Eukaryota",
       organism_taxonomy_02kingdom = "Metazoa",
       organism_taxonomy_03phylum = "Chordata",
@@ -119,11 +126,11 @@ prepare_hmdb <- function(input = paths$data$source$libraries$hmdb,
       organism_taxonomy_07tribe = NA_character_,
       organism_taxonomy_08genus = "Homo",
       organism_taxonomy_09species = "Homo sapiens",
-      organism_taxonomy_10varietas = NA_character_
+      organism_taxonomy_10varietas = NA_character_,
+      reference_doi = NA_character_
     ) |>
     round_reals() |>
-    dplyr::distinct() |>
-    dplyr::mutate(reference_doi = NA)
+    dplyr::distinct()
 
   log_debug(x = "Exporting ...")
   export_output(x = hmdb_df, file = output_minimal)

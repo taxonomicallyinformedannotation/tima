@@ -29,7 +29,6 @@ Arguments:
   fil-ann-raw-sir            Directory containing the sirius results. STRING
   fil-ann-pre                List of pretreated annotations. STRING
   fil-ann-fil                Filled annotations file. STRING
-  fil-ann-tre                Treated annotations file. STRING
   fil-ann-pro                Final results file. STRING
 
   fil-fea-raw                Raw features file. STRING

@@ -46,14 +46,14 @@ clean_chemo <-
         # Or chemical consistency score is obtained
       ) |>
       dplyr::group_by(feature_id) |>
-      dplyr::distinct(inchikey_2D,
+      dplyr::distinct(structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
       dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
       dplyr::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
-    df11 <- metadata_table_spectral_annotation
+    df11 <- annotation_table_ms2
     if (exists(x = "annotation_table_ms1")) {
       df11 <- annotation_table_ms1
     }
@@ -64,9 +64,9 @@ clean_chemo <-
         component_id,
         rt,
         mz,
-        molecular_formula,
-        inchikey_2D,
-        smiles_2D,
+        structure_molecular_formula,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         library,
         mz_error
       )
@@ -86,9 +86,9 @@ clean_chemo <-
         component_id,
         rt,
         mz,
-        molecular_formula,
-        inchikey_2D,
-        smiles_2D,
+        structure_molecular_formula,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         library,
         mz_error,
         rank_initial,
@@ -112,7 +112,7 @@ clean_chemo <-
     df3 <- structureOrganismPairsTable |>
       dplyr::arrange(reference_doi) |>
       dplyr::distinct(
-        inchikey_2D = structure_inchikey_2D,
+        structure_inchikey_2D,
         structure_name,
         structure_xlogp,
         structure_01pathway = structure_taxonomy_npclassifier_01pathway,
@@ -129,9 +129,9 @@ clean_chemo <-
         component_id,
         rt,
         mz,
-        molecular_formula,
-        inchikey_2D,
-        smiles_2D,
+        structure_molecular_formula,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         structure_name,
         structure_xlogp,
         structure_01pathway,
@@ -157,9 +157,9 @@ clean_chemo <-
     df4b <- df4a |>
       dplyr::select(
         -component_id,
-        -molecular_formula,
-        -inchikey_2D,
-        -smiles_2D,
+        -structure_molecular_formula,
+        -structure_inchikey_2D,
+        -structure_smiles_2D,
         -score_initialNormalized,
         -score_biological,
         -rank_initial,
@@ -225,7 +225,7 @@ clean_chemo <-
     df5b <- dplyr::left_join(df5a, df4b) |>
       dplyr::distinct()
 
-    df6 <- metadata_table_spectral_annotation |>
+    df6 <- annotation_table_ms2 |>
       dplyr::select(dplyr::any_of(c(
         "feature_id",
         "component_id",
@@ -244,11 +244,13 @@ clean_chemo <-
           "component_id",
           "mz",
           "rt",
-          "molecular_formula",
+          "structure_name",
+          "structure_molecular_formula",
+          "structure_xlogp",
           "mz_error",
           "library",
-          "smiles_2D",
-          "inchikey_2D",
+          "structure_smiles_2D",
+          "structure_inchikey_2D",
           "score_initialNormalized",
           "score_biological",
           "score_chemical",
@@ -269,10 +271,10 @@ clean_chemo <-
 
     log_debug("adding consensus again to droped candidates \n")
     df8 <- df7 |>
-      dplyr::filter(!is.na(inchikey_2D))
+      dplyr::filter(!is.na(structure_inchikey_2D))
 
     df9 <- df7 |>
-      dplyr::filter(is.na(inchikey_2D))
+      dplyr::filter(is.na(structure_inchikey_2D))
 
     df10 <- dplyr::left_join(
       df9,

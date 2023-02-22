@@ -3,6 +3,11 @@
 #' @description This function weights and eventually complements initial annotations.
 #'
 #' @param library Library to be used to perform MS1 annotation
+#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_met File containing structures metadata
+#' @param str_nam File containing structures names
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param name Name of the adducts
 #' @param annotations Prepared annotations file
 #' @param taxa Prepared taxed features file
@@ -47,8 +52,8 @@
 #' @export
 #'
 #' @importFrom crayon green
-#' @importFrom dplyr across arrange bind_rows distinct filter select left_join
-#' @importFrom dplyr mutate mutate_all mutate_if
+#' @importFrom dplyr across arrange bind_rows distinct filter select
+#' @importFrom dplyr left_join matches mutate mutate_all mutate_if
 #' @importFrom readr read_delim write_delim
 #' @importFrom yaml write_yaml
 #'
@@ -56,9 +61,15 @@
 #'
 #' @examples NULL
 process_annotations <-
-  function(library = params$files$libraries$sop$merged,
+  function(library = paths$data$interim$libraries$merged$keys,
+           org_tax_ott = paths$data$interim$libraries$merged$organisms$taxonomies$ott,
+           str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+           str_met = paths$data$interim$libraries$merged$structures$metadata,
+           str_nam = paths$data$interim$libraries$merged$structures$names,
+           str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            name = params$files$libraries$adducts$processed,
-           annotations = params$files$annotations$treated,
+           annotations = params$files$annotations$filled,
            taxa = params$files$taxa$processed,
            edges = params$files$networks$spectral$edges$processed,
            output = params$files$annotations$processed,
@@ -116,16 +127,17 @@ process_annotations <-
     #  adducts ...
     # )
 
+    paths <<- parse_yaml_paths()
+    params <<- parameters
+
     vars <- ls(all.names = TRUE)
     for (i in 1:length(vars)) {
       assign(vars[i], get(vars[i]), envir = .GlobalEnv)
     }
-    paths <- parse_yaml_paths()
-    params <<- parameters
 
     log_debug(x = "... files ...")
     log_debug(x = "... annotations")
-    metadata_table_spectral_annotation <<-
+    annotation_table_ms2 <<-
       readr::read_delim(
         file = annotations,
         col_types = "c"
@@ -135,7 +147,10 @@ process_annotations <-
         replacement = " or ",
         x = .x
       ))) |>
-      dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
+      dplyr::mutate(dplyr::across(
+        c(feature_id, component_id, rt, mz, score_input, mz_error),
+        as.numeric
+      )) |>
       dplyr::distinct() |>
       dplyr::arrange(feature_id)
 
@@ -158,6 +173,30 @@ process_annotations <-
         file = library,
         col_types = "c"
       ) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_2D_3D,
+        col_types = "c"
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_met,
+        col_types = "c"
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_nam,
+        col_types = "c"
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_tax_cla,
+        col_types = "c"
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_tax_npc,
+        col_types = "c"
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = org_tax_ott,
+        col_types = "c"
+      )) |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(c(
         "structure_exact_mass",
@@ -165,24 +204,20 @@ process_annotations <-
       ), as.numeric)) |>
       round_reals() |>
       dplyr::mutate(dplyr::across(
-        tidyr::matches("taxonomy"),
+        dplyr::matches("taxonomy.*_0"),
         ~ tidyr::replace_na(.x, "notClassified")
       ))
 
     if (ms1_only == TRUE) {
       log_debug(x = "Erasing MS2 results")
-      metadata_table_spectral_annotation <<-
-        metadata_table_spectral_annotation |>
+      annotation_table_ms2 <<-
+        annotation_table_ms2 |>
         dplyr::mutate(
-          inchikey_2D = NA,
-          score_input = NA,
-          library = NA,
-          mz_error = NA
-        ) |>
-        dplyr::mutate(dplyr::across(
-          c(inchikey_2D, score_input, library, mz_error),
-          as.character
-        ))
+          structure_inchikey_2D = NA_character_,
+          score_input = NA_real_,
+          library = NA_character_,
+          mz_error = NA_real_
+        )
     }
 
     if (annotate == TRUE) {
@@ -246,22 +281,12 @@ process_annotations <-
       decorate_ms1()
     } else {
       annotation_table_ms1 <<-
-        annotate_non_ms1(annotationTable = metadata_table_spectral_annotation)
+        annotate_non_ms1(annotationTable = annotation_table_ms2)
     }
 
     log_debug(x = "adding biological organism metadata")
     annotation_table_ms1_taxed <<-
-      dplyr::left_join(annotation_table_ms1, taxed_features_table) |>
-      dplyr::left_join(
-        metadata_table_spectral_annotation |>
-          dplyr::distinct(
-            inchikey_2D,
-            smiles_2D,
-            structure_taxonomy_npclassifier_01pathway,
-            structure_taxonomy_npclassifier_02superclass,
-            structure_taxonomy_npclassifier_03class
-          )
-      )
+      dplyr::left_join(annotation_table_ms1, taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <<- weight_bio()

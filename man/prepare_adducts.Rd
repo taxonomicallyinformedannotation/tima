@@ -7,7 +7,6 @@
 prepare_adducts(
   adducts_input = params$files$libraries$sop$merged,
   adducts_table_input = paths$inst$extdata$adducts,
-  config_output_path = paths$data$interim$config$path,
   adducts_output_path = paths$data$interim$adducts$path,
   output_name = params$files$libraries$adducts$processed,
   masses_pos_output_path = paths$data$interim$adducts$pos,
@@ -20,8 +19,6 @@ prepare_adducts(
 
 \item{adducts_table_input}{Table of adducts taken as input}
 
-\item{config_output_path}{Path where the configuration will be saved}
-
 \item{adducts_output_path}{Path where the adducts will be saved}
 
 \item{output_name}{Name of the file where adducts will be saved}
@@ -31,6 +28,8 @@ prepare_adducts(
 \item{masses_neg_output_path}{Path where negative adducts masses will be saved}
 
 \item{parameters}{Parameters}
+
+\item{config_output_path}{Path where the configuration will be saved}
 }
 \description{
 This function prepares adducts for further use

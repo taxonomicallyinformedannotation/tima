@@ -47,18 +47,18 @@ clean_bio <-
         annotationTableWeightedBio |>
           dplyr::distinct(
             feature_id,
-            inchikey_2D,
+            structure_inchikey_2D,
             .keep_all = TRUE
           ),
         df01
       ) |>
-      dplyr::mutate(inchikey_2D = "notAnnotated")
+      dplyr::mutate(structure_inchikey_2D = "notAnnotated")
 
     df03 <- dplyr::bind_rows(df01, df02)
 
     df <- df03 |>
       dplyr::distinct(
-        inchikey_2D,
+        structure_inchikey_2D,
         feature_id,
         component_id,
         candidate_structure_1_pathway = structure_taxonomy_npclassifier_01pathway,
@@ -69,11 +69,11 @@ clean_bio <-
       )
 
     log_debug("adding \"notAnnotated\" \n")
-    df$candidate_structure_1_pathway[df["inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_1_pathway[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
-    df$candidate_structure_2_superclass[df["inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_2_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
-    df$candidate_structure_3_class[df["inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_3_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
 
     log_debug("adding \"notClassified\" \n")
@@ -84,10 +84,11 @@ clean_bio <-
       dplyr::filter(component_id != -1) |>
       dplyr::group_by(component_id) |>
       dplyr::distinct(feature_id,
-        inchikey_2D,
+        structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
       dplyr::add_count() |>
+      dplyr::ungroup() |>
       dplyr::filter(n >= 3) |>
       dplyr::select(-n)
 
@@ -99,6 +100,7 @@ clean_bio <-
         dplyr::group_by(component_id) |>
         dplyr::distinct(feature_id, .keep_all = TRUE) |>
         dplyr::add_count() |>
+        dplyr::ungroup() |>
         dplyr::filter(n <= 2) |>
         dplyr::select(-n)
     )

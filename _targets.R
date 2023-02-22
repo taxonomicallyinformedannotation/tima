@@ -77,13 +77,6 @@ list(
         }
       ),
       tar_file(
-        name = config_default_features_classification,
-        command = {
-          config_default_features_classification <-
-            paths$config$default$prepare$features_classification
-        }
-      ),
-      tar_file(
         name = config_default_features_components,
         command = {
           config_default_features_components <-
@@ -104,9 +97,9 @@ list(
         }
       ),
       tar_file(
-        name = config_default_library,
+        name = config_default_libraries,
         command = {
-          config_default_library <- paths$config$default$prepare$library
+          config_default_libraries <- paths$config$default$prepare$libraries
         }
       ),
       tar_file(
@@ -188,20 +181,6 @@ list(
         }
       ),
       tar_file(
-        name = config_user_features_classification,
-        command = {
-          config_user_features_classification <-
-            prepare_config(
-              filename = params_config$files$pattern,
-              gnps_job_id = params_config$gnps$id,
-              ms_mode = params_config$ms$polarity,
-              taxon = params_config$organisms$taxon,
-              parameters = params_config,
-              step = "prepare_features_classification"
-            )
-        }
-      ),
-      tar_file(
         name = config_user_features_components,
         command = {
           config_user_features_components <-
@@ -244,16 +223,16 @@ list(
         }
       ),
       tar_file(
-        name = config_user_library,
+        name = config_user_libraries,
         command = {
-          config_user_library <-
+          config_user_libraries <-
             prepare_config(
               filename = params_config$files$pattern,
               gnps_job_id = params_config$gnps$id,
               ms_mode = params_config$ms$polarity,
               taxon = params_config$organisms$taxon,
               parameters = params_config,
-              step = "prepare_library"
+              step = "prepare_libraries"
             )
         }
       ),
@@ -351,16 +330,6 @@ list(
         }
       ),
       tar_target(
-        name = params_features_classification,
-        command = {
-          params_features_classification <-
-            parse_yaml_params(
-              def = config_default_features_classification,
-              usr = config_user_features_classification[1]
-            )
-        }
-      ),
-      tar_target(
         name = params_features_components,
         command = {
           params_features_components <-
@@ -392,12 +361,12 @@ list(
       ),
       ## TODO ADD PARAMS HMDB,
       tar_target(
-        name = params_library,
+        name = params_libraries,
         command = {
-          params_library <-
+          params_libraries <-
             parse_yaml_params(
-              def = config_default_library,
-              usr = config_user_library[1]
+              def = config_default_libraries,
+              usr = config_user_libraries[1]
             )
         }
       ),
@@ -467,8 +436,7 @@ list(
     ## Structure organism pairs
     list(
       ## Raw
-      list(
-        ## This does not work as it forces the file to exist.
+      list( ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
         # tar_file(
         #   name = library_sop_closed,
@@ -520,28 +488,60 @@ list(
         )
       ),
       ## Merged
-      list(tar_file(
-        name = library_sop_merged,
-        command = {
-          library_sop_merged <- prepare_library(
-            files = c(library_sop_closed_prepared, library_sop_lotus_prepared),
-            filter = params_library$organisms$filter$mode,
-            level = params_library$organisms$filter$level,
-            value = params_library$organisms$filter$value,
-            output = params_library$files$libraries$sop$merged,
-            parameters = params_library
-          )
-        }
-      ))
+      list(
+        tar_file(
+          name = library_sop_merged,
+          command = {
+            library_sop_merged <- prepare_libraries(
+              files = c(library_sop_closed_prepared, library_sop_lotus_prepared),
+              filter = params_libraries$organisms$filter$mode,
+              level = params_libraries$organisms$filter$level,
+              value = params_libraries$organisms$filter$value,
+              output_key = paths$data$interim$libraries$merged$keys,
+              output_org_nam = paths$data$interim$libraries$merged$organisms$names,
+              output_org_tax_ott = paths$data$interim$libraries$merged$organisms$taxonomies$ott,
+              output_str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+              output_str_met = paths$data$interim$libraries$merged$structures$metadata,
+              output_str_nam = paths$data$interim$libraries$merged$structures$names,
+              output_str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+              output_str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
+              parameters = params_libraries
+            )
+          }
+        ),
+        tar_file(name = library_merged_key, command = {
+          library_merged_key <- library_sop_merged[[1]]
+        }),
+        tar_file(name = library_merged_org, command = {
+          library_merged_org <- library_sop_merged[[2]]
+        }),
+        tar_file(name = library_merged_org_tax_ott, command = {
+          library_merged_org_tax_ott <- library_sop_merged[[3]]
+        }),
+        tar_file(name = library_merged_str_2D_3D, command = {
+          library_merged_str_2D_3D <- library_sop_merged[[4]]
+        }),
+        tar_file(name = library_merged_str_met, command = {
+          library_merged_str_met <- library_sop_merged[[5]]
+        }),
+        tar_file(name = library_merged_str_nam, command = {
+          library_merged_str_nam <- library_sop_merged[[6]]
+        }),
+        tar_file(name = library_merged_str_tax_cla, command = {
+          library_merged_str_tax_cla <- library_sop_merged[[7]]
+        }),
+        tar_file(name = library_merged_str_tax_npc, command = {
+          library_merged_str_tax_npc <- library_sop_merged[[8]]
+        })
+      )
     ),
     ## Adducts
     list(tar_file(
       name = library_adducts,
       command = {
         library_adducts <- prepare_adducts(
-          adducts_input = library_sop_merged,
+          adducts_input = library_merged_str_met,
           adducts_table_input = paths$inst$extdata$adducts,
-          config_output_path = paths$data$interim$config$path,
           adducts_output_path = paths$data$interim$adducts$path,
           output_name = params_adducts$files$libraries$adducts$processed,
           masses_pos_output_path = paths$data$interim$adducts$pos,
@@ -575,7 +575,8 @@ list(
                 }
             }
             ## To always check if a newest version is available
-            , cue = tar_cue(mode = "always")
+            ,
+            cue = tar_cue(mode = "always")
           ),
           tar_file(
             name = library_spectra_is_lotus_neg,
@@ -597,7 +598,8 @@ list(
                 }
             }
             ## To always check if a newest version is available
-            , cue = tar_cue(mode = "always")
+            ,
+            cue = tar_cue(mode = "always")
           )
         )
       ),
@@ -657,6 +659,11 @@ list(
               prepare_gnps(
                 gnps_job_id = params_gnps$gnps$id,
                 output = params_gnps$files$annotations$pretreated,
+                str_2D_3D = library_merged_str_2D_3D,
+                str_met = library_merged_str_met,
+                str_nam = library_merged_str_nam,
+                str_tax_cla = library_merged_str_tax_cla,
+                str_tax_npc = library_merged_str_tax_npc,
                 parameters = params_gnps
               )
           }
@@ -735,6 +742,11 @@ list(
             annotations_spectral_is_prepared <- prepare_spectral_matches(
               input = annotations_spectral_is_merged,
               output = params_spectral_matches$files$annotations$pretreated,
+              str_2D_3D = library_merged_str_2D_3D,
+              str_met = library_merged_str_met,
+              str_nam = library_merged_str_nam,
+              str_tax_cla = library_merged_str_tax_cla,
+              str_tax_npc = library_merged_str_tax_npc,
               parameters = params_spectral_matches
             )
           }
@@ -756,6 +768,11 @@ list(
             input_directory = params_sirius$files$annotations$raw$sirius,
             npc = params_sirius$tools$taxonomies$chemical,
             output = params_sirius$files$annotations$pretreated,
+            str_2D_3D = library_merged_str_2D_3D,
+            str_met = library_merged_str_met,
+            str_nam = library_merged_str_nam,
+            str_tax_cla = library_merged_str_tax_cla,
+            str_tax_npc = library_merged_str_tax_npc,
             parameters = params_sirius
           )
       }
@@ -795,18 +812,6 @@ list(
           parameters = params_features_components
         )
       }
-    ),
-    tar_file(
-      name = features_classification_prepared,
-      command = {
-        features_classification_prepared <- prepare_features_classification(
-          library = library_sop_merged,
-          input = features_components_prepared,
-          output = params_features_classification$files$annotations$treated,
-          quickmode = params_features_classification$options$fast,
-          parameters = params_features_classification
-        )
-      }
     )
   ),
   tar_file(
@@ -831,9 +836,14 @@ list(
     name = annotations_processed,
     command = {
       annotations_processed <- process_annotations(
-        library = library_sop_merged,
+        library = library_merged_key,
+        str_2D_3D = library_merged_str_2D_3D,
+        str_met = library_merged_str_met,
+        str_nam = library_merged_str_nam,
+        str_tax_cla = library_merged_str_tax_cla,
+        str_tax_npc = library_merged_str_tax_npc,
         name = library_adducts[params_annotations$ms$polarity],
-        annotations = features_classification_prepared,
+        annotations = features_components_prepared,
         taxa = taxa_prepared,
         edges = features_edges_prepared,
         output = params_annotations$files$annotations$processed,

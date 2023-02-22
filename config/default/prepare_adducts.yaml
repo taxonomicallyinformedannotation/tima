@@ -14,4 +14,4 @@ files:
     sop:
 
       #' Merged structure organism pairs library. STRING
-      merged: data/interim/libraries/library.tsv.gz
+      merged: data/interim/libraries/structures_metadata.tsv.gz

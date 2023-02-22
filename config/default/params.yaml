@@ -92,10 +92,7 @@ files:
     
     #' Filled annotations file. STRING
     filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
-    
-    #' Treated annotations file. STRING
-    treated: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated.tsv.gz
-    
+        
     #' Final results file. STRING
     processed: FinalResults.tsv
 
@@ -114,6 +111,18 @@ files:
       #' Prepared adducts library. STRING
       processed: library
 
+    #' Organisms libraries.
+    organisms:
+
+      #' Organisms names. STRING
+      names: data/interim/libraries/organisms_names.tsv.gz
+
+      #' Organisms taxonomies.
+      taxonomies:
+
+        #' OTT organisms taxonomy. STRING
+        ott:  data/interim/libraries/organisms_taxonomies_ott.tsv.gz
+
     #' Structure organism pairs libraries.
     sop:
 
@@ -129,9 +138,34 @@ files:
       #' List of prepared structure organism pairs libraries. STRING
       processed: 
         - data/interim/libraries/lotus_prepared.tsv.gz
+        - data/interim/libraries/closed_prepared.tsv.gz
 
       #' Merged structure organism pairs library. STRING
-      merged: data/interim/libraries/library.tsv.gz
+      merged: data/interim/libraries/keys.tsv.gz
+
+    #' Structures libraries.
+    structures:
+
+      #' Structures 2D. STRING
+      dd: data/interim/libraries/structures_2D.tsv.gz
+
+      #' Structures 2D and 3D. STRING
+      dd_ddd: data/interim/libraries/structures_2D_3D.tsv.gz
+
+      #' Structures metadata. STRING
+      metadata: data/interim/libraries/structures_metadata.tsv.gz
+
+      #' Structures names. STRING
+      names: data/interim/libraries/structures_names.tsv.gz
+
+      #' Structures taxonomies.
+      taxonomies:
+
+        #' Classyfire structures taxonomy. STRING
+        cla:  data/interim/libraries/structures_taxonomies_classyfire.tsv.gz
+
+        #' NPClassifier structures taxonomy. STRING
+        npc:  data/interim/libraries/structures_taxonomies_npc.tsv.gz
 
     #' Spectral libraries. STRING
     spectral:
@@ -191,7 +225,6 @@ gnps:
   #' Workflow used within GNPS.
   #' Currently "fbmn" or "classical" supported. STRING
   workflow: fbmn
-
 
 
 #' MS related parameters.
@@ -329,7 +362,6 @@ names:
 
   #' Name of the "taxon name" variable in the input. STRING
   taxon: ATTRIBUTE_species
-
 
 
 #' Organisms related parameters.

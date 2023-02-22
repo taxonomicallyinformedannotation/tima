@@ -60,12 +60,6 @@ prepare_config <- function(filename = params$files$pattern,
   yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
     replace_gnps_job_id()
-  yamls_params$prepare_features_classification$files$annotations$filled <-
-    yamls_params$prepare_features_classification$files$annotations$filled |>
-    replace_gnps_job_id()
-  yamls_params$prepare_features_classification$files$annotations$treated <-
-    yamls_params$prepare_features_classification$files$annotations$treated |>
-    replace_gnps_job_id()
   yamls_params$prepare_features_components$files$annotations$pretreated <-
     yamls_params$prepare_features_components$files$annotations$pretreated |>
     replace_gnps_job_id()

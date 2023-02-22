@@ -28,7 +28,7 @@
 #'
 #' @examples NULL
 annotate_ms1 <-
-  function(annotationTable = metadata_table_spectral_annotation,
+  function(annotationTable = annotation_table_ms2,
            structureExactMassTable = structure_exact_mass_table,
            structureOrganismPairsTable = structure_organism_pairs_table,
            adducts = unlist(adducts_list[[ms_mode]]),
@@ -289,14 +289,14 @@ annotate_ms1 <-
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::distinct(
         structure_exact_mass,
-        molecular_formula = structure_molecular_formula,
-        inchikey_2D = structure_inchikey_2D,
-        smiles_2D = structure_smiles_2D
+        structure_molecular_formula,
+        structure_inchikey_2D,
+        structure_smiles_2D
       ) |>
       # Avoid SMILES redundancy
       dplyr::distinct(
-        inchikey_2D,
-        molecular_formula,
+        structure_inchikey_2D,
+        structure_molecular_formula,
         structure_exact_mass,
         .keep_all = TRUE
       ) |>
@@ -327,7 +327,7 @@ annotate_ms1 <-
       by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
       dplyr::select(
-        molecular_formula = structure_molecular_formula,
+        structure_molecular_formula,
         library,
         dplyr::everything(), -exact_mass
       ) |>
@@ -529,7 +529,7 @@ annotate_ms1 <-
       ) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
-        molecular_formula = structure_molecular_formula,
+        structure_molecular_formula,
         library = library_name,
         dplyr::everything(), -exact_mass, -adduct_value
       ) |>
@@ -563,7 +563,7 @@ annotate_ms1 <-
       df22 |>
         dplyr::left_join(df13_b)
     ) |>
-      dplyr::filter(!is.na(inchikey_2D)) |>
+      dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
       dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
@@ -574,9 +574,9 @@ annotate_ms1 <-
         score_input,
         library,
         mz_error,
-        molecular_formula,
-        inchikey_2D,
-        smiles_2D,
+        structure_molecular_formula,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         rank_initial
       )
 
@@ -600,7 +600,7 @@ annotate_ms1 <-
       dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
-    df26["inchikey_2D"][is.na(df26["inchikey_2D"])] <-
+    df26["structure_inchikey_2D"][is.na(df26["structure_inchikey_2D"])] <-
       "notAnnotated"
     df26["score_input"][is.na(df26["score_input"])] <-
       0
@@ -615,8 +615,8 @@ annotate_ms1 <-
       df26,
       structureOrganismPairsTable |>
         dplyr::distinct(
-          inchikey_2D = structure_inchikey_2D,
-          smiles_2D = structure_smiles_2D,
+          structure_inchikey_2D,
+          structure_smiles_2D,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class

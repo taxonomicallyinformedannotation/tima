@@ -5,9 +5,15 @@
 \title{Process annotations}
 \usage{
 process_annotations(
-  library = params$files$libraries$sop$merged,
+  library = paths$data$interim$libraries$merged$keys,
+  org_tax_ott = paths$data$interim$libraries$merged$organisms$taxonomies$ott,
+  str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+  str_met = paths$data$interim$libraries$merged$structures$metadata,
+  str_nam = paths$data$interim$libraries$merged$structures$names,
+  str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+  str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
   name = params$files$libraries$adducts$processed,
-  annotations = params$files$annotations$treated,
+  annotations = params$files$annotations$filled,
   taxa = params$files$taxa$processed,
   edges = params$files$networks$spectral$edges$processed,
   output = params$files$annotations$processed,
@@ -50,6 +56,16 @@ process_annotations(
 }
 \arguments{
 \item{library}{Library to be used to perform MS1 annotation}
+
+\item{str_2D_3D}{File containing 2D and 3D structures}
+
+\item{str_met}{File containing structures metadata}
+
+\item{str_nam}{File containing structures names}
+
+\item{str_tax_cla}{File containing Classyfire taxonomy}
+
+\item{str_tax_npc}{File containing NPClassifier taxonomy}
 
 \item{name}{Name of the adducts}
 

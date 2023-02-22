@@ -5,19 +5,19 @@ require(
   quietly = TRUE
 )
 
-# step <- "prepare_features_classification"
+# step <- "prepare_libraries"
 # paths <- parse_yaml_paths()
 # params <- get_params(step = step)
 
 log_debug(
   "This script",
-  crayon::green("prepares features metadata (chemical classes)")
+  crayon::green("prepares a library from prepared sub-libraries. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# prepare_features_classification()
-targets::tar_make(names = matches("features_classification_prepared"))
+# prepare_libraries()
+targets::tar_make(names = matches("library_sop_merged"))
 
 end <- Sys.time()
 

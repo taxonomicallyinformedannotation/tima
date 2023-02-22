@@ -5,7 +5,7 @@
 \title{Annotate non MS1}
 \usage{
 annotate_non_ms1(
-  annotationTable = metadata_table_spectral_annotation,
+  annotationTable = table_ms2_annotations,
   candidatesInitial = candidates_initial
 )
 }

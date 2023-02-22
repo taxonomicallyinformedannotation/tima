@@ -129,12 +129,6 @@ step <- "prepare_features_components"
 params <- get_params(step = step)
 prepare_features_components()
 
-### Features classification
-log_debug("Preparing features classification")
-step <- "prepare_features_classification"
-params <- get_params(step = step)
-prepare_features_classification()
-
 ### Taxa
 log_debug("Preparing taxa")
 step <- "prepare_taxa"

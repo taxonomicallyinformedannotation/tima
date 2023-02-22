@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/process_annotations.R
 
 Usage: 
-  process_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-ann=<ann-ms1-ann>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-tre=<fil-ann-tre>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-int-thr-ms1=<ms-int-thr-ms1>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>] [--force=<force>]
+  process_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-ann=<ann-ms1-ann>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-int-thr-ms1=<ms-int-thr-ms1>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>] [--force=<force>]
 
 Arguments:
   ann-can-ini                Number of initial candidates. INTEGER
@@ -13,7 +13,7 @@ Arguments:
   ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
   ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
   
-  fil-ann-tre                Treated annotations file. STRING
+  fil-ann-fil                Filled annotations file. STRING
   fil-ann-pro                Final results file. STRING
   fil-lib-add-pro            Prepared adducts library. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING

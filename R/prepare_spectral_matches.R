@@ -4,6 +4,10 @@
 #'
 #' @param input Input file
 #' @param output Output file
+#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_met File containing structures metadata
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param parameters Params
 #'
 #' @return NULL
@@ -17,6 +21,11 @@
 prepare_spectral_matches <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$pretreated,
+           str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+           str_met = paths$data$interim$libraries$merged$structures$metadata,
+           str_nam = paths$data$interim$libraries$merged$structures$names,
+           str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            parameters = params) {
     # Check if input file exists
     stopifnot(
@@ -27,13 +36,18 @@ prepare_spectral_matches <-
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
-    table <- lapply(X = input, FUN = readr::read_delim, col_types = readr::cols(.default = "c")) |>
+    table <-
+      lapply(
+        X = input,
+        FUN = readr::read_delim,
+        col_types = readr::cols(.default = "c")
+      ) |>
       dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
-        inchikey_2D = short_inchikey,
-        smiles,
-        molecular_formula,
+        structure_inchikey_2D = short_inchikey,
+        structure_smiles_2D = smiles,
+        structure_molecular_formula = molecular_formula,
         structure_exact_mass = exact_mass,
         score_input = msms_score
       ) |>
@@ -41,8 +55,6 @@ prepare_spectral_matches <-
       dplyr::mutate(
         library = "ISDB",
         structure_name = NA,
-        inchikey = NA,
-        smiles_2D = smiles,
         structure_exact_mass = as.numeric(structure_exact_mass),
         structure_xlogp = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
@@ -54,16 +66,17 @@ prepare_spectral_matches <-
         structure_taxonomy_classyfire_03class = NA,
         structure_taxonomy_classyfire_04directparent = NA
       ) |>
-      # Call complement_metadata function on the modified data frame
-      complement_metadata() |>
+      # dplyr::rowwise() |>
+      # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
+      # dplyr::ungroup() |>
       dplyr::select(
         feature_id,
         structure_name,
-        inchikey,
-        inchikey_2D,
-        smiles,
-        smiles_2D,
-        molecular_formula,
+        # structure_inchikey,
+        structure_inchikey_2D,
+        # structure_smiles,
+        structure_smiles_2D,
+        structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
         library,
@@ -77,7 +90,12 @@ prepare_spectral_matches <-
         structure_taxonomy_classyfire_02superclass,
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
-      )
+      ) |>
+      dplyr::mutate_all(as.character) |>
+      dplyr::mutate_all(dplyr::na_if, "N/A") |>
+      dplyr::mutate_all(dplyr::na_if, "null") |>
+      round_reals() |>
+      complement_structures_metadata()
 
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions

@@ -108,6 +108,8 @@ targets::tar_visnetwork(names = starts_with("annotations_s"), targets_only = TRU
 ```
 
 You now have your annotations well prepared and can keep on formatting the rest of your metadata.
+Your features are not only informed with structural information but also, chemical class information.
+The latter might be corresponding **or not** to the chemical class of your annotated structure, depending on the consistency of your annotations.
 
 ## Chemical class annotation of your features
 
@@ -133,7 +135,7 @@ source(file = "inst/scripts/get_example_features.R")
 
 ### Formatting
 
-Before running the corresponding code, do not forget to modify `config/user/prepare_features_edges.yaml`, `config/user/prepare_features_components.yaml`, and `config/user/prepare_features_classification.yaml` accordingly.
+Before running the corresponding code, do not forget to modify `config/user/prepare_features_edges.yaml`, and `config/user/prepare_features_components.yaml` accordingly.
 
 ```{r}
 source(file = "inst/scripts/prepare_features_edges.R")
@@ -142,13 +144,6 @@ source(file = "inst/scripts/prepare_features_edges.R")
 ```{r}
 source(file = "inst/scripts/prepare_features_components.R")
 ```
-
-```{r}
-source(file = "inst/scripts/prepare_features_classification.R")
-```
-
-Your features are now not only informed with structural information but also, chemical class information.
-The latter might be corresponding **or not** to the chemical class of your annotated structure, depending on the consistency of your annotations.
 
 ## Biological source annotation
 

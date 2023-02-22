@@ -9,11 +9,10 @@ config:
     prepare:
       adducts: config/default/prepare_adducts.yaml
       closed: config/default/prepare_closed.yaml
-      features_classification: config/default/prepare_features_classification.yaml
       features_components: config/default/prepare_features_components.yaml
       features_edges: config/default/prepare_features_edges.yaml
       gnps: config/default/prepare_gnps.yaml
-      library: config/default/prepare_library.yaml
+      libraries: config/default/prepare_libraries.yaml
       sirius: config/default/prepare_sirius.yaml
       spectral_matches: config/default/prepare_spectral_matches.yaml
       taxa: config/default/prepare_taxa.yaml
@@ -29,11 +28,10 @@ config:
     prepare:
       adducts: config/user/prepare_adducts.yaml
       closed: config/user/prepare_closed.yaml
-      features_classification: config/user/prepare_features_classification.yaml
       features_components: config/user/prepare_features_components.yaml
       features_edges: config/user/prepare_features_edges.yaml
       gnps: config/user/prepare_gnps.yaml
-      library: config/user/prepare_library.yaml
+      libraries: config/user/prepare_libraries.yaml
       sirius: config/user/prepare_sirius.yaml
       spectral_matches: config/user/prepare_spectral_matches.yaml
       taxa: config/user/prepare_taxa.yaml
@@ -61,6 +59,19 @@ data:
       hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
       hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
       lotus: data/interim/libraries/lotus_prepared.tsv.gz
+      merged:
+        keys: data/interim/libraries/keys.tsv.gz
+        organisms: 
+          names: data/interim/libraries/organisms_names.tsv.gz
+          taxonomies: 
+            ott: data/interim/libraries/organisms_taxonomies_ott.tsv.gz
+        structures:
+          dd_ddd: data/interim/libraries/structures_2D_3D.tsv.gz
+          metadata: data/interim/libraries/structures_metadata.tsv.gz
+          names: data/interim/libraries/structures_names.tsv.gz
+          taxonomies:
+            classyfire: data/interim/libraries/structures_taxonomies_classyfire.tsv.gz
+            npc: data/interim/libraries/structures_taxonomies_npc.tsv.gz
     spectra:
       path: data/interim/spectra
       hmdb:

@@ -32,6 +32,8 @@ prepare_closed <-
         )) |>
         dplyr::select(
           structure_name = structure_nameTraditional,
+          structure_inchikey,
+          structure_smiles,
           structure_inchikey_2D,
           structure_smiles_2D,
           structure_molecular_formula,
@@ -46,6 +48,7 @@ prepare_closed <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent,
           organism_name,
+          organism_taxonomy_ottid,
           organism_taxonomy_01domain,
           organism_taxonomy_02kingdom,
           organism_taxonomy_03phylum,
@@ -64,6 +67,8 @@ prepare_closed <-
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- data.frame(
         structure_name = NA,
+        structure_inchikey = NA,
+        structure_smiles = NA,
         structure_inchikey_2D = NA,
         structure_smiles_2D = NA,
         structure_molecular_formula = NA,
@@ -78,6 +83,7 @@ prepare_closed <-
         structure_taxonomy_classyfire_03class = NA,
         structure_taxonomy_classyfire_04directparent = NA,
         organism_name = NA,
+        organism_taxonomy_ottid = NA,
         organism_taxonomy_01domain = NA,
         organism_taxonomy_02kingdom = NA,
         organism_taxonomy_03phylum = NA,

@@ -15,12 +15,12 @@
 decorate_ms1 <- function(df = annotation_table_ms1) {
   df_1 <- df |>
     dplyr::filter(score_input == 0) |>
-    dplyr::filter(!is.na(inchikey_2D) |
-      inchikey_2D != "notAnnotated")
+    dplyr::filter(!is.na(structure_inchikey_2D) |
+      structure_inchikey_2D != "notAnnotated")
   log_debug(
     "MS1 annotation led to \n",
     crayon::green(nrow(df_1 |>
-      dplyr::distinct(inchikey_2D))),
+      dplyr::distinct(structure_inchikey_2D))),
     crayon::green("annotations"),
     ", on \n",
     crayon::blue(nrow(df_1 |>
@@ -82,43 +82,43 @@ decorate_bio <-
     log_debug(
       "taxonomically informed scoring led to \n",
       crayon::silver(nrow(df_kin |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::silver("kingdom"),
       "level, \n",
       crayon::white(nrow(df_phy |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::white("phylum"),
       "level, \n",
       crayon::cyan(nrow(df_cla |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::cyan("class"),
       "level, \n",
       crayon::magenta(nrow(df_ord |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::magenta("order"),
       "level, \n",
       crayon::blue(nrow(df_fam |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::blue("family"),
       "level, \n",
       crayon::yellow(nrow(df_gen |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::yellow("genus"),
       "level, \n",
       crayon::green(nrow(df_spe |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::green("species"),
       "level, \n",
       "and",
       crayon::red(nrow(df_var |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::red("variety"),
       "level. \n"
@@ -173,17 +173,17 @@ decorate_chemo <- function(df = annotation_table_weighted_chemo,
     x = paste(
       "chemically informed scoring led to \n",
       crayon::blue(nrow(df_pat |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::blue("pathway"),
       "level, \n",
       crayon::yellow(nrow(df_sup |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::yellow("superclass"),
       "level, and \n",
       crayon::green(nrow(df_cla |>
-        dplyr::distinct(inchikey_2D))),
+        dplyr::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::green("class"),
       "level. \n"

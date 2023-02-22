@@ -16,7 +16,7 @@
 #'
 #' @examples NULL
 annotate_non_ms1 <-
-  function(annotationTable = metadata_table_spectral_annotation,
+  function(annotationTable = table_ms2_annotations,
            candidatesInitial = candidates_initial) {
     log_debug("formatting initial results \n")
     df23 <- annotationTable |>
@@ -46,9 +46,12 @@ annotate_non_ms1 <-
         score_input,
         library,
         mz_error,
-        molecular_formula,
-        inchikey_2D,
-        smiles_2D,
+        structure_molecular_formula,
+        structure_xlogp,
+        structure_exact_mass,
+        structure_name,
+        structure_inchikey_2D,
+        structure_smiles_2D,
         rank_initial
       )
 
@@ -72,7 +75,7 @@ annotate_non_ms1 <-
       dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
-    df26["inchikey_2D"][is.na(df26["inchikey_2D"])] <-
+    df26["structure_inchikey_2D"][is.na(df26["structure_inchikey_2D"])] <-
       "notAnnotated"
     df26["score_input"][is.na(df26["score_input"])] <-
       0
@@ -87,8 +90,8 @@ annotate_non_ms1 <-
       df26,
       structure_organism_pairs_table |>
         dplyr::distinct(
-          inchikey_2D = structure_inchikey_2D,
-          smiles_2D = structure_smiles_2D,
+          structure_inchikey_2D,
+          structure_smiles_2D,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class

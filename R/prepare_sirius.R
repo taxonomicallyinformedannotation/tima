@@ -5,6 +5,10 @@
 #' @param input_directory Directory containing the Sirius results
 #' @param npc Boolean. NPClassifier classes computed. TRUE or FALSE
 #' @param output Output where to save prepared results
+#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_met File containing structures metadata
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param parameters Params
 #'
 #' @return NULL
@@ -20,6 +24,11 @@ prepare_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            npc = params$tools$taxonomies$chemical,
            output = params$files$annotations$pretreated,
+           str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+           str_met = paths$data$interim$libraries$merged$structures$metadata,
+           str_nam = paths$data$interim$libraries$merged$structures$names,
+           str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            parameters = params) {
     if (file.exists(input_directory)) {
       stopifnot("Chemical class must be 'npc'." = npc %in% c("npc"))
@@ -137,7 +146,7 @@ prepare_sirius <-
         dplyr::select(
           feature_id,
           structure_name = name,
-          smiles,
+          smiles_2D = smiles,
           inchikey_2D = InChIkey2D,
           molecular_formula = molecularFormula,
           score_input
@@ -145,7 +154,7 @@ prepare_sirius <-
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
-          smiles_2D = smiles
+          smiles = NA
         )
 
       compound_adducts_prepared <- compound_adducts |>
@@ -160,7 +169,7 @@ prepare_sirius <-
         dplyr::select(
           feature_id,
           structure_name = name,
-          smiles,
+          smiles_2D = smiles,
           inchikey_2D = InChIkey2D,
           molecular_formula = molecularFormula,
           structure_xlogp = xlogp,
@@ -169,7 +178,7 @@ prepare_sirius <-
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
-          smiles_2D = smiles,
+          smiles = NA,
           ## TODO until better
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
@@ -200,15 +209,14 @@ prepare_sirius <-
         dplyr::left_join(formulas_prepared) |>
         dplyr::left_join(canopus_npc_prepared) |>
         dplyr::distinct() |>
-        complement_metadata() |>
         dplyr::select(
           feature_id,
           structure_name,
-          inchikey,
-          inchikey_2D,
-          smiles,
-          smiles_2D,
-          molecular_formula,
+          # structure_inchikey = inchikey,
+          structure_inchikey_2D = inchikey_2D,
+          # structure_smiles = smiles,
+          structure_smiles_2D = smiles_2D,
+          structure_molecular_formula = molecular_formula,
           structure_exact_mass,
           structure_xlogp,
           library,
@@ -224,7 +232,10 @@ prepare_sirius <-
           structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate_all(as.character) |>
-        dplyr::mutate_all(dplyr::na_if, "N/A")
+        dplyr::mutate_all(dplyr::na_if, "N/A") |>
+        dplyr::mutate_all(dplyr::na_if, "null") |>
+        round_reals() |>
+        complement_structures_metadata()
 
       if (nrow(table |>
         dplyr::filter(is.na(structure_exact_mass))) > 0) {
@@ -242,11 +253,11 @@ prepare_sirius <-
       table <- data.frame(
         feature_id = NA,
         structure_name = NA,
-        inchikey = NA,
-        inchikey_2D = NA,
-        smiles = NA,
-        smiles_2D = NA,
-        molecular_formula = NA,
+        # structure_inchikey = NA,
+        structure_inchikey_2D = NA,
+        # structure_smiles = NA,
+        structure_smiles_2D = NA,
+        structure_molecular_formula = NA,
         structure_exact_mass = NA,
         structure_xlogp = NA,
         library = NA,

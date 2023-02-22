@@ -5,7 +5,7 @@
 \title{Annotate MS1}
 \usage{
 annotate_ms1(
-  annotationTable = metadata_table_spectral_annotation,
+  annotationTable = annotation_table_ms2,
   structureExactMassTable = structure_exact_mass_table,
   structureOrganismPairsTable = structure_organism_pairs_table,
   adducts = unlist(adducts_list[[ms_mode]]),

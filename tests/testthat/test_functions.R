@@ -156,22 +156,6 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   fake_features_components()
 
-  ### Features classification
-  step <- "prepare_features_classification"
-  params <- get_params(step = step)
-  #### Fake no RT
-  fake_no_rt(
-    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz",
-    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled_no_rt.tsv.gz"
-  )
-  #### Fake no RT classification
-  prepare_features_classification(
-    input = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled_no_rt.tsv.gz",
-    output = "data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_treated_no_rt.tsv.gz"
-  )
-  #### Normal
-  prepare_features_classification()
-
   ### Taxa
   step <- "prepare_taxa"
   params <- get_params(step = step)
@@ -219,7 +203,6 @@ testthat::test_that("Whole process", {
   arguments$fil_ann_raw_sir <<- "x"
   arguments$fil_ann_pre <<- "x"
   arguments$fil_ann_fil <<- "x"
-  arguments$fil_ann_tre <<- "x"
   arguments$fil_ann_pro <<- "x"
   arguments$fil_fea_raw <<- "x"
   arguments$fil_lib_add_pro <<- "x"

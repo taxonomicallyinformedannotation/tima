@@ -8,6 +8,11 @@ prepare_sirius(
   input_directory = params$files$annotations$raw$sirius,
   npc = params$tools$taxonomies$chemical,
   output = params$files$annotations$pretreated,
+  str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+  str_met = paths$data$interim$libraries$merged$structures$metadata,
+  str_nam = paths$data$interim$libraries$merged$structures$names,
+  str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+  str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
   parameters = params
 )
 }
@@ -17,6 +22,14 @@ prepare_sirius(
 \item{npc}{Boolean. NPClassifier classes computed. TRUE or FALSE}
 
 \item{output}{Output where to save prepared results}
+
+\item{str_2D_3D}{File containing 2D and 3D structures}
+
+\item{str_met}{File containing structures metadata}
+
+\item{str_tax_cla}{File containing Classyfire taxonomy}
+
+\item{str_tax_npc}{File containing NPClassifier taxonomy}
 
 \item{parameters}{Params}
 }
