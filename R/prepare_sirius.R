@@ -17,7 +17,7 @@
 #'
 #' @importFrom dplyr bind_rows distinct filter left_join mutate mutate_all
 #' @importFrom dplyr na_if select
-#' @importFrom readr read_delim write_delim
+#' @importFrom readr cols read_delim write_delim
 #'
 #' @examples NULL
 prepare_sirius <-
@@ -94,7 +94,7 @@ prepare_sirius <-
           recursive = TRUE
         ),
         FUN = readr::read_delim,
-        col_types = "c",
+        col_types = readr::cols(.default = "c"),
         col_select = c(
           "ConfidenceScore",
           "CSI:FingerIDScore",

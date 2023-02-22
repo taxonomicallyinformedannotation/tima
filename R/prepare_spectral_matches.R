@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @importFrom dplyr distinct mutate
-#' @importFrom readr read_delim write_delim
+#' @importFrom readr cols read_delim write_delim
 #'
 #' @examples NULL
 prepare_spectral_matches <-

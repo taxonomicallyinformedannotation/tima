@@ -25,7 +25,7 @@
 #' @export
 #'
 #' @importFrom dplyr anti_join bind_rows distinct filter left_join
-#' @importFrom readr read_delim write_delim
+#' @importFrom readr cols read_delim write_delim
 #'
 #' @examples NULL
 prepare_libraries <-
@@ -79,7 +79,8 @@ prepare_libraries <-
     params <<- parameters
     libraries <- list()
     for (i in seq_along(files)) {
-      libraries[[i]] <- readr::read_delim(file = files[[i]])
+      libraries[[i]] <- readr::read_delim(file = files[[i]],
+                                          col_types = readr::cols(.default = "c"))
     }
 
     tables <- dplyr::bind_rows(libraries) |>

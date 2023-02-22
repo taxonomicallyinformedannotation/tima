@@ -54,7 +54,7 @@
 #' @importFrom crayon green
 #' @importFrom dplyr across arrange bind_rows distinct filter select
 #' @importFrom dplyr left_join matches mutate mutate_all mutate_if
-#' @importFrom readr read_delim write_delim
+#' @importFrom readr cols read_delim write_delim
 #' @importFrom yaml write_yaml
 #'
 #' @seealso annotate_ms1 weight_bio weight_chemo
@@ -140,7 +140,7 @@ process_annotations <-
     annotation_table_ms2 <<-
       readr::read_delim(
         file = annotations,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       ) |>
       dplyr::mutate_all(list(~ gsub(
         pattern = "\\|",
@@ -157,7 +157,7 @@ process_annotations <-
     log_debug(x = "... metadata_table_biological_annotation")
     taxed_features_table <<- readr::read_delim(
       file = taxa,
-      col_types = "c"
+      col_types = readr::cols(.default = "c")
     ) |>
       dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
       dplyr::mutate_if(is.logical, as.character)
@@ -171,31 +171,31 @@ process_annotations <-
     structure_organism_pairs_table <<-
       readr::read_delim(
         file = library,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       ) |>
       dplyr::left_join(readr::read_delim(
         file = str_2D_3D,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
         file = str_met,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
         file = str_nam,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
         file = str_tax_cla,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
         file = str_tax_npc,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
         file = org_tax_ott,
-        col_types = "c"
+        col_types = readr::cols(.default = "c")
       )) |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(c(
