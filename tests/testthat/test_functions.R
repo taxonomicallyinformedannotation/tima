@@ -135,8 +135,8 @@ testthat::test_that("Whole process", {
   ## To fake there is no input
   prepare_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
-  prepare_sirius(input_directory = paths$data$interim$annotations$example_sirius |>
-    gsub(pattern = ".zip",replacement ="_mini.zip"))
+  prepare_sirius(input_directory = params$files$annotations$raw$sirius |>
+    gsub(pattern = "/$",replacement ="_mini/"))
 
   ### ISDB results
   step <- "prepare_spectral_matches"
