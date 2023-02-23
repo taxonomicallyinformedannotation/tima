@@ -3,7 +3,6 @@
 #' @description This function cleans the results obtained after biological weighting
 #'
 #' @param annotationTableWeightedBio Table containing your biologically weighted annotation
-#' @param structureOrganismPairsTable Table containing the structure - organism pairs
 #' @param edgesTable Table containing the edges between features
 #' @param aNnOtAtE Boolean parameter indicating if you performed MS1 annotation completion
 #' @param candidatesInitial Number of initial candidates to keep
@@ -24,7 +23,6 @@
 #' @examples NULL
 clean_bio <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
-           structureOrganismPairsTable = structure_organism_pairs_table,
            edgesTable = edges_table,
            aNnOtAtE = annotate,
            candidatesInitial = candidates_initial,

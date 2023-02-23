@@ -15,8 +15,7 @@
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
-#' @importFrom purrr map
-#' @importFrom readr read_delim write_delim
+#' @importFrom readr cols read_delim write_delim
 #'
 #' @examples NULL
 fake_features_components <-
@@ -42,9 +41,9 @@ fake_features_components <-
     log_debug("Loading files ...")
     table <- lapply(
       X = input,
-      FUN = readr::read_delim
+      FUN = readr::read_delim,
+      col_types = readr::cols(.default = "c")
     ) |>
-      purrr::map(.f = mutate_all, as.character) |>
       dplyr::bind_rows() |>
       dplyr::mutate(feature_id = as.numeric(feature_id))
 

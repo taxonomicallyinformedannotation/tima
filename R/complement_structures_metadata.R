@@ -22,7 +22,7 @@ complement_structures_metadata <- function(df,
                                            str_nam = paths$data$interim$libraries$merged$structures$names,
                                            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
                                            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
-                                           quickmode = FALSE) {
+                                           quickmode = TRUE) {
   log_debug("Trying to look for already computed metadata")
 
   paths <- parse_yaml_paths()
@@ -213,6 +213,8 @@ complement_structures_metadata <- function(df,
     dplyr::select(
       -structure_taxonomy_classyfire_chemontid_i, -structure_taxonomy_classyfire_01kingdom_i, -structure_taxonomy_classyfire_02superclass_i, -structure_taxonomy_classyfire_03class_i, -structure_taxonomy_classyfire_04directparent_i
     )
+
+  ## TODO if (quickmode == FALSE){...}
 
   return(table_final)
 }

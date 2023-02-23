@@ -4,14 +4,12 @@
 \alias{export_output}
 \title{Export output}
 \usage{
-export_output(x, file = output, ...)
+export_output(x, file = output)
 }
 \arguments{
 \item{x}{data frame to be exported}
 
 \item{file}{path to the output file}
-
-\item{...}{...}
 }
 \description{
 This function creates the output directory if it doesn't exist and exports the data frame to a tab-delimited file.

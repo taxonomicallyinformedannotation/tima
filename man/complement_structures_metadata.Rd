@@ -11,7 +11,7 @@ complement_structures_metadata(
   str_nam = paths$data$interim$libraries$merged$structures$names,
   str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
   str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
-  quickmode = FALSE
+  quickmode = TRUE
 )
 }
 \arguments{

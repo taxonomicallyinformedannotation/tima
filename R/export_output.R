@@ -4,7 +4,6 @@
 #'
 #' @param x data frame to be exported
 #' @param file path to the output file
-#' @param ... ...
 #'
 #' @return NULL
 #'
@@ -14,7 +13,7 @@
 #' @importFrom readr write_delim
 #'
 #' @examples export_output(x = data.frame(), file = "output/file.tsv")
-export_output <- function(x, file = output, ...) {
+export_output <- function(x, file = output) {
   # Create the output directory if it doesn't exist
   create_dir(export = file)
 

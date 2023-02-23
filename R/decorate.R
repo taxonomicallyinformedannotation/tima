@@ -148,21 +148,21 @@ decorate_chemo <- function(df = annotation_table_weighted_chemo,
                            sc_sup = score_chemical_superclass,
                            sc_cla = score_chemical_class) {
   df_pat <- df |>
-    dplyr::filter(score_chemical >= score_chemical_pathway) |>
+    dplyr::filter(score_chemical >= sc_pat) |>
     dplyr::filter(
       consensus_structure_pat != "notAnnotated" &
         consensus_structure_cla != "notConsistent" &
         consensus_structure_pat != "dummy"
     )
   df_sup <- df_pat |>
-    dplyr::filter(score_chemical >= score_chemical_superclass) |>
+    dplyr::filter(score_chemical >= sc_sup) |>
     dplyr::filter(
       consensus_structure_sup != "notAnnotated" &
         consensus_structure_cla != "notConsistent" &
         consensus_structure_sup != "dummy"
     )
   df_cla <- df_sup |>
-    dplyr::filter(score_chemical >= score_chemical_class) |>
+    dplyr::filter(score_chemical >= sc_cla) |>
     dplyr::filter(
       consensus_structure_cla != "notAnnotated" &
         consensus_structure_cla != "notConsistent" &

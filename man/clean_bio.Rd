@@ -6,7 +6,6 @@
 \usage{
 clean_bio(
   annotationTableWeightedBio = annotation_table_weighted_bio,
-  structureOrganismPairsTable = structure_organism_pairs_table,
   edgesTable = edges_table,
   aNnOtAtE = annotate,
   candidatesInitial = candidates_initial,
@@ -15,8 +14,6 @@ clean_bio(
 }
 \arguments{
 \item{annotationTableWeightedBio}{Table containing your biologically weighted annotation}
-
-\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
 \item{edgesTable}{Table containing the edges between features}
 

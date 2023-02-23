@@ -23,7 +23,7 @@ prepare_config <- function(filename = params$files$pattern,
                            taxon = params$organisms$taxon,
                            parameters = params,
                            step = NA) {
-  ## TODO Filename actually not taken into account
+  ## TODO filename actually not taken into account
 
   stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
