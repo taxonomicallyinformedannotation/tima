@@ -55,12 +55,8 @@ get_last_version_from_zenodo <-
         doi,
         " (",
         content$metadata$title,
-        "; version: ",
-        ifelse(
-          !is.null(content$metadata$version),
-          content$metadata$version,
-          content$metadata$relations$version[1, 1]
-        ),
+        "; unique identifier: ",
+        content$doi_url,
         ")\n"
       )
       create_dir(export = path)
