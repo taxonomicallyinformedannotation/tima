@@ -150,9 +150,7 @@ prepare_libraries <-
         ) |>
         dplyr::distinct()
 
-      if (nrow(table_keys) == 0) {
-        stop("Your filter led to no entries, try to change it.")
-      }
+      stopifnot("Your filter led to no entries, try to change it." = nrow(table_keys) != 0)
     }
 
     # Export the library

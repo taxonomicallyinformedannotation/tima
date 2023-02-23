@@ -168,6 +168,9 @@ testthat::test_that("Whole process", {
   ### Fake features components
   step <- "fake_features_components"
   params <- get_params(step = step)
+  ## neg
+  fake_features_components(ms_mode = "neg")
+  ## pos
   fake_features_components()
 
   ### Taxa
@@ -263,6 +266,8 @@ testthat::test_that("Whole process", {
   arguments$too_met <<- "x"
   arguments$too_net_spe_com <<- "x"
   arguments$too_net_spe_edg <<- "x"
+  arguments$too_tax_bio <<- "x"
+  arguments$too_tax_che <<- "x"
   arguments$wei_glo_bio <<- "x"
   arguments$wei_glo_che <<- "x"
   arguments$wei_glo_spe <<- "x"

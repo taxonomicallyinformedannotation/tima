@@ -42,58 +42,37 @@ export_spectra <- function(file,
             compound_id = if (!is.null(spectra$compound_id)) {
               spectra$compound_id
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             },
             name = if (!is.null(spectra$name)) {
               spectra$name
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             },
             inchi = if (!is.null(spectra$inchi)) {
               spectra$inchi
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             },
             inchikey = if (!is.null(spectra$inchikey)) {
               spectra$inchikey
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             },
             exactmass = if (!is.null(spectra$exactmass)) {
               spectra$exactmass
             } else {
-              no <- rep(
-                NA_integer_,
-                nrow(spectra)
-              )
+              rep(NA_real_, nrow(spectra))
             },
             formula = if (!is.null(spectra$formula)) {
               spectra$formula
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             },
             synonyms = if (!is.null(spectra$synonyms)) {
               spectra$synonyms
             } else {
-              no <- rep(
-                NA,
-                nrow(spectra)
-              )
+              rep(NA, nrow(spectra))
             }
           )
       }

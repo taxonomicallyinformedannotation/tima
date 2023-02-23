@@ -23,7 +23,8 @@ prepare_config <- function(filename = params$files$pattern,
                            taxon = params$organisms$taxon,
                            parameters = params,
                            step = NA) {
-  ## TODO filename actually not taken into account
+  ## TODO 'filename' actually not taken into account
+  ## TODO 'step' actually not taken into account
 
   stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
@@ -114,6 +115,7 @@ prepare_config <- function(filename = params$files$pattern,
     gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
 
+  ## TODO 'step' actually not taken into account
   if (!is.na(step)) {
     yamls_params <-
       yamls_params[grepl(pattern = step, x = names(yamls_params))]
