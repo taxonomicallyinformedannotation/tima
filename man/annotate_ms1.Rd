@@ -9,6 +9,8 @@ annotate_ms1(
   structureExactMassTable = structure_exact_mass_table,
   structureOrganismPairsTable = structure_organism_pairs_table,
   adducts = unlist(adducts_list[[ms_mode]]),
+  adductsM = adducts_masses,
+  adductsTable = adducts_table,
   neutralLosses = neutral_losses_table,
   msMode = ms_mode,
   tolerancePpm = tolerance_ppm,
@@ -24,6 +26,10 @@ annotate_ms1(
 \item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
 \item{adducts}{List of adducts to be used}
+
+\item{adductsM}{Adducts masses}
+
+\item{adductsTable}{Table containing the adducted library masses}
 
 \item{neutralLosses}{List of neutral losses to be used}
 

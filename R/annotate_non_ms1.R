@@ -3,6 +3,7 @@
 #' @description This function filters MS2 results in case no MS1 annotation was performed
 #'
 #' @param annotationTable Table containing your previous annotation
+#' @param structureOrganismPairsTable Table containing the structure - organism pairs
 #' @param candidatesInitial Number of initial candidates to keep
 #'
 #' @return A table containing the initial annotation where only part of initial candidates are kept
@@ -17,6 +18,7 @@
 #' @examples NULL
 annotate_non_ms1 <-
   function(annotationTable = table_ms2_annotations,
+           structureOrganismPairsTable = structure_organism_pairs_table,
            candidatesInitial = candidates_initial) {
     log_debug("formatting initial results \n")
     df23 <- annotationTable |>
@@ -88,7 +90,7 @@ annotate_non_ms1 <-
 
     df27 <- dplyr::left_join(
       df26,
-      structure_organism_pairs_table |>
+      structureOrganismPairsTable |>
         dplyr::distinct(
           structure_inchikey_2D,
           structure_smiles_2D,

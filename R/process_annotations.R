@@ -155,7 +155,7 @@ process_annotations <-
       dplyr::arrange(feature_id)
 
     log_debug(x = "... metadata_table_biological_annotation")
-    taxed_features_table <<- readr::read_delim(
+    taxed_features_table <- readr::read_delim(
       file = taxa,
       col_types = readr::cols(.default = "c")
     ) |>
@@ -165,10 +165,10 @@ process_annotations <-
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
     log_debug(x = "... edges table")
-    edges_table <<- readr::read_delim(file = edges)
+    edges_table <- readr::read_delim(file = edges)
 
     log_debug(x = "... structure-organism pairs table")
-    structure_organism_pairs_table <<-
+    structure_organism_pairs_table <-
       readr::read_delim(
         file = library,
         col_types = readr::cols(.default = "c")
@@ -229,28 +229,28 @@ process_annotations <-
         adduct_file <- paths$data$interim$adducts$neg
       }
 
-      adductsTable <<- readr::read_delim(file = adduct_file)
+      adducts_table <- readr::read_delim(file = adduct_file)
 
       log_debug("... adducts masses for in source dimers and multicharged")
-      adductsMassTable <<-
+      adductsMassTable <-
         readr::read_delim(file = adducts_masses_list)
 
       log_debug("... neutral lossses")
-      neutral_losses_table <<-
+      neutral_losses_table <-
         readr::read_delim(file = neutral_losses_list)
 
-      adductsM <<- adductsMassTable$mass
-      names(adductsM) <<- adductsMassTable$adduct
+      adducts_m <- adductsMassTable$mass
+      names(adducts_m) <- adductsMassTable$adduct
 
       if (ms_mode == "pos") {
-        adduct_db_file <<-
+        adduct_db_file <-
           file.path(
             paths$data$interim$adducts$path,
             paste0(name, "_pos.tsv.gz")
           )
       }
       if (ms_mode == "neg") {
-        adduct_db_file <<-
+        adduct_db_file <-
           file.path(
             paths$data$interim$adducts$path,
             paste0(name, "_neg.tsv.gz")
@@ -271,7 +271,7 @@ process_annotations <-
         )
 
       log_debug(x = "... exact masses for MS1 annotation")
-      structure_exact_mass_table <<-
+      structure_exact_mass_table <-
         readr::read_delim(file = adduct_db_file) |>
         dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
@@ -281,6 +281,8 @@ process_annotations <-
           structureExactMassTable = structure_exact_mass_table,
           structureOrganismPairsTable = structure_organism_pairs_table,
           adducts = unlist(adducts_list[[ms_mode]]),
+          adductsM = adducts_m,
+          adductsTable = adducts_table,
           neutralLosses = neutral_losses_table,
           msMode = ms_mode,
           tolerancePpm = tolerance_ppm,
@@ -291,16 +293,19 @@ process_annotations <-
       annotation_table_ms1 |>
         decorate_ms1()
     } else {
-      annotation_table_ms1 <<- table_ms2_annotations |>
-      annotate_non_ms1(candidatesInitial = candidates_initial)
+      annotation_table_ms1 <<- annotation_table_ms2 |>
+        annotate_non_ms1(
+          structureOrganismPairsTable = structure_organism_pairs_table,
+          candidatesInitial = candidates_initial
+        )
     }
 
     log_debug(x = "adding biological organism metadata")
-    annotation_table_ms1_taxed <<- annotation_table_ms1 |>
+    annotation_table_ms1_taxed <- annotation_table_ms1 |>
       dplyr::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
-    annotation_table_weighted_bio <<- annotation_table_ms1_taxed |>
+    annotation_table_weighted_bio <- annotation_table_ms1_taxed |>
       weight_bio(
         structureOrganismPairsTable = structure_organism_pairs_table,
         weightSpectral = weight_spectral,
@@ -330,7 +335,7 @@ process_annotations <-
       )
 
     log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-    annotation_table_weighted_bio_cleaned <<-
+    annotation_table_weighted_bio_cleaned <-
       annotation_table_weighted_bio |>
       clean_bio(
         edgesTable = edges_table,
@@ -340,7 +345,7 @@ process_annotations <-
       )
 
     log_debug(x = "performing chemically informed scoring")
-    annotation_table_weighted_chemo <<-
+    annotation_table_weighted_chemo <-
       annotation_table_weighted_bio_cleaned |>
       weight_chemo(
         weightSpectral = weight_spectral,
@@ -359,7 +364,7 @@ process_annotations <-
       )
 
     log_debug(x = "cleaning for export")
-    results <<- annotation_table_weighted_chemo |>
+    results <- annotation_table_weighted_chemo |>
       clean_chemo(
         structureOrganismPairsTable = structure_organism_pairs_table,
         candidatesFinal = candidates_final,

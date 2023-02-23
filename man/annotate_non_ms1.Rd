@@ -6,11 +6,14 @@
 \usage{
 annotate_non_ms1(
   annotationTable = table_ms2_annotations,
+  structureOrganismPairsTable = structure_organism_pairs_table,
   candidatesInitial = candidates_initial
 )
 }
 \arguments{
 \item{annotationTable}{Table containing your previous annotation}
+
+\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
 \item{candidatesInitial}{Number of initial candidates to keep}
 }

@@ -6,6 +6,8 @@
 #' @param structureExactMassTable Table containing the structure - exact mass pairs to perform annotation
 #' @param structureOrganismPairsTable Table containing the structure - organism pairs
 #' @param adducts List of adducts to be used
+#' @param adductsM Adducts masses
+#' @param adductsTable Table containing the adducted library masses
 #' @param neutralLosses List of neutral losses to be used
 #' @param msMode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
@@ -32,6 +34,8 @@ annotate_ms1 <-
            structureExactMassTable = structure_exact_mass_table,
            structureOrganismPairsTable = structure_organism_pairs_table,
            adducts = unlist(adducts_list[[ms_mode]]),
+           adductsM = adducts_masses,
+           adductsTable = adducts_table,
            neutralLosses = neutral_losses_table,
            msMode = ms_mode,
            tolerancePpm = tolerance_ppm,
