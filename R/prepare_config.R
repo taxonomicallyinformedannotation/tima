@@ -71,7 +71,15 @@ prepare_config <- function(filename = params$files$pattern,
   yamls_params$prepare_gnps$files$annotations$pretreated <-
     yamls_params$prepare_gnps$files$annotations$pretreated |>
     replace_gnps_job_id()
-  ## TODO
+  yamls_params$prepare_spectral_matches$files$annotations$raw$spectral <-
+    yamls_params$prepare_spectral_matches$files$annotations$raw$spectral |>
+    gsub(
+      pattern = yamls_params$prepare_spectral_matches$files$annotations$raw$spectral,
+      replacement = file.path(
+        paths$data$interim$annotations$path,
+        paste(params$files$pattern, "isdb.tsv.gz", sep = "_")
+      )
+    )
   yamls_params$prepare_spectral_matches$files$annotations$pretreated <-
     yamls_params$prepare_spectral_matches$files$annotations$pretreated |>
     replace_gnps_job_id()

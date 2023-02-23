@@ -44,8 +44,7 @@ files:
 
       #' List of spectral matching results. STRING
       spectral:
-        - data/interim/annotations/example_isdb_pos.tsv.gz
-        - data/interim/annotations/example_isdb_neg.tsv.gz
+        - data/interim/annotations/example_isdb.tsv.gz
 
   #' Libraries files.
   libraries:
