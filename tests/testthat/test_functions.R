@@ -43,6 +43,12 @@ testthat::test_that("Whole process", {
     pattern = paths$urls$lotus$pattern,
     path = paths$data$source$libraries$lotus
   )
+  ## check it does not download it a second time
+  get_last_version_from_zenodo(
+    doi = paths$url$lotus$doi,
+    pattern = paths$urls$lotus$pattern,
+    path = paths$data$source$libraries$lotus
+  )
 
   #### HMDB
   # get_hmdb()
