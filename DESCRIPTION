@@ -25,7 +25,6 @@ Imports:
     MetaboAnnotation,
     MsBackendMgf,
     MsCoreUtils,
-    purrr (>= 1.0.0),
     readr,
     rotl,
     Spectra,

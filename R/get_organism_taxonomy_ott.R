@@ -9,9 +9,8 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr bind_rows coalesce distinct filter left_join matches
-#' @importFrom dplyr mutate select setdiff
-#' @importFrom purrr map_df
+#' @importFrom dplyr arrange bind_rows coalesce desc distinct filter left_join
+#' @importFrom dplyr matches mutate row_number select setdiff
 #' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
 #' @importFrom stringr fixed str_remove
 #' @importFrom tidyr pivot_wider
@@ -100,7 +99,7 @@ get_organism_taxonomy_ott <- function(df) {
       )
     ) |>
     dplyr::distinct() |>
-    purrr::map_df(rev) |>
+    dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
     ## feeling it is better that way
     dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE) |>
     ## canonical_name important for synonyms
@@ -122,7 +121,7 @@ get_organism_taxonomy_ott <- function(df) {
       organism_taxonomy_09species = dplyr::matches("name_species"),
       organism_taxonomy_10varietas = dplyr::matches("name_varietas")
     ) |>
-    purrr::map_df(rev) |>
+    dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
     dplyr::coalesce()
 
   if (nrow(biological_metadata) != 0) {

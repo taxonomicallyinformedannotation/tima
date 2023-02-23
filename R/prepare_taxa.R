@@ -26,7 +26,6 @@
 #' @importFrom dplyr everything filter group_by group_cols left_join matches
 #' @importFrom dplyr mutate mutate_all mutate_at na_if row_number select
 #' @importFrom dplyr setdiff summarise_all ungroup vars
-#' @importFrom purrr map_df
 #' @importFrom readr read_delim write_delim
 #' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
 #' @importFrom stringr fixed str_length str_remove
