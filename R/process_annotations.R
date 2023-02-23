@@ -291,7 +291,7 @@ process_annotations <-
       annotation_table_ms1 |>
         decorate_ms1()
     } else {
-      annotation_table_ms1 <<- table_ms2_annotations
+      annotation_table_ms1 <<- table_ms2_annotations |>
       annotate_non_ms1(candidatesInitial = candidates_initial)
     }
 
