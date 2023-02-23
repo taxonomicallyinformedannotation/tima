@@ -120,16 +120,16 @@ export_spectra <- function(file,
 #'
 #' @export
 #'
-#' @importFrom tidyr drop_na
+#' @importFrom dplyr filter
 #'
 #' @examples NULL
 export_spectra_2 <- function(file,
                              spectra,
                              meta) {
-  log_debug("Exporting")
-  create_dir(export = file)
   if (nrow(spectra |>
-    tidyr::drop_na(compound_id)) != 0) {
+    dplyr::filter(!is.na(compound_id))) != 0) {
+    log_debug("Exporting")
+    create_dir(export = file)
     spectra |>
       export_spectra(
         file = file,

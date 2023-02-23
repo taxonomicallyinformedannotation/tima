@@ -14,7 +14,10 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_example_features()
+download_file(
+  url = paths$urls$examples$features,
+  export = paths$data$source$examples$features
+)
 
 end <- Sys.time()
 

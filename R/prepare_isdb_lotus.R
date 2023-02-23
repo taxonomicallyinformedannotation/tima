@@ -12,10 +12,8 @@
 #' @export
 #'
 #' @importFrom CompoundDb make_metadata
-#' @importFrom curl curl_fetch_memory
-#' @importFrom dplyr mutate rename select
+#' @importFrom dplyr filter
 #' @importFrom jsonlite fromJSON
-#' @importFrom tidyr drop_na
 #'
 #' @examples NULL
 prepare_isdb_lotus <-
@@ -34,19 +32,11 @@ prepare_isdb_lotus <-
 
     if (!file.exists(output)) {
       log_debug("Generating metadata ...")
-      ## Probably better to store it before
-      req <-
-        curl::curl_fetch_memory(url = "https://zenodo.org/api/records/5607185")
-      content <- jsonlite::fromJSON(txt = rawToChar(req$content))
-      version <- ifelse(
-        !is.null(content$metadata$version),
-        content$metadata$version,
-        content$metadata$relations$version[1, 1]
-      )
+      content <- jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")
       metad <- CompoundDb::make_metadata(
         source = "LOTUS",
         url = "https://doi.org/10.5281/zenodo.5607185",
-        source_version = version,
+        source_version = content$doi_url,
         source_date = content[["metadata"]][["publication_date"]],
         organism = "Life"
       )

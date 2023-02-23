@@ -1,9 +1,10 @@
-#' @title Get example spectra
+#' @title Download file
 #'
-#' @description This function gets an example mgf file to work with
+#' @description This function download files
 #'
-#' @param url URL of the MGF file to be downloaded
-#' @param export File path where the MGF file should be saved
+#' @param url URL of the file to be downloaded
+#' @param export File path where the file should be saved
+#' @param limit Timeout limit (in seconds)
 #'
 #' @return NULL
 #'
@@ -11,13 +12,13 @@
 #'
 #' @importFrom utils download.file
 #'
-#' @examples NULL
-get_example_spectra <-
-  function(url = paths$url$examples$spectra,
-           export = paths$data$source$examples$spectra) {
-    paths <- parse_yaml_paths()
+#' @examples download_file(url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv", export = "data/source/examples/metadata.tsv")
+download_file <-
+  function(url,
+           export,
+           limit = 600) {
     ## Set the timeout for download to 600 seconds
-    options(timeout = 600)
+    options(timeout = limit)
     message("Timeout for download is ", getOption("timeout"), " seconds")
 
     ## Create the export directory if it does not exist

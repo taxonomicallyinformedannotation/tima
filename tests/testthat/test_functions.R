@@ -11,31 +11,49 @@ testthat::test_that("Whole process", {
   prepare_config()
 
   ## Get all files
+  ### Features table
+  download_file(
+    url = paths$urls$examples$features,
+    export = paths$data$source$examples$features
+  )
 
-  ### Benchmark
-  get_benchmark(url = "https://raw.githubusercontent.com/matchms/matchms/master/tests/massbank_five_spectra.msp")
+  ### Metadata table
+  download_file(
+    url = paths$urls$examples$metadata,
+    export = paths$data$source$examples$metadata
+  )
 
-  ### Examples
-
-  #### Feature table
-  get_example_features()
-
-  #### Metadata table
-  get_example_metadata()
-
-  #### MGF
-  ## mini version for tests
-  get_example_spectra(url = paths$url$examples$spectra_mini)
-  # get_example_spectra()
+  ### Spectra
+  #### Mini version for tests
+  download_file(
+    url = paths$url$examples$spectra_mini,
+    export = paths$data$source$examples$spectra
+  )
+  # download_file(url = paths$url$examples$spectra,
+  #               export = paths$data$source$examples$spectra)
 
   #### SIRIUS
   ## mini version for tests
-  get_example_sirius(
+  sirius_mini <- paths$data$interim$annotations$example_sirius |>
+    gsub(pattern = ".zip", replacement = "_mini.zip")
+  download_file(
     url = paths$urls$examples$sirius_mini,
-    export = paths$data$interim$annotations$example_sirius |>
-      gsub(pattern = ".zip", replacement = "_mini.zip")
+    export = sirius_mini
   )
-  # get_example_sirius()
+  message("Unzipping")
+  utils::unzip(
+    zipfile = sirius_mini,
+    exdir = dirname(sirius_mini)
+  )
+  # download_file(
+  #   url = paths$urls$examples$sirius,
+  #   export = paths$data$interim$annotations$example_sirius
+  # )
+  # message("Unzipping")
+  # utils::unzip(
+  #   zipfile = paths$data$interim$annotations$example_sirius,
+  #   exdir = dirname(paths$data$interim$annotations$example_sirius)
+  # )
 
   #### LOTUS
   get_last_version_from_zenodo(
@@ -43,7 +61,7 @@ testthat::test_that("Whole process", {
     pattern = paths$urls$lotus$pattern,
     path = paths$data$source$libraries$lotus
   )
-  ## check it does not download it a second time
+  ## Check it does not download it a second time
   get_last_version_from_zenodo(
     doi = paths$url$lotus$doi,
     pattern = paths$urls$lotus$pattern,
@@ -95,6 +113,8 @@ testthat::test_that("Whole process", {
   ## Without sqlite
   prepare_isdb_lotus(export_sqlite = FALSE)
   ## Pos
+  prepare_isdb_lotus()
+  ## Check the library already exists warning
   prepare_isdb_lotus()
   ## Neg
   prepare_isdb_lotus(
@@ -163,6 +183,9 @@ testthat::test_that("Whole process", {
   ### Features components
   step <- "prepare_features_components"
   params <- get_params(step = step)
+  ## neg
+  prepare_features_components(ms_mode = "neg")
+  ## pos
   prepare_features_components()
 
   ### Fake features components

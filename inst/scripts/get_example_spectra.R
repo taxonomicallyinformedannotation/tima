@@ -14,7 +14,10 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_example_spectra()
+download_file(
+  url = paths$url$examples$spectra,
+  export = paths$data$source$examples$spectra
+)
 
 end <- Sys.time()
 

@@ -14,9 +14,8 @@
 #'
 #' @importFrom dplyr add_count anti_join arrange bind_rows distinct filter
 #' @importFrom dplyr full_join group_by mutate n_distinct right_join select
-#' @importFrom dplyr tibble ungroup
+#' @importFrom dplyr tibble ungroup where
 #' @importFrom stats setNames
-#' @importFrom tidyselect where
 #'
 #' @seealso weight_bio
 #'
@@ -290,7 +289,7 @@ clean_bio <-
         dplyr::everything()
       ) |>
       # In case there are no consensus at all because no network
-      dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.character)) |>
+      dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
       dplyr::tibble()
 
     # Think about better scoring option

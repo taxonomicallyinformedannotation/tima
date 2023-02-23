@@ -19,11 +19,24 @@ params <- get_params(step = step)
 prepare_config()
 
 ## Get all files
-#### MGF
-get_example_spectra(url = paths$url$examples$spectra_mini)
+#### spectra
+download_file(
+  url = paths$url$examples$spectra_mini,
+  export = paths$data$source$examples$spectra
+)
 
 ### SIRIUS
-get_example_sirius(url = paths$urls$examples$sirius_mini)
+sirius_mini <- paths$data$interim$annotations$example_sirius |>
+  gsub(pattern = ".zip", replacement = "_mini.zip")
+download_file(
+  url = paths$urls$examples$sirius_mini,
+  export = sirius_mini
+)
+message("Unzipping")
+utils::unzip(
+  zipfile = sirius_mini,
+  exdir = dirname(sirius_mini)
+)
 
 ### LOTUS
 log_debug("Getting LOTUS")

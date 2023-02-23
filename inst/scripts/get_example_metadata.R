@@ -9,14 +9,14 @@ paths <- parse_yaml_paths()
 
 log_debug(
   "This script",
-  crayon::green("downloads benchmarking set from matchms work on GNPS dataset. \n")
+  crayon::green("downloads an example of metadata table. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 download_file(
-  url = paths$urls$benchmarking_set,
-  export = paths$data$source$benchmark$set
+  url = paths$urls$examples$metadata,
+  export = paths$data$source$examples$metadata
 )
 
 end <- Sys.time()
