@@ -95,7 +95,13 @@ prepare_spectral_matches <-
       dplyr::mutate_all(dplyr::na_if, "N/A") |>
       dplyr::mutate_all(dplyr::na_if, "null") |>
       round_reals() |>
-      complement_structures_metadata()
+      complement_structures_metadata(
+        str_2D_3D = str_2D_3D,
+        str_met = str_met,
+        str_nam = str_nam,
+        str_tax_cla = str_tax_cla,
+        str_tax_npc = str_tax_npc
+      )
 
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions

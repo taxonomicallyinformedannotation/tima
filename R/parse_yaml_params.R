@@ -13,9 +13,6 @@
 #'
 #' @examples NULL
 parse_yaml_params <- function(def = default_path, usr = user_path) {
-  # Initialize an empty list to store the parameters
-  params <- list()
-
   # Read the default YAML file
   log_debug("Loading yaml parameters")
   suppressWarnings(

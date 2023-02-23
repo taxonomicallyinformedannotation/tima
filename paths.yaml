@@ -122,7 +122,6 @@ inst:
     path: inst/extdata
     adducts: inst/extdata/adducts.tsv
     neutral_losses: inst/extdata/neutral_losses.tsv
-    ranks: inst/extdata/ranks.tsv
   scripts:
     path: inst/scripts
     docopt:

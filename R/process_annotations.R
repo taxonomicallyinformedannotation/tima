@@ -276,33 +276,96 @@ process_annotations <-
         dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
       log_debug(x = "performing MS1 annotation")
-      annotation_table_ms1 <<- annotate_ms1()
+      annotation_table_ms1 <<- annotation_table_ms2 |>
+        annotate_ms1(
+          structureExactMassTable = structure_exact_mass_table,
+          structureOrganismPairsTable = structure_organism_pairs_table,
+          adducts = unlist(adducts_list[[ms_mode]]),
+          neutralLosses = neutral_losses_table,
+          msMode = ms_mode,
+          tolerancePpm = tolerance_ppm,
+          toleranceRt = tolerance_rt,
+          candidatesInitial = candidates_initial
+        )
 
-      decorate_ms1()
+      annotation_table_ms1 |>
+        decorate_ms1()
     } else {
-      annotation_table_ms1 <<-
-        annotate_non_ms1(annotationTable = annotation_table_ms2)
+      annotation_table_ms1 <<- table_ms2_annotations
+      annotate_non_ms1(candidatesInitial = candidates_initial)
     }
 
     log_debug(x = "adding biological organism metadata")
-    annotation_table_ms1_taxed <<-
-      dplyr::left_join(annotation_table_ms1, taxed_features_table)
+    annotation_table_ms1_taxed <<- annotation_table_ms1 |>
+      dplyr::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
-    annotation_table_weighted_bio <<- weight_bio()
+    annotation_table_weighted_bio <<- annotation_table_ms1_taxed |>
+      weight_bio(
+        structureOrganismPairsTable = structure_organism_pairs_table,
+        weightSpectral = weight_spectral,
+        weightBiological = weight_biological,
+        scoreBiologicalDomain = score_biological_domain,
+        scoreBiologicalKingdom = score_biological_kingdom,
+        scoreBiologicalPhylum = score_biological_phylum,
+        scoreBiologicalClass = score_biological_class,
+        scoreBiologicalOrder = score_biological_order,
+        scoreBiologicalFamily = score_biological_family,
+        scoreBiologicalTribe = score_biological_tribe,
+        scoreBiologicalGenus = score_biological_genus,
+        scoreBiologicalSpecies = score_biological_species,
+        scoreBiologicalVariety = score_biological_variety
+      )
 
-    decorate_bio()
+    annotation_table_weighted_bio |>
+      decorate_bio(
+        sc_kin = score_biological_kingdom,
+        sc_phy = score_biological_phylum,
+        sc_cla = score_biological_class,
+        sc_ord = score_biological_order,
+        sc_fam = score_biological_family,
+        sc_gen = score_biological_genus,
+        sc_spe = score_biological_species,
+        sc_var = score_biological_variety
+      )
 
     log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-    annotation_table_weighted_bio_cleaned <<- clean_bio()
+    annotation_table_weighted_bio_cleaned <<-
+      annotation_table_weighted_bio |>
+      clean_bio(
+        edgesTable = edges_table,
+        aNnOtAtE = annotate,
+        candidatesInitial = candidates_initial,
+        minimalMs1Bio = minimal_ms1_bio
+      )
 
     log_debug(x = "performing chemically informed scoring")
-    annotation_table_weighted_chemo <<- weight_chemo()
+    annotation_table_weighted_chemo <<-
+      annotation_table_weighted_bio_cleaned |>
+      weight_chemo(
+        weightSpectral = weight_spectral,
+        weightBiological = weight_biological,
+        weightChemical = weight_chemical,
+        scoreChemicalPathway = score_chemical_pathway,
+        scoreChemicalSuperclass = score_chemical_superclass,
+        scoreChemicalClass = score_chemical_class
+      )
 
-    decorate_chemo()
+    annotation_table_weighted_chemo |>
+      decorate_chemo(
+        sc_pat = score_chemical_pathway,
+        sc_sup = score_chemical_superclass,
+        sc_cla = score_chemical_class
+      )
 
     log_debug(x = "cleaning for export")
-    results <<- clean_chemo()
+    results <<- annotation_table_weighted_chemo |>
+      clean_chemo(
+        structureOrganismPairsTable = structure_organism_pairs_table,
+        candidatesFinal = candidates_final,
+        minimalMs1Bio = minimal_ms1_bio,
+        minimalMs1Chemo = minimal_ms1_chemo
+      )
 
     log_debug(x = "Exporting ...")
     time <- format(Sys.time(), "%y%m%d_%H%M%OS")

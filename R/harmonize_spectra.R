@@ -71,19 +71,19 @@ harmonize_spectra <- function(spectra,
   spectra_harmonized <- spectra_filtered |>
     dplyr::full_join(spectra_missing) |>
     dplyr::select(
-      collision_energy := !!as.name(colnames["colname_collision_energy"]),
+      # collision_energy := !!as.name(colnames["colname_collision_energy"]),
       compound_id := !!as.name(colnames["colname_compound_id"]),
       exactmass := !!as.name(colnames["colname_exact_mass"]),
-      formula := !!as.name(colnames["colname_formula"]),
-      inchi := !!as.name(colnames["colname_inchi"]),
-      inchikey := !!as.name(colnames["colname_inchikey"]),
+      # formula := !!as.name(colnames["colname_formula"]),
+      # inchi := !!as.name(colnames["colname_inchi"]),
+      # inchikey := !!as.name(colnames["colname_inchikey"]),
       name := !!as.name(colnames["colname_name"]),
-      precursorMz := !!as.name(colnames["colname_precursorMz"]),
-      precursorCharge := !!as.name(colnames["colname_precursorCharge"]),
-      smiles := !!as.name(colnames["colname_smiles"]),
+      # precursorMz := !!as.name(colnames["colname_precursorMz"]),
+      # precursorCharge := !!as.name(colnames["colname_precursorCharge"]),
+      # smiles := !!as.name(colnames["colname_smiles"]),
       spectrum_id := !!as.name(colnames["colname_spectrum_id"]),
-      splash := !!as.name(colnames["colname_splash"]),
-      synonyms := !!as.name(colnames["colname_synonyms"]),
+      # splash := !!as.name(colnames["colname_splash"]),
+      # synonyms := !!as.name(colnames["colname_synonyms"]),
       ## TODO
       # rtime
       mz,

@@ -51,12 +51,6 @@ list(
         command = {
           dic_neutral_losses <- paths$inst$extdata$neutral_losses
         }
-      ),
-      tar_file(
-        name = dic_ranks,
-        command = {
-          dic_ranks <- paths$inst$extdata$ranks
-        }
       )
     )
   ),
@@ -827,7 +821,6 @@ list(
         top_k = params_taxa$organisms$candidates,
         output = params_taxa$files$taxa$processed,
         taxon = params_taxa$organisms$taxon,
-        dictionary = dic_ranks,
         parameters = params_taxa
       )
     }

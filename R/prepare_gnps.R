@@ -85,7 +85,13 @@ prepare_gnps <-
         dplyr::mutate_all(dplyr::na_if, "N/A") |>
         dplyr::mutate_all(dplyr::na_if, "null") |>
         round_reals() |>
-        complement_structures_metadata()
+        complement_structures_metadata(
+          str_2D_3D = str_2D_3D,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc
+        )
     } else {
       log_debug("No GNPS job ID provided, returning an empty file instead")
       table <- data.frame(

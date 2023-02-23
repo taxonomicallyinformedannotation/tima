@@ -155,7 +155,10 @@ prepare_taxa()
 log_debug("Processing annotations")
 step <- "process_annotations"
 params <- get_params(step = step)
-process_annotations()
+process_annotations(
+  candidates_final = 1,
+  minimal_ms1_bio = 0.8
+)
 
 end <- Sys.time()
 

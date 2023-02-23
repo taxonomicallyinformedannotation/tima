@@ -21,12 +21,8 @@ complement_structures_metadata <- function(df,
                                            str_met = paths$data$interim$libraries$merged$structures$metadata,
                                            str_nam = paths$data$interim$libraries$merged$structures$names,
                                            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
-                                           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
-                                           quickmode = TRUE) {
+                                           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc) {
   log_debug("Trying to look for already computed metadata")
-
-  paths <- parse_yaml_paths()
-
   dd_ddd <- readr::read_delim(str_2D_3D)
 
   dd_ddd_s <- dd_ddd |>

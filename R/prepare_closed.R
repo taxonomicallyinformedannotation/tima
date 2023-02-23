@@ -19,7 +19,6 @@ prepare_closed <-
     params <<- parameters
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
-      paths <- parse_yaml_paths()
       closed <-
         readr::read_delim(file = input)
 

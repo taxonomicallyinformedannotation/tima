@@ -74,11 +74,11 @@ prepare_sirius <-
           "formula_identifications_adducts.tsv"
         ))
 
-      compound <-
-        readr::read_delim(file = file.path(
-          input_directory,
-          "compound_identifications.tsv"
-        ))
+      # compound <-
+      #   readr::read_delim(file = file.path(
+      #     input_directory,
+      #     "compound_identifications.tsv"
+      #   ))
 
       compound_adducts <-
         readr::read_delim(file = file.path(
@@ -235,7 +235,13 @@ prepare_sirius <-
         dplyr::mutate_all(dplyr::na_if, "N/A") |>
         dplyr::mutate_all(dplyr::na_if, "null") |>
         round_reals() |>
-        complement_structures_metadata()
+        complement_structures_metadata(
+          str_2D_3D = str_2D_3D,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc
+        )
 
       if (nrow(table |>
         dplyr::filter(is.na(structure_exact_mass))) > 0) {

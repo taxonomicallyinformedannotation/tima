@@ -216,15 +216,22 @@ testthat::test_that("Whole process", {
   step <- "process_annotations"
   params <- get_params(step = step)
   ### Normal
-  process_annotations()
+  process_annotations(
+    candidates_final = 1,
+    minimal_ms1_bio = 0.8
+  )
   ### No MS1
   process_annotations(
-    annotate = FALSE
+    annotate = FALSE,
+    candidates_final = 1,
+    minimal_ms1_bio = 0.8
   )
   ### Only MS1
   process_annotations(
     ms_mode = "neg",
-    ms1_only = TRUE
+    ms1_only = TRUE,
+    candidates_final = 1,
+    minimal_ms1_bio = 0.8
   )
 
   ## CLI arguments check
