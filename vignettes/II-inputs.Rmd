@@ -104,6 +104,12 @@ Basically, the most important file you need to provide is an MGF file containing
 targets::tar_visnetwork(names = starts_with("input"), targets_only = TRUE, degree_from = 8)
 ```
 
+If you already ran a GNPS job, you can simply do:
+
+```{r}
+source(file = "inst/scripts/get_gnps_tables.R")
+```
+
 To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
 
 ```{r}

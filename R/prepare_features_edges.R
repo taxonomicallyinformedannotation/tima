@@ -13,8 +13,7 @@
 #' @export
 #'
 #' @importFrom dplyr filter select
-#' @importFrom readr read_delim write_delim
-#' @importFrom stringr str_length
+#' @importFrom readr read_tsv
 #'
 #' @examples NULL
 prepare_features_edges <-
@@ -27,7 +26,7 @@ prepare_features_edges <-
     params <<- parameters
     ## Load edges table
     log_debug(x = "Loading edge table")
-    edges_table <- readr::read_delim(file = input)
+    edges_table <- readr::read_tsv(file = input)
 
     ## Format edges table
     log_debug(x = "Formatting edge table")

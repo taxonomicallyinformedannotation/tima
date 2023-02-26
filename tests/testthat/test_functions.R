@@ -99,7 +99,7 @@ testthat::test_that("Whole process", {
   step <- "prepare_closed"
   params <- get_params(step = step)
   ## To fake there is an input
-  prepare_closed(input = paths$data$source$libraries$lotus)
+  prepare_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
   prepare_closed()
 

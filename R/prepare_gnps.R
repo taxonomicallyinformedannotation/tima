@@ -14,9 +14,8 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr mutate mutate_all na_if select
-#' @importFrom readr read_delim write_delim
-#' @importFrom stringr str_length
+#' @importFrom dplyr bind_rows mutate mutate_all na_if select
+#' @importFrom readr read_tsv
 #'
 #' @examples NULL
 prepare_gnps <-
@@ -35,7 +34,7 @@ prepare_gnps <-
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(
         X = input,
-        FUN = readr::read_delim,
+        FUN = readr::read_tsv,
         col_types = readr::cols(.default = "c")
       ) |>
         dplyr::bind_rows() |>

@@ -90,49 +90,55 @@ get_gnps_tables <-
       path_interim_a,
       paste0(names(gnps_job_id), "_gnps.tsv")
     )
-    download_file(
-      url = paste0(
-        gnps_url,
-        gnps_job_id,
-        gnps_block,
-        switch(workflow,
-          "fbmn" = "DB_result/",
-          "classical" = "result_specnets_DB/"
-        )
-      ),
-      export = file_annotations
-    )
+    if (!file.exists(file_annotations)) {
+      download_file(
+        url = paste0(
+          gnps_url,
+          gnps_job_id,
+          gnps_block,
+          switch(workflow,
+            "fbmn" = "DB_result/",
+            "classical" = "result_specnets_DB/"
+          )
+        ),
+        export = file_annotations
+      )
+    }
     log_debug("... Components")
     file_components <- file.path(
       path_interim_f,
       paste0(names(gnps_job_id), "_components.tsv")
     )
-    download_file(
-      url = paste0(
-        gnps_url,
-        gnps_job_id,
-        gnps_block,
-        switch(workflow,
-          "fbmn" = "clusterinfo_summary/",
-          "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
-        )
-      ),
-      export = file_components
-    )
+    if (!file.exists(file_components)) {
+      download_file(
+        url = paste0(
+          gnps_url,
+          gnps_job_id,
+          gnps_block,
+          switch(workflow,
+            "fbmn" = "clusterinfo_summary/",
+            "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
+          )
+        ),
+        export = file_components
+      )
+    }
     log_debug("... Edges")
     file_edges <- file.path(
       path_interim_f,
       paste0(names(gnps_job_id), "_edges.tsv")
     )
-    download_file(
-      url = paste0(
-        gnps_url,
-        gnps_job_id,
-        gnps_block,
-        "networkedges_selfloop/"
-      ),
-      export = file_edges
-    )
+    if (!file.exists(file_edges)) {
+      download_file(
+        url = paste0(
+          gnps_url,
+          gnps_job_id,
+          gnps_block,
+          "networkedges_selfloop/"
+        ),
+        export = file_edges
+      )
+    }
 
     return(
       c(

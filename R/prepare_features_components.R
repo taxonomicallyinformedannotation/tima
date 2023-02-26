@@ -13,8 +13,7 @@
 #' @export
 #'
 #' @importFrom dplyr arrange desc distinct left_join mutate select
-#' @importFrom readr cols read_delim write_delim
-#' @importFrom stringr str_length
+#' @importFrom readr cols read_tsv write_delim
 #'
 #' @examples NULL
 prepare_features_components <- function(input = params$files$annotations$pretreated,
@@ -30,7 +29,7 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
   log_debug(x = "... features table")
   table <- lapply(
     X = input,
-    FUN = readr::read_delim,
+    FUN = readr::read_tsv,
     col_types = readr::cols(.default = "c")
   ) |>
     dplyr::bind_rows() |>
