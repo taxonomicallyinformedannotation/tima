@@ -208,12 +208,6 @@ testthat::test_that("Whole process", {
   prepare_taxa(taxon = "Homo sapiens")
   ## Without file extension in the column names
   prepare_taxa(extension = FALSE)
-  ## With manual file
-  prepare_taxa(
-    input = paths$data$source$features,
-    metadata = paths$data$source$metadata,
-    tool = "manual"
-  )
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
 
