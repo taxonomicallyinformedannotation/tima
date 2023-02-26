@@ -12,13 +12,14 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
-## Prepare params
 paths <- parse_yaml_paths()
+## Prepare params
 step <- "prepare_config"
 params <- get_params(step = step)
-prepare_config()
+# prepare_config()
 
 ## Get all files
+get_gnps_tables(gnps_job_id = params$gnps$id)
 ### LOTUS
 log_debug("Getting LOTUS")
 get_last_version_from_zenodo(

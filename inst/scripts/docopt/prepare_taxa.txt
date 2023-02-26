@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_taxa.R --fil-tax-pro data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --too-met gnps --org-can 1 --names-taxon ATTRIBUTE_species --names-extension FALSE
+  Rscript inst/scripts/prepare_taxa.R --fil-tax-pro data/interim/taxa/example_taxed.tsv.gz --org-can 1 --names-taxon ATTRIBUTE_species --names-extension FALSE
 
 Usage: 
   prepare_taxa.R [--fil-fea-raw=<fil-fea-raw>] [--fil-tax-raw=<fil-tax-raw>] [--fil-tax-pro=<fil-tax-pro>] [--gnps-id=<gnps-id>] [--names-extension=<names-extension>] [--names-taxon=<names-taxon>][--org-can=<org-can>] [--org-tax=<org-tax>] [--too-met=<too-met>]
@@ -9,15 +9,11 @@ Arguments:
   fil-tax-raw                OPTIONAL. If tool is "manual". Biological origin metadata file. STRING
   fil-tax-pro                Taxonomically informed features file. STRING
 
-  gnps-id                    GNPS job ID. STRING
-
   names-extension            The file(s) extension is present in the sample name. BOOLEAN
   names-taxon                Name of the "taxon name" variable in the input. STRING
 
   org-can                    Number of organisms to keep per feature. INTEGER
   org-tax                    OPTIONAL. Force all features to be attributed to given taxon. Example: "Homo sapiens". STRING
-
-  too-met                    Tool used to store metadata. Currently "gnps" or "manual" supported. STRING
 
 Options:
   -h --help                  Shows this screen.

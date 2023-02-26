@@ -4,10 +4,7 @@
 #'
 #' @param input Input file if tool == 'manual'
 #' @param output Output file
-#' @param tool Tool used to generate components
 #' @param components File containing the components if tool == 'manual'
-#' @param gnps_job_id GNPS job ID
-#' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param parameters Params
 #'
@@ -22,23 +19,11 @@
 #' @examples NULL
 prepare_features_components <- function(input = params$files$annotations$pretreated,
                                         output = params$files$annotations$filled,
-                                        tool = params$tools$networks$spectral$components,
                                         components = params$files$networks$spectral$components$raw,
-                                        gnps_job_id = params$gnps$id,
-                                        workflow = params$gnps$workflow,
                                         ms_mode = params$ms$polarity,
                                         parameters = params) {
   params <<- parameters
-  if (tool == "gnps") {
-    stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
-  } else {
-    stopifnot(
-      "Input file(s) do(es) not exist" =
-        rep(TRUE, length(input)) ==
-          lapply(X = input, file.exists)
-    )
-    stopifnot("Your components file does not exist" = file.exists(components))
-  }
+  stopifnot("Your components file does not exist" = file.exists(components))
   stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   log_debug(x = "Loading files ...")
@@ -53,38 +38,14 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
 
   log_debug(x = "... cluster table")
   log_debug(x = "THIS STEP COULD BE IMPROVED BY CALCULATING THE CLUSTERS DIRECTLY")
-  ## TODO
-  if (tool == "gnps") {
-    components <-
-      read_clusters(id = gnps_job_id, workflow = workflow) |>
-      dplyr::select(
-        feature_id = `cluster index`,
-        component_id = componentindex,
-        rt = RTMean,
-        mz = `precursor mass`
-      ) |>
-      dplyr::distinct()
-  }
-
-  if (tool == "manual") {
-    manual_components <-
-      readr::read_delim(file = components) |>
-      dplyr::distinct(
-        feature_id = feature_id,
-        component_id = ComponentIndex,
-        rt = rt,
-        mz = mz
-      )
-
-    components <- manual_components |>
-      dplyr::select(-component_id) |>
-      dplyr::left_join(manual_components) |>
-      dplyr::mutate(component_id = ifelse(
-        test = is.na(component_id),
-        yes = -1,
-        no = component_id
-      ))
-  }
+  components <- readr::read_delim(file = components) |>
+    dplyr::select(
+      feature_id = `cluster index`,
+      component_id = componentindex,
+      rt = RTMean,
+      mz = `precursor mass`
+    ) |>
+    dplyr::distinct()
 
   log_debug(x = "Adding components to features")
   table_filled <-

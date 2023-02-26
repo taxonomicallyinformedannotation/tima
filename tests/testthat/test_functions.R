@@ -12,25 +12,30 @@ testthat::test_that("Whole process", {
 
   ## Get all files
   ### Features table
-  download_file(
-    url = paths$urls$examples$features,
-    export = paths$data$source$examples$features
-  )
+  if (!is.null(params$gnps$id)) {
+    get_gnps_tables(gnps_job_id = params$gnps$id)
+  } else {
+    download_file(
+      url = paths$urls$examples$features,
+      export = paths$data$source$features
+    )
 
-  ### Metadata table
-  download_file(
-    url = paths$urls$examples$metadata,
-    export = paths$data$source$examples$metadata
-  )
+    ### Metadata table
+    download_file(
+      url = paths$urls$examples$metadata,
+      export = paths$data$source$metadata
+    )
+  }
 
   ### Spectra
   #### Mini version for tests
+  ## Not including it in else statement above on purpose
   download_file(
     url = paths$url$examples$spectra_mini,
-    export = paths$data$source$examples$spectra
+    export = paths$data$source$spectra
   )
   # download_file(url = paths$url$examples$spectra,
-  #               export = paths$data$source$examples$spectra)
+  #               export = paths$data$source$spectra)
 
   #### SIRIUS
   ## mini version for tests
@@ -205,8 +210,8 @@ testthat::test_that("Whole process", {
   prepare_taxa(extension = FALSE)
   ## With manual file
   prepare_taxa(
-    input = paths$data$source$examples$features,
-    metadata = paths$data$source$examples$metadata,
+    input = paths$data$source$features,
+    metadata = paths$data$source$metadata,
     tool = "manual"
   )
   ## Attributing based on intensity (multiple source organisms)

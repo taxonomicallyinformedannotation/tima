@@ -88,16 +88,7 @@ Arguments:
   org-fil-val                Value to be applied for filtering. "OR" can be used as "|". Example: "Simaroubaceae|Gentianaceae". STRING
 
   org-tax                    OPTIONAL. Force all features to be attributed to given taxon. Example: "Homo sapiens". STRING
-
-
-  too-met                    Tool used to store metadata. Currently "gnps" or "manual" supported. STRING
-
-  too-net-spe-com            Tool used to generate components. Currently "gnps" or "manual" supported. STRING
-  too-net-spe-edg            Tool used to generate edges. Currently "gnps" or "manual" supported. STRING
-
-  too-tax-bio                Biological taxonomy used for matching. Currently only "otl" supported. STRING
-  too-tax-che                Chemical taxonomy used for matching. Currently only "npc" supported. STRING
-
+  
   
   wei-glo-bio                Weight for the biological part. FLOAT
   wei-glo-che                Weight for the chemical part. FLOAT

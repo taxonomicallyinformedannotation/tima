@@ -5,25 +5,17 @@ files:
   features: 
 
     #' Raw features file. STRING
-    raw: data/source/examples/features.tsv.gz
+    raw: data/source/example_features.csv
 
   #' Taxa files.
   taxa:
 
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
-    raw: data/examples/metadata.tsv
+    raw: data/source/example_metadata.tsv
 
     #' Taxonomically informed features file. STRING
     processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
-
-
-#' GNPS related parameters.
-gnps: 
-  
-  #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
-
 
 #' Names of the different variables in the input files.
 names:
@@ -44,11 +36,3 @@ organisms:
   #' OPTIONAL. Force all features to be attributed to given taxon.
   #' Example: "Homo sapiens". STRING
   taxon: ~
-
-
-#' Tools used for each step.
-tools:
-
-  #' Tool used to store metadata.
-  #' Currently "gnps" or "manual" supported. STRING
-  metadata: gnps

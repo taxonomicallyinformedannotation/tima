@@ -2,6 +2,7 @@ files:
   pattern: example
 gnps:
   id: 96fa7c88200e4a03bee4644e581e3fb0
+  workflow: fbmn
 ms:
   polarity: pos
 organisms:

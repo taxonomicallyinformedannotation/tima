@@ -22,8 +22,7 @@ tar_source()
 # Replace the target list below with your own:
 list(
   ## Architecture
-  list(
-    ## Paths
+  list( ## Paths
     list(
       tar_file(
         name = yaml_paths,
@@ -416,12 +415,37 @@ list(
       )
     )
   ),
+  ## gnps
+  list(tar_file(
+    name = gnps_tables,
+    command = {
+      gnps_tables <- get_gnps_tables(
+        gnps_job_id = params_config$gnps$id,
+        workflow = "fbmn",
+        path_source = paths$data$source$path,
+        path_interim_a = paths$data$interim$annotations$path,
+        path_interim_f = paths$data$interim$features$path
+      )
+    }
+  )),
   ## inputs
-  list( ## TODO ADD Input Features
+  list(
+    tar_file(
+      name = input_features,
+      command = {
+        input_features <- params_spectra$files$spectral$raw
+      }
+    ),
     tar_file(
       name = input_spectra,
       command = {
         input_spectra <- params_spectra$files$spectral$raw
+      }
+    ),
+    tar_file(
+      name = input_metadata,
+      command = {
+        input_taxa <- params_taxa$files$taxa$raw
       }
     )
   ),
@@ -435,7 +459,7 @@ list(
         # tar_file(
         #   name = library_sop_closed,
         #   command = {
-        #     library_sop_closed <- paths$data$source$libraries$closed
+        #     library_sop_closed <- paths$data$source$libraries$sop$closed
         #   }
         # ),
         ## TODO ADD HMDB,
@@ -445,7 +469,7 @@ list(
             library_sop_lotus <- get_last_version_from_zenodo(
               doi = paths$url$lotus$doi,
               pattern = paths$urls$lotus$pattern,
-              path = paths$data$source$libraries$lotus
+              path = paths$data$source$libraries$sop$lotus
             )
           },
           ## To always check if a newest version is available
@@ -459,7 +483,7 @@ list(
           command = {
             library_sop_closed_prepared <-
               prepare_closed(
-                input = paths$data$source$libraries$closed,
+                input = paths$data$source$libraries$sop$closed,
                 output = paths$data$interim$libraries$closed,
                 parameters = params_closed
               )
@@ -474,7 +498,7 @@ list(
                 input = if (paths$tests$mode == FALSE) {
                   library_sop_lotus
                 } else {
-                  paths$data$source$libraries$lotus
+                  paths$data$source$libraries$sop$lotus
                 },
                 output = paths$data$interim$libraries$lotus
               )
@@ -557,15 +581,15 @@ list(
                   get_last_version_from_zenodo(
                     doi = paths$url$lotus_isdb$doi,
                     pattern = paths$urls$lotus_isdb$pattern$pos,
-                    path = paths$data$source$spectra$lotus$pos
+                    path = paths$data$source$libraries$spectra$lotus$pos
                   )
                 } else {
-                  create_dir(paths$data$source$spectra$lotus$pos)
+                  create_dir(paths$data$source$libraries$spectra$lotus$pos)
                   utils::download.file(
                     url = paths$urls$examples$spectral_lib$pos,
-                    destfile = paths$data$source$spectra$lotus$pos
+                    destfile = paths$data$source$libraries$spectra$lotus$pos
                   )
-                  return(paths$data$source$spectra$lotus$pos)
+                  return(paths$data$source$libraries$spectra$lotus$pos)
                 }
             }
             ## To always check if a newest version is available
@@ -580,15 +604,15 @@ list(
                   get_last_version_from_zenodo(
                     doi = paths$url$lotus_isdb$doi,
                     pattern = paths$urls$lotus_isdb$pattern$neg,
-                    path = paths$data$source$spectra$lotus$neg
+                    path = paths$data$source$libraries$spectra$lotus$neg
                   )
                 } else {
-                  create_dir(paths$data$source$spectra$lotus$neg)
+                  create_dir(paths$data$source$libraries$spectra$lotus$neg)
                   utils::download.file(
                     url = paths$urls$examples$spectral_lib$neg,
-                    destfile = paths$data$source$spectra$lotus$neg
+                    destfile = paths$data$source$libraries$spectra$lotus$neg
                   )
-                  return(paths$data$source$spectra$lotus$neg)
+                  return(paths$data$source$libraries$spectra$lotus$neg)
                 }
             }
             ## To always check if a newest version is available
@@ -607,7 +631,7 @@ list(
               input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_pos
               } else {
-                paths$data$source$spectra$lotus$pos
+                paths$data$source$libraries$spectra$lotus$pos
               },
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "pos",
@@ -622,7 +646,7 @@ list(
               input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_neg
               } else {
-                paths$data$source$spectra$lotus$neg
+                paths$data$source$libraries$spectra$lotus$neg
               },
               output = paths$data$interim$spectra$lotus$pos,
               polarity = "neg",
@@ -651,7 +675,7 @@ list(
           command = {
             annotations_spectral_exp_gnps_prepared <-
               prepare_gnps(
-                gnps_job_id = params_gnps$gnps$id,
+                input = params_gnps$files$annotations$raw,
                 output = params_gnps$files$annotations$pretreated,
                 str_2D_3D = library_merged_str_2D_3D,
                 str_met = library_merged_str_met,
@@ -779,8 +803,6 @@ list(
       name = features_edges_prepared,
       command = {
         features_edges_prepared <- prepare_features_edges(
-          tool = params_features_edges$tools$networks$spectral$edges,
-          gnps_job_id = params_features_edges$gnps$id,
           input = params_features_edges$files$networks$spectral$edges$raw,
           output = params_features_edges$files$networks$spectral$edges$processed,
           name_source = params_features_edges$names$source,
@@ -799,9 +821,7 @@ list(
             annotations_sirius_prepared
           ),
           output = params_features_components$files$annotations$filled,
-          tool = params_features_components$tools$networks$spectral$components,
           components = params_features_components$files$networks$spectral$components$raw,
-          gnps_job_id = params_features_components$gnps$id,
           ms_mode = params_features_components$ms$polarity,
           parameters = params_features_components
         )
@@ -813,10 +833,8 @@ list(
     command = {
       taxa_prepared <- prepare_taxa(
         input = params_taxa$files$features$raw,
-        tool = params_taxa$tools$metadata,
         extension = params_taxa$names$extension,
         colname = params_taxa$names$taxon,
-        gnps_job_id = params_taxa$gnps$id,
         metadata = params_taxa$files$taxa$raw,
         top_k = params_taxa$organisms$candidates,
         output = params_taxa$files$taxa$processed,

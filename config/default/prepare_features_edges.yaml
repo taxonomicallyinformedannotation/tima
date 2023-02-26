@@ -11,16 +11,10 @@ files:
       edges:
 
         #' Raw edges file. STRING
-        raw: data/source/example_edges_manual.csv
+        raw: data/interim/features/example_edges.tsv
 
         #' Prepared edges file. STRING
         processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
-
-#' GNPS related parameters.
-gnps: 
-  
-  #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
 
 #' Names of the different variables in the input files.
 names:
@@ -30,17 +24,3 @@ names:
 
   #' Name of "target IDs" variable in the input. STRING
   target: CLUSTERID2
-
-
-#' Tools used for each step.
-tools:
-
-  #' Networks related parameters.
-  networks:
-
-    #' Spectral networks related parameters.
-    spectral:
-
-      #' Tool used to generate edges.
-      #' Currently "gnps" or "manual" supported. STRING
-      edges: gnps

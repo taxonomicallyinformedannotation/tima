@@ -23,36 +23,10 @@ files:
       components:
 
         #' Raw components file. STRING
-        raw: ~
-
-
-#' GNPS related parameters.
-gnps: 
-  
-  #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
-  
-  #' Workflow used within GNPS.
-  #' Currently "fbmn" or "classical" supported. STRING
-  workflow: fbmn
-
+        raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv
 
 #' MS related parameters.
 ms:
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos
-
-
-#' Tools used for each step.
-tools:
-
-  #' Networks related parameters.
-  networks:
-
-    #' Spectral networks related parameters.
-    spectral:
-
-      #' Tool used to generate components.
-      #' Currently "gnps" or "manual" supported. STRING
-      components: gnps

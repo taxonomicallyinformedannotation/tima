@@ -91,27 +91,26 @@ data:
       path: data/processed/config
   source:
     path: data/source
+    features: data/source/example_features.csv
+    metadata: data/source/example_metadata.tsv
+    spectra: data/source/example_spectra.mgf
     benchmark:
       path: data/source/benchmark
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
-    examples:
-      path: data/source/examples
-      features: data/source/examples/features.csv
-      metadata: data/source/examples/metadata.tsv
-      spectra: data/source/examples/spectra.mgf
     libraries:
       path: data/source/libraries
-      closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
-      hmdb: data/source/libraries/hmdb_metabolites.zip
-      lotus: data/source/libraries/lotus.csv.gz
-      structure_metadata: data/source/libraries/structure_metadata.tsv.gz
-    spectra:
-      path: data/source/spectra
-      hmdb_isdb: data/source/spectra/hmdb_predicted_msms_spectra.zip
-      lotus:
-        pos: data/source/spectra/isdb_pos.mgf
-        neg: data/source/spectra/isdb_neg.mgf
-      mona_lcmsms: data/source/spectra/MoNA-export-LC-MS-MS_Spectra.sdf
+      sop:
+        path: data/source/libraries/sop
+        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+        hmdb: data/source/libraries/sop/hmdb_metabolites.zip
+        lotus: data/source/libraries/sop/lotus.csv.gz
+      spectra:
+        path: data/source/libraries/spectra
+        hmdb_isdb: data/source/libraries/spectra/hmdb_predicted_msms_spectra.zip
+        lotus:
+          pos: data/source/libraries/spectra/isdb_pos.mgf
+          neg: data/source/libraries/spectra/isdb_neg.mgf
+        mona_lcmsms: data/source/libraries/spectra/MoNA-export-LC-MS-MS_Spectra.sdf
 doc:
   path: doc
 img:
@@ -132,12 +131,12 @@ tests:
 urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   examples:
-    features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/features.csv
-    metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv
+    features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv
+    metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv
     sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius.zip
     sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_mini.zip
-    spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra.mgf
-    spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectra_mini.mgf
+    spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf
+    spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf
     spectral_lib_mini: 
       neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_neg.mgf
       pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_pos.mgf

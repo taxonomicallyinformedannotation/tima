@@ -4,17 +4,13 @@ files:
   #' Annotation files.
   annotations:
 
+    #' Raw annotation files.
+    raw:
+
+      #' List of spectral matching results. STRING
+      spectral:
+        - data/interim/annotations/example_gnps.tsv
+
     #' List of pretreated annotations. STRING
     pretreated:
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
-
-
-#' GNPS related parameters.
-gnps: 
-  
-  #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
-  
-  #' Workflow used within GNPS.
-  #' Currently "fbmn" or "classical" supported. STRING
-  workflow: fbmn

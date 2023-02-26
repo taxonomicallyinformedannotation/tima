@@ -1,19 +1,15 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_features_edges.R --gnps-id 96fa7c88200e4a03bee4644e581e3fb0 --fil-net-spe-edg-pro data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz --too-net-spe-edg gnps
+  Rscript inst/scripts/prepare_features_edges.R --fil-net-spe-edg-pro data/interim/features/example_edges.tsv.gz
 
 Usage: 
-  prepare_features_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--gnps-id=<gnps-id>] [--names-source=<names-source>] [--names-target=<names-target>] [--too-net-spe-edg=<too-net-spe-edg>]
+  prepare_features_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--names-source=<names-source>] [--names-target=<names-target>]
 
 Arguments:
   fil-net-spe-edg-raw        Raw edges file. STRING
   fil-net-spe-edg-pro        Prepared edges file. STRING
 
-  gnps-id                    GNPS job ID. STRING
-
   names-source               Name of "source IDs" variable in the input. STRING
   names-target               Name of "target IDs" variable in the input. STRING
-
-  too-net-spe-edg            Tool used to generate edges. Currently "gnps" or "manual" supported. STRING
 
 Options:
   -h --help                  Shows this screen.

@@ -5,8 +5,6 @@
 \title{Prepare edges}
 \usage{
 prepare_features_edges(
-  tool = params$tools$networks$spectral$edges,
-  gnps_job_id = params$gnps$id,
   input = params$files$networks$spectral$edges$raw,
   output = params$files$networks$spectral$edges$processed,
   name_source = params$names$source,
@@ -15,10 +13,6 @@ prepare_features_edges(
 )
 }
 \arguments{
-\item{tool}{Tool used to generate the edges}
-
-\item{gnps_job_id}{GNPS job ID, if the tool was 'gnps'}
-
 \item{input}{Input file if 'manual'}
 
 \item{output}{Output file}

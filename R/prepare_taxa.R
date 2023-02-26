@@ -7,10 +7,8 @@
 #'    according to their relative intensities among the samples.
 #'
 #' @param input File containing your features intensities
-#' @param tool Tool from which your file comes from ('manual', 'gnps' or 'ready')
 #' @param extension Does your colun names contain the file extension? (MZmine mainly)
 #' @param colname Name of the column containing biological source information
-#' @param gnps_job_id If your tool is 'gnps', corresponding GNPS job ID
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities
 #' @param output Output file
@@ -34,25 +32,16 @@
 #' @examples NULL
 prepare_taxa <-
   function(input = params$files$features$raw,
-           tool = params$tools$metadata,
            extension = params$names$extension,
            colname = params$names$taxon,
-           gnps_job_id = params$gnps$id,
            metadata = params$files$taxa$raw,
            top_k = params$organisms$candidates,
            output = params$files$taxa$processed,
            taxon = params$organisms$taxon,
            parameters = params) {
-    stopifnot("Your tool must be 'gnps', 'manual' or 'ready'" = tool %in% c("gnps", "manual", "ready"))
-    if (tool == "gnps") {
-      stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
-    } else {
-      if (is.null(taxon)) {
-        if (tool == "manual") {
-          stopifnot("Your metadata file does not exist" = file.exists(metadata))
-        }
-        stopifnot("Your input file does not exist" = file.exists(input))
-      }
+    if (is.null(taxon)) {
+      stopifnot("Your metadata file does not exist" = file.exists(metadata))
+      stopifnot("Your input file does not exist" = file.exists(input))
     }
 
     stopifnot("Your top k organisms parameter should be lower or equal to 5" = top_k <=
@@ -60,50 +49,34 @@ prepare_taxa <-
 
     params <<- parameters
 
-    if (tool == "gnps") {
-      log_debug(x = "Loading feature table")
-      feature_table <- read_features(id = gnps_job_id)
-      if (is.null(taxon)) {
-        log_debug(x = "Loading metadata table")
-        metadata_table <- read_metadata(id = gnps_job_id)
-      }
-    }
+    log_debug(x = "Loading feature table")
+    feature_table <- readr::read_delim(file = input)
+    log_debug(x = "Loading metadata table")
+    metadata_table <- readr::read_delim(file = metadata)
 
-    if (tool == "manual") {
-      log_debug(x = "Loading feature table")
-      feature_table <- readr::read_delim(file = input)
-      log_debug(x = "Loading metadata table")
-      metadata_table <- readr::read_delim(file = metadata)
-    }
-
-    if (tool != "ready") {
-      log_debug(x = "Formatting feature table ...")
-      log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
-      feature_table <- feature_table |>
-        dplyr::select(
-          `row ID`,
-          dplyr::matches(" Peak area")
-        ) |>
-        tibble::column_to_rownames(var = "row ID")
-      colnames(feature_table) <-
-        stringr::str_remove(
-          string = colnames(feature_table),
-          pattern = stringr::fixed(pattern = " Peak area")
-        )
-      log_debug(x = "... filtering top K intensities per feature")
-      top_n <- feature_table |>
-        tibble::rownames_to_column() |>
-        tidyr::gather(column, value, -rowname) |>
-        dplyr::filter(value != 0) |>
-        dplyr::group_by(rowname) |>
-        dplyr::mutate(rank = rank(-value)) |>
-        dplyr::ungroup() |>
-        dplyr::filter(rank <= top_k) |>
-        dplyr::arrange(rowname, rank)
-    } else {
-      metadata_table <-
-        readr::read_delim(file = input)
-    }
+    log_debug(x = "Formatting feature table ...")
+    log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
+    feature_table <- feature_table |>
+      dplyr::select(
+        `row ID`,
+        dplyr::matches(" Peak area")
+      ) |>
+      tibble::column_to_rownames(var = "row ID")
+    colnames(feature_table) <-
+      stringr::str_remove(
+        string = colnames(feature_table),
+        pattern = stringr::fixed(pattern = " Peak area")
+      )
+    log_debug(x = "... filtering top K intensities per feature")
+    top_n <- feature_table |>
+      tibble::rownames_to_column() |>
+      tidyr::gather(column, value, -rowname) |>
+      dplyr::filter(value != 0) |>
+      dplyr::group_by(rowname) |>
+      dplyr::mutate(rank = rank(-value)) |>
+      dplyr::ungroup() |>
+      dplyr::filter(rank <= top_k) |>
+      dplyr::arrange(rowname, rank)
 
     if (!is.null(taxon)) {
       log_debug(x = "Forcing all features to given organism")
@@ -138,26 +111,18 @@ prepare_taxa <-
       }
     }
     log_debug(x = "Joining top K with metadata table")
-    if (tool != "ready") {
-      if (!is.null(taxon)) {
-        metadata_table_joined <- cbind(
-          feature_table |>
-            dplyr::mutate(feature_id = dplyr::row_number()),
-          biological_metadata |>
-            dplyr::select(organismOriginal = organism_name)
-        )
-      } else {
-        metadata_table_joined <-
-          dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
-          dplyr::select(
-            feature_id := rowname,
-            organismOriginal = dplyr::all_of(colname),
-            dplyr::everything()
-          )
-      }
+    if (!is.null(taxon)) {
+      metadata_table_joined <- cbind(
+        feature_table |>
+          dplyr::mutate(feature_id = dplyr::row_number()),
+        biological_metadata |>
+          dplyr::select(organismOriginal = organism_name)
+      )
     } else {
-      metadata_table_joined <- metadata_table |>
-        dplyr::select(feature_id,
+      metadata_table_joined <-
+        dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
+        dplyr::select(
+          feature_id := rowname,
           organismOriginal = dplyr::all_of(colname),
           dplyr::everything()
         )

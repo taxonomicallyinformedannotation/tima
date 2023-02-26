@@ -54,7 +54,8 @@ process_spectra <- function(input = params$files$spectral$raw,
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   params <<- parameters
   if (length(library) > 1) {
-    library <- library[polarity][[1]] |> as.character()
+    library <- library[polarity][[1]] |>
+      as.character()
   }
   if (file.exists(library |>
     gsub(
@@ -87,7 +88,7 @@ process_spectra <- function(input = params$files$spectral$raw,
     BiocParallel::SerialParam()
   }
 
-  log_debug("Loading spectra")
+  log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra() |>
     Spectra::filterPrecursorCharge(z = if (polarity == "pos") {

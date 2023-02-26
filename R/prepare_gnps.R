@@ -2,7 +2,7 @@
 #'
 #' @description This function prepares GNPS obtained annotations for further use
 #'
-#' @param gnps_job_id GNPS job ID
+#' @param output Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
@@ -20,7 +20,7 @@
 #'
 #' @examples NULL
 prepare_gnps <-
-  function(gnps_job_id = params$gnps$id,
+  function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$pretreated,
            str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
            str_met = paths$data$interim$libraries$merged$structures$metadata,
@@ -28,12 +28,17 @@ prepare_gnps <-
            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
            parameters = params) {
-    if (!is.null(gnps_job_id)) {
-      stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
+    if (rep(TRUE, length(input)) ==
+      lapply(X = input, file.exists)) {
       params <<- parameters
       log_debug("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-      table <- read_results(id = gnps_job_id) |>
+      table <- lapply(
+        X = input,
+        FUN = readr::read_delim,
+        col_types = readr::cols(.default = "c")
+      ) |>
+        dplyr::bind_rows() |>
         dplyr::select(
           feature_id = `#Scan#`,
           structure_name = Compound_Name,
@@ -93,7 +98,7 @@ prepare_gnps <-
           str_tax_npc = str_tax_npc
         )
     } else {
-      log_debug("No GNPS job ID provided, returning an empty file instead")
+      log_debug("No GNPS annotations found, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
         structure_name = NA,

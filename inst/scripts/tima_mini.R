@@ -19,10 +19,11 @@ params <- get_params(step = step)
 prepare_config()
 
 ## Get all files
+get_gnps_tables(gnps_job_id = params$gnps$id)
 #### spectra
 download_file(
   url = paths$url$examples$spectra_mini,
-  export = paths$data$source$examples$spectra
+  export = paths$data$source$spectra
 )
 
 ### SIRIUS

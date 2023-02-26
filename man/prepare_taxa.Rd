@@ -6,10 +6,8 @@
 \usage{
 prepare_taxa(
   input = params$files$features$raw,
-  tool = params$tools$metadata,
   extension = params$names$extension,
   colname = params$names$taxon,
-  gnps_job_id = params$gnps$id,
   metadata = params$files$taxa$raw,
   top_k = params$organisms$candidates,
   output = params$files$taxa$processed,
@@ -20,13 +18,9 @@ prepare_taxa(
 \arguments{
 \item{input}{File containing your features intensities}
 
-\item{tool}{Tool from which your file comes from ('manual', 'gnps' or 'ready')}
-
 \item{extension}{Does your colun names contain the file extension? (MZmine mainly)}
 
 \item{colname}{Name of the column containing biological source information}
-
-\item{gnps_job_id}{If your tool is 'gnps', corresponding GNPS job ID}
 
 \item{metadata}{File containing your metadata including biological source}
 

@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_spectral_matches.R --fil-ann-raw-spe data/interim/annotations/example_isdb.tsv.gz --fil-ann-pre data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
+Rscript inst/scripts/prepare_spectral_matches.R --fil-ann-raw-spe data/interim/annotations/example_isdb.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_pretreated.tsv.gz
 
 Usage: 
   prepare_spectral_matches.R [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-ann-pre=<fil-ann-pre>]

@@ -23,13 +23,18 @@ prepare_config <- function(filename = params$files$pattern,
                            taxon = params$organisms$taxon,
                            parameters = params,
                            step = NA) {
-  ## TODO 'filename' actually not taken into account
   ## TODO 'step' actually not taken into account
 
+  stopifnot(
+    "Either 'filename' or 'GNPS' have to be filled" = !is.null(filename) |
+      !is.null(gnps_job_id)
+  )
   stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
   stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   params <<- parameters
+  gnps_job_id <<- gnps_job_id
+  filename <<- filename
   paths <- parse_yaml_paths()
   log_debug(x = "Loading default params")
   yaml_files <- c(
@@ -45,65 +50,15 @@ prepare_config <- function(filename = params$files$pattern,
     gsub(pattern = "config/default/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
 
-  yamls_default <<- lapply(
+  yamls_default <- lapply(
     X = yaml_files,
     FUN = yaml::read_yaml
   )
-  names(yamls_default) <<- yaml_names
+  names(yamls_default) <- yaml_names
 
   yamls_params <- yamls_default
 
   log_debug(x = "Changing params")
-  yamls_params$prepare_features_edges$gnps$id <- gnps_job_id
-  yamls_params$prepare_gnps$gnps$id <- gnps_job_id
-  yamls_params$prepare_taxa$gnps$id <- gnps_job_id
-
-  yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
-    yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
-    replace_gnps_job_id()
-  yamls_params$prepare_features_components$files$annotations$pretreated <-
-    yamls_params$prepare_features_components$files$annotations$pretreated |>
-    replace_gnps_job_id()
-  yamls_params$prepare_features_components$files$annotations$filled <-
-    yamls_params$prepare_features_components$files$annotations$filled |>
-    replace_gnps_job_id()
-  yamls_params$prepare_features_components$gnps$id <- gnps_job_id
-  yamls_params$prepare_gnps$files$annotations$pretreated <-
-    yamls_params$prepare_gnps$files$annotations$pretreated |>
-    replace_gnps_job_id()
-  yamls_params$prepare_spectral_matches$files$annotations$raw$spectral <-
-    yamls_params$prepare_spectral_matches$files$annotations$raw$spectral |>
-    gsub(
-      pattern = yamls_params$prepare_spectral_matches$files$annotations$raw$spectral,
-      replacement = file.path(
-        paths$data$interim$annotations$path,
-        paste(params$files$pattern, "isdb.tsv.gz", sep = "_")
-      )
-    )
-  yamls_params$prepare_spectral_matches$files$annotations$pretreated <-
-    yamls_params$prepare_spectral_matches$files$annotations$pretreated |>
-    replace_gnps_job_id()
-  yamls_params$prepare_sirius$files$annotations$raw$sirius <-
-    yamls_params$prepare_sirius$files$annotations$raw$sirius |>
-    gsub(
-      pattern = yamls_params$prepare_sirius$files$annotations$raw$sirius,
-      replacement = file.path(
-        paths$data$interim$annotations$path,
-        paste(params$files$pattern, "sirius/", sep = "_")
-      )
-    )
-  yamls_params$prepare_sirius$files$annotations$pretreated <-
-    yamls_params$prepare_sirius$files$annotations$pretreated |>
-    replace_gnps_job_id()
-  yamls_params$prepare_taxa$files$taxa$processed <-
-    yamls_params$prepare_taxa$files$taxa$processed |>
-    replace_gnps_job_id()
-  yamls_params$process_annotations$files$networks$spectral$edges$processed <-
-    yamls_params$process_annotations$files$networks$spectral$edges$processed |>
-    replace_gnps_job_id()
-  yamls_params$process_annotations$files$taxa$processed <-
-    yamls_params$process_annotations$files$taxa$processed |>
-    replace_gnps_job_id()
 
   yamls_params$fake_features_components$ms$polarity <- ms_mode
   yamls_params$prepare_features_components$ms$polarity <- ms_mode
@@ -111,11 +66,68 @@ prepare_config <- function(filename = params$files$pattern,
 
   yamls_params$prepare_taxa$organisms$taxon <- taxon
 
+  log_debug(x = "Changing filenames")
+
+  yamls_params$fake_features_components$files$annotations$pretreated <-
+    yamls_params$fake_features_components$files$annotations$pretreated |>
+    replace_id()
+  yamls_params$fake_features_components$files$annotations$filled <-
+    yamls_params$fake_features_components$files$annotations$filled |>
+    replace_id()
+  yamls_params$fake_features_edges$files$networks$spectral$edges$processed <-
+    yamls_params$fake_features_edges$files$networks$spectral$edges$processed |>
+    replace_id()
+
+  yamls_params$prepare_features_components$files$annotations$pretreated <-
+    yamls_params$prepare_features_components$files$annotations$pretreated |>
+    replace_id()
+  yamls_params$prepare_features_components$files$annotations$filled <-
+    yamls_params$prepare_features_components$files$annotations$filled |>
+    replace_id()
+  yamls_params$prepare_features_components$files$networks$spectral$components$raw <-
+    yamls_params$prepare_features_components$files$networks$spectral$components$raw |>
+    replace_id()
+
+  yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
+    yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
+    replace_id()
+
+  yamls_params$prepare_gnps$files$annotations$pretreated <-
+    yamls_params$prepare_gnps$files$annotations$pretreated |>
+    replace_id()
+
+  yamls_params$prepare_sirius$files$annotations$pretreated <-
+    yamls_params$prepare_sirius$files$annotations$pretreated |>
+    replace_id()
+
+  yamls_params$prepare_spectral_matches$files$annotations$raw$spectral <-
+    yamls_params$prepare_spectral_matches$files$annotations$raw$spectral |>
+    replace_id()
+  yamls_params$prepare_spectral_matches$files$annotations$pretreated <-
+    yamls_params$prepare_spectral_matches$files$annotations$pretreated |>
+    replace_id()
+  yamls_params$prepare_sirius$files$annotations$raw$sirius <-
+    yamls_params$prepare_sirius$files$annotations$raw$sirius |>
+    replace_id()
+
+  yamls_params$prepare_taxa$files$taxa$processed <-
+    yamls_params$prepare_taxa$files$taxa$processed |>
+    replace_id()
+
+  yamls_params$process_annotations$files$annotations$filled <-
+    yamls_params$process_annotations$files$annotations$filled |>
+    replace_id()
+  yamls_params$process_annotations$files$networks$spectral$edges$processed <-
+    yamls_params$process_annotations$files$networks$spectral$edges$processed |>
+    replace_id()
+  yamls_params$process_annotations$files$taxa$processed <-
+    yamls_params$process_annotations$files$taxa$processed |>
+    replace_id()
+
   yaml_export <- yaml_files |>
     gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
 
-  ## TODO 'step' actually not taken into account
   if (!is.na(step)) {
     yamls_params <-
       yamls_params[grepl(pattern = step, x = names(yamls_params))]

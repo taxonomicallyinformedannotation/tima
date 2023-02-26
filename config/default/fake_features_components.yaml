@@ -17,7 +17,7 @@ files:
   features: 
 
     #' Raw features file. STRING
-    raw: data/source/examples/features.csv
+    raw: data/source/features.csv
 
 
 #' MS related parameters.

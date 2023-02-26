@@ -5,7 +5,7 @@
 \title{Prepare GNPS}
 \usage{
 prepare_gnps(
-  gnps_job_id = params$gnps$id,
+  input = params$files$annotations$raw$spectral,
   output = params$files$annotations$pretreated,
   str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
   str_met = paths$data$interim$libraries$merged$structures$metadata,
@@ -16,8 +16,6 @@ prepare_gnps(
 )
 }
 \arguments{
-\item{gnps_job_id}{GNPS job ID}
-
 \item{output}{Output file}
 
 \item{str_2D_3D}{File containing 2D and 3D structures}
