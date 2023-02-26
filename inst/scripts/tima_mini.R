@@ -53,14 +53,14 @@ get_last_version_from_zenodo(
 
 ### LOTUS ISDB
 log_debug("Getting LOTUS ISDB...")
-create_dir(paths$data$source$spectra$lotus$pos)
+create_dir(paths$data$source$libraries$spectra$lotus$pos)
 utils::download.file(
   url = paths$url$examples$spectral_lib$pos,
-  destfile = paths$data$source$spectra$lotus$pos
+  destfile = paths$data$source$libraries$spectra$lotus$pos
 )
 utils::download.file(
   url = paths$url$examples$spectral_lib$neg,
-  destfile = paths$data$source$spectra$lotus$neg
+  destfile = paths$data$source$libraries$spectra$lotus$neg
 )
 
 ### HMDB ISDB

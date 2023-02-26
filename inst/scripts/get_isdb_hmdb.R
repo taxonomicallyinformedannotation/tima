@@ -18,7 +18,7 @@ log_debug("Contributors: ...")
 log_debug("Downloading HMDB (might be long)")
 download_file(
   url = paths$urls$hmdb$spectra$predicted,
-  export = paths$data$source$spectra$hmdb_isdb
+  export = paths$data$source$libraries$spectra$hmdb_isdb
 )
 
 log_debug("Script finished in", crayon::green(format(end - start)))

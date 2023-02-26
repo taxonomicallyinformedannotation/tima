@@ -17,7 +17,7 @@
 #'
 #' @examples NULL
 prepare_isdb_lotus <-
-  function(input = paths$data$source$spectra$lotus$pos,
+  function(input = paths$data$source$libraries$spectra$lotus$pos,
            output = paths$data$interim$spectra$lotus$pos,
            polarity = "pos",
            export_sqlite = TRUE) {

@@ -16,7 +16,7 @@ log_debug("Contributors: ...")
 
 download_file(
   url = paths$urls$examples$features,
-  export = paths$data$source$examples$features
+  export = paths$data$source$features
 )
 
 end <- Sys.time()

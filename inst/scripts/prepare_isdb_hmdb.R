@@ -34,7 +34,7 @@ log_debug("Contributors: ...")
 #'
 #' @examples NULL
 prepare_isdb_hmdb <-
-  function(input = paths$data$source$spectra$hmdb_isdb,
+  function(input = paths$data$source$libraries$spectra$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
            output_pos = paths$data$interim$spectra$hmdb$pos,
            output_neg = paths$data$interim$spectra$hmdb$neg,

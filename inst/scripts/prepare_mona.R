@@ -33,7 +33,7 @@ log_debug("Contributors: ...")
 #'
 #' @examples NULL
 prepare_mona <-
-  function(input = paths$data$source$spectra$mona_lcmsms,
+  function(input = paths$data$source$libraries$spectra$mona_lcmsms,
            output_pos = paths$data$interim$spectra$mona$pos,
            output_neg = paths$data$interim$spectra$mona$neg,
            export_sqlite = TRUE) {
