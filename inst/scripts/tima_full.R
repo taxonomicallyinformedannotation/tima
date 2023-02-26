@@ -25,7 +25,7 @@ log_debug("Getting LOTUS")
 get_last_version_from_zenodo(
   doi = paths$url$lotus$doi,
   pattern = paths$urls$lotus$pattern,
-  path = paths$data$source$libraries$lotus
+  path = paths$data$source$libraries$sop$lotus
 )
 
 ### HMDB
@@ -38,13 +38,13 @@ log_debug("... positive")
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$pos,
-  path = paths$data$source$spectra$lotus$pos
+  path = paths$data$source$libraries$spectra$lotus$pos
 )
 log_debug("... negative")
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$neg,
-  path = paths$data$source$spectra$lotus$neg
+  path = paths$data$source$libraries$spectra$lotus$neg
 )
 
 ### HMDB ISDB

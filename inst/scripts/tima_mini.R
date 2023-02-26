@@ -44,7 +44,7 @@ log_debug("Getting LOTUS")
 get_last_version_from_zenodo(
   doi = paths$url$lotus$doi,
   pattern = paths$urls$lotus$pattern,
-  path = paths$data$source$libraries$lotus
+  path = paths$data$source$libraries$sop$lotus
 )
 
 ### HMDB
