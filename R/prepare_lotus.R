@@ -14,7 +14,7 @@
 #'
 #' @examples NULL
 prepare_lotus <-
-  function(input = paths$data$source$libraries$lotus,
+  function(input = paths$data$source$libraries$sop$lotus,
            output = paths$data$interim$libraries$lotus) {
     log_debug(x = "Loading and preparing LOTUS")
     lotus_prepared <- input |>

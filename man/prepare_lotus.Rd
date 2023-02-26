@@ -5,7 +5,7 @@
 \title{Prepare LOTUS}
 \usage{
 prepare_lotus(
-  input = paths$data$source$libraries$lotus,
+  input = paths$data$source$libraries$sop$lotus,
   output = paths$data$interim$libraries$lotus
 )
 }
