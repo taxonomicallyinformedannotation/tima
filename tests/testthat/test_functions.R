@@ -158,7 +158,7 @@ testthat::test_that("Whole process", {
   ### GNPS results
   step <- "prepare_gnps"
   params <- get_params(step = step)
-  prepare_gnps(gnps_job_id = NULL)
+  prepare_gnps(input = "fileDoesNotExist")
   prepare_gnps()
 
   ### SIRIUS results
