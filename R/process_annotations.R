@@ -276,8 +276,9 @@ process_annotations <-
         dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 
       log_debug(x = "performing MS1 annotation")
-      annotation_table_ms1 <<- annotation_table_ms2 |>
+      annotation_table_ms1 <<-
         annotate_ms1(
+          annotationTable = annotation_table_ms2,
           structureExactMassTable = structure_exact_mass_table,
           structureOrganismPairsTable = structure_organism_pairs_table,
           adducts = unlist(adducts_list[[ms_mode]]),
@@ -293,8 +294,9 @@ process_annotations <-
       annotation_table_ms1 |>
         decorate_ms1()
     } else {
-      annotation_table_ms1 <<- annotation_table_ms2 |>
+      annotation_table_ms1 <<-
         annotate_non_ms1(
+          annotationTable = annotation_table_ms2,
           structureOrganismPairsTable = structure_organism_pairs_table,
           candidatesInitial = candidates_initial
         )
@@ -305,8 +307,9 @@ process_annotations <-
       dplyr::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
-    annotation_table_weighted_bio <- annotation_table_ms1_taxed |>
+    annotation_table_weighted_bio <-
       weight_bio(
+        annotationTable = annotation_table_ms1_taxed,
         structureOrganismPairsTable = structure_organism_pairs_table,
         weightSpectral = weight_spectral,
         weightBiological = weight_biological,
@@ -335,19 +338,18 @@ process_annotations <-
       )
 
     log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-    annotation_table_weighted_bio_cleaned <-
-      annotation_table_weighted_bio |>
-      clean_bio(
-        edgesTable = edges_table,
-        aNnOtAtE = annotate,
-        candidatesInitial = candidates_initial,
-        minimalMs1Bio = minimal_ms1_bio
-      )
+    annotation_table_weighted_bio_cleaned <- clean_bio(
+      annotationTableWeightedBio = annotation_table_weighted_bio,
+      edgesTable = edges_table,
+      aNnOtAtE = annotate,
+      candidatesInitial = candidates_initial,
+      minimalMs1Bio = minimal_ms1_bio
+    )
 
     log_debug(x = "performing chemically informed scoring")
     annotation_table_weighted_chemo <-
-      annotation_table_weighted_bio_cleaned |>
       weight_chemo(
+        annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
         weightSpectral = weight_spectral,
         weightBiological = weight_biological,
         weightChemical = weight_chemical,
@@ -364,13 +366,13 @@ process_annotations <-
       )
 
     log_debug(x = "cleaning for export")
-    results <- annotation_table_weighted_chemo |>
-      clean_chemo(
-        structureOrganismPairsTable = structure_organism_pairs_table,
-        candidatesFinal = candidates_final,
-        minimalMs1Bio = minimal_ms1_bio,
-        minimalMs1Chemo = minimal_ms1_chemo
-      )
+    results <- clean_chemo(
+      annotationTableWeightedChemo = annotation_table_weighted_chemo,
+      structureOrganismPairsTable = structure_organism_pairs_table,
+      candidatesFinal = candidates_final,
+      minimalMs1Bio = minimal_ms1_bio,
+      minimalMs1Chemo = minimal_ms1_chemo
+    )
 
     log_debug(x = "Exporting ...")
     time <- format(Sys.time(), "%y%m%d_%H%M%OS")

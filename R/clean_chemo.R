@@ -64,6 +64,7 @@ clean_chemo <-
         component_id,
         rt,
         mz,
+        score_input,
         structure_molecular_formula,
         structure_inchikey_2D,
         structure_smiles_2D,
