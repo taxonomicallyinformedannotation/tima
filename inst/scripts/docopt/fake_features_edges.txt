@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/fake_features_edges.R --fil-fea-raw data/source/examples/features.csv --fil-net-spe-edg-pro data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz --names-features 'row ID'
+  Rscript inst/scripts/fake_features_edges.R --fil-fea-raw data/source/example_features.csv --fil-net-spe-edg-pro data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_faked_edges.tsv.gz --names-features 'row ID'
 
 Usage: 
   fake_features_edges.R [--fil-fea-raw=<fil-fea-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--names-features=<names-features>]

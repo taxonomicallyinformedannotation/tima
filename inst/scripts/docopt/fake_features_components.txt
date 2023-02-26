@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/example_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_sirius_pretreated.tsv.gz --fil-fea-raw data/source/examples/features.csv --fil-ann-fil data/interim/annotations/example_faked_filled.tsv.gz --ms-pol pos --names-features 'row ID' --names-precursor 'row m/z' --names-rt 'row retention time'
+  Rscript inst/scripts/fake_features_components.R --fil-ann-pre data/interim/annotations/example_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_sirius_pretreated.tsv.gz --fil-fea-raw data/source/example_features.csv --fil-ann-fil data/interim/annotations/example_faked_filled.tsv.gz --ms-pol pos --names-features 'row ID' --names-precursor 'row m/z' --names-rt 'row retention time'
 
 Usage: 
   fake_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-fea-raw=<fil-fea-raw>] [--ms-pol=<ms-pol>] [--names-precursor=<names-precursor>] [--names-rt=<names-rt>]
