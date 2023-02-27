@@ -51,7 +51,8 @@ prepare_spectral_libraries <-
     }
 
     if (length(output) > 1) {
-      output <- output[[polarity]]
+      output <- output[output |>
+                         grepl(pattern=polarity)]
     }
 
     if (!file.exists(output)) {
