@@ -416,36 +416,116 @@ list(
     )
   ),
   ## gnps
-  list(tar_file(
-    name = gnps_tables,
-    command = {
-      gnps_tables <- get_gnps_tables(
-        gnps_job_id = params_config$gnps$id,
-        workflow = "fbmn",
-        path_source = paths$data$source$path,
-        path_interim_a = paths$data$interim$annotations$path,
-        path_interim_f = paths$data$interim$features$path
+  list(
+    tar_file(
+      name = gnps_tables,
+      command = {
+        gnps_tables <- get_gnps_tables(
+          gnps_job_id = params_config$gnps$id,
+          workflow = "fbmn",
+          path_source = paths$data$source$path,
+          path_interim_a = paths$data$interim$annotations$path,
+          path_interim_f = paths$data$interim$features$path
+        )
+      }
+    ),
+    list(
+      tar_file(
+        name = gnps_features,
+        command = {
+          gnps_features <- gnps_tables[[1]]
+        }
+      ),
+      tar_file(
+        name = gnps_metadata,
+        command = {
+          gnps_metadata <- gnps_tables[[2]]
+        }
+      ),
+      tar_file(
+        name = gnps_spectra,
+        command = {
+          gnps_spectra <- gnps_tables[[3]]
+        }
+      ),
+      tar_file(
+        name = gnps_annotations,
+        command = {
+          gnps_annotations <- gnps_tables[[4]]
+        }
+      ),
+      tar_file(
+        name = gnps_components,
+        command = {
+          gnps_components <- gnps_tables[[5]]
+        }
+      ),
+      tar_file(
+        name = gnps_edges,
+        command = {
+          gnps_edges <- gnps_tables[[6]]
+        }
       )
-    }
-  )),
+    )
+  ),
   ## inputs
   list(
     tar_file(
       name = input_features,
       command = {
-        input_features <- params_spectra$files$spectral$raw
+        input_features <-
+          ifelse(
+            test = file.exists(gnps_features),
+            yes = gnps_features,
+            no = params_taxa$files$features$raw
+          )
       }
     ),
     tar_file(
       name = input_spectra,
       command = {
-        input_spectra <- params_spectra$files$spectral$raw
+        input_spectra <-
+          ifelse(
+            test = file.exists(gnps_spectra),
+            yes = gnps_spectra,
+            no = params_spectra$files$spectral$raw
+          )
       }
     ),
     tar_file(
       name = input_metadata,
       command = {
-        input_taxa <- params_taxa$files$taxa$raw
+        input_metadata <-
+          ifelse(
+            test = file.exists(gnps_metadata),
+            yes = gnps_metadata,
+            no = params_taxa$files$taxa$raw
+          )
+      }
+    )
+  ),
+  ## interim
+  list(
+    tar_file(
+      name = interim_components,
+      command = {
+        interim_components <-
+          ifelse(
+            test = file.exists(gnps_components),
+            yes = gnps_components,
+            no = params_features_components$files$networks$spectral$components$raw
+          )
+      }
+    ),
+    tar_file(
+      name = interim_edges,
+      command = {
+        interim_edges <-
+          ifelse(
+            test = file.exists(gnps_edges),
+            yes = gnps_edges,
+            no = params_features_edges$files$networks$spectral$edges$raw
+          )
       }
     )
   ),
@@ -670,22 +750,23 @@ list(
       ## Experimental
       list(
         ## TODO Extend to other libraries
-        annotations_spectral_exp_gnps_p <- tar_file(
-          name = annotations_spectral_exp_gnps_prepared,
-          command = {
-            annotations_spectral_exp_gnps_prepared <-
-              prepare_gnps(
-                input = params_gnps$files$annotations$raw,
-                output = params_gnps$files$annotations$pretreated,
-                str_2D_3D = library_merged_str_2D_3D,
-                str_met = library_merged_str_met,
-                str_nam = library_merged_str_nam,
-                str_tax_cla = library_merged_str_tax_cla,
-                str_tax_npc = library_merged_str_tax_npc,
-                parameters = params_gnps
-              )
-          }
-        )
+        annotations_spectral_exp_gnps_p <-
+          tar_file(
+            name = annotations_spectral_exp_gnps_prepared,
+            command = {
+              annotations_spectral_exp_gnps_prepared <-
+                prepare_gnps(
+                  input = gnps_annotations,
+                  output = params_gnps$files$annotations$pretreated,
+                  str_2D_3D = library_merged_str_2D_3D,
+                  str_met = library_merged_str_met,
+                  str_nam = library_merged_str_nam,
+                  str_tax_cla = library_merged_str_tax_cla,
+                  str_tax_npc = library_merged_str_tax_npc,
+                  parameters = params_gnps
+                )
+            }
+          )
       ),
       ## In silico
       list(
@@ -754,21 +835,22 @@ list(
           annotations_spectral_is_lotus_2,
           command = list(!!!.x)
         ),
-        annotations_spectral_is_p <- tar_file(
-          name = annotations_spectral_is_prepared,
-          command = {
-            annotations_spectral_is_prepared <- prepare_spectral_matches(
-              input = annotations_spectral_is_merged,
-              output = params_spectral_matches$files$annotations$pretreated,
-              str_2D_3D = library_merged_str_2D_3D,
-              str_met = library_merged_str_met,
-              str_nam = library_merged_str_nam,
-              str_tax_cla = library_merged_str_tax_cla,
-              str_tax_npc = library_merged_str_tax_npc,
-              parameters = params_spectral_matches
-            )
-          }
-        )
+        annotations_spectral_is_p <-
+          tar_file(
+            name = annotations_spectral_is_prepared,
+            command = {
+              annotations_spectral_is_prepared <- prepare_spectral_matches(
+                input = annotations_spectral_is_merged,
+                output = params_spectral_matches$files$annotations$pretreated,
+                str_2D_3D = library_merged_str_2D_3D,
+                str_met = library_merged_str_met,
+                str_nam = library_merged_str_nam,
+                str_tax_cla = library_merged_str_tax_cla,
+                str_tax_npc = library_merged_str_tax_npc,
+                parameters = params_spectral_matches
+              )
+            }
+          )
       ),
       tar_combine(
         name = annotations_spectral_prepared,
@@ -803,7 +885,7 @@ list(
       name = features_edges_prepared,
       command = {
         features_edges_prepared <- prepare_features_edges(
-          input = params_features_edges$files$networks$spectral$edges$raw,
+          input = interim_edges,
           output = params_features_edges$files$networks$spectral$edges$processed,
           name_source = params_features_edges$names$source,
           name_target = params_features_edges$names$target,
@@ -821,7 +903,7 @@ list(
             annotations_sirius_prepared
           ),
           output = params_features_components$files$annotations$filled,
-          components = params_features_components$files$networks$spectral$components$raw,
+          components = interim_components,
           ms_mode = params_features_components$ms$polarity,
           parameters = params_features_components
         )
@@ -832,10 +914,10 @@ list(
     name = taxa_prepared,
     command = {
       taxa_prepared <- prepare_taxa(
-        input = params_taxa$files$features$raw,
+        input = input_features,
         extension = params_taxa$names$extension,
         colname = params_taxa$names$taxon,
-        metadata = params_taxa$files$taxa$raw,
+        metadata = input_metadata,
         top_k = params_taxa$organisms$candidates,
         output = params_taxa$files$taxa$processed,
         taxon = params_taxa$organisms$taxon,
