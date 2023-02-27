@@ -102,6 +102,13 @@ list(
         }
       ),
       tar_file(
+        name = config_default_spectral_libraries,
+        command = {
+          config_default_spectral_libraries <-
+            paths$config$default$prepare$spectral_libraries
+        }
+      ),
+      tar_file(
         name = config_default_spectral_matches,
         command = {
           config_default_spectral_matches <-
@@ -244,6 +251,20 @@ list(
         }
       ),
       tar_file(
+        name = config_user_spectral_libraries,
+        command = {
+          config_user_spectral_libraries <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_spectral_libraries"
+            )
+        }
+      ),
+      tar_file(
         name = config_user_spectral_matches,
         command = {
           config_user_spectral_matches <-
@@ -370,6 +391,16 @@ list(
             parse_yaml_params(
               def = config_default_sirius,
               usr = config_user_sirius[1]
+            )
+        }
+      ),
+      tar_target(
+        name = params_spectral_libraries,
+        command = {
+          params_spectral_libraries <-
+            parse_yaml_params(
+              def = config_default_spectral_libraries,
+              usr = config_user_spectral_libraries[1]
             )
         }
       ),
@@ -703,43 +734,135 @@ list(
       ),
       ## Prepared
       list(
-        ## TODO ADD ISDB HMDB PREPARED,
+        ## TODO ADD HMDB PREPARED,
+        ## TODO improve polarity handling, suboptimal
         tar_file(
           name = library_spectra_is_lotus_prepared_pos,
           command = {
-            library_spectra_is_lotus_prepared_pos <- prepare_isdb_lotus(
+            library_spectra_is_lotus_prepared_pos <- prepare_spectral_libraries(
               input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_pos
               } else {
                 paths$data$source$libraries$spectra$lotus$pos
               },
-              output = paths$data$interim$spectra$lotus$pos,
+              output = paths$data$interim$libraries$spectra$lotus$pos,
+              col_ce = NULL,
+              col_ci = "FILENAME",
+              col_em = "EXACTMASS",
+              col_in = "INCHI",
+              col_ik = "NAME",
+              col_mf = "MOLECULAR_FORMULA",
+              col_na = NULL,
+              col_po = "IONMODE",
+              col_sm = "SMILES",
+              col_si = NULL,
+              col_sp = NULL,
+              col_sy = NULL,
               polarity = "pos",
-              export_sqlite = TRUE
+              metad = CompoundDb::make_metadata(
+                source = "LOTUS",
+                url = "https://doi.org/10.5281/zenodo.5607185",
+                source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+                source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+                organism = "Life"
+              )
             )
           }
         ),
         tar_file(
           name = library_spectra_is_lotus_prepared_neg,
           command = {
-            library_spectra_is_lotus_prepared_neg <- prepare_isdb_lotus(
+            library_spectra_is_lotus_prepared_neg <- prepare_spectral_libraries(
               input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_neg
               } else {
                 paths$data$source$libraries$spectra$lotus$neg
               },
-              output = paths$data$interim$spectra$lotus$pos,
-              polarity = "neg",
-              export_sqlite = TRUE
+              output = paths$data$interim$libraries$spectra$lotus$neg,
+              col_ce = NULL,
+              col_ci = "FILENAME",
+              col_em = "EXACTMASS",
+              col_in = "INCHI",
+              col_ik = "NAME",
+              col_mf = "MOLECULAR_FORMULA",
+              col_na = NULL,
+              col_po = "IONMODE",
+              col_sm = "SMILES",
+              col_si = NULL,
+              col_sp = NULL,
+              col_sy = NULL,
+              metad = CompoundDb::make_metadata(
+                source = "LOTUS",
+                url = "https://doi.org/10.5281/zenodo.5607185",
+                source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+                source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+                organism = "Life"
+              ),
+              polarity = "neg"
             )
           }
         )
       ),
       ## Experimental
-      list( ## RAW
-        list(),
+      list(
+        ## RAW
+        list(tar_file(
+          name = library_spectra_exp_internal_raw,
+          command = {
+            library_spectra_exp_internal_raw <-
+              params_spectral_libraries$files$libraries$spectral$raw
+          }
+        )),
         ## Prepared
-        list()
+        list(
+          ## TODO improve polarity handling, suboptimal
+          tar_file(
+            name = library_spectra_exp_internal_prepared_pos,
+            command = {
+              library_spectra_exp_internal_prepared_pos <-
+                prepare_spectral_libraries(
+                  input = library_spectra_exp_internal_raw,
+                  output = params_spectral_libraries$files$libraries$spectral,
+                  polarity = "pos",
+                  col_ce = params_spectral_libraries$names$mgf$collision_energy,
+                  col_ci = params_spectral_libraries$names$mgf$compound_id,
+                  col_em = params_spectral_libraries$names$mgf$exact_mass,
+                  col_in = params_spectral_libraries$names$mgf$inchi,
+                  col_ik = params_spectral_libraries$names$mgf$inchikey,
+                  col_mf = params_spectral_libraries$names$mgf$molecular_formula,
+                  col_na = params_spectral_libraries$names$mgf$name,
+                  col_po = params_spectral_libraries$names$mgf$polarity,
+                  col_sm = params_spectral_libraries$names$mgf$smiles,
+                  col_si = params_spectral_libraries$names$mgf$spectrum_id,
+                  col_sp = params_spectral_libraries$names$mgf$splash,
+                  col_sy = params_spectral_libraries$names$mgf$synonyms
+                )
+            }
+          ),
+          tar_file(
+            name = library_spectra_exp_internal_prepared_neg,
+            command = {
+              library_spectra_exp_internal_prepared_neg <-
+                prepare_spectral_libraries(
+                  input = library_spectra_exp_internal_raw,
+                  output = params_spectral_libraries$files$libraries$spectral,
+                  polarity = "neg",
+                  col_ce = params_spectral_libraries$names$mgf$collision_energy,
+                  col_ci = params_spectral_libraries$names$mgf$compound_id,
+                  col_em = params_spectral_libraries$names$mgf$exact_mass,
+                  col_in = params_spectral_libraries$names$mgf$inchi,
+                  col_ik = params_spectral_libraries$names$mgf$inchikey,
+                  col_mf = params_spectral_libraries$names$mgf$molecular_formula,
+                  col_na = params_spectral_libraries$names$mgf$name,
+                  col_po = params_spectral_libraries$names$mgf$polarity,
+                  col_sm = params_spectral_libraries$names$mgf$smiles,
+                  col_si = params_spectral_libraries$names$mgf$spectrum_id,
+                  col_sp = params_spectral_libraries$names$mgf$splash,
+                  col_sy = params_spectral_libraries$names$mgf$synonyms
+                )
+            }
+          )
+        )
       )
     )
   ),
@@ -765,6 +888,91 @@ list(
                   str_tax_npc = library_merged_str_tax_npc,
                   parameters = params_gnps
                 )
+            }
+          ),
+        annotations_spectral_exp_internal_1 <-
+          tar_file(
+            name = annotations_spectral_exp_internal_pos,
+            command = {
+              annotations_spectral_exp_internal_pos <- process_spectra(
+                input = input_spectra,
+                library = library_spectra_exp_internal_prepared_pos,
+                polarity = "pos",
+                output = gsub(
+                  pattern = "isdb.tsv.gz",
+                  replacement = "exp_rt_pos.tsv.gz",
+                  x = params_spectra$files$annotations$raw$spectral,
+                  fixed = TRUE
+                ),
+                method = params_spectra$annotations$ms2$method,
+                threshold = params_spectra$annotations$ms2$thresholds$similarity,
+                ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+                dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+                npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+                rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+                condition = params_spectra$annotations$ms2$thresholds$condition,
+                qutoff = params_spectra$ms$intensity$thresholds$ms2,
+                parallel = params_spectra$options$parallel,
+                fast = params_spectra$options$fast,
+                approx = params_spectra$annotations$ms2$approx,
+                parameters = params_spectra
+              )
+            }
+          ),
+        annotations_spectral_exp_internal_2 <-
+          tar_file(
+            name = annotations_spectral_exp_internal_neg,
+            command = {
+              annotations_spectral_exp_internal_neg <- process_spectra(
+                input = input_spectra,
+                library = library_spectra_exp_internal_prepared_neg,
+                polarity = "neg",
+                output = gsub(
+                  pattern = "isdb.tsv.gz",
+                  replacement = "exp_rt_neg.tsv.gz",
+                  x = params_spectra$files$annotations$raw$spectral,
+                  fixed = TRUE
+                ),
+                method = params_spectra$annotations$ms2$method,
+                threshold = params_spectra$annotations$ms2$thresholds$similarity,
+                ppm = params_spectra$ms$tolerances$mass$ppm$ms2,
+                dalton = params_spectra$ms$tolerances$mass$dalton$ms2,
+                npeaks = params_spectra$annotations$ms2$thresholds$peaks$absolute,
+                rpeaks = params_spectra$annotations$ms2$thresholds$peaks$ratio,
+                condition = params_spectra$annotations$ms2$thresholds$condition,
+                qutoff = params_spectra$ms$intensity$thresholds$ms2,
+                parallel = params_spectra$options$parallel,
+                fast = params_spectra$options$fast,
+                approx = params_spectra$annotations$ms2$approx,
+                parameters = params_spectra
+              )
+            }
+          ),
+        tar_combine(
+          name = annotations_spectral_exp_internal_merged,
+          annotations_spectral_exp_internal_1,
+          annotations_spectral_exp_internal_2,
+          command = list(!!!.x)
+        ),
+        annotations_spectral_exp_internal_p <-
+          tar_file(
+            name = annotations_spectral_exp_internal_prepared,
+            command = {
+              annotations_spectral_exp_internal_prepared <- prepare_spectral_matches(
+                input = annotations_spectral_exp_internal_merged,
+                output = gsub(
+                  pattern = "isdb_pretreated.tsv.gz",
+                  replacement = "exp_rt_pretreated.tsv.gz",
+                  x = params_spectral_matches$files$annotations$pretreated,
+                  fixed = TRUE
+                ),
+                str_2D_3D = library_merged_str_2D_3D,
+                str_met = library_merged_str_met,
+                str_nam = library_merged_str_nam,
+                str_tax_cla = library_merged_str_tax_cla,
+                str_tax_npc = library_merged_str_tax_npc,
+                parameters = params_spectral_matches
+              )
             }
           )
       ),
@@ -855,6 +1063,7 @@ list(
       tar_combine(
         name = annotations_spectral_prepared,
         annotations_spectral_exp_gnps_p,
+        annotations_spectral_exp_internal_p,
         annotations_spectral_is_p,
         command = list(!!!.x)
       )

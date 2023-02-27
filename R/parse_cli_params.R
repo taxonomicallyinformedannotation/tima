@@ -92,6 +92,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$fil_lib_spe_pos)) {
       params$files$libraries$spectral$pos <- as.character(arguments$fil_lib_spe_pos)
     }
+    if (!is.null(arguments$fil_lib_spe_raw)) {
+      params$files$libraries$spectral$raw <- as.character(arguments$fil_lib_spe_raw)
+    }
     if (!is.null(arguments$fil_net_spe_edg_raw)) {
       params$files$networks$spectral$edges$raw <- as.character(arguments$fil_net_spe_edg_raw)
     }
@@ -151,6 +154,48 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$names_features)) {
       params$names$features <- as.character(arguments$names_features)
+    }
+    if (!is.null(arguments$names_mgf_ce)) {
+      params$names$mgf$collision_energy <- as.character(arguments$names_mgf_ce)
+    }
+    if (!is.null(arguments$names_mgf_ci)) {
+      params$names$mgf$compound_id <- as.character(arguments$names_mgf_ci)
+    }
+    if (!is.null(arguments$names_mgf_em)) {
+      params$names$mgf$exact_mass <- as.character(arguments$names_mgf_em)
+    }
+    if (!is.null(arguments$names_mgf_in)) {
+      params$names$mgf$inchi <- as.character(arguments$names_mgf_in)
+    }
+    if (!is.null(arguments$names_mgf_ik)) {
+      params$names$mgf$inchikey <- as.character(arguments$names_mgf_ik)
+    }
+    if (!is.null(arguments$names_mgf_mf)) {
+      params$names$mgf$molecular_formula <- as.character(arguments$names_mgf_mf)
+    }
+    if (!is.null(arguments$names_mgf_na)) {
+      params$names$mgf$name <- as.character(arguments$names_mgf_na)
+    }
+    if (!is.null(arguments$names_mgf_po)) {
+      params$names$mgf$polarity <- as.character(arguments$names_mgf_po)
+    }
+    if (!is.null(arguments$names_mgf_pc)) {
+      params$names$mgf$precursor_charge <- as.character(arguments$names_mgf_pc)
+    }
+    if (!is.null(arguments$names_mgf_pm)) {
+      params$names$mgf$precursor_mz <- as.character(arguments$names_mgf_pm)
+    }
+    if (!is.null(arguments$names_mgf_sm)) {
+      params$names$mgf$smiles <- as.character(arguments$names_mgf_sm)
+    }
+    if (!is.null(arguments$names_mgf_si)) {
+      params$names$mgf$spectrum_id <- as.character(arguments$names_mgf_si)
+    }
+    if (!is.null(arguments$names_mgf_sp)) {
+      params$names$mgf$splash <- as.character(arguments$names_mgf_sp)
+    }
+    if (!is.null(arguments$names_mgf_sy)) {
+      params$names$mgf$synonyms <- as.character(arguments$names_mgf_sy)
     }
     if (!is.null(arguments$names_precursor)) {
       params$names$precursor <- as.character(arguments$names_precursor)

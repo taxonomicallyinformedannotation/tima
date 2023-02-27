@@ -37,6 +37,12 @@ testthat::test_that("Whole process", {
   # download_file(url = paths$url$examples$spectra,
   #               export = paths$data$source$spectra)
 
+  ### Spectral library with rt
+  download_file(
+    url = paths$url$examples$spectral_lib_mini$with_rt,
+    export = paths$data$source$libraries$spectra$with_rt
+  )
+
   #### SIRIUS
   ## mini version for tests
   sirius_mini <- paths$data$interim$annotations$example_sirius |>
@@ -114,17 +120,59 @@ testthat::test_that("Whole process", {
   prepare_libraries()
 
   ## Prepare spectra
+  step <- "prepare_spectral_libraries"
+  params <- get_params(step = step)
   ### LOTUS
-  ## Without sqlite
-  prepare_isdb_lotus(export_sqlite = FALSE)
   ## Pos
-  prepare_isdb_lotus()
+  prepare_spectral_libraries(
+    input = paths$data$source$libraries$spectra$lotus$pos,
+    output = paths$data$interim$libraries$spectra$lotus$pos,
+    col_ce = NULL,
+    col_ci = "FILENAME",
+    col_em = "EXACTMASS",
+    col_in = "INCHI",
+    col_ik = "NAME",
+    col_mf = "MOLECULAR_FORMULA",
+    col_na = NULL,
+    col_po = "IONMODE",
+    col_sm = "SMILES",
+    col_si = NULL,
+    col_sp = NULL,
+    col_sy = NULL,
+    metad = CompoundDb::make_metadata(
+      source = "LOTUS",
+      url = "https://doi.org/10.5281/zenodo.5607185",
+      source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+      source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+      organism = "Life"
+    )
+  )
   ## Check the library already exists warning
-  prepare_isdb_lotus()
-  ## Neg
-  prepare_isdb_lotus(
+  prepare_spectral_libraries(
+    input = paths$data$source$libraries$spectra$lotus$pos,
+    output = paths$data$interim$libraries$spectra$lotus$pos
+  )
+  ## Neg & without metadata
+  prepare_spectral_libraries(
     input = paths$data$source$libraries$spectra$lotus$neg,
-    output = paths$data$interim$spectra$lotus$neg,
+    output = paths$data$interim$libraries$spectra$lotus$neg,
+    col_ce = NULL,
+    col_ci = "FILENAME",
+    col_em = "EXACTMASS",
+    col_in = "INCHI",
+    col_ik = "NAME",
+    col_mf = "MOLECULAR_FORMULA",
+    col_na = NULL,
+    col_po = "IONMODE",
+    col_sm = "SMILES",
+    col_si = NULL,
+    col_sp = NULL,
+    col_sy = NULL,
+    polarity = "neg"
+  )
+  ## Classical
+  prepare_spectral_libraries()
+  prepare_spectral_libraries(
     polarity = "neg"
   )
 
@@ -261,6 +309,7 @@ testthat::test_that("Whole process", {
   arguments$fil_lib_sop_mer <<- "x"
   arguments$fil_lib_spe_neg <<- "x"
   arguments$fil_lib_spe_pos <<- "x"
+  arguments$fil_lib_spe_raw <<- "x"
   arguments$fil_net_spe_edg_raw <<- "x"
   arguments$fil_net_spe_edg_pro <<- "x"
   arguments$fil_net_spe_com_raw <<- "x"
@@ -281,6 +330,20 @@ testthat::test_that("Whole process", {
   arguments$ms_tol_rt_min <<- "x"
   arguments$names_extension <<- "x"
   arguments$names_features <<- "x"
+  arguments$names_mgf_ce <<- "x"
+  arguments$names_mgf_ci <<- "x"
+  arguments$names_mgf_em <<- "x"
+  arguments$names_mgf_in <<- "x"
+  arguments$names_mgf_ik <<- "x"
+  arguments$names_mgf_mf <<- "x"
+  arguments$names_mgf_na <<- "x"
+  arguments$names_mgf_po <<- "x"
+  arguments$names_mgf_pc <<- "x"
+  arguments$names_mgf_pm <<- "x"
+  arguments$names_mgf_sm <<- "x"
+  arguments$names_mgf_si <<- "x"
+  arguments$names_mgf_sp <<- "x"
+  arguments$names_mgf_sy <<- "x"
   arguments$names_precursor <<- "x"
   arguments$names_rt <<- "x"
   arguments$names_source <<- "x"

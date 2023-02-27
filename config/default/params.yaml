@@ -173,11 +173,15 @@ files:
 
       #' List of negative spectral libraries. STRING
       neg:
-        - data/interim/spectra/isdb_lotus_neg.mgf
+        - data/interim/spectra/internal_neg.sqlite
 
       #' List of positive spectral libraries. STRING
       pos:
-        - data/interim/spectra/isdb_lotus_pos.mgf
+        - data/interim/spectra/internal_pos.sqlite
+
+      #' List of raw spectral libraries. STRING
+      raw:
+        - data/source/libraries/spectra/spectral_lib_mini_with_rt.mgf
 
   #' Networks files.
   networks:
@@ -348,6 +352,45 @@ names:
 
   #' Name of "feature IDs" variable in the input. STRING
   features: feature_id
+
+  #' Name of fields present in the MGF.
+  mgf:
+
+    #' Name of "collision energy" in MGF. STRING
+    collision_energy: ~
+
+    #' Name of "compound ID" in MGF. STRING
+    compound_id: ~
+
+    #' Name of "exact mass" in MGF. STRING
+    exact_mass: EXACTMASS
+
+    #' Name of "InChI" in MGF. STRING
+    inchi: INCHI
+
+    #' Name of "InChIKey" in MGF. STRING
+    inchikey: ~
+
+    #' Name of "molecular formula" in MGF. STRING
+    molecular_formula: ~
+
+    #' Name of "name" in MGF. STRING
+    name: ~
+
+    #' Name of "polarity" in MGF. STRING
+    polarity: IONMODE
+
+    #' Name of "SMILES" in MGF. STRING
+    smiles: SMILES
+
+    #' Name of "spectrum ID" in MGF. STRING
+    spectrum_id: SPECTRUMID
+
+    #' Name of "SPLASH" in MGF. STRING
+    splash: ~
+
+    #' Name of "synonyms" in MGF. STRING
+    synonyms: ~
 
   #' Name of "precursor m/z" variable in the input. STRING
   precursor: mz

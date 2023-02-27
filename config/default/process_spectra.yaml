@@ -54,11 +54,11 @@ files:
 
       #' List of negative spectral libraries. STRING
       neg:
-        - data/interim/spectra/isdb_lotus_neg.mgf
+        - data/interim/libraries/spectra/isdb_lotus_neg.sqlite
 
       #' List of positive spectral libraries. STRING
       pos:
-        - data/interim/spectra/isdb_lotus_pos.mgf
+        - data/interim/libraries/spectra/isdb_lotus_pos.sqlite
 
   #' Spectral files. STRING
   spectral:

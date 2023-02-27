@@ -49,22 +49,23 @@ Each step of the whole pipeline will be described next.
 library(targets)
 Sys.setenv(TAR_WARN = "false")
 targets::tar_visnetwork(
-        names = starts_with("annotations"),
-        exclude = c(
-                contains("config"),
-                contains("gnps"),
-                contains("input"),
-                contains("paths"),
-                contains("params"),
-                contains("_merged"),
-                contains("_neg"),
-                contains("_pos"),
-                contains("library_sop_lotus"),
-                contains("library_sop_closed")
-        ),
-        targets_only = TRUE,
-        degree_from = 8,
-        level_separation = 200
+  names = starts_with("annotations"),
+  exclude = c(
+    contains("dic"),
+    contains("config"),
+    contains("gnps"),
+    contains("input"),
+    contains("interim"),
+    contains("paths"),
+    contains("params"),
+    contains("_is"),
+    contains("_exp"),
+    contains("library_sop_lotus"),
+    contains("library_sop_closed")
+  ),
+  targets_only = TRUE,
+  degree_from = 8,
+  level_separation = 200
 )
 ```
 

@@ -36,23 +36,8 @@ log_debug("Contributors: ...")
 prepare_isdb_hmdb <-
   function(input = paths$data$source$libraries$spectra$hmdb_isdb,
            metadata = paths$data$interim$libraries$hmdb_minimal,
-           output_pos = paths$data$interim$spectra$hmdb$pos,
-           output_neg = paths$data$interim$spectra$hmdb$neg,
-           export_sqlite = TRUE) {
-    if (export_sqlite == TRUE) {
-      output_pos <- output_pos |>
-        gsub(
-          pattern = ".mgf",
-          replacement = ".sqlite",
-          fixed = TRUE
-        )
-      output_neg <- output_neg |>
-        gsub(
-          pattern = ".mgf",
-          replacement = ".sqlite",
-          fixed = TRUE
-        )
-    }
+           output_pos = paths$data$interim$libraries$spectra$hmdb$pos,
+           output_neg = paths$data$interim$libraries$spectra$hmdb$neg) {
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 
@@ -87,7 +72,7 @@ prepare_isdb_hmdb <-
       dplyr::select(-original_spectrum_id, -spectrum_id) |>
       dplyr::distinct() |>
       dplyr::mutate(
-        precursor_mz = ifelse(
+        precursorMz = ifelse(
           test = polarity == 1,
           yes = monisotopic_molecular_weight + proton,
           no = monisotopic_molecular_weight - proton
@@ -97,7 +82,7 @@ prepare_isdb_hmdb <-
           yes = "POSITIVE",
           no = "NEGATIVE"
         ),
-        precursor_charge = ifelse(
+        precursorCharge = ifelse(
           test = polarity == 1,
           yes = 1L,
           no = -1L
@@ -111,36 +96,40 @@ prepare_isdb_hmdb <-
     spctra_enhanced <- spctra_enhanced |>
       dplyr::left_join(df_clean)
 
-    log_debug("Formatting")
-    colnames_hmdb <- c(
-      colname_collision_energy = "collision_energy",
-      colname_compound_id = NA,
-      colname_exact_mass = "monisotopic_molecular_weight",
-      colname_formula = "chemical_formula",
-      colname_inchi = "inchi_2D",
-      colname_inchikey = "inchikey_2D",
-      colname_mode = "ionmode",
-      colname_name = "inchikey_2D",
-      colname_precursorMz = "precursor_mz",
-      colname_precursorCharge = "precursor_charge",
-      colname_smiles = "smiles_2D",
-      colname_spectrum_id = NA,
-      colname_splash = "splash",
-      colname_synonyms = NA
-    )
-
     log_debug("Positive")
     spectra_harmonized_pos <- spctra_enhanced |>
       harmonize_spectra(
-        colnames = colnames_hmdb,
-        mode = "pos"
+        mode = "pos",
+        co_ce = "collision_energy",
+        co_ci = "compound_id",
+        co_em = "monisotopic_molecular_weight",
+        co_mf = "chemical_formula",
+        co_in = "inchi_2D",
+        co_ik = "inchikey",
+        co_po = "ionmode",
+        co_na = "iupac_name",
+        co_sm = "smiles_2D",
+        co_si = NULL,
+        co_sp = "splash",
+        co_sy = NULL
       )
 
     log_debug("Negative")
     spectra_harmonized_neg <- spctra_enhanced |>
       harmonize_spectra(
-        colnames = colnames_hmdb,
-        mode = "neg"
+        mode = "neg",
+        co_ce = "collision_energy",
+        co_ci = "compound_id",
+        co_em = "monisotopic_molecular_weight",
+        co_mf = "chemical_formula",
+        co_in = "inchi_2D",
+        co_ik = "inchikey",
+        co_po = "ionmode",
+        co_na = "iupac_name",
+        co_sm = "smiles_2D",
+        co_si = NULL,
+        co_sp = "splash",
+        co_sy = NULL
       )
 
     log_debug("Exporting")

@@ -40,6 +40,7 @@ Arguments:
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
   fil-lib-spe-neg            List of negative spectral libraries. STRING
   fil-lib-spe-pos            List of positive spectral libraries. STRING
+  fil-lib-spe-raw            List of raw spectral libraries. STRING
 
   fil-net-spe-edg-raw        Raw edges file. STRING
   fil-net-spe-edg-pro        Prepared edges file. STRING
@@ -74,6 +75,18 @@ Arguments:
 
   names-extension            The file(s) extension is present in the sample name. BOOLEAN
   names-features             Name of "feature IDs" variable in the input. STRING
+  names-mgf-ce               Name of "collision energy" in MGF. STRING
+  names-mgf-ci               Name of "compound ID" in MGF. STRING
+  names-mgf-em               Name of "exact mass" in MGF. STRING
+  names-mgf-in               Name of "InChI" in MGF. STRING
+  names-mgf-ik               Name of "InChIKey" in MGF. STRING
+  names-mgf-mf               Name of "molecular formula" in MGF. STRING
+  names-mgf-na               Name of "name" in MGF. STRING
+  names-mgf-po               Name of "polarity" in MGF. STRING
+  names-mgf-sm               Name of "SMILES" in MGF. STRING
+  names-mgf-si               Name of "spectrum ID" in MGF. STRING
+  names-mgf-sp               Name of "SPLASH" in MGF. STRING
+  names-mgf-sy               Name of "synonyms" in MGF. STRING
   names-precursor            Name of "precursor m/z" variable in the input. STRING
   names-rt                   Name of "retention time" variable in the input. STRING
   names-source               Name of "source IDs" variable in the input. STRING

@@ -94,7 +94,15 @@ prepare_libraries()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
-prepare_isdb_lotus()
+prepare_spectral_libraries(
+  metad = CompoundDb::make_metadata(
+    source = "LOTUS",
+    url = "https://doi.org/10.5281/zenodo.5607185",
+    source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+    source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+    organism = "Life"
+  )
+)
 
 ### ISDB HMDB
 # log_debug("Preparing ISDB HMDB")

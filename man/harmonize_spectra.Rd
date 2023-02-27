@@ -6,21 +6,49 @@
 \usage{
 harmonize_spectra(
   spectra,
-  colnames = c(colname_collision_energy = NA, colname_compound_id = NA,
-    colname_exact_mass = "EXACTMASS", colname_formula = "MOLECULAR_FORMULA",
-    colname_inchi = "INCHI", colname_inchikey = "NAME", colname_mode = "IONMODE",
-    colname_name = "NAME", colname_precursorMz = "precursorMz", colname_precursorCharge =
-    "precursorCharge", colname_smiles = "SMILES", colname_spectrum_id = NA,
-    colname_splash = NA, colname_synonyms = NA),
-  mode = "pos"
+  mode,
+  co_ce,
+  co_ci,
+  co_em,
+  co_in,
+  co_ik,
+  co_mf,
+  co_na,
+  co_po,
+  co_sm,
+  co_si,
+  co_sp,
+  co_sy
 )
 }
 \arguments{
 \item{spectra}{Spectra object to be harmonized}
 
-\item{colnames}{Names of the different columns corresponding to standardized headers}
-
 \item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
+
+\item{co_ce}{Name of the collision energy in mgf}
+
+\item{co_ci}{Name of the compound id in mgf}
+
+\item{co_em}{Name of the exact mass in mgf}
+
+\item{co_in}{Name of the InChI in mgf}
+
+\item{co_ik}{Name of the InChIKey in mgf}
+
+\item{co_mf}{Name of the molecular formula in mgf}
+
+\item{co_na}{Name of the name in mgf}
+
+\item{co_po}{Name of the polarity in mgf}
+
+\item{co_sm}{Name of the SMILES in mgf}
+
+\item{co_si}{Name of the spectrum id in mgf}
+
+\item{co_sp}{Name of the SPLASH in mgf}
+
+\item{co_sy}{Name of the synonyms in mgf}
 }
 \description{
 This function harmonizes spectra headers

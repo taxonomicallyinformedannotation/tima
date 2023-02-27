@@ -135,9 +135,5 @@ export_spectra_2 <- function(file,
         file = file,
         metad = meta
       )
-  } else {
-    log_debug(
-      "There is already a library with the same name existing, to avoid any conflict please remove it."
-    )
   }
 }

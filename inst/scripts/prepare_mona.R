@@ -34,23 +34,8 @@ log_debug("Contributors: ...")
 #' @examples NULL
 prepare_mona <-
   function(input = paths$data$source$libraries$spectra$mona_lcmsms,
-           output_pos = paths$data$interim$spectra$mona$pos,
-           output_neg = paths$data$interim$spectra$mona$neg,
-           export_sqlite = TRUE) {
-    if (export_sqlite == TRUE) {
-      output_pos <- output_pos |>
-        gsub(
-          pattern = ".mgf",
-          replacement = ".sqlite",
-          fixed = TRUE
-        )
-      output_neg <- output_neg |>
-        gsub(
-          pattern = ".mgf",
-          replacement = ".sqlite",
-          fixed = TRUE
-        )
-    }
+           output_pos = paths$data$interim$libraries$spectra$mona$pos,
+           output_neg = paths$data$interim$libraries$spectra$mona$neg) {
     log_debug("Loading standardization function (temp)")
     source(file = "inst/scripts/standardize.R")
 

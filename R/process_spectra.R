@@ -54,21 +54,7 @@ process_spectra <- function(input = params$files$spectral$raw,
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   params <<- parameters
   if (length(library) > 1) {
-    library <- library[polarity][[1]] |>
-      as.character()
-  }
-  if (file.exists(library |>
-    gsub(
-      pattern = ".mgf",
-      replacement = ".sqlite",
-      fixed = TRUE
-    ))) {
-    library <- library |>
-      gsub(
-        pattern = ".mgf",
-        replacement = ".sqlite",
-        fixed = TRUE
-      )
+    library <- library[[polarity]]
   }
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot(
@@ -103,7 +89,7 @@ process_spectra <- function(input = params$files$spectral$raw,
     spectral_library <- library |>
       import_spectra()
 
-    ## COMMENT (AR): Temporary dumb fix
+    ## COMMENT (AR): Temporary dumb fix TODO change it
     spectral_library$precursorMz <-
       spectral_library$exactmass + spectral_library$precursorCharge * 1.00728
 
@@ -231,6 +217,21 @@ process_spectra <- function(input = params$files$spectral$raw,
       rpeaks,
       "(relative) matched peaks."
     )
+    if (nrow(df_final) == 0) {
+      log_debug("No spectra were matched, returning an empty dataframe")
+      df_final <-
+        data.frame(
+          feature_id = NA,
+          msms_score = NA,
+          reverse_score = NA,
+          presence_ratio = NA,
+          matched_peaks_count = NA,
+          short_inchikey = NA,
+          smiles = NA,
+          molecular_formula = NA,
+          exact_mass = NA
+        )
+    }
   } else {
     log_debug("No spectra matched the given polarity, returning an empty dataframe")
     df_final <-
