@@ -52,7 +52,7 @@ prepare_spectral_libraries <-
 
     if (length(output) > 1) {
       output <- output[output |>
-                         grepl(pattern=polarity)] |>
+        grepl(pattern = polarity)] |>
         as.character()
     }
 

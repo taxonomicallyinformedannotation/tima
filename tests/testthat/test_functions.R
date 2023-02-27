@@ -173,11 +173,12 @@ testthat::test_that("Whole process", {
   ## Classical
   prepare_spectral_libraries()
   prepare_spectral_libraries(
-    polarity = "neg")
+    polarity = "neg"
+  )
   prepare_spectral_libraries(
     polarity = "neg",
     output = params$files$libraries$spectral |>
-      gsub(pattern = ".sqlite",replacement = ".mgf")
+      gsub(pattern = ".sqlite", replacement = ".mgf")
   )
 
   ### HMDB

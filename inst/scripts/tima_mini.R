@@ -98,6 +98,8 @@ prepare_libraries()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
+step <- "prepare_spectral_libraries"
+params <- get_params(step = step)
 prepare_spectral_libraries(
   input = paths$data$source$libraries$spectra$lotus$pos,
   output = paths$data$interim$libraries$spectra$lotus$pos,
