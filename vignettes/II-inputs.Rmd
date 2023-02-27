@@ -231,6 +231,15 @@ Finally, you need a spectral library to perform MS2-based annotation.
 You can of course use your own experimental spectral library to perform MS2 annotation.
 We currently only support spectral libraries in MGF format.
 
+To get a small example:
+
+```{r}
+download_file(
+  url = paths$url$examples$spectral_lib_mini$with_rt,
+  export = paths$data$source$libraries$spectra$with_rt
+)
+```
+
 We are currently working to get all MONA and GNPS experimental spectra easily available.
 
 However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.

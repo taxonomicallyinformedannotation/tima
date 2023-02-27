@@ -25,6 +25,10 @@ download_file(
   url = paths$url$examples$spectra_mini,
   export = paths$data$source$spectra
 )
+download_file(
+  url = paths$url$examples$spectral_lib_mini$with_rt,
+  export = paths$data$source$libraries$spectra$with_rt
+)
 
 ### SIRIUS
 sirius_mini <- paths$data$interim$annotations$example_sirius |>
@@ -95,6 +99,20 @@ prepare_libraries()
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
 prepare_spectral_libraries(
+  input = paths$data$source$libraries$spectra$lotus$pos,
+  output = paths$data$interim$libraries$spectra$lotus$pos,
+  col_ce = NULL,
+  col_ci = "FILENAME",
+  col_em = "EXACTMASS",
+  col_in = "INCHI",
+  col_ik = "NAME",
+  col_mf = "MOLECULAR_FORMULA",
+  col_na = NULL,
+  col_po = "IONMODE",
+  col_sm = "SMILES",
+  col_si = NULL,
+  col_sp = NULL,
+  col_sy = NULL,
   metad = CompoundDb::make_metadata(
     source = "LOTUS",
     url = "https://doi.org/10.5281/zenodo.5607185",
