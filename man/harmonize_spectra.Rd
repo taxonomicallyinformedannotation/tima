@@ -11,14 +11,18 @@ harmonize_spectra(
   co_ci,
   co_em,
   co_in,
+  co_io,
   co_ik,
+  co_il,
   co_mf,
   co_na,
   co_po,
   co_sm,
+  co_sn,
   co_si,
   co_sp,
-  co_sy
+  co_sy,
+  co_xl
 )
 }
 \arguments{
@@ -34,7 +38,11 @@ harmonize_spectra(
 
 \item{co_in}{Name of the InChI in mgf}
 
+\item{co_io}{Name of the InChI 2D in mgf}
+
 \item{co_ik}{Name of the InChIKey in mgf}
+
+\item{co_il}{Name of the InChIKey 2D in mgf}
 
 \item{co_mf}{Name of the molecular formula in mgf}
 
@@ -44,11 +52,15 @@ harmonize_spectra(
 
 \item{co_sm}{Name of the SMILES in mgf}
 
+\item{co_sn}{Name of the SMILES 2D in mgf}
+
 \item{co_si}{Name of the spectrum id in mgf}
 
 \item{co_sp}{Name of the SPLASH in mgf}
 
 \item{co_sy}{Name of the synonyms in mgf}
+
+\item{co_xl}{Name of the xlogp in mgf}
 }
 \description{
 This function harmonizes spectra headers

@@ -38,8 +38,14 @@ prepare_gnps <-
         col_types = readr::cols(.default = "c")
       ) |>
         dplyr::bind_rows() |>
+        dplyr::mutate(
+          mz_error = as.numeric(MZErrorPPM) * 1E-6 * as.numeric(Precursor_MZ),
+          rt_error = NA
+        ) |>
         dplyr::select(
           feature_id = `#Scan#`,
+          mz_error,
+          rt_error,
           structure_name = Compound_Name,
           # structure_smiles = Smiles,
           score_input = MQScore,
@@ -66,6 +72,8 @@ prepare_gnps <-
         ) |>
         dplyr::select(
           feature_id,
+          mz_error,
+          rt_error,
           structure_name,
           # structure_inchikey,
           structure_inchikey_2D,
@@ -100,6 +108,8 @@ prepare_gnps <-
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
+        mz_error,
+        rt_error,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,

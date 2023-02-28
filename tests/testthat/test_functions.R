@@ -133,15 +133,19 @@ testthat::test_that("Whole process", {
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
-    col_in = "INCHI",
-    col_ik = "NAME",
+    col_in = NULL,
+    col_io = "INCHI",
+    col_ik = NULL,
+    col_il = "NAME",
     col_mf = "MOLECULAR_FORMULA",
     col_na = NULL,
     col_po = "IONMODE",
-    col_sm = "SMILES",
+    col_sm = NULL,
+    col_sn = "SMILES",
     col_si = NULL,
     col_sp = NULL,
     col_sy = NULL,
+    col_xl = NULL,
     metad = CompoundDb::make_metadata(
       source = "LOTUS",
       url = "https://doi.org/10.5281/zenodo.5607185",
@@ -162,15 +166,19 @@ testthat::test_that("Whole process", {
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
-    col_in = "INCHI",
-    col_ik = "NAME",
+    col_in = NULL,
+    col_io = "INCHI",
+    col_ik = NULL,
+    col_il = "NAME",
     col_mf = "MOLECULAR_FORMULA",
     col_na = NULL,
     col_po = "IONMODE",
-    col_sm = "SMILES",
+    col_sm = NULL,
+    col_sn = "SMILES",
     col_si = NULL,
     col_sp = NULL,
     col_sy = NULL,
+    col_xl = NULL,
     polarity = "neg"
   )
   ## Classical
@@ -244,17 +252,11 @@ testthat::test_that("Whole process", {
   ### Features components
   step <- "prepare_features_components"
   params <- get_params(step = step)
-  ## neg
-  prepare_features_components(ms_mode = "neg")
-  ## pos
   prepare_features_components()
 
   ### Fake features components
   step <- "fake_features_components"
   params <- get_params(step = step)
-  ## neg
-  fake_features_components(ms_mode = "neg")
-  ## pos
   fake_features_components()
 
   ### Taxa
@@ -342,16 +344,20 @@ testthat::test_that("Whole process", {
   arguments$names_mgf_ci <<- "x"
   arguments$names_mgf_em <<- "x"
   arguments$names_mgf_in <<- "x"
+  arguments$names_mgf_io <<- "x"
   arguments$names_mgf_ik <<- "x"
+  arguments$names_mgf_il <<- "x"
   arguments$names_mgf_mf <<- "x"
   arguments$names_mgf_na <<- "x"
   arguments$names_mgf_po <<- "x"
   arguments$names_mgf_pc <<- "x"
   arguments$names_mgf_pm <<- "x"
   arguments$names_mgf_sm <<- "x"
+  arguments$names_mgf_sn <<- "x"
   arguments$names_mgf_si <<- "x"
   arguments$names_mgf_sp <<- "x"
   arguments$names_mgf_sy <<- "x"
+  arguments$names_mgf_xl <<- "x"
   arguments$names_precursor <<- "x"
   arguments$names_rt <<- "x"
   arguments$names_source <<- "x"

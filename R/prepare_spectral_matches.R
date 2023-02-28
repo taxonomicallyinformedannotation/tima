@@ -45,18 +45,20 @@ prepare_spectral_matches <-
       dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
-        structure_inchikey_2D = short_inchikey,
-        structure_smiles_2D = smiles,
-        structure_molecular_formula = molecular_formula,
-        structure_exact_mass = exact_mass,
-        score_input = msms_score
+        mz_error,
+        rt_error,
+        structure_name,
+        structure_inchikey_2D,
+        structure_smiles_2D,
+        structure_molecular_formula,
+        structure_exact_mass,
+        structure_xlogp,
+        score_input = score
       ) |>
       # Add new columns
       dplyr::mutate(
         library = "ISDB",
-        structure_name = NA,
         structure_exact_mass = as.numeric(structure_exact_mass),
-        structure_xlogp = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
@@ -71,6 +73,8 @@ prepare_spectral_matches <-
       # dplyr::ungroup() |>
       dplyr::select(
         feature_id,
+        mz_error,
+        rt_error,
         structure_name,
         # structure_inchikey,
         structure_inchikey_2D,

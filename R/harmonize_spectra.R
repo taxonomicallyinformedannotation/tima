@@ -8,14 +8,18 @@
 #' @param co_ci Name of the compound id in mgf
 #' @param co_em Name of the exact mass in mgf
 #' @param co_in Name of the InChI in mgf
+#' @param co_io Name of the InChI 2D in mgf
 #' @param co_ik Name of the InChIKey in mgf
+#' @param co_il Name of the InChIKey 2D in mgf
 #' @param co_mf Name of the molecular formula in mgf
 #' @param co_na Name of the name in mgf
 #' @param co_po Name of the polarity in mgf
 #' @param co_sm Name of the SMILES in mgf
+#' @param co_sn Name of the SMILES 2D in mgf
 #' @param co_si Name of the spectrum id in mgf
 #' @param co_sp Name of the SPLASH in mgf
 #' @param co_sy Name of the synonyms in mgf
+#' @param co_xl Name of the xlogp in mgf
 #'
 #' @return NULL
 #'
@@ -32,26 +36,34 @@ harmonize_spectra <- function(spectra,
                               co_ci,
                               co_em,
                               co_in,
+                              co_io,
                               co_ik,
+                              co_il,
                               co_mf,
                               co_na,
                               co_po,
                               co_sm,
+                              co_sn,
                               co_si,
                               co_sp,
-                              co_sy) {
+                              co_sy,
+                              co_xl) {
   columns <- c(
     "collision_energy",
     "compound_id",
     "exactmass",
     "formula",
     "inchi",
+    "inchi_2D",
     "inchikey",
+    "inchikey_2D",
     "name",
     "smiles",
+    "smiles_2D",
     "spectrum_id",
     "splash",
-    "synonyms"
+    "synonyms",
+    "xlogp"
   )
   columns_full <-
     c(
@@ -60,12 +72,16 @@ harmonize_spectra <- function(spectra,
       "exactmass" = co_em,
       "formula" = co_mf,
       "inchi" = co_in,
+      "inchi_2D" = co_io,
       "inchikey" = co_ik,
+      "inchikey_2D" = co_il,
       "name" = co_na,
       "smiles" = co_sm,
+      "smiles_2D" = co_sn,
       "spectrum_id" = co_si,
       "splash" = co_sp,
-      "synonyms" = co_sy
+      "synonyms" = co_sy,
+      "xlogp" = co_xl
     )
   columns_missing <- columns[!columns %in% names(columns_full)]
   names(columns_missing) <- columns_missing
@@ -105,14 +121,18 @@ harmonize_spectra <- function(spectra,
       exactmass,
       formula,
       inchi,
+      inchi_2D,
       inchikey,
+      inchikey_2D,
       name,
       precursorMz,
       precursorCharge,
       smiles,
+      smiles_2D,
       spectrum_id,
       splash,
       synonyms,
+      xlogp,
       rtime,
       mz,
       intensity

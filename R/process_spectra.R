@@ -28,8 +28,9 @@
 #' @export
 #'
 #' @importFrom BiocParallel MulticoreParam SerialParam
-#' @importFrom dplyr full_join left_join select
-#' @importFrom MetaboAnnotation CompareSpectraParam MatchForwardReverseParam matchSpectra
+#' @importFrom dplyr distinct filter mutate select
+#' @importFrom MetaboAnnotation CompareSpectraParam matchedData
+#' @importFrom MetaboAnnotation MatchForwardReverseParam matchSpectra
 #' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
 #' @importFrom Spectra filterIntensity joinPeaksGnps
 #'
@@ -155,50 +156,59 @@ process_spectra <- function(input = params$files$spectral$raw,
       param = params_sim
     )
 
-    df_full <- matches_sim@matches |>
-      dplyr::rename(msms_score = score)
+    log_debug("Collecting results")
+    df_final <- matches_sim |>
+      MetaboAnnotation::matchedData() |>
+      data.frame() |>
+      dplyr::mutate(
+        feature_id = as.numeric(acquisitionNum),
+        rt_error = target_rtime - rtime,
+        mz_error = target_precursorMz - precursorMz,
+        structure_inchikey_2D = ifelse(
+          test = is.na(target_inchikey_2D),
+          yes = target_inchikey |>
+            gsub(
+              pattern = "-.*",
+              replacement = ""
+            ),
+          no = target_inchikey_2D
+        ),
+        structure_smiles_2D = dplyr::coalesce(target_smiles_2D, target_smiles)
+      ) |>
+      dplyr::select(dplyr::any_of(
+        c(
+          "feature_id",
+          "mz_error",
+          "rt_error",
+          "structure_name" = "target_name",
+          # "structure_inchikey" = "target_inchikey",
+          "structure_inchikey_2D",
+          # "structure_smiles" = "target_smiles",
+          "structure_smiles_2D",
+          "structure_molecular_formula" = "target_formula",
+          "structure_exact_mass" = "target_exactmass",
+          "structure_xlogp" = "target_xlogp",
+          "score",
+          "reverse_score",
+          "presence_ratio",
+          "matched_peaks_count"
+        )
+      ))
+
+    ## COMMENT AR: Not doing it because of thresholding
+    # df_final[is.na(df_final)] <- 0
 
     if (condition == "AND") {
-      df_full <- df_full |>
-        dplyr::filter(msms_score >= threshold &
+      df_final <- df_final |>
+        dplyr::filter(score >= threshold &
           matched_peaks_count >= npeaks &
           presence_ratio >= rpeaks)
     }
 
-    ## COMMENT AR: Not doing it because of thresholding
-    # df_full[is.na(df_full)] <- 0
-
-    spectral_library_extracted <-
-      spectral_library[spectral_library@backend@spectraIds %in% matches_sim@matches[["target_idx"]]] |>
-      extract_spectra()
-    target_idx <- spectral_library_extracted$spectrum_id
-    short_inchikey <- spectral_library_extracted$name
-    smiles <- spectral_library_extracted$smiles
-    molecular_formula <- spectral_library_extracted$formula
-    exact_mass <- spectral_library_extracted$exactmass
-
-    df_meta <- data.frame(
-      target_idx,
-      short_inchikey,
-      smiles,
-      molecular_formula,
-      exact_mass
-    )
-
-    spectra_ids <- spectra |>
-      extract_spectra() |>
-      dplyr::mutate(query_idx = dplyr::row_number()) |>
-      dplyr::distinct(feature_id = acquisitionNum, query_idx)
-
-    df_final <- df_full |>
-      dplyr::left_join(df_meta) |>
-      dplyr::left_join(spectra_ids) |>
-      dplyr::select(-target_idx, -query_idx) |>
-      dplyr::relocate(feature_id, .before = msms_score)
-
     log_debug(
       nrow(df_final |>
-        dplyr::distinct(short_inchikey)),
+        ## else doesn't work if some are empty
+        dplyr::distinct(structure_inchikey_2D, structure_smiles_2D)),
       "Candidates were annotated on",
       nrow(df_final |>
         dplyr::distinct(feature_id)),
@@ -218,14 +228,20 @@ process_spectra <- function(input = params$files$spectral$raw,
       df_final <-
         data.frame(
           feature_id = NA,
-          msms_score = NA,
+          mz_error = NA,
+          rt_error = NA,
+          structure_name = NA,
+          # structure_inchikey = NA,
+          structure_inchikey_2D = NA,
+          # structure_smiles = target_smiles,
+          structure_smiles_2D = NA,
+          structure_molecular_formula = NA,
+          structure_exact_mass = NA,
+          structure_xlogp = NA,
+          score = NA,
           reverse_score = NA,
           presence_ratio = NA,
-          matched_peaks_count = NA,
-          short_inchikey = NA,
-          smiles = NA,
-          molecular_formula = NA,
-          exact_mass = NA
+          matched_peaks_count = NA
         )
     }
   } else {
@@ -233,14 +249,20 @@ process_spectra <- function(input = params$files$spectral$raw,
     df_final <-
       data.frame(
         feature_id = NA,
-        msms_score = NA,
+        mz_error = NA,
+        rt_error = NA,
+        structure_name = NA,
+        # structure_inchikey = NA,
+        structure_inchikey_2D = NA,
+        # structure_smiles = target_smiles,
+        structure_smiles_2D = NA,
+        structure_molecular_formula = NA,
+        structure_exact_mass = NA,
+        structure_xlogp = NA,
+        score = NA,
         reverse_score = NA,
         presence_ratio = NA,
-        matched_peaks_count = NA,
-        short_inchikey = NA,
-        smiles = NA,
-        molecular_formula = NA,
-        exact_mass = NA
+        matched_peaks_count = NA
       )
   }
 

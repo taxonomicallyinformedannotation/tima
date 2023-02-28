@@ -2,10 +2,9 @@
 #'
 #' @description This function prepares the components (clusters in molecular network) for further use
 #'
-#' @param input Input file if tool == 'manual'
+#' @param input Input file
 #' @param output Output file
-#' @param components File containing the components if tool == 'manual'
-#' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
+#' @param components File containing the components
 #' @param parameters Params
 #'
 #' @return NULL
@@ -19,11 +18,9 @@
 prepare_features_components <- function(input = params$files$annotations$pretreated,
                                         output = params$files$annotations$filled,
                                         components = params$files$networks$spectral$components$raw,
-                                        ms_mode = params$ms$polarity,
                                         parameters = params) {
   params <<- parameters
   stopifnot("Your components file does not exist" = file.exists(components))
-  stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")
@@ -57,6 +54,8 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
       component_id,
       rt,
       mz,
+      rt_error,
+      mz_error,
       structure_inchikey_2D,
       structure_smiles_2D,
       structure_name,
@@ -69,18 +68,6 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
       structure_taxonomy_npclassifier_02superclass,
       structure_taxonomy_npclassifier_03class
     )
-
-  log_debug(x = "Calculating mz error")
-  ## TODO can be improved
-  if (ms_mode == "pos") {
-    table_filled <- table_filled |>
-      dplyr::mutate(mz_error = as.numeric(mz) -
-        1.007276 -
-        as.numeric(structure_exact_mass))
-  } else {
-    table_filled <- table_filled |>
-      dplyr::mutate(mz_error = as.numeric(mz) + 1.007276 - as.numeric(structure_exact_mass))
-  }
 
   log_debug(x = "Exporting ...")
   export_params(step = "prepare_features_components")

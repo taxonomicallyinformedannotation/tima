@@ -61,7 +61,6 @@ prepare_config <- function(filename = params$files$pattern,
   log_debug(x = "Changing params")
 
   yamls_params$fake_features_components$ms$polarity <- ms_mode
-  yamls_params$prepare_features_components$ms$polarity <- ms_mode
   yamls_params$process_annotations$ms$polarity <- ms_mode
 
   yamls_params$prepare_taxa$organisms$taxon <- taxon

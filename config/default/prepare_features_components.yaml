@@ -24,9 +24,3 @@ files:
 
         #' Raw components file. STRING
         raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv
-
-#' MS related parameters.
-ms:
-
-  #' Polarity used. Must be "pos" or "neg". STRING
-  polarity: pos

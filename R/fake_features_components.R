@@ -5,7 +5,6 @@
 #' @param input Path to the file containing the input data
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
-#' @param ms_mode Mode of mass spectrometry, either "pos" or "neg"
 #' @param name_features Name of the features column in the features data
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
@@ -22,7 +21,6 @@ fake_features_components <-
   function(input = params$files$annotations$pretreated,
            features = params$files$features$raw,
            output = params$files$annotations$filled,
-           ms_mode = params$ms$polarity,
            name_features = params$names$features,
            name_rt = params$names$rt,
            name_mz = params$names$precursor) {
@@ -33,9 +31,6 @@ fake_features_components <-
           lapply(X = input, file.exists)
     )
     stopifnot("Your features file does not exist" = file.exists(features))
-
-    # Check that ms_mode is valid
-    stopifnot("Your mode must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
 
     # Read input and features files
     log_debug("Loading files ...")
@@ -78,6 +73,8 @@ fake_features_components <-
         component_id,
         rt,
         mz,
+        rt_error,
+        mz_error,
         structure_inchikey_2D,
         structure_smiles_2D,
         structure_name,
@@ -90,18 +87,6 @@ fake_features_components <-
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class
       )
-
-    log_debug(x = "Calculating mz error")
-    ## TODO can be improved
-    if (ms_mode == "pos") {
-      table_filled <- table_filled |>
-        dplyr::mutate(mz_error = as.numeric(mz) -
-          1.007276 -
-          as.numeric(structure_exact_mass))
-    } else {
-      table_filled <- table_filled |>
-        dplyr::mutate(mz_error = as.numeric(mz) + 1.007276 - as.numeric(structure_exact_mass))
-    }
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_components")

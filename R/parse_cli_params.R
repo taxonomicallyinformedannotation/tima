@@ -167,8 +167,14 @@ parse_cli_params <- function() {
     if (!is.null(arguments$names_mgf_in)) {
       params$names$mgf$inchi <- as.character(arguments$names_mgf_in)
     }
+    if (!is.null(arguments$names_mgf_io)) {
+      params$names$mgf$inchi_2D <- as.character(arguments$names_mgf_io)
+    }
     if (!is.null(arguments$names_mgf_ik)) {
       params$names$mgf$inchikey <- as.character(arguments$names_mgf_ik)
+    }
+    if (!is.null(arguments$names_mgf_il)) {
+      params$names$mgf$inchikey_2D <- as.character(arguments$names_mgf_il)
     }
     if (!is.null(arguments$names_mgf_mf)) {
       params$names$mgf$molecular_formula <- as.character(arguments$names_mgf_mf)
@@ -188,6 +194,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$names_mgf_sm)) {
       params$names$mgf$smiles <- as.character(arguments$names_mgf_sm)
     }
+    if (!is.null(arguments$names_mgf_sn)) {
+      params$names$mgf$smiles_2D <- as.character(arguments$names_mgf_sn)
+    }
     if (!is.null(arguments$names_mgf_si)) {
       params$names$mgf$spectrum_id <- as.character(arguments$names_mgf_si)
     }
@@ -196,6 +205,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$names_mgf_sy)) {
       params$names$mgf$synonyms <- as.character(arguments$names_mgf_sy)
+    }
+    if (!is.null(arguments$names_mgf_xl)) {
+      params$names$mgf$xlogp <- as.character(arguments$names_mgf_xl)
     }
     if (!is.null(arguments$names_precursor)) {
       params$names$precursor <- as.character(arguments$names_precursor)

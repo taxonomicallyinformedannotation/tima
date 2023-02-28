@@ -20,13 +20,6 @@ files:
     raw: data/source/example_features.csv
 
 
-#' MS related parameters.
-ms:
-
-  #' Polarity used. Must be "pos" or "neg". STRING
-  polarity: pos
-
-
 #' Names of the different variables in the input files.
 names:
 

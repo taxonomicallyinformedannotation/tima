@@ -14,14 +14,18 @@ prepare_spectral_libraries(
   col_ci = params$names$mgf$compound_id,
   col_em = params$names$mgf$exact_mass,
   col_in = params$names$mgf$inchi,
+  col_io = params$names$mgf$inchi_2D,
   col_ik = params$names$mgf$inchikey,
+  col_il = params$names$mgf$inchikey_2D,
   col_mf = params$names$mgf$molecular_formula,
   col_na = params$names$mgf$name,
   col_po = params$names$mgf$polarity,
   col_sm = params$names$mgf$smiles,
+  col_sn = params$names$mgf$smiles_2D,
   col_si = params$names$mgf$spectrum_id,
   col_sp = params$names$mgf$splash,
   col_sy = params$names$mgf$synonyms,
+  col_xl = params$names$mgf$xlogp,
   parameters = NULL
 )
 }
@@ -42,7 +46,11 @@ prepare_spectral_libraries(
 
 \item{col_in}{Name of the InChI in mgf}
 
+\item{col_io}{Name of the InChI 2D in mgf}
+
 \item{col_ik}{Name of the InChIKey in mgf}
+
+\item{col_il}{Name of the InChIKey 2D in mgf}
 
 \item{col_mf}{Name of the molecular formula in mgf}
 
@@ -52,11 +60,15 @@ prepare_spectral_libraries(
 
 \item{col_sm}{Name of the SMILES in mgf}
 
+\item{col_sn}{Name of the SMILES 2D in mgf}
+
 \item{col_si}{Name of the spectrum id in mgf}
 
 \item{col_sp}{Name of the SPLASH in mgf}
 
 \item{col_sy}{Name of the synonyms in mgf}
+
+\item{col_xl}{Name of the xlogp in mgf}
 
 \item{parameters}{Params}
 }

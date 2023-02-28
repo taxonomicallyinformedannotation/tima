@@ -368,8 +368,14 @@ names:
     #' Name of "InChI" in MGF. STRING
     inchi: INCHI
 
+    #' Name of "InChI 2D" in MGF. STRING
+    inchi_2D: ~
+
     #' Name of "InChIKey" in MGF. STRING
     inchikey: ~
+
+    #' Name of "InChIKey 2D" in MGF. STRING
+    inchikey_2D: ~
 
     #' Name of "molecular formula" in MGF. STRING
     molecular_formula: ~
@@ -383,6 +389,9 @@ names:
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
 
+    #' Name of "SMILES 2D" in MGF. STRING
+    smiles_2D: ~
+
     #' Name of "spectrum ID" in MGF. STRING
     spectrum_id: SPECTRUMID
 
@@ -391,6 +400,9 @@ names:
 
     #' Name of "synonyms" in MGF. STRING
     synonyms: ~
+
+    #' Name of "xlogP" in MGF. STRING
+    xlogp: ~
 
   #' Name of "precursor m/z" variable in the input. STRING
   precursor: mz

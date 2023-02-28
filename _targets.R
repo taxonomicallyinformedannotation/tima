@@ -749,15 +749,19 @@ list(
               col_ce = NULL,
               col_ci = "FILENAME",
               col_em = "EXACTMASS",
-              col_in = "INCHI",
-              col_ik = "NAME",
+              col_in = NULL,
+              col_io = "INCHI",
+              col_ik = NULL,
+              col_il = "NAME",
               col_mf = "MOLECULAR_FORMULA",
               col_na = NULL,
               col_po = "IONMODE",
-              col_sm = "SMILES",
+              col_sm = NULL,
+              col_sn = "SMILES",
               col_si = NULL,
               col_sp = NULL,
               col_sy = NULL,
+              col_xl = NULL,
               polarity = "pos",
               metad = CompoundDb::make_metadata(
                 source = "LOTUS",
@@ -782,15 +786,19 @@ list(
               col_ce = NULL,
               col_ci = "FILENAME",
               col_em = "EXACTMASS",
-              col_in = "INCHI",
-              col_ik = "NAME",
+              col_in = NULL,
+              col_io = "INCHI",
+              col_ik = NULL,
+              col_il = "NAME",
               col_mf = "MOLECULAR_FORMULA",
               col_na = NULL,
               col_po = "IONMODE",
-              col_sm = "SMILES",
+              col_sm = NULL,
+              col_sn = "SMILES",
               col_si = NULL,
               col_sp = NULL,
               col_sy = NULL,
+              col_xl = NULL,
               metad = CompoundDb::make_metadata(
                 source = "LOTUS",
                 url = "https://doi.org/10.5281/zenodo.5607185",
@@ -828,14 +836,18 @@ list(
                   col_ci = params_spectral_libraries$names$mgf$compound_id,
                   col_em = params_spectral_libraries$names$mgf$exact_mass,
                   col_in = params_spectral_libraries$names$mgf$inchi,
+                  col_io = params_spectral_libraries$names$mgf$inchi_2D,
                   col_ik = params_spectral_libraries$names$mgf$inchikey,
+                  col_il = params_spectral_libraries$names$mgf$inchikey_2D,
                   col_mf = params_spectral_libraries$names$mgf$molecular_formula,
                   col_na = params_spectral_libraries$names$mgf$name,
                   col_po = params_spectral_libraries$names$mgf$polarity,
                   col_sm = params_spectral_libraries$names$mgf$smiles,
+                  col_sn = params_spectral_libraries$names$mgf$smiles_2D,
                   col_si = params_spectral_libraries$names$mgf$spectrum_id,
                   col_sp = params_spectral_libraries$names$mgf$splash,
-                  col_sy = params_spectral_libraries$names$mgf$synonyms
+                  col_sy = params_spectral_libraries$names$mgf$synonyms,
+                  col_xl = params_spectral_libraries$names$mgf$xlogp
                 )
             }
           ),
@@ -851,14 +863,18 @@ list(
                   col_ci = params_spectral_libraries$names$mgf$compound_id,
                   col_em = params_spectral_libraries$names$mgf$exact_mass,
                   col_in = params_spectral_libraries$names$mgf$inchi,
+                  col_io = params_spectral_libraries$names$mgf$inchi_2D,
                   col_ik = params_spectral_libraries$names$mgf$inchikey,
+                  col_il = params_spectral_libraries$names$mgf$inchikey_2D,
                   col_mf = params_spectral_libraries$names$mgf$molecular_formula,
                   col_na = params_spectral_libraries$names$mgf$name,
                   col_po = params_spectral_libraries$names$mgf$polarity,
                   col_sm = params_spectral_libraries$names$mgf$smiles,
+                  col_sn = params_spectral_libraries$names$mgf$smiles_2D,
                   col_si = params_spectral_libraries$names$mgf$spectrum_id,
                   col_sp = params_spectral_libraries$names$mgf$splash,
-                  col_sy = params_spectral_libraries$names$mgf$synonyms
+                  col_sy = params_spectral_libraries$names$mgf$synonyms,
+                  col_xl = params_spectral_libraries$names$mgf$xlogp
                 )
             }
           )
@@ -1113,7 +1129,6 @@ list(
           ),
           output = params_features_components$files$annotations$filled,
           components = interim_components,
-          ms_mode = params_features_components$ms$polarity,
           parameters = params_features_components
         )
       }

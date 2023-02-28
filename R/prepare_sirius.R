@@ -189,13 +189,27 @@ prepare_sirius <-
 
       formula_prepared <- formula |>
         dplyr::mutate(feature_id = treat_names_sirius(id)) |>
-        dplyr::mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
-        dplyr::distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
+        dplyr::mutate(
+          structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
+          mz_error = ionMass * `massErrorPrecursor(ppm)` * 1E-6
+        ) |>
+        dplyr::distinct(feature_id,
+          molecular_formula = molecularFormula,
+          structure_exact_mass,
+          mz_error
+        )
 
       formula_adducts_prepared <- formula_adducts |>
         dplyr::mutate(feature_id = treat_names_sirius(id)) |>
-        dplyr::mutate(structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 0.000001) |>
-        dplyr::distinct(feature_id, molecular_formula = molecularFormula, structure_exact_mass)
+        dplyr::mutate(
+          structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
+          mz_error = ionMass * `massErrorPrecursor(ppm)` * 1E-6
+        ) |>
+        dplyr::distinct(feature_id,
+          molecular_formula = molecularFormula,
+          structure_exact_mass,
+          mz_error
+        )
 
       compounds_prepared <-
         dplyr::bind_rows(compound_prepared, compound_adducts_prepared) |>
@@ -209,8 +223,11 @@ prepare_sirius <-
         dplyr::left_join(formulas_prepared) |>
         dplyr::left_join(canopus_npc_prepared) |>
         dplyr::distinct() |>
+        dplyr::mutate(rt_error = NA) |>
         dplyr::select(
           feature_id,
+          mz_error,
+          rt_error,
           structure_name,
           # structure_inchikey = inchikey,
           structure_inchikey_2D = inchikey_2D,
@@ -258,6 +275,8 @@ prepare_sirius <-
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
+        mz_error = NA,
+        rt_error = NA,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,

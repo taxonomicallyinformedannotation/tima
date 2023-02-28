@@ -104,14 +104,18 @@ prepare_isdb_hmdb <-
         co_ci = "compound_id",
         co_em = "monisotopic_molecular_weight",
         co_mf = "chemical_formula",
-        co_in = "inchi_2D",
+        co_in = "inchi",
+        co_io = "inchi_2D",
         co_ik = "inchikey",
+        co_il = "inchikey_2D",
         co_po = "ionmode",
-        co_na = "iupac_name",
-        co_sm = "smiles_2D",
+        co_na = "name",
+        co_sm = "smiles",
+        co_sn = "smiles_2D",
         co_si = NULL,
         co_sp = "splash",
-        co_sy = NULL
+        co_sy = "iupac_name",
+        co_xl = NULL
       )
 
     log_debug("Negative")
@@ -122,14 +126,18 @@ prepare_isdb_hmdb <-
         co_ci = "compound_id",
         co_em = "monisotopic_molecular_weight",
         co_mf = "chemical_formula",
-        co_in = "inchi_2D",
+        co_in = "inchi",
+        co_io = "inchi_2D",
         co_ik = "inchikey",
+        co_il = "inchikey_2D",
         co_po = "ionmode",
-        co_na = "iupac_name",
-        co_sm = "smiles_2D",
+        co_na = "name",
+        co_sm = "smiles",
+        co_sn = "smiles_2D",
         co_si = NULL,
         co_sp = "splash",
-        co_sy = NULL
+        co_sy = "iupac_name",
+        co_xl = NULL
       )
 
     log_debug("Exporting")
