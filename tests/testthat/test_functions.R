@@ -8,6 +8,9 @@ testthat::test_that("Whole process", {
   }
   step <- "prepare_config"
   params <- get_params(step = step)
+  ## Prepare config for a single step only
+  prepare_config(step = "process_annotations")
+  ## For all steps
   prepare_config()
 
   ## Get all files

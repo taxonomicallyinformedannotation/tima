@@ -39,41 +39,13 @@ export_spectra <- function(file,
       if (is.null(cmps)) {
         cmps <-
           data.frame(
-            compound_id = if (!is.null(spectra$compound_id)) {
-              spectra$compound_id
-            } else {
-              rep(NA, nrow(spectra))
-            },
-            name = if (!is.null(spectra$name)) {
-              spectra$name
-            } else {
-              rep(NA, nrow(spectra))
-            },
-            inchi = if (!is.null(spectra$inchi)) {
-              spectra$inchi
-            } else {
-              rep(NA, nrow(spectra))
-            },
-            inchikey = if (!is.null(spectra$inchikey)) {
-              spectra$inchikey
-            } else {
-              rep(NA, nrow(spectra))
-            },
-            exactmass = if (!is.null(spectra$exactmass)) {
-              spectra$exactmass
-            } else {
-              rep(NA_real_, nrow(spectra))
-            },
-            formula = if (!is.null(spectra$formula)) {
-              spectra$formula
-            } else {
-              rep(NA, nrow(spectra))
-            },
-            synonyms = if (!is.null(spectra$synonyms)) {
-              spectra$synonyms
-            } else {
-              rep(NA, nrow(spectra))
-            }
+            compound_id = spectra$compound_id,
+            name = spectra$name,
+            inchi = spectra$inchi,
+            inchikey = spectra$inchikey,
+            exactmass = spectra$exactmass,
+            formula = spectra$formula,
+            synonyms = spectra$synonyms
           )
       }
       if (is.null(metad)) {
