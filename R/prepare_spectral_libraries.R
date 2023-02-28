@@ -24,6 +24,8 @@
 #'
 #' @export
 #'
+#' @importFrom dplyr mutate
+#'
 #' @examples NULL
 prepare_spectral_libraries <-
   function(input = params$files$libraries$spectral$raw,
@@ -78,7 +80,9 @@ prepare_spectral_libraries <-
           co_sp = col_sp,
           co_sy = col_sy,
           mode = polarity
-        )
+        ) |>
+        ## TODO report the issue as otherwise precursorMz is lost
+        dplyr::mutate(precursor_mz = precursorMz)
 
       log_debug("Exporting")
       export_spectra_2(

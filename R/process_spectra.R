@@ -89,10 +89,6 @@ process_spectra <- function(input = params$files$spectral$raw,
     spectral_library <- library |>
       import_spectra()
 
-    ## COMMENT (AR): Temporary dumb fix TODO change it
-    spectral_library$precursorMz <-
-      spectral_library$exactmass + spectral_library$precursorCharge * 1.00728
-
     sim_fun <- switch(
       EXPR = method,
       "gnps" = MsCoreUtils::gnps,
