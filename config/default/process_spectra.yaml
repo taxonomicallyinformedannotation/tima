@@ -36,10 +36,10 @@ annotations:
 #' Files.
 files:
 
-  #' Annotation files.
+  #' Annotations files.
   annotations:
 
-    #' Raw annotation files.
+    #' Raw annotations files.
     raw:
 
       #' List of spectral matching results. STRING

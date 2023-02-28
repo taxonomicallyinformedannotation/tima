@@ -1,10 +1,10 @@
 #' Files.
 files:
 
-  #' Annotation files.
+  #' Annotations files.
   annotations:
 
-    #' Raw annotation files.
+    #' Raw annotations files.
     raw:
 
       #' Directory containing the sirius results. STRING

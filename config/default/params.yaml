@@ -71,10 +71,10 @@ files:
   #' Pattern to identify the files. STRING
   pattern: example
 
-  #' Annotation files.
+  #' Annotations files.
   annotations:
 
-    #' Raw annotation files.
+    #' Raw annotations files.
     raw:
 
       #' List of spectral matching results. STRING

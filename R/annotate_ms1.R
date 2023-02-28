@@ -34,7 +34,7 @@ annotate_ms1 <-
            structureExactMassTable = structure_exact_mass_table,
            structureOrganismPairsTable = structure_organism_pairs_table,
            adducts = unlist(adducts_list[[ms_mode]]),
-           adductsM = adducts_masses,
+           adductsM = adducts_m,
            adductsTable = adducts_table,
            neutralLosses = neutral_losses_table,
            msMode = ms_mode,
@@ -246,7 +246,10 @@ annotate_ms1 <-
       df10_a,
       df2
     ) |>
-      dplyr::mutate(mz_error = adduct_mass - mz_2) |>
+      dplyr::mutate(
+        mz_error = adduct_mass - mz_2,
+        rt_error = NA_real_
+      ) |>
       dplyr::select(
         feature_id,
         component_id,
@@ -254,6 +257,7 @@ annotate_ms1 <-
         mz,
         score_input,
         mz_error,
+        rt_error,
         exact_mass,
         adduct,
         adduct_mass,
@@ -278,6 +282,7 @@ annotate_ms1 <-
         score_input,
         library,
         mz_error,
+        rt_error,
         exact_mass
       ) |>
       dplyr::filter(!is.na(exact_mass))
@@ -333,7 +338,8 @@ annotate_ms1 <-
       dplyr::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(), -exact_mass
+        dplyr::everything(),
+        -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
@@ -535,7 +541,9 @@ annotate_ms1 <-
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(), -exact_mass, -adduct_value
+        dplyr::everything(),
+        -exact_mass,
+        -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -547,6 +555,7 @@ annotate_ms1 <-
         dplyr::any_of(
           c(
             "mz_error",
+            "rt_error",
             "component_id",
             "mz",
             "rt",
@@ -578,6 +587,7 @@ annotate_ms1 <-
         score_input,
         library,
         mz_error,
+        rt_error,
         structure_molecular_formula,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -601,7 +611,6 @@ annotate_ms1 <-
     log_debug("adding \"notAnnotated\" \n")
     df26 <- dplyr::left_join(df25, df24) |>
       dplyr::distinct() |>
-      dplyr::mutate(dplyr::across(mz_error, as.numeric)) |>
       data.frame()
 
     df26["structure_inchikey_2D"][is.na(df26["structure_inchikey_2D"])] <-
@@ -611,6 +620,8 @@ annotate_ms1 <-
     df26["library"][is.na(df26["library"])] <-
       "N/A"
     df26["mz_error"][is.na(df26["mz_error"])] <-
+      666
+    df26["rt_error"][is.na(df26["rt_error"])] <-
       666
     df26["rank_initial"][is.na(df26["rank_initial"])] <-
       candidatesInitial

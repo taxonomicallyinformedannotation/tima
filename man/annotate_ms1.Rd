@@ -9,7 +9,7 @@ annotate_ms1(
   structureExactMassTable = structure_exact_mass_table,
   structureOrganismPairsTable = structure_organism_pairs_table,
   adducts = unlist(adducts_list[[ms_mode]]),
-  adductsM = adducts_masses,
+  adductsM = adducts_m,
   adductsTable = adducts_table,
   neutralLosses = neutral_losses_table,
   msMode = ms_mode,

@@ -37,10 +37,10 @@ annotations:
 #' Files.
 files:
 
-  #' Annotation files.
+  #' Annotations files.
   annotations:
 
-    #' Filled annotation files. STRING
+    #' Filled annotations files. STRING
     filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
     
     #' Final results file. STRING

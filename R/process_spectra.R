@@ -162,7 +162,8 @@ process_spectra <- function(input = params$files$spectral$raw,
       data.frame() |>
       dplyr::mutate(
         feature_id = as.numeric(acquisitionNum),
-        rt_error = target_rtime - rtime,
+        ## Working in minutes
+        rt_error = (target_rtime - rtime) / 60,
         mz_error = target_precursorMz - precursorMz,
         structure_inchikey_2D = ifelse(
           test = is.na(target_inchikey_2D),

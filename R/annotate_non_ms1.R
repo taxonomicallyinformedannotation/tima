@@ -48,6 +48,7 @@ annotate_non_ms1 <-
         score_input,
         library,
         mz_error,
+        rt_error,
         structure_molecular_formula,
         structure_xlogp,
         structure_exact_mass,
@@ -84,6 +85,8 @@ annotate_non_ms1 <-
     df26["library"][is.na(df26["library"])] <-
       "N/A"
     df26["mz_error"][is.na(df26["mz_error"])] <-
+      666
+    df26["rt_error"][is.na(df26["mz_error"])] <-
       666
     df26["rank_initial"][is.na(df26["rank_initial"])] <-
       candidatesInitial

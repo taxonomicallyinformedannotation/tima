@@ -69,7 +69,8 @@ clean_chemo <-
         structure_inchikey_2D,
         structure_smiles_2D,
         library,
-        mz_error
+        mz_error,
+        rt_error
       )
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
@@ -92,6 +93,7 @@ clean_chemo <-
         structure_smiles_2D,
         library,
         mz_error,
+        rt_error,
         rank_initial,
         rank_final,
         score_initialNormalized,
@@ -143,6 +145,7 @@ clean_chemo <-
         score_chemical,
         library,
         mz_error,
+        rt_error,
         score_interim,
         score_final,
         reference_doi,
@@ -173,6 +176,7 @@ clean_chemo <-
         -mz,
         -library,
         -mz_error,
+        -rt_error,
         -score_interim,
         -score_final,
         -structure_name,
@@ -214,7 +218,7 @@ clean_chemo <-
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_final)) |>
       dplyr::summarise(dplyr::across(
-        colnames(df4a)[3:25],
+        colnames(df4a)[3:26],
         ~ gsub(
           pattern = "\\bNA\\b",
           replacement = "",
@@ -249,6 +253,7 @@ clean_chemo <-
           "structure_molecular_formula",
           "structure_xlogp",
           "mz_error",
+          "rt_error",
           "library",
           "structure_smiles_2D",
           "structure_inchikey_2D",

@@ -216,7 +216,8 @@ process_annotations <-
           structure_inchikey_2D = NA_character_,
           score_input = NA_real_,
           library = NA_character_,
-          mz_error = NA_real_
+          mz_error = NA_real_,
+          rt_error = NA_real_
         )
     }
 
