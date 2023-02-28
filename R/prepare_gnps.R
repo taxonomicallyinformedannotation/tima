@@ -108,8 +108,8 @@ prepare_gnps <-
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
-        mz_error,
-        rt_error,
+        mz_error = NA,
+        rt_error = NA,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,

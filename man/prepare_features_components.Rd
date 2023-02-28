@@ -8,18 +8,15 @@ prepare_features_components(
   input = params$files$annotations$pretreated,
   output = params$files$annotations$filled,
   components = params$files$networks$spectral$components$raw,
-  ms_mode = params$ms$polarity,
   parameters = params
 )
 }
 \arguments{
-\item{input}{Input file if tool == 'manual'}
+\item{input}{Input file}
 
 \item{output}{Output file}
 
-\item{components}{File containing the components if tool == 'manual'}
-
-\item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
+\item{components}{File containing the components}
 
 \item{parameters}{Params}
 }

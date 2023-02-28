@@ -8,7 +8,6 @@ fake_features_components(
   input = params$files$annotations$pretreated,
   features = params$files$features$raw,
   output = params$files$annotations$filled,
-  ms_mode = params$ms$polarity,
   name_features = params$names$features,
   name_rt = params$names$rt,
   name_mz = params$names$precursor
@@ -20,8 +19,6 @@ fake_features_components(
 \item{features}{Path to the file containing the features data}
 
 \item{output}{Path to the file to export the merged data to}
-
-\item{ms_mode}{Mode of mass spectrometry, either "pos" or "neg"}
 
 \item{name_features}{Name of the features column in the features data}
 
