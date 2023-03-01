@@ -71,6 +71,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$fil_fea_raw)) {
       params$files$features$raw <- as.character(arguments$fil_fea_raw)
     }
+    if (!is.null(arguments$fil_fea_pre)) {
+      params$files$features$prepared <- as.character(arguments$fil_fea_pre)
+    }
     if (!is.null(arguments$fil_lib_add_pro)) {
       params$files$libraries$adducts$processed <- as.character(arguments$fil_lib_add_pro)
     }

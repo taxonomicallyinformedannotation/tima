@@ -107,7 +107,7 @@ testthat::test_that("Whole process", {
   ### Closed
   step <- "prepare_closed"
   params <- get_params(step = step)
-  ## To fake there is an input
+  ## To do as if there was an input
   prepare_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
   prepare_closed()
@@ -183,9 +183,7 @@ testthat::test_that("Whole process", {
   )
   ## Classical
   prepare_spectral_libraries()
-  prepare_spectral_libraries(
-    polarity = "neg"
-  )
+  prepare_spectral_libraries(polarity = "neg")
   prepare_spectral_libraries(
     polarity = "neg",
     output = params$files$libraries$spectral |>
@@ -202,6 +200,19 @@ testthat::test_that("Whole process", {
   step <- "prepare_adducts"
   params <- get_params(step = step)
   prepare_adducts()
+
+  ### Features
+  step <- "prepare_features"
+  params <- get_params(step = step)
+  prepare_features()
+
+  ## Performing MS1 annotation
+  step <- "annotate_ms1"
+  params <- get_params(step = step)
+  ### Negative
+  annotate_ms1(msMode = "neg")
+  ### Positive
+  annotate_ms1(msMode = "pos")
 
   ## Performing MS2 annotation
   step <- "process_spectra"
@@ -228,11 +239,13 @@ testthat::test_that("Whole process", {
   ### SIRIUS results
   step <- "prepare_sirius"
   params <- get_params(step = step)
-  ## To fake there is no input
+  ## To do as if there was no input
   prepare_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
-  prepare_sirius(input_directory = params$files$annotations$raw$sirius |>
-    gsub(pattern = "sirius", replacement = "sirius_mini"))
+  prepare_sirius(
+    input_directory = params$files$annotations$raw$sirius |>
+      gsub(pattern = "sirius", replacement = "sirius_mini")
+  )
 
   ### ISDB results
   step <- "prepare_spectral_matches"
@@ -244,20 +257,10 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   prepare_features_edges()
 
-  ### Fake edges
-  step <- "fake_features_edges"
-  params <- get_params(step = step)
-  fake_features_edges()
-
   ### Features components
   step <- "prepare_features_components"
   params <- get_params(step = step)
   prepare_features_components()
-
-  ### Fake features components
-  step <- "fake_features_components"
-  params <- get_params(step = step)
-  fake_features_components()
 
   ### Taxa
   step <- "prepare_taxa"

@@ -124,6 +124,18 @@ step <- "prepare_adducts"
 params <- get_params(step = step)
 prepare_adducts()
 
+## Preparing features
+log_debug("Preparing features")
+step <- "prepare_features"
+params <- get_params(step = step)
+prepare_features()
+
+## Performing MS1 annotation
+log_debug("Performing MS1 annotation")
+step <- "annotate_ms1"
+params <- get_params(step = step)
+annotate_ms1()
+
 ## Performing MS2 annotation
 log_debug("Performing MS2 annotation")
 step <- "process_spectra"

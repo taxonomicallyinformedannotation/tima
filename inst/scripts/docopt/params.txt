@@ -32,6 +32,7 @@ Arguments:
   fil-ann-pro                Final results file. STRING
 
   fil-fea-raw                Raw features file. STRING
+  fil-fea-pre                Prepared features file. STRING
 
   fil-lib-add-pro            Prepared adducts library. STRING
   fil-lib-sop-raw-clo        Closed raw structure organism pairs library. STRING

@@ -1,4 +1,4 @@
-#' @title Prepare edges
+#' @title Prepare features edges
 #'
 #' @description This function prepares edges for further use
 #'

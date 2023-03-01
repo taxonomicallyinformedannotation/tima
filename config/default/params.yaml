@@ -103,6 +103,9 @@ files:
     #' Raw features file. STRING
     raw: data/source/features.tsv.gz
 
+    #' Prepared features file. STRING
+    prepared: data/interim/features/example_features.tsv.gz
+
   #' Libraries files.
   libraries:
 

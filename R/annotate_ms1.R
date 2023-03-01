@@ -1,10 +1,9 @@
 #' @title Annotate MS1
 #'
-#' @description This function complements MS2 results with MS1 annotation and filters the final results.
+#' @description This function performs MS1 annotation.
 #'
-#' @param annotationTable Table containing your previous annotation to complement
+#' @param featuresTable Table containing your previous annotation to complement
 #' @param structureExactMassTable Table containing the structure - exact mass pairs to perform annotation
-#' @param structureOrganismPairsTable Table containing the structure - organism pairs
 #' @param adducts List of adducts to be used
 #' @param adductsM Adducts masses
 #' @param adductsTable Table containing the adducted library masses
@@ -12,15 +11,14 @@
 #' @param msMode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
 #' @param toleranceRt Tolerance to perform adduct attribution. Should be lower than 0.1min
-#' @param candidatesInitial Number of initial candidates to keep
 #'
-#' @return A table containing the initial annotation complemented by additional MS1 annotations based on exact mass
+#' @return A table containing MS1 annotations based on exact mass
 #'
 #' @export
 #'
 #' @importFrom data.table data.table foverlaps setkey
-#' @importFrom dplyr across bind_rows dense_rank desc distinct everything
-#' @importFrom dplyr filter group_by inner_join left_join mutate mutate_all
+#' @importFrom dplyr across bind_rows desc distinct everything filter
+#' @importFrom dplyr group_by inner_join left_join mutate mutate_all
 #' @importFrom dplyr rowwise select ungroup
 #' @importFrom stats dist setNames
 #' @importFrom stringr str_detect
@@ -30,43 +28,157 @@
 #'
 #' @examples NULL
 annotate_ms1 <-
-  function(annotationTable = annotation_table_ms2,
-           structureExactMassTable = structure_exact_mass_table,
-           structureOrganismPairsTable = structure_organism_pairs_table,
-           adducts = unlist(adducts_list[[ms_mode]]),
-           adductsM = adducts_m,
-           adductsTable = adducts_table,
-           neutralLosses = neutral_losses_table,
-           msMode = ms_mode,
-           tolerancePpm = tolerance_ppm,
-           toleranceRt = tolerance_rt,
-           candidatesInitial = candidates_initial) {
+  function(features = params$files$features$prepared,
+           output = params$files$annotations$pretreated,
+           library = paths$data$interim$libraries$merged$keys,
+           str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+           str_met = paths$data$interim$libraries$merged$structures$metadata,
+           str_nam = paths$data$interim$libraries$merged$structures$names,
+           str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+           str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
+           name = params$files$libraries$adducts$processed,
+           adducts_list = params$ms$adducts,
+           adducts_masses_list = paths$inst$extdata$adducts,
+           neutral_losses_list = paths$inst$extdata$neutral_losses,
+           msMode = params$ms$polarity,
+           tolerancePpm = params$ms$tolerances$mass$ppm$ms1,
+           toleranceRt = params$ms$tolerances$rt$minutes,
+           parameters = params) {
+    stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerancePpm <=
+      20)
+    stopifnot("Your rt tolerance must be lower or equal to 0.1" = toleranceRt <=
+      0.1)
+
+    paths <<- parse_yaml_paths()
+    params <<- parameters
+
+    featuresTable <- readr::read_delim(
+      file = features,
+      col_types = readr::cols(.default = "c")
+    )
+
+    neutralLosses <-
+      readr::read_delim(file = neutral_losses_list)
+
+    log_debug("... single charge adducts table")
+    if (msMode == "pos") {
+      adduct_file <- paths$data$interim$adducts$pos
+    } else {
+      adduct_file <- paths$data$interim$adducts$neg
+    }
+
+    adductsTable <- readr::read_delim(file = adduct_file)
+
+    log_debug("... adducts masses for in source dimers and multicharged")
+    adductsMassTable <-
+      readr::read_delim(file = adducts_masses_list)
+
+    log_debug("... neutral lossses")
+
+
+    adductsM <- adductsMassTable$mass
+    names(adductsM) <- adductsMassTable$adduct
+
+    if (msMode == "pos") {
+      adduct_db_file <-
+        file.path(
+          paths$data$interim$adducts$path,
+          paste0(name, "_pos.tsv.gz")
+        )
+    } else {
+      adduct_db_file <-
+        file.path(
+          paths$data$interim$adducts$path,
+          paste0(name, "_neg.tsv.gz")
+        )
+    }
+
+    ## TODO remove this dirty fix
+    adduct_db_file <- adduct_db_file |>
+      gsub(
+        pattern = "NA_pos.tsv.gz",
+        replacement = "library_pos.tsv.gz",
+        fixed = TRUE
+      ) |>
+      gsub(
+        pattern = "NA_neg.tsv.gz",
+        replacement = "library_neg.tsv.gz",
+        fixed = TRUE
+      )
+
+    log_debug(x = "... exact masses for MS1 annotation")
+    structureExactMassTable <-
+      readr::read_delim(file = adduct_db_file)
+
+    adducts <- unlist(adducts_list[[msMode]])
+
+
+    # |>
+    #   dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
+
+
+    ## slim it
+    structureOrganismPairsTable <-
+      readr::read_delim(
+        file = library,
+        col_types = readr::cols(.default = "c")
+      ) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_2D_3D,
+        col_types = readr::cols(.default = "c")
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_met,
+        col_types = readr::cols(.default = "c")
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_nam,
+        col_types = readr::cols(.default = "c")
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_tax_cla,
+        col_types = readr::cols(.default = "c")
+      )) |>
+      dplyr::left_join(readr::read_delim(
+        file = str_tax_npc,
+        col_types = readr::cols(.default = "c")
+      )) |>
+      # dplyr::left_join(readr::read_delim(file = org_tax_ott,
+      #                                    col_types = readr::cols(.default = "c"))) |>
+      dplyr::filter(!is.na(structure_exact_mass)) |>
+      dplyr::mutate(dplyr::across(c(
+        "structure_exact_mass",
+        "structure_xlogp"
+      ), as.numeric)) |>
+      round_reals() |>
+      dplyr::mutate(dplyr::across(
+        dplyr::matches("taxonomy.*_0"),
+        ~ tidyr::replace_na(.x, "notClassified")
+      ))
+
     log_debug("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
       dplyr::filter(!is.na(exact_mass)) |>
       dplyr::filter(adduct %in% adducts) |>
       dplyr::mutate(
-        value_min = adduct_mass - (0.000001 * tolerancePpm * adduct_mass),
-        value_max = adduct_mass + (0.000001 * tolerancePpm * adduct_mass)
+        value_min = adduct_mass - (1E-6 * tolerancePpm * adduct_mass),
+        value_max = adduct_mass + (1E-6 * tolerancePpm * adduct_mass)
       ) |>
       dplyr::filter(!is.na(value_min)) |>
       dplyr::filter(value_min > 0) |>
       data.table::data.table()
 
     log_debug("setting to data.table format for faster performance \n")
-    df3 <- annotationTable |>
+    df3 <- featuresTable |>
       dplyr::mutate(dplyr::across(
-        c(
-          mz,
-          component_id,
-        ),
+        c(mz),
         as.numeric
       )) |>
       dplyr::mutate(mz_2 = mz) |>
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
       data.table::data.table()
 
-    if (any(names(annotationTable) == "rt")) {
+    if (any(names(featuresTable) == "rt")) {
       df3 <- df3 |>
         dplyr::mutate(dplyr::across(
           c(rt),
@@ -116,21 +228,21 @@ annotate_ms1 <-
         delta_min = ifelse(
           test = mz >= mz_dest,
           yes = abs(mz -
-            (0.000001 *
+            (1E-6 *
               tolerancePpm *
               mz) -
             mz_dest),
-          no = abs(mz + (0.000001 *
+          no = abs(mz + (1E-6 *
             tolerancePpm *
             mz) - mz_dest)
         ),
         delta_max = ifelse(
           test = mz >= mz_dest,
-          yes = abs(mz + (0.000001 *
+          yes = abs(mz + (1E-6 *
             tolerancePpm *
             mz) - mz_dest),
           no = abs(mz -
-            (0.000001 *
+            (1E-6 *
               tolerancePpm *
               mz) -
             mz_dest)
@@ -162,7 +274,7 @@ annotate_ms1 <-
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df9_d <- data.table::foverlaps(df7, df8_a) |>
       dplyr::filter(!is.na(loss)) |>
-      dplyr::distinct(feature_id, loss, mass)
+      dplyr::distinct(feature_id, loss, mass, feature_id_dest)
 
     log_debug("joining within given delta mz tolerance (adducts) \n")
     df9 <- data.table::foverlaps(df7, df8) |>
@@ -209,7 +321,6 @@ annotate_ms1 <-
       df3 |>
         dplyr::distinct(
           feature_id,
-          component_id,
           rt,
           mz,
           mz_2
@@ -252,7 +363,6 @@ annotate_ms1 <-
       ) |>
       dplyr::select(
         feature_id,
-        component_id,
         rt,
         mz,
         score_input,
@@ -263,20 +373,23 @@ annotate_ms1 <-
         adduct_mass,
         loss
       ) |>
-      dplyr::mutate(library = as.character(adduct)) |>
+      dplyr::mutate(library = ifelse(
+        test = !is.na(loss),
+        yes = paste0(adduct, " - ", loss),
+        no = adduct
+      )) |>
       dplyr::distinct() |>
       dplyr::mutate_all(~ replace(
         .,
         . == "NA",
         NA
       )) |>
-      dplyr::filter(!is.na(adduct))
+      dplyr::filter(!is.na(library))
 
     log_debug("cleaning results \n")
     df12 <- df11 |>
       dplyr::select(
         feature_id,
-        component_id,
         rt,
         mz,
         score_input,
@@ -286,6 +399,8 @@ annotate_ms1 <-
         exact_mass
       ) |>
       dplyr::filter(!is.na(exact_mass))
+
+    ## HERE
 
     log_debug("keeping unique adducts per exact mass \n")
     df13 <- structureOrganismPairsTable |>
@@ -297,16 +412,21 @@ annotate_ms1 <-
     df13_b <- structureOrganismPairsTable |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::distinct(
-        structure_exact_mass,
-        structure_molecular_formula,
+        structure_name,
+        # structure_inchikey,
         structure_inchikey_2D,
-        structure_smiles_2D
+        # structure_smiles,
+        structure_smiles_2D,
+        structure_molecular_formula,
+        structure_exact_mass,
+        structure_xlogp
       ) |>
       # Avoid SMILES redundancy
       dplyr::distinct(
         structure_inchikey_2D,
         structure_molecular_formula,
         structure_exact_mass,
+        structure_xlogp,
         .keep_all = TRUE
       ) |>
       dplyr::mutate_all(as.character)
@@ -338,8 +458,7 @@ annotate_ms1 <-
       dplyr::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(),
-        -exact_mass
+        dplyr::everything(), -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
@@ -362,7 +481,6 @@ annotate_ms1 <-
       df17 <- df16 |>
         dplyr::select(
           feature_id,
-          component_id,
           rt,
           mz,
           adduct_mass
@@ -425,14 +543,11 @@ annotate_ms1 <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidyr::pivot_longer(cols = dplyr::all_of(5:cols))
-    }
-
-    if (msMode == "neg") {
+        tidyr::pivot_longer(cols = dplyr::all_of(4:cols))
+    } else {
       df17 <- df16 |>
         dplyr::select(
           feature_id,
-          component_id,
           rt,
           mz,
           adduct_mass
@@ -452,13 +567,13 @@ annotate_ms1 <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidyr::pivot_longer(cols = dplyr::all_of(5:cols))
+        tidyr::pivot_longer(cols = dplyr::all_of(4:cols))
     }
 
     df17 <- df17 |>
       dplyr::mutate(
-        mz_min = value - (0.000001 * tolerancePpm * value),
-        mz_max = value + (0.000001 * tolerancePpm * value),
+        mz_min = value - (1E-6 * tolerancePpm * value),
+        mz_max = value + (1E-6 * tolerancePpm * value),
         rt_min = rt - toleranceRt,
         rt_max = rt + toleranceRt
       ) |>
@@ -467,7 +582,6 @@ annotate_ms1 <-
     df19 <- df5 |>
       dplyr::select(
         feature_id,
-        component_id,
         rt,
         mz,
         rt_1,
@@ -499,7 +613,6 @@ annotate_ms1 <-
       )) |>
       dplyr::select(
         feature_id,
-        component_id,
         rt,
         mz,
         library_name = name,
@@ -523,7 +636,6 @@ annotate_ms1 <-
       dplyr::mutate(mz_error = adduct_mass - adduct_value) |>
       dplyr::distinct(
         feature_id,
-        component_id,
         rt,
         mz,
         exact_mass,
@@ -541,36 +653,14 @@ annotate_ms1 <-
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(),
-        -exact_mass,
-        -adduct_value
+        dplyr::everything(), -exact_mass, -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
       dplyr::distinct()
 
-    log_debug("formatting initial results \n")
-    df23 <- annotationTable |>
-      dplyr::mutate(dplyr::across(
-        dplyr::any_of(
-          c(
-            "mz_error",
-            "rt_error",
-            "component_id",
-            "mz",
-            "rt",
-            "score_input"
-          )
-        ),
-        as.numeric
-      )) |>
-      dplyr::distinct()
-
-    log_debug(
-      "joining MS2 results, single adducts, neutral losses, and multicharged / dimers and ranking \n"
-    )
+    log_debug("joining single adducts, neutral losses, and multicharged / dimers \n")
     df24 <- dplyr::bind_rows(
-      df23,
       df14 |>
         dplyr::left_join(df13_b),
       df22 |>
@@ -578,65 +668,55 @@ annotate_ms1 <-
     ) |>
       dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
-      dplyr::mutate(rank_initial = dplyr::dense_rank(dplyr::desc(score_input))) |>
       dplyr::ungroup() |>
-      dplyr::filter(rank_initial <= candidatesInitial) |>
       dplyr::distinct(
         feature_id,
-        component_id,
-        score_input,
-        library,
         mz_error,
         rt_error,
-        structure_molecular_formula,
+        structure_name,
+        # structure_inchikey,
         structure_inchikey_2D,
+        # structure_smiles,
         structure_smiles_2D,
-        rank_initial
+        structure_molecular_formula,
+        structure_exact_mass,
+        structure_xlogp,
+        library,
+        score_input
       )
 
-    if (!any(names(annotationTable) == "rt")) {
-      annotationTable[, "rt"] <- 0
-    }
-
-    df25 <- annotationTable |>
-      dplyr::select(
-        feature_id,
-        component_id,
-        rt,
-        mz,
-      ) |>
-      dplyr::distinct() |>
-      dplyr::mutate_all(as.numeric)
-
-    log_debug("adding \"notAnnotated\" \n")
-    df26 <- dplyr::left_join(df25, df24) |>
-      dplyr::distinct() |>
-      data.frame()
-
-    df26["structure_inchikey_2D"][is.na(df26["structure_inchikey_2D"])] <-
-      "notAnnotated"
-    df26["score_input"][is.na(df26["score_input"])] <-
-      0
-    df26["library"][is.na(df26["library"])] <-
-      "N/A"
-    df26["mz_error"][is.na(df26["mz_error"])] <-
-      666
-    df26["rt_error"][is.na(df26["rt_error"])] <-
-      666
-    df26["rank_initial"][is.na(df26["rank_initial"])] <-
-      candidatesInitial
-
-    df27 <- dplyr::left_join(
-      df26,
+    log_debug("adding chemical classification")
+    df25 <- dplyr::left_join(
+      df24,
       structureOrganismPairsTable |>
         dplyr::distinct(
           structure_inchikey_2D,
           structure_smiles_2D,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class
+          structure_taxonomy_npclassifier_03class,
+          ## TODO until better
+          structure_taxonomy_classyfire_chemontid,
+          structure_taxonomy_classyfire_01kingdom,
+          structure_taxonomy_classyfire_02superclass,
+          structure_taxonomy_classyfire_03class,
+          structure_taxonomy_classyfire_04directparent
         )
     )
 
-    return(df27)
+    edges <- dplyr::bind_rows(
+      df9 |>
+        dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
+        dplyr::select(feature_id, feature_target = feature_id_dest, label) |>
+        dplyr::distinct(),
+      df9_d |>
+        dplyr::mutate(label = paste0(loss, " loss")) |>
+        dplyr::select(feature_id, feature_target = feature_id_dest, label) |>
+        dplyr::distinct()
+    )
+
+    export_params(step = "annotate_ms1")
+    export_output(x = df25, file = output[[1]])
+
+    return(output[[1]])
   }

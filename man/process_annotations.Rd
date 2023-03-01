@@ -12,7 +12,6 @@ process_annotations(
   str_nam = paths$data$interim$libraries$merged$structures$names,
   str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
   str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
-  name = params$files$libraries$adducts$processed,
   annotations = params$files$annotations$filled,
   taxa = params$files$taxa$processed,
   edges = params$files$networks$spectral$edges$processed,
@@ -40,13 +39,6 @@ process_annotations(
   score_biological_species = params$weights$biological$species,
   score_biological_subspecies = params$weights$biological$subspecies,
   score_biological_variety = params$weights$biological$variety,
-  ms_mode = params$ms$polarity,
-  annotate = params$annotations$ms1$annotate,
-  tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
-  tolerance_rt = params$ms$tolerances$rt$minutes,
-  adducts_list = params$ms$adducts,
-  adducts_masses_list = paths$inst$extdata$adducts,
-  neutral_losses_list = paths$inst$extdata$neutral_losses,
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
@@ -66,8 +58,6 @@ process_annotations(
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
-
-\item{name}{Name of the adducts}
 
 \item{annotations}{Prepared annotations file}
 
@@ -122,16 +112,6 @@ process_annotations(
 \item{score_biological_subspecies}{Score for a \code{subspecies} match (should be lower than \code{variety})}
 
 \item{score_biological_variety}{Score for a \code{variety} match (should be the highest)}
-
-\item{ms_mode}{MS ionization mode. Should be 'pos' or 'neg'}
-
-\item{annotate}{Boolean. Perform MS1 annotation completion or not}
-
-\item{tolerance_ppm}{Tolerance in ppm for MS1 annotation}
-
-\item{tolerance_rt}{Tolerance in retention time (minute) for adducts attribution}
-
-\item{adducts_list}{Adducts list}
 
 \item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 

@@ -25,17 +25,15 @@ clean_chemo <-
            candidatesFinal = candidates_final,
            minimalMs1Bio = minimal_ms1_bio,
            minimalMs1Chemo = minimal_ms1_chemo) {
-    if (annotate == TRUE) {
-      log_debug(
-        "filtering top ",
-        candidatesFinal,
-        " candidates and keeping only MS1 candidates with minimum \n",
-        minimalMs1Bio,
-        " biological score or \n",
-        minimalMs1Chemo,
-        "chemical score \n"
-      )
-    }
+    log_debug(
+      "filtering top ",
+      candidatesFinal,
+      " candidates and keeping only MS1 candidates with minimum \n",
+      minimalMs1Bio,
+      " biological score or \n",
+      minimalMs1Chemo,
+      "chemical score \n"
+    )
     df1 <- annotationTableWeightedChemo |>
       dplyr::filter(
         score_initialNormalized > 0 |
@@ -53,10 +51,7 @@ clean_chemo <-
       dplyr::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
-    df11 <- annotation_table_ms2
-    if (exists(x = "annotation_table_ms1")) {
-      df11 <- annotation_table_ms1
-    }
+    df11 <- annotation_table
 
     df12 <- df11 |>
       dplyr::distinct(
@@ -230,7 +225,7 @@ clean_chemo <-
     df5b <- dplyr::left_join(df5a, df4b) |>
       dplyr::distinct()
 
-    df6 <- annotation_table_ms2 |>
+    df6 <- annotation_table |>
       dplyr::select(dplyr::any_of(c(
         "feature_id",
         "component_id",

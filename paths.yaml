@@ -3,12 +3,12 @@ config:
   path: config
   default:
     path: config/default
-    fake:
-      features_components: config/default/fake_features_components.yaml
-      features_edges: config/default/fake_features_edges.yaml
+    annotate:
+      ms1: config/default/annotate_ms1.yaml
     prepare:
       adducts: config/default/prepare_adducts.yaml
       closed: config/default/prepare_closed.yaml
+      features: config/default/prepare_features.yaml
       features_components: config/default/prepare_features_components.yaml
       features_edges: config/default/prepare_features_edges.yaml
       gnps: config/default/prepare_gnps.yaml
@@ -23,12 +23,12 @@ config:
   prepare_config: config/prepare_config.yaml
   user:
     path: config/user
-    fake:
-      features_components: config/user/fake_features_components.yaml
-      features_edges: config/user/fake_features_edges.yaml
+    annotate:
+      ms1: config/user/annotate_ms1.yaml
     prepare:
       adducts: config/user/prepare_adducts.yaml
       closed: config/user/prepare_closed.yaml
+      features: config/user/prepare_features.yaml
       features_components: config/user/prepare_features_components.yaml
       features_edges: config/user/prepare_features_edges.yaml
       gnps: config/user/prepare_gnps.yaml

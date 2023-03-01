@@ -48,7 +48,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Collate:
     'annotate_ms1.R'
-    'annotate_non_ms1.R'
     'clean_bio.R'
     'clean_chemo.R'
     'complement_structures_metadata.R'
@@ -60,8 +59,6 @@ Collate:
     'export_params.R'
     'export_spectra.R'
     'extract_spectra.R'
-    'fake_features_components.R'
-    'fake_features_edges.R'
     'form_adducts_neg.R'
     'form_adducts_pos.R'
     'get_gnps_tables.R'
@@ -77,6 +74,7 @@ Collate:
     'prepare_adducts.R'
     'prepare_closed.R'
     'prepare_config.R'
+    'prepare_features.R'
     'prepare_features_components.R'
     'prepare_features_edges.R'
     'prepare_gnps.R'

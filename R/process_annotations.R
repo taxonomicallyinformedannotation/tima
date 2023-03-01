@@ -8,7 +8,6 @@
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
-#' @param name Name of the adducts
 #' @param annotations Prepared annotations file
 #' @param taxa Prepared taxed features file
 #' @param edges Prepared edges file
@@ -36,12 +35,7 @@
 #' @param score_biological_species Score for a `species` match (should be lower than `subspecies`)
 #' @param score_biological_subspecies Score for a `subspecies` match (should be lower than `variety`)
 #' @param score_biological_variety Score for a `variety` match (should be the highest)
-#' @param ms_mode MS ionization mode. Should be 'pos' or 'neg'
-#' @param annotate Boolean. Perform MS1 annotation completion or not
-#' @param tolerance_ppm Tolerance in ppm for MS1 annotation
-#' @param tolerance_rt Tolerance in retention time (minute) for adducts attribution
 #' @param force Force parameters. Use it at your own risk
-#' @param adducts_list Adducts list
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param ms1_only Boolean. Keep only MS1 annotations
@@ -68,7 +62,6 @@ process_annotations <-
            str_nam = paths$data$interim$libraries$merged$structures$names,
            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
-           name = params$files$libraries$adducts$processed,
            annotations = params$files$annotations$filled,
            taxa = params$files$taxa$processed,
            edges = params$files$networks$spectral$edges$processed,
@@ -96,13 +89,6 @@ process_annotations <-
            score_biological_species = params$weights$biological$species,
            score_biological_subspecies = params$weights$biological$subspecies,
            score_biological_variety = params$weights$biological$variety,
-           ms_mode = params$ms$polarity,
-           annotate = params$annotations$ms1$annotate,
-           tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
-           tolerance_rt = params$ms$tolerances$rt$minutes,
-           adducts_list = params$ms$adducts,
-           adducts_masses_list = paths$inst$extdata$adducts,
-           neutral_losses_list = paths$inst$extdata$neutral_losses,
            minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
            # TODO ADD CONDITION,
@@ -114,18 +100,6 @@ process_annotations <-
     stopifnot("Your annotations file does not exist." = file.exists(annotations))
     stopifnot("Your taxa file does not exist." = file.exists(taxa))
     stopifnot("Your edges file does not exist." = file.exists(edges))
-    stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
-    stopifnot("Your ms_annotate parameter must be 'true' or 'false'" = annotate %in% c(TRUE, FALSE))
-    if (force == FALSE) {
-      stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
-        20)
-      stopifnot("Your rt tolerance must be lower or equal to 0.1" = tolerance_rt <=
-        0.1)
-    }
-    ## TODO for later on
-    # stopifnot(
-    #  adducts ...
-    # )
 
     paths <<- parse_yaml_paths()
     params <<- parameters
@@ -137,7 +111,7 @@ process_annotations <-
 
     log_debug(x = "... files ...")
     log_debug(x = "... annotations")
-    annotation_table_ms2 <<-
+    annotation_table <<-
       readr::read_delim(
         file = annotations,
         col_types = readr::cols(.default = "c")
@@ -209,108 +183,17 @@ process_annotations <-
       ))
 
     if (ms1_only == TRUE) {
-      log_debug(x = "Erasing MS2 results")
-      annotation_table_ms2 <<-
-        annotation_table_ms2 |>
-        dplyr::mutate(
-          structure_inchikey_2D = NA_character_,
-          score_input = NA_real_,
-          library = NA_character_,
-          mz_error = NA_real_,
-          rt_error = NA_real_
-        )
-    }
-
-    if (annotate == TRUE) {
-      log_debug("... single charge adducts table")
-      if (ms_mode == "pos") {
-        adduct_file <- paths$data$interim$adducts$pos
-      }
-      if (ms_mode == "neg") {
-        adduct_file <- paths$data$interim$adducts$neg
-      }
-
-      adducts_table <- readr::read_delim(file = adduct_file)
-
-      log_debug("... adducts masses for in source dimers and multicharged")
-      adductsMassTable <-
-        readr::read_delim(file = adducts_masses_list)
-
-      log_debug("... neutral lossses")
-      neutral_losses_table <-
-        readr::read_delim(file = neutral_losses_list)
-
-      adducts_m <- adductsMassTable$mass
-      names(adducts_m) <- adductsMassTable$adduct
-
-      if (ms_mode == "pos") {
-        adduct_db_file <-
-          file.path(
-            paths$data$interim$adducts$path,
-            paste0(name, "_pos.tsv.gz")
-          )
-      }
-      if (ms_mode == "neg") {
-        adduct_db_file <-
-          file.path(
-            paths$data$interim$adducts$path,
-            paste0(name, "_neg.tsv.gz")
-          )
-      }
-
-      ## TODO remove this dirty fix
-      adduct_db_file <- adduct_db_file |>
-        gsub(
-          pattern = "NA_pos.tsv.gz",
-          replacement = "library_pos.tsv.gz",
-          fixed = TRUE
-        ) |>
-        gsub(
-          pattern = "NA_neg.tsv.gz",
-          replacement = "library_neg.tsv.gz",
-          fixed = TRUE
-        )
-
-      log_debug(x = "... exact masses for MS1 annotation")
-      structure_exact_mass_table <-
-        readr::read_delim(file = adduct_db_file) |>
-        dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
-
-      log_debug(x = "performing MS1 annotation")
-      annotation_table_ms1 <<-
-        annotate_ms1(
-          annotationTable = annotation_table_ms2,
-          structureExactMassTable = structure_exact_mass_table,
-          structureOrganismPairsTable = structure_organism_pairs_table,
-          adducts = unlist(adducts_list[[ms_mode]]),
-          adductsM = adducts_m,
-          adductsTable = adducts_table,
-          neutralLosses = neutral_losses_table,
-          msMode = ms_mode,
-          tolerancePpm = tolerance_ppm,
-          toleranceRt = tolerance_rt,
-          candidatesInitial = candidates_initial
-        )
-
-      annotation_table_ms1 |>
-        decorate_ms1()
-    } else {
-      annotation_table_ms1 <<-
-        annotate_non_ms1(
-          annotationTable = annotation_table_ms2,
-          structureOrganismPairsTable = structure_organism_pairs_table,
-          candidatesInitial = candidates_initial
-        )
+      log_debug(x = "TODO CHANGE THIS")
     }
 
     log_debug(x = "adding biological organism metadata")
-    annotation_table_ms1_taxed <- annotation_table_ms1 |>
+    annotation_table_taxed <- annotation_table |>
       dplyr::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-
       weight_bio(
-        annotationTable = annotation_table_ms1_taxed,
+        annotationTable = annotation_table_taxed,
         structureOrganismPairsTable = structure_organism_pairs_table,
         weightSpectral = weight_spectral,
         weightBiological = weight_biological,
@@ -342,7 +225,6 @@ process_annotations <-
     annotation_table_weighted_bio_cleaned <- clean_bio(
       annotationTableWeightedBio = annotation_table_weighted_bio,
       edgesTable = edges_table,
-      aNnOtAtE = annotate,
       candidatesInitial = candidates_initial,
       minimalMs1Bio = minimal_ms1_bio
     )

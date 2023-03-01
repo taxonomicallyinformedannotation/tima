@@ -5,18 +5,19 @@ require(
   quietly = TRUE
 )
 
-step <- "fake_features_components"
-paths <- parse_yaml_paths()
-params <- get_params(step = step)
+# step <- "annotate_ms1"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
 
 log_debug(
   "This script",
-  crayon::green("prepares features metadata (mz, rt) and fakes component id)")
+  crayon::green("annotates based on exact mass (MS1)")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-fake_features_components()
+# annotate_ms1()
+targets::tar_make(names = matches("annotations_ms1_prepared"))
 
 end <- Sys.time()
 

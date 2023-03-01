@@ -60,21 +60,17 @@ prepare_config <- function(filename = params$files$pattern,
 
   log_debug(x = "Changing params")
 
-  yamls_params$fake_features_components$ms$polarity <- ms_mode
-  yamls_params$process_annotations$ms$polarity <- ms_mode
+  yamls_params$annotate_ms1$ms$polarity <- ms_mode
 
   yamls_params$prepare_taxa$organisms$taxon <- taxon
 
   log_debug(x = "Changing filenames")
 
-  yamls_params$fake_features_components$files$annotations$pretreated <-
-    yamls_params$fake_features_components$files$annotations$pretreated |>
+  yamls_params$prepare_features$files$features$raw <-
+    yamls_params$prepare_features$files$features$raw |>
     replace_id()
-  yamls_params$fake_features_components$files$annotations$filled <-
-    yamls_params$fake_features_components$files$annotations$filled |>
-    replace_id()
-  yamls_params$fake_features_edges$files$networks$spectral$edges$processed <-
-    yamls_params$fake_features_edges$files$networks$spectral$edges$processed |>
+  yamls_params$prepare_features$files$features$prepared <-
+    yamls_params$prepare_features$files$features$prepared |>
     replace_id()
 
   yamls_params$prepare_features_components$files$annotations$pretreated <-
@@ -113,6 +109,13 @@ prepare_config <- function(filename = params$files$pattern,
     yamls_params$prepare_taxa$files$taxa$processed |>
     replace_id()
 
+  yamls_params$annotate_ms1$files$features$prepared <-
+    yamls_params$annotate_ms1$files$features$prepared |>
+    replace_id()
+  yamls_params$annotate_ms1$files$annotations$pretreated <-
+    yamls_params$annotate_ms1$files$annotations$pretreated |>
+    replace_id()
+
   yamls_params$process_annotations$files$annotations$filled <-
     yamls_params$process_annotations$files$annotations$filled |>
     replace_id()
@@ -128,10 +131,14 @@ prepare_config <- function(filename = params$files$pattern,
   names(yaml_export) <- yaml_names
 
   if (!is.na(step)) {
+    ## The dot is for steps having similar names separated by underscores
     yamls_params <-
-      yamls_params[grepl(pattern = step, x = names(yamls_params))]
+      yamls_params[grepl(
+        pattern = paste0(step, "\\."),
+        x = names(yamls_params)
+      )]
     yaml_export <-
-      yaml_export[grepl(pattern = step, x = yaml_export)]
+      yaml_export[grepl(pattern = paste0(step, "\\."), x = yaml_export)]
   }
 
   log_debug(x = "Exporting params ...")

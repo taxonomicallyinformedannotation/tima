@@ -5,25 +5,34 @@
 \title{Annotate MS1}
 \usage{
 annotate_ms1(
-  annotationTable = annotation_table_ms2,
-  structureExactMassTable = structure_exact_mass_table,
-  structureOrganismPairsTable = structure_organism_pairs_table,
-  adducts = unlist(adducts_list[[ms_mode]]),
-  adductsM = adducts_m,
-  adductsTable = adducts_table,
-  neutralLosses = neutral_losses_table,
-  msMode = ms_mode,
-  tolerancePpm = tolerance_ppm,
-  toleranceRt = tolerance_rt,
-  candidatesInitial = candidates_initial
+  features = params$files$features$prepared,
+  output = params$files$annotations$pretreated,
+  library = paths$data$interim$libraries$merged$keys,
+  str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+  str_met = paths$data$interim$libraries$merged$structures$metadata,
+  str_nam = paths$data$interim$libraries$merged$structures$names,
+  str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+  str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc,
+  name = params$files$libraries$adducts$processed,
+  adducts_list = params$ms$adducts,
+  adducts_masses_list = paths$inst$extdata$adducts,
+  neutral_losses_list = paths$inst$extdata$neutral_losses,
+  msMode = params$ms$polarity,
+  tolerancePpm = params$ms$tolerances$mass$ppm$ms1,
+  toleranceRt = params$ms$tolerances$rt$minutes,
+  parameters = params
 )
 }
 \arguments{
-\item{annotationTable}{Table containing your previous annotation to complement}
+\item{msMode}{Ionization mode. Must be 'pos' or 'neg'}
+
+\item{tolerancePpm}{Tolerance to perform annotation. Should be lower than 10 ppm}
+
+\item{toleranceRt}{Tolerance to perform adduct attribution. Should be lower than 0.1min}
+
+\item{featuresTable}{Table containing your previous annotation to complement}
 
 \item{structureExactMassTable}{Table containing the structure - exact mass pairs to perform annotation}
-
-\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
 \item{adducts}{List of adducts to be used}
 
@@ -32,20 +41,12 @@ annotate_ms1(
 \item{adductsTable}{Table containing the adducted library masses}
 
 \item{neutralLosses}{List of neutral losses to be used}
-
-\item{msMode}{Ionization mode. Must be 'pos' or 'neg'}
-
-\item{tolerancePpm}{Tolerance to perform annotation. Should be lower than 10 ppm}
-
-\item{toleranceRt}{Tolerance to perform adduct attribution. Should be lower than 0.1min}
-
-\item{candidatesInitial}{Number of initial candidates to keep}
 }
 \value{
-A table containing the initial annotation complemented by additional MS1 annotations based on exact mass
+A table containing MS1 annotations based on exact mass
 }
 \description{
-This function complements MS2 results with MS1 annotation and filters the final results.
+This function performs MS1 annotation.
 }
 \examples{
 NULL

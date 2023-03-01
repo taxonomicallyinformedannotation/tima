@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/process_annotations.R
 
 Usage: 
-  process_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-ann=<ann-ms1-ann>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-int-thr-ms1=<ms-int-thr-ms1>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>] [--force=<force>]
+  process_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-ann=<ann-ms1-ann>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>] [--force=<force>]
 
 Arguments:
   ann-can-ini                Number of initial candidates. INTEGER
@@ -15,18 +15,9 @@ Arguments:
   
   fil-ann-fil                Filled annotations file. STRING
   fil-ann-pro                Final results file. STRING
-  fil-lib-add-pro            Prepared adducts library. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
   fil-net-spe-edg-pro        Prepared edges file. STRING
   fil-tax-pro                Taxonomically informed features file. STRING
-
-  ms-add-neg                 List of adducts to be used in negative. STRING
-  ms-add-pos                 List of adducts to be used in positive. STRING
-  ms-int-thr-ms1             Intensity threshold for MS1. INTEGER
-  ms-pol                     Polarity used. Must be "pos" or "neg". STRING
-  ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT
-  ms-tol-mas-dal-ms1         Absolute mass tolerance for MS1 in Dalton. FLOAT
-  ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
 
   wei-glo-bio                Weight for the biological part. FLOAT
   wei-glo-che                Weight for the chemical part. FLOAT

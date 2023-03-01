@@ -7,7 +7,6 @@
 clean_bio(
   annotationTableWeightedBio = annotation_table_weighted_bio,
   edgesTable = edges_table,
-  aNnOtAtE = annotate,
   candidatesInitial = candidates_initial,
   minimalMs1Bio = minimal_ms1_bio
 )
@@ -16,8 +15,6 @@ clean_bio(
 \item{annotationTableWeightedBio}{Table containing your biologically weighted annotation}
 
 \item{edgesTable}{Table containing the edges between features}
-
-\item{aNnOtAtE}{Boolean parameter indicating if you performed MS1 annotation completion}
 
 \item{candidatesInitial}{Number of initial candidates to keep}
 

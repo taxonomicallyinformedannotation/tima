@@ -12,10 +12,8 @@ require(
 log_debug(
   "This script performs",
   crayon::green("taxonomically informed scoring"),
-  "preceded by",
-  crayon::blue("MS1 annotation"),
   "and followed by",
-  crayon::yellow("chemical consistency informed scoring")
+  crayon::blue("chemical consistency informed scoring")
 )
 log_debug(
   "Authors: ",

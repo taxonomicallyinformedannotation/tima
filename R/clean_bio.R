@@ -4,7 +4,6 @@
 #'
 #' @param annotationTableWeightedBio Table containing your biologically weighted annotation
 #' @param edgesTable Table containing the edges between features
-#' @param aNnOtAtE Boolean parameter indicating if you performed MS1 annotation completion
 #' @param candidatesInitial Number of initial candidates to keep
 #' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
 #'
@@ -23,16 +22,14 @@
 clean_bio <-
   function(annotationTableWeightedBio = annotation_table_weighted_bio,
            edgesTable = edges_table,
-           aNnOtAtE = annotate,
            candidatesInitial = candidates_initial,
            minimalMs1Bio = minimal_ms1_bio) {
-    if (aNnOtAtE == TRUE) {
-      log_debug(
-        "keeping only MS1 candidates with minimum \n",
-        minimalMs1Bio,
-        " biological score \n"
-      )
-    }
+    log_debug(
+      "keeping only MS1 candidates with minimum \n",
+      minimalMs1Bio,
+      " biological score \n"
+    )
+
     df01 <- annotationTableWeightedBio |>
       dplyr::filter(score_initialNormalized > 0 |
         # Those lines are to keep ms1 annotation
@@ -42,8 +39,7 @@ clean_bio <-
     df02 <-
       dplyr::anti_join(
         annotationTableWeightedBio |>
-          dplyr::distinct(
-            feature_id,
+          dplyr::distinct(feature_id,
             structure_inchikey_2D,
             .keep_all = TRUE
           ),

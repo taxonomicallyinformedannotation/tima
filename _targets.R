@@ -58,6 +58,12 @@ list(
     ## Default
     list(
       tar_file(
+        name = config_default_annotate_ms1,
+        command = {
+          config_default_annotate_ms1 <- paths$config$default$annotate$ms1
+        }
+      ),
+      tar_file(
         name = config_default_adducts,
         command = {
           config_default_adducts <- paths$config$default$prepare$adducts
@@ -67,6 +73,13 @@ list(
         name = config_default_closed,
         command = {
           config_default_closed <- paths$config$default$prepare$closed
+        }
+      ),
+      tar_file(
+        name = config_default_features,
+        command = {
+          config_default_features <-
+            paths$config$default$prepare$features
         }
       ),
       tar_file(
@@ -153,6 +166,20 @@ list(
         }
       ),
       tar_file(
+        name = config_user_annotate_ms1,
+        command = {
+          config_user_adducts <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "annotate_ms1"
+            )
+        }
+      ),
+      tar_file(
         name = config_user_adducts,
         command = {
           config_user_adducts <-
@@ -177,6 +204,20 @@ list(
               taxon = params_config$organisms$taxon,
               parameters = params_config,
               step = "prepare_closed"
+            )
+        }
+      ),
+      tar_file(
+        name = config_user_features,
+        command = {
+          config_user_features <-
+            prepare_config(
+              filename = params_config$files$pattern,
+              gnps_job_id = params_config$gnps$id,
+              ms_mode = params_config$ms$polarity,
+              taxon = params_config$organisms$taxon,
+              parameters = params_config,
+              step = "prepare_features"
             )
         }
       ),
@@ -324,6 +365,16 @@ list(
     ## Final
     list(
       tar_target(
+        name = params_annotate_ms1,
+        command = {
+          params_adducts <-
+            parse_yaml_params(
+              def = config_default_annotate_ms1,
+              usr = config_user_annotate_ms1[1]
+            )
+        }
+      ),
+      tar_target(
         name = params_adducts,
         command = {
           params_adducts <-
@@ -340,6 +391,16 @@ list(
             parse_yaml_params(
               def = config_default_closed,
               usr = config_user_closed[1]
+            )
+        }
+      ),
+      tar_target(
+        name = params_features,
+        command = {
+          params_features <-
+            parse_yaml_params(
+              def = config_default_features,
+              usr = config_user_features[1]
             )
         }
       ),
@@ -884,6 +945,30 @@ list(
   ),
   ## Annotations
   list(
+    ## MS1
+    list(tar_file(
+      name = annotations_ms1_prepared,
+      command = {
+        annotations_ms1_prepared <-
+          annotate_ms1(
+            features = features_prepared,
+            library = library_merged_key,
+            str_2D_3D = library_merged_str_2D_3D,
+            str_met = library_merged_str_met,
+            str_nam = library_merged_str_nam,
+            str_tax_cla = library_merged_str_tax_cla,
+            str_tax_npc = library_merged_str_tax_npc,
+            name = library_adducts[params_annotate_ms1$ms$polarity],
+            adducts_list = params_annotate_ms1$ms$adducts,
+            adducts_masses_list = paths$inst$extdata$adducts,
+            neutral_losses_list = paths$inst$extdata$neutral_losses,
+            msMode = params_annotate_ms1$ms$polarity,
+            tolerancePpm = params_annotate_ms1$ms$tolerances$mass$ppm$ms1,
+            toleranceRt = params_annotate_ms1$ms$tolerances$rt$minutes,
+            parameters = params_annotate_ms1
+          )
+      }
+    )),
     ## Spectral
     list(
       ## Experimental
@@ -1107,6 +1192,18 @@ list(
   ## Features
   list(
     tar_file(
+      name = features_prepared,
+      command = {
+        features_prepared <- prepare_features(
+          features = params_features$files$features$raw,
+          output = params_features$files$features$prepared,
+          name_features = params_features$names$features,
+          name_rt = params_features$names$rt,
+          name_mz = params_features$names$precursor
+        )
+      }
+    ),
+    tar_file(
       name = features_edges_prepared,
       command = {
         features_edges_prepared <- prepare_features_edges(
@@ -1125,7 +1222,8 @@ list(
           input = list(
             annotations_spectral_prepared |>
               unlist(),
-            annotations_sirius_prepared
+            annotations_sirius_prepared,
+            annotations_ms1_prepared
           ),
           output = params_features_components$files$annotations$filled,
           components = interim_components,
@@ -1159,7 +1257,6 @@ list(
         str_nam = library_merged_str_nam,
         str_tax_cla = library_merged_str_tax_cla,
         str_tax_npc = library_merged_str_tax_npc,
-        name = library_adducts[params_annotations$ms$polarity],
         annotations = features_components_prepared,
         taxa = taxa_prepared,
         edges = features_edges_prepared,
@@ -1187,13 +1284,6 @@ list(
         score_biological_species = params_annotations$weights$biological$species,
         score_biological_subspecies = params_annotations$weights$biological$subspecies,
         score_biological_variety = params_annotations$weights$biological$variety,
-        ms_mode = params_annotations$ms$polarity,
-        annotate = params_annotations$annotations$ms1$annotate,
-        tolerance_ppm = params_annotations$ms$tolerances$mass$ppm$ms1,
-        tolerance_rt = params_annotations$ms$tolerances$rt$minutes,
-        adducts_list = params_annotations$ms$adducts,
-        adducts_masses_list = dic_adducts,
-        neutral_losses_list = dic_neutral_losses,
         minimal_ms1_bio = params_annotations$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = params_annotations$annotations$ms1$thresholds$chemical,
         # TODO ADD CONDITION

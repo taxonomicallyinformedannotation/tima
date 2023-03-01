@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_features_edges.R
 \name{prepare_features_edges}
 \alias{prepare_features_edges}
-\title{Prepare edges}
+\title{Prepare features edges}
 \usage{
 prepare_features_edges(
   input = params$files$networks$spectral$edges$raw,
