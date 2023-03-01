@@ -131,12 +131,13 @@ prepare_config <- function(filename = params$files$pattern,
   names(yaml_export) <- yaml_names
 
   if (!is.na(step)) {
-    ## The dot is for steps having similar names separated by underscores
+    ## The dollar is for steps having similar names separated by underscores
     yamls_params <-
       yamls_params[grepl(
-        pattern = paste0(step, "\\."),
+        pattern = paste0(step, "$"),
         x = names(yamls_params)
       )]
+    ## The dot is for steps having similar names separated by underscores
     yaml_export <-
       yaml_export[grepl(pattern = paste0(step, "\\."), x = yaml_export)]
   }

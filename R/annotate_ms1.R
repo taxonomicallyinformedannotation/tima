@@ -11,6 +11,7 @@
 #' @param msMode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
 #' @param toleranceRt Tolerance to perform adduct attribution. Should be lower than 0.1min
+#' @param parameters params
 #'
 #' @return A table containing MS1 annotations based on exact mass
 #'

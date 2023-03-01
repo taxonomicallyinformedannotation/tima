@@ -7,6 +7,7 @@
 #' @param name_features Name of the features column in the features data
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
+#' @param parameters params
 #'
 #' @return NULL
 #'
@@ -21,7 +22,9 @@ prepare_features <-
            output = params$files$annotations$filled,
            name_features = params$names$features,
            name_rt = params$names$rt,
-           name_mz = params$names$precursor) {
+           name_mz = params$names$precursor,
+           parameters = params) {
+    params <<- parameters
     stopifnot("Your features file does not exist" = file.exists(features))
 
     log_debug("Preparing features table")

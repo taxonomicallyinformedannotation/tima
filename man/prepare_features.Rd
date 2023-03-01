@@ -9,7 +9,8 @@ prepare_features(
   output = params$files$annotations$filled,
   name_features = params$names$features,
   name_rt = params$names$rt,
-  name_mz = params$names$precursor
+  name_mz = params$names$precursor,
+  parameters = params
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ prepare_features(
 \item{name_rt}{Name of the retention time column in the features data}
 
 \item{name_mz}{Name of the m/z column in the features data}
+
+\item{parameters}{params}
 }
 \description{
 This function prepares features

@@ -30,6 +30,8 @@ annotate_ms1(
 
 \item{toleranceRt}{Tolerance to perform adduct attribution. Should be lower than 0.1min}
 
+\item{parameters}{params}
+
 \item{featuresTable}{Table containing your previous annotation to complement}
 
 \item{structureExactMassTable}{Table containing the structure - exact mass pairs to perform annotation}
