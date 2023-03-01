@@ -6,7 +6,7 @@
 \usage{
 prepare_features(
   features = params$files$features$raw,
-  output = params$files$annotations$filled,
+  output = params$files$features$prepared,
   name_features = params$names$features,
   name_rt = params$names$rt,
   name_mz = params$names$precursor,
