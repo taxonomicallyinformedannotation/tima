@@ -112,8 +112,6 @@ annotate_ms1 <-
       readr::read_delim(file = adduct_db_file)
 
     adducts <- unlist(adducts_list[[msMode]])
-
-
     # |>
     #   dplyr::filter(exact_mass %in% structure_organism_pairs_table[["structure_exact_mass"]])
 

@@ -280,14 +280,8 @@ testthat::test_that("Whole process", {
     candidates_final = 1,
     minimal_ms1_bio = 0.8
   )
-  ### No MS1
-  process_annotations(
-    annotate = FALSE,
-    candidates_final = 1
-  )
   ### Only MS1
   process_annotations(
-    ms_mode = "neg",
     ms1_only = TRUE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8

@@ -965,8 +965,8 @@ list(
             str_tax_npc = library_merged_str_tax_npc,
             name = library_adducts[params_annotate_ms1$ms$polarity],
             adducts_list = params_annotate_ms1$ms$adducts,
-            adducts_masses_list = paths$inst$extdata$adducts,
-            neutral_losses_list = paths$inst$extdata$neutral_losses,
+            adducts_masses_list = dic_adducts,
+            neutral_losses_list = dic_neutral_losses,
             msMode = params_annotate_ms1$ms$polarity,
             tolerancePpm = params_annotate_ms1$ms$tolerances$mass$ppm$ms1,
             toleranceRt = params_annotate_ms1$ms$tolerances$rt$minutes,
@@ -1204,7 +1204,8 @@ list(
           output = params_features$files$features$prepared,
           name_features = params_features$names$features,
           name_rt = params_features$names$rt,
-          name_mz = params_features$names$precursor
+          name_mz = params_features$names$precursor,
+          parameters = params_features
         )
       }
     ),
