@@ -155,7 +155,7 @@ prepare_libraries_sop_merged <-
 
     # Export the library
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_libraries")
+    export_params(step = "prepare_libraries_sop_merged")
     export_output(
       x = table_keys,
       file = output_key
