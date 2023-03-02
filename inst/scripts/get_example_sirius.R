@@ -14,7 +14,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-download_file(
+get_file(
   url = paths$urls$examples$sirius,
   export = paths$data$interim$annotations$example_sirius
 )

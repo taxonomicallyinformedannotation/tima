@@ -1,0 +1,13 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_annotations_gnps.R --fil-ann-raw-spe data/interim/annotations/example_gnps.tsv --fil-ann-pre data/interim/annotations/example_gnps_pretreated.tsv.gz
+
+Usage: 
+  prepare_annotations_gnps.R [--=fil-ann-pre<fil-ann-pre>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>]
+
+Arguments:
+  fil-ann-raw-spe            List of spectral matching results. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

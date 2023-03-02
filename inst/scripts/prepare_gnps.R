@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-step <- "prepare_gnps"
+step <- "prepare_annotations_gnps"
 paths <- parse_yaml_paths()
 params <- get_params(step = step)
 
@@ -16,7 +16,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-prepare_gnps()
+prepare_annotations_gnps()
 
 end <- Sys.time()
 

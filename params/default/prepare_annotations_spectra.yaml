@@ -1,0 +1,16 @@
+#' Files.
+files:
+
+  #' Annotations files.
+  annotations:
+
+    #' Raw annotations files.
+    raw:
+
+      #' List of spectral matching results. STRING
+      spectral:
+        - data/interim/annotations/example_spectral_matches.tsv.gz
+
+    #' List of pretreated annotations. STRING
+    pretreated:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_spectral_matches_pretreated.tsv.gz

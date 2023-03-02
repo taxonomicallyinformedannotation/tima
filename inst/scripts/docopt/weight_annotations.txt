@@ -1,0 +1,49 @@
+You can use this script with the following example:
+  Rscript inst/scripts/weight_annotations.R
+
+Usage: 
+  weight_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-01=<wei-che-01>] [--wei-che-02=<wei-che-02>] [--wei-che-03=<wei-che-03>] [--force=<force>]
+
+Arguments:
+  ann-can-ini                Number of initial candidates. INTEGER
+  ann-can-fin                Number of final candidates. INTEGER
+  ann-ms1only                Erase MS2 results and keep MS1 only. BOOLEAN
+  ann-ms1-thr-bio            Minimal biological score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
+  ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+  
+  fil-ann-fil                Filled annotations file. STRING
+  fil-ann-pro                Final results file. STRING
+  fil-lib-sop-mer            Merged structure organism pairs library. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+  fil-tax-pro                Taxonomically informed features file. STRING
+
+  wei-glo-bio                Weight for the biological part. FLOAT
+  wei-glo-che                Weight for the chemical part. FLOAT
+  wei-glo-spe                Weight for the spectral part. FLOAT
+
+  wei-bio-01                 Score for a biological domain match. FLOAT
+  wei-bio-02                 Score for a biological kingdom match. FLOAT
+  wei-bio-03                 Score for a biological phylum match. FLOAT
+  wei-bio-04                 Score for a biological class match. FLOAT
+  wei-bio-05                 Score for a biological order match. FLOAT
+  wei-bio-06                 Score for a biological infraorder match. FLOAT
+  wei-bio-07                 Score for a biological family match. FLOAT
+  wei-bio-08                 Score for a biological subfamily match. FLOAT
+  wei-bio-09                 Score for a biological tribe match. FLOAT
+  wei-bio-10                 Score for a biological subtribe match. FLOAT
+  wei-bio-11                 Score for a biological genus match. FLOAT
+  wei-bio-12                 Score for a biological subgenus match. FLOAT
+  wei-bio-13                 Score for a biological species match. FLOAT
+  wei-bio-14                 Score for a biological subspecies match. FLOAT
+  wei-bio-15                 Score for a biological variety match. FLOAT
+
+  wei-che-01                 Score for a chemical pathway match. FLOAT
+  wei-che-02                 Score for a chemical superclass match. FLOAT
+  wei-che-03                 Score for a chemical class match. FLOAT
+
+  force                      Do not use it. BOOLEAN
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

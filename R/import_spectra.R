@@ -10,7 +10,7 @@
 #'
 #' @importFrom CompoundDb CompDb Spectra
 #' @importFrom MsBackendMgf readMgf
-#' @importFrom Spectra Spectra
+#' @importFrom Spectra MsBackendMemory Spectra setBackend
 #' @importFrom stringr str_remove
 #'
 #' @examples NULL
@@ -19,26 +19,16 @@ import_spectra <- function(file) {
 
   switch(EXPR = file_ext,
     "mgf" = {
-      spectra <- MsBackendMgf::readMgf(f = file, msLevel = 2L) |>
-        Spectra::Spectra()
-      ## Steps needed because of new mzmine3 MGF produced for SIRIUS
-      if ("MSLEVEL" %in% Spectra::spectraVariables(spectra)) {
-        spectra <- spectra[spectra$MSLEVEL == 2]
-      }
-      if (all(is.na(spectra@backend@spectraData$acquisitionNum))) {
-        spectra@backend@spectraData$acquisitionNum <-
-          spectra@backend@spectraData$FEATURE_ID
-      }
-      if (all(is.na(spectra@backend@spectraData$rtime)) &
-        "RT" %in% Spectra::spectraVariables(spectra)) {
-        spectra@backend@spectraData$rtime <-
-          as.numeric(spectra@backend@spectraData$RT)
-      }
-      return(spectra)
+      MsBackendMgf::readMgf(f = file, msLevel = 2L) |>
+        Spectra::Spectra() |>
+        ## TODO change it as soon as https://github.com/RforMassSpectrometry/MsBackendSql will be available
+        Spectra::setBackend(Spectra::MsBackendMemory())
     },
     "sqlite" = {
       CompoundDb::CompDb(x = file) |>
-        CompoundDb::Spectra()
+        CompoundDb::Spectra() |>
+        ## TODO change it as soon as https://github.com/RforMassSpectrometry/MsBackendSql will be available
+        Spectra::setBackend(Spectra::MsBackendMemory())
     }
   )
 }

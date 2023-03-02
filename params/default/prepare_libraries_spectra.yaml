@@ -1,0 +1,99 @@
+#' Files.
+files:
+
+  #' Libraries files.
+  libraries:
+
+    #' Spectral libraries. STRING
+    spectral:
+
+      #' Experimental libraries
+      exp:
+
+        #' List of negative experimental spectral libraries. STRING
+        neg:
+          - data/interim/libraries/spectra/exp/internal_neg.sqlite
+
+        #' List of positive experimental spectral libraries. STRING
+        pos:
+          - data/interim/libraries/spectra/exp/internal_pos.sqlite
+
+        #' List of raw experimental spectral libraries. STRING
+        raw:
+         - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
+
+      #' In silico libraries
+      is:
+
+        #' List of negative in silico spectral libraries. STRING
+        neg:
+          - data/interim/libraries/spectra/is/lotus_pos.sqlite
+
+        #' List of positive in silico spectral libraries. STRING
+        pos:
+          - data/interim/libraries/spectra/is/lotus_neg.sqlite
+
+        #' List of raw in silico spectral libraries. STRING
+        raw:
+         - data/source/libraries/spectra/is/isdb_pos.mgf
+         - data/source/libraries/spectra/is/isdb_neg.mgf
+
+#' MS related parameters.
+ms:
+
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+#' Names of the different variables in the input files.
+names:
+
+  #' Name of fields present in the MGF.
+  mgf:
+
+    #' Name of "collision energy" in MGF. STRING
+    collision_energy: ~
+
+    #' Name of "compound ID" in MGF. STRING
+    compound_id: SPECTRUMID
+
+    #' Name of "exact mass" in MGF. STRING
+    exact_mass: EXACTMASS
+
+    #' Name of "InChI" in MGF. STRING
+    inchi: INCHI
+
+    #' Name of "InChI 2D" in MGF. STRING
+    inchi_2D: ~
+
+    #' Name of "InChIKey" in MGF. STRING
+    inchikey: ~
+
+    #' Name of "InChIKey 2D" in MGF. STRING
+    inchikey_2D: ~
+
+    #' Name of "molecular formula" in MGF. STRING
+    molecular_formula: ~
+
+    #' Name of "name" in MGF. STRING
+    name: ~
+
+    #' Name of "polarity" in MGF. STRING
+    polarity: IONMODE
+
+    #' Name of "SMILES" in MGF. STRING
+    smiles: SMILES
+
+    #' Name of "SMILES 2D" in MGF. STRING
+    smiles_2D: ~
+
+    #' Name of "spectrum ID" in MGF. STRING
+    spectrum_id: ~
+
+    #' Name of "SPLASH" in MGF. STRING
+    splash: ~
+
+    #' Name of "synonyms" in MGF. STRING
+    synonyms: ~
+
+    #' Name of "xlogP" in MGF. STRING
+    xlogp: ~

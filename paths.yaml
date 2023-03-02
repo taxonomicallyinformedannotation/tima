@@ -1,89 +1,60 @@
 base_dir: ./
-config:
-  path: config
-  default:
-    path: config/default
-    annotate:
-      ms1: config/default/annotate_ms1.yaml
-    prepare:
-      adducts: config/default/prepare_adducts.yaml
-      closed: config/default/prepare_closed.yaml
-      features: config/default/prepare_features.yaml
-      features_components: config/default/prepare_features_components.yaml
-      features_edges: config/default/prepare_features_edges.yaml
-      gnps: config/default/prepare_gnps.yaml
-      libraries: config/default/prepare_libraries.yaml
-      sirius: config/default/prepare_sirius.yaml
-      spectral_libraries: config/default/prepare_spectral_libraries.yaml
-      spectral_matches: config/default/prepare_spectral_matches.yaml
-      taxa: config/default/prepare_taxa.yaml
-    process:
-      annotations: config/default/process_annotations.yaml
-      spectra: config/default/process_spectra.yaml
-  prepare_config: config/prepare_config.yaml
-  user:
-    path: config/user
-    annotate:
-      ms1: config/user/annotate_ms1.yaml
-    prepare:
-      adducts: config/user/prepare_adducts.yaml
-      closed: config/user/prepare_closed.yaml
-      features: config/user/prepare_features.yaml
-      features_components: config/user/prepare_features_components.yaml
-      features_edges: config/user/prepare_features_edges.yaml
-      gnps: config/user/prepare_gnps.yaml
-      libraries: config/user/prepare_libraries.yaml
-      sirius: config/user/prepare_sirius.yaml
-      spectral_matches: config/user/prepare_spectral_matches.yaml
-      taxa: config/user/prepare_taxa.yaml
-    process:
-      annotations: config/user/process_annotations.yaml
-      spectra: config/user/process_spectra.yaml
 data:
   path: data
   interim:
     path: data/interim
-    adducts:
-      path: data/interim/adducts
-      neg: data/interim/adducts/adducts_neg.tsv.gz
-      pos: data/interim/adducts/adducts_pos.tsv.gz
     annotations:
       path: data/interim/annotations
       example_sirius: data/interim/annotations/example_sirius.zip
-    config:
-      path: data/interim/config
     features:
       path: data/interim/features
     libraries:
       path: data/interim/libraries
-      closed: data/interim/libraries/closed_prepared.tsv.gz
-      hmdb: data/interim/libraries/hmdb_prepared.tsv.gz
-      hmdb_minimal: data/interim/libraries/hmdb_minimal.tsv.gz
-      lotus: data/interim/libraries/lotus_prepared.tsv.gz
-      merged:
-        keys: data/interim/libraries/keys.tsv.gz
-        organisms: 
-          names: data/interim/libraries/organisms_names.tsv.gz
-          taxonomies: 
-            ott: data/interim/libraries/organisms_taxonomies_ott.tsv.gz
-        structures:
-          dd_ddd: data/interim/libraries/structures_2D_3D.tsv.gz
-          metadata: data/interim/libraries/structures_metadata.tsv.gz
-          names: data/interim/libraries/structures_names.tsv.gz
-          taxonomies:
-            classyfire: data/interim/libraries/structures_taxonomies_classyfire.tsv.gz
-            npc: data/interim/libraries/structures_taxonomies_npc.tsv.gz
+      adducts:
+        path: data/interim/libraries/adducts
+        neg: data/interim/libraries/adducts/neg.tsv.gz
+        pos: data/interim/libraries/adducts/pos.tsv.gz
+      sop:
+        path: data/interim/libraries/sop
+        closed: data/interim/libraries/sop/closed_prepared.tsv.gz
+        hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
+        hmdb_minimal: data/interim/libraries/sop/hmdb_minimal.tsv.gz
+        lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
+        merged:
+          path: data/interim/libraries/sop/merged
+          keys: data/interim/libraries/sop/merged/keys.tsv.gz
+          organisms:
+            path: data/interim/libraries/sop/merged/organisms
+            names: data/interim/libraries/sop/merged/organisms/names.tsv.gz
+            taxonomies:
+              path: data/interim/libraries/sop/merged/organisms/taxonomies
+              ott: data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
+          structures:
+            path: data/interim/libraries/sop/merged/structures
+            dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+            metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+            names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+            taxonomies:
+              path: data/interim/libraries/sop/merged/structures/taxonomies
+              classyfire: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+              npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
       spectra:
         path: data/interim/libraries/spectra
-        hmdb:
-          pos: data/interim/libraries/spectra/isdb_hmdb_pos.sqlite
-          neg: data/interim/libraries/spectra/isdb_hmdb_neg.sqlite
-        lotus:
-          pos: data/interim/libraries/spectra/isdb_lotus_pos.sqlite
-          neg: data/interim/libraries/spectra/isdb_lotus_neg.sqlite
-        mona:
-          pos: data/interim/libraries/spectra/mona_pos.sqlite
-          neg: data/interim/libraries/spectra/mona_neg.sqlite
+        exp:
+          path: data/interim/libraries/spectra/exp
+          mona:
+          pos: data/interim/libraries/spectra/exp/mona_pos.sqlite
+          neg: data/interim/libraries/spectra/exp/mona_neg.sqlite
+        is:
+          path: data/interim/libraries/spectra/is
+          hmdb:
+            pos: data/interim/libraries/spectra/is/hmdb_pos.sqlite
+            neg: data/interim/libraries/spectra/is/hmdb_neg.sqlite
+          lotus:
+            pos: data/interim/libraries/spectra/is/lotus_pos.sqlite
+            neg: data/interim/libraries/spectra/is/lotus_neg.sqlite
+    params:
+      path: data/interim/params
     taxa:
       path: data/interim/taxa
   processed:
@@ -107,12 +78,15 @@ data:
         lotus: data/source/libraries/sop/lotus.csv.gz
       spectra:
         path: data/source/libraries/spectra
-        hmdb_isdb: data/source/libraries/spectra/hmdb_predicted_msms_spectra.zip
-        lotus:
-          pos: data/source/libraries/spectra/isdb_pos.mgf
-          neg: data/source/libraries/spectra/isdb_neg.mgf
-        mona_lcmsms: data/source/libraries/spectra/MoNA-export-LC-MS-MS_Spectra.sdf
-        with_rt: data/source/libraries/spectra/spectral_lib_mini_with_rt.mgf
+        exp:
+          path: data/source/libraries/spectra/exp
+          mona_lcmsms: data/source/libraries/spectra/exp/MoNA-export-LC-MS-MS_Spectra.sdf
+          with_rt: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
+        is:
+          hmdb: data/source/libraries/spectra/is/hmdb_predicted_msms_spectra.zip
+          lotus:
+            pos: data/source/libraries/spectra/is/isdb_pos.mgf
+            neg: data/source/libraries/spectra/is/isdb_neg.mgf
 doc:
   path: doc
 img:
@@ -127,6 +101,59 @@ inst:
     path: inst/scripts
     docopt:
       path: inst/scripts/docopt
+params:
+  path: params
+  default:
+    path: params/default
+    annotate:
+      masses: params/default/annotate_masses.yaml
+      spectra: params/default/annotate_spectra.yaml
+    prepare:
+      features: 
+        components: params/default/prepare_features_components.yaml
+        edges: params/default/prepare_features_edges.yaml
+        tables: params/default/prepare_features_tables.yaml
+      libraries:
+        adducts: params/default/prepare_libraries_adducts.yaml
+        sop:
+          closed: params/default/prepare_libraries_sop_closed.yaml
+          hmdb: params/default/prepare_libraries_sop_hmdb.yaml
+          lotus: params/default/prepare_libraries_sop_lotus.yaml
+          merged: params/default/prepare_libraries_sop_merged.yaml
+        spectra: params/default/prepare_libraries_spectra.yaml
+      annotations:
+        gnps: params/default/prepare_annotations_gnps.yaml
+        sirius: params/default/prepare_annotations_sirius.yaml
+        spectra: params/default/prepare_annotations_spectra.yaml
+      taxa: params/default/prepare_taxa.yaml
+    weight:
+      annotations: params/default/weight_annotations.yaml
+  prepare_params: params/prepare_params.yaml
+  user:
+    path: params/user
+    annotate:
+      masses: params/user/annotate_masses.yaml
+      spectra: params/user/annotate_spectra.yaml
+    prepare:
+      features: 
+        components: params/user/prepare_features_components.yaml
+        edges: params/user/prepare_features_edges.yaml
+        tables: params/user/prepare_features_tables.yaml
+      libraries:
+        adducts: params/user/prepare_libraries_adducts.yaml
+        sop:
+          closed: params/user/prepare_libraries_sop_closed.yaml
+          hmdb: params/user/prepare_libraries_sop_hmdb.yaml
+          lotus: params/user/prepare_libraries_sop_lotus.yaml
+          merged: params/user/prepare_libraries_sop_merged.yaml
+        spectra: params/user/prepare_libraries_spectra.yaml
+      annotations:
+        gnps: params/user/prepare_annotations_gnps.yaml
+        sirius: params/user/prepare_annotations_sirius.yaml
+        spectra: params/user/prepare_annotations_spectra.yaml
+      taxa: params/user/prepare_taxa.yaml
+    weight:
+      annotations: params/user/weight_annotations.yaml
 tests:
   mode: no
   path: tests

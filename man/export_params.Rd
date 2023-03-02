@@ -6,7 +6,7 @@
 \usage{
 export_params(
   parameters = params,
-  directory = paths$data$interim$config$path,
+  directory = paths$data$interim$params$path,
   step
 )
 }

@@ -19,8 +19,14 @@ prepare_features_components <- function(input = params$files$annotations$pretrea
                                         output = params$files$annotations$filled,
                                         components = params$files$networks$spectral$components$raw,
                                         parameters = params) {
-  params <<- parameters
+  # Check if input file(s) exists
+  stopifnot(
+    "Input file(s) do(es) not exist" =
+      rep(TRUE, length(input)) ==
+        lapply(X = input, file.exists)
+  )
   stopifnot("Your components file does not exist" = file.exists(components))
+  params <<- parameters
 
   log_debug(x = "Loading files ...")
   log_debug(x = "... features table")

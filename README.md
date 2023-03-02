@@ -66,7 +66,7 @@ cd tima-r
 Then, to copy the defaut parameters:
 
 ```
-Rscript inst/scripts/prepare_config.R
+Rscript inst/scripts/prepare_params.R
 ```
 
 This command will also be useful in case you want to automate your workflow.
@@ -96,7 +96,7 @@ docker build . -t adafede/tima-r
 ```
 
 ```
-docker compose up prepare_config
+docker compose up prepare_params
 docker compose up tests
 docker compose up tima
 ```

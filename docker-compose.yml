@@ -1,12 +1,12 @@
 version: "3.9"
 
 services:
-  prepare_config:
+  prepare_params:
     build: "."
     image: adafede/tima-r
     volumes:
       - "./config:/config"
-    command: Rscript inst/scripts/prepare_config.R
+    command: Rscript inst/scripts/prepare_params.R
 
   tests:
     build: "."

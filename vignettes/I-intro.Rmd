@@ -52,7 +52,8 @@ targets::tar_visnetwork(
   names = starts_with("annotations"),
   exclude = c(
     contains("dic"),
-    contains("config"),
+    contains("par_"),
+    contains("params"),
     contains("gnps"),
     contains("input"),
     contains("interim"),

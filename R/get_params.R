@@ -23,14 +23,14 @@ get_params <- function(step) {
   doc_path <<-
     file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
   default_path <<-
-    if (step != "prepare_config") {
-      file.path(paths$config$default$path, paste0(step, ".yaml"))
+    if (step != "prepare_params") {
+      file.path(paths$params$default$path, paste0(step, ".yaml"))
     } else {
-      file.path(paths$config$prepare_config)
+      file.path(paths$params$prepare_params)
     }
 
   user_path <<-
-    file.path(paths$config$user$path, paste0(step, ".yaml"))
+    file.path(paths$params$user$path, paste0(step, ".yaml"))
 
   doc <<- readChar(
     con = doc_path,

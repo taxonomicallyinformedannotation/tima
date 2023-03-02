@@ -16,9 +16,9 @@ log_debug("Contributors: ...")
 
 ## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)
 log_debug("Downloading HMDB (might be long)")
-download_file(
+get_file(
   url = paths$urls$hmdb$metabolites,
-  export = paths$data$source$libraries$hmdb
+  export = paths$data$source$libraries$sop$hmdb
 )
 
 log_debug("Script finished in", crayon::green(format(end - start)))

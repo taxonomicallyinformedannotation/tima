@@ -6,25 +6,25 @@ testthat::test_that("Whole process", {
   for (i in 1:length(vars)) {
     assign(vars[i], get(vars[i]), envir = .GlobalEnv)
   }
-  step <- "prepare_config"
+  step <- "prepare_params"
   params <- get_params(step = step)
   ## Prepare config for a single step only
-  prepare_config(step = "process_annotations")
+  prepare_params(step = "weight_annotations")
   ## For all steps
-  prepare_config()
+  prepare_params()
 
   ## Get all files
   ### Features table
   if (!is.null(params$gnps$id)) {
     get_gnps_tables(gnps_job_id = params$gnps$id)
   } else {
-    download_file(
+    get_file(
       url = paths$urls$examples$features,
       export = paths$data$source$features
     )
 
     ### Metadata table
-    download_file(
+    get_file(
       url = paths$urls$examples$metadata,
       export = paths$data$source$metadata
     )
@@ -33,24 +33,24 @@ testthat::test_that("Whole process", {
   ### Spectra
   #### Mini version for tests
   ## Not including it in else statement above on purpose
-  download_file(
+  get_file(
     url = paths$url$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  # download_file(url = paths$url$examples$spectra,
+  # get_file(url = paths$url$examples$spectra,
   #               export = paths$data$source$spectra)
 
   ### Spectral library with rt
-  download_file(
+  get_file(
     url = paths$url$examples$spectral_lib_mini$with_rt,
-    export = paths$data$source$libraries$spectra$with_rt
+    export = paths$data$source$libraries$spectra$exp$with_rt
   )
 
   #### SIRIUS
   ## mini version for tests
   sirius_mini <- paths$data$interim$annotations$example_sirius |>
     gsub(pattern = ".zip", replacement = "_mini.zip")
-  download_file(
+  get_file(
     url = paths$urls$examples$sirius_mini,
     export = sirius_mini
   )
@@ -59,7 +59,7 @@ testthat::test_that("Whole process", {
     zipfile = sirius_mini,
     exdir = dirname(sirius_mini)
   )
-  # download_file(
+  # get_file(
   #   url = paths$urls$examples$sirius,
   #   export = paths$data$interim$annotations$example_sirius
   # )
@@ -87,49 +87,49 @@ testthat::test_that("Whole process", {
 
   #### ISDB
   ## smaller version for testing
-  create_dir(paths$data$source$libraries$spectra$lotus$pos)
+  create_dir(paths$data$source$libraries$spectra$is$lotus$pos)
   utils::download.file(
     url = paths$url$examples$spectral_lib$pos,
-    destfile = paths$data$source$libraries$spectra$lotus$pos
+    destfile = paths$data$source$libraries$spectra$is$lotus$pos
   )
   utils::download.file(
     url = paths$url$examples$spectral_lib$neg,
-    destfile = paths$data$source$libraries$spectra$lotus$neg
+    destfile = paths$data$source$libraries$spectra$is$lotus$neg
   )
 
   ## Prepare libraries
   ### LOTUS
-  prepare_lotus()
+  prepare_libraries_sop_lotus()
 
   ### HMDB
   # prepare_hmdb()
 
   ### Closed
-  step <- "prepare_closed"
+  step <- "prepare_libraries_sop_closed"
   params <- get_params(step = step)
   ## To do as if there was an input
-  prepare_closed(input = paths$data$source$libraries$sop$lotus)
+  prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
-  prepare_closed()
+  prepare_libraries_sop_closed()
 
-  ### Structural library
-  step <- "prepare_libraries"
+  ### SOP library
+  step <- "prepare_libraries_sop_merged"
   params <- get_params(step = step)
-  prepare_libraries(
+  prepare_libraries_sop_merged(
     filter = TRUE,
     level = "family",
     value = "Simaroubaceae|Gentianaceae"
   )
-  prepare_libraries()
+  prepare_libraries_sop_merged()
 
   ## Prepare spectra
-  step <- "prepare_spectral_libraries"
+  step <- "prepare_libraries_spectra"
   params <- get_params(step = step)
   ### LOTUS
   ## Pos
-  prepare_spectral_libraries(
-    input = paths$data$source$libraries$spectra$lotus$pos,
-    output = paths$data$interim$libraries$spectra$lotus$pos,
+  prepare_libraries_spectra(
+    input = paths$data$source$libraries$spectra$is$lotus$pos,
+    output = paths$data$interim$libraries$spectra$is$lotus$pos,
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
@@ -155,14 +155,14 @@ testthat::test_that("Whole process", {
     )
   )
   ## Check the library already exists warning
-  prepare_spectral_libraries(
-    input = paths$data$source$libraries$spectra$lotus$pos,
-    output = paths$data$interim$libraries$spectra$lotus$pos
+  prepare_libraries_spectra(
+    input = paths$data$source$libraries$spectra$is$lotus$pos,
+    output = paths$data$interim$libraries$spectra$is$lotus$pos
   )
   ## Neg & without metadata
-  prepare_spectral_libraries(
-    input = paths$data$source$libraries$spectra$lotus$neg,
-    output = paths$data$interim$libraries$spectra$lotus$neg,
+  prepare_libraries_spectra(
+    input = paths$data$source$libraries$spectra$is$lotus$neg,
+    output = paths$data$interim$libraries$spectra$is$lotus$neg,
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
@@ -182,11 +182,11 @@ testthat::test_that("Whole process", {
     polarity = "neg"
   )
   ## Classical
-  prepare_spectral_libraries()
-  prepare_spectral_libraries(polarity = "neg")
-  prepare_spectral_libraries(
+  prepare_libraries_spectra()
+  prepare_libraries_spectra(polarity = "neg")
+  prepare_libraries_spectra(
     polarity = "neg",
-    output = params$files$libraries$spectral |>
+    output = params$files$libraries$spectral$exp |>
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
 
@@ -197,60 +197,60 @@ testthat::test_that("Whole process", {
   # prepare_mona()
 
   ### Adducts
-  step <- "prepare_adducts"
+  step <- "prepare_libraries_adducts"
   params <- get_params(step = step)
-  prepare_adducts()
+  prepare_libraries_adducts()
 
   ### Features
-  step <- "prepare_features"
+  step <- "prepare_features_tables"
   params <- get_params(step = step)
-  prepare_features()
+  prepare_features_tables()
 
   ## Performing MS1 annotation
-  step <- "annotate_ms1"
+  step <- "annotate_masses"
   params <- get_params(step = step)
   ### Negative
-  annotate_ms1(msMode = "neg")
+  annotate_masses(msMode = "neg")
   ### Positive
-  annotate_ms1(msMode = "pos")
+  annotate_masses(msMode = "pos")
 
   ## Performing MS2 annotation
-  step <- "process_spectra"
+  step <- "annotate_spectra"
   params <- get_params(step = step)
   ### Negative
-  process_spectra(
+  annotate_spectra(
     polarity = "neg",
     parallel = FALSE
   )
   ### Slow
-  process_spectra(
+  annotate_spectra(
     fast = FALSE,
     condition = "AND"
   )
   ### Normal
-  process_spectra()
+  annotate_spectra()
 
   ### GNPS results
-  step <- "prepare_gnps"
+  step <- "prepare_annotations_gnps"
   params <- get_params(step = step)
-  prepare_gnps(input = "fileDoesNotExist")
-  prepare_gnps()
+  prepare_annotations_gnps(input = "fileDoesNotExist")
+  prepare_annotations_gnps()
 
   ### SIRIUS results
-  step <- "prepare_sirius"
+  step <- "prepare_annotations_sirius"
   params <- get_params(step = step)
   ## To do as if there was no input
-  prepare_sirius(input_directory = "randomDirThatDoesNotExist")
+  prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
-  prepare_sirius(
+  prepare_annotations_sirius(
     input_directory = params$files$annotations$raw$sirius |>
       gsub(pattern = "sirius", replacement = "sirius_mini")
   )
 
   ### ISDB results
-  step <- "prepare_spectral_matches"
+  step <- "prepare_annotations_spectra"
   params <- get_params(step = step)
-  prepare_spectral_matches()
+  prepare_annotations_spectra()
 
   ### Edges
   step <- "prepare_features_edges"
@@ -273,15 +273,15 @@ testthat::test_that("Whole process", {
   prepare_taxa()
 
   ## Perform TIMA
-  step <- "process_annotations"
+  step <- "weight_annotations"
   params <- get_params(step = step)
   ### Normal
-  process_annotations(
+  weight_annotations(
     candidates_final = 1,
     minimal_ms1_bio = 0.8
   )
   ### Only MS1
-  process_annotations(
+  weight_annotations(
     ms1_only = TRUE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8

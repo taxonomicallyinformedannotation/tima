@@ -1,0 +1,17 @@
+#' Files.
+files:
+
+  #' Libraries files.
+  libraries:
+
+    #' Adducts libraries.
+    adducts:
+
+      #' Prepared adducts library. STRING
+      processed: library
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/sop/merged/structures/metadata.tsv.gz

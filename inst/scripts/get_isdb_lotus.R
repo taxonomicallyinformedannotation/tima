@@ -17,13 +17,13 @@ log_debug("Contributors: ...")
 # get_last_version_from_zenodo(
 #   doi = paths$url$lotus_isdb$doi,
 #   pattern = paths$urls$lotus_isdb$pattern$pos,
-#   path = paths$data$source$libraries$spectra$lotus$pos
+#   path = paths$data$source$libraries$spectra$is$lotus$pos
 # )
 #
 # get_last_version_from_zenodo(
 #   doi = paths$url$lotus_isdb$doi,
 #   pattern = paths$urls$lotus_isdb$pattern$neg,
-#   path = paths$data$source$libraries$spectra$lotus$neg
+#   path = paths$data$source$libraries$spectra$is$lotus$neg
 # )
 targets::tar_make(names = starts_with("library_spectra_is_lotus"))
 

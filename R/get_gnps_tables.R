@@ -41,7 +41,7 @@ get_gnps_tables <-
     file_features <-
       file.path(path_source, paste0(names(gnps_job_id), "_features.csv"))
     if (!file.exists(file_features)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,
@@ -58,7 +58,7 @@ get_gnps_tables <-
         paste0(names(gnps_job_id), "_metadata.tsv")
       )
     if (!file.exists(file_metadata)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,
@@ -73,7 +73,7 @@ get_gnps_tables <-
     file_spectra <-
       file.path(path_source, paste0(names(gnps_job_id), "_spectra.mgf"))
     if (!file.exists(file_spectra)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,
@@ -91,7 +91,7 @@ get_gnps_tables <-
       paste0(names(gnps_job_id), "_gnps.tsv")
     )
     if (!file.exists(file_annotations)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,
@@ -110,7 +110,7 @@ get_gnps_tables <-
       paste0(names(gnps_job_id), "_components.tsv")
     )
     if (!file.exists(file_components)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,
@@ -129,7 +129,7 @@ get_gnps_tables <-
       paste0(names(gnps_job_id), "_edges.tsv")
     )
     if (!file.exists(file_edges)) {
-      download_file(
+      get_file(
         url = paste0(
           gnps_url,
           gnps_job_id,

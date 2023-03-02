@@ -14,15 +14,15 @@ log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
 paths <- parse_yaml_paths()
 ## Prepare params
-step <- "prepare_config"
+step <- "prepare_params"
 params <- get_params(step = step)
-# prepare_config()
+# prepare_params()
 
 ## Get all files
 get_gnps_tables(gnps_job_id = params$gnps$id)
-download_file(
+get_file(
   url = paths$url$examples$spectral_lib_mini$with_rt,
-  export = paths$data$source$libraries$spectra$with_rt
+  export = paths$data$source$libraries$spectra$exp$with_rt
 )
 ### LOTUS
 log_debug("Getting LOTUS")
@@ -42,13 +42,13 @@ log_debug("... positive")
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$pos,
-  path = paths$data$source$libraries$spectra$lotus$pos
+  path = paths$data$source$libraries$spectra$is$lotus$pos
 )
 log_debug("... negative")
 get_last_version_from_zenodo(
   doi = paths$url$lotus_isdb$doi,
   pattern = paths$urls$lotus_isdb$pattern$neg,
-  path = paths$data$source$libraries$spectra$lotus$neg
+  path = paths$data$source$libraries$spectra$is$lotus$neg
 )
 
 ### HMDB ISDB
@@ -62,7 +62,7 @@ get_last_version_from_zenodo(
 ## Prepare all files
 ### LOTUS
 log_debug("Preparing LOTUS")
-prepare_lotus()
+prepare_libraries_sop_lotus()
 
 ### HMDB
 # log_debug("Preparing HMDB")
@@ -70,21 +70,21 @@ prepare_lotus()
 
 ### Closed
 log_debug("Preparing closed")
-step <- "prepare_closed"
+step <- "prepare_libraries_sop_closed"
 params <- get_params(step = step)
-prepare_closed()
+prepare_libraries_sop_closed()
 
-### Structural library
-log_debug("Preparing structural library")
-step <- "prepare_libraries"
+### SOP library
+log_debug("Preparing sop library")
+step <- "prepare_libraries_sop_merged"
 params <- get_params(step = step)
-prepare_libraries()
+prepare_libraries_sop_merged()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
-prepare_spectral_libraries(
-  input = paths$data$source$libraries$spectra$lotus$pos,
-  output = paths$data$interim$libraries$spectra$lotus$pos,
+prepare_libraries_spectra(
+  input = paths$data$source$libraries$spectra$is$lotus$pos,
+  output = paths$data$interim$libraries$spectra$is$lotus$pos,
   col_ce = NULL,
   col_ci = "FILENAME",
   col_em = "EXACTMASS",
@@ -120,45 +120,45 @@ prepare_spectral_libraries(
 
 ### Adducts
 log_debug("Preparing adducts")
-step <- "prepare_adducts"
+step <- "prepare_libraries_adducts"
 params <- get_params(step = step)
-prepare_adducts()
+prepare_libraries_adducts()
 
 ## Preparing features
 log_debug("Preparing features")
-step <- "prepare_features"
+step <- "prepare_features_tables"
 params <- get_params(step = step)
-prepare_features()
+prepare_features_tables()
 
 ## Performing MS1 annotation
 log_debug("Performing MS1 annotation")
-step <- "annotate_ms1"
+step <- "annotate_masses"
 params <- get_params(step = step)
-annotate_ms1()
+annotate_masses()
 
 ## Performing MS2 annotation
 log_debug("Performing MS2 annotation")
-step <- "process_spectra"
+step <- "annotate_spectra"
 params <- get_params(step = step)
-process_spectra()
+annotate_spectra()
 
 ### GNPS results
 log_debug("Preparing GNPS")
-step <- "prepare_gnps"
+step <- "prepare_annotations_gnps"
 params <- get_params(step = step)
-prepare_gnps()
+prepare_annotations_gnps()
 
 ### SIRIUS results
 log_debug("Preparing SIRIUS")
-step <- "prepare_sirius"
+step <- "prepare_annotations_sirius"
 params <- get_params(step = step)
-prepare_sirius()
+prepare_annotations_sirius()
 
 ### Spectral matches results
 log_debug("Preparing spectral matches")
-step <- "prepare_spectral_matches"
+step <- "prepare_annotations_spectra"
 params <- get_params(step = step)
-prepare_spectral_matches()
+prepare_annotations_spectra()
 
 ### Edges
 log_debug("Preparing edges")
@@ -180,9 +180,9 @@ prepare_taxa()
 
 ## Perform TIMA
 log_debug("Processing annotations")
-step <- "process_annotations"
+step <- "weight_annotations"
 params <- get_params(step = step)
-process_annotations()
+weight_annotations()
 
 end <- Sys.time()
 

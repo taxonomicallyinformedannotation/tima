@@ -1,0 +1,15 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre data/interim/annotations/example_sirius_pretreated.tsv.gz
+
+Usage: 
+  prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre=<fil-ann-pre>] [--too-tax-che=<too-tax-che>]
+
+Arguments:
+  fil-ann-raw-sir            Directory containing the sirius results. STRING
+  fil-ann-pre                List of pretreated annotations. STRING
+  
+  too-tax-che                Chemical taxonomy used for matching. Currently only "npc" supported. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

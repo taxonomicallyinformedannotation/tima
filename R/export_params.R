@@ -16,7 +16,7 @@
 #' @examples export_params(parameters = list(), directory = ".", step = "step")
 export_params <-
   function(parameters = params,
-           directory = paths$data$interim$config$path,
+           directory = paths$data$interim$params$path,
            step) {
     paths <- parse_yaml_paths()
     # Create directory if it does not exist
