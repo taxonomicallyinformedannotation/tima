@@ -264,7 +264,7 @@ source(file = "inst/scripts/get_isdb_lotus.R")
 And as previously, then prepare it:
 
 ```{r}
-source(file = "inst/scripts/prepare_libraries_is_lotus.R")
+source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
