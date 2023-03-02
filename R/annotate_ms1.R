@@ -275,6 +275,9 @@ annotate_ms1 <-
       dplyr::filter(!is.na(loss)) |>
       dplyr::distinct(feature_id, loss, mass, feature_id_dest)
 
+    df9_e <- df9_d |>
+      dplyr::distinct(feature_id, loss, mass)
+
     log_debug("joining within given delta mz tolerance (adducts) \n")
     df9 <- data.table::foverlaps(df7, df8) |>
       dplyr::mutate(mz_2 = mz) |>
@@ -333,7 +336,7 @@ annotate_ms1 <-
       data.table::data.table()
 
     log_debug("joining with initial results (neutral losses) \n")
-    df10_a <- dplyr::left_join(df10, df9_d) |>
+    df10_a <- dplyr::left_join(df10, df9_e) |>
       dplyr::mutate(
         mz_1 = ifelse(
           test = !is.na(loss),
@@ -702,6 +705,9 @@ annotate_ms1 <-
           structure_taxonomy_classyfire_04directparent
         )
     )
+
+    df25 |>
+      decorate_ms1()
 
     edges <- dplyr::bind_rows(
       df9 |>
