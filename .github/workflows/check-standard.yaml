@@ -49,7 +49,7 @@ jobs:
       - name: Additional step for tests to run
         run: |
           cp -R paths.yaml tests/testthat/paths.yaml
-          cp -R config tests/testthat/config
+          cp -R params tests/testthat/params
           cp -R inst tests/testthat/inst
 
       - uses: r-lib/actions/check-r-package@v2
