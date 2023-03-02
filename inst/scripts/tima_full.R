@@ -82,9 +82,39 @@ prepare_libraries_sop_merged()
 
 ### ISDB LOTUS
 # log_debug("Preparing ISDB LOTUS")
+prepare_libraries_spectra()
+prepare_libraries_spectra(polarity = "neg")
 prepare_libraries_spectra(
   input = paths$data$source$libraries$spectra$is$lotus$pos,
   output = paths$data$interim$libraries$spectra$is$lotus$pos,
+  col_ce = NULL,
+  col_ci = "FILENAME",
+  col_em = "EXACTMASS",
+  col_in = NULL,
+  col_io = "INCHI",
+  col_ik = NULL,
+  col_il = "NAME",
+  col_mf = "MOLECULAR_FORMULA",
+  col_na = NULL,
+  col_po = "IONMODE",
+  col_sm = NULL,
+  col_sn = "SMILES",
+  col_si = NULL,
+  col_sp = NULL,
+  col_sy = NULL,
+  col_xl = NULL,
+  metad = CompoundDb::make_metadata(
+    source = "LOTUS",
+    url = "https://doi.org/10.5281/zenodo.5607185",
+    source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+    source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+    organism = "Life"
+  )
+)
+prepare_libraries_spectra(
+  input = paths$data$source$libraries$spectra$is$lotus$neg,
+  output = paths$data$interim$libraries$spectra$is$lotus$neg,
+  polarity = "neg",
   col_ce = NULL,
   col_ci = "FILENAME",
   col_em = "EXACTMASS",
