@@ -34,13 +34,13 @@ yaml::write_yaml(x = paths, file = "paths.yaml")
 ## Parameters
 
 As mentioned previously, almost all steps require parameters.
-Some pre-defined parameters are given in `config/default` directory.
+Some pre-defined parameters are given in `params/default` directory.
 Those will help you understanding how the workflow works so you can adapt them later to your own data.
 
 So first, let's have a look at the structure of the parameters:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("config_default"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("par_def"), targets_only = TRUE, degree_from = 8)
 ```
 
 ### Copy
@@ -48,7 +48,7 @@ targets::tar_visnetwork(names = starts_with("config_default"), targets_only = TR
 Now, you want to copy them and adapt them to your own files to get something like:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("params"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(names = starts_with("par_"), targets_only = TRUE, degree_from = 8)
 ```
 
 ### Prepare
@@ -66,7 +66,7 @@ targets::tar_visnetwork(names = starts_with("params"), targets_only = TRUE, degr
 ```
 
 See how your targets changed?
-The values you adapted in `config/prepare_params.yaml` were automatically propagated to all subfiles in `config/user`.
+The values you adapted in `params/prepare_params.yaml` were automatically propagated to all subfiles in `params/user`.
 
 And everything is stored in case you re-perform it, the beauty of `{targets}`!
 
@@ -180,7 +180,7 @@ You just need to format it in order to be compatible.
 As example, we prepared some ways too format closed, *in house* libraries.
 If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
 
-Before running the corresponding code, do not forget to modify `config/user/prepare_libraries_sop_closed.yaml`
+Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_closed.yaml`
 
 ```{r}
 source(file = "inst/scripts/prepare_libraries_sop_closed.R")
@@ -190,7 +190,7 @@ source(file = "inst/scripts/prepare_libraries_sop_closed.R")
 
 Once you have all your sub-libraries prepared, you are ready to merge them in a single file that will be used for the next steps.
 
-Before running the corresponding code, do not forget to modify `config/user/prepare_libraries_sop_merged.yaml`.
+Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_merged.yaml`.
 
 At this step, if you want to, you can restrict your library to specific taxa only.
 We do not advise doing so, but we offer you the possibility to do it.
@@ -216,7 +216,7 @@ targets::tar_visnetwork(names = starts_with("library_adducts"), targets_only = T
 
 As you can see, it depends on the previously built library.
 
-Before running the corresponding code, do not forget to modify `config/user/prepare_libraries_adducts.yaml`.
+Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_adducts.yaml`.
 
 ```{r}
 source(file = "inst/scripts/prepare_libraries_adducts.R")
@@ -236,7 +236,7 @@ To get a small example:
 ```{r}
 get_file(
   url = paths$url$examples$spectral_lib_mini$with_rt,
-  export = paths$data$source$libraries$spectra$with_rt
+  export = paths$data$source$libraries$spectra$exp$with_rt
 )
 ```
 
