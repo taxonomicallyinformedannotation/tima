@@ -44,13 +44,13 @@ files:
 
         #' Raw edges file. STRING
         raw: 
-          - data/interim/features/example_edges_spectra.tsv.gz
+          - data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges_spectra.tsv.gz
 
   #' Spectral files. STRING
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/example_spectra.mgf
+    raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_spectra.mgf
 
 #' MS related parameters.
 ms:
@@ -81,6 +81,15 @@ ms:
 
         #' Absolute mass tolerance for MS2 in Dalton. FLOAT
         ms2: 0.01
+
+#' Names of the different variables in the input files.
+names:
+
+  #' Name of "source IDs" variable in the input. STRING
+  source: CLUSTERID1
+
+  #' Name of "target IDs" variable in the input. STRING
+  target: CLUSTERID2
 
 #' Options.
 options:

@@ -5,6 +5,9 @@
 #' @param features Table containing your previous annotation to complement
 #' @param output_annotations Output for mass based structural annotations
 #' @param output_edges Output for mass based edges
+#' @param name_source Name of the source features column
+#' @param name_target Name of the target features column
+#' @param library Library containing the keys
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -21,13 +24,13 @@
 #'
 #' @export
 #'
-#' @seealso annotate_non_ms1
-#'
 #' @examples NULL
 annotate_masses <-
   function(features = params$files$features$prepared,
            output_annotations = params$files$annotations$pretreated,
            output_edges = params$files$networks$spectral$edges$raw,
+           name_source = params$names$source,
+           name_target = params$names$target,
            library = paths$data$interim$libraries$sop$merged$keys,
            str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
            str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -456,8 +459,7 @@ annotate_masses <-
       dplyr::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(),
-        -exact_mass
+        dplyr::everything(), -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
@@ -652,9 +654,7 @@ annotate_masses <-
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(),
-        -exact_mass,
-        -adduct_value
+        dplyr::everything(), -exact_mass, -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -711,12 +711,19 @@ annotate_masses <-
     edges <- dplyr::bind_rows(
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
-        ## TODO adapt names
-        dplyr::select(CLUSTERID1 = feature_id, CLUSTERID2 = feature_id_dest, label) |>
+        dplyr::select(
+          name_source = feature_id,
+          name_target = feature_id_dest,
+          label
+        ) |>
         dplyr::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
-        dplyr::select(CLUSTERID1 = feature_id, CLUSTERID2 = feature_id_dest, label) |>
+        dplyr::select(
+          name_source = feature_id,
+          name_target = feature_id_dest,
+          label
+        ) |>
         dplyr::distinct()
     )
 

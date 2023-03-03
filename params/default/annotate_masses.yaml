@@ -12,7 +12,7 @@ files:
   features: 
 
     #' Prepared features file. STRING
-    prepared: data/interim/features/example_features.tsv.gz
+    prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_features.tsv.gz
 
   #' Libraries files.
   libraries:
@@ -64,7 +64,7 @@ files:
 
         #' Raw edges file. STRING
         raw: 
-          - data/interim/features/example_edges_masses.tsv.gz
+          - data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges_masses.tsv.gz
 
 #' MS related parameters.
 ms:
@@ -168,6 +168,14 @@ ms:
       #' Retention time tolerance in minutes. FLOAT
       minutes: 0.05
 
+#' Names of the different variables in the input files.
+names:
+
+  #' Name of "source IDs" variable in the input. STRING
+  source: CLUSTERID1
+
+  #' Name of "target IDs" variable in the input. STRING
+  target: CLUSTERID2
 
 #' Options.
 options:

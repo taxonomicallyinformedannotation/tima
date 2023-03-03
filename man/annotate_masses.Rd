@@ -8,6 +8,8 @@ annotate_masses(
   features = params$files$features$prepared,
   output_annotations = params$files$annotations$pretreated,
   output_edges = params$files$networks$spectral$edges$raw,
+  name_source = params$names$source,
+  name_target = params$names$target,
   library = paths$data$interim$libraries$sop$merged$keys,
   str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
   str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -30,6 +32,12 @@ annotate_masses(
 \item{output_annotations}{Output for mass based structural annotations}
 
 \item{output_edges}{Output for mass based edges}
+
+\item{name_source}{Name of the source features column}
+
+\item{name_target}{Name of the target features column}
+
+\item{library}{Library containing the keys}
 
 \item{str_2D_3D}{File containing 2D and 3D structures}
 
@@ -61,7 +69,4 @@ This function annotates masses
 }
 \examples{
 NULL
-}
-\seealso{
-annotate_non_ms1
 }

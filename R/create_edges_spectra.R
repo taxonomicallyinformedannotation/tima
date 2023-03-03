@@ -4,6 +4,8 @@
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param output Output file.
+#' @param name_source Name of the source features column
+#' @param name_target Name of the target features column
 #' @param method Method to be used to perform spectral comparison
 #' @param threshold Minimal similarity to report
 #' @param ppm Relative ppm tolerance to be used
@@ -22,6 +24,8 @@
 #' @examples NULL
 create_edges_spectra <- function(input = params$files$spectral$raw,
                                  output = params$files$networks$spectral$edges$raw,
+                                 name_source = params$names$source,
+                                 name_target = params$names$target,
                                  method = params$annotations$ms2$method,
                                  threshold = params$annotations$ms2$thresholds$similarity,
                                  ppm = params$ms$tolerances$mass$ppm$ms2,
@@ -108,9 +112,8 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       matched_peaks_count >= npeaks |
       presence_ratio >= rpeaks) |>
     dplyr::select(
-      ## TODO adapt names
-      CLUSTERID1 = acquisitionNum,
-      CLUSTERID2 = target_acquisitionNum,
+      name_source = acquisitionNum,
+      name_target = target_acquisitionNum,
       score,
       reverse_score,
       presence_ratio,

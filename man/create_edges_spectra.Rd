@@ -7,6 +7,8 @@
 create_edges_spectra(
   input = params$files$spectral$raw,
   output = params$files$networks$spectral$edges$raw,
+  name_source = params$names$source,
+  name_target = params$names$target,
   method = params$annotations$ms2$method,
   threshold = params$annotations$ms2$thresholds$similarity,
   ppm = params$ms$tolerances$mass$ppm$ms2,
@@ -23,6 +25,10 @@ create_edges_spectra(
 \item{input}{Query file containing spectra. Currently an '.mgf' file}
 
 \item{output}{Output file.}
+
+\item{name_source}{Name of the source features column}
+
+\item{name_target}{Name of the target features column}
 
 \item{method}{Method to be used to perform spectral comparison}
 

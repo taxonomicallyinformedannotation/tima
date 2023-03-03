@@ -968,6 +968,10 @@ list(
             annotate_masses(
               features = features_prepared,
               library = library_merged_key,
+              output_annotations = params_annotate_masses$files$annotations$pretreated,
+              output_edges = params_annotate_masses$files$networks$spectral$edges$raw,
+              name_source = params_annotate_masses$names$source,
+              name_target = params_annotate_masses$names$target,
               str_2D_3D = library_merged_str_2D_3D,
               str_met = library_merged_str_met,
               str_nam = library_merged_str_nam,
@@ -1199,6 +1203,8 @@ list(
         features_edges_spectra <- create_edges_spectra(
           input = input_spectra,
           output = params_create_edges_spectra$files$networks$spectral$edges$raw,
+          name_source = params_create_edges_spectra$names$source,
+          name_target = params_create_edges_spectra$names$target,
           method = params_create_edges_spectra$annotations$ms2$method,
           threshold = params_create_edges_spectra$annotations$ms2$thresholds$similarity,
           ppm = params_create_edges_spectra$ms$tolerances$mass$ppm$ms2,

@@ -38,7 +38,10 @@ replace_id <-
         )
       )
 
-    final <- file.path(path, new)
+    final <- ifelse(test = path != file,
+      yes = file.path(path, new),
+      no = new
+    )
 
     return(final)
   }

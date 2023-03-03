@@ -41,7 +41,7 @@ files:
     filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
     
     #' Final results file. STRING
-    processed: FinalResults.tsv
+    processed: 96fa7c88200e4a03bee4644e581e3fb0_results.tsv
 
     #' Structure organism pairs libraries.
     sop:
