@@ -8,9 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom docopt docopt
-#' @importFrom stringr fixed str_remove
-#'
 #' @examples NULL
 get_params <- function(step) {
   paths <- parse_yaml_paths()

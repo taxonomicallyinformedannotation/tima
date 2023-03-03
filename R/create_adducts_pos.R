@@ -9,9 +9,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr all_of everything mutate select
-#' @importFrom tidyr pivot_longer
-#'
 #' @examples NULL
 create_adducts_pos <- function(massesTable, adductsTable) {
   ## Calculate the masses for various positive adducts

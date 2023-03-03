@@ -8,11 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom CompoundDb CompDb Spectra
-#' @importFrom MsBackendMgf readMgf
-#' @importFrom Spectra MsBackendMemory Spectra setBackend
-#' @importFrom stringr str_remove
-#'
 #' @examples NULL
 import_spectra <- function(file) {
   file_ext <- stringr::str_remove(string = file, pattern = ".*\\.")

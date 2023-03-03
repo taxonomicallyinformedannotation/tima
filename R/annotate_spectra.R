@@ -27,13 +27,6 @@
 #'
 #' @export
 #'
-#' @importFrom BiocParallel MulticoreParam SerialParam
-#' @importFrom dplyr distinct filter mutate select
-#' @importFrom MetaboAnnotation CompareSpectraParam matchedData
-#' @importFrom MetaboAnnotation MatchForwardReverseParam matchSpectra
-#' @importFrom MsCoreUtils gnps navdist ndotproduct neuclidean nspectraangle
-#' @importFrom Spectra filterIntensity joinPeaksGnps
-#'
 #' @examples NULL
 annotate_spectra <- function(input = params$files$spectral$raw,
                              library = params$files$libraries$spectral$exp,

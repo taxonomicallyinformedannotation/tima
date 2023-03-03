@@ -14,3 +14,33 @@ files:
     #' List of pretreated annotations. STRING
     pretreated:
       - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_spectral_matches_pretreated.tsv.gz
+
+  #' Libraries files.
+  libraries:
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Merged structure organism pairs library.
+      merged:
+
+        #' Structures libraries.
+        structures:
+
+          #' Structures 2D and 3D. STRING
+          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+
+          #' Structures metadata. STRING
+          metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+
+          #' Structures names. STRING
+          names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+
+          #' Structures taxonomies.
+          taxonomies:
+
+            #' Classyfire structures taxonomy. STRING
+            cla:  data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+
+            #' NPClassifier structures taxonomy. STRING
+            npc:  data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz

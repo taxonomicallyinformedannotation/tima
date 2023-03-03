@@ -11,9 +11,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr arrange desc distinct left_join mutate select
-#' @importFrom readr cols read_tsv write_delim
-#'
 #' @examples NULL
 prepare_features_components <- function(input = params$files$annotations$pretreated,
                                         output = params$files$annotations$filled,

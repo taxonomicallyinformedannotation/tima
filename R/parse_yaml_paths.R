@@ -8,8 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom yaml read_yaml
-#'
 #' @examples NULL
 parse_yaml_paths <- function(file = "paths.yaml") {
   # Read the YAML file containing the paths

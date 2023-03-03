@@ -11,11 +11,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr add_count anti_join arrange bind_rows distinct filter
-#' @importFrom dplyr full_join group_by mutate n_distinct right_join select
-#' @importFrom dplyr tibble ungroup where
-#' @importFrom stats setNames
-#'
 #' @seealso weight_bio
 #'
 #' @examples NULL

@@ -15,20 +15,16 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr bind_rows distinct filter left_join mutate mutate_all
-#' @importFrom dplyr na_if select
-#' @importFrom readr cols read_delim write_delim
-#'
 #' @examples NULL
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            npc = params$tools$taxonomies$chemical,
            output = params$files$annotations$pretreated,
-           str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-           str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-           str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-           str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-           str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+           str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     params <<- parameters
     if (file.exists(input_directory)) {
@@ -252,7 +248,7 @@ prepare_annotations_sirius <-
         dplyr::mutate_all(dplyr::na_if, "N/A") |>
         dplyr::mutate_all(dplyr::na_if, "null") |>
         round_reals() |>
-        complement_structures_metadata(
+        complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,
           str_nam = str_nam,

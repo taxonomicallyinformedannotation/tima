@@ -38,7 +38,6 @@ Arguments:
   fil-lib-sop-raw-clo        Closed raw structure organism pairs library. STRING
   fil-lib-sop-raw-lot        Lotus raw structure organism pairs library. STRING
   fil-lib-sop-pro            List of prepared structure organism pairs libraries. STRING
-  fil-lib-sop-mer            Merged structure organism pairs library. STRING
   fil-lib-spe-neg            List of negative spectral libraries. STRING
   fil-lib-spe-pos            List of positive spectral libraries. STRING
   fil-lib-spe-raw            List of raw spectral libraries. STRING

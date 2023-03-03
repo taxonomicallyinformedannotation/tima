@@ -26,12 +26,6 @@ log_debug("Contributors: ...")
 #'
 #' @export
 #'
-#' @importFrom CompoundDb msms_spectra_hmdb
-#' @importFrom dplyr distinct filter left_join mutate pull select
-#' @importFrom MsBackendMgf MsBackendMgf
-#' @importFrom readr read_tsv
-#' @importFrom Spectra export Spectra
-#'
 #' @examples NULL
 prepare_isdb_hmdb <-
   function(input = paths$data$source$libraries$spectra$is$hmdb,

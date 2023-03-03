@@ -115,18 +115,6 @@ files:
       #' Prepared adducts library. STRING
       processed: library
 
-    #' Organisms libraries.
-    organisms:
-
-      #' Organisms names. STRING
-      names: data/interim/libraries/organisms_names.tsv.gz
-
-      #' Organisms taxonomies.
-      taxonomies:
-
-        #' OTT organisms taxonomy. STRING
-        ott:  data/interim/libraries/organisms_taxonomies_ott.tsv.gz
-
     #' Structure organism pairs libraries.
     sop:
 
@@ -141,35 +129,50 @@ files:
 
       #' List of prepared structure organism pairs libraries. STRING
       processed: 
-        - data/interim/libraries/lotus_prepared.tsv.gz
-        - data/interim/libraries/closed_prepared.tsv.gz
+        - data/interim/libraries/sop/lotus_prepared.tsv.gz
+        - data/interim/libraries/sop/closed_prepared.tsv.gz
 
-      #' Merged structure organism pairs library. STRING
-      merged: data/interim/libraries/keys.tsv.gz
+      #' Merged structure organism pairs library.
+      merged:
 
-    #' Structures libraries.
-    structures:
+        #' Merged structure organism pairs library keys. STRING
+        keys: data/interim/libraries/sop/merged/keys.tsv.gz
 
-      #' Structures 2D. STRING
-      dd: data/interim/libraries/structures_2D.tsv.gz
+        #' Organisms libraries.
+        organisms:
 
-      #' Structures 2D and 3D. STRING
-      dd_ddd: data/interim/libraries/structures_2D_3D.tsv.gz
+          #' Organisms names. STRING
+          names: data/interim/libraries/sop/merged/organisms/names.tsv.gz
 
-      #' Structures metadata. STRING
-      metadata: data/interim/libraries/structures_metadata.tsv.gz
+          #' Organisms taxonomies.
+          taxonomies:
 
-      #' Structures names. STRING
-      names: data/interim/libraries/structures_names.tsv.gz
+            #' OTT organisms taxonomy. STRING
+            ott:  data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
 
-      #' Structures taxonomies.
-      taxonomies:
+        #' Structures libraries.
+        structures:
 
-        #' Classyfire structures taxonomy. STRING
-        cla:  data/interim/libraries/structures_taxonomies_classyfire.tsv.gz
+          #' Structures 2D. STRING
+          dd: data/interim/libraries/sop/merged/structures/2D.tsv.gz
 
-        #' NPClassifier structures taxonomy. STRING
-        npc:  data/interim/libraries/structures_taxonomies_npc.tsv.gz
+          #' Structures 2D and 3D. STRING
+          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+
+          #' Structures metadata. STRING
+          metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+
+          #' Structures names. STRING
+          names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+
+          #' Structures taxonomies.
+          taxonomies:
+
+            #' Classyfire structures taxonomy. STRING
+            cla:  data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+
+            #' NPClassifier structures taxonomy. STRING
+            npc:  data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
 
     #' Spectral libraries. STRING
     spectral:
@@ -179,30 +182,22 @@ files:
 
         #' List of negative experimental spectral libraries. STRING
         neg:
-          - data/interim/spectra/exp/internal_neg.sqlite
+          - data/interim/libraries/spectra/exp/internal_neg.sqlite
 
         #' List of positive experimental spectral libraries. STRING
         pos:
-          - data/interim/spectra/exp/internal_pos.sqlite
-
-        #' List of raw experimental spectral libraries. STRING
-        raw:
-         - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
+          - data/interim/libraries/spectra/exp/internal_pos.sqlite
 
       #' In silico libraries
       is:
 
         #' List of negative in silico spectral libraries. STRING
         neg:
-          - data/interim/spectra/is/TODO.sqlite
+          - data/interim/libraries/spectra/is/lotus_neg.sqlite
 
         #' List of positive in silico spectral libraries. STRING
         pos:
-          - data/interim/spectra/is/TODO.sqlite
-
-        #' List of raw in silico spectral libraries. STRING
-        raw:
-         - data/source/libraries/spectra/is/TODO.mgf
+          - data/interim/libraries/spectra/is/lotus_pos.sqlite
 
   #' Networks files.
   networks:
@@ -230,7 +225,7 @@ files:
 
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
-    raw: data/examples/metadata.tsv
+    raw: data/source/example_metadata.tsv
 
     #' Taxonomically informed features file. STRING
     processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
@@ -239,7 +234,7 @@ files:
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/spectra.mgf
+    raw: data/source/example_spectra.mgf
 
 
 #' GNPS related parameters.
@@ -344,10 +339,10 @@ ms:
       ppm: 
 
         #' Relative mass tolerance for MS1 in ppm. FLOAT
-        ms1: 10
+        ms1: 5
 
         #' Relative mass tolerance for MS2 in ppm. FLOAT
-        ms2: 10
+        ms2: 5
 
       #' Absolute in Dalton.
       dalton:

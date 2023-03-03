@@ -7,11 +7,11 @@
 prepare_annotations_spectra(
   input = params$files$annotations$raw$spectral,
   output = params$files$annotations$pretreated,
-  str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-  str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-  str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-  str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-  str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+  str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+  str_met = params$files$libraries$sop$merged$structures$metadata,
+  str_nam = params$files$libraries$sop$merged$structures$names,
+  str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
   parameters = params
 )
 }

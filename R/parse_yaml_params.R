@@ -9,8 +9,6 @@
 #'
 #' @export
 #'
-#' @importFrom yaml read_yaml
-#'
 #' @examples NULL
 parse_yaml_params <- function(def = default_path, usr = user_path) {
   # Read the default YAML file

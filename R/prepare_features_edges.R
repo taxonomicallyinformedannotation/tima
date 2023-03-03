@@ -12,9 +12,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr filter select
-#' @importFrom readr read_tsv
-#'
 #' @examples NULL
 prepare_features_edges <-
   function(input = params$files$networks$spectral$edges$raw,

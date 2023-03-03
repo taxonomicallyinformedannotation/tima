@@ -40,7 +40,11 @@ Those will help you understanding how the workflow works so you can adapt them l
 So first, let's have a look at the structure of the parameters:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("par_def"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("par_def"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 ### Copy
@@ -48,7 +52,11 @@ targets::tar_visnetwork(names = starts_with("par_def"), targets_only = TRUE, deg
 Now, you want to copy them and adapt them to your own files to get something like:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("par_"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("par_"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 ### Prepare
@@ -81,7 +89,11 @@ You can easily fine tune all parameters in each file and only the steps impacted
 Your final prepared parameters look now like:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("params"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("params"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 ## Inputs
@@ -93,7 +105,11 @@ These dictionaries are needed among the pipeline and it is recommended **NOT** t
 If you are confident in doing so, feel free.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("dic"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("dic"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 ### Your own file(s)
@@ -101,7 +117,12 @@ targets::tar_visnetwork(names = starts_with("dic"), targets_only = TRUE, degree_
 Basically, the most important file you need to provide is an MGF file containing the spectra you want to annotate, as you can see in the architecture:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("input"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("input"),
+  exclude = c(contains("par")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 If you already ran a GNPS job, you can simply do:
@@ -130,7 +151,12 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("input"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("input"),
+  exclude = c(contains("par")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 You can easily get it by running: 
@@ -140,7 +166,11 @@ source(file = "inst/scripts/get_lotus.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = matches("library_sop_lotus$"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = matches("library_sop_lotus$"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 You then need to format it as expected by the pipeline, to do so:
@@ -150,7 +180,11 @@ source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = matches("library_sop_lotus"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = matches("library_sop_lotus"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 As you can see, the target seems outdated.
@@ -202,7 +236,12 @@ source(file = "inst/scripts/prepare_libraries_sop_merged.R")
 You now should have a nice custom structure-organism pairs library for the next steps!
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("library_sop"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("library_sop"),
+  exclude = c(contains("par_")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 #### Adducts
@@ -211,7 +250,12 @@ The next library you need is an adducts library!
 As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS1 annotation later on.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("library_adducts"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("library_adducts"),
+  exclude = c(contains("par_")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 As you can see, it depends on the previously built library.
@@ -268,7 +312,12 @@ source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("library_spectra"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("library_spectra"),
+  exclude = c(contains("par_")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 As you can see, both MS polarities are available!
@@ -284,7 +333,12 @@ source(file = "inst/scripts/get_isdb_hmdb.R")
 You are finally ready for the next step, with all dictionaries, inputs, and libraries you need!
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("library"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("library"),
+  exclude = c(contains("par_")),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).

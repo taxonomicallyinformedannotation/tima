@@ -60,8 +60,6 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @export
 #'
-#' @importFrom utils combn
-#'
 #' @examples NULL
 dist_groups <- function(d, g) {
   # Convert d to a dist object

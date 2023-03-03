@@ -168,7 +168,7 @@ list(
           }
         )
       ),
-      ## User prepared
+      ## User
       list(
         tar_file(
           name = par_usr_ann_mas,
@@ -513,14 +513,14 @@ list(
       )
     )
   ),
-  ## gnps
+  ## GNPS
   list(
     tar_file(
       name = gnps_tables,
       command = {
         gnps_tables <- get_gnps_tables(
           gnps_job_id = par_fin_par$gnps$id,
-          workflow = "fbmn",
+          workflow = par_fin_par$gnps$workflow,
           path_source = paths$data$source$path,
           path_interim_a = paths$data$interim$annotations$path,
           path_interim_f = paths$data$interim$features$path
@@ -566,7 +566,7 @@ list(
       )
     )
   ),
-  ## inputs
+  ## Inputs
   list(
     tar_file(
       name = input_features,
@@ -602,7 +602,7 @@ list(
       }
     )
   ),
-  ## interim
+  ## Interim
   list(
     tar_file(
       name = interim_components,
@@ -737,8 +737,8 @@ list(
       name = library_adducts,
       command = {
         library_adducts <- prepare_libraries_adducts(
-          adducts_input = library_merged_str_met,
-          adducts_table_input = paths$inst$extdata$adducts,
+          str_met = library_merged_str_met,
+          adducts_masses = dic_adducts,
           adducts_output_path = paths$data$interim$libraries$adducts$path,
           output_name = params_prepare_libraries_adducts$files$libraries$adducts$processed,
           masses_pos_output_path = paths$data$interim$libraries$adducts$pos,

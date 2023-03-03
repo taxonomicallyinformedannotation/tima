@@ -2,8 +2,8 @@
 #'
 #' @description This function prepares adducts for further use
 #'
-#' @param adducts_input List of adducts taken as input
-#' @param adducts_table_input Table of adducts taken as input
+#' @param str_met File containing structures metadata
+#' @param adducts_masses Table of adducts taken as input
 #' @param config_output_path Path where the configuration will be saved
 #' @param adducts_output_path Path where the adducts will be saved
 #' @param output_name Name of the file where adducts will be saved
@@ -15,25 +15,21 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr distinct filter mutate_all select
-#' @importFrom readr read_delim write_delim
-#' @importFrom stringr str_remove
-#'
 #' @examples NULL
 prepare_libraries_adducts <-
-  function(adducts_input = params$files$libraries$sop$merged,
-           adducts_table_input = paths$inst$extdata$adducts,
+  function(str_met = params$files$libraries$sop$merged$structures$metadata,
+           adducts_masses = paths$inst$extdata$adducts,
            adducts_output_path = paths$data$interim$libraries$adducts$path,
            output_name = params$files$libraries$adducts$processed,
            masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
            masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
            parameters = params) {
-    stopifnot("Your input file does not exist" = file.exists(adducts_input))
+    stopifnot("Your structure metadata file does not exist" = file.exists(str_met))
     params <<- parameters
     log_debug("Loading files ...")
     log_debug("... exact masses")
     masses <- readr::read_delim(
-      file = adducts_input,
+      file = str_met,
       col_select = "structure_exact_mass"
     ) |>
       dplyr::select(exact_mass = structure_exact_mass) |>
@@ -41,7 +37,7 @@ prepare_libraries_adducts <-
 
     log_debug("... adducts")
     adducts_table <-
-      readr::read_delim(file = adducts_table_input)
+      readr::read_delim(file = adducts_masses)
 
     log_debug("Treating adducts table")
     adducts_t <- t(adducts_table) |>

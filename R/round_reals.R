@@ -7,8 +7,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr across any_of mutate
-#'
 #' @examples NULL
 round_reals <- function(df, dig = 5) {
   df |>

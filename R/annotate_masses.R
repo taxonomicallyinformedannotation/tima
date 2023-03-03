@@ -17,14 +17,6 @@
 #'
 #' @export
 #'
-#' @importFrom data.table data.table foverlaps setkey
-#' @importFrom dplyr across bind_rows desc distinct everything filter
-#' @importFrom dplyr group_by inner_join left_join mutate mutate_all
-#' @importFrom dplyr rowwise select ungroup
-#' @importFrom stats dist setNames
-#' @importFrom stringr str_detect
-#' @importFrom tidyr pivot_longer
-#'
 #' @seealso annotate_non_ms1
 #'
 #' @examples NULL
@@ -32,11 +24,11 @@ annotate_masses <-
   function(features = params$files$features$prepared,
            output = params$files$annotations$pretreated,
            library = paths$data$interim$libraries$sop$merged$keys,
-           str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-           str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-           str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-           str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-           str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+           str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            name = params$files$libraries$adducts$processed,
            adducts_list = params$ms$adducts,
            adducts_masses_list = paths$inst$extdata$adducts,
@@ -75,7 +67,6 @@ annotate_masses <-
       readr::read_delim(file = adducts_masses_list)
 
     log_debug("... neutral lossses")
-
 
     adductsM <- adductsMassTable$mass
     names(adductsM) <- adductsMassTable$adduct
@@ -707,7 +698,7 @@ annotate_masses <-
     )
 
     df25 |>
-      decorate_ms1()
+      decorate_masses()
 
     edges <- dplyr::bind_rows(
       df9 |>

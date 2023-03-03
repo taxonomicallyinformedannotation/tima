@@ -68,11 +68,11 @@ files:
 
         #' List of negative in silico spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/is/lotus_pos.sqlite
+          - data/interim/libraries/spectra/is/lotus_neg.sqlite
 
         #' List of positive in silico spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/is/lotus_neg.sqlite
+          - data/interim/libraries/spectra/is/lotus_pos.sqlite
 
   #' Spectral files. STRING
   spectral:
@@ -105,7 +105,7 @@ ms:
       ppm: 
 
         #' Relative mass tolerance for MS2 in ppm. FLOAT
-        ms2: 10
+        ms2: 5
 
       #' Absolute in Dalton.
       dalton:

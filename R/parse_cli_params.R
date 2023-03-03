@@ -86,9 +86,6 @@ parse_cli_params <- function() {
     if (!is.null(arguments$fil_lib_sop_pro)) {
       params$files$libraries$sop$processed <- as.character(arguments$fil_lib_sop_pro)
     }
-    if (!is.null(arguments$fil_lib_sop_mer)) {
-      params$files$libraries$sop$merged <- as.character(arguments$fil_lib_sop_mer)
-    }
     if (!is.null(arguments$fil_lib_spe_neg)) {
       params$files$libraries$spectral$neg <- as.character(arguments$fil_lib_spe_neg)
     }

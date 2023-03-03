@@ -28,8 +28,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr mutate
-#'
 #' @examples NULL
 prepare_libraries_spectra <-
   function(input = params$files$libraries$spectral$exp$raw,

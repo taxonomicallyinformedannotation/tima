@@ -21,10 +21,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr across arrange bind_rows dense_rank desc distinct filter
-#' @importFrom dplyr full_join group_by left_join mutate select tibble ungroup
-#' @importFrom stringr str_detect
-#'
 #' @examples NULL
 weight_bio <-
   function(annotationTable = annotation_table_ms1_taxed,

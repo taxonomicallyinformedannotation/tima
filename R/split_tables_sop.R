@@ -8,8 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr add_count distinct filter group_by select ungroup
-#'
 #' @examples NULL
 split_tables_sop <- function(table) {
   log_debug(x = "Splitting the concatenated library into smaller pieces")

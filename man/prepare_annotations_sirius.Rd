@@ -8,11 +8,11 @@ prepare_annotations_sirius(
   input_directory = params$files$annotations$raw$sirius,
   npc = params$tools$taxonomies$chemical,
   output = params$files$annotations$pretreated,
-  str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-  str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-  str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-  str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-  str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+  str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+  str_met = params$files$libraries$sop$merged$structures$metadata,
+  str_nam = params$files$libraries$sop$merged$structures$names,
+  str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
   parameters = params
 )
 }

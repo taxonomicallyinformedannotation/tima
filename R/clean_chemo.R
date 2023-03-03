@@ -12,10 +12,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr across arrange bind_rows dense_rank desc distinct
-#' @importFrom dplyr everything filter group_by left_join mutate mutate_all
-#' @importFrom dplyr na_if select summarise ungroup
-#'
 #' @seealso weight_chemo
 #'
 #' @examples NULL

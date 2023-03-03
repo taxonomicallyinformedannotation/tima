@@ -10,9 +10,6 @@
 #'
 #' @export
 #'
-#' @importFrom crayon green
-#' @importFrom yaml write_yaml
-#'
 #' @examples export_params(parameters = list(), directory = ".", step = "step")
 export_params <-
   function(parameters = params,

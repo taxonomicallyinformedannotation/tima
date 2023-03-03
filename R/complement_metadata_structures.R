@@ -1,4 +1,4 @@
-#' @title Complement structures metadata
+#' @title Complement metadata of structures
 #'
 #' @description This function complement structural metadata
 #'
@@ -12,11 +12,8 @@
 #'
 #' @export
 #'
-#' @importFrom readr read_delim
-#' @importFrom dplyr coalesce distinct left_join mutate select
-#'
 #' @examples NULL
-complement_structures_metadata <- function(df,
+complement_metadata_structures <- function(df,
                                            str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
                                            str_met = paths$data$interim$libraries$merged$structures$metadata,
                                            str_nam = paths$data$interim$libraries$merged$structures$names,

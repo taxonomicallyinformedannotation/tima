@@ -45,12 +45,6 @@
 #'
 #' @export
 #'
-#' @importFrom crayon green
-#' @importFrom dplyr across arrange bind_rows distinct filter select
-#' @importFrom dplyr left_join matches mutate mutate_all mutate_if
-#' @importFrom readr cols read_delim write_delim
-#' @importFrom yaml write_yaml
-#'
 #' @seealso annotate_masses weight_bio weight_chemo
 #'
 #' @examples NULL

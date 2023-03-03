@@ -5,8 +5,8 @@
 \title{Prepare libraries of adducts}
 \usage{
 prepare_libraries_adducts(
-  adducts_input = params$files$libraries$sop$merged,
-  adducts_table_input = paths$inst$extdata$adducts,
+  str_met = params$files$libraries$sop$merged$structures$metadata,
+  adducts_masses = paths$inst$extdata$adducts,
   adducts_output_path = paths$data$interim$libraries$adducts$path,
   output_name = params$files$libraries$adducts$processed,
   masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
@@ -15,9 +15,9 @@ prepare_libraries_adducts(
 )
 }
 \arguments{
-\item{adducts_input}{List of adducts taken as input}
+\item{str_met}{File containing structures metadata}
 
-\item{adducts_table_input}{Table of adducts taken as input}
+\item{adducts_masses}{Table of adducts taken as input}
 
 \item{adducts_output_path}{Path where the adducts will be saved}
 

@@ -8,9 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr across any_of group_by mutate rename select summarize summarize_all ungroup
-#' @importFrom Spectra peaksData spectraData
-#'
 #' @examples NULL
 extract_spectra <- function(object) {
   ## issues

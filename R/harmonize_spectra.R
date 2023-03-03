@@ -25,10 +25,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr any_of filter full_join mutate row_number select
-#' @importFrom stringr fixed str_remove
-#' @importFrom tidyr pivot_wider
-#'
 #' @examples NULL
 harmonize_spectra <- function(spectra,
                               mode,

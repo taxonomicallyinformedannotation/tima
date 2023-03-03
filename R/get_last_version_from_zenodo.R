@@ -12,9 +12,6 @@
 #'
 #' @export
 #'
-#' @importFrom jsonlite fromJSON
-#' @importFrom stringr fixed str_match str_remove
-#'
 #' @examples NULL
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {

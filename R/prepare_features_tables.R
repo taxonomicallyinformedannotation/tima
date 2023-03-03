@@ -13,9 +13,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr arrange desc distinct left_join mutate select
-#' @importFrom readr cols read_delim write_delim
-#'
 #' @examples NULL
 prepare_features_tables <-
   function(features = params$files$features$raw,

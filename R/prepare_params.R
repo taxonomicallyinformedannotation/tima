@@ -13,9 +13,6 @@
 #'
 #' @export
 #'
-#' @importFrom stringr str_length
-#' @importFrom yaml read_yaml write_yaml
-#'
 #' @examples NULL
 prepare_params <- function(filename = params$files$pattern,
                            gnps_job_id = params$gnps$id,

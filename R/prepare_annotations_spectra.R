@@ -14,18 +14,15 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr distinct mutate
-#' @importFrom readr cols read_delim write_delim
-#'
 #' @examples NULL
 prepare_annotations_spectra <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$pretreated,
-           str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-           str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-           str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-           str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-           str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+           str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     # Check if input file(s) exists
     stopifnot(
@@ -99,7 +96,7 @@ prepare_annotations_spectra <-
       dplyr::mutate_all(dplyr::na_if, "N/A") |>
       dplyr::mutate_all(dplyr::na_if, "null") |>
       round_reals() |>
-      complement_structures_metadata(
+      complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,
         str_nam = str_nam,

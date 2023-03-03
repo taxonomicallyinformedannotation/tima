@@ -9,9 +9,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr distinct mutate select
-#' @importFrom readr read_csv
-#'
 #' @examples NULL
 prepare_libraries_sop_lotus <-
   function(input = paths$data$source$libraries$sop$lotus,

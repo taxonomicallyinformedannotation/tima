@@ -9,12 +9,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr arrange bind_rows coalesce desc distinct filter left_join
-#' @importFrom dplyr matches mutate row_number select setdiff
-#' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
-#' @importFrom stringr fixed str_remove
-#' @importFrom tidyr pivot_wider
-#'
 #' @examples NULL
 get_organism_taxonomy_ott <- function(df) {
   organism_table <- df |>

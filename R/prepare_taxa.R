@@ -19,16 +19,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr across all_of arrange bind_rows coalesce distinct
-#' @importFrom dplyr everything filter group_by group_cols left_join matches
-#' @importFrom dplyr mutate mutate_all mutate_at na_if row_number select
-#' @importFrom dplyr setdiff summarise_all ungroup vars
-#' @importFrom readr read_delim write_delim
-#' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
-#' @importFrom stringr fixed str_length str_remove
-#' @importFrom tibble column_to_rownames rownames_to_column
-#' @importFrom tidyr gather pivot_wider separate_rows
-#'
 #' @examples NULL
 prepare_taxa <-
   function(input = params$files$features$raw,

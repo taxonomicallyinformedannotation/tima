@@ -8,8 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom stringr fixed str_remove
-#'
 #' @examples pretreated_name <- pre_harmonize_names_sirius("My name/suffix")
 pre_harmonize_names_sirius <- function(x) {
   # Remove any characters after and including the '/' character from the name

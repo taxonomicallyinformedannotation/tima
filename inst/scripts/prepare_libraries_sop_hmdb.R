@@ -24,10 +24,6 @@ log_debug("Contributors: ...")
 #'
 #' @export
 #'
-#' @importFrom dplyr distinct filter mutate mutate_all na_if select
-#' @importFrom readr read_tsv write_tsv
-#' @importFrom XML xmlParse xmlValue xpathSApply
-#'
 #' @examples NULL
 prepare_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
                          output = paths$data$interim$libraries$sop$hmdb,
