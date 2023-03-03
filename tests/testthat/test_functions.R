@@ -230,6 +230,17 @@ testthat::test_that("Whole process", {
   ### Normal
   annotate_spectra()
 
+  ## Create MS2 based edges
+  step <- "create_edges_spectra"
+  params <- get_params(step = step)
+  ### Slow
+  create_edges_spectra(
+    parallel = FALSE,
+    condition = "OR"
+  )
+  ### Normal
+  create_edges_spectra()
+
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)

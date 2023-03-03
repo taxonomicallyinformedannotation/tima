@@ -172,6 +172,12 @@ step <- "annotate_spectra"
 params <- get_params(step = step)
 annotate_spectra()
 
+## Create MS2 based edges
+log_debug("Creating MS2-based edges")
+step <- "create_edges_spectra"
+params <- get_params(step = step)
+create_edges_spectra()
+
 ### GNPS results
 log_debug("Preparing GNPS")
 step <- "prepare_annotations_gnps"

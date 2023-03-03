@@ -19,11 +19,16 @@ prepare_features_edges <-
            name_source = params$names$source,
            name_target = params$names$target,
            parameters = params) {
-    stopifnot("Your input file does not exist" = file.exists(input))
+    stopifnot(
+      "Your input file(s) do(es) not exist" =
+        rep(TRUE, length(unlist(input))) ==
+          lapply(X = unlist(input), file.exists)
+    )
     params <<- parameters
     ## Load edges table
     log_debug(x = "Loading edge table")
-    edges_table <- readr::read_tsv(file = input)
+    edges_table <- lapply(X = input, FUN = readr::read_tsv) |>
+      dplyr::bind_rows()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
