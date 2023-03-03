@@ -62,6 +62,7 @@ Collate:
     'export_output.R'
     'export_params.R'
     'export_spectra.R'
+    'export_spectra_2.R'
     'extract_spectra.R'
     'get_file.R'
     'get_gnps_tables.R'
