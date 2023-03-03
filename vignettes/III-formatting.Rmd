@@ -21,7 +21,7 @@ This vignette describes how to format all your files.
 
 ## Structural annotations of your features
 
-For the moment, we support annotations coming from 4 different annotation tools: 
+For the moment, we support annotations coming from 4 different annotation tools:
 
 * MS1 exact mass-based library search
 * [GNPS](https://gnps.ucsd.edu)
@@ -158,8 +158,11 @@ We are currently also working on CANOPUS integration for chemical class annotati
 
 ### Case when no network available
 
-If no network was generated, we will be generating some.
-Development follows...
+If no network was generated previously on GNPS (no GNPS job ID provided), it can be generated using:
+
+```{r}
+source(file = "inst/scripts/create_edges_spectra.R")
+```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
 

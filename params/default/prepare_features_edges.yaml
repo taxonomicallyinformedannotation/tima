@@ -11,7 +11,9 @@ files:
       edges:
 
         #' Raw edges file. STRING
-        raw: data/interim/features/example_edges.tsv
+        raw: 
+          - data/interim/features/example_edges_spectra.tsv
+          - data/interim/features/example_edges_masses.tsv.gz
 
         #' Prepared edges file. STRING
         processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz

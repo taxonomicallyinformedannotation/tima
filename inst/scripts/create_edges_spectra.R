@@ -5,21 +5,19 @@ require(
   quietly = TRUE
 )
 
-# step <- "annotate_spectra"
+# step <- "create_edges_spectra"
 # paths <- parse_yaml_paths()
 # params <- get_params(step = step)
 
 log_debug(
   "This script",
-  crayon::green(
-    "performs spectral similarity calculation to annotate against a spectral library. \n"
-  )
+  crayon::green("performs spectral similarity calculation to create edges. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# annotate_spectra()
-targets::tar_make(names = matches("annotations_spectral_merged"))
+# create_edges_spectra()
+targets::tar_make(names = matches("features_edges_spectra"))
 
 end <- Sys.time()
 

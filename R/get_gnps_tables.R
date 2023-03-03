@@ -126,7 +126,7 @@ get_gnps_tables <-
     log_debug("... Edges")
     file_edges <- file.path(
       path_interim_f,
-      paste0(names(gnps_job_id), "_edges.tsv")
+      paste0(names(gnps_job_id), "_edges_spectra.tsv")
     )
     if (!file.exists(file_edges)) {
       get_file(

@@ -2,12 +2,16 @@
 #'
 #' @description This function annotates masses
 #'
-#' @param featuresTable Table containing your previous annotation to complement
-#' @param structureExactMassTable Table containing the structure - exact mass pairs to perform annotation
-#' @param adducts List of adducts to be used
-#' @param adductsM Adducts masses
-#' @param adductsTable Table containing the adducted library masses
-#' @param neutralLosses List of neutral losses to be used
+#' @param features Table containing your previous annotation to complement
+#' @param output_annotations Output for mass based structural annotations
+#' @param output_edges Output for mass based edges
+#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_met File containing structures metadata
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
+#' @param adducts_list List of adducts to be used
+#' @param adducts_masses_list Adducts masses
+#' @param neutral_losses_list List of neutral losses to be used
 #' @param msMode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
 #' @param toleranceRt Tolerance to perform adduct attribution. Should be lower than 0.1min
@@ -22,7 +26,8 @@
 #' @examples NULL
 annotate_masses <-
   function(features = params$files$features$prepared,
-           output = params$files$annotations$pretreated,
+           output_annotations = params$files$annotations$pretreated,
+           output_edges = params$files$networks$spectral$edges$raw,
            library = paths$data$interim$libraries$sop$merged$keys,
            str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
            str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -451,7 +456,8 @@ annotate_masses <-
       dplyr::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(), -exact_mass
+        dplyr::everything(),
+        -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
@@ -646,7 +652,9 @@ annotate_masses <-
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(), -exact_mass, -adduct_value
+        dplyr::everything(),
+        -exact_mass,
+        -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -703,16 +711,21 @@ annotate_masses <-
     edges <- dplyr::bind_rows(
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
-        dplyr::select(feature_id, feature_target = feature_id_dest, label) |>
+        ## TODO adapt names
+        dplyr::select(CLUSTERID1 = feature_id, CLUSTERID2 = feature_id_dest, label) |>
         dplyr::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
-        dplyr::select(feature_id, feature_target = feature_id_dest, label) |>
+        dplyr::select(CLUSTERID1 = feature_id, CLUSTERID2 = feature_id_dest, label) |>
         dplyr::distinct()
     )
 
     export_params(step = "annotate_masses")
-    export_output(x = df25, file = output[[1]])
+    export_output(x = edges, file = output_edges[[1]])
+    export_output(x = df25, file = output_annotations[[1]])
 
-    return(output[[1]])
+    return(c(
+      "annotations" = output_annotations[[1]],
+      "edges" = output_edges[[1]]
+    ))
   }

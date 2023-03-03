@@ -70,6 +70,12 @@ list(
         }
       ),
       tar_file(
+        name = par_def_cre_edg_spe,
+        command = {
+          par_def_cre_edg_spe <- paths$params$default$create$edges$spectra
+        }
+      ),
+      tar_file(
         name = par_def_pre_ann_gnp,
         command = {
           par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
@@ -195,6 +201,20 @@ list(
                 taxon = par_fin_par$organisms$taxon,
                 parameters = par_fin_par,
                 step = "annotate_spectra"
+              )
+          }
+        ),
+        tar_file(
+          name = par_usr_cre_edg_spe,
+          command = {
+            par_usr_cre_edg_spe <-
+              prepare_params(
+                filename = par_fin_par$files$pattern,
+                gnps_job_id = par_fin_par$gnps$id,
+                ms_mode = par_fin_par$ms$polarity,
+                taxon = par_fin_par$organisms$taxon,
+                parameters = par_fin_par,
+                step = "create_edges_spectra"
               )
           }
         ),
@@ -387,6 +407,16 @@ list(
             parse_yaml_params(
               def = par_def_ann_spe,
               usr = par_usr_ann_spe[1]
+            )
+        }
+      ),
+      tar_target(
+        name = params_create_edges_spectra,
+        command = {
+          params_create_edges_spectra <-
+            parse_yaml_params(
+              def = par_def_cre_edg_spe,
+              usr = par_usr_cre_edg_spe[1]
             )
         }
       ),
@@ -598,31 +628,6 @@ list(
             test = file.exists(gnps_metadata),
             yes = gnps_metadata,
             no = params_prepare_taxa$files$taxa$raw
-          )
-      }
-    )
-  ),
-  ## Interim
-  list(
-    tar_file(
-      name = interim_components,
-      command = {
-        interim_components <-
-          ifelse(
-            test = file.exists(gnps_components),
-            yes = gnps_components,
-            no = params_prepare_features_components$files$networks$spectral$components$raw
-          )
-      }
-    ),
-    tar_file(
-      name = interim_edges,
-      command = {
-        interim_edges <-
-          ifelse(
-            test = file.exists(gnps_edges),
-            yes = gnps_edges,
-            no = params_prepare_features_edges$files$networks$spectral$edges$raw
           )
       }
     )
@@ -955,29 +960,43 @@ list(
   ## Annotations
   list(
     ## MS1
-    list(tar_file(
-      name = annotations_ms1_prepared,
-      command = {
-        annotations_ms1_prepared <-
-          annotate_masses(
-            features = features_prepared,
-            library = library_merged_key,
-            str_2D_3D = library_merged_str_2D_3D,
-            str_met = library_merged_str_met,
-            str_nam = library_merged_str_nam,
-            str_tax_cla = library_merged_str_tax_cla,
-            str_tax_npc = library_merged_str_tax_npc,
-            name = library_adducts[params_annotate_masses$ms$polarity],
-            adducts_list = params_annotate_masses$ms$adducts,
-            adducts_masses_list = dic_adducts,
-            neutral_losses_list = dic_neutral_losses,
-            msMode = params_annotate_masses$ms$polarity,
-            tolerancePpm = params_annotate_masses$ms$tolerances$mass$ppm$ms1,
-            toleranceRt = params_annotate_masses$ms$tolerances$rt$minutes,
-            parameters = params_annotate_masses
-          )
-      }
-    )),
+    list(
+      tar_file(
+        name = annotations_ms1_prepared,
+        command = {
+          annotations_ms1_prepared <-
+            annotate_masses(
+              features = features_prepared,
+              library = library_merged_key,
+              str_2D_3D = library_merged_str_2D_3D,
+              str_met = library_merged_str_met,
+              str_nam = library_merged_str_nam,
+              str_tax_cla = library_merged_str_tax_cla,
+              str_tax_npc = library_merged_str_tax_npc,
+              name = library_adducts[params_annotate_masses$ms$polarity],
+              adducts_list = params_annotate_masses$ms$adducts,
+              adducts_masses_list = dic_adducts,
+              neutral_losses_list = dic_neutral_losses,
+              msMode = params_annotate_masses$ms$polarity,
+              tolerancePpm = params_annotate_masses$ms$tolerances$mass$ppm$ms1,
+              toleranceRt = params_annotate_masses$ms$tolerances$rt$minutes,
+              parameters = params_annotate_masses
+            )
+        }
+      ),
+      tar_file(
+        name = annotations_ms1_prepared_annotations,
+        command = {
+          annotations_ms1_prepared_annotations <- annotations_ms1_prepared[[1]]
+        }
+      ),
+      tar_file(
+        name = annotations_ms1_prepared_edges,
+        command = {
+          annotations_ms1_prepared_edges <- annotations_ms1_prepared[[2]]
+        }
+      )
+    ),
     ## Spectral
     list(
       ## Experimental
@@ -1175,10 +1194,54 @@ list(
   ## Features
   list(
     tar_file(
+      name = features_edges_spectra,
+      command = {
+        features_edges_spectra <- create_edges_spectra(
+          input = input_spectra,
+          output = params_create_edges_spectra$files$networks$spectral$edges$raw,
+          method = params_create_edges_spectra$annotations$ms2$method,
+          threshold = params_create_edges_spectra$annotations$ms2$thresholds$similarity,
+          ppm = params_create_edges_spectra$ms$tolerances$mass$ppm$ms2,
+          dalton = params_create_edges_spectra$ms$tolerances$mass$dalton$ms2,
+          npeaks = params_create_edges_spectra$annotations$ms2$thresholds$peaks$absolute,
+          rpeaks = params_create_edges_spectra$annotations$ms2$thresholds$peaks$ratio,
+          condition = params_create_edges_spectra$annotations$ms2$thresholds$condition,
+          qutoff = params_create_edges_spectra$ms$intensity$thresholds$ms2,
+          parallel = params_create_edges_spectra$options$parallel,
+          parameters = params_create_edges_spectra
+        )
+      }
+    ),
+    ## Interim
+    list(
+      tar_file(
+        name = interim_components,
+        command = {
+          interim_components <-
+            ifelse(
+              test = file.exists(gnps_components),
+              yes = gnps_components,
+              no = params_prepare_features_components$files$networks$spectral$components$raw
+            )
+        }
+      ),
+      tar_file(
+        name = edges_spectra,
+        command = {
+          edges_spectra <-
+            ifelse(
+              test = file.exists(gnps_edges),
+              yes = gnps_edges,
+              no = features_edges_spectra
+            )
+        }
+      )
+    ),
+    tar_file(
       name = features_edges_prepared,
       command = {
         features_edges_prepared <- prepare_features_edges(
-          input = interim_edges,
+          input = list(annotations_ms1_prepared_edges, edges_spectra),
           output = params_prepare_features_edges$files$networks$spectral$edges$processed,
           name_source = params_prepare_features_edges$names$source,
           name_target = params_prepare_features_edges$names$target,
@@ -1195,7 +1258,7 @@ list(
             annotations_spectral_exp_internal_prepared,
             annotations_spectral_is_prepared,
             annotations_sirius_prepared,
-            annotations_ms1_prepared
+            annotations_ms1_prepared_annotations
           ),
           output = params_prepare_features_components$files$annotations$filled,
           components = interim_components,

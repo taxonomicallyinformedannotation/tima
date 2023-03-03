@@ -6,7 +6,8 @@
 \usage{
 annotate_masses(
   features = params$files$features$prepared,
-  output = params$files$annotations$pretreated,
+  output_annotations = params$files$annotations$pretreated,
+  output_edges = params$files$networks$spectral$edges$raw,
   library = paths$data$interim$libraries$sop$merged$keys,
   str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
   str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -24,6 +25,26 @@ annotate_masses(
 )
 }
 \arguments{
+\item{features}{Table containing your previous annotation to complement}
+
+\item{output_annotations}{Output for mass based structural annotations}
+
+\item{output_edges}{Output for mass based edges}
+
+\item{str_2D_3D}{File containing 2D and 3D structures}
+
+\item{str_met}{File containing structures metadata}
+
+\item{str_tax_cla}{File containing Classyfire taxonomy}
+
+\item{str_tax_npc}{File containing NPClassifier taxonomy}
+
+\item{adducts_list}{List of adducts to be used}
+
+\item{adducts_masses_list}{Adducts masses}
+
+\item{neutral_losses_list}{List of neutral losses to be used}
+
 \item{msMode}{Ionization mode. Must be 'pos' or 'neg'}
 
 \item{tolerancePpm}{Tolerance to perform annotation. Should be lower than 10 ppm}
@@ -31,18 +52,6 @@ annotate_masses(
 \item{toleranceRt}{Tolerance to perform adduct attribution. Should be lower than 0.1min}
 
 \item{parameters}{params}
-
-\item{featuresTable}{Table containing your previous annotation to complement}
-
-\item{structureExactMassTable}{Table containing the structure - exact mass pairs to perform annotation}
-
-\item{adducts}{List of adducts to be used}
-
-\item{adductsM}{Adducts masses}
-
-\item{adductsTable}{Table containing the adducted library masses}
-
-\item{neutralLosses}{List of neutral losses to be used}
 }
 \value{
 A table containing MS1 annotations based on exact mass

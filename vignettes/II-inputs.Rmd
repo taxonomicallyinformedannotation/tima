@@ -159,7 +159,7 @@ targets::tar_visnetwork(
 )
 ```
 
-You can easily get it by running: 
+You can easily get it by running:
 
 ```{r}
 source(file = "inst/scripts/get_lotus.R")

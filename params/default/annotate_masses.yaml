@@ -53,6 +53,19 @@ files:
             #' NPClassifier structures taxonomy. STRING
             npc:  data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
 
+  #' Networks files.
+  networks:
+
+    #' Spectral networks files.
+    spectral:
+
+      #' Edges files.
+      edges:
+
+        #' Raw edges file. STRING
+        raw: 
+          - data/interim/features/example_edges_masses.tsv.gz
+
 #' MS related parameters.
 ms:
 

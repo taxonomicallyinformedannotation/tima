@@ -21,6 +21,8 @@
 #' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
 #' @param qutoff Intensity under which ms2 fragments will be removed previous to comparison.
 #' @param parallel Boolean. Process in parallel
+#' @param fast Boolean. Do it fast
+#' @param approx Perform matching without precursor match
 #' @param parameters Params
 #'
 #' @return NULL
@@ -99,7 +101,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       "nspectraangle" = MsCoreUtils::nspectraangle
     )
 
-    ## COMMENT (AR): TODO export as param, same for precursor
     if (fast) {
       params_sim <- MetaboAnnotation::CompareSpectraParam(
         ppm = ppm,

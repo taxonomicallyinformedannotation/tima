@@ -36,7 +36,9 @@ prepare_annotations_gnps <-
       ) |>
         dplyr::bind_rows() |>
         dplyr::mutate(
-          mz_error = as.numeric(MZErrorPPM) * 1E-6 * as.numeric(Precursor_MZ),
+          mz_error = as.numeric(MZErrorPPM) *
+            1E-6 *
+            as.numeric(Precursor_MZ),
           rt_error = NA
         ) |>
         dplyr::select(
