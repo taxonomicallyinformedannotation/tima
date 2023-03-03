@@ -112,8 +112,8 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       matched_peaks_count >= npeaks |
       presence_ratio >= rpeaks) |>
     dplyr::select(
-      name_source = acquisitionNum,
-      name_target = target_acquisitionNum,
+      !!as.name(name_source) := acquisitionNum,
+      !!as.name(name_target) := target_acquisitionNum,
       score,
       reverse_score,
       presence_ratio,

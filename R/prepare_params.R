@@ -104,6 +104,9 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$prepare_features_components$files$networks$spectral$components$raw |>
     replace_id()
 
+  yamls_params$prepare_features_edges$files$networks$spectral$edges$raw <-
+    yamls_params$prepare_features_edges$files$networks$spectral$edges$raw |>
+    replace_id()
   yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
     replace_id()

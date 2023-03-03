@@ -712,16 +712,16 @@ annotate_masses <-
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
         dplyr::select(
-          name_source = feature_id,
-          name_target = feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         dplyr::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
         dplyr::select(
-          name_source = feature_id,
-          name_target = feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         dplyr::distinct()
