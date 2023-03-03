@@ -129,6 +129,12 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$prepare_annotations_spectra$files$annotations$pretreated |>
     replace_id()
 
+  yamls_params$prepare_taxa$files$features$raw <-
+    yamls_params$prepare_taxa$files$features$raw |>
+    replace_id()
+  yamls_params$prepare_taxa$files$taxa$raw <-
+    yamls_params$prepare_taxa$files$taxa$raw |>
+    replace_id()
   yamls_params$prepare_taxa$files$taxa$processed <-
     yamls_params$prepare_taxa$files$taxa$processed |>
     replace_id()
