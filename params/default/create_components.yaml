@@ -11,7 +11,7 @@ files:
       edges:
 
         #' Prepared edges file. STRING
-        processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 
       #' Components files.
       components:

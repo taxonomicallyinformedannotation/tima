@@ -8,7 +8,7 @@ files:
     sop:
 
       #' List of prepared structure organism pairs libraries. STRING
-      processed: 
+      prepared: 
         - data/interim/libraries/sop/lotus_prepared.tsv.gz
         - data/interim/libraries/sop/closed_prepared.tsv.gz
 

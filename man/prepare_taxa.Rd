@@ -10,7 +10,7 @@ prepare_taxa(
   colname = params$names$taxon,
   metadata = params$files$taxa$raw,
   top_k = params$organisms$candidates,
-  output = params$files$taxa$processed,
+  output = params$files$taxa$prepared,
   taxon = params$organisms$taxon,
   parameters = params
 )

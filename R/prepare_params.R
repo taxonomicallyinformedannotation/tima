@@ -63,8 +63,8 @@ prepare_params <- function(filename = params$files$pattern,
 
   log_debug(x = "Changing filenames")
 
-  yamls_params$annotate_masses$files$annotations$pretreated <-
-    yamls_params$annotate_masses$files$annotations$pretreated |>
+  yamls_params$annotate_masses$files$annotations$prepared <-
+    yamls_params$annotate_masses$files$annotations$prepared |>
     replace_id()
   yamls_params$annotate_masses$files$features$prepared <-
     yamls_params$annotate_masses$files$features$prepared |>
@@ -87,8 +87,8 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$create_edges_spectra$files$spectral$raw |>
     replace_id()
 
-  yamls_params$create_components$files$networks$spectral$edges$processed <-
-    yamls_params$create_components$files$networks$spectral$edges$processed |>
+  yamls_params$create_components$files$networks$spectral$edges$prepared <-
+    yamls_params$create_components$files$networks$spectral$edges$prepared |>
     replace_id()
   yamls_params$create_components$files$networks$spectral$components$raw <-
     yamls_params$create_components$files$networks$spectral$components$raw |>
@@ -101,42 +101,39 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$prepare_features_tables$files$features$prepared |>
     replace_id()
 
-  yamls_params$prepare_features_components$files$annotations$pretreated <-
-    yamls_params$prepare_features_components$files$annotations$pretreated |>
-    replace_id()
-  yamls_params$prepare_features_components$files$annotations$filled <-
-    yamls_params$prepare_features_components$files$annotations$filled |>
-    replace_id()
   yamls_params$prepare_features_components$files$networks$spectral$components$raw <-
     yamls_params$prepare_features_components$files$networks$spectral$components$raw |>
+    replace_id()
+  yamls_params$prepare_features_components$files$networks$spectral$components$prepared <-
+    yamls_params$prepare_features_components$files$networks$spectral$components$prepared |>
     replace_id()
 
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$raw |>
     replace_id()
-  yamls_params$prepare_features_edges$files$networks$spectral$edges$processed <-
-    yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
+  yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
+    yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared |>
     replace_id()
 
   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
     yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
     replace_id()
-  yamls_params$prepare_annotations_gnps$files$annotations$pretreated <-
-    yamls_params$prepare_annotations_gnps$files$annotations$pretreated |>
+  yamls_params$prepare_annotations_gnps$files$annotations$prepared <-
+    yamls_params$prepare_annotations_gnps$files$annotations$prepared |>
     replace_id()
 
   yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
     yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
     replace_id()
-  yamls_params$prepare_annotations_sirius$files$annotations$pretreated <-
-    yamls_params$prepare_annotations_sirius$files$annotations$pretreated |>
+  yamls_params$prepare_annotations_sirius$files$annotations$prepared <-
+    yamls_params$prepare_annotations_sirius$files$annotations$prepared |>
     replace_id()
 
   yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral <-
     yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral |>
     replace_id()
-  yamls_params$prepare_annotations_spectra$files$annotations$pretreated <-
-    yamls_params$prepare_annotations_spectra$files$annotations$pretreated |>
+  yamls_params$prepare_annotations_spectra$files$annotations$prepared <-
+    yamls_params$prepare_annotations_spectra$files$annotations$prepared |>
     replace_id()
 
   yamls_params$prepare_taxa$files$features$raw <-
@@ -145,21 +142,21 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$prepare_taxa$files$taxa$raw <-
     yamls_params$prepare_taxa$files$taxa$raw |>
     replace_id()
-  yamls_params$prepare_taxa$files$taxa$processed <-
-    yamls_params$prepare_taxa$files$taxa$processed |>
+  yamls_params$prepare_taxa$files$taxa$prepared <-
+    yamls_params$prepare_taxa$files$taxa$prepared |>
     replace_id()
 
-  yamls_params$weight_annotations$files$annotations$filled <-
-    yamls_params$weight_annotations$files$annotations$filled |>
+  yamls_params$weight_annotations$files$annotations$prepared <-
+    yamls_params$weight_annotations$files$annotations$prepared |>
     replace_id()
   yamls_params$weight_annotations$files$annotations$processed <-
     yamls_params$weight_annotations$files$annotations$processed |>
     replace_id()
-  yamls_params$weight_annotations$files$networks$spectral$edges$processed <-
-    yamls_params$weight_annotations$files$networks$spectral$edges$processed |>
+  yamls_params$weight_annotations$files$networks$spectral$edges$prepared <-
+    yamls_params$weight_annotations$files$networks$spectral$edges$prepared |>
     replace_id()
-  yamls_params$weight_annotations$files$taxa$processed <-
-    yamls_params$weight_annotations$files$taxa$processed |>
+  yamls_params$weight_annotations$files$taxa$prepared <-
+    yamls_params$weight_annotations$files$taxa$prepared |>
     replace_id()
 
   yaml_export <- yaml_files |>

@@ -10,9 +10,9 @@ files:
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius
 
-    #' List of pretreated annotations. STRING
-    pretreated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_prepared.tsv.gz
 
   #' Libraries files.
   libraries:

@@ -1,20 +1,6 @@
 #' Files.
 files:
 
-  #' Annotations files.
-  annotations:
-
-    #' List of pretreated annotations. STRING
-    pretreated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_ms1_pretreated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_spectral_matches_pretreated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
-      # - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_exp_rt_pretreated.tsv.gz
-    
-    #' Filled annotations files. STRING
-    filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
-
   #' Networks files.
   networks:
 
@@ -26,3 +12,6 @@ files:
 
         #' Raw components file. STRING
         raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv.gz
+
+        #' Prepared components file. STRING
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components_prepared.tsv.gz

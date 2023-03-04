@@ -16,5 +16,5 @@ Character string with the name modified according to the rules specified in the 
 This function pre harmonizes Sirius names to make them compatible
 }
 \examples{
-pretreated_name <- pre_harmonize_names_sirius("My name/suffix")
+prepared_name <- pre_harmonize_names_sirius("My name/suffix")
 }

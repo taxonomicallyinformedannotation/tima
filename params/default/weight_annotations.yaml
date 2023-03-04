@@ -37,8 +37,13 @@ files:
   #' Annotations files.
   annotations:
 
-    #' Filled annotations files. STRING
-    filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_ms1_prepared.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_prepared.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_spectral_matches_prepared.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_prepared.tsv.gz
+      # - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_exp_rt_prepared.tsv.gz
     
     #' Final results file. STRING
     processed: 96fa7c88200e4a03bee4644e581e3fb0_results.tsv
@@ -55,17 +60,23 @@ files:
     #' Spectral networks files.
     spectral:
 
+      #' Components files.
+      components:
+
+        #' Prepared edges file. STRING
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components_prepared.tsv.gz
+
       #' Edges files.
       edges:
 
         #' Prepared edges file. STRING
-        processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 
   #' Taxa files.
   taxa:
 
     #' Taxonomically informed features file. STRING
-    processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+    prepared: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
 
 
 #' Weights to apply to each part of the final score.

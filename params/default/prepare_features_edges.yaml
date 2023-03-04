@@ -16,7 +16,7 @@ files:
           - data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges_masses.tsv.gz
 
         #' Prepared edges file. STRING
-        processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 
 #' Names of the different variables in the input files.
 names:

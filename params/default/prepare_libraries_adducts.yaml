@@ -8,7 +8,7 @@ files:
     adducts:
 
       #' Prepared adducts library. STRING
-      processed: library
+      prepared: library
 
     #' Structure organism pairs libraries.
     sop:

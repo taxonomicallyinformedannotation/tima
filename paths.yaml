@@ -59,8 +59,6 @@ data:
       path: data/interim/taxa
   processed:
     path: data/processed
-    config:
-      path: data/processed/config
   source:
     path: data/source
     features: data/source/example_features.csv
@@ -73,7 +71,7 @@ data:
       path: data/source/libraries
       sop:
         path: data/source/libraries/sop
-        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+        closed: ../lotus-processor/data/prepared/230106_closed_metadata.csv.gz
         hmdb: data/source/libraries/sop/hmdb_metabolites.zip
         lotus: data/source/libraries/sop/lotus.csv.gz
       spectra:

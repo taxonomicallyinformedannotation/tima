@@ -6,7 +6,7 @@
 \usage{
 prepare_libraries_sop_closed(
   input = params$files$libraries$sop$raw$closed,
-  output = params$files$libraries$sop$processed,
+  output = params$files$libraries$sop$prepared,
   parameters = params
 )
 }

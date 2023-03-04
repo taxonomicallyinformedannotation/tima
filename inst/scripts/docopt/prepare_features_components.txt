@@ -1,11 +1,10 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/example_gnps_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_pretreated.tsv.gz --fil-ann-pre data/interim/annotations/example_sirius_pretreated.tsv.gz --fil-ann-fil data/interim/annotations/example_filled.tsv.gz
+  Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/example_gnps_prepared.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_prepared.tsv.gz --fil-ann-pre data/interim/annotations/example_sirius_prepared.tsv.gz --fil-ann-fil data/interim/annotations/example_filled.tsv.gz
 Usage: 
   prepare_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>] [--too-net-spe-com=<too-net-spe-com>]
 
 Arguments:
-  fil-ann-pre                List of pretreated annotations. STRING
-  fil-ann-fil                Filled annotations file. STRING
+  fil-ann-pre                List of prepared annotations. STRING
   fil-net-spe-com-raw        Raw components file. STRING
 
 Options:

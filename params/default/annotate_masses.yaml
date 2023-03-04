@@ -4,9 +4,9 @@ files:
   #' Annotations files.
   annotations:
 
-    #' List of pretreated annotations. STRING
-    pretreated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_ms1_pretreated.tsv.gz
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_ms1_prepared.tsv.gz
 
   #' Features files.
   features: 
@@ -21,7 +21,7 @@ files:
     adducts:
 
       #' Prepared adducts library. STRING
-      processed: library
+      prepared: library
 
     #' Structure organism pairs libraries.
     sop:

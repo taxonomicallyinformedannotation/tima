@@ -775,7 +775,7 @@ list(
           str_met = library_merged_str_met,
           adducts_masses = dic_adducts,
           adducts_output_path = paths$data$interim$libraries$adducts$path,
-          output_name = params_prepare_libraries_adducts$files$libraries$adducts$processed,
+          output_name = params_prepare_libraries_adducts$files$libraries$adducts$prepared,
           masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
           masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
           parameters = params_prepare_libraries_adducts
@@ -998,7 +998,7 @@ list(
             annotate_masses(
               features = features_prepared,
               library = library_merged_key,
-              output_annotations = params_annotate_masses$files$annotations$pretreated,
+              output_annotations = params_annotate_masses$files$annotations$prepared,
               output_edges = params_annotate_masses$files$networks$spectral$edges$raw,
               name_source = params_annotate_masses$names$source,
               name_target = params_annotate_masses$names$target,
@@ -1041,7 +1041,7 @@ list(
             annotations_spectral_exp_gnps_prepared <-
               prepare_annotations_gnps(
                 input = gnps_annotations,
-                output = params_prepare_annotations_gnps$files$annotations$pretreated,
+                output = params_prepare_annotations_gnps$files$annotations$prepared,
                 str_2D_3D = library_merged_str_2D_3D,
                 str_met = library_merged_str_met,
                 str_nam = library_merged_str_nam,
@@ -1114,9 +1114,9 @@ list(
               prepare_annotations_spectra(
                 input = list(annotations_spectral_exp_internal_neg, annotations_spectral_exp_internal_pos),
                 output = gsub(
-                  pattern = "_pretreated.tsv.gz",
-                  replacement = "exp_rt_pretreated.tsv.gz",
-                  x = params_prepare_annotations_spectra$files$annotations$pretreated,
+                  pattern = "_prepared.tsv.gz",
+                  replacement = "exp_rt_prepared.tsv.gz",
+                  x = params_prepare_annotations_spectra$files$annotations$prepared,
                   fixed = TRUE
                 ),
                 str_2D_3D = library_merged_str_2D_3D,
@@ -1193,7 +1193,7 @@ list(
           command = {
             annotations_spectral_is_prepared <- prepare_annotations_spectra(
               input = list(annotations_spectral_is_lotus_neg, annotations_spectral_is_lotus_pos),
-              output = params_prepare_annotations_spectra$files$annotations$pretreated,
+              output = params_prepare_annotations_spectra$files$annotations$prepared,
               str_2D_3D = library_merged_str_2D_3D,
               str_met = library_merged_str_met,
               str_nam = library_merged_str_nam,
@@ -1213,7 +1213,7 @@ list(
           prepare_annotations_sirius(
             input_directory = params_prepare_annotations_sirius$files$annotations$raw$sirius,
             npc = params_prepare_annotations_sirius$tools$taxonomies$chemical,
-            output = params_prepare_annotations_sirius$files$annotations$pretreated,
+            output = params_prepare_annotations_sirius$files$annotations$prepared,
             str_2D_3D = library_merged_str_2D_3D,
             str_met = library_merged_str_met,
             str_nam = library_merged_str_nam,
@@ -1252,7 +1252,7 @@ list(
       name = features_components,
       command = {
         features_components <- create_components(
-          input = params_create_components$files$networks$spectral$edges$processed,
+          input = params_create_components$files$networks$spectral$edges$prepared,
           output = params_create_components$files$networks$spectral$components$raw,
           parameters = params_create_components
         )
@@ -1288,7 +1288,7 @@ list(
       command = {
         features_edges_prepared <- prepare_features_edges(
           input = list(annotations_ms1_prepared_edges, edges_spectra),
-          output = params_prepare_features_edges$files$networks$spectral$edges$processed,
+          output = params_prepare_features_edges$files$networks$spectral$edges$prepared,
           name_source = params_prepare_features_edges$names$source,
           name_target = params_prepare_features_edges$names$target,
           parameters = params_prepare_features_edges
@@ -1299,15 +1299,8 @@ list(
       name = features_components_prepared,
       command = {
         features_components_prepared <- prepare_features_components(
-          input = list(
-            annotations_spectral_exp_gnps_prepared,
-            annotations_spectral_exp_internal_prepared,
-            annotations_spectral_is_prepared,
-            annotations_sirius_prepared,
-            annotations_ms1_prepared_annotations
-          ),
-          output = params_prepare_features_components$files$annotations$filled,
-          components = interim_components,
+          input = interim_components,
+          output = params$files$networks$spectral$components$prepared,
           parameters = params_prepare_features_components
         )
       }
@@ -1335,25 +1328,33 @@ list(
         colname = params_prepare_taxa$names$taxon,
         metadata = input_metadata,
         top_k = params_prepare_taxa$organisms$candidates,
-        output = params_prepare_taxa$files$taxa$processed,
+        output = params_prepare_taxa$files$taxa$prepared,
         taxon = params_prepare_taxa$organisms$taxon,
         parameters = params_prepare_taxa
       )
     }
   ),
   tar_file(
-    name = annotations_processed,
+    name = annotations_prepared,
     command = {
-      annotations_processed <- weight_annotations(
+      annotations_prepared <- weight_annotations(
         library = library_merged_key,
         str_2D_3D = library_merged_str_2D_3D,
         str_met = library_merged_str_met,
         str_nam = library_merged_str_nam,
         str_tax_cla = library_merged_str_tax_cla,
         str_tax_npc = library_merged_str_tax_npc,
-        annotations = features_components_prepared,
-        taxa = taxa_prepared,
+        annotations = list(
+          annotations_spectral_exp_gnps_prepared,
+          annotations_spectral_exp_internal_prepared,
+          annotations_spectral_is_prepared,
+          annotations_sirius_prepared,
+          annotations_ms1_prepared_annotations
+        ),
+        components = features_components_prepared,
         edges = features_edges_prepared,
+        features = features_prepared,
+        taxa = taxa_prepared,
         output = params_weight_annotations$files$annotations$processed,
         candidates_initial = params_weight_annotations$annotations$candidates$initial,
         candidates_final = params_weight_annotations$annotations$candidates$final,

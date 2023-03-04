@@ -8,7 +8,7 @@ prepare_libraries_adducts(
   str_met = params$files$libraries$sop$merged$structures$metadata,
   adducts_masses = paths$inst$extdata$adducts,
   adducts_output_path = paths$data$interim$libraries$adducts$path,
-  output_name = params$files$libraries$adducts$processed,
+  output_name = params$files$libraries$adducts$prepared,
   masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
   masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
   parameters = params
@@ -28,8 +28,6 @@ prepare_libraries_adducts(
 \item{masses_neg_output_path}{Path where negative adducts masses will be saved}
 
 \item{parameters}{Parameters}
-
-\item{config_output_path}{Path where the configuration will be saved}
 }
 \description{
 This function prepares adducts for further use

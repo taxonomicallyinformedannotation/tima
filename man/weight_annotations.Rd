@@ -12,9 +12,11 @@ weight_annotations(
   str_nam = paths$data$interim$libraries$sop$merged$structures$names,
   str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
   str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
-  annotations = params$files$annotations$filled,
-  taxa = params$files$taxa$processed,
-  edges = params$files$networks$spectral$edges$processed,
+  annotations = params$files$annotations$prepared,
+  components = params$files$networks$spectral$components$prepared,
+  edges = params$files$networks$spectral$edges$prepared,
+  features = params$files$features$prepared,
+  taxa = params$files$taxa$prepared,
   output = params$files$annotations$processed,
   candidates_initial = params$annotations$candidates$initial,
   candidates_final = params$annotations$candidates$final,
@@ -47,7 +49,7 @@ weight_annotations(
 )
 }
 \arguments{
-\item{library}{Library to be used to perform MS1 annotation}
+\item{library}{Library containing the keys}
 
 \item{str_2D_3D}{File containing 2D and 3D structures}
 
@@ -61,9 +63,13 @@ weight_annotations(
 
 \item{annotations}{Prepared annotations file}
 
-\item{taxa}{Prepared taxed features file}
+\item{components}{Prepared components file}
 
 \item{edges}{Prepared edges file}
+
+\item{features}{Prepared features file}
+
+\item{taxa}{Prepared taxed features file}
 
 \item{output}{Output file}
 

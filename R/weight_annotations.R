@@ -2,15 +2,17 @@
 #'
 #' @description This function weights and eventually complements initial annotations.
 #'
-#' @param library Library to be used to perform MS1 annotation
+#' @param library Library containing the keys
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param annotations Prepared annotations file
-#' @param taxa Prepared taxed features file
+#' @param components Prepared components file
 #' @param edges Prepared edges file
+#' @param features Prepared features file
+#' @param taxa Prepared taxed features file
 #' @param output Output file
 #' @param candidates_initial Number of initial candidates to keep
 #' @param candidates_final Number of final candidates to keep
@@ -56,9 +58,11 @@ weight_annotations <-
            str_nam = paths$data$interim$libraries$sop$merged$structures$names,
            str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
            str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
-           annotations = params$files$annotations$filled,
-           taxa = params$files$taxa$processed,
-           edges = params$files$networks$spectral$edges$processed,
+           annotations = params$files$annotations$prepared,
+           components = params$files$networks$spectral$components$prepared,
+           edges = params$files$networks$spectral$edges$prepared,
+           features = params$files$features$prepared,
+           taxa = params$files$taxa$prepared,
            output = params$files$annotations$processed,
            candidates_initial = params$annotations$candidates$initial,
            candidates_final = params$annotations$candidates$final,
@@ -89,11 +93,16 @@ weight_annotations <-
            ms1_only = params$annotations$ms1only,
            force = params$options$force,
            parameters = params) {
+    stopifnot(
+      "Annotations file(s) do(es) not exist" =
+        rep(TRUE, length(annotations)) ==
+          lapply(X = annotations, file.exists)
+    )
     stopifnot("Your library file does not exist." = file.exists(library))
-    ## TODO add name
-    stopifnot("Your annotations file does not exist." = file.exists(annotations))
-    stopifnot("Your taxa file does not exist." = file.exists(taxa))
+    stopifnot("Your components file does not exist." = file.exists(components))
     stopifnot("Your edges file does not exist." = file.exists(edges))
+    stopifnot("Your features file does not exist." = file.exists(features))
+    stopifnot("Your taxa file does not exist." = file.exists(taxa))
 
     paths <<- parse_yaml_paths()
     params <<- parameters
@@ -104,17 +113,32 @@ weight_annotations <-
     }
 
     log_debug(x = "... files ...")
-    log_debug(x = "... annotations")
-    annotation_table <<-
-      readr::read_delim(
-        file = annotations,
+    log_debug(x = "... features")
+    features_table <-
+      readr::read_delim(features,
         col_types = readr::cols(.default = "c")
-      ) |>
+      )
+    log_debug(x = "... components")
+    components_table <-
+      readr::read_delim(components,
+        col_types = readr::cols(.default = "c")
+      )
+
+    log_debug(x = "... annotations")
+    annotation_table <<- lapply(
+      X = annotations,
+      FUN = readr::read_delim,
+      col_types = readr::cols(.default = "c")
+    ) |>
+      dplyr::bind_rows() |>
       dplyr::mutate_all(list(~ gsub(
         pattern = "\\|",
         replacement = " or ",
         x = .x
       ))) |>
+      ## TODO refactor this
+      dplyr::left_join(features_table) |>
+      dplyr::left_join(components_table) |>
       dplyr::mutate(dplyr::across(
         c(feature_id, component_id, rt, mz, score_input, mz_error),
         as.numeric

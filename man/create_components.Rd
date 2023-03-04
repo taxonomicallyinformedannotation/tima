@@ -5,7 +5,7 @@
 \title{Create components}
 \usage{
 create_components(
-  input = params$files$networks$spectral$edges$processed,
+  input = params$files$networks$spectral$edges$prepared,
   output = params$files$networks$spectral$components$raw,
   parameters = params
 )

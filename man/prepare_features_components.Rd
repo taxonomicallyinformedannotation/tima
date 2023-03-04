@@ -5,9 +5,8 @@
 \title{Prepare features components}
 \usage{
 prepare_features_components(
-  input = params$files$annotations$pretreated,
-  output = params$files$annotations$filled,
-  components = params$files$networks$spectral$components$raw,
+  input = params$files$networks$spectral$components$raw,
+  output = params$files$networks$spectral$components$prepared,
   parameters = params
 )
 }
@@ -15,8 +14,6 @@ prepare_features_components(
 \item{input}{Input file}
 
 \item{output}{Output file}
-
-\item{components}{File containing the components}
 
 \item{parameters}{Params}
 }

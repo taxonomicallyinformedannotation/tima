@@ -24,7 +24,7 @@
 #'
 #' @examples NULL
 prepare_libraries_sop_merged <-
-  function(files = params$files$libraries$sop$processed,
+  function(files = params$files$libraries$sop$prepared,
            filter = params$organisms$filter$mode,
            level = params$organisms$filter$level,
            value = params$organisms$filter$value,

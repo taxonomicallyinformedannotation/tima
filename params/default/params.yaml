@@ -85,15 +85,12 @@ files:
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius/
 
-    #' List of pretreated annotations. STRING
-    pretreated:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_pretreated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_pretreated.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_pretreated.tsv.gz
-    
-    #' Filled annotations file. STRING
-    filled: data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_filled.tsv.gz
-        
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_prepared.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_prepared.tsv.gz
+      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_prepared.tsv.gz
+
     #' Final results file. STRING
     processed: 96fa7c88200e4a03bee4644e581e3fb0_results.tsv
 
@@ -113,7 +110,7 @@ files:
     adducts:
 
       #' Prepared adducts library. STRING
-      processed: library
+      prepared: library
 
     #' Structure organism pairs libraries.
     sop:
@@ -122,13 +119,13 @@ files:
       raw:
 
         #' Closed structure organism pairs library. STRING
-        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+        closed: ../lotus-processor/data/prepared/230106_closed_metadata.csv.gz
 
         #' Lotus raw structure organism pairs library. STRING
         lotus: ~
 
       #' List of prepared structure organism pairs libraries. STRING
-      processed: 
+      prepared: 
         - data/interim/libraries/sop/lotus_prepared.tsv.gz
         - data/interim/libraries/sop/closed_prepared.tsv.gz
 
@@ -212,13 +209,16 @@ files:
         raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_edges_manual.csv
 
         #' Prepared edges file. STRING
-        processed: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
 
       #' Components files.
       components:
 
         #' Raw components file. STRING
         raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv.gz
+
+        #' Prepared components file. STRING
+        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components_prepared.tsv.gz
 
   #' Taxa files.
   taxa:
@@ -228,7 +228,7 @@ files:
     raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_metadata.tsv
 
     #' Taxonomically informed features file. STRING
-    processed: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+    prepared: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
 
   #' Spectral files. STRING
   spectral:

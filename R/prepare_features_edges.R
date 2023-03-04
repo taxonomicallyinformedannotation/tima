@@ -15,7 +15,7 @@
 #' @examples NULL
 prepare_features_edges <-
   function(input = params$files$networks$spectral$edges$raw,
-           output = params$files$networks$spectral$edges$processed,
+           output = params$files$networks$spectral$edges$prepared,
            name_source = params$names$source,
            name_target = params$names$target,
            parameters = params) {

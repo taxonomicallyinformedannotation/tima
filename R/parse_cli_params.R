@@ -60,10 +60,7 @@ parse_cli_params <- function() {
       params$files$annotations$raw$sirius <- as.character(arguments$fil_ann_raw_sir)
     }
     if (!is.null(arguments$fil_ann_pre)) {
-      params$files$annotations$pretreated <- as.character(arguments$fil_ann_pre)
-    }
-    if (!is.null(arguments$fil_ann_fil)) {
-      params$files$annotations$filled <- as.character(arguments$fil_ann_fil)
+      params$files$annotations$prepared <- as.character(arguments$fil_ann_pre)
     }
     if (!is.null(arguments$fil_ann_pro)) {
       params$files$annotations$processed <- as.character(arguments$fil_ann_pro)
@@ -75,7 +72,7 @@ parse_cli_params <- function() {
       params$files$features$prepared <- as.character(arguments$fil_fea_pre)
     }
     if (!is.null(arguments$fil_lib_add_pro)) {
-      params$files$libraries$adducts$processed <- as.character(arguments$fil_lib_add_pro)
+      params$files$libraries$adducts$prepared <- as.character(arguments$fil_lib_add_pro)
     }
     if (!is.null(arguments$fil_lib_sop_raw_clo)) {
       params$files$libraries$sop$raw$closed <- as.character(arguments$fil_lib_sop_raw_clo)
@@ -84,7 +81,7 @@ parse_cli_params <- function() {
       params$files$libraries$sop$raw$lotus <- as.character(arguments$fil_lib_sop_raw_lot)
     }
     if (!is.null(arguments$fil_lib_sop_pro)) {
-      params$files$libraries$sop$processed <- as.character(arguments$fil_lib_sop_pro)
+      params$files$libraries$sop$prepared <- as.character(arguments$fil_lib_sop_pro)
     }
     if (!is.null(arguments$fil_lib_spe_neg)) {
       params$files$libraries$spectral$neg <- as.character(arguments$fil_lib_spe_neg)
@@ -99,7 +96,7 @@ parse_cli_params <- function() {
       params$files$networks$spectral$edges$raw <- as.character(arguments$fil_net_spe_edg_raw)
     }
     if (!is.null(arguments$fil_net_spe_edg_pro)) {
-      params$files$networks$spectral$edges$processed <- as.character(arguments$fil_net_spe_edg_pro)
+      params$files$networks$spectral$edges$prepared <- as.character(arguments$fil_net_spe_edg_pro)
     }
     if (!is.null(arguments$fil_net_spe_com_raw)) {
       params$files$networks$spectral$components$raw <- as.character(arguments$fil_net_spe_com_raw)
@@ -108,7 +105,7 @@ parse_cli_params <- function() {
       params$files$taxa$raw <- as.character(arguments$fil_tax_raw)
     }
     if (!is.null(arguments$fil_tax_pro)) {
-      params$files$taxa$processed <- as.character(arguments$fil_tax_pro)
+      params$files$taxa$prepared <- as.character(arguments$fil_tax_pro)
     }
     if (!is.null(arguments$fil_spe_raw)) {
       params$files$spectral$raw <- as.character(arguments$fil_spe_raw)

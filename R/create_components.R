@@ -12,7 +12,7 @@
 #'
 #' @examples NULL
 create_components <-
-  function(input = params$files$networks$spectral$edges$processed,
+  function(input = params$files$networks$spectral$edges$prepared,
            output = params$files$networks$spectral$components$raw,
            parameters = params) {
     stopifnot(

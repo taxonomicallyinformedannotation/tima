@@ -5,7 +5,7 @@
 \title{Prepare merged structure organism pairs libraries}
 \usage{
 prepare_libraries_sop_merged(
-  files = params$files$libraries$sop$processed,
+  files = params$files$libraries$sop$prepared,
   filter = params$organisms$filter$mode,
   level = params$organisms$filter$level,
   value = params$organisms$filter$value,

@@ -6,7 +6,7 @@
 \usage{
 annotate_masses(
   features = params$files$features$prepared,
-  output_annotations = params$files$annotations$pretreated,
+  output_annotations = params$files$annotations$prepared,
   output_edges = params$files$networks$spectral$edges$raw,
   name_source = params$names$source,
   name_target = params$names$target,
@@ -16,7 +16,7 @@ annotate_masses(
   str_nam = params$files$libraries$sop$merged$structures$names,
   str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-  name = params$files$libraries$adducts$processed,
+  name = params$files$libraries$adducts$prepared,
   adducts_list = params$ms$adducts,
   adducts_masses_list = paths$inst$extdata$adducts,
   neutral_losses_list = paths$inst$extdata$neutral_losses,

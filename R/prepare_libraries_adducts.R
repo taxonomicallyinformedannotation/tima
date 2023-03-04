@@ -4,7 +4,6 @@
 #'
 #' @param str_met File containing structures metadata
 #' @param adducts_masses Table of adducts taken as input
-#' @param config_output_path Path where the configuration will be saved
 #' @param adducts_output_path Path where the adducts will be saved
 #' @param output_name Name of the file where adducts will be saved
 #' @param masses_pos_output_path Path where positive adducts masses will be saved
@@ -20,7 +19,7 @@ prepare_libraries_adducts <-
   function(str_met = params$files$libraries$sop$merged$structures$metadata,
            adducts_masses = paths$inst$extdata$adducts,
            adducts_output_path = paths$data$interim$libraries$adducts$path,
-           output_name = params$files$libraries$adducts$processed,
+           output_name = params$files$libraries$adducts$prepared,
            masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
            masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
            parameters = params) {

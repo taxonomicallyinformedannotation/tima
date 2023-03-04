@@ -5,14 +5,14 @@ services:
     build: "."
     image: adafede/tima-r
     volumes:
-      - "./config:/config"
+      - "./params:/params"
     command: Rscript inst/scripts/prepare_params.R
 
   tests:
     build: "."
     image: adafede/tima-r
     volumes:
-      - "./config:/config"
+      - "./params:/params"
       - "./inst:/inst"
       - "./data:/data"
     command: Rscript inst/scripts/tima_mini.R
@@ -21,7 +21,7 @@ services:
     build: "."
     image: adafede/tima-r
     volumes:
-      - "./config:/config"
+      - "./params:/params"
       - "./inst:/inst"
       - "./data:/data"
     command: Rscript inst/scripts/tima_full.R
