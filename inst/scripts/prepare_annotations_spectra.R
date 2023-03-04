@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_annotations_spectra()
-targets::tar_make(names = matches("annotations_spectral_prepared"))
+targets::tar_make(names = matches("annotations_spectral_"))
 
 end <- Sys.time()
 
