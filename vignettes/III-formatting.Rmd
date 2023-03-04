@@ -162,7 +162,6 @@ If no network was generated previously on GNPS (no GNPS job ID provided), it can
 
 ```{r}
 source(file = "inst/scripts/create_edges_spectra.R")
-source(file = "inst/scripts/create_components.R")
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
@@ -173,7 +172,7 @@ source(file = "inst/scripts/get_example_features.R")
 
 ### Formatting
 
-Before running the corresponding code, do not forget to modify `params/user/prepare_features_tables.yaml`, `params/user/prepare_features_edges.yaml`, and `params/user/prepare_features_components.yaml` accordingly.
+Before running the corresponding code, do not forget to modify `params/user/prepare_features_tables.yaml`, `params/user/prepare_features_edges.yaml`, `params/user/create_components.yaml`, and `params/user/prepare_features_components.yaml` accordingly.
 
 ```{r}
 source(file = "inst/scripts/prepare_features_tables.R")
@@ -181,6 +180,10 @@ source(file = "inst/scripts/prepare_features_tables.R")
 
 ```{r}
 source(file = "inst/scripts/prepare_features_edges.R")
+```
+
+```{r}
+source(file = "inst/scripts/create_components.R")
 ```
 
 ```{r}

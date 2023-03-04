@@ -178,12 +178,6 @@ step <- "create_edges_spectra"
 params <- get_params(step = step)
 create_edges_spectra()
 
-## Create components
-log_debug("Creating components from edges")
-step <- "create_components"
-params <- get_params(step = step)
-create_components()
-
 ### GNPS results
 log_debug("Preparing GNPS")
 step <- "prepare_annotations_gnps"
@@ -207,6 +201,12 @@ log_debug("Preparing edges")
 step <- "prepare_features_edges"
 params <- get_params(step = step)
 prepare_features_edges()
+
+## Create components
+log_debug("Creating components from edges")
+step <- "create_components"
+params <- get_params(step = step)
+create_components()
 
 ### Features components
 log_debug("Preparing features components")
