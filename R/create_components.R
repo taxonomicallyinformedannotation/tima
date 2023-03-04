@@ -48,7 +48,7 @@ create_components <-
       tidyr::unnest(cols = c(feature_source)) |>
       dplyr::distinct(
         `cluster index` = feature_source,
-        componentindex = componentIndex
+        componentindex = ComponentIndex
       ) |>
       dplyr::mutate_all(as.numeric) |>
       dplyr::arrange(`cluster index`)
