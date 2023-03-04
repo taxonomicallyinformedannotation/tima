@@ -152,6 +152,12 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$weight_annotations$files$annotations$processed <-
     yamls_params$weight_annotations$files$annotations$processed |>
     replace_id()
+  yamls_params$weight_annotations$files$features$prepared <-
+    yamls_params$weight_annotations$files$features$prepared |>
+    replace_id()
+  yamls_params$weight_annotations$files$networks$spectral$components$prepared <-
+    yamls_params$weight_annotations$files$networks$spectral$components$prepared |>
+    replace_id()
   yamls_params$weight_annotations$files$networks$spectral$edges$prepared <-
     yamls_params$weight_annotations$files$networks$spectral$edges$prepared |>
     replace_id()

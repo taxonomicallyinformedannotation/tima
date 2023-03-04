@@ -54,6 +54,12 @@ files:
       #' Merged structure organism pairs library. STRING
       merged: data/interim/libraries/keys.tsv.gz
 
+  #' Features files.
+  features: 
+
+    #' Prepared features file. STRING
+    prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_features.tsv.gz
+
   #' Networks files.
   networks:
 
