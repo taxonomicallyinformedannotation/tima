@@ -241,6 +241,11 @@ testthat::test_that("Whole process", {
   ### Normal
   create_edges_spectra()
 
+  ## Create components
+  step <- "create_components"
+  params <- get_params(step = step)
+  create_components()
+
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)

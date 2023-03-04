@@ -25,4 +25,4 @@ files:
       components:
 
         #' Raw components file. STRING
-        raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv
+        raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv.gz

@@ -162,6 +162,7 @@ If no network was generated previously on GNPS (no GNPS job ID provided), it can
 
 ```{r}
 source(file = "inst/scripts/create_edges_spectra.R")
+source(file = "inst/scripts/create_components.R")
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):

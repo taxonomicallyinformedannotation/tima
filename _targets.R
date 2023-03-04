@@ -70,6 +70,12 @@ list(
         }
       ),
       tar_file(
+        name = par_def_cre_com,
+        command = {
+          par_def_cre_com <- paths$params$default$create$components
+        }
+      ),
+      tar_file(
         name = par_def_cre_edg_spe,
         command = {
           par_def_cre_edg_spe <- paths$params$default$create$edges$spectra
@@ -201,6 +207,20 @@ list(
                 taxon = par_fin_par$organisms$taxon,
                 parameters = par_fin_par,
                 step = "annotate_spectra"
+              )
+          }
+        ),
+        tar_file(
+          name = par_usr_cre_com,
+          command = {
+            par_usr_cre_com <-
+              prepare_params(
+                filename = par_fin_par$files$pattern,
+                gnps_job_id = par_fin_par$gnps$id,
+                ms_mode = par_fin_par$ms$polarity,
+                taxon = par_fin_par$organisms$taxon,
+                parameters = par_fin_par,
+                step = "create_components"
               )
           }
         ),
@@ -407,6 +427,16 @@ list(
             parse_yaml_params(
               def = par_def_ann_spe,
               usr = par_usr_ann_spe[1]
+            )
+        }
+      ),
+      tar_target(
+        name = params_create_components,
+        command = {
+          params_create_components <-
+            parse_yaml_params(
+              def = par_def_cre_com,
+              usr = par_usr_cre_com[1]
             )
         }
       ),
@@ -1218,6 +1248,16 @@ list(
         )
       }
     ),
+    tar_file(
+      name = features_components,
+      command = {
+        features_components <- create_components(
+          input = params_create_components$files$networks$spectral$edges$processed,
+          output = params_create_components$files$networks$spectral$components$raw,
+          parameters = params_create_components
+        )
+      }
+    ),
     ## Interim
     list(
       tar_file(
@@ -1227,7 +1267,7 @@ list(
             ifelse(
               test = file.exists(gnps_components),
               yes = gnps_components,
-              no = params_prepare_features_components$files$networks$spectral$components$raw
+              no = features_components
             )
         }
       ),

@@ -109,6 +109,7 @@ params:
       masses: params/default/annotate_masses.yaml
       spectra: params/default/annotate_spectra.yaml
     create:
+      components: params/default/create_components.yaml
       edges:
         spectra: params/default/create_edges_spectra.yaml
     prepare:
@@ -138,6 +139,7 @@ params:
       masses: params/user/annotate_masses.yaml
       spectra: params/user/annotate_spectra.yaml
     create:
+      components: params/user/create_components.yaml
       edges:
         spectra: params/user/create_edges_spectra.yaml
     prepare:

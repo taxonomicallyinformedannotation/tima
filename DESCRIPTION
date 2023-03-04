@@ -21,6 +21,7 @@ Imports:
     data.table (>= 1.14.8),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.0),
+    igraph (>= 1.4.1),
     jsonlite (>= 1.8.4),
     MetaboAnnotation (>= 1.2.0),
     MsBackendMgf (>= 1.6.0),
@@ -54,6 +55,7 @@ Collate:
     'complement_metadata_structures.R'
     'create_adducts_neg.R'
     'create_adducts_pos.R'
+    'create_components.R'
     'create_dir.R'
     'create_edges_spectra.R'
     'decorate_bio.R'

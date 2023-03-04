@@ -87,6 +87,13 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$create_edges_spectra$files$spectral$raw |>
     replace_id()
 
+  yamls_params$create_components$files$networks$spectral$edges$processed <-
+    yamls_params$create_components$files$networks$spectral$edges$processed |>
+    replace_id()
+  yamls_params$create_components$files$networks$spectral$components$raw <-
+    yamls_params$create_components$files$networks$spectral$components$raw |>
+    replace_id()
+
   yamls_params$prepare_features_tables$files$features$raw <-
     yamls_params$prepare_features_tables$files$features$raw |>
     replace_id()
@@ -111,6 +118,9 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$prepare_features_edges$files$networks$spectral$edges$processed |>
     replace_id()
 
+  yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
+    yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
+    replace_id()
   yamls_params$prepare_annotations_gnps$files$annotations$pretreated <-
     yamls_params$prepare_annotations_gnps$files$annotations$pretreated |>
     replace_id()
