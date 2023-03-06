@@ -5,7 +5,7 @@
 \title{Weight bio}
 \usage{
 weight_bio(
-  annotationTable = annotation_table_ms1_taxed,
+  annotationTable = annotation_table_taxed,
   structureOrganismPairsTable = structure_organism_pairs_table,
   weightSpectral = weight_spectral,
   weightBiological = weight_biological,

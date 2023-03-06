@@ -92,15 +92,23 @@ prepare_taxa <-
       )
 
     log_debug(x = "Submitting the rest to OTL")
-    biological_metadata_1 <- organism_table_filled |>
-      dplyr::filter(is.na(organism_taxonomy_ottid)) |>
-      get_organism_taxonomy_ott()
+    organism_table_missing <- organism_table_filled |>
+      dplyr::filter(is.na(organism_taxonomy_ottid))
 
-    log_debug(x = "Joining all results")
-    biological_metadata <- organism_table_filled |>
-      dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
-      dplyr::rename(organism_name = organism) |>
-      dplyr::bind_rows(biological_metadata_1)
+    if (nrow(organism_table_missing) != 0) {
+      biological_metadata_1 <- organism_table_missing |>
+        get_organism_taxonomy_ott()
+
+      log_debug(x = "Joining all results")
+      biological_metadata <- organism_table_filled |>
+        dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
+        dplyr::rename(organism_name = organism) |>
+        dplyr::bind_rows(biological_metadata_1)
+    } else {
+      biological_metadata <- organism_table_filled |>
+        dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
+        dplyr::rename(organism_name = organism)
+    }
 
     if (is.null(taxon)) {
       if (extension == FALSE) {
@@ -134,7 +142,7 @@ prepare_taxa <-
     }
 
     log_debug(x = "Joining with cleaned taxonomy table")
-    metadata_table_joined_summarized <-
+    taxed_features_table <-
       dplyr::left_join(
         metadata_table_joined,
         biological_metadata,
@@ -163,9 +171,11 @@ prepare_taxa <-
       dplyr::mutate_all(as.character) |>
       dplyr::mutate_all(dplyr::na_if, "")
 
+    taxed_features_table[is.na(taxed_features_table)] <- "ND"
+
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_taxa")
-    export_output(x = metadata_table_joined_summarized, file = output)
+    export_output(x = taxed_features_table, file = output)
 
     return(output)
   }

@@ -6,14 +6,21 @@
 \usage{
 clean_chemo(
   annotationTableWeightedChemo = annotation_table_weighted_chemo,
+  componentsTable = components_table,
+  featuresTable = features_table,
   structureOrganismPairsTable = structure_organism_pairs_table,
   candidatesFinal = candidates_final,
   minimalMs1Bio = minimal_ms1_bio,
-  minimalMs1Chemo = minimal_ms1_chemo
+  minimalMs1Chemo = minimal_ms1_chemo,
+  summarize = summarise
 )
 }
 \arguments{
 \item{annotationTableWeightedChemo}{Table containing your chemically weighted annotation}
+
+\item{componentsTable}{Prepared components file}
+
+\item{featuresTable}{Prepared features file}
 
 \item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
 
@@ -22,6 +29,8 @@ clean_chemo(
 \item{minimalMs1Bio}{Minimal biological score to keep MS1 based annotation}
 
 \item{minimalMs1Chemo}{Minimal chemical score to keep MS1 based annotation}
+
+\item{summarize}{Boolean. Summarize results (1 row per feature)}
 }
 \value{
 A table containing the chemically weighted annotation where only a given number of initial candidates are kept

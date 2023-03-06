@@ -8,10 +8,6 @@ weight_annotations(
   library = paths$data$interim$libraries$sop$merged$keys,
   org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
   str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-  str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-  str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-  str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-  str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
   annotations = params$files$annotations$prepared,
   components = params$files$networks$spectral$components$prepared,
   edges = params$files$networks$spectral$edges$prepared,
@@ -44,6 +40,7 @@ weight_annotations(
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
+  summarise = TRUE,
   force = params$options$force,
   parameters = params
 )
@@ -52,14 +49,6 @@ weight_annotations(
 \item{library}{Library containing the keys}
 
 \item{str_2D_3D}{File containing 2D and 3D structures}
-
-\item{str_met}{File containing structures metadata}
-
-\item{str_nam}{File containing structures names}
-
-\item{str_tax_cla}{File containing Classyfire taxonomy}
-
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
 
 \item{annotations}{Prepared annotations file}
 
@@ -124,6 +113,8 @@ weight_annotations(
 \item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
 \item{ms1_only}{Boolean. Keep only MS1 annotations}
+
+\item{summarise}{Boolean. Summarize results (1 row per feature)}
 
 \item{force}{Force parameters. Use it at your own risk}
 

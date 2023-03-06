@@ -3,10 +3,13 @@
 #' @description This function cleans the results obtained after chemical weighting
 #'
 #' @param annotationTableWeightedChemo Table containing your chemically weighted annotation
+#' @param componentsTable Prepared components file
+#' @param featuresTable Prepared features file
 #' @param structureOrganismPairsTable Table containing the structure - organism pairs
 #' @param candidatesFinal Number of final candidates to keep
 #' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
 #' @param minimalMs1Chemo Minimal chemical score to keep MS1 based annotation
+#' @param summarize Boolean. Summarize results (1 row per feature)
 #'
 #' @return A table containing the chemically weighted annotation where only a given number of initial candidates are kept
 #'
@@ -17,10 +20,13 @@
 #' @examples NULL
 clean_chemo <-
   function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
+           componentsTable = components_table,
+           featuresTable = features_table,
            structureOrganismPairsTable = structure_organism_pairs_table,
            candidatesFinal = candidates_final,
            minimalMs1Bio = minimal_ms1_bio,
-           minimalMs1Chemo = minimal_ms1_chemo) {
+           minimalMs1Chemo = minimal_ms1_chemo,
+           summarize = summarise) {
     log_debug(
       "filtering top ",
       candidatesFinal,
@@ -32,7 +38,7 @@ clean_chemo <-
     )
     df1 <- annotationTableWeightedChemo |>
       dplyr::filter(
-        score_initialNormalized > 0 |
+        score_input > 0 |
           # Those lines are to keep ms1 annotation
           score_biological >= minimalMs1Bio |
           # Only if a good biological
@@ -47,30 +53,15 @@ clean_chemo <-
       dplyr::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
-    df11 <- annotation_table
-
-    df12 <- df11 |>
-      dplyr::distinct(
-        feature_id,
-        component_id,
-        rt,
-        mz,
-        score_input,
-        structure_molecular_formula,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        library,
-        mz_error,
-        rt_error
-      )
-
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
-    df2 <- dplyr::left_join(df1, df12) |>
+    df2 <- featuresTable |>
+      dplyr::left_join(componentsTable) |>
+      dplyr::left_join(df1) |>
       dplyr::mutate(
         best_candidate_structure = paste(
-          candidate_structure_1_pathway,
-          candidate_structure_2_superclass,
-          candidate_structure_3_class,
+          structure_taxonomy_npclassifier_01pathway,
+          structure_taxonomy_npclassifier_02superclass,
+          structure_taxonomy_npclassifier_03class,
           sep = "\u00a7"
         )
       ) |>
@@ -80,19 +71,24 @@ clean_chemo <-
         rt,
         mz,
         structure_molecular_formula,
+        structure_exact_mass,
+        structure_xlogp,
         structure_inchikey_2D,
         structure_smiles_2D,
+        structure_name,
+        structure_01pathway = structure_taxonomy_npclassifier_01pathway,
+        structure_02superclass = structure_taxonomy_npclassifier_02superclass,
+        structure_03class = structure_taxonomy_npclassifier_03class,
         library,
         mz_error,
         rt_error,
         rank_initial,
         rank_final,
-        score_initialNormalized,
+        score_input,
         score_biological,
         score_interim = score_pondered_bio,
         score_chemical,
         score_final = score_pondered_chemo,
-        lowest_candidate_organism = organism_name,
         best_candidate_organism = best_candidate,
         best_candidate_structure,
         consensus_structure_pat,
@@ -103,21 +99,37 @@ clean_chemo <-
         consistency_structure_cla
       )
 
-    df3 <- structureOrganismPairsTable |>
-      dplyr::arrange(reference_doi) |>
+    references <- structureOrganismPairsTable |>
       dplyr::distinct(
         structure_inchikey_2D,
-        structure_name,
-        structure_xlogp,
-        structure_01pathway = structure_taxonomy_npclassifier_01pathway,
-        structure_02superclass = structure_taxonomy_npclassifier_02superclass,
-        structure_03class = structure_taxonomy_npclassifier_03class,
-        lowest_candidate_organism = organism_name,
+        reference_doi,
+        organism_name,
+        across(c(
+          dplyr::contains("organism_taxonomy_")
+        ))
+      ) |>
+      tidyr::pivot_longer(dplyr::contains("organism_taxonomy_")) |>
+      dplyr::filter(!is.na(value)) |>
+      dplyr::filter(value != "notClassified") |>
+      dplyr::distinct(structure_inchikey_2D,
+        best_candidate_organism = value,
         reference_doi
       )
 
-    log_debug("adding structures metadata \n")
-    df4a <- dplyr::left_join(df2, df3) |>
+
+    log_debug("adding references \n")
+    df3 <- df2 |>
+      dplyr::left_join(references) |>
+      dplyr::group_by(dplyr::across(c(-reference_doi))) |>
+      dplyr::summarise(dplyr::across(
+        c(reference_doi),
+        ~ gsub(
+          pattern = "\\bNA\\b",
+          replacement = "",
+          x = paste(unique(.x), collapse = " $ ")
+        )
+      )) |>
+      dplyr::ungroup() |>
       dplyr::select(
         feature_id,
         component_id,
@@ -127,11 +139,12 @@ clean_chemo <-
         structure_inchikey_2D,
         structure_smiles_2D,
         structure_name,
+        structure_exact_mass,
         structure_xlogp,
         structure_01pathway,
         structure_02superclass,
         structure_03class,
-        score_initialNormalized,
+        score_input,
         score_biological,
         score_chemical,
         library,
@@ -139,99 +152,38 @@ clean_chemo <-
         rt_error,
         score_interim,
         score_final,
-        reference_doi,
         rank_initial,
         rank_final,
         best_candidate_organism,
         best_candidate_structure,
-        lowest_candidate_organism,
+        reference_doi,
         dplyr::everything()
       )
 
-    log_debug("selecting columns for cytoscape output \n")
-    df4b <- df4a |>
-      dplyr::select(
-        -component_id,
-        -structure_molecular_formula,
-        -structure_inchikey_2D,
-        -structure_smiles_2D,
-        -score_initialNormalized,
-        -score_biological,
-        -rank_initial,
-        -rank_final,
-        -best_candidate_structure,
-        -best_candidate_organism,
-        -lowest_candidate_organism,
-        -score_chemical,
-        -rt,
-        -mz,
-        -library,
-        -mz_error,
-        -rt_error,
-        -score_interim,
-        -score_final,
-        -structure_name,
-        -structure_xlogp,
-        -structure_01pathway,
-        -structure_02superclass,
-        -structure_03class,
-        -reference_doi
-      ) |>
-      dplyr::distinct()
+    if (summarize == TRUE) {
+      log_debug("summarizing results \n")
+      df4 <- df3 |>
+        dplyr::group_by(feature_id) |>
+        dplyr::summarise(dplyr::across(
+          colnames(df3)[5:26],
+          ~ gsub(
+            pattern = "\\bNA\\b",
+            replacement = "",
+            x = paste(.x, collapse = "|")
+          )
+        )) |>
+        dplyr::ungroup()
 
-    log_debug("summarizing results \n")
-    df5a <- df4a |>
-      dplyr::group_by(dplyr::across(
-        c(
-          -reference_doi,
-          -structure_name,
-          -structure_xlogp,
-          -structure_01pathway,
-          -structure_02superclass,
-          -structure_03class
-        )
-      )) |>
-      dplyr::summarise(dplyr::across(
-        c(
-          reference_doi,
-          structure_name,
-          structure_xlogp,
-          structure_01pathway,
-          structure_02superclass,
-          structure_03class
-        ),
-        ~ gsub(
-          pattern = "\\bNA\\b",
-          replacement = "",
-          x = paste(unique(.x), collapse = "$")
-        )
-      )) |>
-      dplyr::group_by(feature_id) |>
-      dplyr::arrange(dplyr::desc(score_final)) |>
-      dplyr::summarise(dplyr::across(
-        colnames(df4a)[3:26],
-        ~ gsub(
-          pattern = "\\bNA\\b",
-          replacement = "",
-          x = paste(.x, collapse = "|")
-        )
-      )) |>
-      dplyr::select(-rt, -mz)
+      df5 <- df4 |>
+        dplyr::left_join(df3 |>
+          dplyr::select("feature_id", !colnames(df4)) |>
+          dplyr::distinct())
+    } else {
+      df5 <- df3
+    }
 
-    df5b <- dplyr::left_join(df5a, df4b) |>
-      dplyr::distinct()
-
-    df6 <- annotation_table |>
-      dplyr::select(dplyr::any_of(c(
-        "feature_id",
-        "component_id",
-        "mz",
-        "rt"
-      ))) |>
-      dplyr::distinct()
-
-    df7 <- dplyr::left_join(df6, df5b) |>
-      dplyr::arrange(feature_id) |>
+    log_debug("selecting columns to export \n")
+    df6 <- df5 |>
       dplyr::mutate_all(as.character) |>
       dplyr::mutate_all(dplyr::na_if, "") |>
       dplyr::select(dplyr::any_of(
@@ -267,10 +219,10 @@ clean_chemo <-
       ))
 
     log_debug("adding consensus again to droped candidates \n")
-    df8 <- df7 |>
+    df8 <- df6 |>
       dplyr::filter(!is.na(structure_inchikey_2D))
 
-    df9 <- df7 |>
+    df9 <- df6 |>
       dplyr::filter(is.na(structure_inchikey_2D))
 
     df10 <- dplyr::left_join(

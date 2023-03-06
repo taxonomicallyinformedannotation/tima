@@ -166,3 +166,6 @@ options:
 
   #' Do not use it. BOOLEAN
   force: no
+
+  #' Summarise results to one row per feature. BOOLEAN
+  summarise: yes

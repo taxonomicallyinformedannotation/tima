@@ -110,7 +110,11 @@ split_tables_sop <- function(table) {
       x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
     }) |>
     dplyr::ungroup() |>
-    dplyr::mutate_all(trimws)
+    dplyr::mutate_all(trimws) |>
+    dplyr::mutate(dplyr::across(
+      dplyr::matches("taxonomy.*_0"),
+      ~ tidyr::replace_na(.x, "notClassified")
+    ))
 
   table_structures_taxonomy_classyfire <- table |>
     dplyr::filter(
@@ -125,7 +129,11 @@ split_tables_sop <- function(table) {
       structure_taxonomy_classyfire_03class,
       structure_taxonomy_classyfire_04directparent
     ) |>
-    dplyr::distinct()
+    dplyr::distinct() |>
+    dplyr::mutate(dplyr::across(
+      dplyr::matches("taxonomy.*_0"),
+      ~ tidyr::replace_na(.x, "notClassified")
+    ))
 
   table_organisms_names <- table |>
     dplyr::filter(!is.na(organism_name)) |>
@@ -151,7 +159,11 @@ split_tables_sop <- function(table) {
       organism_taxonomy_09species,
       organism_taxonomy_10varietas
     ) |>
-    dplyr::distinct()
+    dplyr::distinct() |>
+    dplyr::mutate(dplyr::across(
+      dplyr::matches("taxonomy.*_0"),
+      ~ tidyr::replace_na(.x, "notClassified")
+    ))
 
   tables <-
     list(

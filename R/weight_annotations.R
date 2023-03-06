@@ -4,10 +4,6 @@
 #'
 #' @param library Library containing the keys
 #' @param str_2D_3D File containing 2D and 3D structures
-#' @param str_met File containing structures metadata
-#' @param str_nam File containing structures names
-#' @param str_tax_cla File containing Classyfire taxonomy
-#' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file
 #' @param edges Prepared edges file
@@ -41,6 +37,7 @@
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param ms1_only Boolean. Keep only MS1 annotations
+#' @param summarise Boolean. Summarize results (1 row per feature)
 #' @param parameters Params
 #'
 #' @return NULL
@@ -54,10 +51,6 @@ weight_annotations <-
   function(library = paths$data$interim$libraries$sop$merged$keys,
            org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
            str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-           str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-           str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-           str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-           str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
            annotations = params$files$annotations$prepared,
            components = params$files$networks$spectral$components$prepared,
            edges = params$files$networks$spectral$edges$prepared,
@@ -91,6 +84,7 @@ weight_annotations <-
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
            # TODO ADD CONDITION,
            ms1_only = params$annotations$ms1only,
+           summarise = TRUE,
            force = params$options$force,
            parameters = params) {
     stopifnot(
@@ -107,57 +101,37 @@ weight_annotations <-
     paths <<- parse_yaml_paths()
     params <<- parameters
 
-    vars <- ls(all.names = TRUE)
-    for (i in 1:length(vars)) {
-      assign(vars[i], get(vars[i]), envir = .GlobalEnv)
-    }
-
     log_debug(x = "... files ...")
     log_debug(x = "... features")
-    features_table <-
-      readr::read_delim(features,
-        col_types = readr::cols(.default = "c")
-      )
+    features_table <- readr::read_delim(
+      file = features,
+      col_types = readr::cols(.default = "c")
+    )
     log_debug(x = "... components")
-    components_table <-
-      readr::read_delim(components,
-        col_types = readr::cols(.default = "c")
-      )
+    components_table <- readr::read_delim(
+      file = components,
+      col_types = readr::cols(.default = "c")
+    )
 
     log_debug(x = "... annotations")
-    annotation_table <<- lapply(
+    annotation_table <- lapply(
       X = annotations,
       FUN = readr::read_delim,
       col_types = readr::cols(.default = "c")
     ) |>
-      dplyr::bind_rows() |>
-      dplyr::mutate_all(list(~ gsub(
-        pattern = "\\|",
-        replacement = " or ",
-        x = .x
-      ))) |>
-      ## TODO refactor this
-      dplyr::left_join(features_table) |>
-      dplyr::left_join(components_table) |>
-      dplyr::mutate(dplyr::across(
-        c(feature_id, component_id, rt, mz, score_input, mz_error),
-        as.numeric
-      )) |>
-      dplyr::distinct() |>
-      dplyr::arrange(feature_id)
+      dplyr::bind_rows()
 
     log_debug(x = "... metadata_table_biological_annotation")
     taxed_features_table <- readr::read_delim(
       file = taxa,
       col_types = readr::cols(.default = "c")
-    ) |>
-      dplyr::mutate(dplyr::across(feature_id, as.numeric)) |>
-      dplyr::mutate_if(is.logical, as.character)
-
-    taxed_features_table[is.na(taxed_features_table)] <- "ND"
+    )
 
     log_debug(x = "... edges table")
-    edges_table <- readr::read_delim(file = edges)
+    edges_table <- readr::read_delim(
+      file = edges,
+      col_types = readr::cols(.default = "c")
+    )
 
     log_debug(x = "... structure-organism pairs table")
     structure_organism_pairs_table <-
@@ -170,38 +144,13 @@ weight_annotations <-
         col_types = readr::cols(.default = "c")
       )) |>
       dplyr::left_join(readr::read_delim(
-        file = str_met,
-        col_types = readr::cols(.default = "c")
-      )) |>
-      dplyr::left_join(readr::read_delim(
-        file = str_nam,
-        col_types = readr::cols(.default = "c")
-      )) |>
-      dplyr::left_join(readr::read_delim(
-        file = str_tax_cla,
-        col_types = readr::cols(.default = "c")
-      )) |>
-      dplyr::left_join(readr::read_delim(
-        file = str_tax_npc,
-        col_types = readr::cols(.default = "c")
-      )) |>
-      dplyr::left_join(readr::read_delim(
         file = org_tax_ott,
         col_types = readr::cols(.default = "c")
-      )) |>
-      dplyr::filter(!is.na(structure_exact_mass)) |>
-      dplyr::mutate(dplyr::across(c(
-        "structure_exact_mass",
-        "structure_xlogp"
-      ), as.numeric)) |>
-      round_reals() |>
-      dplyr::mutate(dplyr::across(
-        dplyr::matches("taxonomy.*_0"),
-        ~ tidyr::replace_na(.x, "notClassified")
       ))
 
     if (ms1_only == TRUE) {
-      log_debug(x = "TODO CHANGE THIS")
+      annotation_table <- annotation_table |>
+        dplyr::filter(score_input == 0)
     }
 
     log_debug(x = "adding biological organism metadata")
@@ -269,10 +218,13 @@ weight_annotations <-
     log_debug(x = "cleaning for export")
     results <- clean_chemo(
       annotationTableWeightedChemo = annotation_table_weighted_chemo,
+      componentsTable = components_table,
+      featuresTable = features_table,
       structureOrganismPairsTable = structure_organism_pairs_table,
       candidatesFinal = candidates_final,
       minimalMs1Bio = minimal_ms1_bio,
-      minimalMs1Chemo = minimal_ms1_chemo
+      minimalMs1Chemo = minimal_ms1_chemo,
+      summarize = summarise
     )
 
     log_debug(x = "Exporting ...")

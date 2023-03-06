@@ -30,7 +30,6 @@ weight_chemo <-
     df2 <- df1 |>
       dplyr::distinct(
         feature_id,
-        component_id,
         structure_inchikey_2D,
         structure_smiles_2D,
         candidate_structure_1_pathway,
@@ -78,14 +77,15 @@ weight_chemo <-
         feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
-        candidate_structure_1_pathway,
-        candidate_structure_2_superclass,
-        candidate_structure_3_class,
+        # candidate_structure_1_pathway,
+        # candidate_structure_2_superclass,
+        # candidate_structure_3_class,
         score_chemical
       )
 
     log_debug("... joining \n")
-    df4 <- dplyr::left_join(df1, df3) |>
+    df4 <-
+      dplyr::left_join(df1 |> dplyr::select(-dplyr::contains("candidate_structure")), df3) |>
       data.frame()
 
     df4$score_chemical[is.na(df4$score_chemical)] <- 0
@@ -115,25 +115,22 @@ weight_chemo <-
                 weightSpectral
             )) *
               weightSpectral *
-              score_initialNormalized
+              as.numeric(score_input)
         )
       ) |>
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
-      dplyr::distinct(
-        feature_id,
+      dplyr::distinct(feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
-        candidate_structure_1_pathway,
-        candidate_structure_2_superclass,
-        candidate_structure_3_class,
+        # candidate_structure_1_pathway,
+        # candidate_structure_2_superclass,
+        # candidate_structure_3_class,
         .keep_all = TRUE
       ) |>
       dplyr::mutate(
-        rank_initial = (dplyr::dense_rank(-as.numeric(
-          score_initialNormalized
-        ))),
+        rank_initial = (dplyr::dense_rank(-as.numeric(score_input))),
         rank_final = (dplyr::dense_rank(-score_pondered_chemo))
       ) |>
       dplyr::arrange(rank_final) |>

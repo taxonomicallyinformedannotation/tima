@@ -1338,10 +1338,6 @@ list(
       annotations_prepared <- weight_annotations(
         library = library_merged_key,
         str_2D_3D = library_merged_str_2D_3D,
-        str_met = library_merged_str_met,
-        str_nam = library_merged_str_nam,
-        str_tax_cla = library_merged_str_tax_cla,
-        str_tax_npc = library_merged_str_tax_npc,
         annotations = list(
           annotations_spectral_exp_gnps_prepared,
           annotations_spectral_exp_internal_prepared,
@@ -1381,6 +1377,7 @@ list(
         minimal_ms1_chemo = params_weight_annotations$annotations$ms1$thresholds$chemical,
         # TODO ADD CONDITION
         ms1_only = params_weight_annotations$annotations$ms1only,
+        summarise = params_weight_annotations$options$summarise,
         force = params_weight_annotations$options$force,
         parameters = params_weight_annotations
       )

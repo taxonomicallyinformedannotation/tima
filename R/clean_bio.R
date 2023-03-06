@@ -26,7 +26,7 @@ clean_bio <-
     )
 
     df01 <- annotationTableWeightedBio |>
-      dplyr::filter(score_initialNormalized > 0 |
+      dplyr::filter(score_input > 0 |
         # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
@@ -48,7 +48,6 @@ clean_bio <-
       dplyr::distinct(
         structure_inchikey_2D,
         feature_id,
-        component_id,
         candidate_structure_1_pathway = structure_taxonomy_npclassifier_01pathway,
         candidate_structure_2_superclass = structure_taxonomy_npclassifier_02superclass,
         candidate_structure_3_class = structure_taxonomy_npclassifier_03class,
@@ -67,38 +66,44 @@ clean_bio <-
     log_debug("adding \"notClassified\" \n")
     df[is.character(is.na(df))] <- "notClassified"
 
-    log_debug("keeping clusters with at least 3 features  \n")
-    df1 <- df |>
-      dplyr::filter(component_id != -1) |>
-      dplyr::group_by(component_id) |>
-      dplyr::distinct(feature_id,
-        structure_inchikey_2D,
-        .keep_all = TRUE
-      ) |>
-      dplyr::add_count() |>
-      dplyr::ungroup() |>
-      dplyr::filter(n >= 3) |>
-      dplyr::select(-n)
-
-    log_debug("keeping clusters with less than 3 features \n")
-    df2 <- dplyr::full_join(
-      x = df |>
-        dplyr::filter(component_id == -1),
-      y = df |>
-        dplyr::group_by(component_id) |>
-        dplyr::distinct(feature_id, .keep_all = TRUE) |>
-        dplyr::add_count() |>
-        dplyr::ungroup() |>
-        dplyr::filter(n <= 2) |>
-        dplyr::select(-n)
-    )
+    # log_debug("keeping clusters with at least 3 features  \n")
+    # df1 <- df |>
+    #   dplyr::filter(component_id != -1) |>
+    #   dplyr::group_by(component_id) |>
+    #   dplyr::distinct(feature_id,
+    #     structure_inchikey_2D,
+    #     .keep_all = TRUE
+    #   ) |>
+    #   dplyr::add_count() |>
+    #   dplyr::ungroup() |>
+    #   dplyr::filter(n >= 3) |>
+    #   dplyr::select(-n)
+    #
+    # log_debug("keeping clusters with less than 3 features \n")
+    # df2 <- dplyr::full_join(
+    #   x = df |>
+    #     dplyr::filter(component_id == -1),
+    #   y = df |>
+    #     dplyr::group_by(component_id) |>
+    #     dplyr::distinct(feature_id, .keep_all = TRUE) |>
+    #     dplyr::add_count() |>
+    #     dplyr::ungroup() |>
+    #     dplyr::filter(n <= 2) |>
+    #     dplyr::select(-n)
+    # )
 
     log_debug("calculating chemical consistency features with at least 2 neighbors ... \n")
 
     log_debug("... among edges ... \n")
     df3 <-
-      dplyr::right_join(edgesTable,
-        df1,
+      dplyr::right_join(
+        edgesTable |>
+          dplyr::group_by(feature_source) |>
+          dplyr::add_count() |>
+          dplyr::ungroup() |>
+          dplyr::filter(n >= 2) |>
+          dplyr::select(-n),
+        df,
         by = stats::setNames("feature_id", "feature_target")
       ) |>
       dplyr::filter(!is.na(feature_source))
@@ -264,7 +269,7 @@ clean_bio <-
 
     log_debug("joining all except -1 together \n")
     df4 <-
-      dplyr::left_join(df1,
+      dplyr::left_join(df,
         freq_pat,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
@@ -274,7 +279,6 @@ clean_bio <-
       dplyr::left_join(freq_cla,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::mutate(component_id = as.numeric(component_id)) |>
       dplyr::select(
         feature_id,
         dplyr::everything()
@@ -283,24 +287,20 @@ clean_bio <-
       dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
       dplyr::tibble()
 
-    # Think about better scoring option
+    # TODO Think about better scoring option
     log_debug("adding dummy consistency for features with less than 2 neighbors \n")
-    dummy_consistency <- df2 |>
+    dummy_consistency <- df4 |>
       dplyr::mutate(
-        consensus_structure_pat = "dummy",
-        consistency_structure_pat = 1,
-        consistency_score_chemical_1_pathway = 0,
-        consensus_structure_sup = "dummy",
-        consistency_structure_sup = 1,
-        consistency_score_chemical_2_superclass = 0,
-        consensus_structure_cla = "dummy",
-        consistency_structure_cla = 1,
-        consistency_score_chemical_3_class = 0
-      ) |>
-      dplyr::mutate(component_id = as.numeric(component_id))
+        consensus_structure_pat = dplyr::coalesce(consensus_structure_pat, "dummy"),
+        consistency_structure_pat = dplyr::coalesce(consistency_structure_pat, 1),
+        consistency_score_chemical_1_pathway = dplyr::coalesce(consistency_score_chemical_1_pathway, 0),
+        consensus_structure_sup = dplyr::coalesce(consensus_structure_sup, "dummy"),
+        consistency_structure_sup = dplyr::coalesce(consistency_structure_sup, 1),
+        consistency_score_chemical_2_superclass = dplyr::coalesce(consistency_score_chemical_2_superclass, 0),
+        consensus_structure_cla = dplyr::coalesce(consensus_structure_cla, "dummy"),
+        consistency_structure_cla = dplyr::coalesce(consistency_structure_cla, 1),
+        consistency_score_chemical_3_class = dplyr::coalesce(consistency_score_chemical_3_class, 0),
+      )
 
-    log_debug("binding results together \n")
-    df5 <- dplyr::bind_rows(df4, dummy_consistency)
-
-    return(df5)
+    return(dummy_consistency)
   }
