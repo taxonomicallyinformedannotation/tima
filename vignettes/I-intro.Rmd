@@ -56,7 +56,6 @@ targets::tar_visnetwork(
     contains("params"),
     contains("gnps"),
     contains("input"),
-    contains("interim"),
     contains("paths"),
     contains("params"),
     contains("_is"),

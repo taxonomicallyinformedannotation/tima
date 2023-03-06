@@ -11,6 +11,7 @@
 #' @param colname Name of the column containing biological source information
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities
+#' @param org_tax_ott File containing Open Tree of Life Taxonomy
 #' @param output Output file
 #' @param taxon If you want to enforce all features to a given taxon, put its name here.
 #' @param parameters Params
@@ -26,6 +27,7 @@ prepare_taxa <-
            colname = params$names$taxon,
            metadata = params$files$taxa$raw,
            top_k = params$organisms$candidates,
+           org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
            output = params$files$taxa$prepared,
            taxon = params$organisms$taxon,
            parameters = params) {
@@ -74,7 +76,7 @@ prepare_taxa <-
       colnames(metadata_table) <- colname
     }
 
-    log_debug(x = "Keeping list of organisms to submit to OTL")
+    log_debug(x = "Preparing organisms names")
     organism_table <- metadata_table |>
       dplyr::filter(!is.na(!!as.name(colname))) |>
       dplyr::distinct(!!as.name(colname)) |>
@@ -83,8 +85,22 @@ prepare_taxa <-
         sep = "\\|",
       )
 
-    biological_metadata <- organism_table |>
+    log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
+    organism_table_filled <- organism_table |>
+      dplyr::left_join(readr::read_delim(org_tax_ott),
+        by = c("organism" = "organism_name")
+      )
+
+    log_debug(x = "Submitting the rest to OTL")
+    biological_metadata_1 <- organism_table_filled |>
+      dplyr::filter(is.na(organism_taxonomy_ottid)) |>
       get_organism_taxonomy_ott()
+
+    log_debug(x = "Joining all results")
+    biological_metadata <- organism_table_filled |>
+      dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
+      dplyr::rename(organism_name = organism) |>
+      dplyr::bind_rows(biological_metadata_1)
 
     if (is.null(taxon)) {
       if (extension == FALSE) {
@@ -111,8 +127,7 @@ prepare_taxa <-
     } else {
       metadata_table_joined <-
         dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
-        dplyr::select(
-          feature_id := rowname,
+        dplyr::select(feature_id := rowname,
           organismOriginal = dplyr::all_of(colname),
           dplyr::everything()
         )

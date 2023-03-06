@@ -45,7 +45,11 @@ source(file = "inst/scripts/annotate_masses.R")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("annotations_ms1"),
-  exclude = c(contains("par_")),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -73,7 +77,11 @@ source(file = "inst/scripts/prepare_annotations_spectra.R")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("annotations_spectral_is"),
-  exclude = c(contains("par_")),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -96,7 +104,11 @@ You now have all your spectral annotations:
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("annotations_spectral"),
-  exclude = c(contains("par_")),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -136,7 +148,11 @@ source(file = "inst/scripts/prepare_annotations_sirius.R")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("annotations_s"),
-  exclude = c(contains("par_")),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -208,7 +224,11 @@ You are almost there! See already all the steps accomplished!
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("features"),
-  exclude = c(contains("par_")),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )

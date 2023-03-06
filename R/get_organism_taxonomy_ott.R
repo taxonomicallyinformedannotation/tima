@@ -2,7 +2,6 @@
 #'
 #' @description This function retrieves taxonomy from the Open Tree of Life taxonomy
 #'
-#'
 #' @param df Dataframe containing your organism(s) name(s)
 #'
 #' @return NULL

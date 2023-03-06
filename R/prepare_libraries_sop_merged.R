@@ -29,7 +29,7 @@ prepare_libraries_sop_merged <-
            level = params$organisms$filter$level,
            value = params$organisms$filter$value,
            output_key = paths$data$interim$libraries$sop$merged$keys,
-           output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
+           # output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
            output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
            output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
            output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
@@ -87,11 +87,11 @@ prepare_libraries_sop_merged <-
     table_keys <- tables$key
 
     log_debug(x = "Keeping organisms")
-    table_organisms_names <- tables$org_nam
+    # table_organisms_names <- tables$org_nam
     table_organisms_taxonomy_ott <- tables$org_tax_ott
 
     log_debug(x = "Completing organisms taxonomy")
-    table_organisms_taxonomy_ott_2 <- table_organisms_names |>
+    table_organisms_taxonomy_ott_2 <- table_keys |>
       dplyr::anti_join(table_organisms_taxonomy_ott) |>
       dplyr::distinct(organism = organism_name)
 
@@ -157,10 +157,10 @@ prepare_libraries_sop_merged <-
       x = table_keys,
       file = output_key
     )
-    export_output(
-      x = table_organisms_names,
-      file = output_org_nam
-    )
+    # export_output(
+    #   x = table_organisms_names,
+    #   file = output_org_nam
+    # )
     export_output(
       x = table_organisms_taxonomy_ott,
       file = output_org_tax_ott
@@ -189,7 +189,7 @@ prepare_libraries_sop_merged <-
     return(
       c(
         "key" = output_key,
-        "org_nam" = output_org_nam,
+        # "org_nam" = output_org_nam,
         "org_tax_ott" = output_org_tax_ott,
         "str_2D_3D" = output_str_2D_3D,
         "str_met" = output_str_met,

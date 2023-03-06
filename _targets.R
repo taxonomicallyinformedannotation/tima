@@ -730,7 +730,7 @@ list(
               level = params_prepare_libraries_sop_merged$organisms$filter$level,
               value = params_prepare_libraries_sop_merged$organisms$filter$value,
               output_key = paths$data$interim$libraries$sop$merged$keys,
-              output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
+              # output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
               output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
               output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
@@ -744,26 +744,23 @@ list(
         tar_file(name = library_merged_key, command = {
           library_merged_key <- library_sop_merged[[1]]
         }),
-        tar_file(name = library_merged_org, command = {
-          library_merged_org <- library_sop_merged[[2]]
-        }),
         tar_file(name = library_merged_org_tax_ott, command = {
-          library_merged_org_tax_ott <- library_sop_merged[[3]]
+          library_merged_org_tax_ott <- library_sop_merged[[2]]
         }),
         tar_file(name = library_merged_str_2D_3D, command = {
-          library_merged_str_2D_3D <- library_sop_merged[[4]]
+          library_merged_str_2D_3D <- library_sop_merged[[3]]
         }),
         tar_file(name = library_merged_str_met, command = {
-          library_merged_str_met <- library_sop_merged[[5]]
+          library_merged_str_met <- library_sop_merged[[4]]
         }),
         tar_file(name = library_merged_str_nam, command = {
-          library_merged_str_nam <- library_sop_merged[[6]]
+          library_merged_str_nam <- library_sop_merged[[5]]
         }),
         tar_file(name = library_merged_str_tax_cla, command = {
-          library_merged_str_tax_cla <- library_sop_merged[[7]]
+          library_merged_str_tax_cla <- library_sop_merged[[6]]
         }),
         tar_file(name = library_merged_str_tax_npc, command = {
-          library_merged_str_tax_npc <- library_sop_merged[[8]]
+          library_merged_str_tax_npc <- library_sop_merged[[7]]
         })
       )
     ),
@@ -1328,6 +1325,7 @@ list(
         colname = params_prepare_taxa$names$taxon,
         metadata = input_metadata,
         top_k = params_prepare_taxa$organisms$candidates,
+        org_tax_ott = library_merged_org_tax_ott,
         output = params_prepare_taxa$files$taxa$prepared,
         taxon = params_prepare_taxa$organisms$taxon,
         parameters = params_prepare_taxa

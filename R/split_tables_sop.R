@@ -156,7 +156,7 @@ split_tables_sop <- function(table) {
   tables <-
     list(
       "key" = table_keys,
-      "org_nam" = table_organisms_names,
+      # "org_nam" = table_organisms_names,
       "org_tax_ott" = table_organisms_taxonomy_ott,
       "str_2D_3D" = table_structures_2D_3D,
       "str_met" = table_structures_metadata,

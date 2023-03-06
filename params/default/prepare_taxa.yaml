@@ -17,6 +17,24 @@ files:
     #' Taxonomically informed features file. STRING
     prepared: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
 
+  #' Libraries files.
+  libraries:
+
+    #' Structure organism pairs libraries.
+    sop:
+
+      #' Merged structure organism pairs library.
+      merged:
+
+        #' Organisms libraries.
+        organisms:
+
+          #' Organisms taxonomies.
+          taxonomies:
+
+            #' OTT organisms taxonomy. STRING
+            ott:  data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
+
 #' Names of the different variables in the input files.
 names:
 

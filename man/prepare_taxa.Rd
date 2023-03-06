@@ -10,6 +10,7 @@ prepare_taxa(
   colname = params$names$taxon,
   metadata = params$files$taxa$raw,
   top_k = params$organisms$candidates,
+  org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
   output = params$files$taxa$prepared,
   taxon = params$organisms$taxon,
   parameters = params
@@ -25,6 +26,8 @@ prepare_taxa(
 \item{metadata}{File containing your metadata including biological source}
 
 \item{top_k}{Number of organisms to be retained per feature top intensities}
+
+\item{org_tax_ott}{File containing Open Tree of Life Taxonomy}
 
 \item{output}{Output file}
 
