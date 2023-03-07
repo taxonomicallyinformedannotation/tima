@@ -3,7 +3,7 @@
 #' @description This function weights and eventually complements initial annotations.
 #'
 #' @param library Library containing the keys
-#' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
+#' @param org_tax_ott File containing organisms taxonomy (OTT)
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file

@@ -48,6 +48,8 @@ weight_annotations(
 \arguments{
 \item{library}{Library containing the keys}
 
+\item{org_tax_ott}{File containing organisms taxonomy (OTT)}
+
 \item{str_2D_3D}{File containing 2D and 3D structures}
 
 \item{annotations}{Prepared annotations file}
@@ -119,8 +121,6 @@ weight_annotations(
 \item{force}{Force parameters. Use it at your own risk}
 
 \item{parameters}{Params}
-
-\item{output_org_tax_ott}{Output file for organisms taxonomy (OTT)}
 }
 \description{
 This function weights and eventually complements initial annotations.
