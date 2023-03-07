@@ -761,12 +761,12 @@ list(
       ## Raw
       list( ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
-        tar_file(
-          name = library_sop_closed,
-          command = {
-            library_sop_closed <- paths$data$source$libraries$sop$closed
-          }
-        ),
+        # tar_file(
+        #   name = library_sop_closed,
+        #   command = {
+        #     library_sop_closed <- paths$data$source$libraries$sop$closed
+        #   }
+        # ),
         tar_file(
           name = library_sop_ecmdb,
           command = {
@@ -798,7 +798,8 @@ list(
           command = {
             library_sop_closed_prepared <-
               prepare_libraries_sop_closed(
-                input = library_sop_closed,
+                ## TODO improve
+                input = paths$data$source$libraries$sop$closed,
                 output = params_prepare_libraries_sop_closed$files$libraries$sop$prepared,
                 parameters = params_prepare_libraries_sop_closed
               )
