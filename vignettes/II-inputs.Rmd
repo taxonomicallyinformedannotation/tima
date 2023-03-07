@@ -177,6 +177,11 @@ source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = matches("library_sop_lotus"),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -186,9 +191,32 @@ As you can see, the target seems outdated.
 In reality, we force it to search if a new version of LOTUS exists each time.
 If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
+#### ECMDB
+
+If you want, you can also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
+
+To do so, you need to:
+
+```{r}
+source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = matches("library_sop_ecmdb"),
+  exclude = c(
+    contains("par_"),
+    contains("params"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
 ##### HMDB
 
-If you want, you can also complement LOTUS pairs with the ones coming from HMDB (not running by default as quite long):
+You can do the same with the ones coming from HMDB (not running by default as quite long):
 
 ```{r eval=FALSE, include=TRUE}
 source(file = "inst/scripts/get_hmdb.R")

@@ -10,9 +10,9 @@ files:
       #' Raw structure organism pairs libraries.
       raw:
 
-        #' Closed structure organism pairs library. STRING
-        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+        #' Lotus raw structure organism pairs library. STRING
+        lotus: data/source/libraries/sop/lotus.csv.gz
 
       #' List of prepared structure organism pairs libraries. STRING
       prepared: 
-        - data/interim/libraries/sop/closed_prepared.tsv.gz
+        - data/interim/libraries/sop/lotus_prepared.tsv.gz

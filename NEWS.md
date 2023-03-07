@@ -2,6 +2,7 @@
 
 # timaR 2.7.4
 
+* ECMDB support
 * Edges (mass and spectra-based) and components are generated if not present.
 * Retention time matching additionnally to MS2 if RT present in library
 * Parameters refactoring

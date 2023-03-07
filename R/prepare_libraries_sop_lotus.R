@@ -11,8 +11,8 @@
 #'
 #' @examples NULL
 prepare_libraries_sop_lotus <-
-  function(input = paths$data$source$libraries$sop$lotus,
-           output = paths$data$interim$libraries$sop$lotus) {
+  function(input = params$files$libraries$sop$raw$lotus,
+           output = params$files$libraries$sop$prepared) {
     log_debug(x = "Loading and preparing LOTUS")
     lotus_prepared <- input |>
       readr::read_csv(

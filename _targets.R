@@ -135,6 +135,27 @@ list(
         }
       ),
       tar_file(
+        name = par_def_pre_lib_sop_ecm,
+        command = {
+          par_def_pre_lib_sop_ecm <-
+            paths$params$default$prepare$libraries$sop$ecmdb
+        }
+      ),
+      # tar_file(
+      #   name = par_def_pre_lib_sop_hmd,
+      #   command = {
+      #     par_def_pre_lib_sop_hmd <-
+      #       paths$params$default$prepare$libraries$sop$hmdb
+      #   }
+      # ),
+      tar_file(
+        name = par_def_pre_lib_sop_lot,
+        command = {
+          par_def_pre_lib_sop_lot <-
+            paths$params$default$prepare$libraries$sop$lotus
+        }
+      ),
+      tar_file(
         name = par_def_pre_lib_sop_mer,
         command = {
           par_def_pre_lib_sop_mer <-
@@ -351,6 +372,48 @@ list(
           }
         ),
         tar_file(
+          name = par_usr_pre_lib_sop_ecm,
+          command = {
+            par_usr_pre_lib_sop_ecm <-
+              prepare_params(
+                filename = par_fin_par$files$pattern,
+                gnps_job_id = par_fin_par$gnps$id,
+                ms_mode = par_fin_par$ms$polarity,
+                taxon = par_fin_par$organisms$taxon,
+                parameters = par_fin_par,
+                step = "prepare_libraries_sop_ecmdb"
+              )
+          }
+        ),
+        # tar_file(
+        #   name = par_usr_pre_lib_sop_hmd,
+        #   command = {
+        #     par_usr_pre_lib_sop_hmd <-
+        #       prepare_params(
+        #         filename = par_fin_par$files$pattern,
+        #         gnps_job_id = par_fin_par$gnps$id,
+        #         ms_mode = par_fin_par$ms$polarity,
+        #         taxon = par_fin_par$organisms$taxon,
+        #         parameters = par_fin_par,
+        #         step = "prepare_libraries_sop_hmdb"
+        #       )
+        #   }
+        # ),
+        tar_file(
+          name = par_usr_pre_lib_sop_lot,
+          command = {
+            par_usr_pre_lib_sop_lot <-
+              prepare_params(
+                filename = par_fin_par$files$pattern,
+                gnps_job_id = par_fin_par$gnps$id,
+                ms_mode = par_fin_par$ms$polarity,
+                taxon = par_fin_par$organisms$taxon,
+                parameters = par_fin_par,
+                step = "prepare_libraries_sop_lotus"
+              )
+          }
+        ),
+        tar_file(
           name = par_usr_pre_lib_sop_mer,
           command = {
             par_usr_pre_lib_sop_mer <-
@@ -530,7 +593,36 @@ list(
             )
         }
       ),
-      ## TODO ADD PARAMS HMDB,
+      tar_target(
+        name = params_prepare_libraries_sop_ecmdb,
+        command = {
+          params_prepare_libraries_sop_ecmdb <-
+            parse_yaml_params(
+              def = par_def_pre_lib_sop_ecm,
+              usr = par_usr_pre_lib_sop_ecm[1]
+            )
+        }
+      ),
+      # tar_target(
+      #   name = params_prepare_libraries_sop_hmdb,
+      #   command = {
+      #     params_prepare_libraries_sop_hmdb <-
+      #       parse_yaml_params(
+      #         def = par_def_pre_lib_sop_hmd,
+      #         usr = par_usr_pre_lib_sop_hmd[1]
+      #       )
+      #   }
+      # ),
+      tar_target(
+        name = params_prepare_libraries_sop_lotus,
+        command = {
+          params_prepare_libraries_sop_lotus <-
+            parse_yaml_params(
+              def = par_def_pre_lib_sop_lot,
+              usr = par_usr_pre_lib_sop_lot[1]
+            )
+        }
+      ),
       tar_target(
         name = params_prepare_libraries_sop_merged,
         command = {
@@ -669,13 +761,22 @@ list(
       ## Raw
       list( ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
-        # tar_file(
-        #   name = library_sop_closed,
-        #   command = {
-        #     library_sop_closed <- paths$data$source$libraries$sop$closed
-        #   }
-        # ),
-        ## TODO ADD HMDB,
+        tar_file(
+          name = library_sop_closed,
+          command = {
+            library_sop_closed <- paths$data$source$libraries$sop$closed
+          }
+        ),
+        tar_file(
+          name = library_sop_ecmdb,
+          command = {
+            library_sop_ecmdb <- get_file(
+              url = paths$urls$ecmdb$metabolites,
+              export = paths$data$source$libraries$sop$ecmdb
+            )
+          }
+        ),
+        ## TODO ADD  GET HMDB
         tar_file(
           name = library_sop_lotus,
           command = {
@@ -697,13 +798,24 @@ list(
           command = {
             library_sop_closed_prepared <-
               prepare_libraries_sop_closed(
-                input = paths$data$source$libraries$sop$closed,
-                output = paths$data$interim$libraries$sop$closed,
+                input = library_sop_closed,
+                output = params_prepare_libraries_sop_closed$files$libraries$sop$prepared,
                 parameters = params_prepare_libraries_sop_closed
               )
           }
         ),
-        ## TODO ADD HMDB PREPARED,
+        tar_file(
+          name = library_sop_ecmdb_prepared,
+          command = {
+            library_sop_ecmdb_prepared <-
+              prepare_libraries_sop_ecmdb(
+                input = library_sop_ecmdb,
+                output = params_prepare_libraries_sop_ecmdb$files$libraries$sop$prepared,
+                parameters = params_prepare_libraries_sop_ecmdb
+              )
+          }
+        ),
+        ## TODO ADD HMDB PREPARED
         tar_file(
           name = library_sop_lotus_prepared,
           command = {
@@ -714,7 +826,7 @@ list(
                 } else {
                   paths$data$source$libraries$sop$lotus
                 },
-                output = paths$data$interim$libraries$sop$lotus
+                output = params_prepare_libraries_sop_lotus$files$libraries$sop$prepared
               )
           }
         )
@@ -725,12 +837,17 @@ list(
           name = library_sop_merged,
           command = {
             library_sop_merged <- prepare_libraries_sop_merged(
-              files = c(library_sop_closed_prepared, library_sop_lotus_prepared),
+              files = c(
+                library_sop_closed_prepared,
+                library_sop_ecmdb_prepared,
+                ## TODO
+                # library_sop_hmdb_prepared,
+                library_sop_lotus_prepared
+              ),
               filter = params_prepare_libraries_sop_merged$organisms$filter$mode,
               level = params_prepare_libraries_sop_merged$organisms$filter$level,
               value = params_prepare_libraries_sop_merged$organisms$filter$value,
               output_key = paths$data$interim$libraries$sop$merged$keys,
-              # output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
               output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
               output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
@@ -836,7 +953,7 @@ list(
       ),
       ## Prepared
       list(
-        ## TODO ADD HMDB PREPARED,
+        ## TODO ADD IS HMDB PREPARED,
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = library_spectra_is_lotus_prepared_pos,
@@ -1128,6 +1245,7 @@ list(
       ),
       ## In silico
       list(
+        ## TODO add HMDB is spectral matches
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = annotations_spectral_is_lotus_pos,
@@ -1189,7 +1307,11 @@ list(
           name = annotations_spectral_is_prepared,
           command = {
             annotations_spectral_is_prepared <- prepare_annotations_spectra(
-              input = list(annotations_spectral_is_lotus_neg, annotations_spectral_is_lotus_pos),
+              input = list(
+                annotations_spectral_is_lotus_neg,
+                ## TODO add is hmdb
+                annotations_spectral_is_lotus_pos
+              ),
               output = params_prepare_annotations_spectra$files$annotations$prepared,
               str_2D_3D = library_merged_str_2D_3D,
               str_met = library_merged_str_met,

@@ -25,9 +25,9 @@ log_debug("Contributors: ...")
 #' @export
 #'
 #' @examples NULL
-prepare_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
-                         output = paths$data$interim$libraries$sop$hmdb,
-                         output_minimal = paths$data$interim$libraries$sop$hmdb_minimal) {
+prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
+                                       output = paths$data$interim$libraries$sop$hmdb,
+                                       output_minimal = paths$data$interim$libraries$sop$hmdb_minimal) {
   log_debug("Unzipping HMDB (6.5GB)")
   unzip(
     zipfile = input,
@@ -85,6 +85,7 @@ prepare_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
         first = 1,
         last = 14
       ),
+      ## TODO compute it
       structure_smiles_2D = NA_character_,
       monisotopic_molecular_weight = as.numeric(monisotopic_molecular_weight)
     ) |>
@@ -94,12 +95,10 @@ prepare_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
       structure_smiles = smiles,
       structure_inchikey_2D,
       structure_smiles_2D,
-      ## COMMENT (AR): To improve!
       structure_molecular_formula = chemical_formula,
       structure_exact_mass = monisotopic_molecular_weight
     ) |>
     dplyr::mutate(
-      ## COMMENT (AR): To improve!
       structure_xlogp = NA_integer_,
       structure_taxonomy_npclassifier_01pathway = NA_character_,
       structure_taxonomy_npclassifier_02superclass = NA_character_,
@@ -136,7 +135,7 @@ prepare_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
   file.remove(input)
 }
 
-prepare_hmdb()
+prepare_libraries_sop_hmdb()
 
 end <- Sys.time()
 

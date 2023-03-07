@@ -89,6 +89,7 @@ Collate:
     'prepare_features_edges.R'
     'prepare_libraries_adducts.R'
     'prepare_libraries_sop_closed.R'
+    'prepare_libraries_sop_ecmdb.R'
     'prepare_libraries_sop_lotus.R'
     'prepare_libraries_sop_merged.R'
     'prepare_libraries_spectra.R'

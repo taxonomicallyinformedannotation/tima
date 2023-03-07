@@ -69,6 +69,16 @@ testthat::test_that("Whole process", {
   #   exdir = dirname(paths$data$interim$annotations$example_sirius)
   # )
 
+  ### Libraries
+  #### ECMDB
+  get_file(
+    url = paths$urls$ecmdb$metabolites,
+    export = paths$data$source$libraries$sop$ecmdb
+  )
+
+  #### HMDB
+  # get_hmdb()
+
   #### LOTUS
   get_last_version_from_zenodo(
     doi = paths$url$lotus$doi,
@@ -81,9 +91,6 @@ testthat::test_that("Whole process", {
     pattern = paths$urls$lotus$pattern,
     path = paths$data$source$libraries$sop$lotus
   )
-
-  #### HMDB
-  # get_hmdb()
 
   #### ISDB
   ## smaller version for testing
@@ -98,12 +105,6 @@ testthat::test_that("Whole process", {
   )
 
   ## Prepare libraries
-  ### LOTUS
-  prepare_libraries_sop_lotus()
-
-  ### HMDB
-  # prepare_hmdb()
-
   ### Closed
   step <- "prepare_libraries_sop_closed"
   params <- get_params(step = step)
@@ -111,6 +112,24 @@ testthat::test_that("Whole process", {
   prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
   prepare_libraries_sop_closed()
+
+  ### ECMDB
+  step <- "prepare_libraries_sop_ecmdb"
+  params <- get_params(step = step)
+  ## To do as if there was an input
+  prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
+  ## When there is no input
+  prepare_libraries_sop_ecmdb()
+
+  ### HMDB
+  # step <- "prepare_libraries_sop_hmdb"
+  # params <- get_params(step = step)
+  # prepare_libraries_sop_hmdb()
+
+  ### LOTUS
+  step <- "prepare_libraries_sop_lotus"
+  params <- get_params(step = step)
+  prepare_libraries_sop_lotus()
 
   ### SOP library
   step <- "prepare_libraries_sop_merged"
@@ -329,6 +348,7 @@ testthat::test_that("Whole process", {
   arguments$fil_fea_pre <<- "x"
   arguments$fil_lib_add_pro <<- "x"
   arguments$fil_lib_sop_raw_clo <<- "x"
+  arguments$fil_lib_sop_raw_ecm <<- "x"
   arguments$fil_lib_sop_raw_lot <<- "x"
   arguments$fil_lib_sop_pro <<- "x"
   arguments$fil_lib_spe_neg <<- "x"

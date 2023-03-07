@@ -140,6 +140,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 ### Others
 
 - The *RforMassSpectrometry* packages suite for MS2 matching: <https://doi.org/10.3390/metabo12020173>
+- ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
 - HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
 - ROTL: <https://doi.org/10.1111/2041-210X.12593>

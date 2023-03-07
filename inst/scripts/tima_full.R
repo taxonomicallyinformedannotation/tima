@@ -24,6 +24,18 @@ get_file(
   url = paths$url$examples$spectral_lib_mini$with_rt,
   export = paths$data$source$libraries$spectra$exp$with_rt
 )
+
+#### ECMDB
+log_debug("Getting ECMDB")
+get_file(
+  url = paths$urls$ecmdb$metabolites,
+  export = paths$data$source$libraries$sop$ecmdb
+)
+
+### HMDB
+# log_debug("Getting HMDB")
+# get_hmdb()
+
 ### LOTUS
 log_debug("Getting LOTUS")
 get_last_version_from_zenodo(
@@ -31,10 +43,6 @@ get_last_version_from_zenodo(
   pattern = paths$urls$lotus$pattern,
   path = paths$data$source$libraries$sop$lotus
 )
-
-### HMDB
-# log_debug("Getting HMDB")
-# get_hmdb()
 
 ### LOTUS ISDB
 log_debug("Getting LOTUS ISDB...")
@@ -60,19 +68,29 @@ get_last_version_from_zenodo(
 # get_mona() ## not available actually
 
 ## Prepare all files
-### LOTUS
-log_debug("Preparing LOTUS")
-prepare_libraries_sop_lotus()
-
-### HMDB
-# log_debug("Preparing HMDB")
-# prepare_hmdb()
-
 ### Closed
 log_debug("Preparing closed")
 step <- "prepare_libraries_sop_closed"
 params <- get_params(step = step)
 prepare_libraries_sop_closed()
+
+### ECMDB
+log_debug("Preparing ECMDB")
+step <- "prepare_libraries_sop_ecmdb"
+params <- get_params(step = step)
+prepare_libraries_sop_ecmdb()
+
+### HMDB
+# log_debug("Preparing HMDB")
+# step <- "prepare_libraries_sop_hmdb"
+# params <- get_params(step = step)
+# prepare_libraries_sop_hmdb()
+
+### LOTUS
+log_debug("Preparing LOTUS")
+step <- "prepare_libraries_sop_lotus"
+params <- get_params(step = step)
+prepare_libraries_sop_lotus()
 
 ### SOP library
 log_debug("Preparing sop library")

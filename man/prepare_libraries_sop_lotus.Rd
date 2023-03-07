@@ -5,8 +5,8 @@
 \title{Prepare libraries of structure organism pairs LOTUS}
 \usage{
 prepare_libraries_sop_lotus(
-  input = paths$data$source$libraries$sop$lotus,
-  output = paths$data$interim$libraries$sop$lotus
+  input = params$files$libraries$sop$raw$lotus,
+  output = params$files$libraries$sop$prepared
 )
 }
 \arguments{
