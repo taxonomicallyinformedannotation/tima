@@ -133,6 +133,7 @@ Arguments:
   fast                       Skip time-consuming steps. BOOLEAN
   force                      Do not use it. BOOLEAN
   parallel                   Execute processes in parallel when available. BOOLEAN
+  summarise                  Summarize results (1 row per feature). BOOLEAN
 
 Options:
 

@@ -32,7 +32,6 @@
 prepare_libraries_spectra <-
   function(input = params$files$libraries$spectral$exp$raw,
            output = params$files$libraries$spectral$exp,
-           mgf_colnames = params$names$mgf,
            polarity = params$ms$polarity,
            metad = NULL,
            col_ce = params$names$mgf$collision_energy,

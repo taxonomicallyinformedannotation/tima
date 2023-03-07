@@ -411,6 +411,7 @@ testthat::test_that("Whole process", {
   arguments$fast <<- "x"
   arguments$force <<- "x"
   arguments$parallel <<- "x"
+  arguments$summarise <<- "x"
 
   parse_cli_params()
 

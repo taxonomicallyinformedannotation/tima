@@ -9,7 +9,6 @@
 #' @param level Biological rank to be filtered. Kingdom, phylum, family, genus, ...
 #' @param value Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'
 #' @param output_key Output file for keys
-#' @param output_org_nam Output file for organisms names
 #' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
 #' @param output_str_2D_3D Output file for structures (2D + 3D)
 #' @param output_str_met Output file for structures metadata
@@ -29,6 +28,7 @@ prepare_libraries_sop_merged <-
            level = params$organisms$filter$level,
            value = params$organisms$filter$value,
            output_key = paths$data$interim$libraries$sop$merged$keys,
+           ## document it above in case
            # output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
            output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
            output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,

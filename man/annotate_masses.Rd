@@ -43,9 +43,13 @@ annotate_masses(
 
 \item{str_met}{File containing structures metadata}
 
+\item{str_nam}{File containing structures names}
+
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
+
+\item{name}{Name of the adducts library}
 
 \item{adducts_list}{List of adducts to be used}
 

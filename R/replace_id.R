@@ -3,8 +3,8 @@
 #' @description This function replaces the default ID in the example by a user-specified one
 #'
 #' @param x a character string containing the default ID
-#' @param default the default values for a GNPS job ID
-#' @param repl a user-specified values for a GNPS job ID
+#' @param user_filename a user-specified value for a file name job ID
+#' @param user_gnps a user-specified value for a GNPS job ID
 #'
 #' @return Character string with the GNPS job ID modified according to the rules specified in the function
 #'

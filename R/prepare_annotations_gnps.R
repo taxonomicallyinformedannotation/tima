@@ -2,10 +2,11 @@
 #'
 #' @description This function prepares GNPS obtained annotations for further use
 #'
-#' @param output Input file
+#' @param input Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
+#' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param parameters Parameters

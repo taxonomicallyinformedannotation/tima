@@ -3,6 +3,7 @@
 #' @description This function weights and eventually complements initial annotations.
 #'
 #' @param library Library containing the keys
+#' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file
@@ -84,7 +85,7 @@ weight_annotations <-
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
            # TODO ADD CONDITION,
            ms1_only = params$annotations$ms1only,
-           summarise = TRUE,
+           summarise = params$options$summarise,
            force = params$options$force,
            parameters = params) {
     stopifnot(

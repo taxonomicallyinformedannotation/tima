@@ -16,11 +16,15 @@ prepare_annotations_gnps(
 )
 }
 \arguments{
+\item{input}{Input file}
+
 \item{output}{Output file}
 
 \item{str_2D_3D}{File containing 2D and 3D structures}
 
 \item{str_met}{File containing structures metadata}
+
+\item{str_nam}{File containing structures names}
 
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 

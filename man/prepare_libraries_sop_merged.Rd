@@ -44,8 +44,6 @@ prepare_libraries_sop_merged(
 \item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
 
 \item{parameters}{Param}
-
-\item{output_org_nam}{Output file for organisms names}
 }
 \description{
 This function prepares the libraries made of all sub-libraries containing structure-organism pairs

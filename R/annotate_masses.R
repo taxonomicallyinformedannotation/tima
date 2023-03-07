@@ -10,11 +10,13 @@
 #' @param library Library containing the keys
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
+#' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
 #' @param adducts_masses_list Adducts masses
 #' @param neutral_losses_list List of neutral losses to be used
+#' @param name Name of the adducts library
 #' @param msMode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerancePpm Tolerance to perform annotation. Should be lower than 10 ppm
 #' @param toleranceRt Tolerance to perform adduct attribution. Should be lower than 0.1min

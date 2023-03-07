@@ -40,7 +40,7 @@ weight_annotations(
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
-  summarise = TRUE,
+  summarise = params$options$summarise,
   force = params$options$force,
   parameters = params
 )
@@ -119,6 +119,8 @@ weight_annotations(
 \item{force}{Force parameters. Use it at your own risk}
 
 \item{parameters}{Params}
+
+\item{output_org_tax_ott}{Output file for organisms taxonomy (OTT)}
 }
 \description{
 This function weights and eventually complements initial annotations.

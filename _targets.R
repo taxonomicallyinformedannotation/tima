@@ -686,8 +686,8 @@ list(
             )
           },
           ## To always check if a newest version is available
-          # cue = tar_cue(mode = "always")
-          cue = tar_cue(mode = "thorough")
+          cue = tar_cue(mode = "always")
+          # cue = tar_cue(mode = "thorough")
         )
       ),
       ## Prepared
@@ -805,8 +805,8 @@ list(
             }
             ## To always check if a newest version is available
             ,
-            # cue = tar_cue(mode = "always")
-            cue = tar_cue(mode = "thorough")
+            cue = tar_cue(mode = "always")
+            # cue = tar_cue(mode = "thorough")
           ),
           tar_file(
             name = library_spectra_is_lotus_neg,
@@ -829,8 +829,8 @@ list(
             }
             ## To always check if a newest version is available
             ,
-            # cue = tar_cue(mode = "always")
-            cue = tar_cue(mode = "thorough")
+            cue = tar_cue(mode = "always")
+            # cue = tar_cue(mode = "thorough")
           )
         )
       ),

@@ -323,6 +323,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$parallel)) {
       params$options$parallel <- as.logical(arguments$parallel)
     }
+    if (!is.null(arguments$summarise)) {
+      params$options$summarise <- as.logical(arguments$summarise)
+    }
   }
 
   if (exists("params")) {

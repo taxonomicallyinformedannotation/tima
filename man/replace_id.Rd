@@ -9,9 +9,9 @@ replace_id(x, user_filename = filename, user_gnps = gnps_job_id)
 \arguments{
 \item{x}{a character string containing the default ID}
 
-\item{default}{the default values for a GNPS job ID}
+\item{user_filename}{a user-specified value for a file name job ID}
 
-\item{repl}{a user-specified values for a GNPS job ID}
+\item{user_gnps}{a user-specified value for a GNPS job ID}
 }
 \value{
 Character string with the GNPS job ID modified according to the rules specified in the function
