@@ -1,6 +1,6 @@
 #' @title Weight chemo
 #'
-#' @description This function weights the biologically weigthed annotations according their chemical consistency
+#' @description This function weights the biologically weighted annotations according their chemical consistency
 #'
 #' @param annotationTableWeightedBioCleaned Table containing the biologically weighted annotation
 #' @param weightSpectral Weight for the spectral score

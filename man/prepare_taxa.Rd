@@ -19,7 +19,7 @@ prepare_taxa(
 \arguments{
 \item{input}{File containing your features intensities}
 
-\item{extension}{Does your colun names contain the file extension? (MZmine mainly)}
+\item{extension}{Does your column names contain the file extension? (MZmine mainly)}
 
 \item{colname}{Name of the column containing biological source information}
 

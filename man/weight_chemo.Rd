@@ -33,7 +33,7 @@ weight_chemo(
 A table containing the chemically weighted annotation
 }
 \description{
-This function weights the biologically weigthed annotations according their chemical consistency
+This function weights the biologically weighted annotations according their chemical consistency
 }
 \examples{
 NULL

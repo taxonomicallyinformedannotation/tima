@@ -7,7 +7,7 @@
 #'    according to their relative intensities among the samples.
 #'
 #' @param input File containing your features intensities
-#' @param extension Does your colun names contain the file extension? (MZmine mainly)
+#' @param extension Does your column names contain the file extension? (MZmine mainly)
 #' @param colname Name of the column containing biological source information
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities

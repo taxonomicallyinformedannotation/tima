@@ -13,7 +13,7 @@
 #' @param output_str_2D_3D Output file for structures (2D + 3D)
 #' @param output_str_met Output file for structures metadata
 #' @param output_str_nam Output file for structures names
-#' @param output_str_tax_cla Output file for structures taxonomy (Classyifre)
+#' @param output_str_tax_cla Output file for structures taxonomy (Classyfire)
 #' @param output_str_tax_npc Output file for structures taxonomy (NPC)
 #' @param parameters Param
 #'

@@ -39,7 +39,7 @@ prepare_libraries_sop_merged(
 
 \item{output_str_nam}{Output file for structures names}
 
-\item{output_str_tax_cla}{Output file for structures taxonomy (Classyifre)}
+\item{output_str_tax_cla}{Output file for structures taxonomy (Classyfire)}
 
 \item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
 

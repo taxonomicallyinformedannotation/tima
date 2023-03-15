@@ -63,7 +63,7 @@ git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
-Then, to copy the defaut parameters:
+Then, to copy the default parameters:
 
 ```
 Rscript inst/scripts/prepare_params.R

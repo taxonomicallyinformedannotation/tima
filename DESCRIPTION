@@ -39,6 +39,7 @@ Imports:
     yaml (>= 2.3.7)
 Suggests:
     knitr (>= 1.42),
+    spelling (>= 2.2),
     testthat (>= 3.1.6),
     visNetwork (>= 2.1.2)
 Config/testthat/edition: 3
@@ -104,3 +105,4 @@ VignetteBuilder:
     knitr
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
 X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
+Language: en-US

@@ -74,7 +74,7 @@ targets::tar_visnetwork(names = starts_with("params"), targets_only = TRUE, degr
 ```
 
 See how your targets changed?
-The values you adapted in `params/prepare_params.yaml` were automatically propagated to all subfiles in `params/user`.
+The values you adapted in `params/prepare_params.yaml` were automatically propagated to all sub-files in `params/user`.
 
 And everything is stored in case you re-perform it, the beauty of `{targets}`!
 

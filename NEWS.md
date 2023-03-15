@@ -4,7 +4,7 @@
 
 * ECMDB support
 * Edges (mass and spectra-based) and components are generated if not present.
-* Retention time matching additionnally to MS2 if RT present in library
+* Retention time matching additionally to MS2 if RT present in library
 * Parameters refactoring
 * Steps refactoring
 * Further [Targets](https://books.ropensci.org/targets/) improvements
@@ -95,7 +95,7 @@
 * Minor fixes
 * Added support for annotation without MN (#28)
 * Added support for multi tool annotations (#27)
-* Added suport for classical MN GNPS jobs (#25)
+* Added support for classical MN GNPS jobs (#25)
 * Added support for new version of LOTUS
 * General improvements for manual inputs
 * Updated adducts
@@ -105,7 +105,7 @@
 
 * Minor fixes
 * Additional benchmark
-  figure ([Correct hits repartition](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#correct-hits-repartition))
+  figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution)
 
 # timaR 2.2.1
 
