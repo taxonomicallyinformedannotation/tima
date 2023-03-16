@@ -1463,6 +1463,55 @@ list(
         library = library_merged_key,
         str_2D_3D = library_merged_str_2D_3D,
         annotations = list(
+          annotations_spectral_exp_internal_prepared,
+          annotations_spectral_is_prepared,
+          annotations_ms1_prepared_annotations
+        ),
+        components = features_components_prepared,
+        edges = features_edges_prepared,
+        features = features_prepared,
+        taxa = taxa_prepared,
+        output = params_weight_annotations$files$annotations$processed,
+        candidates_initial = params_weight_annotations$annotations$candidates$initial,
+        candidates_final = params_weight_annotations$annotations$candidates$final,
+        weight_spectral = params_weight_annotations$weights$global$spectral,
+        weight_chemical = params_weight_annotations$weights$global$chemical,
+        weight_biological = params_weight_annotations$weights$global$biological,
+        score_chemical_pathway = params_weight_annotations$weights$chemical$pathway,
+        score_chemical_superclass = params_weight_annotations$weights$chemical$superclass,
+        score_chemical_class = params_weight_annotations$weights$chemical$class,
+        score_biological_domain = params_weight_annotations$weights$biological$domain,
+        score_biological_kingdom = params_weight_annotations$weights$biological$kingdom,
+        score_biological_phylum = params_weight_annotations$weights$biological$phylum,
+        score_biological_class = params_weight_annotations$weights$biological$class,
+        score_biological_order = params_weight_annotations$weights$biological$order,
+        score_biological_infraorder = params_weight_annotations$weights$biological$infraorder,
+        score_biological_family = params_weight_annotations$weights$biological$family,
+        score_biological_subfamily = params_weight_annotations$weights$biological$subfamily,
+        score_biological_tribe = params_weight_annotations$weights$biological$tribe,
+        score_biological_subtribe = params_weight_annotations$weights$biological$subtribe,
+        score_biological_genus = params_weight_annotations$weights$biological$genus,
+        score_biological_subgenus = params_weight_annotations$weights$biological$subgenus,
+        score_biological_species = params_weight_annotations$weights$biological$species,
+        score_biological_subspecies = params_weight_annotations$weights$biological$subspecies,
+        score_biological_variety = params_weight_annotations$weights$biological$variety,
+        minimal_ms1_bio = params_weight_annotations$annotations$ms1$thresholds$biological,
+        minimal_ms1_chemo = params_weight_annotations$annotations$ms1$thresholds$chemical,
+        # TODO ADD CONDITION
+        ms1_only = params_weight_annotations$annotations$ms1only,
+        summarise = params_weight_annotations$options$summarise,
+        force = params_weight_annotations$options$force,
+        parameters = params_weight_annotations
+      )
+    }
+  ),
+  tar_file(
+    name = annotations_prepared_crazy,
+    command = {
+      annotations_prepared_crazy <- weight_annotations(
+        library = library_merged_key,
+        str_2D_3D = library_merged_str_2D_3D,
+        annotations = list(
           annotations_spectral_exp_gnps_prepared,
           annotations_spectral_exp_internal_prepared,
           annotations_spectral_is_prepared,
