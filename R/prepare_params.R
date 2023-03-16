@@ -6,6 +6,7 @@
 #' @param gnps_job_id GNPS job ID
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
+#' @param summarise Summarise results to one row per feature. BOOLEAN
 #' @param parameters Params
 #' @param step Step
 #'
@@ -18,6 +19,7 @@ prepare_params <- function(filename = params$files$pattern,
                            gnps_job_id = params$gnps$id,
                            ms_mode = params$ms$polarity,
                            taxon = params$organisms$taxon,
+                           summarise = params$options$summarise,
                            parameters = params,
                            step = NA) {
   ## TODO 'step' actually not taken into account
@@ -60,6 +62,8 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$annotate_masses$ms$polarity <- ms_mode
 
   yamls_params$prepare_taxa$organisms$taxon <- taxon
+
+  yamls_params$weight_annotations$options$summarise <- summarise
 
   log_debug(x = "Changing filenames")
 

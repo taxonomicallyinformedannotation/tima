@@ -212,6 +212,7 @@ list(
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
+                summarise = par_fin_par$options$summarise,
                 parameters = par_fin_par,
                 step = "annotate_masses"
               )

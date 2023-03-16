@@ -9,6 +9,7 @@ prepare_params(
   gnps_job_id = params$gnps$id,
   ms_mode = params$ms$polarity,
   taxon = params$organisms$taxon,
+  summarise = params$options$summarise,
   parameters = params,
   step = NA
 )
@@ -21,6 +22,8 @@ prepare_params(
 \item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 
 \item{taxon}{Name of a taxon you want to enforce}
+
+\item{summarise}{Summarise results to one row per feature. BOOLEAN}
 
 \item{parameters}{Params}
 
