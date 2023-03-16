@@ -1,9 +1,28 @@
+#' Files.
 files:
+  #' Pattern used to recognize the files. STRING
   pattern: example
+
+#' GNPS related parameters.
 gnps:
+  #' GNPS job ID. STRING
   id: 96fa7c88200e4a03bee4644e581e3fb0
+  #' Workflow used within GNPS.
+  #' Currently "fbmn" or "classical" supported. STRING
   workflow: fbmn
+
+#' MS related parameters.
 ms:
+  #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos
+
+#' Organisms related parameters.
 organisms:
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
   taxon: ~
+
+#' Options.
+options:
+  #' Summarise results to one row per feature. BOOLEAN
+  summarise: yes
