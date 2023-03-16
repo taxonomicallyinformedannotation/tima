@@ -55,8 +55,8 @@ clean_chemo <-
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
-      dplyr::left_join(componentsTable) |>
       dplyr::left_join(df1) |>
+      dplyr::left_join(componentsTable) |>
       dplyr::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
@@ -116,7 +116,6 @@ clean_chemo <-
         reference_doi
       )
 
-
     log_debug("adding references \n")
     df3 <- df2 |>
       dplyr::left_join(references) |>
@@ -158,7 +157,8 @@ clean_chemo <-
         best_candidate_structure,
         reference_doi,
         dplyr::everything()
-      )
+      ) |>
+      dplyr::arrange(rank_final)
 
     if (summarize == TRUE) {
       log_debug("summarizing results \n")
