@@ -32,38 +32,14 @@ Optionally, you may want to add:
 
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
-On *nix systems:
-
-```
-Rscript -e 'if(!requireNamespace("remotes")){install.packages("remotes")}
-remotes::install_github("taxonomicallyinformedannotation/tima-r")'
-```
-
-On Windows:
-
-```
-Rscript -e "if(!requireNamespace('remotes')){install.packages('remotes')}
-remotes::install_github('taxonomicallyinformedannotation/tima-r')"
-```
-
-or in R directly:
-
-```
-if(!requireNamespace("remotes", quietly = TRUE))
-    install.packages("remotes")
-remotes::install_github("taxonomicallyinformedannotation/tima-r")
-```
-
-Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
-
-Do not forget to clone the repository (it will allow you to access default architecture, files, and parameters):
-
 ```
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
+R CMD INSTALL .
 ```
+Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
-Then, to copy the default parameters:
+First, to copy the default parameters:
 
 ```
 Rscript inst/scripts/prepare_params.R
