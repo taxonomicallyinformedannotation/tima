@@ -1373,7 +1373,7 @@ list(
       name = features_components,
       command = {
         features_components <- create_components(
-          input = params_create_components$files$networks$spectral$edges$prepared,
+          input = features_edges_prepared,
           output = params_create_components$files$networks$spectral$components$raw,
           parameters = params_create_components
         )
