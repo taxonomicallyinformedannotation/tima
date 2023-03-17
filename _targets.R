@@ -931,7 +931,7 @@ list(
             name = library_spectra_is_lotus_neg,
             command = {
               library_spectra_is_lotus_neg <-
-                if (file.exists(paths$data$source$libraries$spectra$is$lotus$ne)) {
+                if (file.exists(paths$data$source$libraries$spectra$is$lotus$neg)) {
                   get_last_version_from_zenodo(
                     doi = paths$url$lotus_isdb$doi,
                     pattern = paths$urls$lotus_isdb$pattern$neg,
