@@ -823,7 +823,7 @@ list(
           command = {
             library_sop_lotus_prepared <-
               prepare_libraries_sop_lotus(
-                input = if (file.exists(library_sop_lotus)) {
+                input = if (paths$tests$mode == FALSE) {
                   library_sop_lotus
                 } else {
                   paths$data$source$libraries$sop$lotus
@@ -907,7 +907,7 @@ list(
             name = library_spectra_is_lotus_pos,
             command = {
               library_spectra_is_lotus_pos <-
-                if (file.exists(paths$data$source$libraries$spectra$is$lotus$pos)) {
+                if (paths$tests$mode == FALSE) {
                   get_last_version_from_zenodo(
                     doi = paths$url$lotus_isdb$doi,
                     pattern = paths$urls$lotus_isdb$pattern$pos,
@@ -931,7 +931,7 @@ list(
             name = library_spectra_is_lotus_neg,
             command = {
               library_spectra_is_lotus_neg <-
-                if (file.exists(paths$data$source$libraries$spectra$is$lotus$neg)) {
+                if (paths$tests$mode == FALSE) {
                   get_last_version_from_zenodo(
                     doi = paths$url$lotus_isdb$doi,
                     pattern = paths$urls$lotus_isdb$pattern$neg,
@@ -961,7 +961,7 @@ list(
           name = library_spectra_is_lotus_prepared_pos,
           command = {
             library_spectra_is_lotus_prepared_pos <- prepare_libraries_spectra(
-              input = if (file.exists(library_spectra_is_lotus_pos)) {
+              input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_pos
               } else {
                 paths$data$source$libraries$spectra$is$lotus$pos
@@ -998,7 +998,7 @@ list(
           name = library_spectra_is_lotus_prepared_neg,
           command = {
             library_spectra_is_lotus_prepared_neg <- prepare_libraries_spectra(
-              input = if (file.exists(library_spectra_is_lotus_neg)) {
+              input = if (paths$tests$mode == FALSE) {
                 library_spectra_is_lotus_neg
               } else {
                 paths$data$source$libraries$spectra$is$lotus$neg

@@ -23,12 +23,7 @@ This vignette describes how to prepare:
 * All inputs you need
 
 ```{r include = FALSE}
-paths <- yaml::read_yaml(file = "paths.yaml")
-
-paths$tests$mode <- "yes"
-paths$urls$examples$spectra <- paths$urls$examples$spectra_mini
-
-yaml::write_yaml(x = paths, file = "paths.yaml")
+source(file = "inst/scripts/change_tests.R")
 ```
 
 ## Parameters
