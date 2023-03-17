@@ -15,7 +15,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_libraries_spectra()
-targets::tar_make(names = starts_with("library_spectra_internal_prepared"))
+targets::tar_make(names = matches("library_spectra_internal_prepared"))
 
 end <- Sys.time()
 

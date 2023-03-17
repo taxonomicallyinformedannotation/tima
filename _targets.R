@@ -1463,7 +1463,6 @@ list(
         library = library_merged_key,
         str_2D_3D = library_merged_str_2D_3D,
         annotations = list(
-          annotations_spectral_exp_internal_prepared,
           annotations_spectral_is_prepared,
           annotations_ms1_prepared_annotations
         ),
