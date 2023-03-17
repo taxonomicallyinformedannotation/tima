@@ -737,9 +737,19 @@ list(
       command = {
         input_spectra <-
           ifelse(
-            test = file.exists(gnps_spectra),
-            yes = gnps_spectra,
-            no = params_annotate_spectra$files$spectral$raw
+            test = paths$tests$mode == FALSE,
+            yes = ifelse(
+              test = file.exists(gnps_spectra),
+              yes = gnps_spectra,
+              no = params_annotate_spectra$files$spectral$raw
+            ),
+            no = {
+              get_file(
+                url = paths$url$examples$spectra_mini,
+                export = paths$data$source$spectra
+              )
+              return(paths$data$source$spectra)
+            }
           )
       }
     ),
