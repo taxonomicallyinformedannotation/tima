@@ -41,7 +41,7 @@ parse.inchi <- function(inchis) {
   return(mols)
 }
 
-standadrize_mol <- function(mol) {
+standardize_mol <- function(mol) {
   if (mol$isEmpty()) {
     list <-
       list(
