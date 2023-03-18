@@ -12,7 +12,6 @@
 #' @examples NULL
 parse_yaml_params <- function(def = default_path, usr = user_path) {
   # Read the default YAML file
-  log_debug("Loading yaml parameters")
   suppressWarnings(
     params <- yaml::read_yaml(file = def)
   )
