@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.2.2 (2022-10-31)",
+  "runtimePlatform": "R version 4.2.3 (2023-03-15)",
   "author": [
     {
       "@type": "Person",
@@ -376,7 +376,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2497.875KB",
+  "fileSize": "2481.259KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
