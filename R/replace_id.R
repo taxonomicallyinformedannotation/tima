@@ -15,7 +15,7 @@ replace_id <-
   function(x,
            user_filename = filename,
            user_gnps = gnps_job_id) {
-    if (user_gnps == "96fa7c88200e4a03bee4644e581e3fb0") {
+    if (user_gnps == "41c6068e905d482db5698ad81d145d7c") {
       user_gnps <- "example"
     }
 

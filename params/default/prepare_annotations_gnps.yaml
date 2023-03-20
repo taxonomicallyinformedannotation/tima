@@ -9,11 +9,11 @@ files:
 
       #' List of spectral matching results. STRING
       spectral:
-        - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps.tsv
+        - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_gnps.tsv
 
     #' List of prepared annotations. STRING
     prepared:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_prepared.tsv.gz
+      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_gnps_prepared.tsv.gz
 
   #' Libraries files.
   libraries:

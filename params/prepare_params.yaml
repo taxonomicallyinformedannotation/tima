@@ -6,7 +6,7 @@ files:
 #' GNPS related parameters.
 gnps:
   #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
+  id: 41c6068e905d482db5698ad81d145d7c
   #' Workflow used within GNPS.
   #' Currently "fbmn" or "classical" supported. STRING
   workflow: fbmn

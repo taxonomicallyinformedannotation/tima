@@ -11,7 +11,7 @@ files:
       components:
 
         #' Raw components file. STRING
-        raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv.gz
+        raw: data/interim/features/41c6068e905d482db5698ad81d145d7c_components.tsv.gz
 
         #' Prepared components file. STRING
-        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components_prepared.tsv.gz
+        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_components_prepared.tsv.gz

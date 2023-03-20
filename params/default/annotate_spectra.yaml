@@ -44,7 +44,7 @@ files:
 
       #' List of spectral matching results. STRING
       spectral:
-        - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_spectral_matches.tsv.gz
+        - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_spectral_matches.tsv.gz
 
   #' Libraries files.
   libraries:
@@ -78,7 +78,7 @@ files:
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_spectra.mgf
+    raw: data/source/41c6068e905d482db5698ad81d145d7c_spectra.mgf
 
 #' MS related parameters.
 ms:

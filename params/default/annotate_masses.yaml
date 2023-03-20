@@ -6,13 +6,13 @@ files:
 
     #' List of prepared annotations. STRING
     prepared:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_ms1_prepared.tsv.gz
+      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_ms1_prepared.tsv.gz
 
   #' Features files.
   features: 
 
     #' Prepared features file. STRING
-    prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_features.tsv.gz
+    prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_features.tsv.gz
 
   #' Libraries files.
   libraries:
@@ -64,7 +64,7 @@ files:
 
         #' Raw edges file. STRING
         raw: 
-          - data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges_masses.tsv.gz
+          - data/interim/features/41c6068e905d482db5698ad81d145d7c_edges_masses.tsv.gz
 
 #' MS related parameters.
 ms:

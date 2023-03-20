@@ -79,20 +79,20 @@ files:
 
       #' List of spectral matching results. STRING
       spectral:
-        - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps.tsv
-        - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb.tsv.gz
+        - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_gnps.tsv
+        - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_isdb.tsv.gz
 
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius/
 
     #' List of prepared annotations. STRING
     prepared:
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_gnps_prepared.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_isdb_prepared.tsv.gz
-      - data/interim/annotations/96fa7c88200e4a03bee4644e581e3fb0_sirius_prepared.tsv.gz
+      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_gnps_prepared.tsv.gz
+      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_isdb_prepared.tsv.gz
+      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_sirius_prepared.tsv.gz
 
     #' Final results file. STRING
-    processed: 96fa7c88200e4a03bee4644e581e3fb0_results.tsv
+    processed: 41c6068e905d482db5698ad81d145d7c_results.tsv
 
   #' Features files.
   features: 
@@ -101,7 +101,7 @@ files:
     raw: data/source/features.tsv.gz
 
     #' Prepared features file. STRING
-    prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_features.tsv.gz
+    prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_features.tsv.gz
 
   #' Libraries files.
   libraries:
@@ -209,42 +209,42 @@ files:
       edges:
 
         #' Raw edges file. STRING
-        raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_edges_manual.csv
+        raw: data/source/41c6068e905d482db5698ad81d145d7c_edges_manual.csv
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_edges.tsv.gz
+        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_edges.tsv.gz
 
       #' Components files.
       components:
 
         #' Raw components file. STRING
-        raw: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components.tsv.gz
+        raw: data/interim/features/41c6068e905d482db5698ad81d145d7c_components.tsv.gz
 
         #' Prepared components file. STRING
-        prepared: data/interim/features/96fa7c88200e4a03bee4644e581e3fb0_components_prepared.tsv.gz
+        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_components_prepared.tsv.gz
 
   #' Taxa files.
   taxa:
 
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
-    raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_metadata.tsv
+    raw: data/source/41c6068e905d482db5698ad81d145d7c_metadata.tsv
 
     #' Taxonomically informed features file. STRING
-    prepared: data/interim/taxa/96fa7c88200e4a03bee4644e581e3fb0_taxed.tsv.gz
+    prepared: data/interim/taxa/41c6068e905d482db5698ad81d145d7c_taxed.tsv.gz
 
   #' Spectral files. STRING
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/96fa7c88200e4a03bee4644e581e3fb0_spectra.mgf
+    raw: data/source/41c6068e905d482db5698ad81d145d7c_spectra.mgf
 
 
 #' GNPS related parameters.
 gnps: 
   
   #' GNPS job ID. STRING
-  id: 96fa7c88200e4a03bee4644e581e3fb0
+  id: 41c6068e905d482db5698ad81d145d7c
 
   #' Workflow used within GNPS.
   #' Currently "fbmn" or "classical" supported. STRING
