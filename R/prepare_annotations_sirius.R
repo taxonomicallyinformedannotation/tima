@@ -3,7 +3,6 @@
 #' @description This function prepares Sirius results to make them compatible
 #'
 #' @param input_directory Directory containing the Sirius results
-#' @param npc Boolean. NPClassifier classes computed. TRUE or FALSE
 #' @param output Output where to save prepared results
 #' @param str_2D_3D File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
@@ -19,7 +18,6 @@
 #' @examples NULL
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
-           npc = params$tools$taxonomies$chemical,
            output = params$files$annotations$prepared,
            str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
            str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -29,7 +27,6 @@ prepare_annotations_sirius <-
            parameters = params) {
     params <<- parameters
     if (file.exists(input_directory)) {
-      stopifnot("Chemical class must be 'npc'." = npc %in% c("npc"))
       stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
         file.path(
           input_directory,
@@ -47,17 +44,11 @@ prepare_annotations_sirius <-
         ) != 0
       )
       log_debug("Loading and formatting SIRIUS results")
-      if (npc == "npc") {
-        canopus <-
-          readr::read_delim(file = file.path(
-            input_directory,
-            "canopus_compound_summary.tsv"
-          ))
-      } else {
-        log_debug(
-          "Please compute NPClassifier Canopus summary file, we do not support Classyfire anymore"
-        )
-      }
+      canopus <-
+        readr::read_delim(file = file.path(
+          input_directory,
+          "canopus_compound_summary.tsv"
+        ))
 
       formula <-
         readr::read_delim(file = file.path(
@@ -112,7 +103,6 @@ prepare_annotations_sirius <-
       ) |>
         pre_harmonize_names_sirius() |>
         harmonize_names_sirius()
-
 
       compound_summary_ready <-
         lapply(compound_summary, FUN = dplyr::mutate_all, as.character) |>

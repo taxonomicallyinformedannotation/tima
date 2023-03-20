@@ -26,7 +26,7 @@ annotations:
       biological: 0.5
 
       #' Minimal chemical score to keep MS1 only annotation. FLOAT
-      chemical: 0.666
+      chemical: 0.5
 
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
@@ -518,61 +518,77 @@ weights:
   biological: 
 
     #' Score for a biological domain match. FLOAT
-    domain: 0.1
+    domain: 0.10
 
     #' Score for a biological kingdom match. FLOAT
-    kingdom: 0.2
+    kingdom: 0.20
 
     #' Score for a biological phylum match. FLOAT
-    phylum: 0.3
+    phylum: 0.30
 
     #' Score for a biological class match. FLOAT
-    class: 0.4
+    class: 0.40
 
     #' Score for a biological order match. FLOAT
-    order: 0.5
+    order: 0.50
 
     #' Score for a biological infraorder match. FLOAT
     infraorder: 0.55
 
     #' Score for a biological family match. FLOAT
-    family: 0.6
+    family: 0.60
 
     #' Score for a biological subfamily match. FLOAT
     subfamily: 0.65
 
     #' Score for a biological tribe match. FLOAT
-    tribe: 0.7
+    tribe: 0.70
 
     #' Score for a biological subtribe match. FLOAT
-    subtribe: 0.7
+    subtribe: 0.75
 
     #' Score for a biological genus match. FLOAT
-    genus: 0.8
+    genus: 0.80
 
     #' Score for a biological subgenus match. FLOAT
     subgenus: 0.85
 
     #' Score for a biological species match. FLOAT
-    species: 0.9
+    species: 0.90
 
     #' Score for a biological subspecies match. FLOAT
     subspecies: 0.95
 
     #' Score for a biological variety match. FLOAT
-    variety: 1.0
+    variety: 1.00
 
   #' Weights for the chemical part.
   chemical: 
     
-    #' Score for a chemical pathway match. FLOAT
-    pathway: 0.333
+    #' Score for a classyfire match.
+    cla:
+      #' Score for a chemical kingdom match. FLOAT
+      kingdom: 0.25
 
-    #' Score for a chemical superclass match. FLOAT
-    superclass: 0.666
+      #' Score for a chemical superclass match. FLOAT
+      superclass: 0.50
 
-    #' Score for a chemical class match. FLOAT
-    class: 1.000
+      #' Score for a chemical class match. FLOAT
+      class: 0.75
+
+      #' Score for a chemical parent match. FLOAT
+      parent: 1.00
+
+    #' Score for a NPClassifier match.
+    npc:
+      #' Score for a chemical kingdom match. FLOAT
+      pathway: 0.333
+
+      #' Score for a chemical superclass match. FLOAT
+      superclass: 0.666
+
+      #' Score for a chemical class match. FLOAT
+      class: 1.000
 
 
 #' Options.

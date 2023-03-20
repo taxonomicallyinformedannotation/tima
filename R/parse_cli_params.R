@@ -305,14 +305,26 @@ parse_cli_params <- function() {
     if (!is.null(arguments$wei_bio_15)) {
       params$weights$biological$variety <- as.numeric(arguments$wei_bio_15)
     }
-    if (!is.null(arguments$wei_che_01)) {
-      params$weights$chemical$pathway <- as.numeric(arguments$wei_che_01)
+    if (!is.null(arguments$wei_che_11)) {
+      params$weights$chemical$cla$kingdom <- as.numeric(arguments$wei_che_11)
     }
-    if (!is.null(arguments$wei_che_02)) {
-      params$weights$chemical$superclass <- as.numeric(arguments$wei_che_02)
+    if (!is.null(arguments$wei_che_12)) {
+      params$weights$chemical$cla$superclass <- as.numeric(arguments$wei_che_12)
     }
-    if (!is.null(arguments$wei_che_03)) {
-      params$weights$chemical$class <- as.numeric(arguments$wei_che_03)
+    if (!is.null(arguments$wei_che_13)) {
+      params$weights$chemical$cla$class <- as.numeric(arguments$wei_che_13)
+    }
+    if (!is.null(arguments$wei_che_14)) {
+      params$weights$chemical$cla$parent <- as.numeric(arguments$wei_che_14)
+    }
+    if (!is.null(arguments$wei_che_21)) {
+      params$weights$chemical$npc$pathway <- as.numeric(arguments$wei_che_21)
+    }
+    if (!is.null(arguments$wei_che_22)) {
+      params$weights$chemical$npc$superclass <- as.numeric(arguments$wei_che_22)
+    }
+    if (!is.null(arguments$wei_che_23)) {
+      params$weights$chemical$npc$class <- as.numeric(arguments$wei_che_23)
     }
     if (!is.null(arguments$fast)) {
       params$options$fast <- as.logical(arguments$fast)

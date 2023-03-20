@@ -4,6 +4,7 @@
 
 * ECMDB support
 * Edges (mass and spectra-based) and components are generated if not present.
+* Re-introducing Classyfire support.
 * Retention time matching additionally to MS2 if RT present in library
 * Parameters refactoring
 * Steps refactoring

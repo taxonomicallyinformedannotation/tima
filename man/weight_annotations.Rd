@@ -19,9 +19,6 @@ weight_annotations(
   weight_spectral = params$weights$global$spectral,
   weight_chemical = params$weights$global$chemical,
   weight_biological = params$weights$global$biological,
-  score_chemical_pathway = params$weights$chemical$pathway,
-  score_chemical_superclass = params$weights$chemical$superclass,
-  score_chemical_class = params$weights$chemical$class,
   score_biological_domain = params$weights$biological$domain,
   score_biological_kingdom = params$weights$biological$kingdom,
   score_biological_phylum = params$weights$biological$phylum,
@@ -37,6 +34,13 @@ weight_annotations(
   score_biological_species = params$weights$biological$species,
   score_biological_subspecies = params$weights$biological$subspecies,
   score_biological_variety = params$weights$biological$variety,
+  score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
+  score_chemical_cla_superclass = params$weights$chemical$cla$superclass,
+  score_chemical_cla_class = params$weights$chemical$cla$class,
+  score_chemical_cla_parent = params$weights$chemical$cla$parent,
+  score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
+  score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
+  score_chemical_npc_class = params$weights$chemical$npc$class,
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
@@ -74,12 +78,6 @@ weight_annotations(
 
 \item{weight_biological}{Weight for the chemical consistency score}
 
-\item{score_chemical_pathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
-
-\item{score_chemical_superclass}{Score for a \code{superclass} match (should be lower than \code{class})}
-
-\item{score_chemical_class}{Score for a \code{class} match (should be the highest)}
-
 \item{score_biological_domain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
 
 \item{score_biological_kingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
@@ -109,6 +107,20 @@ weight_annotations(
 \item{score_biological_subspecies}{Score for a \code{subspecies} match (should be lower than \code{variety})}
 
 \item{score_biological_variety}{Score for a \code{variety} match (should be the highest)}
+
+\item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match (should be lower than \verb{ Classyfire superclass})}
+
+\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass} match (should be lower than \verb{Classyfire class})}
+
+\item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match (should be lower than \verb{Classyfire parent})}
+
+\item{score_chemical_cla_parent}{Score for a \verb{Classyfire parent} match (should be the highest)}
+
+\item{score_chemical_npc_pathway}{Score for a \verb{NPC pathway} match (should be lower than \verb{ NPC superclass})}
+
+\item{score_chemical_npc_superclass}{Score for a \verb{NPC superclass} match (should be lower than \verb{NPC class})}
+
+\item{score_chemical_npc_class}{Score for a \verb{NPC class} match (should be the highest)}
 
 \item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 

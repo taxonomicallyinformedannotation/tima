@@ -6,19 +6,31 @@
 \usage{
 decorate_chemo(
   df = annotation_table_weighted_chemo,
-  sc_pat = score_chemical_pathway,
-  sc_sup = score_chemical_superclass,
-  sc_cla = score_chemical_class
+  sc_cla_kin = score_chemical_cla_kingdom,
+  sc_cla_sup = score_chemical_cla_superclass,
+  sc_cla_cla = score_chemical_cla_class,
+  sc_cla_par = score_chemical_cla_parent,
+  sc_npc_pat = score_chemical_npc_pathway,
+  sc_npc_sup = score_chemical_npc_superclass,
+  sc_npc_cla = score_chemical_npc_class
 )
 }
 \arguments{
 \item{df}{Table to decorate}
 
-\item{sc_pat}{Pathway score}
+\item{sc_cla_kin}{Classyfire kingdom score}
 
-\item{sc_sup}{Superclass score}
+\item{sc_cla_sup}{Classyfire superclass score}
 
-\item{sc_cla}{Class score}
+\item{sc_cla_cla}{Classyfire class score}
+
+\item{sc_cla_par}{Classyfire parent score}
+
+\item{sc_npc_pat}{NPC pathway score}
+
+\item{sc_npc_sup}{NPC superclass score}
+
+\item{sc_npc_cla}{NPC class score}
 }
 \value{
 Message indicating the number of annotations weighted at each chemical level

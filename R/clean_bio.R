@@ -48,19 +48,33 @@ clean_bio <-
       dplyr::distinct(
         structure_inchikey_2D,
         feature_id,
-        candidate_structure_1_pathway = structure_taxonomy_npclassifier_01pathway,
-        candidate_structure_2_superclass = structure_taxonomy_npclassifier_02superclass,
-        candidate_structure_3_class = structure_taxonomy_npclassifier_03class,
+        candidate_structure_1_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
+        candidate_structure_1_npc_pathway = structure_taxonomy_npclassifier_01pathway,
+        candidate_structure_2_cla_superclass = structure_taxonomy_classyfire_02superclass,
+        candidate_structure_2_npc_superclass = structure_taxonomy_npclassifier_02superclass,
+        candidate_structure_3_cla_class = structure_taxonomy_classyfire_03class,
+        candidate_structure_3_npc_class = structure_taxonomy_npclassifier_03class,
+        candidate_structure_4_cla_parent = structure_taxonomy_classyfire_04directparent,
         rank_final,
         .keep_all = TRUE
       )
 
+    ## Loosing CANOPUS from SIRIUS
+    ## TODO improve
     log_debug("adding \"notAnnotated\" \n")
-    df$candidate_structure_1_pathway[df["structure_inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_1_cla_kingdom[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
-    df$candidate_structure_2_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_1_npc_pathway[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
-    df$candidate_structure_3_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
+    df$candidate_structure_2_cla_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
+      "notAnnotated"
+    df$candidate_structure_2_npc_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
+      "notAnnotated"
+    df$candidate_structure_3_cla_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
+      "notAnnotated"
+    df$candidate_structure_3_npc_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
+      "notAnnotated"
+    df$candidate_structure_4_cla_parent[df["structure_inchikey_2D"] == "notAnnotated"] <-
       "notAnnotated"
 
     log_debug("adding \"notClassified\" \n")
@@ -108,161 +122,373 @@ clean_bio <-
       ) |>
       dplyr::filter(!is.na(feature_source))
 
-    log_debug("... at the pathway level \n")
-    freq_pat <- df3 |>
+    log_debug("... at the (classyfire) kingdom level \n")
+    freq_cla_kin <- df3 |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_1_pathway
+        candidate_structure_1_cla_kingdom
+      ) |>
+      dplyr::mutate(count_kin = dplyr::n_distinct(feature_target)) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(feature_source) |>
+      dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_kin = count_kin / sum) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(
+        feature_target,
+        candidate_structure_1_cla_kingdom
+      ) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::arrange(rank_final) |>
+      dplyr::distinct(feature_source,
+        candidate_structure_1_cla_kingdom,
+        .keep_all = TRUE
+      ) |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_1_cla_kingdom
+      ) |>
+      dplyr::mutate(
+        rank_avg_pat = ifelse(
+          test = candidate_structure_1_cla_kingdom == "notAnnotated" |
+            candidate_structure_1_cla_kingdom == "notClassified",
+          yes = candidatesInitial / 2,
+          no = mean(as.numeric(rank_final))
+        )
+      ) |>
+      dplyr::mutate(consistency_score_chemical_1_cla_kingdom = consistency_structure_cla_kin / sqrt(rank_avg_pat)) |>
+      dplyr::group_by(feature_source) |>
+      dplyr::arrange(-consistency_score_chemical_1_cla_kingdom) |>
+      dplyr::ungroup() |>
+      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      dplyr::select(
+        feature_source,
+        consensus_structure_cla_kin = candidate_structure_1_cla_kingdom,
+        consistency_structure_cla_kin,
+        consistency_score_chemical_1_cla_kingdom
+      ) |>
+      dplyr::mutate(
+        consensus_structure_cla_kin = ifelse(
+          test = consistency_score_chemical_1_cla_kingdom > 0.5,
+          yes = consensus_structure_cla_kin,
+          no = "notConsistent"
+        )
+      )
+
+    log_debug("... at the (NPC) pathway level \n")
+    freq_npc_pat <- df3 |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_1_npc_pathway
       ) |>
       dplyr::mutate(count_pat = dplyr::n_distinct(feature_target)) |>
       dplyr::ungroup() |>
       dplyr::group_by(feature_source) |>
       dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
-      dplyr::mutate(consistency_structure_pat = count_pat / sum) |>
+      dplyr::mutate(consistency_structure_npc_pat = count_pat / sum) |>
       dplyr::ungroup() |>
       dplyr::group_by(
         feature_target,
-        candidate_structure_1_pathway
+        candidate_structure_1_npc_pathway
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
       dplyr::distinct(feature_source,
-        candidate_structure_1_pathway,
+        candidate_structure_1_npc_pathway,
         .keep_all = TRUE
       ) |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_1_pathway
+        candidate_structure_1_npc_pathway
       ) |>
       dplyr::mutate(
         rank_avg_pat = ifelse(
-          test = candidate_structure_1_pathway == "notAnnotated" |
-            candidate_structure_1_pathway == "notClassified",
+          test = candidate_structure_1_npc_pathway == "notAnnotated" |
+            candidate_structure_1_npc_pathway == "notClassified",
           yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      dplyr::mutate(consistency_score_chemical_1_pathway = consistency_structure_pat / sqrt(rank_avg_pat)) |>
+      dplyr::mutate(consistency_score_chemical_1_npc_pathway = consistency_structure_npc_pat / sqrt(rank_avg_pat)) |>
       dplyr::group_by(feature_source) |>
-      dplyr::arrange(-consistency_score_chemical_1_pathway) |>
+      dplyr::arrange(-consistency_score_chemical_1_npc_pathway) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
       dplyr::select(
         feature_source,
-        consensus_structure_pat = candidate_structure_1_pathway,
-        consistency_structure_pat,
-        consistency_score_chemical_1_pathway
+        consensus_structure_npc_pat = candidate_structure_1_npc_pathway,
+        consistency_structure_npc_pat,
+        consistency_score_chemical_1_npc_pathway
       ) |>
       dplyr::mutate(
-        consensus_structure_pat = ifelse(
-          test = consistency_score_chemical_1_pathway > 0.5,
-          yes = consensus_structure_pat,
+        consensus_structure_npc_pat = ifelse(
+          test = consistency_score_chemical_1_npc_pathway > 0.5,
+          yes = consensus_structure_npc_pat,
           no = "notConsistent"
         )
       )
 
-    log_debug("... at the superclass level \n")
-    freq_sup <- df3 |>
+    log_debug("... at the (classyfire) superclass level \n")
+    freq_cla_sup <- df3 |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_2_superclass
+        candidate_structure_2_cla_superclass
       ) |>
       dplyr::mutate(count_sup = dplyr::n_distinct(feature_target)) |>
       dplyr::ungroup() |>
       dplyr::group_by(feature_source) |>
       dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
-      dplyr::mutate(consistency_structure_sup = count_sup / sum) |>
+      dplyr::mutate(consistency_structure_cla_sup = count_sup / sum) |>
       dplyr::ungroup() |>
       dplyr::group_by(
         feature_target,
-        candidate_structure_2_superclass
+        candidate_structure_2_cla_superclass
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
       dplyr::distinct(feature_source,
-        candidate_structure_2_superclass,
+        candidate_structure_2_cla_superclass,
         .keep_all = TRUE
       ) |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_2_superclass
+        candidate_structure_2_cla_superclass
       ) |>
       dplyr::mutate(
         rank_avg_sup = ifelse(
-          test = candidate_structure_2_superclass == "notAnnotated" |
-            candidate_structure_2_superclass == "notClassified",
+          test = candidate_structure_2_cla_superclass == "notAnnotated" |
+            candidate_structure_2_cla_superclass == "notClassified",
           yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      dplyr::mutate(consistency_score_chemical_2_superclass = consistency_structure_sup / sqrt(rank_avg_sup)) |>
+      dplyr::mutate(consistency_score_chemical_2_cla_superclass = consistency_structure_cla_sup / sqrt(rank_avg_sup)) |>
       dplyr::group_by(feature_source) |>
-      dplyr::arrange(-consistency_score_chemical_2_superclass) |>
+      dplyr::arrange(-consistency_score_chemical_2_cla_superclass) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
       dplyr::select(
         feature_source,
-        consensus_structure_sup = candidate_structure_2_superclass,
-        consistency_structure_sup,
-        consistency_score_chemical_2_superclass
+        consensus_structure_cla_sup = candidate_structure_2_cla_superclass,
+        consistency_structure_cla_sup,
+        consistency_score_chemical_2_cla_superclass
       ) |>
       dplyr::mutate(
-        consensus_structure_sup = ifelse(
-          test = consistency_score_chemical_2_superclass > 0.5,
-          yes = consensus_structure_sup,
+        consensus_structure_cla_sup = ifelse(
+          test = consistency_score_chemical_2_cla_superclass > 0.5,
+          yes = consensus_structure_cla_sup,
           no = "notConsistent"
         )
       )
 
-    log_debug("... at the class level \n")
-    freq_cla <- df3 |>
+    log_debug("... at the (NPC) superclass level \n")
+    freq_npc_sup <- df3 |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_3_class
+        candidate_structure_2_npc_superclass
+      ) |>
+      dplyr::mutate(count_sup = dplyr::n_distinct(feature_target)) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(feature_source) |>
+      dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_npc_sup = count_sup / sum) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(
+        feature_target,
+        candidate_structure_2_npc_superclass
+      ) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::arrange(rank_final) |>
+      dplyr::distinct(feature_source,
+        candidate_structure_2_npc_superclass,
+        .keep_all = TRUE
+      ) |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_2_npc_superclass
+      ) |>
+      dplyr::mutate(
+        rank_avg_sup = ifelse(
+          test = candidate_structure_2_npc_superclass == "notAnnotated" |
+            candidate_structure_2_npc_superclass == "notClassified",
+          yes = candidatesInitial / 2,
+          no = mean(as.numeric(rank_final))
+        )
+      ) |>
+      dplyr::mutate(consistency_score_chemical_2_npc_superclass = consistency_structure_npc_sup / sqrt(rank_avg_sup)) |>
+      dplyr::group_by(feature_source) |>
+      dplyr::arrange(-consistency_score_chemical_2_npc_superclass) |>
+      dplyr::ungroup() |>
+      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      dplyr::select(
+        feature_source,
+        consensus_structure_npc_sup = candidate_structure_2_npc_superclass,
+        consistency_structure_npc_sup,
+        consistency_score_chemical_2_npc_superclass
+      ) |>
+      dplyr::mutate(
+        consensus_structure_npc_sup = ifelse(
+          test = consistency_score_chemical_2_npc_superclass > 0.5,
+          yes = consensus_structure_npc_sup,
+          no = "notConsistent"
+        )
+      )
+
+    log_debug("... at the (classyfire) class level \n")
+    freq_cla_cla <- df3 |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_3_cla_class
       ) |>
       dplyr::mutate(count_cla = dplyr::n_distinct(feature_target)) |>
       dplyr::ungroup() |>
       dplyr::group_by(feature_source) |>
       dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
-      dplyr::mutate(consistency_structure_cla = count_cla / sum) |>
+      dplyr::mutate(consistency_structure_cla_cla = count_cla / sum) |>
       dplyr::ungroup() |>
       dplyr::group_by(
         feature_target,
-        candidate_structure_3_class
+        candidate_structure_3_cla_class
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
       dplyr::distinct(feature_source,
-        candidate_structure_3_class,
+        candidate_structure_3_cla_class,
         .keep_all = TRUE
       ) |>
       dplyr::group_by(
         feature_source,
-        candidate_structure_3_class
+        candidate_structure_3_cla_class
       ) |>
       dplyr::mutate(
         rank_avg_cla = ifelse(
-          test = candidate_structure_3_class == "notAnnotated" |
-            candidate_structure_3_class == "notClassified",
+          test = candidate_structure_3_cla_class == "notAnnotated" |
+            candidate_structure_3_cla_class == "notClassified",
           yes = candidatesInitial / 2,
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      dplyr::mutate(consistency_score_chemical_3_class = consistency_structure_cla / sqrt(rank_avg_cla)) |>
+      dplyr::mutate(consistency_score_chemical_3_cla_class = consistency_structure_cla_cla / sqrt(rank_avg_cla)) |>
       dplyr::group_by(feature_source) |>
-      dplyr::arrange(-consistency_score_chemical_3_class) |>
+      dplyr::arrange(-consistency_score_chemical_3_cla_class) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
       dplyr::select(
         feature_source,
-        consensus_structure_cla = candidate_structure_3_class,
-        consistency_structure_cla,
-        consistency_score_chemical_3_class
+        consensus_structure_cla_cla = candidate_structure_3_cla_class,
+        consistency_structure_cla_cla,
+        consistency_score_chemical_3_cla_class
       ) |>
       dplyr::mutate(
-        consensus_structure_cla = ifelse(
-          test = consistency_score_chemical_3_class > 0.5,
-          yes = consensus_structure_cla,
+        consensus_structure_cla_cla = ifelse(
+          test = consistency_score_chemical_3_cla_class > 0.5,
+          yes = consensus_structure_cla_cla,
+          no = "notConsistent"
+        )
+      )
+
+    log_debug("... at the (NPC) class level \n")
+    freq_npc_cla <- df3 |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_3_npc_class
+      ) |>
+      dplyr::mutate(count_cla = dplyr::n_distinct(feature_target)) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(feature_source) |>
+      dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_npc_cla = count_cla / sum) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(
+        feature_target,
+        candidate_structure_3_npc_class
+      ) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::arrange(rank_final) |>
+      dplyr::distinct(feature_source,
+        candidate_structure_3_npc_class,
+        .keep_all = TRUE
+      ) |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_3_npc_class
+      ) |>
+      dplyr::mutate(
+        rank_avg_cla = ifelse(
+          test = candidate_structure_3_npc_class == "notAnnotated" |
+            candidate_structure_3_npc_class == "notClassified",
+          yes = candidatesInitial / 2,
+          no = mean(as.numeric(rank_final))
+        )
+      ) |>
+      dplyr::mutate(consistency_score_chemical_3_npc_class = consistency_structure_npc_cla / sqrt(rank_avg_cla)) |>
+      dplyr::group_by(feature_source) |>
+      dplyr::arrange(-consistency_score_chemical_3_npc_class) |>
+      dplyr::ungroup() |>
+      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      dplyr::select(
+        feature_source,
+        consensus_structure_npc_cla = candidate_structure_3_npc_class,
+        consistency_structure_npc_cla,
+        consistency_score_chemical_3_npc_class
+      ) |>
+      dplyr::mutate(
+        consensus_structure_npc_cla = ifelse(
+          test = consistency_score_chemical_3_npc_class > 0.5,
+          yes = consensus_structure_npc_cla,
+          no = "notConsistent"
+        )
+      )
+
+    log_debug("... at the (classyfire) parent level \n")
+    freq_cla_par <- df3 |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_4_cla_parent
+      ) |>
+      dplyr::mutate(count_par = dplyr::n_distinct(feature_target)) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(feature_source) |>
+      dplyr::mutate(sum = dplyr::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_par = count_par / sum) |>
+      dplyr::ungroup() |>
+      dplyr::group_by(
+        feature_target,
+        candidate_structure_4_cla_parent
+      ) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::arrange(rank_final) |>
+      dplyr::distinct(feature_source,
+        candidate_structure_4_cla_parent,
+        .keep_all = TRUE
+      ) |>
+      dplyr::group_by(
+        feature_source,
+        candidate_structure_4_cla_parent
+      ) |>
+      dplyr::mutate(
+        rank_avg_par = ifelse(
+          test = candidate_structure_4_cla_parent == "notAnnotated" |
+            candidate_structure_4_cla_parent == "notClassified",
+          yes = candidatesInitial / 2,
+          no = mean(as.numeric(rank_final))
+        )
+      ) |>
+      dplyr::mutate(consistency_score_chemical_4_cla_parent = consistency_structure_cla_par / sqrt(rank_avg_par)) |>
+      dplyr::group_by(feature_source) |>
+      dplyr::arrange(-consistency_score_chemical_4_cla_parent) |>
+      dplyr::ungroup() |>
+      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      dplyr::select(
+        feature_source,
+        consensus_structure_cla_par = candidate_structure_4_cla_parent,
+        consistency_structure_cla_par,
+        consistency_score_chemical_4_cla_parent
+      ) |>
+      dplyr::mutate(
+        consensus_structure_cla_par = ifelse(
+          test = consistency_score_chemical_4_cla_parent > 0.5,
+          yes = consensus_structure_cla_par,
           no = "notConsistent"
         )
       )
@@ -270,13 +496,25 @@ clean_bio <-
     log_debug("joining all except -1 together \n")
     df4 <-
       dplyr::left_join(df,
-        freq_pat,
+        freq_cla_kin,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_sup,
+      dplyr::left_join(freq_npc_pat,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_cla,
+      dplyr::left_join(freq_cla_sup,
+        by = stats::setNames("feature_source", "feature_id")
+      ) |>
+      dplyr::left_join(freq_npc_sup,
+        by = stats::setNames("feature_source", "feature_id")
+      ) |>
+      dplyr::left_join(freq_cla_cla,
+        by = stats::setNames("feature_source", "feature_id")
+      ) |>
+      dplyr::left_join(freq_npc_cla,
+        by = stats::setNames("feature_source", "feature_id")
+      ) |>
+      dplyr::left_join(freq_cla_par,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
       dplyr::select(
@@ -291,15 +529,27 @@ clean_bio <-
     log_debug("adding dummy consistency for features with less than 2 neighbors \n")
     dummy_consistency <- df4 |>
       dplyr::mutate(
-        consensus_structure_pat = dplyr::coalesce(consensus_structure_pat, "dummy"),
-        consistency_structure_pat = dplyr::coalesce(consistency_structure_pat, 1),
-        consistency_score_chemical_1_pathway = dplyr::coalesce(consistency_score_chemical_1_pathway, 0),
-        consensus_structure_sup = dplyr::coalesce(consensus_structure_sup, "dummy"),
-        consistency_structure_sup = dplyr::coalesce(consistency_structure_sup, 1),
-        consistency_score_chemical_2_superclass = dplyr::coalesce(consistency_score_chemical_2_superclass, 0),
-        consensus_structure_cla = dplyr::coalesce(consensus_structure_cla, "dummy"),
-        consistency_structure_cla = dplyr::coalesce(consistency_structure_cla, 1),
-        consistency_score_chemical_3_class = dplyr::coalesce(consistency_score_chemical_3_class, 0),
+        consensus_structure_cla_kin = dplyr::coalesce(consensus_structure_cla_kin, "dummy"),
+        consistency_structure_cla_kin = dplyr::coalesce(consistency_structure_cla_kin, 1),
+        consistency_score_chemical_1_cla_kingdom = dplyr::coalesce(consistency_score_chemical_1_cla_kingdom, 0),
+        consensus_structure_npc_pat = dplyr::coalesce(consensus_structure_npc_pat, "dummy"),
+        consistency_structure_npc_pat = dplyr::coalesce(consistency_structure_npc_pat, 1),
+        consistency_score_chemical_1_npc_pathway = dplyr::coalesce(consistency_score_chemical_1_npc_pathway, 0),
+        consensus_structure_cla_sup = dplyr::coalesce(consensus_structure_cla_sup, "dummy"),
+        consistency_structure_cla_sup = dplyr::coalesce(consistency_structure_cla_sup, 1),
+        consistency_score_chemical_2_cla_superclass = dplyr::coalesce(consistency_score_chemical_2_cla_superclass, 0),
+        consensus_structure_npc_sup = dplyr::coalesce(consensus_structure_npc_sup, "dummy"),
+        consistency_structure_npc_sup = dplyr::coalesce(consistency_structure_npc_sup, 1),
+        consistency_score_chemical_2_npc_superclass = dplyr::coalesce(consistency_score_chemical_2_npc_superclass, 0),
+        consensus_structure_cla_cla = dplyr::coalesce(consensus_structure_cla_cla, "dummy"),
+        consistency_structure_cla_cla = dplyr::coalesce(consistency_structure_cla_cla, 1),
+        consistency_score_chemical_3_cla_class = dplyr::coalesce(consistency_score_chemical_3_cla_class, 0),
+        consensus_structure_npc_cla = dplyr::coalesce(consensus_structure_npc_cla, "dummy"),
+        consistency_structure_npc_cla = dplyr::coalesce(consistency_structure_npc_cla, 1),
+        consistency_score_chemical_3_npc_class = dplyr::coalesce(consistency_score_chemical_3_npc_class, 0),
+        consensus_structure_cla_par = dplyr::coalesce(consensus_structure_cla_par, "dummy"),
+        consistency_structure_cla_par = dplyr::coalesce(consistency_structure_cla_par, 1),
+        consistency_score_chemical_4_cla_parent = dplyr::coalesce(consistency_score_chemical_4_cla_parent, 0)
       )
 
     return(dummy_consistency)

@@ -9,9 +9,13 @@ weight_chemo(
   weightSpectral = weight_spectral,
   weightBiological = weight_biological,
   weightChemical = weight_chemical,
-  scoreChemicalPathway = score_chemical_pathway,
-  scoreChemicalSuperclass = score_chemical_superclass,
-  scoreChemicalClass = score_chemical_class
+  scoreChemicalClaKingdom = score_chemical_cla_kingdom,
+  scoreChemicalClaSuperclass = score_chemical_cla_superclass,
+  scoreChemicalClaClass = score_chemical_cla_class,
+  scoreChemicalClaParent = score_chemical_cla_parent,
+  scoreChemicalNpcPathway = score_chemical_npc_pathway,
+  scoreChemicalNpcSuperclass = score_chemical_npc_superclass,
+  scoreChemicalNpcClass = score_chemical_npc_class
 )
 }
 \arguments{
@@ -23,11 +27,19 @@ weight_chemo(
 
 \item{weightChemical}{Weight for the chemical consistency score}
 
-\item{scoreChemicalPathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
+\item{scoreChemicalClaKingdom}{Score for a \verb{Classyfire kingdom} match (should be lower than \verb{ Classyfire superclass})}
 
-\item{scoreChemicalSuperclass}{Score for a \code{superclass} match (should be lower than \code{class})}
+\item{scoreChemicalClaSuperclass}{Score for a \verb{Classyfire superclass} match (should be lower than \verb{Classyfire class})}
 
-\item{scoreChemicalClass}{Score for a \code{class} match (should be the highest)}
+\item{scoreChemicalClaClass}{Score for a \verb{Classyfire class} match (should be lower than \verb{Classyfire parent})}
+
+\item{scoreChemicalClaParent}{Score for a \verb{Classyfire parent} match (should be the highest)}
+
+\item{scoreChemicalNpcPathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
+
+\item{scoreChemicalNpcSuperclass}{Score for a \code{superclass} match (should be lower than \code{class})}
+
+\item{scoreChemicalNpcClass}{Score for a \code{class} match (should be the highest)}
 }
 \value{
 A table containing the chemically weighted annotation

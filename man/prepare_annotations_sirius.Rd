@@ -6,7 +6,6 @@
 \usage{
 prepare_annotations_sirius(
   input_directory = params$files$annotations$raw$sirius,
-  npc = params$tools$taxonomies$chemical,
   output = params$files$annotations$prepared,
   str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
   str_met = params$files$libraries$sop$merged$structures$metadata,
@@ -18,8 +17,6 @@ prepare_annotations_sirius(
 }
 \arguments{
 \item{input_directory}{Directory containing the Sirius results}
-
-\item{npc}{Boolean. NPClassifier classes computed. TRUE or FALSE}
 
 \item{output}{Output where to save prepared results}
 

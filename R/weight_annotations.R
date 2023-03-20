@@ -16,9 +16,6 @@
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_chemical Weight for the biological score
 #' @param weight_biological Weight for the chemical consistency score
-#' @param score_chemical_pathway Score for a `pathway` match (should be lower than `superclass`)
-#' @param score_chemical_superclass Score for a `superclass` match (should be lower than `class`)
-#' @param score_chemical_class Score for a `class` match (should be the highest)
 #' @param score_biological_domain Score for a `domain` match (should be lower than `kingdom`)
 #' @param score_biological_kingdom Score for a `kingdom` match (should be lower than `phylum`)
 #' @param score_biological_phylum Score for a `phylum` match (should be lower than `class`)
@@ -34,6 +31,13 @@
 #' @param score_biological_species Score for a `species` match (should be lower than `subspecies`)
 #' @param score_biological_subspecies Score for a `subspecies` match (should be lower than `variety`)
 #' @param score_biological_variety Score for a `variety` match (should be the highest)
+#' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match (should be lower than ` Classyfire superclass`)
+#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match (should be lower than `Classyfire class`)
+#' @param score_chemical_cla_class Score for a `Classyfire class` match (should be lower than `Classyfire parent`)
+#' @param score_chemical_cla_parent Score for a `Classyfire parent` match (should be the highest)
+#' @param score_chemical_npc_pathway Score for a `NPC pathway` match (should be lower than ` NPC superclass`)
+#' @param score_chemical_npc_superclass Score for a `NPC superclass` match (should be lower than `NPC class`)
+#' @param score_chemical_npc_class Score for a `NPC class` match (should be the highest)
 #' @param force Force parameters. Use it at your own risk
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
@@ -63,9 +67,6 @@ weight_annotations <-
            weight_spectral = params$weights$global$spectral,
            weight_chemical = params$weights$global$chemical,
            weight_biological = params$weights$global$biological,
-           score_chemical_pathway = params$weights$chemical$pathway,
-           score_chemical_superclass = params$weights$chemical$superclass,
-           score_chemical_class = params$weights$chemical$class,
            score_biological_domain = params$weights$biological$domain,
            score_biological_kingdom = params$weights$biological$kingdom,
            score_biological_phylum = params$weights$biological$phylum,
@@ -81,6 +82,13 @@ weight_annotations <-
            score_biological_species = params$weights$biological$species,
            score_biological_subspecies = params$weights$biological$subspecies,
            score_biological_variety = params$weights$biological$variety,
+           score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
+           score_chemical_cla_superclass = params$weights$chemical$cla$superclass,
+           score_chemical_cla_class = params$weights$chemical$cla$class,
+           score_chemical_cla_parent = params$weights$chemical$cla$parent,
+           score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
+           score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
+           score_chemical_npc_class = params$weights$chemical$npc$class,
            minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
            # TODO ADD CONDITION,
@@ -204,16 +212,24 @@ weight_annotations <-
         weightSpectral = weight_spectral,
         weightBiological = weight_biological,
         weightChemical = weight_chemical,
-        scoreChemicalPathway = score_chemical_pathway,
-        scoreChemicalSuperclass = score_chemical_superclass,
-        scoreChemicalClass = score_chemical_class
+        scoreChemicalClaKingdom = score_chemical_cla_kingdom,
+        scoreChemicalClaSuperclass = score_chemical_cla_superclass,
+        scoreChemicalClaClass = score_chemical_cla_class,
+        scoreChemicalClaParent = score_chemical_cla_parent,
+        scoreChemicalNpcPathway = score_chemical_npc_pathway,
+        scoreChemicalNpcSuperclass = score_chemical_npc_superclass,
+        scoreChemicalNpcClass = score_chemical_npc_class
       )
 
     annotation_table_weighted_chemo |>
       decorate_chemo(
-        sc_pat = score_chemical_pathway,
-        sc_sup = score_chemical_superclass,
-        sc_cla = score_chemical_class
+        sc_cla_kin = score_chemical_cla_kingdom,
+        sc_cla_sup = score_chemical_cla_superclass,
+        sc_cla_cla = score_chemical_cla_class,
+        sc_cla_par = score_chemical_cla_parent,
+        sc_npc_pat = score_chemical_npc_pathway,
+        sc_npc_sup = score_chemical_npc_superclass,
+        sc_npc_cla = score_chemical_npc_class
       )
 
     log_debug(x = "cleaning for export")

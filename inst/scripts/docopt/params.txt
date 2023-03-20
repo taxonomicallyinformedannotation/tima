@@ -127,9 +127,13 @@ Arguments:
   wei-bio-14                 Score for a biological subspecies match. FLOAT
   wei-bio-15                 Score for a biological variety match. FLOAT
 
-  wei-che-01                 Score for a chemical pathway match. FLOAT
-  wei-che-02                 Score for a chemical superclass match. FLOAT
-  wei-che-03                 Score for a chemical class match. FLOAT
+  wei-che-11                 Score for a chemical classyfire kingdom match. FLOAT
+  wei-che-12                 Score for a chemical classyfire superclass match. FLOAT
+  wei-che-13                 Score for a chemical classyfire class match. FLOAT
+  wei-che-14                 Score for a chemical classyfire parent match. FLOAT
+  wei-che-21                 Score for a chemical NPC pathway match. FLOAT
+  wei-che-22                 Score for a chemical NPC superclass match. FLOAT
+  wei-che-23                 Score for a chemical NPC class match. FLOAT
 
   fast                       Skip time-consuming steps. BOOLEAN
   force                      Do not use it. BOOLEAN
