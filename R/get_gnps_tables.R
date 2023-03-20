@@ -30,7 +30,7 @@ get_gnps_tables <-
 
 
     ## Little hack for the example
-    if (gnps_job_id == "96fa7c88200e4a03bee4644e581e3fb0") {
+    if (gnps_job_id == "41c6068e905d482db5698ad81d145d7c") {
       names(gnps_job_id) <- "example"
     } else {
       names(gnps_job_id) <- gnps_job_id
