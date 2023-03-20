@@ -216,7 +216,7 @@ clean_chemo <-
           "library",
           "structure_smiles_2D",
           "structure_inchikey_2D",
-          "score_initialNormalized",
+          "score_input",
           "score_biological",
           "score_chemical",
           "score_final",
