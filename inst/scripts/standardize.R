@@ -84,15 +84,33 @@ standardize_smiles <- function(smiles) {
   list <- rcdk::parse.smiles(
     smiles = smiles,
     kekulise = TRUE
-  )[[1]] |>
-    standadrize_mol()
+  )[[1]]
+  if (length(list) > 0) {
+    list <- list |>
+      standardize_mol()
+  } else {
+    list <- list(
+      smiles_2D = NA_character_,
+      inchi_2D = NA_character_,
+      inchikey_2D = NA_character_
+    )
+  }
 
   return(data.frame(smiles, list))
 }
 
 standardize_inchi <- function(inchi) {
-  list <- parse.inchi(inchi)[[1]] |>
-    standadrize_mol()
+  list <- parse.inchi(inchi)[[1]]
+  if (length(list) > 0) {
+    list <- list |>
+      standardize_mol()
+  } else {
+    list <- list(
+      smiles_2D = NA_character_,
+      inchi_2D = NA_character_,
+      inchikey_2D = NA_character_
+    )
+  }
 
   return(data.frame(inchi, list))
 }
