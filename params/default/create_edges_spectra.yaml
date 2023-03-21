@@ -27,7 +27,7 @@ annotations:
         ratio: 0.2
 
       #' Similarity threhsold. FLOAT
-      similarity: 0.6
+      similarity: 0.7
 
 
 #' Files.

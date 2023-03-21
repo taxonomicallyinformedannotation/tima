@@ -255,10 +255,14 @@ testthat::test_that("Whole process", {
   ### Slow
   create_edges_spectra(
     parallel = FALSE,
-    condition = "OR"
+    fast = FALSE,
+    condition = "AND"
   )
   ### Normal
-  create_edges_spectra()
+  create_edges_spectra(
+    fast = FALSE,
+    condition = "OR"
+  )
 
   ### GNPS results
   step <- "prepare_annotations_gnps"

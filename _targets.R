@@ -1241,7 +1241,7 @@ list(
                 input = list(annotations_spectral_exp_internal_neg, annotations_spectral_exp_internal_pos),
                 output = gsub(
                   pattern = "_prepared.tsv.gz",
-                  replacement = "exp_rt_prepared.tsv.gz",
+                  replacement = "_exp_rt_prepared.tsv.gz",
                   x = params_prepare_annotations_spectra$files$annotations$prepared,
                   fixed = TRUE
                 ),
@@ -1374,6 +1374,7 @@ list(
           condition = params_create_edges_spectra$annotations$ms2$thresholds$condition,
           qutoff = params_create_edges_spectra$ms$intensity$thresholds$ms2,
           parallel = params_create_edges_spectra$options$parallel,
+          fast = params_create_edges_spectra$options$fast,
           parameters = params_create_edges_spectra
         )
       }

@@ -18,6 +18,7 @@ create_edges_spectra(
   condition = params$annotations$ms2$thresholds$condition,
   qutoff = params$ms$intensity$thresholds$ms2,
   parallel = params$options$parallel,
+  fast = params$options$fast,
   parameters = params
 )
 }
@@ -47,6 +48,8 @@ create_edges_spectra(
 \item{qutoff}{Intensity under which ms2 fragments will be removed previous to comparison.}
 
 \item{parallel}{Boolean. Process in parallel}
+
+\item{fast}{Boolean. Do it fast}
 
 \item{parameters}{Params}
 }

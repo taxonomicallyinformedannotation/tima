@@ -15,6 +15,7 @@
 #' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
 #' @param qutoff Intensity under which ms2 fragments will be removed previous to comparison.
 #' @param parallel Boolean. Process in parallel
+#' @param fast Boolean. Do it fast
 #' @param parameters Params
 #'
 #' @return NULL
@@ -35,6 +36,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
                                  condition = params$annotations$ms2$thresholds$condition,
                                  qutoff = params$ms$intensity$thresholds$ms2,
                                  parallel = params$options$parallel,
+                                 fast = params$options$fast,
                                  parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot(
@@ -71,17 +73,31 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     "nspectraangle" = MsCoreUtils::nspectraangle
   )
 
-  params_sim <- MetaboAnnotation::MatchForwardReverseParam(
-    ppm = ppm,
-    tolerance = dalton,
-    MAPFUN = Spectra::joinPeaksGnps,
-    FUN = sim_fun,
-    requirePrecursor = FALSE,
-    THRESHFUN = function(x) {
-      which(x >= threshold)
-    },
-    BPPARAM = par
-  )
+  if (fast) {
+    params_sim <- MetaboAnnotation::CompareSpectraParam(
+      ppm = ppm,
+      tolerance = dalton,
+      MAPFUN = Spectra::joinPeaksGnps,
+      FUN = sim_fun,
+      requirePrecursor = FALSE,
+      THRESHFUN = function(x) {
+        which(x >= threshold)
+      },
+      BPPARAM = par
+    )
+  } else {
+    params_sim <- MetaboAnnotation::MatchForwardReverseParam(
+      ppm = ppm,
+      tolerance = dalton,
+      MAPFUN = Spectra::joinPeaksGnps,
+      FUN = sim_fun,
+      requirePrecursor = FALSE,
+      THRESHFUN = function(x) {
+        which(x >= threshold)
+      },
+      BPPARAM = par
+    )
+  }
 
   ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
   ## Can be very slow otherwise
@@ -99,6 +115,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     "If you need it, the score threshold greatly impacts speed.
     A higher threshold will lead to faster results."
   )
+
   matches_sim <- MetaboAnnotation::matchSpectra(
     query = spectra,
     target = spectra,
@@ -108,24 +125,35 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
   edges <- MetaboAnnotation::matchedData(matches_sim) |>
     data.frame() |>
     dplyr::filter(acquisitionNum != target_acquisitionNum) |>
-    dplyr::filter(score >= threshold |
-      matched_peaks_count >= npeaks |
-      presence_ratio >= rpeaks) |>
     dplyr::select(
-      !!as.name(name_source) := acquisitionNum,
-      !!as.name(name_target) := target_acquisitionNum,
-      score,
-      reverse_score,
-      presence_ratio,
-      matched_peaks_count
+      !!as.name(name_source) := "acquisitionNum",
+      !!as.name(name_target) := "target_acquisitionNum",
+      dplyr::everything()
     )
 
-  if (condition == "AND") {
-    edges <- edges |>
-      dplyr::filter(score >= threshold &
-        matched_peaks_count >= npeaks &
-        presence_ratio >= rpeaks)
+  if (!fast) {
+    if (condition == "AND") {
+      edges <- edges |>
+        dplyr::filter(score >= threshold &
+          matched_peaks_count >= npeaks &
+          presence_ratio >= rpeaks)
+    } else {
+      edges <- edges |>
+        dplyr::filter(score >= threshold |
+          matched_peaks_count >= npeaks |
+          presence_ratio >= rpeaks)
+    }
   }
+
+  edges <- edges |>
+    dplyr::select(dplyr::any_of(c(
+      name_source,
+      name_target,
+      "score",
+      "reverse_score",
+      "presence_ratio",
+      "matched_peaks_count"
+    )))
 
   export_params(step = "create_edges_spectra")
   export_output(x = edges, file = output[[1]])
