@@ -69,105 +69,105 @@ prepare_params <- function(filename = params$files$pattern,
 
   yamls_params$annotate_masses$files$annotations$prepared <-
     yamls_params$annotate_masses$files$annotations$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$annotate_masses$files$features$prepared <-
     yamls_params$annotate_masses$files$features$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$annotate_masses$files$networks$spectral$edges$raw <-
     yamls_params$annotate_masses$files$networks$spectral$edges$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$annotate_spectra$files$annotations$raw$spectral <-
     yamls_params$annotate_spectra$files$annotations$raw$spectral |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$annotate_spectra$files$spectral$raw <-
     yamls_params$annotate_spectra$files$spectral$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
     yamls_params$create_edges_spectra$files$networks$spectral$edges$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$create_edges_spectra$files$spectral$raw <-
     yamls_params$create_edges_spectra$files$spectral$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$create_components$files$networks$spectral$edges$prepared <-
     yamls_params$create_components$files$networks$spectral$edges$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$create_components$files$networks$spectral$components$raw <-
     yamls_params$create_components$files$networks$spectral$components$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_features_tables$files$features$raw <-
     yamls_params$prepare_features_tables$files$features$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_features_tables$files$features$prepared <-
     yamls_params$prepare_features_tables$files$features$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_features_components$files$networks$spectral$components$raw <-
     yamls_params$prepare_features_components$files$networks$spectral$components$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_features_components$files$networks$spectral$components$prepared <-
     yamls_params$prepare_features_components$files$networks$spectral$components$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
     yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_annotations_gnps$files$annotations$prepared <-
     yamls_params$prepare_annotations_gnps$files$annotations$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
     yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_annotations_sirius$files$annotations$prepared <-
     yamls_params$prepare_annotations_sirius$files$annotations$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral <-
     yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_annotations_spectra$files$annotations$prepared <-
     yamls_params$prepare_annotations_spectra$files$annotations$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$prepare_taxa$files$features$raw <-
     yamls_params$prepare_taxa$files$features$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_taxa$files$taxa$raw <-
     yamls_params$prepare_taxa$files$taxa$raw |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$prepare_taxa$files$taxa$prepared <-
     yamls_params$prepare_taxa$files$taxa$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yamls_params$weight_annotations$files$annotations$prepared <-
     yamls_params$weight_annotations$files$annotations$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$annotations$processed <-
     yamls_params$weight_annotations$files$annotations$processed |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$features$prepared <-
     yamls_params$weight_annotations$files$features$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$networks$spectral$components$prepared <-
     yamls_params$weight_annotations$files$networks$spectral$components$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$networks$spectral$edges$prepared <-
     yamls_params$weight_annotations$files$networks$spectral$edges$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$taxa$prepared <-
     yamls_params$weight_annotations$files$taxa$prepared |>
-    replace_id()
+    lapply(FUN = replace_id)
 
   yaml_export <- yaml_files |>
     gsub(pattern = "default", replacement = "user")

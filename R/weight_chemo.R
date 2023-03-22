@@ -140,8 +140,12 @@ weight_chemo <-
       )
 
     log_debug("... joining \n")
-    df4 <-
-      dplyr::left_join(df1 |> dplyr::select(-dplyr::contains("candidate_structure")), df3, multiple = "all") |>
+    df4 <- dplyr::left_join(
+      df1 |>
+        dplyr::select(-dplyr::contains("candidate_structure")),
+      df3,
+      multiple = "all"
+    ) |>
       data.frame()
 
     df4$score_chemical[is.na(df4$score_chemical)] <- 0

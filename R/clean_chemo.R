@@ -55,8 +55,12 @@ clean_chemo <-
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
-      dplyr::left_join(df1) |>
-      dplyr::left_join(componentsTable) |>
+      dplyr::left_join(df1,
+        multiple = "all"
+      ) |>
+      dplyr::left_join(componentsTable,
+        multiple = "all"
+      ) |>
       dplyr::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
@@ -130,7 +134,9 @@ clean_chemo <-
 
     log_debug("adding references \n")
     df3 <- df2 |>
-      dplyr::left_join(references) |>
+      dplyr::left_join(references,
+        multiple = "all"
+      ) |>
       dplyr::group_by(dplyr::across(c(-reference_doi))) |>
       dplyr::summarise(dplyr::across(
         c(reference_doi),
@@ -191,9 +197,12 @@ clean_chemo <-
         dplyr::ungroup()
 
       df5 <- df4 |>
-        dplyr::left_join(df3 |>
-          dplyr::select("feature_id", !colnames(df4)) |>
-          dplyr::distinct())
+        dplyr::left_join(
+          df3 |>
+            dplyr::select("feature_id", !colnames(df4)) |>
+            dplyr::distinct(),
+          multiple = "all"
+        )
     } else {
       df5 <- df3
     }
@@ -252,7 +261,8 @@ clean_chemo <-
     df10 <- dplyr::left_join(
       df9,
       annotationTableWeightedChemo |>
-        dplyr::mutate_all(as.character)
+        dplyr::mutate_all(as.character),
+      multiple = "all"
     ) |>
       dplyr::select(dplyr::any_of(
         c(

@@ -38,7 +38,8 @@ clean_bio <-
             structure_inchikey_2D,
             .keep_all = TRUE
           ),
-        df01
+        df01,
+        multiple = "all"
       ) |>
       dplyr::mutate(structure_inchikey_2D = "notAnnotated")
 
@@ -118,7 +119,8 @@ clean_bio <-
           dplyr::filter(n >= 2) |>
           dplyr::select(-n),
         df,
-        by = stats::setNames("feature_id", "feature_target")
+        by = stats::setNames("feature_id", "feature_target"),
+        multiple = "all"
       ) |>
       dplyr::filter(!is.na(feature_source))
 
