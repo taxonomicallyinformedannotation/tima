@@ -126,23 +126,23 @@ annotate_masses <-
       dplyr::left_join(readr::read_delim(
         file = str_2D_3D,
         col_types = readr::cols(.default = "c")
-      )) |>
+      ), multiple = "all") |>
       dplyr::left_join(readr::read_delim(
         file = str_met,
         col_types = readr::cols(.default = "c")
-      )) |>
+      ), multiple = "all") |>
       dplyr::left_join(readr::read_delim(
         file = str_nam,
         col_types = readr::cols(.default = "c")
-      )) |>
+      ), multiple = "all") |>
       dplyr::left_join(readr::read_delim(
         file = str_tax_cla,
         col_types = readr::cols(.default = "c")
-      )) |>
+      ), multiple = "all") |>
       dplyr::left_join(readr::read_delim(
         file = str_tax_npc,
         col_types = readr::cols(.default = "c")
-      )) |>
+      ), multiple = "all") |>
       # dplyr::left_join(readr::read_delim(file = org_tax_ott,
       #                                    col_types = readr::cols(.default = "c"))) |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
@@ -328,7 +328,8 @@ annotate_masses <-
           mz,
           mz_2
         ),
-      df9_c
+      df9_c,
+      multiple = "all"
     ) |>
       dplyr::mutate(
         mz_1 = mz,
@@ -337,7 +338,7 @@ annotate_masses <-
       data.table::data.table()
 
     log_debug("joining with initial results (neutral losses) \n")
-    df10_a <- dplyr::left_join(df10, df9_e) |>
+    df10_a <- dplyr::left_join(df10, df9_e, multiple = "all") |>
       dplyr::mutate(
         mz_1 = ifelse(
           test = !is.na(loss),
@@ -456,7 +457,8 @@ annotate_masses <-
     df14 <- dplyr::left_join(
       x = df12,
       y = df13,
-      by = stats::setNames("structure_exact_mass", "exact_mass")
+      by = stats::setNames("structure_exact_mass", "exact_mass"),
+      multiple = "all"
     ) |>
       dplyr::select(
         structure_molecular_formula,
@@ -468,7 +470,7 @@ annotate_masses <-
 
     log_debug("adding adduct mass to get back to [M] \n")
     df15 <-
-      dplyr::left_join(df14, adductsTable, by = stats::setNames("adduct", "library")) |>
+      dplyr::left_join(df14, adductsTable, by = stats::setNames("adduct", "library"), multiple = "all") |>
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
       dplyr::select(
         feature_id,
@@ -477,7 +479,7 @@ annotate_masses <-
       dplyr::filter(!is.na(adduct_mass))
 
     log_debug("keeping these ions for dimers and multicharged exploration starting from [M] \n")
-    df16 <- dplyr::inner_join(df3, df15)
+    df16 <- dplyr::inner_join(df3, df15, multiple = "all")
 
     log_debug("calculating multicharged and in source dimers and adding delta mz tolerance \n")
     if (msMode == "pos") {
@@ -650,7 +652,8 @@ annotate_masses <-
     df22 <-
       dplyr::left_join(df21,
         df13,
-        by = stats::setNames("structure_exact_mass", "exact_mass")
+        by = stats::setNames("structure_exact_mass", "exact_mass"),
+        multiple = "all"
       ) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
@@ -665,9 +668,9 @@ annotate_masses <-
     log_debug("joining single adducts, neutral losses, and multicharged / dimers \n")
     df24 <- dplyr::bind_rows(
       df14 |>
-        dplyr::left_join(df13_b),
+        dplyr::left_join(df13_b, multiple = "all"),
       df22 |>
-        dplyr::left_join(df13_b)
+        dplyr::left_join(df13_b, multiple = "all")
     ) |>
       dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
@@ -704,7 +707,8 @@ annotate_masses <-
           structure_taxonomy_classyfire_02superclass,
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
-        )
+        ),
+      multiple = "all"
     )
 
     df25 |>

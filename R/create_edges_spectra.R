@@ -96,7 +96,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
     ## Originally written with future but too slow...TODO investigate
     matches_sim <- pbmcapply::pbmclapply(
-      X = xs,
+      X = 1:(nspe - 1),
       mc.cores = parallelly::availableCores(),
       ignore.interactive = TRUE,
       FUN = function(x,

@@ -88,7 +88,8 @@ prepare_taxa <-
     log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
     organism_table_filled <- organism_table |>
       dplyr::left_join(readr::read_delim(org_tax_ott),
-        by = c("organism" = "organism_name")
+        by = c("organism" = "organism_name"),
+        multiple = "all"
       )
 
     log_debug(x = "Submitting the rest to OTL")
@@ -134,7 +135,7 @@ prepare_taxa <-
       )
     } else {
       metadata_table_joined <-
-        dplyr::left_join(top_n, metadata_table, by = c("column" = "filename")) |>
+        dplyr::left_join(top_n, metadata_table, by = c("column" = "filename"), multiple = "all") |>
         dplyr::select(feature_id := rowname,
           organismOriginal = dplyr::all_of(colname),
           dplyr::everything()
@@ -146,7 +147,7 @@ prepare_taxa <-
       dplyr::left_join(
         metadata_table_joined,
         biological_metadata,
-        by = c("organismOriginal" = "organism_name")
+        by = c("organismOriginal" = "organism_name"), multiple = "all"
       ) |>
       dplyr::distinct() |>
       dplyr::mutate_at(dplyr::vars(-dplyr::group_cols()), as.character) |>
