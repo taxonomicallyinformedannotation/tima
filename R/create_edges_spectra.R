@@ -77,7 +77,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     spectra <- spectra[lengths >= npeaks * 2]
 
     log_debug("Extracting fragments and precursors...")
-    fragments_norm <<-
+    fragments_norm <-
       lapply(
         X = spectra@backend@peaksData,
         FUN = function(x) {
@@ -85,8 +85,8 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
           return(x)
         }
       )
-    precursors <<- spectra$precursorMz
-    nspe <<- length(spectra)
+    precursors <- spectra$precursorMz
+    nspe <- length(spectra)
 
     log_debug("Performing spectral comparison")
     log_debug(
@@ -105,7 +105,9 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
                      nspecs = nspe) {
         lapply(
           X = (x + 1):nspecs,
-          FUN = create_edges_progress
+          FUN = create_edges_progress,
+          query = x,
+          s1 = cbind(mz = frags[[x]][, 1], intensity = frags[[x]][, 2])
         )
       }
     ) |>

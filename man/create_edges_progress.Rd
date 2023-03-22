@@ -4,18 +4,14 @@
 \alias{create_edges_progress}
 \title{Create edges progress}
 \usage{
-create_edges_progress(
-  y,
-  id = x,
-  s1 = cbind(mz = frags[[x]][, 1], intensity = frags[[x]][, 2])
-)
+create_edges_progress(target, query, s1)
 }
 \arguments{
-\item{y}{Indices of target spectra}
+\item{target}{Indices of target spectra}
+
+\item{query}{Index of query spectra}
 
 \item{s1}{Query spectrum}
-
-\item{x}{Index of query spectra}
 }
 \description{
 This function is slow so it outputs the progression of the creation of edges
