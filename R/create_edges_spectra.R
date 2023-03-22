@@ -94,9 +94,21 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     )
     log_debug("Take yourself a break, you deserve it.")
 
-    matches_sim <- create_edges_progress(xs = 1:(nspe - 1))
-
-    matches_sim <- matches_sim |>
+    ## Originally written with future but too slow...TODO investigate
+    matches_sim <- pbmcapply::pbmclapply(
+      X = xs,
+      mc.cores = parallelly::availableCores(),
+      ignore.interactive = TRUE,
+      FUN = function(x,
+                     frags = fragments_norm,
+                     precs = precursors,
+                     nspecs = nspe) {
+        lapply(
+          X = (x + 1):nspecs,
+          FUN = create_edges_progress
+        )
+      }
+    ) |>
       dplyr::bind_rows()
 
     ## old version, keep in case

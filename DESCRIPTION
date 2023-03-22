@@ -62,7 +62,6 @@ Collate:
     'create_dir.R'
     'create_edges_progress.R'
     'create_edges_spectra.R'
-    'create_edges_sub.R'
     'decorate_bio.R'
     'decorate_chemo.R'
     'decorate_masses.R'
