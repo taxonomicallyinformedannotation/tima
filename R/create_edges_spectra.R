@@ -1,3 +1,5 @@
+library(MsCoreUtils)
+
 #' @title Create edges spectra
 #'
 #' @description This function create edges based on fragmentation spectra similarity
@@ -78,7 +80,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
   nspe <<- length(spectra)
 
   log_debug("Performing spectral comparison")
-  log_debug("As we do not bin the spectra, nor limit the precursors delta, this will take some time")
+  log_debug("As we do not bin the spectra, nor limit the precursors delta, this will take some time.")
   log_debug("Take yourself a break, you deserve it.")
 
   matches_sim <- create_edges_progress(xs = 1:(nspe - 1)) |>

@@ -1,7 +1,3 @@
-library(future.apply)
-library(MsCoreUtils)
-library(progressr)
-
 #' @title Create edges progress
 #'
 #' @description This function is slow so it outputs the progression of the creation of edges
@@ -14,8 +10,8 @@ library(progressr)
 #'
 #' @examples NULL
 create_edges_progress <- function(xs) {
-  p <- progressor(along = xs)
-  future_lapply(
+  p <- progressr::progressor(along = xs)
+  future.apply::future_lapply(
     X = xs,
     FUN = function(x,
                    frags = fragments_norm,

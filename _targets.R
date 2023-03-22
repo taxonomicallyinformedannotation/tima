@@ -9,16 +9,24 @@ library(tarchetypes)
 
 # Set target options:
 tar_option_set()
+strat <- ifelse(test = .Platform$OS.type == "unix",
+  yes = "multicore",
+  no = "multisession"
+)
 
 # tar_make_clustermq() configuration (okay to leave alone):
-options(clustermq.scheduler = "multicore")
+options(clustermq.scheduler = strat)
 
 # tar_make_future() configuration (okay to leave alone):
 # Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
 library(future)
 library(future.callr)
 library(progressr)
-plan(callr, workers = nbrOfWorkers())
+strat <- ifelse(test = .Platform$OS.type == "unix",
+  yes = "multicore",
+  no = "multisession"
+)
+plan(strategy = strat, workers = nbrOfWorkers())
 ## Not this way
 # handlers(global = TRUE)
 # handlers(
