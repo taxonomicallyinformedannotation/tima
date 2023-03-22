@@ -26,7 +26,7 @@ create_edges_progress <- function(xs) {
           s2 <-
             cbind(mz = frags[[y]][, 1], intensity = frags[[y]][, 2])
           map <-
-            join_gnps(
+            MsCoreUtils::join_gnps(
               x = s1[, 1],
               y = s2[, 1],
               xPrecursorMz = precs[id],
@@ -34,7 +34,7 @@ create_edges_progress <- function(xs) {
               tolerance = params$ms$tolerances$mass$dalton$ms2,
               ppm = params$ms$tolerances$mass$ppm$ms2
             )
-          score <- gnps(s1[map$x, ], s2[map$y, ])
+          score <- MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ])
           matched_peaks_count <-
             length((map$x * map$y)[!is.na(map$x * map$y)])
           presence_ratio <- matched_peaks_count / length(map$y)
