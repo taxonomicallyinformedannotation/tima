@@ -29,6 +29,7 @@ Imports:
     MetaboAnnotation (>= 1.2.0),
     MsBackendMgf (>= 1.6.0),
     MsCoreUtils (>= 1.10.0),
+    progressr (>= 0.13.0),
     readr (>= 2.1.4),
     rotl (>= 3.0.14),
     Spectra (>= 1.8.1),
