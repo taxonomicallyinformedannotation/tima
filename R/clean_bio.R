@@ -118,8 +118,7 @@ clean_bio <-
           dplyr::filter(n >= 2) |>
           dplyr::select(-n),
         df,
-        by = stats::setNames("feature_id", "feature_target"),
-        multiple = "all"
+        by = stats::setNames("feature_id", "feature_target")
       ) |>
       dplyr::filter(!is.na(feature_source))
 

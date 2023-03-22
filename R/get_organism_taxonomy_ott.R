@@ -70,8 +70,8 @@ get_organism_taxonomy_ott <- function(df) {
     dplyr::mutate(ott_id = as.integer(ott_id))
 
   biological_metadata <-
-    dplyr::left_join(organism_table, new_matched_otl_exact, multiple = "all") |>
-    dplyr::left_join(otl, by = c("ott_id" = "id"), multiple = "all") |>
+    dplyr::left_join(organism_table, new_matched_otl_exact) |>
+    dplyr::left_join(otl, by = c("ott_id" = "id")) |>
     dplyr::filter(
       rank %in% c(
         "domain",

@@ -151,11 +151,11 @@ weight_annotations <-
       dplyr::left_join(readr::read_delim(
         file = str_2D_3D,
         col_types = readr::cols(.default = "c")
-      ), multiple = "all") |>
+      )) |>
       dplyr::left_join(readr::read_delim(
         file = org_tax_ott,
         col_types = readr::cols(.default = "c")
-      ), multiple = "all")
+      ))
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>
@@ -164,7 +164,7 @@ weight_annotations <-
 
     log_debug(x = "adding biological organism metadata")
     annotation_table_taxed <- annotation_table |>
-      dplyr::left_join(taxed_features_table, multiple = "all")
+      dplyr::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-

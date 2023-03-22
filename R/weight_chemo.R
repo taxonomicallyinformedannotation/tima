@@ -143,8 +143,7 @@ weight_chemo <-
     df4 <- dplyr::left_join(
       df1 |>
         dplyr::select(-dplyr::contains("candidate_structure")),
-      df3,
-      multiple = "all"
+      df3
     ) |>
       data.frame()
 

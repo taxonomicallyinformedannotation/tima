@@ -652,8 +652,7 @@ weight_bio <-
       dplyr::left_join(
         annotationTable |>
           dplyr::select(-dplyr::contains("sample_")),
-        biologically_weighted,
-        multiple = "all"
+        biologically_weighted
       )
 
     biologically_weighted_full$score_biological[is.na(biologically_weighted_full$score_biological)] <-
