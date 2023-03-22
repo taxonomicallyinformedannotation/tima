@@ -38,8 +38,7 @@ clean_bio <-
             structure_inchikey_2D,
             .keep_all = TRUE
           ),
-        df01,
-        multiple = "all"
+        df01
       ) |>
       dplyr::mutate(structure_inchikey_2D = "notAnnotated")
 
