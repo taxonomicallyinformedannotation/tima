@@ -10,14 +10,15 @@
 #'
 #' @examples NULL
 create_edges_progress <- function(xs) {
-  p <- progressr::progressor(along = xs)
-  future.apply::future_lapply(
+  ## Originally written with future but too slow...TODO investigate
+  pbmcapply::pbmclapply(
     X = xs,
+    mc.cores = parallelly::availableCores(),
+    ignore.interactive = TRUE,
     FUN = function(x,
                    frags = fragments_norm,
                    precs = precursors,
                    nspecs = nspe) {
-      p()
       lapply(
         X = (x + 1):nspecs,
         FUN = function(y,

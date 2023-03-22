@@ -90,7 +90,7 @@ ms:
     thresholds:
 
       #' Intensity threshold for MS2. INTEGER
-      ms2: 0
+      ms2: 10
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos

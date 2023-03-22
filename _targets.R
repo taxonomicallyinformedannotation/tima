@@ -9,30 +9,11 @@ library(tarchetypes)
 
 # Set target options:
 tar_option_set()
-strat <- ifelse(test = .Platform$OS.type == "unix",
-  yes = "multicore",
-  no = "multisession"
-)
 
 # tar_make_clustermq() configuration (okay to leave alone):
-options(clustermq.scheduler = strat)
 
 # tar_make_future() configuration (okay to leave alone):
 # Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
-library(future)
-library(future.callr)
-library(progressr)
-strat <- ifelse(test = .Platform$OS.type == "unix",
-  yes = "multicore",
-  no = "multisession"
-)
-plan(strategy = strat, workers = nbrOfWorkers())
-## Not this way
-# handlers(global = TRUE)
-# handlers(
-#   handler_txtprogressbar(enable = TRUE),
-#   handler_progress(format = ":spin [:bar] ETA: :eta :percent")
-# )
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source()

@@ -260,7 +260,6 @@ testthat::test_that("Whole process", {
   )
   ### Normal
   create_edges_spectra(
-    fast = FALSE,
     condition = "OR"
   )
 
