@@ -19,11 +19,12 @@ library(future)
 library(future.callr)
 library(progressr)
 plan(callr, workers = nbrOfWorkers())
-handlers(global = TRUE)
-handlers(
-  handler_txtprogressbar(enable = TRUE),
-  handler_progress(format = ":spin [:bar] ETA: :eta :percent")
-)
+## Not this way
+# handlers(global = TRUE)
+# handlers(
+#   handler_txtprogressbar(enable = TRUE),
+#   handler_progress(format = ":spin [:bar] ETA: :eta :percent")
+# )
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source()
