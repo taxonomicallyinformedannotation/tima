@@ -21,6 +21,9 @@ Imports:
     data.table (>= 1.14.8),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.0),
+    future (>= 1.32.0),
+    future.apply (>= 1.10.0),
+    future.callr (>= 0.8.1),
     igraph (>= 1.4.1),
     jsonlite (>= 1.8.4),
     MetaboAnnotation (>= 1.2.0),
@@ -58,6 +61,7 @@ Collate:
     'create_adducts_pos.R'
     'create_components.R'
     'create_dir.R'
+    'create_edges_progress.R'
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'

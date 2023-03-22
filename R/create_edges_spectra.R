@@ -54,50 +54,9 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
   params <<- parameters
 
-  par <- if (parallel) {
-    BiocParallel::MulticoreParam()
-  } else {
-    BiocParallel::SerialParam()
-  }
-
   log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra()
-
-  sim_fun <- switch(
-    EXPR = method,
-    "gnps" = MsCoreUtils::gnps,
-    "navdist" = MsCoreUtils::navdist,
-    "ndotproduct" = MsCoreUtils::ndotproduct,
-    "neuclidean" = MsCoreUtils::neuclidean,
-    "nspectraangle" = MsCoreUtils::nspectraangle
-  )
-
-  if (fast) {
-    params_sim <- MetaboAnnotation::CompareSpectraParam(
-      ppm = ppm,
-      tolerance = dalton,
-      MAPFUN = Spectra::joinPeaksGnps,
-      FUN = sim_fun,
-      requirePrecursor = FALSE,
-      THRESHFUN = function(x) {
-        which(x >= threshold)
-      },
-      BPPARAM = par
-    )
-  } else {
-    params_sim <- MetaboAnnotation::MatchForwardReverseParam(
-      ppm = ppm,
-      tolerance = dalton,
-      MAPFUN = Spectra::joinPeaksGnps,
-      FUN = sim_fun,
-      requirePrecursor = FALSE,
-      THRESHFUN = function(x) {
-        which(x >= threshold)
-      },
-      BPPARAM = par
-    )
-  }
 
   ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
   ## Can be very slow otherwise
@@ -106,54 +65,94 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
   spectra <- spectra |>
     Spectra::filterIntensity(intensity = c(qutoff, Inf))
 
+  log_debug("Extracting fragments and precursors...")
+  fragments_norm <<-
+    lapply(
+      X = spectra@backend@peaksData,
+      FUN = function(x) {
+        x[, 2] <- x[, 2] / max(x[, 2])
+        return(x)
+      }
+    )
+  precursors <<- spectra$precursorMz
+  nspe <<- length(spectra)
+
   log_debug("Performing spectral comparison")
-  log_debug(
-    "If you do not need the number/ratio of matched peaks,
-    computation can be much faster by setting the parameter fast to TRUE"
-  )
-  log_debug(
-    "If you need it, the score threshold greatly impacts speed.
-    A higher threshold will lead to faster results."
-  )
+  log_debug("As we do not bin the spectra, nor limit the precursors delta, this will take some time")
+  log_debug("Take yourself a break, you deserve it.")
 
-  matches_sim <- MetaboAnnotation::matchSpectra(
-    query = spectra,
-    target = spectra,
-    param = params_sim
-  )
+  matches_sim <- create_edges_progress(xs = 1:(nspe - 1)) |>
+    dplyr::bind_rows()
 
-  edges <- MetaboAnnotation::matchedData(matches_sim) |>
-    data.frame() |>
-    dplyr::filter(acquisitionNum != target_acquisitionNum) |>
+  ## old version, keep in case
+  # par <- if (parallel) {
+  #   BiocParallel::MulticoreParam()
+  # } else {
+  #   BiocParallel::SerialParam()
+  # }
+  # sim_fun <- switch(
+  #   EXPR = method,
+  #   "gnps" = MsCoreUtils::gnps,
+  #   "navdist" = MsCoreUtils::navdist,
+  #   "ndotproduct" = MsCoreUtils::ndotproduct,
+  #   "neuclidean" = MsCoreUtils::neuclidean,
+  #   "nspectraangle" = MsCoreUtils::nspectraangle
+  # )
+  # params_sim <- MetaboAnnotation::MatchForwardReverseParam(
+  #   ppm = ppm,
+  #   tolerance = dalton,
+  #   MAPFUN = Spectra::joinPeaksGnps,
+  #   FUN = sim_fun,
+  #   requirePrecursor = FALSE,
+  #   THRESHFUN = function(x) {
+  #     which(x >= threshold)
+  #   },
+  #   BPPARAM = par
+  # )
+  # matches_sim_2 <- MetaboAnnotation::matchSpectra(
+  #   query = spectra,
+  #   target = spectra,
+  #   param = params_sim
+  # )
+  # edges <- MetaboAnnotation::matchedData(matches_sim_2) |>
+  #   data.frame() |>
+  #   dplyr::filter(acquisitionNum != target_acquisitionNum) |>
+  #   dplyr::select(
+  #     !!as.name(name_source) := "acquisitionNum",
+  #     !!as.name(name_target) := "target_acquisitionNum",
+  #     dplyr::everything()
+  #   )
+
+  edges <- matches_sim |>
     dplyr::select(
-      !!as.name(name_source) := "acquisitionNum",
-      !!as.name(name_target) := "target_acquisitionNum",
+      !!as.name(name_source) := "feature_id",
+      !!as.name(name_target) := "target_id",
       dplyr::everything()
     )
 
-  if (!fast) {
-    if (condition == "AND") {
-      edges <- edges |>
-        dplyr::filter(score >= threshold &
-          matched_peaks_count >= npeaks &
-          presence_ratio >= rpeaks)
-    } else {
-      edges <- edges |>
-        dplyr::filter(score >= threshold |
-          matched_peaks_count >= npeaks |
-          presence_ratio >= rpeaks)
-    }
+  if (condition == "AND") {
+    edges <- edges |>
+      dplyr::filter(score >= threshold &
+        matched_peaks_count >= npeaks &
+        presence_ratio >= rpeaks)
+  } else {
+    edges <- edges |>
+      dplyr::filter(score >= threshold |
+        matched_peaks_count >= npeaks |
+        presence_ratio >= rpeaks)
   }
 
   edges <- edges |>
-    dplyr::select(dplyr::any_of(c(
-      name_source,
-      name_target,
-      "score",
-      "reverse_score",
-      "presence_ratio",
-      "matched_peaks_count"
-    )))
+    dplyr::select(dplyr::any_of(
+      c(
+        name_source,
+        name_target,
+        "score",
+        "reverse_score",
+        "presence_ratio",
+        "matched_peaks_count"
+      )
+    ))
 
   export_params(step = "create_edges_spectra")
   export_output(x = edges, file = output[[1]])
