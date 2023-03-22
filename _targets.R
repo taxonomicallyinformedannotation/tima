@@ -15,6 +15,15 @@ options(clustermq.scheduler = "multicore")
 
 # tar_make_future() configuration (okay to leave alone):
 # Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
+library(future)
+library(future.callr)
+library(progressr)
+plan(callr, workers = nbrOfWorkers())
+handlers(global = TRUE)
+handlers(
+  handler_txtprogressbar(enable = TRUE),
+  handler_progress(format = ":spin [:bar] ETA: :eta :percent")
+)
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source()
@@ -770,7 +779,8 @@ list(
     ## Structure organism pairs
     list(
       ## Raw
-      list( ## This does not work as it forces the file to exist.
+      list(
+        ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
         # tar_file(
         #   name = library_sop_closed,
@@ -1147,7 +1157,8 @@ list(
       tar_file(
         name = annotations_ms1_prepared_annotations,
         command = {
-          annotations_ms1_prepared_annotations <- annotations_ms1_prepared[[1]]
+          annotations_ms1_prepared_annotations <-
+            annotations_ms1_prepared[[1]]
         }
       ),
       tar_file(
@@ -1238,7 +1249,10 @@ list(
           command = {
             annotations_spectral_exp_internal_prepared <-
               prepare_annotations_spectra(
-                input = list(annotations_spectral_exp_internal_neg, annotations_spectral_exp_internal_pos),
+                input = list(
+                  annotations_spectral_exp_internal_neg,
+                  annotations_spectral_exp_internal_pos
+                ),
                 output = gsub(
                   pattern = "_prepared.tsv.gz",
                   replacement = "_exp_rt_prepared.tsv.gz",
@@ -1395,8 +1409,7 @@ list(
         name = interim_components,
         command = {
           interim_components <-
-            ifelse(
-              test = file.exists(gnps_components),
+            ifelse(test = file.exists(gnps_components),
               yes = gnps_components,
               no = features_components
             )
@@ -1406,8 +1419,7 @@ list(
         name = edges_spectra,
         command = {
           edges_spectra <-
-            ifelse(
-              test = file.exists(gnps_edges),
+            ifelse(test = file.exists(gnps_edges),
               yes = gnps_edges,
               no = features_edges_spectra
             )

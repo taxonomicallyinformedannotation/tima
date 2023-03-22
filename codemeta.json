@@ -183,6 +183,45 @@
     },
     "8": {
       "@type": "SoftwareApplication",
+      "identifier": "future",
+      "name": "future",
+      "version": ">= 1.32.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "future.apply",
+      "name": "future.apply",
+      "version": ">= 1.10.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future.apply"
+    },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "future.callr",
+      "name": "future.callr",
+      "version": ">= 0.8.1",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future.callr"
+    },
+    "11": {
+      "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
       "version": ">= 1.4.1",
@@ -194,7 +233,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "9": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -207,7 +246,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "10": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboAnnotation",
       "name": "MetaboAnnotation",
@@ -220,7 +259,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboAnnotation.html"
     },
-    "11": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -233,7 +272,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "12": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
@@ -246,7 +285,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
     },
-    "13": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "readr",
       "name": "readr",
@@ -259,7 +298,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=readr"
     },
-    "14": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -272,7 +311,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "15": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -285,12 +324,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "16": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "17": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "stringr",
       "name": "stringr",
@@ -303,7 +342,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringr"
     },
-    "18": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -316,7 +355,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "19": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
@@ -329,7 +368,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tarchetypes"
     },
-    "20": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -342,7 +381,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "21": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -355,12 +394,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "22": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "23": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -376,7 +415,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2584.071KB",
+  "fileSize": "2588.941KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
