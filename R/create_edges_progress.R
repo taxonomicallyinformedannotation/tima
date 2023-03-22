@@ -5,6 +5,8 @@
 #' @param target Indices of target spectra
 #' @param query Index of query spectra
 #' @param s1 Query spectrum
+#' @param fragments Fragments
+#' @param precursors Precursors
 #'
 #' @return NULL
 #'
@@ -13,15 +15,17 @@
 #' @examples NULL
 create_edges_progress <- function(target,
                                   query,
-                                  s1) {
+                                  s1,
+                                  fragments = frags,
+                                  precursors = precs) {
   s2 <-
-    cbind(mz = frags[[target]][, 1], intensity = frags[[target]][, 2])
+    cbind(mz = fragments[[target]][, 1], intensity = fragments[[target]][, 2])
   map <-
     MsCoreUtils::join_gnps(
       x = s1[, 1],
       y = s2[, 1],
-      xPrecursorMz = precs[query],
-      yPrecursorMz = precs[target],
+      xPrecursorMz = precursors[query],
+      yPrecursorMz = precursors[target],
       tolerance = params$ms$tolerances$mass$dalton$ms2,
       ppm = params$ms$tolerances$mass$ppm$ms2
     )

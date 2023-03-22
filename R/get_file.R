@@ -14,8 +14,8 @@
 get_file <-
   function(url,
            export,
-           limit = 600) {
-    ## Set the timeout for download to 600 seconds
+           limit = 1000) {
+    ## Set the timeout for download
     options(timeout = limit)
     message("Timeout for download is ", getOption("timeout"), " seconds")
 

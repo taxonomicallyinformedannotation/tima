@@ -177,12 +177,12 @@ prepare_params <- function(filename = params$files$pattern,
     ## The dollar is for steps having similar names separated by underscores
     yamls_params <-
       yamls_params[grepl(
-        pattern = paste0(step, "$"),
+        pattern = paste0(step[[1]], "$"),
         x = names(yamls_params)
       )]
     ## The dot is for steps having similar names separated by underscores
     yaml_export <-
-      yaml_export[grepl(pattern = paste0(step, "\\."), x = yaml_export)]
+      yaml_export[grepl(pattern = paste0(step[[1]], "\\."), x = yaml_export)]
   }
 
   log_debug(x = "Exporting params ...")

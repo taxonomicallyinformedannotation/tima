@@ -107,10 +107,14 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
           X = (x + 1):nspecs,
           FUN = create_edges_progress,
           query = x,
-          s1 = cbind(mz = frags[[x]][, 1], intensity = frags[[x]][, 2])
+          s1 = cbind(mz = frags[[x]][, 1], intensity = frags[[x]][, 2]),
+          fragments = frags,
+          precursors = precs
         )
       }
-    ) |>
+    )
+
+    edges <- matches_sim |>
       dplyr::bind_rows()
 
     ## old version, keep in case
@@ -152,7 +156,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     #     dplyr::everything()
     #   )
 
-    edges <- matches_sim |>
+    edges <- edges |>
       dplyr::select(
         !!as.name(name_source) := "feature_id", !!as.name(name_target) := "target_id",
         dplyr::everything()

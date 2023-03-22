@@ -4,7 +4,7 @@
 \alias{get_file}
 \title{Get file}
 \usage{
-get_file(url, export, limit = 600)
+get_file(url, export, limit = 1000)
 }
 \arguments{
 \item{url}{URL of the file to be downloaded}

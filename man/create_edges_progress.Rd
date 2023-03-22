@@ -4,7 +4,7 @@
 \alias{create_edges_progress}
 \title{Create edges progress}
 \usage{
-create_edges_progress(target, query, s1)
+create_edges_progress(target, query, s1, fragments = frags, precursors = precs)
 }
 \arguments{
 \item{target}{Indices of target spectra}
@@ -12,6 +12,10 @@ create_edges_progress(target, query, s1)
 \item{query}{Index of query spectra}
 
 \item{s1}{Query spectrum}
+
+\item{fragments}{Fragments}
+
+\item{precursors}{Precursors}
 }
 \description{
 This function is slow so it outputs the progression of the creation of edges
