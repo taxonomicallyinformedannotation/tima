@@ -35,7 +35,7 @@ As the package is not (yet) available on CRAN, you will need to install the deve
 ```
 git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
-R CMD INSTALL .
+Rscript inst/scripts/install.R
 ```
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
