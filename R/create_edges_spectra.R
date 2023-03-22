@@ -140,7 +140,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
     edges <- matches_sim |>
       dplyr::select(
-        !!as.name(name_source) := "feature_id",!!as.name(name_target) := "target_id",
+        !!as.name(name_source) := "feature_id", !!as.name(name_target) := "target_id",
         dplyr::everything()
       )
 
@@ -176,13 +176,13 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
   if (condition == "AND") {
     edges <- edges |>
       dplyr::filter(score >= threshold &
-                      matched_peaks_count >= npeaks &
-                      presence_ratio >= rpeaks)
+        matched_peaks_count >= npeaks &
+        presence_ratio >= rpeaks)
   } else {
     edges <- edges |>
       dplyr::filter(score >= threshold |
-                      matched_peaks_count >= npeaks |
-                      presence_ratio >= rpeaks)
+        matched_peaks_count >= npeaks |
+        presence_ratio >= rpeaks)
   }
 
   export_params(step = "create_edges_spectra")

@@ -1,6 +1,7 @@
 .DS_Store
 .httr-oauth
 .idea
+.future
 .Rproj.user
 .Rhistory
 .Rdata
