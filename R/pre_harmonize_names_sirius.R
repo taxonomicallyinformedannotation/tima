@@ -12,7 +12,7 @@
 pre_harmonize_names_sirius <- function(x) {
   # Remove any characters after and including the '/' character from the name
   y <- x |>
-    stringr::str_remove(pattern = stringr::fixed(pattern = "/.*"))
+    stringr::str_remove(pattern = "/.*")
 
   return(y)
 }
