@@ -32,7 +32,10 @@ testthat::test_that("Whole process", {
     )
   }
   ## When no GNPS job ID is given
-  get_gnps_tables(gnps_job_id = NULL)
+  get_gnps_tables(
+    filename = "example",
+    gnps_job_id = NULL
+  )
 
   ### Spectra
   #### Mini version for tests
