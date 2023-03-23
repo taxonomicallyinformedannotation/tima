@@ -15,7 +15,7 @@ BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    BiocParallel (>= 1.32.5),
+    BiocParallel (>= 1.32.6),
     CompoundDb (>= 1.2.1),
     crayon (>= 1.5.2),
     data.table (>= 1.14.8),

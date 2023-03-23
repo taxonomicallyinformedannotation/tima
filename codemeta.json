@@ -60,7 +60,7 @@
       "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
-      "version": ">= 2.2",
+      "version": ">= 2.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -73,7 +73,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.1.6",
+      "version": ">= 3.1.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -107,7 +107,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.32.5",
+      "version": ">= 1.32.6",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -172,7 +172,7 @@
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
-      "version": ">= 1.1.0",
+      "version": ">= 1.1.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -302,7 +302,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.8.1",
+      "version": ">= 1.8.2",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -333,7 +333,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 0.14.2",
+      "version": ">= 0.14.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -346,7 +346,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
-      "version": ">= 0.7.4",
+      "version": ">= 0.7.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -359,7 +359,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
-      "version": ">= 3.1.8",
+      "version": ">= 3.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -402,7 +402,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2588.742KB",
+  "fileSize": "2589.393KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
