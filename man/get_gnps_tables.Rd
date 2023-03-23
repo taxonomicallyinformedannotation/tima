@@ -5,6 +5,7 @@
 \title{Get GNPS Tables}
 \usage{
 get_gnps_tables(
+  filename,
   gnps_job_id,
   workflow = "fbmn",
   path_source = paths$data$source$path,

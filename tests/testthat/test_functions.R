@@ -12,6 +12,8 @@ testthat::test_that("Whole process", {
   prepare_params(step = "weight_annotations")
   ## For all steps
   prepare_params()
+  ## When previous params exist
+  prepare_params()
 
   ## Get all files
   ### Features table
@@ -29,6 +31,8 @@ testthat::test_that("Whole process", {
       export = paths$data$source$metadata
     )
   }
+  ## When no GNPS job ID is given
+  get_gnps_tables(gnps_job_id = NULL)
 
   ### Spectra
   #### Mini version for tests

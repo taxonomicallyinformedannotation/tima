@@ -15,8 +15,10 @@ replace_id <-
   function(x,
            user_filename = filename,
            user_gnps = gnps_job_id) {
-    if (user_gnps == "41c6068e905d482db5698ad81d145d7c") {
-      user_gnps <- "example"
+    if (!is.null(user_gnps)) {
+      if (user_gnps == "41c6068e905d482db5698ad81d145d7c") {
+        user_gnps <- "example"
+      }
     }
 
     path <- x |>
