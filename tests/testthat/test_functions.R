@@ -18,7 +18,12 @@ testthat::test_that("Whole process", {
   ## Get all files
   ### Features table
   if (!is.null(params$gnps$id)) {
-    get_gnps_tables(gnps_job_id = params$gnps$id)
+    get_gnps_tables(
+      path_features = paths$data$source$features,
+      path_metadata = paths$data$source$metadata,
+      path_spectra = paths$data$source$spectra,
+      gnps_job_id = params$gnps$id
+    )
   } else {
     get_file(
       url = paths$urls$examples$features,
@@ -33,7 +38,9 @@ testthat::test_that("Whole process", {
   }
   ## When no GNPS job ID is given
   get_gnps_tables(
-    filename = "example",
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
     gnps_job_id = NULL
   )
 
