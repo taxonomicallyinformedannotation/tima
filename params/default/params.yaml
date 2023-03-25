@@ -36,7 +36,7 @@ annotations:
   #' MS2 annotation related parameters.
   ms2:
 
-    #' Execute approximative matching without precursor matching? BOOLEAN
+    #' Perform approximative matching without precursor matching? BOOLEAN
     approx: no
 
     #' Similarity method to be used to compare spectra.
@@ -448,7 +448,7 @@ organisms:
   #' Organisms filter related parameters.
   filter:
 
-    #' Filter library to restrict it to a portion of organisms only.. BOOLEAN
+    #' Filter library to restrict it to a portion of organisms only. BOOLEAN
     mode: no
 
     #' Level at which the library will be filtered.
@@ -602,3 +602,6 @@ options:
 
   #' Execute processes in parallel when available. BOOLEAN
   parallel: yes
+
+  #' Summarise results to one row per feature. BOOLEAN
+  summarise: yes

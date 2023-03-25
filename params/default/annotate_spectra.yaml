@@ -4,7 +4,7 @@ annotations:
   #' MS2 annotation related parameters.
   ms2:
 
-    #' Execute approximative matching without precursor matching? BOOLEAN
+    #' Perform approximative matching without precursor matching? BOOLEAN
     approx: no
 
     #' Similarity method to be used to compare spectra.

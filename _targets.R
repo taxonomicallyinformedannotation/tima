@@ -671,9 +671,11 @@ list(
       name = gnps_tables,
       command = {
         gnps_tables <- get_gnps_tables(
-          filename = par_fin_par$files$pattern,
           gnps_job_id = par_fin_par$gnps$id,
           workflow = par_fin_par$gnps$workflow,
+          path_features = params_prepare_taxa$files$features$raw,
+          path_metadata = params_prepare_taxa$files$taxa$raw,
+          path_spectra = params_annotate_spectra$files$spectral$raw,
           path_source = paths$data$source$path,
           path_interim_a = paths$data$interim$annotations$path,
           path_interim_f = paths$data$interim$features$path
@@ -726,8 +728,13 @@ list(
       command = {
         input_features <-
           ifelse(
-            test = file.exists(gnps_features),
-            yes = gnps_features,
+            test = !is.null(gnps_features),
+            yes =
+              ifelse(
+                test = file.exists(gnps_features),
+                yes = gnps_features,
+                no = params_prepare_taxa$files$features$raw
+              ),
             no = params_prepare_taxa$files$features$raw
           )
       }
@@ -739,8 +746,13 @@ list(
           ifelse(
             test = paths$tests$mode == FALSE,
             yes = ifelse(
-              test = file.exists(gnps_spectra),
-              yes = gnps_spectra,
+              test = !is.null(gnps_spectra),
+              yes =
+                ifelse(
+                  test = file.exists(gnps_spectra),
+                  yes = gnps_spectra,
+                  no = params_annotate_spectra$files$spectral$raw
+                ),
               no = params_annotate_spectra$files$spectral$raw
             ),
             no = {
@@ -758,8 +770,13 @@ list(
       command = {
         input_metadata <-
           ifelse(
-            test = file.exists(gnps_metadata),
-            yes = gnps_metadata,
+            test = !is.null(gnps_metadata),
+            yes =
+              ifelse(
+                test = file.exists(gnps_metadata),
+                yes = gnps_metadata,
+                no = params_prepare_taxa$files$taxa$raw
+              ),
             no = params_prepare_taxa$files$taxa$raw
           )
       }

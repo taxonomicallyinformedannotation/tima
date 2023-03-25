@@ -39,27 +39,16 @@ Rscript inst/scripts/install.R
 ```
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
-First, to copy the default parameters:
+Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 
 ```
-Rscript inst/scripts/prepare_params.R
+Rscript inst/app/tima.R
 ```
 
-This command will also be useful in case you want to automate your workflow.
-More details are given in the [General comments about the infrastructure](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-intro.html)
-
-Once done, you can start with an example using:
-
+This command will open a small app you can access by entering the given address into your browser.
+You will have a line saying:
 ```
-Rscript inst/scripts/tima_mini.R 
-```
-
-This will launch a `mini` example where small example files will be given.
-It is also suitable if you want to run things quickly.
-For the next iterations, you can keep it this way or change from the `mini` examples and use:
-
-```
-Rscript inst/scripts/tima_full.R
+Listening on <YOUR_ADDRESS>
 ```
 
 ### Docker

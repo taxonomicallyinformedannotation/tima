@@ -4,6 +4,9 @@
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
+#' @param path_features Path to features
+#' @param path_metadata Path to metadata
+#' @param path_spectra Path to spectra
 #' @param path_source Path to store the source files
 #' @param path_interim_a Path to store the interim annotations file
 #' @param path_interim_f Path to store the interim features files
@@ -14,12 +17,17 @@
 #'
 #' @examples NULL
 get_gnps_tables <-
-  function(filename,
-           gnps_job_id,
+  function(gnps_job_id,
            workflow = "fbmn",
+           path_features,
+           path_metadata,
+           path_spectra,
            path_source = paths$data$source$path,
            path_interim_a = paths$data$interim$annotations$path,
            path_interim_f = paths$data$interim$features$path) {
+    if (gnps_job_id == "") {
+      gnps_job_id <- NULL
+    }
     if (!is.null(gnps_job_id)) {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)
       stopifnot(
@@ -202,9 +210,9 @@ get_gnps_tables <-
 
       return(
         c(
-          "features" = file.path(path_source, paste0(filename, "_features.csv")),
-          "metadata" = file.path(path_source, paste0(filename, "_metadata.tsv")),
-          "spectra" = file.path(path_source, paste0(filename, "_spectra.mgf")),
+          "features" = path_features,
+          "metadata" = path_metadata,
+          "spectra" = path_spectra,
           "annotations" = file.path(
             path_interim_a,
             paste0(filename, "_gnps.tsv")

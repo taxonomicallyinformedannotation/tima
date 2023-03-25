@@ -15,6 +15,9 @@ replace_id <-
   function(x,
            user_filename = filename,
            user_gnps = gnps_job_id) {
+    if (user_gnps == "") {
+      user_gnps <- NULL
+    }
     if (!is.null(user_gnps)) {
       if (user_gnps == "41c6068e905d482db5698ad81d145d7c") {
         user_gnps <- "example"
@@ -22,16 +25,16 @@ replace_id <-
     }
 
     path <- x |>
-      gsub(pattern = "/[^/]*$", replacement = "")
+      stringr::str_replace(pattern = "/[^/]*$", replacement = "")
 
     file <- x |>
-      gsub(pattern = ".*/", replacement = "")
+      stringr::str_replace(pattern = ".*/", replacement = "")
 
     old <- file |>
-      gsub(pattern = "_.*", replacement = "")
+      stringr::str_replace(pattern = "_.*", replacement = "")
 
     new <- file |>
-      gsub(
+      stringr::str_replace(
         pattern = old,
         replacement = ifelse(
           test = !is.null(user_gnps),

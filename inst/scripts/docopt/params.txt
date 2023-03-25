@@ -15,7 +15,7 @@ Arguments:
   ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
   ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.666 chemical. STRING
   
-  ann-ms2-app                Execute approximative matching without precursor matching? BOOLEAN
+  ann-ms2-app                Perform approximative matching without precursor matching? BOOLEAN
   ann-ms2-met                The MS similarity method to be used to compare spectra. Currently "gnps", "navdist", "ndotproduct", "neuclidean", "nspectraangle" supported. STRING
   ann-ms2-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 6 peaks AND 0.2 similarity. STRING
   ann-ms2-thr-pea-abs        Minimal shared peaks (absolute). INTEGER

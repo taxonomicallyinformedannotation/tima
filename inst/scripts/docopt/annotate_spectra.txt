@@ -5,7 +5,7 @@ Usage:
   annotate_spectra.R [--ann-ms2-app=<ann-ms2-app>] [--ann-ms2-met=<ann-ms2-met>] [--ann-ms2-thr-con=<ann-ms2-thr-con>] [--ann-ms2-thr-pea-abs=<ann-ms2-thr-pea-abs>] [--ann-ms2-thr-pea-rat=<ann-ms2-thr-pea-rat>] [--ann-ms2-thr-sim=<ann-ms2-thr-sim>] [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-spe-raw=<fil-spe-raw>] [--ms-int-thr-ms2=<ms-int-thr-ms2>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--fast=<fast>] [--parallel=<parallel>]
 
 Arguments:
-  ann-ms2-app                Execute approximative matching without precursor matching? BOOLEAN
+  ann-ms2-app                Perform approximative matching without precursor matching? BOOLEAN
   ann-ms2-met                The MS similarity method to be used to compare spectra. Currently "gnps", "navdist", "ndotproduct", "neuclidean", "nspectraangle" supported. STRING
   ann-ms2-thr-con           Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 6 peaks AND 0.2 similarity. STRING
   ann-ms2-thr-pea-abs        Minimal shared peaks (absolute). INTEGER

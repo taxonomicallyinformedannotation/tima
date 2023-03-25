@@ -22,7 +22,7 @@ organisms:
   #' Organisms filter related parameters.
   filter:
 
-    #' Filter library to restrict it to a portion of organisms only.. BOOLEAN
+    #' Filter library to restrict it to a portion of organisms only. BOOLEAN
     mode: no
 
     #' Level at which the library will be filtered.

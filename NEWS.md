@@ -1,9 +1,14 @@
 # timaR
 
+# timaR 2.8.0
+
+* Adding GUI prototype
+
 # timaR 2.7.4
 
 * ECMDB support
 * Edges (mass and spectra-based) and components are generated if not present.
+* Fix case when no GNPS job ID
 * Re-introducing Classyfire support.
 * Retention time matching additionally to MS2 if RT present in library
 * Parameters refactoring

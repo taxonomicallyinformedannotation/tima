@@ -5,9 +5,11 @@
 \title{Get GNPS Tables}
 \usage{
 get_gnps_tables(
-  filename,
   gnps_job_id,
   workflow = "fbmn",
+  path_features,
+  path_metadata,
+  path_spectra,
   path_source = paths$data$source$path,
   path_interim_a = paths$data$interim$annotations$path,
   path_interim_f = paths$data$interim$features$path
@@ -17,6 +19,12 @@ get_gnps_tables(
 \item{gnps_job_id}{GNPS job ID}
 
 \item{workflow}{Character string indicating the type of workflow, either "fbmn" or "classical"}
+
+\item{path_features}{Path to features}
+
+\item{path_metadata}{Path to metadata}
+
+\item{path_spectra}{Path to spectra}
 
 \item{path_source}{Path to store the source files}
 

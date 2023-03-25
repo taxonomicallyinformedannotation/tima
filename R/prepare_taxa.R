@@ -31,6 +31,9 @@ prepare_taxa <-
            output = params$files$taxa$prepared,
            taxon = params$organisms$taxon,
            parameters = params) {
+    if (taxon == "") {
+      taxon <- NULL
+    }
     if (is.null(taxon)) {
       stopifnot("Your metadata file does not exist" = file.exists(metadata))
       stopifnot("Your input file does not exist" = file.exists(input))
