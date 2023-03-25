@@ -1,23 +1,7 @@
 version: "3.9"
 
 services:
-  prepare_params:
-    build: "."
-    image: adafede/tima-r
-    volumes:
-      - "./params:/params"
-    command: Rscript inst/scripts/prepare_params.R
-
-  tests:
-    build: "."
-    image: adafede/tima-r
-    volumes:
-      - "./params:/params"
-      - "./inst:/inst"
-      - "./data:/data"
-    command: Rscript inst/scripts/tima_mini.R
-
-  tima:
+  tima-full:
     build: "."
     image: adafede/tima-r
     volumes:
@@ -26,4 +10,18 @@ services:
       - "./data:/data"
     command: Rscript inst/scripts/tima_full.R
 
-# other smaller services not implemented yet
+  tima-gui:
+    build: "."
+    image: adafede/tima-r
+    volumes:
+      - "./params:/params"
+    command: Rscript inst/app/app.R
+
+  tima-mini:
+    build: "."
+    image: adafede/tima-r
+    volumes:
+      - "./params:/params"
+      - "./inst:/inst"
+      - "./data:/data"
+    command: Rscript inst/scripts/tima_mini.R

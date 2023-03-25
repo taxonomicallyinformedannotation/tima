@@ -53,7 +53,7 @@ Listening on <YOUR_ADDRESS>
 
 ### Docker
 
-A container is also available, together with a small compose.
+A container is also available, together with a small compose file.
 Main commands are below:
 
 ```
@@ -61,9 +61,9 @@ docker build . -t adafede/tima-r
 ```
 
 ```
-docker compose up prepare_params
-docker compose up tests
-docker compose up tima
+docker compose up tima-gui
+# docker compose up tima-mini
+# docker compose up tima-full
 ```
 
 
