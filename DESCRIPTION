@@ -31,6 +31,7 @@ Imports:
     readr (>= 2.1.4),
     rotl (>= 3.0.14),
     shiny (>= 1.7.4),
+    shinyjs (>= 2.1.0),
     Spectra (>= 1.8.2),
     stats,
     stringr (>= 1.5.0),

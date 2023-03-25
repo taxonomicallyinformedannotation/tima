@@ -1,5 +1,5 @@
 # save the results to a file
-saveData <- function(data) {
+save_input <- function(input) {
   setwd("../../")
 
   paths <- parse_yaml_paths()

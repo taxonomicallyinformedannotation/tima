@@ -313,6 +313,19 @@
     },
     "18": {
       "@type": "SoftwareApplication",
+      "identifier": "shinyjs",
+      "name": "shinyjs",
+      "version": ">= 2.1.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyjs"
+    },
+    "19": {
+      "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
       "version": ">= 1.8.2",
@@ -324,12 +337,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "19": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "20": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "stringr",
       "name": "stringr",
@@ -342,7 +355,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringr"
     },
-    "21": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -355,7 +368,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "22": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
@@ -368,7 +381,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tarchetypes"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -381,7 +394,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -394,12 +407,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "25": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "26": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -415,7 +428,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2631.903KB",
+  "fileSize": "2628.51KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
