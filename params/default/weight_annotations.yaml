@@ -39,14 +39,14 @@ files:
 
     #' List of prepared annotations. STRING
     prepared:
-      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_ms1_prepared.tsv.gz
-      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_gnps_prepared.tsv.gz
-      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_spectral_matches_prepared.tsv.gz
-      - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_sirius_prepared.tsv.gz
-      # - data/interim/annotations/41c6068e905d482db5698ad81d145d7c_exp_rt_prepared.tsv.gz
+      - data/interim/annotations/example_ms1_prepared.tsv.gz
+      - data/interim/annotations/example_gnps_prepared.tsv.gz
+      - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+      - data/interim/annotations/example_sirius_prepared.tsv.gz
+      # - data/interim/annotations/example_exp_rt_prepared.tsv.gz
     
     #' Final results file. STRING
-    processed: 41c6068e905d482db5698ad81d145d7c_results.tsv
+    processed: example_results.tsv
 
     #' Structure organism pairs libraries.
     sop:
@@ -58,7 +58,7 @@ files:
   features: 
 
     #' Prepared features file. STRING
-    prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_features.tsv.gz
+    prepared: data/interim/features/example_features.tsv.gz
 
   #' Networks files.
   networks:
@@ -70,19 +70,19 @@ files:
       components:
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_components_prepared.tsv.gz
+        prepared: data/interim/features/example_components_prepared.tsv.gz
 
       #' Edges files.
       edges:
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_edges.tsv.gz
+        prepared: data/interim/features/example_edges.tsv.gz
 
   #' Taxa files.
   taxa:
 
     #' Taxonomically informed features file. STRING
-    prepared: data/interim/taxa/41c6068e905d482db5698ad81d145d7c_taxed.tsv.gz
+    prepared: data/interim/taxa/example_taxed.tsv.gz
 
 
 #' Weights to apply to each part of the final score.

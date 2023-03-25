@@ -5,17 +5,17 @@ files:
   features: 
 
     #' Raw features file. STRING
-    raw: data/source/41c6068e905d482db5698ad81d145d7c_features.csv
+    raw: data/source/example_features.csv
 
   #' Taxa files.
   taxa:
 
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
-    raw: data/source/41c6068e905d482db5698ad81d145d7c_metadata.tsv
+    raw: data/source/example_metadata.tsv
 
     #' Taxonomically informed features file. STRING
-    prepared: data/interim/taxa/41c6068e905d482db5698ad81d145d7c_taxed.tsv.gz
+    prepared: data/interim/taxa/example_taxed.tsv.gz
 
   #' Libraries files.
   libraries:

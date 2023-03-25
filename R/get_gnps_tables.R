@@ -25,8 +25,10 @@ get_gnps_tables <-
            path_source = paths$data$source$path,
            path_interim_a = paths$data$interim$annotations$path,
            path_interim_f = paths$data$interim$features$path) {
-    if (gnps_job_id == "") {
-      gnps_job_id <- NULL
+    if (!is.null(gnps_job_id)) {
+      if (gnps_job_id == "") {
+        gnps_job_id <- NULL
+      }
     }
     if (!is.null(gnps_job_id)) {
       stopifnot("Your GNPS job ID is invalid" = stringr::str_length(string = gnps_job_id) == 32)

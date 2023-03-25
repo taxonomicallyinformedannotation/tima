@@ -44,13 +44,13 @@ files:
 
         #' Raw edges file. STRING
         raw: 
-          - data/interim/features/41c6068e905d482db5698ad81d145d7c_edges_spectra.tsv.gz
+          - data/interim/features/example_edges_spectra.tsv.gz
 
   #' Spectral files. STRING
   spectral:
 
     #' Raw spectral file. STRING
-    raw: data/source/41c6068e905d482db5698ad81d145d7c_spectra.mgf
+    raw: data/source/example_spectra.mgf
 
 #' MS related parameters.
 ms:

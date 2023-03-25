@@ -11,10 +11,10 @@ files:
       edges:
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/41c6068e905d482db5698ad81d145d7c_edges.tsv.gz
+        prepared: data/interim/features/example_edges.tsv.gz
 
       #' Components files.
       components:
 
         #' Raw components file. STRING
-        raw: data/interim/features/41c6068e905d482db5698ad81d145d7c_components.tsv.gz
+        raw: data/interim/features/example_components.tsv.gz
