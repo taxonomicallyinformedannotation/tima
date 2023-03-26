@@ -4,7 +4,7 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, ratio = prop, cutoff = qutoff, fragments = npeaks)
+sanitize_spectra(spectra, ratio = 1000, cutoff = qutoff, fragments = 2)
 }
 \arguments{
 \item{spectra}{Spectra object}

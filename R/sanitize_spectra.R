@@ -14,15 +14,15 @@
 #' @examples NULL
 sanitize_spectra <-
   function(spectra,
-           ratio = prop,
+           ratio = 1000,
            cutoff = qutoff,
-           fragments = npeaks) {
+           fragments = 2) {
     log_debug("Applying initial filters to query spectra")
 
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
       Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
-      Spectra::filterIntensity(intensity = keep_peaks, prop = 1000) |>
+      Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
       Spectra::applyProcessing()
 
     lengths <- lapply(spectra@backend@peaksData, length)

@@ -57,7 +57,8 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
   if (!fast) {
     log_debug("Loading spectra...")
     spectra <- input |>
-      import_spectra()
+      import_spectra() |>
+      sanitize_spectra()
 
     log_debug("Extracting fragments and precursors...")
     fragments_norm <-
