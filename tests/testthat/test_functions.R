@@ -286,7 +286,6 @@ testthat::test_that("Whole process", {
   )
   ## TODO additional tests to include the rest
 
-
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)

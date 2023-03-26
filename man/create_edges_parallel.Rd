@@ -4,21 +4,16 @@
 \alias{create_edges_parallel}
 \title{Create edges parallel}
 \usage{
-create_edges_parallel(
-  x,
-  frags = fragments_norm,
-  precs = precursors,
-  nspecs = nspe
-)
+create_edges_parallel(index, frags, precs, nspecs)
 }
 \arguments{
-\item{x}{Indices}
-
 \item{frags}{Fragments}
 
 \item{precs}{Precursors}
 
 \item{nspecs}{Number of spectra}
+
+\item{x}{Indices}
 }
 \description{
 This function part of the creation of edges

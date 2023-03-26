@@ -79,7 +79,10 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       X = 1:(nspe - 1),
       mc.cores = parallelly::availableCores(),
       ignore.interactive = TRUE,
-      FUN = create_edges_parallel
+      FUN = create_edges_parallel,
+      frags = fragments_norm,
+      precs = precursors,
+      nspecs = nspe
     )
 
     edges <- matches_sim |>

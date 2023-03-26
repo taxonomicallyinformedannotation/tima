@@ -16,8 +16,8 @@
 create_edges_progress <- function(target,
                                   query,
                                   s1,
-                                  fragments = frags,
-                                  precursors = precs) {
+                                  fragments,
+                                  precursors) {
   s2 <-
     cbind(mz = fragments[[target]][, 1], intensity = fragments[[target]][, 2])
   map <-
