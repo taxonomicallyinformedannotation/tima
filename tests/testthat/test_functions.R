@@ -290,6 +290,7 @@ testthat::test_that("Whole process", {
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)
   prepare_annotations_gnps(input = "fileDoesNotExist")
+  prepare_annotations_gnps(input = NULL)
   prepare_annotations_gnps()
 
   ### SIRIUS results

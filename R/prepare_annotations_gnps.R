@@ -25,112 +25,85 @@ prepare_annotations_gnps <-
            str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
-    if (length(input != 0)) {
-      if (rep(TRUE, length(input)) ==
-        lapply(X = input, file.exists)) {
-        params <<- parameters
-        log_debug("Loading and formatting GNPS results")
-        ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-        table <- lapply(
-          X = input,
-          FUN = readr::read_tsv,
-          col_types = readr::cols(.default = "c")
+    if (length(input != 0) &
+      rep(TRUE, length(input)) == lapply(X = input, file.exists)) {
+      params <<- parameters
+      log_debug("Loading and formatting GNPS results")
+      ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
+      table <- lapply(
+        X = input,
+        FUN = readr::read_tsv,
+        col_types = readr::cols(.default = "c")
+      ) |>
+        dplyr::bind_rows() |>
+        dplyr::mutate(
+          mz_error = as.numeric(MZErrorPPM) *
+            1E-6 *
+            as.numeric(Precursor_MZ),
+          rt_error = NA
         ) |>
-          dplyr::bind_rows() |>
-          dplyr::mutate(
-            mz_error = as.numeric(MZErrorPPM) *
-              1E-6 *
-              as.numeric(Precursor_MZ),
-            rt_error = NA
-          ) |>
-          dplyr::select(
-            feature_id = `#Scan#`,
-            mz_error,
-            rt_error,
-            structure_name = Compound_Name,
-            # structure_smiles = Smiles,
-            score_input = MQScore,
-            # smiles_2D, ## Not available for now
-            structure_inchikey = InChIKey,
-            structure_inchikey_2D = `InChIKey-Planar`,
-            structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
-            structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
-            structure_taxonomy_npclassifier_03class = npclassifier_class,
-            # molecular_formula, ## Not available for now
-            structure_exact_mass = ExactMass
-          ) |>
-          dplyr::mutate(
-            library = "GNPS",
-            structure_smiles_2D = NA,
-            structure_molecular_formula = NA,
-            structure_xlogp = NA,
-            ## Only partially present
-            structure_taxonomy_classyfire_chemontid = NA,
-            structure_taxonomy_classyfire_01kingdom = NA,
-            structure_taxonomy_classyfire_02superclass = NA,
-            structure_taxonomy_classyfire_03class = NA,
-            structure_taxonomy_classyfire_04directparent = NA
-          ) |>
-          dplyr::select(
-            feature_id,
-            mz_error,
-            rt_error,
-            structure_name,
-            # structure_inchikey,
-            structure_inchikey_2D,
-            # structure_smiles,
-            structure_smiles_2D,
-            structure_molecular_formula,
-            structure_exact_mass,
-            structure_xlogp,
-            library,
-            score_input,
-            structure_taxonomy_npclassifier_01pathway,
-            structure_taxonomy_npclassifier_02superclass,
-            structure_taxonomy_npclassifier_03class,
-            structure_taxonomy_classyfire_chemontid,
-            structure_taxonomy_classyfire_01kingdom,
-            structure_taxonomy_classyfire_02superclass,
-            structure_taxonomy_classyfire_03class,
-            structure_taxonomy_classyfire_04directparent
-          ) |>
-          dplyr::mutate_all(as.character) |>
-          dplyr::mutate_all(dplyr::na_if, "N/A") |>
-          dplyr::mutate_all(dplyr::na_if, "null") |>
-          round_reals() |>
-          complement_metadata_structures(
-            str_2D_3D = str_2D_3D,
-            str_met = str_met,
-            str_nam = str_nam,
-            str_tax_cla = str_tax_cla,
-            str_tax_npc = str_tax_npc
-          )
-      } else {
-        log_debug("No GNPS annotations found, returning an empty file instead")
-        table <- data.frame(
-          feature_id = NA,
-          mz_error = NA,
-          rt_error = NA,
-          structure_name = NA,
-          # structure_inchikey = NA,
-          structure_inchikey_2D = NA,
-          # structure_smiles = NA,
+        dplyr::select(
+          feature_id = `#Scan#`,
+          mz_error,
+          rt_error,
+          structure_name = Compound_Name,
+          # structure_smiles = Smiles,
+          score_input = MQScore,
+          # smiles_2D, ## Not available for now
+          structure_inchikey = InChIKey,
+          structure_inchikey_2D = `InChIKey-Planar`,
+          structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
+          structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
+          structure_taxonomy_npclassifier_03class = npclassifier_class,
+          # molecular_formula, ## Not available for now
+          structure_exact_mass = ExactMass
+        ) |>
+        dplyr::mutate(
+          library = "GNPS",
           structure_smiles_2D = NA,
           structure_molecular_formula = NA,
-          structure_exact_mass = NA,
           structure_xlogp = NA,
-          library = NA,
-          score_input = NA,
-          structure_taxonomy_npclassifier_01pathway = NA,
-          structure_taxonomy_npclassifier_02superclass = NA,
-          structure_taxonomy_npclassifier_03class = NA,
+          ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
           structure_taxonomy_classyfire_02superclass = NA,
           structure_taxonomy_classyfire_03class = NA,
           structure_taxonomy_classyfire_04directparent = NA
+        ) |>
+        dplyr::select(
+          feature_id,
+          mz_error,
+          rt_error,
+          structure_name,
+          # structure_inchikey,
+          structure_inchikey_2D,
+          # structure_smiles,
+          structure_smiles_2D,
+          structure_molecular_formula,
+          structure_exact_mass,
+          structure_xlogp,
+          library,
+          score_input,
+          structure_taxonomy_npclassifier_01pathway,
+          structure_taxonomy_npclassifier_02superclass,
+          structure_taxonomy_npclassifier_03class,
+          structure_taxonomy_classyfire_chemontid,
+          structure_taxonomy_classyfire_01kingdom,
+          structure_taxonomy_classyfire_02superclass,
+          structure_taxonomy_classyfire_03class,
+          structure_taxonomy_classyfire_04directparent
+        ) |>
+        dplyr::mutate_all(as.character) |>
+        dplyr::mutate_all(dplyr::na_if, "N/A") |>
+        dplyr::mutate_all(dplyr::na_if, "null") |>
+        round_reals() |>
+        complement_metadata_structures(
+          str_2D_3D = str_2D_3D,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc
         )
-      }
     } else {
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- data.frame(
