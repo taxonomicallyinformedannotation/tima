@@ -15,7 +15,7 @@
 sanitize_spectra <-
   function(spectra,
            ratio = 1000,
-           cutoff = qutoff,
+           cutoff = 10,
            fragments = 2) {
     log_debug("Applying initial filters to query spectra")
 
