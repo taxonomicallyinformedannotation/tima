@@ -1,3 +1,5 @@
+source(file = "R/save_input.R")
+
 server <- function(input, output, session) {
   # Enable the Submit button when all mandatory fields are filled out
   observe(x = {
@@ -29,7 +31,7 @@ server <- function(input, output, session) {
       # Save the data (show an error message in case of error)
       tryCatch(
         expr = {
-          saveData(input = input)
+          save_input(input = input)
           shinyjs::show("thankyou_msg")
         },
         error = function(err) {

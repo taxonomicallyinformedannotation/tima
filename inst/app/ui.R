@@ -1,4 +1,6 @@
 source(file = "R/app_css.R")
+source(file = "R/fields_mandatory.R")
+source(file = "R/label_mandatory.R")
 
 ui <- fluidPage(
   shinyjs::useShinyjs(),
