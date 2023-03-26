@@ -25,8 +25,10 @@ prepare_annotations_gnps <-
            str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
-    if (length(input != 0) &
-      rep(TRUE, length(input)) == lapply(X = input, file.exists)) {
+    if (length(input) == 0) {
+      input <- "w1llN3v3r3v3r3x1st"
+    }
+    if (rep(TRUE, length(input)) == lapply(X = input, file.exists)) {
       params <<- parameters
       log_debug("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
