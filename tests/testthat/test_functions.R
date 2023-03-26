@@ -36,6 +36,13 @@ testthat::test_that("Whole process", {
       export = paths$data$source$metadata
     )
   }
+  ## Other GNPS job id
+  get_gnps_tables(
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = "2a49fa45a5a74a8794399619d07359b5"
+  )
   ## When no GNPS job ID is given
   get_gnps_tables(
     path_features = paths$data$source$features,
@@ -43,6 +50,7 @@ testthat::test_that("Whole process", {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = NULL
   )
+
 
   ### Spectra
   #### Mini version for tests
@@ -276,6 +284,8 @@ testthat::test_that("Whole process", {
   create_edges_spectra(
     condition = "OR"
   )
+  ## TODO additional tests to include the rest
+
 
   ### GNPS results
   step <- "prepare_annotations_gnps"

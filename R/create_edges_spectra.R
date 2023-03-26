@@ -59,31 +59,11 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     spectra <- input |>
       import_spectra()
 
-    ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
-    ## Can be very slow otherwise
-
-    log_debug("Applying initial filters to query spectra")
-    keep_peaks <- function(x, prop) {
-      x > max(x, na.rm = TRUE) / prop
-    }
-
-    spectra <- spectra |>
-      Spectra::dropNaSpectraVariables() |>
-      Spectra::filterIntensity(intensity = c(qutoff, Inf)) |>
-      Spectra::filterIntensity(intensity = keep_peaks, prop = 1000) |>
-      Spectra::applyProcessing()
-
-    lengths <- lapply(spectra@backend@peaksData, length)
-    spectra <- spectra[lengths >= npeaks * 2]
-
     log_debug("Extracting fragments and precursors...")
     fragments_norm <-
       lapply(
         X = spectra@backend@peaksData,
-        FUN = function(x) {
-          x[, 2] <- x[, 2] / max(x[, 2])
-          return(x)
-        }
+        FUN = normalize_peaks
       )
     precursors <- spectra$precursorMz
     nspe <- length(spectra)
@@ -99,19 +79,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       X = 1:(nspe - 1),
       mc.cores = parallelly::availableCores(),
       ignore.interactive = TRUE,
-      FUN = function(x,
-                     frags = fragments_norm,
-                     precs = precursors,
-                     nspecs = nspe) {
-        lapply(
-          X = (x + 1):nspecs,
-          FUN = create_edges_progress,
-          query = x,
-          s1 = cbind(mz = frags[[x]][, 1], intensity = frags[[x]][, 2]),
-          fragments = frags,
-          precursors = precs
-        )
-      }
+      FUN = create_edges_parallel
     )
 
     edges <- matches_sim |>
@@ -158,7 +126,8 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
     edges <- edges |>
       dplyr::select(
-        !!as.name(name_source) := "feature_id", !!as.name(name_target) := "target_id",
+        !!as.name(name_source) := "feature_id",
+        !!as.name(name_target) := "target_id",
         dplyr::everything()
       )
 
