@@ -192,13 +192,9 @@ annotate_masses <-
         rt_max = as.numeric(rt + toleranceRt)
       )
 
-    log_debug("... on the other side (without tolerance) \n")
-    df5 <- df3 |>
-      dplyr::mutate(dplyr::across(rt, as.numeric))
-
     log_debug("joining within given rt tolerance \n")
     df7 <- df4 |>
-      dplyr::inner_join(df5,
+      dplyr::inner_join(df3,
         by = dplyr::join_by(
           rt_min <= rt,
           rt_max >= rt
@@ -216,6 +212,7 @@ annotate_masses <-
         feature_id_dest,
         mz_dest
       ) |>
+      dplyr::filter(feature_id != feature_id_dest) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       dplyr::filter(mz >= mz_dest) |>
       dplyr::mutate(
@@ -321,19 +318,16 @@ annotate_masses <-
       df9_c
     ) |>
       dplyr::mutate(
-        mz_1 = mz,
         score_input = 0
       )
 
     log_debug("joining with initial results (neutral losses) \n")
     df10_a <- dplyr::left_join(df10, df9_e) |>
-      dplyr::mutate(
-        mz = ifelse(
-          test = !is.na(loss),
-          yes = mz_1 + mass,
-          no = mz_1
-        )
-      )
+      dplyr::mutate(mz_1 = ifelse(
+        test = !is.na(loss),
+        yes = mz + mass,
+        no = mz
+      ))
 
     log_debug("joining within given mz tolerance and filtering possible single charge adducts only \n")
     df11 <- df10_a |>
@@ -437,13 +431,13 @@ annotate_masses <-
     df14 <- dplyr::left_join(
       x = df12,
       y = df13,
-      by = stats::setNames("structure_exact_mass", "exact_mass"),
-      multiple = "all"
+      by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
       dplyr::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(), -exact_mass
+        dplyr::everything(),
+        -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
@@ -563,16 +557,9 @@ annotate_masses <-
         rt_max = rt + toleranceRt
       )
 
-    df19 <- df5 |>
-      dplyr::select(
-        feature_id,
-        rt,
-        mz
-      )
-
     log_debug("joining within given rt tolerance \n")
     df20 <- df17 |>
-      dplyr::inner_join(df19,
+      dplyr::inner_join(df3,
         by = dplyr::join_by(
           rt_min <= rt,
           rt_max >= rt
@@ -592,7 +579,8 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      dplyr::filter(!is.na(loss) | (mz.x >= mz_min & mz.x <= mz_max)) |>
+      dplyr::filter(!is.na(loss) |
+        (mz.x >= mz_min & mz.x <= mz_max)) |>
       dplyr::mutate(name = ifelse(
         test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
@@ -636,14 +624,15 @@ annotate_masses <-
     df22 <-
       dplyr::left_join(df21,
         df13,
-        by = stats::setNames("structure_exact_mass", "exact_mass"),
-        multiple = "all"
+        by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
       dplyr::mutate(score_input = 0) |>
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(), -exact_mass, -adduct_value
+        dplyr::everything(),
+        -exact_mass,
+        -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -651,11 +640,10 @@ annotate_masses <-
 
     log_debug("joining single adducts, neutral losses, and multicharged / dimers \n")
     df24 <- dplyr::bind_rows(
-      df14 |>
-        dplyr::left_join(df13_b),
-      df22 |>
-        dplyr::left_join(df13_b)
+      df14,
+      df22
     ) |>
+      dplyr::left_join(df13_b) |>
       dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
       dplyr::ungroup() |>
@@ -691,8 +679,7 @@ annotate_masses <-
           structure_taxonomy_classyfire_02superclass,
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
-        ),
-      multiple = "all"
+        )
     )
 
     df25 |>
@@ -702,16 +689,14 @@ annotate_masses <-
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
         dplyr::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         dplyr::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
         dplyr::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         dplyr::distinct()
