@@ -42,14 +42,11 @@ Once installed, you are ready to go through our [documentation](https://taxonomi
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 
 ```
-Rscript inst/app/tima.R
+Rscript inst/scripts/run_app.R
 ```
 
-This command will open a small app you can access by entering the given address into your browser.
-You will have a line saying:
-```
-Listening on <YOUR_ADDRESS>
-```
+This command will open a small app you can access by entering the following address into your browser: <http://localhost:3838>
+
 
 ### Docker
 
