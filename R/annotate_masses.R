@@ -165,18 +165,14 @@ annotate_masses <-
         value_max = adduct_mass + (1E-6 * tolerancePpm * adduct_mass)
       ) |>
       dplyr::filter(!is.na(value_min)) |>
-      dplyr::filter(value_min > 0) |>
-      data.table::data.table()
+      dplyr::filter(value_min > 0)
 
-    log_debug("setting to data.table format for faster performance \n")
     df3 <- featuresTable |>
       dplyr::mutate(dplyr::across(
         c(mz),
         as.numeric
       )) |>
-      dplyr::mutate(mz_2 = mz) |>
-      dplyr::distinct(feature_id, .keep_all = TRUE) |>
-      data.table::data.table()
+      dplyr::distinct(feature_id, .keep_all = TRUE)
 
     if (any(names(featuresTable) == "rt")) {
       df3 <- df3 |>
@@ -198,29 +194,27 @@ annotate_masses <-
 
     log_debug("... on the other side (without tolerance) \n")
     df5 <- df3 |>
-      dplyr::mutate(dplyr::across(rt, as.numeric)) |>
-      dplyr::mutate(
-        rt_1 = as.numeric(rt),
-        rt_2 = as.numeric(rt)
-      ) |>
-      data.table::data.table()
-
-    log_debug("setting joining keys \n")
-    data.table::setkey(df4, rt_min, rt_max)
-    data.table::setkey(df5, rt_1, rt_2)
+      dplyr::mutate(dplyr::across(rt, as.numeric))
 
     log_debug("joining within given rt tolerance \n")
-    df7 <- data.table::foverlaps(df4, df5) |>
-      dplyr::distinct(
-        feature_id,
-        rt,
-        mz,
-        i.feature_id,
-        i.mz
+    df7 <- df4 |>
+      dplyr::inner_join(df5,
+        by = dplyr::join_by(
+          rt_min <= rt,
+          rt_max >= rt
+        )
       ) |>
-      dplyr::select(dplyr::everything(),
-        feature_id_dest = i.feature_id,
-        mz_dest = i.mz
+      dplyr::distinct(
+        feature_id = feature_id.x,
+        rt = rt.x,
+        mz = mz.x,
+        feature_id_dest = feature_id.y,
+        mz_dest = mz.y
+      ) |>
+      dplyr::select(
+        dplyr::everything(),
+        feature_id_dest,
+        mz_dest
       ) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       dplyr::filter(mz >= mz_dest) |>
@@ -255,24 +249,16 @@ annotate_masses <-
         d = stats::dist(adductsTable$adduct_mass),
         g = adductsTable$adduct
       ) |>
-      dplyr::mutate(Distance_2 = Distance) |>
-      dplyr::select(-Item1, -Item2, -Label) |>
-      data.table::data.table()
-
-    log_debug("setting joining keys \n")
-    data.table::setkey(df7, delta_min, delta_max)
-    data.table::setkey(df8, Distance, Distance_2)
-
-    log_debug("neutral losses \n")
-    df8_a <- neutralLosses |>
-      dplyr::mutate(mass_2 = mass) |>
-      data.table::data.table()
-
-    log_debug("setting joining keys \n")
-    data.table::setkey(df8_a, mass, mass_2)
+      dplyr::select(-Item1, -Item2, -Label)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
-    df9_d <- data.table::foverlaps(df7, df8_a) |>
+    df9_d <- df7 |>
+      dplyr::inner_join(neutralLosses,
+        by = dplyr::join_by(
+          delta_min <= mass,
+          delta_max >= mass
+        )
+      ) |>
       dplyr::filter(!is.na(loss)) |>
       dplyr::distinct(feature_id, loss, mass, feature_id_dest)
 
@@ -280,8 +266,13 @@ annotate_masses <-
       dplyr::distinct(feature_id, loss, mass)
 
     log_debug("joining within given delta mz tolerance (adducts) \n")
-    df9 <- data.table::foverlaps(df7, df8) |>
-      dplyr::mutate(mz_2 = mz) |>
+    df9 <- df7 |>
+      dplyr::inner_join(df8,
+        by = dplyr::join_by(
+          delta_min <= Distance,
+          delta_max >= Distance
+        )
+      ) |>
       dplyr::filter(!is.na(Group1)) |>
       dplyr::mutate(dplyr::across(rt, as.character)) |>
       dplyr::mutate(
@@ -325,44 +316,35 @@ annotate_masses <-
         dplyr::distinct(
           feature_id,
           rt,
-          mz,
-          mz_2
+          mz
         ),
-      df9_c,
-      multiple = "all"
+      df9_c
     ) |>
       dplyr::mutate(
         mz_1 = mz,
         score_input = 0
-      ) |>
-      data.table::data.table()
+      )
 
     log_debug("joining with initial results (neutral losses) \n")
     df10_a <- dplyr::left_join(df10, df9_e) |>
       dplyr::mutate(
-        mz_1 = ifelse(
+        mz = ifelse(
           test = !is.na(loss),
           yes = mz_1 + mass,
           no = mz_1
-        ),
-        mz_2 = ifelse(
-          test = !is.na(loss),
-          yes = mz_2 + mass,
-          no = mz_2
         )
       )
 
-    log_debug("setting joining keys \n")
-    data.table::setkey(df2, value_min, value_max)
-    data.table::setkey(df10_a, mz_1, mz_2)
-
     log_debug("joining within given mz tolerance and filtering possible single charge adducts only \n")
-    df11 <- data.table::foverlaps(
-      df10_a,
-      df2
-    ) |>
+    df11 <- df10_a |>
+      dplyr::inner_join(df2,
+        by = dplyr::join_by(
+          mz_1 >= value_min,
+          mz_1 <= value_max
+        )
+      ) |>
       dplyr::mutate(
-        mz_error = adduct_mass - mz_2,
+        mz_error = adduct_mass - mz_1,
         rt_error = NA_real_
       ) |>
       dplyr::select(
@@ -403,8 +385,6 @@ annotate_masses <-
         exact_mass
       ) |>
       dplyr::filter(!is.na(exact_mass))
-
-    ## HERE
 
     log_debug("keeping unique adducts per exact mass \n")
     df13 <- structureOrganismPairsTable |>
@@ -581,59 +561,63 @@ annotate_masses <-
         mz_max = value + (1E-6 * tolerancePpm * value),
         rt_min = rt - toleranceRt,
         rt_max = rt + toleranceRt
-      ) |>
-      data.table::data.table()
+      )
 
     df19 <- df5 |>
       dplyr::select(
         feature_id,
         rt,
-        mz,
-        rt_1,
-        rt_2
+        mz
       )
 
-    log_debug("setting joining keys \n")
-    data.table::setkey(df17, rt_min, rt_max)
-    data.table::setkey(df19, rt_1, rt_2)
-
     log_debug("joining within given rt tolerance \n")
-    df20 <- data.table::foverlaps(df17, df19) |>
-      dplyr::mutate(
-        delta_min = mz - mz_max,
-        delta_max = mz - mz_min
+    df20 <- df17 |>
+      dplyr::inner_join(df19,
+        by = dplyr::join_by(
+          rt_min <= rt,
+          rt_max >= rt
+        )
       ) |>
-      dplyr::filter(delta_max > min(df8_a$mass) |
-        (mz >= mz_min & mz <= mz_max))
+      dplyr::mutate(
+        delta_min = mz.x - mz_max,
+        delta_max = mz.x - mz_min
+      ) |>
+      dplyr::filter(delta_max > min(neutralLosses$mass) |
+        (mz.x >= mz_min & mz.x <= mz_max))
 
-    log_debug("setting joining keys \n")
-    data.table::setkey(df20, delta_min, delta_max)
-
-    df20_a <- data.table::foverlaps(df20, df8_a) |>
-      dplyr::filter(!is.na(loss) | (mz >= mz_min & mz <= mz_max)) |>
+    df20_a <- df20 |>
+      dplyr::inner_join(neutralLosses,
+        by = dplyr::join_by(
+          delta_min <= mass,
+          delta_max >= mass
+        )
+      ) |>
+      dplyr::filter(!is.na(loss) | (mz.x >= mz_min & mz.x <= mz_max)) |>
       dplyr::mutate(name = ifelse(
         test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
         no = name
       )) |>
       dplyr::select(
-        feature_id,
-        rt,
-        mz,
+        feature_id = feature_id.x,
+        rt = rt.x,
+        mz = mz.x,
         library_name = name,
         adduct_value = value,
         mz_min,
         mz_max
       )
 
-    log_debug("setting joining keys \n")
-    data.table::setkey(df20_a, mz_min, mz_max)
-    data.table::setkey(df2, value_min, value_max)
-
     log_debug(
       "joining within given mz tolerance and filtering possible multicharge / dimeric adducts \n"
     )
-    df21 <- data.table::foverlaps(df20_a, df2) |>
+    df21 <- df20_a |>
+      dplyr::inner_join(df2,
+        by = dplyr::join_by(
+          adduct_value >= value_min,
+          adduct_value <= value_max
+        )
+      ) |>
       dplyr::filter(stringr::str_detect(
         pattern = paste(adduct, "", sep = " "),
         string = library_name
