@@ -15,12 +15,15 @@ BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.1.0)
 Imports:
+    BiocManager (>= 1.30.20),
     BiocParallel (>= 1.32.6),
     bs4Dash (>= 2.2.1),
+    clustermq (>= 0.8.95.5),
     CompoundDb (>= 1.2.1),
     crayon (>= 1.5.2),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.1),
+    future (>= 1.32.0),
     gt (>= 0.8.0),
     igraph (>= 1.4.1),
     jsonlite (>= 1.8.4),
@@ -33,6 +36,7 @@ Imports:
     pingr (>= 2.0.2),
     readr (>= 2.1.4),
     rotl (>= 3.0.14),
+    rstudioapi (>= 0.14),
     shiny (>= 1.7.4),
     shinybusy (>= 0.3.1),
     shinyjs (>= 2.1.0),
@@ -47,7 +51,7 @@ Imports:
     utils,
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.7)
-Suggests:
+Suggests: 
     knitr (>= 1.42),
     spelling (>= 2.2.1),
     testthat (>= 3.1.7)

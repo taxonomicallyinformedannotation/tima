@@ -12,12 +12,14 @@ services:
 
   tima-gui:
     build: "."
+    ports:
+      - "3838:3838"
     image: adafede/tima-r
     volumes:
       - "./params:/params"
       - "./inst:/inst"
       - "./data:/data"
-    command: Rscript inst/app/app.R
+    command: Rscript -e "shiny::runApp(appDir = 'inst/app', host = '0.0.0.0', port = 3838)"
 
   tima-mini:
     build: "."

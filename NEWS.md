@@ -3,6 +3,7 @@
 # timaR 2.8.0
 
 * Adding GUI prototype
+* Started using [renv](https://rstudio.github.io/renv/index.html)
 
 # timaR 2.7.4
 

@@ -31,7 +31,8 @@ jobs:
           needs: website
 
       - name: Install package
-        run: R CMD INSTALL .
+        run: |
+          Rscript inst/scripts/install.R
       - name: Run tests
         run: |
           Rscript inst/scripts/change_tests.R

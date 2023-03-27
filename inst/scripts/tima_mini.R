@@ -1,9 +1,6 @@
 start <- Sys.time()
 
-require(
-  package = "timaR",
-  quietly = TRUE
-)
+library("timaR")
 
 log_debug(
   "This script",
