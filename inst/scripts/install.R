@@ -1,9 +1,9 @@
 ## Simple install helper
-if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes")
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  install.packages("devtools")
 }
-remotes::install_github(
-  repo = "taxonomicallyinformedannotation/tima-r",
-  upgrade = "always",
-  build_vignettes = FALSE
-)
+# if (!requireNamespace("renv", quietly = TRUE)) {
+#   install.packages("renv")
+# }
+# renv::restore()
+devtools::install()
