@@ -1,13 +1,15 @@
 ## Simple install helper
-options(repos = c(CRAN = "https://cloud.r-project.org"))
 if (!requireNamespace("pak", quietly = TRUE)) {
-  install.packages("pak")
+  stream <- "devel"
+  install.packages(
+    "pak",
+    repos = sprintf(
+      "https://r-lib.github.io/p/pak/%s/%s/%s/%s",
+      stream,
+      .Platform$pkgType,
+      R.Version()$os,
+      R.Version()$arch
+    )
+  )
 }
-# if (!requireNamespace("renv", quietly = TRUE)) {
-#   install.packages("renv")
-# }
-# renv::restore()
-pak::local_install(
-  upgrade = TRUE,
-  dependencies = TRUE
-)
+pak::pkg_install(pkg = desc::desc_get_urls()[[1]])
