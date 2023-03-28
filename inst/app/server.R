@@ -1,5 +1,7 @@
 source(file = "R/save_input.R")
 
+options(shiny.maxRequestSize=1000*1024^2)
+
 server <- function(input, output, session) {
   # Enable the Submit button when all mandatory fields are filled out
   observe(x = {
@@ -61,7 +63,6 @@ server <- function(input, output, session) {
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
       targets::tar_watch_server(id = "tar_watch")
-      setwd("../../")
       targets::tar_watch()
       targets::tar_make(
         names = targets::matches("annotations_prepared$"),

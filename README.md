@@ -39,6 +39,12 @@ Rscript inst/scripts/install.R
 ```
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
+In case you do not have your data ready, you can obtain some example data using:
+
+```
+Rscript inst/scripts/get_gnps_tables.R
+```
+
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 
 ```
