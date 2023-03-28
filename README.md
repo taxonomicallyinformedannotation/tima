@@ -39,10 +39,13 @@ Rscript inst/scripts/install.R
 ```
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
-In case you do not have your data ready, you can obtain some example data using:
+In case you do not have your data ready, you can obtain some example data (set of 8,000 spectra) using:
 
 ```
-Rscript inst/scripts/get_gnps_tables.R
+Rscript inst/scripts/get_example_spectra.R 
+Rscript inst/scripts/get_example_features.R 
+Rscript inst/scripts/get_example_metadata.R 
+# Rscript inst/scripts/get_example_sirius.R
 ```
 
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
