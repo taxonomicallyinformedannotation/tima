@@ -9,8 +9,7 @@ if (!requireNamespace("pak", quietly = TRUE)) {
       .Platform$pkgType,
       R.Version()$os,
       R.Version()$arch
-    ),
-    type = "source"
+    )
   )
 }
 pak::pak(pkg = "desc")
