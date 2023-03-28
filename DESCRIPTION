@@ -60,6 +60,7 @@ Imports:
     yaml (>= 2.3.7)
 Remotes:
     Bioconductor/BiocParallel,
+    r-lib/pak,
     RforMassSpectrometry/CompoundDb,
     RforMassSpectrometry/MetaboAnnotation,
     RforMassSpectrometry/MsBackendMgf,
