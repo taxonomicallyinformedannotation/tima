@@ -29,31 +29,50 @@ ui <- fluidPage(
   fluidPage(div(
     id = "params",
     navlistPanel(
+      widths = c(4, 4),
       "Parameters",
       tabPanel(
         title = "Files",
         h3("Required files"),
         h5("They MUST be located in `data/source`"),
-        fileInput(
-          inputId = "fil_spe_raw",
-          label = label_mandatory("MGF file"),
-          accept = ".mgf"
-        ),
+        div(
+          fileInput(
+            inputId = "fil_spe_raw",
+            label = label_mandatory("MGF file"),
+            accept = ".mgf"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         fileInput(
           inputId = "fil_fea_raw",
           label = label_mandatory("Features table"),
           accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         fileInput(
           inputId = "fil_tax_raw",
           label = "Metadata table (mandatory if you do not provide the taxon name manually)",
           accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "fil_pat",
           label = label_mandatory("Pattern to identify your job locally"),
           value = "example"
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "Annotations",
@@ -66,7 +85,11 @@ ui <- fluidPage(
           value = 50,
           step = 1,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_can_fin",
           label = "Number of final candidates",
@@ -75,17 +98,29 @@ ui <- fluidPage(
           step = 1,
           value = 3,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "ann_ms1only",
           label = "Erase MS2 results and keep MS1 only",
           value = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "ann_ms1_ann",
           label = "Perform MS1 annotation",
           value = TRUE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_ms1_thr_bio",
           label = "Minimal biological score to keep MS1 only annotation",
@@ -94,7 +129,11 @@ ui <- fluidPage(
           value = 0.5,
           step = 0.1,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_ms1_thr_che",
           label = "Minimal chemical score to keep MS1 only annotation",
@@ -103,18 +142,30 @@ ui <- fluidPage(
           value = 0.5,
           step = 0.1,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         selectInput(
           inputId = "ann_ms1_thr_con",
           label = "Condition to be used to retain candidates",
           choices = c("AND", "OR"),
           selected = "OR"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "ann_ms2_app",
           label = "Perform approximative matching without precursor matching? (can lead to very long processing time)",
           value = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         selectInput(
           inputId = "ann_ms2_met",
           label = "Similarity method to be used to compare spectra",
@@ -126,7 +177,11 @@ ui <- fluidPage(
             "nspectraangle"
           ),
           selected = "gnps"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_ms2_thr_pea_abs",
           label = "Minimal shared peaks (absolute)",
@@ -135,7 +190,11 @@ ui <- fluidPage(
           step = 1,
           value = 6,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_ms2_thr_pea_rat",
           label = "Minimal shared peaks (ratio)",
@@ -144,7 +203,11 @@ ui <- fluidPage(
           step = 0.05,
           value = 0.2,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ann_ms2_thr_sim",
           label = "Minimal similarity score",
@@ -153,13 +216,21 @@ ui <- fluidPage(
           step = 0.05,
           value = 0.2,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         selectInput(
           inputId = "ann_ms2_thr_con",
           label = "Condition to be used to retain candidates",
           choices = c("AND", "OR"),
           selected = "OR"
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "MS",
@@ -169,7 +240,11 @@ ui <- fluidPage(
           label = "Polarity used",
           choices = c("pos", "neg"),
           selected = "pos"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_int_thr_ms1",
           label = "Intensity threshold for MS1",
@@ -178,7 +253,11 @@ ui <- fluidPage(
           value = 1E5,
           step = 1E4,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_int_thr_ms2",
           label = "Intensity threshold for MS2",
@@ -187,7 +266,11 @@ ui <- fluidPage(
           value = 50,
           step = 10,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_tol_mas_ppm_ms1",
           label = "Relative mass tolerance for MS1 in ppm",
@@ -195,7 +278,11 @@ ui <- fluidPage(
           max = 20,
           value = 5,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_tol_mas_dal_ms1",
           label = "Absolute mass tolerance for MS1 in Dalton",
@@ -203,7 +290,11 @@ ui <- fluidPage(
           max = 0.02,
           value = 0.01,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_tol_mas_ppm_ms2",
           label = "Relative mass tolerance for MS2 in ppm",
@@ -211,7 +302,11 @@ ui <- fluidPage(
           max = 20,
           value = 5,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_tol_mas_dal_ms2",
           label = "Absolute mass tolerance for MS2 in Dalton",
@@ -219,7 +314,11 @@ ui <- fluidPage(
           max = 0.02,
           value = 0.01,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "ms_tol_rt_min",
           label = "Retention time tolerance in minutes",
@@ -227,7 +326,11 @@ ui <- fluidPage(
           max = 0.20,
           value = 0.05,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxGroupInput(
           inputId = "ms_add_pos",
           label = "List of adducts to be used in positive",
@@ -279,7 +382,11 @@ ui <- fluidPage(
             "pos_1_1sodium",
             "pos_2MH"
           )
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxGroupInput(
           inputId = "ms_add_neg",
           label = "List of adducts to be used in negative",
@@ -305,7 +412,11 @@ ui <- fluidPage(
             "neg_1_minus1proton",
             "neg_2MH"
           )
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "Organisms",
@@ -314,7 +425,11 @@ ui <- fluidPage(
           inputId = "org_tax",
           label = "OPTIONAL. Force all features to be attributed to given taxon (e.g. Gentiana lutea)",
           value = NULL
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "org_can",
           label = "Number of organisms to keep per feature",
@@ -323,12 +438,20 @@ ui <- fluidPage(
           value = 1,
           step = 1,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "org_fil_mod",
           label = "Filter library to restrict it to a portion of organisms only",
           value = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         selectInput(
           inputId = "org_fil_lev",
           label = "Level at which the library will be filtered",
@@ -349,7 +472,11 @@ ui <- fluidPage(
           inputId = "org_fil_val",
           label = "Value to be applied for filtering",
           value = "Streptophyta"
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "Names",
@@ -358,37 +485,65 @@ ui <- fluidPage(
           inputId = "names_features",
           label = "Name of \"feature IDs\" variable in the input",
           value = "row ID"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "names_extension",
           label = "The file(s) extension is present in the sample name",
           value = TRUE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "names_precursor",
           label = "Name of \"precursor m/z\" variable in the input",
           value = "row m/z"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "names_rt",
           label = "Name of \"retention time\" variable in the input",
           value = "row retention time"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "names_source",
           label = "Name of \"source IDs\" variable in the input",
           value = "CLUSTERID1"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "names_target",
           label = "Name of \"target IDs\" variable in the input",
           value = "CLUSTERID2"
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         textInput(
           inputId = "names_taxon",
           label = "Name of \"taxon name\" variable in the input",
           value = "ATTRIBUTE_species"
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "Weights",
@@ -401,7 +556,11 @@ ui <- fluidPage(
           value = 0.500,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_glo_che",
           label = "Weight for the chemical part",
@@ -410,7 +569,11 @@ ui <- fluidPage(
           value = 0.166,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_glo_spe",
           label = "Weight for the spectral part",
@@ -419,7 +582,11 @@ ui <- fluidPage(
           value = 0.333,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_01",
           label = "Score for a biological domain match",
@@ -428,7 +595,11 @@ ui <- fluidPage(
           value = 0.100,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_02",
           label = "Score for a biological kingdom match",
@@ -437,7 +608,11 @@ ui <- fluidPage(
           value = 0.200,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_03",
           label = "Score for a biological phylum match",
@@ -446,7 +621,11 @@ ui <- fluidPage(
           value = 0.300,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_04",
           label = "Score for a biological class match",
@@ -455,7 +634,11 @@ ui <- fluidPage(
           value = 0.400,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_05",
           label = "Score for a biological order match",
@@ -464,7 +647,11 @@ ui <- fluidPage(
           value = 0.500,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_06",
           label = "Score for a biological infraorder match",
@@ -473,7 +660,11 @@ ui <- fluidPage(
           value = 0.550,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_07",
           label = "Score for a biological family match",
@@ -482,7 +673,11 @@ ui <- fluidPage(
           value = 0.600,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_08",
           label = "Score for a biological subfamily match",
@@ -491,7 +686,11 @@ ui <- fluidPage(
           value = 0.650,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_09",
           label = "Score for a biological tribe match",
@@ -500,7 +699,11 @@ ui <- fluidPage(
           value = 0.700,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_10",
           label = "Score for a biological subtribe match",
@@ -509,7 +712,11 @@ ui <- fluidPage(
           value = 0.750,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_11",
           label = "Score for a biological genus match",
@@ -518,7 +725,11 @@ ui <- fluidPage(
           value = 0.800,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_12",
           label = "Score for a biological subgenus match",
@@ -527,7 +738,11 @@ ui <- fluidPage(
           value = 0.850,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_13",
           label = "Score for a biological species match",
@@ -536,7 +751,11 @@ ui <- fluidPage(
           value = 0.900,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_14",
           label = "Score for a biological subspecies match",
@@ -545,7 +764,11 @@ ui <- fluidPage(
           value = 0.950,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_bio_15",
           label = "Score for a biological variety match",
@@ -554,7 +777,11 @@ ui <- fluidPage(
           value = 1.000,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_11",
           label = "Score for a (classyfire) chemical kingdom match",
@@ -563,7 +790,11 @@ ui <- fluidPage(
           value = 0.250,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_12",
           label = "Score for a (classyfire) chemical superclass match",
@@ -572,7 +803,11 @@ ui <- fluidPage(
           value = 0.500,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_13",
           label = "Score for a (classyfire) chemical class match",
@@ -581,7 +816,11 @@ ui <- fluidPage(
           value = 0.750,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_14",
           label = "Score for a (classyfire) chemical parent match",
@@ -590,7 +829,11 @@ ui <- fluidPage(
           value = 1.000,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_21",
           label = "Score for a (NPC) chemical pathway match",
@@ -599,7 +842,11 @@ ui <- fluidPage(
           value = 0.333,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_22",
           label = "Score for a (NPC) chemical superclass match",
@@ -608,7 +855,11 @@ ui <- fluidPage(
           value = 0.666,
           step = 0.001,
           ticks = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         sliderInput(
           inputId = "wei_che_23",
           label = "Score for a (NPC) chemical class match",
@@ -617,7 +868,11 @@ ui <- fluidPage(
           value = 1.000,
           step = 0.001,
           ticks = FALSE
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "Options",
@@ -626,22 +881,38 @@ ui <- fluidPage(
           inputId = "fast",
           label = "Skip time-consuming steps",
           value = TRUE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "force",
           label = "Do not use it!",
           value = FALSE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "parallel",
           label = "Execute processes in parallel when available",
           value = TRUE
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
           value = TRUE
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       ),
       tabPanel(
         title = "GNPS (optional)",
@@ -650,13 +921,21 @@ ui <- fluidPage(
           inputId = "gnps_id",
           label = "GNPS job ID",
           value = NULL
-        ),
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          ),
         selectInput(
           inputId = "gnps_workflow",
           label = "Workflow used within GNPS",
           choices = c("classical", "fbmn"),
           selected = "fbmn"
-        )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Info soon available")
+          )
       )
     )
   )),

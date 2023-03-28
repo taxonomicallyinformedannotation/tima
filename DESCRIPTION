@@ -39,6 +39,7 @@ Imports:
     rstudioapi (>= 0.14),
     shiny (>= 1.7.4),
     shinybusy (>= 0.3.1),
+    shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
     shinyWidgets (>= 0.7.6),
     Spectra (>= 1.8.3),

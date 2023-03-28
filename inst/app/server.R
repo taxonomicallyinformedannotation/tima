@@ -1,8 +1,11 @@
 source(file = "R/save_input.R")
 
-options(shiny.maxRequestSize=1000*1024^2)
+options(shiny.maxRequestSize = 1000 * 1024^2)
 
 server <- function(input, output, session) {
+  # Observe helpers
+  shinyhelper::observe_helpers()
+
   # Enable the Submit button when all mandatory fields are filled out
   observe(x = {
     mandatoryFilled <-
