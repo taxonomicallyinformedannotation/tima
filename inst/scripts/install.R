@@ -7,5 +7,7 @@ if (!requireNamespace("pak", quietly = TRUE)) {
 #   install.packages("renv")
 # }
 # renv::restore()
-pak::local_install(upgrade = TRUE,
-                   dependencies = TRUE)
+pak::local_install(
+  upgrade = TRUE,
+  dependencies = TRUE
+)
