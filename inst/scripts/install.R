@@ -9,7 +9,8 @@ if (!requireNamespace("pak", quietly = TRUE)) {
       .Platform$pkgType,
       R.Version()$os,
       R.Version()$arch
-    )
+    ),
+    type = "source"
   )
 }
 pak::pkg_install(pkg = desc::desc_get_urls()[[1]])
