@@ -66,7 +66,12 @@ server <- function(input, output, session) {
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
       targets::tar_watch_server(id = "tar_watch")
-      targets::tar_watch()
+      targets::tar_watch(
+        port = 3839,
+        targets_only = TRUE,
+        degree_from = 8,
+        level_separation = 300
+      )
       targets::tar_make(
         names = targets::matches("annotations_prepared$"),
         reporter = "verbose_positives"

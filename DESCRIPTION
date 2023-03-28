@@ -65,7 +65,7 @@ Remotes:
     RforMassSpectrometry/MetaboAnnotation,
     RforMassSpectrometry/MsBackendMgf,
     RforMassSpectrometry/MsCoreUtils,
-    RforMassSpectrometry/Spectra,
+    RforMassSpectrometry/Spectra
 Suggests: 
     knitr (>= 1.42),
     pak (>= 0.4.0.9000),

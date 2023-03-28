@@ -19,5 +19,6 @@ COPY . .
 
 # For Shiny
 EXPOSE 3838
+EXPOSE 3839
 
 #CMD ["--help"]
