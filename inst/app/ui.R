@@ -11,8 +11,10 @@ ui <- fluidPage(
     h1("Taxonomically Informed Metabolite Annotation"),
     h4(
       "This app helps performing TIMA as described in the",
-      a(href = "https://taxonomicallyinformedannotation.github.io/tima-r/",
-        "following documentation")
+      a(
+        href = "https://taxonomicallyinformedannotation.github.io/tima-r/",
+        "following documentation"
+      )
     ),
     strong(
       span("Created by "),
@@ -228,14 +230,16 @@ ui <- fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("See",
-                        as.character(
-                          tags$a(
-                            "https://github.com/rformassspectrometry/MsCoreUtils/pull/33",
-                            href = "https://github.com/rformassspectrometry/MsCoreUtils/pull/33"
-                          )
-                        ),
-                        "for more info")
+            content = c(
+              "See",
+              as.character(
+                tags$a(
+                  "https://github.com/rformassspectrometry/MsCoreUtils/pull/33",
+                  href = "https://github.com/rformassspectrometry/MsCoreUtils/pull/33"
+                )
+              ),
+              "for more info"
+            )
           ),
         sliderInput(
           inputId = "ann_ms2_thr_pea_abs",
@@ -495,9 +499,11 @@ ui <- fluidPage(
             "neg_2MACH",
             "neg_3MH"
           ),
-          selected = list("neg_2_2proton",
-                          "neg_1_minus1proton",
-                          "neg_2MH")
+          selected = list(
+            "neg_2_2proton",
+            "neg_1_minus1proton",
+            "neg_2MH"
+          )
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -1187,10 +1193,12 @@ ui <- fluidPage(
       actionButton(inputId = "save", "Save parameters", class = "btn-primary"),
       shinyjs::hidden(
         span(id = "save_msg", "Saving parameters..."),
-        div(id = "error",
-            div(
-              br(), tags$b("Error: "), span(id = "error_msg")
-            ))
+        div(
+          id = "error",
+          div(
+            br(), tags$b("Error: "), span(id = "error_msg")
+          )
+        )
       ),
       actionButton(inputId = "launch", "Launch job", class = "btn-primary"),
     ),
@@ -1198,8 +1206,10 @@ ui <- fluidPage(
       id = "thankyou_msg",
       h3("Thanks, your parameters were saved successfully!")
     )),
-    shinyjs::hidden(div(id = "job_msg",
-                        h3("Job is running!"))),
+    shinyjs::hidden(div(
+      id = "job_msg",
+      h3("Job is running!")
+    )),
     shinyjs::hidden(div(
       targets::tar_watch_ui(
         id = "tar_watch",
