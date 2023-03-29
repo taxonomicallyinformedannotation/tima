@@ -1,22 +1,20 @@
 # Image
 FROM ghcr.io/bioconductor/bioconductor:RELEASE_3_16
 
+# Copy files
+COPY DESCRIPTION ./DESCRIPTION
+COPY data ./data
+COPY inst ./inst
+COPY params ./params
+COPY paths.yaml ./paths.yaml
+
 # To force bioconductor to install from source
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 
-# Copy files
-COPY data data
-COPY DESCRIPTION DESCRIPTION
-COPY inst inst
-COPY params params
-COPY paths.yaml paths.yaml
-COPY renv.lock renv.lock
-
-# R install
+# R dependencies
 RUN Rscript inst/scripts/install.R
 
-# Copy the app
-COPY . .
+COPY . ./.
 
 # For Shiny
 EXPOSE 3838

@@ -1,7 +1,5 @@
 ## Simple install helper
-if (!requireNamespace("renv", quietly = TRUE)) {
-  install.packages("renv")
-}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 if (Sys.info()[["sysname"]] == "Windows") {
   if (!requireNamespace("installr", quietly = TRUE)) {
     install.packages("installr")
@@ -9,7 +7,12 @@ if (Sys.info()[["sysname"]] == "Windows") {
   installr::install.rtools()
 }
 if (Sys.info()[["sysname"]] != "Linux") {
+  if (!requireNamespace("renv", quietly = TRUE)) {
+    install.packages("renv")
+  }
   renv::equip()
 }
-renv::restore()
-renv::install(packages = ".")
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
+devtools::install()
