@@ -1208,16 +1208,21 @@ ui <- fluidPage(
     )),
     shinyjs::hidden(div(
       id = "job_msg",
-      h3("Job is running!")
+      h3("Job is running!"),
+      h4("You can follow it at", a(
+        href = "http://localhost:3839/",
+        "http://localhost:3839/"
+      ))
     )),
     shinyjs::hidden(div(
       targets::tar_watch_ui(
         id = "tar_watch",
         label = "Live Show",
         targets_only = TRUE,
-        degree_from = 10,
+        degree_from = 8,
+        level_separation = 300,
         display = "graph",
-        displays = c("summary", "graph", "about")
+        displays = c("summary", "progress", "graph")
       )
     ))
   )

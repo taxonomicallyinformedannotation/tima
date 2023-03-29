@@ -67,10 +67,8 @@ server <- function(input, output, session) {
       shinyjs::show("tar_watch")
       targets::tar_watch_server(id = "tar_watch")
       targets::tar_watch(
-        port = 3839,
-        targets_only = TRUE,
-        degree_from = 8,
-        level_separation = 300
+        host = "0.0.0.0",
+        port = 3839
       )
       targets::tar_make(
         names = targets::matches("annotations_prepared$"),
