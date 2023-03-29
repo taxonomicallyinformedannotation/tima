@@ -25,8 +25,10 @@ get_file <-
 
       ## Download the file from the given URL and save it to the specified location
       message("Downloading")
-      utils::download.file(url = url,
-                           destfile = export)
+      utils::download.file(
+        url = url,
+        destfile = export
+      )
     } else {
       message("File already exists. Skipping.")
     }
