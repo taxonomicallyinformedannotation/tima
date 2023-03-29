@@ -942,12 +942,10 @@ list(
                     path = paths$data$source$libraries$spectra$is$lotus$pos
                   )
                 } else {
-                  create_dir(paths$data$source$libraries$spectra$is$lotus$pos)
-                  utils::download.file(
+                  get_file(
                     url = paths$urls$examples$spectral_lib$pos,
-                    destfile = paths$data$source$libraries$spectra$is$lotus$pos
+                    export = paths$data$source$libraries$spectra$is$lotus$pos
                   )
-                  return(paths$data$source$libraries$spectra$is$lotus$pos)
                 }
             }
             ## To always check if a newest version is available
@@ -966,12 +964,10 @@ list(
                     path = paths$data$source$libraries$spectra$is$lotus$neg
                   )
                 } else {
-                  create_dir(paths$data$source$libraries$spectra$is$lotus$neg)
-                  utils::download.file(
+                  get_file(
                     url = paths$urls$examples$spectral_lib$neg,
-                    destfile = paths$data$source$libraries$spectra$is$lotus$neg
+                    export = paths$data$source$libraries$spectra$is$lotus$neg
                   )
-                  return(paths$data$source$libraries$spectra$is$lotus$neg)
                 }
             }
             ## To always check if a newest version is available

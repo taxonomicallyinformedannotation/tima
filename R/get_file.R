@@ -15,19 +15,21 @@ get_file <-
   function(url,
            export,
            limit = 1000) {
-    ## Set the timeout for download
-    options(timeout = limit)
-    message("Timeout for download is ", getOption("timeout"), " seconds")
+    if (!file.exists(export)) {
+      ## Set the timeout for download
+      options(timeout = limit)
+      message("Timeout for download is ", getOption("timeout"), " seconds")
 
-    ## Create the export directory if it does not exist
-    create_dir(export = export)
+      ## Create the export directory if it does not exist
+      create_dir(export = export)
 
-    ## Download the file from the given URL and save it to the specified location
-    message("Downloading")
-    utils::download.file(
-      url = url,
-      destfile = export
-    )
+      ## Download the file from the given URL and save it to the specified location
+      message("Downloading")
+      utils::download.file(url = url,
+                           destfile = export)
+    } else {
+      message("File already exists. Skipping.")
+    }
 
     return(export)
   }
