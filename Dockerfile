@@ -10,6 +10,7 @@ COPY DESCRIPTION DESCRIPTION
 COPY inst inst
 COPY params params
 COPY paths.yaml paths.yaml
+COPY renv.lock renv.lock
 
 # R install
 RUN Rscript inst/scripts/install.R
