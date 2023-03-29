@@ -19,6 +19,9 @@ if (!requireNamespace("pak", quietly = TRUE)) {
   lib <- Sys.getenv("R_LIBS_SITE")
   if (lib == "") {
     lib <- file.path(dirname(.Library), "site-library")
+    cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
+    cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
+
     message("Setting R_LIBS_SITE to ", lib)
   } else {
     message("R_LIBS_SITE is already set to ", lib)
@@ -27,7 +30,6 @@ if (!requireNamespace("pak", quietly = TRUE)) {
         "R_LIB_FOR_PAK=%s\n",
         strsplit(lib, .Platform$path.sep)[[1]][[1]]
       ),
-      file = Sys.getenv("GITHUB_ENV"),
       append = TRUE
     )
   }
@@ -55,7 +57,7 @@ if (!requireNamespace("pak", quietly = TRUE)) {
   #   )
   # )
 }
-Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
+pak::pak_update()
 pak::lockfile_create()
 pak::lockfile_install()
 unlink(x = "pkg.lock")
