@@ -12,9 +12,6 @@ if (!requireNamespace("pak", quietly = TRUE)) {
     )
   )
 }
-pak::lockfile_create(
-  upgrade = TRUE,
-  dependencies = TRUE
-)
-pak::lockfile_install()
-pak::pak()
+pak::lockfile_create()
+pak::lockfile_install(update = FALSE)
+pak::pak(upgrade = FALSE)
