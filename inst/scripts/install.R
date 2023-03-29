@@ -12,7 +12,18 @@ if (Sys.info()[["sysname"]] != "Linux") {
   }
   renv::equip()
 }
-if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools")
+if (!requireNamespace("pak", quietly = TRUE)) {
+  stream <- "devel"
+  install.packages(
+    "pak",
+    repos = sprintf(
+      "https://r-lib.github.io/p/pak/%s/%s/%s/%s",
+      stream,
+      .Platform$pkgType,
+      R.Version()$os,
+      R.Version()$arch
+    )
+  )
 }
-devtools::install()
+pak::pak()
+pak::pkg_install(pkg = desc::desc_get_urls()[[1]])
