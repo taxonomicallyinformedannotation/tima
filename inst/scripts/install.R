@@ -35,15 +35,13 @@ if (!requireNamespace("pak", quietly = TRUE)) {
     lib <- Sys.getenv("R_LIB_FOR_PAK")
     dir.create(lib, showWarnings = FALSE, recursive = TRUE)
     install.packages("pak",
-                     repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/",
-                     lib = lib)
+      repos = "https://r-lib.github.io/p/pak/stable",
+      lib = lib
+    )
   } else {
-    dir.create(Sys.getenv("R_LIB_FOR_PAK"),
-               recursive = TRUE,
-               showWarnings = FALSE)
     install.packages("pak",
-                     repos = "https://r-lib.github.io/p/pak/${{ inputs.pak-version }}/",
-                     lib = Sys.getenv("R_LIB_FOR_PAK"))
+      repos = "https://r-lib.github.io/p/pak/stable"
+    )
   }
   # stream <- "devel"
   # install.packages(
