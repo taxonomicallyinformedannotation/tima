@@ -110,23 +110,35 @@ prepare_annotations_sirius <-
 
       canopus_npc_prepared <- canopus |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(
-          feature_id,
-          structure_taxonomy_npclassifier_01pathway = `NPC#pathway`,
-          `NPC#pathway Probability`,
-          structure_taxonomy_npclassifier_02superclass = `NPC#superclass`,
-          `NPC#superclass Probability`,
-          structure_taxonomy_npclassifier_03class = `NPC#class`,
-          `NPC#class Probability`
-        )
+        dplyr::select(dplyr::any_of(
+          c(
+            "feature_id",
+            "structure_taxonomy_npclassifier_01pathway" = "NPC#pathway",
+            "NPC#pathway Probability",
+            "structure_taxonomy_npclassifier_02superclass" = "NPC#superclass",
+            "NPC#superclass Probability",
+            "structure_taxonomy_npclassifier_03class" = "NPC#class",
+            "NPC#class Probability",
+            "structure_taxonomy_classyfire_01kingdom" = "ClassyFire#TODO",
+            "ClassyFire#TODO Probability",
+            "structure_taxonomy_classyfire_02superclass" = "ClassyFire#superclass",
+            "ClassyFire#superclass probability",
+            "structure_taxonomy_classyfire_03class" = "ClassyFire#class",
+            "ClassyFire#class Probability",
+            "structure_taxonomy_classyfire_04directparent" = "ClassyFire#most specific class",
+            "ClassyFire#most specific class Probability"
+          )
+        ))
 
       ## TODO score not optimal
       compound_prepared <- compound_summary_ready |>
         dplyr::mutate(
-          score_input = ifelse(
-            test = ConfidenceScore != "N/A",
-            yes = ConfidenceScore,
-            no = -10 / as.numeric(`CSI:FingerIDScore`)
+          score_input = as.numeric(
+            ifelse(
+              test = ConfidenceScore != "N/A",
+              yes = ConfidenceScore,
+              no = -10 / as.numeric(`CSI:FingerIDScore`)
+            )
           ),
           structure_xlogp = as.numeric(xlogp)
         ) |>
@@ -165,13 +177,7 @@ prepare_annotations_sirius <-
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
-          smiles = NA,
-          ## TODO until better
-          structure_taxonomy_classyfire_chemontid = NA,
-          structure_taxonomy_classyfire_01kingdom = NA,
-          structure_taxonomy_classyfire_02superclass = NA,
-          structure_taxonomy_classyfire_03class = NA,
-          structure_taxonomy_classyfire_04directparent = NA
+          smiles = NA
         )
 
       formula_prepared <- formula |>
@@ -210,7 +216,11 @@ prepare_annotations_sirius <-
         dplyr::left_join(formulas_prepared) |>
         dplyr::left_join(canopus_npc_prepared) |>
         dplyr::distinct() |>
-        dplyr::mutate(rt_error = NA) |>
+        dplyr::mutate(
+          rt_error = NA,
+          structure_taxonomy_classyfire_chemontid = NA,
+          structure_taxonomy_classyfire_01kingdom = NA
+        ) |>
         dplyr::select(
           feature_id,
           mz_error,
