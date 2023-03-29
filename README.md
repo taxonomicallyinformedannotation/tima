@@ -37,6 +37,11 @@ git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 Rscript inst/scripts/install.R
 ```
+
+Normally, everything you need should then be installed (as tested in [here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)).
+If for some reason, some packages were not installed, try to install them manually.
+To avoid such issues, we offer a containerized version (see [Docker](#docker)).
+
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example data (set of 8,000 spectra) using:
@@ -63,7 +68,8 @@ A container is also available, together with a small compose file.
 Main commands are below:
 
 ```
-docker build . -t adafede/tima-r 
+docker pull adafede/tima-r
+# docker build . -t adafede/tima-r 
 ```
 
 ```

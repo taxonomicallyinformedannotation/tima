@@ -35,7 +35,6 @@ if (!requireNamespace("pak", quietly = TRUE)) {
   }
   if (Sys.info()[["sysname"]] == "Windows") {
     lib <- Sys.getenv("R_LIB_FOR_PAK")
-    dir.create(lib, showWarnings = FALSE, recursive = TRUE)
     install.packages("pak",
       repos = "https://r-lib.github.io/p/pak/stable",
       lib = lib
