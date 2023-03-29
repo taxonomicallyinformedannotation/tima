@@ -13,4 +13,8 @@ if (!requireNamespace("pak", quietly = TRUE)) {
   )
 }
 pak::pak(pkg = "desc")
-pak::pkg_install(pkg = desc::desc_get_urls()[[1]])
+pak::pkg_install(
+  pkg = desc::desc_get_urls()[[1]],
+  upgrade = TRUE,
+  dependencies = TRUE
+)
