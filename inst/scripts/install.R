@@ -12,9 +12,9 @@ if (!requireNamespace("pak", quietly = TRUE)) {
     )
   )
 }
-pak::pak(pkg = "desc")
-pak::pkg_install(
-  pkg = desc::desc_get_urls()[[1]],
+pak::lockfile_create(
   upgrade = TRUE,
   dependencies = TRUE
 )
+pak::lockfile_install()
+pak::pak()
