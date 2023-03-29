@@ -30,44 +30,67 @@ get_organism_taxonomy_ott <- function(df) {
 
   organisms <- organism_table$canonical_name
 
-  new_matched_otl_exact <- rotl::tnrs_match_names(
-    names = organisms,
-    do_approximate_matching = FALSE,
-    include_suppressed = FALSE
-  )
-
-  new_ott_id <- new_matched_otl_exact |>
-    dplyr::filter(!is.na(ott_id)) |>
-    dplyr::distinct(ott_id)
-
-  otts <- new_ott_id$ott_id
-
-  taxon_info <- rotl::taxonomy_taxon_info(
-    ott_ids = otts,
-    include_lineage = TRUE,
-    include_terminal_descendants = TRUE
-  )
-
-  taxon_lineage <- taxon_info |>
-    rotl::tax_lineage()
-
-  list_df <- list()
-
-  for (i in seq_along(1:length(taxon_lineage))) {
-    list_df[[i]] <- dplyr::bind_rows(
+  log_debug("Testing if Open Tree of Life API is up")
+  res <- httr::GET("https://api.opentreeoflife.org/v3/")
+  status <- res |>
+    httr::http_status()
+  if (status$category != "Success") {
+    log_debug("Sorry, Open Tree of Life API is down")
+    log_debug("Failing gracefuly and returning empty results")
+    new_matched_otl_exact <-
       data.frame(
-        id = otts[i],
-        rank = taxon_info[[i]]$rank,
-        name = taxon_info[[i]]$name,
-        unique_name = taxon_info[[i]]$unique_name,
-        ott_id = as.character(taxon_info[[i]]$ott_id)
-      ),
-      data.frame(id = otts[i], taxon_lineage[[i]])
+        "search_string" = NA_character_,
+        "ott_id" = NA_integer_,
+        "unique_name" = NA_character_
+      )
+    otl <-
+      data.frame(
+        "id" = NA_integer_,
+        "rank" = NA_character_,
+        "name" = NA_character_,
+        "unique_name" = NA_character_,
+        "ott_id" = NA_integer_
+      )
+  } else {
+    new_matched_otl_exact <- rotl::tnrs_match_names(
+      names = organisms,
+      do_approximate_matching = FALSE,
+      include_suppressed = FALSE
     )
-  }
 
-  otl <- dplyr::bind_rows(list_df) |>
-    dplyr::mutate(ott_id = as.integer(ott_id))
+    new_ott_id <- new_matched_otl_exact |>
+      dplyr::filter(!is.na(ott_id)) |>
+      dplyr::distinct(ott_id)
+
+    otts <- new_ott_id$ott_id
+
+    taxon_info <- rotl::taxonomy_taxon_info(
+      ott_ids = otts,
+      include_lineage = TRUE,
+      include_terminal_descendants = TRUE
+    )
+
+    taxon_lineage <- taxon_info |>
+      rotl::tax_lineage()
+
+    list_df <- list()
+
+    for (i in seq_along(1:length(taxon_lineage))) {
+      list_df[[i]] <- dplyr::bind_rows(
+        data.frame(
+          id = otts[i],
+          rank = taxon_info[[i]]$rank,
+          name = taxon_info[[i]]$name,
+          unique_name = taxon_info[[i]]$unique_name,
+          ott_id = as.character(taxon_info[[i]]$ott_id)
+        ),
+        data.frame(id = otts[i], taxon_lineage[[i]])
+      )
+    }
+
+    otl <- dplyr::bind_rows(list_df) |>
+      dplyr::mutate(ott_id = as.integer(ott_id))
+  }
 
   biological_metadata <-
     dplyr::left_join(organism_table, new_matched_otl_exact) |>
