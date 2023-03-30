@@ -8,7 +8,9 @@ library(targets)
 library(tarchetypes)
 
 # Set target options:
-tar_option_set()
+tar_option_set(
+  memory = "transient"
+)
 
 # tar_make_clustermq() configuration (okay to leave alone):
 
@@ -983,6 +985,7 @@ list(
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = library_spectra_is_lotus_prepared_pos,
+          garbage_collection = TRUE,
           command = {
             library_spectra_is_lotus_prepared_pos <- prepare_libraries_spectra(
               input = if (paths$tests$mode == FALSE) {
@@ -1020,6 +1023,7 @@ list(
         ),
         tar_file(
           name = library_spectra_is_lotus_prepared_neg,
+          garbage_collection = TRUE,
           command = {
             library_spectra_is_lotus_prepared_neg <- prepare_libraries_spectra(
               input = if (paths$tests$mode == FALSE) {
@@ -1071,6 +1075,7 @@ list(
           ## TODO improve polarity handling, suboptimal
           tar_file(
             name = library_spectra_exp_internal_prepared_pos,
+            garbage_collection = TRUE,
             command = {
               library_spectra_exp_internal_prepared_pos <-
                 prepare_libraries_spectra(
@@ -1098,6 +1103,7 @@ list(
           ),
           tar_file(
             name = library_spectra_exp_internal_prepared_neg,
+            garbage_collection = TRUE,
             command = {
               library_spectra_exp_internal_prepared_neg <-
                 prepare_libraries_spectra(
@@ -1133,6 +1139,7 @@ list(
     list(
       tar_file(
         name = annotations_ms1_prepared,
+        garbage_collection = TRUE,
         command = {
           annotations_ms1_prepared <-
             annotate_masses(
@@ -1194,6 +1201,7 @@ list(
         ),
         tar_file(
           name = annotations_spectral_exp_internal_pos,
+          garbage_collection = TRUE,
           command = {
             annotations_spectral_exp_internal_pos <- annotate_spectra(
               input = input_spectra,
@@ -1222,6 +1230,7 @@ list(
         ),
         tar_file(
           name = annotations_spectral_exp_internal_neg,
+          garbage_collection = TRUE,
           command = {
             annotations_spectral_exp_internal_neg <- annotate_spectra(
               input = input_spectra,
@@ -1279,6 +1288,7 @@ list(
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = annotations_spectral_is_lotus_pos,
+          garbage_collection = TRUE,
           command = {
             annotations_spectral_is_lotus_pos <- annotate_spectra(
               input = input_spectra,
@@ -1307,6 +1317,7 @@ list(
         ),
         tar_file(
           name = annotations_spectral_is_lotus_neg,
+          garbage_collection = TRUE,
           command = {
             annotations_spectral_is_lotus_neg <- annotate_spectra(
               input = input_spectra,
