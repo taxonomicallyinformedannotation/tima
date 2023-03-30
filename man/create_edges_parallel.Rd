@@ -7,13 +7,13 @@
 create_edges_parallel(index, frags, precs, nspecs)
 }
 \arguments{
+\item{index}{Indices}
+
 \item{frags}{Fragments}
 
 \item{precs}{Precursors}
 
 \item{nspecs}{Number of spectra}
-
-\item{x}{Indices}
 }
 \description{
 This function part of the creation of edges

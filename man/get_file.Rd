@@ -17,5 +17,5 @@ get_file(url, export, limit = 1000)
 This function get files
 }
 \examples{
-get_file(url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv", export = "data/source/examples/metadata.tsv")
+get_file(url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv", export = "data/source/example_metadata.tsv")
 }

@@ -1,3 +1,5 @@
+library(timaR)
+
 ## need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Whole process", {
   ## Copy needed files and directories
@@ -166,14 +168,13 @@ testthat::test_that("Whole process", {
 
   #### ISDB
   ## smaller version for testing
-  create_dir(paths$data$source$libraries$spectra$is$lotus$pos)
-  utils::download.file(
+  get_file(
     url = paths$url$examples$spectral_lib$pos,
-    destfile = paths$data$source$libraries$spectra$is$lotus$pos
+    export = paths$data$source$libraries$spectra$is$lotus$pos
   )
-  utils::download.file(
+  get_file(
     url = paths$url$examples$spectral_lib$neg,
-    destfile = paths$data$source$libraries$spectra$is$lotus$neg
+    export = paths$data$source$libraries$spectra$is$lotus$neg
   )
 
   ## Prepare libraries

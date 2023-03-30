@@ -10,7 +10,7 @@
 #'
 #' @export
 #'
-#' @examples get_file(url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/metadata.tsv", export = "data/source/examples/metadata.tsv")
+#' @examples get_file(url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv", export = "data/source/example_metadata.tsv")
 get_file <-
   function(url,
            export,

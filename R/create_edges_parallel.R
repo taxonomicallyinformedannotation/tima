@@ -2,7 +2,7 @@
 #'
 #' @description This function part of the creation of edges
 #'
-#' @param x Indices
+#' @param index Indices
 #' @param frags Fragments
 #' @param precs Precursors
 #' @param nspecs Number of spectra
