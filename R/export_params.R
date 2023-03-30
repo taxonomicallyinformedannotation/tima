@@ -10,7 +10,7 @@
 #'
 #' @export
 #'
-#' @examples export_params(parameters = list(), directory = ".", step = "step")
+#' @examples NULL
 export_params <-
   function(parameters = params,
            directory = paths$data$interim$params$path,

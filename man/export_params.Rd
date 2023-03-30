@@ -21,5 +21,5 @@ export_params(
 This function writes the parameters to a YAML file in the specified directory.
 }
 \examples{
-export_params(parameters = list(), directory = ".", step = "step")
+NULL
 }
