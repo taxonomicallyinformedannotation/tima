@@ -1,6 +1,5 @@
 ## need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Whole process", {
-  library(timaR)
   ## Copy needed files and directories
   # diff <- "../.."
   # papath <- "paths.yaml"
