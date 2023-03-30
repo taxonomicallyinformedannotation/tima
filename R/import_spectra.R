@@ -24,6 +24,12 @@ import_spectra <- function(file) {
         CompoundDb::Spectra() |>
         ## TODO change it as soon as https://github.com/RforMassSpectrometry/MsBackendSql will be available
         Spectra::setBackend(Spectra::MsBackendMemory())
+    },
+    "rds" = {
+      readRDS(file = file) |>
+        Spectra::Spectra() |>
+        ## TODO change it as soon as https://github.com/RforMassSpectrometry/MsBackendSql will be available
+        Spectra::setBackend(Spectra::MsBackendMemory())
     }
   )
 }

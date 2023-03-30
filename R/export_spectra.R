@@ -18,60 +18,61 @@ export_spectra <- function(file,
                            dir = ".",
                            cmps = NULL,
                            metad = NULL) {
-  switch(
-    EXPR = gsub(
-      pattern = ".*\\.",
-      replacement = "",
-      x = file
-    ),
-    "mgf" = {
-      Spectra::Spectra(object = spectra) |>
-        Spectra::export(
-          backend = MsBackendMgf::MsBackendMgf(),
-          file = file
-        )
-    },
-    "sqlite" = {
-      if (is.null(cmps)) {
-        cmps <-
-          data.frame(
-            compound_id = spectra$compound_id,
-            name = spectra$name,
-            inchi = spectra$inchi,
-            inchikey = spectra$inchikey,
-            exactmass = spectra$exactmass,
-            formula = spectra$formula,
-            synonyms = spectra$synonyms
-          )
-      }
-      if (is.null(metad)) {
-        metad <-
-          data.frame(
-            name = c(
-              "source",
-              "url",
-              "source_version",
-              "source_date",
-              "organism"
-            ),
-            value = c(
-              NA,
-              NA,
-              0,
-              Sys.time() |>
-                as.character(),
-              NA
-            )
-          )
-      }
-
-      CompoundDb::createCompDb(
-        x = cmps,
-        metadata = metad,
-        msms_spectra = spectra,
-        path = dir,
-        dbFile = file
-      )
-    }
-  )
+  spectra |>
+    saveRDS(file = file)
+  # switch(
+  #   EXPR = gsub(
+  #     pattern = ".*\\.",
+  #     replacement = "",
+  #     x = file
+  #   ),
+  #   "mgf" = {
+  #     Spectra::Spectra(object = spectra) |>
+  #       Spectra::export(
+  #         backend = MsBackendMgf::MsBackendMgf(),
+  #         file = file
+  #       )
+  #   },
+  #   "sqlite" = {
+  #     if (is.null(cmps)) {
+  #       cmps <-
+  #         data.frame(
+  #           compound_id = spectra$compound_id,
+  #           name = spectra$name,
+  #           inchi = spectra$inchi,
+  #           inchikey = spectra$inchikey,
+  #           exactmass = spectra$exactmass,
+  #           formula = spectra$formula,
+  #           synonyms = spectra$synonyms
+  #         )
+  #     }
+  #     if (is.null(metad)) {
+  #       metad <-
+  #         data.frame(
+  #           name = c(
+  #             "source",
+  #             "url",
+  #             "source_version",
+  #             "source_date",
+  #             "organism"
+  #           ),
+  #           value = c(
+  #             NA,
+  #             NA,
+  #             0,
+  #             Sys.time() |>
+  #               as.character(),
+  #             NA
+  #           )
+  #         )
+  #     }
+  #     CompoundDb::createCompDb(
+  #       x = cmps,
+  #       metadata = metad,
+  #       msms_spectra = spectra,
+  #       path = dir,
+  #       dbFile = file
+  #     )
+  #   }
+  # )
 }

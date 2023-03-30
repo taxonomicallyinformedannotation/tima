@@ -146,14 +146,14 @@
       "@type": "SoftwareApplication",
       "identifier": "CompoundDb",
       "name": "CompoundDb",
-      "version": ">= 1.2.1",
+      "version": ">= 1.3.3",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
         "name": "Bioconductor",
         "url": "https://www.bioconductor.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/CompoundDb.html"
+      "sameAs": "https://github.com/RforMassSpectrometry/CompoundDb"
     },
     "7": {
       "@type": "SoftwareApplication",
@@ -276,40 +276,40 @@
       "@type": "SoftwareApplication",
       "identifier": "MetaboAnnotation",
       "name": "MetaboAnnotation",
-      "version": ">= 1.2.0",
+      "version": ">= 1.3.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
         "name": "Bioconductor",
         "url": "https://www.bioconductor.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboAnnotation.html"
+      "sameAs": "https://github.com/RforMassSpectrometry/MetaboAnnotation"
     },
     "17": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.6.0",
+      "version": ">= 1.7.5",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
         "name": "Bioconductor",
         "url": "https://www.bioconductor.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
+      "sameAs": "https://github.com/RforMassSpectrometry/MsBackendMgf"
     },
     "18": {
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
-      "version": ">= 1.10.0",
+      "version": ">= 1.11.5",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
         "name": "Bioconductor",
         "url": "https://www.bioconductor.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
+      "sameAs": "https://github.com/RforMassSpectrometry/MsCoreUtils"
     },
     "19": {
       "@type": "SoftwareApplication",
@@ -458,14 +458,14 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.8.3",
+      "version": ">= 1.9.14",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
         "name": "Bioconductor",
         "url": "https://www.bioconductor.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
+      "sameAs": "https://github.com/RforMassSpectrometry/Spectra"
     },
     "31": {
       "@type": "SoftwareApplication",
@@ -571,7 +571,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "15060.077KB",
+  "fileSize": "302264.738KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

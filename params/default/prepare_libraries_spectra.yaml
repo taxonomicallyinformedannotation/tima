@@ -12,11 +12,11 @@ files:
 
         #' List of negative experimental spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/exp/internal_neg.sqlite
+          - data/interim/libraries/spectra/exp/internal_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/exp/internal_pos.sqlite
+          - data/interim/libraries/spectra/exp/internal_pos.rds
 
         #' List of raw experimental spectral libraries. STRING
         raw:
@@ -27,11 +27,11 @@ files:
 
         #' List of negative in silico spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/is/lotus_pos.sqlite
+          - data/interim/libraries/spectra/is/lotus_pos.rds
 
         #' List of positive in silico spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/is/lotus_neg.sqlite
+          - data/interim/libraries/spectra/is/lotus_neg.rds
 
         #' List of raw in silico spectral libraries. STRING
         raw:
