@@ -43,16 +43,16 @@ data:
         exp:
           path: data/interim/libraries/spectra/exp
           mona:
-          pos: data/interim/libraries/spectra/exp/mona_pos.sqlite
-          neg: data/interim/libraries/spectra/exp/mona_neg.sqlite
+          pos: data/interim/libraries/spectra/exp/mona_pos.rds
+          neg: data/interim/libraries/spectra/exp/mona_neg.rds
         is:
           path: data/interim/libraries/spectra/is
           hmdb:
-            pos: data/interim/libraries/spectra/is/hmdb_pos.sqlite
-            neg: data/interim/libraries/spectra/is/hmdb_neg.sqlite
+            pos: data/interim/libraries/spectra/is/hmdb_pos.rds
+            neg: data/interim/libraries/spectra/is/hmdb_neg.rds
           lotus:
-            pos: data/interim/libraries/spectra/is/lotus_pos.sqlite
-            neg: data/interim/libraries/spectra/is/lotus_neg.sqlite
+            pos: data/interim/libraries/spectra/is/lotus_pos.rds
+            neg: data/interim/libraries/spectra/is/lotus_neg.rds
     params:
       path: data/interim/params
     taxa:
