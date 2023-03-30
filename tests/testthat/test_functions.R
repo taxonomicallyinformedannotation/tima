@@ -51,11 +51,7 @@ testthat::test_that("Whole process", {
   # )
 
   ## Prepare parameters
-  paths <- parse_yaml_paths()
-  vars <- ls(all.names = TRUE)
-  for (i in 1:length(vars)) {
-    assign(vars[i], get(vars[i]), envir = .GlobalEnv)
-  }
+  paths <<- parse_yaml_paths()
   step <- "prepare_params"
   params <- get_params(step = step)
   ## Prepare config for a single step only
@@ -100,7 +96,6 @@ testthat::test_that("Whole process", {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = NULL
   )
-
 
   ### Spectra
   #### Mini version for tests

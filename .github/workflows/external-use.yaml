@@ -35,7 +35,6 @@ jobs:
           Rscript inst/scripts/install.R
       - name: Run tests
         run: |
-          Rscript inst/scripts/change_tests.R
           Rscript inst/scripts/tima_mini.R
           # Check if targets works correctly
           Rscript inst/scripts/tima_mini.R
