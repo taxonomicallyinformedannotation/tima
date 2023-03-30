@@ -25,6 +25,7 @@ jobs:
         with:
           extra-packages: any::covr
           needs: coverage
+          pak-version: devel
 
       - name: Additional step for tests to run
         run: |
