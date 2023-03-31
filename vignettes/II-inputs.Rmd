@@ -119,7 +119,7 @@ source(file = "inst/scripts/get_gnps_tables.R")
 
 To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
 
-```{r setup, include = FALSE}
+```{r include = FALSE}
 unlink("data/source/example_spectra.mgf")
 ```
 
