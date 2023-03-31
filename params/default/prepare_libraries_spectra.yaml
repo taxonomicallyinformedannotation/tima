@@ -27,16 +27,16 @@ files:
 
         #' List of negative in silico spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/is/lotus_pos.rds
+          - data/interim/libraries/spectra/is/lotus_neg.rds
 
         #' List of positive in silico spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/is/lotus_neg.rds
+          - data/interim/libraries/spectra/is/lotus_pos.rds
 
         #' List of raw in silico spectral libraries. STRING
         raw:
-         - data/source/libraries/spectra/is/lotus_pos.rds
          - data/source/libraries/spectra/is/lotus_neg.rds
+         - data/source/libraries/spectra/is/lotus_pos.rds
 
 #' MS related parameters.
 ms:
