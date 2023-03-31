@@ -204,7 +204,8 @@ testthat::test_that("Whole process", {
   ### LOTUS
   ## Pos
   prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[1]],
+    input = params$files$libraries$spectral$is$raw[[1]] |>
+      gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds"),
     output = params$files$libraries$spectral$is$pos,
     col_ce = NULL,
     col_ci = "FILENAME",
@@ -232,12 +233,14 @@ testthat::test_that("Whole process", {
   )
   ## Check the library already exists warning
   prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[1]],
+    input = params$files$libraries$spectral$is$raw[[1]] |>
+      gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds"),
     output = params$files$libraries$spectral$is$pos
   )
   ## Neg & without metadata
   prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[2]],
+    input = params$files$libraries$spectral$is$raw[[2]] |>
+      gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds"),
     output = params$files$libraries$spectral$is$neg,
     col_ce = NULL,
     col_ci = "FILENAME",
