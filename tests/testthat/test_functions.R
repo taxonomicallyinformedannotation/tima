@@ -115,17 +115,17 @@ testthat::test_that("Whole process", {
 
   #### SIRIUS
   ## mini version for tests
-  sirius_mini <- paths$data$interim$annotations$example_sirius |>
-    gsub(pattern = ".zip", replacement = "_mini.zip")
-  get_file(
-    url = paths$urls$examples$sirius_mini,
-    export = sirius_mini
-  )
-  message("Unzipping")
-  utils::unzip(
-    zipfile = sirius_mini,
-    exdir = dirname(sirius_mini)
-  )
+  # sirius_mini <- paths$data$interim$annotations$example_sirius |>
+  #   gsub(pattern = ".zip", replacement = "_mini.zip")
+  # get_file(
+  #   url = paths$urls$examples$sirius_mini,
+  #   export = sirius_mini
+  # )
+  # message("Unzipping")
+  # utils::unzip(
+  #   zipfile = sirius_mini,
+  #   exdir = dirname(sirius_mini)
+  # )
   # get_file(
   #   url = paths$urls$examples$sirius,
   #   export = paths$data$interim$annotations$example_sirius
