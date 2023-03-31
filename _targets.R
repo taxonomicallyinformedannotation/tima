@@ -939,23 +939,23 @@ list(
             name = library_spectra_is_lotus_pos,
             command = {
               library_spectra_is_lotus_pos <-
-                if (paths$tests$mode == FALSE) {
-                  get_file(
-                    url = paths$urls$examples$spectral_lib$pos,
-                    export = paths$data$source$libraries$spectra$is$lotus$pos |>
-                      gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
-                  )
-                  # get_last_version_from_zenodo(
-                  #   doi = paths$url$lotus_isdb$doi,
-                  #   pattern = paths$urls$lotus_isdb$pattern$pos,
-                  #   path = paths$data$source$libraries$spectra$is$lotus$pos
-                  # )
-                } else {
-                  get_file(
-                    url = paths$urls$examples$spectral_lib$pos,
-                    export = paths$data$source$libraries$spectra$is$lotus$pos
-                  )
-                }
+                # if (paths$tests$mode == FALSE) {
+                get_file(
+                  url = paths$urls$examples$spectral_lib$pos,
+                  export = paths$data$source$libraries$spectra$is$lotus$pos |>
+                    gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
+                )
+              # get_last_version_from_zenodo(
+              #   doi = paths$url$lotus_isdb$doi,
+              #   pattern = paths$urls$lotus_isdb$pattern$pos,
+              #   path = paths$data$source$libraries$spectra$is$lotus$pos
+              # )
+              # } else {
+              #   get_file(
+              #     url = paths$urls$examples$spectral_lib$pos,
+              #     export = paths$data$source$libraries$spectra$is$lotus$pos
+              #   )
+              # }
             }
             ## To always check if a newest version is available
             ,
@@ -966,23 +966,23 @@ list(
             name = library_spectra_is_lotus_neg,
             command = {
               library_spectra_is_lotus_neg <-
-                if (paths$tests$mode == FALSE) {
-                  get_file(
-                    url = paths$urls$examples$spectral_lib$neg,
-                    export = paths$data$source$libraries$spectra$is$lotus$neg |>
-                      gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
-                  )
-                  # get_last_version_from_zenodo(
-                  #   doi = paths$url$lotus_isdb$doi,
-                  #   pattern = paths$urls$lotus_isdb$pattern$neg,
-                  #   path = paths$data$source$libraries$spectra$is$lotus$neg
-                  # )
-                } else {
-                  get_file(
-                    url = paths$urls$examples$spectral_lib$neg,
-                    export = paths$data$source$libraries$spectra$is$lotus$neg
-                  )
-                }
+                # if (paths$tests$mode == FALSE) {
+                get_file(
+                  url = paths$urls$examples$spectral_lib$neg,
+                  export = paths$data$source$libraries$spectra$is$lotus$neg |>
+                    gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
+                )
+              # get_last_version_from_zenodo(
+              #   doi = paths$url$lotus_isdb$doi,
+              #   pattern = paths$urls$lotus_isdb$pattern$neg,
+              #   path = paths$data$source$libraries$spectra$is$lotus$neg
+              # )
+              # } else {
+              #   get_file(
+              #     url = paths$urls$examples$spectral_lib$neg,
+              #     export = paths$data$source$libraries$spectra$is$lotus$neg
+              #   )
+              # }
             }
             ## To always check if a newest version is available
             ,

@@ -172,7 +172,6 @@ urls:
     features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv
     metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv
     sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius.zip
-    sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_mini.zip
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf
     spectral_lib: 

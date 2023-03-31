@@ -118,23 +118,14 @@ testthat::test_that("Whole process", {
   sirius_mini <- paths$data$interim$annotations$example_sirius |>
     gsub(pattern = ".zip", replacement = "_mini.zip")
   get_file(
-    url = paths$urls$examples$sirius_mini,
-    export = sirius_mini
+    url = paths$urls$examples$sirius,
+    export = paths$data$interim$annotations$example_sirius
   )
   message("Unzipping")
   utils::unzip(
-    zipfile = sirius_mini,
-    exdir = dirname(sirius_mini)
+    zipfile = paths$data$interim$annotations$example_sirius,
+    exdir = dirname(paths$data$interim$annotations$example_sirius)
   )
-  # get_file(
-  #   url = paths$urls$examples$sirius,
-  #   export = paths$data$interim$annotations$example_sirius
-  # )
-  # message("Unzipping")
-  # utils::unzip(
-  #   zipfile = paths$data$interim$annotations$example_sirius,
-  #   exdir = dirname(paths$data$interim$annotations$example_sirius)
-  # )
 
   ### Libraries
   #### ECMDB
@@ -360,8 +351,7 @@ testthat::test_that("Whole process", {
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
   prepare_annotations_sirius(
-    input_directory = params$files$annotations$raw$sirius |>
-      gsub(pattern = "sirius", replacement = "sirius_mini")
+    input_directory = params$files$annotations$raw$sirius
   )
 
   ### ISDB results
