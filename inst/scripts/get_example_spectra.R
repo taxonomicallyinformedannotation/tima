@@ -15,7 +15,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 get_file(
-  url = paths$url$examples$spectra,
+  url = paths$urls$examples$spectra,
   export = paths$data$source$spectra
 )
 

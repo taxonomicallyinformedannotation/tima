@@ -305,7 +305,7 @@ To get a small example:
 
 ```{r}
 get_file(
-  url = paths$url$examples$spectral_lib_mini$with_rt,
+  url = paths$urls$examples$spectral_lib_mini$with_rt,
   export = paths$data$source$libraries$spectra$exp$with_rt
 )
 ```

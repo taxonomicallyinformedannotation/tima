@@ -761,7 +761,7 @@ list(
             ),
             no = {
               get_file(
-                url = paths$url$examples$spectra_mini,
+                url = paths$urls$examples$spectra_mini,
                 export = paths$data$source$spectra
               )
               return(paths$data$source$spectra)
@@ -814,7 +814,7 @@ list(
           name = library_sop_lotus,
           command = {
             library_sop_lotus <- get_last_version_from_zenodo(
-              doi = paths$url$lotus$doi,
+              doi = paths$urls$lotus$doi,
               pattern = paths$urls$lotus$pattern,
               path = paths$data$source$libraries$sop$lotus
             )
@@ -946,7 +946,7 @@ list(
                     gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
                 )
               # get_last_version_from_zenodo(
-              #   doi = paths$url$lotus_isdb$doi,
+              #   doi = paths$urls$lotus_isdb$doi,
               #   pattern = paths$urls$lotus_isdb$pattern$pos,
               #   path = paths$data$source$libraries$spectra$is$lotus$pos
               # )
@@ -973,7 +973,7 @@ list(
                     gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
                 )
               # get_last_version_from_zenodo(
-              #   doi = paths$url$lotus_isdb$doi,
+              #   doi = paths$urls$lotus_isdb$doi,
               #   pattern = paths$urls$lotus_isdb$pattern$neg,
               #   path = paths$data$source$libraries$spectra$is$lotus$neg
               # )

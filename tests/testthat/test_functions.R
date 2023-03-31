@@ -101,15 +101,15 @@ testthat::test_that("Whole process", {
   #### Mini version for tests
   ## Not including it in else statement above on purpose
   get_file(
-    url = paths$url$examples$spectra_mini,
+    url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  # get_file(url = paths$url$examples$spectra,
+  # get_file(url = paths$urls$examples$spectra,
   #               export = paths$data$source$spectra)
 
   ### Spectral library with rt
   get_file(
-    url = paths$url$examples$spectral_lib_mini$with_rt,
+    url = paths$urls$examples$spectral_lib_mini$with_rt,
     export = paths$data$source$libraries$spectra$exp$with_rt
   )
 
@@ -139,13 +139,13 @@ testthat::test_that("Whole process", {
 
   #### LOTUS
   get_last_version_from_zenodo(
-    doi = paths$url$lotus$doi,
+    doi = paths$urls$lotus$doi,
     pattern = paths$urls$lotus$pattern,
     path = paths$data$source$libraries$sop$lotus
   )
   ## Check it does not download it a second time
   get_last_version_from_zenodo(
-    doi = paths$url$lotus$doi,
+    doi = paths$urls$lotus$doi,
     pattern = paths$urls$lotus$pattern,
     path = paths$data$source$libraries$sop$lotus
   )
@@ -153,13 +153,23 @@ testthat::test_that("Whole process", {
   #### ISDB
   ## smaller version for testing
   get_file(
-    url = paths$url$examples$spectral_lib_mini$pos,
-    export = paths$data$source$libraries$spectra$is$lotus$pos
+    url = paths$urls$examples$spectral_lib$pos,
+    export = paths$data$source$libraries$spectra$is$lotus$pos |>
+      gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
   )
+  # get_file(
+  #   url = paths$urls$examples$spectral_lib_mini$pos,
+  #   export = paths$data$source$libraries$spectra$is$lotus$pos
+  # )
   get_file(
-    url = paths$url$examples$spectral_lib_mini$neg,
-    export = paths$data$source$libraries$spectra$is$lotus$neg
+    url = paths$urls$examples$spectral_lib$neg,
+    export = paths$data$source$libraries$spectra$is$lotus$neg |>
+      gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
   )
+  # get_file(
+  #   url = paths$urls$examples$spectral_lib_mini$neg,
+  #   export = paths$data$source$libraries$spectra$is$lotus$neg
+  # )
 
   ## Prepare libraries
   ### Closed

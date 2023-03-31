@@ -15,7 +15,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # get_last_version_from_zenodo(
-#   doi = paths$url$lotus$doi,
+#   doi = paths$urls$lotus$doi,
 #   pattern = paths$urls$lotus$pattern,
 #   path = paths$data$source$libraries$lotus
 # )
