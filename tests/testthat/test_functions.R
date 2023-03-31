@@ -213,8 +213,8 @@ testthat::test_that("Whole process", {
   ### LOTUS
   ## Pos
   prepare_libraries_spectra(
-    input = paths$data$source$libraries$spectra$is$lotus$pos,
-    output = paths$data$interim$libraries$spectra$is$lotus$pos,
+    input = params$files$libraries$spectral$is$raw[[1]],
+    output = params$files$libraries$spectral$is$pos,
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
@@ -241,13 +241,13 @@ testthat::test_that("Whole process", {
   )
   ## Check the library already exists warning
   prepare_libraries_spectra(
-    input = paths$data$source$libraries$spectra$is$lotus$pos,
-    output = paths$data$interim$libraries$spectra$is$lotus$pos
+    input = params$files$libraries$spectral$is$raw[[1]],
+    output = params$files$libraries$spectral$is$pos
   )
   ## Neg & without metadata
   prepare_libraries_spectra(
-    input = paths$data$source$libraries$spectra$is$lotus$neg,
-    output = paths$data$interim$libraries$spectra$is$lotus$neg,
+    input = params$files$libraries$spectral$is$raw[[2]],
+    output = params$files$libraries$spectral$is$neg,
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
