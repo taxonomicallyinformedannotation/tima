@@ -18,17 +18,21 @@ get_file <-
     if (!file.exists(export)) {
       ## Set the timeout for download
       options(timeout = limit)
-      message("Timeout for download is ",
-              getOption("timeout") / 60,
-              " minutes")
+      message(
+        "Timeout for download is ",
+        getOption("timeout") / 60,
+        " minutes"
+      )
 
       ## Create the export directory if it does not exist
       create_dir(export = export)
 
       ## Download the file from the given URL and save it to the specified location
       message("Downloading")
-      utils::download.file(url = url,
-                           destfile = export)
+      utils::download.file(
+        url = url,
+        destfile = export
+      )
     } else {
       message("File already exists. Skipping.")
     }

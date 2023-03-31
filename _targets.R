@@ -940,11 +940,15 @@ list(
             command = {
               library_spectra_is_lotus_pos <-
                 if (paths$tests$mode == FALSE) {
-                  get_last_version_from_zenodo(
-                    doi = paths$url$lotus_isdb$doi,
-                    pattern = paths$urls$lotus_isdb$pattern$pos,
-                    path = paths$data$source$libraries$spectra$is$lotus$pos
+                  get_file(
+                    url = paths$urls$examples$spectral_lib$pos,
+                    export = paths$data$source$libraries$spectra$is$lotus$pos
                   )
+                  # get_last_version_from_zenodo(
+                  #   doi = paths$url$lotus_isdb$doi,
+                  #   pattern = paths$urls$lotus_isdb$pattern$pos,
+                  #   path = paths$data$source$libraries$spectra$is$lotus$pos
+                  # )
                 } else {
                   get_file(
                     url = paths$urls$examples$spectral_lib$pos,
@@ -962,11 +966,15 @@ list(
             command = {
               library_spectra_is_lotus_neg <-
                 if (paths$tests$mode == FALSE) {
-                  get_last_version_from_zenodo(
-                    doi = paths$url$lotus_isdb$doi,
-                    pattern = paths$urls$lotus_isdb$pattern$neg,
-                    path = paths$data$source$libraries$spectra$is$lotus$neg
+                  get_file(
+                    url = paths$urls$examples$spectral_lib$neg,
+                    export = paths$data$source$libraries$spectra$is$lotus$neg
                   )
+                  # get_last_version_from_zenodo(
+                  #   doi = paths$url$lotus_isdb$doi,
+                  #   pattern = paths$urls$lotus_isdb$pattern$neg,
+                  #   path = paths$data$source$libraries$spectra$is$lotus$neg
+                  # )
                 } else {
                   get_file(
                     url = paths$urls$examples$spectral_lib$neg,
@@ -987,78 +995,80 @@ list(
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = library_spectra_is_lotus_prepared_pos,
-          garbage_collection = TRUE,
           command = {
-            library_spectra_is_lotus_prepared_pos <- prepare_libraries_spectra(
-              input = if (paths$tests$mode == FALSE) {
-                library_spectra_is_lotus_pos
-              } else {
-                paths$data$source$libraries$spectra$is$lotus$pos
-              },
-              output = paths$data$interim$libraries$spectra$is$lotus$pos,
-              col_ce = NULL,
-              col_ci = "FILENAME",
-              col_em = "EXACTMASS",
-              col_in = NULL,
-              col_io = "INCHI",
-              col_ik = NULL,
-              col_il = "NAME",
-              col_mf = "MOLECULAR_FORMULA",
-              col_na = NULL,
-              col_po = "IONMODE",
-              col_sm = NULL,
-              col_sn = "SMILES",
-              col_si = NULL,
-              col_sp = NULL,
-              col_sy = NULL,
-              col_xl = NULL,
-              polarity = "pos",
-              metad = CompoundDb::make_metadata(
-                source = "LOTUS",
-                url = "https://doi.org/10.5281/zenodo.5607185",
-                source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-                source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
-                organism = "Life"
-              )
-            )
+            library_spectra_is_lotus_prepared_pos <-
+              library_spectra_is_lotus_pos
+            # library_spectra_is_lotus_prepared_pos <- prepare_libraries_spectra(
+            #   input = if (paths$tests$mode == FALSE) {
+            #     library_spectra_is_lotus_pos
+            #   } else {
+            #     paths$data$source$libraries$spectra$is$lotus$pos
+            #   },
+            #   output = paths$data$interim$libraries$spectra$is$lotus$pos,
+            #   col_ce = NULL,
+            #   col_ci = "FILENAME",
+            #   col_em = "EXACTMASS",
+            #   col_in = NULL,
+            #   col_io = "INCHI",
+            #   col_ik = NULL,
+            #   col_il = "NAME",
+            #   col_mf = "MOLECULAR_FORMULA",
+            #   col_na = NULL,
+            #   col_po = "IONMODE",
+            #   col_sm = NULL,
+            #   col_sn = "SMILES",
+            #   col_si = NULL,
+            #   col_sp = NULL,
+            #   col_sy = NULL,
+            #   col_xl = NULL,
+            #   polarity = "pos",
+            #   metad = CompoundDb::make_metadata(
+            #     source = "LOTUS",
+            #     url = "https://doi.org/10.5281/zenodo.5607185",
+            #     source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+            #     source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            #     organism = "Life"
+            #   )
+            # )
           }
         ),
         tar_file(
           name = library_spectra_is_lotus_prepared_neg,
-          garbage_collection = TRUE,
           command = {
-            library_spectra_is_lotus_prepared_neg <- prepare_libraries_spectra(
-              input = if (paths$tests$mode == FALSE) {
-                library_spectra_is_lotus_neg
-              } else {
-                paths$data$source$libraries$spectra$is$lotus$neg
-              },
-              output = paths$data$interim$libraries$spectra$is$lotus$neg,
-              col_ce = NULL,
-              col_ci = "FILENAME",
-              col_em = "EXACTMASS",
-              col_in = NULL,
-              col_io = "INCHI",
-              col_ik = NULL,
-              col_il = "NAME",
-              col_mf = "MOLECULAR_FORMULA",
-              col_na = NULL,
-              col_po = "IONMODE",
-              col_sm = NULL,
-              col_sn = "SMILES",
-              col_si = NULL,
-              col_sp = NULL,
-              col_sy = NULL,
-              col_xl = NULL,
-              metad = CompoundDb::make_metadata(
-                source = "LOTUS",
-                url = "https://doi.org/10.5281/zenodo.5607185",
-                source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-                source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
-                organism = "Life"
-              ),
-              polarity = "neg"
-            )
+            library_spectra_is_lotus_prepared_neg <-
+              library_spectra_is_lotus_neg
+            # library_spectra_is_lotus_prepared_neg <- prepare_libraries_spectra(
+            #   input = if (paths$tests$mode == FALSE) {
+            #     library_spectra_is_lotus_neg
+            #   } else {
+            #     paths$data$source$libraries$spectra$is$lotus$neg
+            #   },
+            #   output = paths$data$interim$libraries$spectra$is$lotus$neg,
+            #   col_ce = NULL,
+            #   col_ci = "FILENAME",
+            #   col_em = "EXACTMASS",
+            #   col_in = NULL,
+            #   col_io = "INCHI",
+            #   col_ik = NULL,
+            #   col_il = "NAME",
+            #   col_mf = "MOLECULAR_FORMULA",
+            #   col_na = NULL,
+            #   col_po = "IONMODE",
+            #   col_sm = NULL,
+            #   col_sn = "SMILES",
+            #   col_si = NULL,
+            #   col_sp = NULL,
+            #   col_sy = NULL,
+            #   col_xl = NULL,
+            #   metad = CompoundDb::make_metadata(
+            #     source = "LOTUS",
+            #     url = "https://doi.org/10.5281/zenodo.5607185",
+            #     source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+            #     source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            #     organism = "Life"
+            #   ),
+            #   polarity = "neg"
+            # )
           }
         )
       ),
@@ -1077,7 +1087,6 @@ list(
           ## TODO improve polarity handling, suboptimal
           tar_file(
             name = library_spectra_exp_internal_prepared_pos,
-            garbage_collection = TRUE,
             command = {
               library_spectra_exp_internal_prepared_pos <-
                 prepare_libraries_spectra(
@@ -1105,7 +1114,6 @@ list(
           ),
           tar_file(
             name = library_spectra_exp_internal_prepared_neg,
-            garbage_collection = TRUE,
             command = {
               library_spectra_exp_internal_prepared_neg <-
                 prepare_libraries_spectra(
@@ -1141,7 +1149,6 @@ list(
     list(
       tar_file(
         name = annotations_ms1_prepared,
-        garbage_collection = TRUE,
         command = {
           annotations_ms1_prepared <-
             annotate_masses(
@@ -1203,7 +1210,6 @@ list(
         ),
         tar_file(
           name = annotations_spectral_exp_internal_pos,
-          garbage_collection = TRUE,
           command = {
             annotations_spectral_exp_internal_pos <- annotate_spectra(
               input = input_spectra,
@@ -1232,7 +1238,6 @@ list(
         ),
         tar_file(
           name = annotations_spectral_exp_internal_neg,
-          garbage_collection = TRUE,
           command = {
             annotations_spectral_exp_internal_neg <- annotate_spectra(
               input = input_spectra,
@@ -1290,7 +1295,6 @@ list(
         ## TODO improve polarity handling, suboptimal
         tar_file(
           name = annotations_spectral_is_lotus_pos,
-          garbage_collection = TRUE,
           command = {
             annotations_spectral_is_lotus_pos <- annotate_spectra(
               input = input_spectra,
@@ -1319,7 +1323,6 @@ list(
         ),
         tar_file(
           name = annotations_spectral_is_lotus_neg,
-          garbage_collection = TRUE,
           command = {
             annotations_spectral_is_lotus_neg <- annotate_spectra(
               input = input_spectra,

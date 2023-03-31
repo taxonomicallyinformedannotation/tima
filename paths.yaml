@@ -175,6 +175,9 @@ urls:
     sirius_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_mini.zip
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf
+    spectral_lib: 
+      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_neg.rds
+      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_pos.rds
     spectral_lib_mini: 
       neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_neg.mgf
       pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_pos.mgf
