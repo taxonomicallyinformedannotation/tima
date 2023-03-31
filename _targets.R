@@ -942,7 +942,8 @@ list(
                 if (paths$tests$mode == FALSE) {
                   get_file(
                     url = paths$urls$examples$spectral_lib$pos,
-                    export = paths$data$source$libraries$spectra$is$lotus$pos
+                    export = paths$data$source$libraries$spectra$is$lotus$pos |>
+                      gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
                   )
                   # get_last_version_from_zenodo(
                   #   doi = paths$url$lotus_isdb$doi,
@@ -968,7 +969,8 @@ list(
                 if (paths$tests$mode == FALSE) {
                   get_file(
                     url = paths$urls$examples$spectral_lib$neg,
-                    export = paths$data$source$libraries$spectra$is$lotus$neg
+                    export = paths$data$source$libraries$spectra$is$lotus$neg |>
+                      gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
                   )
                   # get_last_version_from_zenodo(
                   #   doi = paths$url$lotus_isdb$doi,
