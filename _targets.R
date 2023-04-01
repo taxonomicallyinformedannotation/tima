@@ -676,6 +676,7 @@ list(
       command = {
         gnps_tables <- get_gnps_tables(
           gnps_job_id = par_fin_par$gnps$id,
+          filename = par_fin_par$files$pattern,
           workflow = par_fin_par$gnps$workflow,
           path_features = params_prepare_features_tables$files$features$raw,
           path_metadata = params_prepare_taxa$files$taxa$raw,

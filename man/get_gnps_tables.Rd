@@ -6,6 +6,7 @@
 \usage{
 get_gnps_tables(
   gnps_job_id,
+  filename,
   workflow = "fbmn",
   path_features,
   path_metadata,
@@ -17,6 +18,8 @@ get_gnps_tables(
 }
 \arguments{
 \item{gnps_job_id}{GNPS job ID}
+
+\item{filename}{Name of the file}
 
 \item{workflow}{Character string indicating the type of workflow, either "fbmn" or "classical"}
 

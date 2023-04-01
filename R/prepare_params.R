@@ -80,6 +80,7 @@ prepare_params <- function(filename = params$files$pattern,
   log_debug(x = "Changing params")
 
   yamls_params$annotate_masses$ms$polarity <- ms_mode
+  yamls_params$annotate_spectra$ms$polarity <- ms_mode
 
   yamls_params$prepare_taxa$organisms$taxon <- taxon
 
@@ -100,16 +101,16 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$annotate_spectra$files$annotations$raw$spectral <-
     yamls_params$annotate_spectra$files$annotations$raw$spectral |>
     lapply(FUN = replace_id)
-  # yamls_params$annotate_spectra$files$spectral$raw <-
-  #   yamls_params$annotate_spectra$files$spectral$raw |>
-  #   lapply(FUN = replace_id)
+  yamls_params$annotate_spectra$files$spectral$raw <-
+    yamls_params$annotate_spectra$files$spectral$raw |>
+    lapply(FUN = replace_id)
 
   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
     yamls_params$create_edges_spectra$files$networks$spectral$edges$raw |>
     lapply(FUN = replace_id)
-  # yamls_params$create_edges_spectra$files$spectral$raw <-
-  #   yamls_params$create_edges_spectra$files$spectral$raw |>
-  #   lapply(FUN = replace_id)
+  yamls_params$create_edges_spectra$files$spectral$raw <-
+    yamls_params$create_edges_spectra$files$spectral$raw |>
+    lapply(FUN = replace_id)
 
   yamls_params$create_components$files$networks$spectral$edges$prepared <-
     yamls_params$create_components$files$networks$spectral$edges$prepared |>
@@ -118,9 +119,9 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$create_components$files$networks$spectral$components$raw |>
     lapply(FUN = replace_id)
 
-  # yamls_params$prepare_features_tables$files$features$raw <-
-  #   yamls_params$prepare_features_tables$files$features$raw |>
-  #   lapply(FUN = replace_id)
+  yamls_params$prepare_features_tables$files$features$raw <-
+    yamls_params$prepare_features_tables$files$features$raw |>
+    lapply(FUN = replace_id)
   yamls_params$prepare_features_tables$files$features$prepared <-
     yamls_params$prepare_features_tables$files$features$prepared |>
     lapply(FUN = replace_id)
@@ -160,12 +161,12 @@ prepare_params <- function(filename = params$files$pattern,
     yamls_params$prepare_annotations_spectra$files$annotations$prepared |>
     lapply(FUN = replace_id)
 
-  # yamls_params$prepare_taxa$files$features$raw <-
-  #   yamls_params$prepare_taxa$files$features$raw |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$prepare_taxa$files$taxa$raw <-
-  #   yamls_params$prepare_taxa$files$taxa$raw |>
-  #   lapply(FUN = replace_id)
+  yamls_params$prepare_taxa$files$features$raw <-
+    yamls_params$prepare_taxa$files$features$raw |>
+    lapply(FUN = replace_id)
+  yamls_params$prepare_taxa$files$taxa$raw <-
+    yamls_params$prepare_taxa$files$taxa$raw |>
+    lapply(FUN = replace_id)
   yamls_params$prepare_taxa$files$taxa$prepared <-
     yamls_params$prepare_taxa$files$taxa$prepared |>
     lapply(FUN = replace_id)

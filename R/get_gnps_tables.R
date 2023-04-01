@@ -3,6 +3,7 @@
 #' @description This function gets GNPS tables from corresponding job ID.
 #'
 #' @param gnps_job_id GNPS job ID
+#' @param filename Name of the file
 #' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
 #' @param path_features Path to features
 #' @param path_metadata Path to metadata
@@ -18,6 +19,7 @@
 #' @examples NULL
 get_gnps_tables <-
   function(gnps_job_id,
+           filename,
            workflow = "fbmn",
            path_features,
            path_metadata,

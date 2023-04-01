@@ -159,10 +159,12 @@ prepare_annotations_sirius <-
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(
           feature_id = harmonize_names_sirius(id),
-          score_input = ifelse(
-            test = ConfidenceScore != "N/A",
-            yes = ConfidenceScore,
-            no = -10 / `CSI:FingerIDScore`
+          score_input = as.numeric(
+            ifelse(
+              test = ConfidenceScore != "N/A",
+              yes = ConfidenceScore,
+              no = -10 / `CSI:FingerIDScore`
+            )
           )
         ) |>
         dplyr::select(

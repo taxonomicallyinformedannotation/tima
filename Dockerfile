@@ -1,5 +1,5 @@
 # Image
-FROM ghcr.io/bioconductor/bioconductor:RELEASE_3_16
+FROM bioconductor/bioconductor_docker:RELEASE_3_16
 
 # Copy files
 COPY DESCRIPTION ./DESCRIPTION
