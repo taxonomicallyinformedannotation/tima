@@ -17,6 +17,9 @@ if (Sys.info()[["sysname"]] != "Linux") {
 ###
 ###
 ## Trial to isolate from pre-existing libraries
+if (!requireNamespace("renv", quietly = TRUE)) {
+  install.packages("renv")
+}
 renv::activate()
 ###
 if (!requireNamespace("pak", quietly = TRUE)) {
