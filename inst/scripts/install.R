@@ -15,6 +15,10 @@ if (Sys.info()[["sysname"]] != "Linux") {
   renv::equip()
 }
 ###
+###
+## Trial to isolate from pre-existing libraries
+renv::activate()
+###
 if (!requireNamespace("pak", quietly = TRUE)) {
   lib <- Sys.getenv("R_LIBS_SITE")
   if (lib == "") {
