@@ -65,6 +65,7 @@ testthat::test_that("Whole process", {
   ### Features table
   if (!is.null(params$gnps$id)) {
     get_gnps_tables(
+      filename = "example",
       path_features = paths$data$source$features,
       path_metadata = paths$data$source$metadata,
       path_spectra = paths$data$source$spectra,
