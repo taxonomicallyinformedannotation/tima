@@ -85,6 +85,7 @@ testthat::test_that("Whole process", {
   }
   ## Other GNPS job id
   get_gnps_tables(
+    filename = "other",
     path_features = paths$data$source$features,
     path_metadata = paths$data$source$metadata,
     path_spectra = paths$data$source$spectra,
@@ -92,6 +93,7 @@ testthat::test_that("Whole process", {
   )
   ## When no GNPS job ID is given
   get_gnps_tables(
+    filename = "noGNPS",
     path_features = paths$data$source$features,
     path_metadata = paths$data$source$metadata,
     path_spectra = paths$data$source$spectra,
