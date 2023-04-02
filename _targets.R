@@ -1432,9 +1432,9 @@ list(
         name = interim_components,
         command = {
           interim_components <-
-            ifelse(test = file.exists(gnps_components),
-              yes = gnps_components,
-              no = features_components
+            ifelse(test = file.exists(features_components),
+              yes = features_components,
+              no = gnps_components
             )
         }
       ),
@@ -1442,9 +1442,9 @@ list(
         name = edges_spectra,
         command = {
           edges_spectra <-
-            ifelse(test = file.exists(gnps_edges),
-              yes = gnps_edges,
-              no = features_edges_spectra
+            ifelse(test = file.exists(features_edges_spectra),
+              yes = features_edges_spectra,
+              no = gnps_edges
             )
         }
       )
