@@ -211,7 +211,7 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
-      "version": ">= 0.8.0",
+      "version": ">= 0.9.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -458,7 +458,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.9.14",
+      "version": ">= 1.9.15",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -571,7 +571,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2603.766KB",
+  "fileSize": "2600.411KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
