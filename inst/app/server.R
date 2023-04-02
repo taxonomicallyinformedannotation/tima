@@ -122,7 +122,7 @@ server <- function(input, output, session) {
         )
       )
       targets::tar_make(
-        names = targets::matches("annotations_prepared$"),
+        names = matches("annotations_prepared$"),
         reporter = "verbose_positives"
       )
     }
