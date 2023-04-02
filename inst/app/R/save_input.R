@@ -2,9 +2,9 @@
 save_input <- function(input) {
   setwd("../../")
 
-  paths <- parse_yaml_paths()
+  paths <- timaR::parse_yaml_paths()
   paths_data_source <- paths$data$source$path
-  log_debug(x = "Loading default params")
+  timaR::log_debug(x = "Loading default params")
   yaml_files <- c(
     list.files(
       path = file.path(paths$params$default),
@@ -43,31 +43,31 @@ save_input <- function(input) {
   yamls_params <- yamls_default
 
   ## Params occurring more than once
-  fil_fea_raw <<- isolate(data$fil_fea_raw)[[1]]
-  fil_spe_raw <<- isolate(data$fil_spe_raw)[[1]]
-  fil_tax_raw <<- isolate(data$fil_tax_raw)[[1]]
+  fil_fea_raw <<- isolate(input$fil_fea_raw)[[1]]
+  fil_spe_raw <<- isolate(input$fil_spe_raw)[[1]]
+  fil_tax_raw <<- isolate(input$fil_tax_raw)[[1]]
 
-  filename <<- isolate(data$fil_pat)
-  gnps_job_id <<- isolate(data$gnps_id)
+  filename <<- isolate(input$fil_pat)
+  gnps_job_id <<- isolate(input$gnps_id)
   if (gnps_job_id == "") {
     gnps_job_id <<- NULL
   }
-  gnps_workflow <<- isolate(data$gnps_workflow)
-  org_tax <<- isolate(data$org_tax)
+  gnps_workflow <<- isolate(input$gnps_workflow)
+  org_tax <<- isolate(input$org_tax)
   if (org_tax == "") {
     org_tax <<- NULL
   }
-  ms_mode <<- isolate(data$ms_pol)
-  ms_tol_rt_min <<- isolate(data$ms_tol_rt_min)
-  names_source <<- isolate(data$names_source)
-  names_target <<- isolate(data$names_target)
-  fast <<- isolate(data$fast)
-  forceps <<- isolate(data$force)
-  parallel <<- isolate(data$parallel)
-  summarise <<- isolate(data$summarise)
+  ms_mode <<- isolate(input$ms_pol)
+  ms_tol_rt_min <<- isolate(input$ms_tol_rt_min)
+  names_source <<- isolate(input$names_source)
+  names_target <<- isolate(input$names_target)
+  fast <<- isolate(input$fast)
+  forceps <<- isolate(input$force)
+  parallel <<- isolate(input$parallel)
+  summarise <<- isolate(input$summarise)
 
   ## Change 1
-  log_debug(x = "Changing parameters")
+  timaR::log_debug(x = "Changing parameters")
   yamls_params$`params/prepare_params`$files$pattern <- filename
   yamls_params$`params/prepare_params`$gnps$id <- gnps_job_id
   yamls_params$`params/prepare_params`$gnps$workflow <-
@@ -80,16 +80,16 @@ save_input <- function(input) {
   yaml::write_yaml(x = yamls_params$`params/prepare_params`, file = "params/prepare_params.yaml")
 
   yamls_params$annotate_masses$ms$adducts$neg <-
-    isolate(data$ms_add_neg)
+    isolate(input$ms_add_neg)
   yamls_params$annotate_masses$ms$adducts$pos <-
-    isolate(data$ms_add_pos)
+    isolate(input$ms_add_pos)
   yamls_params$annotate_masses$ms$intensity$thresholds$ms1 <-
-    isolate(data$ms_int_thr_ms1)
+    isolate(input$ms_int_thr_ms1)
   yamls_params$annotate_masses$ms$polarity <- ms_mode
   yamls_params$annotate_masses$ms$tolerances$mass$ppm$ms1 <-
-    isolate(data$ms_tol_mas_ppm_ms1)
+    isolate(input$ms_tol_mas_ppm_ms1)
   yamls_params$annotate_masses$ms$tolerances$mass$dalton$ms1 <-
-    isolate(data$ms_tol_mas_dal_ms1)
+    isolate(input$ms_tol_mas_dal_ms1)
   yamls_params$annotate_masses$ms$tolerances$rt$minutes <-
     ms_tol_rt_min
   yamls_params$annotate_masses$names$source <- names_source
@@ -99,24 +99,24 @@ save_input <- function(input) {
   yamls_params$annotate_spectra$files$spectral$raw <-
     file.path(paths_data_source, fil_spe_raw)
   yamls_params$annotate_spectra$annotations$ms2$approx <-
-    isolate(data$ann_ms2_app)
+    isolate(input$ann_ms2_app)
   yamls_params$annotate_spectra$annotations$ms2$method <-
-    isolate(data$ann_ms2_met)
+    isolate(input$ann_ms2_met)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$condition <-
-    isolate(data$ann_ms2_thr_con)
+    isolate(input$ann_ms2_thr_con)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$peaks$absolute <-
-    isolate(data$ann_ms2_thr_pea_abs)
+    isolate(input$ann_ms2_thr_pea_abs)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$peaks$ratio <-
-    isolate(data$ann_ms2_thr_pea_rat)
+    isolate(input$ann_ms2_thr_pea_rat)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$similarity <-
-    isolate(data$ann_ms2_thr_sim)
+    isolate(input$ann_ms2_thr_sim)
   yamls_params$annotate_spectra$ms$intensity$thresholds$ms2 <-
-    isolate(data$ms_int_thr_ms2)
+    isolate(input$ms_int_thr_ms2)
   yamls_params$annotate_spectra$ms$polarity <- ms_mode
   yamls_params$annotate_spectra$ms$tolerances$mass$ppm$ms2 <-
-    isolate(data$ms_tol_mas_ppm_ms2)
+    isolate(input$ms_tol_mas_ppm_ms2)
   yamls_params$annotate_spectra$ms$tolerances$mass$dalton$ms2 <-
-    isolate(data$ms_tol_mas_dal_ms2)
+    isolate(input$ms_tol_mas_dal_ms2)
   yamls_params$annotate_spectra$ms$tolerances$rt$minutes <-
     ms_tol_rt_min
   yamls_params$annotate_spectra$options$fast <- fast
@@ -125,22 +125,22 @@ save_input <- function(input) {
   yamls_params$create_edges_spectra$files$spectral$raw <-
     file.path(paths_data_source, fil_spe_raw)
   yamls_params$create_edges_spectra$annotations$ms2$method <-
-    isolate(data$ann_ms2_met)
+    isolate(input$ann_ms2_met)
   yamls_params$create_edges_spectra$annotations$ms2$thresholds$condition <-
-    isolate(data$ann_ms2_met)
+    isolate(input$ann_ms2_met)
   yamls_params$create_edges_spectra$annotations$ms2$thresholds$peaks$absolute <-
-    isolate(data$ann_ms2_thr_pea_abs)
+    isolate(input$ann_ms2_thr_pea_abs)
   yamls_params$create_edges_spectra$annotations$ms2$thresholds$peaks$ratio <-
-    isolate(data$ann_ms2_thr_pea_rat)
+    isolate(input$ann_ms2_thr_pea_rat)
   yamls_params$create_edges_spectra$annotations$ms2$thresholds$similarity <-
-    isolate(data$ann_ms2_thr_sim)
+    isolate(input$ann_ms2_thr_sim)
   yamls_params$create_edges_spectra$ms$intensity$thresholds$ms2 <-
-    isolate(data$ms_int_thr_ms2)
+    isolate(input$ms_int_thr_ms2)
   yamls_params$create_edges_spectra$ms$polarity <- ms_mode
   yamls_params$create_edges_spectra$ms$tolerances$mass$ppm$ms2 <-
-    isolate(data$ms_tol_mas_ppm_ms2)
+    isolate(input$ms_tol_mas_ppm_ms2)
   yamls_params$create_edges_spectra$ms$tolerances$mass$dalton$ms2 <-
-    isolate(data$ms_tol_mas_dal_ms2)
+    isolate(input$ms_tol_mas_dal_ms2)
   yamls_params$create_edges_spectra$ms$tolerances$rt$minutes <-
     ms_tol_rt_min
   yamls_params$create_edges_spectra$names$source <- names_source
@@ -154,18 +154,18 @@ save_input <- function(input) {
   yamls_params$prepare_features_tables$files$features$raw <-
     file.path(paths_data_source, fil_fea_raw)
   yamls_params$prepare_features_tables$names$features <-
-    isolate(data$names_features)
+    isolate(input$names_features)
   yamls_params$prepare_features_tables$names$precursor <-
-    isolate(data$names_precursor)
+    isolate(input$names_precursor)
   yamls_params$prepare_features_tables$names$rt <-
-    isolate(data$names_rt)
+    isolate(input$names_rt)
 
   yamls_params$prepare_libraries_sop_merged$organisms$filter$mode <-
-    isolate(data$org_fil_mod)
+    isolate(input$org_fil_mod)
   yamls_params$prepare_libraries_sop_merged$organisms$filter$level <-
-    isolate(data$org_fil_lev)
+    isolate(input$org_fil_lev)
   yamls_params$prepare_libraries_sop_merged$organisms$filter$value <-
-    isolate(data$org_fil_val)
+    isolate(input$org_fil_val)
 
   yamls_params$prepare_libraries_spectra$ms$polarity <- ms_mode
 
@@ -174,80 +174,80 @@ save_input <- function(input) {
   yamls_params$prepare_taxa$files$taxa$raw <-
     file.path(paths_data_source, fil_tax_raw)
   yamls_params$prepare_taxa$names$extension <-
-    isolate(data$names_extension)
-  yamls_params$prepare_taxa$names$taxon <- isolate(data$names_taxon)
+    isolate(input$names_extension)
+  yamls_params$prepare_taxa$names$taxon <- isolate(input$names_taxon)
   yamls_params$prepare_taxa$organisms$candidates <-
-    isolate(data$org_can)
+    isolate(input$org_can)
   yamls_params$prepare_taxa$organisms$taxon <- org_tax
 
   yamls_params$weight_annotations$annotations$candidates$initial <-
-    isolate(data$ann_can_ini)
+    isolate(input$ann_can_ini)
   yamls_params$weight_annotations$annotations$candidates$final <-
-    isolate(data$ann_can_fin)
+    isolate(input$ann_can_fin)
   yamls_params$weight_annotations$annotations$ms1only <-
-    isolate(data$ann_ms1only)
+    isolate(input$ann_ms1only)
   yamls_params$weight_annotations$annotations$ms1$thresholds$biological <-
-    isolate(data$ann_ms1_thr_bio)
+    isolate(input$ann_ms1_thr_bio)
   yamls_params$weight_annotations$annotations$ms1$thresholds$chemical <-
-    isolate(data$ann_ms1_thr_che)
+    isolate(input$ann_ms1_thr_che)
   yamls_params$weight_annotations$annotations$ms1$thresholds$condition <-
-    isolate(data$ann_ms1_thr_con)
+    isolate(input$ann_ms1_thr_con)
   yamls_params$weight_annotations$weights$global$biological <-
-    isolate(data$wei_glo_bio)
+    isolate(input$wei_glo_bio)
   yamls_params$weight_annotations$weights$global$chemical <-
-    isolate(data$wei_glo_che)
+    isolate(input$wei_glo_che)
   yamls_params$weight_annotations$weights$global$spectral <-
-    isolate(data$wei_glo_spe)
+    isolate(input$wei_glo_spe)
   yamls_params$weight_annotations$weights$biological$domain <-
-    isolate(data$wei_bio_01)
+    isolate(input$wei_bio_01)
   yamls_params$weight_annotations$weights$biological$kingdom <-
-    isolate(data$wei_bio_02)
+    isolate(input$wei_bio_02)
   yamls_params$weight_annotations$weights$biological$phylum <-
-    isolate(data$wei_bio_03)
+    isolate(input$wei_bio_03)
   yamls_params$weight_annotations$weights$biological$class <-
-    isolate(data$wei_bio_04)
+    isolate(input$wei_bio_04)
   yamls_params$weight_annotations$weights$biological$order <-
-    isolate(data$wei_bio_05)
+    isolate(input$wei_bio_05)
   yamls_params$weight_annotations$weights$biological$infraorder <-
-    isolate(data$wei_bio_06)
+    isolate(input$wei_bio_06)
   yamls_params$weight_annotations$weights$biological$family <-
-    isolate(data$wei_bio_07)
+    isolate(input$wei_bio_07)
   yamls_params$weight_annotations$weights$biological$subfamily <-
-    isolate(data$wei_bio_08)
+    isolate(input$wei_bio_08)
   yamls_params$weight_annotations$weights$biological$tribe <-
-    isolate(data$wei_bio_09)
+    isolate(input$wei_bio_09)
   yamls_params$weight_annotations$weights$biological$subtribe <-
-    isolate(data$wei_bio_10)
+    isolate(input$wei_bio_10)
   yamls_params$weight_annotations$weights$biological$genus <-
-    isolate(data$wei_bio_11)
+    isolate(input$wei_bio_11)
   yamls_params$weight_annotations$weights$biological$subgenus <-
-    isolate(data$wei_bio_12)
+    isolate(input$wei_bio_12)
   yamls_params$weight_annotations$weights$biological$species <-
-    isolate(data$wei_bio_13)
+    isolate(input$wei_bio_13)
   yamls_params$weight_annotations$weights$biological$subspecies <-
-    isolate(data$wei_bio_14)
+    isolate(input$wei_bio_14)
   yamls_params$weight_annotations$weights$biological$variety <-
-    isolate(data$wei_bio_15)
+    isolate(input$wei_bio_15)
   yamls_params$weight_annotations$weights$chemical$cla$kingdom <-
-    isolate(data$wei_che_11)
+    isolate(input$wei_che_11)
   yamls_params$weight_annotations$weights$chemical$cla$superclass <-
-    isolate(data$wei_che_12)
+    isolate(input$wei_che_12)
   yamls_params$weight_annotations$weights$chemical$cla$superclass <-
-    isolate(data$wei_che_13)
+    isolate(input$wei_che_13)
   yamls_params$weight_annotations$weights$chemical$cla$parent <-
-    isolate(data$wei_che_14)
+    isolate(input$wei_che_14)
   yamls_params$weight_annotations$weights$chemical$npc$pathway <-
-    isolate(data$wei_che_11)
+    isolate(input$wei_che_11)
   yamls_params$weight_annotations$weights$chemical$npc$superclass <-
-    isolate(data$wei_che_12)
+    isolate(input$wei_che_12)
   yamls_params$weight_annotations$weights$chemical$npc$class <-
-    isolate(data$wei_che_13)
+    isolate(input$wei_che_13)
   yamls_params$weight_annotations$options$force <- forceps
   yamls_params$weight_annotations$options$summarise <-
-    isolate(data$summarise)
+    isolate(input$summarise)
 
   # Change 3
-  log_debug(x = "Changing filenames")
+  timaR::log_debug(x = "Changing filenames")
 
   # yamls_params$annotate_masses$files$annotations$prepared <-
   #   yamls_params$annotate_masses$files$annotations$prepared |>
@@ -355,7 +355,7 @@ save_input <- function(input) {
     gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
 
-  create_dir(export = yaml_export[[1]])
+  timaR::create_dir(export = yaml_export[[1]])
 
   lapply(
     X = seq_along(yamls_params),

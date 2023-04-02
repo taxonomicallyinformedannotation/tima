@@ -65,64 +65,84 @@ server <- function(input, output, session) {
       shinyjs::hide("params")
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
-      targets::tar_watch_server(id = "tar_watch")
-      targets::tar_watch(
-        port = 3839,
-        display = "graph",
-        displays = c("summary", "graph"),
-        degree_from = 10,
-        # level_separation = 500,
-        outdated = TRUE,
-        # targets_only = TRUE,
-        supervise = TRUE,
-        verbose = TRUE,
-        exclude = c(
-          "yaml_paths",
-          "paths",
-          "par_def_ann_mas",
-          "par_def_ann_spe",
-          "par_def_cre_com",
-          "par_def_cre_edg_spe",
-          "par_def_pre_ann_gnp",
-          "par_def_pre_ann_sir",
-          "par_def_pre_ann_spe",
-          "par_def_pre_fea_com",
-          "par_def_pre_fea_edg",
-          "par_def_pre_fea_tab",
-          "par_def_pre_lib_add",
-          "par_def_pre_lib_sop_clo",
-          "par_def_pre_lib_sop_ecm",
-          "par_def_pre_lib_sop_lot",
-          "par_def_pre_lib_sop_mer",
-          "par_def_pre_lib_spe",
-          "par_def_pre_tax",
-          "par_def_wei_ann",
-          "par_fin_par",
-          "par_pre_par",
-          "par_usr_ann_mas",
-          "par_usr_ann_spe",
-          "par_usr_cre_com",
-          "par_usr_cre_edg_spe",
-          "par_usr_pre_ann_gnp",
-          "par_usr_pre_ann_sir",
-          "par_usr_pre_ann_spe",
-          "par_usr_pre_fea_com",
-          "par_usr_pre_fea_edg",
-          "par_usr_pre_fea_tab",
-          "par_usr_pre_lib_add",
-          "par_usr_pre_lib_sop_clo",
-          "par_usr_pre_lib_sop_ecm",
-          "par_usr_pre_lib_sop_lot",
-          "par_usr_pre_lib_sop_mer",
-          "par_usr_pre_lib_spe",
-          "par_usr_pre_tax",
-          "par_usr_wei_ann",
-          ".Random.seed"
-        )
+      tryCatch(
+        expr = {
+          setwd("../..")
+          targets::tar_watch_server(id = "tar_watch")
+          targets::tar_watch(
+            port = 3839,
+            display = "graph",
+            displays = c("summary", "graph"),
+            degree_from = 10,
+            # level_separation = 500,
+            outdated = TRUE,
+            # targets_only = TRUE,
+            supervise = TRUE,
+            verbose = TRUE,
+            exclude = c(
+              "yaml_paths",
+              "paths",
+              "par_def_ann_mas",
+              "par_def_ann_spe",
+              "par_def_cre_com",
+              "par_def_cre_edg_spe",
+              "par_def_pre_ann_gnp",
+              "par_def_pre_ann_sir",
+              "par_def_pre_ann_spe",
+              "par_def_pre_fea_com",
+              "par_def_pre_fea_edg",
+              "par_def_pre_fea_tab",
+              "par_def_pre_lib_add",
+              "par_def_pre_lib_sop_clo",
+              "par_def_pre_lib_sop_ecm",
+              "par_def_pre_lib_sop_lot",
+              "par_def_pre_lib_sop_mer",
+              "par_def_pre_lib_spe",
+              "par_def_pre_tax",
+              "par_def_wei_ann",
+              "par_fin_par",
+              "par_pre_par",
+              "par_usr_ann_mas",
+              "par_usr_ann_spe",
+              "par_usr_cre_com",
+              "par_usr_cre_edg_spe",
+              "par_usr_pre_ann_gnp",
+              "par_usr_pre_ann_sir",
+              "par_usr_pre_ann_spe",
+              "par_usr_pre_fea_com",
+              "par_usr_pre_fea_edg",
+              "par_usr_pre_fea_tab",
+              "par_usr_pre_lib_add",
+              "par_usr_pre_lib_sop_clo",
+              "par_usr_pre_lib_sop_ecm",
+              "par_usr_pre_lib_sop_lot",
+              "par_usr_pre_lib_sop_mer",
+              "par_usr_pre_lib_spe",
+              "par_usr_pre_tax",
+              "par_usr_wei_ann",
+              ".Random.seed"
+            )
+          )
+          targets::tar_make(
+            names = matches("annotations_prepared$"),
+            reporter = "verbose_positives"
+          )
+        }, finally = {
+          stopApp()
+        }
       )
-      targets::tar_make(
-        names = matches("annotations_prepared$"),
-        reporter = "verbose_positives"
+      process <- reactiveValues(status = targets::tar_active())
+      observe({
+        invalidateLater(millis = 5000)
+        process$status <- targets::tar_active()
+      })
+
+      observeEvent(
+        eventExpr = process$status,
+        handlerExpr = {
+          message("Job finished")
+          stopApp()
+        }
       )
     }
   )
