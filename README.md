@@ -59,8 +59,7 @@ Once you are done, you can open a small GUI to adapt your parameters and launch 
 Rscript inst/scripts/run_app.R
 ```
 
-This command will open a small app you can access by entering the following address into your browser: <http://localhost:3838>
-
+This command will open a small app in your default browser.
 
 ### Docker
 

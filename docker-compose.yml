@@ -20,7 +20,7 @@ services:
       - "./params:/params"
       - "./inst:/inst"
       - "./data:/data"
-    command: Rscript inst/scripts/run_app.R
+    command: Rscript inst/scripts/run_app_docker.R
 
   tima-mini:
     build: "."
