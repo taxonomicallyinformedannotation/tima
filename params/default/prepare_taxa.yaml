@@ -41,6 +41,9 @@ names:
   #' The file(s) extension is present in the sample name. BOOLEAN
   extension: yes
 
+  #' Name of "feature IDs" variable in the input. STRING
+  features: row ID
+
   #' Name of the "taxon name" variable in the input. STRING
   taxon: ATTRIBUTE_species
 

@@ -615,7 +615,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Name of the `feature id` column in your features file.",
-              "The default corresponds to the default in MZmine."
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'slaw_id'",
             )
           ),
         checkboxInput(
@@ -640,7 +641,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Name of the `precursor m/z` column in your features file.",
-              "The default corresponds to the default in MZmine."
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'mz'",
             )
           ),
         textInput(
@@ -653,6 +655,7 @@ ui <- fluidPage(
             content = c(
               "Name of the `retention time` column in your features file.",
               "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'rt'",
               "Assumed to be in minutes."
             )
           ),
@@ -1208,11 +1211,11 @@ ui <- fluidPage(
     )),
     shinyjs::hidden(div(
       id = "job_msg",
-      h3("Job is running!"),
-      h4("You can follow it at", a(
-        href = "http://localhost:3839/",
-        "http://localhost:3839/"
-      ))
+      h3("Job is running!")
+      # h4("You can follow it at", a(
+      #   href = "http://localhost:3839/",
+      #   "http://localhost:3839/"
+      # ))
     )),
     shinyjs::hidden(div(
       targets::tar_watch_ui(

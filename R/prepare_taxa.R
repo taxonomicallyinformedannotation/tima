@@ -8,6 +8,7 @@
 #'
 #' @param input File containing your features intensities
 #' @param extension Does your column names contain the file extension? (MZmine mainly)
+#' @param name_features Name of the features column in the features data
 #' @param colname Name of the column containing biological source information
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities
@@ -24,6 +25,7 @@
 prepare_taxa <-
   function(input = params$files$features$raw,
            extension = params$names$extension,
+           name_features = params$names$features,
            colname = params$names$taxon,
            metadata = params$files$taxa$raw,
            top_k = params$organisms$candidates,
@@ -53,12 +55,15 @@ prepare_taxa <-
 
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
+    log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table |>
       dplyr::select(
-        `row ID`,
-        dplyr::matches(" Peak area")
+        dplyr::all_of(name_features),
+        dplyr::matches(" Peak area"),
+        dplyr::matches("quant_"),
       ) |>
-      tibble::column_to_rownames(var = "row ID")
+      dplyr::select(-dplyr::matches("quant_peaktable")) |>
+      tibble::column_to_rownames(var = name_features)
     colnames(feature_table) <-
       stringr::str_remove(
         string = colnames(feature_table),

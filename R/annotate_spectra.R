@@ -162,7 +162,11 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       MetaboAnnotation::matchedData() |>
       data.frame() |>
       dplyr::mutate(
-        feature_id = as.numeric(acquisitionNum),
+        feature_id = ifelse(
+          test = !is.na(SLAW_ID),
+          yes = as.numeric(SLAW_ID),
+          no = as.numeric(acquisitionNum)
+        ),
         ## Working in minutes
         rt_error = (target_rtime - rtime) / 60,
         mz_error = target_precursorMz - precursorMz,

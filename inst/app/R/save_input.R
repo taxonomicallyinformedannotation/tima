@@ -175,6 +175,8 @@ save_input <- function(input) {
     file.path(paths_data_source, fil_tax_raw)
   yamls_params$prepare_taxa$names$extension <-
     isolate(input$names_extension)
+  yamls_params$prepare_taxa$names$features <-
+    isolate(input$names_features)
   yamls_params$prepare_taxa$names$taxon <- isolate(input$names_taxon)
   yamls_params$prepare_taxa$organisms$candidates <-
     isolate(input$org_can)

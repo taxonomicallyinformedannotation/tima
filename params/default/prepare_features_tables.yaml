@@ -13,6 +13,7 @@ files:
 #' Names of the different variables in the input files.
 names:
 
+  #' Name of "feature IDs" variable in the input. STRING
   features: 'row ID'
 
   #' Name of "precursor m/z" variable in the input. STRING
