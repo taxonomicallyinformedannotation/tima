@@ -211,6 +211,17 @@ get_gnps_tables <-
           paste0(filename, "_edges_spectra.tsv")
         )
       )
+      if (length(path_metadata) == 0) {
+        path_metadata <- "data/source/metadata.tsv"
+        fake_metadata <- data.frame(
+          filename = NULL,
+          ATTRIBUTE_species = NULL
+        )
+        export_output(
+          x = fake_metadata,
+          file = path_metadata
+        )
+      }
 
       return(
         c(
