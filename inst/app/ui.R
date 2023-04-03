@@ -616,7 +616,7 @@ ui <- fluidPage(
             content = c(
               "Name of the `feature id` column in your features file.",
               "The default corresponds to the default in MZmine.",
-              "If using SLAW, please input 'slaw_id'",
+              "If using SLAW, please input 'slaw_id'"
             )
           ),
         checkboxInput(
@@ -642,7 +642,7 @@ ui <- fluidPage(
             content = c(
               "Name of the `precursor m/z` column in your features file.",
               "The default corresponds to the default in MZmine.",
-              "If using SLAW, please input 'mz'",
+              "If using SLAW, please input 'mz'"
             )
           ),
         textInput(
