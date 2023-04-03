@@ -29,7 +29,7 @@ Imports:
     igraph (>= 1.4.1),
     jsonlite (>= 1.8.4),
     markdown (>= 1.5),
-    MetaboAnnotation (>= 1.3.1),
+    MetaboAnnotation (>= 1.3.2),
     MsBackendMgf (>= 1.7.5),
     MsCoreUtils (>= 1.11.5),
     parallelly (>= 1.35.0),
