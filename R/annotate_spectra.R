@@ -160,10 +160,14 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     log_debug("Collecting results")
     df_final <- matches_sim |>
       MetaboAnnotation::matchedData() |>
-      data.frame() |>
+      data.frame()
+
+    isSlaw <- "SLAW_ID" %in% colnames(df_final)
+
+    df_final <- df_final |>
       dplyr::mutate(
         feature_id = ifelse(
-          test = !is.na(SLAW_ID),
+          test = isSlaw,
           yes = as.numeric(SLAW_ID),
           no = as.numeric(acquisitionNum)
         ),
