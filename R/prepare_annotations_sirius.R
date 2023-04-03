@@ -258,18 +258,6 @@ prepare_annotations_sirius <-
           str_tax_cla = str_tax_cla,
           str_tax_npc = str_tax_npc
         )
-
-      if (nrow(table |>
-        dplyr::filter(is.na(structure_exact_mass))) > 0) {
-        log_debug(
-          "Warning:",
-          nrow(table |> dplyr::filter(is.na(
-            structure_exact_mass
-          ))),
-          "features have no exact mass.",
-          "This is somehow unexpected and under investigation."
-        )
-      }
     } else {
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
       table <- data.frame(
