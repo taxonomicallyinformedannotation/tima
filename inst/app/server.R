@@ -1,3 +1,4 @@
+library(shinyvalidate)
 source(file = "R/save_input.R")
 
 options(shiny.maxRequestSize = 1000 * 1024^2)
