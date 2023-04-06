@@ -282,6 +282,9 @@ testthat::test_that("Whole process", {
     output = params$files$libraries$spectral$exp |>
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
+  ## missing due to current .rds export
+  spectra <- params$files$libraries$spectral$exp |>
+    import_spectra()
 
   ### HMDB
   # prepare_isdb_hmdb()
