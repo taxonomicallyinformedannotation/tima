@@ -99,6 +99,14 @@ testthat::test_that("Whole process", {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = NULL
   )
+  ## When GNPS job ID == ""
+  get_gnps_tables(
+    filename = "noNoGNPS",
+    path_features = paths$data$source$features,
+    path_metadata = list(),
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = ""
+  )
 
   ### Spectra
   #### Mini version for tests
