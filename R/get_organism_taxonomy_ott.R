@@ -31,7 +31,7 @@ get_organism_taxonomy_ott <- function(df) {
   organisms <- organism_table$canonical_name
 
   log_debug("Testing if Open Tree of Life API is up")
-  res <- httr::GET("https://api.opentreeoflife.org/v3/")
+  res <- httr::POST("https://api.opentreeoflife.org/v3/taxonomy/about")
   status <- res |>
     httr::http_status()
   if (status$category != "Success") {
