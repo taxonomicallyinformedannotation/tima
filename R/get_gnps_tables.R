@@ -71,15 +71,33 @@ get_gnps_tables <-
           paste0(names(gnps_job_id), "_metadata.tsv")
         )
       if (!file.exists(file_metadata)) {
-        get_file(
-          url = paste0(
-            gnps_url,
-            gnps_job_id,
-            gnps_block,
-            "metadata_table/"
-          ),
-          export = file_metadata
+        url <- paste0(
+          gnps_url,
+          gnps_job_id,
+          gnps_block,
+          "metadata_table/"
         )
+        res <- httr::GET(url)
+        status <- res |>
+          httr::http_status()
+
+        if (status$category == "Success") {
+          get_file(
+            url = url,
+            export = file_metadata
+          )
+        } else {
+          log_debug("The given GNPS job ID has no metadata")
+          log_debug("Returning empty dataframes instead")
+          fake_metadata <- data.frame(
+            filename = NULL,
+            ATTRIBUTE_species = NULL
+          )
+          export_output(
+            x = fake_metadata,
+            file = file_metadata
+          )
+        }
       }
 
       log_debug("... Spectra")

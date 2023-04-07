@@ -83,13 +83,13 @@ testthat::test_that("Whole process", {
       export = paths$data$source$metadata
     )
   }
-  ## Other GNPS job id
+  ## Other GNPS job id (without metadata)
   get_gnps_tables(
     filename = "other",
     path_features = paths$data$source$features,
     path_metadata = paths$data$source$metadata,
     path_spectra = paths$data$source$spectra,
-    gnps_job_id = "2a49fa45a5a74a8794399619d07359b5"
+    gnps_job_id = "958d60d32e0c43bc9a06798b744f41c7"
   )
   ## When no GNPS job ID and no metadata are given
   get_gnps_tables(

@@ -443,6 +443,19 @@
     },
     "29": {
       "@type": "SoftwareApplication",
+      "identifier": "shinyvalidate",
+      "name": "shinyvalidate",
+      "version": ">= 0.1.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
+    },
+    "30": {
+      "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
       "version": ">= 0.7.6",
@@ -454,7 +467,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "30": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -467,12 +480,12 @@
       },
       "sameAs": "https://github.com/RforMassSpectrometry/Spectra"
     },
-    "31": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "32": {
+    "33": {
       "@type": "SoftwareApplication",
       "identifier": "stringr",
       "name": "stringr",
@@ -485,7 +498,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringr"
     },
-    "33": {
+    "34": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -498,7 +511,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "34": {
+    "35": {
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
@@ -511,7 +524,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tarchetypes"
     },
-    "35": {
+    "36": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -524,7 +537,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "36": {
+    "37": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -537,12 +550,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "37": {
+    "38": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "38": {
+    "39": {
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
@@ -555,7 +568,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     },
-    "39": {
+    "40": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -571,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2608.133KB",
+  "fileSize": "2609.074KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
