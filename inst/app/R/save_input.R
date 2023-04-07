@@ -69,6 +69,8 @@ save_input <- function(input) {
   ## Change 1
   timaR::log_debug(x = "Changing parameters")
   yamls_params$`params/prepare_params`$files$pattern <- filename
+  yamls_params$`params/prepare_params`$files$features$raw <- fil_fea_raw
+  yamls_params$`params/prepare_params`$files$spectral$raw <- fil_spe_raw
   yamls_params$`params/prepare_params`$gnps$id <- gnps_job_id
   yamls_params$`params/prepare_params`$gnps$workflow <-
     gnps_workflow
