@@ -4,10 +4,15 @@
 \alias{get_organism_taxonomy_ott}
 \title{Get organism taxonomy (Open Tree of Life Taxonomy)}
 \usage{
-get_organism_taxonomy_ott(df)
+get_organism_taxonomy_ott(
+  df,
+  url = "https://api.opentreeoflife.org/v3/taxonomy/about"
+)
 }
 \arguments{
 \item{df}{Dataframe containing your organism(s) name(s)}
+
+\item{url}{url of the ott api (for testing purposes)}
 }
 \description{
 This function retrieves taxonomy from the Open Tree of Life taxonomy

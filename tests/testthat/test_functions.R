@@ -408,6 +408,13 @@ testthat::test_that("Whole process", {
   prepare_taxa(extension = FALSE)
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
+  ## Tests for ott API
+  fake_taxon_df <- data.frame("organism" = "Gentiana lutea")
+  get_organism_taxonomy_ott(df = fake_taxon_df)
+  get_organism_taxonomy_ott(
+    df = fake_taxon_df,
+    url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
+  )
 
   ## Perform TIMA
   step <- "weight_annotations"

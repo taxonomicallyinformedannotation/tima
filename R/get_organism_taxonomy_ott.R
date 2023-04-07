@@ -3,13 +3,14 @@
 #' @description This function retrieves taxonomy from the Open Tree of Life taxonomy
 #'
 #' @param df Dataframe containing your organism(s) name(s)
+#' @param url url of the ott api (for testing purposes)
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-get_organism_taxonomy_ott <- function(df) {
+get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
     dplyr::mutate(organism = stringr::str_remove(
       string = organism,
@@ -31,7 +32,7 @@ get_organism_taxonomy_ott <- function(df) {
   organisms <- organism_table$canonical_name
 
   log_debug("Testing if Open Tree of Life API is up")
-  res <- httr::POST("https://api.opentreeoflife.org/v3/taxonomy/about")
+  res <- httr::POST(url = url)
   status <- res |>
     httr::http_status()
   if (status$category != "Success") {
