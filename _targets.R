@@ -1111,7 +1111,8 @@ list(
                   col_si = params_prepare_libraries_spectra$names$mgf$spectrum_id,
                   col_sp = params_prepare_libraries_spectra$names$mgf$splash,
                   col_sy = params_prepare_libraries_spectra$names$mgf$synonyms,
-                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp
+                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp,
+                  parameters = params_prepare_libraries_spectra
                 )
             }
           ),
@@ -1138,7 +1139,8 @@ list(
                   col_si = params_prepare_libraries_spectra$names$mgf$spectrum_id,
                   col_sp = params_prepare_libraries_spectra$names$mgf$splash,
                   col_sy = params_prepare_libraries_spectra$names$mgf$synonyms,
-                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp
+                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp,
+                  parameters = params_prepare_libraries_spectra
                 )
             }
           )
