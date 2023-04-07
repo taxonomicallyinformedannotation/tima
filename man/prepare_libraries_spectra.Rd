@@ -25,7 +25,7 @@ prepare_libraries_spectra(
   col_sp = params$names$mgf$splash,
   col_sy = params$names$mgf$synonyms,
   col_xl = params$names$mgf$xlogp,
-  parameters = NULL
+  parameters = params
 )
 }
 \arguments{

@@ -58,6 +58,8 @@ testthat::test_that("Whole process", {
   prepare_params(step = "weight_annotations")
   ## For all steps
   prepare_params()
+  ## With empty GNPS ID
+  prepare_params(gnps_job_id = "")
   ## When previous params exist
   prepare_params()
 
@@ -112,6 +114,11 @@ testthat::test_that("Whole process", {
   #### Mini version for tests
   ## Not including it in else statement above on purpose
   unlink(paths$data$source$spectra)
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  ## Checking if file already exists
   get_file(
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
@@ -404,6 +411,8 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   ## Forcing all features to a single source organism
   prepare_taxa(taxon = "Homo sapiens")
+  ## When empty
+  prepare_taxa(taxon = "")
   ## Without file extension in the column names
   prepare_taxa(extension = FALSE)
   ## Attributing based on intensity (multiple source organisms)

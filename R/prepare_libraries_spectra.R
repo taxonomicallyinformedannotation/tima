@@ -50,12 +50,10 @@ prepare_libraries_spectra <-
            col_sp = params$names$mgf$splash,
            col_sy = params$names$mgf$synonyms,
            col_xl = params$names$mgf$xlogp,
-           parameters = NULL) {
+           parameters = params) {
     stopifnot("Your input file does not exist." = file.exists(input))
     stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
-    if (!is.null(parameters)) {
-      params <<- parameters
-    }
+    params <<- parameters
 
     if (length(output) > 1) {
       output <- output[output |>
@@ -100,9 +98,7 @@ prepare_libraries_spectra <-
         meta = metad
       )
     }
-    if (!is.null(parameters)) {
-      export_params(step = "prepare_libraries_spectra")
-    }
+    export_params(step = "prepare_libraries_spectra")
 
     return(output)
   }
