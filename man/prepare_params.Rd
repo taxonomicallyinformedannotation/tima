@@ -6,6 +6,8 @@
 \usage{
 prepare_params(
   filename = params$files$pattern,
+  features = params$files$features$raw,
+  spectra = params$files$spectral$raw,
   gnps_job_id = params$gnps$id,
   ms_mode = params$ms$polarity,
   taxon = params$organisms$taxon,
@@ -16,6 +18,10 @@ prepare_params(
 }
 \arguments{
 \item{filename}{Name of the file}
+
+\item{features}{File containing the features table}
+
+\item{spectra}{File containing the spectra}
 
 \item{gnps_job_id}{GNPS job ID}
 

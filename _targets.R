@@ -212,6 +212,8 @@ list(
             par_usr_ann_mas <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -227,6 +229,8 @@ list(
             par_usr_ann_spe <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -241,6 +245,8 @@ list(
             par_usr_cre_com <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -255,6 +261,8 @@ list(
             par_usr_cre_edg_spe <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -269,6 +277,8 @@ list(
             par_usr_pre_ann_gnp <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -283,6 +293,8 @@ list(
             par_usr_pre_ann_sir <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -297,6 +309,8 @@ list(
             par_usr_pre_ann_spe <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -311,6 +325,8 @@ list(
             par_usr_pre_fea_com <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -325,6 +341,8 @@ list(
             par_usr_pre_fea_edg <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -339,6 +357,8 @@ list(
             par_usr_pre_fea_tab <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -353,6 +373,8 @@ list(
             par_usr_pre_lib_add <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -367,6 +389,8 @@ list(
             par_usr_pre_lib_sop_clo <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -381,6 +405,8 @@ list(
             par_usr_pre_lib_sop_ecm <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -395,6 +421,8 @@ list(
         #     par_usr_pre_lib_sop_hmd <-
         #       prepare_params(
         #         filename = par_fin_par$files$pattern,
+        #         features = par_fin_par$files$features$raw,
+        #         spectra = par_fin_par$files$spectral$raw,
         #         gnps_job_id = par_fin_par$gnps$id,
         #         ms_mode = par_fin_par$ms$polarity,
         #         taxon = par_fin_par$organisms$taxon,
@@ -409,6 +437,8 @@ list(
             par_usr_pre_lib_sop_lot <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -423,6 +453,8 @@ list(
             par_usr_pre_lib_sop_mer <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -437,6 +469,8 @@ list(
             par_usr_pre_lib_spe <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -451,6 +485,8 @@ list(
             par_usr_pre_tax <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
@@ -465,6 +501,8 @@ list(
             par_usr_wei_ann <-
               prepare_params(
                 filename = par_fin_par$files$pattern,
+                features = par_fin_par$files$features$raw,
+                spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,

@@ -2,6 +2,14 @@
 files:
   #' Pattern used to recognize the files. STRING
   pattern: example
+  #' Features files.
+  features:
+    #' Raw features file. STRING
+    raw: data/source/example_features.csv
+  #' Spectral files.
+  spectral:
+    #' Raw spectral file. STRING
+    raw: data/source/example_spectra.mgf
 
 #' GNPS related parameters.
 gnps:

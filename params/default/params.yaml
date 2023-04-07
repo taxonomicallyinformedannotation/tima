@@ -233,7 +233,7 @@ files:
     #' Taxonomically informed features file. STRING
     prepared: data/interim/taxa/example_taxed.tsv.gz
 
-  #' Spectral files. STRING
+  #' Spectral files.
   spectral:
 
     #' Raw spectral file. STRING
