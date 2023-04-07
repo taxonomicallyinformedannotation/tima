@@ -10,7 +10,8 @@
 #' @export
 #'
 #' @examples NULL
-get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
+get_organism_taxonomy_ott <- function(df,
+                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
     dplyr::mutate(organism = stringr::str_remove(
       string = organism,
