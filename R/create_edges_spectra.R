@@ -91,9 +91,13 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
     ## old version, keep in case
     # par <- if (parallel) {
-    #   BiocParallel::MulticoreParam()
+    #   if (.Platform$OS.type == "windows") {
+    #     BiocParallel::SnowParam(progressbar = TRUE)
+    #   } else {
+    #     BiocParallel::MulticoreParam(progressbar = TRUE)
+    #   }
     # } else {
-    #   BiocParallel::SerialParam()
+    #   BiocParallel::SerialParam(progressbar = TRUE)
     # }
     # sim_fun <- switch(
     #   EXPR = method,

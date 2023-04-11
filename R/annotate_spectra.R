@@ -73,9 +73,13 @@ annotate_spectra <- function(input = params$files$spectral$raw,
   }
 
   par <- if (parallel) {
-    BiocParallel::MulticoreParam()
+    if (.Platform$OS.type == "windows") {
+      BiocParallel::SnowParam(progressbar = TRUE)
+    } else {
+      BiocParallel::MulticoreParam(progressbar = TRUE)
+    }
   } else {
-    BiocParallel::SerialParam()
+    BiocParallel::SerialParam(progressbar = TRUE)
   }
 
   log_debug("Loading spectra...")
