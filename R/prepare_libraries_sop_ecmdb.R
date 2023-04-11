@@ -27,10 +27,13 @@ prepare_libraries_sop_ecmdb <-
           replacement = ""
         )
 
-      ecmdb <- jsonlite::stream_in(con = unz(
-        description = input,
-        filename = file
-      ))
+      ## Get rid of the annoying incomplete final line warning
+      suppressWarnings(expr = {
+        ecmdb <- jsonlite::stream_in(con = unz(
+          description = input,
+          filename = file
+        ))
+      })
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>

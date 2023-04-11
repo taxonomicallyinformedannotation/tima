@@ -91,6 +91,7 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$prepare_taxa$organisms$taxon <- taxon
 
   yamls_params$weight_annotations$options$summarise <- summarise
+  yamls_params$weight_annotations$files$pattern <- filename
 
   log_debug(x = "Changing filenames")
 
@@ -185,9 +186,9 @@ prepare_params <- function(filename = params$files$pattern,
   yamls_params$weight_annotations$files$annotations$prepared <-
     yamls_params$weight_annotations$files$annotations$prepared |>
     lapply(FUN = replace_id)
-  yamls_params$weight_annotations$files$annotations$processed <-
-    yamls_params$weight_annotations$files$annotations$processed |>
-    lapply(FUN = replace_id)
+  # yamls_params$weight_annotations$files$annotations$processed <-
+  #   yamls_params$weight_annotations$files$annotations$processed |>
+  #   lapply(FUN = replace_id)
   yamls_params$weight_annotations$files$features$prepared <-
     yamls_params$weight_annotations$files$features$prepared |>
     lapply(FUN = replace_id)

@@ -45,6 +45,7 @@ weight_annotations(
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   ms1_only = params$annotations$ms1only,
   summarise = params$options$summarise,
+  pattern = params$files$pattern,
   force = params$options$force,
   parameters = params
 )
@@ -129,6 +130,8 @@ weight_annotations(
 \item{ms1_only}{Boolean. Keep only MS1 annotations}
 
 \item{summarise}{Boolean. Summarize results (1 row per feature)}
+
+\item{pattern}{Pattern to identify your job. STRING}
 
 \item{force}{Force parameters. Use it at your own risk}
 

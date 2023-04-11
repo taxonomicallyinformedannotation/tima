@@ -54,6 +54,7 @@ get_organism_taxonomy_ott <- function(df,
         "ott_id" = NA_integer_
       )
   } else {
+    log_debug("Success! Submitting request...")
     new_matched_otl_exact <- rotl::tnrs_match_names(
       names = organisms,
       do_approximate_matching = FALSE,

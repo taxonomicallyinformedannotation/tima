@@ -43,6 +43,7 @@
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param ms1_only Boolean. Keep only MS1 annotations
 #' @param summarise Boolean. Summarize results (1 row per feature)
+#' @param pattern Pattern to identify your job. STRING
 #' @param parameters Params
 #'
 #' @return NULL
@@ -94,6 +95,7 @@ weight_annotations <-
            # TODO ADD CONDITION,
            ms1_only = params$annotations$ms1only,
            summarise = params$options$summarise,
+           pattern = params$files$pattern,
            force = params$options$force,
            parameters = params) {
     stopifnot(
@@ -246,7 +248,7 @@ weight_annotations <-
 
     log_debug(x = "Exporting ...")
     time <- format(Sys.time(), "%y%m%d_%H%M%OS")
-    dir_time <- file.path(paths$data$processed$path, time)
+    dir_time <- file.path(paths$data$processed$path, paste0(time, "_", pattern))
     final_output <- file.path(
       dir_time,
       output

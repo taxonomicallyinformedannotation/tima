@@ -249,8 +249,8 @@ save_input <- function(input) {
   yamls_params$weight_annotations$weights$chemical$npc$class <-
     isolate(input$wei_che_13)
   yamls_params$weight_annotations$options$force <- forceps
-  yamls_params$weight_annotations$options$summarise <-
-    isolate(input$summarise)
+  yamls_params$weight_annotations$options$summarise <- summarise
+  yamls_params$weight_annotations$files$pattern <- filename
 
   # Change 3
   timaR::log_debug(x = "Changing filenames")

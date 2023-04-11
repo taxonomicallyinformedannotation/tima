@@ -1588,6 +1588,7 @@ list(
         # TODO ADD CONDITION
         ms1_only = params_weight_annotations$annotations$ms1only,
         summarise = params_weight_annotations$options$summarise,
+        pattern = params_weight_annotations$files$pattern,
         force = params_weight_annotations$options$force,
         parameters = params_weight_annotations
       )
@@ -1643,6 +1644,7 @@ list(
         # TODO ADD CONDITION
         ms1_only = params_weight_annotations$annotations$ms1only,
         summarise = params_weight_annotations$options$summarise,
+        pattern = params_weight_annotations$files$pattern,
         force = params_weight_annotations$options$force,
         parameters = params_weight_annotations
       )
