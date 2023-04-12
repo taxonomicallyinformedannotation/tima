@@ -1,3 +1,24 @@
+utils::globalVariables(
+  c(
+    "consensus_structure_cla_cla",
+    "consensus_structure_cla_kin",
+    "consensus_structure_cla_par",
+    "consensus_structure_cla_sup",
+    "consensus_structure_npc_cla",
+    "consensus_structure_npc_pat",
+    "consensus_structure_npc_sup",
+    "score_chemical",
+    "score_chemical_cla_class",
+    "score_chemical_cla_kingdom",
+    "score_chemical_cla_parent",
+    "score_chemical_cla_superclass",
+    "score_chemical_npc_class",
+    "score_chemical_npc_pathway",
+    "score_chemical_npc_superclass",
+    "structure_inchikey_2D"
+  )
+)
+
 #' @title Decorate chemo
 #'
 #' @description This function outputs information about chemical weighting

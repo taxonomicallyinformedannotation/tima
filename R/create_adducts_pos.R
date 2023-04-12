@@ -1,3 +1,23 @@
+utils::globalVariables(
+  c(
+    "acetonitrile",
+    "ammonium",
+    "calcium",
+    "dmso",
+    "ethylamine",
+    "exact_mass",
+    "iron",
+    "isopropanol",
+    "magnesium",
+    "methanol",
+    "name",
+    "potassium",
+    "proton",
+    "sodium",
+    "value"
+  )
+)
+
 #' @title Create adducts positive
 #'
 #' @description This function creates positive adducts

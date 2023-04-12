@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "score_input"
+  )
+)
+
 #' @title Weight annotations
 #'
 #' @description This function weights and eventually complements initial annotations.

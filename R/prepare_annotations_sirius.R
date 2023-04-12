@@ -1,3 +1,36 @@
+utils::globalVariables(
+  c(
+    "ConfidenceScore",
+    "CSI:FingerIDScore",
+    "feature_id",
+    "id",
+    "inchikey_2D",
+    "InChIkey2D",
+    "ionMass",
+    "massErrorPrecursor(ppm)",
+    "molecular_formula",
+    "molecularFormula",
+    "mz_error",
+    "name",
+    "rt_error",
+    "score_input",
+    "smiles",
+    "smiles_2D",
+    "structure_exact_mass",
+    "structure_name",
+    "structure_taxonomy_classyfire_01kingdom",
+    "structure_taxonomy_classyfire_02superclass",
+    "structure_taxonomy_classyfire_03class",
+    "structure_taxonomy_classyfire_04directparent",
+    "structure_taxonomy_classyfire_chemontid",
+    "structure_taxonomy_npclassifier_01pathway",
+    "structure_taxonomy_npclassifier_02superclass",
+    "structure_taxonomy_npclassifier_03class",
+    "structure_xlogp",
+    "xlogp"
+  )
+)
+
 #' @title Prepare annotations SIRIUS
 #'
 #' @description This function prepares Sirius results to make them compatible

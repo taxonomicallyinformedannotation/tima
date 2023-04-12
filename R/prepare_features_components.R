@@ -1,3 +1,10 @@
+utils::globalVariables(
+  c(
+    "cluster index",
+    "componentindex"
+  )
+)
+
 #' @title Prepare features components
 #'
 #' @description This function prepares the components (clusters in molecular network) for further use

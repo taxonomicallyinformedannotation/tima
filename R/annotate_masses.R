@@ -29,8 +29,6 @@ utils::globalVariables(
     "mz_min",
     "mz.x",
     "mz.y",
-    "params",
-    "paths",
     "rt",
     "rt_error",
     "rt_max",

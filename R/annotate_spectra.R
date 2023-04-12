@@ -1,3 +1,24 @@
+utils::globalVariables(
+  c(
+    "acquisitionNum",
+    "feature_id",
+    "matched_peaks_count",
+    "precursorMz",
+    "presence_ratio",
+    "rtime",
+    "score",
+    "SLAW_ID",
+    "structure_inchikey_2D",
+    "structure_smiles_2D",
+    "target_inchikey",
+    "target_inchikey_2D",
+    "target_precursorMz",
+    "target_rtime",
+    "target_smiles",
+    "target_smiles_2D"
+  )
+)
+
 #' @title Annotate spectra
 #'
 #' @description This function annotates spectra

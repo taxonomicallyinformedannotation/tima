@@ -1,3 +1,16 @@
+utils::globalVariables(
+  c(
+    "column",
+    "feature_id",
+    "filename",
+    "organism",
+    "organism_name",
+    "organism_taxonomy_ottid",
+    "rowname",
+    "value"
+  )
+)
+
 #' @title Prepare taxa
 #'
 #' @description This function performs taxon name preparation to match the Open Tree of Life taxonomy

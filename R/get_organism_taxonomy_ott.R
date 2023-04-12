@@ -1,3 +1,12 @@
+utils::globalVariables(
+  c(
+    "canonical_name",
+    "organism",
+    "ott_id",
+    "search_string"
+  )
+)
+
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
 #'
 #' @description This function retrieves taxonomy from the Open Tree of Life taxonomy

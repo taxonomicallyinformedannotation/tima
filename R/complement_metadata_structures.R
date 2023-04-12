@@ -1,3 +1,40 @@
+utils::globalVariables(
+  c(
+    "structure_exact_mass",
+    "structure_exact_mass_i",
+    "structure_exact_mass_s",
+    "structure_inchikey_2D",
+    "structure_inchikey_2D_s",
+    "structure_molecular_formula",
+    "structure_molecular_formula_i",
+    "structure_molecular_formula_s",
+    "structure_name",
+    "structure_name_i",
+    "structure_name_s",
+    "structure_smiles_2D",
+    "structure_smiles_2D_i",
+    "structure_taxonomy_classyfire_01kingdom",
+    "structure_taxonomy_classyfire_01kingdom_i",
+    "structure_taxonomy_classyfire_02superclass",
+    "structure_taxonomy_classyfire_02superclass_i",
+    "structure_taxonomy_classyfire_03class",
+    "structure_taxonomy_classyfire_03class_i",
+    "structure_taxonomy_classyfire_04directparent",
+    "structure_taxonomy_classyfire_04directparent_i",
+    "structure_taxonomy_classyfire_chemontid",
+    "structure_taxonomy_classyfire_chemontid_i",
+    "structure_taxonomy_npclassifier_01pathway",
+    "structure_taxonomy_npclassifier_01pathway_s",
+    "structure_taxonomy_npclassifier_02superclass",
+    "structure_taxonomy_npclassifier_02superclass_s",
+    "structure_taxonomy_npclassifier_03class",
+    "structure_taxonomy_npclassifier_03class_s",
+    "structure_xlogp",
+    "structure_xlogp_i",
+    "structure_xlogp_s"
+  )
+)
+
 #' @title Complement metadata of structures
 #'
 #' @description This function complement structural metadata

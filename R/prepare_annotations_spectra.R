@@ -1,3 +1,27 @@
+utils::globalVariables(
+  c(
+    "feature_id",
+    "mz_error",
+    "rt_error",
+    "score",
+    "score_input",
+    "structure_exact_mass",
+    "structure_inchikey_2D",
+    "structure_molecular_formula",
+    "structure_name",
+    "structure_smiles_2D",
+    "structure_taxonomy_classyfire_01kingdom",
+    "structure_taxonomy_classyfire_02superclass",
+    "structure_taxonomy_classyfire_03class",
+    "structure_taxonomy_classyfire_04directparent",
+    "structure_taxonomy_classyfire_chemontid",
+    "structure_taxonomy_npclassifier_01pathway",
+    "structure_taxonomy_npclassifier_02superclass",
+    "structure_taxonomy_npclassifier_03class",
+    "structure_xlogp"
+  )
+)
+
 #' @title Prepare annotations MS2
 #'
 #' @description This function prepares the spectral matches obtained previously to make them compatible

@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "group"
+  )
+)
+
 #' @title Extract spectra from a Spectra object
 #'
 #' @description This function extracts spectra from a `Spectra`object

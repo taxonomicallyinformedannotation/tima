@@ -1,3 +1,12 @@
+utils::globalVariables(
+  c(
+    "organism_name",
+    "reference_doi",
+    "structure_inchikey",
+    "structure_smiles"
+  )
+)
+
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function prepares the libraries made of all sub-libraries containing structure-organism pairs

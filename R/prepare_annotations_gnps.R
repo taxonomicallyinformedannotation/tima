@@ -1,3 +1,37 @@
+utils::globalVariables(
+  c(
+    "#Scan#",
+    "Compound_Name",
+    "ExactMass",
+    "feature_id",
+    "InChIKey",
+    "InChIKey-Planar",
+    "MQScore",
+    "mz_error",
+    "MZErrorPPM",
+    "npclassifier_class",
+    "npclassifier_pathway",
+    "npclassifier_superclass",
+    "Precursor_MZ",
+    "rt_error",
+    "score_input",
+    "structure_exact_mass",
+    "structure_inchikey_2D",
+    "structure_molecular_formula",
+    "structure_name",
+    "structure_smiles_2D",
+    "structure_taxonomy_classyfire_01kingdom",
+    "structure_taxonomy_classyfire_02superclass",
+    "structure_taxonomy_classyfire_03class",
+    "structure_taxonomy_classyfire_04directparent",
+    "structure_taxonomy_classyfire_chemontid",
+    "structure_taxonomy_npclassifier_01pathway",
+    "structure_taxonomy_npclassifier_02superclass",
+    "structure_taxonomy_npclassifier_03class",
+    "structure_xlogp"
+  )
+)
+
 #' @title Prepare annotations GNPS
 #'
 #' @description This function prepares GNPS obtained annotations for further use

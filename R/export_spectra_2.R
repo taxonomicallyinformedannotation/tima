@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "compound_id"
+  )
+)
+
 #' @title Export spectra 2
 #'
 #' @description This function export spectra.

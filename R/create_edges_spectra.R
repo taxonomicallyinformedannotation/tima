@@ -1,3 +1,11 @@
+utils::globalVariables(
+  c(
+    "matched_peaks_count",
+    "presence_ratio",
+    "score"
+  )
+)
+
 #' @title Create edges spectra
 #'
 #' @description This function create edges based on fragmentation spectra similarity

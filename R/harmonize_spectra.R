@@ -1,3 +1,28 @@
+utils::globalVariables(
+  c(
+    "collision_energy",
+    "compound_id",
+    "exactmass",
+    "formula",
+    "inchi",
+    "inchi_2D",
+    "inchikey",
+    "inchikey_2D",
+    "intensity",
+    "mz",
+    "name",
+    "precursorCharge",
+    "precursorMz",
+    "rtime",
+    "smiles",
+    "smiles_2D",
+    "spectrum_id",
+    "splash",
+    "synonyms",
+    "xlogp"
+  )
+)
+
 #' @title Harmonize spectra
 #'
 #' @description This function harmonizes spectra headers

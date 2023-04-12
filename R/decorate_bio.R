@@ -1,3 +1,18 @@
+utils::globalVariables(
+  c(
+    "score_biological",
+    "score_biological_class",
+    "score_biological_family",
+    "score_biological_genus",
+    "score_biological_kingdom",
+    "score_biological_order",
+    "score_biological_phylum",
+    "score_biological_species",
+    "score_biological_variety",
+    "structure_inchikey_2D"
+  )
+)
+
 #' @title Decorate bio
 #'
 #' @description This function outputs information about biological weighting
