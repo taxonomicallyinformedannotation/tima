@@ -30,7 +30,6 @@ Imports:
     pbmcapply (>= 1.5.1),
     readr (>= 2.1.4),
     rotl (>= 3.0.14),
-    rlang (>= 1.1.0),
     Spectra (>= 1.9.15),
     stats,
     stringr (>= 1.5.0),

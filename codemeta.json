@@ -508,19 +508,6 @@
     },
     "17": {
       "@type": "SoftwareApplication",
-      "identifier": "rlang",
-      "name": "rlang",
-      "version": ">= 1.1.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=rlang"
-    },
-    "18": {
-      "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
       "version": ">= 1.9.15",
@@ -532,12 +519,12 @@
       },
       "sameAs": "https://github.com/RforMassSpectrometry/Spectra"
     },
-    "19": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "stringr",
       "name": "stringr",
@@ -550,7 +537,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringr"
     },
-    "21": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -563,7 +550,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "22": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -576,12 +563,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyr"
     },
-    "23": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "24": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -597,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2593.635KB",
+  "fileSize": "2099.171KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
