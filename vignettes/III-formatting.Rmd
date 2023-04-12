@@ -47,7 +47,6 @@ targets::tar_visnetwork(
   names = starts_with("annotations_ms1"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -79,7 +78,6 @@ targets::tar_visnetwork(
   names = starts_with("annotations_spectral_is"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -106,7 +104,6 @@ targets::tar_visnetwork(
   names = starts_with("annotations_spectral"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -150,7 +147,6 @@ targets::tar_visnetwork(
   names = starts_with("annotations_s"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -226,7 +222,6 @@ targets::tar_visnetwork(
   names = starts_with("features"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,

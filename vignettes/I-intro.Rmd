@@ -53,11 +53,9 @@ targets::tar_visnetwork(
   exclude = c(
     contains("dic"),
     contains("par_"),
-    contains("params"),
     contains("gnps"),
     contains("input"),
     contains("paths"),
-    contains("params"),
     contains("_is"),
     contains("_exp"),
     contains("library_sop_lotus"),

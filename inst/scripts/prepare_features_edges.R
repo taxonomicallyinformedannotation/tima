@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_feeatures_edges()
-targets::tar_make(names = matches("features_edges_prepared"))
+targets::tar_make(names = matches("fea_edg_pre"))
 
 end <- Sys.time()
 

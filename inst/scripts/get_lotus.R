@@ -19,7 +19,7 @@ log_debug("Contributors: ...")
 #   pattern = paths$urls$lotus$pattern,
 #   path = paths$data$source$libraries$lotus
 # )
-targets::tar_make(names = matches("library_sop_lotus"))
+targets::tar_make(names = matches("lib_sop_lot"))
 
 end <- Sys.time()
 

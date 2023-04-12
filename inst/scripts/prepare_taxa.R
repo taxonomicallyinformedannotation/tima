@@ -23,7 +23,7 @@ log_debug(
 log_debug("Contributors: ...")
 
 # prepare_taxa()
-targets::tar_make(names = matches("taxa_prepared"))
+targets::tar_make(names = matches("tax_pre"))
 
 end <- Sys.time()
 

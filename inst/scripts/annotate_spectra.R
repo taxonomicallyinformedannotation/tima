@@ -20,7 +20,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # annotate_spectra()
-targets::tar_make(names = matches("annotations_spectral_is_l"))
+targets::tar_make(names = matches("ann_spe_is_l"))
 
 end <- Sys.time()
 

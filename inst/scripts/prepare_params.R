@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"))
 log_debug("Contributors: ...")
 
 # prepare_params()
-targets::tar_make(names = starts_with("params"))
+targets::tar_make(names = matches("par_"))
 
 end <- Sys.time()
 

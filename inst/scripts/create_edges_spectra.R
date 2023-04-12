@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # create_edges_spectra()
-targets::tar_make(names = matches("features_edges_spectra"))
+targets::tar_make(names = matches("fea_edg_spe"))
 
 end <- Sys.time()
 

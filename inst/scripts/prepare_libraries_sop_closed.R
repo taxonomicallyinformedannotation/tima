@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_libraries_sop_closed()
-targets::tar_make(names = matches("library_sop_closed_prepared"))
+targets::tar_make(names = matches("lib_sop_clo_pre"))
 
 end <- Sys.time()
 

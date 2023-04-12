@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_annotations_sirius()
-targets::tar_make(names = matches("annotations_sirius_prepared"))
+targets::tar_make(names = matches("ann_sir_pre"))
 
 end <- Sys.time()
 

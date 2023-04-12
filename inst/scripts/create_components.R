@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # create_components()
-targets::tar_make(names = matches("features_components"))
+targets::tar_make(names = matches("fea_com"))
 
 end <- Sys.time()
 

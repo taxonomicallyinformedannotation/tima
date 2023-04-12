@@ -25,7 +25,7 @@ log_debug(
 log_debug("Contributors: ...")
 
 # weight_annotations()
-targets::tar_make(names = matches("annotations_prepared$"))
+targets::tar_make(names = matches("ann_pre$"))
 
 end <- Sys.time()
 

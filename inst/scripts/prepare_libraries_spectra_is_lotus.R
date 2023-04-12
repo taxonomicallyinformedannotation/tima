@@ -23,7 +23,7 @@ log_debug("Contributors: ...")
 #     organism = "Life"
 #   )
 # )
-targets::tar_make(names = matches("library_spectra_is_lotus_prepared"))
+targets::tar_make(names = matches("lib_spe_is_lot_pre"))
 
 end <- Sys.time()
 

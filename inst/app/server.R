@@ -93,7 +93,7 @@ server <- function(input, output, session) {
           degree_from = 10,
           # level_separation = 500,
           outdated = TRUE,
-          # targets_only = TRUE,
+          targets_only = TRUE,
           supervise = TRUE,
           verbose = TRUE,
           exclude = c(
@@ -137,11 +137,29 @@ server <- function(input, output, session) {
             "par_usr_pre_lib_spe",
             "par_usr_pre_tax",
             "par_usr_wei_ann",
+            "par_ann_mas",
+            "par_ann_spe",
+            "par_cre_com",
+            "par_cre_edg_spe",
+            "par_pre_ann_gnp",
+            "par_pre_ann_sir",
+            "par_pre_ann_spe",
+            "par_pre_fea_com",
+            "par_pre_fea_edg",
+            "par_pre_fea_tab",
+            "par_pre_lib_add",
+            "par_pre_lib_sop_clo",
+            "par_pre_lib_sop_ecm",
+            "par_pre_lib_sop_lot",
+            "par_pre_lib_sop_mer",
+            "par_pre_lib_spe",
+            "par_pre_tax",
+            "par_wei_ann",
             ".Random.seed"
           )
         )
         targets::tar_make(
-          names = matches("annotations_prepared$"),
+          names = matches("ann_pre$"),
           reporter = "verbose_positives"
         )
       }, finally = {

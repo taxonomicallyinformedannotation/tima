@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_libraries_sop_ecmdb()
-targets::tar_make(names = matches("library_sop_ecmdb_prepared"))
+targets::tar_make(names = matches("lib_sop_ecm_pre"))
 
 end <- Sys.time()
 

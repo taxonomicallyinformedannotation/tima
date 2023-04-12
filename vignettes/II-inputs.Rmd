@@ -149,7 +149,6 @@ targets::tar_visnetwork(
   names = starts_with("input"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -182,7 +181,6 @@ targets::tar_visnetwork(
   names = matches("library_sop_lotus"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -209,7 +207,6 @@ targets::tar_visnetwork(
   names = matches("library_sop_ecmdb"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -266,7 +263,6 @@ targets::tar_visnetwork(
   names = starts_with("library_sop"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -284,7 +280,6 @@ targets::tar_visnetwork(
   names = starts_with("library_adducts"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -350,7 +345,6 @@ targets::tar_visnetwork(
   names = starts_with("library_spectra"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,
@@ -375,7 +369,6 @@ targets::tar_visnetwork(
   names = starts_with("library"),
   exclude = c(
     contains("par_"),
-    contains("params"),
     contains("paths")
   ),
   targets_only = TRUE,

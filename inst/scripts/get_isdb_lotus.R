@@ -25,7 +25,7 @@ log_debug("Contributors: ...")
 #   pattern = paths$urls$lotus_isdb$pattern$neg,
 #   path = paths$data$source$libraries$spectra$is$lotus$neg
 # )
-targets::tar_make(names = matches("library_spectra_is_lotus"))
+targets::tar_make(names = matches("lib_spe_is_lotus"))
 
 end <- Sys.time()
 

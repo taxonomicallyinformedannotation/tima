@@ -17,7 +17,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 # prepare_annotations_gnps()
-targets::tar_make(names = matches("annotations_spectral_exp_gnps_prepared"))
+targets::tar_make(names = matches("ann_spe_exp_gnp_pre"))
 
 end <- Sys.time()
 

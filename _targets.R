@@ -44,15 +44,15 @@ list(
     ## Dictionaries
     list(
       tar_file(
-        name = dic_adducts,
+        name = dic_add,
         command = {
-          dic_adducts <- paths$inst$extdata$adducts
+          dic_add <- paths$inst$extdata$adducts
         }
       ),
       tar_file(
-        name = dic_neutral_losses,
+        name = dic_neu_los,
         command = {
-          dic_neutral_losses <- paths$inst$extdata$neutral_losses
+          dic_neu_los <- paths$inst$extdata$neutral_losses
         }
       )
     )
@@ -517,9 +517,9 @@ list(
     ## Final
     list(
       tar_target(
-        name = params_annotate_masses,
+        name = par_ann_mas,
         command = {
-          params_annotate_masses <-
+          par_ann_mas <-
             parse_yaml_params(
               def = par_def_ann_mas,
               usr = par_usr_ann_mas[1]
@@ -527,9 +527,9 @@ list(
         }
       ),
       tar_target(
-        name = params_annotate_spectra,
+        name = par_ann_spe,
         command = {
-          params_annotate_spectra <-
+          par_ann_spe <-
             parse_yaml_params(
               def = par_def_ann_spe,
               usr = par_usr_ann_spe[1]
@@ -537,9 +537,9 @@ list(
         }
       ),
       tar_target(
-        name = params_create_components,
+        name = par_cre_com,
         command = {
-          params_create_components <-
+          par_cre_com <-
             parse_yaml_params(
               def = par_def_cre_com,
               usr = par_usr_cre_com[1]
@@ -547,9 +547,9 @@ list(
         }
       ),
       tar_target(
-        name = params_create_edges_spectra,
+        name = par_cre_edg_spe,
         command = {
-          params_create_edges_spectra <-
+          par_cre_edg_spe <-
             parse_yaml_params(
               def = par_def_cre_edg_spe,
               usr = par_usr_cre_edg_spe[1]
@@ -557,9 +557,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_annotations_gnps,
+        name = par_pre_ann_gnp,
         command = {
-          params_prepare_annotations_gnps <-
+          par_pre_ann_gnp <-
             parse_yaml_params(
               def = par_def_pre_ann_gnp,
               usr = par_usr_pre_ann_gnp[1]
@@ -567,9 +567,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_annotations_sirius,
+        name = par_pre_ann_sir,
         command = {
-          params_prepare_annotations_sirius <-
+          par_pre_ann_sir <-
             parse_yaml_params(
               def = par_def_pre_ann_sir,
               usr = par_usr_pre_ann_sir[1]
@@ -577,9 +577,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_annotations_spectra,
+        name = par_pre_ann_spe,
         command = {
-          params_prepare_annotations_spectra <-
+          par_pre_ann_spe <-
             parse_yaml_params(
               def = par_def_pre_ann_spe,
               usr = par_usr_pre_ann_spe[1]
@@ -587,9 +587,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_features_components,
+        name = par_pre_fea_com,
         command = {
-          params_prepare_features_components <-
+          par_pre_fea_com <-
             parse_yaml_params(
               def = par_def_pre_fea_com,
               usr = par_usr_pre_fea_com[1]
@@ -597,9 +597,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_features_edges,
+        name = par_pre_fea_edg,
         command = {
-          params_prepare_features_edges <-
+          par_pre_fea_edg <-
             parse_yaml_params(
               def = par_def_pre_fea_edg,
               usr = par_usr_pre_fea_edg[1]
@@ -607,9 +607,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_features_tables,
+        name = par_pre_fea_tab,
         command = {
-          params_prepare_features_tables <-
+          par_pre_fea_tab <-
             parse_yaml_params(
               def = par_def_pre_fea_tab,
               usr = par_usr_pre_fea_tab[1]
@@ -617,9 +617,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_libraries_adducts,
+        name = par_pre_lib_add,
         command = {
-          params_prepare_libraries_adducts <-
+          par_pre_lib_add <-
             parse_yaml_params(
               def = par_def_pre_lib_add,
               usr = par_usr_pre_lib_add[1]
@@ -627,9 +627,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_libraries_sop_closed,
+        name = par_pre_lib_sop_clo,
         command = {
-          params_prepare_libraries_sop_closed <-
+          par_pre_lib_sop_clo <-
             parse_yaml_params(
               def = par_def_pre_lib_sop_clo,
               usr = par_usr_pre_lib_sop_clo[1]
@@ -637,9 +637,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_libraries_sop_ecmdb,
+        name = par_pre_lib_sop_ecm,
         command = {
-          params_prepare_libraries_sop_ecmdb <-
+          par_pre_lib_sop_ecm <-
             parse_yaml_params(
               def = par_def_pre_lib_sop_ecm,
               usr = par_usr_pre_lib_sop_ecm[1]
@@ -647,9 +647,9 @@ list(
         }
       ),
       # tar_target(
-      #   name = params_prepare_libraries_sop_hmdb,
+      #   name = par_pre_lib_sop_hmd,
       #   command = {
-      #     params_prepare_libraries_sop_hmdb <-
+      #     par_pre_lib_sop_hmd <-
       #       parse_yaml_params(
       #         def = par_def_pre_lib_sop_hmd,
       #         usr = par_usr_pre_lib_sop_hmd[1]
@@ -657,9 +657,9 @@ list(
       #   }
       # ),
       tar_target(
-        name = params_prepare_libraries_sop_lotus,
+        name = par_pre_lib_sop_lot,
         command = {
-          params_prepare_libraries_sop_lotus <-
+          par_pre_lib_sop_lot <-
             parse_yaml_params(
               def = par_def_pre_lib_sop_lot,
               usr = par_usr_pre_lib_sop_lot[1]
@@ -667,9 +667,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_libraries_sop_merged,
+        name = par_pre_lib_sop_mer,
         command = {
-          params_prepare_libraries_sop_merged <-
+          par_pre_lib_sop_mer <-
             parse_yaml_params(
               def = par_def_pre_lib_sop_mer,
               usr = par_usr_pre_lib_sop_mer[1]
@@ -677,9 +677,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_libraries_spectra,
+        name = par_pre_lib_spe,
         command = {
-          params_prepare_libraries_spectra <-
+          par_pre_lib_spe <-
             parse_yaml_params(
               def = par_def_pre_lib_spe,
               usr = par_usr_pre_lib_spe[1]
@@ -687,9 +687,9 @@ list(
         }
       ),
       tar_target(
-        name = params_prepare_taxa,
+        name = par_pre_tax,
         command = {
-          params_prepare_taxa <-
+          par_pre_tax <-
             parse_yaml_params(
               def = par_def_pre_tax,
               usr = par_usr_pre_tax[1]
@@ -697,9 +697,9 @@ list(
         }
       ),
       tar_target(
-        name = params_weight_annotations,
+        name = par_wei_ann,
         command = {
-          params_weight_annotations <-
+          par_wei_ann <-
             parse_yaml_params(
               def = par_def_wei_ann,
               usr = par_usr_wei_ann[1]
@@ -717,9 +717,9 @@ list(
           gnps_job_id = par_fin_par$gnps$id,
           filename = par_fin_par$files$pattern,
           workflow = par_fin_par$gnps$workflow,
-          path_features = params_prepare_features_tables$files$features$raw,
-          path_metadata = params_prepare_taxa$files$taxa$raw,
-          path_spectra = params_annotate_spectra$files$spectral$raw,
+          path_features = par_pre_fea_tab$files$features$raw,
+          path_metadata = par_pre_tax$files$taxa$raw,
+          path_spectra = par_ann_spe$files$spectral$raw,
           path_source = paths$data$source$path,
           path_interim_a = paths$data$interim$annotations$path,
           path_interim_f = paths$data$interim$features$path
@@ -777,9 +777,9 @@ list(
               ifelse(
                 test = file.exists(gnps_features),
                 yes = gnps_features,
-                no = params_prepare_taxa$files$features$raw
+                no = par_pre_tax$files$features$raw
               ),
-            no = params_prepare_taxa$files$features$raw
+            no = par_pre_tax$files$features$raw
           )
       }
     ),
@@ -795,9 +795,9 @@ list(
                 ifelse(
                   test = file.exists(gnps_spectra),
                   yes = gnps_spectra,
-                  no = params_annotate_spectra$files$spectral$raw
+                  no = par_ann_spe$files$spectral$raw
                 ),
-              no = params_annotate_spectra$files$spectral$raw
+              no = par_ann_spe$files$spectral$raw
             ),
             no = {
               get_file(
@@ -819,9 +819,9 @@ list(
               ifelse(
                 test = file.exists(gnps_metadata),
                 yes = gnps_metadata,
-                no = params_prepare_taxa$files$taxa$raw
+                no = par_pre_tax$files$taxa$raw
               ),
-            no = params_prepare_taxa$files$taxa$raw
+            no = par_pre_tax$files$taxa$raw
           )
       }
     )
@@ -835,15 +835,15 @@ list(
         ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
         # tar_file(
-        #   name = library_sop_closed,
+        #   name = lib_sop_clo,
         #   command = {
-        #     library_sop_closed <- paths$data$source$libraries$sop$closed
+        #     lib_sop_clo <- paths$data$source$libraries$sop$closed
         #   }
         # ),
         tar_file(
-          name = library_sop_ecmdb,
+          name = lib_sop_ecm,
           command = {
-            library_sop_ecmdb <- get_file(
+            lib_sop_ecm <- get_file(
               url = paths$urls$ecmdb$metabolites,
               export = paths$data$source$libraries$sop$ecmdb
             )
@@ -851,9 +851,9 @@ list(
         ),
         ## TODO ADD  GET HMDB
         tar_file(
-          name = library_sop_lotus,
+          name = lib_sop_lot,
           command = {
-            library_sop_lotus <- get_last_version_from_zenodo(
+            lib_sop_lot <- get_last_version_from_zenodo(
               doi = paths$urls$lotus$doi,
               pattern = paths$urls$lotus$pattern,
               path = paths$data$source$libraries$sop$lotus
@@ -867,40 +867,40 @@ list(
       ## Prepared
       list(
         tar_file(
-          name = library_sop_closed_prepared,
+          name = lib_sop_clo_pre,
           command = {
-            library_sop_closed_prepared <-
+            lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
                 ## TODO improve
                 input = paths$data$source$libraries$sop$closed,
-                output = params_prepare_libraries_sop_closed$files$libraries$sop$prepared,
-                parameters = params_prepare_libraries_sop_closed
+                output = par_pre_lib_sop_clo$files$libraries$sop$prepared,
+                parameters = par_pre_lib_sop_clo
               )
           }
         ),
         tar_file(
-          name = library_sop_ecmdb_prepared,
+          name = lib_sop_ecm_pre,
           command = {
-            library_sop_ecmdb_prepared <-
+            lib_sop_ecm_pre <-
               prepare_libraries_sop_ecmdb(
-                input = library_sop_ecmdb,
-                output = params_prepare_libraries_sop_ecmdb$files$libraries$sop$prepared,
-                parameters = params_prepare_libraries_sop_ecmdb
+                input = lib_sop_ecm,
+                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared,
+                parameters = par_pre_lib_sop_ecm
               )
           }
         ),
         ## TODO ADD HMDB PREPARED
         tar_file(
-          name = library_sop_lotus_prepared,
+          name = lib_sop_lot_pre,
           command = {
-            library_sop_lotus_prepared <-
+            lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
                 input = if (paths$tests$mode == FALSE) {
-                  library_sop_lotus
+                  lib_sop_lot
                 } else {
                   paths$data$source$libraries$sop$lotus
                 },
-                output = params_prepare_libraries_sop_lotus$files$libraries$sop$prepared
+                output = par_pre_lib_sop_lot$files$libraries$sop$prepared
               )
           }
         )
@@ -908,19 +908,19 @@ list(
       ## Merged
       list(
         tar_file(
-          name = library_sop_merged,
+          name = lib_sop_mer,
           command = {
-            library_sop_merged <- prepare_libraries_sop_merged(
+            lib_sop_mer <- prepare_libraries_sop_merged(
               files = c(
-                library_sop_closed_prepared,
-                library_sop_ecmdb_prepared,
+                lib_sop_clo_pre,
+                lib_sop_ecm_pre,
                 ## TODO
-                # library_sop_hmdb_prepared,
-                library_sop_lotus_prepared
+                # lib_sop_hmd_pre,
+                lib_sop_lot_pre
               ),
-              filter = params_prepare_libraries_sop_merged$organisms$filter$mode,
-              level = params_prepare_libraries_sop_merged$organisms$filter$level,
-              value = params_prepare_libraries_sop_merged$organisms$filter$value,
+              filter = par_pre_lib_sop_mer$organisms$filter$mode,
+              level = par_pre_lib_sop_mer$organisms$filter$level,
+              value = par_pre_lib_sop_mer$organisms$filter$value,
               output_key = paths$data$interim$libraries$sop$merged$keys,
               output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
@@ -928,45 +928,45 @@ list(
               output_str_nam = paths$data$interim$libraries$sop$merged$structures$names,
               output_str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
               output_str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
-              parameters = params_prepare_libraries_sop_merged
+              parameters = par_pre_lib_sop_mer
             )
           }
         ),
-        tar_file(name = library_merged_key, command = {
-          library_merged_key <- library_sop_merged[[1]]
+        tar_file(name = lib_mer_key, command = {
+          lib_mer_key <- lib_sop_mer[[1]]
         }),
-        tar_file(name = library_merged_org_tax_ott, command = {
-          library_merged_org_tax_ott <- library_sop_merged[[2]]
+        tar_file(name = lib_mer_org_tax_ott, command = {
+          lib_mer_org_tax_ott <- lib_sop_mer[[2]]
         }),
-        tar_file(name = library_merged_str_2D_3D, command = {
-          library_merged_str_2D_3D <- library_sop_merged[[3]]
+        tar_file(name = lib_mer_str_2D_3D, command = {
+          lib_mer_str_2D_3D <- lib_sop_mer[[3]]
         }),
-        tar_file(name = library_merged_str_met, command = {
-          library_merged_str_met <- library_sop_merged[[4]]
+        tar_file(name = lib_mer_str_met, command = {
+          lib_mer_str_met <- lib_sop_mer[[4]]
         }),
-        tar_file(name = library_merged_str_nam, command = {
-          library_merged_str_nam <- library_sop_merged[[5]]
+        tar_file(name = lib_mer_str_nam, command = {
+          lib_mer_str_nam <- lib_sop_mer[[5]]
         }),
-        tar_file(name = library_merged_str_tax_cla, command = {
-          library_merged_str_tax_cla <- library_sop_merged[[6]]
+        tar_file(name = lib_mer_str_tax_cla, command = {
+          lib_mer_str_tax_cla <- lib_sop_mer[[6]]
         }),
-        tar_file(name = library_merged_str_tax_npc, command = {
-          library_merged_str_tax_npc <- library_sop_merged[[7]]
+        tar_file(name = lib_mer_str_tax_npc, command = {
+          lib_mer_str_tax_npc <- lib_sop_mer[[7]]
         })
       )
     ),
     ## Adducts
     list(tar_file(
-      name = library_adducts,
+      name = lib_add,
       command = {
-        library_adducts <- prepare_libraries_adducts(
-          str_met = library_merged_str_met,
-          adducts_masses = dic_adducts,
+        lib_add <- prepare_libraries_adducts(
+          str_met = lib_mer_str_met,
+          adducts_masses = dic_add,
           adducts_output_path = paths$data$interim$libraries$adducts$path,
-          output_name = params_prepare_libraries_adducts$files$libraries$adducts$prepared,
+          output_name = par_pre_lib_add$files$libraries$adducts$prepared,
           masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
           masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
-          parameters = params_prepare_libraries_adducts
+          parameters = par_pre_lib_add
         )
       }
     )),
@@ -976,14 +976,17 @@ list(
         list(
           ## TODO ADD ISDB HMDB,
           tar_file(
-            name = library_spectra_is_lotus_pos,
+            name = lib_spe_is_lot_pos,
             command = {
-              library_spectra_is_lotus_pos <-
+              lib_spe_is_lot_pos <-
                 # if (paths$tests$mode == FALSE) {
                 get_file(
                   url = paths$urls$examples$spectral_lib$pos,
                   export = paths$data$source$libraries$spectra$is$lotus$pos |>
-                    gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
+                    gsub(
+                      pattern = "isdb_pos.mgf",
+                      replacement = "lotus_pos.rds"
+                    )
                 )
               # get_last_version_from_zenodo(
               #   doi = paths$urls$lotus_isdb$doi,
@@ -1003,14 +1006,17 @@ list(
             # cue = tar_cue(mode = "thorough")
           ),
           tar_file(
-            name = library_spectra_is_lotus_neg,
+            name = lib_spe_is_lot_neg,
             command = {
-              library_spectra_is_lotus_neg <-
+              lib_spe_is_lot_neg <-
                 # if (paths$tests$mode == FALSE) {
                 get_file(
                   url = paths$urls$examples$spectral_lib$neg,
                   export = paths$data$source$libraries$spectra$is$lotus$neg |>
-                    gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
+                    gsub(
+                      pattern = "isdb_neg.mgf",
+                      replacement = "lotus_neg.rds"
+                    )
                 )
               # get_last_version_from_zenodo(
               #   doi = paths$urls$lotus_isdb$doi,
@@ -1036,13 +1042,13 @@ list(
         ## TODO ADD IS HMDB PREPARED,
         ## TODO improve polarity handling, suboptimal
         tar_file(
-          name = library_spectra_is_lotus_prepared_pos,
+          name = lib_spe_is_lot_pre_pos,
           command = {
-            library_spectra_is_lotus_prepared_pos <-
-              library_spectra_is_lotus_pos
-            # library_spectra_is_lotus_prepared_pos <- prepare_libraries_spectra(
+            lib_spe_is_lot_pre_pos <-
+              lib_spe_is_lot_pos
+            # lib_spe_is_lot_pre_pos <- prepare_libraries_spectra(
             #   input = if (paths$tests$mode == FALSE) {
-            #     library_spectra_is_lotus_pos
+            #     lib_spe_is_lot_pos
             #   } else {
             #     paths$data$source$libraries$spectra$is$lotus$pos
             #   },
@@ -1075,13 +1081,13 @@ list(
           }
         ),
         tar_file(
-          name = library_spectra_is_lotus_prepared_neg,
+          name = lib_spe_is_lot_pre_neg,
           command = {
-            library_spectra_is_lotus_prepared_neg <-
-              library_spectra_is_lotus_neg
-            # library_spectra_is_lotus_prepared_neg <- prepare_libraries_spectra(
+            lib_spe_is_lot_pre_neg <-
+              lib_spe_is_lot_neg
+            # lib_spe_is_lot_pre_neg <- prepare_libraries_spectra(
             #   input = if (paths$tests$mode == FALSE) {
-            #     library_spectra_is_lotus_neg
+            #     lib_spe_is_lot_neg
             #   } else {
             #     paths$data$source$libraries$spectra$is$lotus$neg
             #   },
@@ -1118,68 +1124,68 @@ list(
       list(
         ## RAW
         list(tar_file(
-          name = library_spectra_exp_internal_raw,
+          name = lib_spe_exp_int_raw,
           command = {
-            library_spectra_exp_internal_raw <-
-              params_prepare_libraries_spectra$files$libraries$spectral$exp$raw
+            lib_spe_exp_int_raw <-
+              par_pre_lib_spe$files$libraries$spectral$exp$raw
           }
         )),
         ## Prepared
         list(
           ## TODO improve polarity handling, suboptimal
           tar_file(
-            name = library_spectra_exp_internal_prepared_pos,
+            name = lib_spe_exp_int_pre_pos,
             command = {
-              library_spectra_exp_internal_prepared_pos <-
+              lib_spe_exp_int_pre_pos <-
                 prepare_libraries_spectra(
-                  input = library_spectra_exp_internal_raw,
-                  output = params_prepare_libraries_spectra$files$libraries$spectral$exp,
+                  input = lib_spe_exp_int_raw,
+                  output = par_pre_lib_spe$files$libraries$spectral$exp,
                   polarity = "pos",
-                  col_ce = params_prepare_libraries_spectra$names$mgf$collision_energy,
-                  col_ci = params_prepare_libraries_spectra$names$mgf$compound_id,
-                  col_em = params_prepare_libraries_spectra$names$mgf$exact_mass,
-                  col_in = params_prepare_libraries_spectra$names$mgf$inchi,
-                  col_io = params_prepare_libraries_spectra$names$mgf$inchi_2D,
-                  col_ik = params_prepare_libraries_spectra$names$mgf$inchikey,
-                  col_il = params_prepare_libraries_spectra$names$mgf$inchikey_2D,
-                  col_mf = params_prepare_libraries_spectra$names$mgf$molecular_formula,
-                  col_na = params_prepare_libraries_spectra$names$mgf$name,
-                  col_po = params_prepare_libraries_spectra$names$mgf$polarity,
-                  col_sm = params_prepare_libraries_spectra$names$mgf$smiles,
-                  col_sn = params_prepare_libraries_spectra$names$mgf$smiles_2D,
-                  col_si = params_prepare_libraries_spectra$names$mgf$spectrum_id,
-                  col_sp = params_prepare_libraries_spectra$names$mgf$splash,
-                  col_sy = params_prepare_libraries_spectra$names$mgf$synonyms,
-                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp,
-                  parameters = params_prepare_libraries_spectra
+                  col_ce = par_pre_lib_spe$names$mgf$collision_energy,
+                  col_ci = par_pre_lib_spe$names$mgf$compound_id,
+                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
+                  col_in = par_pre_lib_spe$names$mgf$inchi,
+                  col_io = par_pre_lib_spe$names$mgf$inchi_2D,
+                  col_ik = par_pre_lib_spe$names$mgf$inchikey,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_2D,
+                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
+                  col_na = par_pre_lib_spe$names$mgf$name,
+                  col_po = par_pre_lib_spe$names$mgf$polarity,
+                  col_sm = par_pre_lib_spe$names$mgf$smiles,
+                  col_sn = par_pre_lib_spe$names$mgf$smiles_2D,
+                  col_si = par_pre_lib_spe$names$mgf$spectrum_id,
+                  col_sp = par_pre_lib_spe$names$mgf$splash,
+                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
+                  col_xl = par_pre_lib_spe$names$mgf$xlogp,
+                  parameters = par_pre_lib_spe
                 )
             }
           ),
           tar_file(
-            name = library_spectra_exp_internal_prepared_neg,
+            name = lib_spe_exp_int_pre_neg,
             command = {
-              library_spectra_exp_internal_prepared_neg <-
+              lib_spe_exp_int_pre_neg <-
                 prepare_libraries_spectra(
-                  input = library_spectra_exp_internal_raw,
-                  output = params_prepare_libraries_spectra$files$libraries$spectral$exp,
+                  input = lib_spe_exp_int_raw,
+                  output = par_pre_lib_spe$files$libraries$spectral$exp,
                   polarity = "neg",
-                  col_ce = params_prepare_libraries_spectra$names$mgf$collision_energy,
-                  col_ci = params_prepare_libraries_spectra$names$mgf$compound_id,
-                  col_em = params_prepare_libraries_spectra$names$mgf$exact_mass,
-                  col_in = params_prepare_libraries_spectra$names$mgf$inchi,
-                  col_io = params_prepare_libraries_spectra$names$mgf$inchi_2D,
-                  col_ik = params_prepare_libraries_spectra$names$mgf$inchikey,
-                  col_il = params_prepare_libraries_spectra$names$mgf$inchikey_2D,
-                  col_mf = params_prepare_libraries_spectra$names$mgf$molecular_formula,
-                  col_na = params_prepare_libraries_spectra$names$mgf$name,
-                  col_po = params_prepare_libraries_spectra$names$mgf$polarity,
-                  col_sm = params_prepare_libraries_spectra$names$mgf$smiles,
-                  col_sn = params_prepare_libraries_spectra$names$mgf$smiles_2D,
-                  col_si = params_prepare_libraries_spectra$names$mgf$spectrum_id,
-                  col_sp = params_prepare_libraries_spectra$names$mgf$splash,
-                  col_sy = params_prepare_libraries_spectra$names$mgf$synonyms,
-                  col_xl = params_prepare_libraries_spectra$names$mgf$xlogp,
-                  parameters = params_prepare_libraries_spectra
+                  col_ce = par_pre_lib_spe$names$mgf$collision_energy,
+                  col_ci = par_pre_lib_spe$names$mgf$compound_id,
+                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
+                  col_in = par_pre_lib_spe$names$mgf$inchi,
+                  col_io = par_pre_lib_spe$names$mgf$inchi_2D,
+                  col_ik = par_pre_lib_spe$names$mgf$inchikey,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_2D,
+                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
+                  col_na = par_pre_lib_spe$names$mgf$name,
+                  col_po = par_pre_lib_spe$names$mgf$polarity,
+                  col_sm = par_pre_lib_spe$names$mgf$smiles,
+                  col_sn = par_pre_lib_spe$names$mgf$smiles_2D,
+                  col_si = par_pre_lib_spe$names$mgf$spectrum_id,
+                  col_sp = par_pre_lib_spe$names$mgf$splash,
+                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
+                  col_xl = par_pre_lib_spe$names$mgf$xlogp,
+                  parameters = par_pre_lib_spe
                 )
             }
           )
@@ -1192,43 +1198,43 @@ list(
     ## MS1
     list(
       tar_file(
-        name = annotations_ms1_prepared,
+        name = ann_ms1_pre,
         command = {
-          annotations_ms1_prepared <-
+          ann_ms1_pre <-
             annotate_masses(
-              features = features_prepared,
-              library = library_merged_key,
-              output_annotations = params_annotate_masses$files$annotations$prepared,
-              output_edges = params_annotate_masses$files$networks$spectral$edges$raw,
-              name_source = params_annotate_masses$names$source,
-              name_target = params_annotate_masses$names$target,
-              str_2D_3D = library_merged_str_2D_3D,
-              str_met = library_merged_str_met,
-              str_nam = library_merged_str_nam,
-              str_tax_cla = library_merged_str_tax_cla,
-              str_tax_npc = library_merged_str_tax_npc,
-              name = library_adducts[params_annotate_masses$ms$polarity],
-              adducts_list = params_annotate_masses$ms$adducts,
-              adducts_masses_list = dic_adducts,
-              neutral_losses_list = dic_neutral_losses,
-              msMode = params_annotate_masses$ms$polarity,
-              tolerancePpm = params_annotate_masses$ms$tolerances$mass$ppm$ms1,
-              toleranceRt = params_annotate_masses$ms$tolerances$rt$minutes,
-              parameters = params_annotate_masses
+              features = fea_pre,
+              library = lib_mer_key,
+              output_annotations = par_ann_mas$files$annotations$prepared,
+              output_edges = par_ann_mas$files$networks$spectral$edges$raw,
+              name_source = par_ann_mas$names$source,
+              name_target = par_ann_mas$names$target,
+              str_2D_3D = lib_mer_str_2D_3D,
+              str_met = lib_mer_str_met,
+              str_nam = lib_mer_str_nam,
+              str_tax_cla = lib_mer_str_tax_cla,
+              str_tax_npc = lib_mer_str_tax_npc,
+              name = lib_add[par_ann_mas$ms$polarity],
+              adducts_list = par_ann_mas$ms$adducts,
+              adducts_masses_list = dic_add,
+              neutral_losses_list = dic_neu_los,
+              msMode = par_ann_mas$ms$polarity,
+              tolerancePpm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
+              toleranceRt = par_ann_mas$ms$tolerances$rt$minutes,
+              parameters = par_ann_mas
             )
         }
       ),
       tar_file(
-        name = annotations_ms1_prepared_annotations,
+        name = ann_ms1_pre_ann,
         command = {
-          annotations_ms1_prepared_annotations <-
-            annotations_ms1_prepared[[1]]
+          ann_ms1_pre_ann <-
+            ann_ms1_pre[[1]]
         }
       ),
       tar_file(
-        name = annotations_ms1_prepared_edges,
+        name = ann_ms1_pre_edg,
         command = {
-          annotations_ms1_prepared_edges <- annotations_ms1_prepared[[2]]
+          ann_ms1_pre_edg <- ann_ms1_pre[[2]]
         }
       )
     ),
@@ -1237,98 +1243,98 @@ list(
       ## Experimental
       list(
         tar_file(
-          name = annotations_spectral_exp_gnps_prepared,
+          name = ann_spe_exp_gnp_pre,
           command = {
-            annotations_spectral_exp_gnps_prepared <-
+            ann_spe_exp_gnp_pre <-
               prepare_annotations_gnps(
                 input = gnps_annotations,
-                output = params_prepare_annotations_gnps$files$annotations$prepared,
-                str_2D_3D = library_merged_str_2D_3D,
-                str_met = library_merged_str_met,
-                str_nam = library_merged_str_nam,
-                str_tax_cla = library_merged_str_tax_cla,
-                str_tax_npc = library_merged_str_tax_npc,
-                parameters = params_prepare_annotations_gnps
+                output = par_pre_ann_gnp$files$annotations$prepared,
+                str_2D_3D = lib_mer_str_2D_3D,
+                str_met = lib_mer_str_met,
+                str_nam = lib_mer_str_nam,
+                str_tax_cla = lib_mer_str_tax_cla,
+                str_tax_npc = lib_mer_str_tax_npc,
+                parameters = par_pre_ann_gnp
               )
           }
         ),
         tar_file(
-          name = annotations_spectral_exp_internal_pos,
+          name = ann_spe_exp_int_pos,
           command = {
-            annotations_spectral_exp_internal_pos <- annotate_spectra(
+            ann_spe_exp_int_pos <- annotate_spectra(
               input = input_spectra,
-              library = library_spectra_exp_internal_prepared_pos,
+              library = lib_spe_exp_int_pre_pos,
               polarity = "pos",
               output = gsub(
                 pattern = "matches.tsv.gz",
                 replacement = "matches_exp_rt_pos.tsv.gz",
-                x = params_annotate_spectra$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = params_annotate_spectra$annotations$ms2$method,
-              threshold = params_annotate_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_annotate_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_annotate_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_annotate_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_annotate_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_annotate_spectra$options$parallel,
-              fast = params_annotate_spectra$options$fast,
-              approx = params_annotate_spectra$annotations$ms2$approx,
-              parameters = params_annotate_spectra
+              method = par_ann_spe$annotations$ms2$method,
+              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
+              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
+              npeaks = par_ann_spe$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = par_ann_spe$annotations$ms2$thresholds$peaks$ratio,
+              condition = par_ann_spe$annotations$ms2$thresholds$condition,
+              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
+              parallel = par_ann_spe$options$parallel,
+              fast = par_ann_spe$options$fast,
+              approx = par_ann_spe$annotations$ms2$approx,
+              parameters = par_ann_spe
             )
           }
         ),
         tar_file(
-          name = annotations_spectral_exp_internal_neg,
+          name = ann_spe_exp_int_neg,
           command = {
-            annotations_spectral_exp_internal_neg <- annotate_spectra(
+            ann_spe_exp_int_neg <- annotate_spectra(
               input = input_spectra,
-              library = library_spectra_exp_internal_prepared_neg,
+              library = lib_spe_exp_int_pre_neg,
               polarity = "neg",
               output = gsub(
                 pattern = "matches.tsv.gz",
                 replacement = "matches_exp_rt_neg.tsv.gz",
-                x = params_annotate_spectra$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = params_annotate_spectra$annotations$ms2$method,
-              threshold = params_annotate_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_annotate_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_annotate_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_annotate_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_annotate_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_annotate_spectra$options$parallel,
-              fast = params_annotate_spectra$options$fast,
-              approx = params_annotate_spectra$annotations$ms2$approx,
-              parameters = params_annotate_spectra
+              method = par_ann_spe$annotations$ms2$method,
+              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
+              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
+              npeaks = par_ann_spe$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = par_ann_spe$annotations$ms2$thresholds$peaks$ratio,
+              condition = par_ann_spe$annotations$ms2$thresholds$condition,
+              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
+              parallel = par_ann_spe$options$parallel,
+              fast = par_ann_spe$options$fast,
+              approx = par_ann_spe$annotations$ms2$approx,
+              parameters = par_ann_spe
             )
           }
         ),
         tar_file(
-          name = annotations_spectral_exp_internal_prepared,
+          name = ann_spe_exp_int_pre,
           command = {
-            annotations_spectral_exp_internal_prepared <-
+            ann_spe_exp_int_pre <-
               prepare_annotations_spectra(
                 input = list(
-                  annotations_spectral_exp_internal_neg,
-                  annotations_spectral_exp_internal_pos
+                  ann_spe_exp_int_neg,
+                  ann_spe_exp_int_pos
                 ),
                 output = gsub(
-                  pattern = "_prepared.tsv.gz",
-                  replacement = "_exp_rt_prepared.tsv.gz",
-                  x = params_prepare_annotations_spectra$files$annotations$prepared,
+                  pattern = "_pre.tsv.gz",
+                  replacement = "_exp_rt_pre.tsv.gz",
+                  x = par_pre_ann_spe$files$annotations$prepared,
                   fixed = TRUE
                 ),
-                str_2D_3D = library_merged_str_2D_3D,
-                str_met = library_merged_str_met,
-                str_nam = library_merged_str_nam,
-                str_tax_cla = library_merged_str_tax_cla,
-                str_tax_npc = library_merged_str_tax_npc,
-                parameters = params_prepare_annotations_spectra
+                str_2D_3D = lib_mer_str_2D_3D,
+                str_met = lib_mer_str_met,
+                str_nam = lib_mer_str_nam,
+                str_tax_cla = lib_mer_str_tax_cla,
+                str_tax_npc = lib_mer_str_tax_npc,
+                parameters = par_pre_ann_spe
               )
           }
         )
@@ -1338,77 +1344,77 @@ list(
         ## TODO add HMDB is spectral matches
         ## TODO improve polarity handling, suboptimal
         tar_file(
-          name = annotations_spectral_is_lotus_pos,
+          name = ann_spe_is_lot_pos,
           command = {
-            annotations_spectral_is_lotus_pos <- annotate_spectra(
+            ann_spe_is_lot_pos <- annotate_spectra(
               input = input_spectra,
-              library = library_spectra_is_lotus_prepared_pos,
+              library = lib_spe_is_lot_pre_pos,
               polarity = "pos",
               output = gsub(
                 pattern = ".tsv.gz",
                 replacement = "_pos.tsv.gz",
-                x = params_annotate_spectra$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = params_annotate_spectra$annotations$ms2$method,
-              threshold = params_annotate_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_annotate_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_annotate_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_annotate_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_annotate_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_annotate_spectra$options$parallel,
-              fast = params_annotate_spectra$options$fast,
-              approx = params_annotate_spectra$annotations$ms2$approx,
-              parameters = params_annotate_spectra
+              method = par_ann_spe$annotations$ms2$method,
+              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
+              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
+              npeaks = par_ann_spe$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = par_ann_spe$annotations$ms2$thresholds$peaks$ratio,
+              condition = par_ann_spe$annotations$ms2$thresholds$condition,
+              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
+              parallel = par_ann_spe$options$parallel,
+              fast = par_ann_spe$options$fast,
+              approx = par_ann_spe$annotations$ms2$approx,
+              parameters = par_ann_spe
             )
           }
         ),
         tar_file(
-          name = annotations_spectral_is_lotus_neg,
+          name = ann_spe_is_lot_neg,
           command = {
-            annotations_spectral_is_lotus_neg <- annotate_spectra(
+            ann_spe_is_lot_neg <- annotate_spectra(
               input = input_spectra,
-              library = library_spectra_is_lotus_prepared_neg,
+              library = lib_spe_is_lot_pre_neg,
               polarity = "neg",
               output = gsub(
                 pattern = ".tsv.gz",
                 replacement = "_neg.tsv.gz",
-                x = params_annotate_spectra$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = params_annotate_spectra$annotations$ms2$method,
-              threshold = params_annotate_spectra$annotations$ms2$thresholds$similarity,
-              ppm = params_annotate_spectra$ms$tolerances$mass$ppm$ms2,
-              dalton = params_annotate_spectra$ms$tolerances$mass$dalton$ms2,
-              npeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$absolute,
-              rpeaks = params_annotate_spectra$annotations$ms2$thresholds$peaks$ratio,
-              condition = params_annotate_spectra$annotations$ms2$thresholds$condition,
-              qutoff = params_annotate_spectra$ms$intensity$thresholds$ms2,
-              parallel = params_annotate_spectra$options$parallel,
-              fast = params_annotate_spectra$options$fast,
-              approx = params_annotate_spectra$annotations$ms2$approx,
-              parameters = params_annotate_spectra
+              method = par_ann_spe$annotations$ms2$method,
+              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
+              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
+              npeaks = par_ann_spe$annotations$ms2$thresholds$peaks$absolute,
+              rpeaks = par_ann_spe$annotations$ms2$thresholds$peaks$ratio,
+              condition = par_ann_spe$annotations$ms2$thresholds$condition,
+              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
+              parallel = par_ann_spe$options$parallel,
+              fast = par_ann_spe$options$fast,
+              approx = par_ann_spe$annotations$ms2$approx,
+              parameters = par_ann_spe
             )
           }
         ),
         tar_file(
-          name = annotations_spectral_is_prepared,
+          name = ann_spe_is_pre,
           command = {
-            annotations_spectral_is_prepared <- prepare_annotations_spectra(
+            ann_spe_is_pre <- prepare_annotations_spectra(
               input = list(
-                annotations_spectral_is_lotus_neg,
+                ann_spe_is_lot_neg,
                 ## TODO add is hmdb
-                annotations_spectral_is_lotus_pos
+                ann_spe_is_lot_pos
               ),
-              output = params_prepare_annotations_spectra$files$annotations$prepared,
-              str_2D_3D = library_merged_str_2D_3D,
-              str_met = library_merged_str_met,
-              str_nam = library_merged_str_nam,
-              str_tax_cla = library_merged_str_tax_cla,
-              str_tax_npc = library_merged_str_tax_npc,
-              parameters = params_prepare_annotations_spectra
+              output = par_pre_ann_spe$files$annotations$prepared,
+              str_2D_3D = lib_mer_str_2D_3D,
+              str_met = lib_mer_str_met,
+              str_nam = lib_mer_str_nam,
+              str_tax_cla = lib_mer_str_tax_cla,
+              str_tax_npc = lib_mer_str_tax_npc,
+              parameters = par_pre_ann_spe
             )
           }
         )
@@ -1416,18 +1422,18 @@ list(
     ),
     # SIRIUS
     tar_file(
-      name = annotations_sirius_prepared,
+      name = ann_sir_pre,
       command = {
-        annotations_sirius_prepared <-
+        ann_sir_pre <-
           prepare_annotations_sirius(
-            input_directory = params_prepare_annotations_sirius$files$annotations$raw$sirius,
-            output = params_prepare_annotations_sirius$files$annotations$prepared,
-            str_2D_3D = library_merged_str_2D_3D,
-            str_met = library_merged_str_met,
-            str_nam = library_merged_str_nam,
-            str_tax_cla = library_merged_str_tax_cla,
-            str_tax_npc = library_merged_str_tax_npc,
-            parameters = params_prepare_annotations_sirius
+            input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
+            output = par_pre_ann_sir$files$annotations$prepared,
+            str_2D_3D = lib_mer_str_2D_3D,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            parameters = par_pre_ann_sir
           )
       }
     ),
@@ -1436,218 +1442,218 @@ list(
   ## Features
   list(
     tar_file(
-      name = features_edges_spectra,
+      name = fea_edg_spe,
       command = {
-        features_edges_spectra <- create_edges_spectra(
+        fea_edg_spe <- create_edges_spectra(
           input = input_spectra,
-          output = params_create_edges_spectra$files$networks$spectral$edges$raw,
-          name_source = params_create_edges_spectra$names$source,
-          name_target = params_create_edges_spectra$names$target,
-          method = params_create_edges_spectra$annotations$ms2$method,
-          threshold = params_create_edges_spectra$annotations$ms2$thresholds$similarity,
-          ppm = params_create_edges_spectra$ms$tolerances$mass$ppm$ms2,
-          dalton = params_create_edges_spectra$ms$tolerances$mass$dalton$ms2,
-          npeaks = params_create_edges_spectra$annotations$ms2$thresholds$peaks$absolute,
-          rpeaks = params_create_edges_spectra$annotations$ms2$thresholds$peaks$ratio,
-          condition = params_create_edges_spectra$annotations$ms2$thresholds$condition,
-          qutoff = params_create_edges_spectra$ms$intensity$thresholds$ms2,
-          parallel = params_create_edges_spectra$options$parallel,
-          fast = params_create_edges_spectra$options$fast,
-          parameters = params_create_edges_spectra
+          output = par_cre_edg_spe$files$networks$spectral$edges$raw,
+          name_source = par_cre_edg_spe$names$source,
+          name_target = par_cre_edg_spe$names$target,
+          method = par_cre_edg_spe$annotations$ms2$method,
+          threshold = par_cre_edg_spe$annotations$ms2$thresholds$similarity,
+          ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_cre_edg_spe$annotations$ms2$thresholds$peaks$absolute,
+          rpeaks = par_cre_edg_spe$annotations$ms2$thresholds$peaks$ratio,
+          condition = par_cre_edg_spe$annotations$ms2$thresholds$condition,
+          qutoff = par_cre_edg_spe$ms$intensity$thresholds$ms2,
+          parallel = par_cre_edg_spe$options$parallel,
+          fast = par_cre_edg_spe$options$fast,
+          parameters = par_cre_edg_spe
         )
       }
     ),
     tar_file(
-      name = features_components,
+      name = fea_com,
       command = {
-        features_components <- create_components(
-          input = features_edges_prepared,
-          output = params_create_components$files$networks$spectral$components$raw,
-          parameters = params_create_components
+        fea_com <- create_components(
+          input = fea_edg_pre,
+          output = par_cre_com$files$networks$spectral$components$raw,
+          parameters = par_cre_com
         )
       }
     ),
     ## Interim
     list(
       tar_file(
-        name = interim_components,
+        name = int_com,
         command = {
-          interim_components <-
-            ifelse(test = file.exists(features_components),
-              yes = features_components,
+          int_com <-
+            ifelse(test = file.exists(fea_com),
+              yes = fea_com,
               no = gnps_components
             )
         }
       ),
       tar_file(
-        name = edges_spectra,
+        name = edg_spe,
         command = {
-          edges_spectra <-
-            ifelse(test = file.exists(features_edges_spectra),
-              yes = features_edges_spectra,
+          edg_spe <-
+            ifelse(test = file.exists(fea_edg_spe),
+              yes = fea_edg_spe,
               no = gnps_edges
             )
         }
       )
     ),
     tar_file(
-      name = features_edges_prepared,
+      name = fea_edg_pre,
       command = {
-        features_edges_prepared <- prepare_features_edges(
-          input = list(annotations_ms1_prepared_edges, edges_spectra),
-          output = params_prepare_features_edges$files$networks$spectral$edges$prepared,
-          name_source = params_prepare_features_edges$names$source,
-          name_target = params_prepare_features_edges$names$target,
-          parameters = params_prepare_features_edges
+        fea_edg_pre <- prepare_features_edges(
+          input = list(ann_ms1_pre_edg, edg_spe),
+          output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
+          name_source = par_pre_fea_edg$names$source,
+          name_target = par_pre_fea_edg$names$target,
+          parameters = par_pre_fea_edg
         )
       }
     ),
     tar_file(
-      name = features_components_prepared,
+      name = fea_com_pre,
       command = {
-        features_components_prepared <- prepare_features_components(
-          input = interim_components,
+        fea_com_pre <- prepare_features_components(
+          input = int_com,
           output = params$files$networks$spectral$components$prepared,
-          parameters = params_prepare_features_components
+          parameters = par_pre_fea_com
         )
       }
     ),
     tar_file(
-      name = features_prepared,
+      name = fea_pre,
       command = {
-        features_prepared <- prepare_features_tables(
-          features = params_prepare_features_tables$files$features$raw,
-          output = params_prepare_features_tables$files$features$prepared,
-          name_features = params_prepare_features_tables$names$features,
-          name_rt = params_prepare_features_tables$names$rt,
-          name_mz = params_prepare_features_tables$names$precursor,
-          parameters = params_prepare_features_tables
+        fea_pre <- prepare_features_tables(
+          features = par_pre_fea_tab$files$features$raw,
+          output = par_pre_fea_tab$files$features$prepared,
+          name_features = par_pre_fea_tab$names$features,
+          name_rt = par_pre_fea_tab$names$rt,
+          name_mz = par_pre_fea_tab$names$precursor,
+          parameters = par_pre_fea_tab
         )
       }
     )
   ),
   tar_file(
-    name = taxa_prepared,
+    name = tax_pre,
     command = {
-      taxa_prepared <- prepare_taxa(
+      tax_pre <- prepare_taxa(
         input = input_features,
-        extension = params_prepare_taxa$names$extension,
-        colname = params_prepare_taxa$names$taxon,
+        extension = par_pre_tax$names$extension,
+        colname = par_pre_tax$names$taxon,
         metadata = input_metadata,
-        top_k = params_prepare_taxa$organisms$candidates,
-        org_tax_ott = library_merged_org_tax_ott,
-        output = params_prepare_taxa$files$taxa$prepared,
-        taxon = params_prepare_taxa$organisms$taxon,
-        parameters = params_prepare_taxa
+        top_k = par_pre_tax$organisms$candidates,
+        org_tax_ott = lib_mer_org_tax_ott,
+        output = par_pre_tax$files$taxa$prepared,
+        taxon = par_pre_tax$organisms$taxon,
+        parameters = par_pre_tax
       )
     }
   ),
   tar_file(
-    name = annotations_prepared,
+    name = ann_pre,
     command = {
-      annotations_prepared <- weight_annotations(
-        library = library_merged_key,
-        str_2D_3D = library_merged_str_2D_3D,
+      ann_pre <- weight_annotations(
+        library = lib_mer_key,
+        str_2D_3D = lib_mer_str_2D_3D,
         annotations = list(
-          annotations_spectral_is_prepared,
-          annotations_ms1_prepared_annotations
+          ann_spe_is_pre,
+          ann_ms1_pre_ann
         ),
-        components = features_components_prepared,
-        edges = features_edges_prepared,
-        features = features_prepared,
-        taxa = taxa_prepared,
-        output = params_weight_annotations$files$annotations$processed,
-        candidates_initial = params_weight_annotations$annotations$candidates$initial,
-        candidates_final = params_weight_annotations$annotations$candidates$final,
-        weight_spectral = params_weight_annotations$weights$global$spectral,
-        weight_chemical = params_weight_annotations$weights$global$chemical,
-        weight_biological = params_weight_annotations$weights$global$biological,
-        score_biological_domain = params_weight_annotations$weights$biological$domain,
-        score_biological_kingdom = params_weight_annotations$weights$biological$kingdom,
-        score_biological_phylum = params_weight_annotations$weights$biological$phylum,
-        score_biological_class = params_weight_annotations$weights$biological$class,
-        score_biological_order = params_weight_annotations$weights$biological$order,
-        score_biological_infraorder = params_weight_annotations$weights$biological$infraorder,
-        score_biological_family = params_weight_annotations$weights$biological$family,
-        score_biological_subfamily = params_weight_annotations$weights$biological$subfamily,
-        score_biological_tribe = params_weight_annotations$weights$biological$tribe,
-        score_biological_subtribe = params_weight_annotations$weights$biological$subtribe,
-        score_biological_genus = params_weight_annotations$weights$biological$genus,
-        score_biological_subgenus = params_weight_annotations$weights$biological$subgenus,
-        score_biological_species = params_weight_annotations$weights$biological$species,
-        score_biological_subspecies = params_weight_annotations$weights$biological$subspecies,
-        score_biological_variety = params_weight_annotations$weights$biological$variety,
-        score_chemical_cla_kingdom = params_weight_annotations$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass = params_weight_annotations$weights$chemical$cla$superclass,
-        score_chemical_cla_class = params_weight_annotations$weights$chemical$cla$class,
-        score_chemical_cla_parent = params_weight_annotations$weights$chemical$cla$parent,
-        score_chemical_npc_pathway = params_weight_annotations$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass = params_weight_annotations$weights$chemical$npc$superclass,
-        score_chemical_npc_class = params_weight_annotations$weights$chemical$npc$class,
-        minimal_ms1_bio = params_weight_annotations$annotations$ms1$thresholds$biological,
-        minimal_ms1_chemo = params_weight_annotations$annotations$ms1$thresholds$chemical,
+        components = fea_com_pre,
+        edges = fea_edg_pre,
+        features = fea_pre,
+        taxa = tax_pre,
+        output = par_wei_ann$files$annotations$processed,
+        candidates_initial = par_wei_ann$annotations$candidates$initial,
+        candidates_final = par_wei_ann$annotations$candidates$final,
+        weight_spectral = par_wei_ann$weights$global$spectral,
+        weight_chemical = par_wei_ann$weights$global$chemical,
+        weight_biological = par_wei_ann$weights$global$biological,
+        score_biological_domain = par_wei_ann$weights$biological$domain,
+        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
+        score_biological_phylum = par_wei_ann$weights$biological$phylum,
+        score_biological_class = par_wei_ann$weights$biological$class,
+        score_biological_order = par_wei_ann$weights$biological$order,
+        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
+        score_biological_family = par_wei_ann$weights$biological$family,
+        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
+        score_biological_tribe = par_wei_ann$weights$biological$tribe,
+        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
+        score_biological_genus = par_wei_ann$weights$biological$genus,
+        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
+        score_biological_species = par_wei_ann$weights$biological$species,
+        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
+        score_biological_variety = par_wei_ann$weights$biological$variety,
+        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
+        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
+        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
+        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
+        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
+        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
         # TODO ADD CONDITION
-        ms1_only = params_weight_annotations$annotations$ms1only,
-        summarise = params_weight_annotations$options$summarise,
-        pattern = params_weight_annotations$files$pattern,
-        force = params_weight_annotations$options$force,
-        parameters = params_weight_annotations
+        ms1_only = par_wei_ann$annotations$ms1only,
+        summarise = par_wei_ann$options$summarise,
+        pattern = par_wei_ann$files$pattern,
+        force = par_wei_ann$options$force,
+        parameters = par_wei_ann
       )
     }
   ),
   tar_file(
-    name = annotations_prepared_crazy,
+    name = ann_pre_crazy,
     command = {
-      annotations_prepared_crazy <- weight_annotations(
-        library = library_merged_key,
-        str_2D_3D = library_merged_str_2D_3D,
+      ann_pre_crazy <- weight_annotations(
+        library = lib_mer_key,
+        str_2D_3D = lib_mer_str_2D_3D,
         annotations = list(
-          annotations_spectral_exp_gnps_prepared,
-          annotations_spectral_exp_internal_prepared,
-          annotations_spectral_is_prepared,
-          annotations_sirius_prepared,
-          annotations_ms1_prepared_annotations
+          ann_spe_exp_gnp_pre,
+          ann_spe_exp_int_pre,
+          ann_spe_is_pre,
+          ann_sir_pre,
+          ann_ms1_pre_ann
         ),
-        components = features_components_prepared,
-        edges = features_edges_prepared,
-        features = features_prepared,
-        taxa = taxa_prepared,
-        output = params_weight_annotations$files$annotations$processed,
-        candidates_initial = params_weight_annotations$annotations$candidates$initial,
-        candidates_final = params_weight_annotations$annotations$candidates$final,
-        weight_spectral = params_weight_annotations$weights$global$spectral,
-        weight_chemical = params_weight_annotations$weights$global$chemical,
-        weight_biological = params_weight_annotations$weights$global$biological,
-        score_biological_domain = params_weight_annotations$weights$biological$domain,
-        score_biological_kingdom = params_weight_annotations$weights$biological$kingdom,
-        score_biological_phylum = params_weight_annotations$weights$biological$phylum,
-        score_biological_class = params_weight_annotations$weights$biological$class,
-        score_biological_order = params_weight_annotations$weights$biological$order,
-        score_biological_infraorder = params_weight_annotations$weights$biological$infraorder,
-        score_biological_family = params_weight_annotations$weights$biological$family,
-        score_biological_subfamily = params_weight_annotations$weights$biological$subfamily,
-        score_biological_tribe = params_weight_annotations$weights$biological$tribe,
-        score_biological_subtribe = params_weight_annotations$weights$biological$subtribe,
-        score_biological_genus = params_weight_annotations$weights$biological$genus,
-        score_biological_subgenus = params_weight_annotations$weights$biological$subgenus,
-        score_biological_species = params_weight_annotations$weights$biological$species,
-        score_biological_subspecies = params_weight_annotations$weights$biological$subspecies,
-        score_biological_variety = params_weight_annotations$weights$biological$variety,
-        score_chemical_cla_kingdom = params_weight_annotations$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass = params_weight_annotations$weights$chemical$cla$superclass,
-        score_chemical_cla_class = params_weight_annotations$weights$chemical$cla$class,
-        score_chemical_cla_parent = params_weight_annotations$weights$chemical$cla$parent,
-        score_chemical_npc_pathway = params_weight_annotations$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass = params_weight_annotations$weights$chemical$npc$superclass,
-        score_chemical_npc_class = params_weight_annotations$weights$chemical$npc$class,
-        minimal_ms1_bio = params_weight_annotations$annotations$ms1$thresholds$biological,
-        minimal_ms1_chemo = params_weight_annotations$annotations$ms1$thresholds$chemical,
+        components = fea_com_pre,
+        edges = fea_edg_pre,
+        features = fea_pre,
+        taxa = tax_pre,
+        output = par_wei_ann$files$annotations$processed,
+        candidates_initial = par_wei_ann$annotations$candidates$initial,
+        candidates_final = par_wei_ann$annotations$candidates$final,
+        weight_spectral = par_wei_ann$weights$global$spectral,
+        weight_chemical = par_wei_ann$weights$global$chemical,
+        weight_biological = par_wei_ann$weights$global$biological,
+        score_biological_domain = par_wei_ann$weights$biological$domain,
+        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
+        score_biological_phylum = par_wei_ann$weights$biological$phylum,
+        score_biological_class = par_wei_ann$weights$biological$class,
+        score_biological_order = par_wei_ann$weights$biological$order,
+        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
+        score_biological_family = par_wei_ann$weights$biological$family,
+        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
+        score_biological_tribe = par_wei_ann$weights$biological$tribe,
+        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
+        score_biological_genus = par_wei_ann$weights$biological$genus,
+        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
+        score_biological_species = par_wei_ann$weights$biological$species,
+        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
+        score_biological_variety = par_wei_ann$weights$biological$variety,
+        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
+        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
+        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
+        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
+        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
+        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
         # TODO ADD CONDITION
-        ms1_only = params_weight_annotations$annotations$ms1only,
-        summarise = params_weight_annotations$options$summarise,
-        pattern = params_weight_annotations$files$pattern,
-        force = params_weight_annotations$options$force,
-        parameters = params_weight_annotations
+        ms1_only = par_wei_ann$annotations$ms1only,
+        summarise = par_wei_ann$options$summarise,
+        pattern = par_wei_ann$files$pattern,
+        force = par_wei_ann$options$force,
+        parameters = par_wei_ann
       )
     }
   )
