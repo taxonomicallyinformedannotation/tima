@@ -12,7 +12,8 @@ require(
 log_debug(
   "This script",
   crayon::green(
-    "performs spectral similarity calculation to annotate against a spectral library. \n"
+    "performs spectral similarity calculation",
+    "to annotate against a spectral library. \n"
   )
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")

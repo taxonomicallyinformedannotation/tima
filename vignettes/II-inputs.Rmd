@@ -65,7 +65,11 @@ source(file = "inst/scripts/prepare_params.R")
 And now, you should get the following:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(names = starts_with("params"), targets_only = TRUE, degree_from = 8)
+targets::tar_visnetwork(
+  names = starts_with("params"),
+  targets_only = TRUE,
+  degree_from = 8
+)
 ```
 
 See how your targets changed?

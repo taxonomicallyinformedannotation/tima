@@ -14,7 +14,8 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-## TODO check md5 if possible (see https://twitter.com/Adafede/status/1592543895094788096)
+## TODO check md5 if possible
+## (see https://twitter.com/Adafede/status/1592543895094788096)
 log_debug("Downloading HMDB (might be long)")
 get_file(
   url = paths$urls$hmdb$metabolites,

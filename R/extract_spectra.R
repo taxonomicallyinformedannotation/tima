@@ -37,7 +37,7 @@ extract_spectra <- function(object) {
   ## Synonyms issue
   spectra <- spectra |>
     dplyr::group_by(dplyr::across(c(-dplyr::any_of("synonym")))) |>
-    dplyr::summarize(dplyr::across(.cols = where(is.list), .fns = as.character)) |>
+    dplyr::summarize(dplyr::across(.cols = dplyr::where(is.list), .fns = as.character)) |>
     dplyr::ungroup()
 
   ## Columns types issue

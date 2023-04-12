@@ -8,10 +8,10 @@ server <- function(input, output, session) {
   shinyhelper::observe_helpers()
 
   # Enable the Submit button when all mandatory fields are filled out
-  observe(x = {
-    mandatoryFilled <-
+  shiny::observe(x = {
+    mandatory_filled <-
       vapply(
-        X = fieldsMandatory,
+        X = fields_mandatory,
         FUN = function(x) {
           ## TODO improve
           suppressWarnings(!is.null(input[[x]]) &&
@@ -19,9 +19,9 @@ server <- function(input, output, session) {
         },
         FUN.VALUE = logical(1)
       )
-    mandatoryFilled <- all(mandatoryFilled)
+    mandatory_filled <- all(mandatory_filled)
 
-    shinyjs::toggleState(id = "save", condition = mandatoryFilled)
+    shinyjs::toggleState(id = "save", condition = mandatory_filled)
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
   })
 
@@ -33,14 +33,17 @@ server <- function(input, output, session) {
     }
   })
   iv$add_rule("org_tax", function(taxon) {
-    if (is.na(rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id)) {
+    if (is.na(rotl::tnrs_match_names(
+      names = taxon,
+      do_approximate_matching = FALSE
+    )$ott_id)) {
       "Taxon not found in Open Tree of Life"
     }
   })
   iv$enable()
 
   # When the Save button is clicked, save the response
-  observeEvent(
+  shiny::observeEvent(
     eventExpr = input$save,
     handlerExpr = {
       # User-experience stuff
@@ -72,7 +75,7 @@ server <- function(input, output, session) {
     }
   )
 
-  observeEvent(
+  shiny::observeEvent(
     eventExpr = input$launch,
     handlerExpr = {
       shinyjs::show("job_msg")
@@ -142,19 +145,20 @@ server <- function(input, output, session) {
           reporter = "verbose_positives"
         )
       }, finally = {
-        stopApp()
+        shiny::stopApp()
       })
-      process <- reactiveValues(status = targets::tar_active())
-      observe({
-        invalidateLater(millis = 5000)
+      process <-
+        shiny::reactiveValues(status = targets::tar_active())
+      shiny::observe({
+        shiny::invalidateLater(millis = 5000)
         process$status <- targets::tar_active()
       })
 
-      observeEvent(
+      shiny::observeEvent(
         eventExpr = process$status,
         handlerExpr = {
           message("Job finished")
-          stopApp()
+          shiny::stopApp()
         }
       )
     }

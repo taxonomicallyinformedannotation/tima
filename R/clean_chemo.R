@@ -116,7 +116,7 @@ clean_chemo <-
         structure_inchikey_2D,
         reference_doi,
         organism_name,
-        across(c(
+        dplyr::across(c(
           dplyr::contains("organism_taxonomy_")
         ))
       ) |>

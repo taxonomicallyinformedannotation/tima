@@ -53,7 +53,8 @@ prepare_mona <-
         x = inchi,
         fixed = TRUE
       )) |>
-      ## COMMENT (AR): Dropped the idea, too many things to do (mainly replace u by ?)
+      ## COMMENT (AR): Dropped the idea
+      ## too many things to do (mainly replace u by ?)
       ## COMMENT (AR): No way
       dplyr::mutate(inchi = gsub(
         pattern = " ",
@@ -134,7 +135,9 @@ prepare_mona <-
 
     log_debug(
       nrow(spctra_enhanced_5),
-      "spectra were not unambiguously attributed, trying the same by default base on ion type, might induce some errors"
+      "spectra were not unambiguously attributed,",
+      "trying the same by default base on ion type,",
+      "might induce some errors"
     )
 
     spctra_enhanced_final <- dplyr::bind_rows(
