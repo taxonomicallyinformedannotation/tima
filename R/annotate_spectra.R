@@ -190,6 +190,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
     df_final <- df_final |>
+      dplyr::rowwise() |>
       dplyr::mutate(
         feature_id = ifelse(
           test = isSlaw,
@@ -228,7 +229,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "presence_ratio",
           "matched_peaks_count"
         )
-      ))
+      )) |>
+      dplyr::filter(!is.na(score))
 
     ## COMMENT AR: Not doing it because of thresholding
     # df_final[is.na(df_final)] <- 0
