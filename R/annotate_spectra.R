@@ -185,7 +185,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     log_debug("Collecting results")
     df_final <- matches_sim |>
       MetaboAnnotation::matchedData() |>
-      data.frame()
+      data.frame() |>
+      dplyr::filter(!is.na(score))
 
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
@@ -229,8 +230,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "presence_ratio",
           "matched_peaks_count"
         )
-      )) |>
-      dplyr::filter(!is.na(score))
+      ))
 
     ## COMMENT AR: Not doing it because of thresholding
     # df_final[is.na(df_final)] <- 0
