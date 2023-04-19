@@ -91,7 +91,7 @@ prepare_libraries_adducts <-
     pure_pos <-
       create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
       dplyr::filter(grepl(
-        pattern = "pos_1",
+        pattern = "]1+",
         x = adduct,
         fixed = TRUE
       )) |>
@@ -101,7 +101,7 @@ prepare_libraries_adducts <-
     pure_neg <-
       create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
       dplyr::filter(grepl(
-        pattern = "neg_1",
+        pattern = "]1-",
         x = adduct,
         fixed = TRUE
       )) |>

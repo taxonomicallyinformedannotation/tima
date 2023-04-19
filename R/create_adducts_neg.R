@@ -30,23 +30,23 @@ create_adducts_neg <- function(massesTable, adductsTable) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
     dplyr::mutate(
-      neg_3_3proton = (exact_mass - 3 * proton) / 3,
-      neg_2_2proton = ((exact_mass - 2 * proton) / 2),
-      # neg_1_minus2waterminus1proton = exact_mass - 2 * water - proton,
-      # neg_1_minus1waterminus1proton = exact_mass - water - proton,
-      neg_1_minus1proton = exact_mass - proton,
-      neg_1_minus2proton1sodium = exact_mass + sodium - 2 * proton,
-      neg_1_1chlorine = exact_mass + chlorine,
-      neg_1_minus2proton1potassium = exact_mass + potassium - 2 * proton,
-      neg_1_minus1proton1formic = exact_mass + formic - proton,
-      neg_1_minus1proton1acetic = exact_mass + acetic - proton,
-      neg_1_minus2proton1sodium1formic = exact_mass + formic + sodium - 2 * proton,
-      neg_1_1bromine = exact_mass + bromine,
-      neg_1_minus1proton1tfa = exact_mass + tfa - proton,
-      neg_2MH = 2 * exact_mass - proton,
-      neg_2MFAH = 2 * exact_mass + formic - proton,
-      neg_2MACH = 2 * exact_mass + acetic - proton,
-      neg_3MH = 3 * exact_mass - proton
+      `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
+      `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),
+      # `[1M-(H)2(H2O)1]1-` = exact_mass - 2 * water - proton,
+      # `[1M-(H)2(H2O)1]1-` = exact_mass - water - proton,
+      `[1M-(H)1]1-` = exact_mass - proton,
+      `[1M+(Na)1-(H)2]1-` = exact_mass + sodium - 2 * proton,
+      `[1M+(Cl)1]1-` = exact_mass + chlorine,
+      `[1M+(K)1-(H)2]1-` = exact_mass + potassium - 2 * proton,
+      `[1M+(FA)1-(H)1]1-` = exact_mass + formic - proton,
+      `[1M+(Hac)1-(H)1]1-` = exact_mass + acetic - proton,
+      `[1M+(Na)1(FA)1-(H)2]1-` = exact_mass + formic + sodium - 2 * proton,
+      `[1M+(Br)1]1-` = exact_mass + bromine,
+      `[1M+(TFA)1-(H)1]1-` = exact_mass + tfa - proton,
+      `[2M-(H)1]1-` = 2 * exact_mass - proton,
+      `[2M+(FA)1-(H)1]1-` = 2 * exact_mass + formic - proton,
+      `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
+      `[3M-(H)1]1-` = 3 * exact_mass - proton
     ) |>
     dplyr::select(-colnames(adductsTable))
 

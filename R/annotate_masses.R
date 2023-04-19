@@ -360,12 +360,12 @@ annotate_masses <-
         label = label_dest
       )
 
-    ## Always considering [M+H]+ and [M-H]- ions by default
+    ## Always considering [1M+H]+ and [1M-H]- ions by default
     df9_ion <- df3 |>
       dplyr::distinct(feature_id) |>
       dplyr::mutate(label = switch(msMode,
-        "pos" = "pos_1_1proton",
-        "neg" = "neg_1_1proton"
+        "pos" = "[1M+(H)1]1+",
+        "neg" = "[1M-(H)1]1-"
       ))
 
     df9_c <- dplyr::bind_rows(
@@ -477,18 +477,18 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
-      "pos_1_1proton1acetonitrile - NH3",
-      "pos_1_1proton1ammonium - NH3",
-      "pos_1_1proton1ethylamine - NH3",
-      "pos_1_1proton1methanol - CH3COOH",
-      "pos_1_1proton1methanol - H2O",
-      "pos_1_1proton1methanol - O",
-      "pos_1_1proton2acetonitrile - NH3",
-      "pos_1_1sodium1acetonitrile - NH3",
-      "pos_2_2proton1acetonitrile - NH3",
-      "pos_2_2proton1ammonium - NH3",
-      "pos_2_2proton2acetonitrile - NH3",
-      "pos_2_2proton3acetonitrile - NH3"
+      "[1M+(H)1(ACN)1]1+ - NH3",
+      "[1M+(H)1(NH3)1]1+ - NH3",
+      "[1M+(H)1(C2H7N)1]1+ - NH3",
+      "[1M+(H)1(CH3OH)1]1+ - CH3COOH",
+      "[1M+(H)1(CH3OH)1]1+ - H2O",
+      "[1M+(H)1(CH3OH)1]1+ - O",
+      "[1M+(H)1(ACN)2]1+ - NH3",
+      "[1M+(Na)1(ACN)1]1+ - NH3",
+      "[1M+(H)2(ACN)1]2+ - NH3",
+      "[1M+(H)2(NH3)1]2+ - NH3",
+      "[1M+(H)2(ACN)2]2+ - NH3",
+      "[1M+(H)2(ACN)3]2+ - NH3"
     )
 
     "%ni%" <- Negate("%in%")
@@ -508,7 +508,7 @@ annotate_masses <-
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::distinct()
 
-    log_debug("adding adduct mass to get back to [M] \n")
+    log_debug("adding adduct mass to get back to [1M] \n")
     df15 <-
       dplyr::left_join(df14, adductsTable, by = stats::setNames("adduct", "library")) |>
       dplyr::distinct(feature_id, .keep_all = TRUE) |>
@@ -518,7 +518,7 @@ annotate_masses <-
       ) |>
       dplyr::filter(!is.na(adduct_mass))
 
-    log_debug("keeping these ions for dimers and multicharged exploration starting from [M] \n")
+    log_debug("keeping these ions for dimers and multicharged exploration starting from [1M] \n")
     df16 <- dplyr::inner_join(df3, df15)
 
     log_debug("calculating multicharged and in source dimers and adding delta mz tolerance \n")
@@ -532,60 +532,60 @@ annotate_masses <-
         ) |>
         dplyr::rowwise() |>
         dplyr::mutate(
-          pos_3_3proton = (mz - adduct_mass + 3 * adductsM["H (proton)"]) / 3,
-          pos_3_2proton1sodium = (mz - adduct_mass +
+          `[1M+(H)3]3+` = (mz - adduct_mass + 3 * adductsM["H (proton)"]) / 3,
+          `[1M+(H)2(Na)1]3+` = (mz - adduct_mass +
             2 * adductsM["H (proton)"] +
             adductsM["Na (sodium)"]) / 3,
-          pos_3_1proton2sodium = (mz - adduct_mass +
+          `[1M+(H)1(Na)2]3+` = (mz - adduct_mass +
             adductsM["H (proton)"] +
             2 * adductsM["Na (sodium)"]) / 3,
-          pos_3_3sodium = (mz - adduct_mass + 3 * adductsM["Na (sodium)"]) / 3,
-          pos_2_2proton = (mz - adduct_mass + 2 * adductsM["H (proton)"]) / 2,
-          pos_2_2proton1ammonium = (mz - adduct_mass +
+          `[1M+(Na)3]3+` = (mz - adduct_mass + 3 * adductsM["Na (sodium)"]) / 3,
+          `[1M+(H)2]2+` = (mz - adduct_mass + 2 * adductsM["H (proton)"]) / 2,
+          `[1M+(H)2(NH3)1]2+` = (mz - adduct_mass +
             2 * adductsM["H (proton)"] +
             adductsM["NH4 (ammonium)"]) / 2,
-          pos_2_1proton1sodium = (mz - adduct_mass +
+          `[1M+(H)1(Na)1]2+` = (mz - adduct_mass +
             adductsM["H (proton)"] +
             adductsM["Na (sodium)"]) / 2,
-          pos_2_1magnesium = (mz - adduct_mass +
+          `[1M+(Mg)1]2+` = (mz - adduct_mass +
             adductsM["Mg (magnesium)"]) / 2,
-          pos_2_1proton1potassium = (mz - adduct_mass +
+          `[1M+(H)1(K)1]2+` = (mz - adduct_mass +
             adductsM["H (proton)"] +
             adductsM["K (potassium)"]) / 2,
-          pos_2_1calcium = (mz - adduct_mass +
+          `[1M+(Ca)1]2+` = (mz - adduct_mass +
             adductsM["Ca (calcium)"]) / 2,
-          pos_2_2proton1acetonitrile = (mz - adduct_mass +
+          `[1M+(H)2(ACN)1]2+` = (mz - adduct_mass +
             2 * adductsM["H (proton)"] +
             adductsM["C2H3N (acetonitrile)"]) / 2,
-          pos_2_2sodium = (mz - adduct_mass +
+          `[1M+(Na)2]2+` = (mz - adduct_mass +
             2 * adductsM["Na (sodium)"]) / 2,
-          pos_2_1iron = (mz - adduct_mass +
+          `[1M+(Fe)1]2+` = (mz - adduct_mass +
             adductsM["Fe (iron)"]) / 2,
-          pos_2_2proton2acetonitrile = (mz - adduct_mass +
+          `[1M+(H)2(ACN)2]2+` = (mz - adduct_mass +
             2 * adductsM["H (proton)"] +
             2 * adductsM["C2H3N (acetonitrile)"]) / 2,
-          pos_2_2proton3acetonitrile = (mz - adduct_mass +
+          `[1M+(H)2(ACN)3]2+` = (mz - adduct_mass +
             2 * adductsM["H (proton)"] +
             3 * adductsM["C2H3N (acetonitrile)"]) / 2,
-          pos_2MMg = (2 * (mz - adduct_mass) +
+          `[2M+(Mg)1]2+` = (2 * (mz - adduct_mass) +
             adductsM["Mg (magnesium)"]) / 2,
-          pos_2MCa = (2 * (mz - adduct_mass) +
+          `[2M+(Ca)1]2+` = (2 * (mz - adduct_mass) +
             adductsM["Ca (calcium)"]) / 2,
-          pos_2MFe = (2 * (mz - adduct_mass) +
+          `[2M+(Fe)1]2+` = (2 * (mz - adduct_mass) +
             adductsM["Fe (iron)"]) / 2,
-          pos_2MH = 2 * (mz - adduct_mass) +
+          `[2M+(H)1]1+` = 2 * (mz - adduct_mass) +
             adductsM["H (proton)"],
-          pos_2MHNH3 = 2 * (mz - adduct_mass) +
+          `[2M+(H)1(NH3)1]1+` = 2 * (mz - adduct_mass) +
             adductsM["H (proton)"] +
             adductsM["NH4 (ammonium)"],
-          pos_2MNa = 2 * (mz - adduct_mass) +
+          `[2M+(Na)1]1+` = 2 * (mz - adduct_mass) +
             adductsM["Na (sodium)"],
-          pos_2MK = 2 * (mz - adductsM["H (proton)"]) +
+          `[2M+(K)1]1+` = 2 * (mz - adductsM["H (proton)"]) +
             adductsM["K (potassium)"],
-          pos_2MHCH3CN = 2 * (mz - adduct_mass) +
+          `[2M+(H)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
             adductsM["H (proton)"] +
             adductsM["C2H3N (acetonitrile)"],
-          pos_2MCH3CNNa = 2 * (mz - adduct_mass) +
+          `[2M+(Na)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
             adductsM["C2H3N (acetonitrile)"] +
             adductsM["Na (sodium)"]
         ) |>
@@ -606,17 +606,17 @@ annotate_masses <-
         ) |>
         dplyr::rowwise() |>
         dplyr::mutate(
-          neg_3_3proton = (mz + adduct_mass -
+          `[1M-(H)3]3-` = (mz + adduct_mass -
             3 * adductsM["H (proton)"]) / 3,
-          neg_2_2proton = (mz + adduct_mass -
+          `[1M-(H)2]2-` = (mz + adduct_mass -
             2 * adductsM["H (proton)"]) / 2,
-          neg_2MH = 2 * (mz + adduct_mass) -
+          `[2M-(H)1]1-` = 2 * (mz + adduct_mass) -
             adductsM["H (proton)"],
-          neg_2MFAH = 2 * (mz + adduct_mass) +
+          `[2M+(FA)1-(H)1]1-` = 2 * (mz + adduct_mass) +
             adductsM["CH2O2 (formic)"] - adductsM["H (proton)"],
-          neg_2MACH = 2 * (mz + adduct_mass) +
+          `[2M+(Hac)1-(H)1]1-` = 2 * (mz + adduct_mass) +
             adductsM["C2H4O2 (acetic)"] - adductsM["H (proton)"],
-          neg_3MH = 3 * (mz + adduct_mass) -
+          `[3M-(H)1]1-` = 3 * (mz + adduct_mass) -
             adductsM["H (proton)"]
         ) |>
         dplyr::select(-adduct_mass) |>
@@ -687,7 +687,7 @@ annotate_masses <-
         )
       ) |>
       dplyr::filter(stringr::str_detect(
-        pattern = paste(adduct, "", sep = " "),
+        pattern = stringr::fixed(paste(adduct, "", sep = " ")),
         string = library_name
       )) |>
       dplyr::mutate(mz_error = adduct_mass - adduct_value) |>
