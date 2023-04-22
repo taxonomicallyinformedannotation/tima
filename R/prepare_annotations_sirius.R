@@ -14,7 +14,7 @@ utils::globalVariables(
     "molecularFormula",
     "name",
     "score_input",
-    # "score_input_tukeyed",
+    # "score_input_normalized",
     "smiles",
     "smiles_2D",
     "structure_exact_mass",
@@ -256,7 +256,13 @@ prepare_annotations_sirius <-
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA
-          # score_input_tukeyed = rcompanion::transformTukey(as.numeric(score_input)),
+          # score_input_normalized = bestNormalize::bestNormalize(
+          #   x = score_input,
+          #   standardize = FALSE,
+          #   allow_orderNorm = FALSE,
+          #   allow_lambert_s = TRUE,
+          #   allow_lambert_h = TRUE
+          # )$x.t
         ) |>
         dplyr::select(
           feature_id,
@@ -272,7 +278,7 @@ prepare_annotations_sirius <-
           structure_xlogp,
           library,
           score_input,
-          # score_input_tukeyed,
+          # score_input_normalized,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -310,7 +316,7 @@ prepare_annotations_sirius <-
         structure_xlogp = NA,
         library = NA,
         score_input = NA,
-        # score_input_tukeyed = NA,
+        # score_input_normalized = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,

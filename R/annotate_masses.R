@@ -35,7 +35,7 @@ utils::globalVariables(
     "rt_min",
     "rt.x",
     "score_input",
-    # "score_input_tukeyed",
+    # "score_input_normalized",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -709,7 +709,7 @@ annotate_masses <-
       ) |>
       dplyr::mutate(
         score_input = 0
-        # score_input_tukeyed = 0
+        # score_input_normalized = 0
       ) |>
       dplyr::select(
         structure_molecular_formula,
@@ -745,7 +745,7 @@ annotate_masses <-
         structure_xlogp,
         library,
         score_input
-        # score_input_tukeyed
+        # score_input_normalized
       )
 
     log_debug("adding chemical classification")

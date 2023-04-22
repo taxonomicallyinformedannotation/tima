@@ -5,7 +5,7 @@ utils::globalVariables(
     "feature_id",
     "score",
     "score_input",
-    # "score_input_tukeyed",
+    # "score_input_normalized",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -81,7 +81,13 @@ prepare_annotations_spectra <-
       # Add new columns
       dplyr::mutate(
         library = "ISDB",
-        # score_input_tukeyed = rcompanion::transformTukey(as.numeric(score_input)),
+        # score_input_normalized = bestNormalize::bestNormalize(
+        #   x = score_input,
+        #   standardize = FALSE,
+        #   allow_orderNorm = FALSE,
+        #   allow_lambert_s = TRUE,
+        #   allow_lambert_h = TRUE
+        # )$x.t,
         structure_exact_mass = as.numeric(structure_exact_mass),
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
@@ -109,7 +115,7 @@ prepare_annotations_spectra <-
         structure_xlogp,
         library,
         score_input,
-        # score_input_tukeyed,
+        # score_input_normalized,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class,
