@@ -44,7 +44,7 @@ utils::globalVariables(
     "score_biological_tribe",
     "score_biological_variety",
     "score_input",
-    "score_input_tukeyed",
+    # "score_input_tukeyed",
     "score_pondered_bio",
     "structure_inchikey_2D",
     "structure_molecular_formula",
