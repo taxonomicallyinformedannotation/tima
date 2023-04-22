@@ -1,10 +1,11 @@
 utils::globalVariables(
   c(
+    "error_mz",
+    "error_rt",
     "feature_id",
-    "mz_error",
-    "rt_error",
     "score",
     "score_input",
+    # "score_input_tukeyed",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -67,8 +68,8 @@ prepare_annotations_spectra <-
       dplyr::bind_rows() |>
       dplyr::distinct(
         feature_id,
-        mz_error,
-        rt_error,
+        error_mz,
+        error_rt,
         structure_name,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -80,6 +81,7 @@ prepare_annotations_spectra <-
       # Add new columns
       dplyr::mutate(
         library = "ISDB",
+        # score_input_tukeyed = rcompanion::transformTukey(as.numeric(score_input)),
         structure_exact_mass = as.numeric(structure_exact_mass),
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
@@ -95,8 +97,8 @@ prepare_annotations_spectra <-
       # dplyr::ungroup() |>
       dplyr::select(
         feature_id,
-        mz_error,
-        rt_error,
+        error_mz,
+        error_rt,
         structure_name,
         # structure_inchikey,
         structure_inchikey_2D,
@@ -107,6 +109,7 @@ prepare_annotations_spectra <-
         structure_xlogp,
         library,
         score_input,
+        # score_input_tukeyed,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class,

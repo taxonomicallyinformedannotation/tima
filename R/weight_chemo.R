@@ -43,6 +43,7 @@ utils::globalVariables(
     "score_chemical_npc_pathway",
     "score_chemical_npc_superclass",
     "score_input",
+    # "score_input_tukeyed",
     "score_pondered_chemo",
     "structure_inchikey_2D",
     "structure_smiles_2D",
@@ -229,6 +230,7 @@ weight_chemo <-
             )) *
               weightSpectral *
               as.numeric(score_input)
+          # as.numeric(score_input_tukeyed)
         )
       ) |>
       dplyr::group_by(feature_id) |>

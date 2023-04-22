@@ -6,6 +6,8 @@ utils::globalVariables(
     "delta_max",
     "delta_min",
     "Distance",
+    "error_mz",
+    "error_rt",
     "exact_mass",
     "feature_id",
     "feature_id_dest",
@@ -24,17 +26,16 @@ utils::globalVariables(
     "mz",
     "mz_1",
     "mz_dest",
-    "mz_error",
     "mz_max",
     "mz_min",
     "mz.x",
     "mz.y",
     "rt",
-    "rt_error",
     "rt_max",
     "rt_min",
     "rt.x",
     "score_input",
+    # "score_input_tukeyed",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -404,16 +405,16 @@ annotate_masses <-
         )
       ) |>
       dplyr::mutate(
-        mz_error = adduct_mass - mz_1,
-        rt_error = NA_real_
+        error_mz = adduct_mass - mz_1,
+        error_rt = NA_real_
       ) |>
       dplyr::select(
         feature_id,
         rt,
         mz,
         score_input,
-        mz_error,
-        rt_error,
+        error_mz,
+        error_rt,
         exact_mass,
         adduct,
         adduct_mass,
@@ -440,8 +441,8 @@ annotate_masses <-
         mz,
         score_input,
         library,
-        mz_error,
-        rt_error,
+        error_mz,
+        error_rt,
         exact_mass
       ) |>
       dplyr::filter(!is.na(exact_mass))
@@ -690,14 +691,14 @@ annotate_masses <-
         pattern = stringr::fixed(paste(adduct, "", sep = " ")),
         string = library_name
       )) |>
-      dplyr::mutate(mz_error = adduct_mass - adduct_value) |>
+      dplyr::mutate(error_mz = adduct_mass - adduct_value) |>
       dplyr::distinct(
         feature_id,
         rt,
         mz,
         exact_mass,
         library_name,
-        mz_error,
+        error_mz,
         adduct_value
       )
 
@@ -706,7 +707,10 @@ annotate_masses <-
         df13,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
-      dplyr::mutate(score_input = 0) |>
+      dplyr::mutate(
+        score_input = 0
+        # score_input_tukeyed = 0
+      ) |>
       dplyr::select(
         structure_molecular_formula,
         library = library_name,
@@ -729,8 +733,8 @@ annotate_masses <-
       dplyr::ungroup() |>
       dplyr::distinct(
         feature_id,
-        mz_error,
-        rt_error,
+        error_mz,
+        error_rt,
         structure_name,
         # structure_inchikey,
         structure_inchikey_2D,
@@ -741,6 +745,7 @@ annotate_masses <-
         structure_xlogp,
         library,
         score_input
+        # score_input_tukeyed
       )
 
     log_debug("adding chemical classification")

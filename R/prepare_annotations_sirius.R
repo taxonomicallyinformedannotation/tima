@@ -2,6 +2,8 @@ utils::globalVariables(
   c(
     "ConfidenceScore",
     "CSI:FingerIDScore",
+    "error_mz",
+    "error_rt",
     "feature_id",
     "id",
     "inchikey_2D",
@@ -10,10 +12,9 @@ utils::globalVariables(
     "massErrorPrecursor(ppm)",
     "molecular_formula",
     "molecularFormula",
-    "mz_error",
     "name",
-    "rt_error",
     "score_input",
+    # "score_input_tukeyed",
     "smiles",
     "smiles_2D",
     "structure_exact_mass",
@@ -196,7 +197,7 @@ prepare_annotations_sirius <-
             ifelse(
               test = ConfidenceScore != "N/A",
               yes = ConfidenceScore,
-              no = -10 / `CSI:FingerIDScore`
+              no = -10 / as.numeric(`CSI:FingerIDScore`)
             )
           )
         ) |>
@@ -219,24 +220,24 @@ prepare_annotations_sirius <-
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
         dplyr::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
-          mz_error = ionMass * `massErrorPrecursor(ppm)` * 1E-6
+          error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
         dplyr::distinct(feature_id,
           molecular_formula = molecularFormula,
           structure_exact_mass,
-          mz_error
+          error_mz
         )
 
       formula_adducts_prepared <- formula_adducts |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
         dplyr::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
-          mz_error = ionMass * `massErrorPrecursor(ppm)` * 1E-6
+          error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
         dplyr::distinct(feature_id,
           molecular_formula = molecularFormula,
           structure_exact_mass,
-          mz_error
+          error_mz
         )
 
       compounds_prepared <-
@@ -252,14 +253,15 @@ prepare_annotations_sirius <-
         dplyr::left_join(canopus_npc_prepared) |>
         dplyr::distinct() |>
         dplyr::mutate(
-          rt_error = NA,
+          error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA
+          # score_input_tukeyed = rcompanion::transformTukey(as.numeric(score_input)),
         ) |>
         dplyr::select(
           feature_id,
-          mz_error,
-          rt_error,
+          error_mz,
+          error_rt,
           structure_name,
           # structure_inchikey = inchikey,
           structure_inchikey_2D = inchikey_2D,
@@ -270,6 +272,7 @@ prepare_annotations_sirius <-
           structure_xlogp,
           library,
           score_input,
+          # score_input_tukeyed,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -295,8 +298,8 @@ prepare_annotations_sirius <-
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
-        mz_error = NA,
-        rt_error = NA,
+        error_mz = NA,
+        error_rt = NA,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,
@@ -307,6 +310,7 @@ prepare_annotations_sirius <-
         structure_xlogp = NA,
         library = NA,
         score_input = NA,
+        # score_input_tukeyed = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,

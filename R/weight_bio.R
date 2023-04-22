@@ -44,6 +44,7 @@ utils::globalVariables(
     "score_biological_tribe",
     "score_biological_variety",
     "score_input",
+    "score_input_tukeyed",
     "score_pondered_bio",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -103,6 +104,7 @@ weight_bio <-
         structure_inchikey_2D,
         structure_smiles_2D,
         score_input,
+        # score_input_tukeyed,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -726,6 +728,7 @@ weight_bio <-
             (1 / (weightBiological + weightSpectral)) *
               weightSpectral *
               as.numeric(score_input)
+          # as.numeric(score_input_tukeyed)
         )
       )
 

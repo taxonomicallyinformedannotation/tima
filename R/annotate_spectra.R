@@ -199,8 +199,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           no = as.numeric(acquisitionNum)
         ),
         ## Working in minutes
-        rt_error = (target_rtime - rtime) / 60,
-        mz_error = target_precursorMz - precursorMz,
+        error_rt = (target_rtime - rtime) / 60,
+        error_mz = target_precursorMz - precursorMz,
         structure_inchikey_2D = ifelse(
           test = is.na(target_inchikey_2D),
           yes = target_inchikey |>
@@ -215,8 +215,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       dplyr::select(dplyr::any_of(
         c(
           "feature_id",
-          "mz_error",
-          "rt_error",
+          "error_mz",
+          "error_rt",
           "structure_name" = "target_name",
           # "structure_inchikey" = "target_inchikey",
           "structure_inchikey_2D",
@@ -267,8 +267,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       df_final <-
         data.frame(
           feature_id = NA,
-          mz_error = NA,
-          rt_error = NA,
+          error_mz = NA,
+          error_rt = NA,
           structure_name = NA,
           # structure_inchikey = NA,
           structure_inchikey_2D = NA,
@@ -288,8 +288,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     df_final <-
       data.frame(
         feature_id = NA,
-        mz_error = NA,
-        rt_error = NA,
+        error_mz = NA,
+        error_rt = NA,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,

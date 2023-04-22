@@ -2,19 +2,20 @@ utils::globalVariables(
   c(
     "#Scan#",
     "Compound_Name",
+    "error_mz",
+    "error_rt",
     "ExactMass",
     "feature_id",
     "InChIKey",
     "InChIKey-Planar",
     "MQScore",
-    "mz_error",
     "MZErrorPPM",
     "npclassifier_class",
     "npclassifier_pathway",
     "npclassifier_superclass",
     "Precursor_MZ",
-    "rt_error",
     "score_input",
+    # "score_input_tukeyed",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -73,15 +74,15 @@ prepare_annotations_gnps <-
       ) |>
         dplyr::bind_rows() |>
         dplyr::mutate(
-          mz_error = as.numeric(MZErrorPPM) *
+          error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
-          rt_error = NA
+          error_rt = NA
         ) |>
         dplyr::select(
           feature_id = `#Scan#`,
-          mz_error,
-          rt_error,
+          error_mz,
+          error_rt,
           structure_name = Compound_Name,
           # structure_smiles = Smiles,
           score_input = MQScore,
@@ -99,6 +100,7 @@ prepare_annotations_gnps <-
           structure_smiles_2D = NA,
           structure_molecular_formula = NA,
           structure_xlogp = NA,
+          # score_input_tukeyed = rcompanion::transformTukey(as.numeric(score_input)),
           ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
@@ -108,8 +110,8 @@ prepare_annotations_gnps <-
         ) |>
         dplyr::select(
           feature_id,
-          mz_error,
-          rt_error,
+          error_mz,
+          error_rt,
           structure_name,
           # structure_inchikey,
           structure_inchikey_2D,
@@ -120,6 +122,7 @@ prepare_annotations_gnps <-
           structure_xlogp,
           library,
           score_input,
+          # score_input_tukeyed,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -144,8 +147,8 @@ prepare_annotations_gnps <-
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- data.frame(
         feature_id = NA,
-        mz_error = NA,
-        rt_error = NA,
+        error_mz = NA,
+        error_rt = NA,
         structure_name = NA,
         # structure_inchikey = NA,
         structure_inchikey_2D = NA,
@@ -156,6 +159,7 @@ prepare_annotations_gnps <-
         structure_xlogp = NA,
         library = NA,
         score_input = NA,
+        # score_input_tukeyed = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
