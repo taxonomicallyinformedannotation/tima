@@ -1522,7 +1522,7 @@ list(
       name = fea_pre,
       command = {
         fea_pre <- prepare_features_tables(
-          features = par_pre_fea_tab$files$features$raw,
+          features = input_features,
           output = par_pre_fea_tab$files$features$prepared,
           name_features = par_pre_fea_tab$names$features,
           name_rt = par_pre_fea_tab$names$rt,
