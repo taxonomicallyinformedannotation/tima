@@ -1,6 +1,8 @@
 utils::globalVariables(
   c(
     "ConfidenceScore",
+    "count_peaks_explained",
+    "count_peaks_matched",
     "CSI:FingerIDScore",
     "error_mz",
     "error_rt",
@@ -15,6 +17,9 @@ utils::globalVariables(
     "name",
     "score_input",
     # "score_input_normalized",
+    # "score_sirius_csi",
+    # "score_sirius_sirius",
+    # "score_sirius_zodiac",
     "smiles",
     "smiles_2D",
     "structure_exact_mass",
@@ -120,6 +125,8 @@ prepare_annotations_sirius <-
         col_select = c(
           "ConfidenceScore",
           "CSI:FingerIDScore",
+          # "ZodiacScore",
+          # "SiriusScore",
           "molecularFormula",
           "adduct",
           "InChIkey2D",
@@ -164,56 +171,47 @@ prepare_annotations_sirius <-
           )
         ))
 
-      ## TODO score not optimal
       compound_prepared <- compound_summary_ready |>
-        dplyr::mutate(
-          score_input = as.numeric(
-            ifelse(
-              test = ConfidenceScore != "N/A",
-              yes = ConfidenceScore,
-              no = -10 / as.numeric(`CSI:FingerIDScore`)
-            )
-          ),
-          structure_xlogp = as.numeric(xlogp)
-        ) |>
         dplyr::select(
           feature_id,
           structure_name = name,
-          smiles_2D = smiles,
-          inchikey_2D = InChIkey2D,
-          molecular_formula = molecularFormula,
-          score_input
+          structure_smiles_2D = smiles,
+          structure_inchikey_2D = InChIkey2D,
+          structure_molecular_formula = molecularFormula,
+          structure_xlogp = xlogp,
+          score_input = ConfidenceScore,
+          score_sirius_csi = `CSI:FingerIDScore`
         ) |>
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
           smiles = NA
+        ) |>
+        dplyr::mutate_all(
+          as.character
         )
 
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(
-          feature_id = harmonize_names_sirius(id),
-          score_input = as.numeric(
-            ifelse(
-              test = ConfidenceScore != "N/A",
-              yes = ConfidenceScore,
-              no = -10 / as.numeric(`CSI:FingerIDScore`)
-            )
-          )
+          feature_id = harmonize_names_sirius(id)
         ) |>
         dplyr::select(
           feature_id,
           structure_name = name,
-          smiles_2D = smiles,
-          inchikey_2D = InChIkey2D,
-          molecular_formula = molecularFormula,
+          structure_smiles_2D = smiles,
+          structure_inchikey_2D = InChIkey2D,
+          structure_molecular_formula = molecularFormula,
           structure_xlogp = xlogp,
-          score_input
+          score_input = ConfidenceScore,
+          score_sirius_csi = `CSI:FingerIDScore`
         ) |>
         dplyr::mutate(
           library = "SIRIUS",
           inchikey = NA,
           smiles = NA
+        ) |>
+        dplyr::mutate_all(
+          as.character
         )
 
       formula_prepared <- formula |>
@@ -222,10 +220,17 @@ prepare_annotations_sirius <-
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
-        dplyr::distinct(feature_id,
-          molecular_formula = molecularFormula,
+        dplyr::distinct(
+          feature_id,
+          structure_molecular_formula = molecularFormula,
           structure_exact_mass,
-          error_mz
+          error_mz,
+          score_sirius_zodiac = ZodiacScore,
+          score_sirius_sirius = SiriusScore,
+          score_sirius_tree = TreeScore,
+          score_sirius_isotope = IsotopeScore,
+          count_peaks_explained = numExplainedPeaks,
+          score_sirius_intensity = explainedIntensity
         )
 
       formula_adducts_prepared <- formula_adducts |>
@@ -235,9 +240,15 @@ prepare_annotations_sirius <-
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
         dplyr::distinct(feature_id,
-          molecular_formula = molecularFormula,
+          structure_molecular_formula = molecularFormula,
           structure_exact_mass,
-          error_mz
+          error_mz,
+          score_sirius_zodiac = ZodiacScore,
+          score_sirius_sirius = SiriusScore,
+          score_sirius_tree = TreeScore,
+          score_sirius_isotope = IsotopeScore,
+          count_peaks_explained = numExplainedPeaks,
+          score_sirius_intensity = explainedIntensity
         )
 
       compounds_prepared <-
@@ -263,6 +274,7 @@ prepare_annotations_sirius <-
           #   allow_lambert_s = TRUE,
           #   allow_lambert_h = TRUE
           # )$x.t,
+          ## mirror spectral match
           count_peaks_matched = NA
         ) |>
         dplyr::select(
@@ -270,17 +282,21 @@ prepare_annotations_sirius <-
           error_mz,
           error_rt,
           structure_name,
-          # structure_inchikey = inchikey,
-          structure_inchikey_2D = inchikey_2D,
-          # structure_smiles = smiles,
-          structure_smiles_2D = smiles_2D,
-          structure_molecular_formula = molecular_formula,
+          # structure_inchikey,
+          structure_inchikey_2D,
+          # structure_smiles,
+          structure_smiles_2D,
+          structure_molecular_formula,
           structure_exact_mass,
           structure_xlogp,
           library,
           score_input,
           # score_input_normalized,
+          # score_sirius_csi,
+          # score_sirius_zodiac,
+          # score_sirius_sirius,
           count_peaks_matched,
+          count_peaks_explained,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -319,7 +335,11 @@ prepare_annotations_sirius <-
         library = NA,
         score_input = NA,
         # score_input_normalized = NA,
+        # score_sirius_csi = NA,
+        # score_sirius_zodiac = NA,
+        # score_sirius_sirius = NA,
         count_peaks_matched = NA,
+        count_peaks_explained = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,

@@ -1,5 +1,7 @@
 utils::globalVariables(
   c(
+    "count_peaks_explained",
+    "count_peaks_matched",
     "error_mz",
     "error_rt",
     "feature_id",
@@ -97,7 +99,9 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_01kingdom = NA,
         structure_taxonomy_classyfire_02superclass = NA,
         structure_taxonomy_classyfire_03class = NA,
-        structure_taxonomy_classyfire_04directparent = NA
+        structure_taxonomy_classyfire_04directparent = NA,
+        ## mirror sirius
+        count_peaks_explained = NA
       ) |>
       # dplyr::rowwise() |>
       # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
@@ -118,6 +122,7 @@ prepare_annotations_spectra <-
         score_input,
         # score_input_normalized,
         count_peaks_matched,
+        count_peaks_explained,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class,

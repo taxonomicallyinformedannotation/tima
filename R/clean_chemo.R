@@ -19,6 +19,8 @@ utils::globalVariables(
     "consistency_structure_npc_cla",
     "consistency_structure_npc_pat",
     "consistency_structure_npc_sup",
+    "count_peaks_explained",
+    "count_peaks_matched",
     "error_mz",
     "error_rt",
     "feature_id",
@@ -161,6 +163,7 @@ clean_chemo <-
         score_interim = score_pondered_bio,
         score_chemical,
         score_final = score_pondered_chemo,
+        count_peaks_explained,
         count_peaks_matched,
         best_candidate_organism = best_candidate,
         best_candidate_structure,
@@ -233,6 +236,7 @@ clean_chemo <-
         score_biological,
         score_chemical,
         count_peaks_matched,
+        count_peaks_explained,
         library,
         error_mz,
         error_rt,
@@ -252,7 +256,7 @@ clean_chemo <-
       df4 <- df3 |>
         dplyr::group_by(feature_id) |>
         dplyr::summarise(dplyr::across(
-          colnames(df3)[5:31],
+          colnames(df3)[5:32],
           ~ gsub(
             pattern = "\\bNA\\b",
             replacement = "",
@@ -295,6 +299,7 @@ clean_chemo <-
           "score_chemical",
           "score_final",
           "count_peaks_matched",
+          "count_peaks_explained",
           "rank_initial",
           "rank_final",
           "best_candidate_organism",

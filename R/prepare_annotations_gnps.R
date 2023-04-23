@@ -2,6 +2,8 @@ utils::globalVariables(
   c(
     "#Scan#",
     "Compound_Name",
+    "count_peaks_explained",
+    "count_peaks_matched",
     "error_mz",
     "error_rt",
     "ExactMass",
@@ -118,7 +120,9 @@ prepare_annotations_gnps <-
           # )$x.t,
           ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
-          structure_taxonomy_classyfire_01kingdom = NA
+          structure_taxonomy_classyfire_01kingdom = NA,
+          ## mirror sirius
+          count_peaks_explained = NA
         ) |>
         dplyr::select(
           feature_id,
@@ -174,6 +178,7 @@ prepare_annotations_gnps <-
         score_input = NA,
         # score_input_normalized = NA,
         count_peaks_matched = NA,
+        count_peaks_explained = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,
