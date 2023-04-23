@@ -81,24 +81,33 @@ prepare_annotations_gnps <-
         ) |>
         dplyr::select(
           feature_id = `#Scan#`,
-          error_mz,
+          error_mz = MassDiff,
           error_rt,
+          library = LibraryName,
           structure_name = Compound_Name,
           # structure_smiles = Smiles,
           score_input = MQScore,
+          count_peaks_matched = SharedPeaks,
           # smiles_2D, ## Not available for now
+          structure_inchi = INCHI,
           structure_inchikey = InChIKey,
           structure_inchikey_2D = `InChIKey-Planar`,
           structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
           structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
           structure_taxonomy_npclassifier_03class = npclassifier_class,
-          # molecular_formula, ## Not available for now
-          structure_exact_mass = ExactMass
+          structure_exact_mass = ExactMass,
+          ## Only partially present
+          structure_taxonomy_classyfire_02superclass = superclass,
+          structure_taxonomy_classyfire_03class = class,
+          structure_taxonomy_classyfire_04directparent = subclass
         ) |>
         dplyr::mutate(
-          library = "GNPS",
+          error_rt = NA,
           structure_smiles_2D = NA,
-          structure_molecular_formula = NA,
+          structure_molecular_formula = structure_inchi |>
+            ## really dirty
+            gsub(pattern = ".*\\/C", replacement = "C") |>
+            gsub(pattern = "\\/.*", replacement = ""),
           structure_xlogp = NA,
           # score_input_normalized = bestNormalize::bestNormalize(
           #   x = score_input,
@@ -109,10 +118,7 @@ prepare_annotations_gnps <-
           # )$x.t,
           ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
-          structure_taxonomy_classyfire_01kingdom = NA,
-          structure_taxonomy_classyfire_02superclass = NA,
-          structure_taxonomy_classyfire_03class = NA,
-          structure_taxonomy_classyfire_04directparent = NA
+          structure_taxonomy_classyfire_01kingdom = NA
         ) |>
         dplyr::select(
           feature_id,
@@ -129,6 +135,7 @@ prepare_annotations_gnps <-
           library,
           score_input,
           # score_input_normalized,
+          count_peaks_matched,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -166,6 +173,7 @@ prepare_annotations_gnps <-
         library = NA,
         score_input = NA,
         # score_input_normalized = NA,
+        count_peaks_matched = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,

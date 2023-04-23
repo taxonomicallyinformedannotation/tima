@@ -228,9 +228,19 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "score",
           "reverse_score",
           "presence_ratio",
-          "matched_peaks_count"
+          "count_peaks_matched" = "matched_peaks_count"
         )
       ))
+
+    log_debug("Adding columns if they do not exist")
+    df_add <-
+      data.frame(
+        reverse_score = NA,
+        presence_ratio = NA,
+        count_peaks_matched = NA
+      )
+    df_final <- df_final |>
+      dplyr::bind_rows(df_add)
 
     ## COMMENT AR: Not doing it because of thresholding
     # df_final[is.na(df_final)] <- 0
@@ -238,7 +248,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (condition == "AND") {
       df_final <- df_final |>
         dplyr::filter(score >= threshold &
-          matched_peaks_count >= npeaks &
+          count_peaks_matched >= npeaks &
           presence_ratio >= rpeaks)
     }
 
@@ -280,7 +290,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           score = NA,
           reverse_score = NA,
           presence_ratio = NA,
-          matched_peaks_count = NA
+          count_peaks_matched = NA
         )
     }
   } else {
@@ -301,7 +311,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         score = NA,
         reverse_score = NA,
         presence_ratio = NA,
-        matched_peaks_count = NA
+        count_peaks_matched = NA
       )
   }
 

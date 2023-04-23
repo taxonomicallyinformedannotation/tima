@@ -255,14 +255,15 @@ prepare_annotations_sirius <-
         dplyr::mutate(
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
-          structure_taxonomy_classyfire_01kingdom = NA
+          structure_taxonomy_classyfire_01kingdom = NA,
           # score_input_normalized = bestNormalize::bestNormalize(
           #   x = score_input,
           #   standardize = FALSE,
           #   allow_orderNorm = FALSE,
           #   allow_lambert_s = TRUE,
           #   allow_lambert_h = TRUE
-          # )$x.t
+          # )$x.t,
+          count_peaks_matched = NA
         ) |>
         dplyr::select(
           feature_id,
@@ -279,6 +280,7 @@ prepare_annotations_sirius <-
           library,
           score_input,
           # score_input_normalized,
+          count_peaks_matched,
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
           structure_taxonomy_npclassifier_03class,
@@ -317,6 +319,7 @@ prepare_annotations_sirius <-
         library = NA,
         score_input = NA,
         # score_input_normalized = NA,
+        count_peaks_matched = NA,
         structure_taxonomy_npclassifier_01pathway = NA,
         structure_taxonomy_npclassifier_02superclass = NA,
         structure_taxonomy_npclassifier_03class = NA,

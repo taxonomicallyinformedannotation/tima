@@ -76,7 +76,8 @@ prepare_annotations_spectra <-
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
-        score_input = score
+        score_input = score,
+        count_peaks_matched
       ) |>
       # Add new columns
       dplyr::mutate(
@@ -116,6 +117,7 @@ prepare_annotations_spectra <-
         library,
         score_input,
         # score_input_normalized,
+        count_peaks_matched,
         structure_taxonomy_npclassifier_01pathway,
         structure_taxonomy_npclassifier_02superclass,
         structure_taxonomy_npclassifier_03class,
