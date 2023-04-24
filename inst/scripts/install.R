@@ -6,7 +6,7 @@ if (Sys.info()[["sysname"]] == "Windows") {
   if (!requireNamespace("installr", quietly = TRUE)) {
     install.packages("installr")
   }
-  installr::install.rtools()
+  installr::install.rtools(GUI = FALSE)
 }
 if (Sys.info()[["sysname"]] != "Linux") {
   if (!requireNamespace("renv", quietly = TRUE)) {
