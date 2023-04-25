@@ -84,6 +84,12 @@ testthat::test_that("Whole process", {
       url = paths$urls$examples$metadata,
       export = paths$data$source$metadata
     )
+    get_file(
+      url = paths$urls$examples$metadata |>
+        gsub(pattern = ".tsv", replacement = "_unrecognized.tsv"),
+      export = paths$data$source$metadata |>
+        gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
+    )
   }
   ## Other GNPS job id (without metadata)
   get_gnps_tables(
@@ -413,8 +419,11 @@ testthat::test_that("Whole process", {
   prepare_taxa(taxon = "")
   ## Without file extension in the column names
   prepare_taxa(extension = FALSE)
-  ## Testing for unreconized taxa
-  prepare_taxa(metadata = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/example_metadata_unrecognized.tsv")
+  ## Testing for unrecognized taxa
+  prepare_taxa(
+    metadata = paths$data$source$metadata |>
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
+  )
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
   ## Tests for ott API
