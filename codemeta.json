@@ -255,7 +255,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 0.14.3",
+      "version": ">= 1.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -315,7 +315,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.33.12",
+      "version": ">= 1.32.6",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -584,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2655.232KB",
+  "fileSize": "2660.284KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

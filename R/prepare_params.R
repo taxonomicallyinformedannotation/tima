@@ -176,9 +176,9 @@ prepare_params <- function(filename = params$files$pattern,
   # yamls_params$prepare_taxa$files$features$raw <-
   #   yamls_params$prepare_taxa$files$features$raw |>
   #   lapply(FUN = replace_id)
-  # yamls_params$prepare_taxa$files$taxa$raw <-
-  #   yamls_params$prepare_taxa$files$taxa$raw |>
-  #   lapply(FUN = replace_id)
+  yamls_params$prepare_taxa$files$taxa$raw <-
+    yamls_params$prepare_taxa$files$taxa$raw |>
+    lapply(FUN = replace_id)
   yamls_params$prepare_taxa$files$taxa$prepared <-
     yamls_params$prepare_taxa$files$taxa$prepared |>
     lapply(FUN = replace_id)

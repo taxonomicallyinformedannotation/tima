@@ -382,9 +382,7 @@ testthat::test_that("Whole process", {
   ## To do as if there was no input
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
-  prepare_annotations_sirius(
-    input_directory = params$files$annotations$raw$sirius
-  )
+  prepare_annotations_sirius(input_directory = params$files$annotations$raw$sirius)
 
   ### ISDB results
   step <- "prepare_annotations_spectra"
@@ -415,6 +413,8 @@ testthat::test_that("Whole process", {
   prepare_taxa(taxon = "")
   ## Without file extension in the column names
   prepare_taxa(extension = FALSE)
+  ## Testing for unreconized taxa
+  prepare_taxa(metadata = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/example_metadata_unrecognized.tsv")
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
   ## Tests for ott API

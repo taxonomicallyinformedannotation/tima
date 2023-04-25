@@ -14,8 +14,10 @@ server <- function(input, output, session) {
         X = fields_mandatory,
         FUN = function(x) {
           ## TODO improve
-          suppressWarnings(!is.null(input[[x]]) &&
-            input[[x]] != "")
+          suppressWarnings(any(
+            !is.null(input[[x]]),
+            input[[x]] != ""
+          ))
         },
         FUN.VALUE = logical(1)
       )
