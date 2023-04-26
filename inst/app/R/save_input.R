@@ -180,11 +180,16 @@ save_input <- function(input) {
     file.path(paths_data_source, fil_fea_raw)
   yamls_params$prepare_taxa$files$taxa$raw <-
     file.path(paths_data_source, fil_tax_raw)
+  if (!is.null(gnps_job_id)) {
+    yamls_params$prepare_taxa$files$taxa$raw <-
+      file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
+  }
   yamls_params$prepare_taxa$names$extension <-
     shiny::isolate(input$names_extension)
   yamls_params$prepare_taxa$names$features <-
     shiny::isolate(input$names_features)
-  yamls_params$prepare_taxa$names$taxon <- shiny::isolate(input$names_taxon)
+  yamls_params$prepare_taxa$names$taxon <-
+    shiny::isolate(input$names_taxon)
   yamls_params$prepare_taxa$organisms$candidates <-
     shiny::isolate(input$org_can)
   yamls_params$prepare_taxa$organisms$taxon <- org_tax
