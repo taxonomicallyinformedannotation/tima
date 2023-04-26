@@ -165,7 +165,11 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     log_debug("Applying initial intensity filter to query spectra")
     spectra <- spectra |>
-      Spectra::filterIntensity(intensity = c(qutoff, Inf))
+      Spectra::filterIntensity(intensity = c(qutoff, Inf)) |>
+      Spectra::addProcessing(remove_above_precursor(),
+        spectraVariables = c("precursorMz")
+      ) |>
+      Spectra::applyProcessing()
 
     log_debug("Performing spectral comparison")
     log_debug(

@@ -1,10 +1,8 @@
-utils::globalVariables(
-  c(
-    "matched_peaks_count",
-    "presence_ratio",
-    "score"
-  )
-)
+utils::globalVariables(c(
+  "matched_peaks_count",
+  "presence_ratio",
+  "score"
+))
 
 #' @title Create edges spectra
 #'
@@ -66,7 +64,11 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     log_debug("Loading spectra...")
     spectra <- input |>
       import_spectra() |>
-      sanitize_spectra(cutoff = qutoff)
+      sanitize_spectra(cutoff = qutoff) |>
+      Spectra::addProcessing(remove_above_precursor(),
+        spectraVariables = c("precursorMz")
+      ) |>
+      Spectra::applyProcessing()
 
     log_debug("Extracting fragments and precursors...")
     fragments_norm <-
