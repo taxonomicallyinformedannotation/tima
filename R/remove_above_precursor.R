@@ -14,6 +14,6 @@
 #' @examples NULL
 remove_above_precursor <- function(tol_mz = 0.5) {
   function(x, precursorMz, ...) {
-    x[!(x[, 1] >= precursorMz - tol), , drop = FALSE]
+    x[!(x[, 1] >= precursorMz - tol_mz), , drop = FALSE]
   }
 }
