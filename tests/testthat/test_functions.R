@@ -65,32 +65,20 @@ testthat::test_that("Whole process", {
 
   ## Get all files
   ### Features table
-  if (!is.null(params$gnps$id)) {
-    get_gnps_tables(
-      filename = "example",
-      path_features = paths$data$source$features,
-      path_metadata = paths$data$source$metadata,
-      path_spectra = paths$data$source$spectra,
-      gnps_job_id = params$gnps$id
-    )
-  } else {
-    get_file(
-      url = paths$urls$examples$features,
-      export = paths$data$source$features
-    )
-
-    ### Metadata table
-    get_file(
-      url = paths$urls$examples$metadata,
-      export = paths$data$source$metadata
-    )
-    get_file(
-      url = paths$urls$examples$metadata |>
-        gsub(pattern = ".tsv", replacement = "_unrecognized.tsv"),
-      export = paths$data$source$metadata |>
-        gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
-    )
-  }
+  get_gnps_tables(
+    filename = "example",
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = params$gnps$id
+  )
+  ### Metadata table
+  get_file(
+    url = paths$urls$examples$metadata |>
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv"),
+    export = paths$data$source$metadata |>
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
+  )
   ## Other GNPS job id (without metadata)
   get_gnps_tables(
     filename = "other",

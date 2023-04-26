@@ -73,9 +73,19 @@ get_organism_taxonomy_ott <- function(df,
       dplyr::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id)) {
-      organism_table$search_string <-
-        stringr::str_remove(string = organism_table$search_string, pattern = " .*")
-      organisms <- unique(organism_table$search_string)
+      ## keep obtained results
+      pretable <- new_matched_otl_exact |>
+        dplyr::filter(!is.na(ott_id))
+
+      new_ott_id_1 <- pretable |>
+        dplyr::distinct(ott_id)
+
+      organism_table_2 <- organism_table |>
+        dplyr::filter(!organism_table$search_string %in% pretable$search_string)
+
+      organism_table_2$search_string <-
+        stringr::str_remove(string = organism_table_2$search_string, pattern = " .*")
+      organisms <- unique(organism_table_2$search_string)
       organisms_new <-
         stringr::str_remove(string = organisms, pattern = " .*")
       new_matched_otl_exact <- rotl::tnrs_match_names(
@@ -84,9 +94,11 @@ get_organism_taxonomy_ott <- function(df,
         include_suppressed = FALSE
       )
       log_debug("Retrying with", organisms)
-      new_ott_id <- new_matched_otl_exact |>
+      new_ott_id_2 <- new_matched_otl_exact |>
         dplyr::filter(!is.na(ott_id)) |>
         dplyr::distinct(ott_id)
+
+      new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
     }
 
     if (nrow(new_ott_id) != 0) {
