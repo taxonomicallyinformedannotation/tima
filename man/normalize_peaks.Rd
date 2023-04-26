@@ -4,10 +4,7 @@
 \alias{normalize_peaks}
 \title{Normalize peaks}
 \usage{
-normalize_peaks(x)
-}
-\arguments{
-\item{x}{PeakData}
+normalize_peaks()
 }
 \description{
 This function normalizes peaks

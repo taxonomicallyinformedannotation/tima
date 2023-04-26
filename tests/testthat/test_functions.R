@@ -350,10 +350,10 @@ testthat::test_that("Whole process", {
   spectra <- spectra |>
     sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
   single_pair <- spectra@backend@peaksData[1:2]
-  single_pair[[1]] <- single_pair[[1]] |>
-    normalize_peaks()
-  single_pair[[2]] <- single_pair[[2]] |>
-    normalize_peaks()
+  # single_pair[[1]] <- single_pair[[1]] |>
+  #   normalize_peaks()
+  # single_pair[[2]] <- single_pair[[2]] |>
+  #   normalize_peaks()
   precursors <- spectra$precursorMz[1:2]
   nspe <- length(single_pair)
   create_edges_parallel(1,

@@ -115,7 +115,12 @@ annotate_spectra <- function(input = params$files$spectral$raw,
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- lapply(library, import_spectra) |>
-      Spectra::concatenateSpectra()
+      Spectra::concatenateSpectra() |>
+      Spectra::addProcessing(remove_above_precursor(),
+        spectraVariables = c("precursorMz")
+      ) |>
+      Spectra::addProcessing(normalize_peaks()) |>
+      Spectra::applyProcessing()
 
     sim_fun <- switch(
       EXPR = method,
@@ -169,6 +174,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       Spectra::addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
+      Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
     log_debug("Performing spectral comparison")

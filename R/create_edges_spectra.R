@@ -68,14 +68,11 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       Spectra::addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
+      Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
     log_debug("Extracting fragments and precursors...")
-    fragments_norm <-
-      lapply(
-        X = spectra@backend@peaksData,
-        FUN = normalize_peaks
-      )
+    fragments_norm <- spectra@backend@peaksData
     precursors <- spectra$precursorMz
     nspe <- length(spectra)
 
