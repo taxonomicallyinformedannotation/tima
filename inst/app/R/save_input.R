@@ -107,8 +107,9 @@ save_input <- function(input) {
     file.path(paths_data_source, fil_spe_raw)
   yamls_params$annotate_spectra$annotations$ms2$approx <-
     shiny::isolate(input$ann_ms2_app)
-  yamls_params$annotate_spectra$annotations$ms2$method <-
-    shiny::isolate(input$ann_ms2_met)
+  ## for spectral matching, we let the default, modify manually if needed (expert mode)
+  # yamls_params$annotate_spectra$annotations$ms2$method <-
+  #   shiny::isolate(input$ann_ms2_met)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$condition <-
     shiny::isolate(input$ann_ms2_thr_con)
   yamls_params$annotate_spectra$annotations$ms2$thresholds$peaks$absolute <-

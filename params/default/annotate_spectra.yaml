@@ -10,7 +10,7 @@ annotations:
     #' Similarity method to be used to compare spectra.
     #' Currently "gnps", "navdist", "ndotproduct", 
     # "neuclidean", "nspectraangle" supported. STRING
-    method: gnps
+    method: ndotproduct
       
     #' Thresholds
     thresholds: 
