@@ -14,7 +14,7 @@ log_debug(
   crayon::green("performs spectral similarity calculation to create edges. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ", crayon::blue("CH"), "\n")
+log_debug("Contributors: ", crayon::blue("CH"), crayon::cyan("MS"), "\n")
 
 # create_edges_spectra()
 targets::tar_make(names = matches("fea_edg_spe"))

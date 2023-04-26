@@ -14,7 +14,7 @@ log_debug(
   crayon::green("annotates based on exact mass (MS1)")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ", crayon::blue("CH"), "\n")
+log_debug("Contributors: ", crayon::blue("CH"), crayon::cyan("MS"), "\n")
 
 # annotate_masses()
 targets::tar_make(names = matches("ann_ms1_pre"))

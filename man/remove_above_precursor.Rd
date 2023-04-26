@@ -4,7 +4,10 @@
 \alias{remove_above_precursor}
 \title{Remove peaks above precursor in MS2 spectra}
 \usage{
-remove_above_precursor()
+remove_above_precursor(tol_mz = 0.5)
+}
+\arguments{
+\item{tol_mz}{m/z tolerance}
 }
 \description{
 This function remove peaks above precursor in MS2 spectra
