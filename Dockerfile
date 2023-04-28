@@ -1,5 +1,5 @@
 # Image
-FROM bioconductor/bioconductor_docker:RELEASE_3_16
+FROM bioconductor/bioconductor_docker:RELEASE_3_17
 
 # Copy files
 COPY DESCRIPTION ./DESCRIPTION
