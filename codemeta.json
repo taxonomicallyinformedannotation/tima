@@ -268,7 +268,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
-      "version": ">= 0.7.5",
+      "version": ">= 0.7.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -309,7 +309,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 4.1.0"
+      "version": ">= 4.3.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -584,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2657.986KB",
+  "fileSize": "2657.965KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
