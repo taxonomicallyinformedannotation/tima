@@ -200,6 +200,9 @@ get_gnps_tables <-
         npclassifier_pathway = NA,
         npclassifier_superclass = NA,
         npclassifier_class = NA,
+        superclass = NA,
+        class = NA,
+        subclass = NA,
         check.names = FALSE
       )
       export_output(
