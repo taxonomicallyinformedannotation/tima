@@ -872,7 +872,7 @@ list(
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
                 ## TODO improve
-                input = paths$data$source$libraries$sop$closed,
+                input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
                 output = par_pre_lib_sop_clo$files$libraries$sop$prepared,
                 parameters = par_pre_lib_sop_clo
               )
