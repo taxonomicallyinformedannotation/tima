@@ -186,13 +186,17 @@ get_gnps_tables <-
       log_debug("Returning empty dataframes instead")
       fake_annotations <- data.frame(
         `#Scan#` = NA,
+        MassDiff = NA,
         MZErrorPPM = NA,
         Precursor_MZ = NA,
+        LibraryName = NA,
         Compound_Name = NA,
+        INCHI = NA,
         InChIKey = NA,
         `InChIKey-Planar` = NA,
         ExactMass = NA,
         MQScore = NA,
+        SharedPeaks = NA,
         npclassifier_pathway = NA,
         npclassifier_superclass = NA,
         npclassifier_class = NA,
