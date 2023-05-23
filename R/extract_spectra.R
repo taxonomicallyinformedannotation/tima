@@ -1,8 +1,4 @@
-utils::globalVariables(
-  c(
-    "group"
-  )
-)
+utils::globalVariables(c("group"))
 
 #' @title Extract spectra from a Spectra object
 #'
@@ -16,6 +12,7 @@ utils::globalVariables(
 #'
 #' @examples NULL
 extract_spectra <- function(object) {
+  ## TODO find alternative without dplyr
   ## issues
   incoherent_colnames <- c(
     ms_level = "msLevel",
@@ -29,7 +26,9 @@ extract_spectra <- function(object) {
     Spectra::peaksData() |>
     data.frame() |>
     dplyr::group_by(group) |>
-    dplyr::summarize_all(list)
+    dplyr::summarize(dplyr::across(dplyr::everything(),
+      .fns = list
+    ))
 
   ## Extract spectra data and transform it into a data frame
   spectra <- object |>
@@ -48,19 +47,19 @@ extract_spectra <- function(object) {
 
   ## Columns types issue
   spectra <- spectra |>
-    dplyr::mutate(dplyr::across(
+    tidytable::mutate(tidytable::across(
       .cols = dplyr::any_of(incoherent_logical),
       .fns = as.logical
     )) |>
-    dplyr::mutate(dplyr::across(
+    tidytable::mutate(tidytable::across(
       .cols = dplyr::any_of(incoherent_integer),
       .fns = as.integer
     ))
 
   ## Select all columns except those specified in 'incoherent_colnames', and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
-    dplyr::select(-c(dplyr::any_of(incoherent_colnames))) |>
-    dplyr::rename(dplyr::any_of(incoherent_colnames))
+    tidytable::select(-c(tidytable::any_of(incoherent_colnames))) |>
+    tidytable::rename(tidytable::any_of(incoherent_colnames))
 
   return(spectra)
 }

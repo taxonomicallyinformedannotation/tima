@@ -71,17 +71,16 @@ prepare_annotations_gnps <-
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(
         X = input,
-        FUN = readr::read_tsv,
-        col_types = readr::cols(.default = "c")
+        FUN = tidytable::fread
       ) |>
-        dplyr::bind_rows() |>
-        dplyr::mutate(
+        tidytable::bind_rows() |>
+        tidytable::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
           error_rt = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,
           error_rt,
@@ -103,7 +102,7 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class = class,
           structure_taxonomy_classyfire_04directparent = subclass
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           error_rt = NA,
           structure_smiles_2D = NA,
           structure_molecular_formula = structure_inchi |>
@@ -124,7 +123,7 @@ prepare_annotations_gnps <-
           ## mirror sirius
           count_peaks_explained = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           error_mz,
           error_rt,
@@ -149,10 +148,11 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        dplyr::mutate_all(as.character) |>
-        dplyr::mutate_all(dplyr::na_if, "N/A") |>
-        dplyr::mutate_all(dplyr::na_if, "null") |>
+        tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+        tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "N/A")) |>
+        tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "null")) |>
         round_reals() |>
+        tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

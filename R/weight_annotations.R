@@ -120,59 +120,51 @@ weight_annotations <-
 
     log_debug(x = "... files ...")
     log_debug(x = "... features")
-    features_table <- readr::read_delim(
-      file = features,
-      col_types = readr::cols(.default = "c")
+    features_table <- tidytable::fread(
+      file = features
     )
     log_debug(x = "... components")
-    components_table <- readr::read_delim(
-      file = components,
-      col_types = readr::cols(.default = "c")
+    components_table <- tidytable::fread(
+      file = components
     )
 
     log_debug(x = "... annotations")
     annotation_table <- lapply(
       X = annotations,
-      FUN = readr::read_delim,
-      col_types = readr::cols(.default = "c")
+      FUN = tidytable::fread
     ) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     log_debug(x = "... metadata_table_biological_annotation")
-    taxed_features_table <- readr::read_delim(
-      file = taxa,
-      col_types = readr::cols(.default = "c")
+    taxed_features_table <- tidytable::fread(
+      file = taxa
     )
 
     log_debug(x = "... edges table")
-    edges_table <- readr::read_delim(
-      file = edges,
-      col_types = readr::cols(.default = "c")
+    edges_table <- tidytable::fread(
+      file = edges
     )
 
     log_debug(x = "... structure-organism pairs table")
     structure_organism_pairs_table <-
-      readr::read_delim(
-        file = library,
-        col_types = readr::cols(.default = "c")
+      tidytable::fread(
+        file = library
       ) |>
-      dplyr::left_join(readr::read_delim(
-        file = str_2D_3D,
-        col_types = readr::cols(.default = "c")
+      tidytable::left_join(tidytable::fread(
+        file = str_2D_3D
       )) |>
-      dplyr::left_join(readr::read_delim(
-        file = org_tax_ott,
-        col_types = readr::cols(.default = "c")
+      tidytable::left_join(tidytable::fread(
+        file = org_tax_ott
       ))
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>
-        dplyr::filter(score_input == 0)
+        tidytable::filter(score_input == 0)
     }
 
     log_debug(x = "adding biological organism metadata")
     annotation_table_taxed <- annotation_table |>
-      dplyr::left_join(taxed_features_table)
+      tidytable::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-

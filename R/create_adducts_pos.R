@@ -33,7 +33,7 @@ utils::globalVariables(
 create_adducts_pos <- function(massesTable, adductsTable) {
   ## Calculate the masses for various positive adducts
   adducts_pos <- massesTable |>
-    dplyr::mutate(
+    tidytable::mutate(
       `[1M+(H)3]3+` = (exact_mass + 3 * proton) / 3,
       `[1M+(H)2(Na)1]3+` = (exact_mass + 2 * proton + sodium) / 3,
       `[1M+(H)1(Na)2]3+` = (exact_mass + proton + 2 * sodium) / 3,
@@ -79,14 +79,14 @@ create_adducts_pos <- function(massesTable, adductsTable) {
       `[2M+(H)1(ACN)1]1+` = 2 * exact_mass + proton + acetonitrile,
       `[2M+(Na)1(ACN)1]1+` = 2 * exact_mass + acetonitrile + sodium
     ) |>
-    dplyr::select(-colnames(adductsTable))
+    tidytable::select(-colnames(adductsTable))
 
   n <- ncol(adducts_pos)
 
   ## Pivot the adducts_pos table to get a long format with adduct and adduct mass as columns
   adducts_pos <- adducts_pos |>
-    tidyr::pivot_longer(2:dplyr::all_of(n)) |>
-    dplyr::select(dplyr::everything(),
+    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
+    tidytable::select(tidytable::everything(),
       adduct = name,
       adduct_mass = value
     )

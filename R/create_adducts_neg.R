@@ -29,7 +29,7 @@ utils::globalVariables(
 create_adducts_neg <- function(massesTable, adductsTable) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
-    dplyr::mutate(
+    tidytable::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
       `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),
       # `[1M-(H)2(H2O)1]1-` = exact_mass - 2 * water - proton,
@@ -48,13 +48,13 @@ create_adducts_neg <- function(massesTable, adductsTable) {
       `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
       `[3M-(H)1]1-` = 3 * exact_mass - proton
     ) |>
-    dplyr::select(-colnames(adductsTable))
+    tidytable::select(-colnames(adductsTable))
 
   ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
   n <- ncol(adducts_neg)
   adducts_neg <- adducts_neg |>
-    tidyr::pivot_longer(2:dplyr::all_of(n)) |>
-    dplyr::select(dplyr::everything(),
+    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
+    tidytable::select(tidytable::everything(),
       adduct = name,
       adduct_mass = value
     )

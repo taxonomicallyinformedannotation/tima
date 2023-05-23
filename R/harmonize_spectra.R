@@ -109,9 +109,10 @@ harmonize_spectra <- function(spectra,
 
   spectra_missing <- columns_missing |>
     data.frame() |>
-    dplyr::mutate(value = NA_character_) |>
-    tidyr::pivot_wider(names_from = columns_missing) |>
-    dplyr::mutate(join = "x")
+    tidytable::tidytable() |>
+    tidytable::mutate(value = NA_character_) |>
+    tidytable::pivot_wider(names_from = columns_missing) |>
+    tidytable::mutate(join = "x")
 
   if (!"rtime" %in% colnames(spectra)) {
     log_debug("no retention time found")
@@ -119,24 +120,25 @@ harmonize_spectra <- function(spectra,
   }
 
   spectra_filtered <- spectra |>
-    dplyr::filter(grepl(
+    tidytable::filter(grepl(
       pattern = mode,
       x = !!as.name(co_po),
       ignore.case = TRUE
     )) |>
-    dplyr::select(
-      dplyr::any_of(c(columns_full)),
+    tidytable::select(
+      tidytable::any_of(c(columns_full)),
       precursorCharge,
       precursorMz,
       rtime,
       mz,
       intensity
     ) |>
-    dplyr::mutate(join = "x")
+    tidytable::mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
-    dplyr::full_join(spectra_missing) |>
-    dplyr::select(
+    tidytable::full_join(spectra_missing) |>
+    tidytable::tidytable() |>
+    tidytable::select(
       collision_energy,
       compound_id,
       exactmass,
@@ -158,12 +160,12 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    dplyr::mutate(
+    tidytable::mutate(
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
-        yes = dplyr::row_number(),
-        no = spectrum_id
+        yes = tidytable::row_number(),
+        no = as.numeric(spectrum_id)
       ),
       compound_id = ifelse(
         test = is.na(compound_id),

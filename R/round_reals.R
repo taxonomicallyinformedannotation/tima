@@ -11,12 +11,12 @@
 round_reals <- function(df, dig = 5) {
   df |>
     # Round to 5 digits to avoid small discrepancies
-    dplyr::mutate(dplyr::across(
-      .cols = dplyr::any_of(c(
+    tidytable::mutate(tidytable::across(
+      .cols = tidytable::any_of(c(
         "structure_exact_mass",
         "structure_xlogp"
       )),
-      .fns = \(x) round(as.numeric(x),
+      .fns = ~ round(as.numeric(.x),
         digits = dig
       )
     ))

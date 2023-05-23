@@ -10,9 +10,16 @@
 #'
 #' @examples NULL
 import_spectra <- function(file) {
-  file_ext <- stringr::str_remove(string = file, pattern = ".*\\.")
+  file_ext <-
+    stringi::stri_replace_all_regex(
+      str = file,
+      pattern = ".*\\.",
+      replacement = "",
+      vectorize_all = FALSE
+    )
 
-  switch(EXPR = file_ext,
+  switch(
+    EXPR = file_ext,
     "mgf" = {
       MsBackendMgf::readMgf(f = file, msLevel = 2L) |>
         Spectra::Spectra() |>

@@ -196,18 +196,23 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     df_final <- matches_sim |>
       MetaboAnnotation::matchedData() |>
       data.frame() |>
-      dplyr::filter(!is.na(score))
+      tidytable::tidytable() |>
+      tidytable::filter(!is.na(score))
 
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
+    if (isSlaw) {
+      df_final <- df_final |>
+        tidytable::rowwise() |>
+        dplyr::mutate(feature_id = as.numeric(SLAW_ID))
+    } else {
+      df_final <- df_final |>
+        tidytable::rowwise() |>
+        dplyr::mutate(feature_id = as.numeric(acquisitionNum))
+    }
     df_final <- df_final |>
-      dplyr::rowwise() |>
+      tidytable::rowwise() |>
       dplyr::mutate(
-        feature_id = ifelse(
-          test = isSlaw,
-          yes = as.numeric(SLAW_ID),
-          no = as.numeric(acquisitionNum)
-        ),
         ## Working in minutes
         error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,
@@ -220,9 +225,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             ),
           no = target_inchikey_2D
         ),
-        structure_smiles_2D = dplyr::coalesce(target_smiles_2D, target_smiles)
+        structure_smiles_2D = tidytable::coalesce(target_smiles_2D, target_smiles)
       ) |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           "feature_id",
           "error_mz",
@@ -250,14 +255,14 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         count_peaks_matched = NA
       )
     df_final <- df_final |>
-      dplyr::bind_rows(df_add)
+      tidytable::bind_rows(df_add)
 
     ## COMMENT AR: Not doing it because of thresholding
     # df_final[is.na(df_final)] <- 0
 
     if (condition == "AND") {
       df_final <- df_final |>
-        dplyr::filter(score >= threshold &
+        tidytable::filter(score >= threshold &
           count_peaks_matched >= npeaks &
           presence_ratio >= rpeaks)
     }
@@ -266,11 +271,11 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       nrow(
         df_final |>
           ## else doesn't work if some are empty
-          dplyr::distinct(structure_inchikey_2D, structure_smiles_2D)
+          tidytable::distinct(structure_inchikey_2D, structure_smiles_2D)
       ),
       "Candidates were annotated on",
       nrow(df_final |>
-        dplyr::distinct(feature_id)),
+        tidytable::distinct(feature_id)),
       "features, with at least",
       threshold,
       "similarity score",

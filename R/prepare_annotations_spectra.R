@@ -53,22 +53,18 @@ prepare_annotations_spectra <-
            str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     # Check if input file(s) exists
-    stopifnot(
-      "Input file(s) do(es) not exist" =
-        rep(TRUE, length(input)) ==
-          lapply(X = input, file.exists)
-    )
+    stopifnot("Input file(s) do(es) not exist" =
+                rep(TRUE, length(input)) ==
+                lapply(X = input, file.exists))
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
     table <-
-      lapply(
-        X = input,
-        FUN = readr::read_delim,
-        col_types = readr::cols(.default = "c")
-      ) |>
-      dplyr::bind_rows() |>
-      dplyr::distinct(
+      lapply(X = input,
+             FUN = tidytable::fread) |>
+      tidytable::bind_rows() |>
+      tidytable::filter(!is.na(feature_id)) |>
+      tidytable::distinct(
         feature_id,
         error_mz,
         error_rt,
@@ -82,7 +78,7 @@ prepare_annotations_spectra <-
         count_peaks_matched
       ) |>
       # Add new columns
-      dplyr::mutate(
+      tidytable::mutate(
         library = "ISDB",
         # score_input_normalized = bestNormalize::bestNormalize(
         #   x = score_input,
@@ -103,10 +99,10 @@ prepare_annotations_spectra <-
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
-      # dplyr::rowwise() |>
-      # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
-      # dplyr::ungroup() |>
-      dplyr::select(
+      # tidytable::rowwise() |>
+      # tidytable::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
+      # tidytable::ungroup() |>
+      tidytable::select(
         feature_id,
         error_mz,
         error_rt,
@@ -133,10 +129,11 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
       ) |>
-      dplyr::mutate_all(as.character) |>
-      dplyr::mutate_all(dplyr::na_if, "N/A") |>
-      dplyr::mutate_all(dplyr::na_if, "null") |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "N/A")) |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "null")) |>
       round_reals() |>
+      tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
       complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,

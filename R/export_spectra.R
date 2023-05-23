@@ -19,6 +19,7 @@ export_spectra <- function(file,
                            cmps = NULL,
                            metad = NULL) {
   spectra |>
+    data.frame() |>
     saveRDS(file = file)
   # switch(
   #   EXPR = gsub(

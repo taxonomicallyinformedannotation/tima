@@ -83,13 +83,12 @@ prepare_libraries_sop_merged <-
     params <<- parameters
     libraries <- list()
     for (i in seq_along(files)) {
-      libraries[[i]] <- readr::read_delim(
-        file = files[[i]],
-        col_types = readr::cols(.default = "c")
+      libraries[[i]] <- tidytable::fread(
+        file = files[[i]]
       )
     }
 
-    tables <- dplyr::bind_rows(libraries) |>
+    tables <- tidytable::bind_rows(libraries) |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -101,8 +100,8 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Completing organisms taxonomy")
     table_organisms_taxonomy_ott_2 <- table_keys |>
-      dplyr::anti_join(table_organisms_taxonomy_ott) |>
-      dplyr::distinct(organism = organism_name)
+      tidytable::anti_join(table_organisms_taxonomy_ott) |>
+      tidytable::distinct(organism = organism_name)
 
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
       table_organisms_taxonomy_ott_full <-
@@ -111,8 +110,8 @@ prepare_libraries_sop_merged <-
 
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
-        dplyr::bind_rows(table_organisms_taxonomy_ott_full |>
-          dplyr::mutate_all(as.character))
+        tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
+          tidytable::mutate(tidytable::across(tidytable::everything(), as.character)))
     }
 
     log_debug(x = "Keeping structures")
@@ -138,23 +137,23 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        dplyr::left_join(table_organisms_taxonomy_ott)
+        tidytable::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
-        dplyr::filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)
           )]),
           pattern = value
         )) |>
-        dplyr::select(
+        tidytable::select(
           structure_inchikey,
           structure_smiles,
           organism_name,
           reference_doi
         ) |>
-        dplyr::distinct()
+        tidytable::distinct()
 
       stopifnot("Your filter led to no entries, try to change it." = nrow(table_keys) != 0)
     }

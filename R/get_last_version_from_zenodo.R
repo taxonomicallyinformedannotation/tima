@@ -17,9 +17,11 @@ get_last_version_from_zenodo <-
   function(doi, pattern, path) {
     # Remove the prefix from the DOI
     record <-
-      stringr::str_remove(
-        string = doi,
-        pattern = stringr::fixed("10.5281/zenodo.")
+      stringi::stri_replace_all_fixed(
+        str = doi,
+        pattern = "10.5281/zenodo.",
+        replacement = "",
+        case_insensitive = TRUE
       )
 
     # Retrieve file name by records call
@@ -28,9 +30,10 @@ get_last_version_from_zenodo <-
 
     # Extract individual file names and urls
     fileurls <- content$files$links$download
-    filenames <- stringr::str_match(
-      string = fileurls,
-      pattern = ".+/([^/]+)"
+    filenames <- stringi::stri_match(
+      str = fileurls,
+      pattern = ".+/([^/]+)",
+      regex = TRUE
     )[, 2]
 
     # Select the file URL and name matching the given pattern

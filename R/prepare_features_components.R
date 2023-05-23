@@ -34,15 +34,14 @@ prepare_features_components <-
     log_debug(x = "... components table")
     table <- lapply(
       X = input,
-      FUN = readr::read_tsv,
-      col_types = readr::cols(.default = "c"),
-      col_select = c(
+      FUN = tidytable::fread
+    ) |>
+      tidytable::bind_rows() |>
+      tidytable::select(
         feature_id = `cluster index`,
         component_id = componentindex
-      )
-    ) |>
-      dplyr::bind_rows() |>
-      dplyr::distinct()
+      ) |>
+      tidytable::distinct()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_components")

@@ -47,6 +47,7 @@ benchmarking
 bioconductor
 cli
 etabolite
+fastverse
 fbmn
 github
 gnps
@@ -74,6 +75,7 @@ silico
 sirius
 sqlite
 taxo
+tidyverse
 usedist
 xlogp
 yaml

@@ -21,10 +21,10 @@ export_output <- function(x, file = output) {
   )
 
   # Write the data frame to a tab-delimited file
-  readr::write_delim(
+  tidytable::fwrite(
     x = x,
     file = file,
-    delim = "\t",
+    sep = "\t",
     na = ""
   )
 }

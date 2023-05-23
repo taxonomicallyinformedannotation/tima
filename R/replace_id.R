@@ -27,22 +27,22 @@ replace_id <-
     }
 
     path <- x |>
-      stringr::str_replace(pattern = "/[^/]*$", replacement = "")
+      stringi::stri_replace_all_regex(pattern = "/[^/]*$", replacement = "", vectorize_all = FALSE)
 
     file <- x |>
-      stringr::str_replace(pattern = ".*/", replacement = "")
+      stringi::stri_replace_all_regex(pattern = ".*/", replacement = "", vectorize_all = FALSE)
 
     old <- file |>
-      stringr::str_replace(pattern = "_.*", replacement = "")
+      stringi::stri_replace_all_regex(pattern = "_.*", replacement = "", vectorize_all = FALSE)
 
     new <- file |>
-      stringr::str_replace(
+      stringi::stri_replace_all_regex(
         pattern = old,
         replacement = ifelse(
           test = !is.null(user_gnps),
           yes = user_gnps,
           no = user_filename
-        )
+        ), vectorize_all = FALSE
       )
 
     final <- ifelse(test = path != file,

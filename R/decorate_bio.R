@@ -43,62 +43,62 @@ decorate_bio <-
            sc_spe = score_biological_species,
            sc_var = score_biological_variety) {
     df_kin <- df |>
-      dplyr::filter(score_biological >= sc_kin)
+      tidytable::filter(score_biological >= sc_kin)
     df_phy <- df_kin |>
-      dplyr::filter(score_biological >= sc_phy)
+      tidytable::filter(score_biological >= sc_phy)
     df_cla <- df_phy |>
-      dplyr::filter(score_biological >= sc_cla)
+      tidytable::filter(score_biological >= sc_cla)
     df_ord <- df_cla |>
-      dplyr::filter(score_biological >= sc_ord)
+      tidytable::filter(score_biological >= sc_ord)
     df_fam <- df_ord |>
-      dplyr::filter(score_biological >= sc_fam)
+      tidytable::filter(score_biological >= sc_fam)
     df_gen <- df_fam |>
-      dplyr::filter(score_biological >= sc_gen)
+      tidytable::filter(score_biological >= sc_gen)
     df_spe <- df_gen |>
-      dplyr::filter(score_biological >= sc_spe)
+      tidytable::filter(score_biological >= sc_spe)
     df_var <- df_spe |>
-      dplyr::filter(score_biological >= sc_var)
+      tidytable::filter(score_biological >= sc_var)
 
     log_debug(
       "taxonomically informed scoring led to \n",
       crayon::silver(nrow(df_kin |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::silver("kingdom"),
       "level, \n",
       crayon::white(nrow(df_phy |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::white("phylum"),
       "level, \n",
       crayon::cyan(nrow(df_cla |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::cyan("class"),
       "level, \n",
       crayon::magenta(nrow(df_ord |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::magenta("order"),
       "level, \n",
       crayon::blue(nrow(df_fam |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::blue("family"),
       "level, \n",
       crayon::yellow(nrow(df_gen |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::yellow("genus"),
       "level, \n",
       crayon::green(nrow(df_spe |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::green("species"),
       "level, \n",
       "and",
       crayon::red(nrow(df_var |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::red("variety"),
       "level. \n"

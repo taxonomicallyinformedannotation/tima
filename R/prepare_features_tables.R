@@ -26,14 +26,12 @@ prepare_features_tables <-
 
     log_debug("Preparing features table")
     features_prepared <- features |>
-      readr::read_delim(
-        col_select =
-          dplyr::all_of(c(
-            feature_id = name_features,
-            rt = name_rt,
-            mz = name_mz
-          ))
-      )
+      tidytable::fread() |>
+      tidytable::select(tidytable::all_of(c(
+        feature_id = name_features,
+        rt = name_rt,
+        mz = name_mz
+      )))
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_tables")

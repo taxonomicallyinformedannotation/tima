@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.8.1
+* Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse)
+* Minor fixes
+
 # timaR 2.8.0
 
 * Adding GUI prototype

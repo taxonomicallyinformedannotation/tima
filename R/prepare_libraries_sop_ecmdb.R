@@ -50,7 +50,7 @@ prepare_libraries_sop_ecmdb <-
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
-        dplyr::mutate(
+        tidytable::mutate(
           structure_inchikey_2D = substring(
             text = moldb_inchikey,
             first = 1,
@@ -59,7 +59,7 @@ prepare_libraries_sop_ecmdb <-
           ## TODO compute it
           structure_smiles_2D = NA_character_
         ) |>
-        dplyr::select(
+        tidytable::select(
           structure_name = name,
           structure_inchikey = moldb_inchikey,
           structure_smiles = moldb_smiles,
@@ -69,7 +69,7 @@ prepare_libraries_sop_ecmdb <-
           structure_exact_mass = moldb_mono_mass,
           structure_xlogp = moldb_logp
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           structure_taxonomy_npclassifier_01pathway = NA_character_,
           structure_taxonomy_npclassifier_02superclass = NA_character_,
           structure_taxonomy_npclassifier_03class = NA_character_,
@@ -79,7 +79,7 @@ prepare_libraries_sop_ecmdb <-
           structure_taxonomy_classyfire_03class = NA_character_,
           structure_taxonomy_classyfire_04directparent = NA_character_
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           organism_name = "Escherichia coli",
           organism_taxonomy_ottid = 474506,
           organism_taxonomy_01domain = "Bacteria",
@@ -94,8 +94,8 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_10varietas = NA_character_
         ) |>
         round_reals() |>
-        dplyr::distinct() |>
-        dplyr::mutate(reference_doi = NA)
+        tidytable::distinct() |>
+        tidytable::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, ECMDB not found, returning an empty file instead")
       ecmdb_prepared <- data.frame(

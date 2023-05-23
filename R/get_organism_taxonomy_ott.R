@@ -20,21 +20,25 @@ utils::globalVariables(c(
 get_organism_taxonomy_ott <- function(df,
                                       url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
-    dplyr::mutate(organism = stringr::str_remove(
-      string = organism,
-      pattern = stringr::fixed(pattern = " x ")
-    )) |>
-    dplyr::distinct() |>
-    dplyr::mutate(search_string = tolower(organism)) |>
-    dplyr::distinct(
+    tidytable::mutate(
+      organism = stringi::stri_replace_all_fixed(
+        str = organism,
+        pattern = " x ",
+        replacement = "",
+        vectorize = FALSE
+      )
+    ) |>
+    tidytable::distinct() |>
+    tidytable::mutate(search_string = tolower(organism)) |>
+    tidytable::distinct(
       organism,
       search_string
     ) |>
-    dplyr::select(
+    tidytable::select(
       canonical_name = organism,
       search_string
     ) |>
-    dplyr::filter(!is.na(canonical_name)) |>
+    tidytable::filter(!is.na(canonical_name)) |>
     data.frame()
 
   organisms <- organism_table$canonical_name
@@ -69,25 +73,35 @@ get_organism_taxonomy_ott <- function(df,
     )
 
     new_ott_id <- new_matched_otl_exact |>
-      dplyr::filter(!is.na(ott_id)) |>
-      dplyr::distinct(ott_id)
+      tidytable::filter(!is.na(ott_id)) |>
+      tidytable::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id)) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
-        dplyr::filter(!is.na(ott_id))
+        tidytable::filter(!is.na(ott_id))
 
       new_ott_id_1 <- pretable |>
-        dplyr::distinct(ott_id)
+        tidytable::distinct(ott_id)
 
       organism_table_2 <- organism_table |>
-        dplyr::filter(!organism_table$search_string %in% pretable$search_string)
+        tidytable::filter(!organism_table$search_string %in% pretable$search_string)
 
       organism_table_2$search_string <-
-        stringr::str_remove(string = organism_table_2$search_string, pattern = " .*")
+        stringi::stri_replace_all_regex(
+          str = organism_table_2$search_string,
+          pattern = " .*",
+          replacement = "",
+          vectorize = FALSE
+        )
       organisms <- unique(organism_table_2$search_string)
       organisms_new <-
-        stringr::str_remove(string = organisms, pattern = " .*")
+        stringi::stri_replace_all_regex(
+          str = organisms,
+          pattern = " .*",
+          replacement = "",
+          vectorize = FALSE
+        )
       new_matched_otl_exact <- rotl::tnrs_match_names(
         names = organisms_new,
         do_approximate_matching = FALSE,
@@ -95,15 +109,16 @@ get_organism_taxonomy_ott <- function(df,
       )
       log_debug("Retrying with", organisms)
       new_ott_id_2 <- new_matched_otl_exact |>
-        dplyr::filter(!is.na(ott_id)) |>
-        dplyr::distinct(ott_id)
+        tidytable::filter(!is.na(ott_id)) |>
+        tidytable::distinct(ott_id)
 
-      new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
+      new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
     }
 
     if (nrow(new_ott_id) != 0) {
       otts <- new_ott_id$ott_id
 
+      log_debug("Getting taxonomy...")
       taxon_info <- rotl::taxonomy_taxon_info(
         ott_ids = otts,
         include_lineage = TRUE,
@@ -116,7 +131,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(1:length(taxon_lineage))) {
-        list_df[[i]] <- dplyr::bind_rows(
+        list_df[[i]] <- tidytable::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -128,8 +143,8 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- dplyr::bind_rows(list_df) |>
-        dplyr::mutate(ott_id = as.integer(ott_id))
+      otl <- tidytable::bind_rows(list_df) |>
+        tidytable::mutate(ott_id = as.integer(ott_id))
     } else {
       otl <-
         data.frame(
@@ -141,6 +156,7 @@ get_organism_taxonomy_ott <- function(df,
         )
     }
 
+    ## Todo find a dplyr alternative
     biological_metadata <-
       dplyr::left_join(organism_table, new_matched_otl_exact) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>

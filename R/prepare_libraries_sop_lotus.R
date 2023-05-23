@@ -49,44 +49,13 @@ prepare_libraries_sop_lotus <-
            output = params$files$libraries$sop$prepared) {
     log_debug(x = "Loading and preparing LOTUS")
     lotus_prepared <- input |>
-      readr::read_csv(
-        col_select = c(
-          structure_nameTraditional,
-          structure_inchikey,
-          structure_smiles,
-          structure_smiles_2D,
-          structure_molecular_formula,
-          structure_exact_mass,
-          structure_xlogp,
-          structure_taxonomy_npclassifier_01pathway,
-          structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class,
-          structure_taxonomy_classyfire_chemontid,
-          structure_taxonomy_classyfire_01kingdom,
-          structure_taxonomy_classyfire_02superclass,
-          structure_taxonomy_classyfire_03class,
-          structure_taxonomy_classyfire_04directparent,
-          organism_name,
-          organism_taxonomy_ottid,
-          organism_taxonomy_01domain,
-          organism_taxonomy_02kingdom,
-          organism_taxonomy_03phylum,
-          organism_taxonomy_04class,
-          organism_taxonomy_05order,
-          organism_taxonomy_06family,
-          organism_taxonomy_07tribe,
-          organism_taxonomy_08genus,
-          organism_taxonomy_09species,
-          organism_taxonomy_10varietas,
-          reference_doi
-        )
-      ) |>
-      dplyr::mutate(structure_inchikey_2D = substring(
+      tidytable::fread() |>
+      tidytable::mutate(structure_inchikey_2D = substring(
         text = structure_inchikey,
         first = 1,
         last = 14
       )) |>
-      dplyr::select(
+      tidytable::select(
         structure_name = structure_nameTraditional,
         structure_inchikey,
         structure_smiles,
@@ -118,7 +87,7 @@ prepare_libraries_sop_lotus <-
         reference_doi
       ) |>
       round_reals() |>
-      dplyr::distinct()
+      tidytable::distinct()
 
     log_debug(x = "Exporting ...")
     # Write modified data frame to output file
