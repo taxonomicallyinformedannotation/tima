@@ -105,16 +105,25 @@ clean_bio <-
     df03 <- tidytable::bind_rows(df01, df02)
 
     df <- df03 |>
-      dplyr::distinct(
-        structure_inchikey_2D,
-        feature_id,
+      tidytable::mutate(
         candidate_structure_1_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
         candidate_structure_1_npc_pathway = structure_taxonomy_npclassifier_01pathway,
         candidate_structure_2_cla_superclass = structure_taxonomy_classyfire_02superclass,
         candidate_structure_2_npc_superclass = structure_taxonomy_npclassifier_02superclass,
         candidate_structure_3_cla_class = structure_taxonomy_classyfire_03class,
         candidate_structure_3_npc_class = structure_taxonomy_npclassifier_03class,
-        candidate_structure_4_cla_parent = structure_taxonomy_classyfire_04directparent,
+        candidate_structure_4_cla_parent = structure_taxonomy_classyfire_04directparent
+      ) |>
+      tidytable::distinct(
+        structure_inchikey_2D,
+        feature_id,
+        candidate_structure_1_cla_kingdom,
+        candidate_structure_1_npc_pathway,
+        candidate_structure_2_cla_superclass,
+        candidate_structure_2_npc_superclass,
+        candidate_structure_3_cla_class,
+        candidate_structure_3_npc_class,
+        candidate_structure_4_cla_parent,
         rank_final,
         .keep_all = TRUE
       ) |>

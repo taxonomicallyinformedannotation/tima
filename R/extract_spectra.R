@@ -12,7 +12,6 @@ utils::globalVariables(c("group"))
 #'
 #' @examples NULL
 extract_spectra <- function(object) {
-  ## TODO find alternative without dplyr
   ## issues
   incoherent_colnames <- c(
     ms_level = "msLevel",

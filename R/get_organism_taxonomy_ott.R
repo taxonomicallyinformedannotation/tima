@@ -156,7 +156,6 @@ get_organism_taxonomy_ott <- function(df,
         )
     }
 
-    ## Todo find a dplyr alternative
     biological_metadata <-
       dplyr::left_join(organism_table, new_matched_otl_exact) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>

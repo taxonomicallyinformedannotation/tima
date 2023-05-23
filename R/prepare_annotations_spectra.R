@@ -53,15 +53,19 @@ prepare_annotations_spectra <-
            str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     # Check if input file(s) exists
-    stopifnot("Input file(s) do(es) not exist" =
-                rep(TRUE, length(input)) ==
-                lapply(X = input, file.exists))
+    stopifnot(
+      "Input file(s) do(es) not exist" =
+        rep(TRUE, length(input)) ==
+          lapply(X = input, file.exists)
+    )
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
     # Read input file and select specific columns
     table <-
-      lapply(X = input,
-             FUN = tidytable::fread) |>
+      lapply(
+        X = input,
+        FUN = tidytable::fread
+      ) |>
       tidytable::bind_rows() |>
       tidytable::filter(!is.na(feature_id)) |>
       tidytable::distinct(
