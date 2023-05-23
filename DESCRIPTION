@@ -28,6 +28,7 @@ Imports:
     MsCoreUtils (>= 1.12.0),
     parallelly (>= 1.35.0),
     pbmcapply (>= 1.5.1),
+    R.utils,
     rotl (>= 3.0.14),
     Spectra (>= 1.10.1),
     stats,
