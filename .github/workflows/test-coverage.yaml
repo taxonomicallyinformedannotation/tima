@@ -31,6 +31,7 @@ jobs:
           cp -R paths.yaml tests/testthat/paths.yaml
           cp -R params tests/testthat/params
           cp -R inst tests/testthat/inst
+          cp -R R tests/testthat/R
 
       - name: Test coverage
         run: |
