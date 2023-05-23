@@ -189,7 +189,7 @@ testthat::test_that("Whole process", {
   step <- "prepare_libraries_sop_closed"
   params <- get_params(step = step)
   ## Weird
-  source(file = "R/round_reals")
+  source(file = "R/round_reals.R")
   source(file = "R/prepare_libraries_sop_closed.R")
   ## To do as if there was an input
   prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
