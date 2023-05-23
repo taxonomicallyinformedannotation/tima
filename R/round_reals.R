@@ -9,15 +9,27 @@
 #'
 #' @examples NULL
 round_reals <- function(df, dig = 5) {
-  df |>
+  df_round <- df |>
     # Round to 5 digits to avoid small discrepancies
     tidytable::mutate(tidytable::across(
-      .cols = tidytable::any_of(c(
-        "structure_exact_mass",
-        "structure_xlogp"
-      )),
-      .fns = ~ round(as.numeric(.x),
-        digits = dig
-      )
+      tidytable::any_of(
+        c(
+          "structure_exact_mass",
+          "structure_xlogp"
+        )
+      ),
+      as.numeric
+    )) |>
+    tidytable::mutate(tidytable::across(
+      tidytable::any_of(
+        c(
+          "structure_exact_mass",
+          "structure_xlogp"
+        )
+      ),
+      round,
+      digits = dig
     ))
+
+  return(df_round)
 }

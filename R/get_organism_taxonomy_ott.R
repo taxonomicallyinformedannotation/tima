@@ -21,12 +21,12 @@ get_organism_taxonomy_ott <- function(df,
                                       url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
     tidytable::mutate(
-      organism = stringi::stri_replace_all_fixed(
-        str = organism,
-        pattern = " x ",
-        replacement = "",
-        vectorize = FALSE
-      )
+      organism = organism |>
+        stringi::stri_replace_all_fixed(
+          pattern = " x ",
+          replacement = "",
+          vectorize = FALSE
+        )
     ) |>
     tidytable::distinct() |>
     tidytable::mutate(search_string = tolower(organism)) |>

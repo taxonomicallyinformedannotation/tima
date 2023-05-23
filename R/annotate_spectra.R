@@ -204,15 +204,15 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (isSlaw) {
       df_final <- df_final |>
         tidytable::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(SLAW_ID))
+        tidytable::mutate(feature_id = as.numeric(SLAW_ID))
     } else {
       df_final <- df_final |>
         tidytable::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(acquisitionNum))
+        tidytable::mutate(feature_id = as.numeric(acquisitionNum))
     }
     df_final <- df_final |>
       tidytable::rowwise() |>
-      dplyr::mutate(
+      tidytable::mutate(
         ## Working in minutes
         error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,

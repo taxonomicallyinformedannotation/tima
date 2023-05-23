@@ -77,9 +77,8 @@ prepare_taxa <-
       ) |>
       tidytable::select(-tidytable::matches("quant_peaktable")) |>
       tidyfst::col_rn(var = name_features)
-    colnames(feature_table) <-
+    colnames(feature_table) <- colnames(feature_table) |>
       stringi::stri_replace_all_fixed(
-        str = colnames(feature_table),
         pattern = " Peak area",
         replacement = "",
         vectorize_all = FALSE
@@ -183,7 +182,7 @@ prepare_taxa <-
         by = c("organismOriginal" = "organism_name")
       ) |>
       tidytable::distinct() |>
-      dplyr::mutate_at(dplyr::vars(-dplyr::group_cols()), as.character) |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
       tidytable::select(
         feature_id,
         sample_organism_01_domain = tidytable::matches("organism_taxonomy_01domain"),
