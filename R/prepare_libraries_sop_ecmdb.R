@@ -45,12 +45,13 @@ prepare_libraries_sop_ecmdb <-
         ecmdb <- jsonlite::stream_in(con = unz(
           description = input,
           filename = file
-        ))
+        )) |>
+          tidytable::tidytable()
       })
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
-        tidytable::mutate(
+        dplyr::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = moldb_inchikey,
             from = 1,

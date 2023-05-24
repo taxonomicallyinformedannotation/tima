@@ -50,11 +50,12 @@ prepare_libraries_sop_closed <-
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
-        tidytable::fread()
+        tidytable::fread() |>
+        tidytable::tidytable()
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        tidytable::mutate(
+        dplyr::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = structure_inchikey,
             from = 1,
