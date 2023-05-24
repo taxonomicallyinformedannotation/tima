@@ -164,7 +164,7 @@ harmonize_spectra <- function(spectra,
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
-        yes = tidytable::row_number(),
+        yes = dplyr::row_number(),
         no = as.numeric(spectrum_id)
       ),
       compound_id = ifelse(

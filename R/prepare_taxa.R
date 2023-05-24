@@ -160,7 +160,7 @@ prepare_taxa <-
     if (!is.null(taxon)) {
       metadata_table_joined <- cbind(
         feature_table |>
-          dplyr::mutate(feature_id = tidytable::row_number()),
+          dplyr::mutate(feature_id = dplyr::row_number()),
         biological_metadata |>
           tidytable::select(organismOriginal = organism_name)
       )
