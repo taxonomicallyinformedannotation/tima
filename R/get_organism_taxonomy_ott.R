@@ -152,7 +152,7 @@ get_organism_taxonomy_ott <- function(df,
           rank = NA_character_,
           name = NA_character_,
           unique_name = NA_character_,
-          ott_id = NA_character_
+          ott_id = NA_integer_
         )
     }
 
