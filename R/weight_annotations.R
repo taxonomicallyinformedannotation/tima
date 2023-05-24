@@ -159,7 +159,7 @@ weight_annotations <-
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>
-        tidytable::filter(score_input == 0)
+        dplyr::filter(score_input == 0)
     }
 
     log_debug(x = "adding biological organism metadata")

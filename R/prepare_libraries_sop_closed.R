@@ -95,7 +95,7 @@ prepare_libraries_sop_closed <-
         tidytable::data.table() |>
         round_reals() |>
         tidytable::distinct() |>
-        tidytable::mutate(reference_doi = NA)
+        dplyr::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- tidytable::tidytable(

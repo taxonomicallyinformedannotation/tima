@@ -111,7 +111,7 @@ prepare_libraries_sop_merged <-
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
         tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
-          tidytable::mutate(tidytable::across(tidytable::everything(), as.character)))
+          dplyr::mutate(dplyr::across(dplyr::everything(), as.character)))
     }
 
     log_debug(x = "Keeping structures")
@@ -140,7 +140,7 @@ prepare_libraries_sop_merged <-
         tidytable::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
-        tidytable::filter(grepl(
+        dplyr::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)

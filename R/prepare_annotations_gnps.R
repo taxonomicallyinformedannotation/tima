@@ -74,7 +74,7 @@ prepare_annotations_gnps <-
         FUN = tidytable::fread
       ) |>
         tidytable::bind_rows() |>
-        tidytable::mutate(
+        dplyr::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
@@ -102,7 +102,7 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class = class,
           structure_taxonomy_classyfire_04directparent = subclass
         ) |>
-        tidytable::mutate(
+        dplyr::mutate(
           error_rt = NA,
           structure_smiles_2D = NA,
           structure_molecular_formula = structure_inchi |>
@@ -148,11 +148,11 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "N/A")) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), tidytable::na_if, "null")) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "N/A")) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "null")) |>
         round_reals() |>
-        tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
+        dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

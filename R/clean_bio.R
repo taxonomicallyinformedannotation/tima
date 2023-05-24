@@ -86,7 +86,7 @@ clean_bio <-
     )
 
     df01 <- annotationTableWeightedBio |>
-      tidytable::filter(score_input > 0 |
+      dplyr::filter(score_input > 0 |
         # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
@@ -100,12 +100,12 @@ clean_bio <-
           ),
         df01
       ) |>
-      tidytable::mutate(structure_inchikey_2D = "notAnnotated")
+      dplyr::mutate(structure_inchikey_2D = "notAnnotated")
 
     df03 <- tidytable::bind_rows(df01, df02)
 
     df <- df03 |>
-      tidytable::mutate(
+      dplyr::mutate(
         candidate_structure_1_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
         candidate_structure_1_npc_pathway = structure_taxonomy_npclassifier_01pathway,
         candidate_structure_2_cla_superclass = structure_taxonomy_classyfire_02superclass,
@@ -154,7 +154,7 @@ clean_bio <-
       tidytable::tidytable()
     # log_debug("keeping clusters with at least 3 features  \n")
     # df1 <- df |>
-    #   tidytable::filter(component_id != -1) |>
+    #   dplyr::filter(component_id != -1) |>
     #   tidytable::group_by(component_id) |>
     #   tidytable::distinct(feature_id,
     #     structure_inchikey_2D,
@@ -162,19 +162,19 @@ clean_bio <-
     #   ) |>
     #   tidytable::add_count() |>
     #   tidytable::ungroup() |>
-    #   tidytable::filter(n >= 3) |>
+    #   dplyr::filter(n >= 3) |>
     #   tidytable::select(-n)
     #
     # log_debug("keeping clusters with less than 3 features \n")
     # df2 <- tidytable::full_join(
     #   x = df |>
-    #     tidytable::filter(component_id == -1),
+    #     dplyr::filter(component_id == -1),
     #   y = df |>
     #     tidytable::group_by(component_id) |>
     #     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     #     tidytable::add_count() |>
     #     tidytable::ungroup() |>
-    #     tidytable::filter(n <= 2) |>
+    #     dplyr::filter(n <= 2) |>
     #     tidytable::select(-n)
     # )
 
@@ -187,12 +187,12 @@ clean_bio <-
           tidytable::group_by(feature_source) |>
           tidytable::add_count() |>
           tidytable::ungroup() |>
-          tidytable::filter(n >= 2) |>
+          dplyr::filter(n >= 2) |>
           tidytable::select(-n),
         df,
         by = stats::setNames("feature_id", "feature_target")
       ) |>
-      tidytable::filter(!is.na(feature_source))
+      dplyr::filter(!is.na(feature_source))
 
     log_debug("... at the (classyfire) kingdom level \n")
     freq_cla_kin <- df3 |>
@@ -200,17 +200,17 @@ clean_bio <-
         feature_source,
         candidate_structure_1_cla_kingdom
       ) |>
-      tidytable::mutate(count_kin = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_kin = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_cla_kin = count_kin / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_kin = count_kin / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_1_cla_kingdom
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_1_cla_kingdom,
@@ -220,7 +220,7 @@ clean_bio <-
         feature_source,
         candidate_structure_1_cla_kingdom
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_pat = ifelse(
           test = candidate_structure_1_cla_kingdom == "notAnnotated" |
             candidate_structure_1_cla_kingdom == "notClassified",
@@ -228,7 +228,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_1_cla_kingdom = consistency_structure_cla_kin / sqrt(rank_avg_pat)) |>
+      dplyr::mutate(consistency_score_chemical_1_cla_kingdom = consistency_structure_cla_kin / sqrt(rank_avg_pat)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_1_cla_kingdom) |>
       tidytable::ungroup() |>
@@ -239,7 +239,7 @@ clean_bio <-
         consistency_structure_cla_kin,
         consistency_score_chemical_1_cla_kingdom
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_cla_kin = ifelse(
           test = consistency_score_chemical_1_cla_kingdom > 0.5,
           yes = consensus_structure_cla_kin,
@@ -253,17 +253,17 @@ clean_bio <-
         feature_source,
         candidate_structure_1_npc_pathway
       ) |>
-      tidytable::mutate(count_pat = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_pat = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_npc_pat = count_pat / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_npc_pat = count_pat / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_1_npc_pathway
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_1_npc_pathway,
@@ -273,7 +273,7 @@ clean_bio <-
         feature_source,
         candidate_structure_1_npc_pathway
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_pat = ifelse(
           test = candidate_structure_1_npc_pathway == "notAnnotated" |
             candidate_structure_1_npc_pathway == "notClassified",
@@ -281,7 +281,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_1_npc_pathway = consistency_structure_npc_pat / sqrt(rank_avg_pat)) |>
+      dplyr::mutate(consistency_score_chemical_1_npc_pathway = consistency_structure_npc_pat / sqrt(rank_avg_pat)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_1_npc_pathway) |>
       tidytable::ungroup() |>
@@ -292,7 +292,7 @@ clean_bio <-
         consistency_structure_npc_pat,
         consistency_score_chemical_1_npc_pathway
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_npc_pat = ifelse(
           test = consistency_score_chemical_1_npc_pathway > 0.5,
           yes = consensus_structure_npc_pat,
@@ -306,17 +306,17 @@ clean_bio <-
         feature_source,
         candidate_structure_2_cla_superclass
       ) |>
-      tidytable::mutate(count_sup = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_sup = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_cla_sup = count_sup / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_sup = count_sup / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_2_cla_superclass
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_2_cla_superclass,
@@ -326,7 +326,7 @@ clean_bio <-
         feature_source,
         candidate_structure_2_cla_superclass
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_sup = ifelse(
           test = candidate_structure_2_cla_superclass == "notAnnotated" |
             candidate_structure_2_cla_superclass == "notClassified",
@@ -334,7 +334,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_2_cla_superclass = consistency_structure_cla_sup / sqrt(rank_avg_sup)) |>
+      dplyr::mutate(consistency_score_chemical_2_cla_superclass = consistency_structure_cla_sup / sqrt(rank_avg_sup)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_2_cla_superclass) |>
       tidytable::ungroup() |>
@@ -345,7 +345,7 @@ clean_bio <-
         consistency_structure_cla_sup,
         consistency_score_chemical_2_cla_superclass
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_cla_sup = ifelse(
           test = consistency_score_chemical_2_cla_superclass > 0.5,
           yes = consensus_structure_cla_sup,
@@ -359,17 +359,17 @@ clean_bio <-
         feature_source,
         candidate_structure_2_npc_superclass
       ) |>
-      tidytable::mutate(count_sup = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_sup = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_npc_sup = count_sup / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_npc_sup = count_sup / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_2_npc_superclass
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_2_npc_superclass,
@@ -379,7 +379,7 @@ clean_bio <-
         feature_source,
         candidate_structure_2_npc_superclass
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_sup = ifelse(
           test = candidate_structure_2_npc_superclass == "notAnnotated" |
             candidate_structure_2_npc_superclass == "notClassified",
@@ -387,7 +387,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_2_npc_superclass = consistency_structure_npc_sup / sqrt(rank_avg_sup)) |>
+      dplyr::mutate(consistency_score_chemical_2_npc_superclass = consistency_structure_npc_sup / sqrt(rank_avg_sup)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_2_npc_superclass) |>
       tidytable::ungroup() |>
@@ -398,7 +398,7 @@ clean_bio <-
         consistency_structure_npc_sup,
         consistency_score_chemical_2_npc_superclass
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_npc_sup = ifelse(
           test = consistency_score_chemical_2_npc_superclass > 0.5,
           yes = consensus_structure_npc_sup,
@@ -412,17 +412,17 @@ clean_bio <-
         feature_source,
         candidate_structure_3_cla_class
       ) |>
-      tidytable::mutate(count_cla = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_cla = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_cla_cla = count_cla / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_cla = count_cla / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_3_cla_class
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_3_cla_class,
@@ -432,7 +432,7 @@ clean_bio <-
         feature_source,
         candidate_structure_3_cla_class
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_cla = ifelse(
           test = candidate_structure_3_cla_class == "notAnnotated" |
             candidate_structure_3_cla_class == "notClassified",
@@ -440,7 +440,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_3_cla_class = consistency_structure_cla_cla / sqrt(rank_avg_cla)) |>
+      dplyr::mutate(consistency_score_chemical_3_cla_class = consistency_structure_cla_cla / sqrt(rank_avg_cla)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_3_cla_class) |>
       tidytable::ungroup() |>
@@ -451,7 +451,7 @@ clean_bio <-
         consistency_structure_cla_cla,
         consistency_score_chemical_3_cla_class
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_cla_cla = ifelse(
           test = consistency_score_chemical_3_cla_class > 0.5,
           yes = consensus_structure_cla_cla,
@@ -465,17 +465,17 @@ clean_bio <-
         feature_source,
         candidate_structure_3_npc_class
       ) |>
-      tidytable::mutate(count_cla = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_cla = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_npc_cla = count_cla / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_npc_cla = count_cla / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_3_npc_class
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_3_npc_class,
@@ -485,7 +485,7 @@ clean_bio <-
         feature_source,
         candidate_structure_3_npc_class
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_cla = ifelse(
           test = candidate_structure_3_npc_class == "notAnnotated" |
             candidate_structure_3_npc_class == "notClassified",
@@ -493,7 +493,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_3_npc_class = consistency_structure_npc_cla / sqrt(rank_avg_cla)) |>
+      dplyr::mutate(consistency_score_chemical_3_npc_class = consistency_structure_npc_cla / sqrt(rank_avg_cla)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_3_npc_class) |>
       tidytable::ungroup() |>
@@ -504,7 +504,7 @@ clean_bio <-
         consistency_structure_npc_cla,
         consistency_score_chemical_3_npc_class
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_npc_cla = ifelse(
           test = consistency_score_chemical_3_npc_class > 0.5,
           yes = consensus_structure_npc_cla,
@@ -518,17 +518,17 @@ clean_bio <-
         feature_source,
         candidate_structure_4_cla_parent
       ) |>
-      tidytable::mutate(count_par = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(count_par = tidytable::n_distinct(feature_target)) |>
       tidytable::ungroup() |>
       tidytable::group_by(feature_source) |>
-      tidytable::mutate(sum = tidytable::n_distinct(feature_target)) |>
-      tidytable::mutate(consistency_structure_cla_par = count_par / sum) |>
+      dplyr::mutate(sum = tidytable::n_distinct(feature_target)) |>
+      dplyr::mutate(consistency_structure_cla_par = count_par / sum) |>
       tidytable::ungroup() |>
       tidytable::group_by(
         feature_target,
         candidate_structure_4_cla_parent
       ) |>
-      tidytable::mutate(rank_final = as.numeric(rank_final)) |>
+      dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       tidytable::arrange(rank_final) |>
       tidytable::distinct(feature_source,
         candidate_structure_4_cla_parent,
@@ -538,7 +538,7 @@ clean_bio <-
         feature_source,
         candidate_structure_4_cla_parent
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         rank_avg_par = ifelse(
           test = candidate_structure_4_cla_parent == "notAnnotated" |
             candidate_structure_4_cla_parent == "notClassified",
@@ -546,7 +546,7 @@ clean_bio <-
           no = mean(as.numeric(rank_final))
         )
       ) |>
-      tidytable::mutate(consistency_score_chemical_4_cla_parent = consistency_structure_cla_par / sqrt(rank_avg_par)) |>
+      dplyr::mutate(consistency_score_chemical_4_cla_parent = consistency_structure_cla_par / sqrt(rank_avg_par)) |>
       tidytable::group_by(feature_source) |>
       tidytable::arrange(-consistency_score_chemical_4_cla_parent) |>
       tidytable::ungroup() |>
@@ -557,7 +557,7 @@ clean_bio <-
         consistency_structure_cla_par,
         consistency_score_chemical_4_cla_parent
       ) |>
-      tidytable::mutate(
+      dplyr::mutate(
         consensus_structure_cla_par = ifelse(
           test = consistency_score_chemical_4_cla_parent > 0.5,
           yes = consensus_structure_cla_par,
@@ -594,34 +594,34 @@ clean_bio <-
         tidytable::everything()
       ) |>
       # In case there are no consensus at all because no network
-      tidytable::mutate(tidytable::across(tidytable::where(is.logical), as.character)) |>
+      dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
       tidytable::tidytable()
 
     # TODO Think about better scoring option
     log_debug("adding dummy consistency for features with less than 2 neighbors \n")
     dummy_consistency <- df4 |>
-      tidytable::mutate(
-        consensus_structure_cla_kin = tidytable::coalesce(consensus_structure_cla_kin, "dummy"),
-        consistency_structure_cla_kin = tidytable::coalesce(consistency_structure_cla_kin, 1),
-        consistency_score_chemical_1_cla_kingdom = tidytable::coalesce(consistency_score_chemical_1_cla_kingdom, 0),
-        consensus_structure_npc_pat = tidytable::coalesce(consensus_structure_npc_pat, "dummy"),
-        consistency_structure_npc_pat = tidytable::coalesce(consistency_structure_npc_pat, 1),
-        consistency_score_chemical_1_npc_pathway = tidytable::coalesce(consistency_score_chemical_1_npc_pathway, 0),
-        consensus_structure_cla_sup = tidytable::coalesce(consensus_structure_cla_sup, "dummy"),
-        consistency_structure_cla_sup = tidytable::coalesce(consistency_structure_cla_sup, 1),
-        consistency_score_chemical_2_cla_superclass = tidytable::coalesce(consistency_score_chemical_2_cla_superclass, 0),
-        consensus_structure_npc_sup = tidytable::coalesce(consensus_structure_npc_sup, "dummy"),
-        consistency_structure_npc_sup = tidytable::coalesce(consistency_structure_npc_sup, 1),
-        consistency_score_chemical_2_npc_superclass = tidytable::coalesce(consistency_score_chemical_2_npc_superclass, 0),
-        consensus_structure_cla_cla = tidytable::coalesce(consensus_structure_cla_cla, "dummy"),
-        consistency_structure_cla_cla = tidytable::coalesce(consistency_structure_cla_cla, 1),
-        consistency_score_chemical_3_cla_class = tidytable::coalesce(consistency_score_chemical_3_cla_class, 0),
-        consensus_structure_npc_cla = tidytable::coalesce(consensus_structure_npc_cla, "dummy"),
-        consistency_structure_npc_cla = tidytable::coalesce(consistency_structure_npc_cla, 1),
-        consistency_score_chemical_3_npc_class = tidytable::coalesce(consistency_score_chemical_3_npc_class, 0),
-        consensus_structure_cla_par = tidytable::coalesce(consensus_structure_cla_par, "dummy"),
-        consistency_structure_cla_par = tidytable::coalesce(consistency_structure_cla_par, 1),
-        consistency_score_chemical_4_cla_parent = tidytable::coalesce(consistency_score_chemical_4_cla_parent, 0)
+      dplyr::mutate(
+        consensus_structure_cla_kin = dplyr::coalesce(consensus_structure_cla_kin, "dummy"),
+        consistency_structure_cla_kin = dplyr::coalesce(consistency_structure_cla_kin, 1),
+        consistency_score_chemical_1_cla_kingdom = dplyr::coalesce(consistency_score_chemical_1_cla_kingdom, 0),
+        consensus_structure_npc_pat = dplyr::coalesce(consensus_structure_npc_pat, "dummy"),
+        consistency_structure_npc_pat = dplyr::coalesce(consistency_structure_npc_pat, 1),
+        consistency_score_chemical_1_npc_pathway = dplyr::coalesce(consistency_score_chemical_1_npc_pathway, 0),
+        consensus_structure_cla_sup = dplyr::coalesce(consensus_structure_cla_sup, "dummy"),
+        consistency_structure_cla_sup = dplyr::coalesce(consistency_structure_cla_sup, 1),
+        consistency_score_chemical_2_cla_superclass = dplyr::coalesce(consistency_score_chemical_2_cla_superclass, 0),
+        consensus_structure_npc_sup = dplyr::coalesce(consensus_structure_npc_sup, "dummy"),
+        consistency_structure_npc_sup = dplyr::coalesce(consistency_structure_npc_sup, 1),
+        consistency_score_chemical_2_npc_superclass = dplyr::coalesce(consistency_score_chemical_2_npc_superclass, 0),
+        consensus_structure_cla_cla = dplyr::coalesce(consensus_structure_cla_cla, "dummy"),
+        consistency_structure_cla_cla = dplyr::coalesce(consistency_structure_cla_cla, 1),
+        consistency_score_chemical_3_cla_class = dplyr::coalesce(consistency_score_chemical_3_cla_class, 0),
+        consensus_structure_npc_cla = dplyr::coalesce(consensus_structure_npc_cla, "dummy"),
+        consistency_structure_npc_cla = dplyr::coalesce(consistency_structure_npc_cla, 1),
+        consistency_score_chemical_3_npc_class = dplyr::coalesce(consistency_score_chemical_3_npc_class, 0),
+        consensus_structure_cla_par = dplyr::coalesce(consensus_structure_cla_par, "dummy"),
+        consistency_structure_cla_par = dplyr::coalesce(consistency_structure_cla_par, 1),
+        consistency_score_chemical_4_cla_parent = dplyr::coalesce(consistency_score_chemical_4_cla_parent, 0)
       )
 
     return(dummy_consistency)

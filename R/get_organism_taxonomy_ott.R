@@ -20,7 +20,7 @@ utils::globalVariables(c(
 get_organism_taxonomy_ott <- function(df,
                                       url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
-    tidytable::mutate(
+    dplyr::mutate(
       organism = organism |>
         stringi::stri_replace_all_fixed(
           pattern = " x ",
@@ -29,7 +29,7 @@ get_organism_taxonomy_ott <- function(df,
         )
     ) |>
     tidytable::distinct() |>
-    tidytable::mutate(search_string = tolower(organism)) |>
+    dplyr::mutate(search_string = tolower(organism)) |>
     tidytable::distinct(
       organism,
       search_string
@@ -38,7 +38,7 @@ get_organism_taxonomy_ott <- function(df,
       canonical_name = organism,
       search_string
     ) |>
-    tidytable::filter(!is.na(canonical_name)) |>
+    dplyr::filter(!is.na(canonical_name)) |>
     data.frame()
 
   organisms <- organism_table$canonical_name
@@ -73,19 +73,19 @@ get_organism_taxonomy_ott <- function(df,
     )
 
     new_ott_id <- new_matched_otl_exact |>
-      tidytable::filter(!is.na(ott_id)) |>
+      dplyr::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id)) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
-        tidytable::filter(!is.na(ott_id))
+        dplyr::filter(!is.na(ott_id))
 
       new_ott_id_1 <- pretable |>
         tidytable::distinct(ott_id)
 
       organism_table_2 <- organism_table |>
-        tidytable::filter(!organism_table$search_string %in% pretable$search_string)
+        dplyr::filter(!organism_table$search_string %in% pretable$search_string)
 
       organism_table_2$search_string <-
         stringi::stri_replace_all_regex(
@@ -109,7 +109,7 @@ get_organism_taxonomy_ott <- function(df,
       )
       log_debug("Retrying with", organisms)
       new_ott_id_2 <- new_matched_otl_exact |>
-        tidytable::filter(!is.na(ott_id)) |>
+        dplyr::filter(!is.na(ott_id)) |>
         tidytable::distinct(ott_id)
 
       new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
@@ -144,7 +144,7 @@ get_organism_taxonomy_ott <- function(df,
       }
 
       otl <- tidytable::bind_rows(list_df) |>
-        tidytable::mutate(ott_id = as.integer(ott_id))
+        dplyr::mutate(ott_id = as.integer(ott_id))
     } else {
       otl <-
         data.frame(
@@ -181,30 +181,32 @@ get_organism_taxonomy_ott <- function(df,
       dplyr::distinct() |>
       dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
       ## feeling it is better that way
-      dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE) |>
-      ## canonical_name important for synonyms
-      tidyr::pivot_wider(
-        names_from = "rank",
-        values_from = c("name", "unique_name.y", "ott_id.y")
-      ) |>
-      dplyr::select(
-        organism_name = canonical_name,
-        organism_taxonomy_ottid = ott_id,
-        organism_taxonomy_01domain = dplyr::matches("name_domain"),
-        organism_taxonomy_02kingdom = dplyr::matches("name_kingdom"),
-        organism_taxonomy_03phylum = dplyr::matches("name_phylum"),
-        organism_taxonomy_04class = dplyr::matches("name_class"),
-        organism_taxonomy_05order = dplyr::matches("name_order"),
-        organism_taxonomy_06family = dplyr::matches("name_family"),
-        organism_taxonomy_07tribe = dplyr::matches("name_tribe"),
-        organism_taxonomy_08genus = dplyr::matches("name_genus"),
-        organism_taxonomy_09species = dplyr::matches("name_species"),
-        organism_taxonomy_10varietas = dplyr::matches("name_varietas")
-      ) |>
-      dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
-      dplyr::coalesce()
+      dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
 
     if (nrow(biological_metadata) != 0) {
+      biological_metadata <- biological_metadata |>
+        ## canonical_name important for synonyms
+        tidytable::pivot_wider(
+          names_from = "rank",
+          values_from = c("name", "unique_name.y", "ott_id.y")
+        ) |>
+        dplyr::select(
+          organism_name = canonical_name,
+          organism_taxonomy_ottid = ott_id,
+          organism_taxonomy_01domain = dplyr::matches("name_domain"),
+          organism_taxonomy_02kingdom = dplyr::matches("name_kingdom"),
+          organism_taxonomy_03phylum = dplyr::matches("name_phylum"),
+          organism_taxonomy_04class = dplyr::matches("name_class"),
+          organism_taxonomy_05order = dplyr::matches("name_order"),
+          organism_taxonomy_06family = dplyr::matches("name_family"),
+          organism_taxonomy_07tribe = dplyr::matches("name_tribe"),
+          organism_taxonomy_08genus = dplyr::matches("name_genus"),
+          organism_taxonomy_09species = dplyr::matches("name_species"),
+          organism_taxonomy_10varietas = dplyr::matches("name_varietas")
+        ) |>
+        dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
+        dplyr::coalesce()
+
       biological_metadata[dplyr::setdiff(
         x = c(
           "organism_name",
