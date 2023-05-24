@@ -184,12 +184,13 @@ clean_chemo <-
       )
 
     references <- structureOrganismPairsTable |>
-      dplyr::distinct(
+      dplyr::select(
         structure_inchikey_2D,
         reference_doi,
         organism_name,
         dplyr::contains("organism_taxonomy_")
       ) |>
+      dplyr::distinct() |>
       tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
       dplyr::filter(!is.na(value)) |>
       dplyr::filter(value != "notClassified") |>
