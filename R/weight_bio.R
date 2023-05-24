@@ -755,7 +755,7 @@ weight_bio <-
         rank_final,
         score_pondered_bio
       ) |>
-      tidytable::arrange(as.numeric(feature_id)) |>
+      dplyr::arrange(as.numeric(feature_id)) |>
       tidytable::ungroup() |>
       tidytable::tidytable()
 

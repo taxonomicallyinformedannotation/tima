@@ -357,7 +357,7 @@ clean_chemo <-
       tidytable::distinct()
 
     df11 <- tidytable::bind_rows(df8, df10) |>
-      tidytable::arrange(as.numeric(feature_id))
+      dplyr::arrange(as.numeric(feature_id))
 
     ## Because cytoscape import fails otherwise
     colnames(df11) <-

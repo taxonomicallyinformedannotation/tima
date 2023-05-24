@@ -179,22 +179,22 @@ annotate_masses <-
       tidytable::fread(
         file = library
       ) |>
-      tidytable::left_join(tidytable::fread(
+      dplyr::left_join(tidytable::fread(
         file = str_2D_3D
       )) |>
-      tidytable::left_join(tidytable::fread(
+      dplyr::left_join(tidytable::fread(
         file = str_met
       )) |>
-      tidytable::left_join(tidytable::fread(
+      dplyr::left_join(tidytable::fread(
         file = str_nam
       )) |>
-      tidytable::left_join(tidytable::fread(
+      dplyr::left_join(tidytable::fread(
         file = str_tax_cla
       )) |>
-      tidytable::left_join(tidytable::fread(
+      dplyr::left_join(tidytable::fread(
         file = str_tax_npc
       )) |>
-      # tidytable::left_join(tidytable::fread(file = org_tax_ott)) |>
+      # dplyr::left_join(tidytable::fread(file = org_tax_ott)) |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(
         c(

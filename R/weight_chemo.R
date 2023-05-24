@@ -250,7 +250,7 @@ weight_chemo <-
       ) |>
       tidytable::arrange(rank_final) |>
       tidytable::ungroup() |>
-      tidytable::arrange(as.numeric(feature_id)) |>
+      dplyr::arrange(as.numeric(feature_id)) |>
       data.frame()
 
     return(df4)
