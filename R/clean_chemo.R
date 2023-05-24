@@ -190,7 +190,7 @@ clean_chemo <-
         organism_name,
         dplyr::contains("organism_taxonomy_")
       ) |>
-      tidytable::pivot_longer(dplyr::contains("organism_taxonomy_")) |>
+      tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
       dplyr::filter(!is.na(value)) |>
       dplyr::filter(value != "notClassified") |>
       dplyr::distinct(structure_inchikey_2D,
