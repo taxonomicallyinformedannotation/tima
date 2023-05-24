@@ -84,34 +84,47 @@ prepare_annotations_sirius <-
       )
       log_debug("Loading and formatting SIRIUS results")
       canopus <-
-        tidytable::fread(file = file.path(
-          input_directory,
-          "canopus_compound_summary.tsv"
-        ))
+        tidytable::fread(
+          file = file.path(
+            input_directory,
+            "canopus_compound_summary.tsv"
+          ),
+          na.strings = ""
+        )
 
       formula <-
-        tidytable::fread(file = file.path(
-          input_directory,
-          "formula_identifications.tsv"
-        ))
+        tidytable::fread(
+          file = file.path(
+            input_directory,
+            "formula_identifications.tsv"
+          ),
+          na.strings = ""
+        )
 
       formula_adducts <-
-        tidytable::fread(file = file.path(
-          input_directory,
-          "formula_identifications_adducts.tsv"
-        ))
+        tidytable::fread(
+          file = file.path(
+            input_directory,
+            "formula_identifications_adducts.tsv"
+          ),
+          na.strings = ""
+        )
 
       # compound <-
       #   tidytable::fread(file = file.path(
       #     input_directory,
       #     "compound_identifications.tsv"
-      #   ))
+      #   ),
+      #         na.strings = "")
 
       compound_adducts <-
-        tidytable::fread(file = file.path(
-          input_directory,
-          "compound_identifications_adducts.tsv"
-        ))
+        tidytable::fread(
+          file = file.path(
+            input_directory,
+            "compound_identifications_adducts.tsv"
+          ),
+          na.strings = ""
+        )
 
       compound_summary <- lapply(
         X = list.files(
@@ -120,7 +133,8 @@ prepare_annotations_sirius <-
           full.names = TRUE,
           recursive = TRUE
         ),
-        FUN = tidytable::fread
+        FUN = tidytable::fread,
+        na.strings = ""
       )
 
       names(compound_summary) <- list.files(
@@ -295,8 +309,12 @@ prepare_annotations_sirius <-
           structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "N/A")) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "null")) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+          tidytable::na_if(x, "N/A")
+        })) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+          tidytable::na_if(x, "null")
+        })) |>
         round_reals() |>
         dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
         complement_metadata_structures(

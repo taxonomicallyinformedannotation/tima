@@ -121,40 +121,56 @@ weight_annotations <-
     log_debug(x = "... files ...")
     log_debug(x = "... features")
     features_table <- tidytable::fread(
-      file = features
+      file = features,
+      colClasses = "character",
+      na.strings = ""
     )
     log_debug(x = "... components")
     components_table <- tidytable::fread(
-      file = components
+      file = components,
+      colClasses = "character",
+      na.strings = ""
     )
 
     log_debug(x = "... annotations")
     annotation_table <- lapply(
       X = annotations,
-      FUN = tidytable::fread
+      FUN = tidytable::fread,
+      colClasses = "character",
+      na.strings = ""
     ) |>
       dplyr::bind_rows()
 
     log_debug(x = "... metadata_table_biological_annotation")
     taxed_features_table <- tidytable::fread(
-      file = taxa
+      file = taxa,
+      colClasses = "character",
+      na.strings = ""
     )
 
     log_debug(x = "... edges table")
     edges_table <- tidytable::fread(
-      file = edges
+      file = edges,
+      colClasses = "character",
+      na.strings = ""
     )
 
     log_debug(x = "... structure-organism pairs table")
     structure_organism_pairs_table <-
       tidytable::fread(
-        file = library
+        file = library,
+        colClasses = "character",
+        na.strings = ""
       ) |>
       dplyr::left_join(tidytable::fread(
-        file = str_2D_3D
+        file = str_2D_3D,
+        colClasses = "character",
+        na.strings = ""
       )) |>
       dplyr::left_join(tidytable::fread(
-        file = org_tax_ott
+        file = org_tax_ott,
+        colClasses = "character",
+        na.strings = ""
       ))
 
     if (ms1_only == TRUE) {

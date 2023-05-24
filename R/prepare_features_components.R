@@ -34,7 +34,8 @@ prepare_features_components <-
     log_debug(x = "... components table")
     table <- lapply(
       X = input,
-      FUN = tidytable::fread
+      FUN = tidytable::fread,
+      na.strings = ""
     ) |>
       dplyr::bind_rows() |>
       dplyr::select(

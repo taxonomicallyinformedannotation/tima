@@ -71,7 +71,8 @@ prepare_annotations_gnps <-
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(
         X = input,
-        FUN = tidytable::fread
+        FUN = tidytable::fread,
+        na.strings = ""
       ) |>
         dplyr::bind_rows() |>
         dplyr::mutate(
@@ -149,8 +150,12 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_04directparent
         ) |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "N/A")) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "null")) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+          tidytable::na_if(x, "N/A")
+        })) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+          tidytable::na_if(x, "null")
+        })) |>
         round_reals() |>
         dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
         complement_metadata_structures(

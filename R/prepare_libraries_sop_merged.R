@@ -84,7 +84,8 @@ prepare_libraries_sop_merged <-
     libraries <- list()
     for (i in seq_along(files)) {
       libraries[[i]] <- tidytable::fread(
-        file = files[[i]]
+        file = files[[i]],
+        na.strings = ""
       )
     }
 

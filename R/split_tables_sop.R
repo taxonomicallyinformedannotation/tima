@@ -124,7 +124,7 @@ split_tables_sop <- function(table) {
       structure_inchikey,
       structure_smiles
     ) |>
-    dplyr::summarize(dplyr::across(dplyr::everything(), function(x) {
+    dplyr::summarize(dplyr::across(dplyr::everything(), .fns = function(x) {
       x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
     })) |>
     dplyr::ungroup() |>
@@ -145,14 +145,16 @@ split_tables_sop <- function(table) {
     ) |>
     dplyr::distinct() |>
     dplyr::group_by(structure_smiles_2D) |>
-    dplyr::summarize(dplyr::across(dplyr::everything(), function(x) {
+    dplyr::summarize(dplyr::across(dplyr::everything(), .fns = function(x) {
       x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
     })) |>
     dplyr::ungroup() |>
     dplyr::mutate(dplyr::across(dplyr::everything(), trimws)) |>
     dplyr::mutate(dplyr::across(
       dplyr::matches("taxonomy.*_0"),
-      ~ tidytable::replace_na(.x, "notClassified")
+      .fns = function(x) {
+        tidytable::replace_na(x, "notClassified")
+      }
     ))
 
   table_structures_taxonomy_classyfire <- table |>
@@ -171,7 +173,9 @@ split_tables_sop <- function(table) {
     dplyr::distinct() |>
     dplyr::mutate(dplyr::across(
       dplyr::matches("taxonomy.*_0"),
-      ~ tidytable::replace_na(.x, "notClassified")
+      .fns = function(x) {
+        tidytable::replace_na(x, "notClassified")
+      }
     ))
 
   table_organisms_names <- table |>
@@ -203,7 +207,9 @@ split_tables_sop <- function(table) {
     dplyr::distinct() |>
     dplyr::mutate(dplyr::across(
       dplyr::matches("taxonomy.*_0"),
-      ~ tidytable::replace_na(.x, "notClassified")
+      .fns = function(x) {
+        tidytable::replace_na(x, "notClassified")
+      }
     ))
 
   tables <-

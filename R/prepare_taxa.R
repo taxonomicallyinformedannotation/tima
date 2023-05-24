@@ -62,9 +62,15 @@ prepare_taxa <-
     params <<- parameters
 
     log_debug(x = "Loading feature table")
-    feature_table <- tidytable::fread(file = input)
+    feature_table <- tidytable::fread(
+      file = input,
+      na.strings = ""
+    )
     log_debug(x = "Loading metadata table")
-    metadata_table <- tidytable::fread(file = metadata)
+    metadata_table <- tidytable::fread(
+      file = metadata,
+      na.strings = ""
+    )
 
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
@@ -111,7 +117,10 @@ prepare_taxa <-
 
     log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
     organism_table_filled <- organism_table |>
-      dplyr::left_join(tidytable::fread(org_tax_ott),
+      dplyr::left_join(
+        tidytable::fread(org_tax_ott,
+          na.strings = ""
+        ),
         by = c("organism" = "organism_name")
       )
 
@@ -167,8 +176,7 @@ prepare_taxa <-
     } else {
       metadata_table_joined <-
         dplyr::left_join(top_n, metadata_table, by = c("name" = "filename")) |>
-        dplyr::select(
-          feature_id := rowname,
+        dplyr::select(feature_id := rowname,
           organismOriginal = dplyr::all_of(colname),
           dplyr::everything()
         )
@@ -202,7 +210,12 @@ prepare_taxa <-
       })) |>
       dplyr::ungroup() |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, ""))
+      dplyr::mutate(dplyr::across(
+        dplyr::everything(),
+        .fns = function(x) {
+          tidytable::na_if(x, "")
+        }
+      ))
 
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 

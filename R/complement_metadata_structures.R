@@ -58,7 +58,9 @@ complement_metadata_structures <- function(df,
                                            str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
                                            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc) {
   log_debug("Trying to look for already computed metadata")
-  dd_ddd <- tidytable::fread(str_2D_3D) |>
+  dd_ddd <- tidytable::fread(str_2D_3D,
+    na.strings = ""
+  ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   dd_ddd_s <- dd_ddd |>
@@ -76,7 +78,9 @@ complement_metadata_structures <- function(df,
     dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
-  met_2D <- tidytable::fread(str_met) |>
+  met_2D <- tidytable::fread(str_met,
+    na.strings = ""
+  ) |>
     dplyr::left_join(dd_ddd) |>
     dplyr::distinct(
       structure_inchikey_2D,
@@ -94,7 +98,9 @@ complement_metadata_structures <- function(df,
     ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
-  nam_2D <- tidytable::fread(str_nam) |>
+  nam_2D <- tidytable::fread(str_nam,
+    na.strings = ""
+  ) |>
     dplyr::left_join(dd_ddd) |>
     dplyr::distinct(
       structure_inchikey_2D,
@@ -119,7 +125,9 @@ complement_metadata_structures <- function(df,
     ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
-  tax_cla <- tidytable::fread(str_tax_cla) |>
+  tax_cla <- tidytable::fread(str_tax_cla,
+    na.strings = ""
+  ) |>
     dplyr::select(
       structure_inchikey_2D,
       structure_taxonomy_classyfire_chemontid_i = structure_taxonomy_classyfire_chemontid,
@@ -131,7 +139,9 @@ complement_metadata_structures <- function(df,
     dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
-  tax_npc <- tidytable::fread(str_tax_npc) |>
+  tax_npc <- tidytable::fread(str_tax_npc,
+    na.strings = ""
+  ) |>
     dplyr::select(
       structure_smiles_2D,
       structure_taxonomy_npclassifier_01pathway_s = structure_taxonomy_npclassifier_01pathway,

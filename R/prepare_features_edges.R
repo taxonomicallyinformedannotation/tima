@@ -34,7 +34,10 @@ prepare_features_edges <-
     params <<- parameters
     ## Load edges table
     log_debug(x = "Loading edge table")
-    edges_table <- lapply(X = input, FUN = tidytable::fread) |>
+    edges_table <- lapply(
+      X = input, FUN = tidytable::fread,
+      na.strings = ""
+    ) |>
       dplyr::bind_rows()
 
     ## Format edges table

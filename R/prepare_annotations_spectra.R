@@ -64,7 +64,8 @@ prepare_annotations_spectra <-
     table <-
       lapply(
         X = input,
-        FUN = tidytable::fread
+        FUN = tidytable::fread,
+        na.strings = ""
       ) |>
       dplyr::bind_rows() |>
       dplyr::filter(!is.na(feature_id)) |>
@@ -134,8 +135,12 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_04directparent
       ) |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "N/A")) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "null")) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidytable::na_if(x, "N/A")
+      })) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidytable::na_if(x, "null")
+      })) |>
       round_reals() |>
       dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
       complement_metadata_structures(

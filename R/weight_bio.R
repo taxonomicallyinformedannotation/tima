@@ -123,90 +123,105 @@ weight_bio <-
       )
 
     sample_domain <- annotationTable |>
+      dplyr::filter(sample_organism_01_domain != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_01_domain
       )
 
     sample_kingdom <- annotationTable |>
+      dplyr::filter(sample_organism_02_kingdom != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_02_kingdom
       )
 
     sample_phylum <- annotationTable |>
+      dplyr::filter(sample_organism_03_phylum != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_03_phylum
       )
 
     sample_class <- annotationTable |>
+      dplyr::filter(sample_organism_04_class != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_04_class
       )
 
     sample_order <- annotationTable |>
+      dplyr::filter(sample_organism_05_order != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_05_order
       )
 
     # sample_infraorder <- annotationTable |>
+    #   dplyr::filter(sample_organism_05_1_infraorder != "ND") |>
     #   dplyr::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_05_1_infraorder
     #   )
 
     sample_family <- annotationTable |>
+      dplyr::filter(sample_organism_06_family != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_06_family
       )
 
     # sample_subfamily <- annotationTable |>
+    #   dplyr::filter(sample_organism_06_1_subfamily != "ND") |>
     #   dplyr::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_06_1_subfamily
     #   )
 
     sample_tribe <- annotationTable |>
+      dplyr::filter(sample_organism_07_tribe != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_07_tribe
       )
 
     # sample_subtribe <- annotationTable |>
+    #   dplyr::filter(sample_organism_07_1_subtribe != "ND") |>
     #   dplyr::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_07_1_subtribe
     #   )
 
     sample_genus <- annotationTable |>
+      dplyr::filter(sample_organism_08_genus != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_08_genus
       )
 
     # sample_subgenus <- annotationTable |>
+    #   dplyr::filter(sample_organism_08_1_subgenus != "ND") |>
     #   dplyr::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_08_1_subgenus
     #   )
 
     sample_species <- annotationTable |>
+      dplyr::filter(sample_organism_09_species != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_09_species
       )
 
     # sample_subspecies <- annotationTable |>
+    #   dplyr::filter(sample_organism_09_1_subspecies != "ND") |>
     #   dplyr::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_09_1_subspecies
     #   )
 
     sample_varietas <- annotationTable |>
+      dplyr::filter(sample_organism_10_varietas != "ND") |>
       dplyr::distinct(
         structure_inchikey_2D,
         sample_organism_10_varietas
@@ -233,7 +248,13 @@ weight_bio <-
         # candidate_organism_09_1_subspecies = organism_taxonomy_09_1subspecies,
         candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
-      dplyr::distinct()
+      dplyr::distinct() |>
+      dplyr::mutate(dplyr::across(
+        dplyr::everything(),
+        .fns = function(x) {
+          tidytable::na_if(x, "")
+        }
+      ))
 
     log_debug("keeping distinct candidates per taxonomical rank \n")
 

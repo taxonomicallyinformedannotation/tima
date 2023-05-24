@@ -205,11 +205,13 @@ clean_chemo <-
       dplyr::group_by(dplyr::across(c(-reference_doi))) |>
       dplyr::summarize(dplyr::across(
         c(reference_doi),
-        ~ gsub(
-          pattern = "\\bNA\\b",
-          replacement = "",
-          x = paste(unique(.x), collapse = " $ ")
-        )
+        .fns = function(x) {
+          gsub(
+            pattern = "\\bNA\\b",
+            replacement = "",
+            x = paste(unique(x), collapse = " $ ")
+          )
+        }
       )) |>
       dplyr::ungroup() |>
       dplyr::select(
@@ -256,11 +258,13 @@ clean_chemo <-
         dplyr::group_by(feature_id) |>
         dplyr::summarize(dplyr::across(
           colnames(df3)[5:32],
-          ~ gsub(
-            pattern = "\\bNA\\b",
-            replacement = "",
-            x = paste(.x, collapse = "|")
-          )
+          .fns = function(x) {
+            gsub(
+              pattern = "\\bNA\\b",
+              replacement = "",
+              x = paste(x, collapse = "|")
+            )
+          }
         )) |>
         dplyr::ungroup()
 
@@ -277,7 +281,9 @@ clean_chemo <-
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), tidytable::na_if, "")) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidytable::na_if(x, "")
+      })) |>
       dplyr::select(dplyr::any_of(
         c(
           "feature_id",

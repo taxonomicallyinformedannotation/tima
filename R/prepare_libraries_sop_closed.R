@@ -50,7 +50,9 @@ prepare_libraries_sop_closed <-
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
-        tidytable::fread() |>
+        tidytable::fread(
+          na.strings = ""
+        ) |>
         tidytable::tidytable()
 
       log_debug(x = "Formatting closed resource")

@@ -114,11 +114,15 @@ annotate_masses <-
     params <<- parameters
 
     featuresTable <- tidytable::fread(
-      file = features
+      file = features,
+      na.strings = ""
     )
 
     neutralLosses <-
-      tidytable::fread(file = neutral_losses_list)
+      tidytable::fread(
+        file = neutral_losses_list,
+        na.strings = ""
+      )
 
     log_debug("... single charge adducts table")
     if (msMode == "pos") {
@@ -127,11 +131,17 @@ annotate_masses <-
       adduct_file <- paths$data$interim$libraries$adducts$neg
     }
 
-    adductsTable <- tidytable::fread(file = adduct_file)
+    adductsTable <- tidytable::fread(
+      file = adduct_file,
+      na.strings = ""
+    )
 
     log_debug("... adducts masses for in source dimers and multicharged")
     adductsMassTable <-
-      tidytable::fread(file = adducts_masses_list)
+      tidytable::fread(
+        file = adducts_masses_list,
+        na.strings = ""
+      )
 
     log_debug("... neutral lossses")
 
@@ -167,7 +177,10 @@ annotate_masses <-
 
     log_debug(x = "... exact masses for MS1 annotation")
     structureExactMassTable <-
-      tidytable::fread(file = adduct_db_file)
+      tidytable::fread(
+        file = adduct_db_file,
+        na.strings = ""
+      )
 
     adducts <- unlist(adducts_list[[msMode]])
     # |>
@@ -177,24 +190,31 @@ annotate_masses <-
     ## slim it
     structureOrganismPairsTable <-
       tidytable::fread(
-        file = library
+        file = library,
+        na.strings = ""
       ) |>
       dplyr::left_join(tidytable::fread(
-        file = str_2D_3D
+        file = str_2D_3D,
+        na.strings = ""
       )) |>
       dplyr::left_join(tidytable::fread(
-        file = str_met
+        file = str_met,
+        na.strings = ""
       )) |>
       dplyr::left_join(tidytable::fread(
-        file = str_nam
+        file = str_nam,
+        na.strings = ""
       )) |>
       dplyr::left_join(tidytable::fread(
-        file = str_tax_cla
+        file = str_tax_cla,
+        na.strings = ""
       )) |>
       dplyr::left_join(tidytable::fread(
-        file = str_tax_npc
+        file = str_tax_npc,
+        na.strings = ""
       )) |>
-      # dplyr::left_join(tidytable::fread(file = org_tax_ott)) |>
+      # dplyr::left_join(tidytable::fread(file = org_tax_ott,
+      #         na.strings = "")) |>
       dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(
         c(
@@ -206,7 +226,9 @@ annotate_masses <-
       round_reals() |>
       dplyr::mutate(dplyr::across(
         dplyr::matches("taxonomy.*_0"),
-        ~ tidytable::replace_na(.x, "notClassified")
+        .fns = function(x) {
+          tidytable::replace_na(x, "notClassified")
+        }
       ))
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
