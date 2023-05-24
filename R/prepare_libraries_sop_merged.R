@@ -88,7 +88,7 @@ prepare_libraries_sop_merged <-
       )
     }
 
-    tables <- tidytable::bind_rows(libraries) |>
+    tables <- dplyr::bind_rows(libraries) |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -100,8 +100,8 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Completing organisms taxonomy")
     table_organisms_taxonomy_ott_2 <- table_keys |>
-      tidytable::anti_join(table_organisms_taxonomy_ott) |>
-      tidytable::distinct(organism = organism_name)
+      dplyr::anti_join(table_organisms_taxonomy_ott) |>
+      dplyr::distinct(organism = organism_name)
 
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
       table_organisms_taxonomy_ott_full <-
@@ -110,7 +110,7 @@ prepare_libraries_sop_merged <-
 
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
-        tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
+        dplyr::bind_rows(table_organisms_taxonomy_ott_full |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)))
     }
 
@@ -137,7 +137,7 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        tidytable::left_join(table_organisms_taxonomy_ott)
+        dplyr::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
         dplyr::filter(grepl(
@@ -147,13 +147,13 @@ prepare_libraries_sop_merged <-
           )]),
           pattern = value
         )) |>
-        tidytable::select(
+        dplyr::select(
           structure_inchikey,
           structure_smiles,
           organism_name,
           reference_doi
         ) |>
-        tidytable::distinct()
+        dplyr::distinct()
 
       stopifnot("Your filter led to no entries, try to change it." = nrow(table_keys) != 0)
     }

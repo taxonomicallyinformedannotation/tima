@@ -62,7 +62,7 @@ prepare_libraries_sop_closed <-
             to = 14
           )
         ) |>
-        tidytable::select(
+        dplyr::select(
           structure_name = structure_nameTraditional,
           structure_inchikey,
           structure_smiles,
@@ -94,7 +94,7 @@ prepare_libraries_sop_closed <-
         ) |>
         tidytable::data.table() |>
         round_reals() |>
-        tidytable::distinct() |>
+        dplyr::distinct() |>
         dplyr::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")

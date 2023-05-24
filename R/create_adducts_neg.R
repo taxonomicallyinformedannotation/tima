@@ -48,13 +48,13 @@ create_adducts_neg <- function(massesTable, adductsTable) {
       `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
       `[3M-(H)1]1-` = 3 * exact_mass - proton
     ) |>
-    tidytable::select(-colnames(adductsTable))
+    dplyr::select(-colnames(adductsTable))
 
   ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
   n <- ncol(adducts_neg)
   adducts_neg <- adducts_neg |>
-    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
-    tidytable::select(tidytable::everything(),
+    tidytable::pivot_longer(2:dplyr::all_of(n)) |>
+    dplyr::select(dplyr::everything(),
       adduct = name,
       adduct_mass = value
     )

@@ -66,9 +66,9 @@ prepare_annotations_spectra <-
         X = input,
         FUN = tidytable::fread
       ) |>
-      tidytable::bind_rows() |>
+      dplyr::bind_rows() |>
       dplyr::filter(!is.na(feature_id)) |>
-      tidytable::distinct(
+      dplyr::distinct(
         feature_id,
         error_mz,
         error_rt,
@@ -103,10 +103,10 @@ prepare_annotations_spectra <-
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
-      # tidytable::rowwise() |>
+      # dplyr::rowwise() |>
       # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
-      # tidytable::ungroup() |>
-      tidytable::select(
+      # dplyr::ungroup() |>
+      dplyr::select(
         feature_id,
         error_mz,
         error_rt,

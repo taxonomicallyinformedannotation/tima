@@ -17,11 +17,11 @@ decorate_masses <- function(df = annotation_table_ms1) {
   log_debug(
     "MS1 annotation led to \n",
     crayon::green(nrow(df_1 |>
-      tidytable::distinct(structure_inchikey_2D))),
+      dplyr::distinct(structure_inchikey_2D))),
     crayon::green("annotations"),
     ", on \n",
     crayon::blue(nrow(df_1 |>
-      tidytable::distinct(feature_id))),
+      dplyr::distinct(feature_id))),
     crayon::blue("features")
   )
 }

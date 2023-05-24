@@ -132,12 +132,12 @@ prepare_annotations_sirius <-
         harmonize_names_sirius()
 
       compound_summary_ready <- compound_summary |>
-        tidytable::bind_rows(.id = "feature_id") |>
+        dplyr::bind_rows(.id = "feature_id") |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
       canopus_npc_prepared <- canopus |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::select(tidytable::any_of(
+        dplyr::select(dplyr::any_of(
           c(
             "feature_id",
             "structure_taxonomy_npclassifier_01pathway" = "NPC#pathway",
@@ -158,7 +158,7 @@ prepare_annotations_sirius <-
         ))
 
       compound_prepared <- compound_summary_ready |>
-        tidytable::select(
+        dplyr::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -174,13 +174,13 @@ prepare_annotations_sirius <-
           smiles = NA
         ) |>
         dplyr::mutate(dplyr::across(
-          tidytable::everything(),
+          dplyr::everything(),
           as.character
         ))
 
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::select(
+        dplyr::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -196,7 +196,7 @@ prepare_annotations_sirius <-
           smiles = NA
         ) |>
         dplyr::mutate(dplyr::across(
-          tidytable::everything(),
+          dplyr::everything(),
           as.character
         ))
 
@@ -206,7 +206,7 @@ prepare_annotations_sirius <-
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
-        tidytable::distinct(
+        dplyr::distinct(
           feature_id,
           structure_molecular_formula = molecularFormula,
           structure_exact_mass,
@@ -225,7 +225,7 @@ prepare_annotations_sirius <-
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
-        tidytable::distinct(
+        dplyr::distinct(
           feature_id,
           structure_molecular_formula = molecularFormula,
           structure_exact_mass,
@@ -239,17 +239,17 @@ prepare_annotations_sirius <-
         )
 
       compounds_prepared <-
-        tidytable::bind_rows(compound_prepared, compound_adducts_prepared) |>
-        tidytable::distinct()
+        dplyr::bind_rows(compound_prepared, compound_adducts_prepared) |>
+        dplyr::distinct()
 
       formulas_prepared <-
-        tidytable::bind_rows(formula_prepared, formula_adducts_prepared) |>
-        tidytable::distinct()
+        dplyr::bind_rows(formula_prepared, formula_adducts_prepared) |>
+        dplyr::distinct()
 
       table <- compounds_prepared |>
-        tidytable::left_join(formulas_prepared) |>
-        tidytable::left_join(canopus_npc_prepared) |>
-        tidytable::distinct() |>
+        dplyr::left_join(formulas_prepared) |>
+        dplyr::left_join(canopus_npc_prepared) |>
+        dplyr::distinct() |>
         dplyr::mutate(
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
@@ -264,7 +264,7 @@ prepare_annotations_sirius <-
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>
-        tidytable::select(
+        dplyr::select(
           feature_id,
           error_mz,
           error_rt,

@@ -35,12 +35,12 @@ prepare_features_edges <-
     ## Load edges table
     log_debug(x = "Loading edge table")
     edges_table <- lapply(X = input, FUN = tidytable::fread) |>
-      tidytable::bind_rows()
+      dplyr::bind_rows()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
     edges_table_treated <- edges_table |>
-      tidytable::select(
+      dplyr::select(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>

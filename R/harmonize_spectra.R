@@ -125,8 +125,8 @@ harmonize_spectra <- function(spectra,
       x = !!as.name(co_po),
       ignore.case = TRUE
     )) |>
-    tidytable::select(
-      tidytable::any_of(c(columns_full)),
+    dplyr::select(
+      dplyr::any_of(c(columns_full)),
       precursorCharge,
       precursorMz,
       rtime,
@@ -136,9 +136,9 @@ harmonize_spectra <- function(spectra,
     dplyr::mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
-    tidytable::full_join(spectra_missing) |>
+    dplyr::full_join(spectra_missing) |>
     tidytable::tidytable() |>
-    tidytable::select(
+    dplyr::select(
       collision_energy,
       compound_id,
       exactmass,

@@ -57,7 +57,7 @@ prepare_libraries_sop_lotus <-
           to = 14
         )
       ) |>
-      tidytable::select(
+      dplyr::select(
         structure_name = structure_nameTraditional,
         structure_inchikey,
         structure_smiles,
@@ -89,7 +89,7 @@ prepare_libraries_sop_lotus <-
         reference_doi
       ) |>
       round_reals() |>
-      tidytable::distinct()
+      dplyr::distinct()
 
     log_debug(x = "Exporting ...")
     # Write modified data frame to output file

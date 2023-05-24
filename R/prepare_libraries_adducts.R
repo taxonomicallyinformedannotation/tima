@@ -39,8 +39,8 @@ prepare_libraries_adducts <-
       file = str_met,
       select = "structure_exact_mass"
     ) |>
-      tidytable::select(exact_mass = structure_exact_mass) |>
-      tidytable::distinct()
+      dplyr::select(exact_mass = structure_exact_mass) |>
+      dplyr::distinct()
 
     log_debug("... adducts")
     adducts_table <-
@@ -89,7 +89,7 @@ prepare_libraries_adducts <-
         x = adduct,
         fixed = TRUE
       )) |>
-      tidytable::select(-exact_mass)
+      dplyr::select(-exact_mass)
 
     log_debug("... negative")
     pure_neg <-
@@ -99,7 +99,7 @@ prepare_libraries_adducts <-
         x = adduct,
         fixed = TRUE
       )) |>
-      tidytable::select(-exact_mass)
+      dplyr::select(-exact_mass)
 
     log_debug("Exporting ...")
     export_params(step = "prepare_libraries_adducts")

@@ -9,9 +9,9 @@ library(tarchetypes)
 
 # Set target options:
 tar_option_set(
-  garbage_collection = TRUE,
+  packages = "timaR",
   memory = "transient",
-  packages = "timaR"
+  garbage_collection = TRUE
 )
 
 # tar_make_clustermq() configuration (okay to leave alone):

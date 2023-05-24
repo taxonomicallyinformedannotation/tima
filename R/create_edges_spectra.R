@@ -94,7 +94,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     )
 
     edges <- matches_sim |>
-      tidytable::bind_rows()
+      dplyr::bind_rows()
 
     ## old version, keep in case
     # par <- if (parallel) {
@@ -133,21 +133,21 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     # edges <- MetaboAnnotation::matchedData(matches_sim_2) |>
     #   data.frame() |>
     #   dplyr::filter(acquisitionNum != target_acquisitionNum) |>
-    #   tidytable::select(
+    #   dplyr::select(
     #     !!as.name(name_source) := "acquisitionNum",
     #     !!as.name(name_target) := "target_acquisitionNum",
-    #     tidytable::everything()
+    #     dplyr::everything()
     #   )
 
     edges <- edges |>
-      tidytable::select(
+      dplyr::select(
         !!as.name(name_source) := "feature_id",
         !!as.name(name_target) := "target_id",
-        tidytable::everything()
+        dplyr::everything()
       )
 
     edges <- edges |>
-      tidytable::select(tidytable::any_of(
+      dplyr::select(dplyr::any_of(
         c(
           name_source,
           name_target,

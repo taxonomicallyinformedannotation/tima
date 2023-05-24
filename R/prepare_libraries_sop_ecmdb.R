@@ -60,7 +60,7 @@ prepare_libraries_sop_ecmdb <-
           ## TODO compute it
           structure_smiles_2D = NA_character_
         ) |>
-        tidytable::select(
+        dplyr::select(
           structure_name = name,
           structure_inchikey = moldb_inchikey,
           structure_smiles = moldb_smiles,
@@ -95,7 +95,7 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_10varietas = NA_character_
         ) |>
         round_reals() |>
-        tidytable::distinct() |>
+        dplyr::distinct() |>
         dplyr::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, ECMDB not found, returning an empty file instead")

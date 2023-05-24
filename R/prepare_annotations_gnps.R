@@ -73,14 +73,14 @@ prepare_annotations_gnps <-
         X = input,
         FUN = tidytable::fread
       ) |>
-        tidytable::bind_rows() |>
+        dplyr::bind_rows() |>
         dplyr::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
           error_rt = NA
         ) |>
-        tidytable::select(
+        dplyr::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,
           error_rt,
@@ -123,7 +123,7 @@ prepare_annotations_gnps <-
           ## mirror sirius
           count_peaks_explained = NA
         ) |>
-        tidytable::select(
+        dplyr::select(
           feature_id,
           error_mz,
           error_rt,

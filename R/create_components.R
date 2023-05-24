@@ -34,9 +34,9 @@ create_components <-
       X = input,
       tidytable::fread,
     ) |>
-      tidytable::bind_rows() |>
-      tidytable::select(feature_source, feature_target) |>
-      tidytable::distinct()
+      dplyr::bind_rows() |>
+      dplyr::select(feature_source, feature_target) |>
+      dplyr::distinct()
 
     g <- igraph::graph.data.frame(
       d = edges,
@@ -55,12 +55,12 @@ create_components <-
       data.frame() |>
       tidyfst::rn_col("ComponentIndex") |>
       tidytable::unnest(feature_source) |>
-      tidytable::distinct(
+      dplyr::distinct(
         `cluster index` = feature_source,
         componentindex = ComponentIndex
       ) |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.numeric)) |>
-      tidytable::arrange(`cluster index`)
+      dplyr::arrange(`cluster index`)
 
     # Export
     log_debug(x = "Exporting ...")

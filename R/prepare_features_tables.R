@@ -27,7 +27,7 @@ prepare_features_tables <-
     log_debug("Preparing features table")
     features_prepared <- features |>
       tidytable::fread() |>
-      tidytable::select(tidytable::all_of(c(
+      dplyr::select(dplyr::all_of(c(
         feature_id = name_features,
         rt = name_rt,
         mz = name_mz

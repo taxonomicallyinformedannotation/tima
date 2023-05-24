@@ -28,13 +28,13 @@ get_organism_taxonomy_ott <- function(df,
           vectorize = FALSE
         )
     ) |>
-    tidytable::distinct() |>
+    dplyr::distinct() |>
     dplyr::mutate(search_string = tolower(organism)) |>
-    tidytable::distinct(
+    dplyr::distinct(
       organism,
       search_string
     ) |>
-    tidytable::select(
+    dplyr::select(
       canonical_name = organism,
       search_string
     ) |>
@@ -74,7 +74,7 @@ get_organism_taxonomy_ott <- function(df,
 
     new_ott_id <- new_matched_otl_exact |>
       dplyr::filter(!is.na(ott_id)) |>
-      tidytable::distinct(ott_id)
+      dplyr::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id)) {
       ## keep obtained results
@@ -82,7 +82,7 @@ get_organism_taxonomy_ott <- function(df,
         dplyr::filter(!is.na(ott_id))
 
       new_ott_id_1 <- pretable |>
-        tidytable::distinct(ott_id)
+        dplyr::distinct(ott_id)
 
       organism_table_2 <- organism_table |>
         dplyr::filter(!organism_table$search_string %in% pretable$search_string)
@@ -110,9 +110,9 @@ get_organism_taxonomy_ott <- function(df,
       log_debug("Retrying with", organisms)
       new_ott_id_2 <- new_matched_otl_exact |>
         dplyr::filter(!is.na(ott_id)) |>
-        tidytable::distinct(ott_id)
+        dplyr::distinct(ott_id)
 
-      new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
+      new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -131,7 +131,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(1:length(taxon_lineage))) {
-        list_df[[i]] <- tidytable::bind_rows(
+        list_df[[i]] <- dplyr::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -143,7 +143,7 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- tidytable::bind_rows(list_df) |>
+      otl <- dplyr::bind_rows(list_df) |>
         dplyr::mutate(ott_id = as.integer(ott_id))
     } else {
       otl <-

@@ -36,12 +36,12 @@ prepare_features_components <-
       X = input,
       FUN = tidytable::fread
     ) |>
-      tidytable::bind_rows() |>
-      tidytable::select(
+      dplyr::bind_rows() |>
+      dplyr::select(
         feature_id = `cluster index`,
         component_id = componentindex
       ) |>
-      tidytable::distinct()
+      dplyr::distinct()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_components")
