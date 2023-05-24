@@ -51,10 +51,10 @@ prepare_libraries_sop_ecmdb <-
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
-          structure_inchikey_2D = substring(
-            text = moldb_inchikey,
-            first = 1,
-            last = 14
+          structure_inchikey_2D = stringi::stri_sub(
+            str = moldb_inchikey,
+            from = 1,
+            to = 14
           ),
           ## TODO compute it
           structure_smiles_2D = NA_character_

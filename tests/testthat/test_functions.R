@@ -188,9 +188,6 @@ testthat::test_that("Whole process", {
   ### Closed
   step <- "prepare_libraries_sop_closed"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/round_reals.R")
-  source(file = "R/prepare_libraries_sop_closed.R")
   ## To do as if there was an input
   prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
@@ -199,8 +196,6 @@ testthat::test_that("Whole process", {
   ### ECMDB
   step <- "prepare_libraries_sop_ecmdb"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/prepare_libraries_sop_ecmdb.R")
   ## To do as if there was an input
   prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
   ## When there is no input
@@ -214,8 +209,6 @@ testthat::test_that("Whole process", {
   ### LOTUS
   step <- "prepare_libraries_sop_lotus"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/prepare_libraries_sop_lotus.R")
   prepare_libraries_sop_lotus()
 
   ### SOP library
@@ -318,8 +311,6 @@ testthat::test_that("Whole process", {
   ## Performing MS1 annotation
   step <- "annotate_masses"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/annotate_masses.R")
   ### Negative
   annotate_masses(msMode = "neg")
   ### Positive
@@ -375,8 +366,6 @@ testthat::test_that("Whole process", {
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/prepare_annotations_gnps.R")
   prepare_annotations_gnps(input = "fileDoesNotExist")
   prepare_annotations_gnps(input = NULL)
   prepare_annotations_gnps()
@@ -384,8 +373,6 @@ testthat::test_that("Whole process", {
   ### SIRIUS results
   step <- "prepare_annotations_sirius"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/prepare_annotations_sirius.R")
   ## To do as if there was no input
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
@@ -394,8 +381,6 @@ testthat::test_that("Whole process", {
   ### ISDB results
   step <- "prepare_annotations_spectra"
   params <- get_params(step = step)
-  ## Weird
-  source(file = "R/prepare_annotations_spectra.R")
   prepare_annotations_spectra()
 
   ### Edges

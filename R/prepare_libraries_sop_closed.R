@@ -49,16 +49,18 @@ prepare_libraries_sop_closed <-
     params <<- parameters
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
-      closed <-
-        tidytable::fread(file = input)
+      closed <- input |>
+        tidytable::fread()
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        tidytable::mutate(structure_inchikey_2D = substring(
-          text = structure_inchikey,
-          first = 1,
-          last = 14
-        )) |>
+        tidytable::mutate(
+          structure_inchikey_2D = stringi::stri_sub(
+            str = structure_inchikey,
+            from = 1,
+            to = 14
+          )
+        ) |>
         tidytable::select(
           structure_name = structure_nameTraditional,
           structure_inchikey,
@@ -89,12 +91,13 @@ prepare_libraries_sop_closed <-
           organism_taxonomy_09species,
           organism_taxonomy_10varietas
         ) |>
+        tidytable::data.table() |>
         round_reals() |>
         tidytable::distinct() |>
         tidytable::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
-      closed_prepared <- data.frame(
+      closed_prepared <- tidytable::tidytable(
         structure_name = NA,
         structure_inchikey = NA,
         structure_smiles = NA,
