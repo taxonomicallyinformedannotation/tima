@@ -20,10 +20,8 @@ utils::globalVariables(c(
 get_organism_taxonomy_ott <- function(df,
                                       url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
   organism_table <- df |>
-    dplyr::mutate(
-      organism = organism |>
-        trimws()
-    ) |>
+    dplyr::mutate(organism = organism |>
+      trimws()) |>
     dplyr::mutate(
       organism = organism |>
         stringi::stri_replace_all_fixed(
@@ -80,9 +78,10 @@ get_organism_taxonomy_ott <- function(df,
     log_debug("Success! Submitting request...")
     ## cutting in smaller requests
     cut <- 100
-    organisms_split <- lapply(seq(1, length(organisms), cut), function(i) {
-      organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
-    })
+    organisms_split <-
+      lapply(seq(1, length(organisms), cut), function(i) {
+        organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
+      })
     new_matched_otl_exact_list <- organisms_split |>
       lapply(
         FUN = function(x) {
@@ -95,8 +94,9 @@ get_organism_taxonomy_ott <- function(df,
       )
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
-      dplyr::bind_rows()
-   new_ott_id <- new_matched_otl_exact |>
+      dplyr::bind_rows() |>
+      data.frame()
+    new_ott_id <- new_matched_otl_exact |>
       dplyr::filter(!is.na(ott_id)) |>
       dplyr::distinct(ott_id)
 
@@ -128,9 +128,10 @@ get_organism_taxonomy_ott <- function(df,
         )
       ## TODO make it cleaner
       cut <- 100
-      organisms_new_split <- lapply(seq(1, length(organisms_new), cut), function(i) {
-        organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
-      })
+      organisms_new_split <-
+        lapply(seq(1, length(organisms_new), cut), function(i) {
+          organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
+        })
       log_debug("Retrying with", organisms_new)
       new_matched_otl_exact_list_2 <- organisms_new_split |>
         lapply(
@@ -143,12 +144,16 @@ get_organism_taxonomy_ott <- function(df,
           }
         )
 
-      new_ott_id_2 <- new_matched_otl_exact_list_2 |>
+      new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         dplyr::bind_rows() |>
         dplyr::filter(!is.na(ott_id)) |>
+        data.frame()
+      new_ott_id_2 <- new_matched_otl_exact_2 |>
         dplyr::distinct(ott_id)
 
       new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
+      new_matched_otl_exact_final <-
+        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -193,7 +198,7 @@ get_organism_taxonomy_ott <- function(df,
     }
 
     biological_metadata <-
-      dplyr::left_join(organism_table, new_matched_otl_exact) |>
+      dplyr::left_join(organism_table, new_matched_otl_exact_final) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>
       dplyr::filter(
         rank %in% c(
