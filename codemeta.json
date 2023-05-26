@@ -112,7 +112,7 @@
       "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
-      "version": ">= 1.42",
+      "version": ">= 1.43",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -584,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "254467.652KB",
+  "fileSize": "254471.911KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

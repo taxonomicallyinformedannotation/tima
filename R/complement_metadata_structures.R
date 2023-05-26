@@ -59,7 +59,7 @@ complement_metadata_structures <- function(df,
                                            str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc) {
   log_debug("Trying to look for already computed metadata")
   dd_ddd <- tidytable::fread(str_2D_3D,
-    na.strings = c("","NA")
+    na.strings = c("", "NA")
   ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
@@ -79,7 +79,7 @@ complement_metadata_structures <- function(df,
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   met_2D <- tidytable::fread(str_met,
-    na.strings = c("","NA")
+    na.strings = c("", "NA")
   ) |>
     dplyr::left_join(dd_ddd) |>
     dplyr::distinct(
@@ -99,7 +99,7 @@ complement_metadata_structures <- function(df,
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   nam_2D <- tidytable::fread(str_nam,
-    na.strings = c("","NA")
+    na.strings = c("", "NA")
   ) |>
     dplyr::left_join(dd_ddd) |>
     dplyr::distinct(
@@ -126,7 +126,7 @@ complement_metadata_structures <- function(df,
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   tax_cla <- tidytable::fread(str_tax_cla,
-    na.strings = c("","NA")
+    na.strings = c("", "NA")
   ) |>
     dplyr::select(
       structure_inchikey_2D,
@@ -140,7 +140,7 @@ complement_metadata_structures <- function(df,
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   tax_npc <- tidytable::fread(str_tax_npc,
-    na.strings = c("","NA")
+    na.strings = c("", "NA")
   ) |>
     dplyr::select(
       structure_smiles_2D,

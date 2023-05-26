@@ -22,8 +22,20 @@ get_organism_taxonomy_ott <- function(df,
   organism_table <- df |>
     dplyr::mutate(
       organism = organism |>
+        trimws()
+    ) |>
+    dplyr::mutate(
+      organism = organism |>
         stringi::stri_replace_all_fixed(
           pattern = " x ",
+          replacement = "",
+          vectorize = FALSE
+        )
+    ) |>
+    dplyr::mutate(
+      organism = organism |>
+        stringi::stri_replace_all_fixed(
+          pattern = "× ",
           replacement = "",
           vectorize = FALSE
         )
@@ -66,13 +78,24 @@ get_organism_taxonomy_ott <- function(df,
       )
   } else {
     log_debug("Success! Submitting request...")
-    new_matched_otl_exact <- rotl::tnrs_match_names(
-      names = organisms,
-      do_approximate_matching = FALSE,
-      include_suppressed = FALSE
-    )
+    ## cutting in smaller requests
+    cut <- 100
+    organisms_split <- lapply(seq(1, length(organisms), cut), function(i) {
+      organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
+    })
+    new_matched_otl_exact_list <- organisms_split |>
+      lapply(
+        FUN = function(x) {
+          rotl::tnrs_match_names(
+            names = x,
+            do_approximate_matching = FALSE,
+            include_suppressed = FALSE
+          )
+        }
+      )
 
-    new_ott_id <- new_matched_otl_exact |>
+    new_ott_id <- new_matched_otl_exact_list |>
+      dplyr::bind_rows() |>
       dplyr::filter(!is.na(ott_id)) |>
       dplyr::distinct(ott_id)
 
@@ -102,13 +125,25 @@ get_organism_taxonomy_ott <- function(df,
           replacement = "",
           vectorize = FALSE
         )
-      new_matched_otl_exact <- rotl::tnrs_match_names(
-        names = organisms_new,
-        do_approximate_matching = FALSE,
-        include_suppressed = FALSE
-      )
-      log_debug("Retrying with", organisms)
-      new_ott_id_2 <- new_matched_otl_exact |>
+      ## TODO make it cleaner
+      cut <- 100
+      organisms_new_split <- lapply(seq(1, length(organisms_new), cut), function(i) {
+        organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
+      })
+      log_debug("Retrying with", organisms_new)
+      new_matched_otl_exact_list_2 <- organisms_new_split |>
+        lapply(
+          FUN = function(x) {
+            rotl::tnrs_match_names(
+              names = x,
+              do_approximate_matching = FALSE,
+              include_suppressed = FALSE
+            )
+          }
+        )
+
+      new_ott_id_2 <- new_matched_otl_exact_list_2 |>
+        dplyr::bind_rows() |>
         dplyr::filter(!is.na(ott_id)) |>
         dplyr::distinct(ott_id)
 

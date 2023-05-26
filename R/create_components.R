@@ -33,7 +33,7 @@ create_components <-
     edges <- lapply(
       X = input,
       FUN = tidytable::fread,
-      na.strings = c("","NA")
+      na.strings = c("", "NA")
     ) |>
       dplyr::bind_rows() |>
       dplyr::select(feature_source, feature_target) |>

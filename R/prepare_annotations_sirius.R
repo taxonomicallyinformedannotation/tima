@@ -89,7 +89,7 @@ prepare_annotations_sirius <-
             input_directory,
             "canopus_compound_summary.tsv"
           ),
-          na.strings = c("","NA")
+          na.strings = c("", "NA")
         )
 
       formula <-
@@ -98,7 +98,7 @@ prepare_annotations_sirius <-
             input_directory,
             "formula_identifications.tsv"
           ),
-          na.strings = c("","NA")
+          na.strings = c("", "NA")
         )
 
       formula_adducts <-
@@ -107,7 +107,7 @@ prepare_annotations_sirius <-
             input_directory,
             "formula_identifications_adducts.tsv"
           ),
-          na.strings = c("","NA")
+          na.strings = c("", "NA")
         )
 
       # compound <-
@@ -123,7 +123,7 @@ prepare_annotations_sirius <-
             input_directory,
             "compound_identifications_adducts.tsv"
           ),
-          na.strings = c("","NA")
+          na.strings = c("", "NA")
         )
 
       compound_summary <- lapply(
@@ -134,7 +134,7 @@ prepare_annotations_sirius <-
           recursive = TRUE
         ),
         FUN = tidytable::fread,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )
 
       names(compound_summary) <- list.files(

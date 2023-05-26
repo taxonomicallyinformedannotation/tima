@@ -65,7 +65,7 @@ prepare_annotations_spectra <-
       lapply(
         X = input,
         FUN = tidytable::fread,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       ) |>
       dplyr::bind_rows() |>
       dplyr::filter(!is.na(feature_id)) |>

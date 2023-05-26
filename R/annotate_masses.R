@@ -115,13 +115,13 @@ annotate_masses <-
 
     featuresTable <- tidytable::fread(
       file = features,
-      na.strings = c("","NA")
+      na.strings = c("", "NA")
     )
 
     neutralLosses <-
       tidytable::fread(
         file = neutral_losses_list,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )
 
     log_debug("... single charge adducts table")
@@ -133,14 +133,14 @@ annotate_masses <-
 
     adductsTable <- tidytable::fread(
       file = adduct_file,
-      na.strings = c("","NA")
+      na.strings = c("", "NA")
     )
 
     log_debug("... adducts masses for in source dimers and multicharged")
     adductsMassTable <-
       tidytable::fread(
         file = adducts_masses_list,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )
 
     log_debug("... neutral lossses")
@@ -179,7 +179,7 @@ annotate_masses <-
     structureExactMassTable <-
       tidytable::fread(
         file = adduct_db_file,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )
 
     adducts <- unlist(adducts_list[[msMode]])
@@ -191,27 +191,27 @@ annotate_masses <-
     structureOrganismPairsTable <-
       tidytable::fread(
         file = library,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       ) |>
       dplyr::left_join(tidytable::fread(
         file = str_2D_3D,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )) |>
       dplyr::left_join(tidytable::fread(
         file = str_met,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )) |>
       dplyr::left_join(tidytable::fread(
         file = str_nam,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )) |>
       dplyr::left_join(tidytable::fread(
         file = str_tax_cla,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )) |>
       dplyr::left_join(tidytable::fread(
         file = str_tax_npc,
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       )) |>
       # dplyr::left_join(tidytable::fread(file = org_tax_ott,
       #         na.strings = c("","NA"))) |>

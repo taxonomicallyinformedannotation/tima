@@ -27,7 +27,7 @@ prepare_features_tables <-
     log_debug("Preparing features table")
     features_prepared <- features |>
       tidytable::fread(
-        na.strings = c("","NA")
+        na.strings = c("", "NA")
       ) |>
       dplyr::select(dplyr::all_of(c(
         feature_id = name_features,

@@ -36,7 +36,7 @@ prepare_features_edges <-
     log_debug(x = "Loading edge table")
     edges_table <- lapply(
       X = input, FUN = tidytable::fread,
-      na.strings = c("","NA")
+      na.strings = c("", "NA")
     ) |>
       dplyr::bind_rows()
 
