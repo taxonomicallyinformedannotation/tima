@@ -50,7 +50,7 @@ prepare_libraries_sop_lotus <-
     log_debug(x = "Loading and preparing LOTUS")
     lotus_prepared <- input |>
       tidytable::fread(
-        na.strings = ""
+        na.strings = c("","NA")
       ) |>
       dplyr::mutate(
         structure_inchikey_2D = stringi::stri_sub(

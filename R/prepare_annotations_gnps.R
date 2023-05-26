@@ -72,7 +72,7 @@ prepare_annotations_gnps <-
       table <- lapply(
         X = input,
         FUN = tidytable::fread,
-        na.strings = ""
+        na.strings = c("","NA")
       ) |>
         dplyr::bind_rows() |>
         dplyr::mutate(

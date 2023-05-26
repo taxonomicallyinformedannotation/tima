@@ -38,7 +38,7 @@ prepare_libraries_adducts <-
     masses <- tidytable::fread(
       file = str_met,
       select = "structure_exact_mass",
-      na.strings = ""
+      na.strings = c("","NA")
     ) |>
       dplyr::select(exact_mass = structure_exact_mass) |>
       dplyr::distinct()
@@ -47,7 +47,7 @@ prepare_libraries_adducts <-
     adducts_table <-
       tidytable::fread(
         file = adducts_masses,
-        na.strings = ""
+        na.strings = c("","NA")
       ) |>
       dplyr::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,

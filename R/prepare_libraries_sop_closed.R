@@ -51,7 +51,7 @@ prepare_libraries_sop_closed <-
       log_debug(x = "Loading closed resources")
       closed <- input |>
         tidytable::fread(
-          na.strings = ""
+          na.strings = c("","NA")
         ) |>
         tidytable::tidytable()
 

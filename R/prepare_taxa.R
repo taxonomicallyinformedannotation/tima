@@ -64,12 +64,12 @@ prepare_taxa <-
     log_debug(x = "Loading feature table")
     feature_table <- tidytable::fread(
       file = input,
-      na.strings = ""
+      na.strings = c("","NA")
     )
     log_debug(x = "Loading metadata table")
     metadata_table <- tidytable::fread(
       file = metadata,
-      na.strings = ""
+      na.strings = c("","NA")
     )
 
     log_debug(x = "Formatting feature table ...")
@@ -119,7 +119,7 @@ prepare_taxa <-
     organism_table_filled <- organism_table |>
       dplyr::left_join(
         tidytable::fread(org_tax_ott,
-          na.strings = ""
+          na.strings = c("","NA")
         ),
         by = c("organism" = "organism_name")
       )
