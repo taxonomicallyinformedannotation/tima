@@ -154,7 +154,7 @@ get_organism_taxonomy_ott <- function(df,
         dplyr::distinct(ott_id)
 
       new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
-      new_matched_otl_exact_final <-
+      new_matched_otl_exact <-
         dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
     }
 
@@ -200,7 +200,7 @@ get_organism_taxonomy_ott <- function(df,
     }
 
     biological_metadata <-
-      dplyr::left_join(organism_table, new_matched_otl_exact_final) |>
+      dplyr::left_join(organism_table, new_matched_otl_exact) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>
       dplyr::filter(
         rank %in% c(
