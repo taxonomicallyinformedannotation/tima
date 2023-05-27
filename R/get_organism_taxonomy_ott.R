@@ -155,7 +155,8 @@ get_organism_taxonomy_ott <- function(df,
 
       new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
       new_matched_otl_exact <-
-        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
+        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2) |>
+        data.frame()
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -187,7 +188,8 @@ get_organism_taxonomy_ott <- function(df,
       }
 
       otl <- dplyr::bind_rows(list_df) |>
-        dplyr::mutate(ott_id = as.integer(ott_id))
+        dplyr::mutate(ott_id = as.integer(ott_id)) |>
+        data.frame()
     } else {
       otl <-
         data.frame(
