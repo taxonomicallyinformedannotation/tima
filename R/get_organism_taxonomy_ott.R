@@ -147,6 +147,7 @@ get_organism_taxonomy_ott <- function(df,
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         dplyr::bind_rows() |>
         dplyr::filter(!is.na(ott_id)) |>
+        dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
         data.frame()
       new_ott_id_2 <- new_matched_otl_exact_2 |>
         dplyr::distinct(ott_id)
