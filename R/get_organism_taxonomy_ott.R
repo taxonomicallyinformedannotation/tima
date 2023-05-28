@@ -48,8 +48,7 @@ get_organism_taxonomy_ott <- function(df,
       canonical_name = organism,
       search_string
     ) |>
-    dplyr::filter(!is.na(canonical_name)) |>
-    data.frame()
+    dplyr::filter(!is.na(canonical_name))
 
   organisms <- organism_table$canonical_name
 
@@ -95,8 +94,7 @@ get_organism_taxonomy_ott <- function(df,
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
       dplyr::bind_rows() |>
-      dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
-      data.frame()
+      dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
     new_ott_id <- new_matched_otl_exact |>
       dplyr::filter(!is.na(ott_id)) |>
       dplyr::distinct(ott_id)
@@ -148,15 +146,13 @@ get_organism_taxonomy_ott <- function(df,
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         dplyr::bind_rows() |>
         dplyr::filter(!is.na(ott_id)) |>
-        dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character)) |>
-        data.frame()
+        dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
         dplyr::distinct(ott_id)
 
       new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
       new_matched_otl_exact <-
-        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2) |>
-        data.frame()
+        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -170,8 +166,7 @@ get_organism_taxonomy_ott <- function(df,
       )
 
       taxon_lineage <- taxon_info |>
-        rotl::tax_lineage()|>
-        data.frame()
+        rotl::tax_lineage()
 
       list_df <- list()
 
@@ -203,9 +198,7 @@ get_organism_taxonomy_ott <- function(df,
     }
 
     biological_metadata <-
-      dplyr::left_join(organism_table|>
-        data.frame(), new_matched_otl_exact|>
-        data.frame()) |>
+      dplyr::left_join(organism_table, new_matched_otl_exact) |>
       dplyr::left_join(otl, by = c("ott_id" = "id")) |>
       dplyr::filter(
         rank %in% c(
@@ -253,7 +246,8 @@ get_organism_taxonomy_ott <- function(df,
           organism_taxonomy_10varietas = dplyr::matches("name_varietas")
         ) |>
         dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
-        dplyr::coalesce()
+        dplyr::coalesce() |>
+        data.frame()
 
       biological_metadata[dplyr::setdiff(
         x = c(
