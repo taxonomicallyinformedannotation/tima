@@ -94,7 +94,8 @@ prepare_libraries_sop_merged <-
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
-    table_keys <- tables$key
+    table_keys <- tables$key |>
+      data.frame()
 
     log_debug(x = "Keeping organisms")
     # table_organisms_names <- tables$org_nam
