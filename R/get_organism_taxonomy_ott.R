@@ -167,10 +167,12 @@ get_organism_taxonomy_ott <- function(df,
         ott_ids = otts,
         include_lineage = TRUE,
         include_terminal_descendants = TRUE
-      )
+      )|>
+        data.frame()
 
       taxon_lineage <- taxon_info |>
-        rotl::tax_lineage()
+        rotl::tax_lineage()|>
+        data.frame()
 
       list_df <- list()
 
