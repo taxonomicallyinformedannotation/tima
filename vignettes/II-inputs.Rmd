@@ -58,7 +58,7 @@ targets::tar_visnetwork(
 
 To do so, simply:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_params.R")
 ```
 
@@ -66,7 +66,7 @@ And now, you should get the following:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("par"),
+  names = starts_with("par_usr"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -77,7 +77,7 @@ The values you adapted in `params/prepare_params.yaml` were automatically propag
 
 And everything is stored in case you re-perform it, the beauty of `{targets}`!
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_params.R")
 ```
 
@@ -89,7 +89,7 @@ Your final prepared parameters look now like:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("params"),
+  names = starts_with("par"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -117,7 +117,7 @@ The most important file you need to provide is an MGF file containing the spectr
 
 If you already ran a GNPS job, you can simply do:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_gnps_tables.R")
 ```
 
@@ -127,7 +127,7 @@ To get an example of an MGF file (corresponding to the spectra to annotate, not 
 unlink("data/source/example_spectra.mgf")
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_example_spectra.R")
 ```
 
@@ -158,13 +158,13 @@ targets::tar_visnetwork(
 
 You can easily get it by running:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_lotus.R")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = matches("library_sop_lotus$"),
+  names = matches("lib_sop_lot$"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -172,7 +172,7 @@ targets::tar_visnetwork(
 
 You then need to format it as expected by the pipeline, to do so:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
 ```
 
@@ -198,7 +198,7 @@ If you want, you can also complement LOTUS pairs with the ones coming from [ECMD
 
 To do so, you need to:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
 ```
 
@@ -239,7 +239,7 @@ If you need help formatting your library or would like to share it with us for i
 
 Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_closed.yaml`
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_sop_closed.R")
 ```
 
@@ -252,7 +252,7 @@ Before running the corresponding code, do not forget to modify `params/user/prep
 At this step, if you want to, you can restrict your library to specific taxa only.
 We do not advise doing so, but we offer you the possibility to do it.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_sop_merged.R")
 ```
 
@@ -291,7 +291,7 @@ As you can see, it depends on the previously built library.
 
 Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_adducts.yaml`.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_adducts.R")
 ```
 
@@ -306,7 +306,7 @@ We currently only support spectral libraries in MGF format.
 
 To get a small example:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 get_file(
   url = paths$urls$examples$spectral_lib_mini$with_rt,
   export = paths$data$source$libraries$spectra$exp$with_rt
@@ -330,13 +330,13 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 
 In order to get it:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_isdb_lotus.R")
 ```
 
 And as previously, then prepare it:
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
 ```
 

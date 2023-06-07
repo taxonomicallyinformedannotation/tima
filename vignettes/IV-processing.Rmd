@@ -20,7 +20,7 @@ knitr::opts_knit$set(root.dir = "..")
 This vignette describes how to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
 If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library("timaR")
 ```
 
