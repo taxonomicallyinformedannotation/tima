@@ -34,11 +34,11 @@ These annotations are of the lowest possible quality.
 However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 library("timaR")
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/annotate_masses.R")
 ```
 
@@ -60,7 +60,7 @@ In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**as
 
 #### ISDB
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/annotate_spectra.R")
 ```
 
@@ -69,7 +69,7 @@ The python version also includes more elaborated similarity measures.
 
 And as before:
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_annotations_spectra.R")
 ```
 
@@ -93,7 +93,7 @@ Before running the corresponding code, do not forget to modify `params/user/prep
 
 Depending on the annotation tool you used, you can format its results using:
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_annotations_gnps.R")
 ```
 
@@ -132,13 +132,13 @@ sirius -i inst/extdata/interim/annotations/sirius_example/ write-summaries -c --
 
 You can get the example running:
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_example_sirius.R")
 ```
 
 Then prepare it:
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_annotations_sirius.R")
 ```
 
@@ -172,13 +172,13 @@ We are currently also working on CANOPUS integration for chemical class annotati
 
 If no network was generated previously on GNPS (no GNPS job ID provided), it can be generated using:
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/create_edges_spectra.R")
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_example_features.R")
 ```
 
@@ -186,19 +186,19 @@ source(file = "inst/scripts/get_example_features.R")
 
 Before running the corresponding code, do not forget to modify `params/user/prepare_features_tables.yaml`, `params/user/prepare_features_edges.yaml`, `params/user/create_components.yaml`, and `params/user/prepare_features_components.yaml` accordingly.
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_features_tables.R")
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_features_edges.R")
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/create_components.R")
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_features_components.R")
 ```
 
@@ -211,7 +211,7 @@ It can take both manual inputs or GNPS metadata directly from your GNPS job ID.
 
 Before running the corresponding code, do not forget to modify `params/user/prepare_taxa.yaml`.
 
-```{r, message=FALSE, warning=FALSE}
+```{r, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_taxa.R")
 ```
 
