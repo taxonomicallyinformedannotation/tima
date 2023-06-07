@@ -406,7 +406,7 @@
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
-      "version": ">= 1.8.4",
+      "version": ">= 1.8.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -458,7 +458,7 @@
       "@type": "SoftwareApplication",
       "identifier": "parallelly",
       "name": "parallelly",
-      "version": ">= 1.35.0",
+      "version": ">= 1.36.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -584,7 +584,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "254472.335KB",
+  "fileSize": "254472.248KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

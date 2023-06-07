@@ -48,7 +48,7 @@ Now, you want to copy them and adapt them to your own files to get something lik
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("par_"),
+  names = starts_with("par_usr"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -66,7 +66,7 @@ And now, you should get the following:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("params"),
+  names = starts_with("par"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -178,7 +178,7 @@ source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = matches("library_sop_lotus"),
+  names = matches("lib_sop_lot"),
   exclude = c(
     contains("par_"),
     contains("paths")
@@ -204,7 +204,7 @@ source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = matches("library_sop_ecmdb"),
+  names = matches("lib_sop_ecm"),
   exclude = c(
     contains("par_"),
     contains("paths")
@@ -260,7 +260,7 @@ You now should have a nice custom structure-organism pairs library for the next 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("library_sop"),
+  names = starts_with("lib_sop"),
   exclude = c(
     contains("par_"),
     contains("paths")
@@ -277,7 +277,7 @@ As a main limitation of current annotation tools is adducts detection and covera
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("library_adducts"),
+  names = starts_with("lib_add"),
   exclude = c(
     contains("par_"),
     contains("paths")
@@ -342,7 +342,7 @@ source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("library_spectra"),
+  names = starts_with("lib_spe"),
   exclude = c(
     contains("par_"),
     contains("paths")
@@ -366,7 +366,7 @@ You are finally ready for the next step, with all dictionaries, inputs, and libr
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = starts_with("library"),
+  names = starts_with("lib"),
   exclude = c(
     contains("par_"),
     contains("paths")

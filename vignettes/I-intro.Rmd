@@ -49,7 +49,7 @@ Each step of the whole pipeline will be described next.
 library(targets)
 Sys.setenv(TAR_WARN = "false")
 targets::tar_visnetwork(
-  names = starts_with("annotations"),
+  names = starts_with("ann"),
   exclude = c(
     contains("dic"),
     contains("par_"),
