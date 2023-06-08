@@ -1,11 +1,12 @@
 # Image
-FROM bioconductor/bioconductor_docker:RELEASE_3_17
+FROM bioconductor/bioconductor_docker:3.17-R-4.3.0
 
 # Copy files
 COPY DESCRIPTION ./DESCRIPTION
 COPY data ./data
 COPY inst ./inst
 COPY params ./params
+COPY docker-compose.yml ./docker-compose.yml
 COPY paths.yaml ./paths.yaml
 
 # To force bioconductor to install from source
