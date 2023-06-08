@@ -8,7 +8,7 @@ on:
 env:
   TEST_TAG: adafede/tima-r:test
   LATEST_TAG: adafede/tima-r:latest
-  DOCKER_COMMAND: 'docker-compose up tima-mini'
+  DOCKER_SERVICE: tima-mini
 
 jobs:
   docker:
@@ -48,9 +48,11 @@ jobs:
           load: true
           tags: ${{ env.TEST_TAG }} 
       -
-        name: Test
-        run: |
-          ${{ env.DOCKER_COMMAND }}
+        name: Docker Compose Action
+        uses: isbang/compose-action@v1.4.1
+        with:
+          services: |
+            ${{ env.DOCKER_SERVICE }}
       -
         name: Build and push
         uses: docker/build-push-action@v4
