@@ -8,8 +8,7 @@ on:
 env:
   TEST_TAG: adafede/tima-r:test
   LATEST_TAG: adafede/tima-r:latest
-  DOCKER_ARGS: '-v /params:/params -v /inst:/inst -v /data:/data'
-  DOCKER_COMMAND: 'Rscript /inst/scripts/tima_mini.R'
+  DOCKER_COMMAND: 'docker-compose up tima-mini'
 
 jobs:
   docker:
@@ -51,7 +50,7 @@ jobs:
       -
         name: Test
         run: |
-          docker run --rm ${{ env.DOCKER_ARGS }} ${{ env.TEST_TAG }} ${{ env.DOCKER_COMMAND }}
+          ${{ env.DOCKER_COMMAND }}
       -
         name: Build and push
         uses: docker/build-push-action@v4

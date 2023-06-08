@@ -3,9 +3,9 @@ FROM bioconductor/bioconductor_docker:RELEASE_3_17
 
 # Copy files
 COPY DESCRIPTION ./DESCRIPTION
-COPY /data/ ./data/
-COPY /inst/ ./inst/
-COPY /params/ ./params/
+COPY data ./data
+COPY inst ./inst
+COPY params ./params
 COPY paths.yaml ./paths.yaml
 
 # To force bioconductor to install from source
