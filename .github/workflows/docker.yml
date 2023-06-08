@@ -7,7 +7,6 @@ on:
 
 env:
   TEST_TAG: 'adafede/tima-r:test'
-  LATEST_TAG: 'adafede/tima-r:latest'
   DOCKER_SERVICE: 'tima-mini'
 
 jobs:
@@ -62,4 +61,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.LATEST_TAG }}
+          tags: adafede/tima-r:latest
