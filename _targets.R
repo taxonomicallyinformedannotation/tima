@@ -1324,8 +1324,8 @@ list(
                   ann_spe_exp_int_pos
                 ),
                 output = gsub(
-                  pattern = "_pre.tsv.gz",
-                  replacement = "_exp_rt_pre.tsv.gz",
+                  pattern = "_prepared.tsv.gz",
+                  replacement = "_exp_rt_prepared.tsv.gz",
                   x = par_pre_ann_spe$files$annotations$prepared,
                   fixed = TRUE
                 ),

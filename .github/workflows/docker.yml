@@ -6,9 +6,9 @@ on:
       - 'main'
 
 env:
-  TEST_TAG: adafede/tima-r:test
-  LATEST_TAG: adafede/tima-r:latest
-  DOCKER_SERVICE: tima-mini
+  TEST_TAG: 'adafede/tima-r:test'
+  LATEST_TAG: 'adafede/tima-r:latest'
+  DOCKER_SERVICE: 'tima-mini'
 
 jobs:
   docker:

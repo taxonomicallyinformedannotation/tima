@@ -273,7 +273,7 @@ targets::tar_visnetwork(
 #### Adducts
 
 The next library you need is an adducts library!
-As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS1 annotation later on.
+As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS^1^ annotation later on.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
@@ -297,11 +297,11 @@ source(file = "inst/scripts/prepare_libraries_adducts.R")
 
 #### Spectra
 
-Finally, you need a spectral library to perform MS2-based annotation.
+Finally, you need a spectral library to perform MS^2^-based annotation.
 
 ##### Experimental
 
-You can of course use your own experimental spectral library to perform MS2 annotation.
+You can of course use your own experimental spectral library to perform MS^2^ annotation.
 We currently only support spectral libraries in MGF format.
 
 To get a small example:

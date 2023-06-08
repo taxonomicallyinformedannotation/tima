@@ -33,7 +33,7 @@ get_organism_taxonomy_ott <- function(df,
     dplyr::mutate(
       organism = organism |>
         stringi::stri_replace_all_fixed(
-          pattern = "× ",
+          pattern = "\u00D7 ",
           replacement = "",
           vectorize = FALSE
         )

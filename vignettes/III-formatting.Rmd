@@ -23,12 +23,12 @@ This vignette describes how to format all your files.
 
 For the moment, we support annotations coming from 4 different annotation tools:
 
-* MS1 exact mass-based library search
+* MS^1^ exact mass-based library search
 * [GNPS](https://gnps.ucsd.edu)
 * [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
 * Formatted results of **ISDB** annotation.
 
-### MS1-based
+### MS^1^-based
 
 These annotations are of the lowest possible quality.
 However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
@@ -56,7 +56,7 @@ targets::tar_visnetwork(
 
 ### Spectral
 
-In order to perform MS2 annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following steps.
+In order to perform MS^2^ annotation based on an **I**n **S**ilico **D**ata**B**ase, please follow the following steps.
 
 #### ISDB
 
