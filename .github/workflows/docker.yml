@@ -6,9 +6,8 @@ on:
       - 'main'
 
 env:
-  TEST_TAG: 'adafede/tima-r:test'
-  LATEST_TAG: 'adafede/tima-r:latest'
   DOCKER_SERVICE: 'tima-mini'
+  LATEST_TAG: 'adafede/tima-r:latest'
 
 jobs:
   docker:
@@ -39,21 +38,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          load: true
-          push: false
-          tags: ${{ env.TEST_TAG }} 
-      -
-        name: Docker Compose Action
+      - name: Docker Compose Action
         uses: isbang/compose-action@v1.4.1
         with:
           services: |
             ${{ env.DOCKER_SERVICE }}
-      -
-        name: Build and push
+            
+      - name: Build and push
         uses: docker/build-push-action@v4
         with:
           cache-from: type=gha
