@@ -37,12 +37,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Docker Compose Action
-        uses: isbang/compose-action@v1.4.1
-        with:
-          services: |
-            ${{ env.DOCKER_SERVICE }}
             
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -53,3 +47,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.LATEST_TAG }}
+
+      - name: Docker Compose Action
+        uses: isbang/compose-action@v1.4.1
+        with:
+          services: |
+            ${{ env.DOCKER_SERVICE }}
