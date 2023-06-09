@@ -7,6 +7,7 @@ on:
 
 env:
   TEST_TAG: 'adafede/tima-r:test'
+  LATEST_TAG: 'adafede/tima-r:latest'
   DOCKER_SERVICE: 'tima-mini'
 
 jobs:
@@ -41,10 +42,9 @@ jobs:
       - name: Build and export to Docker
         uses: docker/build-push-action@v4
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           context: .
           load: true
+          push: false
           tags: ${{ env.TEST_TAG }} 
       -
         name: Docker Compose Action
@@ -61,4 +61,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: adafede/tima-r:latest
+          tags: ${{ env.LATEST_TAG }}
