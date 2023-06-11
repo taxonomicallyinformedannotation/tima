@@ -134,7 +134,8 @@ prepare_annotations_sirius <-
           recursive = TRUE
         ),
         FUN = tidytable::fread,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "c"
       )
 
       names(compound_summary) <- list.files(
@@ -144,6 +145,9 @@ prepare_annotations_sirius <-
       ) |>
         pre_harmonize_names_sirius() |>
         harmonize_names_sirius()
+
+      compound_summary <-
+        compound_summary[lapply(compound_summary, nrow) > 0]
 
       compound_summary_ready <- compound_summary |>
         dplyr::bind_rows(.id = "feature_id") |>
