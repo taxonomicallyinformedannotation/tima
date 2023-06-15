@@ -66,11 +66,14 @@ prepare_taxa <-
       file = input,
       na.strings = c("", "NA")
     )
-    log_debug(x = "Loading metadata table")
-    metadata_table <- tidytable::fread(
-      file = metadata,
-      na.strings = c("", "NA")
-    )
+
+    if (is.null(taxon)) {
+      log_debug(x = "Loading metadata table")
+      metadata_table <- tidytable::fread(
+        file = metadata,
+        na.strings = c("", "NA")
+      )
+    }
 
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
