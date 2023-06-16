@@ -62,7 +62,8 @@ pak::pak_update()
 pak::lockfile_create()
 pak::lockfile_install()
 unlink(x = "pkg.lock")
-pak::pak(ask = FALSE)
+pak::pak(ask = FALSE,
+         upgrade = FALSE)
 pak::pkg_install(
   pkg = desc::desc_get_urls()[[1]],
   ask = FALSE,
