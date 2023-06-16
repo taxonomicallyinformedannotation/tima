@@ -47,7 +47,6 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocManager",
       "name": "BiocManager",
-      "version": ">= 1.30.20",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -60,7 +59,6 @@
       "@type": "SoftwareApplication",
       "identifier": "bs4Dash",
       "name": "bs4Dash",
-      "version": ">= 2.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -73,7 +71,6 @@
       "@type": "SoftwareApplication",
       "identifier": "clustermq",
       "name": "clustermq",
-      "version": ">= 0.8.95.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -86,7 +83,6 @@
       "@type": "SoftwareApplication",
       "identifier": "future",
       "name": "future",
-      "version": ">= 1.32.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -99,7 +95,6 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
-      "version": ">= 0.9.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -112,7 +107,6 @@
       "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
-      "version": ">= 1.43",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -125,7 +119,6 @@
       "@type": "SoftwareApplication",
       "identifier": "markdown",
       "name": "markdown",
-      "version": ">= 1.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -138,7 +131,6 @@
       "@type": "SoftwareApplication",
       "identifier": "pingr",
       "name": "pingr",
-      "version": ">= 2.0.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -151,7 +143,6 @@
       "@type": "SoftwareApplication",
       "identifier": "rstudioapi",
       "name": "rstudioapi",
-      "version": ">= 0.14",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -164,7 +155,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
-      "version": ">= 1.7.4",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -177,7 +167,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
-      "version": ">= 0.7.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -190,7 +179,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
-      "version": ">= 0.3.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -203,7 +191,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyhelper",
       "name": "shinyhelper",
-      "version": ">= 0.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -216,7 +203,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyjs",
       "name": "shinyjs",
-      "version": ">= 2.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -229,7 +215,6 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyvalidate",
       "name": "shinyvalidate",
-      "version": ">= 0.1.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -242,7 +227,6 @@
       "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
-      "version": ">= 2.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -255,7 +239,6 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.1.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -268,7 +251,6 @@
       "@type": "SoftwareApplication",
       "identifier": "tarchetypes",
       "name": "tarchetypes",
-      "version": ">= 0.7.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -281,7 +263,6 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.1.8",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -294,7 +275,6 @@
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
-      "version": ">= 2.1.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -497,7 +477,7 @@
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
-      "version": ">= 3.0.14",
+      "version": ">= 3.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -584,7 +564,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "254481.047KB",
+  "fileSize": "254480.824KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
