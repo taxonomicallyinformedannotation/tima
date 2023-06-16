@@ -70,8 +70,8 @@ prepare_params <- function(filename = params$files$pattern,
   }
 
   yaml_names <- yaml_files |>
-    gsub(pattern = "params/default/", replacement = "") |>
-    gsub(pattern = "params/user/", replacement = "") |>
+    gsub(pattern = "tools/default/", replacement = "") |>
+    gsub(pattern = "tools/user/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
 
   yamls_default <- lapply(
