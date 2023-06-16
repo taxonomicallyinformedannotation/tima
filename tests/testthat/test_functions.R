@@ -91,7 +91,7 @@ testthat::test_that("Whole process", {
   get_gnps_tables(
     filename = "noGNPS",
     path_features = paths$data$source$features,
-    path_metadata = NULL,
+    path_metadata = list(),
     path_spectra = paths$data$source$spectra,
     gnps_job_id = NULL
   )
@@ -99,7 +99,7 @@ testthat::test_that("Whole process", {
   get_gnps_tables(
     filename = "noNoGNPS",
     path_features = paths$data$source$features,
-    path_metadata = "",
+    path_metadata = NULL,
     path_spectra = paths$data$source$spectra,
     gnps_job_id = ""
   )
