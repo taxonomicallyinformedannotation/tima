@@ -24,7 +24,7 @@ If you followed all previous steps successfully, this should be a piece of cake,
 library("timaR")
 ```
 
-Before running the corresponding code, do not forget to modify `params/user/weight_annotations.yaml`.
+Before running the corresponding code, do not forget to modify `tools/user/weight_annotations.yaml`.
 
 ```{r, message=FALSE}
 source(file = "inst/scripts/weight_annotations.R")

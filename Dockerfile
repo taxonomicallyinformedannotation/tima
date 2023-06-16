@@ -5,7 +5,7 @@ FROM bioconductor/bioconductor_docker:3.17-R-4.3.0
 COPY DESCRIPTION ./DESCRIPTION
 COPY data ./data
 COPY inst ./inst
-COPY params ./params
+COPY tools ./tools
 COPY docker-compose.yml ./docker-compose.yml
 COPY paths.yaml ./paths.yaml
 

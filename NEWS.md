@@ -1,6 +1,9 @@
 # timaR
 
 # timaR 2.8.1
+
+* Dependencies update
+* Moved `/params` to `/tools` as more standard. (see <https://r-pkgs.org/misc.html#other-directories>)
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Minor fixes
 

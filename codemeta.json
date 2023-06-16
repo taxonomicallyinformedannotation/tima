@@ -373,7 +373,7 @@
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
-      "version": ">= 1.5.0",
+      "version": ">= 1.4.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -564,7 +564,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "254480.872KB",
+  "fileSize": "254481.522KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

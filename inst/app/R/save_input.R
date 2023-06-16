@@ -29,8 +29,8 @@ save_input <- function(input) {
   }
 
   yaml_names <- yaml_files |>
-    gsub(pattern = "params/default/", replacement = "") |>
-    gsub(pattern = "params/user/", replacement = "") |>
+    gsub(pattern = "tools/default/", replacement = "") |>
+    gsub(pattern = "tools/user/", replacement = "") |>
     gsub(pattern = ".yaml", replacement = "")
 
   yamls_default <- lapply(
@@ -68,22 +68,22 @@ save_input <- function(input) {
 
   ## Change 1
   timaR::log_debug(x = "Changing parameters")
-  yamls_params$`params/prepare_params`$files$pattern <- filename
-  yamls_params$`params/prepare_params`$files$features$raw <-
+  yamls_params$`tools/prepare_params`$files$pattern <- filename
+  yamls_params$`tools/prepare_params`$files$features$raw <-
     file.path(paths_data_source, fil_fea_raw)
-  yamls_params$`params/prepare_params`$files$spectral$raw <-
+  yamls_params$`tools/prepare_params`$files$spectral$raw <-
     file.path(paths_data_source, fil_spe_raw)
-  yamls_params$`params/prepare_params`$gnps$id <- gnps_job_id
-  yamls_params$`params/prepare_params`$gnps$workflow <-
+  yamls_params$`tools/prepare_params`$gnps$id <- gnps_job_id
+  yamls_params$`tools/prepare_params`$gnps$workflow <-
     gnps_workflow
-  yamls_params$`params/prepare_params`$ms$polarity <- ms_mode
-  yamls_params$`params/prepare_params`$organisms$taxon <- org_tax
+  yamls_params$`tools/prepare_params`$ms$polarity <- ms_mode
+  yamls_params$`tools/prepare_params`$organisms$taxon <- org_tax
   ## crazy
-  yamls_params$`params/prepare_params`$options$summarise <-
+  yamls_params$`tools/prepare_params`$options$summarise <-
     summarise
   yaml::write_yaml(
-    x = yamls_params$`params/prepare_params`,
-    file = "params/prepare_params.yaml"
+    x = yamls_params$`tools/prepare_params`,
+    file = "tools/prepare_params.yaml"
   )
 
   yamls_params$annotate_masses$ms$adducts$neg <-

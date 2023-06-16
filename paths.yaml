@@ -101,68 +101,68 @@ inst:
     docopt:
       path: inst/scripts/docopt
 params:
-  path: params
+  path: tools
   default:
-    path: params/default
+    path: tools/default
     annotate:
-      masses: params/default/annotate_masses.yaml
-      spectra: params/default/annotate_spectra.yaml
+      masses: tools/default/annotate_masses.yaml
+      spectra: tools/default/annotate_spectra.yaml
     create:
-      components: params/default/create_components.yaml
+      components: tools/default/create_components.yaml
       edges:
-        spectra: params/default/create_edges_spectra.yaml
+        spectra: tools/default/create_edges_spectra.yaml
     prepare:
       features: 
-        components: params/default/prepare_features_components.yaml
-        edges: params/default/prepare_features_edges.yaml
-        tables: params/default/prepare_features_tables.yaml
+        components: tools/default/prepare_features_components.yaml
+        edges: tools/default/prepare_features_edges.yaml
+        tables: tools/default/prepare_features_tables.yaml
       libraries:
-        adducts: params/default/prepare_libraries_adducts.yaml
+        adducts: tools/default/prepare_libraries_adducts.yaml
         sop:
-          closed: params/default/prepare_libraries_sop_closed.yaml
-          ecmdb: params/default/prepare_libraries_sop_ecmdb.yaml
-          hmdb: params/default/prepare_libraries_sop_hmdb.yaml
-          lotus: params/default/prepare_libraries_sop_lotus.yaml
-          merged: params/default/prepare_libraries_sop_merged.yaml
-        spectra: params/default/prepare_libraries_spectra.yaml
+          closed: tools/default/prepare_libraries_sop_closed.yaml
+          ecmdb: tools/default/prepare_libraries_sop_ecmdb.yaml
+          hmdb: tools/default/prepare_libraries_sop_hmdb.yaml
+          lotus: tools/default/prepare_libraries_sop_lotus.yaml
+          merged: tools/default/prepare_libraries_sop_merged.yaml
+        spectra: tools/default/prepare_libraries_spectra.yaml
       annotations:
-        gnps: params/default/prepare_annotations_gnps.yaml
-        sirius: params/default/prepare_annotations_sirius.yaml
-        spectra: params/default/prepare_annotations_spectra.yaml
-      taxa: params/default/prepare_taxa.yaml
+        gnps: tools/default/prepare_annotations_gnps.yaml
+        sirius: tools/default/prepare_annotations_sirius.yaml
+        spectra: tools/default/prepare_annotations_spectra.yaml
+      taxa: tools/default/prepare_taxa.yaml
     weight:
-      annotations: params/default/weight_annotations.yaml
-  prepare_params: params/prepare_params.yaml
+      annotations: tools/default/weight_annotations.yaml
+  prepare_params: tools/prepare_params.yaml
   user:
-    path: params/user
+    path: tools/user
     annotate:
-      masses: params/user/annotate_masses.yaml
-      spectra: params/user/annotate_spectra.yaml
+      masses: tools/user/annotate_masses.yaml
+      spectra: tools/user/annotate_spectra.yaml
     create:
-      components: params/user/create_components.yaml
+      components: tools/user/create_components.yaml
       edges:
-        spectra: params/user/create_edges_spectra.yaml
+        spectra: tools/user/create_edges_spectra.yaml
     prepare:
       features: 
-        components: params/user/prepare_features_components.yaml
-        edges: params/user/prepare_features_edges.yaml
-        tables: params/user/prepare_features_tables.yaml
+        components: tools/user/prepare_features_components.yaml
+        edges: tools/user/prepare_features_edges.yaml
+        tables: tools/user/prepare_features_tables.yaml
       libraries:
-        adducts: params/user/prepare_libraries_adducts.yaml
+        adducts: tools/user/prepare_libraries_adducts.yaml
         sop:
-          closed: params/user/prepare_libraries_sop_closed.yaml
-          ecmdb: params/user/prepare_libraries_sop_ecmdb.yaml
-          hmdb: params/user/prepare_libraries_sop_hmdb.yaml
-          lotus: params/user/prepare_libraries_sop_lotus.yaml
-          merged: params/user/prepare_libraries_sop_merged.yaml
-        spectra: params/user/prepare_libraries_spectra.yaml
+          closed: tools/user/prepare_libraries_sop_closed.yaml
+          ecmdb: tools/user/prepare_libraries_sop_ecmdb.yaml
+          hmdb: tools/user/prepare_libraries_sop_hmdb.yaml
+          lotus: tools/user/prepare_libraries_sop_lotus.yaml
+          merged: tools/user/prepare_libraries_sop_merged.yaml
+        spectra: tools/user/prepare_libraries_spectra.yaml
       annotations:
-        gnps: params/user/prepare_annotations_gnps.yaml
-        sirius: params/user/prepare_annotations_sirius.yaml
-        spectra: params/user/prepare_annotations_spectra.yaml
-      taxa: params/user/prepare_taxa.yaml
+        gnps: tools/user/prepare_annotations_gnps.yaml
+        sirius: tools/user/prepare_annotations_sirius.yaml
+        spectra: tools/user/prepare_annotations_spectra.yaml
+      taxa: tools/user/prepare_taxa.yaml
     weight:
-      annotations: params/user/weight_annotations.yaml
+      annotations: tools/user/weight_annotations.yaml
 tests:
   mode: no
   path: tests

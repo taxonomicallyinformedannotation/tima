@@ -5,9 +5,9 @@ services:
     build: "."
     image: adafede/tima-r
     volumes:
-      - "./params:/params"
-      - "./inst:/inst"
       - "./data:/data"
+      - "./inst:/inst"
+      - "./tools:/tools"
     command: Rscript inst/scripts/tima_full.R
 
   tima-gui:
@@ -17,16 +17,16 @@ services:
       - "3839:3839"
     image: adafede/tima-r
     volumes:
-      - "./params:/params"
-      - "./inst:/inst"
       - "./data:/data"
+      - "./inst:/inst"
+      - "./tools:/tools"
     command: Rscript inst/scripts/run_app_docker.R
 
   tima-mini:
     build: "."
     image: adafede/tima-r
     volumes:
-      - "./params:/params"
-      - "./inst:/inst"
       - "./data:/data"
+      - "./inst:/inst"
+      - "./tools:/tools"
     command: Rscript inst/scripts/tima_mini.R
