@@ -4,10 +4,10 @@
 \alias{parse_yaml_paths}
 \title{Parse YAML paths}
 \usage{
-parse_yaml_paths(file = "paths.yaml")
+parse_yaml_paths(file = "tools/paths.yaml")
 }
 \arguments{
-\item{file}{The file name of the YAML file containing the paths (default is "paths.yaml")}
+\item{file}{The file name of the YAML file containing the paths (default is "tools/paths.yaml")}
 }
 \value{
 A list containing the paths specified in the YAML file

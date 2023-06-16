@@ -31,7 +31,7 @@ list(
       tar_file(
         name = yaml_paths,
         command = {
-          yaml_paths <- "paths.yaml"
+          yaml_paths <- "tools/paths.yaml"
         }
       ),
       tar_target(

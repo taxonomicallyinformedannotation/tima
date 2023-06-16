@@ -29,7 +29,6 @@ jobs:
 
       - name: Additional step for tests to run
         run: |
-          cp -R paths.yaml tests/testthat/paths.yaml
           cp -R tools tests/testthat/tools
           cp -R inst tests/testthat/inst
           cp -R R tests/testthat/R

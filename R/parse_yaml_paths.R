@@ -2,14 +2,14 @@
 #'
 #' @description This function parses YAML paths
 #'
-#' @param file The file name of the YAML file containing the paths (default is "paths.yaml")
+#' @param file The file name of the YAML file containing the paths (default is "tools/paths.yaml")
 #'
 #' @return A list containing the paths specified in the YAML file
 #'
 #' @export
 #'
 #' @examples NULL
-parse_yaml_paths <- function(file = "paths.yaml") {
+parse_yaml_paths <- function(file = "tools/paths.yaml") {
   # Read the YAML file containing the paths
   suppressWarnings(
     paths <- yaml::read_yaml(

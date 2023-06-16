@@ -2,7 +2,7 @@
 testthat::test_that("Whole process", {
   ## Copy needed files and directories
   # diff <- "../.."
-  # papath <- "paths.yaml"
+  # papath <- "tools/paths.yaml"
   # paparam <- "params"
   # painstdoc <- "inst/scripts/docopt"
   # painstext <- "inst/extdata"

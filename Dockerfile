@@ -7,7 +7,6 @@ COPY data ./data
 COPY inst ./inst
 COPY tools ./tools
 COPY docker-compose.yml ./docker-compose.yml
-COPY paths.yaml ./paths.yaml
 
 # To force bioconductor to install from source
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
