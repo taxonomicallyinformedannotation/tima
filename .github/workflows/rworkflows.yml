@@ -6,8 +6,6 @@ name: rworkflows
   pull_request:
     branches:
     - main
-env:
-      GITHUB_PAT: ${{ secrets.PAT_GITHUB }}
 jobs:
   rworkflows:
     runs-on: ${{ matrix.config.os }}
@@ -19,17 +17,17 @@ jobs:
         config:
         - os: ubuntu-latest
           bioc: devel
-          r: auto
+          r: devel
           cont: bioconductor/bioconductor_docker:devel
           rspm: https://packagemanager.rstudio.com/cran/__linux__/focal/release
         - os: macOS-latest
           bioc: release
-          r: auto
+          r: latest
           cont: ~
           rspm: ~
         - os: windows-latest
           bioc: release
-          r: auto
+          r: latest
           cont: ~
           rspm: ~
     steps:
@@ -46,6 +44,8 @@ jobs:
         has_latex: ${{ false }}
         GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         run_docker: ${{ false }}
+        docker_user: adafede
+        docker_org: adafede
         # DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         runner_os: ${{ runner.os }}
