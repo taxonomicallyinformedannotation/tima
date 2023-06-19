@@ -1,54 +1,13 @@
 ## need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Whole process", {
-  ## Copy needed files and directories
-  # diff <- "../.."
-  # papath <- "tools/paths.yaml"
-  # paparam <- "params"
-  # painstdoc <- "inst/scripts/docopt"
-  # painstext <- "inst/extdata"
-  #
-  # papaparam <- list.files(file.path(diff, paparam), recursive = TRUE)
-  # papaparam_base <- papaparam[!grepl(pattern = "/", x = papaparam)]
-  # papaparam_default <- papaparam[grepl(pattern = "default", x = papaparam)]
-  # papaparam_user <- papaparam[grepl(pattern = "user", x = papaparam)]
-  # papainstdoc <- list.files(file.path(diff, painstdoc), recursive = TRUE)
-  # papainstext <- list.files(file.path(diff, painstext), recursive = TRUE)
-  #
-  # file.copy(
-  #   from = file.path(diff, papath),
-  #   to = papath,
-  #   overwrite = TRUE
-  # )
-  # dir.create(paparam)
-  # dir.create(file.path(paparam, "default"))
-  # dir.create(file.path(paparam, "user"))
-  # file.copy(
-  #   from = file.path(diff, paparam, papaparam_base),
-  #   to = file.path(paparam, papaparam_base),
-  #   overwrite = TRUE
-  # )
-  # file.copy(
-  #   from = file.path(diff, paparam, papaparam_default),
-  #   to = file.path(paparam, papaparam_default),
-  #   overwrite = TRUE
-  # )
-  # file.copy(
-  #   from = file.path(diff, paparam, papaparam_user),
-  #   to = file.path(paparam, papaparam_user),
-  #   overwrite = TRUE
-  # )
-  # dir.create(painstdoc, recursive = TRUE)
-  # file.copy(
-  #   from = file.path(diff, painstdoc, papainstdoc),
-  #   to = file.path(painstdoc, papainstdoc),
-  #   overwrite = TRUE
-  # )
-  # dir.create(painstext, recursive = TRUE)
-  # file.copy(
-  #   from = file.path(diff, painstext, papainstext),
-  #   to = file.path(painstext, papainstext),
-  #   overwrite = TRUE
-  # )
+  system(
+    command =
+    "
+    cp -R ../../tools tools
+    cp -R ../../inst inst
+    cp -R ../../R R
+    "
+  )
 
   ## Prepare parameters
   paths <<- parse_yaml_paths()

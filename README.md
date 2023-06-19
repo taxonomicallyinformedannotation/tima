@@ -2,9 +2,11 @@
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
-[![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions)
 [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
+[![GitHub Super-Linter](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions)
+[![](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/rworkflows/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions)
 <!-- badges: end -->
 
 The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.

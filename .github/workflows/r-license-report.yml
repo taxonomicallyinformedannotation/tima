@@ -1,0 +1,17 @@
+---
+name: License Report
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  license-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: License Report
+        uses: insightsengineering/r-license-report@v1
