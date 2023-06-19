@@ -11,9 +11,9 @@ testthat::test_that("Whole process", {
   system(
     command =
     "
-    cp -R ../tools tools
-    cp -R ../inst inst
-    cp -R ../R R
+    cp -R ../tools testthat/tools
+    cp -R ../inst testthat/inst
+    cp -R ../R testthat/R
     "
   )
 
