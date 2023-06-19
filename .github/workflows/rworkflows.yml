@@ -16,24 +16,12 @@ jobs:
       matrix:
         config:
         - os: ubuntu-latest
-          bioc: devel
-          r: auto
-          cont: bioconductor/bioconductor_docker:devel
-          rspm: https://packagemanager.rstudio.com/cran/__linux__/focal/release
         - os: macOS-latest
-          bioc: release
-          r: auto
-          cont: ~
-          rspm: ~
         - os: windows-latest
-          bioc: release
-          r: auto
-          cont: ~
-          rspm: ~
     steps:
     - uses: neurogenomics/rworkflows@master
       with:
-        run_bioccheck: ${{ false }}
+        run_bioccheck: ${{ true }}
         run_rcmdcheck: ${{ true }}
         as_cran: ${{ true }}
         run_vignettes: ${{ true }}

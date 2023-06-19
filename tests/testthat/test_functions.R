@@ -1,13 +1,13 @@
 ## need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Whole process", {
-  system(
-    command =
-    "
-    cp -R ../../tools tools
-    cp -R ../../inst inst
-    cp -R ../../R R
-    "
-  )
+  # system(
+  #   command =
+  #   "
+  #   cp -R ../../tools tools
+  #   cp -R ../../inst inst
+  #   cp -R ../../R R
+  #   "
+  # )
 
   ## Prepare parameters
   paths <<- parse_yaml_paths()
