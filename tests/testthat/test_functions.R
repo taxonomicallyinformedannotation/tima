@@ -8,6 +8,14 @@ testthat::test_that("Whole process", {
   #   cp -R ../../R R
   #   "
   # )
+  system(
+    command =
+    "
+    cp -R ../tools tools
+    cp -R ../inst inst
+    cp -R ../R R
+    "
+  )
 
   ## Prepare parameters
   paths <<- parse_yaml_paths()
