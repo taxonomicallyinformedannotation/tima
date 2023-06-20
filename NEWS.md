@@ -1,6 +1,6 @@
 # timaR
 
-## timaR 2.8.1
+# timaR 2.8.1
 
 * Linting
 * Dependencies update
@@ -10,12 +10,12 @@
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Minor fixes
 
-## timaR 2.8.0
+# timaR 2.8.0
 
 * Adding GUI prototype
 * Started using [renv](https://rstudio.github.io/renv/index.html)
 
-## timaR 2.7.4
+# timaR 2.7.4
 
 * ECMDB support
 * Edges (mass and spectra-based) and components are generated if not present.
@@ -28,7 +28,7 @@
 * Clearer vocabulary
 * Lot of fixes
 
-## timaR 2.7.3
+# timaR 2.7.3
 
 * [Targets](https://books.ropensci.org/targets/) implementation
 * Parameters refactoring
@@ -36,7 +36,7 @@
 * Spectral matching update (see <https://github.com/rformassspectrometry/MetaboAnnotation/issues/93>)
 * Minor fixes
 
-## timaR 2.7.2
+# timaR 2.7.2
 
 * Benchmark update (including negative mode)
 * Spectral comparison + intensity filtering update
@@ -44,7 +44,7 @@
 * Improved parameters documentation
 * Minor fixes
 
-## timaR 2.7.1
+# timaR 2.7.1
 
 * Added parallelization on process_spectra
 * Added sqlite storing for spectra
@@ -53,61 +53,61 @@
 * Improved code documentation
 * Minor fixes
 
-## timaR 2.7.0
+# timaR 2.7.0
 
 * Added MS2 annotation capability (kudos @jorainer for the awesome *Spectra* suite)
 * Added HMDB helpers for both taxo and ISDB
 * Minor fixes
 
-## timaR 2.6.0
+# timaR 2.6.0
 
 * Added Docker container
 * Changed data architecture
 * Minor fixes
 
-## timaR 2.5.6
+# timaR 2.5.6
 
 * Minor fixes
 * Partial functions cleanup
 * Dependencies removal (e.g. metabo-store)
 
-## timaR 2.5.5
+# timaR 2.5.5
 
 * Minor fixes
 * Automation and parameters improvement
 
-## timaR 2.5.4
+# timaR 2.5.4
 
 * Minor fixes
 * Metadata completion improvement
 * Molecular formula and adducts formalism improvement
 
-## timaR 2.5.3
+# timaR 2.5.3
 
 * Imports improvements
 * LOTUS update
 
-## timaR 2.5.2
+# timaR 2.5.2
 
 * Packaging improvements
 
-## timaR 2.5.1
+# timaR 2.5.1
 
 * Improved support for SIRIUS (with new summaries)
 
-## timaR 2.5.0
+# timaR 2.5.0
 
 * Minor fixes
 * LOTUS update
 
-## timaR 2.4.0
+# timaR 2.4.0
 
 * Minor fixes
 * Improved output (#34)
 * Added chemical names and xlogp to output (#33)
 * Added support for case when no consensus is found (#30)
 
-## timaR 2.3.0
+# timaR 2.3.0
 
 * Minor fixes
 * Added support for annotation without MN (#28)
@@ -118,25 +118,25 @@
 * Updated adducts
 * Improved tests code coverage
 
-## timaR 2.2.2
+# timaR 2.2.2
 
 * Minor fixes
 * Additional benchmark
   figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution)
 
-## timaR 2.2.1
+# timaR 2.2.1
 
 * Minor version name fixes
 
-## timaR 2.2.0
+# timaR 2.2.0
 
 * Various fixes
 * Added benchmark ([here](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html))
 
-## timaR 2.1.0
+# timaR 2.1.0
 
 * Fixes, deletion of binary dependencies.
 
-## timaR 2.0.0
+# timaR 2.0.0
 
 * Initial version.
