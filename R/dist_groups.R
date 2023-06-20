@@ -17,24 +17,8 @@ dist_get <- function(d, idx1, idx2) {
   # Convert input to distance matrix
   d <- stats::as.dist(d)
 
-  # Check if idx1 and idx2 are character vectors and convert them to indexes
-  if (is.character(idx1)) {
-    idx1 <- match(idx1, attr(d, "Labels"))
-  }
-  if (is.character(idx2)) {
-    idx2 <- match(idx2, attr(d, "Labels"))
-  }
-
   # Get size of distance matrix
   n <- attr(d, "Size")
-
-  # Check if idx1 and idx2 are within range
-  if (any(is.na(idx1) | (idx1 < 1) | (idx1 > n))) {
-    stop("idx1 out of range")
-  }
-  if (any(is.na(idx2) | (idx2 < 1) | (idx2 > n))) {
-    stop("idx2 out of range")
-  }
 
   # Calculate distance
   i <- pmin(idx1, idx2)
@@ -70,12 +54,6 @@ dist_groups <- function(d, g) {
 
   # Check that the length of g matches the number of observations in d
   dsize <- attr(d, "Size")
-  if (length(g) != dsize) {
-    stop(
-      "Length of grouping vector (g) must equal number of observations in ",
-      "dist object (d)"
-    )
-  }
 
   # Get the labels of the observations in d
   dlabels <- attr(d, "Labels")
@@ -93,16 +71,8 @@ dist_groups <- function(d, g) {
 
   # Create the data frame with the pairs of observations and their distances
   data.frame(
-    Item1 = if (is.null(dlabels)) {
-      idx1
-    } else {
-      dlabels[idx1]
-    },
-    Item2 = if (is.null(dlabels)) {
-      idx2
-    } else {
-      dlabels[idx2]
-    },
+    Item1 = idx1,
+    Item2 = idx2,
     Group1 = g[idx1],
     Group2 = g[idx2],
     Label = factor(ifelse(
