@@ -1,0 +1,170 @@
+---
+#' Annotations related parameters.
+annotations:
+  #' Number of candidates to keep per feature.
+  candidates:
+    #' Number of initial candidates. INTEGER
+    initial: 50
+
+    #' Number of final candidates. INTEGER
+    final: 3
+
+  #' Erase MS2 results and keep MS1 only. BOOLEAN
+  ms1only: no
+
+  #' MS1 annotation related parameters.
+  ms1:
+    #' Thresholds related parameters.
+    thresholds:
+      #' Minimal biological score to keep MS1 only annotation. FLOAT
+      biological: 0.5
+
+      #' Minimal chemical score to keep MS1 only annotation. FLOAT
+      chemical: 0.5
+
+      #' Condition to be used to retain candidates.
+      #' Must be "OR" or "AND".
+      #' Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+      condition: OR
+
+#' Files.
+files:
+  #' Pattern to identify the files. STRING
+  pattern: example
+
+  #' Annotations files.
+  annotations:
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/example_ms1_prepared.tsv.gz
+      - data/interim/annotations/example_gnps_prepared.tsv.gz
+      - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+      - data/interim/annotations/example_sirius_prepared.tsv.gz
+      # - data/interim/annotations/example_exp_rt_prepared.tsv.gz
+
+    #' Final results file. STRING
+    processed: annotations.tsv
+
+    #' Structure organism pairs libraries.
+    sop:
+      #' Merged structure organism pairs library. STRING
+      merged: data/interim/libraries/keys.tsv.gz
+
+  #' Features files.
+  features:
+    #' Prepared features file. STRING
+    prepared: data/interim/features/example_features.tsv.gz
+
+  #' Networks files.
+  networks:
+    #' Spectral networks files.
+    spectral:
+      #' Components files.
+      components:
+        #' Prepared edges file. STRING
+        prepared: data/interim/features/example_components_prepared.tsv.gz
+
+      #' Edges files.
+      edges:
+        #' Prepared edges file. STRING
+        prepared: data/interim/features/example_edges.tsv.gz
+
+  #' Taxa files.
+  taxa:
+    #' Taxonomically informed features file. STRING
+    prepared: data/interim/taxa/example_taxed.tsv.gz
+
+#' Weights to apply to each part of the final score.
+weights:
+  #' Global weights.
+  global:
+    #' Weight for the biological part. FLOAT
+    biological: 0.500
+
+    #' Weight for the chemical part. FLOAT
+    chemical: 0.166
+
+    #' Weight for the spectral part. FLOAT
+    spectral: 0.333
+
+  #' Weights for the biological part.
+  biological:
+    #' Score for a biological domain match. FLOAT
+    domain: 0.10
+
+    #' Score for a biological kingdom match. FLOAT
+    kingdom: 0.20
+
+    #' Score for a biological phylum match. FLOAT
+    phylum: 0.30
+
+    #' Score for a biological class match. FLOAT
+    class: 0.40
+
+    #' Score for a biological order match. FLOAT
+    order: 0.50
+
+    #' Score for a biological infraorder match. FLOAT
+    infraorder: 0.55
+
+    #' Score for a biological family match. FLOAT
+    family: 0.60
+
+    #' Score for a biological subfamily match. FLOAT
+    subfamily: 0.65
+
+    #' Score for a biological tribe match. FLOAT
+    tribe: 0.70
+
+    #' Score for a biological subtribe match. FLOAT
+    subtribe: 0.75
+
+    #' Score for a biological genus match. FLOAT
+    genus: 0.80
+
+    #' Score for a biological subgenus match. FLOAT
+    subgenus: 0.85
+
+    #' Score for a biological species match. FLOAT
+    species: 0.90
+
+    #' Score for a biological subspecies match. FLOAT
+    subspecies: 0.95
+
+    #' Score for a biological variety match. FLOAT
+    variety: 1.00
+
+  #' Weights for the chemical part.
+  chemical:
+    #' Score for a classyfire match.
+    cla:
+      #' Score for a chemical kingdom match. FLOAT
+      kingdom: 0.25
+
+      #' Score for a chemical superclass match. FLOAT
+      superclass: 0.50
+
+      #' Score for a chemical class match. FLOAT
+      class: 0.75
+
+      #' Score for a chemical parent match. FLOAT
+      parent: 1.00
+
+    #' Score for a NPClassifier match.
+    npc:
+      #' Score for a chemical kingdom match. FLOAT
+      pathway: 0.333
+
+      #' Score for a chemical superclass match. FLOAT
+      superclass: 0.666
+
+      #' Score for a chemical class match. FLOAT
+      class: 1.000
+
+#' Options.
+options:
+  #' Do not use it. BOOLEAN
+  force: no
+
+  #' Summarise results to one row per feature. BOOLEAN
+  summarise: yes

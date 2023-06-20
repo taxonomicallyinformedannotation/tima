@@ -1,0 +1,108 @@
+---
+#' Annotations related parameters.
+annotations:
+  #' MS2 annotation related parameters.
+  ms2:
+    #' Perform approximative matching without precursor matching? BOOLEAN
+    approx: no
+
+    #' Similarity method to be used to compare spectra.
+    #' Currently "gnps", "navdist", "ndotproduct",
+    # "neuclidean", "nspectraangle" supported. STRING
+    method: ndotproduct
+
+    #' Thresholds
+    thresholds:
+      #' Condition to be used to retain candidates.
+      #' Must be "OR" or "AND".
+      #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
+      condition: OR
+
+      #' For peaks.
+      peaks:
+        #' Minimal shared peaks (absolute). INTEGER
+        absolute: 6
+
+        #' Minimal shared peaks (ratio). FLOAT
+        ratio: 0.2
+
+      #' Similarity threhsold. FLOAT
+      similarity: 0.2
+
+#' Files.
+files:
+  #' Annotations files.
+  annotations:
+    #' Raw annotations files.
+    raw:
+      #' List of spectral matching results. STRING
+      spectral:
+        - data/interim/annotations/example_spectral_matches.tsv.gz
+
+  #' Libraries files.
+  libraries:
+    #' Spectral libraries. STRING
+    spectral:
+      #' Experimental libraries
+      exp:
+        #' List of negative experimental spectral libraries. STRING
+        neg:
+          - data/interim/libraries/spectra/exp/internal_neg.rds
+
+        #' List of positive experimental spectral libraries. STRING
+        pos:
+          - data/interim/libraries/spectra/exp/internal_pos.rds
+
+      #' In silico libraries
+      is:
+        #' List of negative in silico spectral libraries. STRING
+        neg:
+          - data/interim/libraries/spectra/is/lotus_neg.rds
+
+        #' List of positive in silico spectral libraries. STRING
+        pos:
+          - data/interim/libraries/spectra/is/lotus_pos.rds
+
+  #' Spectral files. STRING
+  spectral:
+    #' Raw spectral file. STRING
+    raw: data/source/example_spectra.mgf
+
+#' MS related parameters.
+ms:
+  #' Intensity related parameters.
+  intensity:
+    #' Thresholds related parameters.
+    thresholds:
+      #' Intensity threshold for MS2. INTEGER
+      ms2: 10
+
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+  #' Tolerances.
+  tolerances:
+    #' For mass.
+    mass:
+      #' Relative in ppm.
+      ppm:
+        #' Relative mass tolerance for MS2 in ppm. FLOAT
+        ms2: 5
+
+      #' Absolute in Dalton.
+      dalton:
+        #' Absolute mass tolerance for MS2 in Dalton. FLOAT
+        ms2: 0.01
+
+    #' For retention time.
+    rt:
+      #' Retention time tolerance in minutes. FLOAT
+      minutes: 0.05
+
+#' Options.
+options:
+  #' Skip time-consuming steps. BOOLEAN
+  fast: yes
+
+  #' Execute processes in parallel when available. BOOLEAN
+  parallel: yes

@@ -1,0 +1,16 @@
+.DS_Store
+.httr-oauth
+.idea
+.future
+.Rprofile
+.Rproj.user
+.Rhistory
+.Rdata
+.vscode
+
+docs
+renv
+
+pkg.lock
+
+_targets

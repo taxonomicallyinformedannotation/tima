@@ -1,0 +1,3 @@
+---
+main:
+  script: inst/pipelines/_targets.R

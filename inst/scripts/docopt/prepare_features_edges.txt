@@ -1,0 +1,16 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_features_edges.R --fil-net-spe-edg-pro data/interim/features/example_edges.tsv.gz
+
+Usage: 
+  prepare_features_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--names-source=<names-source>] [--names-target=<names-target>]
+
+Arguments:
+  fil-net-spe-edg-raw        Raw edges file. STRING
+  fil-net-spe-edg-pro        Prepared edges file. STRING
+
+  names-source               Name of "source IDs" variable in the input. STRING
+  names-target               Name of "target IDs" variable in the input. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

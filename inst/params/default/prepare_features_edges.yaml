@@ -1,0 +1,24 @@
+---
+#' Files.
+files:
+  #' Networks files.
+  networks:
+    #' Spectral networks files.
+    spectral:
+      #' Edges files.
+      edges:
+        #' Raw edges file. STRING
+        raw:
+          - data/interim/features/example_edges_spectra.tsv.gz
+          - data/interim/features/example_edges_masses.tsv.gz
+
+        #' Prepared edges file. STRING
+        prepared: data/interim/features/example_edges.tsv.gz
+
+#' Names of the different variables in the input files.
+names:
+  #' Name of "source IDs" variable in the input. STRING
+  source: CLUSTERID1
+
+  #' Name of "target IDs" variable in the input. STRING
+  target: CLUSTERID2

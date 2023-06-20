@@ -1,0 +1,46 @@
+---
+#' Files.
+files:
+  #' Annotations files.
+  annotations:
+    #' Raw annotations files.
+    raw:
+      #' Directory containing the sirius results. STRING
+      sirius: data/interim/annotations/example_sirius
+
+    #' List of prepared annotations. STRING
+    prepared:
+      - data/interim/annotations/example_sirius_prepared.tsv.gz
+
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Merged structure organism pairs library.
+      merged:
+        #' Structures libraries.
+        structures:
+          #' Structures 2D and 3D. STRING
+          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+
+          #' Structures metadata. STRING
+          metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+
+          #' Structures names. STRING
+          names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+
+          #' Structures taxonomies.
+          taxonomies:
+            #' Classyfire structures taxonomy. STRING
+            cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+
+            #' NPClassifier structures taxonomy. STRING
+            npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
+
+#' Tools used for each step.
+tools:
+  #' Taxonomies related parameters.
+  taxonomies:
+    #' Chemical taxonomy used for matching.
+    #' Currently only "npc" or supported. STRING
+    chemical: npc

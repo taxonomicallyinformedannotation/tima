@@ -1,0 +1,24 @@
+start <- Sys.time()
+
+require(
+  package = "timaR",
+  quietly = TRUE
+)
+
+# step <- "prepare_annotations_sirius"
+# paths <- parse_yaml_paths()
+# params <- get_params(step = step)
+
+log_debug(
+  "This script",
+  crayon::green("formats SIRIUS results")
+)
+log_debug("Authors: ", crayon::green("AR"), "\n")
+log_debug("Contributors: ...")
+
+# prepare_annotations_sirius()
+targets::tar_make(names = matches("ann_sir_pre"))
+
+end <- Sys.time()
+
+log_debug("Script finished in", crayon::green(format(end - start)))

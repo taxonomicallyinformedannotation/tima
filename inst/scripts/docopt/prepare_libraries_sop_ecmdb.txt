@@ -1,0 +1,13 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_libraries_sop_ecmdb.R --fil-lib-sop-raw-ecm data/source/libraries/sop/ecmdb.json.zip --fil-lib-sop-pre data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+
+Usage: 
+  prepare_libraries_sop_ecmdb.R [--fil-lib-sop-raw-ecm=<fil-lib-sop-raw-ecm>] [--fil-lib-sop-pre=<fil-lib-sop-pre>]
+
+Arguments:
+  fil-lib-sop-raw-ecm        ECMDB raw structure organism pairs library. STRING
+  fil-lib-sop-pre            List of prepared structure organism pairs libraries. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

@@ -1,0 +1,17 @@
+---
+home:
+  title: Taxonomically Informed Metabolite Annotation
+  description: Taxonomically Informed Metabolite Annotation
+template:
+  bootstrap: 5
+  params:
+    google_site_verification: Bt77rpBuC_R-0p62TWtA_ba5rvx-PuSEMv4LHg1UsOo
+  opengraph:
+    image:
+      src: man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
+url: https://taxonomicallyinformedannotation.github.io/tima-r
+figure:
+  fig.ext: svg
