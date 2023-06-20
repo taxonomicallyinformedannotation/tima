@@ -1,0 +1,37 @@
+---
+#' Files.
+files:
+  #' Pattern used to recognize the files. STRING
+  pattern: example
+  #' Features files.
+  features:
+    #' Raw features file. STRING
+    raw: data/source/example_features.csv
+  #' Spectral files.
+  spectral:
+    #' Raw spectral file. STRING
+    raw: data/source/example_spectra.mgf
+
+#' GNPS related parameters.
+gnps:
+  #' GNPS job ID. STRING
+  id: 41c6068e905d482db5698ad81d145d7c
+  #' Workflow used within GNPS.
+  #' Currently "fbmn" or "classical" supported. STRING
+  workflow: fbmn
+
+#' MS related parameters.
+ms:
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
+#' Organisms related parameters.
+organisms:
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
+  taxon: ~
+
+#' Options.
+options:
+  #' Summarise results to one row per feature. BOOLEAN
+  summarise: yes

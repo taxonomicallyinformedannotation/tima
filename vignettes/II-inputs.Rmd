@@ -1,0 +1,379 @@
+---
+title: "2 Inputs: Getting everything you need"
+author: "Adriano Rutz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2 Inputs: Getting everything you need}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_knit$set(root.dir = "..")
+```
+
+This vignette describes how to prepare:
+
+* All parameters you need
+* All inputs you need
+
+```{r change-tests, include = FALSE}
+source(file = "inst/scripts/change_tests.R")
+```
+
+## Parameters
+
+As mentioned previously, almost all steps require parameters.
+Some pre-defined parameters are given in `inst/params/default` directory.
+Those will help you understanding how the workflow works so you can adapt them later to your own data.
+
+So first, let's have a look at the structure of the parameters:
+
+```{r params-default, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("par_def"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+### Copy
+
+Now, you want to copy them and adapt them to your own files to get something like:
+
+```{r params-user-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("par_usr"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+### Prepare
+
+To do so, simply:
+
+```{r prepare-params-1, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_params.R")
+```
+
+And now, you should get the following:
+
+```{r params-user-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("par_usr"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+See how your targets changed?
+The values you adapted in `inst/prepare_params.yaml` were automatically propagated to all sub-files in `inst/params/user`.
+
+And everything is stored in case you re-perform it, the beauty of `{targets}`!
+
+```{r prepare-params-2, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_params.R")
+```
+
+You can easily fine tune all parameters in each file and only the steps impacted by these modifications will run!
+
+### Adapt
+
+Your final prepared parameters look now like:
+
+```{r params-final, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("par"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+## Inputs
+
+### Dictionaries
+
+The package already comes with some default dictionaries.
+These dictionaries are needed among the pipeline and it is recommended **NOT** to touch them.
+If you are confident in doing so, feel free.
+
+```{r dictionaries, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("dic"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+### Your own file(s)
+
+The most important file you need to provide is an MGF file containing the spectra you want to annotate.
+
+If you already ran a GNPS job, you can simply do:
+
+```{r get-gnps, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_gnps_tables.R")
+```
+
+To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
+
+```{r unlink-spectra, include = FALSE}
+unlink("data/source/example_spectra.mgf")
+```
+
+```{r get-spectra, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_example_spectra.R")
+```
+
+### Libraries
+
+#### Structure-Organism Pairs
+
+##### LOTUS
+
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://doi.org/10.7554/eLife.70780>] with
+**T**axonomically
+**I**nformed
+**M**etabolite
+**A**nnotation in mind,
+we provide it here as a starting point for your structure-organism pairs library.
+
+```{r input, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("input"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+You can easily get it by running:
+
+```{r get-lotus, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_lotus.R")
+```
+
+```{r prepare-lotus-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = matches("lib_sop_lot$"),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+You then need to format it as expected by the pipeline, to do so:
+
+```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
+```
+
+```{r prepare-lotus-3, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = matches("lib_sop_lot"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+As you can see, the target seems outdated.
+In reality, we force it to search if a new version of LOTUS exists each time.
+If a newer version exists, it will fetch it and re-run needed steps accordingly.
+
+#### ECMDB
+
+If you want, you can also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
+
+To do so, you need to:
+
+```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
+```
+
+```{r prepare-ecmdb-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = matches("lib_sop_ecm"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+##### HMDB
+
+You can do the same with the ones coming from HMDB (not running by default as quite long):
+
+```{r get-hmdb, eval=FALSE, include=TRUE}
+source(file = "inst/scripts/get_hmdb.R")
+```
+
+As previously, you then need to prepare the library:
+
+```{r prepare-hmdb, eval=FALSE, include=TRUE}
+source(file = "inst/scripts/prepare_hmdb.R")
+```
+
+For these first steps, you do not need to change any parameters as they are implemented *by default*.
+
+##### Other libraries
+
+As we want our tool to be flexible, you can also add your own library to LOTUS.
+You just need to format it in order to be compatible.
+As example, we prepared some ways too format closed, *in house* libraries.
+If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
+
+Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`
+
+```{r prepare-closed, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_sop_closed.R")
+```
+
+##### Merging
+
+Once you have all your sub-libraries prepared, you are ready to merge them in a single file that will be used for the next steps.
+
+Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_merged.yaml`.
+
+At this step, if you want to, you can restrict your library to specific taxa only.
+We do not advise doing so, but we offer you the possibility to do it.
+
+```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_sop_merged.R")
+```
+
+You now should have a nice custom structure-organism pairs library for the next steps!
+
+```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("lib_sop"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+#### Adducts
+
+The next library you need is an adducts library!
+As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS^1^ annotation later on.
+
+```{r adducts-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("lib_add"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+As you can see, it depends on the previously built library.
+
+Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_adducts.yaml`.
+
+```{r adducts-2, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_adducts.R")
+```
+
+#### Spectra
+
+Finally, you need a spectral library to perform MS^2^-based annotation.
+
+##### Experimental
+
+You can of course use your own experimental spectral library to perform MS^2^ annotation.
+We currently only support spectral libraries in MGF format.
+
+To get a small example:
+
+```{r spectra-rt, results="hide", message=FALSE, warning=FALSE}
+get_file(
+  url = paths$urls$examples$spectral_lib_mini$with_rt,
+  export = paths$data$source$libraries$spectra$exp$with_rt
+)
+```
+
+We are currently working to get all MONA and GNPS experimental spectra easily available.
+
+However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.
+
+So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available.
+
+##### *In silico*
+
+As the availability of experimental spectra is limited, we can take advantage of *in silico* generated spectra.
+
+#### LOTUS
+
+We generated an *in silico* spectral library of the structures found in LOTUS using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465).
+For more info, see <https://doi.org/10.5281/zenodo.5607185>.
+
+In order to get it:
+
+```{r get-isdb-lotus, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_isdb_lotus.R")
+```
+
+And as previously, then prepare it:
+
+```{r prepare-isdb-lotus-1, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
+```
+
+```{r prepare-isdb-lotus-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("lib_spe"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+As you can see, both MS polarities are available!
+
+Again, you can also complement with the in silico spectra from HMDB (not running by default as quite long):
+
+#### HMDB
+
+```{r get-isdb-hmdb, eval=FALSE, include=TRUE}
+source(file = "inst/scripts/get_isdb_hmdb.R")
+```
+
+You are finally ready for the next step, with all dictionaries, inputs, and libraries you need!
+
+```{r libraries, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("lib"),
+  exclude = c(
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-formatting.html).

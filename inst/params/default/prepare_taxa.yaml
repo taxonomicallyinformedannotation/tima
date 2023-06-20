@@ -1,0 +1,49 @@
+---
+#' Files.
+files:
+  #' Features files.
+  features:
+    #' Raw features file. STRING
+    raw: data/source/example_features.csv
+
+  #' Taxa files.
+  taxa:
+    #' OPTIONAL. If tool is "manual".
+    #' Biological origin metadata file. STRING
+    raw: data/source/example_metadata.tsv
+
+    #' Taxonomically informed features file. STRING
+    prepared: data/interim/taxa/example_taxed.tsv.gz
+
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Merged structure organism pairs library.
+      merged:
+        #' Organisms libraries.
+        organisms:
+          #' Organisms taxonomies.
+          taxonomies:
+            #' OTT organisms taxonomy. STRING
+            ott: data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
+
+#' Names of the different variables in the input files.
+names:
+  #' The file(s) extension is present in the sample name. BOOLEAN
+  extension: yes
+
+  #' Name of "feature IDs" variable in the input. STRING
+  features: row ID
+
+  #' Name of the "taxon name" variable in the input. STRING
+  taxon: ATTRIBUTE_species
+
+#' Organisms related parameters.
+organisms:
+  #' Number of organisms to keep per feature. INTEGER
+  candidates: 1
+
+  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' Example: "Homo sapiens". STRING
+  taxon: ~

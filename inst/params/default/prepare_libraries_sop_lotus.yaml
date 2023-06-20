@@ -1,0 +1,15 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Raw structure organism pairs libraries.
+      raw:
+        #' Lotus raw structure organism pairs library. STRING
+        lotus: data/source/libraries/sop/lotus.csv.gz
+
+      #' List of prepared structure organism pairs libraries. STRING
+      prepared:
+        - data/interim/libraries/sop/lotus_prepared.tsv.gz

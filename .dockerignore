@@ -1,0 +1,12 @@
+.DS_Store
+.httr-oauth
+.idea
+.Rproj.user
+.Rhistory
+.Rdata
+.vscode
+
+.git
+.gitignore
+manifest.json
+rsconnect/

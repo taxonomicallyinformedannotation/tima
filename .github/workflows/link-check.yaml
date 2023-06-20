@@ -1,0 +1,23 @@
+---
+# from: https://github.com/gaurav-nelson/github-action-markdown-link-check
+
+name: Check Markdown links
+
+permissions: read-all
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1

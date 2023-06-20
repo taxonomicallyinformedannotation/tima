@@ -1,0 +1,3 @@
+PRE_COMMANDS:
+  - command: R --slave -e 'install.packages(c("lintr"))'
+    cwd: "root"

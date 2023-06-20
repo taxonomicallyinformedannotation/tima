@@ -1,0 +1,15 @@
+^renv$
+^renv\.lock$
+^timaR\.Rproj$
+^\.Rproj\.user$
+^_pkgdown\.yml$
+^data$
+^docs$
+^pkgdown$
+^LICENSE\.md$
+^codecov\.yml$
+^\.github$
+^README\.Rmd$
+^cran-comments\.md$
+^\.dockerignore$
+^codemeta\.json$

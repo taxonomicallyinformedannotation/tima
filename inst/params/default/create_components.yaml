@@ -1,0 +1,16 @@
+---
+#' Files.
+files:
+  #' Networks files.
+  networks:
+    #' Spectral networks files.
+    spectral:
+      #' Edges files.
+      edges:
+        #' Prepared edges file. STRING
+        prepared: data/interim/features/example_edges.tsv.gz
+
+      #' Components files.
+      components:
+        #' Raw components file. STRING
+        raw: data/interim/features/example_components.tsv.gz

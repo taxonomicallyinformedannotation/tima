@@ -1,0 +1,15 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Raw structure organism pairs libraries.
+      raw:
+        #' ECMDB structure organism pairs library. STRING
+        ecmdb: data/source/libraries/sop/ecmdb.json.zip
+
+      #' List of prepared structure organism pairs libraries. STRING
+      prepared:
+        - data/interim/libraries/sop/ecmdb_prepared.tsv.gz

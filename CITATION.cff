@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+message: "Please cite the following works when using this software."
+authors:
+  - family-names: Rutz
+    given-names: Adriano
+    orcid: https://orcid.org/0000-0003-0443-9902
+  - family-names: Bisson
+    given-names: Jonathan
+    orcid: https://orcid.org/0000-0003-1640-9989
+  - family-names: Allard
+    given-names: Pierre-Marie
+    orcid: https://orcid.org/0000-0003-3389-2191
+title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
+url: "https://github.com/taxonomicallyinformedannotation/tima-r"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: Rutz
+    given-names: Adriano
+    orcid: https://orcid.org/0000-0003-0443-9902
+  - family-names: Dounoue-Kubo
+    given-names: Miwa
+  - family-names: Ollivier
+    given-names: Simon
+    orcid: https://orcid.org/0000-0002-7671-1736
+  - family-names: Bisson
+    given-names: Jonathan
+    orcid: https://orcid.org/0000-0003-1640-9989
+  - family-names: Bagheri
+    given-names: Mohsen
+  - family-names: Saesong
+    given-names: Tongchai
+  - family-names: Ebrahimi
+    given-names: Samad Nejad
+    orcid: https://orcid.org/0000-0003-2167-8032
+  - family-names: Ingkaninan
+    given-names: Kornkanok
+    orcid: https://orcid.org/0000-0002-4415-8489
+  - family-names: Wolfender
+    given-names: Jean-Luc
+    orcid: https://orcid.org/0000-0002-0125-952X
+  - family-names: Allard
+    given-names: Pierre-Marie
+    orcid: https://orcid.org/0000-0003-3389-2191
+  title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
+  year: 2019
+  journal: Frontiers in Plant Science
+  volume: 10
+  doi: 10.3389/fpls.2019.01329
+  url: "https://dx.doi.org/10.3389/fpls.2019.01329"
+  identifiers:
+    - type: "doi"
+      value: "10.3389/fpls.2019.01329"
+    - type: "url"
+      value: "https://dx.doi.org/10.3389/fpls.2019.01329"
+    - type: "other"
+      value: "urn:issn:1664-462X"

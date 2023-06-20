@@ -1,0 +1,15 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Raw structure organism pairs libraries.
+      raw:
+        #' Closed structure organism pairs library. STRING
+        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+
+      #' List of prepared structure organism pairs libraries. STRING
+      prepared:
+        - data/interim/libraries/sop/closed_prepared.tsv.gz

@@ -1,0 +1,131 @@
+Package: timaR
+Title: Taxonomically Informed Metabolite Annotation
+Version: 2.8.1
+Authors@R: c(
+    person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0443-9902")),
+    person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
+           comment = c(ORCID = "0000-0003-3389-2191"))
+  )
+Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
+Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
+License: GPL (>= 3)
+URL: https://github.com/taxonomicallyinformedannotation/tima-r, https://taxonomicallyinformedannotation.github.io/tima-r/
+BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
+Depends:
+    R (>= 4.3.0)
+Imports:
+    BiocParallel (>= 1.34.2),
+    CompoundDb (>= 1.4.0),
+    crayon (>= 1.5.2),
+    docopt (>= 0.7.1),
+    dplyr (>= 1.1.2),
+    httr (>= 1.4.6),
+    igraph (>= 1.4.3),
+    jsonlite (>= 1.8.5),
+    MetaboAnnotation (>= 1.4.1),
+    MsBackendMgf (>= 1.8.0),
+    MsCoreUtils (>= 1.12.0),
+    parallelly (>= 1.36.0),
+    pbmcapply (>= 1.5.1),
+    R.utils (>= 2.12.2),
+    rotl (>= 3.1.0),
+    Spectra (>= 1.10.1),
+    stats,
+    stringi (>= 1.7.12),
+    tidytable (>= 0.10.1),
+    tidyfst (>= 1.7.6),
+    utils,
+    yaml (>= 2.3.7)
+Suggests: 
+    BiocManager,
+    bs4Dash,
+    clustermq,
+    future,
+    gt,
+    knitr,
+    markdown,
+    pingr,
+    rstudioapi,
+    shiny,
+    shinyWidgets,
+    shinybusy,
+    shinyhelper,
+    shinyjs,
+    shinyvalidate,
+    spelling,
+    targets,
+    tarchetypes,
+    testthat,
+    visNetwork
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Collate:
+    'annotate_masses.R'
+    'annotate_spectra.R'
+    'clean_bio.R'
+    'clean_chemo.R'
+    'complement_metadata_structures.R'
+    'create_adducts_neg.R'
+    'create_adducts_pos.R'
+    'create_components.R'
+    'create_dir.R'
+    'create_edges_parallel.R'
+    'create_edges_progress.R'
+    'create_edges_spectra.R'
+    'decorate_bio.R'
+    'decorate_chemo.R'
+    'decorate_masses.R'
+    'dist_groups.R'
+    'export_output.R'
+    'export_params.R'
+    'export_spectra.R'
+    'export_spectra_2.R'
+    'extract_spectra.R'
+    'get_file.R'
+    'get_gnps_tables.R'
+    'get_last_version_from_zenodo.R'
+    'get_organism_taxonomy_ott.R'
+    'get_params.R'
+    'globals.R'
+    'harmonize_names_sirius.R'
+    'harmonize_spectra.R'
+    'import_spectra.R'
+    'keep_peaks.R'
+    'log_debug.R'
+    'normalize_peaks.R'
+    'parse_cli_params.R'
+    'parse_yaml_params.R'
+    'parse_yaml_paths.R'
+    'pre_harmonize_names_sirius.R'
+    'prepare_params.R'
+    'prepare_annotations_gnps.R'
+    'prepare_annotations_sirius.R'
+    'prepare_annotations_spectra.R'
+    'prepare_features_tables.R'
+    'prepare_features_components.R'
+    'prepare_features_edges.R'
+    'prepare_libraries_adducts.R'
+    'prepare_libraries_sop_closed.R'
+    'prepare_libraries_sop_ecmdb.R'
+    'prepare_libraries_sop_lotus.R'
+    'prepare_libraries_sop_merged.R'
+    'prepare_libraries_spectra.R'
+    'prepare_taxa.R'
+    'round_reals.R'
+    'remove_above_precursor.R'
+    'replace_id.R'
+    'sanitize_spectra.R'
+    'split_tables_sop.R'
+    'weight_annotations.R'
+    'weight_bio.R'
+    'weight_chemo.R'
+VignetteBuilder:
+    knitr
+biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
+X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
+Language: en-US
