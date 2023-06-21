@@ -12,7 +12,7 @@ services:
     image: adafede/tima-r
     networks:
       - service-service-frontend
-    pid: "container:tima-full"
+    pid: "container:tima_1"
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
@@ -34,7 +34,7 @@ services:
     image: adafede/tima-r
     networks:
       - service-service-frontend
-    pid: "container:tima-gui"
+    pid: "container:tima_2"
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
@@ -53,7 +53,7 @@ services:
     image: adafede/tima-r
     networks:
       - service-service-frontend
-    pid: "container:tima-mini"
+    pid: "container:tima_3"
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
