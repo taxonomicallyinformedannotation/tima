@@ -11,6 +11,7 @@ utils::globalVariables(c(
 #'
 #' @param df Dataframe containing your organism(s) name(s)
 #' @param url url of the ott api (for testing purposes)
+#' @param retry Boolean. Retry with generic epithet
 #'
 #' @return NULL
 #'
@@ -18,7 +19,8 @@ utils::globalVariables(c(
 #'
 #' @examples NULL
 get_organism_taxonomy_ott <- function(df,
-                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about") {
+                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about",
+                                      retry = TRUE) {
   organism_table <- df |>
     dplyr::mutate(organism = organism |>
       trimws()) |>
@@ -99,7 +101,7 @@ get_organism_taxonomy_ott <- function(df,
       dplyr::filter(!is.na(ott_id)) |>
       dplyr::distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id)) {
+    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) & retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         dplyr::filter(!is.na(ott_id))

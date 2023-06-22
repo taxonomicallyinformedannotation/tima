@@ -2,7 +2,7 @@
 
 # timaR 2.8.1
 
-* Linting
+* Added `retry` parameter to `get_organism_taxonomy_ott`
 * Dependencies update
 * Replace `extdata` loading
 * Moved `/params` and `paths.yaml` to `/inst` as more standard. (see <https://r-pkgs.org/misc.html#other-directories>)
