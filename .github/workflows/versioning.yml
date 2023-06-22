@@ -1,8 +1,6 @@
 ---
 name: Keep the versions up-to-date
 
-permissions: read-all
-
 on:
   release:
     types:
