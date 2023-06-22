@@ -154,7 +154,7 @@ prepare_libraries_sop_merged <-
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
       table_organisms_taxonomy_ott_full <-
         table_organisms_taxonomy_ott_2 |>
-        get_organism_taxonomy_ott()
+        get_organism_taxonomy_ott(retry = FALSE)
 
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>

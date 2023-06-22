@@ -6,13 +6,16 @@
 \usage{
 get_organism_taxonomy_ott(
   df,
-  url = "https://api.opentreeoflife.org/v3/taxonomy/about"
+  url = "https://api.opentreeoflife.org/v3/taxonomy/about",
+  retry = TRUE
 )
 }
 \arguments{
 \item{df}{Dataframe containing your organism(s) name(s)}
 
 \item{url}{url of the ott api (for testing purposes)}
+
+\item{retry}{Boolean. Retry with generic epithet}
 }
 \description{
 This function retrieves taxonomy from the Open Tree of Life taxonomy
