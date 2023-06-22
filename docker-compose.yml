@@ -7,8 +7,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 4G
+          cpus: "0.8"
+          memory: 8G
     image: adafede/tima-r
     networks:
       - service-service-frontend
@@ -25,8 +25,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 4G
+          cpus: "0.8"
+          memory: 8G
     ports:
       - "127.0.0.1:3838:3838"
       - "127.0.0.1:3839:3839"
@@ -46,8 +46,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 4G
+          cpus: "0.8"
+          memory: 8G
     image: adafede/tima-r
     networks:
       - service-service-frontend
