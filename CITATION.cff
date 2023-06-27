@@ -47,11 +47,11 @@ preferred-citation:
   journal: Frontiers in Plant Science
   volume: 10
   doi: 10.3389/fpls.2019.01329
-  url: "https://dx.doi.org/10.3389/fpls.2019.01329"
+  url: "https://doi.org/10.3389/fpls.2019.01329"
   identifiers:
     - type: "doi"
       value: "10.3389/fpls.2019.01329"
     - type: "url"
-      value: "https://dx.doi.org/10.3389/fpls.2019.01329"
+      value: "https://doi.org/10.3389/fpls.2019.01329"
     - type: "other"
       value: "urn:issn:1664-462X"
