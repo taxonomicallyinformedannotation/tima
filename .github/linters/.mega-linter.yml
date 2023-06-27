@@ -1,0 +1,19 @@
+# Configuration file for MegaLinter
+# See all available variables at https://megalinter.io/configuration/ and in linters documentation
+# ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+APPLY_FIXES: all
+# ENABLE: # If you use ENABLE variable, all other languages/formats/tooling formats will be disabled by default
+# ENABLE_LINTERS: # If you use ENABLE_LINTERS variable, all other linters will be disabled by default
+DISABLE_ERRORS_LINTERS:
+  - SPELL
+  - MARKDOWN_MARKDOWN_LINK_CHECK
+  - REPOSITORY_KICS
+  - REPOSITORY_CHECKOV
+  - R_LINTR
+  - COPYPASTE_JSCPD
+MARKDOWN_FILTER_REGEX_EXCLUDE: '(LICENSE\.md|docs/NEWS\.md)'
+MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
+PRE_COMMANDS:
+  - command: R --slave -e 'install.packages(c("lintr"))'
+    cwd: "root"
+PRINT_ALL_FILES: false
