@@ -5,10 +5,11 @@
 [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
 [![License report action test](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![MegaLinter](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/MegaLinter/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/mega-linter.yml)
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml)
 <!-- badges: end -->
 
-The initial work is available at <https://dx.doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.
+The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.
 The workflow is illustrated below.
 
 ![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/tima.svg)
@@ -85,39 +86,39 @@ According to which steps you used, please give credit to the authors of the tool
 
 ### TIMA
 
-General: <https://dx.doi.org/10.3389/fpls.2019.01329>
+General: <https://doi.org/10.3389/fpls.2019.01329>
 
-⚠️ Do not forget to cite which version you used: <https://dx.doi.org/10.5281/zenodo.5797920>
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5797920>
 
 ### LOTUS
 
-General: <https://dx.doi.org/10.7554/eLife.70780>
+General: <https://doi.org/10.7554/eLife.70780>
 
-⚠️ Do not forget to cite which version you used: <https://dx.doi.org/10.5281/zenodo.5794106>
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5794106>
 
 ### ISDB
 
-General: <https://dx.doi.org/10.1021/acs.analchem.5b04804>
+General: <https://doi.org/10.1021/acs.analchem.5b04804>
 
-⚠️ Do not forget to cite which version you used: <https://dx.doi.org/10.5281/zenodo.5607185>
+⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5607185>
 
 ### GNPS
 
-General: <https://dx.doi.org/10.1038/nbt.3597>
+General: <https://doi.org/10.1038/nbt.3597>
 
 ### SIRIUS
 
-General: <https://dx.doi.org/10.1038/s41592-019-0344-8>
+General: <https://doi.org/10.1038/s41592-019-0344-8>
 
-- *CSI:FingerId*: <https://dx.doi.org/10.1073/pnas.1509788112>
-- *ZODIAC*: <https://dx.doi.org/10.1038/s42256-020-00234-6>
-- *CANOPUS*: <https://dx.doi.org/10.1038/s41587-020-0740-8>
-- *COSMIC*: <https://dx.doi.org/10.1038/s41587-021-01045-9>
+- *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
+- *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
+- *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
+- *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
 
-- The *RforMassSpectrometry* packages suite for MS2 matching: <https://dx.doi.org/10.3390/metabo12020173>
-- ECMDB 2.0: <https://dx.doi.org/10.1093/nar/gkv1060>
-- HMDB 5.0: <https://dx.doi.org/10.1093/nar/gkab1062>
-- NPClassifier: <https://dx.doi.org/10.1021/acs.jnatprod.1c00399>
-- ROTL: <https://dx.doi.org/10.1111/2041-210X.12593>
+- The *RforMassSpectrometry* packages suite for MS2 matching: <https://doi.org/10.3390/metabo12020173>
+- ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
+- HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
+- NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+- ROTL: <https://doi.org/10.1111/2041-210X.12593>

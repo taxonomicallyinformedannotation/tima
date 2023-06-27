@@ -10,7 +10,7 @@
 
 docs
 renv
-
+megalinter-reports
 pkg.lock
 
 _targets

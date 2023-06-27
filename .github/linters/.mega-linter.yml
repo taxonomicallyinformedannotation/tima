@@ -2,6 +2,8 @@
 # See all available variables at https://megalinter.io/configuration/ and in linters documentation
 # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
 APPLY_FIXES: all
+APPLY_FIXES_EVENT: all
+APPLY_FIXES_MODE: pull_request
 # ENABLE: # If you use ENABLE variable, all other languages/formats/tooling formats will be disabled by default
 # ENABLE_LINTERS: # If you use ENABLE_LINTERS variable, all other linters will be disabled by default
 DISABLE_ERRORS_LINTERS:
