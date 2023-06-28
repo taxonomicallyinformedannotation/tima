@@ -93,6 +93,7 @@ get_organism_taxonomy_ott <- function(df,
           )
         }
       )
+    log_debug("Request finished!")
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
       dplyr::bind_rows() |>
@@ -166,6 +167,7 @@ get_organism_taxonomy_ott <- function(df,
         include_lineage = TRUE,
         include_terminal_descendants = TRUE
       )
+      log_debug("Taxonomy retrieved!")
 
       taxon_lineage <- taxon_info |>
         rotl::tax_lineage()

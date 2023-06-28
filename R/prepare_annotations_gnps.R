@@ -113,7 +113,7 @@ prepare_annotations_gnps <-
             as.numeric(Precursor_MZ),
           error_rt = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,
           error_rt,
@@ -156,7 +156,7 @@ prepare_annotations_gnps <-
           ## mirror sirius
           count_peaks_explained = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           error_mz,
           error_rt,

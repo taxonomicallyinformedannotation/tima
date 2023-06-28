@@ -282,11 +282,11 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       nrow(
         df_final |>
           ## else doesn't work if some are empty
-          dplyr::distinct(structure_inchikey_2D, structure_smiles_2D)
+          tidytable::distinct(structure_inchikey_2D, structure_smiles_2D)
       ),
       "Candidates were annotated on",
       nrow(df_final |>
-        dplyr::distinct(feature_id)),
+        tidytable::distinct(feature_id)),
       "features, with at least",
       threshold,
       "similarity score",

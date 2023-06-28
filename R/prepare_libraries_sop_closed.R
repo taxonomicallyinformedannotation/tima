@@ -64,7 +64,7 @@ prepare_libraries_sop_closed <-
             to = 14
           )
         ) |>
-        dplyr::select(
+        tidytable::select(
           structure_name = structure_nameTraditional,
           structure_inchikey,
           structure_smiles,

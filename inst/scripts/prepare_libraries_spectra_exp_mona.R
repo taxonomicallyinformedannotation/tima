@@ -50,7 +50,7 @@ prepare_mona <-
 
     log_debug("Adding metadata")
     spctra_enhanced <- spctra |>
-      dplyr::left_join(cpd) |>
+      tidytable::left_join(cpd) |>
       dplyr::filter(spectrum_type == "MS2") |>
       ## COMMENT (AR): CURATING NON-STANDARD InChIs
       dplyr::mutate(inchi = gsub(
@@ -92,7 +92,7 @@ prepare_mona <-
       dplyr::bind_rows()
 
     spctra_enhanced <- spctra_enhanced |>
-      dplyr::left_join(df_clean)
+      tidytable::left_join(df_clean)
 
     log_debug("Cleaning charges")
     spctra_enhanced_1 <- spctra_enhanced |>
@@ -128,10 +128,10 @@ prepare_mona <-
       dplyr::mutate(precursorCharge = -1L)
 
     spctra_enhanced_5 <- spctra_enhanced |>
-      dplyr::anti_join(spctra_enhanced_1) |>
-      dplyr::anti_join(spctra_enhanced_2) |>
-      dplyr::anti_join(spctra_enhanced_3) |>
-      dplyr::anti_join(spctra_enhanced_4) |>
+      tidytable::anti_join(spctra_enhanced_1) |>
+      tidytable::anti_join(spctra_enhanced_2) |>
+      tidytable::anti_join(spctra_enhanced_3) |>
+      tidytable::anti_join(spctra_enhanced_4) |>
       dplyr::mutate(diff = exactmass - precursor_mz) |>
       dplyr::mutate(precursorCharge = ifelse(
         test = ionmode == "POSITIVE",

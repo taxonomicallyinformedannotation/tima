@@ -139,7 +139,7 @@ prepare_annotations_spectra <-
       # dplyr::rowwise() |>
       # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
       # dplyr::ungroup() |>
-      dplyr::select(
+      tidytable::select(
         feature_id,
         error_mz,
         error_rt,

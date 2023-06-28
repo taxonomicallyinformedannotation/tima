@@ -138,7 +138,7 @@ harmonize_spectra <- function(spectra,
   spectra_harmonized <- spectra_filtered |>
     dplyr::full_join(spectra_missing) |>
     tidytable::tidytable() |>
-    dplyr::select(
+    tidytable::select(
       collision_energy,
       compound_id,
       exactmass,

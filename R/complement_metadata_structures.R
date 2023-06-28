@@ -96,25 +96,25 @@ complement_metadata_structures <- function(df,
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   dd_ddd_s <- dd_ddd |>
-    dplyr::select(
+    tidytable::select(
       structure_inchikey_2D_s = structure_inchikey_2D,
       structure_smiles_2D
     ) |>
-    dplyr::distinct(structure_smiles_2D, .keep_all = TRUE) |>
+    tidytable::distinct(structure_smiles_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   dd_ddd_i <- dd_ddd |>
-    dplyr::select(structure_inchikey_2D,
+    tidytable::select(structure_inchikey_2D,
       structure_smiles_2D_i = structure_smiles_2D
     ) |>
-    dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
+    tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   met_2D <- tidytable::fread(str_met,
     na.strings = c("", "NA")
   ) |>
-    dplyr::left_join(dd_ddd) |>
-    dplyr::distinct(
+    tidytable::left_join(dd_ddd) |>
+    tidytable::distinct(
       structure_inchikey_2D,
       structure_smiles_2D,
       structure_exact_mass,
@@ -122,10 +122,10 @@ complement_metadata_structures <- function(df,
       structure_molecular_formula
     ) |>
     ## Avoid small discrepancies
-    dplyr::distinct(structure_inchikey_2D,
+    tidytable::distinct(structure_inchikey_2D,
       .keep_all = TRUE
     ) |>
-    dplyr::distinct(structure_smiles_2D,
+    tidytable::distinct(structure_smiles_2D,
       .keep_all = TRUE
     ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
@@ -133,8 +133,8 @@ complement_metadata_structures <- function(df,
   nam_2D <- tidytable::fread(str_nam,
     na.strings = c("", "NA")
   ) |>
-    dplyr::left_join(dd_ddd) |>
-    dplyr::distinct(
+    tidytable::left_join(dd_ddd) |>
+    tidytable::distinct(
       structure_inchikey_2D,
       structure_smiles_2D,
       structure_name
@@ -149,10 +149,10 @@ complement_metadata_structures <- function(df,
     dplyr::ungroup() |>
     dplyr::mutate(dplyr::across(dplyr::everything(), trimws)) |>
     ## Avoid small discrepancies
-    dplyr::distinct(structure_inchikey_2D,
+    tidytable::distinct(structure_inchikey_2D,
       .keep_all = TRUE
     ) |>
-    dplyr::distinct(structure_smiles_2D,
+    tidytable::distinct(structure_smiles_2D,
       .keep_all = TRUE
     ) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
@@ -160,7 +160,7 @@ complement_metadata_structures <- function(df,
   tax_cla <- tidytable::fread(str_tax_cla,
     na.strings = c("", "NA")
   ) |>
-    dplyr::select(
+    tidytable::select(
       structure_inchikey_2D,
       structure_taxonomy_classyfire_chemontid_i = structure_taxonomy_classyfire_chemontid,
       structure_taxonomy_classyfire_01kingdom_i = structure_taxonomy_classyfire_01kingdom,
@@ -168,62 +168,62 @@ complement_metadata_structures <- function(df,
       structure_taxonomy_classyfire_03class_i = structure_taxonomy_classyfire_03class,
       structure_taxonomy_classyfire_04directparent_i = structure_taxonomy_classyfire_04directparent
     ) |>
-    dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
+    tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   tax_npc <- tidytable::fread(str_tax_npc,
     na.strings = c("", "NA")
   ) |>
-    dplyr::select(
+    tidytable::select(
       structure_smiles_2D,
       structure_taxonomy_npclassifier_01pathway_s = structure_taxonomy_npclassifier_01pathway,
       structure_taxonomy_npclassifier_02superclass_s = structure_taxonomy_npclassifier_02superclass,
       structure_taxonomy_npclassifier_03class_s = structure_taxonomy_npclassifier_03class,
     ) |>
-    dplyr::distinct(structure_smiles_2D, .keep_all = TRUE) |>
+    tidytable::distinct(structure_smiles_2D, .keep_all = TRUE) |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   met_i <- met_2D |>
-    dplyr::select(
+    tidytable::select(
       structure_inchikey_2D,
       structure_molecular_formula_i = structure_molecular_formula,
       structure_exact_mass_i = structure_exact_mass,
       structure_xlogp_i = structure_xlogp
     ) |>
-    dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE)
+    tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
   met_s <- met_2D |>
-    dplyr::select(
+    tidytable::select(
       structure_smiles_2D,
       structure_molecular_formula_s = structure_molecular_formula,
       structure_exact_mass_s = structure_exact_mass,
       structure_xlogp_s = structure_xlogp
     ) |>
-    dplyr::distinct(structure_smiles_2D, .keep_all = TRUE)
+    tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 
   nam_i <- nam_2D |>
-    dplyr::select(structure_inchikey_2D,
+    tidytable::select(structure_inchikey_2D,
       structure_name_i = structure_name
     ) |>
-    dplyr::distinct(structure_inchikey_2D, .keep_all = TRUE)
+    tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
   nam_s <- nam_2D |>
-    dplyr::select(structure_smiles_2D,
+    tidytable::select(structure_smiles_2D,
       structure_name_s = structure_name
     ) |>
-    dplyr::distinct(structure_smiles_2D, .keep_all = TRUE)
+    tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 
   ## Always returning preferentially internal values (smiles > inchikey > external)
   table_final <- df |>
-    dplyr::left_join(dd_ddd_i) |>
-    dplyr::left_join(dd_ddd_s) |>
+    tidytable::left_join(dd_ddd_i) |>
+    tidytable::left_join(dd_ddd_s) |>
     dplyr::mutate(
       structure_smiles_2D = dplyr::coalesce(structure_smiles_2D_i, structure_smiles_2D),
       structure_inchikey_2D = dplyr::coalesce(structure_inchikey_2D_s, structure_inchikey_2D)
     ) |>
-    dplyr::select(-structure_smiles_2D_i, -structure_inchikey_2D_s) |>
-    dplyr::left_join(met_i) |>
-    dplyr::left_join(met_s) |>
+    tidytable::select(-structure_smiles_2D_i, -structure_inchikey_2D_s) |>
+    tidytable::left_join(met_i) |>
+    tidytable::left_join(met_s) |>
     dplyr::mutate(
       structure_molecular_formula = dplyr::coalesce(
         structure_molecular_formula_s,
@@ -237,14 +237,14 @@ complement_metadata_structures <- function(df,
       ),
       structure_xlogp = dplyr::coalesce(structure_xlogp_s, structure_xlogp_i, structure_xlogp)
     ) |>
-    dplyr::select(
+    tidytable::select(
       -structure_molecular_formula_s, -structure_molecular_formula_i, -structure_exact_mass_s, -structure_exact_mass_i, -structure_xlogp_s, -structure_xlogp_i
     ) |>
-    dplyr::left_join(nam_i) |>
-    dplyr::left_join(nam_s) |>
+    tidytable::left_join(nam_i) |>
+    tidytable::left_join(nam_s) |>
     dplyr::mutate(structure_name = dplyr::coalesce(structure_name_s, structure_name_i, structure_name)) |>
-    dplyr::select(-structure_name_s, -structure_name_i) |>
-    dplyr::left_join(tax_npc) |>
+    tidytable::select(-structure_name_s, -structure_name_i) |>
+    tidytable::left_join(tax_npc) |>
     dplyr::mutate(
       structure_taxonomy_npclassifier_01pathway = dplyr::coalesce(
         structure_taxonomy_npclassifier_01pathway_s,
@@ -259,12 +259,12 @@ complement_metadata_structures <- function(df,
         structure_taxonomy_npclassifier_03class
       ),
     ) |>
-    dplyr::select(
+    tidytable::select(
       -structure_taxonomy_npclassifier_01pathway_s,
       -structure_taxonomy_npclassifier_02superclass_s,
       -structure_taxonomy_npclassifier_03class_s
     ) |>
-    dplyr::left_join(tax_cla) |>
+    tidytable::left_join(tax_cla) |>
     dplyr::mutate(
       structure_taxonomy_classyfire_chemontid = dplyr::coalesce(
         structure_taxonomy_classyfire_chemontid_i,
@@ -287,7 +287,7 @@ complement_metadata_structures <- function(df,
         structure_taxonomy_classyfire_04directparent
       )
     ) |>
-    dplyr::select(
+    tidytable::select(
       -structure_taxonomy_classyfire_chemontid_i,
       -structure_taxonomy_classyfire_01kingdom_i,
       -structure_taxonomy_classyfire_02superclass_i,

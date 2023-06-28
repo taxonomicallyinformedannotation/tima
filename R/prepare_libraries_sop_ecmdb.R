@@ -60,7 +60,7 @@ prepare_libraries_sop_ecmdb <-
           ## TODO compute it
           structure_smiles_2D = NA_character_
         ) |>
-        dplyr::select(
+        tidytable::select(
           structure_name = name,
           structure_inchikey = moldb_inchikey,
           structure_smiles = moldb_smiles,

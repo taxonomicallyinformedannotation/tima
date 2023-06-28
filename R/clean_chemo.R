@@ -124,8 +124,8 @@ clean_chemo <-
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
-      dplyr::left_join(df1) |>
-      dplyr::left_join(componentsTable) |>
+      tidytable::left_join(df1) |>
+      tidytable::left_join(componentsTable) |>
       dplyr::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
@@ -201,7 +201,7 @@ clean_chemo <-
 
     log_debug("adding references \n")
     df3 <- df2 |>
-      dplyr::left_join(references) |>
+      tidytable::left_join(references) |>
       dplyr::group_by(dplyr::across(c(-reference_doi))) |>
       dplyr::summarize(dplyr::across(
         c(reference_doi),
@@ -269,7 +269,7 @@ clean_chemo <-
         dplyr::ungroup()
 
       df5 <- df4 |>
-        dplyr::left_join(
+        tidytable::left_join(
           df3 |>
             dplyr::select("feature_id", !colnames(df4)) |>
             dplyr::distinct()
@@ -334,7 +334,7 @@ clean_chemo <-
     df9 <- df6 |>
       dplyr::filter(is.na(structure_inchikey_2D))
 
-    df10 <- dplyr::left_join(
+    df10 <- tidytable::left_join(
       df9,
       annotationTableWeightedChemo |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))

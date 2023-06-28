@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.8.2
+
+* Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
+
 # timaR 2.8.1
 
 * Added `retry` parameter to `get_organism_taxonomy_ott`

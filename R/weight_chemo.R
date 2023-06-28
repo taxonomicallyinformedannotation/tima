@@ -184,7 +184,7 @@ weight_chemo <-
         yes = 0,
         no = score_chemical
       )) |>
-      dplyr::select(
+      tidytable::select(
         feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -195,7 +195,7 @@ weight_chemo <-
       )
 
     log_debug("... joining \n")
-    df4 <- dplyr::left_join(
+    df4 <- tidytable::left_join(
       df1 |>
         dplyr::select(-dplyr::contains("candidate_structure")),
       df3

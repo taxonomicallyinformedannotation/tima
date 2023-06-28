@@ -36,8 +36,8 @@ create_components <-
       na.strings = c("", "NA")
     ) |>
       dplyr::bind_rows() |>
-      dplyr::select(feature_source, feature_target) |>
-      dplyr::distinct()
+      tidytable::select(feature_source, feature_target) |>
+      tidytable::distinct()
 
     g <- igraph::graph.data.frame(
       d = edges,

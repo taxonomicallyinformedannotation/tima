@@ -182,12 +182,12 @@ weight_annotations <-
         colClasses = "character",
         na.strings = c("", "NA")
       ) |>
-      dplyr::left_join(tidytable::fread(
+      tidytable::left_join(tidytable::fread(
         file = str_2D_3D,
         colClasses = "character",
         na.strings = c("", "NA")
       )) |>
-      dplyr::left_join(tidytable::fread(
+      tidytable::left_join(tidytable::fread(
         file = org_tax_ott,
         colClasses = "character",
         na.strings = c("", "NA")
@@ -200,7 +200,7 @@ weight_annotations <-
 
     log_debug(x = "adding biological organism metadata")
     annotation_table_taxed <- annotation_table |>
-      dplyr::left_join(taxed_features_table)
+      tidytable::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-
