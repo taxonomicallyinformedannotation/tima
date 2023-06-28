@@ -4,10 +4,12 @@ name: External Use
 on:
   push:
     branches:
-      - main
+      - "main"
+      - "dev"
   pull_request:
     branches:
-      - main
+      - "main"
+      - "dev"
   workflow_dispatch:
 
 permissions: read-all

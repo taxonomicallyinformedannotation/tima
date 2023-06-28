@@ -127,7 +127,7 @@ prepare_taxa <-
 
     log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
     organism_table_filled <- organism_table |>
-      dplyr::left_join(
+      tidytable::left_join(
         tidytable::fread(org_tax_ott,
           na.strings = c("", "NA")
         ),
@@ -181,11 +181,11 @@ prepare_taxa <-
         feature_table |>
           dplyr::mutate(feature_id = dplyr::row_number()),
         biological_metadata |>
-          dplyr::select(organismOriginal = organism_name)
+          tidytable::select(organismOriginal = organism_name)
       )
     } else {
       metadata_table_joined <-
-        dplyr::left_join(top_n, metadata_table, by = c("name" = "filename")) |>
+        tidytable::left_join(top_n, metadata_table, by = c("name" = "filename")) |>
         dplyr::select(feature_id := rowname,
           organismOriginal = dplyr::all_of(colname),
           dplyr::everything()
@@ -194,12 +194,12 @@ prepare_taxa <-
 
     log_debug(x = "Joining with cleaned taxonomy table")
     taxed_features_table <-
-      dplyr::left_join(
+      tidytable::left_join(
         metadata_table_joined,
         biological_metadata,
         by = c("organismOriginal" = "organism_name")
       ) |>
-      dplyr::distinct() |>
+      tidytable::distinct() |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
       dplyr::select(
         feature_id,

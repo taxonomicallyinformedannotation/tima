@@ -208,7 +208,7 @@ prepare_annotations_sirius <-
         ))
 
       compound_prepared <- compound_summary_ready |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -230,7 +230,7 @@ prepare_annotations_sirius <-
 
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -290,16 +290,16 @@ prepare_annotations_sirius <-
 
       compounds_prepared <-
         dplyr::bind_rows(compound_prepared, compound_adducts_prepared) |>
-        dplyr::distinct()
+        tidytable::distinct()
 
       formulas_prepared <-
         dplyr::bind_rows(formula_prepared, formula_adducts_prepared) |>
-        dplyr::distinct()
+        tidytable::distinct()
 
       table <- compounds_prepared |>
-        dplyr::left_join(formulas_prepared) |>
-        dplyr::left_join(canopus_npc_prepared) |>
-        dplyr::distinct() |>
+        tidytable::left_join(formulas_prepared) |>
+        tidytable::left_join(canopus_npc_prepared) |>
+        tidytable::distinct() |>
         dplyr::mutate(
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
@@ -314,7 +314,7 @@ prepare_annotations_sirius <-
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           error_mz,
           error_rt,

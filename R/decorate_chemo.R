@@ -99,22 +99,22 @@ decorate_chemo <- function(df = annotation_table_weighted_chemo,
     x = paste(
       "chemically informed scoring led to \n",
       crayon::silver(nrow(df_cla_kin |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::silver("(classyfire) kingdom"),
       "level, \n",
       crayon::cyan(nrow(df_npc_pat |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::cyan("(NPC) pathway"),
       "level, \n",
       crayon::magenta(nrow(df_cla_sup |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::magenta("(classyfire) superclass"),
       "level, \n",
       crayon::blue(nrow(df_npc_sup |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::blue("(NPC) superclass"),
       "level, \n",

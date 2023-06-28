@@ -58,12 +58,12 @@ prepare_isdb_hmdb <-
 
     log_debug("Adding metadata")
     spctra_enhanced <- spctra |>
-      dplyr::left_join(
+      tidytable::left_join(
         y = df_meta,
         by = c("compound_id" = "accession")
       ) |>
       dplyr::filter(!is.na(smiles)) |>
-      dplyr::select(-original_spectrum_id, -spectrum_id) |>
+      tidytable::select(-original_spectrum_id, -spectrum_id) |>
       dplyr::distinct() |>
       dplyr::mutate(
         precursorMz = ifelse(
@@ -88,7 +88,7 @@ prepare_isdb_hmdb <-
     df_clean <- lapply(X = smiles, FUN = standardize_smiles) |>
       dplyr::bind_rows()
     spctra_enhanced <- spctra_enhanced |>
-      dplyr::left_join(df_clean)
+      tidytable::left_join(df_clean)
 
     log_debug("Positive")
     spectra_harmonized_pos <- spctra_enhanced |>

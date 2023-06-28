@@ -92,7 +92,7 @@ clean_bio <-
 
     log_debug("erasing other MS1 candidates \n")
     df02 <-
-      dplyr::anti_join(
+      tidytable::anti_join(
         annotationTableWeightedBio |>
           dplyr::distinct(feature_id,
             structure_inchikey_2D,
@@ -163,7 +163,7 @@ clean_bio <-
     #   dplyr::add_count() |>
     #   dplyr::ungroup() |>
     #   dplyr::filter(n >= 3) |>
-    #   dplyr::select(-n)
+    #   tidytable::select(-n)
     #
     # log_debug("keeping clusters with less than 3 features \n")
     # df2 <- dplyr::full_join(
@@ -175,20 +175,20 @@ clean_bio <-
     #     dplyr::add_count() |>
     #     dplyr::ungroup() |>
     #     dplyr::filter(n <= 2) |>
-    #     dplyr::select(-n)
+    #     tidytable::select(-n)
     # )
 
     log_debug("calculating chemical consistency features with at least 2 neighbors ... \n")
 
     log_debug("... among edges ... \n")
     df3 <-
-      dplyr::right_join(
+      tidytable::right_join(
         edgesTable |>
           dplyr::group_by(feature_source) |>
           dplyr::add_count() |>
           dplyr::ungroup() |>
           dplyr::filter(n >= 2) |>
-          dplyr::select(-n),
+          tidytable::select(-n),
         df,
         by = stats::setNames("feature_id", "feature_target")
       ) |>
@@ -233,7 +233,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_1_cla_kingdom) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_cla_kin = candidate_structure_1_cla_kingdom,
         consistency_structure_cla_kin,
@@ -286,7 +286,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_1_npc_pathway) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_npc_pat = candidate_structure_1_npc_pathway,
         consistency_structure_npc_pat,
@@ -339,7 +339,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_2_cla_superclass) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_cla_sup = candidate_structure_2_cla_superclass,
         consistency_structure_cla_sup,
@@ -392,7 +392,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_2_npc_superclass) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_npc_sup = candidate_structure_2_npc_superclass,
         consistency_structure_npc_sup,
@@ -445,7 +445,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_3_cla_class) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_cla_cla = candidate_structure_3_cla_class,
         consistency_structure_cla_cla,
@@ -498,7 +498,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_3_npc_class) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_npc_cla = candidate_structure_3_npc_class,
         consistency_structure_npc_cla,
@@ -551,7 +551,7 @@ clean_bio <-
       dplyr::arrange(-consistency_score_chemical_4_cla_parent) |>
       dplyr::ungroup() |>
       dplyr::distinct(feature_source, .keep_all = TRUE) |>
-      dplyr::select(
+      tidytable::select(
         feature_source,
         consensus_structure_cla_par = candidate_structure_4_cla_parent,
         consistency_structure_cla_par,
@@ -567,26 +567,26 @@ clean_bio <-
 
     log_debug("joining all except -1 together \n")
     df4 <-
-      dplyr::left_join(df,
+      tidytable::left_join(df,
         freq_cla_kin,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_npc_pat,
+      tidytable::left_join(freq_npc_pat,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_cla_sup,
+      tidytable::left_join(freq_cla_sup,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_npc_sup,
+      tidytable::left_join(freq_npc_sup,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_cla_cla,
+      tidytable::left_join(freq_cla_cla,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_npc_cla,
+      tidytable::left_join(freq_npc_cla,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
-      dplyr::left_join(freq_cla_par,
+      tidytable::left_join(freq_cla_par,
         by = stats::setNames("feature_source", "feature_id")
       ) |>
       dplyr::select(

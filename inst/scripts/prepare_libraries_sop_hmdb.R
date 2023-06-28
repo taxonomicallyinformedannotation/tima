@@ -94,7 +94,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       structure_smiles_2D = NA_character_,
       monisotopic_molecular_weight = as.numeric(monisotopic_molecular_weight)
     ) |>
-    dplyr::select(
+    tidytable::select(
       structure_name = name,
       structure_inchikey = inchikey,
       structure_smiles = smiles,

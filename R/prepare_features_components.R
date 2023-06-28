@@ -43,11 +43,11 @@ prepare_features_components <-
       na.strings = c("", "NA")
     ) |>
       dplyr::bind_rows() |>
-      dplyr::select(
+      tidytable::select(
         feature_id = `cluster index`,
         component_id = componentindex
       ) |>
-      dplyr::distinct()
+      tidytable::distinct()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_components")
