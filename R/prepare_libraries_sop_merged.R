@@ -147,7 +147,7 @@ prepare_libraries_sop_merged <-
     table_organisms_taxonomy_ott <- tables$org_tax_ott
 
     log_debug(x = "Completing organisms taxonomy")
-    table_organisms_taxonomy_ott_2_new <- table_keys |>
+    table_organisms_taxonomy_ott_2 <- table_keys |>
       tidytable::anti_join(table_organisms_taxonomy_ott) |>
       tidytable::distinct(organism = organism_name) |> 
       data.frame()
