@@ -226,7 +226,7 @@ get_organism_taxonomy_ott <- function(df,
       tidytable::distinct() |>
       dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
       ## feeling it is better that way
-      tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
+      dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
 
     if (nrow(biological_metadata) != 0) {
       biological_metadata <- biological_metadata |>
@@ -272,6 +272,7 @@ get_organism_taxonomy_ott <- function(df,
       )] <- NA
     }
 
+    log_debug("Got OTTaxonomy!")
     return(biological_metadata)
   }
 }
