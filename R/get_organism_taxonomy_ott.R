@@ -175,7 +175,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(1:length(taxon_lineage))) {
-        list_df[[i]] <- tidytable::bind_rows(
+        list_df[[i]] <- dplyr::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -187,7 +187,7 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- tidytable::bind_rows(list_df) |>
+      otl <- dplyr::bind_rows(list_df) |>
         dplyr::mutate(ott_id = as.integer(ott_id)) |>
         data.frame()
     } else {
@@ -202,8 +202,8 @@ get_organism_taxonomy_ott <- function(df,
     }
 
     biological_metadata <-
-      tidytable::left_join(organism_table, new_matched_otl_exact) |>
-      tidytable::left_join(otl, by = c("ott_id" = "id")) |>
+      dplyr::left_join(organism_table, new_matched_otl_exact) |>
+      dplyr::left_join(otl, by = c("ott_id" = "id")) |>
       dplyr::filter(
         rank %in% c(
           "domain",
@@ -223,7 +223,7 @@ get_organism_taxonomy_ott <- function(df,
           "varietas"
         )
       ) |>
-      tidytable::distinct() |>
+      dplyr::distinct() |>
       dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
       ## feeling it is better that way
       tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
