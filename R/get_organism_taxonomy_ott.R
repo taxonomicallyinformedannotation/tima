@@ -204,7 +204,7 @@ get_organism_taxonomy_ott <- function(df,
     biological_metadata <-
       tidytable::left_join(organism_table, new_matched_otl_exact) |>
       tidytable::left_join(otl, by = c("ott_id" = "id")) |>
-      tidytable::filter(
+      dplyr::filter(
         rank %in% c(
           "domain",
           "kingdom",
