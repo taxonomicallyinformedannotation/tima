@@ -86,7 +86,7 @@ clean_bio <-
     )
 
     df01 <- annotationTableWeightedBio |>
-      tidytable::filter(score_input > 0 |
+      dplyr::filter(score_input > 0 |
         # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
@@ -154,7 +154,7 @@ clean_bio <-
       tidytable::tidytable()
     # log_debug("keeping clusters with at least 3 features  \n")
     # df1 <- df |>
-    #   tidytable::filter(component_id != -1) |>
+    #   dplyr::filter(component_id != -1) |>
     #   dplyr::group_by(component_id) |>
     #   tidytable::distinct(feature_id,
     #     structure_inchikey_2D,
@@ -162,19 +162,19 @@ clean_bio <-
     #   ) |>
     #   dplyr::add_count() |>
     #   dplyr::ungroup() |>
-    #   tidytable::filter(n >= 3) |>
+    #   dplyr::filter(n >= 3) |>
     #   tidytable::select(-n)
     #
     # log_debug("keeping clusters with less than 3 features \n")
     # df2 <- dplyr::full_join(
     #   x = df |>
-    #     tidytable::filter(component_id == -1),
+    #     dplyr::filter(component_id == -1),
     #   y = df |>
     #     dplyr::group_by(component_id) |>
     #     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     #     dplyr::add_count() |>
     #     dplyr::ungroup() |>
-    #     tidytable::filter(n <= 2) |>
+    #     dplyr::filter(n <= 2) |>
     #     tidytable::select(-n)
     # )
 
@@ -187,12 +187,12 @@ clean_bio <-
           dplyr::group_by(feature_source) |>
           dplyr::add_count() |>
           dplyr::ungroup() |>
-          tidytable::filter(n >= 2) |>
+          dplyr::filter(n >= 2) |>
           tidytable::select(-n),
         df,
         by = stats::setNames("feature_id", "feature_target")
       ) |>
-      tidytable::filter(!is.na(feature_source))
+      dplyr::filter(!is.na(feature_source))
 
     log_debug("... at the (classyfire) kingdom level \n")
     freq_cla_kin <- df3 |>

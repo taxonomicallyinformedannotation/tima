@@ -50,7 +50,7 @@ get_organism_taxonomy_ott <- function(df,
       canonical_name = organism,
       search_string
     ) |>
-    tidytable::filter(!is.na(canonical_name))
+    dplyr::filter(!is.na(canonical_name))
 
   organisms <- organism_table$canonical_name
 
@@ -99,19 +99,19 @@ get_organism_taxonomy_ott <- function(df,
       tidytable::bind_rows() |>
       dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
     new_ott_id <- new_matched_otl_exact |>
-      tidytable::filter(!is.na(ott_id)) |>
+      dplyr::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id) & retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
-        tidytable::filter(!is.na(ott_id))
+        dplyr::filter(!is.na(ott_id))
 
       new_ott_id_1 <- pretable |>
         tidytable::distinct(ott_id)
 
       organism_table_2 <- organism_table |>
-        tidytable::filter(!organism_table$search_string %in% pretable$search_string)
+        dplyr::filter(!organism_table$search_string %in% pretable$search_string)
 
       organism_table_2$search_string <-
         stringi::stri_replace_all_regex(
@@ -148,7 +148,7 @@ get_organism_taxonomy_ott <- function(df,
 
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         tidytable::bind_rows() |>
-        tidytable::filter(!is.na(ott_id)) |>
+        dplyr::filter(!is.na(ott_id)) |>
         dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
         tidytable::distinct(ott_id)
@@ -226,7 +226,7 @@ get_organism_taxonomy_ott <- function(df,
       tidytable::distinct() |>
       dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
       ## feeling it is better that way
-      dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
+      tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
 
     if (nrow(biological_metadata) != 0) {
       biological_metadata <- biological_metadata |>

@@ -83,7 +83,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
   log_debug(x = "Formatting HMDB")
   hmdb_prepared <- hmdb_df |>
     dplyr::mutate_all(dplyr::na_if, "") |>
-    tidytable::filter(!is.na(inchikey)) |>
+    dplyr::filter(!is.na(inchikey)) |>
     dplyr::mutate(
       structure_inchikey_2D = substring(
         text = inchikey,

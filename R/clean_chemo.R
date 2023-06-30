@@ -106,7 +106,7 @@ clean_chemo <-
       "chemical score \n"
     )
     df1 <- annotationTableWeightedChemo |>
-      tidytable::filter(
+      dplyr::filter(
         score_input > 0 |
           # Those lines are to keep ms1 annotation
           score_biological >= minimalMs1Bio |
@@ -119,7 +119,7 @@ clean_chemo <-
         .keep_all = TRUE
       ) |>
       dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
-      tidytable::filter(rank_final <= candidatesFinal) |>
+      dplyr::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
@@ -192,8 +192,8 @@ clean_chemo <-
       ) |>
       tidytable::distinct() |>
       tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
-      tidytable::filter(!is.na(value)) |>
-      tidytable::filter(value != "notClassified") |>
+      dplyr::filter(!is.na(value)) |>
+      dplyr::filter(value != "notClassified") |>
       dplyr::distinct(structure_inchikey_2D,
         best_candidate_organism = value,
         reference_doi
@@ -329,10 +329,10 @@ clean_chemo <-
 
     log_debug("adding consensus again to droped candidates \n")
     df8 <- df6 |>
-      tidytable::filter(!is.na(structure_inchikey_2D))
+      dplyr::filter(!is.na(structure_inchikey_2D))
 
     df9 <- df6 |>
-      tidytable::filter(is.na(structure_inchikey_2D))
+      dplyr::filter(is.na(structure_inchikey_2D))
 
     df10 <- tidytable::left_join(
       df9,

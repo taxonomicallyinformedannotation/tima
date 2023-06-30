@@ -210,7 +210,7 @@ annotate_masses <-
 
     adducts <- unlist(adducts_list[[msMode]])
     # |>
-    #   tidytable::filter(
+    #   dplyr::filter(
     #     exact_mass %in%
     #       structure_organism_pairs_table[["structure_exact_mass"]])
 
@@ -243,7 +243,7 @@ annotate_masses <-
       )) |>
       # tidytable::left_join(tidytable::fread(file = org_tax_ott,
       #         na.strings = c("","NA"))) |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
+      dplyr::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(
         c(
           structure_exact_mass,
@@ -261,14 +261,14 @@ annotate_masses <-
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
-      tidytable::filter(!is.na(exact_mass)) |>
-      tidytable::filter(adduct %in% adducts) |>
+      dplyr::filter(!is.na(exact_mass)) |>
+      dplyr::filter(adduct %in% adducts) |>
       dplyr::mutate(
         value_min = adduct_mass - (1E-6 * tolerancePpm * adduct_mass),
         value_max = adduct_mass + (1E-6 * tolerancePpm * adduct_mass)
       ) |>
-      tidytable::filter(!is.na(value_min)) |>
-      tidytable::filter(value_min > 0)
+      dplyr::filter(!is.na(value_min)) |>
+      dplyr::filter(value_min > 0)
 
     df3 <- featuresTable |>
       dplyr::mutate(dplyr::across(
@@ -315,9 +315,9 @@ annotate_masses <-
         feature_id_dest,
         mz_dest
       ) |>
-      tidytable::filter(feature_id != feature_id_dest) |>
+      dplyr::filter(feature_id != feature_id_dest) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
-      tidytable::filter(mz >= mz_dest) |>
+      dplyr::filter(mz >= mz_dest) |>
       dplyr::mutate(
         delta_min = ifelse(
           test = mz >= mz_dest,
@@ -359,7 +359,7 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      tidytable::filter(!is.na(loss)) |>
+      dplyr::filter(!is.na(loss)) |>
       tidytable::distinct(
         feature_id,
         loss,
@@ -378,7 +378,7 @@ annotate_masses <-
           delta_max >= Distance
         )
       ) |>
-      tidytable::filter(!is.na(Group1)) |>
+      dplyr::filter(!is.na(Group1)) |>
       dplyr::mutate(dplyr::across(rt, as.character)) |>
       dplyr::mutate(
         label = as.character(Group1),
@@ -480,7 +480,7 @@ annotate_masses <-
         . == "NA",
         NA
       ))) |>
-      tidytable::filter(!is.na(library))
+      dplyr::filter(!is.na(library))
 
     log_debug("cleaning results \n")
     df12 <- df11 |>
@@ -494,17 +494,17 @@ annotate_masses <-
         error_rt,
         exact_mass
       ) |>
-      tidytable::filter(!is.na(exact_mass))
+      dplyr::filter(!is.na(exact_mass))
 
     log_debug("keeping unique adducts per exact mass \n")
     df13 <- structureOrganismPairsTable |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
+      dplyr::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_exact_mass,
         structure_molecular_formula
       )
     df13_b <- structureOrganismPairsTable |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
+      dplyr::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_name,
         # structure_inchikey,
@@ -554,7 +554,7 @@ annotate_masses <-
         library,
         dplyr::everything(), -exact_mass
       ) |>
-      tidytable::filter(library %ni% forbidden_adducts) |>
+      dplyr::filter(library %ni% forbidden_adducts) |>
       tidytable::distinct()
 
     log_debug("adding adduct mass to get back to [1M] \n")
@@ -569,7 +569,7 @@ annotate_masses <-
         feature_id,
         adduct_mass
       ) |>
-      tidytable::filter(!is.na(adduct_mass))
+      dplyr::filter(!is.na(adduct_mass))
 
     log_debug("keeping ions for exploration starting from [1M] \n")
     df16 <- tidytable::inner_join(df3, df15)
@@ -701,7 +701,7 @@ annotate_masses <-
         delta_min = mz.x - mz_max,
         delta_max = mz.x - mz_min
       ) |>
-      tidytable::filter(delta_max > min(neutralLosses$mass) |
+      dplyr::filter(delta_max > min(neutralLosses$mass) |
         (mz.x >= mz_min & mz.x <= mz_max))
 
     df20_a <- df20 |>
@@ -711,7 +711,7 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      tidytable::filter(!is.na(loss) |
+      dplyr::filter(!is.na(loss) |
         (mz.x >= mz_min &
           mz.x <= mz_max)) |>
       dplyr::mutate(name = ifelse(
@@ -739,7 +739,7 @@ annotate_masses <-
           adduct_value <= value_max
         )
       ) |>
-      tidytable::filter(stringi::stri_detect_fixed(
+      dplyr::filter(stringi::stri_detect_fixed(
         pattern = paste(adduct, "", sep = " "),
         str = library_name
       )) |>
@@ -768,7 +768,7 @@ annotate_masses <-
         library = library_name,
         dplyr::everything(), -exact_mass, -adduct_value
       ) |>
-      tidytable::filter(library %ni% forbidden_adducts) |>
+      dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
       tidytable::distinct()
 
@@ -778,7 +778,7 @@ annotate_masses <-
       df22
     ) |>
       tidytable::left_join(df13_b) |>
-      tidytable::filter(!is.na(structure_inchikey_2D)) |>
+      dplyr::filter(!is.na(structure_inchikey_2D)) |>
       dplyr::group_by(feature_id) |>
       dplyr::ungroup() |>
       tidytable::distinct(

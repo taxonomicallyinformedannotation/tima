@@ -103,11 +103,11 @@ prepare_taxa <-
     top_n <- feature_table |>
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
-      tidytable::filter(value != 0) |>
+      dplyr::filter(value != 0) |>
       dplyr::group_by(rowname) |>
       dplyr::mutate(rank = rank(-value)) |>
       dplyr::ungroup() |>
-      tidytable::filter(rank <= top_k) |>
+      dplyr::filter(rank <= top_k) |>
       dplyr::arrange(rowname, rank)
 
     if (!is.null(taxon)) {
@@ -118,7 +118,7 @@ prepare_taxa <-
 
     log_debug(x = "Preparing organisms names")
     organism_table <- metadata_table |>
-      tidytable::filter(!is.na(!!as.name(colname))) |>
+      dplyr::filter(!is.na(!!as.name(colname))) |>
       dplyr::distinct(!!as.name(colname)) |>
       dplyr::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism,
@@ -136,7 +136,7 @@ prepare_taxa <-
 
     log_debug(x = "Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
-      tidytable::filter(is.na(organism_taxonomy_ottid))
+      dplyr::filter(is.na(organism_taxonomy_ottid))
 
     if (nrow(organism_table_missing) != 0) {
       biological_metadata_1 <- organism_table_missing |>
@@ -144,12 +144,12 @@ prepare_taxa <-
 
       log_debug(x = "Joining all results")
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
+        dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
         dplyr::rename(organism_name = organism) |>
         tidytable::bind_rows(biological_metadata_1)
     } else {
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
+        dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
         dplyr::rename(organism_name = organism)
     }
 

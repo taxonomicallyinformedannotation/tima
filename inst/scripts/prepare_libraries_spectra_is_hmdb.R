@@ -37,7 +37,7 @@ prepare_isdb_hmdb <-
 
     log_debug("Loading proton mass")
     proton <- readr::read_tsv(file = system.file("extdata", "adducts.tsv", package = "timaR")) |>
-      tidytable::filter(adduct == "H (proton)") |>
+      dplyr::filter(adduct == "H (proton)") |>
       dplyr::pull("mass")
 
     log_debug("Loading metadata")
@@ -62,7 +62,7 @@ prepare_isdb_hmdb <-
         y = df_meta,
         by = c("compound_id" = "accession")
       ) |>
-      tidytable::filter(!is.na(smiles)) |>
+      dplyr::filter(!is.na(smiles)) |>
       tidytable::select(-original_spectrum_id, -spectrum_id) |>
       tidytable::distinct() |>
       dplyr::mutate(

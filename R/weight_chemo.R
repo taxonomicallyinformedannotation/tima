@@ -120,49 +120,49 @@ weight_chemo <-
 
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_cla_kingdom, str = consensus_structure_cla_kin)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaKingdom)
 
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_npc_pathway, str = consensus_structure_npc_pat)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcPathway)
 
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- step_cla_kin |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_cla_superclass, str = consensus_structure_cla_sup)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaSuperclass)
 
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- step_npc_pat |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_npc_superclass, str = consensus_structure_npc_sup)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcSuperclass)
 
     log_debug("... (classyfire) class \n")
     step_cla_cla <- step_cla_sup |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_cla_class, str = consensus_structure_cla_cla)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaClass)
 
     log_debug("... (NPC) class \n")
     step_npc_cla <- step_npc_sup |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_npc_class, str = consensus_structure_npc_cla)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcClass)
 
     log_debug("... (classyfire) parent \n")
     step_cla_par <- step_cla_cla |>
-      tidytable::filter(
+      dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_4_cla_parent, str = consensus_structure_cla_par)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaParent)
