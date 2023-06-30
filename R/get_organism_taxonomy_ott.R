@@ -147,15 +147,15 @@ get_organism_taxonomy_ott <- function(df,
         )
 
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
-        dplyr::bind_rows() |>
-        dplyr::filter(!is.na(ott_id)) |>
+        tidytable::bind_rows() |>
+        tidytable::filter(!is.na(ott_id)) |>
         dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
-        dplyr::distinct(ott_id)
+        tidytable::distinct(ott_id)
 
-      new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
+      new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
       new_matched_otl_exact <-
-        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
+        tidytable::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -175,7 +175,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(1:length(taxon_lineage))) {
-        list_df[[i]] <- dplyr::bind_rows(
+        list_df[[i]] <- tidytable::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -187,7 +187,7 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- dplyr::bind_rows(list_df) |>
+      otl <- tidytable::bind_rows(list_df) |>
         dplyr::mutate(ott_id = as.integer(ott_id)) |>
         data.frame()
     } else {

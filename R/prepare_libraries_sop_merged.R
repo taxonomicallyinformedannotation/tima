@@ -149,7 +149,7 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Completing organisms taxonomy")
     table_organisms_taxonomy_ott_2 <- table_keys |>
       tidytable::anti_join(table_organisms_taxonomy_ott) |>
-      tidytable::distinct(organism = organism_name) |>
+      dplyr::distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
