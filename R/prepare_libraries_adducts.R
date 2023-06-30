@@ -94,7 +94,7 @@ prepare_libraries_adducts <-
     log_debug("... positive")
     pure_pos <-
       create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
-      tidytable::filter(grepl(
+      dplyr::filter(grepl(
         pattern = "]1+",
         x = adduct,
         fixed = TRUE
@@ -104,7 +104,7 @@ prepare_libraries_adducts <-
     log_debug("... negative")
     pure_neg <-
       create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
-      tidytable::filter(grepl(
+      dplyr::filter(grepl(
         pattern = "]1-",
         x = adduct,
         fixed = TRUE

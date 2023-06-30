@@ -120,7 +120,7 @@ harmonize_spectra <- function(spectra,
   }
 
   spectra_filtered <- spectra |>
-    tidytable::filter(grepl(
+    dplyr::filter(grepl(
       pattern = mode,
       x = !!as.name(co_po),
       ignore.case = TRUE

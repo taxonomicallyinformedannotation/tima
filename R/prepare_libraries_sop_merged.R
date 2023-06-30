@@ -189,7 +189,7 @@ prepare_libraries_sop_merged <-
         tidytable::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
-        tidytable::filter(grepl(
+        dplyr::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)
