@@ -175,7 +175,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(1:length(taxon_lineage))) {
-        list_df[[i]] <- tidytable::bind_rows(
+        list_df[[i]] <- dplyr::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -187,7 +187,7 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- tidytable::bind_rows(list_df) |>
+      otl <- dplyr::bind_rows(list_df) |>
         dplyr::mutate(ott_id = as.integer(ott_id)) |>
         data.frame()
     } else {
