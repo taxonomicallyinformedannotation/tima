@@ -95,7 +95,7 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_10varietas = NA_character_
         ) |>
         round_reals() |>
-        dplyr::distinct() |>
+        tidytable::distinct() |>
         dplyr::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, ECMDB not found, returning an empty file instead")

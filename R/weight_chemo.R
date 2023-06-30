@@ -91,7 +91,7 @@ weight_chemo <-
 
     log_debug("... adding metadata \n")
     df2 <- df1 |>
-      dplyr::distinct(
+      tidytable::distinct(
         feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -120,56 +120,56 @@ weight_chemo <-
 
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_cla_kingdom, str = consensus_structure_cla_kin)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaKingdom)
 
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_npc_pathway, str = consensus_structure_npc_pat)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcPathway)
 
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- step_cla_kin |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_cla_superclass, str = consensus_structure_cla_sup)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaSuperclass)
 
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- step_npc_pat |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_npc_superclass, str = consensus_structure_npc_sup)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcSuperclass)
 
     log_debug("... (classyfire) class \n")
     step_cla_cla <- step_cla_sup |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_cla_class, str = consensus_structure_cla_cla)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaClass)
 
     log_debug("... (NPC) class \n")
     step_npc_cla <- step_npc_sup |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_npc_class, str = consensus_structure_npc_cla)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalNpcClass)
 
     log_debug("... (classyfire) parent \n")
     step_cla_par <- step_cla_cla |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_4_cla_parent, str = consensus_structure_cla_par)
       ) |>
       dplyr::mutate(score_chemical = scoreChemicalClaParent)
 
     log_debug("... outputting best score \n")
     df3 <-
-      dplyr::bind_rows(
+      tidytable::bind_rows(
         step_cla_kin,
         step_npc_pat,
         step_cla_sup,
@@ -236,7 +236,7 @@ weight_chemo <-
       dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
-      dplyr::distinct(feature_id,
+      tidytable::distinct(feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
         # candidate_structure_1_pathway,

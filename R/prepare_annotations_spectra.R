@@ -99,8 +99,8 @@ prepare_annotations_spectra <-
         FUN = tidytable::fread,
         na.strings = c("", "NA")
       ) |>
-      dplyr::bind_rows() |>
-      dplyr::filter(!is.na(feature_id)) |>
+      tidytable::bind_rows() |>
+      tidytable::filter(!is.na(feature_id)) |>
       dplyr::distinct(
         feature_id,
         error_mz,

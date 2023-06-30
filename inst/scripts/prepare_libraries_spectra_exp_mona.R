@@ -51,7 +51,7 @@ prepare_mona <-
     log_debug("Adding metadata")
     spctra_enhanced <- spctra |>
       tidytable::left_join(cpd) |>
-      dplyr::filter(spectrum_type == "MS2") |>
+      tidytable::filter(spectrum_type == "MS2") |>
       ## COMMENT (AR): CURATING NON-STANDARD InChIs
       dplyr::mutate(inchi = gsub(
         pattern = "InChI=1/",
@@ -68,41 +68,41 @@ prepare_mona <-
         x = inchi,
         fixed = TRUE
       )) |>
-      dplyr::filter(!is.na(smiles) | !is.na(inchi)) |>
+      tidytable::filter(!is.na(smiles) | !is.na(inchi)) |>
       ## COMMENT (AR): FILTERING INVALID InChIs
-      dplyr::filter(grepl(pattern = "InChI=1S/", x = inchi)) |>
-      dplyr::filter(!grepl(
+      tidytable::filter(grepl(pattern = "InChI=1S/", x = inchi)) |>
+      tidytable::filter(!grepl(
         pattern = ".",
         x = inchi,
         fixed = TRUE
       )) |>
-      # dplyr::filter(!grepl(pattern = "Aux", x = inchi)) |>
+      # tidytable::filter(!grepl(pattern = "Aux", x = inchi)) |>
       dplyr::mutate(ionmode = ifelse(
         test = polarity == 1,
         yes = "POSITIVE",
         no = "NEGATIVE"
       )) |>
       ## COMMENT (AR): FILTERING MISSING PRECURSOR MZS
-      dplyr::filter(!is.na(precursor_mz))
+      tidytable::filter(!is.na(precursor_mz))
 
     log_debug("Standardizing 2D chemical structures")
     inchis <- unique(spctra_enhanced$inchi)
 
     df_clean <- lapply(X = inchis, FUN = standardize_inchi) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     spctra_enhanced <- spctra_enhanced |>
       tidytable::left_join(df_clean)
 
     log_debug("Cleaning charges")
     spctra_enhanced_1 <- spctra_enhanced |>
-      dplyr::filter(
+      tidytable::filter(
         grepl(pattern = "]\\+\\+", x = precursor_type) |
           grepl(pattern = "]2\\+", x = precursor_type)
       ) |>
       dplyr::mutate(precursorCharge = 2L)
     spctra_enhanced_2 <- spctra_enhanced |>
-      dplyr::filter(
+      tidytable::filter(
         grepl(pattern = "]\\+$", x = precursor_type) |
           grepl(pattern = "]1\\+", x = precursor_type) |
           grepl(pattern = "M\\+H$", x = precursor_type) |
@@ -113,13 +113,13 @@ prepare_mona <-
       ) |>
       dplyr::mutate(precursorCharge = 1L)
     spctra_enhanced_3 <- spctra_enhanced |>
-      dplyr::filter(
+      tidytable::filter(
         grepl(pattern = "]\\-\\-", x = precursor_type) |
           grepl(pattern = "]2\\-", x = precursor_type)
       ) |>
       dplyr::mutate(precursorCharge = -2L)
     spctra_enhanced_4 <- spctra_enhanced |>
-      dplyr::filter(
+      tidytable::filter(
         grepl(pattern = "]\\-$", x = precursor_type) |
           grepl(pattern = "]1\\-", x = precursor_type) |
           grepl(pattern = "M\\-H$", x = precursor_type) |
@@ -146,14 +146,14 @@ prepare_mona <-
       "might induce some errors"
     )
 
-    spctra_enhanced_final <- dplyr::bind_rows(
+    spctra_enhanced_final <- tidytable::bind_rows(
       spctra_enhanced_1,
       spctra_enhanced_2,
       spctra_enhanced_3,
       spctra_enhanced_4,
       spctra_enhanced_5
     ) |>
-      dplyr::filter(!is.na(inchikey_2D))
+      tidytable::filter(!is.na(inchikey_2D))
 
     log_debug("Formatting")
     colnames_mona <- c(

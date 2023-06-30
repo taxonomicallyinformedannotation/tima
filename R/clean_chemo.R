@@ -106,7 +106,7 @@ clean_chemo <-
       "chemical score \n"
     )
     df1 <- annotationTableWeightedChemo |>
-      dplyr::filter(
+      tidytable::filter(
         score_input > 0 |
           # Those lines are to keep ms1 annotation
           score_biological >= minimalMs1Bio |
@@ -115,11 +115,11 @@ clean_chemo <-
         # Or chemical consistency score is obtained
       ) |>
       dplyr::group_by(feature_id) |>
-      dplyr::distinct(structure_inchikey_2D,
+      tidytable::distinct(structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
       dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
-      dplyr::filter(rank_final <= candidatesFinal) |>
+      tidytable::filter(rank_final <= candidatesFinal) |>
       dplyr::ungroup()
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
@@ -190,10 +190,10 @@ clean_chemo <-
         organism_name,
         dplyr::contains("organism_taxonomy_")
       ) |>
-      dplyr::distinct() |>
+      tidytable::distinct() |>
       tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
-      dplyr::filter(!is.na(value)) |>
-      dplyr::filter(value != "notClassified") |>
+      tidytable::filter(!is.na(value)) |>
+      tidytable::filter(value != "notClassified") |>
       dplyr::distinct(structure_inchikey_2D,
         best_candidate_organism = value,
         reference_doi
@@ -329,10 +329,10 @@ clean_chemo <-
 
     log_debug("adding consensus again to droped candidates \n")
     df8 <- df6 |>
-      dplyr::filter(!is.na(structure_inchikey_2D))
+      tidytable::filter(!is.na(structure_inchikey_2D))
 
     df9 <- df6 |>
-      dplyr::filter(is.na(structure_inchikey_2D))
+      tidytable::filter(is.na(structure_inchikey_2D))
 
     df10 <- tidytable::left_join(
       df9,
@@ -363,7 +363,7 @@ clean_chemo <-
       )) |>
       dplyr::distinct()
 
-    df11 <- dplyr::bind_rows(df8, df10) |>
+    df11 <- tidytable::bind_rows(df8, df10) |>
       dplyr::arrange(as.numeric(feature_id))
 
     ## Because cytoscape import fails otherwise

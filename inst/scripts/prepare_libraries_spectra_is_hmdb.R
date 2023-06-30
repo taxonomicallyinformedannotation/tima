@@ -37,7 +37,7 @@ prepare_isdb_hmdb <-
 
     log_debug("Loading proton mass")
     proton <- readr::read_tsv(file = system.file("extdata", "adducts.tsv", package = "timaR")) |>
-      dplyr::filter(adduct == "H (proton)") |>
+      tidytable::filter(adduct == "H (proton)") |>
       dplyr::pull("mass")
 
     log_debug("Loading metadata")
@@ -62,9 +62,9 @@ prepare_isdb_hmdb <-
         y = df_meta,
         by = c("compound_id" = "accession")
       ) |>
-      dplyr::filter(!is.na(smiles)) |>
+      tidytable::filter(!is.na(smiles)) |>
       tidytable::select(-original_spectrum_id, -spectrum_id) |>
-      dplyr::distinct() |>
+      tidytable::distinct() |>
       dplyr::mutate(
         precursorMz = ifelse(
           test = polarity == 1,
@@ -86,7 +86,7 @@ prepare_isdb_hmdb <-
     log_debug("Standardizing 2D chemical structures")
     smiles <- unique(spctra_enhanced$smiles)
     df_clean <- lapply(X = smiles, FUN = standardize_smiles) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
     spctra_enhanced <- spctra_enhanced |>
       tidytable::left_join(df_clean)
 

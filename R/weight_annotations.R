@@ -159,7 +159,7 @@ weight_annotations <-
       colClasses = "character",
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     log_debug(x = "... metadata_table_biological_annotation")
     taxed_features_table <- tidytable::fread(
@@ -195,7 +195,7 @@ weight_annotations <-
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>
-        dplyr::filter(score_input == 0)
+        tidytable::filter(score_input == 0)
     }
 
     log_debug(x = "adding biological organism metadata")

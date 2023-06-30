@@ -106,7 +106,7 @@ prepare_annotations_gnps <-
         FUN = tidytable::fread,
         na.strings = c("", "NA")
       ) |>
-        dplyr::bind_rows() |>
+        tidytable::bind_rows() |>
         dplyr::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *

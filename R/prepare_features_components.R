@@ -42,7 +42,7 @@ prepare_features_components <-
       FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows() |>
+      tidytable::bind_rows() |>
       tidytable::select(
         feature_id = `cluster index`,
         component_id = componentindex

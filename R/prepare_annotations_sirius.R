@@ -182,7 +182,7 @@ prepare_annotations_sirius <-
         compound_summary[lapply(compound_summary, nrow) > 0]
 
       compound_summary_ready <- compound_summary |>
-        dplyr::bind_rows(.id = "feature_id") |>
+        tidytable::bind_rows(.id = "feature_id") |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
       canopus_npc_prepared <- canopus |>
@@ -289,11 +289,11 @@ prepare_annotations_sirius <-
         )
 
       compounds_prepared <-
-        dplyr::bind_rows(compound_prepared, compound_adducts_prepared) |>
+        tidytable::bind_rows(compound_prepared, compound_adducts_prepared) |>
         tidytable::distinct()
 
       formulas_prepared <-
-        dplyr::bind_rows(formula_prepared, formula_adducts_prepared) |>
+        tidytable::bind_rows(formula_prepared, formula_adducts_prepared) |>
         tidytable::distinct()
 
       table <- compounds_prepared |>

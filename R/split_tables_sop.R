@@ -48,7 +48,7 @@ split_tables_sop <- function(table) {
   log_debug(x = "Splitting the concatenated library into smaller pieces")
 
   table_keys <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(structure_inchikey),
       !is.na(structure_smiles),
       !is.na(organism_name)
@@ -63,12 +63,12 @@ split_tables_sop <- function(table) {
     dplyr::group_by(structure_inchikey, structure_smiles, organism_name) |>
     dplyr::add_count() |>
     dplyr::ungroup() |>
-    dplyr::filter(!is.na(reference_doi) | n == 1) |>
+    tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
   log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
 
   table_structures_2D_3D <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(structure_inchikey),
       !is.na(structure_smiles),
       !is.na(structure_inchikey_2D),
@@ -92,7 +92,7 @@ split_tables_sop <- function(table) {
   )
 
   table_structures_metadata <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(structure_inchikey),
       !is.na(structure_smiles),
       !is.na(structure_molecular_formula),
@@ -109,7 +109,7 @@ split_tables_sop <- function(table) {
     tidytable::distinct()
 
   table_structures_names <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(structure_inchikey),
       !is.na(structure_smiles),
       !is.na(structure_name)
@@ -131,8 +131,8 @@ split_tables_sop <- function(table) {
     dplyr::mutate(dplyr::across(dplyr::everything(), trimws))
 
   table_structures_taxonomy_npc <- table |>
-    dplyr::filter(!is.na(structure_smiles_2D)) |>
-    dplyr::filter(
+    tidytable::filter(!is.na(structure_smiles_2D)) |>
+    tidytable::filter(
       !is.na(structure_taxonomy_npclassifier_01pathway) |
         !is.na(structure_taxonomy_npclassifier_02superclass) |
         !is.na(structure_taxonomy_npclassifier_03class)
@@ -158,7 +158,7 @@ split_tables_sop <- function(table) {
     ))
 
   table_structures_taxonomy_classyfire <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(structure_inchikey_2D) &
         !is.na(structure_taxonomy_classyfire_chemontid)
     ) |>
@@ -179,14 +179,14 @@ split_tables_sop <- function(table) {
     ))
 
   table_organisms_names <- table |>
-    dplyr::filter(!is.na(organism_name)) |>
+    tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
   log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
 
   table_organisms_taxonomy_ott <- table |>
-    dplyr::filter(
+    tidytable::filter(
       !is.na(organism_name),
       !is.na(organism_taxonomy_ottid)
     ) |>
