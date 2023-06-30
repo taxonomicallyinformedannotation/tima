@@ -46,50 +46,50 @@ decorate_chemo <- function(df = annotation_table_weighted_chemo,
                            sc_npc_sup = score_chemical_npc_superclass,
                            sc_npc_cla = score_chemical_npc_class) {
   df_cla_kin <- df |>
-    dplyr::filter(score_chemical >= sc_cla_kin) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_cla_kin) |>
+    tidytable::filter(
       consensus_structure_cla_kin != "notAnnotated" &
         consensus_structure_cla_kin != "notConsistent" &
         consensus_structure_cla_kin != "dummy"
     )
   df_npc_pat <- df |>
-    dplyr::filter(score_chemical >= sc_npc_pat) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_npc_pat) |>
+    tidytable::filter(
       consensus_structure_npc_pat != "notAnnotated" &
         consensus_structure_npc_pat != "notConsistent" &
         consensus_structure_npc_pat != "dummy"
     )
   df_cla_sup <- df_cla_kin |>
-    dplyr::filter(score_chemical >= sc_cla_sup) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_cla_sup) |>
+    tidytable::filter(
       consensus_structure_cla_sup != "notAnnotated" &
         consensus_structure_cla_sup != "notConsistent" &
         consensus_structure_cla_sup != "dummy"
     )
   df_npc_sup <- df_npc_pat |>
-    dplyr::filter(score_chemical >= sc_npc_sup) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_npc_sup) |>
+    tidytable::filter(
       consensus_structure_npc_sup != "notAnnotated" &
         consensus_structure_npc_sup != "notConsistent" &
         consensus_structure_npc_sup != "dummy"
     )
   df_cla_cla <- df_cla_sup |>
-    dplyr::filter(score_chemical >= sc_cla_cla) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_cla_cla) |>
+    tidytable::filter(
       consensus_structure_cla_cla != "notAnnotated" &
         consensus_structure_cla_cla != "notConsistent" &
         consensus_structure_cla_cla != "dummy"
     )
   df_npc_cla <- df_npc_sup |>
-    dplyr::filter(score_chemical >= sc_npc_cla) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_npc_cla) |>
+    tidytable::filter(
       consensus_structure_npc_cla != "notAnnotated" &
         consensus_structure_npc_cla != "notConsistent" &
         consensus_structure_npc_cla != "dummy"
     )
   df_cla_par <- df_cla_cla |>
-    dplyr::filter(score_chemical >= sc_cla_par) |>
-    dplyr::filter(
+    tidytable::filter(score_chemical >= sc_cla_par) |>
+    tidytable::filter(
       consensus_structure_cla_par != "notAnnotated" &
         consensus_structure_cla_par != "notConsistent" &
         consensus_structure_cla_par != "dummy"
@@ -119,17 +119,17 @@ decorate_chemo <- function(df = annotation_table_weighted_chemo,
       crayon::blue("(NPC) superclass"),
       "level, \n",
       crayon::yellow(nrow(df_cla_cla |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::yellow("(classyfire) class"),
       "level, \n",
       crayon::green(nrow(df_npc_cla |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::green("(NPC) class"),
       "level, and \n",
       crayon::red(nrow(df_cla_par |>
-        dplyr::distinct(structure_inchikey_2D))),
+        tidytable::distinct(structure_inchikey_2D))),
       "annotations reranked at the",
       crayon::red("(classyfire) parent"),
       "level. \n"

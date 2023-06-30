@@ -86,7 +86,7 @@ clean_bio <-
     )
 
     df01 <- annotationTableWeightedBio |>
-      dplyr::filter(score_input > 0 |
+      tidytable::filter(score_input > 0 |
         # Those lines are to keep ms1 annotation
         score_biological >= minimalMs1Bio)
 
@@ -94,7 +94,7 @@ clean_bio <-
     df02 <-
       tidytable::anti_join(
         annotationTableWeightedBio |>
-          dplyr::distinct(feature_id,
+          tidytable::distinct(feature_id,
             structure_inchikey_2D,
             .keep_all = TRUE
           ),
@@ -102,7 +102,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(structure_inchikey_2D = "notAnnotated")
 
-    df03 <- dplyr::bind_rows(df01, df02)
+    df03 <- tidytable::bind_rows(df01, df02)
 
     df <- df03 |>
       dplyr::mutate(
@@ -114,7 +114,7 @@ clean_bio <-
         candidate_structure_3_npc_class = structure_taxonomy_npclassifier_03class,
         candidate_structure_4_cla_parent = structure_taxonomy_classyfire_04directparent
       ) |>
-      dplyr::distinct(
+      tidytable::distinct(
         structure_inchikey_2D,
         feature_id,
         candidate_structure_1_cla_kingdom,
@@ -154,27 +154,27 @@ clean_bio <-
       tidytable::tidytable()
     # log_debug("keeping clusters with at least 3 features  \n")
     # df1 <- df |>
-    #   dplyr::filter(component_id != -1) |>
+    #   tidytable::filter(component_id != -1) |>
     #   dplyr::group_by(component_id) |>
-    #   dplyr::distinct(feature_id,
+    #   tidytable::distinct(feature_id,
     #     structure_inchikey_2D,
     #     .keep_all = TRUE
     #   ) |>
     #   dplyr::add_count() |>
     #   dplyr::ungroup() |>
-    #   dplyr::filter(n >= 3) |>
+    #   tidytable::filter(n >= 3) |>
     #   tidytable::select(-n)
     #
     # log_debug("keeping clusters with less than 3 features \n")
     # df2 <- dplyr::full_join(
     #   x = df |>
-    #     dplyr::filter(component_id == -1),
+    #     tidytable::filter(component_id == -1),
     #   y = df |>
     #     dplyr::group_by(component_id) |>
-    #     dplyr::distinct(feature_id, .keep_all = TRUE) |>
+    #     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     #     dplyr::add_count() |>
     #     dplyr::ungroup() |>
-    #     dplyr::filter(n <= 2) |>
+    #     tidytable::filter(n <= 2) |>
     #     tidytable::select(-n)
     # )
 
@@ -187,12 +187,12 @@ clean_bio <-
           dplyr::group_by(feature_source) |>
           dplyr::add_count() |>
           dplyr::ungroup() |>
-          dplyr::filter(n >= 2) |>
+          tidytable::filter(n >= 2) |>
           tidytable::select(-n),
         df,
         by = stats::setNames("feature_id", "feature_target")
       ) |>
-      dplyr::filter(!is.na(feature_source))
+      tidytable::filter(!is.na(feature_source))
 
     log_debug("... at the (classyfire) kingdom level \n")
     freq_cla_kin <- df3 |>
@@ -212,7 +212,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_1_cla_kingdom,
         .keep_all = TRUE
       ) |>
@@ -232,7 +232,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_1_cla_kingdom) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_cla_kin = candidate_structure_1_cla_kingdom,
@@ -265,7 +265,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_1_npc_pathway,
         .keep_all = TRUE
       ) |>
@@ -285,7 +285,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_1_npc_pathway) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_npc_pat = candidate_structure_1_npc_pathway,
@@ -318,7 +318,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_2_cla_superclass,
         .keep_all = TRUE
       ) |>
@@ -338,7 +338,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_2_cla_superclass) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_cla_sup = candidate_structure_2_cla_superclass,
@@ -371,7 +371,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_2_npc_superclass,
         .keep_all = TRUE
       ) |>
@@ -391,7 +391,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_2_npc_superclass) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_npc_sup = candidate_structure_2_npc_superclass,
@@ -424,7 +424,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_3_cla_class,
         .keep_all = TRUE
       ) |>
@@ -444,7 +444,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_3_cla_class) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_cla_cla = candidate_structure_3_cla_class,
@@ -477,7 +477,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_3_npc_class,
         .keep_all = TRUE
       ) |>
@@ -497,7 +497,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_3_npc_class) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_npc_cla = candidate_structure_3_npc_class,
@@ -530,7 +530,7 @@ clean_bio <-
       ) |>
       dplyr::mutate(rank_final = as.numeric(rank_final)) |>
       dplyr::arrange(rank_final) |>
-      dplyr::distinct(feature_source,
+      tidytable::distinct(feature_source,
         candidate_structure_4_cla_parent,
         .keep_all = TRUE
       ) |>
@@ -550,7 +550,7 @@ clean_bio <-
       dplyr::group_by(feature_source) |>
       dplyr::arrange(-consistency_score_chemical_4_cla_parent) |>
       dplyr::ungroup() |>
-      dplyr::distinct(feature_source, .keep_all = TRUE) |>
+      tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
         consensus_structure_cla_par = candidate_structure_4_cla_parent,

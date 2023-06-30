@@ -78,12 +78,12 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
   hmdb_df <-
     lapply(X = values, FUN = extract_value_from_hmdb_xml) |>
     data.frame() |>
-    dplyr::distinct()
+    tidytable::distinct()
 
   log_debug(x = "Formatting HMDB")
   hmdb_prepared <- hmdb_df |>
     dplyr::mutate_all(dplyr::na_if, "") |>
-    dplyr::filter(!is.na(inchikey)) |>
+    tidytable::filter(!is.na(inchikey)) |>
     dplyr::mutate(
       structure_inchikey_2D = substring(
         text = inchikey,

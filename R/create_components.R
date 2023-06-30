@@ -35,7 +35,7 @@ create_components <-
       FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows() |>
+      tidytable::bind_rows() |>
       tidytable::select(feature_source, feature_target) |>
       tidytable::distinct()
 

@@ -38,7 +38,7 @@ prepare_features_edges <-
       X = input, FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
@@ -47,7 +47,7 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      dplyr::filter(feature_source != feature_target)
+      tidytable::filter(feature_source != feature_target)
 
     ## Export edges table
     log_debug(x = "Exporting ...")

@@ -135,7 +135,7 @@ prepare_libraries_sop_merged <-
       )
     }
 
-    tables <- dplyr::bind_rows(libraries) |>
+    tables <- tidytable::bind_rows(libraries) |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -149,7 +149,7 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Completing organisms taxonomy")
     table_organisms_taxonomy_ott_2 <- table_keys |>
       tidytable::anti_join(table_organisms_taxonomy_ott) |>
-      tidytable::distinct(organism = organism_name) |> 
+      tidytable::distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
@@ -159,7 +159,7 @@ prepare_libraries_sop_merged <-
 
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
-        dplyr::bind_rows(table_organisms_taxonomy_ott_full |>
+        tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character)))
     }
 
@@ -189,7 +189,7 @@ prepare_libraries_sop_merged <-
         tidytable::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
-        dplyr::filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)
