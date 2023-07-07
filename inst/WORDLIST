@@ -18,10 +18,11 @@ ISDB
 InChI
 InChIKey
 Lifecycle
-MGF
-MZmine
 MatchForwardReverseParam
+MGF
+MegaLinter
 MsCoreUtils
+MZmine
 NPC
 NPClassifier
 OTT

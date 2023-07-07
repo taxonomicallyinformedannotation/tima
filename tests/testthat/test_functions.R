@@ -187,11 +187,7 @@ testthat::test_that("Whole process", {
   step <- "prepare_libraries_spectra"
   params <- get_params(step = step)
   ### LOTUS
-  ## Pos
-  prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[2]] |>
-      gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-    output = params$files$libraries$spectral$is$pos,
+  col_args <- list(
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
@@ -207,13 +203,23 @@ testthat::test_that("Whole process", {
     col_si = NULL,
     col_sp = NULL,
     col_sy = NULL,
-    col_xl = NULL,
-    metad = CompoundDb::make_metadata(
-      source = "LOTUS",
-      url = "https://doi.org/10.5281/zenodo.5607185",
-      source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-      source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
-      organism = "Life"
+    col_xl = NULL
+  )
+  ## Pos
+  do.call(
+    what = prepare_libraries_spectra,
+    args = c(
+      col_args,
+      input = params$files$libraries$spectral$is$raw[[2]] |>
+        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
+      output = params$files$libraries$spectral$is$pos,
+      metad = CompoundDb::make_metadata(
+        source = "LOTUS",
+        url = "https://doi.org/10.5281/zenodo.5607185",
+        source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
+        source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+        organism = "Life"
+      )
     )
   )
   ## Check the library already exists warning
@@ -223,27 +229,15 @@ testthat::test_that("Whole process", {
     output = params$files$libraries$spectral$is$pos
   )
   ## Neg & without metadata
-  prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[1]] |>
-      gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
-    output = params$files$libraries$spectral$is$neg,
-    col_ce = NULL,
-    col_ci = "FILENAME",
-    col_em = "EXACTMASS",
-    col_in = NULL,
-    col_io = "INCHI",
-    col_ik = NULL,
-    col_il = "NAME",
-    col_mf = "MOLECULAR_FORMULA",
-    col_na = NULL,
-    col_po = "IONMODE",
-    col_sm = NULL,
-    col_sn = "SMILES",
-    col_si = NULL,
-    col_sp = NULL,
-    col_sy = NULL,
-    col_xl = NULL,
-    polarity = "neg"
+  do.call(
+    what = prepare_libraries_spectra,
+    args = c(
+      col_args,
+      input = params$files$libraries$spectral$is$raw[[1]] |>
+        gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
+      output = params$files$libraries$spectral$is$neg,
+      polarity = "neg"
+    )
   )
   ## Classical
   prepare_libraries_spectra()
