@@ -114,13 +114,12 @@ clean_chemo <-
           score_chemical >= minimalMs1Chemo
         # Or chemical consistency score is obtained
       ) |>
-      dplyr::group_by(feature_id) |>
-      tidytable::distinct(structure_inchikey_2D,
+      tidytable::distinct(feature_id,
+        structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo))) |>
-      dplyr::filter(rank_final <= candidatesFinal) |>
-      dplyr::ungroup()
+      dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
+      dplyr::filter(rank_final <= candidatesFinal, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
@@ -203,8 +202,8 @@ clean_chemo <-
     df3 <- df2 |>
       tidytable::left_join(references) |>
       dplyr::group_by(dplyr::across(c(-reference_doi))) |>
-      dplyr::summarize(dplyr::across(
-        c(reference_doi),
+      dplyr::reframe(dplyr::across(
+        .cols = c(reference_doi),
         .fns = function(x) {
           gsub(
             pattern = "\\bNA\\b",
@@ -256,8 +255,8 @@ clean_chemo <-
       log_debug("summarizing results \n")
       df4 <- df3 |>
         dplyr::group_by(feature_id) |>
-        dplyr::summarize(dplyr::across(
-          colnames(df3)[5:32],
+        dplyr::reframe(dplyr::across(
+          .cols = colnames(df3)[5:32],
           .fns = function(x) {
             gsub(
               pattern = "\\bNA\\b",

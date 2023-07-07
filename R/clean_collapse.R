@@ -11,8 +11,8 @@
 #' @examples NULL
 clean_collapse <- function(grouped_df) {
   clean_collapse_df <- grouped_df |>
-    dplyr::summarize(dplyr::across(
-      dplyr::everything(),
+    dplyr::reframe(dplyr::across(
+      .cols = dplyr::everything(),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }

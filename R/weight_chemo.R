@@ -233,7 +233,6 @@ weight_chemo <-
           # as.numeric(score_input_normalized)
         )
       ) |>
-      dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_chemical)) |>
       dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
       tidytable::distinct(feature_id,
@@ -246,10 +245,10 @@ weight_chemo <-
       ) |>
       dplyr::mutate(
         rank_initial = (dplyr::dense_rank(-as.numeric(score_input))),
-        rank_final = (dplyr::dense_rank(-score_pondered_chemo))
+        rank_final = (dplyr::dense_rank(-score_pondered_chemo)),
+        .by = c(feature_id)
       ) |>
       dplyr::arrange(rank_final) |>
-      dplyr::ungroup() |>
       dplyr::arrange(as.numeric(feature_id)) |>
       data.frame()
 

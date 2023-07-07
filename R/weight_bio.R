@@ -721,13 +721,11 @@ weight_bio <-
       # step_spe2,
       step_var
     ) |>
-      dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_biological)) |>
       tidytable::distinct(feature_id,
         structure_inchikey_2D,
         .keep_all = TRUE
-      ) |>
-      dplyr::ungroup()
+      )
 
     log_debug("joining with initial results \n")
     biologically_weighted_full <-
@@ -757,7 +755,6 @@ weight_bio <-
       0
 
     biologically_weighted_full <- biologically_weighted_full |>
-      dplyr::group_by(feature_id) |>
       dplyr::arrange(dplyr::desc(score_pondered_bio)) |>
       tidytable::distinct(
         feature_id,
@@ -770,14 +767,14 @@ weight_bio <-
       ) |>
       dplyr::mutate(
         rank_initial = dplyr::dense_rank(-as.numeric(score_input)),
-        rank_final = dplyr::dense_rank(-score_pondered_bio)
+        rank_final = dplyr::dense_rank(-score_pondered_bio),
+        .by = c(feature_id)
       ) |>
       dplyr::arrange(
         rank_final,
         score_pondered_bio
       ) |>
       dplyr::arrange(as.numeric(feature_id)) |>
-      dplyr::ungroup() |>
       tidytable::tidytable()
 
     return(biologically_weighted_full)

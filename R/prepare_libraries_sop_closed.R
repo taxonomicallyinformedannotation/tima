@@ -94,7 +94,6 @@ prepare_libraries_sop_closed <-
           organism_taxonomy_09species,
           organism_taxonomy_10varietas
         ) |>
-        tidytable::data.table() |>
         round_reals() |>
         tidytable::distinct() |>
         dplyr::mutate(reference_doi = NA)

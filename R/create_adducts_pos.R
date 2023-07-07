@@ -85,7 +85,7 @@ create_adducts_pos <- function(massesTable, adductsTable) {
 
   ## Pivot the adducts_pos table to get a long format with adduct and adduct mass as columns
   adducts_pos <- adducts_pos |>
-    tidytable::pivot_longer(2:dplyr::all_of(n)) |>
+    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
     dplyr::select(dplyr::everything(),
       adduct = name,
       adduct_mass = value

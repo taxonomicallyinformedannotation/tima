@@ -143,9 +143,12 @@ complement_metadata_structures <- function(df,
       structure_inchikey_2D,
       structure_smiles_2D
     ) |>
-    dplyr::summarize(dplyr::across(dplyr::everything(), function(x) {
-      x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-    })) |>
+    dplyr::reframe(dplyr::across(
+      .cols = dplyr::everything(),
+      .fns = function(x) {
+        x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
+      }
+    )) |>
     dplyr::ungroup() |>
     dplyr::mutate(dplyr::across(dplyr::everything(), trimws)) |>
     ## Avoid small discrepancies

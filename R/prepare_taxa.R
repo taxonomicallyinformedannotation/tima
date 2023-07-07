@@ -104,9 +104,7 @@ prepare_taxa <-
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
       dplyr::filter(value != 0) |>
-      dplyr::group_by(rowname) |>
-      dplyr::mutate(rank = rank(-value)) |>
-      dplyr::ungroup() |>
+      dplyr::mutate(rank = rank(-value), .by = c(rowname)) |>
       dplyr::filter(rank <= top_k) |>
       dplyr::arrange(rowname, rank)
 
@@ -215,7 +213,9 @@ prepare_taxa <-
         sample_organism_10_varietas = dplyr::matches("organism_taxonomy_10varietas")
       ) |>
       dplyr::group_by(feature_id) |>
-      dplyr::summarize(dplyr::across(dplyr::everything(), function(x) {
+      dplyr::reframe(dplyr::across(
+        .cols = dplyr::everything(),
+        .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       })) |>
       dplyr::ungroup() |>

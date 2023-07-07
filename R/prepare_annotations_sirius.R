@@ -230,7 +230,7 @@ prepare_annotations_sirius <-
 
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::select(
+        dplyr::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -350,6 +350,9 @@ prepare_annotations_sirius <-
         })) |>
         dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
           tidytable::na_if(x, "null")
+        })) |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+          tidytable::na_if(x, "")
         })) |>
         round_reals() |>
         dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
