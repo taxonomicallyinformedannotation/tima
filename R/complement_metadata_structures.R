@@ -296,7 +296,10 @@ complement_metadata_structures <- function(df,
       -structure_taxonomy_classyfire_02superclass_i,
       -structure_taxonomy_classyfire_03class_i,
       -structure_taxonomy_classyfire_04directparent_i
-    )
+    ) |> 
+    dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::na_if(x, "")
+    }))
 
   ## TODO if (quickmode == FALSE){...}
 
