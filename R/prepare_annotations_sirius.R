@@ -167,7 +167,7 @@ prepare_annotations_sirius <-
         ),
         FUN = tidytable::fread,
         na.strings = c("", "NA"),
-        colClasses = "c"
+        colClasses = "character"
       )
 
       names(compound_summary) <- list.files(
