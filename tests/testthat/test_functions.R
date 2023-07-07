@@ -223,7 +223,6 @@ testthat::test_that("Whole process", {
       output = params$files$libraries$spectral$is$pos
     )
   )
-  exec(list, !!!args)
   ## Check the library already exists warning
   prepare_libraries_spectra(
     input = params$files$libraries$spectral$is$raw[[2]] |>
