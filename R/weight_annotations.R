@@ -204,81 +204,23 @@ weight_annotations <-
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-
-      weight_bio(
-        annotationTable = annotation_table_taxed,
-        structureOrganismPairsTable = structure_organism_pairs_table,
-        weightSpectral = weight_spectral,
-        weightBiological = weight_biological,
-        scoreBiologicalDomain = score_biological_domain,
-        scoreBiologicalKingdom = score_biological_kingdom,
-        scoreBiologicalPhylum = score_biological_phylum,
-        scoreBiologicalClass = score_biological_class,
-        scoreBiologicalOrder = score_biological_order,
-        scoreBiologicalFamily = score_biological_family,
-        scoreBiologicalTribe = score_biological_tribe,
-        scoreBiologicalGenus = score_biological_genus,
-        scoreBiologicalSpecies = score_biological_species,
-        scoreBiologicalVariety = score_biological_variety
-      )
+      weight_bio()
 
     annotation_table_weighted_bio |>
-      decorate_bio(
-        sc_kin = score_biological_kingdom,
-        sc_phy = score_biological_phylum,
-        sc_cla = score_biological_class,
-        sc_ord = score_biological_order,
-        sc_fam = score_biological_family,
-        sc_gen = score_biological_genus,
-        sc_spe = score_biological_species,
-        sc_var = score_biological_variety
-      )
+      decorate_bio()
 
     log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-    annotation_table_weighted_bio_cleaned <- clean_bio(
-      annotationTableWeightedBio = annotation_table_weighted_bio,
-      edgesTable = edges_table,
-      candidatesInitial = candidates_initial,
-      minimalMs1Bio = minimal_ms1_bio
-    )
+    annotation_table_weighted_bio_cleaned <- clean_bio()
 
     log_debug(x = "performing chemically informed scoring")
     annotation_table_weighted_chemo <-
-      weight_chemo(
-        annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
-        weightSpectral = weight_spectral,
-        weightBiological = weight_biological,
-        weightChemical = weight_chemical,
-        scoreChemicalClaKingdom = score_chemical_cla_kingdom,
-        scoreChemicalClaSuperclass = score_chemical_cla_superclass,
-        scoreChemicalClaClass = score_chemical_cla_class,
-        scoreChemicalClaParent = score_chemical_cla_parent,
-        scoreChemicalNpcPathway = score_chemical_npc_pathway,
-        scoreChemicalNpcSuperclass = score_chemical_npc_superclass,
-        scoreChemicalNpcClass = score_chemical_npc_class
-      )
+      weight_chemo()
 
     annotation_table_weighted_chemo |>
-      decorate_chemo(
-        sc_cla_kin = score_chemical_cla_kingdom,
-        sc_cla_sup = score_chemical_cla_superclass,
-        sc_cla_cla = score_chemical_cla_class,
-        sc_cla_par = score_chemical_cla_parent,
-        sc_npc_pat = score_chemical_npc_pathway,
-        sc_npc_sup = score_chemical_npc_superclass,
-        sc_npc_cla = score_chemical_npc_class
-      )
+      decorate_chemo()
 
     log_debug(x = "cleaning for export")
-    results <- clean_chemo(
-      annotationTableWeightedChemo = annotation_table_weighted_chemo,
-      componentsTable = components_table,
-      featuresTable = features_table,
-      structureOrganismPairsTable = structure_organism_pairs_table,
-      candidatesFinal = candidates_final,
-      minimalMs1Bio = minimal_ms1_bio,
-      minimalMs1Chemo = minimal_ms1_chemo,
-      summarize = summarise
-    )
+    results <- clean_chemo()
 
     log_debug(x = "Exporting ...")
     time <- format(Sys.time(), "%y%m%d_%H%M%OS")

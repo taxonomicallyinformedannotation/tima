@@ -14,15 +14,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-get_file(
-  url = paths$urls$examples$sirius,
-  export = paths$data$interim$annotations$example_sirius
-)
-message("Unzipping")
-utils::unzip(
-  zipfile = paths$data$interim$annotations$example_sirius,
-  exdir = dirname(paths$data$interim$annotations$example_sirius)
-)
+get_example_sirius()
 
 end <- Sys.time()
 
