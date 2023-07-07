@@ -648,7 +648,7 @@ annotate_masses <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidytable::pivot_longer(cols = dplyr::all_of(4:cols))
+        tidytable::pivot_longer(cols = tidytable::all_of(4:cols))
     } else {
       df17 <- df16 |>
         tidytable::select(
@@ -678,7 +678,7 @@ annotate_masses <-
       cols <- ncol(df17)
 
       df17 <- df17 |>
-        tidytable::pivot_longer(cols = dplyr::all_of(4:cols))
+        tidytable::pivot_longer(cols = tidytable::all_of(4:cols))
     }
 
     df17 <- df17 |>
@@ -779,7 +779,6 @@ annotate_masses <-
     ) |>
       tidytable::left_join(df13_b) |>
       dplyr::filter(!is.na(structure_inchikey_2D)) |>
-      dplyr::group_by(feature_id) |>
       dplyr::ungroup() |>
       tidytable::distinct(
         feature_id,

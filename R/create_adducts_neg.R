@@ -53,7 +53,7 @@ create_adducts_neg <- function(massesTable, adductsTable) {
   ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
   n <- ncol(adducts_neg)
   adducts_neg <- adducts_neg |>
-    tidytable::pivot_longer(2:dplyr::all_of(n)) |>
+    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
     dplyr::select(dplyr::everything(),
       adduct = name,
       adduct_mass = value

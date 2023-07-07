@@ -173,6 +173,9 @@ prepare_annotations_spectra <-
       dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
         tidytable::na_if(x, "null")
       })) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidytable::na_if(x, "")
+      })) |>
       round_reals() |>
       dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
       complement_metadata_structures(
