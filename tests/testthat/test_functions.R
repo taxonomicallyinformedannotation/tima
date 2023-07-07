@@ -90,17 +90,7 @@ testthat::test_that("Whole process", {
 
   #### SIRIUS
   ## mini version for tests
-  sirius_mini <- paths$data$interim$annotations$example_sirius |>
-    gsub(pattern = ".zip", replacement = "_mini.zip")
-  get_file(
-    url = paths$urls$examples$sirius,
-    export = paths$data$interim$annotations$example_sirius
-  )
-  message("Unzipping")
-  utils::unzip(
-    zipfile = paths$data$interim$annotations$example_sirius,
-    exdir = dirname(paths$data$interim$annotations$example_sirius)
-  )
+  get_example_sirius()
 
   ### Libraries
   #### ECMDB

@@ -124,11 +124,7 @@ split_tables_sop <- function(table) {
       structure_inchikey,
       structure_smiles
     ) |>
-    dplyr::summarize(dplyr::across(dplyr::everything(), .fns = function(x) {
-      x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-    })) |>
-    dplyr::ungroup() |>
-    dplyr::mutate(dplyr::across(dplyr::everything(), trimws))
+    clean_collapse()
 
   table_structures_taxonomy_npc <- table |>
     dplyr::filter(!is.na(structure_smiles_2D)) |>
@@ -145,11 +141,7 @@ split_tables_sop <- function(table) {
     ) |>
     tidytable::distinct() |>
     dplyr::group_by(structure_smiles_2D) |>
-    dplyr::summarize(dplyr::across(dplyr::everything(), .fns = function(x) {
-      x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-    })) |>
-    dplyr::ungroup() |>
-    dplyr::mutate(dplyr::across(dplyr::everything(), trimws)) |>
+    clean_collapse() |>
     dplyr::mutate(dplyr::across(
       dplyr::matches("taxonomy.*_0"),
       .fns = function(x) {
