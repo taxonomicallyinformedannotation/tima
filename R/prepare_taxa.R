@@ -216,8 +216,9 @@ prepare_taxa <-
       dplyr::reframe(dplyr::across(
         .cols = dplyr::everything(),
         .fns = function(x) {
-        x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-      })) |>
+          x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
+        }
+      )) |>
       dplyr::ungroup() |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
       dplyr::mutate(dplyr::across(
