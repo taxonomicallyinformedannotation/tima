@@ -23,7 +23,7 @@ if (Sys.info()[["sysname"]] != "Linux") {
 if (!requireNamespace("renv", quietly = TRUE)) {
   install.packages("renv")
 }
-renv::activate()
+renv::init()
 ###
 if (!requireNamespace("pak", quietly = TRUE)) {
   lib <- Sys.getenv("R_LIBS_SITE")
