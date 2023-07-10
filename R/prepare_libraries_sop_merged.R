@@ -136,6 +136,7 @@ prepare_libraries_sop_merged <-
     }
 
     tables <- tidytable::bind_rows(libraries) |>
+      tidytable::data.table() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -189,7 +190,7 @@ prepare_libraries_sop_merged <-
         tidytable::left_join(table_organisms_taxonomy_ott)
 
       table_keys <- table_keys |>
-        dplyr::filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)

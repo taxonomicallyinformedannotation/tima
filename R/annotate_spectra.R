@@ -208,7 +208,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       MetaboAnnotation::matchedData() |>
       data.frame() |>
       tidytable::tidytable() |>
-      dplyr::filter(!is.na(score))
+      tidytable::filter(!is.na(score))
 
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
@@ -273,9 +273,11 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     if (condition == "AND") {
       df_final <- df_final |>
-        dplyr::filter(score >= threshold &
-          count_peaks_matched >= npeaks &
-          presence_ratio >= rpeaks)
+        tidytable::filter(
+          score >= threshold &
+            count_peaks_matched >= npeaks &
+            presence_ratio >= rpeaks
+        )
     }
 
     log_debug(

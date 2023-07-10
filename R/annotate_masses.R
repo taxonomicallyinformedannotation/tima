@@ -210,7 +210,7 @@ annotate_masses <-
 
     adducts <- unlist(adducts_list[[msMode]])
     # |>
-    #   dplyr::filter(
+    #   tidytable::filter(
     #     exact_mass %in%
     #       structure_organism_pairs_table[["structure_exact_mass"]])
 
@@ -243,7 +243,7 @@ annotate_masses <-
       )) |>
       # tidytable::left_join(tidytable::fread(file = org_tax_ott,
       #         na.strings = c("","NA"))) |>
-      dplyr::filter(!is.na(structure_exact_mass)) |>
+      tidytable::filter(!is.na(structure_exact_mass)) |>
       dplyr::mutate(dplyr::across(
         c(
           structure_exact_mass,
@@ -261,14 +261,14 @@ annotate_masses <-
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
     df2 <- structureExactMassTable |>
-      dplyr::filter(!is.na(exact_mass)) |>
-      dplyr::filter(adduct %in% adducts) |>
+      tidytable::filter(!is.na(exact_mass)) |>
+      tidytable::filter(adduct %in% adducts) |>
       dplyr::mutate(
         value_min = adduct_mass - (1E-6 * tolerancePpm * adduct_mass),
         value_max = adduct_mass + (1E-6 * tolerancePpm * adduct_mass)
       ) |>
-      dplyr::filter(!is.na(value_min)) |>
-      dplyr::filter(value_min > 0)
+      tidytable::filter(!is.na(value_min)) |>
+      tidytable::filter(value_min > 0)
 
     df3 <- featuresTable |>
       dplyr::mutate(dplyr::across(

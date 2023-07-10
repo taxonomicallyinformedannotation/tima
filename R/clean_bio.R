@@ -154,7 +154,7 @@ clean_bio <-
       tidytable::tidytable()
     # log_debug("keeping clusters with at least 3 features  \n")
     # df1 <- df |>
-    #   dplyr::filter(component_id != -1) |>
+    #   tidytable::filter(component_id != -1) |>
     #   dplyr::group_by(component_id) |>
     #   tidytable::distinct(feature_id,
     #     structure_inchikey_2D,
@@ -162,7 +162,7 @@ clean_bio <-
     #   ) |>
     #   dplyr::add_count() |>
     #   dplyr::ungroup() |>
-    #   dplyr::filter(n >= 3) |>
+    #   tidytable::filter(n >= 3) |>
     #   tidytable::select(-n)
     #
     # log_debug("keeping clusters with less than 3 features \n")

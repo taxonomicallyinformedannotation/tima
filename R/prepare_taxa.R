@@ -88,10 +88,10 @@ prepare_taxa <-
     feature_table <- feature_table |>
       tidytable::select(
         tidytable::all_of(name_features),
-        dplyr::matches(" Peak area"),
-        dplyr::matches("quant_"),
+        tidytable::matches(" Peak area"),
+        tidytable::matches("quant_"),
       ) |>
-      tidytable::select(-dplyr::matches("quant_peaktable")) |>
+      tidytable::select(-tidytable::matches("quant_peaktable")) |>
       tidyfst::col_rn(var = name_features)
     colnames(feature_table) <- colnames(feature_table) |>
       stringi::stri_replace_all_fixed(
@@ -103,10 +103,10 @@ prepare_taxa <-
     top_n <- feature_table |>
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
-      dplyr::filter(value != 0) |>
-      dplyr::mutate(rank = rank(-value), .by = c(rowname)) |>
-      dplyr::filter(rank <= top_k) |>
-      dplyr::arrange(rowname, rank)
+      tidytable::filter(value != 0) |>
+      tidytable::mutate(rank = rank(-value), .by = c(rowname)) |>
+      tidytable::filter(rank <= top_k) |>
+      tidytable::arrange(rowname, rank)
 
     if (!is.null(taxon)) {
       log_debug(x = "Forcing all features to given organism")
@@ -116,8 +116,8 @@ prepare_taxa <-
 
     log_debug(x = "Preparing organisms names")
     organism_table <- metadata_table |>
-      dplyr::filter(!is.na(!!as.name(colname))) |>
-      dplyr::distinct(!!as.name(colname)) |>
+      tidytable::filter(!is.na(!!as.name(colname))) |>
+      tidytable::distinct(!!as.name(colname)) |>
       tidytable::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism,
         sep = "\\|",
@@ -134,7 +134,7 @@ prepare_taxa <-
 
     log_debug(x = "Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
-      dplyr::filter(is.na(organism_taxonomy_ottid))
+      tidytable::filter(is.na(organism_taxonomy_ottid))
 
     if (nrow(organism_table_missing) != 0) {
       biological_metadata_1 <- organism_table_missing |>
@@ -142,7 +142,7 @@ prepare_taxa <-
 
       log_debug(x = "Joining all results")
       biological_metadata <- organism_table_filled |>
-        dplyr::filter(!is.na(organism_taxonomy_ottid)) |>
+        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
         dplyr::rename(organism_name = organism) |>
         tidytable::bind_rows(biological_metadata_1)
     } else {
