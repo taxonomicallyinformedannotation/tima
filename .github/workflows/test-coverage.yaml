@@ -32,9 +32,6 @@ jobs:
         with:
           extra-packages: any::covr
           needs: coverage
-      - name: Install package
-        run: |
-          R CMD INSTALL .
       - name: Test coverage
         run: |
           covr::codecov(
