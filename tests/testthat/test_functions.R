@@ -11,9 +11,6 @@ testthat::test_that("Whole process", {
     cp paths.yaml inst/paths.yaml
     "
   )
-  ## Sourcing all functions
-  list.files("R/", full.names = TRUE) |>
-    lapply(source)
 
   ## Prepare parameters
   paths <<- parse_yaml_paths()
