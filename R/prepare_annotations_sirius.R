@@ -41,6 +41,13 @@ utils::globalVariables(
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include harmonize_names_sirius.R
+#' @include pre_harmonize_names_sirius.R
+#' @include round_reals.R
+#'
 #' @param input_directory Directory containing the Sirius results
 #' @param output Output where to save prepared results
 #' @param str_2D_3D File containing 2D and 3D structures

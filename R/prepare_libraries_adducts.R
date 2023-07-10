@@ -10,6 +10,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares adducts for further use
 #'
+#' @include create_adducts_neg.R
+#' @include create_adducts_pos.R
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param str_met File containing structures metadata
 #' @param adducts_masses Table of adducts taken as input
 #' @param adducts_output_path Path where the adducts will be saved

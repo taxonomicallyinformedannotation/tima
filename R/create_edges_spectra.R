@@ -8,6 +8,12 @@ utils::globalVariables(c(
 #'
 #' @description This function create edges based on fragmentation spectra similarity
 #'
+#' @include create_edges_parallel.R
+#' @include import_spectra.R
+#' @include normalize_peaks.R
+#' @include remove_above_precursor.R
+#' @include sanitize_spectra.R
+#'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param output Output file.
 #' @param name_source Name of the source features column

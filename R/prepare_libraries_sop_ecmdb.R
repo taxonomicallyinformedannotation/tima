@@ -13,6 +13,10 @@ utils::globalVariables(
 
 #' @title Prepare libraries of structure organism pairs ECMDB
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param parameters params

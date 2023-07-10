@@ -8,6 +8,8 @@ utils::globalVariables(
 #'
 #' @description This function export spectra.
 #'
+#' @include export_spectra.R
+#'
 #' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
 #' @param spectra The spectra object where spectra are stored
 #' @param meta Optional. Metadata as in 'CompoundDb' package

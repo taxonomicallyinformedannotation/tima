@@ -37,6 +37,8 @@ utils::globalVariables(
 #'
 #' @description This function splits the structure organism table for efficiency.
 #'
+#' @include clean_collapse.R
+#'
 #' @param table Table to split
 #'
 #' @return NULL

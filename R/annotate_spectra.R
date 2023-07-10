@@ -29,6 +29,10 @@ utils::globalVariables(
 #'    Number of matched peaks and their ratio are also available (See MatchForwardReverseParam for details).
 #'    Parallel processing is also made available.
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include import_spectra.R
+#'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param library Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.

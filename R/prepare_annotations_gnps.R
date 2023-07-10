@@ -39,6 +39,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares GNPS obtained annotations for further use
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures

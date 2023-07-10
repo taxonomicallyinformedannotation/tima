@@ -19,6 +19,10 @@ utils::globalVariables(
 #'    It can either attribute all features to a single organism, or attribute them to multiple ones,
 #'    according to their relative intensities among the samples.
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include get_organism_taxonomy_ott.R
+#'
 #' @param input File containing your features intensities
 #' @param extension Does your column names contain the file extension? (MZmine mainly)
 #' @param name_features Name of the features column in the features data

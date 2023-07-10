@@ -9,6 +9,9 @@ utils::globalVariables(
 #'
 #' @description This function prepares edges for further use
 #'
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param input Input file if 'manual'
 #' @param output Output file
 #' @param name_source Name of the source features column
