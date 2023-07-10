@@ -34,7 +34,7 @@ jobs:
           needs: coverage
       - name: Install package
         run: |
-          Rscript inst/scripts/install.R
+          R CMD INSTALL .
       - name: Test coverage
         run: |
           covr::codecov(
