@@ -132,7 +132,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     # )
     # edges <- MetaboAnnotation::matchedData(matches_sim_2) |>
     #   data.frame() |>
-    #   dplyr::filter(acquisitionNum != target_acquisitionNum) |>
+    #   tidytable::filter(acquisitionNum != target_acquisitionNum) |>
     #   tidytable::select(
     #     !!as.name(name_source) := "acquisitionNum",
     #     !!as.name(name_target) := "target_acquisitionNum",
@@ -177,14 +177,14 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
   if (condition == "AND") {
     edges <- edges |>
-      dplyr::filter(
+      tidytable::filter(
         score >= threshold,
         matched_peaks_count >= npeaks,
         presence_ratio >= rpeaks
       )
   } else {
     edges <- edges |>
-      dplyr::filter(score >= threshold |
+      tidytable::filter(score >= threshold |
         matched_peaks_count >= npeaks |
         presence_ratio >= rpeaks)
   }

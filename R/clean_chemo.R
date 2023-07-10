@@ -119,7 +119,7 @@ clean_chemo <-
         .keep_all = TRUE
       ) |>
       dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
-      dplyr::filter(rank_final <= candidatesFinal, .by = c(feature_id))
+      tidytable::filter(rank_final <= candidatesFinal, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
