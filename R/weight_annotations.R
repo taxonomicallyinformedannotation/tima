@@ -8,6 +8,15 @@ utils::globalVariables(
 #'
 #' @description This function weights and eventually complements initial annotations.
 #'
+#' @include clean_bio.R
+#' @include clean_chemo.R
+#' @include decorate_bio.R
+#' @include decorate_chemo.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include weight_bio.R
+#' @include weight_chemo.R
+#'
 #' @param library Library containing the keys
 #' @param org_tax_ott File containing organisms taxonomy (OTT)
 #' @param str_2D_3D File containing 2D and 3D structures

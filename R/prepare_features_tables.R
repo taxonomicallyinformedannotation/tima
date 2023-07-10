@@ -2,6 +2,9 @@
 #'
 #' @description This function prepares features
 #'
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
 #' @param name_features Name of the features column in the features data

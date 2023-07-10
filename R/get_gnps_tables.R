@@ -2,6 +2,8 @@
 #'
 #' @description This function gets GNPS tables from corresponding job ID.
 #'
+#' @include get_file.R
+#'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example
 #' @param filename Name of the file

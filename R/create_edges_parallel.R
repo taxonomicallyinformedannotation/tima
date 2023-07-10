@@ -2,6 +2,8 @@
 #'
 #' @description This function part of the creation of edges
 #'
+#' @include create_edges_progress.R
+#'
 #' @param index Indices
 #' @param frags Fragments
 #' @param precs Precursors

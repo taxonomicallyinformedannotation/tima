@@ -29,6 +29,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares the spectral matches obtained previously to make them compatible
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures

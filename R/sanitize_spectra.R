@@ -2,6 +2,8 @@
 #'
 #' @description This function sanitizes spectra
 #'
+#' @include keep_peaks.R
+#'
 #' @param spectra Spectra object
 #' @param ratio Minimal ratio to the max peak
 #' @param cutoff Absolute minimal intensity

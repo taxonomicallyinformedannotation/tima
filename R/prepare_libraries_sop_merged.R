@@ -13,6 +13,11 @@ utils::globalVariables(
 #'
 #' @details It can be restricted to specific taxa to have more biologically meaningful annotation.
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include get_organism_taxonomy_ott.R
+#' @include split_tables_sop.R
+#'
 #' @param files List of libraries to be merged
 #' @param filter Boolean. TRUE or FALSE if you want to filter the library
 #' @param level Biological rank to be filtered. Kingdom, phylum, family, genus, ...

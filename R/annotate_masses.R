@@ -60,6 +60,12 @@ utils::globalVariables(
 #'
 #' @description This function annotates masses
 #'
+#' @include decorate_masses.R
+#' @include dist_groups.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param features Table containing your previous annotation to complement
 #' @param output_annotations Output for mass based structural annotations
 #' @param output_edges Output for mass based edges

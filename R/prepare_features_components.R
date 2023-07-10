@@ -9,6 +9,9 @@ utils::globalVariables(
 #'
 #' @description This function prepares the components (clusters in molecular network) for further use
 #'
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param parameters Params
