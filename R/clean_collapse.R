@@ -18,7 +18,10 @@ clean_collapse <- function(grouped_df) {
       }
     )) |>
     dplyr::ungroup() |>
-    dplyr::mutate(dplyr::across(dplyr::everything(), trimws))
+    dplyr::mutate(dplyr::across(dplyr::everything(), trimws)) |> 
+    dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::na_if(x, "")
+    }))
 
   return(clean_collapse_df)
 }
