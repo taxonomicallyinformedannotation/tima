@@ -53,6 +53,7 @@ prepare_libraries_sop_closed <-
         tidytable::fread(
           na.strings = c("", "NA")
         ) |>
+        data.frame() |>
         tidytable::tidytable()
 
       log_debug(x = "Formatting closed resource")

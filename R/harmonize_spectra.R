@@ -137,6 +137,7 @@ harmonize_spectra <- function(spectra,
 
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(spectra_missing) |>
+    data.frame() |>
     tidytable::tidytable() |>
     tidytable::select(
       collision_energy,

@@ -46,6 +46,7 @@ prepare_libraries_sop_ecmdb <-
           description = input,
           filename = file
         )) |>
+          data.frame() |>
           tidytable::tidytable()
       })
 
