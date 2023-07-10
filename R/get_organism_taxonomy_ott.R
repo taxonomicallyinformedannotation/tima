@@ -46,7 +46,7 @@ get_organism_taxonomy_ott <- function(df,
       organism,
       search_string
     ) |>
-    dplyr::select(
+    tidytable::select(
       canonical_name = organism,
       search_string
     ) |>
@@ -235,7 +235,7 @@ get_organism_taxonomy_ott <- function(df,
           names_from = "rank",
           values_from = c("name", "unique_name.y", "ott_id.y")
         ) |>
-        dplyr::select(
+        tidytable::select(
           organism_name = canonical_name,
           organism_taxonomy_ottid = ott_id,
           organism_taxonomy_01domain = dplyr::matches("name_domain"),

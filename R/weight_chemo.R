@@ -197,7 +197,7 @@ weight_chemo <-
     log_debug("... joining \n")
     df4 <- tidytable::left_join(
       df1 |>
-        dplyr::select(-dplyr::contains("candidate_structure")),
+        tidytable::select(-tidytable::contains("candidate_structure")),
       df3
     ) |>
       data.frame()

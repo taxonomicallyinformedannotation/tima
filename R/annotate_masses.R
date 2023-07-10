@@ -310,7 +310,7 @@ annotate_masses <-
         feature_id_dest = feature_id.y,
         mz_dest = mz.y
       ) |>
-      dplyr::select(
+      tidytable::select(
         dplyr::everything(),
         feature_id_dest,
         mz_dest
@@ -399,7 +399,7 @@ annotate_masses <-
         !!as.name(paste("feature_id", "dest", sep = "_")),
         label_dest
       ) |>
-      dplyr::select(
+      tidytable::select(
         feature_id := !!as.name(
           paste(
             "feature_id",
@@ -549,10 +549,10 @@ annotate_masses <-
       y = df13,
       by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
-      dplyr::select(
+      tidytable::select(
         structure_molecular_formula,
         library,
-        dplyr::everything(), -exact_mass
+        tidytable::everything(), -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       tidytable::distinct()
@@ -763,10 +763,10 @@ annotate_masses <-
         score_input = 0
         # score_input_normalized = 0
       ) |>
-      dplyr::select(
+      tidytable::select(
         structure_molecular_formula,
         library = library_name,
-        dplyr::everything(), -exact_mass, -adduct_value
+        tidytable::everything(), -exact_mass, -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -822,7 +822,7 @@ annotate_masses <-
     edges <- tidytable::bind_rows(
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
-        dplyr::select(
+        tidytable::select(
           !!as.name(name_source) := feature_id,
           !!as.name(name_target) := feature_id_dest,
           label
@@ -830,7 +830,7 @@ annotate_masses <-
         tidytable::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
-        dplyr::select(
+        tidytable::select(
           !!as.name(name_source) := feature_id,
           !!as.name(name_target) := feature_id_dest,
           label

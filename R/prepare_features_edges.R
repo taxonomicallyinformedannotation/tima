@@ -43,7 +43,7 @@ prepare_features_edges <-
     ## Format edges table
     log_debug(x = "Formatting edge table")
     edges_table_treated <- edges_table |>
-      dplyr::select(
+      tidytable::select(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>

@@ -79,14 +79,14 @@ create_adducts_pos <- function(massesTable, adductsTable) {
       `[2M+(H)1(ACN)1]1+` = 2 * exact_mass + proton + acetonitrile,
       `[2M+(Na)1(ACN)1]1+` = 2 * exact_mass + acetonitrile + sodium
     ) |>
-    dplyr::select(-colnames(adductsTable))
+    tidytable::select(-colnames(adductsTable))
 
   n <- ncol(adducts_pos)
 
   ## Pivot the adducts_pos table to get a long format with adduct and adduct mass as columns
   adducts_pos <- adducts_pos |>
     tidytable::pivot_longer(2:tidytable::all_of(n)) |>
-    dplyr::select(dplyr::everything(),
+    tidytable::select(tidytable::everything(),
       adduct = name,
       adduct_mass = value
     )

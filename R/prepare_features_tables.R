@@ -29,7 +29,7 @@ prepare_features_tables <-
       tidytable::fread(
         na.strings = c("", "NA")
       ) |>
-      dplyr::select(dplyr::all_of(c(
+      tidytable::select(tidytable::all_of(c(
         feature_id = name_features,
         rt = name_rt,
         mz = name_mz
