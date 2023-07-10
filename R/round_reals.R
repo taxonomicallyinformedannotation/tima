@@ -11,8 +11,8 @@
 round_reals <- function(df, dig = 5) {
   df |>
     # Round to 5 digits to avoid small discrepancies
-    dplyr::mutate(dplyr::across(
-      dplyr::any_of(
+    tidytable::mutate(tidytable::across(
+      tidytable::any_of(
         c(
           "structure_exact_mass",
           "structure_xlogp"

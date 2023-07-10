@@ -106,7 +106,7 @@ clean_chemo <-
       "chemical score \n"
     )
     df1 <- annotationTableWeightedChemo |>
-      dplyr::filter(
+      tidytable::filter(
         score_input > 0 |
           # Those lines are to keep ms1 annotation
           score_biological >= minimalMs1Bio |
@@ -118,14 +118,14 @@ clean_chemo <-
         structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(rank_final = (dplyr::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
+      tidytable::mutate(rank_final = (tidytable::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
       tidytable::filter(rank_final <= candidatesFinal, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
       tidytable::left_join(df1) |>
       tidytable::left_join(componentsTable) |>
-      dplyr::mutate(
+      tidytable::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
@@ -133,7 +133,7 @@ clean_chemo <-
           sep = "\u00a7"
         )
       ) |>
-      dplyr::distinct(
+      tidytable::distinct(
         feature_id,
         component_id,
         rt,
@@ -191,9 +191,9 @@ clean_chemo <-
       ) |>
       tidytable::distinct() |>
       tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
-      dplyr::filter(!is.na(value)) |>
-      dplyr::filter(value != "notClassified") |>
-      dplyr::distinct(structure_inchikey_2D,
+      tidytable::filter(!is.na(value)) |>
+      tidytable::filter(value != "notClassified") |>
+      tidytable::distinct(structure_inchikey_2D,
         best_candidate_organism = value,
         reference_doi
       )
@@ -249,7 +249,7 @@ clean_chemo <-
         reference_doi,
         tidytable::everything()
       ) |>
-      dplyr::arrange(rank_final)
+      tidytable::arrange(rank_final)
 
     if (summarize == TRUE) {
       log_debug("summarizing results \n")
@@ -271,7 +271,7 @@ clean_chemo <-
         tidytable::left_join(
           df3 |>
             tidytable::select("feature_id", !colnames(df4)) |>
-            dplyr::distinct()
+            tidytable::distinct()
         )
     } else {
       df5 <- df3
@@ -279,8 +279,8 @@ clean_chemo <-
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "")
       })) |>
       tidytable::select(tidytable::any_of(
@@ -328,15 +328,15 @@ clean_chemo <-
 
     log_debug("adding consensus again to droped candidates \n")
     df8 <- df6 |>
-      dplyr::filter(!is.na(structure_inchikey_2D))
+      tidytable::filter(!is.na(structure_inchikey_2D))
 
     df9 <- df6 |>
-      dplyr::filter(is.na(structure_inchikey_2D))
+      tidytable::filter(is.na(structure_inchikey_2D))
 
     df10 <- tidytable::left_join(
       df9,
       annotationTableWeightedChemo |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+        tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
     ) |>
       tidytable::select(tidytable::any_of(
         c(
@@ -360,10 +360,10 @@ clean_chemo <-
           "consistency_structure_cla_par"
         )
       )) |>
-      dplyr::distinct()
+      tidytable::distinct()
 
     df11 <- tidytable::bind_rows(df8, df10) |>
-      dplyr::arrange(as.numeric(feature_id))
+      tidytable::arrange(as.numeric(feature_id))
 
     ## Because cytoscape import fails otherwise
     colnames(df11) <-

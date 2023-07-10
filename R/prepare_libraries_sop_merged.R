@@ -150,7 +150,7 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Completing organisms taxonomy")
     table_organisms_taxonomy_ott_2 <- table_keys |>
       tidytable::anti_join(table_organisms_taxonomy_ott) |>
-      dplyr::distinct(organism = organism_name) |>
+      tidytable::distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_organisms_taxonomy_ott_2) != 0) {
@@ -161,7 +161,7 @@ prepare_libraries_sop_merged <-
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
         tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
-          dplyr::mutate(dplyr::across(dplyr::everything(), as.character)))
+          tidytable::mutate(tidytable::across(tidytable::everything(), as.character)))
     }
 
     log_debug(x = "Keeping structures")

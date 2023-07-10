@@ -52,7 +52,7 @@ prepare_libraries_sop_lotus <-
       tidytable::fread(
         na.strings = c("", "NA")
       ) |>
-      dplyr::mutate(
+      tidytable::mutate(
         structure_inchikey_2D = stringi::stri_sub(
           str = structure_inchikey,
           from = 1,
