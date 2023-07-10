@@ -133,21 +133,21 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     # edges <- MetaboAnnotation::matchedData(matches_sim_2) |>
     #   data.frame() |>
     #   dplyr::filter(acquisitionNum != target_acquisitionNum) |>
-    #   dplyr::select(
+    #   tidytable::select(
     #     !!as.name(name_source) := "acquisitionNum",
     #     !!as.name(name_target) := "target_acquisitionNum",
-    #     dplyr::everything()
+    #     tidytable::everything()
     #   )
 
     edges <- edges |>
-      dplyr::select(
+      tidytable::select(
         !!as.name(name_source) := "feature_id",
         !!as.name(name_target) := "target_id",
-        dplyr::everything()
+        tidytable::everything()
       )
 
     edges <- edges |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           name_source,
           name_target,

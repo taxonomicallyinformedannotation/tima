@@ -183,11 +183,11 @@ clean_chemo <-
       )
 
     references <- structureOrganismPairsTable |>
-      dplyr::select(
+      tidytable::select(
         structure_inchikey_2D,
         reference_doi,
         organism_name,
-        dplyr::contains("organism_taxonomy_")
+        tidytable::contains("organism_taxonomy_")
       ) |>
       tidytable::distinct() |>
       tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
@@ -213,7 +213,7 @@ clean_chemo <-
         }
       )) |>
       dplyr::ungroup() |>
-      dplyr::select(
+      tidytable::select(
         feature_id,
         component_id,
         rt,
@@ -247,7 +247,7 @@ clean_chemo <-
         best_candidate_organism,
         best_candidate_structure,
         reference_doi,
-        dplyr::everything()
+        tidytable::everything()
       ) |>
       dplyr::arrange(rank_final)
 
@@ -270,7 +270,7 @@ clean_chemo <-
       df5 <- df4 |>
         tidytable::left_join(
           df3 |>
-            dplyr::select("feature_id", !colnames(df4)) |>
+            tidytable::select("feature_id", !colnames(df4)) |>
             dplyr::distinct()
         )
     } else {
@@ -283,7 +283,7 @@ clean_chemo <-
       dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
         tidytable::na_if(x, "")
       })) |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           "feature_id",
           "component_id",
@@ -338,7 +338,7 @@ clean_chemo <-
       annotationTableWeightedChemo |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     ) |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           "feature_id",
           "component_id",

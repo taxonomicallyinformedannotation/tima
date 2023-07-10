@@ -731,7 +731,7 @@ weight_bio <-
     biologically_weighted_full <-
       tidytable::left_join(
         annotationTable |>
-          dplyr::select(-dplyr::contains("sample_")),
+          tidytable::select(-tidytable::contains("sample_")),
         biologically_weighted
       )
 

@@ -238,7 +238,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         ),
         structure_smiles_2D = dplyr::coalesce(target_smiles_2D, target_smiles)
       ) |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           "feature_id",
           "error_mz",

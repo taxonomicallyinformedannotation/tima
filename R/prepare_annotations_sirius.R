@@ -187,7 +187,7 @@ prepare_annotations_sirius <-
 
       canopus_npc_prepared <- canopus |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(dplyr::any_of(
+        tidytable::select(tidytable::any_of(
           c(
             "feature_id",
             "structure_taxonomy_npclassifier_01pathway" = "NPC#pathway",
@@ -230,7 +230,7 @@ prepare_annotations_sirius <-
 
       compound_adducts_prepared <- compound_adducts |>
         dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,

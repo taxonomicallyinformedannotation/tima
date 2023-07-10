@@ -125,8 +125,8 @@ harmonize_spectra <- function(spectra,
       x = !!as.name(co_po),
       ignore.case = TRUE
     )) |>
-    dplyr::select(
-      dplyr::any_of(c(columns_full)),
+    tidytable::select(
+      tidytable::any_of(c(columns_full)),
       precursorCharge,
       precursorMz,
       rtime,

@@ -86,12 +86,12 @@ prepare_taxa <-
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table |>
-      dplyr::select(
-        dplyr::all_of(name_features),
+      tidytable::select(
+        tidytable::all_of(name_features),
         dplyr::matches(" Peak area"),
         dplyr::matches("quant_"),
       ) |>
-      dplyr::select(-dplyr::matches("quant_peaktable")) |>
+      tidytable::select(-dplyr::matches("quant_peaktable")) |>
       tidyfst::col_rn(var = name_features)
     colnames(feature_table) <- colnames(feature_table) |>
       stringi::stri_replace_all_fixed(
@@ -118,7 +118,7 @@ prepare_taxa <-
     organism_table <- metadata_table |>
       dplyr::filter(!is.na(!!as.name(colname))) |>
       dplyr::distinct(!!as.name(colname)) |>
-      dplyr::select(organism = !!as.name(colname)) |>
+      tidytable::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism,
         sep = "\\|",
       )
@@ -184,8 +184,8 @@ prepare_taxa <-
     } else {
       metadata_table_joined <-
         tidytable::left_join(top_n, metadata_table, by = c("name" = "filename")) |>
-        dplyr::select(feature_id := rowname,
-          organismOriginal = dplyr::all_of(colname),
+        tidytable::select(feature_id := rowname,
+          organismOriginal = tidytable::all_of(colname),
           dplyr::everything()
         )
     }
@@ -199,7 +199,7 @@ prepare_taxa <-
       ) |>
       tidytable::distinct() |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::select(
+      tidytable::select(
         feature_id,
         sample_organism_01_domain = dplyr::matches("organism_taxonomy_01domain"),
         sample_organism_02_kingdom = dplyr::matches("organism_taxonomy_02kingdom"),
