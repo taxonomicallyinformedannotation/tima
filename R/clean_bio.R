@@ -561,6 +561,7 @@ clean_bio <-
       ) |>
       # In case there are no consensus at all because no network
       tidytable::mutate(tidytable::across(tidytable::where(is.logical), as.character)) |>
+      data.frame() |>
       tidytable::tidytable()
 
     # TODO Think about better scoring option

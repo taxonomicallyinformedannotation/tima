@@ -136,7 +136,8 @@ prepare_libraries_sop_merged <-
     }
 
     tables <- tidytable::bind_rows(libraries) |>
-      tidytable::data.table() |>
+      data.frame() |>
+      tidytable::tidytable() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")

@@ -775,6 +775,7 @@ weight_bio <-
         score_pondered_bio
       ) |>
       tidytable::arrange(as.numeric(feature_id)) |>
+      data.frame() |>
       tidytable::tidytable()
 
     return(biologically_weighted_full)
