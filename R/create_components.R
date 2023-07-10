@@ -56,12 +56,12 @@ create_components <-
       data.frame() |>
       tidyfst::rn_col("ComponentIndex") |>
       tidytable::unnest(feature_source) |>
-      dplyr::distinct(
+      tidytable::distinct(
         `cluster index` = feature_source,
         componentindex = ComponentIndex
       ) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.numeric)) |>
-      dplyr::arrange(`cluster index`)
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.numeric)) |>
+      tidytable::arrange(`cluster index`)
 
     # Export
     log_debug(x = "Exporting ...")

@@ -57,7 +57,7 @@ prepare_libraries_sop_closed <-
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        dplyr::mutate(
+        tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = structure_inchikey,
             from = 1,
@@ -96,7 +96,7 @@ prepare_libraries_sop_closed <-
         ) |>
         round_reals() |>
         tidytable::distinct() |>
-        dplyr::mutate(reference_doi = NA)
+        tidytable::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- tidytable::tidytable(

@@ -214,16 +214,16 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     if (isSlaw) {
       df_final <- df_final |>
-        dplyr::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(SLAW_ID))
+        tidytable::rowwise() |>
+        tidytable::mutate(feature_id = as.numeric(SLAW_ID))
     } else {
       df_final <- df_final |>
-        dplyr::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(acquisitionNum))
+        tidytable::rowwise() |>
+        tidytable::mutate(feature_id = as.numeric(acquisitionNum))
     }
     df_final <- df_final |>
-      dplyr::rowwise() |>
-      dplyr::mutate(
+      tidytable::rowwise() |>
+      tidytable::mutate(
         ## Working in minutes
         error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,
@@ -236,7 +236,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             ),
           no = target_inchikey_2D
         ),
-        structure_smiles_2D = dplyr::coalesce(target_smiles_2D, target_smiles)
+        structure_smiles_2D = tidytable::coalesce(target_smiles_2D, target_smiles)
       ) |>
       tidytable::select(tidytable::any_of(
         c(

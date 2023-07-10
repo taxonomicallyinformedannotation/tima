@@ -101,7 +101,7 @@ prepare_annotations_spectra <-
       ) |>
       tidytable::bind_rows() |>
       tidytable::filter(!is.na(feature_id)) |>
-      dplyr::distinct(
+      tidytable::distinct(
         feature_id,
         error_mz,
         error_rt,
@@ -115,7 +115,7 @@ prepare_annotations_spectra <-
         count_peaks_matched
       ) |>
       # Add new columns
-      dplyr::mutate(
+      tidytable::mutate(
         library = "ISDB",
         # score_input_normalized = bestNormalize::bestNormalize(
         #   x = score_input,
@@ -136,9 +136,9 @@ prepare_annotations_spectra <-
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
-      # dplyr::rowwise() |>
-      # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
-      # dplyr::ungroup() |>
+      # tidytable::rowwise() |>
+      # tidytable::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
+      # tidytable::ungroup() |>
       tidytable::select(
         feature_id,
         error_mz,
@@ -166,18 +166,18 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
       ) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "N/A")
       })) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "null")
       })) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "")
       })) |>
       round_reals() |>
-      dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
+      tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
       complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,

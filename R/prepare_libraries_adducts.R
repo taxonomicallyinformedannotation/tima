@@ -55,12 +55,12 @@ prepare_libraries_adducts <-
         file = adducts_masses,
         na.strings = c("", "NA")
       ) |>
-      dplyr::mutate(adduct = stringi::stri_replace_all_regex(
+      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = ".* \\(",
         replacement = ""
       )) |>
-      dplyr::mutate(adduct = stringi::stri_replace_all_regex(
+      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = "\\)",
         replacement = ""
@@ -74,7 +74,7 @@ prepare_libraries_adducts <-
     colnames(adducts_t) <- adducts_t[1, ] |> as.character()
 
     adducts_t <- adducts_t[2, ] |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.numeric))
+      tidytable::mutate(tidytable::across(tidytable::everything(), as.numeric))
 
     masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
 
@@ -94,7 +94,7 @@ prepare_libraries_adducts <-
     log_debug("... positive")
     pure_pos <-
       create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
-      dplyr::filter(grepl(
+      tidytable::filter(grepl(
         pattern = "]1+",
         x = adduct,
         fixed = TRUE
@@ -104,7 +104,7 @@ prepare_libraries_adducts <-
     log_debug("... negative")
     pure_neg <-
       create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
-      dplyr::filter(grepl(
+      tidytable::filter(grepl(
         pattern = "]1-",
         x = adduct,
         fixed = TRUE

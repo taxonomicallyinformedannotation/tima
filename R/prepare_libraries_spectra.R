@@ -89,7 +89,7 @@ prepare_libraries_spectra <-
           mode = polarity
         ) |>
         ## TODO report the issue as otherwise precursorMz is lost
-        dplyr::mutate(precursor_mz = precursorMz)
+        tidytable::mutate(precursor_mz = precursorMz)
 
       log_debug("Exporting")
       export_spectra_2(
