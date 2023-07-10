@@ -12,11 +12,7 @@ testthat::test_that("Whole process", {
     "
   )
   ## Sourcing all functions
-  list.files(path = "R", pattern = ".R", full.names = TRUE)[1:10] |>
-    lapply(FUN = source)
-  cat("test")
-  list.files(path = "R", pattern = ".R", full.names = TRUE) |>
-    lapply(FUN = source)
+  targets::tar_source()
 
   ## Prepare parameters
   paths <<- parse_yaml_paths()
