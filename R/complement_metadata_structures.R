@@ -140,8 +140,10 @@ complement_metadata_structures <- function(df,
       structure_name
     ) |>
     tidytable::reframe(tidytable::across(
-      .by = c(structure_inchikey_2D,
-              structure_smiles_2D),
+      .by = c(
+        structure_inchikey_2D,
+        structure_smiles_2D
+      ),
       .cols = tidytable::everything(),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))

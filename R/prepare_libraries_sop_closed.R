@@ -62,10 +62,10 @@ prepare_libraries_sop_closed <-
       closed_prepared <- closed |>
         tidyft::mutate(
           structure_inchikey_2D = stringi::stri_sub(
-              str = structure_inchikey,
-              from = 1,
-              to = 14
-            )
+            str = structure_inchikey,
+            from = 1,
+            to = 14
+          )
         ) |>
         tidytable::select(
           structure_name = structure_nameTraditional,
