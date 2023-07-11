@@ -56,17 +56,15 @@ prepare_libraries_sop_closed <-
       closed <- input |>
         tidytable::fread(
           na.strings = c("", "NA")
-        ) |>
-        data.frame() |>
-        tidytable::tidytable()
+        )
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
-            str = structure_inchikey,
-            from = 1,
-            to = 14
+        tidyft::mutate(
+          structure_inchikey_2D = substr(
+            x = structure_inchikey,
+            start = 1,
+            stop = 14
           )
         ) |>
         tidytable::select(
@@ -101,7 +99,7 @@ prepare_libraries_sop_closed <-
         ) |>
         round_reals() |>
         tidytable::distinct() |>
-        tidytable::mutate(reference_doi = NA)
+        tidyft::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- tidytable::tidytable(

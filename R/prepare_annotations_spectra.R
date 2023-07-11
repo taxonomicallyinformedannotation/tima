@@ -120,7 +120,7 @@ prepare_annotations_spectra <-
         count_peaks_matched
       ) |>
       # Add new columns
-      tidytable::mutate(
+      tidyft::mutate(
         library = "ISDB",
         # score_input_normalized = bestNormalize::bestNormalize(
         #   x = score_input,
@@ -142,7 +142,7 @@ prepare_annotations_spectra <-
         count_peaks_explained = NA
       ) |>
       # tidytable::rowwise() |>
-      # tidytable::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
+      # tidyft::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
       # tidytable::ungroup() |>
       tidytable::select(
         feature_id,
@@ -171,18 +171,18 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
       ) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "N/A")
       })) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "null")
       })) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "")
       })) |>
       round_reals() |>
-      tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
+      tidyft::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
       complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,

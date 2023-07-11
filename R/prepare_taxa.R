@@ -108,7 +108,7 @@ prepare_taxa <-
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
       tidytable::filter(value != 0) |>
-      tidytable::mutate(rank = rank(-value), .by = c(rowname)) |>
+      tidyft::mutate(rank = rank(-value), .by = c(rowname)) |>
       tidytable::filter(rank <= top_k) |>
       tidytable::arrange(rowname, rank)
 
@@ -159,7 +159,7 @@ prepare_taxa <-
       if (extension == FALSE) {
         log_debug("Removing filename extensions")
         metadata_table <- metadata_table |>
-          tidytable::mutate(
+          tidyft::mutate(
             filename = stringi::stri_replace_all_fixed(
               str = filename,
               pattern = ".mzML",
@@ -167,7 +167,7 @@ prepare_taxa <-
               vectorize_all = FALSE
             )
           ) |>
-          tidytable::mutate(
+          tidyft::mutate(
             filename = stringi::stri_replace_all_fixed(
               str = filename,
               pattern = ".mzxML",
@@ -181,7 +181,7 @@ prepare_taxa <-
     if (!is.null(taxon)) {
       metadata_table_joined <- cbind(
         feature_table |>
-          tidytable::mutate(feature_id = tidytable::row_number()),
+          tidyft::mutate(feature_id = tidytable::row_number()),
         biological_metadata |>
           tidytable::select(organismOriginal = organism_name)
       )
@@ -202,7 +202,7 @@ prepare_taxa <-
         by = c("organismOriginal" = "organism_name")
       ) |>
       tidytable::distinct() |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
       tidytable::select(
         feature_id,
         sample_organism_01_domain = tidytable::matches("organism_taxonomy_01domain"),
@@ -224,8 +224,8 @@ prepare_taxa <-
         }
       )) |>
       tidytable::ungroup() |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-      tidytable::mutate(tidytable::across(
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidyft::mutate(tidytable::across(
         tidytable::everything(),
         .fns = function(x) {
           tidytable::na_if(x, "")

@@ -60,12 +60,12 @@ prepare_libraries_adducts <-
         file = adducts_masses,
         na.strings = c("", "NA")
       ) |>
-      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
+      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = ".* \\(",
         replacement = ""
       )) |>
-      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
+      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = "\\)",
         replacement = ""
@@ -79,7 +79,7 @@ prepare_libraries_adducts <-
     colnames(adducts_t) <- adducts_t[1, ] |> as.character()
 
     adducts_t <- adducts_t[2, ] |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.numeric))
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.numeric))
 
     masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
 

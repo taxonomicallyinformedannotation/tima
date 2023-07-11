@@ -110,9 +110,9 @@ harmonize_spectra <- function(spectra,
   spectra_missing <- columns_missing |>
     data.frame() |>
     tidytable::tidytable() |>
-    tidytable::mutate(value = NA_character_) |>
+    tidyft::mutate(value = NA_character_) |>
     tidytable::pivot_wider(names_from = columns_missing) |>
-    tidytable::mutate(join = "x")
+    tidyft::mutate(join = "x")
 
   if (!"rtime" %in% colnames(spectra)) {
     log_debug("no retention time found")
@@ -133,7 +133,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    tidytable::mutate(join = "x")
+    tidyft::mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(spectra_missing) |>
@@ -161,7 +161,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    tidytable::mutate(
+    tidyft::mutate(
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),

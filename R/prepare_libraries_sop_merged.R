@@ -167,7 +167,7 @@ prepare_libraries_sop_merged <-
       table_organisms_taxonomy_ott <-
         table_organisms_taxonomy_ott |>
         tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
-          tidytable::mutate(tidytable::across(tidytable::everything(), as.character)))
+          tidyft::mutate(tidytable::across(tidytable::everything(), as.character)))
     }
 
     log_debug(x = "Keeping structures")

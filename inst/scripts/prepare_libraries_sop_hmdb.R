@@ -82,9 +82,9 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
 
   log_debug(x = "Formatting HMDB")
   hmdb_prepared <- hmdb_df |>
-    tidytable::mutate_all(tidytable::na_if, "") |>
+    tidyft::mutate_all(tidytable::na_if, "") |>
     tidytable::filter(!is.na(inchikey)) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_inchikey_2D = substring(
         text = inchikey,
         first = 1,
@@ -103,7 +103,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       structure_molecular_formula = chemical_formula,
       structure_exact_mass = monisotopic_molecular_weight
     ) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_xlogp = NA_integer_,
       structure_taxonomy_npclassifier_01pathway = NA_character_,
       structure_taxonomy_npclassifier_02superclass = NA_character_,
@@ -114,7 +114,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       structure_taxonomy_classyfire_03class = NA_character_,
       structure_taxonomy_classyfire_04directparent = NA_character_,
     ) |>
-    tidytable::mutate(
+    tidyft::mutate(
       organism_name = "Homo sapiens",
       organism_taxonomy_ottid = 770315,
       organism_taxonomy_01domain = "Eukaryota",

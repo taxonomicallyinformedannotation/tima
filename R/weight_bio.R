@@ -249,7 +249,7 @@ weight_bio <-
         candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
       tidytable::distinct() |>
-      tidytable::mutate(tidytable::across(
+      tidyft::mutate(tidytable::across(
         tidytable::everything(),
         .fns = function(x) {
           tidytable::na_if(x, "")
@@ -361,7 +361,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_01_domain, str = sample_organism_01_domain)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalDomain) |>
+      tidyft::mutate(score_biological = scoreBiologicalDomain) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -386,7 +386,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_02_kingdom, str = sample_organism_02_kingdom)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalKingdom) |>
+      tidyft::mutate(score_biological = scoreBiologicalKingdom) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -411,7 +411,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_03_phylum, str = sample_organism_03_phylum)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalPhylum) |>
+      tidyft::mutate(score_biological = scoreBiologicalPhylum) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -436,7 +436,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_04_class, str = sample_organism_04_class)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalClass) |>
+      tidyft::mutate(score_biological = scoreBiologicalClass) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -461,7 +461,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_05_order, str = sample_organism_05_order)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalOrder) |>
+      tidyft::mutate(score_biological = scoreBiologicalOrder) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -485,7 +485,7 @@ weight_bio <-
     #   tidytable::filter(
     #     stringi::stri_detect_regex(pattern = candidate_organism_05_1_infraorder, str = sample_organism_05_1_infraorder)
     #   ) |>
-    #   tidytable::mutate(score_biological = scoreBiologicalInfraorder) |>
+    #   tidyft::mutate(score_biological = scoreBiologicalInfraorder) |>
     #   tidytable::left_join(
     #     metadata |> tidytable::distinct(feature_id,
     #                                 structure_inchikey_2D,
@@ -507,7 +507,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_06_family, str = sample_organism_06_family)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalFamily) |>
+      tidyft::mutate(score_biological = scoreBiologicalFamily) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -530,7 +530,7 @@ weight_bio <-
     #   tidytable::filter(
     #     stringi::stri_detect_regex(pattern = candidate_organism_06_1_subfamily, str = sample_organism_06_1_subfamily)
     #   ) |>
-    #   tidytable::mutate(score_biological = scoreBiologicalSubfamily) |>
+    #   tidyft::mutate(score_biological = scoreBiologicalSubfamily) |>
     #   tidytable::left_join(
     #     metadata |> tidytable::distinct(feature_id,
     #                                 structure_inchikey_2D,
@@ -552,7 +552,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_07_tribe, str = sample_organism_07_tribe)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalTribe) |>
+      tidyft::mutate(score_biological = scoreBiologicalTribe) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -577,7 +577,7 @@ weight_bio <-
     #   tidytable::filter(
     #     stringi::stri_detect_regex(pattern = candidate_organism_07_1_subtribe, str = sample_organism_07_1_subtribe)
     #   ) |>
-    #   tidytable::mutate(score_biological = scoreBiologicalSubtribe) |>
+    #   tidyft::mutate(score_biological = scoreBiologicalSubtribe) |>
     #   tidytable::left_join(
     #     metadata |> tidytable::distinct(feature_id,
     #                                 structure_inchikey_2D,
@@ -599,7 +599,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_08_genus, str = sample_organism_08_genus)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalGenus) |>
+      tidyft::mutate(score_biological = scoreBiologicalGenus) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -623,7 +623,7 @@ weight_bio <-
     #   tidytable::filter(
     #     stringi::stri_detect_regex(pattern = candidate_organism_08_1_subgenus, str = sample_organism_08_1_subgenus)
     #   ) |>
-    #   tidytable::mutate(score_biological = scoreBiologicalSubgenus) |>
+    #   tidyft::mutate(score_biological = scoreBiologicalSubgenus) |>
     #   tidytable::left_join(
     #     metadata |> tidytable::distinct(feature_id,
     #                                 structure_inchikey_2D,
@@ -645,7 +645,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_09_species, str = sample_organism_09_species)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalSpecies) |>
+      tidyft::mutate(score_biological = scoreBiologicalSpecies) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -669,7 +669,7 @@ weight_bio <-
     #   tidytable::filter(
     #     stringi::stri_detect_regex(pattern = candidate_organism_09_1_subspecies, str = sample_organism_09_1_subspecies)
     #   ) |>
-    #   tidytable::mutate(score_biological = scoreBiologicalSubspecies) |>
+    #   tidyft::mutate(score_biological = scoreBiologicalSubspecies) |>
     #   tidytable::left_join(
     #     metadata |> tidytable::distinct(feature_id,
     #                                 structure_inchikey_2D,
@@ -691,7 +691,7 @@ weight_bio <-
       tidytable::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_10_varietas, str = sample_organism_10_varietas)
       ) |>
-      tidytable::mutate(score_biological = scoreBiologicalVariety) |>
+      tidyft::mutate(score_biological = scoreBiologicalVariety) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -739,7 +739,7 @@ weight_bio <-
       0
 
     biologically_weighted_full <- biologically_weighted_full |>
-      tidytable::mutate(
+      tidyft::mutate(
         score_pondered_bio = (
           (1 / (weightBiological + weightSpectral)) *
             weightBiological *
@@ -765,7 +765,7 @@ weight_bio <-
         structure_taxonomy_npclassifier_03class,
         .keep_all = TRUE
       ) |>
-      tidytable::mutate(
+      tidyft::mutate(
         rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
         rank_final = tidytable::dense_rank(-score_pondered_bio),
         .by = c(feature_id)
