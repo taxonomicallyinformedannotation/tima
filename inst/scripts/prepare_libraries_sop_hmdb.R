@@ -85,10 +85,10 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
     tidyft::mutate_all(tidytable::na_if, "") |>
     tidytable::filter(!is.na(inchikey)) |>
     tidyft::mutate(
-      structure_inchikey_2D = substring(
-        text = inchikey,
-        first = 1,
-        last = 14
+      structure_inchikey_2D = stringi::stri_sub(
+        str = inchikey,
+        from = 1,
+        to = 14
       ),
       ## TODO compute it
       structure_smiles_2D = NA_character_,
