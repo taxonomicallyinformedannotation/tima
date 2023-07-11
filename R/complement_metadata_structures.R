@@ -139,17 +139,14 @@ complement_metadata_structures <- function(df,
       structure_smiles_2D,
       structure_name
     ) |>
-    tidytable::group_by(
-      structure_inchikey_2D,
-      structure_smiles_2D
-    ) |>
     tidytable::reframe(tidytable::across(
+      .by = c(structure_inchikey_2D,
+              structure_smiles_2D),
       .cols = tidytable::everything(),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
     )) |>
-    tidytable::ungroup() |>
     tidyft::mutate(tidytable::across(tidytable::everything(), trimws)) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_2D,

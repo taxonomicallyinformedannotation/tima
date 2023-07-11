@@ -206,8 +206,8 @@ weight_chemo <-
 
     log_debug("... cleaning \n")
     df4 <- df4 |>
-      dplyr::rowwise() |>
-      dplyr::mutate(
+      tidytable::rowwise() |>
+      tidyft::mutate(
         score_pondered_chemo = (
           (1 / (
             weightChemical +
@@ -243,9 +243,9 @@ weight_chemo <-
         # candidate_structure_3_class,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(
-        rank_initial = (dplyr::dense_rank(-as.numeric(score_input))),
-        rank_final = (dplyr::dense_rank(-score_pondered_chemo)),
+      tidyft::mutate(
+        rank_initial = (tidytable::dense_rank(-as.numeric(score_input))),
+        rank_final = (tidytable::dense_rank(-score_pondered_chemo)),
         .by = c(feature_id)
       ) |>
       tidytable::arrange(rank_final) |>
