@@ -60,7 +60,7 @@ create_components <-
         `cluster index` = feature_source,
         componentindex = ComponentIndex
       ) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.numeric)) |>
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.numeric)) |>
       tidytable::arrange(`cluster index`)
 
     # Export

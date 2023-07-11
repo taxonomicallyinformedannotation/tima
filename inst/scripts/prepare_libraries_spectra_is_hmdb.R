@@ -66,7 +66,7 @@ prepare_isdb_hmdb <-
       tidytable::filter(!is.na(smiles)) |>
       tidytable::select(-original_spectrum_id, -spectrum_id) |>
       tidytable::distinct() |>
-      tidytable::mutate(
+      tidyft::mutate(
         precursorMz = ifelse(
           test = polarity == 1,
           yes = monisotopic_molecular_weight + proton,

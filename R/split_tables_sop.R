@@ -144,7 +144,7 @@ split_tables_sop <- function(table) {
     tidytable::distinct() |>
     tidytable::group_by(structure_smiles_2D) |>
     clean_collapse() |>
-    tidytable::mutate(tidytable::across(
+    tidyft::mutate(tidytable::across(
       tidytable::matches("taxonomy.*_0"),
       .fns = function(x) {
         tidytable::replace_na(x, "notClassified")
@@ -165,7 +165,7 @@ split_tables_sop <- function(table) {
       structure_taxonomy_classyfire_04directparent
     ) |>
     tidytable::distinct() |>
-    tidytable::mutate(tidytable::across(
+    tidyft::mutate(tidytable::across(
       tidytable::matches("taxonomy.*_0"),
       .fns = function(x) {
         tidytable::replace_na(x, "notClassified")
@@ -199,7 +199,7 @@ split_tables_sop <- function(table) {
       organism_taxonomy_10varietas
     ) |>
     tidytable::distinct() |>
-    tidytable::mutate(tidytable::across(
+    tidyft::mutate(tidytable::across(
       tidytable::matches("taxonomy.*_0"),
       .fns = function(x) {
         tidytable::replace_na(x, "notClassified")

@@ -93,7 +93,7 @@ complement_metadata_structures <- function(df,
   dd_ddd <- tidytable::fread(str_2D_3D,
     na.strings = c("", "NA")
   ) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   dd_ddd_s <- dd_ddd |>
     tidytable::select(
@@ -101,14 +101,14 @@ complement_metadata_structures <- function(df,
       structure_smiles_2D
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   dd_ddd_i <- dd_ddd |>
     tidytable::select(structure_inchikey_2D,
       structure_smiles_2D_i = structure_smiles_2D
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   met_2D <- tidytable::fread(str_met,
     na.strings = c("", "NA")
@@ -128,7 +128,7 @@ complement_metadata_structures <- function(df,
     tidytable::distinct(structure_smiles_2D,
       .keep_all = TRUE
     ) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   nam_2D <- tidytable::fread(str_nam,
     na.strings = c("", "NA")
@@ -150,7 +150,7 @@ complement_metadata_structures <- function(df,
       }
     )) |>
     tidytable::ungroup() |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), trimws)) |>
+    tidyft::mutate(tidytable::across(tidytable::everything(), trimws)) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_2D,
       .keep_all = TRUE
@@ -158,7 +158,7 @@ complement_metadata_structures <- function(df,
     tidytable::distinct(structure_smiles_2D,
       .keep_all = TRUE
     ) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   tax_cla <- tidytable::fread(str_tax_cla,
     na.strings = c("", "NA")
@@ -172,7 +172,7 @@ complement_metadata_structures <- function(df,
       structure_taxonomy_classyfire_04directparent_i = structure_taxonomy_classyfire_04directparent
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   tax_npc <- tidytable::fread(str_tax_npc,
     na.strings = c("", "NA")
@@ -184,7 +184,7 @@ complement_metadata_structures <- function(df,
       structure_taxonomy_npclassifier_03class_s = structure_taxonomy_npclassifier_03class,
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+    tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
   met_i <- met_2D |>
     tidytable::select(
@@ -220,14 +220,14 @@ complement_metadata_structures <- function(df,
   table_final <- df |>
     tidytable::left_join(dd_ddd_i) |>
     tidytable::left_join(dd_ddd_s) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_smiles_2D = tidytable::coalesce(structure_smiles_2D_i, structure_smiles_2D),
       structure_inchikey_2D = tidytable::coalesce(structure_inchikey_2D_s, structure_inchikey_2D)
     ) |>
     tidytable::select(-structure_smiles_2D_i, -structure_inchikey_2D_s) |>
     tidytable::left_join(met_i) |>
     tidytable::left_join(met_s) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_molecular_formula = tidytable::coalesce(
         structure_molecular_formula_s,
         structure_molecular_formula_i,
@@ -245,10 +245,10 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::left_join(nam_i) |>
     tidytable::left_join(nam_s) |>
-    tidytable::mutate(structure_name = tidytable::coalesce(structure_name_s, structure_name_i, structure_name)) |>
+    tidyft::mutate(structure_name = tidytable::coalesce(structure_name_s, structure_name_i, structure_name)) |>
     tidytable::select(-structure_name_s, -structure_name_i) |>
     tidytable::left_join(tax_npc) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_taxonomy_npclassifier_01pathway = tidytable::coalesce(
         structure_taxonomy_npclassifier_01pathway_s,
         structure_taxonomy_npclassifier_01pathway
@@ -268,7 +268,7 @@ complement_metadata_structures <- function(df,
       -structure_taxonomy_npclassifier_03class_s
     ) |>
     tidytable::left_join(tax_cla) |>
-    tidytable::mutate(
+    tidyft::mutate(
       structure_taxonomy_classyfire_chemontid = tidytable::coalesce(
         structure_taxonomy_classyfire_chemontid_i,
         structure_taxonomy_classyfire_chemontid
@@ -297,7 +297,7 @@ complement_metadata_structures <- function(df,
       -structure_taxonomy_classyfire_03class_i,
       -structure_taxonomy_classyfire_04directparent_i
     ) |>
-    tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+    tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
       tidytable::na_if(x, "")
     }))
 

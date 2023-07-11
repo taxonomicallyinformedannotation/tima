@@ -190,10 +190,10 @@ prepare_annotations_sirius <-
 
       compound_summary_ready <- compound_summary |>
         tidytable::bind_rows(.id = "feature_id") |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+        tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
 
       canopus_npc_prepared <- canopus |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidytable::select(tidytable::any_of(
           c(
             "feature_id",
@@ -225,18 +225,18 @@ prepare_annotations_sirius <-
           score_input = ConfidenceScore,
           score_sirius_csi = `CSI:FingerIDScore`
         ) |>
-        tidytable::mutate(
+        tidyft::mutate(
           library = "SIRIUS",
           inchikey = NA,
           smiles = NA
         ) |>
-        tidytable::mutate(tidytable::across(
+        tidyft::mutate(tidytable::across(
           tidytable::everything(),
           as.character
         ))
 
       compound_adducts_prepared <- compound_adducts |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidytable::select(
           feature_id,
           structure_name = name,
@@ -247,19 +247,19 @@ prepare_annotations_sirius <-
           score_input = ConfidenceScore,
           score_sirius_csi = `CSI:FingerIDScore`
         ) |>
-        tidytable::mutate(
+        tidyft::mutate(
           library = "SIRIUS",
           inchikey = NA,
           smiles = NA
         ) |>
-        tidytable::mutate(tidytable::across(
+        tidyft::mutate(tidytable::across(
           tidytable::everything(),
           as.character
         ))
 
       formula_prepared <- formula |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::mutate(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
@@ -277,8 +277,8 @@ prepare_annotations_sirius <-
         )
 
       formula_adducts_prepared <- formula_adducts |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::mutate(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
@@ -307,7 +307,7 @@ prepare_annotations_sirius <-
         tidytable::left_join(formulas_prepared) |>
         tidytable::left_join(canopus_npc_prepared) |>
         tidytable::distinct() |>
-        tidytable::mutate(
+        tidyft::mutate(
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
@@ -351,18 +351,18 @@ prepare_annotations_sirius <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
           tidytable::na_if(x, "N/A")
         })) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
           tidytable::na_if(x, "null")
         })) |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
           tidytable::na_if(x, "")
         })) |>
         round_reals() |>
-        tidytable::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
+        tidyft::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

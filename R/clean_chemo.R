@@ -118,14 +118,14 @@ clean_chemo <-
         structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
-      tidytable::mutate(rank_final = (tidytable::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
+      tidyft::mutate(rank_final = (tidytable::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
       tidytable::filter(rank_final <= candidatesFinal, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df2 <- featuresTable |>
       tidytable::left_join(df1) |>
       tidytable::left_join(componentsTable) |>
-      tidytable::mutate(
+      tidyft::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,
@@ -279,8 +279,8 @@ clean_chemo <-
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-      tidytable::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
+      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
         tidytable::na_if(x, "")
       })) |>
       tidytable::select(tidytable::any_of(
@@ -336,7 +336,7 @@ clean_chemo <-
     df10 <- tidytable::left_join(
       df9,
       annotationTableWeightedChemo |>
-        tidytable::mutate(tidytable::across(tidytable::everything(), as.character))
+        tidyft::mutate(tidytable::across(tidytable::everything(), as.character))
     ) |>
       tidytable::select(tidytable::any_of(
         c(

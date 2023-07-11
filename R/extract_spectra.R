@@ -50,11 +50,11 @@ extract_spectra <- function(object) {
 
   ## Columns types issue
   spectra <- spectra |>
-    tidytable::mutate(tidytable::across(
+    tidyft::mutate(tidytable::across(
       .cols = tidytable::any_of(incoherent_logical),
       .fns = as.logical
     )) |>
-    tidytable::mutate(tidytable::across(
+    tidyft::mutate(tidytable::across(
       .cols = tidytable::any_of(incoherent_integer),
       .fns = as.integer
     ))
