@@ -442,7 +442,6 @@ clean_bio <-
       )) |>
       tidyft::mutate(sum = tidytable::n_distinct(feature_target), .by = c(feature_source)) |>
       tidyft::mutate(consistency_structure_npc_cla = count_cla / sum, .by = c(feature_source)) |>
-      tidytable::ungroup() |>
       tidyft::mutate(rank_final = as.numeric(rank_final), .by = c(
         feature_target,
         candidate_structure_3_npc_class

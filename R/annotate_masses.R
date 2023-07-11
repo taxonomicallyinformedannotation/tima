@@ -785,7 +785,6 @@ annotate_masses <-
     ) |>
       tidytable::left_join(df13_b) |>
       tidytable::filter(!is.na(structure_inchikey_2D)) |>
-      tidytable::ungroup() |>
       tidytable::distinct(
         feature_id,
         error_mz,
