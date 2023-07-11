@@ -57,10 +57,10 @@ prepare_libraries_sop_lotus <-
         na.strings = c("", "NA")
       ) |>
       tidyft::mutate(
-        structure_inchikey_2D = substr(
-          x = structure_inchikey,
-          start = 1,
-          stop = 14
+        structure_inchikey_2D = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1,
+          to = 14
         )
       ) |>
       tidytable::select(
