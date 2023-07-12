@@ -26,7 +26,7 @@ extract_spectra <- function(object) {
     data.frame() |>
     dplyr::group_by(group) |>
     dplyr::reframe(dplyr::across(
-      .cols = tidytable::everything(),
+      .cols = dplyr::everything(),
       .fns = list
     ))
 
@@ -41,7 +41,7 @@ extract_spectra <- function(object) {
 
   ## Synonyms issue
   spectra <- spectra |>
-    dplyr::group_by(tidytable::across(c(-tidytable::any_of("synonym")))) |>
+    dplyr::group_by(dplyr::across(c(-dplyr::any_of("synonym")))) |>
     dplyr::reframe(dplyr::across(
       .cols = dplyr::where(is.list),
       .fns = as.character
