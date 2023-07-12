@@ -812,7 +812,10 @@ annotate_masses <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         )
-    )
+    ) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
+        tidytable::na_if(x, "")
+      })
 
     df25 |>
       decorate_masses()
