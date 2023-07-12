@@ -120,20 +120,20 @@ harmonize_spectra <- function(spectra,
   }
 
   spectra_filtered <- spectra |>
-    tidyft::filter(grepl(
+    dplyr::filter(grepl(
       pattern = mode,
       x = !!as.name(co_po),
       ignore.case = TRUE
     )) |>
-    tidytable::select(
-      tidytable::any_of(c(columns_full)),
+    dplyr::select(
+      dplyr::any_of(c(columns_full)),
       precursorCharge,
       precursorMz,
       rtime,
       mz,
       intensity
     ) |>
-    tidyft::mutate(join = "x")
+    dplyr::mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(spectra_missing) |>
@@ -165,7 +165,7 @@ harmonize_spectra <- function(spectra,
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
-        yes = tidytable::row_number(),
+        yes = dplyr::row_number(),
         no = as.numeric(spectrum_id)
       ),
       compound_id = ifelse(
