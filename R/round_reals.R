@@ -11,11 +11,11 @@
 round_reals <- function(df, dig = 5) {
   df |>
     # Round to 5 digits to avoid small discrepancies
-    tidyft::mutate(tidytable::across(
-      c(
+    tidyft::mutate_vars(
+      .cols = c(
         "structure_exact_mass",
         "structure_xlogp"
       ),
-      .fns = \(x) round(as.numeric(x), digits = dig)
-    ))
+      .func = \(x) round(as.numeric(x), digits = dig)
+    )
 }

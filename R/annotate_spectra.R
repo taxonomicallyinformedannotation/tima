@@ -212,18 +212,18 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       MetaboAnnotation::matchedData() |>
       data.frame() |>
       tidytable::tidytable() |>
-      tidytable::filter(!is.na(score))
+      tidyft::filter(!is.na(score))
 
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
     if (isSlaw) {
       df_final <- df_final |>
-        tidytable::rowwise() |>
-        tidyft::mutate(feature_id = as.numeric(SLAW_ID))
+        dplyr::rowwise() |>
+        dplyr::mutate(feature_id = as.numeric(SLAW_ID))
     } else {
       df_final <- df_final |>
-        tidytable::rowwise() |>
-        tidyft::mutate(feature_id = as.numeric(acquisitionNum))
+        dplyr::rowwise() |>
+        dplyr::mutate(feature_id = as.numeric(acquisitionNum))
     }
     df_final <- df_final |>
       tidytable::rowwise() |>
@@ -277,11 +277,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     if (condition == "AND") {
       df_final <- df_final |>
-        tidytable::filter(
-          score >= threshold &
-            count_peaks_matched >= npeaks &
-            presence_ratio >= rpeaks
-        )
+        tidyft::filter(score >= threshold) |>
+        tidyft::filter(count_peaks_matched >= npeaks) |>
+        tidyft::filter(presence_ratio >= rpeaks)
     }
 
     log_debug(

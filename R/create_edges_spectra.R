@@ -183,14 +183,14 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
   if (condition == "AND") {
     edges <- edges |>
-      tidytable::filter(
+      dplyr::filter(
         score >= threshold,
         matched_peaks_count >= npeaks,
         presence_ratio >= rpeaks
       )
   } else {
     edges <- edges |>
-      tidytable::filter(score >= threshold |
+      dplyr::filter(score >= threshold |
         matched_peaks_count >= npeaks |
         presence_ratio >= rpeaks)
   }

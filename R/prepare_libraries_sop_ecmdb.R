@@ -58,7 +58,7 @@ prepare_libraries_sop_ecmdb <-
       ecmdb_prepared <- ecmdb |>
         tidyft::mutate(
           structure_inchikey_2D = stringi::stri_sub(
-            str = structure_inchikey,
+            str = moldb_inchikey,
             from = 1,
             to = 14
           ),

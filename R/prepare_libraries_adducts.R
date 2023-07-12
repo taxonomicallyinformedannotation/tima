@@ -79,7 +79,7 @@ prepare_libraries_adducts <-
     colnames(adducts_t) <- adducts_t[1, ] |> as.character()
 
     adducts_t <- adducts_t[2, ] |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), as.numeric))
+      tidyft::mutate_vars(is.character, .func = as.numeric)
 
     masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
 
@@ -99,7 +99,7 @@ prepare_libraries_adducts <-
     log_debug("... positive")
     pure_pos <-
       create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
-      tidytable::filter(grepl(
+      tidyft::filter(grepl(
         pattern = "]1+",
         x = adduct,
         fixed = TRUE
@@ -109,7 +109,7 @@ prepare_libraries_adducts <-
     log_debug("... negative")
     pure_neg <-
       create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
-      tidytable::filter(grepl(
+      tidyft::filter(grepl(
         pattern = "]1-",
         x = adduct,
         fixed = TRUE

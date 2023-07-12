@@ -11,17 +11,18 @@
 #' @examples NULL
 clean_collapse <- function(grouped_df) {
   clean_collapse_df <- grouped_df |>
-    tidytable::reframe(tidytable::across(
-      .cols = tidytable::everything(),
+    dplyr::reframe(dplyr::across(
+      .cols = dplyr::everything(),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
     )) |>
+    tidytable::tidytable() |>
     tidytable::ungroup() |>
-    tidyft::mutate(tidytable::across(tidytable::everything(), trimws)) |>
-    tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+    tidyft::mutate_vars(is.character, .func = trimws) |>
+    tidyft::mutate_vars(is.character, .func = function(x) {
       tidytable::na_if(x, "")
-    }))
+    })
 
   return(clean_collapse_df)
 }
