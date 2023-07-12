@@ -41,6 +41,13 @@ utils::globalVariables(
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include harmonize_names_sirius.R
+#' @include pre_harmonize_names_sirius.R
+#' @include round_reals.R
+#'
 #' @param input_directory Directory containing the Sirius results
 #' @param output Output where to save prepared results
 #' @param str_2D_3D File containing 2D and 3D structures
@@ -167,7 +174,7 @@ prepare_annotations_sirius <-
         ),
         FUN = tidytable::fread,
         na.strings = c("", "NA"),
-        colClasses = "c"
+        colClasses = "character"
       )
 
       names(compound_summary) <- list.files(
@@ -182,12 +189,11 @@ prepare_annotations_sirius <-
         compound_summary[lapply(compound_summary, nrow) > 0]
 
       compound_summary_ready <- compound_summary |>
-        dplyr::bind_rows(.id = "feature_id") |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+        tidytable::bind_rows(.id = "feature_id")
 
       canopus_npc_prepared <- canopus |>
-        dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(dplyr::any_of(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidytable::select(tidytable::any_of(
           c(
             "feature_id",
             "structure_taxonomy_npclassifier_01pathway" = "NPC#pathway",
@@ -208,7 +214,7 @@ prepare_annotations_sirius <-
         ))
 
       compound_prepared <- compound_summary_ready |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -218,19 +224,15 @@ prepare_annotations_sirius <-
           score_input = ConfidenceScore,
           score_sirius_csi = `CSI:FingerIDScore`
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           library = "SIRIUS",
-          inchikey = NA,
-          smiles = NA
-        ) |>
-        dplyr::mutate(dplyr::across(
-          dplyr::everything(),
-          as.character
-        ))
+          inchikey = NA_character_,
+          smiles = NA_character_
+        )
 
       compound_adducts_prepared <- compound_adducts |>
-        dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::select(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidytable::select(
           feature_id,
           structure_name = name,
           structure_smiles_2D = smiles,
@@ -240,23 +242,19 @@ prepare_annotations_sirius <-
           score_input = ConfidenceScore,
           score_sirius_csi = `CSI:FingerIDScore`
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           library = "SIRIUS",
-          inchikey = NA,
-          smiles = NA
-        ) |>
-        dplyr::mutate(dplyr::across(
-          dplyr::everything(),
-          as.character
-        ))
+          inchikey = NA_character_,
+          smiles = NA_character_
+        )
 
       formula_prepared <- formula |>
-        dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::mutate(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
-        dplyr::distinct(
+        tidytable::distinct(
           feature_id,
           structure_molecular_formula = molecularFormula,
           structure_exact_mass,
@@ -270,12 +268,12 @@ prepare_annotations_sirius <-
         )
 
       formula_adducts_prepared <- formula_adducts |>
-        dplyr::mutate(feature_id = harmonize_names_sirius(id)) |>
-        dplyr::mutate(
+        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidyft::mutate(
           structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
-        dplyr::distinct(
+        tidytable::distinct(
           feature_id,
           structure_molecular_formula = molecularFormula,
           structure_exact_mass,
@@ -289,18 +287,18 @@ prepare_annotations_sirius <-
         )
 
       compounds_prepared <-
-        dplyr::bind_rows(compound_prepared, compound_adducts_prepared) |>
-        dplyr::distinct()
+        tidytable::bind_rows(compound_prepared, compound_adducts_prepared) |>
+        tidytable::distinct()
 
       formulas_prepared <-
-        dplyr::bind_rows(formula_prepared, formula_adducts_prepared) |>
-        dplyr::distinct()
+        tidytable::bind_rows(formula_prepared, formula_adducts_prepared) |>
+        tidytable::distinct()
 
       table <- compounds_prepared |>
-        dplyr::left_join(formulas_prepared) |>
-        dplyr::left_join(canopus_npc_prepared) |>
-        dplyr::distinct() |>
-        dplyr::mutate(
+        tidytable::left_join(formulas_prepared) |>
+        tidytable::left_join(canopus_npc_prepared) |>
+        tidytable::distinct() |>
+        tidyft::mutate(
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
@@ -314,7 +312,7 @@ prepare_annotations_sirius <-
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           error_mz,
           error_rt,
@@ -344,15 +342,17 @@ prepare_annotations_sirius <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "N/A")
-        })) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "null")
-        })) |>
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
+          tidytable::na_if(x, "")
+        }) |>
         round_reals() |>
-        dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
+        tidyft::mutate_vars(is.numeric, .func = as.character) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

@@ -10,6 +10,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares adducts for further use
 #'
+#' @include create_adducts_neg.R
+#' @include create_adducts_pos.R
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param str_met File containing structures metadata
 #' @param adducts_masses Table of adducts taken as input
 #' @param adducts_output_path Path where the adducts will be saved
@@ -46,8 +51,8 @@ prepare_libraries_adducts <-
       select = "structure_exact_mass",
       na.strings = c("", "NA")
     ) |>
-      dplyr::select(exact_mass = structure_exact_mass) |>
-      dplyr::distinct()
+      tidytable::select(exact_mass = structure_exact_mass) |>
+      tidytable::distinct()
 
     log_debug("... adducts")
     adducts_table <-
@@ -55,12 +60,12 @@ prepare_libraries_adducts <-
         file = adducts_masses,
         na.strings = c("", "NA")
       ) |>
-      dplyr::mutate(adduct = stringi::stri_replace_all_regex(
+      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = ".* \\(",
         replacement = ""
       )) |>
-      dplyr::mutate(adduct = stringi::stri_replace_all_regex(
+      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = "\\)",
         replacement = ""
@@ -74,7 +79,7 @@ prepare_libraries_adducts <-
     colnames(adducts_t) <- adducts_t[1, ] |> as.character()
 
     adducts_t <- adducts_t[2, ] |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.numeric))
+      tidyft::mutate_vars(is.character, .func = as.numeric)
 
     masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
 
@@ -94,22 +99,22 @@ prepare_libraries_adducts <-
     log_debug("... positive")
     pure_pos <-
       create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
-      dplyr::filter(grepl(
+      tidyft::filter(grepl(
         pattern = "]1+",
         x = adduct,
         fixed = TRUE
       )) |>
-      dplyr::select(-exact_mass)
+      tidytable::select(-exact_mass)
 
     log_debug("... negative")
     pure_neg <-
       create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
-      dplyr::filter(grepl(
+      tidyft::filter(grepl(
         pattern = "]1-",
         x = adduct,
         fixed = TRUE
       )) |>
-      dplyr::select(-exact_mass)
+      tidytable::select(-exact_mass)
 
     log_debug("Exporting ...")
     export_params(step = "prepare_libraries_adducts")

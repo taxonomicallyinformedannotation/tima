@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.8.1
+Version: 2.8.2
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -21,8 +21,8 @@ Imports:
     docopt (>= 0.7.1),
     dplyr (>= 1.1.2),
     httr (>= 1.4.6),
-    igraph (>= 1.4.3),
-    jsonlite (>= 1.8.5),
+    igraph (>= 1.5.0),
+    jsonlite (>= 1.8.7),
     MetaboAnnotation (>= 1.4.1),
     MsBackendMgf (>= 1.8.0),
     MsCoreUtils (>= 1.12.0),
@@ -35,6 +35,7 @@ Imports:
     stringi (>= 1.7.12),
     tidytable (>= 0.10.1),
     tidyfst (>= 1.7.6),
+    tidyft (>= 0.5.7),
     utils,
     yaml (>= 2.3.7)
 Suggests: 
@@ -65,65 +66,67 @@ ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Collate:
+    'round_reals.R'
+    'export_params.R'
+    'create_dir.R'
+    'export_output.R'
+    'dist_groups.R'
+    'decorate_masses.R'
     'annotate_masses.R'
+    'import_spectra.R'
     'annotate_spectra.R'
     'clean_bio.R'
     'clean_chemo.R'
+    'clean_collapse.R'
     'complement_metadata_structures.R'
     'create_adducts_neg.R'
     'create_adducts_pos.R'
     'create_components.R'
-    'create_dir.R'
-    'create_edges_parallel.R'
     'create_edges_progress.R'
+    'create_edges_parallel.R'
+    'keep_peaks.R'
+    'sanitize_spectra.R'
+    'remove_above_precursor.R'
+    'normalize_peaks.R'
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'
-    'decorate_masses.R'
-    'dist_groups.R'
-    'export_output.R'
-    'export_params.R'
     'export_spectra.R'
     'export_spectra_2.R'
     'extract_spectra.R'
     'get_file.R'
+    'get_example_sirius.R'
     'get_gnps_tables.R'
     'get_last_version_from_zenodo.R'
     'get_organism_taxonomy_ott.R'
+    'parse_yaml_paths.R'
+    'parse_yaml_params.R'
+    'parse_cli_params.R'
     'get_params.R'
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
-    'import_spectra.R'
-    'keep_peaks.R'
     'log_debug.R'
-    'normalize_peaks.R'
-    'parse_cli_params.R'
-    'parse_yaml_params.R'
-    'parse_yaml_paths.R'
     'pre_harmonize_names_sirius.R'
-    'prepare_params.R'
     'prepare_annotations_gnps.R'
     'prepare_annotations_sirius.R'
     'prepare_annotations_spectra.R'
-    'prepare_features_tables.R'
     'prepare_features_components.R'
     'prepare_features_edges.R'
+    'prepare_features_tables.R'
     'prepare_libraries_adducts.R'
     'prepare_libraries_sop_closed.R'
     'prepare_libraries_sop_ecmdb.R'
     'prepare_libraries_sop_lotus.R'
+    'split_tables_sop.R'
     'prepare_libraries_sop_merged.R'
     'prepare_libraries_spectra.R'
+    'prepare_params.R'
     'prepare_taxa.R'
-    'round_reals.R'
-    'remove_above_precursor.R'
     'replace_id.R'
-    'sanitize_spectra.R'
-    'split_tables_sop.R'
-    'weight_annotations.R'
-    'weight_bio.R'
     'weight_chemo.R'
+    'weight_bio.R'
+    'weight_annotations.R'
 VignetteBuilder:
     knitr
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome

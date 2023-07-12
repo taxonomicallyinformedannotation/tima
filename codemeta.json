@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima-r",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.0 (2023-04-21)",
+  "runtimePlatform": "R version 4.3.1 (2023-06-16)",
   "author": [
     {
       "@type": "Person",
@@ -373,7 +373,7 @@
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
-      "version": ">= 1.4.3",
+      "version": ">= 1.5.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -386,7 +386,7 @@
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
-      "version": ">= 1.8.5",
+      "version": ">= 1.8.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -545,10 +545,23 @@
     },
     "22": {
       "@type": "SoftwareApplication",
+      "identifier": "tidyft",
+      "name": "tidyft",
+      "version": ">= 0.5.7",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tidyft"
+    },
+    "23": {
+      "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -572,7 +585,7 @@
     "taxonomicdistance",
     "specializedmetabolome"
   ],
-  "fileSize": "2659.945KB",
+  "fileSize": "2595.064KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -630,7 +643,7 @@
         }
       ],
       "name": "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
-      "url": "https://dx.doi.org/10.3389/fpls.2019.01329",
+      "url": "https://doi.org/10.3389/fpls.2019.01329",
       "isPartOf": {
         "@type": "PublicationIssue",
         "datePublished": "2019",
@@ -647,9 +660,8 @@
   "contIntegration": [
     "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main",
     "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml",
-    "https://github.com/marketplace/actions/super-linter",
-    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml",
-    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/rworkflows.yml"
+    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/mega-linter.yml",
+    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"
   ],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
 }

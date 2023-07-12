@@ -8,6 +8,12 @@ utils::globalVariables(c(
 #'
 #' @description This function create edges based on fragmentation spectra similarity
 #'
+#' @include create_edges_parallel.R
+#' @include import_spectra.R
+#' @include normalize_peaks.R
+#' @include remove_above_precursor.R
+#' @include sanitize_spectra.R
+#'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param output Output file.
 #' @param name_source Name of the source features column
@@ -94,7 +100,7 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     )
 
     edges <- matches_sim |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     ## old version, keep in case
     # par <- if (parallel) {
@@ -132,22 +138,22 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
     # )
     # edges <- MetaboAnnotation::matchedData(matches_sim_2) |>
     #   data.frame() |>
-    #   dplyr::filter(acquisitionNum != target_acquisitionNum) |>
-    #   dplyr::select(
+    #   tidytable::filter(acquisitionNum != target_acquisitionNum) |>
+    #   tidytable::select(
     #     !!as.name(name_source) := "acquisitionNum",
     #     !!as.name(name_target) := "target_acquisitionNum",
-    #     dplyr::everything()
+    #     tidytable::everything()
     #   )
 
     edges <- edges |>
-      dplyr::select(
+      tidytable::select(
         !!as.name(name_source) := "feature_id",
         !!as.name(name_target) := "target_id",
-        dplyr::everything()
+        tidytable::everything()
       )
 
     edges <- edges |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           name_source,
           name_target,

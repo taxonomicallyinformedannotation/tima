@@ -29,6 +29,10 @@ utils::globalVariables(
 #'    Number of matched peaks and their ratio are also available (See MatchForwardReverseParam for details).
 #'    Parallel processing is also made available.
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include import_spectra.R
+#'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param library Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
@@ -208,7 +212,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       MetaboAnnotation::matchedData() |>
       data.frame() |>
       tidytable::tidytable() |>
-      dplyr::filter(!is.na(score))
+      tidyft::filter(!is.na(score))
 
     isSlaw <- "SLAW_ID" %in% colnames(df_final)
 
@@ -222,8 +226,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         dplyr::mutate(feature_id = as.numeric(acquisitionNum))
     }
     df_final <- df_final |>
-      dplyr::rowwise() |>
-      dplyr::mutate(
+      tidytable::rowwise() |>
+      tidyft::mutate(
         ## Working in minutes
         error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,
@@ -236,9 +240,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             ),
           no = target_inchikey_2D
         ),
-        structure_smiles_2D = dplyr::coalesce(target_smiles_2D, target_smiles)
+        structure_smiles_2D = tidytable::coalesce(target_smiles_2D, target_smiles)
       ) |>
-      dplyr::select(dplyr::any_of(
+      tidytable::select(tidytable::any_of(
         c(
           "feature_id",
           "error_mz",
@@ -266,27 +270,27 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         count_peaks_matched = NA
       )
     df_final <- df_final |>
-      dplyr::bind_rows(df_add)
+      tidytable::bind_rows(df_add)
 
     ## COMMENT AR: Not doing it because of thresholding
     # df_final[is.na(df_final)] <- 0
 
     if (condition == "AND") {
       df_final <- df_final |>
-        dplyr::filter(score >= threshold &
-          count_peaks_matched >= npeaks &
-          presence_ratio >= rpeaks)
+        dplyr::filter(score >= threshold) |>
+        dplyr::filter(count_peaks_matched >= npeaks) |>
+        dplyr::filter(presence_ratio >= rpeaks)
     }
 
     log_debug(
       nrow(
         df_final |>
           ## else doesn't work if some are empty
-          dplyr::distinct(structure_inchikey_2D, structure_smiles_2D)
+          tidytable::distinct(structure_inchikey_2D, structure_smiles_2D)
       ),
       "Candidates were annotated on",
       nrow(df_final |>
-        dplyr::distinct(feature_id)),
+        tidytable::distinct(feature_id)),
       "features, with at least",
       threshold,
       "similarity score",

@@ -33,6 +33,10 @@ utils::globalVariables(
 
 #' @title Prepare libraries of structure organism pairs CLOSED
 #'
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param parameters params
@@ -52,19 +56,18 @@ prepare_libraries_sop_closed <-
       closed <- input |>
         tidytable::fread(
           na.strings = c("", "NA")
-        ) |>
-        tidytable::tidytable()
+        )
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        dplyr::mutate(
+        tidyft::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = structure_inchikey,
             from = 1,
             to = 14
           )
         ) |>
-        dplyr::select(
+        tidytable::select(
           structure_name = structure_nameTraditional,
           structure_inchikey,
           structure_smiles,
@@ -94,10 +97,9 @@ prepare_libraries_sop_closed <-
           organism_taxonomy_09species,
           organism_taxonomy_10varietas
         ) |>
-        tidytable::data.table() |>
         round_reals() |>
-        dplyr::distinct() |>
-        dplyr::mutate(reference_doi = NA)
+        tidytable::distinct() |>
+        tidyft::mutate(reference_doi = NA)
     } else {
       log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
       closed_prepared <- tidytable::tidytable(

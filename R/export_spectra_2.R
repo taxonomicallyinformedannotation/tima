@@ -8,6 +8,8 @@ utils::globalVariables(
 #'
 #' @description This function export spectra.
 #'
+#' @include export_spectra.R
+#'
 #' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
 #' @param spectra The spectra object where spectra are stored
 #' @param meta Optional. Metadata as in 'CompoundDb' package
@@ -21,7 +23,7 @@ export_spectra_2 <- function(file,
                              spectra,
                              meta) {
   if (nrow(spectra |>
-    dplyr::filter(!is.na(compound_id))) != 0) {
+    tidyft::filter(!is.na(compound_id))) != 0) {
     log_debug("Exporting")
     create_dir(export = file)
     spectra |>

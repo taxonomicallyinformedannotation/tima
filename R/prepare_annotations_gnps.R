@@ -39,6 +39,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares GNPS obtained annotations for further use
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures
@@ -106,14 +111,14 @@ prepare_annotations_gnps <-
         FUN = tidytable::fread,
         na.strings = c("", "NA")
       ) |>
-        dplyr::bind_rows() |>
-        dplyr::mutate(
+        tidytable::bind_rows() |>
+        tidyft::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
           error_rt = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,
           error_rt,
@@ -135,7 +140,7 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class = class,
           structure_taxonomy_classyfire_04directparent = subclass
         ) |>
-        dplyr::mutate(
+        tidyft::mutate(
           error_rt = NA,
           structure_smiles_2D = NA,
           structure_molecular_formula = structure_inchi |>
@@ -156,7 +161,7 @@ prepare_annotations_gnps <-
           ## mirror sirius
           count_peaks_explained = NA
         ) |>
-        dplyr::select(
+        tidytable::select(
           feature_id,
           error_mz,
           error_rt,
@@ -181,15 +186,17 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "N/A")
-        })) |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "null")
-        })) |>
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
+          tidytable::na_if(x, "")
+        }) |>
         round_reals() |>
-        dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
+        tidyft::mutate_vars(is.numeric, .func = as.character) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

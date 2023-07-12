@@ -91,7 +91,7 @@ weight_chemo <-
 
     log_debug("... adding metadata \n")
     df2 <- df1 |>
-      dplyr::distinct(
+      tidytable::distinct(
         feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -169,7 +169,7 @@ weight_chemo <-
 
     log_debug("... outputting best score \n")
     df3 <-
-      dplyr::bind_rows(
+      tidytable::bind_rows(
         step_cla_kin,
         step_npc_pat,
         step_cla_sup,
@@ -178,13 +178,13 @@ weight_chemo <-
         step_npc_cla,
         step_cla_par
       ) |>
-      dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.numeric)) |>
+      tidyft::mutate_vars(is.logical, .func = as.numeric) |>
       dplyr::mutate(score_chemical = ifelse(
         test = is.na(score_chemical),
         yes = 0,
         no = score_chemical
       )) |>
-      dplyr::select(
+      tidytable::select(
         feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
@@ -195,9 +195,9 @@ weight_chemo <-
       )
 
     log_debug("... joining \n")
-    df4 <- dplyr::left_join(
+    df4 <- tidytable::left_join(
       df1 |>
-        dplyr::select(-dplyr::contains("candidate_structure")),
+        tidytable::select(-tidytable::contains("candidate_structure")),
       df3
     ) |>
       data.frame()
@@ -233,10 +233,9 @@ weight_chemo <-
           # as.numeric(score_input_normalized)
         )
       ) |>
-      dplyr::group_by(feature_id) |>
-      dplyr::arrange(dplyr::desc(score_chemical)) |>
-      dplyr::arrange(dplyr::desc(score_pondered_chemo)) |>
-      dplyr::distinct(feature_id,
+      tidytable::arrange(tidytable::desc(score_chemical)) |>
+      tidytable::arrange(tidytable::desc(score_pondered_chemo)) |>
+      tidytable::distinct(feature_id,
         structure_inchikey_2D,
         structure_smiles_2D,
         # candidate_structure_1_pathway,
@@ -244,12 +243,12 @@ weight_chemo <-
         # candidate_structure_3_class,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(
-        rank_initial = (dplyr::dense_rank(-as.numeric(score_input))),
-        rank_final = (dplyr::dense_rank(-score_pondered_chemo))
+      tidyft::mutate(
+        rank_initial = (tidytable::dense_rank(-as.numeric(score_input))),
+        rank_final = (tidytable::dense_rank(-score_pondered_chemo)),
+        .by = c(feature_id)
       ) |>
-      dplyr::arrange(rank_final) |>
-      dplyr::ungroup() |>
+      tidytable::arrange(rank_final) |>
       dplyr::arrange(as.numeric(feature_id)) |>
       data.frame()
 

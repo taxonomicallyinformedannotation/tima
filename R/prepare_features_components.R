@@ -9,6 +9,9 @@ utils::globalVariables(
 #'
 #' @description This function prepares the components (clusters in molecular network) for further use
 #'
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param parameters Params
@@ -42,12 +45,12 @@ prepare_features_components <-
       FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows() |>
-      dplyr::select(
+      tidytable::bind_rows() |>
+      tidytable::select(
         feature_id = `cluster index`,
         component_id = componentindex
       ) |>
-      dplyr::distinct()
+      tidytable::distinct()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_features_components")
