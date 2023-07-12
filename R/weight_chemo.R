@@ -178,7 +178,6 @@ weight_chemo <-
         step_npc_cla,
         step_cla_par
       ) |>
-      tidyft::mutate_vars(is.logical, .func = as.numeric) |>
       dplyr::mutate(score_chemical = ifelse(
         test = is.na(score_chemical),
         yes = 0,
