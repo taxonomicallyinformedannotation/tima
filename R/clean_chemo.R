@@ -125,7 +125,7 @@ clean_chemo <-
     df2 <- featuresTable |>
       tidytable::left_join(df1) |>
       tidytable::left_join(componentsTable) |>
-      tidyft::mutate(
+      dplyr::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
           structure_taxonomy_npclassifier_02superclass,

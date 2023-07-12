@@ -105,7 +105,7 @@ clean_bio <-
     df03 <- tidytable::bind_rows(df01, df02)
 
     df <- df03 |>
-      tidyft::mutate(
+      dplyr::mutate(
         candidate_structure_1_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
         candidate_structure_1_npc_pathway = structure_taxonomy_npclassifier_01pathway,
         candidate_structure_2_cla_superclass = structure_taxonomy_classyfire_02superclass,
