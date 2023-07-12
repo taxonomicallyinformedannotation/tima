@@ -277,9 +277,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     if (condition == "AND") {
       df_final <- df_final |>
-        tidyft::filter(score >= threshold) |>
-        tidyft::filter(count_peaks_matched >= npeaks) |>
-        tidyft::filter(presence_ratio >= rpeaks)
+        dplyr::filter(score >= threshold) |>
+        dplyr::filter(count_peaks_matched >= npeaks) |>
+        dplyr::filter(presence_ratio >= rpeaks)
     }
 
     log_debug(
