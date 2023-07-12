@@ -33,6 +33,7 @@ utils::globalVariables(
 create_adducts_pos <- function(massesTable, adductsTable) {
   ## Calculate the masses for various positive adducts
   adducts_pos <- massesTable |>
+    tidytable::tidytable() |>
     tidyft::mutate(
       `[1M+(H)3]3+` = (exact_mass + 3 * proton) / 3,
       `[1M+(H)2(Na)1]3+` = (exact_mass + 2 * proton + sodium) / 3,

@@ -29,6 +29,7 @@ utils::globalVariables(
 create_adducts_neg <- function(massesTable, adductsTable) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
+    tidytable::tidytable() |>
     tidyft::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
       `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),

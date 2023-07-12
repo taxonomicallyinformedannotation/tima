@@ -120,7 +120,7 @@ harmonize_spectra <- function(spectra,
   }
 
   spectra_filtered <- spectra |>
-    tidytable::filter(grepl(
+    tidyft::filter(grepl(
       pattern = mode,
       x = !!as.name(co_po),
       ignore.case = TRUE
@@ -161,7 +161,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    tidyft::mutate(
+    dplyr::mutate(
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
