@@ -73,7 +73,7 @@ prepare_taxa <-
     params <<- parameters
 
     log_debug(x = "Loading feature table")
-    feature_table <- tidytable::fread(
+    feature_table_0 <- tidytable::fread(
       file = input,
       na.strings = c("", "NA")
     )
@@ -89,7 +89,7 @@ prepare_taxa <-
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
-    feature_table <- feature_table |>
+    feature_table <- feature_table_0 |>
       tidytable::select(
         tidytable::all_of(name_features),
         tidytable::matches(" Peak area"),
@@ -107,9 +107,9 @@ prepare_taxa <-
     top_n <- feature_table |>
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
-      tidytable::filter(value != 0) |>
-      tidyft::mutate(rank = rank(-value), .by = c(rowname)) |>
-      tidytable::filter(rank <= top_k) |>
+      dplyr::filter(value != 0) |>
+      dplyr::mutate(rank = rank(-value), .by = c(rowname)) |>
+      dplyr::filter(rank <= top_k) |>
       tidytable::arrange(rowname, rank)
 
     if (!is.null(taxon)) {
@@ -120,7 +120,7 @@ prepare_taxa <-
 
     log_debug(x = "Preparing organisms names")
     organism_table <- metadata_table |>
-      tidytable::filter(!is.na(!!as.name(colname))) |>
+      dplyr::filter(!is.na(!!as.name(colname))) |>
       tidytable::distinct(!!as.name(colname)) |>
       tidytable::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism,
@@ -138,7 +138,7 @@ prepare_taxa <-
 
     log_debug(x = "Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
-      tidytable::filter(is.na(organism_taxonomy_ottid))
+      tidyft::filter(is.na(organism_taxonomy_ottid))
 
     if (nrow(organism_table_missing) != 0) {
       biological_metadata_1 <- organism_table_missing |>
@@ -146,12 +146,12 @@ prepare_taxa <-
 
       log_debug(x = "Joining all results")
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
+        tidyft::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism) |>
         tidytable::bind_rows(biological_metadata_1)
     } else {
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
+        tidyft::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism)
     }
 
@@ -180,8 +180,8 @@ prepare_taxa <-
     log_debug(x = "Joining top K with metadata table")
     if (!is.null(taxon)) {
       metadata_table_joined <- cbind(
-        feature_table |>
-          tidyft::mutate(feature_id = tidytable::row_number()),
+        feature_table_0 |>
+          dplyr::mutate(feature_id = !!as.name(name_features)),
         biological_metadata |>
           tidytable::select(organismOriginal = organism_name)
       )
@@ -202,35 +202,33 @@ prepare_taxa <-
         by = c("organismOriginal" = "organism_name")
       ) |>
       tidytable::distinct() |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
       tidytable::select(
         feature_id,
-        sample_organism_01_domain = tidytable::matches("organism_taxonomy_01domain"),
-        sample_organism_02_kingdom = tidytable::matches("organism_taxonomy_02kingdom"),
-        sample_organism_03_phylum = tidytable::matches("organism_taxonomy_03phylum"),
-        sample_organism_04_class = tidytable::matches("organism_taxonomy_04class"),
-        sample_organism_05_order = tidytable::matches("organism_taxonomy_05order"),
-        sample_organism_06_family = tidytable::matches("organism_taxonomy_06family"),
-        sample_organism_07_tribe = tidytable::matches("organism_taxonomy_07tribe"),
-        sample_organism_08_genus = tidytable::matches("organism_taxonomy_08genus"),
-        sample_organism_09_species = tidytable::matches("organism_taxonomy_09species"),
-        sample_organism_10_varietas = tidytable::matches("organism_taxonomy_10varietas")
+        sample_organism_01_domain = organism_taxonomy_01domain,
+        sample_organism_02_kingdom = organism_taxonomy_02kingdom,
+        sample_organism_03_phylum = organism_taxonomy_03phylum,
+        sample_organism_04_class = organism_taxonomy_04class,
+        sample_organism_05_order = organism_taxonomy_05order,
+        sample_organism_06_family = organism_taxonomy_06family,
+        sample_organism_07_tribe = organism_taxonomy_07tribe,
+        sample_organism_08_genus = organism_taxonomy_08genus,
+        sample_organism_09_species = organism_taxonomy_09species,
+        sample_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
-      tidytable::group_by(feature_id) |>
-      tidytable::reframe(tidytable::across(
-        .cols = tidytable::everything(),
+      dplyr::group_by(feature_id) |>
+      dplyr::reframe(dplyr::across(
+        .cols = dplyr::everything(),
         .fns = function(x) {
           x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
         }
       )) |>
-      tidytable::ungroup() |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-      tidyft::mutate(tidytable::across(
-        tidytable::everything(),
-        .fns = function(x) {
-          tidytable::na_if(x, "")
-        }
-      ))
+      dplyr::ungroup() |>
+      dplyr::mutate_all(as.character) |>
+      tidytable::tidytable() |>
+      tidyft::mutate_vars(is.character, .func = trimws) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
+        tidytable::na_if(x, "")
+      })
 
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 

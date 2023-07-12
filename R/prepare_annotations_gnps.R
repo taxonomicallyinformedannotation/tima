@@ -186,18 +186,17 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class,
           structure_taxonomy_classyfire_04directparent
         ) |>
-        tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "N/A")
-        })) |>
-        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "null")
-        })) |>
-        tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+        }) |>
+        tidyft::mutate_vars(is.character, .func = function(x) {
           tidytable::na_if(x, "")
-        })) |>
+        }) |>
         round_reals() |>
-        tidyft::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
+        tidyft::mutate_vars(is.numeric, .func = as.character) |>
         complement_metadata_structures(
           str_2D_3D = str_2D_3D,
           str_met = str_met,

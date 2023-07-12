@@ -102,10 +102,11 @@ prepare_annotations_spectra <-
       lapply(
         X = input,
         FUN = tidytable::fread,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
       tidytable::bind_rows() |>
-      tidytable::filter(!is.na(feature_id)) |>
+      tidyft::filter(!is.na(feature_id)) |>
       tidytable::distinct(
         feature_id,
         error_mz,
@@ -130,14 +131,14 @@ prepare_annotations_spectra <-
         #   allow_lambert_h = TRUE
         # )$x.t,
         structure_exact_mass = as.numeric(structure_exact_mass),
-        structure_taxonomy_npclassifier_01pathway = NA,
-        structure_taxonomy_npclassifier_02superclass = NA,
-        structure_taxonomy_npclassifier_03class = NA,
-        structure_taxonomy_classyfire_chemontid = NA,
-        structure_taxonomy_classyfire_01kingdom = NA,
-        structure_taxonomy_classyfire_02superclass = NA,
-        structure_taxonomy_classyfire_03class = NA,
-        structure_taxonomy_classyfire_04directparent = NA,
+        structure_taxonomy_npclassifier_01pathway = NA_character_,
+        structure_taxonomy_npclassifier_02superclass = NA_character_,
+        structure_taxonomy_npclassifier_03class = NA_character_,
+        structure_taxonomy_classyfire_chemontid = NA_character_,
+        structure_taxonomy_classyfire_01kingdom = NA_character_,
+        structure_taxonomy_classyfire_02superclass = NA_character_,
+        structure_taxonomy_classyfire_03class = NA_character_,
+        structure_taxonomy_classyfire_04directparent = NA_character_,
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
@@ -171,18 +172,17 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
       ) |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), as.character)) |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      tidyft::mutate_vars(is.character, .func = function(x) {
         tidytable::na_if(x, "N/A")
-      })) |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      }) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
         tidytable::na_if(x, "null")
-      })) |>
-      tidyft::mutate(tidytable::across(tidytable::everything(), .fns = function(x) {
+      }) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
         tidytable::na_if(x, "")
-      })) |>
+      }) |>
       round_reals() |>
-      tidyft::mutate(tidytable::across(tidytable::where(is.numeric), as.character)) |>
+      tidyft::mutate_vars(is.numeric, .func = as.character) |>
       complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,
