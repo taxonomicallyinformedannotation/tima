@@ -24,8 +24,8 @@ extract_spectra <- function(object) {
   peaks <- object |>
     Spectra::peaksData() |>
     data.frame() |>
-    tidytable::group_by(group) |>
-    tidytable::reframe(tidytable::across(
+    dplyr::group_by(group) |>
+    dplyr::reframe(dplyr::across(
       .cols = tidytable::everything(),
       .fns = list
     ))
@@ -41,28 +41,28 @@ extract_spectra <- function(object) {
 
   ## Synonyms issue
   spectra <- spectra |>
-    tidytable::group_by(tidytable::across(c(-tidytable::any_of("synonym")))) |>
-    tidytable::reframe(tidytable::across(
-      .cols = tidytable::where(is.list),
+    dplyr::group_by(tidytable::across(c(-tidytable::any_of("synonym")))) |>
+    dplyr::reframe(dplyr::across(
+      .cols = dplyr::where(is.list),
       .fns = as.character
     )) |>
-    tidytable::ungroup()
+    dplyr::ungroup()
 
   ## Columns types issue
   spectra <- spectra |>
-    tidyft::mutate(tidytable::across(
-      .cols = tidytable::any_of(incoherent_logical),
+    dplyr::mutate(dplyr::across(
+      .cols = dplyr::any_of(incoherent_logical),
       .fns = as.logical
     )) |>
-    tidyft::mutate(tidytable::across(
-      .cols = tidytable::any_of(incoherent_integer),
+    dplyr::mutate(dplyr::across(
+      .cols = dplyr::any_of(incoherent_integer),
       .fns = as.integer
     ))
 
   ## Select all columns except those specified in 'incoherent_colnames', and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
-    tidytable::select(-c(tidytable::any_of(incoherent_colnames))) |>
-    tidytable::rename(tidytable::any_of(incoherent_colnames))
+    dplyr::select(-c(dplyr::any_of(incoherent_colnames))) |>
+    dplyr::rename(dplyr::any_of(incoherent_colnames))
 
   return(spectra)
 }
