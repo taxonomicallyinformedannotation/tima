@@ -23,7 +23,7 @@ export_spectra_2 <- function(file,
                              spectra,
                              meta) {
   if (nrow(spectra |>
-    tidytable::filter(!is.na(compound_id))) != 0) {
+    tidyft::filter(!is.na(compound_id))) != 0) {
     log_debug("Exporting")
     create_dir(export = file)
     spectra |>
