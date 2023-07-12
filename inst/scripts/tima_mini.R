@@ -4,7 +4,7 @@ library("timaR")
 
 log_debug(
   "This script",
-  crayon::green("does everything you ever dreamt of. \n")
+  crayon::green("does everything you ever dreamt of (min form). \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ", crayon::blue("PMA"), "\n")

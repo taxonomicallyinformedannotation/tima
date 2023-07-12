@@ -36,9 +36,10 @@ prepare_isdb_hmdb <-
     source(file = "inst/scripts/standardize.R")
 
     log_debug("Loading proton mass")
-    proton <- readr::read_tsv(file = system.file("extdata", "adducts.tsv", package = "timaR")) |>
-      dplyr::filter(adduct == "H (proton)") |>
-      dplyr::pull("mass")
+    proton <-
+      readr::read_tsv(file = system.file("extdata", "adducts.tsv", package = "timaR")) |>
+      tidytable::filter(adduct == "H (proton)") |>
+      tidytable::pull("mass")
 
     log_debug("Loading metadata")
     df_meta <- readr::read_tsv(file = metadata)
@@ -58,14 +59,14 @@ prepare_isdb_hmdb <-
 
     log_debug("Adding metadata")
     spctra_enhanced <- spctra |>
-      dplyr::left_join(
+      tidytable::left_join(
         y = df_meta,
         by = c("compound_id" = "accession")
       ) |>
-      dplyr::filter(!is.na(smiles)) |>
-      dplyr::select(-original_spectrum_id, -spectrum_id) |>
-      dplyr::distinct() |>
-      dplyr::mutate(
+      tidytable::filter(!is.na(smiles)) |>
+      tidytable::select(-original_spectrum_id, -spectrum_id) |>
+      tidytable::distinct() |>
+      tidyft::mutate(
         precursorMz = ifelse(
           test = polarity == 1,
           yes = monisotopic_molecular_weight + proton,
@@ -86,52 +87,46 @@ prepare_isdb_hmdb <-
     log_debug("Standardizing 2D chemical structures")
     smiles <- unique(spctra_enhanced$smiles)
     df_clean <- lapply(X = smiles, FUN = standardize_smiles) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
     spctra_enhanced <- spctra_enhanced |>
-      dplyr::left_join(df_clean)
+      tidytable::left_join(df_clean)
 
+    col_args <- list(
+      co_ce = "collision_energy",
+      co_ci = "compound_id",
+      co_em = "monisotopic_molecular_weight",
+      co_mf = "chemical_formula",
+      co_in = "inchi",
+      co_io = "inchi_2D",
+      co_ik = "inchikey",
+      co_il = "inchikey_2D",
+      co_po = "ionmode",
+      co_na = "name",
+      co_sm = "smiles",
+      co_sn = "smiles_2D",
+      co_si = NULL,
+      co_sp = "splash",
+      co_sy = "iupac_name",
+      co_xl = NULL
+    )
     log_debug("Positive")
-    spectra_harmonized_pos <- spctra_enhanced |>
-      harmonize_spectra(
-        mode = "pos",
-        co_ce = "collision_energy",
-        co_ci = "compound_id",
-        co_em = "monisotopic_molecular_weight",
-        co_mf = "chemical_formula",
-        co_in = "inchi",
-        co_io = "inchi_2D",
-        co_ik = "inchikey",
-        co_il = "inchikey_2D",
-        co_po = "ionmode",
-        co_na = "name",
-        co_sm = "smiles",
-        co_sn = "smiles_2D",
-        co_si = NULL,
-        co_sp = "splash",
-        co_sy = "iupac_name",
-        co_xl = NULL
+    spectra_harmonized_pos <-
+      do.call(
+        what = harmonize_spectra,
+        args = c(col_args,
+          spectra = spectra_enhanced,
+          mode = "pos"
+        )
       )
 
     log_debug("Negative")
-    spectra_harmonized_neg <- spctra_enhanced |>
-      harmonize_spectra(
-        mode = "neg",
-        co_ce = "collision_energy",
-        co_ci = "compound_id",
-        co_em = "monisotopic_molecular_weight",
-        co_mf = "chemical_formula",
-        co_in = "inchi",
-        co_io = "inchi_2D",
-        co_ik = "inchikey",
-        co_il = "inchikey_2D",
-        co_po = "ionmode",
-        co_na = "name",
-        co_sm = "smiles",
-        co_sn = "smiles_2D",
-        co_si = NULL,
-        co_sp = "splash",
-        co_sy = "iupac_name",
-        co_xl = NULL
+    spectra_harmonized_neg <-
+      do.call(
+        what = harmonize_spectra,
+        args = c(col_args,
+          spectra = spectra_enhanced,
+          mode = "neg"
+        )
       )
 
     log_debug("Exporting")

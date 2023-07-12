@@ -40,17 +40,17 @@ get_organism_taxonomy_ott <- function(df,
           vectorize = FALSE
         )
     ) |>
-    dplyr::distinct() |>
+    tidytable::distinct() |>
     dplyr::mutate(search_string = tolower(organism)) |>
-    dplyr::distinct(
+    tidytable::distinct(
       organism,
       search_string
     ) |>
-    dplyr::select(
+    tidytable::select(
       canonical_name = organism,
       search_string
     ) |>
-    dplyr::filter(!is.na(canonical_name))
+    tidyft::filter(!is.na(canonical_name))
 
   organisms <- organism_table$canonical_name
 
@@ -93,21 +93,22 @@ get_organism_taxonomy_ott <- function(df,
           )
         }
       )
+    log_debug("Request finished!")
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
-      dplyr::bind_rows() |>
+      tidytable::bind_rows() |>
       dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
     new_ott_id <- new_matched_otl_exact |>
-      dplyr::filter(!is.na(ott_id)) |>
-      dplyr::distinct(ott_id)
+      tidyft::filter(!is.na(ott_id)) |>
+      tidytable::distinct(ott_id)
 
     if (nrow(new_matched_otl_exact) != nrow(new_ott_id) & retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
-        dplyr::filter(!is.na(ott_id))
+        tidyft::filter(!is.na(ott_id))
 
       new_ott_id_1 <- pretable |>
-        dplyr::distinct(ott_id)
+        tidytable::distinct(ott_id)
 
       organism_table_2 <- organism_table |>
         dplyr::filter(!organism_table$search_string %in% pretable$search_string)
@@ -146,15 +147,15 @@ get_organism_taxonomy_ott <- function(df,
         )
 
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
-        dplyr::bind_rows() |>
-        dplyr::filter(!is.na(ott_id)) |>
+        tidytable::bind_rows() |>
+        tidyft::filter(!is.na(ott_id)) |>
         dplyr::mutate(dplyr::across(dplyr::where(is.logical), as.character))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
-        dplyr::distinct(ott_id)
+        tidytable::distinct(ott_id)
 
-      new_ott_id <- dplyr::bind_rows(new_ott_id_1, new_ott_id_2)
+      new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
       new_matched_otl_exact <-
-        dplyr::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
+        tidytable::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
     }
 
     if (nrow(new_ott_id) != 0) {
@@ -166,6 +167,7 @@ get_organism_taxonomy_ott <- function(df,
         include_lineage = TRUE,
         include_terminal_descendants = TRUE
       )
+      log_debug("Taxonomy retrieved!")
 
       taxon_lineage <- taxon_info |>
         rotl::tax_lineage()
@@ -224,7 +226,7 @@ get_organism_taxonomy_ott <- function(df,
       dplyr::distinct() |>
       dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
       ## feeling it is better that way
-      dplyr::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
+      tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
 
     if (nrow(biological_metadata) != 0) {
       biological_metadata <- biological_metadata |>
@@ -233,7 +235,7 @@ get_organism_taxonomy_ott <- function(df,
           names_from = "rank",
           values_from = c("name", "unique_name.y", "ott_id.y")
         ) |>
-        dplyr::select(
+        tidytable::select(
           organism_name = canonical_name,
           organism_taxonomy_ottid = ott_id,
           organism_taxonomy_01domain = dplyr::matches("name_domain"),
@@ -270,6 +272,7 @@ get_organism_taxonomy_ott <- function(df,
       )] <- NA
     }
 
+    log_debug("Got OTTaxonomy!")
     return(biological_metadata)
   }
 }

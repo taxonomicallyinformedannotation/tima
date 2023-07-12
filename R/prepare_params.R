@@ -2,6 +2,9 @@
 #'
 #' @description This function prepares main parameters
 #'
+#' @include create_dir.R
+#' @include export_params.R
+#'
 #' @param filename Name of the file
 #' @param features File containing the features table
 #' @param spectra File containing the spectra

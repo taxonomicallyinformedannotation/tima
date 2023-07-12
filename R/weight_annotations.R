@@ -8,6 +8,15 @@ utils::globalVariables(
 #'
 #' @description This function weights and eventually complements initial annotations.
 #'
+#' @include clean_bio.R
+#' @include clean_chemo.R
+#' @include decorate_bio.R
+#' @include decorate_chemo.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include weight_bio.R
+#' @include weight_chemo.R
+#'
 #' @param library Library containing the keys
 #' @param org_tax_ott File containing organisms taxonomy (OTT)
 #' @param str_2D_3D File containing 2D and 3D structures
@@ -159,7 +168,7 @@ weight_annotations <-
       colClasses = "character",
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     log_debug(x = "... metadata_table_biological_annotation")
     taxed_features_table <- tidytable::fread(
@@ -182,12 +191,12 @@ weight_annotations <-
         colClasses = "character",
         na.strings = c("", "NA")
       ) |>
-      dplyr::left_join(tidytable::fread(
+      tidytable::left_join(tidytable::fread(
         file = str_2D_3D,
         colClasses = "character",
         na.strings = c("", "NA")
       )) |>
-      dplyr::left_join(tidytable::fread(
+      tidytable::left_join(tidytable::fread(
         file = org_tax_ott,
         colClasses = "character",
         na.strings = c("", "NA")
@@ -195,12 +204,12 @@ weight_annotations <-
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>
-        dplyr::filter(score_input == 0)
+        tidyft::filter(score_input == 0)
     }
 
     log_debug(x = "adding biological organism metadata")
     annotation_table_taxed <- annotation_table |>
-      dplyr::left_join(taxed_features_table)
+      tidytable::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
     annotation_table_weighted_bio <-

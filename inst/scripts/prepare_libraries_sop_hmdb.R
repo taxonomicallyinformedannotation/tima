@@ -78,23 +78,23 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
   hmdb_df <-
     lapply(X = values, FUN = extract_value_from_hmdb_xml) |>
     data.frame() |>
-    dplyr::distinct()
+    tidytable::distinct()
 
   log_debug(x = "Formatting HMDB")
   hmdb_prepared <- hmdb_df |>
-    dplyr::mutate_all(dplyr::na_if, "") |>
-    dplyr::filter(!is.na(inchikey)) |>
-    dplyr::mutate(
-      structure_inchikey_2D = substring(
-        text = inchikey,
-        first = 1,
-        last = 14
+    tidyft::mutate_all(tidytable::na_if, "") |>
+    tidytable::filter(!is.na(inchikey)) |>
+    tidyft::mutate(
+      structure_inchikey_2D = stringi::stri_sub(
+        str = inchikey,
+        from = 1,
+        to = 14
       ),
       ## TODO compute it
       structure_smiles_2D = NA_character_,
       monisotopic_molecular_weight = as.numeric(monisotopic_molecular_weight)
     ) |>
-    dplyr::select(
+    tidytable::select(
       structure_name = name,
       structure_inchikey = inchikey,
       structure_smiles = smiles,
@@ -103,7 +103,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       structure_molecular_formula = chemical_formula,
       structure_exact_mass = monisotopic_molecular_weight
     ) |>
-    dplyr::mutate(
+    tidyft::mutate(
       structure_xlogp = NA_integer_,
       structure_taxonomy_npclassifier_01pathway = NA_character_,
       structure_taxonomy_npclassifier_02superclass = NA_character_,
@@ -114,7 +114,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       structure_taxonomy_classyfire_03class = NA_character_,
       structure_taxonomy_classyfire_04directparent = NA_character_,
     ) |>
-    dplyr::mutate(
+    tidyft::mutate(
       organism_name = "Homo sapiens",
       organism_taxonomy_ottid = 770315,
       organism_taxonomy_01domain = "Eukaryota",
@@ -130,7 +130,7 @@ prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$h
       reference_doi = NA_character_
     ) |>
     round_reals() |>
-    dplyr::distinct()
+    tidytable::distinct()
 
   log_debug(x = "Exporting ...")
   export_output(x = hmdb_df, file = output_minimal)

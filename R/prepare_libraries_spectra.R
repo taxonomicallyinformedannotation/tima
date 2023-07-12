@@ -2,6 +2,12 @@
 #'
 #' @description This function prepares spectra to be used for spectral matching
 #'
+#' @include export_params.R
+#' @include export_spectra_2.R
+#' @include extract_spectra.R
+#' @include harmonize_spectra.R
+#' @include import_spectra.R
+#'
 #' @param input File containing spectra
 #' @param output Output file
 #' @param polarity MS polarity
@@ -89,7 +95,7 @@ prepare_libraries_spectra <-
           mode = polarity
         ) |>
         ## TODO report the issue as otherwise precursorMz is lost
-        dplyr::mutate(precursor_mz = precursorMz)
+        tidyft::mutate(precursor_mz = precursorMz)
 
       log_debug("Exporting")
       export_spectra_2(

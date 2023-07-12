@@ -9,6 +9,9 @@ utils::globalVariables(
 #'
 #' @description This function prepares edges for further use
 #'
+#' @include export_output.R
+#' @include export_params.R
+#'
 #' @param input Input file if 'manual'
 #' @param output Output file
 #' @param name_source Name of the source features column
@@ -38,16 +41,16 @@ prepare_features_edges <-
       X = input, FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
-      dplyr::bind_rows()
+      tidytable::bind_rows()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
     edges_table_treated <- edges_table |>
-      dplyr::select(
+      tidytable::select(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      dplyr::filter(feature_source != feature_target)
+      tidyft::filter(feature_source != feature_target)
 
     ## Export edges table
     log_debug(x = "Exporting ...")

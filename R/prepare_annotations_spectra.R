@@ -29,6 +29,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares the spectral matches obtained previously to make them compatible
 #'
+#' @include complement_metadata_structures.R
+#' @include export_output.R
+#' @include export_params.R
+#' @include round_reals.R
+#'
 #' @param input Input file
 #' @param output Output file
 #' @param str_2D_3D File containing 2D and 3D structures
@@ -97,11 +102,12 @@ prepare_annotations_spectra <-
       lapply(
         X = input,
         FUN = tidytable::fread,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
-      dplyr::bind_rows() |>
-      dplyr::filter(!is.na(feature_id)) |>
-      dplyr::distinct(
+      tidytable::bind_rows() |>
+      tidyft::filter(!is.na(feature_id)) |>
+      tidytable::distinct(
         feature_id,
         error_mz,
         error_rt,
@@ -115,7 +121,7 @@ prepare_annotations_spectra <-
         count_peaks_matched
       ) |>
       # Add new columns
-      dplyr::mutate(
+      tidyft::mutate(
         library = "ISDB",
         # score_input_normalized = bestNormalize::bestNormalize(
         #   x = score_input,
@@ -125,21 +131,21 @@ prepare_annotations_spectra <-
         #   allow_lambert_h = TRUE
         # )$x.t,
         structure_exact_mass = as.numeric(structure_exact_mass),
-        structure_taxonomy_npclassifier_01pathway = NA,
-        structure_taxonomy_npclassifier_02superclass = NA,
-        structure_taxonomy_npclassifier_03class = NA,
-        structure_taxonomy_classyfire_chemontid = NA,
-        structure_taxonomy_classyfire_01kingdom = NA,
-        structure_taxonomy_classyfire_02superclass = NA,
-        structure_taxonomy_classyfire_03class = NA,
-        structure_taxonomy_classyfire_04directparent = NA,
+        structure_taxonomy_npclassifier_01pathway = NA_character_,
+        structure_taxonomy_npclassifier_02superclass = NA_character_,
+        structure_taxonomy_npclassifier_03class = NA_character_,
+        structure_taxonomy_classyfire_chemontid = NA_character_,
+        structure_taxonomy_classyfire_01kingdom = NA_character_,
+        structure_taxonomy_classyfire_02superclass = NA_character_,
+        structure_taxonomy_classyfire_03class = NA_character_,
+        structure_taxonomy_classyfire_04directparent = NA_character_,
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
-      # dplyr::rowwise() |>
-      # dplyr::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
-      # dplyr::ungroup() |>
-      dplyr::select(
+      # tidytable::rowwise() |>
+      # tidyft::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
+      # tidytable::ungroup() |>
+      tidytable::select(
         feature_id,
         error_mz,
         error_rt,
@@ -166,15 +172,17 @@ prepare_annotations_spectra <-
         structure_taxonomy_classyfire_03class,
         structure_taxonomy_classyfire_04directparent
       ) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      tidyft::mutate_vars(is.character, .func = function(x) {
         tidytable::na_if(x, "N/A")
-      })) |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), .fns = function(x) {
+      }) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
         tidytable::na_if(x, "null")
-      })) |>
+      }) |>
+      tidyft::mutate_vars(is.character, .func = function(x) {
+        tidytable::na_if(x, "")
+      }) |>
       round_reals() |>
-      dplyr::mutate(dplyr::across(dplyr::where(is.numeric), as.character)) |>
+      tidyft::mutate_vars(is.numeric, .func = as.character) |>
       complement_metadata_structures(
         str_2D_3D = str_2D_3D,
         str_met = str_met,
