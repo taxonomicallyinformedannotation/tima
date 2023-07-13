@@ -4,10 +4,12 @@
 \alias{clean_collapse}
 \title{Clean collapse}
 \usage{
-clean_collapse(grouped_df)
+clean_collapse(grouped_df, cols = NA)
 }
 \arguments{
 \item{grouped_df}{Grouped dataframe}
+
+\item{cols}{Column to apply collapse to}
 }
 \description{
 This function collapses a grouped dataframe and trims it

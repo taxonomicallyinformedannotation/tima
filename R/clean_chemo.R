@@ -1,10 +1,12 @@
 utils::globalVariables(
   c(
+    "annotation_table_weighted_chemo",
     "best_candidate",
     "best_candidate_organism",
     "best_candidate_structure",
     "candidates_final",
     "component_id",
+    "components_table",
     "consensus_structure_cla_cla",
     "consensus_structure_cla_kin",
     "consensus_structure_cla_par",
@@ -70,6 +72,8 @@ utils::globalVariables(
 #' @title Clean chemo
 #'
 #' @description This function cleans the results obtained after chemical weighting
+#'
+#' @include clean_collapse.R
 #'
 #' @param annotationTableWeightedChemo Table containing your chemically weighted annotation
 #' @param componentsTable Prepared components file
@@ -202,16 +206,7 @@ clean_chemo <-
     df3 <- df2 |>
       tidytable::left_join(references) |>
       dplyr::group_by(dplyr::across(c(-reference_doi))) |>
-      dplyr::reframe(dplyr::across(
-        .cols = c(reference_doi),
-        .fns = function(x) {
-          gsub(
-            pattern = "\\bNA\\b",
-            replacement = "",
-            x = paste(unique(x), collapse = " $ ")
-          )
-        }
-      )) |>
+      clean_collapse(cols = c("reference_doi")) |>
       dplyr::ungroup() |>
       tidytable::select(
         feature_id,

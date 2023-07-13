@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "paths",
     "structure_exact_mass",
     "structure_exact_mass_i",
     "structure_exact_mass_s",
@@ -38,6 +39,8 @@ utils::globalVariables(
 #' @title Complement metadata of structures
 #'
 #' @description This function complement structural metadata
+#'
+#' @include clean_collapse.R
 #'
 #' @param df Data frame with structural metadata to be complemented
 #' @param str_2D_3D File containing 2D and 3D structures
@@ -142,12 +145,7 @@ complement_metadata_structures <- function(df,
       structure_inchikey_2D,
       structure_smiles_2D
     ) |>
-    dplyr::reframe(dplyr::across(
-      .cols = dplyr::everything(),
-      .fns = function(x) {
-        x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-      }
-    )) |>
+    clean_collapse() |>
     tidytable::tidytable() |>
     tidyft::mutate_vars(is.character, .func = trimws) |>
     ## Avoid small discrepancies
@@ -156,8 +154,7 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_smiles_2D,
       .keep_all = TRUE
-    ) |>
-    tidyft::mutate_vars(is.list, .func = as.character)
+    )
 
   tax_cla <- tidytable::fread(str_tax_cla,
     na.strings = c("", "NA"),

@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "annotation_table_weighted_chemo",
     "consensus_structure_cla_cla",
     "consensus_structure_cla_kin",
     "consensus_structure_cla_par",

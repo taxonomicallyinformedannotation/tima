@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "annotation_table_ms1"
+  )
+)
+
 #' @title Decorate masses
 #'
 #' @description This function outputs information about MS1 annotation

@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "params"
+  )
+)
+
 #' @title Export parameters
 #'
 #' @description This function writes the parameters to a YAML file in the specified directory.

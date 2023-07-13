@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "annotation_table_weighted_bio",
     "score_biological",
     "score_biological_class",
     "score_biological_family",

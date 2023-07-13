@@ -1,5 +1,6 @@
 utils::globalVariables(c(
   "matched_peaks_count",
+  "params",
   "presence_ratio",
   "score"
 ))

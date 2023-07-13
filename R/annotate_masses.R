@@ -30,6 +30,8 @@ utils::globalVariables(
     "mz_min",
     "mz.x",
     "mz.y",
+    "params",
+    "paths",
     "rt",
     "rt_max",
     "rt_min",
@@ -433,11 +435,11 @@ annotate_masses <-
         ),
       df9_c
     ) |>
-      tidyft::mutate(score_input = 0)
+      dplyr::mutate(score_input = 0)
 
     log_debug("joining with initial results (neutral losses) \n")
     df10_a <- tidytable::left_join(df10, df9_e) |>
-      tidyft::mutate(mz_1 = ifelse(
+      dplyr::mutate(mz_1 = ifelse(
         test = !is.na(loss),
         yes = mz + mass,
         no = mz
@@ -451,7 +453,7 @@ annotate_masses <-
           mz_1 <= value_max
         )
       ) |>
-      tidyft::mutate(
+      dplyr::mutate(
         error_mz = adduct_mass - mz_1,
         error_rt = NA_real_
       ) |>
@@ -467,7 +469,7 @@ annotate_masses <-
         adduct_mass,
         loss
       ) |>
-      tidyft::mutate(library = ifelse(
+      dplyr::mutate(library = ifelse(
         test = !is.na(loss),
         yes = paste0(adduct, " - ", loss),
         no = adduct
@@ -696,7 +698,7 @@ annotate_masses <-
         )
       ) |>
       tidytable::tidytable() |>
-      tidyft::mutate(
+      dplyr::mutate(
         delta_min = mz.x - mz_max,
         delta_max = mz.x - mz_min
       ) |>
@@ -742,7 +744,7 @@ annotate_masses <-
         pattern = paste(adduct, "", sep = " "),
         str = library_name
       )) |>
-      tidyft::mutate(error_mz = adduct_mass - adduct_value) |>
+      dplyr::mutate(error_mz = adduct_mass - adduct_value) |>
       tidytable::distinct(
         feature_id,
         rt,
@@ -758,7 +760,7 @@ annotate_masses <-
         df13,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
-      tidyft::mutate(
+      dplyr::mutate(
         score_input = 0
         # score_input_normalized = 0
       ) |>
@@ -768,7 +770,7 @@ annotate_masses <-
         tidytable::everything(), -exact_mass, -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
-      tidyft::mutate(library = as.character(library)) |>
+      dplyr::mutate(library = as.character(library)) |>
       tidytable::distinct()
 
     log_debug("joining single adducts, neutral losses, and multicharged \n")
@@ -822,7 +824,7 @@ annotate_masses <-
 
     edges <- tidytable::bind_rows(
       df9 |>
-        tidyft::mutate(label = paste0(label, " _ ", label_dest)) |>
+        dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
         tidytable::select(
           !!as.name(name_source) := feature_id,
           !!as.name(name_target) := feature_id_dest,
@@ -830,7 +832,7 @@ annotate_masses <-
         ) |>
         tidytable::distinct(),
       df9_d |>
-        tidyft::mutate(label = paste0(loss, " loss")) |>
+        dplyr::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
           !!as.name(name_source) := feature_id,
           !!as.name(name_target) := feature_id_dest,

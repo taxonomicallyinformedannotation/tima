@@ -1,7 +1,8 @@
 utils::globalVariables(
   c(
     "cluster index",
-    "componentindex"
+    "componentindex",
+    "params"
   )
 )
 

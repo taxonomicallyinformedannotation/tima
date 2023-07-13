@@ -6,6 +6,7 @@ utils::globalVariables(
     "moldb_mono_mass",
     "moldb_smiles",
     "name",
+    "params",
     "structure_inchikey_2D",
     "structure_smiles_2D"
   )

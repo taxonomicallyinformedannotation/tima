@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "params"
+  )
+)
+
 #' @title Prepare params
 #'
 #' @description This function prepares main parameters
@@ -9,6 +15,7 @@
 #' @param features File containing the features table
 #' @param spectra File containing the spectra
 #' @param gnps_job_id GNPS job ID
+#' @param gnps_example_id GNPS example job ID
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
 #' @param summarise Summarise results to one row per feature. BOOLEAN

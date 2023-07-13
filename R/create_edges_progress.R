@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "params"
+  )
+)
+
 #' @title Create edges progress
 #'
 #' @description This function is slow so it outputs the progression of the creation of edges

@@ -30,7 +30,7 @@ create_adducts_neg <- function(massesTable, adductsTable) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- massesTable |>
     tidytable::tidytable() |>
-    tidyft::mutate(
+    dplyr::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
       `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),
       # `[1M-(H)2(H2O)1]1-` = exact_mass - 2 * water - proton,
