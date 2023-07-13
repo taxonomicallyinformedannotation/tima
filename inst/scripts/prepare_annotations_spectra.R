@@ -18,7 +18,7 @@ log_debug("Contributors: ...")
 
 # prepare_annotations_spectra()
 ## Not ann_spe because of `ann_spe_int` (see #69)
-targets::tar_make(names = c(matches("ann_spe_exp_g"),matches("ann_spe_is")))
+targets::tar_make(names = c(matches("ann_spe_exp_g"), matches("ann_spe_is")))
 
 end <- Sys.time()
 

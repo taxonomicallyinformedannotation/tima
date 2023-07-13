@@ -10,6 +10,7 @@ utils::globalVariables(
 #'
 #' @include create_dir.R
 #' @include export_params.R
+#' @include load_yaml_files.R
 #'
 #' @param filename Name of the file
 #' @param features File containing the features table
@@ -57,43 +58,8 @@ prepare_params <- function(filename = params$files$pattern,
   gnps_job_id <<- gnps_job_id
   paths <- parse_yaml_paths()
   gnps_example_id <<- paths$gnps$example
-  log_debug(x = "Loading default params")
-  yaml_files <- c(
-    list.files(
-      path = file.path(paths$params$default),
-      pattern = ".yaml",
-      full.names = TRUE
-    ),
-    paths$params$prepare_params
-  )
 
-  if (length(list.files(paths$params$user$path)) >=
-    length(list.files(paths$params$default$path)) -
-      ## because of params.yaml
-      1) {
-    yaml_files <- c(
-      list.files(
-        path = file.path(paths$params$user),
-        pattern = ".yaml",
-        full.names = TRUE
-      ),
-      paths$params$prepare_params
-    )
-  }
-
-  yaml_names <- yaml_files |>
-    gsub(pattern = "inst/params/default/", replacement = "") |>
-    gsub(pattern = "inst/params/user/", replacement = "") |>
-    gsub(pattern = ".yaml", replacement = "")
-
-  yamls_default <- lapply(
-    X = yaml_files,
-    FUN = yaml::read_yaml
-  )
-
-  names(yamls_default) <- yaml_names
-
-  yamls_params <- yamls_default
+  load_yaml_file()
 
   log_debug(x = "Changing params")
 

@@ -48,12 +48,11 @@ utils::globalVariables(
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
-#' @include complement_metadata_structures.R
 #' @include export_output.R
 #' @include export_params.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
-#' @include round_reals.R
+#' @include select_annotations_columns.R
 #'
 #' @param input_directory Directory containing the Sirius results
 #' @param output Output where to save prepared results
@@ -319,85 +318,15 @@ prepare_annotations_sirius <-
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>
-        tidytable::select(
-          feature_id,
-          error_mz,
-          error_rt,
-          structure_name,
-          # structure_inchikey,
-          structure_inchikey_2D,
-          # structure_smiles,
-          structure_smiles_2D,
-          structure_molecular_formula,
-          structure_exact_mass,
-          structure_xlogp,
-          library,
-          score_input,
-          # score_input_normalized,
-          # score_sirius_csi,
-          # score_sirius_zodiac,
-          # score_sirius_sirius,
-          count_peaks_matched,
-          count_peaks_explained,
-          structure_taxonomy_npclassifier_01pathway,
-          structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class,
-          ## TODO until better
-          structure_taxonomy_classyfire_chemontid,
-          structure_taxonomy_classyfire_01kingdom,
-          structure_taxonomy_classyfire_02superclass,
-          structure_taxonomy_classyfire_03class,
-          structure_taxonomy_classyfire_04directparent
-        ) |>
-        tidyft::mutate_vars(is.character, .func = function(x) {
-          tidytable::na_if(x, "N/A")
-        }) |>
-        tidyft::mutate_vars(is.character, .func = function(x) {
-          tidytable::na_if(x, "null")
-        }) |>
-        tidyft::mutate_vars(is.character, .func = function(x) {
-          tidytable::na_if(x, "")
-        }) |>
-        round_reals() |>
-        tidyft::mutate_vars(is.numeric, .func = as.character) |>
-        complement_metadata_structures(
+        select_annotations_columns(
           str_2D_3D = str_2D_3D,
           str_met = str_met,
           str_nam = str_nam,
           str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc
-        )
+          str_tax_npc = str_tax_npc)
     } else {
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
-      table <- data.frame(
-        feature_id = NA,
-        error_mz = NA,
-        error_rt = NA,
-        structure_name = NA,
-        # structure_inchikey = NA,
-        structure_inchikey_2D = NA,
-        # structure_smiles = NA,
-        structure_smiles_2D = NA,
-        structure_molecular_formula = NA,
-        structure_exact_mass = NA,
-        structure_xlogp = NA,
-        library = NA,
-        score_input = NA,
-        # score_input_normalized = NA,
-        # score_sirius_csi = NA,
-        # score_sirius_zodiac = NA,
-        # score_sirius_sirius = NA,
-        count_peaks_matched = NA,
-        count_peaks_explained = NA,
-        structure_taxonomy_npclassifier_01pathway = NA,
-        structure_taxonomy_npclassifier_02superclass = NA,
-        structure_taxonomy_npclassifier_03class = NA,
-        structure_taxonomy_classyfire_chemontid = NA,
-        structure_taxonomy_classyfire_01kingdom = NA,
-        structure_taxonomy_classyfire_02superclass = NA,
-        structure_taxonomy_classyfire_03class = NA,
-        structure_taxonomy_classyfire_04directparent = NA
-      )
+      table <- fake_annotations_columns()
     }
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_annotations_sirius")
