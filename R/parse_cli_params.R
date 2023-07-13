@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "arguments"
+  )
+)
+
 #' @title Parse CLI parameters
 #'
 #' @description This function parses command line parameters

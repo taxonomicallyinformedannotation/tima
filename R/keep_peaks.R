@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "ratio"
+  )
+)
+
 #' @title Keep peaks
 #'
 #' @description This function keeps a proportion of peaks

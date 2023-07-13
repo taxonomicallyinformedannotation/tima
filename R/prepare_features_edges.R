@@ -1,7 +1,8 @@
 utils::globalVariables(
   c(
     "feature_source",
-    "feature_target"
+    "feature_target",
+    "params"
   )
 )
 

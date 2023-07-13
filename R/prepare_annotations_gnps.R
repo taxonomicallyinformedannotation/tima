@@ -8,17 +8,23 @@ utils::globalVariables(
     "error_rt",
     "ExactMass",
     "feature_id",
+    "INCHI",
     "InChIKey",
     "InChIKey-Planar",
+    "LibraryName",
+    "MassDiff",
     "MQScore",
     "MZErrorPPM",
     "npclassifier_class",
     "npclassifier_pathway",
     "npclassifier_superclass",
+    "params",
     "Precursor_MZ",
     "score_input",
     # "score_input_normalized",
+    "SharedPeaks",
     "structure_exact_mass",
+    "structure_inchi",
     "structure_inchikey_2D",
     "structure_molecular_formula",
     "structure_name",
@@ -31,7 +37,9 @@ utils::globalVariables(
     "structure_taxonomy_npclassifier_01pathway",
     "structure_taxonomy_npclassifier_02superclass",
     "structure_taxonomy_npclassifier_03class",
-    "structure_xlogp"
+    "structure_xlogp",
+    "subclass",
+    "superclass"
   )
 )
 
@@ -112,7 +120,7 @@ prepare_annotations_gnps <-
         na.strings = c("", "NA")
       ) |>
         tidytable::bind_rows() |>
-        tidyft::mutate(
+        dplyr::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ),
@@ -140,7 +148,7 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class = class,
           structure_taxonomy_classyfire_04directparent = subclass
         ) |>
-        tidyft::mutate(
+        dplyr::mutate(
           error_rt = NA,
           structure_smiles_2D = NA,
           structure_molecular_formula = structure_inchi |>

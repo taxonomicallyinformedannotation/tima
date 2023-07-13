@@ -3,6 +3,8 @@ utils::globalVariables(
     "acquisitionNum",
     "feature_id",
     "matched_peaks_count",
+    "params",
+    "paths",
     "precursorMz",
     "presence_ratio",
     "rtime",
@@ -227,7 +229,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     }
     df_final <- df_final |>
       tidytable::rowwise() |>
-      tidyft::mutate(
+      dplyr::mutate(
         ## Working in minutes
         error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,

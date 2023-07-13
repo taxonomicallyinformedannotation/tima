@@ -1,6 +1,8 @@
 utils::globalVariables(
   c(
     "organism_name",
+    "params",
+    "paths",
     "reference_doi",
     "structure_inchikey",
     "structure_smiles"

@@ -5,6 +5,7 @@ utils::globalVariables(
     "error_mz",
     "error_rt",
     "feature_id",
+    "params",
     "score",
     "score_input",
     # "score_input_normalized",

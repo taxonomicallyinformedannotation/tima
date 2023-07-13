@@ -26,6 +26,8 @@ prepare_params(
 
 \item{gnps_job_id}{GNPS job ID}
 
+\item{gnps_example_id}{GNPS example job ID}
+
 \item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 
 \item{taxon}{Name of a taxon you want to enforce}

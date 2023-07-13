@@ -135,7 +135,11 @@ split_tables_sop <- function(table) {
     ) |>
     tidytable::distinct() |>
     dplyr::group_by(structure_smiles_2D) |>
-    clean_collapse() |>
+    clean_collapse(cols = c(
+      "structure_taxonomy_npclassifier_01pathway",
+      "structure_taxonomy_npclassifier_02superclass",
+      "structure_taxonomy_npclassifier_03class"
+    )) |>
     tidyft::mutate_vars(is.character, .func = function(x) {
       tidytable::replace_na(x, "notClassified")
     })

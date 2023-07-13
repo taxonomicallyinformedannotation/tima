@@ -1,5 +1,7 @@
 utils::globalVariables(
   c(
+    "params",
+    "paths",
     "score_input"
   )
 )

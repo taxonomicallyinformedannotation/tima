@@ -6,6 +6,7 @@ utils::globalVariables(
     "organism",
     "organism_name",
     "organism_taxonomy_ottid",
+    "params",
     "rowname",
     "value"
   )
@@ -19,6 +20,7 @@ utils::globalVariables(
 #'    It can either attribute all features to a single organism, or attribute them to multiple ones,
 #'    according to their relative intensities among the samples.
 #'
+#' @include clean_collapse.R
 #' @include export_output.R
 #' @include export_params.R
 #' @include get_organism_taxonomy_ott.R
@@ -215,20 +217,22 @@ prepare_taxa <-
         sample_organism_09_species = organism_taxonomy_09species,
         sample_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
+      dplyr::mutate_all(as.character) |>
       dplyr::group_by(feature_id) |>
-      dplyr::reframe(dplyr::across(
-        .cols = dplyr::everything(),
-        .fns = function(x) {
-          x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
-        }
+      clean_collapse(cols = c(
+        "sample_organism_01_domain",
+        "sample_organism_02_kingdom",
+        "sample_organism_03_phylum",
+        "sample_organism_04_class",
+        "sample_organism_05_order",
+        "sample_organism_06_family",
+        "sample_organism_07_tribe",
+        "sample_organism_08_genus",
+        "sample_organism_09_species",
+        "sample_organism_10_varietas"
       )) |>
       dplyr::ungroup() |>
-      dplyr::mutate_all(as.character) |>
-      tidytable::tidytable() |>
-      tidyft::mutate_vars(is.character, .func = trimws) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "")
-      })
+      tidytable::tidytable()
 
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 

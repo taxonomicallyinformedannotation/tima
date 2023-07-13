@@ -2,6 +2,8 @@ utils::globalVariables(
   c(
     "adduct",
     "exact_mass",
+    "params",
+    "paths",
     "structure_exact_mass"
   )
 )

@@ -12,6 +12,7 @@ utils::globalVariables(
     "organism_taxonomy_09species",
     "organism_taxonomy_10varietas",
     "organism_taxonomy_ottid",
+    "params",
     "structure_exact_mass",
     "structure_inchikey",
     "structure_inchikey_2D",

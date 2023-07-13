@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "annotation_table_weighted_bio_cleaned",
     "candidate_structure_1_cla_kingdom",
     "candidate_structure_1_npc_pathway",
     "candidate_structure_2_cla_superclass",

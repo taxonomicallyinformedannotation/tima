@@ -1,3 +1,9 @@
+utils::globalVariables(
+  c(
+    "paths"
+  )
+)
+
 #' @title Get example sirius
 #'
 #' @description This function gets example SIRIUS annotations

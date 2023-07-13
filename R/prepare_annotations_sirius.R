@@ -6,20 +6,25 @@ utils::globalVariables(
     "CSI:FingerIDScore",
     "error_mz",
     "error_rt",
+    "explainedIntensity",
     "feature_id",
     "id",
     "inchikey_2D",
     "InChIkey2D",
     "ionMass",
+    "IsotopeScore",
     "massErrorPrecursor(ppm)",
     "molecular_formula",
     "molecularFormula",
     "name",
+    "numExplainedPeaks",
+    "params",
     "score_input",
     # "score_input_normalized",
     # "score_sirius_csi",
     # "score_sirius_sirius",
     # "score_sirius_zodiac",
+    "SiriusScore",
     "smiles",
     "smiles_2D",
     "structure_exact_mass",
@@ -33,7 +38,9 @@ utils::globalVariables(
     "structure_taxonomy_npclassifier_02superclass",
     "structure_taxonomy_npclassifier_03class",
     "structure_xlogp",
-    "xlogp"
+    "TreeScore",
+    "xlogp",
+    "ZodiacScore"
   )
 )
 

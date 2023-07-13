@@ -1,5 +1,6 @@
 utils::globalVariables(
   c(
+    "annotation_table_taxed",
     "candidate_organism_01_domain",
     "candidate_organism_02_kingdom",
     "candidate_organism_03_phylum",
