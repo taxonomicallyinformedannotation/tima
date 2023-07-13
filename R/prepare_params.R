@@ -59,7 +59,7 @@ prepare_params <- function(filename = params$files$pattern,
   paths <- parse_yaml_paths()
   gnps_example_id <<- paths$gnps$example
 
-  load_yaml_file()
+  load_yaml_files()
 
   log_debug(x = "Changing params")
 
