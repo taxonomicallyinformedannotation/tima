@@ -4,10 +4,27 @@
 \alias{select_annotations_columns}
 \title{Select annotations columns}
 \usage{
-select_annotations_columns(df)
+select_annotations_columns(
+  df,
+  str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+  str_met = paths$data$interim$libraries$merged$structures$metadata,
+  str_nam = paths$data$interim$libraries$merged$structures$names,
+  str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
+  str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc
+)
 }
 \arguments{
 \item{df}{Dataframe}
+
+\item{str_2D_3D}{File containing 2D and 3D structures}
+
+\item{str_met}{File containing structures metadata}
+
+\item{str_nam}{File containing structures names}
+
+\item{str_tax_cla}{File containing Classyfire taxonomy}
+
+\item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
 \description{
 This function selects annotations columns

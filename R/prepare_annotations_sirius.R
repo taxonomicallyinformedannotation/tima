@@ -323,7 +323,8 @@ prepare_annotations_sirius <-
           str_met = str_met,
           str_nam = str_nam,
           str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc)
+          str_tax_npc = str_tax_npc
+        )
     } else {
       log_debug("Sorry, your input directory does not exist, returning an empty file instead")
       table <- fake_annotations_columns()

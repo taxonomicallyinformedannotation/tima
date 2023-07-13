@@ -150,7 +150,8 @@ prepare_annotations_spectra <-
         str_met = str_met,
         str_nam = str_nam,
         str_tax_cla = str_tax_cla,
-        str_tax_npc = str_tax_npc)
+        str_tax_npc = str_tax_npc
+      )
 
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions
