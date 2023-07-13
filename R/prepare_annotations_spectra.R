@@ -30,10 +30,9 @@ utils::globalVariables(
 #'
 #' @description This function prepares the spectral matches obtained previously to make them compatible
 #'
-#' @include complement_metadata_structures.R
 #' @include export_output.R
 #' @include export_params.R
-#' @include round_reals.R
+#' @include select_annotations_columns.R
 #'
 #' @param input Input file
 #' @param output Output file
@@ -146,51 +145,12 @@ prepare_annotations_spectra <-
       # tidytable::rowwise() |>
       # tidyft::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
       # tidytable::ungroup() |>
-      tidytable::select(
-        feature_id,
-        error_mz,
-        error_rt,
-        structure_name,
-        # structure_inchikey,
-        structure_inchikey_2D,
-        # structure_smiles,
-        structure_smiles_2D,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
-        library,
-        score_input,
-        # score_input_normalized,
-        count_peaks_matched,
-        count_peaks_explained,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class,
-        ## TODO until better
-        structure_taxonomy_classyfire_chemontid,
-        structure_taxonomy_classyfire_01kingdom,
-        structure_taxonomy_classyfire_02superclass,
-        structure_taxonomy_classyfire_03class,
-        structure_taxonomy_classyfire_04directparent
-      ) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "N/A")
-      }) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "null")
-      }) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "")
-      }) |>
-      round_reals() |>
-      tidyft::mutate_vars(is.numeric, .func = as.character) |>
-      complement_metadata_structures(
+      select_annotations_columns(
         str_2D_3D = str_2D_3D,
         str_met = str_met,
         str_nam = str_nam,
         str_tax_cla = str_tax_cla,
-        str_tax_npc = str_tax_npc
-      )
+        str_tax_npc = str_tax_npc)
 
     log_debug(x = "Exporting ...")
     # Call export_params and export_output functions
