@@ -173,7 +173,8 @@ prepare_annotations_gnps <-
           str_met = str_met,
           str_nam = str_nam,
           str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc)
+          str_tax_npc = str_tax_npc
+        )
     } else {
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- fake_annotations_columns()
