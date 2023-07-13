@@ -1,6 +1,16 @@
 ## Simple install helper
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 ###
+## Probably not necessary anymore, letting for safety for now
+if (Sys.info()[["sysname"]] == "Windows") {
+  if (!requireNamespace("installr", quietly = TRUE)) {
+    install.packages("installr")
+  }
+  installr::install.rtools(
+    check_r_update = FALSE,
+    GUI = FALSE
+  )
+}
 if (!requireNamespace("pak", quietly = TRUE)) {
   lib <- Sys.getenv("R_LIBS_SITE")
   if (lib == "") {
