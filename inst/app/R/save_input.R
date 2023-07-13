@@ -1,9 +1,16 @@
+utils::globalVariables(
+  c(
+    "paths",
+    "paths_data_source"
+  )
+)
+
 # save the results to a file
 save_input <- function(input) {
   setwd("../../")
 
-  paths <- timaR::parse_yaml_paths()
-  paths_data_source <- paths$data$source$path
+  paths <<- timaR::parse_yaml_paths()
+  paths_data_source <<- paths$data$source$path
 
   timaR::load_yaml_files()
 

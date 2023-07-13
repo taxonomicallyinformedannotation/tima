@@ -1,6 +1,7 @@
 utils::globalVariables(
   c(
-    "params"
+    "params",
+    "paths"
   )
 )
 
@@ -56,7 +57,7 @@ prepare_params <- function(filename = params$files$pattern,
   features <<- features
   spectra <<- spectra
   gnps_job_id <<- gnps_job_id
-  paths <- parse_yaml_paths()
+  paths <<- parse_yaml_paths()
   gnps_example_id <<- paths$gnps$example
 
   load_yaml_files()
