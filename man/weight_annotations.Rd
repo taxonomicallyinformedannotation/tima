@@ -7,7 +7,7 @@
 weight_annotations(
   library = paths$data$interim$libraries$sop$merged$keys,
   org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
-  str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+  str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
   annotations = params$files$annotations$prepared,
   components = params$files$networks$spectral$components$prepared,
   edges = params$files$networks$spectral$edges$prepared,
@@ -55,7 +55,7 @@ weight_annotations(
 
 \item{org_tax_ott}{File containing organisms taxonomy (OTT)}
 
-\item{str_2D_3D}{File containing 2D and 3D structures}
+\item{str_2d_3d}{File containing 2D and 3D structures}
 
 \item{annotations}{Prepared annotations file}
 

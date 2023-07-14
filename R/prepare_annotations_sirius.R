@@ -56,7 +56,7 @@ utils::globalVariables(
 #'
 #' @param input_directory Directory containing the Sirius results
 #' @param output Output where to save prepared results
-#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_2d_3d File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -71,7 +71,7 @@ utils::globalVariables(
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            output = params$files$annotations$prepared,
-           str_2D_3D = params$
+           str_2d_3d = params$
              files$
              libraries$
              sop$
@@ -319,7 +319,7 @@ prepare_annotations_sirius <-
           count_peaks_matched = NA
         ) |>
         select_annotations_columns(
-          str_2D_3D = str_2D_3D,
+          str_2d_3d = str_2d_3d,
           str_met = str_met,
           str_nam = str_nam,
           str_tax_cla = str_tax_cla,

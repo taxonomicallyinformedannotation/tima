@@ -43,7 +43,7 @@ utils::globalVariables(
 #' @include clean_collapse.R
 #'
 #' @param df Data frame with structural metadata to be complemented
-#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_2d_3d File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -55,7 +55,7 @@ utils::globalVariables(
 #'
 #' @examples NULL
 complement_metadata_structures <- function(df,
-                                           str_2D_3D = paths$
+                                           str_2d_3d = paths$
                                              data$
                                              interim$
                                              libraries$
@@ -93,7 +93,7 @@ complement_metadata_structures <- function(df,
                                              taxonomies$
                                              npc) {
   log_debug("Trying to look for already computed metadata")
-  dd_ddd <- tidytable::fread(str_2D_3D,
+  dd_ddd <- tidytable::fread(str_2d_3d,
     na.strings = c("", "NA"),
     colClasses = "character"
   )

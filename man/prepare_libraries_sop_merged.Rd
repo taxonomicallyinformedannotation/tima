@@ -11,7 +11,7 @@ prepare_libraries_sop_merged(
   value = params$organisms$filter$value,
   output_key = paths$data$interim$libraries$sop$merged$keys,
   output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
-  output_str_2D_3D = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+  output_str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
   output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
   output_str_nam = paths$data$interim$libraries$sop$merged$structures$names,
   output_str_tax_cla =
@@ -33,7 +33,7 @@ prepare_libraries_sop_merged(
 
 \item{output_org_tax_ott}{Output file for organisms taxonomy (OTT)}
 
-\item{output_str_2D_3D}{Output file for structures (2D + 3D)}
+\item{output_str_2d_3d}{Output file for structures (2D + 3D)}
 
 \item{output_str_met}{Output file for structures metadata}
 
