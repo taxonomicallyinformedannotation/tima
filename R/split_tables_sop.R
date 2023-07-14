@@ -67,7 +67,7 @@ split_tables_sop <- function(table) {
     tidytable::select(-n)
   log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
 
-  table_structures_2D_3D <- table |>
+  table_structures_2d_3d <- table |>
     tidyft::filter(!is.na(structure_inchikey)) |>
     tidyft::filter(!is.na(structure_smiles)) |>
     tidyft::filter(!is.na(structure_inchikey_2D)) |>
@@ -79,11 +79,11 @@ split_tables_sop <- function(table) {
       structure_smiles_2D
     ) |>
     tidytable::distinct()
-  log_debug(x = "Corresponding to", nrow(table_structures_2D_3D), "unique 3D structures...")
+  log_debug(x = "Corresponding to", nrow(table_structures_2d_3d), "unique 3D structures...")
   log_debug(
     x = "and",
     nrow(
-      table_structures_2D_3D |>
+      table_structures_2d_3d |>
         tidytable::distinct(structure_inchikey_2D)
     ),
     "unique 2D structures"
@@ -194,7 +194,7 @@ split_tables_sop <- function(table) {
       "key" = table_keys,
       # "org_nam" = table_organisms_names,
       "org_tax_ott" = table_organisms_taxonomy_ott,
-      "str_2d_3d" = table_structures_2D_3D,
+      "str_2d_3d" = table_structures_2d_3d,
       "str_met" = table_structures_metadata,
       "str_nam" = table_structures_names,
       "str_tax_cla" = table_structures_taxonomy_classyfire,
