@@ -23,7 +23,8 @@ parse_yaml_params <- function(def = default_path, usr = user_path) {
     params <- yaml::read_yaml(file = def)
   )
 
-  ## If a user-specified YAML file exists, read it and overwrite the default values with the user-specified ones
+  ## If a user-specified YAML file exists,
+  ## read it and overwrite the default values with the user-specified ones
   if (file.exists(usr)) {
     suppressWarnings(
       params <- yaml::read_yaml(file = usr)

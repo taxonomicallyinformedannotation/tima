@@ -35,7 +35,7 @@ utils::globalVariables(
 
 #' @title Split Structure Organism Pairs table
 #'
-#' @description This function splits the structure organism table for efficiency.
+#' @description This function splits the structure organism table.
 #'
 #' @include clean_collapse.R
 #'
@@ -65,7 +65,11 @@ split_tables_sop <- function(table) {
     tidytable::ungroup() |>
     tidyft::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
-  log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
+  log_debug(
+    x = "Led to",
+    nrow(table_keys),
+    "referenced structure-organism pairs"
+  )
 
   table_structures_2d_3d <- table |>
     tidyft::filter(!is.na(structure_inchikey)) |>
@@ -79,7 +83,11 @@ split_tables_sop <- function(table) {
       structure_smiles_2D
     ) |>
     tidytable::distinct()
-  log_debug(x = "Corresponding to", nrow(table_structures_2d_3d), "unique 3D structures...")
+  log_debug(
+    x = "Corresponding to",
+    nrow(table_structures_2d_3d),
+    "unique 3D structures..."
+  )
   log_debug(
     x = "and",
     nrow(

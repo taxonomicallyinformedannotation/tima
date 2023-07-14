@@ -2,7 +2,8 @@
 #'
 #' @description This function parses YAML paths
 #'
-#' @param file The file name of the YAML file containing the paths (default is "inst/paths.yaml")
+#' @param file The file name of the YAML file containing the paths
+#'   (default is "inst/paths.yaml")
 #'
 #' @return A list containing the paths specified in the YAML file
 #'

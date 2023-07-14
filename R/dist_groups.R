@@ -2,7 +2,8 @@
 
 #' @title Get the distance between two elements in a distance matrix
 #'
-#' @description This function calculates the distance between two elements in a distance matrix
+#' @description This function calculates the distance between
+#'    two elements in a distance matrix
 #'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element
@@ -37,10 +38,13 @@ dist_get <- function(d, idx1, idx2) {
 #' @param d A distance object
 #' @param g A grouping vector for the distance object
 #'
-#' @return A data frame containing distance information between pairs of observations
-#'   in the distance object, with columns for the names or indices of the observations,
-#'   the group labels for each observation, and the distance between the observations.
-#'   The label column indicates whether the distance is within a group or between groups.
+#' @return A data frame containing distance information
+#'    between pairs of observations in the distance object,
+#'    with columns for the names or indices of the observations,
+#'    the group labels for each observation,
+#'    and the distance between the observations.
+#'    The label column indicates whether the distance is
+#'    within a group or between groups.
 #'
 #' @export
 #'

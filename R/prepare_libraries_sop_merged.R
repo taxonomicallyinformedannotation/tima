@@ -11,9 +11,11 @@ utils::globalVariables(
 
 #' @title Prepare merged structure organism pairs libraries
 #'
-#' @description This function prepares the libraries made of all sub-libraries containing structure-organism pairs
+#' @description This function prepares the libraries made of
+#'    all sub-libraries containing structure-organism pairs
 #'
-#' @details It can be restricted to specific taxa to have more biologically meaningful annotation.
+#' @details It can be restricted to specific taxa to have
+#'    more biologically meaningful annotation.
 #'
 #' @include export_output.R
 #' @include export_params.R
@@ -22,8 +24,10 @@ utils::globalVariables(
 #'
 #' @param files List of libraries to be merged
 #' @param filter Boolean. TRUE or FALSE if you want to filter the library
-#' @param level Biological rank to be filtered. Kingdom, phylum, family, genus, ...
-#' @param value Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'
+#' @param level Biological rank to be filtered.
+#'    Kingdom, phylum, family, genus, ...
+#' @param value Name of the taxon or taxa to be kept,
+#'    e.g. 'Gentianaceae|Apocynaceae'
 #' @param output_key Output file for keys
 #' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
 #' @param output_str_2d_3d Output file for structures (2D + 3D)
@@ -45,7 +49,8 @@ prepare_libraries_sop_merged <-
            value = params$organisms$filter$value,
            output_key = paths$data$interim$libraries$sop$merged$keys,
            ## document it above in case
-           # output_org_nam = paths$data$interim$libraries$sop$merged$organisms$names,
+           # output_org_nam =
+           # paths$data$interim$libraries$sop$merged$organisms$names,
            output_org_tax_ott = paths$
              data$
              interim$
@@ -98,7 +103,10 @@ prepare_libraries_sop_merged <-
              taxonomies$
              npc,
            parameters = params) {
-    stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
+    stopifnot(
+      "Your filter parameter must be 'true' or 'false'" =
+        filter %in% c(TRUE, FALSE)
+    )
 
     if (isTRUE(filter)) {
       stopifnot(
@@ -190,7 +198,8 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Completing structures taxonomy (NPC)")
     log_debug(x = "TODO")
 
-    # If filter is TRUE, filter the library based on the specified level and value
+    ## If filter is TRUE,
+    ## filter the library based on the specified level and value
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
@@ -212,7 +221,9 @@ prepare_libraries_sop_merged <-
         ) |>
         tidytable::distinct()
 
-      stopifnot("Your filter led to no entries, try to change it." = nrow(table_keys) != 0)
+      stopifnot(
+        "Your filter led to no entries, try to change it." = nrow(table_keys) != 0
+      )
     }
 
     log_debug(x = "Exporting ...")

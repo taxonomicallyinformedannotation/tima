@@ -158,7 +158,8 @@ get_gnps_tables <-
             gnps_block,
             switch(workflow,
               "fbmn" = "clusterinfo_summary/",
-              "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
+              "classical" =
+                "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
             )
           ),
           export = file_components
@@ -272,10 +273,25 @@ get_gnps_tables <-
           "spectra" = path_spectra,
           "annotations" = file.path(
             path_interim_a,
-            paste0(filename, "_gnps.tsv")
+            paste0(
+              filename,
+              "_gnps.tsv"
+            )
           ),
-          "components" = file.path(path_interim_f, paste0(filename, "_components.tsv")),
-          "edges" = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv"))
+          "components" = file.path(
+            path_interim_f,
+            paste0(
+              filename,
+              "_components.tsv"
+            )
+          ),
+          "edges" = file.path(
+            path_interim_f,
+            paste0(
+              filename,
+              "_edges_spectra.tsv"
+            )
+          )
         )
       )
     }

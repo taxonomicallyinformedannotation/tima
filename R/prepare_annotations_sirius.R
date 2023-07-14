@@ -111,7 +111,8 @@ prepare_annotations_sirius <-
            parameters = params) {
     params <<- parameters
     if (file.exists(input_directory)) {
-      stopifnot("Your npc summary file must be named 'canopus_compound_summary.tsv" = file.exists(
+      stopifnot("Your npc summary file must be named
+                'canopus_compound_summary.tsv" = file.exists(
         file.path(
           input_directory,
           "canopus_compound_summary.tsv"
@@ -119,7 +120,9 @@ prepare_annotations_sirius <-
       ))
       stopifnot(
         "You must generate the summaries before submission. \n
-              Please do `sirius -i $WORKSPACE write-summaries -o $WORKSPACE_SUMMARIES.zip -c --digits 3" = length(
+              Please do
+        `sirius -i $WORKSPACE write-summaries -o $WORKSPACE_SUMMARIES.zip
+        -c --digits 3" = length(
           list.files(
             path = input_directory,
             pattern = "structure_candidates.tsv",
@@ -257,7 +260,10 @@ prepare_annotations_sirius <-
       formula_prepared <- formula |>
         tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidyft::mutate(
-          structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
+          structure_exact_mass = ionMass -
+            `massErrorPrecursor(ppm)` *
+              ionMass *
+              1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
         tidytable::distinct(
@@ -276,7 +282,11 @@ prepare_annotations_sirius <-
       formula_adducts_prepared <- formula_adducts |>
         tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidyft::mutate(
-          structure_exact_mass = ionMass - `massErrorPrecursor(ppm)` * ionMass * 1E-6,
+          structure_exact_mass = ionMass -
+            `massErrorPrecursor(ppm)`
+            *
+              ionMass *
+              1E-6,
           error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
         ) |>
         tidytable::distinct(
@@ -319,7 +329,8 @@ prepare_annotations_sirius <-
           str_tax_npc = str_tax_npc
         )
     } else {
-      log_debug("Sorry, your input directory does not exist, returning an empty file instead")
+      log_debug("Sorry, your input directory does not exist,
+                returning an empty file instead")
       table <- fake_annotations_columns()
     }
     log_debug(x = "Exporting ...")

@@ -8,7 +8,8 @@ utils::globalVariables(
 
 #' @title Prepare features components
 #'
-#' @description This function prepares the components (clusters in molecular network) for further use
+#' @description This function prepares the components
+#'    (clusters in molecular network) for further use
 #'
 #' @include export_output.R
 #' @include export_params.R

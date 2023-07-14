@@ -1,6 +1,7 @@
 #' @title Prepare libraries of spectra
 #'
-#' @description This function prepares spectra to be used for spectral matching
+#' @description This function prepares spectra
+#'    to be used for spectral matching
 #'
 #' @include export_params.R
 #' @include export_spectra_2.R
@@ -58,7 +59,10 @@ prepare_libraries_spectra <-
            col_xl = params$names$mgf$xlogp,
            parameters = params) {
     stopifnot("Your input file does not exist." = file.exists(input))
-    stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
+    stopifnot(
+      "Polarity must be 'pos' or 'neg'." =
+        polarity %in% c("pos", "neg")
+    )
     params <<- parameters
 
     if (length(output) > 1) {

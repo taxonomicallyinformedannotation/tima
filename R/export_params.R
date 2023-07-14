@@ -6,7 +6,8 @@ utils::globalVariables(
 
 #' @title Export parameters
 #'
-#' @description This function writes the parameters to a YAML file in the specified directory.
+#' @description This function writes the parameters
+#'    to a YAML file in the specified directory.
 #'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved
@@ -28,7 +29,6 @@ export_params <-
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", crayon::green(directory))
 
-    ## Write parameters to YAML file with current timestamp and step identifier in the file name
     yaml::write_yaml(
       x = parameters,
       file = file.path(

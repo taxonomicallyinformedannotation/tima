@@ -25,7 +25,6 @@ get_file <-
            export,
            limit = 3600) {
     if (!file.exists(export)) {
-      ## Set the timeout for download
       options(timeout = limit)
       message(
         "Timeout for download is ",
@@ -33,10 +32,8 @@ get_file <-
         " minutes"
       )
 
-      ## Create the export directory if it does not exist
       create_dir(export = export)
 
-      ## Download the file from the given URL and save it to the specified location
       message("Downloading")
       utils::download.file(
         url = url,

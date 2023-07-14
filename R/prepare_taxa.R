@@ -14,10 +14,13 @@ utils::globalVariables(
 
 #' @title Prepare taxa
 #'
-#' @description This function performs taxon name preparation to match the Open Tree of Life taxonomy
+#' @description This function performs taxon name preparation
+#'    to match the Open Tree of Life taxonomy
 #'
-#' @details Depending if the features are aligned between samples originating from various organisms or not,
-#'    It can either attribute all features to a single organism, or attribute them to multiple ones,
+#' @details Depending if the features are aligned between samples
+#'    originating from various organisms or not,
+#'    It can either attribute all features to a single organism,
+#'    or attribute them to multiple ones,
 #'    according to their relative intensities among the samples.
 #'
 #' @include clean_collapse.R
@@ -26,14 +29,16 @@ utils::globalVariables(
 #' @include get_organism_taxonomy_ott.R
 #'
 #' @param input File containing your features intensities
-#' @param extension Does your column names contain the file extension? (MZmine mainly)
+#' @param extension Does your column names contain the file extension?
+#'    (MZmine mainly)
 #' @param name_features Name of the features column in the features data
 #' @param colname Name of the column containing biological source information
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities
 #' @param org_tax_ott File containing Open Tree of Life Taxonomy
 #' @param output Output file
-#' @param taxon If you want to enforce all features to a given taxon, put its name here.
+#' @param taxon If you want to enforce all features to a given taxon,
+#'    put its name here.
 #' @param parameters Params
 #'
 #' @return NULL
@@ -69,8 +74,10 @@ prepare_taxa <-
       stopifnot("Your input file does not exist" = file.exists(input))
     }
 
-    stopifnot("Your top k organisms parameter should be lower or equal to 5" = top_k <=
-      5)
+    stopifnot(
+      "Your top k organisms parameter should be lower or equal to 5" =
+        top_k <= 5
+    )
 
     params <<- parameters
 
@@ -89,7 +96,8 @@ prepare_taxa <-
     }
 
     log_debug(x = "Formatting feature table ...")
-    log_debug(x = "... WARNING: requires 'Peak area' in columns (MZmine format)")
+    log_debug(x = "... WARNING: requires 'Peak area'
+              in columns (MZmine format)")
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
       tidytable::select(
@@ -189,7 +197,11 @@ prepare_taxa <-
       )
     } else {
       metadata_table_joined <-
-        tidytable::left_join(top_n, metadata_table, by = c("name" = "filename")) |>
+        tidytable::left_join(
+          top_n,
+          metadata_table,
+          by = c("name" = "filename")
+        ) |>
         tidytable::select(feature_id := rowname,
           organismOriginal = tidytable::all_of(colname),
           tidytable::everything()

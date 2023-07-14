@@ -21,8 +21,8 @@ utils::globalVariables(
 #' @param adducts_masses Table of adducts taken as input
 #' @param adducts_output_path Path where the adducts will be saved
 #' @param output_name Name of the file where adducts will be saved
-#' @param masses_pos_output_path Path where positive adducts masses will be saved
-#' @param masses_neg_output_path Path where negative adducts masses will be saved
+#' @param masses_pos_output_path Path where pos adducts masses will be saved
+#' @param masses_neg_output_path Path where neg adducts masses will be saved
 #' @param parameters Parameters
 #'
 #' @return NULL
@@ -38,13 +38,19 @@ prepare_libraries_adducts <-
              merged$
              structures$
              metadata,
-           adducts_masses = system.file("extdata", "adducts.tsv", package = "timaR"),
+           adducts_masses = system.file(
+             "extdata",
+             "adducts.tsv",
+             package = "timaR"
+           ),
            adducts_output_path = paths$data$interim$libraries$adducts$path,
            output_name = params$files$libraries$adducts$prepared,
            masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
            masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
            parameters = params) {
-    stopifnot("Your structure metadata file does not exist" = file.exists(str_met))
+    stopifnot(
+      "Your structure metadata file does not exist" = file.exists(str_met)
+    )
     params <<- parameters
     log_debug("Loading files ...")
     log_debug("... exact masses")

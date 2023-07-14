@@ -1,6 +1,7 @@
 #' @title Create directory
 #'
-#' @description This function creates a directory at the specified path if it does not already exist.
+#' @description This function creates a directory at the specified path
+#'    if it does not already exist.
 #'
 #' @param export Path to the directory to be created
 #'

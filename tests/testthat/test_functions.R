@@ -199,8 +199,12 @@ testthat::test_that("Whole process", {
   meta_args <- CompoundDb::make_metadata(
     source = "LOTUS",
     url = "https://doi.org/10.5281/zenodo.5607185",
-    source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-    source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+    source_version = jsonlite::fromJSON(
+      txt = "https://zenodo.org/api/records/5607185"
+    )$doi_url,
+    source_date = jsonlite::fromJSON(
+      txt = "https://zenodo.org/api/records/5607185"
+    )[["metadata"]][["publication_date"]],
     organism = "Life"
   )
   ## Pos
@@ -324,7 +328,10 @@ testthat::test_that("Whole process", {
   ## To do as if there was no input
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
-  prepare_annotations_sirius(input_directory = params$files$annotations$raw$sirius)
+  prepare_annotations_sirius(
+    input_directory =
+      params$files$annotations$raw$sirius
+  )
 
   ### ISDB results
   step <- "prepare_annotations_spectra"
