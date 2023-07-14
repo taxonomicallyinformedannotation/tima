@@ -46,30 +46,30 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @examples NULL
 dist_groups <- function(d, g) {
-  # Convert d to a dist object
+  ## Convert d to a dist object
   d <- stats::as.dist(d)
 
-  # Convert g to a factor
+  ## Convert g to a factor
   g <- as.factor(g)
 
-  # Check that the length of g matches the number of observations in d
+  ## Check that the length of g matches the number of observations in d
   dsize <- attr(d, "Size")
 
-  # Get the labels of the observations in d
+  ## Get the labels of the observations in d
   dlabels <- attr(d, "Labels")
 
-  # Get the combinations of indices for each pair of observations in d
+  ## Get the combinations of indices for each pair of observations in d
   idxs <- utils::combn(dsize, 2)
   idx1 <- idxs[1, ]
   idx2 <- idxs[2, ]
 
-  # Get the groups of the observations in idx1 and idx2
+  ## Get the groups of the observations in idx1 and idx2
   level1 <-
     levels(g)[pmin(as.numeric(g[idx1]), as.numeric(g[idx2]))]
   level2 <-
     levels(g)[pmax(as.numeric(g[idx1]), as.numeric(g[idx2]))]
 
-  # Create the data frame with the pairs of observations and their distances
+  ## Create the data frame with the pairs of observations and their distances
   data.frame(
     Item1 = idx1,
     Item2 = idx2,

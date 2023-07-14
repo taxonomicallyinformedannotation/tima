@@ -10,16 +10,16 @@
 #'
 #' @examples create_dir(export = "path/to/directory_of_file")
 create_dir <- function(export) {
-  # Check if the export path includes a file name
+  ## Check if the export path includes a file name
   if (grepl(pattern = ".", x = export, fixed = TRUE)) {
-    # Create the directory at the specified path if it does not exist
+    ## Create the directory at the specified path if it does not exist
     ifelse(
       test = !dir.exists(paths = dirname(path = export)),
       yes = dir.create(path = dirname(path = export), recursive = TRUE),
       no = paste(dirname(path = export), "exists")
     )
   } else {
-    # Create the directory at the specified path if it does not exist
+    ## Create the directory at the specified path if it does not exist
     ifelse(
       test = !dir.exists(paths = export),
       yes = dir.create(path = export, recursive = TRUE),

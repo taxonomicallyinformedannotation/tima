@@ -37,7 +37,6 @@ utils::globalVariables(
     "rt_min",
     "rt.x",
     "score_input",
-    # "score_input_normalized",
     "structure_exact_mass",
     "structure_inchikey_2D",
     "structure_molecular_formula",
@@ -217,10 +216,6 @@ annotate_masses <-
       )
 
     adducts <- unlist(adducts_list[[ms_mode]])
-    # |>
-    #   tidyft::filter(
-    #     exact_mass %in%
-    #       structure_organism_pairs_table[["structure_exact_mass"]])
 
     ## slim it
     structure_organism_pairs_table <-
@@ -248,8 +243,6 @@ annotate_masses <-
         file = str_tax_npc,
         na.strings = c("", "NA")
       )) |>
-      # tidytable::left_join(tidytable::fread(file = org_tax_ott,
-      #         na.strings = c("","NA"))) |>
       tidyft::filter(!is.na(structure_exact_mass)) |>
       round_reals()
 
@@ -475,11 +468,6 @@ annotate_masses <-
         no = adduct
       )) |>
       tidytable::distinct() |>
-      # tidytable::mutate(tidytable::across(tidytable::everything(), ~ replace(
-      #   .,
-      #   . == "NA",
-      #   NA
-      # ))) |>
       tidyft::filter(!is.na(library))
 
     log_debug("cleaning results \n")
@@ -507,15 +495,13 @@ annotate_masses <-
       tidyft::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_name,
-        # structure_inchikey,
         structure_inchikey_2D,
-        # structure_smiles,
         structure_smiles_2D,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp
       ) |>
-      # Avoid SMILES redundancy
+      ## Avoid SMILES redundancy
       tidytable::distinct(
         structure_inchikey_2D,
         structure_molecular_formula,
@@ -762,7 +748,6 @@ annotate_masses <-
       ) |>
       dplyr::mutate(
         score_input = 0
-        # score_input_normalized = 0
       ) |>
       tidytable::select(
         structure_molecular_formula,
@@ -785,16 +770,13 @@ annotate_masses <-
         error_mz,
         error_rt,
         structure_name,
-        # structure_inchikey,
         structure_inchikey_2D,
-        # structure_smiles,
         structure_smiles_2D,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
         library,
         score_input
-        # score_input_normalized
       )
 
     log_debug("adding chemical classification")

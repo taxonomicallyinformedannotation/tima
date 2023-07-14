@@ -96,11 +96,11 @@ prepare_libraries_adducts <-
 
     log_debug("... pure adducts masses ...")
     mass_null <-
-      cbind(data.frame(exact_mass = 0), adducts_t)
+      cbind(data.frame(exact_mass = 0), adducts_table)
 
     log_debug("... positive")
     pure_pos <-
-      create_adducts_pos() |>
+      create_adducts_pos(masses_table = mass_null) |>
       tidyft::filter(grepl(
         pattern = "]1+",
         x = adduct,
@@ -110,7 +110,7 @@ prepare_libraries_adducts <-
 
     log_debug("... negative")
     pure_neg <-
-      create_adducts_neg() |>
+      create_adducts_neg(masses_table = mass_null) |>
       tidyft::filter(grepl(
         pattern = "]1-",
         x = adduct,

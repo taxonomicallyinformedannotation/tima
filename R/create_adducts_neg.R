@@ -34,8 +34,8 @@ create_adducts_neg <- function(masses_table = get("masses_table", envir = parent
     dplyr::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
       `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),
-      # `[1M-(H)2(H2O)1]1-` = exact_mass - 2 * water - proton,
-      # `[1M-(H)2(H2O)1]1-` = exact_mass - water - proton,
+      ## `[1M-(H)2(H2O)1]1-` = exact_mass - 2 * water - proton,
+      ## `[1M-(H)2(H2O)1]1-` = exact_mass - water - proton,
       `[1M-(H)1]1-` = exact_mass - proton,
       `[1M+(Na)1-(H)2]1-` = exact_mass + sodium - 2 * proton,
       `[1M+(Cl)1]1-` = exact_mass + chlorine,

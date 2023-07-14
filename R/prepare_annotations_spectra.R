@@ -89,7 +89,6 @@ prepare_annotations_spectra <-
              taxonomies$
              npc,
            parameters = params) {
-    # Check if input file(s) exists
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
@@ -97,7 +96,6 @@ prepare_annotations_spectra <-
     )
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
-    # Read input file and select specific columns
     table <-
       lapply(
         X = input,
@@ -120,16 +118,9 @@ prepare_annotations_spectra <-
         score_input = score,
         count_peaks_matched
       ) |>
-      # Add new columns
+      ## Add new columns
       tidyft::mutate(
         library = "ISDB",
-        # score_input_normalized = bestNormalize::bestNormalize(
-        #   x = score_input,
-        #   standardize = FALSE,
-        #   allow_orderNorm = FALSE,
-        #   allow_lambert_s = TRUE,
-        #   allow_lambert_h = TRUE
-        # )$x.t,
         structure_exact_mass = as.numeric(structure_exact_mass),
         structure_taxonomy_npclassifier_01pathway = NA_character_,
         structure_taxonomy_npclassifier_02superclass = NA_character_,
@@ -142,9 +133,6 @@ prepare_annotations_spectra <-
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
-      # tidytable::rowwise() |>
-      # tidyft::mutate(structure_inchikey = paste0(structure_inchikey_2D, "-UHFFFAOYSA-N")) |>
-      # tidytable::ungroup() |>
       select_annotations_columns(
         str_2d_3d = str_2d_3d,
         str_met = str_met,
@@ -154,7 +142,6 @@ prepare_annotations_spectra <-
       )
 
     log_debug(x = "Exporting ...")
-    # Call export_params and export_output functions
     export_params(step = "prepare_annotations_spectra")
     export_output(x = table, file = output[[1]])
 

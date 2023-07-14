@@ -15,7 +15,7 @@
 #' @examples NULL
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
-    # Remove the prefix from the DOI
+    ## Remove the prefix from the DOI
     record <-
       stringi::stri_replace_all_fixed(
         str = doi,
@@ -24,11 +24,11 @@ get_last_version_from_zenodo <-
         case_insensitive = TRUE
       )
 
-    # Retrieve file name by records call
+    ## Retrieve file name by records call
     base_url <- "https://zenodo.org/api/records/"
     content <- jsonlite::fromJSON(txt = paste0(base_url, record))
 
-    # Extract individual file names and urls
+    ## Extract individual file names and urls
     fileurls <- content$files$links$download
     filenames <- stringi::stri_match(
       str = fileurls,
@@ -36,17 +36,18 @@ get_last_version_from_zenodo <-
       regex = TRUE
     )[, 2]
 
-    # Select the file URL and name matching the given pattern
+    ## Select the file URL and name matching the given pattern
     indices <- grepl(pattern = pattern, x = fileurls)
     fileurl <- fileurls[indices]
     filename <- filenames[indices]
 
-    # Check size and not md5 as we rename the file
-    # a bit hacky
+    ## Check size and not md5 as we rename the file
+    ## a bit hacky
     zenodo_size <- content$files$filesize[indices]
     local_size <- file.size(path)
 
-    # If the local file does not exist or the sizes are different, download the file from Zenodo
+    ## If the local file does not exist or the sizes are different,
+    ## download the file from Zenodo
     if (is.na(local_size) || zenodo_size != local_size) {
       message(
         "Downloading ",

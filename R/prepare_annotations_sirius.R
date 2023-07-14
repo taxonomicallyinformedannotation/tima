@@ -308,13 +308,6 @@ prepare_annotations_sirius <-
           error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
-          # score_input_normalized = bestNormalize::bestNormalize(
-          #   x = score_input,
-          #   standardize = FALSE,
-          #   allow_orderNorm = FALSE,
-          #   allow_lambert_s = TRUE,
-          #   allow_lambert_h = TRUE
-          # )$x.t,
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>

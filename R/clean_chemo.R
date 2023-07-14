@@ -1,6 +1,6 @@
 utils::globalVariables(
   c(
-    "annotation_table_weighted_chemo",
+    "annot_table_weighted_chemo",
     "best_candidate",
     "best_candidate_organism",
     "best_candidate_structure",
@@ -39,7 +39,6 @@ utils::globalVariables(
     "score_chemical",
     "score_final",
     "score_input",
-    # "score_input_normalized",
     "score_interim",
     "score_pondered_bio",
     "score_pondered_chemo",
@@ -75,7 +74,7 @@ utils::globalVariables(
 #'
 #' @include clean_collapse.R
 #'
-#' @param annotation_table_weighted_chemo Table containing your chemically weighted annotation
+#' @param annot_table_weighted_chemo Table containing your chemically weighted annotation
 #' @param components_table Prepared components file
 #' @param features_table Prepared features file
 #' @param structure_organism_pairs_table Table containing the structure - organism pairs
@@ -92,7 +91,7 @@ utils::globalVariables(
 #'
 #' @examples NULL
 clean_chemo <-
-  function(annotation_table_weighted_chemo = get("annotation_table_weighted_chemo", envir = parent.frame()),
+  function(annot_table_weighted_chemo = get("annot_table_weighted_chemo", envir = parent.frame()),
            components_table = get("components_table", envir = parent.frame()),
            features_table = get("features_table", envir = parent.frame()),
            structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
@@ -109,14 +108,14 @@ clean_chemo <-
       minimal_ms1_chemo,
       "chemical score \n"
     )
-    df1 <- annotation_table_weighted_chemo |>
+    df1 <- annot_table_weighted_chemo |>
       dplyr::filter(
         score_input > 0 |
-          # Those lines are to keep ms1 annotation
+          ## Those lines are to keep ms1 annotation
           score_biological >= minimal_ms1_bio |
-          # Only if a good biological
+          ## Only if a good biological
           score_chemical >= minimal_ms1_chemo
-        # Or chemical consistency score is obtained
+        ## Or chemical consistency score is obtained
       ) |>
       tidytable::distinct(feature_id,
         structure_inchikey_2D,
@@ -164,7 +163,6 @@ clean_chemo <-
         rank_initial,
         rank_final,
         score_input,
-        # score_input_normalized,
         score_biological,
         score_interim = score_pondered_bio,
         score_chemical,
@@ -230,7 +228,6 @@ clean_chemo <-
         structure_03_npc_class,
         structure_04_cla_parent,
         score_input,
-        # score_input_normalized,
         score_biological,
         score_chemical,
         count_peaks_matched,
@@ -299,7 +296,6 @@ clean_chemo <-
           "error_mz",
           "error_rt",
           "score_input",
-          # "score_input_normalized",
           "score_biological",
           "score_chemical",
           "score_final",
@@ -336,7 +332,7 @@ clean_chemo <-
 
     df10 <- tidytable::left_join(
       df9,
-      annotation_table_weighted_chemo |>
+      annot_table_weighted_chemo |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     ) |>
       tidytable::select(tidytable::any_of(

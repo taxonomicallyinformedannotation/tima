@@ -5,15 +5,14 @@
 \title{Clean bio}
 \usage{
 clean_bio(
-  annotation_table_weighted_bio = get("annotation_table_weighted_bio", envir =
-    parent.frame()),
+  annot_table_weighted_bio = get("annot_table_weighted_bio", envir = parent.frame()),
   edges_table = get("edges_table", envir = parent.frame()),
   candidates_initial = get("candidates_initial", envir = parent.frame()),
   minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame())
 )
 }
 \arguments{
-\item{annotation_table_weighted_bio}{Table containing your biologically weighted annotation}
+\item{annot_table_weighted_bio}{Table containing your biologically weighted annotation}
 
 \item{edges_table}{Table containing the edges between features}
 
