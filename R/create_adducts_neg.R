@@ -26,7 +26,8 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-create_adducts_neg <- function(masses_table, adducts_table) {
+create_adducts_neg <- function(masses_table = get("masses_table", envir = parent.frame()),
+                               adducts_table = get("adducts_table", envir = parent.frame())) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- masses_table |>
     tidytable::tidytable() |>

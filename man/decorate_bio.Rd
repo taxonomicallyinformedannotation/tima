@@ -28,13 +28,13 @@ decorate_bio(
 
 \item{score_biological_order}{Order score}
 
+\item{score_biological_family}{Family score}
+
 \item{score_biological_genus}{Genus score}
 
 \item{score_biological_species}{Species score}
 
 \item{score_biological_variety}{Variety score}
-
-\item{score_biological_orderscore_biological_family}{Family score}
 }
 \value{
 Message indicating the number of annotations weighted at each biological level

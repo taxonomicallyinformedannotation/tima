@@ -26,7 +26,7 @@ utils::globalVariables(
 #' @param value Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'
 #' @param output_key Output file for keys
 #' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
-#' @param output_str_2D_3D Output file for structures (2D + 3D)
+#' @param output_str_2d_3d Output file for structures (2D + 3D)
 #' @param output_str_met Output file for structures metadata
 #' @param output_str_nam Output file for structures names
 #' @param output_str_tax_cla Output file for structures taxonomy (Classyfire)
@@ -55,7 +55,7 @@ prepare_libraries_sop_merged <-
              organisms$
              taxonomies$
              ott,
-           output_str_2D_3D = paths$
+           output_str_2d_3d = paths$
              data$
              interim$
              libraries$
@@ -176,7 +176,7 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Keeping structures")
-    table_structures_2D_3D <- tables$str_2D_3D
+    table_structures_2D_3D <- tables$str_2d_3d
     table_structures_metadata <- tables$str_met
     table_structures_names <- tables$str_nam
     table_structures_taxonomy_classyfire <- tables$str_tax_cla
@@ -236,7 +236,7 @@ prepare_libraries_sop_merged <-
     )
     export_output(
       x = table_structures_2D_3D,
-      file = output_str_2D_3D
+      file = output_str_2d_3d
     )
     export_output(
       x = table_structures_metadata,
@@ -260,7 +260,7 @@ prepare_libraries_sop_merged <-
         "key" = output_key,
         # "org_nam" = output_org_nam,
         "org_tax_ott" = output_org_tax_ott,
-        "str_2D_3D" = output_str_2D_3D,
+        "str_2d_3d" = output_str_2d_3d,
         "str_met" = output_str_met,
         "str_name" = output_str_nam,
         "str_tax_cla" = output_str_tax_cla,

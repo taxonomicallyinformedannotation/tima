@@ -7,7 +7,7 @@
 prepare_annotations_gnps(
   input = params$files$annotations$raw$spectral,
   output = params$files$annotations$prepared,
-  str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+  str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
   str_met = params$files$libraries$sop$merged$structures$metadata,
   str_nam = params$files$libraries$sop$merged$structures$names,
   str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -20,7 +20,7 @@ prepare_annotations_gnps(
 
 \item{output}{Output file}
 
-\item{str_2D_3D}{File containing 2D and 3D structures}
+\item{str_2d_3d}{File containing 2D and 3D structures}
 
 \item{str_met}{File containing structures metadata}
 

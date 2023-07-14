@@ -4,7 +4,10 @@
 \alias{create_adducts_pos}
 \title{Create adducts positive}
 \usage{
-create_adducts_pos(masses_table, adducts_table)
+create_adducts_pos(
+  masses_table = get("masses_table", envir = parent.frame()),
+  adducts_table = get("adducts_table", envir = parent.frame())
+)
 }
 \arguments{
 \item{masses_table}{Table containing the masses of the adducts}

@@ -6,7 +6,7 @@
 #' @include round_reals.R
 #'
 #' @param df Dataframe
-#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_2d_3d File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -18,7 +18,7 @@
 #'
 #' @examples NULL
 select_annotations_columns <- function(df,
-                                       str_2D_3D = paths$
+                                       str_2d_3d = paths$
                                          data$
                                          interim$
                                          libraries$
@@ -107,7 +107,7 @@ select_annotations_columns <- function(df,
     round_reals() |>
     tidyft::mutate_vars(is.numeric, .func = as.character) |>
     complement_metadata_structures(
-      str_2D_3D = str_2D_3D,
+      str_2d_3d = str_2d_3d,
       str_met = str_met,
       str_nam = str_nam,
       str_tax_cla = str_tax_cla,

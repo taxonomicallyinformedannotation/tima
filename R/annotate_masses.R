@@ -74,7 +74,7 @@ utils::globalVariables(
 #' @param name_source Name of the source features column
 #' @param name_target Name of the target features column
 #' @param library Library containing the keys
-#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_2d_3d File containing 2D and 3D structures
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -100,7 +100,7 @@ annotate_masses <-
            name_source = params$names$source,
            name_target = params$names$target,
            library = paths$data$interim$libraries$sop$merged$keys,
-           str_2D_3D = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
            str_tax_cla = params$
@@ -229,7 +229,7 @@ annotate_masses <-
         na.strings = c("", "NA")
       ) |>
       tidytable::left_join(tidytable::fread(
-        file = str_2D_3D,
+        file = str_2d_3d,
         na.strings = c("", "NA")
       )) |>
       tidytable::left_join(tidytable::fread(

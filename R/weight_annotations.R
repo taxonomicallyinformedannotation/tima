@@ -21,7 +21,7 @@ utils::globalVariables(
 #'
 #' @param library Library containing the keys
 #' @param org_tax_ott File containing organisms taxonomy (OTT)
-#' @param str_2D_3D File containing 2D and 3D structures
+#' @param str_2d_3d File containing 2D and 3D structures
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file
 #' @param edges Prepared edges file
@@ -81,7 +81,7 @@ weight_annotations <-
              organisms$
              taxonomies$
              ott,
-           str_2D_3D = paths$
+           str_2d_3d = paths$
              data$
              interim$
              libraries$
@@ -194,7 +194,7 @@ weight_annotations <-
         na.strings = c("", "NA")
       ) |>
       tidytable::left_join(tidytable::fread(
-        file = str_2D_3D,
+        file = str_2d_3d,
         colClasses = "character",
         na.strings = c("", "NA")
       )) |>

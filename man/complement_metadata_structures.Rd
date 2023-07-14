@@ -6,7 +6,7 @@
 \usage{
 complement_metadata_structures(
   df,
-  str_2D_3D = paths$data$interim$libraries$merged$structures$dd_ddd,
+  str_2d_3d = paths$data$interim$libraries$merged$structures$dd_ddd,
   str_met = paths$data$interim$libraries$merged$structures$metadata,
   str_nam = paths$data$interim$libraries$merged$structures$names,
   str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
@@ -16,7 +16,7 @@ complement_metadata_structures(
 \arguments{
 \item{df}{Data frame with structural metadata to be complemented}
 
-\item{str_2D_3D}{File containing 2D and 3D structures}
+\item{str_2d_3d}{File containing 2D and 3D structures}
 
 \item{str_met}{File containing structures metadata}
 

@@ -57,7 +57,7 @@ prepare_libraries_adducts <-
       tidytable::distinct()
 
     log_debug("... adducts")
-    adducts_table <-
+    adducts_t <-
       tidytable::fread(
         file = adducts_masses,
         na.strings = c("", "NA")
@@ -74,25 +74,25 @@ prepare_libraries_adducts <-
       ))
 
     log_debug("Treating adducts table")
-    adducts_t <- t(adducts_table) |>
+    adducts_table <- t(adducts_t) |>
       data.frame() |>
       tidytable::tidytable()
 
-    colnames(adducts_t) <- adducts_t[1, ] |> as.character()
+    colnames(adducts_table) <- adducts_table[1, ] |> as.character()
 
-    adducts_t <- adducts_t[2, ] |>
+    adducts_table <- adducts_table[2, ] |>
       tidyft::mutate_vars(is.character, .func = as.numeric)
 
-    masses_adducts <- cbind(masses, adducts_t, row.names = NULL)
+    masses_table <- cbind(masses, adducts_table, row.names = NULL)
 
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")
     adducts_pos <-
-      create_adducts_pos(massesTable = masses_adducts, adductsTable = adducts_t)
+      create_adducts_pos()
 
     log_debug("... negative")
     adducts_neg <-
-      create_adducts_neg(massesTable = masses_adducts, adductsTable = adducts_t)
+      create_adducts_neg()
 
     log_debug("... pure adducts masses ...")
     mass_null <-
@@ -100,7 +100,7 @@ prepare_libraries_adducts <-
 
     log_debug("... positive")
     pure_pos <-
-      create_adducts_pos(massesTable = mass_null, adductsTable = adducts_t) |>
+      create_adducts_pos() |>
       tidyft::filter(grepl(
         pattern = "]1+",
         x = adduct,
@@ -110,7 +110,7 @@ prepare_libraries_adducts <-
 
     log_debug("... negative")
     pure_neg <-
-      create_adducts_neg(massesTable = mass_null, adductsTable = adducts_t) |>
+      create_adducts_neg() |>
       tidyft::filter(grepl(
         pattern = "]1-",
         x = adduct,
