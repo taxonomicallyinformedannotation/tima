@@ -1268,9 +1268,9 @@ list(
               adducts_list = par_ann_mas$ms$adducts,
               adducts_masses_list = dic_add,
               neutral_losses_list = dic_neu_los,
-              msMode = par_ann_mas$ms$polarity,
-              tolerancePpm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
-              toleranceRt = par_ann_mas$ms$tolerances$rt$minutes,
+              ms_mode = par_ann_mas$ms$polarity,
+              tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
+              tolerance_rt = par_ann_mas$ms$tolerances$rt$minutes,
               parameters = par_ann_mas
             )
         }

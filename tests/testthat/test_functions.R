@@ -260,9 +260,9 @@ testthat::test_that("Whole process", {
   step <- "annotate_masses"
   params <- get_params(step = step)
   ### Negative
-  annotate_masses(msMode = "neg")
+  annotate_masses(ms_mode = "neg")
   ### Positive
-  annotate_masses(msMode = "pos")
+  annotate_masses(ms_mode = "pos")
 
   ## Performing MS2 annotation
   step <- "annotate_spectra"

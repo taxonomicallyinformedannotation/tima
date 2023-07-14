@@ -111,7 +111,7 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
-  met_2D <- tidytable::fread(str_met,
+  met_2d <- tidytable::fread(str_met,
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -131,7 +131,7 @@ complement_metadata_structures <- function(df,
       .keep_all = TRUE
     )
 
-  nam_2D <- tidytable::fread(str_nam,
+  nam_2d <- tidytable::fread(str_nam,
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -182,7 +182,7 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 
-  met_i <- met_2D |>
+  met_i <- met_2d |>
     tidytable::select(
       structure_inchikey_2D,
       structure_molecular_formula_i = structure_molecular_formula,
@@ -191,7 +191,7 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
-  met_s <- met_2D |>
+  met_s <- met_2d |>
     tidytable::select(
       structure_smiles_2D,
       structure_molecular_formula_s = structure_molecular_formula,
@@ -200,13 +200,13 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 
-  nam_i <- nam_2D |>
+  nam_i <- nam_2d |>
     tidytable::select(structure_inchikey_2D,
       structure_name_i = structure_name
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
-  nam_s <- nam_2D |>
+  nam_s <- nam_2d |>
     tidytable::select(structure_smiles_2D,
       structure_name_s = structure_name
     ) |>

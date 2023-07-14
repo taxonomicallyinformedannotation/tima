@@ -147,7 +147,7 @@ annotate_masses <-
     paths <<- parse_yaml_paths()
     params <<- parameters
 
-    featuresTable <- tidytable::fread(
+    features_table <- tidytable::fread(
       file = features,
       na.strings = c("", "NA")
     )
@@ -171,7 +171,7 @@ annotate_masses <-
     )
 
     log_debug("... adducts masses for in source dimers and multicharged")
-    adducts_massTable <-
+    adducts_mass_table <-
       tidytable::fread(
         file = adducts_masses_list,
         na.strings = c("", "NA")
@@ -179,8 +179,8 @@ annotate_masses <-
 
     log_debug("... neutral lossses")
 
-    adducts_m <- adducts_massTable$mass
-    names(adducts_m) <- adducts_massTable$adduct
+    adducts_m <- adducts_mass_table$mass
+    names(adducts_m) <- adducts_mass_table$adduct
 
     if (ms_mode == "pos") {
       adduct_db_file <-
@@ -210,7 +210,7 @@ annotate_masses <-
       )
 
     log_debug(x = "... exact masses for MS1 annotation")
-    structureExactMassTable <-
+    structure_exact_mass_table <-
       tidytable::fread(
         file = adduct_db_file,
         na.strings = c("", "NA")
@@ -254,7 +254,7 @@ annotate_masses <-
       round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
-    df2 <- structureExactMassTable |>
+    df2 <- structure_exact_mass_table |>
       tidyft::filter(!is.na(exact_mass)) |>
       dplyr::filter(adduct %in% adducts) |>
       dplyr::mutate(
@@ -264,14 +264,14 @@ annotate_masses <-
       tidyft::filter(!is.na(value_min)) |>
       tidyft::filter(value_min > 0)
 
-    df3 <- featuresTable |>
+    df3 <- features_table |>
       tidyft::mutate_vars(
         .cols = c("mz"),
         .func = as.numeric
       ) |>
       tidytable::distinct(feature_id, .keep_all = TRUE)
 
-    if (any(names(featuresTable) == "rt")) {
+    if (any(names(features_table) == "rt")) {
       df3 <- df3 |>
         tidyft::mutate_vars(
           .cols = c("rt"),
