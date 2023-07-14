@@ -7,7 +7,7 @@ require(
 
 log_debug(
   "This script",
-  crayon::green("prepares adducts")
+  crayon::green("gets gnps tables")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
