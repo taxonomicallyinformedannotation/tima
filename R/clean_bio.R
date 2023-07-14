@@ -63,10 +63,10 @@ utils::globalVariables(
 #'
 #' @description This function cleans the results obtained after biological weighting
 #'
-#' @param annotationTableWeightedBio Table containing your biologically weighted annotation
-#' @param edgesTable Table containing the edges between features
-#' @param candidatesInitial Number of initial candidates to keep
-#' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
+#' @param annotation_table_weighted_bio Table containing your biologically weighted annotation
+#' @param edges_table Table containing the edges between features
+#' @param candidates_initial Number of initial candidates to keep
+#' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #'
 #' @return A table containing the biologically weighted annotation where only a given number of initial candidates are kept
 #'
@@ -76,25 +76,25 @@ utils::globalVariables(
 #'
 #' @examples NULL
 clean_bio <-
-  function(annotationTableWeightedBio = annotation_table_weighted_bio,
-           edgesTable = edges_table,
-           candidatesInitial = candidates_initial,
-           minimalMs1Bio = minimal_ms1_bio) {
+  function(annotation_table_weighted_bio = get("annotation_table_weighted_bio", envir = parent.frame()),
+           edges_table = get("edges_table", envir = parent.frame()),
+           candidates_initial = get("candidates_initial", envir = parent.frame()),
+           minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame())) {
     log_debug(
       "keeping only MS1 candidates with minimum \n",
-      minimalMs1Bio,
+      minimal_ms1_bio,
       " biological score \n"
     )
 
-    df01 <- annotationTableWeightedBio |>
+    df01 <- annotation_table_weighted_bio |>
       dplyr::filter(score_input > 0 |
         # Those lines are to keep ms1 annotation
-        score_biological >= minimalMs1Bio)
+        score_biological >= minimal_ms1_bio)
 
     log_debug("erasing other MS1 candidates \n")
     df02 <-
       tidytable::anti_join(
-        annotationTableWeightedBio |>
+        annotation_table_weighted_bio |>
           tidytable::distinct(feature_id,
             structure_inchikey_2D,
             .keep_all = TRUE
@@ -184,7 +184,7 @@ clean_bio <-
     log_debug("... among edges ... \n")
     df3 <-
       tidytable::right_join(
-        edgesTable |>
+        edges_table |>
           tidytable::group_by(feature_source) |>
           tidytable::add_count() |>
           tidytable::ungroup() |>
@@ -217,7 +217,7 @@ clean_bio <-
           test = is.na(candidate_structure_1_cla_kingdom) |
             candidate_structure_1_cla_kingdom == "notAnnotated" |
             candidate_structure_1_cla_kingdom == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -266,7 +266,7 @@ clean_bio <-
           test = is.na(candidate_structure_1_npc_pathway) |
             candidate_structure_1_npc_pathway == "notAnnotated" |
             candidate_structure_1_npc_pathway == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -315,7 +315,7 @@ clean_bio <-
           test = is.na(candidate_structure_2_cla_superclass) |
             candidate_structure_2_cla_superclass == "notAnnotated" |
             candidate_structure_2_cla_superclass == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -364,7 +364,7 @@ clean_bio <-
           test = is.na(candidate_structure_2_npc_superclass) |
             candidate_structure_2_npc_superclass == "notAnnotated" |
             candidate_structure_2_npc_superclass == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -413,7 +413,7 @@ clean_bio <-
           test = is.na(candidate_structure_3_cla_class) |
             candidate_structure_3_cla_class == "notAnnotated" |
             candidate_structure_3_cla_class == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -462,7 +462,7 @@ clean_bio <-
           test = is.na(candidate_structure_3_npc_class) |
             candidate_structure_3_npc_class == "notAnnotated" |
             candidate_structure_3_npc_class == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,
@@ -511,7 +511,7 @@ clean_bio <-
           test = is.na(candidate_structure_4_cla_parent) |
             candidate_structure_4_cla_parent == "notAnnotated" |
             candidate_structure_4_cla_parent == "notClassified",
-          yes = candidatesInitial / 2,
+          yes = candidates_initial / 2,
           no = mean(as.numeric(rank_final))
         ), .by = c(
           feature_source,

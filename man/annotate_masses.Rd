@@ -20,9 +20,9 @@ annotate_masses(
   adducts_list = params$ms$adducts,
   adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
   neutral_losses_list = system.file("extdata", "neutral_losses.tsv", package = "timaR"),
-  msMode = params$ms$polarity,
-  tolerancePpm = params$ms$tolerances$mass$ppm$ms1,
-  toleranceRt = params$ms$tolerances$rt$minutes,
+  ms_mode = params$ms$polarity,
+  tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
+  tolerance_rt = params$ms$tolerances$rt$minutes,
   parameters = params
 )
 }
@@ -57,11 +57,11 @@ annotate_masses(
 
 \item{neutral_losses_list}{List of neutral losses to be used}
 
-\item{msMode}{Ionization mode. Must be 'pos' or 'neg'}
+\item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
-\item{tolerancePpm}{Tolerance to perform annotation. Should be ≤ 10 ppm}
+\item{tolerance_ppm}{Tolerance to perform annotation. Should be ≤ 10 ppm}
 
-\item{toleranceRt}{Tolerance to group adducts. Should be ≤ 0.1min}
+\item{tolerance_rt}{Tolerance to group adducts. Should be ≤ 0.1min}
 
 \item{parameters}{params}
 }

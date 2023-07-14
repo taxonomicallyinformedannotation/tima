@@ -83,9 +83,9 @@ utils::globalVariables(
 #' @param adducts_masses_list Adducts masses
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param name Name of the adducts library
-#' @param msMode Ionization mode. Must be 'pos' or 'neg'
-#' @param tolerancePpm Tolerance to perform annotation. Should be ≤ 10 ppm
-#' @param toleranceRt Tolerance to group adducts. Should be ≤ 0.1min
+#' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
+#' @param tolerance_ppm Tolerance to perform annotation. Should be ≤ 10 ppm
+#' @param tolerance_rt Tolerance to group adducts. Should be ≤ 0.1min
 #' @param parameters params
 #'
 #' @return A table containing MS1 annotations based on exact mass
@@ -131,16 +131,16 @@ annotate_masses <-
              "neutral_losses.tsv",
              package = "timaR"
            ),
-           msMode = params$ms$polarity,
-           tolerancePpm = params$ms$tolerances$mass$ppm$ms1,
-           toleranceRt = params$ms$tolerances$rt$minutes,
+           ms_mode = params$ms$polarity,
+           tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
+           tolerance_rt = params$ms$tolerances$rt$minutes,
            parameters = params) {
     stopifnot(
-      "Your ppm tolerance must be lower or equal to 20" = tolerancePpm <=
+      "Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
         20
     )
     stopifnot(
-      "Your rt tolerance must be lower or equal to 0.1" = toleranceRt <=
+      "Your rt tolerance must be lower or equal to 0.1" = tolerance_rt <=
         0.1
     )
 
@@ -159,7 +159,7 @@ annotate_masses <-
       )
 
     log_debug("... single charge adducts table")
-    if (msMode == "pos") {
+    if (ms_mode == "pos") {
       adduct_file <- paths$data$interim$libraries$adducts$pos
     } else {
       adduct_file <- paths$data$interim$libraries$adducts$neg
@@ -182,7 +182,7 @@ annotate_masses <-
     adductsM <- adductsMassTable$mass
     names(adductsM) <- adductsMassTable$adduct
 
-    if (msMode == "pos") {
+    if (ms_mode == "pos") {
       adduct_db_file <-
         file.path(
           paths$data$interim$libraries$adducts$path,
@@ -216,7 +216,7 @@ annotate_masses <-
         na.strings = c("", "NA")
       )
 
-    adducts <- unlist(adducts_list[[msMode]])
+    adducts <- unlist(adducts_list[[ms_mode]])
     # |>
     #   tidyft::filter(
     #     exact_mass %in%
@@ -258,8 +258,8 @@ annotate_masses <-
       tidyft::filter(!is.na(exact_mass)) |>
       dplyr::filter(adduct %in% adducts) |>
       dplyr::mutate(
-        value_min = adduct_mass - (1E-6 * tolerancePpm * adduct_mass),
-        value_max = adduct_mass + (1E-6 * tolerancePpm * adduct_mass)
+        value_min = adduct_mass - (1E-6 * tolerance_ppm * adduct_mass),
+        value_max = adduct_mass + (1E-6 * tolerance_ppm * adduct_mass)
       ) |>
       tidyft::filter(!is.na(value_min)) |>
       tidyft::filter(value_min > 0)
@@ -288,8 +288,8 @@ annotate_masses <-
         .func = as.numeric
       ) |>
       dplyr::mutate(
-        rt_min = as.numeric(rt - toleranceRt),
-        rt_max = as.numeric(rt + toleranceRt)
+        rt_min = as.numeric(rt - tolerance_rt),
+        rt_max = as.numeric(rt + tolerance_rt)
       )
 
     log_debug("joining within given rt tolerance \n")
@@ -320,21 +320,21 @@ annotate_masses <-
           test = mz >= mz_dest,
           yes = abs(mz -
             (1E-6 *
-              tolerancePpm *
+              tolerance_ppm *
               mz) -
             mz_dest),
           no = abs(mz + (1E-6 *
-            tolerancePpm *
+            tolerance_ppm *
             mz) - mz_dest)
         ),
         delta_max = ifelse(
           test = mz >= mz_dest,
           yes = abs(mz + (1E-6 *
-            tolerancePpm *
+            tolerance_ppm *
             mz) - mz_dest),
           no = abs(mz -
             (1E-6 *
-              tolerancePpm *
+              tolerance_ppm *
               mz) -
             mz_dest)
         )
@@ -413,7 +413,7 @@ annotate_masses <-
     ## Always considering [1M+H]+ and [1M-H]- ions by default
     df9_ion <- df3 |>
       tidytable::distinct(feature_id) |>
-      dplyr::mutate(label = switch(msMode,
+      dplyr::mutate(label = switch(ms_mode,
         "pos" = "[1M+(H)1]1+",
         "neg" = "[1M-(H)1]1-"
       ))
@@ -575,7 +575,7 @@ annotate_masses <-
     df16 <- tidytable::inner_join(df3, df15)
 
     log_debug("calculating multicharged and in source dimers + mz tol \n")
-    if (msMode == "pos") {
+    if (ms_mode == "pos") {
       df17 <- df16 |>
         tidytable::select(
           feature_id,
@@ -683,10 +683,10 @@ annotate_masses <-
 
     df17 <- df17 |>
       dplyr::mutate(
-        mz_min = value - (1E-6 * tolerancePpm * value),
-        mz_max = value + (1E-6 * tolerancePpm * value),
-        rt_min = rt - toleranceRt,
-        rt_max = rt + toleranceRt
+        mz_min = value - (1E-6 * tolerance_ppm * value),
+        mz_max = value + (1E-6 * tolerance_ppm * value),
+        rt_min = rt - tolerance_rt,
+        rt_max = rt + tolerance_rt
       )
 
     log_debug("joining within given rt tolerance \n")

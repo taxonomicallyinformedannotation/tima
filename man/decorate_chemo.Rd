@@ -5,32 +5,35 @@
 \title{Decorate chemo}
 \usage{
 decorate_chemo(
-  df = annotation_table_weighted_chemo,
-  sc_cla_kin = score_chemical_cla_kingdom,
-  sc_cla_sup = score_chemical_cla_superclass,
-  sc_cla_cla = score_chemical_cla_class,
-  sc_cla_par = score_chemical_cla_parent,
-  sc_npc_pat = score_chemical_npc_pathway,
-  sc_npc_sup = score_chemical_npc_superclass,
-  sc_npc_cla = score_chemical_npc_class
+  annotation_table_weighted_chemo = get("annotation_table_weighted_chemo", envir =
+    parent.frame()),
+  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
+  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
+    parent.frame()),
+  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
+  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
+  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
+  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir =
+    parent.frame()),
+  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
 )
 }
 \arguments{
-\item{df}{Table to decorate}
+\item{annotation_table_weighted_chemo}{Table to decorate}
 
-\item{sc_cla_kin}{Classyfire kingdom score}
+\item{score_chemical_cla_kingdom}{Classyfire kingdom score}
 
-\item{sc_cla_sup}{Classyfire superclass score}
+\item{score_chemical_cla_superclass}{Classyfire superclass score}
 
-\item{sc_cla_cla}{Classyfire class score}
+\item{score_chemical_cla_class}{Classyfire class score}
 
-\item{sc_cla_par}{Classyfire parent score}
+\item{score_chemical_cla_parent}{Classyfire parent score}
 
-\item{sc_npc_pat}{NPC pathway score}
+\item{score_chemical_npc_pathway}{NPC pathway score}
 
-\item{sc_npc_sup}{NPC superclass score}
+\item{score_chemical_npc_superclass}{NPC superclass score}
 
-\item{sc_npc_cla}{NPC class score}
+\item{score_chemical_npc_class}{NPC class score}
 }
 \value{
 Message indicating the number of annotations weighted at each chemical level

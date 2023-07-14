@@ -5,50 +5,51 @@
 \title{Weight bio}
 \usage{
 weight_bio(
-  annotationTable = annotation_table_taxed,
-  structureOrganismPairsTable = structure_organism_pairs_table,
-  weightSpectral = weight_spectral,
-  weightBiological = weight_biological,
-  scoreBiologicalDomain = score_biological_domain,
-  scoreBiologicalKingdom = score_biological_kingdom,
-  scoreBiologicalPhylum = score_biological_phylum,
-  scoreBiologicalClass = score_biological_class,
-  scoreBiologicalOrder = score_biological_order,
-  scoreBiologicalFamily = score_biological_family,
-  scoreBiologicalTribe = score_biological_tribe,
-  scoreBiologicalGenus = score_biological_genus,
-  scoreBiologicalSpecies = score_biological_species,
-  scoreBiologicalVariety = score_biological_variety
+  annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
+  structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
+    parent.frame()),
+  weight_spectral = get("weight_spectral", envir = parent.frame()),
+  weight_biological = get("weight_biological", envir = parent.frame()),
+  score_biological_domain = get("score_biological_domain", envir = parent.frame()),
+  score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
+  score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
+  score_biological_class = get("score_biological_class", envir = parent.frame()),
+  score_biological_order = get("score_biological_order", envir = parent.frame()),
+  score_biological_family = get("score_biological_family", envir = parent.frame()),
+  score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
+  score_biological_genus = get("score_biological_genus", envir = parent.frame()),
+  score_biological_species = get("score_biological_species", envir = parent.frame()),
+  score_biological_variety = get("score_biological_variety", envir = parent.frame())
 )
 }
 \arguments{
-\item{annotationTable}{Table containing the initial annotation eventually complemented by additional MS1 annotations}
+\item{annotation_table_taxed}{Table containing the initial annotation eventually complemented by additional MS1 annotations}
 
-\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
+\item{structure_organism_pairs_table}{Table containing the structure - organism pairs}
 
-\item{weightSpectral}{Weight for the spectral score}
+\item{weight_spectral}{Weight for the spectral score}
 
-\item{weightBiological}{Weight for the biological score}
+\item{weight_biological}{Weight for the biological score}
 
-\item{scoreBiologicalDomain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
+\item{score_biological_domain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
 
-\item{scoreBiologicalKingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
+\item{score_biological_kingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
 
-\item{scoreBiologicalPhylum}{Score for a \code{phylum} match (should be lower than \code{class})}
+\item{score_biological_phylum}{Score for a \code{phylum} match (should be lower than \code{class})}
 
-\item{scoreBiologicalClass}{Score for a \code{class} match (should be lower than \code{order})}
+\item{score_biological_class}{Score for a \code{class} match (should be lower than \code{order})}
 
-\item{scoreBiologicalOrder}{Score for a \code{order} match (should be lower than \code{family})}
+\item{score_biological_order}{Score for a \code{order} match (should be lower than \code{family})}
 
-\item{scoreBiologicalFamily}{Score for a \code{family} match (should be lower than \code{tribe})}
+\item{score_biological_family}{Score for a \code{family} match (should be lower than \code{tribe})}
 
-\item{scoreBiologicalTribe}{Score for a \code{tribe} match (should be lower than \code{genus})}
+\item{score_biological_tribe}{Score for a \code{tribe} match (should be lower than \code{genus})}
 
-\item{scoreBiologicalGenus}{Score for a \code{genus} match (should be lower than \code{species})}
+\item{score_biological_genus}{Score for a \code{genus} match (should be lower than \code{species})}
 
-\item{scoreBiologicalSpecies}{Score for a \code{species} match (should be lower than \code{variety})}
+\item{score_biological_species}{Score for a \code{species} match (should be lower than \code{variety})}
 
-\item{scoreBiologicalVariety}{Score for a \code{variety} match (should be the highest)}
+\item{score_biological_variety}{Score for a \code{variety} match (should be the highest)}
 }
 \value{
 A table containing the biologically weighted annotation

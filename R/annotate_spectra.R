@@ -216,9 +216,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::tidytable() |>
       tidyft::filter(!is.na(score))
 
-    isSlaw <- "SLAW_ID" %in% colnames(df_final)
+    is_slaw <- "SLAW_ID" %in% colnames(df_final)
 
-    if (isSlaw) {
+    if (is_slaw) {
       df_final <- df_final |>
         dplyr::rowwise() |>
         dplyr::mutate(feature_id = as.numeric(SLAW_ID))

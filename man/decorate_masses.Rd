@@ -4,10 +4,12 @@
 \alias{decorate_masses}
 \title{Decorate masses}
 \usage{
-decorate_masses(df = annotation_table_ms1)
+decorate_masses(
+  annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
+)
 }
 \arguments{
-\item{df}{Table to decorate}
+\item{annotation_table_ms1}{Table to decorate}
 }
 \value{
 Message indicating the number of annotations obtained by MS1
