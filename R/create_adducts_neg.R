@@ -18,17 +18,17 @@ utils::globalVariables(
 #'
 #' @description This function creates negative adducts
 #'
-#' @param massesTable Table containing the masses of the adducts
-#' @param adductsTable Table containing the adducts
+#' @param masses_table Table containing the masses of the adducts
+#' @param adducts_table Table containing the adducts
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-create_adducts_neg <- function(massesTable, adductsTable) {
+create_adducts_neg <- function(masses_table, adducts_table) {
   ## Calculate the masses for various negative adducts
-  adducts_neg <- massesTable |>
+  adducts_neg <- masses_table |>
     tidytable::tidytable() |>
     dplyr::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
@@ -49,7 +49,7 @@ create_adducts_neg <- function(massesTable, adductsTable) {
       `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
       `[3M-(H)1]1-` = 3 * exact_mass - proton
     ) |>
-    tidytable::select(-colnames(adductsTable))
+    tidytable::select(-colnames(adducts_table))
 
   ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
   n <- ncol(adducts_neg)

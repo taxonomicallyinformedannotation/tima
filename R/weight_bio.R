@@ -63,20 +63,20 @@ utils::globalVariables(
 #'
 #' @description This function weights the eventually MS1 complemented annotations according their biological source
 #'
-#' @param annotationTable Table containing the initial annotation eventually complemented by additional MS1 annotations
-#' @param structureOrganismPairsTable Table containing the structure - organism pairs
-#' @param weightSpectral Weight for the spectral score
-#' @param weightBiological Weight for the biological score
-#' @param scoreBiologicalDomain Score for a `domain` match (should be lower than `kingdom`)
-#' @param scoreBiologicalKingdom Score for a `kingdom` match (should be lower than `phylum`)
-#' @param scoreBiologicalPhylum Score for a `phylum` match (should be lower than `class`)
-#' @param scoreBiologicalClass Score for a `class` match (should be lower than `order`)
-#' @param scoreBiologicalOrder Score for a `order` match (should be lower than `family`)
-#' @param scoreBiologicalFamily Score for a `family` match (should be lower than `tribe`)
-#' @param scoreBiologicalTribe Score for a `tribe` match (should be lower than `genus`)
-#' @param scoreBiologicalGenus Score for a `genus` match (should be lower than `species`)
-#' @param scoreBiologicalSpecies Score for a `species` match (should be lower than `variety`)
-#' @param scoreBiologicalVariety Score for a `variety` match (should be the highest)
+#' @param annotation_table_taxed Table containing the initial annotation eventually complemented by additional MS1 annotations
+#' @param structure_organism_pairs_table Table containing the structure - organism pairs
+#' @param weight_spectral Weight for the spectral score
+#' @param weight_biological Weight for the biological score
+#' @param score_biological_domain Score for a `domain` match (should be lower than `kingdom`)
+#' @param score_biological_kingdom Score for a `kingdom` match (should be lower than `phylum`)
+#' @param score_biological_phylum Score for a `phylum` match (should be lower than `class`)
+#' @param score_biological_class Score for a `class` match (should be lower than `order`)
+#' @param score_biological_order Score for a `order` match (should be lower than `family`)
+#' @param score_biological_family Score for a `family` match (should be lower than `tribe`)
+#' @param score_biological_tribe Score for a `tribe` match (should be lower than `genus`)
+#' @param score_biological_genus Score for a `genus` match (should be lower than `species`)
+#' @param score_biological_species Score for a `species` match (should be lower than `variety`)
+#' @param score_biological_variety Score for a `variety` match (should be the highest)
 #'
 #' @return A table containing the biologically weighted annotation
 #'
@@ -84,21 +84,21 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_bio <-
-  function(annotationTable = annotation_table_taxed,
-           structureOrganismPairsTable = structure_organism_pairs_table,
-           weightSpectral = weight_spectral,
-           weightBiological = weight_biological,
-           scoreBiologicalDomain = score_biological_domain,
-           scoreBiologicalKingdom = score_biological_kingdom,
-           scoreBiologicalPhylum = score_biological_phylum,
-           scoreBiologicalClass = score_biological_class,
-           scoreBiologicalOrder = score_biological_order,
-           scoreBiologicalFamily = score_biological_family,
-           scoreBiologicalTribe = score_biological_tribe,
-           scoreBiologicalGenus = score_biological_genus,
-           scoreBiologicalSpecies = score_biological_species,
-           scoreBiologicalVariety = score_biological_variety) {
-    metadata <- annotationTable |>
+  function(annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
+           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
+           weight_spectral = get("weight_spectral", envir = parent.frame()),
+           weight_biological = get("weight_biological", envir = parent.frame()),
+           score_biological_domain = get("score_biological_domain", envir = parent.frame()),
+           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
+           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
+           score_biological_class = get("score_biological_class", envir = parent.frame()),
+           score_biological_order = get("score_biological_order", envir = parent.frame()),
+           score_biological_family = get("score_biological_family", envir = parent.frame()),
+           score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
+           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
+           score_biological_species = get("score_biological_species", envir = parent.frame()),
+           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
+    metadata <- annotation_table_taxed |>
       tidytable::select(
         feature_id,
         structure_molecular_formula,
@@ -123,105 +123,105 @@ weight_bio <-
         sample_organism_10_varietas
       )
 
-    sample_domain <- annotationTable |>
+    sample_domain <- annotation_table_taxed |>
       tidyft::filter(sample_organism_01_domain != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_01_domain
       )
 
-    sample_kingdom <- annotationTable |>
+    sample_kingdom <- annotation_table_taxed |>
       tidyft::filter(sample_organism_02_kingdom != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_02_kingdom
       )
 
-    sample_phylum <- annotationTable |>
+    sample_phylum <- annotation_table_taxed |>
       tidyft::filter(sample_organism_03_phylum != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_03_phylum
       )
 
-    sample_class <- annotationTable |>
+    sample_class <- annotation_table_taxed |>
       tidyft::filter(sample_organism_04_class != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_04_class
       )
 
-    sample_order <- annotationTable |>
+    sample_order <- annotation_table_taxed |>
       tidyft::filter(sample_organism_05_order != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_05_order
       )
 
-    # sample_infraorder <- annotationTable |>
+    # sample_infraorder <- annotation_table_taxed |>
     #   tidyft::filter(sample_organism_05_1_infraorder != "ND") |>
     #   tidytable::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_05_1_infraorder
     #   )
 
-    sample_family <- annotationTable |>
+    sample_family <- annotation_table_taxed |>
       tidyft::filter(sample_organism_06_family != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_06_family
       )
 
-    # sample_subfamily <- annotationTable |>
+    # sample_subfamily <- annotation_table_taxed |>
     #   tidyft::filter(sample_organism_06_1_subfamily != "ND") |>
     #   tidytable::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_06_1_subfamily
     #   )
 
-    sample_tribe <- annotationTable |>
+    sample_tribe <- annotation_table_taxed |>
       tidyft::filter(sample_organism_07_tribe != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_07_tribe
       )
 
-    # sample_subtribe <- annotationTable |>
+    # sample_subtribe <- annotation_table_taxed |>
     #   tidyft::filter(sample_organism_07_1_subtribe != "ND") |>
     #   tidytable::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_07_1_subtribe
     #   )
 
-    sample_genus <- annotationTable |>
+    sample_genus <- annotation_table_taxed |>
       tidyft::filter(sample_organism_08_genus != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_08_genus
       )
 
-    # sample_subgenus <- annotationTable |>
+    # sample_subgenus <- annotation_table_taxed |>
     #   tidyft::filter(sample_organism_08_1_subgenus != "ND") |>
     #   tidytable::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_08_1_subgenus
     #   )
 
-    sample_species <- annotationTable |>
+    sample_species <- annotation_table_taxed |>
       tidyft::filter(sample_organism_09_species != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
         sample_organism_09_species
       )
 
-    # sample_subspecies <- annotationTable |>
+    # sample_subspecies <- annotation_table_taxed |>
     #   tidyft::filter(sample_organism_09_1_subspecies != "ND") |>
     #   tidytable::distinct(
     #     structure_inchikey_2D,
     #     sample_organism_09_1_subspecies
     #   )
 
-    sample_varietas <- annotationTable |>
+    sample_varietas <- annotation_table_taxed |>
       tidyft::filter(sample_organism_10_varietas != "ND") |>
       tidytable::distinct(
         structure_inchikey_2D,
@@ -229,7 +229,7 @@ weight_bio <-
       )
 
     log_debug("selecting DB columns \n")
-    candidates <- structureOrganismPairsTable |>
+    candidates <- structure_organism_pairs_table |>
       tidyft::filter(!is.na(structure_inchikey_2D)) |>
       tidytable::select(
         structure_inchikey_2D,
@@ -359,7 +359,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_01_domain, str = sample_organism_01_domain)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalDomain) |>
+      dplyr::mutate(score_biological = score_biological_domain) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -384,7 +384,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_02_kingdom, str = sample_organism_02_kingdom)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalKingdom) |>
+      dplyr::mutate(score_biological = score_biological_kingdom) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -409,7 +409,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_03_phylum, str = sample_organism_03_phylum)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalPhylum) |>
+      dplyr::mutate(score_biological = score_biological_phylum) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -434,7 +434,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_04_class, str = sample_organism_04_class)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalClass) |>
+      dplyr::mutate(score_biological = score_biological_class) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -459,7 +459,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_05_order, str = sample_organism_05_order)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalOrder) |>
+      dplyr::mutate(score_biological = score_biological_order) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -505,7 +505,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_06_family, str = sample_organism_06_family)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalFamily) |>
+      dplyr::mutate(score_biological = score_biological_family) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -550,7 +550,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_07_tribe, str = sample_organism_07_tribe)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalTribe) |>
+      dplyr::mutate(score_biological = score_biological_tribe) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -597,7 +597,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_08_genus, str = sample_organism_08_genus)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalGenus) |>
+      dplyr::mutate(score_biological = score_biological_genus) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -643,7 +643,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_09_species, str = sample_organism_09_species)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalSpecies) |>
+      dplyr::mutate(score_biological = score_biological_species) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -689,7 +689,7 @@ weight_bio <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_organism_10_varietas, str = sample_organism_10_varietas)
       ) |>
-      dplyr::mutate(score_biological = scoreBiologicalVariety) |>
+      dplyr::mutate(score_biological = score_biological_variety) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -728,7 +728,7 @@ weight_bio <-
     log_debug("joining with initial results \n")
     biologically_weighted_full <-
       tidytable::left_join(
-        annotationTable |>
+        annotation_table_taxed |>
           tidytable::select(-tidytable::contains("sample_")),
         biologically_weighted
       )
@@ -739,11 +739,11 @@ weight_bio <-
     biologically_weighted_full <- biologically_weighted_full |>
       dplyr::mutate(
         score_pondered_bio = (
-          (1 / (weightBiological + weightSpectral)) *
-            weightBiological *
+          (1 / (weight_biological + weight_spectral)) *
+            weight_biological *
             score_biological +
-            (1 / (weightBiological + weightSpectral)) *
-              weightSpectral *
+            (1 / (weight_biological + weight_spectral)) *
+              weight_spectral *
               as.numeric(score_input)
           # as.numeric(score_input_normalized)
         )

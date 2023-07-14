@@ -102,7 +102,7 @@ get_organism_taxonomy_ott <- function(df,
       tidyft::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) & retry == TRUE) {
+    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         tidyft::filter(!is.na(ott_id))
@@ -174,7 +174,7 @@ get_organism_taxonomy_ott <- function(df,
 
       list_df <- list()
 
-      for (i in seq_along(1:length(taxon_lineage))) {
+      for (i in seq_along(taxon_lineage)) {
         list_df[[i]] <- dplyr::bind_rows(
           data.frame(
             id = otts[i],

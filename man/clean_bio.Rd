@@ -5,20 +5,21 @@
 \title{Clean bio}
 \usage{
 clean_bio(
-  annotationTableWeightedBio = annotation_table_weighted_bio,
-  edgesTable = edges_table,
-  candidatesInitial = candidates_initial,
-  minimalMs1Bio = minimal_ms1_bio
+  annotation_table_weighted_bio = get("annotation_table_weighted_bio", envir =
+    parent.frame()),
+  edges_table = get("edges_table", envir = parent.frame()),
+  candidates_initial = get("candidates_initial", envir = parent.frame()),
+  minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame())
 )
 }
 \arguments{
-\item{annotationTableWeightedBio}{Table containing your biologically weighted annotation}
+\item{annotation_table_weighted_bio}{Table containing your biologically weighted annotation}
 
-\item{edgesTable}{Table containing the edges between features}
+\item{edges_table}{Table containing the edges between features}
 
-\item{candidatesInitial}{Number of initial candidates to keep}
+\item{candidates_initial}{Number of initial candidates to keep}
 
-\item{minimalMs1Bio}{Minimal biological score to keep MS1 based annotation}
+\item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 }
 \value{
 A table containing the biologically weighted annotation where only a given number of initial candidates are kept

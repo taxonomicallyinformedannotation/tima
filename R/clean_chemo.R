@@ -75,14 +75,14 @@ utils::globalVariables(
 #'
 #' @include clean_collapse.R
 #'
-#' @param annotationTableWeightedChemo Table containing your chemically weighted annotation
-#' @param componentsTable Prepared components file
-#' @param featuresTable Prepared features file
-#' @param structureOrganismPairsTable Table containing the structure - organism pairs
-#' @param candidatesFinal Number of final candidates to keep
-#' @param minimalMs1Bio Minimal biological score to keep MS1 based annotation
-#' @param minimalMs1Chemo Minimal chemical score to keep MS1 based annotation
-#' @param summarize Boolean. Summarize results (1 row per feature)
+#' @param annotation_table_weighted_chemo Table containing your chemically weighted annotation
+#' @param components_table Prepared components file
+#' @param features_table Prepared features file
+#' @param structure_organism_pairs_table Table containing the structure - organism pairs
+#' @param candidates_final Number of final candidates to keep
+#' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
+#' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
+#' @param summarise Boolean. summarise results (1 row per feature)
 #'
 #' @return A table containing the chemically weighted annotation where only a given number of initial candidates are kept
 #'
@@ -92,43 +92,46 @@ utils::globalVariables(
 #'
 #' @examples NULL
 clean_chemo <-
-  function(annotationTableWeightedChemo = annotation_table_weighted_chemo,
-           componentsTable = components_table,
-           featuresTable = features_table,
-           structureOrganismPairsTable = structure_organism_pairs_table,
-           candidatesFinal = candidates_final,
-           minimalMs1Bio = minimal_ms1_bio,
-           minimalMs1Chemo = minimal_ms1_chemo,
-           summarize = summarise) {
+  function(annotation_table_weighted_chemo = get("annotation_table_weighted_chemo", envir = parent.frame()),
+           components_table = get("components_table", envir = parent.frame()),
+           features_table = get("features_table", envir = parent.frame()),
+           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
+           candidates_final = get("candidates_final", envir = parent.frame()),
+           minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
+           minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
+           summarise = get("summarise", envir = parent.frame())) {
     log_debug(
       "filtering top ",
-      candidatesFinal,
+      candidates_final,
       " candidates and keeping only MS1 candidates with minimum \n",
-      minimalMs1Bio,
+      minimal_ms1_bio,
       " biological score or \n",
-      minimalMs1Chemo,
+      minimal_ms1_chemo,
       "chemical score \n"
     )
-    df1 <- annotationTableWeightedChemo |>
+    df1 <- annotation_table_weighted_chemo |>
       dplyr::filter(
         score_input > 0 |
           # Those lines are to keep ms1 annotation
-          score_biological >= minimalMs1Bio |
+          score_biological >= minimal_ms1_bio |
           # Only if a good biological
-          score_chemical >= minimalMs1Chemo
+          score_chemical >= minimal_ms1_chemo
         # Or chemical consistency score is obtained
       ) |>
       tidytable::distinct(feature_id,
         structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(rank_final = (tidytable::dense_rank(-score_pondered_chemo)), .by = c(feature_id)) |>
-      dplyr::filter(rank_final <= candidatesFinal, .by = c(feature_id))
+      dplyr::mutate(
+        rank_final = (tidytable::dense_rank(-score_pondered_chemo)),
+        .by = c(feature_id)
+      ) |>
+      dplyr::filter(rank_final <= candidates_final, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
-    df2 <- featuresTable |>
+    df2 <- features_table |>
       tidytable::left_join(df1) |>
-      tidytable::left_join(componentsTable) |>
+      tidytable::left_join(components_table) |>
       dplyr::mutate(
         best_candidate_structure = paste(
           structure_taxonomy_npclassifier_01pathway,
@@ -186,7 +189,7 @@ clean_chemo <-
         consistency_structure_cla_par
       )
 
-    references <- structureOrganismPairsTable |>
+    references <- structure_organism_pairs_table |>
       tidytable::select(
         structure_inchikey_2D,
         reference_doi,
@@ -246,7 +249,7 @@ clean_chemo <-
       ) |>
       tidytable::arrange(rank_final)
 
-    if (summarize == TRUE) {
+    if (summarise == TRUE) {
       log_debug("summarizing results \n")
       df4 <- df3 |>
         dplyr::group_by(feature_id) |>
@@ -263,11 +266,9 @@ clean_chemo <-
         dplyr::ungroup()
 
       df5 <- df4 |>
-        tidytable::left_join(
-          df3 |>
-            tidytable::select("feature_id", !colnames(df4)) |>
-            tidytable::distinct()
-        )
+        tidytable::left_join(df3 |>
+          tidytable::select("feature_id", !colnames(df4)) |>
+          tidytable::distinct())
     } else {
       df5 <- df3
     }
@@ -277,9 +278,12 @@ clean_chemo <-
       dplyr::mutate_all(as.character) |>
       tidytable::tidytable() |>
       tidyft::mutate_vars(is.character, .func = trimws) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "")
-      }) |>
+      tidyft::mutate_vars(
+        is.character,
+        .func = function(x) {
+          tidytable::na_if(x, "")
+        }
+      ) |>
       tidytable::select(tidytable::any_of(
         c(
           "feature_id",
@@ -332,7 +336,7 @@ clean_chemo <-
 
     df10 <- tidytable::left_join(
       df9,
-      annotationTableWeightedChemo |>
+      annotation_table_weighted_chemo |>
         dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
     ) |>
       tidytable::select(tidytable::any_of(

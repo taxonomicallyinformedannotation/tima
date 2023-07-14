@@ -5,41 +5,44 @@
 \title{Weight chemo}
 \usage{
 weight_chemo(
-  annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
-  weightSpectral = weight_spectral,
-  weightBiological = weight_biological,
-  weightChemical = weight_chemical,
-  scoreChemicalClaKingdom = score_chemical_cla_kingdom,
-  scoreChemicalClaSuperclass = score_chemical_cla_superclass,
-  scoreChemicalClaClass = score_chemical_cla_class,
-  scoreChemicalClaParent = score_chemical_cla_parent,
-  scoreChemicalNpcPathway = score_chemical_npc_pathway,
-  scoreChemicalNpcSuperclass = score_chemical_npc_superclass,
-  scoreChemicalNpcClass = score_chemical_npc_class
+  annotation_table_weighted_bio_cleaned = get("annotation_table_weighted_bio_cleaned",
+    envir = parent.frame()),
+  weight_spectral = get("weight_spectral", envir = parent.frame()),
+  weight_biological = get("weight_biological", envir = parent.frame()),
+  weight_chemical = get("weight_chemical", envir = parent.frame()),
+  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
+  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
+    parent.frame()),
+  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
+  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
+  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
+  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir =
+    parent.frame()),
+  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
 )
 }
 \arguments{
-\item{annotationTableWeightedBioCleaned}{Table containing the biologically weighted annotation}
+\item{annotation_table_weighted_bio_cleaned}{Table containing the biologically weighted annotation}
 
-\item{weightSpectral}{Weight for the spectral score}
+\item{weight_spectral}{Weight for the spectral score}
 
-\item{weightBiological}{Weight for the biological score}
+\item{weight_biological}{Weight for the biological score}
 
-\item{weightChemical}{Weight for the chemical consistency score}
+\item{weight_chemical}{Weight for the chemical consistency score}
 
-\item{scoreChemicalClaKingdom}{Score for a \verb{Classyfire kingdom} match (should be lower than \verb{ Classyfire superclass})}
+\item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match (should be lower than \verb{ Classyfire superclass})}
 
-\item{scoreChemicalClaSuperclass}{Score for a \verb{Classyfire superclass} match (should be lower than \verb{Classyfire class})}
+\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass} match (should be lower than \verb{Classyfire class})}
 
-\item{scoreChemicalClaClass}{Score for a \verb{Classyfire class} match (should be lower than \verb{Classyfire parent})}
+\item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match (should be lower than \verb{Classyfire parent})}
 
-\item{scoreChemicalClaParent}{Score for a \verb{Classyfire parent} match (should be the highest)}
+\item{score_chemical_cla_parent}{Score for a \verb{Classyfire parent} match (should be the highest)}
 
-\item{scoreChemicalNpcPathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
+\item{score_chemical_npc_pathway}{Score for a \code{pathway} match (should be lower than \code{superclass})}
 
-\item{scoreChemicalNpcSuperclass}{Score for a \code{superclass} match (should be lower than \code{class})}
+\item{score_chemical_npc_superclass}{Score for a \code{superclass} match (should be lower than \code{class})}
 
-\item{scoreChemicalNpcClass}{Score for a \code{class} match (should be the highest)}
+\item{score_chemical_npc_class}{Score for a \code{class} match (should be the highest)}
 }
 \value{
 A table containing the chemically weighted annotation

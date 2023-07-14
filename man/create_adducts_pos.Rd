@@ -4,12 +4,12 @@
 \alias{create_adducts_pos}
 \title{Create adducts positive}
 \usage{
-create_adducts_pos(massesTable, adductsTable)
+create_adducts_pos(masses_table, adducts_table)
 }
 \arguments{
-\item{massesTable}{Table containing the masses of the adducts}
+\item{masses_table}{Table containing the masses of the adducts}
 
-\item{adductsTable}{Table containing the adducts}
+\item{adducts_table}{Table containing the adducts}
 }
 \description{
 This function creates positive adducts

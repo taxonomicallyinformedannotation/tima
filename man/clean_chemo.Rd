@@ -5,32 +5,34 @@
 \title{Clean chemo}
 \usage{
 clean_chemo(
-  annotationTableWeightedChemo = annotation_table_weighted_chemo,
-  componentsTable = components_table,
-  featuresTable = features_table,
-  structureOrganismPairsTable = structure_organism_pairs_table,
-  candidatesFinal = candidates_final,
-  minimalMs1Bio = minimal_ms1_bio,
-  minimalMs1Chemo = minimal_ms1_chemo,
-  summarize = summarise
+  annotation_table_weighted_chemo = get("annotation_table_weighted_chemo", envir =
+    parent.frame()),
+  components_table = get("components_table", envir = parent.frame()),
+  features_table = get("features_table", envir = parent.frame()),
+  structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
+    parent.frame()),
+  candidates_final = get("candidates_final", envir = parent.frame()),
+  minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
+  minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
+  summarise = get("summarise", envir = parent.frame())
 )
 }
 \arguments{
-\item{annotationTableWeightedChemo}{Table containing your chemically weighted annotation}
+\item{annotation_table_weighted_chemo}{Table containing your chemically weighted annotation}
 
-\item{componentsTable}{Prepared components file}
+\item{components_table}{Prepared components file}
 
-\item{featuresTable}{Prepared features file}
+\item{features_table}{Prepared features file}
 
-\item{structureOrganismPairsTable}{Table containing the structure - organism pairs}
+\item{structure_organism_pairs_table}{Table containing the structure - organism pairs}
 
-\item{candidatesFinal}{Number of final candidates to keep}
+\item{candidates_final}{Number of final candidates to keep}
 
-\item{minimalMs1Bio}{Minimal biological score to keep MS1 based annotation}
+\item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 
-\item{minimalMs1Chemo}{Minimal chemical score to keep MS1 based annotation}
+\item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
-\item{summarize}{Boolean. Summarize results (1 row per feature)}
+\item{summarise}{Boolean. summarise results (1 row per feature)}
 }
 \value{
 A table containing the chemically weighted annotation where only a given number of initial candidates are kept

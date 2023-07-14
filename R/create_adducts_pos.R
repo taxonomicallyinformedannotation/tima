@@ -22,17 +22,17 @@ utils::globalVariables(
 #'
 #' @description This function creates positive adducts
 #'
-#' @param massesTable Table containing the masses of the adducts
-#' @param adductsTable Table containing the adducts
+#' @param masses_table Table containing the masses of the adducts
+#' @param adducts_table Table containing the adducts
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-create_adducts_pos <- function(massesTable, adductsTable) {
+create_adducts_pos <- function(masses_table, adducts_table) {
   ## Calculate the masses for various positive adducts
-  adducts_pos <- massesTable |>
+  adducts_pos <- masses_table |>
     tidytable::tidytable() |>
     dplyr::mutate(
       `[1M+(H)3]3+` = (exact_mass + 3 * proton) / 3,
@@ -80,7 +80,7 @@ create_adducts_pos <- function(massesTable, adductsTable) {
       `[2M+(H)1(ACN)1]1+` = 2 * exact_mass + proton + acetonitrile,
       `[2M+(Na)1(ACN)1]1+` = 2 * exact_mass + acetonitrile + sodium
     ) |>
-    tidytable::select(-colnames(adductsTable))
+    tidytable::select(-colnames(adducts_table))
 
   n <- ncol(adducts_pos)
 

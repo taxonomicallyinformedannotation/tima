@@ -58,17 +58,17 @@ utils::globalVariables(
 #'
 #' @description This function weights the biologically weighted annotations according their chemical consistency
 #'
-#' @param annotationTableWeightedBioCleaned Table containing the biologically weighted annotation
-#' @param weightSpectral Weight for the spectral score
-#' @param weightBiological Weight for the biological score
-#' @param weightChemical Weight for the chemical consistency score
-#' @param scoreChemicalClaKingdom Score for a `Classyfire kingdom` match (should be lower than ` Classyfire superclass`)
-#' @param scoreChemicalClaSuperclass Score for a `Classyfire superclass` match (should be lower than `Classyfire class`)
-#' @param scoreChemicalClaClass Score for a `Classyfire class` match (should be lower than `Classyfire parent`)
-#' @param scoreChemicalClaParent Score for a `Classyfire parent` match (should be the highest)
-#' @param scoreChemicalNpcPathway Score for a `pathway` match (should be lower than `superclass`)
-#' @param scoreChemicalNpcSuperclass Score for a `superclass` match (should be lower than `class`)
-#' @param scoreChemicalNpcClass Score for a `class` match (should be the highest)
+#' @param annotation_table_weighted_bio_cleaned Table containing the biologically weighted annotation
+#' @param weight_spectral Weight for the spectral score
+#' @param weight_biological Weight for the biological score
+#' @param weight_chemical Weight for the chemical consistency score
+#' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match (should be lower than ` Classyfire superclass`)
+#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match (should be lower than `Classyfire class`)
+#' @param score_chemical_cla_class Score for a `Classyfire class` match (should be lower than `Classyfire parent`)
+#' @param score_chemical_cla_parent Score for a `Classyfire parent` match (should be the highest)
+#' @param score_chemical_npc_pathway Score for a `pathway` match (should be lower than `superclass`)
+#' @param score_chemical_npc_superclass Score for a `superclass` match (should be lower than `class`)
+#' @param score_chemical_npc_class Score for a `class` match (should be the highest)
 #'
 #' @return A table containing the chemically weighted annotation
 #'
@@ -76,19 +76,19 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_chemo <-
-  function(annotationTableWeightedBioCleaned = annotation_table_weighted_bio_cleaned,
-           weightSpectral = weight_spectral,
-           weightBiological = weight_biological,
-           weightChemical = weight_chemical,
-           scoreChemicalClaKingdom = score_chemical_cla_kingdom,
-           scoreChemicalClaSuperclass = score_chemical_cla_superclass,
-           scoreChemicalClaClass = score_chemical_cla_class,
-           scoreChemicalClaParent = score_chemical_cla_parent,
-           scoreChemicalNpcPathway = score_chemical_npc_pathway,
-           scoreChemicalNpcSuperclass = score_chemical_npc_superclass,
-           scoreChemicalNpcClass = score_chemical_npc_class) {
+  function(annotation_table_weighted_bio_cleaned = get("annotation_table_weighted_bio_cleaned", envir = parent.frame()),
+           weight_spectral = get("weight_spectral", envir = parent.frame()),
+           weight_biological = get("weight_biological", envir = parent.frame()),
+           weight_chemical = get("weight_chemical", envir = parent.frame()),
+           score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
+           score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir = parent.frame()),
+           score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
+           score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
+           score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
+           score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
+           score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())) {
     log_debug("calculating chemical score ... \n")
-    df1 <- annotationTableWeightedBioCleaned
+    df1 <- annotation_table_weighted_bio_cleaned
 
     log_debug("... adding metadata \n")
     df2 <- df1 |>
@@ -124,49 +124,49 @@ weight_chemo <-
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_cla_kingdom, str = consensus_structure_cla_kin)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalClaKingdom)
+      dplyr::mutate(score_chemical = score_chemical_cla_kingdom)
 
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_1_npc_pathway, str = consensus_structure_npc_pat)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalNpcPathway)
+      dplyr::mutate(score_chemical = score_chemical_npc_pathway)
 
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- step_cla_kin |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_cla_superclass, str = consensus_structure_cla_sup)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalClaSuperclass)
+      dplyr::mutate(score_chemical = score_chemical_cla_superclass)
 
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- step_npc_pat |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_2_npc_superclass, str = consensus_structure_npc_sup)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalNpcSuperclass)
+      dplyr::mutate(score_chemical = score_chemical_npc_superclass)
 
     log_debug("... (classyfire) class \n")
     step_cla_cla <- step_cla_sup |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_cla_class, str = consensus_structure_cla_cla)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalClaClass)
+      dplyr::mutate(score_chemical = score_chemical_cla_class)
 
     log_debug("... (NPC) class \n")
     step_npc_cla <- step_npc_sup |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_3_npc_class, str = consensus_structure_npc_cla)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalNpcClass)
+      dplyr::mutate(score_chemical = score_chemical_npc_class)
 
     log_debug("... (classyfire) parent \n")
     step_cla_par <- step_cla_cla |>
       dplyr::filter(
         stringi::stri_detect_regex(pattern = candidate_structure_4_cla_parent, str = consensus_structure_cla_par)
       ) |>
-      dplyr::mutate(score_chemical = scoreChemicalClaParent)
+      dplyr::mutate(score_chemical = score_chemical_cla_parent)
 
     log_debug("... outputting best score \n")
     df3 <-
@@ -210,25 +210,25 @@ weight_chemo <-
       dplyr::mutate(
         score_pondered_chemo = (
           (1 / (
-            weightChemical +
-              weightBiological +
-              weightSpectral
+            weight_chemical +
+              weight_biological +
+              weight_spectral
           )) *
-            weightChemical *
+            weight_chemical *
             score_chemical +
             (1 / (
-              weightChemical +
-                weightBiological +
-                weightSpectral
+              weight_chemical +
+                weight_biological +
+                weight_spectral
             )) *
-              weightBiological *
+              weight_biological *
               score_biological +
             (1 / (
-              weightChemical +
-                weightBiological +
-                weightSpectral
+              weight_chemical +
+                weight_biological +
+                weight_spectral
             )) *
-              weightSpectral *
+              weight_spectral *
               as.numeric(score_input)
           # as.numeric(score_input_normalized)
         )

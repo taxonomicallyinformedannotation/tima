@@ -18,15 +18,15 @@ utils::globalVariables(
 #'
 #' @description This function outputs information about biological weighting
 #'
-#' @param df Table to decorate
-#' @param sc_kin Kingdom score
-#' @param sc_phy Phylum score
-#' @param sc_cla Class score
-#' @param sc_ord Order score
-#' @param sc_fam Family score
-#' @param sc_gen Genus score
-#' @param sc_spe Species score
-#' @param sc_var Variety score
+#' @param annotation_table_weighted_bio Table to decorate
+#' @param score_biological_kingdom  Kingdom score
+#' @param score_biological_phylum  Phylum score
+#' @param score_biological_class  Class score
+#' @param score_biological_order  Order score
+#' @param score_biological_orderscore_biological_family Family score
+#' @param score_biological_genus Genus score
+#' @param score_biological_species Species score
+#' @param score_biological_variety Variety score
 #'
 #' @return Message indicating the number of annotations weighted at each biological level
 #'
@@ -34,31 +34,31 @@ utils::globalVariables(
 #'
 #' @examples NULL
 decorate_bio <-
-  function(df = annotation_table_weighted_bio,
-           sc_kin = score_biological_kingdom,
-           sc_phy = score_biological_phylum,
-           sc_cla = score_biological_class,
-           sc_ord = score_biological_order,
-           sc_fam = score_biological_family,
-           sc_gen = score_biological_genus,
-           sc_spe = score_biological_species,
-           sc_var = score_biological_variety) {
-    df_kin <- df |>
-      dplyr::filter(score_biological >= sc_kin)
+  function(annotation_table_weighted_bio = get("annotation_table_weighted_chemo", envir = parent.frame()),
+           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
+           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
+           score_biological_class = get("score_biological_class", envir = parent.frame()),
+           score_biological_order = get("score_biological_order", envir = parent.frame()),
+           score_biological_family = get("score_biological_family", envir = parent.frame()),
+           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
+           score_biological_species = get("score_biological_species", envir = parent.frame()),
+           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
+    df_kin <- annotation_table_weighted_bio |>
+      dplyr::filter(score_biological >= score_biological_kingdom)
     df_phy <- df_kin |>
-      dplyr::filter(score_biological >= sc_phy)
+      dplyr::filter(score_biological >= score_biological_phylum)
     df_cla <- df_phy |>
-      dplyr::filter(score_biological >= sc_cla)
+      dplyr::filter(score_biological >= score_biological_class)
     df_ord <- df_cla |>
-      dplyr::filter(score_biological >= sc_ord)
+      dplyr::filter(score_biological >= score_biological_order)
     df_fam <- df_ord |>
-      dplyr::filter(score_biological >= sc_fam)
+      dplyr::filter(score_biological >= score_biological_family)
     df_gen <- df_fam |>
-      dplyr::filter(score_biological >= sc_gen)
+      dplyr::filter(score_biological >= score_biological_genus)
     df_spe <- df_gen |>
-      dplyr::filter(score_biological >= sc_spe)
+      dplyr::filter(score_biological >= score_biological_species)
     df_var <- df_spe |>
-      dplyr::filter(score_biological >= sc_var)
+      dplyr::filter(score_biological >= score_biological_variety)
 
     log_debug(
       "taxonomically informed scoring led to \n",
