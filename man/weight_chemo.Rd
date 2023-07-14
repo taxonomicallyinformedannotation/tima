@@ -5,8 +5,7 @@
 \title{Weight chemo}
 \usage{
 weight_chemo(
-  annot_table_weighted_bio_cleaned = get("annot_table_weighted_bio_cleaned", envir =
-    parent.frame()),
+  annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),
   weight_spectral = get("weight_spectral", envir = parent.frame()),
   weight_biological = get("weight_biological", envir = parent.frame()),
   weight_chemical = get("weight_chemical", envir = parent.frame()),
@@ -22,7 +21,7 @@ weight_chemo(
 )
 }
 \arguments{
-\item{annot_table_weighted_bio_cleaned}{Table containing the biologically weighted annotation}
+\item{annot_table_wei_bio_clean}{Table containing the biologically weighted annotation}
 
 \item{weight_spectral}{Weight for the spectral score}
 

@@ -5,7 +5,7 @@
 \title{Clean chemo}
 \usage{
 clean_chemo(
-  annot_table_weighted_chemo = get("annot_table_weighted_chemo", envir = parent.frame()),
+  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
   components_table = get("components_table", envir = parent.frame()),
   features_table = get("features_table", envir = parent.frame()),
   structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
@@ -17,7 +17,7 @@ clean_chemo(
 )
 }
 \arguments{
-\item{annot_table_weighted_chemo}{Table containing your chemically weighted annotation}
+\item{annot_table_wei_chemo}{Table containing your chemically weighted annotation}
 
 \item{components_table}{Prepared components file}
 

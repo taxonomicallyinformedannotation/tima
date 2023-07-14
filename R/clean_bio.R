@@ -1,6 +1,6 @@
 utils::globalVariables(
   c(
-    "annot_table_weighted_bio",
+    "annot_table_wei_bio",
     "candidate_structure_1_cla_kingdom",
     "candidate_structure_1_npc_pathway",
     "candidate_structure_2_cla_superclass",
@@ -63,7 +63,7 @@ utils::globalVariables(
 #'
 #' @description This function cleans the results obtained after biological weighting
 #'
-#' @param annot_table_weighted_bio Table containing your biologically weighted annotation
+#' @param annot_table_wei_bio Table containing your biologically weighted annotation
 #' @param edges_table Table containing the edges between features
 #' @param candidates_initial Number of initial candidates to keep
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
@@ -76,7 +76,7 @@ utils::globalVariables(
 #'
 #' @examples NULL
 clean_bio <-
-  function(annot_table_weighted_bio = get("annot_table_weighted_bio", envir = parent.frame()),
+  function(annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
            edges_table = get("edges_table", envir = parent.frame()),
            candidates_initial = get("candidates_initial", envir = parent.frame()),
            minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame())) {
@@ -86,7 +86,7 @@ clean_bio <-
       " biological score \n"
     )
 
-    df01 <- annot_table_weighted_bio |>
+    df01 <- annot_table_wei_bio |>
       dplyr::filter(score_input > 0 |
         ## Those lines are to keep ms1 annotation
         score_biological >= minimal_ms1_bio)
@@ -94,7 +94,7 @@ clean_bio <-
     log_debug("erasing other MS1 candidates \n")
     df02 <-
       tidytable::anti_join(
-        annot_table_weighted_bio |>
+        annot_table_wei_bio |>
           tidytable::distinct(feature_id,
             structure_inchikey_2D,
             .keep_all = TRUE
