@@ -10,7 +10,7 @@
 #' @examples NULL
 round_reals <- function(df, dig = 5) {
   df |>
-    # Round to 5 digits to avoid small discrepancies
+    ## Round to 5 digits to avoid small discrepancies
     tidyft::mutate_vars(
       .cols = c(
         "structure_exact_mass",

@@ -131,10 +131,8 @@ prepare_annotations_gnps <-
           error_rt,
           library = LibraryName,
           structure_name = Compound_Name,
-          # structure_smiles = Smiles,
           score_input = MQScore,
           count_peaks_matched = SharedPeaks,
-          # smiles_2D, ## Not available for now
           structure_inchi = INCHI,
           structure_inchikey = InChIKey,
           structure_inchikey_2D = `InChIKey-Planar`,
@@ -155,13 +153,6 @@ prepare_annotations_gnps <-
             gsub(pattern = ".*\\/C", replacement = "C") |>
             gsub(pattern = "\\/.*", replacement = ""),
           structure_xlogp = NA,
-          # score_input_normalized = bestNormalize::bestNormalize(
-          #   x = score_input,
-          #   standardize = FALSE,
-          #   allow_orderNorm = FALSE,
-          #   allow_lambert_s = TRUE,
-          #   allow_lambert_h = TRUE
-          # )$x.t,
           ## Only partially present
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,

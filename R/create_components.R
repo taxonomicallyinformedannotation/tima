@@ -64,7 +64,6 @@ create_components <-
       tidyft::mutate_vars(is.character, .func = as.numeric) |>
       tidytable::arrange(`cluster index`)
 
-    # Export
     log_debug(x = "Exporting ...")
     export_params(step = "create_components")
     export_output(

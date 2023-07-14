@@ -1,6 +1,6 @@
 utils::globalVariables(
   c(
-    "annotation_table_weighted_chemo",
+    "annot_table_weighted_chemo",
     "consensus_structure_cla_cla",
     "consensus_structure_cla_kin",
     "consensus_structure_cla_par",
@@ -24,7 +24,7 @@ utils::globalVariables(
 #'
 #' @description This function outputs information about chemical weighting
 #'
-#' @param annotation_table_weighted_chemo Table to decorate
+#' @param annot_table_weighted_chemo Table to decorate
 #' @param score_chemical_cla_kingdom  Classyfire kingdom score
 #' @param score_chemical_cla_superclass  Classyfire superclass score
 #' @param score_chemical_cla_class  Classyfire class score
@@ -38,7 +38,7 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-decorate_chemo <- function(annotation_table_weighted_chemo = get("annotation_table_weighted_chemo", envir = parent.frame()),
+decorate_chemo <- function(annot_table_weighted_chemo = get("annot_table_weighted_chemo", envir = parent.frame()),
                            score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
                            score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir = parent.frame()),
                            score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
@@ -46,14 +46,14 @@ decorate_chemo <- function(annotation_table_weighted_chemo = get("annotation_tab
                            score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
                            score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
                            score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())) {
-  df_cla_kin <- annotation_table_weighted_chemo |>
+  df_cla_kin <- annot_table_weighted_chemo |>
     dplyr::filter(score_chemical >= score_chemical_cla_kingdom) |>
     dplyr::filter(
       consensus_structure_cla_kin != "notAnnotated" &
         consensus_structure_cla_kin != "notConsistent" &
         consensus_structure_cla_kin != "dummy"
     )
-  df_npc_pat <- annotation_table_weighted_chemo |>
+  df_npc_pat <- annot_table_weighted_chemo |>
     dplyr::filter(score_chemical >= score_chemical_npc_pathway) |>
     dplyr::filter(
       consensus_structure_npc_pat != "notAnnotated" &

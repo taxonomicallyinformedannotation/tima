@@ -31,7 +31,6 @@ prepare_features_components <-
              components$
              prepared,
            parameters = params) {
-    # Check if input file(s) exists
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==

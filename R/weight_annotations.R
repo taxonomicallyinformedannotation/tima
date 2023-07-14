@@ -214,18 +214,18 @@ weight_annotations <-
       tidytable::left_join(taxed_features_table)
 
     log_debug(x = "performing taxonomically informed scoring")
-    annotation_table_weighted_bio <- weight_bio()
+    annot_table_weighted_bio <- weight_bio()
 
-    annotation_table_weighted_bio |>
+    annot_table_weighted_bio |>
       decorate_bio()
 
     log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
-    annotation_table_weighted_bio_cleaned <- clean_bio()
+    annot_table_weighted_bio_cleaned <- clean_bio()
 
     log_debug(x = "performing chemically informed scoring")
-    annotation_table_weighted_chemo <- weight_chemo()
+    annot_table_weighted_chemo <- weight_chemo()
 
-    annotation_table_weighted_chemo |>
+    annot_table_weighted_chemo |>
       decorate_chemo()
 
     log_debug(x = "cleaning for export")

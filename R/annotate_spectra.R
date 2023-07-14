@@ -75,7 +75,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                              parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
-  # Check if library file(s) exists
+  ## Check if library file(s) exists
   stopifnot(
     "Library file(s) do(es) not exist" =
       rep(TRUE, length(unlist(library))) ==
@@ -123,9 +123,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     error_mz = NA,
     error_rt = NA,
     structure_name = NA,
-    # structure_inchikey = NA,
     structure_inchikey_2D = NA,
-    # structure_smiles = target_smiles,
     structure_smiles_2D = NA,
     structure_molecular_formula = NA,
     structure_exact_mass = NA,
@@ -250,9 +248,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "error_mz",
           "error_rt",
           "structure_name" = "target_name",
-          # "structure_inchikey" = "target_inchikey",
           "structure_inchikey_2D",
-          # "structure_smiles" = "target_smiles",
           "structure_smiles_2D",
           "structure_molecular_formula" = "target_formula",
           "structure_exact_mass" = "target_exactmass",
@@ -275,7 +271,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::bind_rows(df_add)
 
     ## COMMENT AR: Not doing it because of thresholding
-    # df_final[is.na(df_final)] <- 0
+    ## df_final[is.na(df_final)] <- 0
 
     if (condition == "AND") {
       df_final <- df_final |>

@@ -98,10 +98,8 @@ prepare_libraries_sop_merged <-
              taxonomies$
              npc,
            parameters = params) {
-    # Check if the filter parameter is valid
     stopifnot("Your filter parameter must be 'true' or 'false'" = filter %in% c(TRUE, FALSE))
 
-    # If filter is TRUE, check if the level parameter is valid
     if (isTRUE(filter)) {
       stopifnot(
         "Your level parameter must be one of:
@@ -130,7 +128,6 @@ prepare_libraries_sop_merged <-
       )
     }
 
-    # Load and concatenate the prepared libraries
     log_debug(x = "Loading and concatenating prepared libraries")
     params <<- parameters
     libraries <- list()
@@ -152,7 +149,6 @@ prepare_libraries_sop_merged <-
       data.frame()
 
     log_debug(x = "Keeping organisms")
-    # table_organisms_names <- tables$org_nam
     table_organisms_taxonomy_ott <- tables$org_tax_ott
 
     log_debug(x = "Completing organisms taxonomy")
@@ -219,17 +215,12 @@ prepare_libraries_sop_merged <-
       stopifnot("Your filter led to no entries, try to change it." = nrow(table_keys) != 0)
     }
 
-    # Export the library
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_libraries_sop_merged")
     export_output(
       x = table_keys,
       file = output_key
     )
-    # export_output(
-    #   x = table_organisms_names,
-    #   file = output_org_nam
-    # )
     export_output(
       x = table_organisms_taxonomy_ott,
       file = output_org_tax_ott
@@ -258,7 +249,6 @@ prepare_libraries_sop_merged <-
     return(
       c(
         "key" = output_key,
-        # "org_nam" = output_org_nam,
         "org_tax_ott" = output_org_tax_ott,
         "str_2d_3d" = output_str_2d_3d,
         "str_met" = output_str_met,
