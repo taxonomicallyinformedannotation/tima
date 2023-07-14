@@ -5,8 +5,6 @@ require(
   quietly = TRUE
 )
 
-# paths <- parse_yaml_paths()
-
 log_debug(
   "This script",
   crayon::green("downloads the In Silico DataBase (ISDB) \n")
@@ -14,17 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# get_last_version_from_zenodo(
-#   doi = paths$urls$lotus_isdb$doi,
-#   pattern = paths$urls$lotus_isdb$pattern$pos,
-#   path = paths$data$source$libraries$spectra$is$lotus$pos
-# )
-#
-# get_last_version_from_zenodo(
-#   doi = paths$urls$lotus_isdb$doi,
-#   pattern = paths$urls$lotus_isdb$pattern$neg,
-#   path = paths$data$source$libraries$spectra$is$lotus$neg
-# )
 targets::tar_make(names = matches("lib_spe_is_lot"))
 
 end <- Sys.time()

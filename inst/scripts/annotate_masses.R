@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "annotate_masses"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green("annotates based on exact mass (MS1)")
@@ -16,7 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ", crayon::blue("CH"), crayon::cyan("MS"), "\n")
 
-# annotate_masses()
 targets::tar_make(names = matches("ann_ms1_pre"))
 
 end <- Sys.time()

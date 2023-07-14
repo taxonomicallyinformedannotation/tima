@@ -1,7 +1,7 @@
 utils::globalVariables(c(
-  "yaml_default",
   "yaml_files",
-  "yaml_names"
+  "yaml_names",
+  "yamls_default"
 ))
 
 #' @title Load yaml files

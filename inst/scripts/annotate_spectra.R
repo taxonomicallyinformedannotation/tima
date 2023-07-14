@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "annotate_spectra"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green(
@@ -19,7 +15,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# annotate_spectra()
 targets::tar_make(names = matches("ann_spe_is_l"))
 
 end <- Sys.time()

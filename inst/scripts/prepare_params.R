@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "prepare_params"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green("prepares parameters")
@@ -16,7 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"))
 log_debug("Contributors: ...")
 
-# prepare_params()
 targets::tar_make(names = matches("par_"))
 
 end <- Sys.time()

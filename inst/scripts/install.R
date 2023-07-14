@@ -32,17 +32,6 @@ if (!requireNamespace("pak", quietly = TRUE)) {
   install.packages("pak",
     repos = "https://r-lib.github.io/p/pak/stable"
   )
-  # stream <- "devel"
-  # install.packages(
-  #   "pak",
-  #   repos = sprintf(
-  #     "https://r-lib.github.io/p/pak/%s/%s/%s/%s",
-  #     stream,
-  #     .Platform$pkgType,
-  #     R.Version()$os,
-  #     R.Version()$arch
-  #   )
-  # )
 }
 pak::pak_update()
 pak::lockfile_create()

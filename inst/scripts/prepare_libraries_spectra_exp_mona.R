@@ -76,7 +76,6 @@ prepare_mona <-
         x = inchi,
         fixed = TRUE
       )) |>
-      # tidytable::filter(!grepl(pattern = "Aux", x = inchi)) |>
       tidyft::mutate(ionmode = ifelse(
         test = polarity == 1,
         yes = "POSITIVE",

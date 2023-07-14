@@ -3,7 +3,7 @@
 ## replacing the original rinchi::parse.inchi
 parse.inchi <- function(inchis) {
   ## Not working?
-  # OKAY <- rJava::.jcall("net/sf/jniinchi/INCHI_RET", "Lnet/sf/jniinchi/INCHI_RET;", "getValue", as.integer(0))
+  ## OKAY <- rJava::.jcall("net/sf/jniinchi/INCHI_RET", "Lnet/sf/jniinchi/INCHI_RET;", "getValue", as.integer(0))
   dcob <-
     rJava::.jcall(
       "org/openscience/cdk/DefaultChemObjectBuilder",
