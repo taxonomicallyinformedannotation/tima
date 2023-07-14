@@ -149,22 +149,22 @@ prepare_libraries_sop_merged <-
       data.frame()
 
     log_debug(x = "Keeping organisms")
-    table_organisms_taxonomy_ott <- tables$org_tax_ott
+    table_org_tax_ott <- tables$org_tax_ott
 
     log_debug(x = "Completing organisms taxonomy")
-    table_organisms_taxonomy_ott_2 <- table_keys |>
-      tidytable::anti_join(table_organisms_taxonomy_ott) |>
+    table_org_tax_ott_2 <- table_keys |>
+      tidytable::anti_join(table_org_tax_ott) |>
       tidytable::distinct(organism = organism_name) |>
       data.frame()
 
-    if (nrow(table_organisms_taxonomy_ott_2) != 0) {
-      table_organisms_taxonomy_ott_full <-
-        table_organisms_taxonomy_ott_2 |>
+    if (nrow(table_org_tax_ott_2) != 0) {
+      table_org_tax_ott_full <-
+        table_org_tax_ott_2 |>
         get_organism_taxonomy_ott(retry = FALSE)
 
-      table_organisms_taxonomy_ott <-
-        table_organisms_taxonomy_ott |>
-        tidytable::bind_rows(table_organisms_taxonomy_ott_full |>
+      table_org_tax_ott <-
+        table_org_tax_ott |>
+        tidytable::bind_rows(table_org_tax_ott_full |>
           tidytable::tidytable() |>
           tidyft::mutate_vars(is.numeric, .func = as.character) |>
           tidyft::mutate_vars(is.list, .func = as.character) |>
@@ -175,7 +175,7 @@ prepare_libraries_sop_merged <-
     table_structures_2d_3d <- tables$str_2d_3d
     table_structures_metadata <- tables$str_met
     table_structures_names <- tables$str_nam
-    table_structures_taxonomy_classyfire <- tables$str_tax_cla
+    table_structures_taxonomy_cla <- tables$str_tax_cla
     table_structures_taxonomy_npc <- tables$str_tax_npc
 
     log_debug(x = "Completing structures metadata")
@@ -194,7 +194,7 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        tidytable::left_join(table_organisms_taxonomy_ott)
+        tidytable::left_join(table_org_tax_ott)
 
       table_keys <- table_keys |>
         dplyr::filter(grepl(
@@ -222,7 +222,7 @@ prepare_libraries_sop_merged <-
       file = output_key
     )
     export_output(
-      x = table_organisms_taxonomy_ott,
+      x = table_org_tax_ott,
       file = output_org_tax_ott
     )
     export_output(
@@ -238,7 +238,7 @@ prepare_libraries_sop_merged <-
       file = output_str_nam
     )
     export_output(
-      x = table_structures_taxonomy_classyfire,
+      x = table_structures_taxonomy_cla,
       file = output_str_tax_cla
     )
     export_output(

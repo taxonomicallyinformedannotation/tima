@@ -5,7 +5,7 @@
 \title{Decorate bio}
 \usage{
 decorate_bio(
-  annot_table_weighted_bio = get("annot_table_weighted_chemo", envir = parent.frame()),
+  annot_table_wei_bio = get("annot_table_wei_chemo", envir = parent.frame()),
   score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
   score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
   score_biological_class = get("score_biological_class", envir = parent.frame()),
@@ -17,7 +17,7 @@ decorate_bio(
 )
 }
 \arguments{
-\item{annot_table_weighted_bio}{Table to decorate}
+\item{annot_table_wei_bio}{Table to decorate}
 
 \item{score_biological_kingdom}{Kingdom score}
 

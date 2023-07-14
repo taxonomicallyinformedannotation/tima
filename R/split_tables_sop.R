@@ -144,7 +144,7 @@ split_tables_sop <- function(table) {
       tidytable::replace_na(x, "notClassified")
     })
 
-  table_structures_taxonomy_classyfire <- table |>
+  table_structures_taxonomy_cla <- table |>
     tidyft::filter(!is.na(structure_inchikey_2D)) |>
     tidyft::filter(!is.na(structure_taxonomy_classyfire_chemontid)) |>
     tidytable::select(
@@ -167,7 +167,7 @@ split_tables_sop <- function(table) {
 
   log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
 
-  table_organisms_taxonomy_ott <- table |>
+  table_org_tax_ott <- table |>
     tidyft::filter(!is.na(organism_name)) |>
     tidyft::filter(!is.na(organism_taxonomy_ottid)) |>
     tidytable::select(
@@ -193,11 +193,11 @@ split_tables_sop <- function(table) {
     list(
       "key" = table_keys,
       # "org_nam" = table_organisms_names,
-      "org_tax_ott" = table_organisms_taxonomy_ott,
+      "org_tax_ott" = table_org_tax_ott,
       "str_2d_3d" = table_structures_2d_3d,
       "str_met" = table_structures_metadata,
       "str_nam" = table_structures_names,
-      "str_tax_cla" = table_structures_taxonomy_classyfire,
+      "str_tax_cla" = table_structures_taxonomy_cla,
       "str_tax_npc" = table_structures_taxonomy_npc
     )
 

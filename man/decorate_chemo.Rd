@@ -5,7 +5,7 @@
 \title{Decorate chemo}
 \usage{
 decorate_chemo(
-  annot_table_weighted_chemo = get("annot_table_weighted_chemo", envir = parent.frame()),
+  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
   score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
   score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
     parent.frame()),
@@ -18,7 +18,7 @@ decorate_chemo(
 )
 }
 \arguments{
-\item{annot_table_weighted_chemo}{Table to decorate}
+\item{annot_table_wei_chemo}{Table to decorate}
 
 \item{score_chemical_cla_kingdom}{Classyfire kingdom score}
 

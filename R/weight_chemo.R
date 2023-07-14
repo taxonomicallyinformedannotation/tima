@@ -1,6 +1,6 @@
 utils::globalVariables(
   c(
-    "annot_table_weighted_bio_cleaned",
+    "annot_table_wei_bio_clean",
     "candidate_structure_1_cla_kingdom",
     "candidate_structure_1_npc_pathway",
     "candidate_structure_2_cla_superclass",
@@ -57,7 +57,7 @@ utils::globalVariables(
 #'
 #' @description This function weights the biologically weighted annotations according their chemical consistency
 #'
-#' @param annot_table_weighted_bio_cleaned Table containing the biologically weighted annotation
+#' @param annot_table_wei_bio_clean Table containing the biologically weighted annotation
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_biological Weight for the biological score
 #' @param weight_chemical Weight for the chemical consistency score
@@ -75,7 +75,7 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_chemo <-
-  function(annot_table_weighted_bio_cleaned = get("annot_table_weighted_bio_cleaned", envir = parent.frame()),
+  function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),
            weight_spectral = get("weight_spectral", envir = parent.frame()),
            weight_biological = get("weight_biological", envir = parent.frame()),
            weight_chemical = get("weight_chemical", envir = parent.frame()),
@@ -87,7 +87,7 @@ weight_chemo <-
            score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
            score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())) {
     log_debug("calculating chemical score ... \n")
-    df1 <- annot_table_weighted_bio_cleaned
+    df1 <- annot_table_wei_bio_clean
 
     log_debug("... adding metadata \n")
     df2 <- df1 |>
