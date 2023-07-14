@@ -152,7 +152,7 @@ annotate_masses <-
       na.strings = c("", "NA")
     )
 
-    neutralLosses <-
+    neutral_losses <-
       tidytable::fread(
         file = neutral_losses_list,
         na.strings = c("", "NA")
@@ -165,13 +165,13 @@ annotate_masses <-
       adduct_file <- paths$data$interim$libraries$adducts$neg
     }
 
-    adductsTable <- tidytable::fread(
+    adducts_table <- tidytable::fread(
       file = adduct_file,
       na.strings = c("", "NA")
     )
 
     log_debug("... adducts masses for in source dimers and multicharged")
-    adductsMassTable <-
+    adducts_massTable <-
       tidytable::fread(
         file = adducts_masses_list,
         na.strings = c("", "NA")
@@ -179,8 +179,8 @@ annotate_masses <-
 
     log_debug("... neutral lossses")
 
-    adductsM <- adductsMassTable$mass
-    names(adductsM) <- adductsMassTable$adduct
+    adducts_m <- adducts_massTable$mass
+    names(adducts_m) <- adducts_massTable$adduct
 
     if (ms_mode == "pos") {
       adduct_db_file <-
@@ -223,7 +223,7 @@ annotate_masses <-
     #       structure_organism_pairs_table[["structure_exact_mass"]])
 
     ## slim it
-    structureOrganismPairsTable <-
+    structure_organism_pairs_table <-
       tidytable::fread(
         file = library,
         na.strings = c("", "NA")
@@ -343,14 +343,14 @@ annotate_masses <-
     log_debug("calculating delta mz for single charge adducts \n")
     df8 <-
       dist_groups(
-        d = stats::dist(adductsTable$adduct_mass),
-        g = adductsTable$adduct
+        d = stats::dist(adducts_table$adduct_mass),
+        g = adducts_table$adduct
       ) |>
       tidytable::select(-Item1, -Item2, -Label)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df9_d <- df7 |>
-      dplyr::inner_join(neutralLosses,
+      dplyr::inner_join(neutral_losses,
         by = dplyr::join_by(
           delta_min <= mass,
           delta_max >= mass
@@ -497,13 +497,13 @@ annotate_masses <-
       tidyft::filter(!is.na(exact_mass))
 
     log_debug("keeping unique adducts per exact mass \n")
-    df13 <- structureOrganismPairsTable |>
+    df13 <- structure_organism_pairs_table |>
       tidyft::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_exact_mass,
         structure_molecular_formula
       )
-    df13_b <- structureOrganismPairsTable |>
+    df13_b <- structure_organism_pairs_table |>
       tidyft::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_name,
@@ -561,7 +561,7 @@ annotate_masses <-
     df15 <-
       tidytable::left_join(
         df14,
-        adductsTable,
+        adducts_table,
         by = stats::setNames("adduct", "library")
       ) |>
       tidytable::distinct(feature_id, .keep_all = TRUE) |>
@@ -585,62 +585,62 @@ annotate_masses <-
         ) |>
         tidytable::rowwise() |>
         dplyr::mutate(
-          `[1M+(H)3]3+` = (mz - adduct_mass + 3 * adductsM["H (proton)"]) / 3,
+          `[1M+(H)3]3+` = (mz - adduct_mass + 3 * adducts_m["H (proton)"]) / 3,
           `[1M+(H)2(Na)1]3+` = (mz - adduct_mass +
-            2 * adductsM["H (proton)"] +
-            adductsM["Na (sodium)"]) / 3,
+            2 * adducts_m["H (proton)"] +
+            adducts_m["Na (sodium)"]) / 3,
           `[1M+(H)1(Na)2]3+` = (mz - adduct_mass +
-            adductsM["H (proton)"] +
-            2 * adductsM["Na (sodium)"]) / 3,
-          `[1M+(Na)3]3+` = (mz - adduct_mass + 3 * adductsM["Na (sodium)"]) / 3,
-          `[1M+(H)2]2+` = (mz - adduct_mass + 2 * adductsM["H (proton)"]) / 2,
+            adducts_m["H (proton)"] +
+            2 * adducts_m["Na (sodium)"]) / 3,
+          `[1M+(Na)3]3+` = (mz - adduct_mass + 3 * adducts_m["Na (sodium)"]) / 3,
+          `[1M+(H)2]2+` = (mz - adduct_mass + 2 * adducts_m["H (proton)"]) / 2,
           `[1M+(H)2(NH3)1]2+` = (mz - adduct_mass +
-            2 * adductsM["H (proton)"] +
-            adductsM["NH4 (ammonium)"]) / 2,
+            2 * adducts_m["H (proton)"] +
+            adducts_m["NH4 (ammonium)"]) / 2,
           `[1M+(H)1(Na)1]2+` = (mz - adduct_mass +
-            adductsM["H (proton)"] +
-            adductsM["Na (sodium)"]) / 2,
+            adducts_m["H (proton)"] +
+            adducts_m["Na (sodium)"]) / 2,
           `[1M+(Mg)1]2+` = (mz - adduct_mass +
-            adductsM["Mg (magnesium)"]) / 2,
+            adducts_m["Mg (magnesium)"]) / 2,
           `[1M+(H)1(K)1]2+` = (mz - adduct_mass +
-            adductsM["H (proton)"] +
-            adductsM["K (potassium)"]) / 2,
+            adducts_m["H (proton)"] +
+            adducts_m["K (potassium)"]) / 2,
           `[1M+(Ca)1]2+` = (mz - adduct_mass +
-            adductsM["Ca (calcium)"]) / 2,
+            adducts_m["Ca (calcium)"]) / 2,
           `[1M+(H)2(ACN)1]2+` = (mz - adduct_mass +
-            2 * adductsM["H (proton)"] +
-            adductsM["C2H3N (acetonitrile)"]) / 2,
+            2 * adducts_m["H (proton)"] +
+            adducts_m["C2H3N (acetonitrile)"]) / 2,
           `[1M+(Na)2]2+` = (mz - adduct_mass +
-            2 * adductsM["Na (sodium)"]) / 2,
+            2 * adducts_m["Na (sodium)"]) / 2,
           `[1M+(Fe)1]2+` = (mz - adduct_mass +
-            adductsM["Fe (iron)"]) / 2,
+            adducts_m["Fe (iron)"]) / 2,
           `[1M+(H)2(ACN)2]2+` = (mz - adduct_mass +
-            2 * adductsM["H (proton)"] +
-            2 * adductsM["C2H3N (acetonitrile)"]) / 2,
+            2 * adducts_m["H (proton)"] +
+            2 * adducts_m["C2H3N (acetonitrile)"]) / 2,
           `[1M+(H)2(ACN)3]2+` = (mz - adduct_mass +
-            2 * adductsM["H (proton)"] +
-            3 * adductsM["C2H3N (acetonitrile)"]) / 2,
+            2 * adducts_m["H (proton)"] +
+            3 * adducts_m["C2H3N (acetonitrile)"]) / 2,
           `[2M+(Mg)1]2+` = (2 * (mz - adduct_mass) +
-            adductsM["Mg (magnesium)"]) / 2,
+            adducts_m["Mg (magnesium)"]) / 2,
           `[2M+(Ca)1]2+` = (2 * (mz - adduct_mass) +
-            adductsM["Ca (calcium)"]) / 2,
+            adducts_m["Ca (calcium)"]) / 2,
           `[2M+(Fe)1]2+` = (2 * (mz - adduct_mass) +
-            adductsM["Fe (iron)"]) / 2,
+            adducts_m["Fe (iron)"]) / 2,
           `[2M+(H)1]1+` = 2 * (mz - adduct_mass) +
-            adductsM["H (proton)"],
+            adducts_m["H (proton)"],
           `[2M+(H)1(NH3)1]1+` = 2 * (mz - adduct_mass) +
-            adductsM["H (proton)"] +
-            adductsM["NH4 (ammonium)"],
+            adducts_m["H (proton)"] +
+            adducts_m["NH4 (ammonium)"],
           `[2M+(Na)1]1+` = 2 * (mz - adduct_mass) +
-            adductsM["Na (sodium)"],
-          `[2M+(K)1]1+` = 2 * (mz - adductsM["H (proton)"]) +
-            adductsM["K (potassium)"],
+            adducts_m["Na (sodium)"],
+          `[2M+(K)1]1+` = 2 * (mz - adducts_m["H (proton)"]) +
+            adducts_m["K (potassium)"],
           `[2M+(H)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
-            adductsM["H (proton)"] +
-            adductsM["C2H3N (acetonitrile)"],
+            adducts_m["H (proton)"] +
+            adducts_m["C2H3N (acetonitrile)"],
           `[2M+(Na)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
-            adductsM["C2H3N (acetonitrile)"] +
-            adductsM["Na (sodium)"]
+            adducts_m["C2H3N (acetonitrile)"] +
+            adducts_m["Na (sodium)"]
         ) |>
         tidytable::select(-adduct_mass) |>
         tidytable::ungroup()
@@ -660,17 +660,17 @@ annotate_masses <-
         tidytable::rowwise() |>
         dplyr::mutate(
           `[1M-(H)3]3-` = (mz + adduct_mass -
-            3 * adductsM["H (proton)"]) / 3,
+            3 * adducts_m["H (proton)"]) / 3,
           `[1M-(H)2]2-` = (mz + adduct_mass -
-            2 * adductsM["H (proton)"]) / 2,
+            2 * adducts_m["H (proton)"]) / 2,
           `[2M-(H)1]1-` = 2 * (mz + adduct_mass) -
-            adductsM["H (proton)"],
+            adducts_m["H (proton)"],
           `[2M+(FA)1-(H)1]1-` = 2 * (mz + adduct_mass) +
-            adductsM["CH2O2 (formic)"] - adductsM["H (proton)"],
+            adducts_m["CH2O2 (formic)"] - adducts_m["H (proton)"],
           `[2M+(Hac)1-(H)1]1-` = 2 * (mz + adduct_mass) +
-            adductsM["C2H4O2 (acetic)"] - adductsM["H (proton)"],
+            adducts_m["C2H4O2 (acetic)"] - adducts_m["H (proton)"],
           `[3M-(H)1]1-` = 3 * (mz + adduct_mass) -
-            adductsM["H (proton)"]
+            adducts_m["H (proton)"]
         ) |>
         tidytable::select(-adduct_mass) |>
         tidytable::ungroup()
@@ -702,11 +702,11 @@ annotate_masses <-
         delta_min = mz.x - mz_max,
         delta_max = mz.x - mz_min
       ) |>
-      dplyr::filter(delta_max > min(neutralLosses$mass) |
+      dplyr::filter(delta_max > min(neutral_losses$mass) |
         (mz.x >= mz_min & mz.x <= mz_max))
 
     df20_a <- df20 |>
-      dplyr::inner_join(neutralLosses,
+      dplyr::inner_join(neutral_losses,
         by = dplyr::join_by(
           delta_min <= mass,
           delta_max >= mass
@@ -800,7 +800,7 @@ annotate_masses <-
     log_debug("adding chemical classification")
     df25 <- tidytable::left_join(
       df24,
-      structureOrganismPairsTable |>
+      structure_organism_pairs_table |>
         tidytable::distinct(
           structure_inchikey_2D,
           structure_smiles_2D,

@@ -937,7 +937,7 @@ list(
                 organisms$
                 taxonomies$
                 ott,
-              output_str_2D_3D = paths$
+              output_str_2d_3d = paths$
                 data$
                 interim$
                 libraries$
@@ -989,8 +989,8 @@ list(
         tar_file(name = lib_mer_org_tax_ott, command = {
           lib_mer_org_tax_ott <- lib_sop_mer[[2]]
         }),
-        tar_file(name = lib_mer_str_2D_3D, command = {
-          lib_mer_str_2D_3D <- lib_sop_mer[[3]]
+        tar_file(name = lib_mer_str_2d_3d, command = {
+          lib_mer_str_2d_3d <- lib_sop_mer[[3]]
         }),
         tar_file(name = lib_mer_str_met, command = {
           lib_mer_str_met <- lib_sop_mer[[4]]
@@ -1259,7 +1259,7 @@ list(
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
               name_source = par_ann_mas$names$source,
               name_target = par_ann_mas$names$target,
-              str_2D_3D = lib_mer_str_2D_3D,
+              str_2d_3d = lib_mer_str_2d_3d,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
@@ -1300,7 +1300,7 @@ list(
               prepare_annotations_gnps(
                 input = gnps_annotations,
                 output = par_pre_ann_gnp$files$annotations$prepared,
-                str_2D_3D = lib_mer_str_2D_3D,
+                str_2d_3d = lib_mer_str_2d_3d,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
@@ -1400,7 +1400,7 @@ list(
                   x = par_pre_ann_spe$files$annotations$prepared,
                   fixed = TRUE
                 ),
-                str_2D_3D = lib_mer_str_2D_3D,
+                str_2d_3d = lib_mer_str_2d_3d,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
@@ -1500,7 +1500,7 @@ list(
                 ann_spe_is_lot_pos
               ),
               output = par_pre_ann_spe$files$annotations$prepared,
-              str_2D_3D = lib_mer_str_2D_3D,
+              str_2d_3d = lib_mer_str_2d_3d,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
@@ -1519,7 +1519,7 @@ list(
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
             output = par_pre_ann_sir$files$annotations$prepared,
-            str_2D_3D = lib_mer_str_2D_3D,
+            str_2d_3d = lib_mer_str_2d_3d,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
@@ -1677,7 +1677,7 @@ list(
     command = {
       ann_pre <- weight_annotations(
         library = lib_mer_key,
-        str_2D_3D = lib_mer_str_2D_3D,
+        str_2d_3d = lib_mer_str_2d_3d,
         annotations = list(
           ann_spe_is_pre,
           ann_ms1_pre_ann
@@ -1730,7 +1730,7 @@ list(
     command = {
       ann_pre_crazy <- weight_annotations(
         library = lib_mer_key,
-        str_2D_3D = lib_mer_str_2D_3D,
+        str_2d_3d = lib_mer_str_2d_3d,
         annotations = list(
           ann_spe_exp_gnp_pre,
           ann_spe_exp_int_pre,

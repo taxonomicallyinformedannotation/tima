@@ -176,7 +176,7 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Keeping structures")
-    table_structures_2D_3D <- tables$str_2d_3d
+    table_structures_2d_3d <- tables$str_2d_3d
     table_structures_metadata <- tables$str_met
     table_structures_names <- tables$str_nam
     table_structures_taxonomy_classyfire <- tables$str_tax_cla
@@ -235,7 +235,7 @@ prepare_libraries_sop_merged <-
       file = output_org_tax_ott
     )
     export_output(
-      x = table_structures_2D_3D,
+      x = table_structures_2d_3d,
       file = output_str_2d_3d
     )
     export_output(
