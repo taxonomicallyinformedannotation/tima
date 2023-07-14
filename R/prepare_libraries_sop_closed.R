@@ -74,7 +74,8 @@ prepare_libraries_sop_closed <-
         round_reals() |>
         tidytable::distinct()
     } else {
-      log_debug("Sorry, you do not have access to the closed resource, returning an empty file instead")
+      log_debug("Sorry, you do not have access to the closed resource,
+                returning an empty file instead")
       closed_prepared <- fake_sop_columns()
     }
 

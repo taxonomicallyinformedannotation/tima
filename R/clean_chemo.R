@@ -70,20 +70,24 @@ utils::globalVariables(
 
 #' @title Clean chemo
 #'
-#' @description This function cleans the results obtained after chemical weighting
+#' @description This function cleans the results
+#'    obtained after chemical weighting
 #'
 #' @include clean_collapse.R
 #'
-#' @param annot_table_wei_chemo Table containing your chemically weighted annotation
+#' @param annot_table_wei_chemo Table containing your
+#'    chemically weighted annotation
 #' @param components_table Prepared components file
 #' @param features_table Prepared features file
-#' @param structure_organism_pairs_table Table containing the structure - organism pairs
+#' @param structure_organism_pairs_table Table containing the
+#'    structure - organism pairs
 #' @param candidates_final Number of final candidates to keep
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param summarise Boolean. summarise results (1 row per feature)
 #'
-#' @return A table containing the chemically weighted annotation where only a given number of initial candidates are kept
+#' @return A table containing the chemically weighted annotation
+#'    where only a given number of initial candidates are kept
 #'
 #' @export
 #'
@@ -91,14 +95,30 @@ utils::globalVariables(
 #'
 #' @examples NULL
 clean_chemo <-
-  function(annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-           components_table = get("components_table", envir = parent.frame()),
-           features_table = get("features_table", envir = parent.frame()),
-           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
-           candidates_final = get("candidates_final", envir = parent.frame()),
-           minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
-           minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
-           summarise = get("summarise", envir = parent.frame())) {
+  function(annot_table_wei_chemo = get("annot_table_wei_chemo",
+             envir = parent.frame()
+           ),
+           components_table = get("components_table",
+             envir = parent.frame()
+           ),
+           features_table = get("features_table",
+             envir = parent.frame()
+           ),
+           structure_organism_pairs_table = get("structure_organism_pairs_table",
+             envir = parent.frame()
+           ),
+           candidates_final = get("candidates_final",
+             envir = parent.frame()
+           ),
+           minimal_ms1_bio = get("minimal_ms1_bio",
+             envir = parent.frame()
+           ),
+           minimal_ms1_chemo = get("minimal_ms1_chemo",
+             envir = parent.frame()
+           ),
+           summarise = get("summarise",
+             envir = parent.frame()
+           )) {
     log_debug(
       "filtering top ",
       candidates_final,

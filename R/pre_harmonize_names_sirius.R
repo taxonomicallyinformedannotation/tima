@@ -1,10 +1,12 @@
 #' @title Pre harmonize names sirius
 #'
-#' @description This function pre harmonizes Sirius names to make them compatible
+#' @description This function pre harmonizes Sirius names
+#'     to make them compatible
 #'
 #' @param x Character string containing a name
 #'
-#' @return Character string with the name modified according to the rules specified in the function
+#' @return Character string with the name modified according
+#'    to the rules specified in the function
 #'
 #' @export
 #'
@@ -12,7 +14,11 @@
 pre_harmonize_names_sirius <- function(x) {
   ## Remove any characters after and including the '/' character from the name
   y <- x |>
-    stringi::stri_replace_all_regex(pattern = "/.*", replacement = "", vectorize_all = FALSE)
+    stringi::stri_replace_all_regex(
+      pattern = "/.*",
+      replacement = "",
+      vectorize_all = FALSE
+    )
 
   return(y)
 }

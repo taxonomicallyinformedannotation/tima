@@ -6,7 +6,8 @@ utils::globalVariables(
 
 #' @title Create edges progress
 #'
-#' @description This function is slow so it outputs the progression of the creation of edges
+#' @description This function is slow so it outputs
+#'    the progression of the creation of edges
 #'
 #' @param target Indices of target spectra
 #' @param query Index of query spectra

@@ -47,10 +47,18 @@ prepare_params <- function(filename = params$files$pattern,
   )
   if (!is.null(gnps_job_id)) {
     if (gnps_job_id != "") {
-      stopifnot("Your GNPS job ID is invalid" = stringi::stri_length(str = gnps_job_id) == 32)
+      stopifnot(
+        "Your GNPS job ID is invalid" =
+          stringi::stri_length(
+            str = gnps_job_id
+          ) == 32
+      )
     }
   }
-  stopifnot("Your ms_mode parameter must be 'pos' or 'neg'" = ms_mode %in% c("pos", "neg"))
+  stopifnot(
+    "Your ms_mode parameter must be 'pos' or 'neg'" =
+      ms_mode %in% c("pos", "neg")
+  )
 
   params <<- parameters
   filename <<- filename

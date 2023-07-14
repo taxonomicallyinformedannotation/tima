@@ -30,8 +30,12 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-create_adducts_pos <- function(masses_table = get("masses_table", envir = parent.frame()),
-                               adducts_table = get("adducts_table", envir = parent.frame())) {
+create_adducts_pos <- function(masses_table = get("masses_table",
+                                 envir = parent.frame()
+                               ),
+                               adducts_table = get("adducts_table",
+                                 envir = parent.frame()
+                               )) {
   ## Calculate the masses for various positive adducts
   adducts_pos <- masses_table |>
     tidytable::tidytable() |>
@@ -85,7 +89,8 @@ create_adducts_pos <- function(masses_table = get("masses_table", envir = parent
 
   n <- ncol(adducts_pos)
 
-  ## Pivot the adducts_pos table to get a long format with adduct and adduct mass as columns
+  ## Pivot the adducts_pos table to get a long format
+  ## with adduct and adduct mass as columns
   adducts_pos <- adducts_pos |>
     tidytable::pivot_longer(2:tidytable::all_of(n)) |>
     tidytable::select(tidytable::everything(),

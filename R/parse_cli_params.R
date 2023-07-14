@@ -30,13 +30,16 @@ parse_cli_params <- function() {
       params$annotations$ms1$annotate <- as.logical(arguments$ann_ms1_ann)
     }
     if (!is.null(arguments$ann_ms1_thr_bio)) {
-      params$annotations$ms1$thresholds$biological <- as.numeric(arguments$ann_ms1_thr_bio)
+      params$annotations$ms1$thresholds$biological <-
+        as.numeric(arguments$ann_ms1_thr_bio)
     }
     if (!is.null(arguments$ann_ms1_thr_che)) {
-      params$annotations$ms1$thresholds$chemical <- as.numeric(arguments$ann_ms1_thr_che)
+      params$annotations$ms1$thresholds$chemical <-
+        as.numeric(arguments$ann_ms1_thr_che)
     }
     if (!is.null(arguments$ann_ms1_thr_con)) {
-      params$annotations$ms1$thresholds$condition <- as.character(arguments$ann_ms1_thr_con)
+      params$annotations$ms1$thresholds$condition <-
+        as.character(arguments$ann_ms1_thr_con)
     }
     if (!is.null(arguments$ann_ms2_app)) {
       params$annotations$ms2$approx <- as.logical(arguments$ann_ms2_app)
@@ -45,25 +48,31 @@ parse_cli_params <- function() {
       params$annotations$ms2$method <- as.character(arguments$ann_ms2_met)
     }
     if (!is.null(arguments$ann_ms2_thr_con)) {
-      params$annotations$ms2$thresholds$condition <- as.character(arguments$ann_ms2_thr_con)
+      params$annotations$ms2$thresholds$condition <-
+        as.character(arguments$ann_ms2_thr_con)
     }
     if (!is.null(arguments$ann_ms2_thr_pea_abs)) {
-      params$annotations$ms2$thresholds$peaks$absolute <- as.numeric(arguments$ann_ms2_thr_pea_abs)
+      params$annotations$ms2$thresholds$peaks$absolute <-
+        as.numeric(arguments$ann_ms2_thr_pea_abs)
     }
     if (!is.null(arguments$ann_ms2_thr_pea_rat)) {
-      params$annotations$ms2$thresholds$peaks$ratio <- as.numeric(arguments$ann_ms2_thr_pea_rat)
+      params$annotations$ms2$thresholds$peaks$ratio <-
+        as.numeric(arguments$ann_ms2_thr_pea_rat)
     }
     if (!is.null(arguments$ann_ms2_thr_sim)) {
-      params$annotations$ms2$thresholds$similarity <- as.numeric(arguments$ann_ms2_thr_sim)
+      params$annotations$ms2$thresholds$similarity <-
+        as.numeric(arguments$ann_ms2_thr_sim)
     }
     if (!is.null(arguments$fil_pat)) {
       params$files$pattern <- as.character(arguments$fil_pat)
     }
     if (!is.null(arguments$fil_ann_raw_spe)) {
-      params$files$annotations$raw$spectral <- as.character(arguments$fil_ann_raw_spe)
+      params$files$annotations$raw$spectral <-
+        as.character(arguments$fil_ann_raw_spe)
     }
     if (!is.null(arguments$fil_ann_raw_sir)) {
-      params$files$annotations$raw$sirius <- as.character(arguments$fil_ann_raw_sir)
+      params$files$annotations$raw$sirius <-
+        as.character(arguments$fil_ann_raw_sir)
     }
     if (!is.null(arguments$fil_ann_pre)) {
       params$files$annotations$prepared <- as.character(arguments$fil_ann_pre)
@@ -78,34 +87,44 @@ parse_cli_params <- function() {
       params$files$features$prepared <- as.character(arguments$fil_fea_pre)
     }
     if (!is.null(arguments$fil_lib_add_pro)) {
-      params$files$libraries$adducts$prepared <- as.character(arguments$fil_lib_add_pro)
+      params$files$libraries$adducts$prepared <-
+        as.character(arguments$fil_lib_add_pro)
     }
     if (!is.null(arguments$fil_lib_sop_raw_clo)) {
-      params$files$libraries$sop$raw$closed <- as.character(arguments$fil_lib_sop_raw_clo)
+      params$files$libraries$sop$raw$closed <-
+        as.character(arguments$fil_lib_sop_raw_clo)
     }
     if (!is.null(arguments$fil_lib_sop_raw_lot)) {
-      params$files$libraries$sop$raw$lotus <- as.character(arguments$fil_lib_sop_raw_lot)
+      params$files$libraries$sop$raw$lotus <-
+        as.character(arguments$fil_lib_sop_raw_lot)
     }
     if (!is.null(arguments$fil_lib_sop_pro)) {
-      params$files$libraries$sop$prepared <- as.character(arguments$fil_lib_sop_pro)
+      params$files$libraries$sop$prepared <-
+        as.character(arguments$fil_lib_sop_pro)
     }
     if (!is.null(arguments$fil_lib_spe_neg)) {
-      params$files$libraries$spectral$neg <- as.character(arguments$fil_lib_spe_neg)
+      params$files$libraries$spectral$neg <-
+        as.character(arguments$fil_lib_spe_neg)
     }
     if (!is.null(arguments$fil_lib_spe_pos)) {
-      params$files$libraries$spectral$pos <- as.character(arguments$fil_lib_spe_pos)
+      params$files$libraries$spectral$pos <-
+        as.character(arguments$fil_lib_spe_pos)
     }
     if (!is.null(arguments$fil_lib_spe_raw)) {
-      params$files$libraries$spectral$raw <- as.character(arguments$fil_lib_spe_raw)
+      params$files$libraries$spectral$raw <-
+        as.character(arguments$fil_lib_spe_raw)
     }
     if (!is.null(arguments$fil_net_spe_edg_raw)) {
-      params$files$networks$spectral$edges$raw <- as.character(arguments$fil_net_spe_edg_raw)
+      params$files$networks$spectral$edges$raw <-
+        as.character(arguments$fil_net_spe_edg_raw)
     }
     if (!is.null(arguments$fil_net_spe_edg_pro)) {
-      params$files$networks$spectral$edges$prepared <- as.character(arguments$fil_net_spe_edg_pro)
+      params$files$networks$spectral$edges$prepared <-
+        as.character(arguments$fil_net_spe_edg_pro)
     }
     if (!is.null(arguments$fil_net_spe_com_raw)) {
-      params$files$networks$spectral$components$raw <- as.character(arguments$fil_net_spe_com_raw)
+      params$files$networks$spectral$components$raw <-
+        as.character(arguments$fil_net_spe_com_raw)
     }
     if (!is.null(arguments$fil_tax_raw)) {
       params$files$taxa$raw <- as.character(arguments$fil_tax_raw)
@@ -138,16 +157,20 @@ parse_cli_params <- function() {
       params$ms$polarity <- as.character(arguments$ms_pol)
     }
     if (!is.null(arguments$ms_tol_mas_ppm_ms1)) {
-      params$ms$tolerances$mass$ppm$ms1 <- as.numeric(arguments$ms_tol_mas_ppm_ms1)
+      params$ms$tolerances$mass$ppm$ms1 <-
+        as.numeric(arguments$ms_tol_mas_ppm_ms1)
     }
     if (!is.null(arguments$ms_tol_mas_ppm_ms2)) {
-      params$ms$tolerances$mass$ppm$ms2 <- as.numeric(arguments$ms_tol_mas_ppm_ms2)
+      params$ms$tolerances$mass$ppm$ms2 <-
+        as.numeric(arguments$ms_tol_mas_ppm_ms2)
     }
     if (!is.null(arguments$ms_tol_mas_dal_ms1)) {
-      params$ms$tolerances$mass$dalton$ms1 <- as.numeric(arguments$ms_tol_mas_dal_ms1)
+      params$ms$tolerances$mass$dalton$ms1 <-
+        as.numeric(arguments$ms_tol_mas_dal_ms1)
     }
     if (!is.null(arguments$ms_tol_mas_dal_ms2)) {
-      params$ms$tolerances$mass$dalton$ms2 <- as.numeric(arguments$ms_tol_mas_dal_ms2)
+      params$ms$tolerances$mass$dalton$ms2 <-
+        as.numeric(arguments$ms_tol_mas_dal_ms2)
     }
     if (!is.null(arguments$ms_tol_rt_min)) {
       params$ms$tolerances$rt$minutes <- as.numeric(arguments$ms_tol_rt_min)
@@ -246,10 +269,12 @@ parse_cli_params <- function() {
       params$tools$metadata <- as.character(arguments$too_met)
     }
     if (!is.null(arguments$too_net_spe_com)) {
-      params$tools$networks$spectral$components <- as.character(arguments$too_net_spe_com)
+      params$tools$networks$spectral$components <-
+        as.character(arguments$too_net_spe_com)
     }
     if (!is.null(arguments$too_net_spe_edg)) {
-      params$tools$networks$spectral$edges <- as.character(arguments$too_net_spe_edg)
+      params$tools$networks$spectral$edges <-
+        as.character(arguments$too_net_spe_edg)
     }
     if (!is.null(arguments$too_tax_bio)) {
       params$tools$taxonomies$biological <- as.character(arguments$too_tax_bio)

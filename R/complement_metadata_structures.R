@@ -212,13 +212,20 @@ complement_metadata_structures <- function(df,
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 
-  ## Always returning preferentially internal values (smiles > inchikey > external)
+  ## Always returning preferentially internal values
+  ## (smiles > inchikey > external)
   table_final <- df |>
     tidytable::left_join(dd_ddd_i) |>
     tidytable::left_join(dd_ddd_s) |>
     dplyr::mutate(
-      structure_smiles_2D = dplyr::coalesce(structure_smiles_2D_i, structure_smiles_2D),
-      structure_inchikey_2D = dplyr::coalesce(structure_inchikey_2D_s, structure_inchikey_2D)
+      structure_smiles_2D = dplyr::coalesce(
+        structure_smiles_2D_i,
+        structure_smiles_2D
+      ),
+      structure_inchikey_2D = dplyr::coalesce(
+        structure_inchikey_2D_s,
+        structure_inchikey_2D
+      )
     ) |>
     tidytable::select(-structure_smiles_2D_i, -structure_inchikey_2D_s) |>
     tidytable::left_join(met_i) |>
@@ -234,14 +241,27 @@ complement_metadata_structures <- function(df,
         structure_exact_mass_i,
         structure_exact_mass
       ),
-      structure_xlogp = dplyr::coalesce(structure_xlogp_s, structure_xlogp_i, structure_xlogp)
+      structure_xlogp = dplyr::coalesce(
+        structure_xlogp_s,
+        structure_xlogp_i,
+        structure_xlogp
+      )
     ) |>
     tidytable::select(
-      -structure_molecular_formula_s, -structure_molecular_formula_i, -structure_exact_mass_s, -structure_exact_mass_i, -structure_xlogp_s, -structure_xlogp_i
+      -structure_molecular_formula_s,
+      -structure_molecular_formula_i,
+      -structure_exact_mass_s,
+      -structure_exact_mass_i,
+      -structure_xlogp_s,
+      -structure_xlogp_i
     ) |>
     tidytable::left_join(nam_i) |>
     tidytable::left_join(nam_s) |>
-    dplyr::mutate(structure_name = dplyr::coalesce(structure_name_s, structure_name_i, structure_name)) |>
+    dplyr::mutate(structure_name = dplyr::coalesce(
+      structure_name_s,
+      structure_name_i,
+      structure_name
+    )) |>
     tidytable::select(-structure_name_s, -structure_name_i) |>
     tidytable::left_join(tax_npc) |>
     dplyr::mutate(

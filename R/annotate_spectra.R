@@ -25,10 +25,13 @@ utils::globalVariables(
 #'
 #' @description This function annotates spectra
 #'
-#' @details It takes two files as input. A query file that will be matched against a library file.
+#' @details It takes two files as input.
+#'    A query file that will be matched against a library file.
 #'    Multiple comparison distances are available
-#'    ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
-#'    Number of matched peaks and their ratio are also available (See MatchForwardReverseParam for details).
+#'    ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle')
+#'    (See MsCoreUtils for details).
+#'    Number of matched peaks and their ratio are also available
+#'    (See MatchForwardReverseParam for details).
 #'    Parallel processing is also made available.
 #'
 #' @include export_output.R
@@ -36,7 +39,8 @@ utils::globalVariables(
 #' @include import_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
-#' @param library Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)
+#' @param library Library containing spectra to match against.
+#'    Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
 #' @param method Method to be used to perform spectral comparison
@@ -45,8 +49,9 @@ utils::globalVariables(
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param npeaks Absolute minimum number of peaks to be matched
 #' @param rpeaks Relative minimum number of peaks to be matched
-#' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
-#' @param qutoff Intensity under which ms2 fragments will be removed previous to comparison.
+#' @param condition Condition to be fulfilled.
+#'    Either 'OR' or 'AND' (mass and peaks minima).
+#' @param qutoff Intensity under which ms2 fragments will be removed.
 #' @param parallel Boolean. Process in parallel
 #' @param fast Boolean. Do it fast
 #' @param approx Perform matching without precursor match
@@ -82,14 +87,17 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         lapply(X = unlist(library), file.exists)
   )
   stopifnot(
-    "Your similarity is not supported, supported similarities are 'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" = method %in%
-      c(
-        "gnps",
-        "navdist",
-        "ndotproduct",
-        "neuclidean",
-        "nspectraangle"
-      )
+    "Your similarity is not supported,
+    supported similarities are
+    'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" =
+      method %in%
+        c(
+          "gnps",
+          "navdist",
+          "ndotproduct",
+          "neuclidean",
+          "nspectraangle"
+        )
   )
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -158,8 +166,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tolerance = dalton,
       MAPFUN = Spectra::joinPeaksGnps,
       FUN = sim_fun,
-      requirePrecursor = ifelse(
-        test = approx,
+      requirePrecursor = ifelse(test = approx,
         yes = FALSE,
         no = TRUE
       ),
@@ -174,13 +181,14 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         args = match_args
       )
     } else {
-      params_sim <- do.call(
-        what = MetaboAnnotation::MatchForwardReverseParam,
-        args = match_args
-      )
+      params_sim <-
+        do.call(
+          what = MetaboAnnotation::MatchForwardReverseParam,
+          args = match_args
+        )
     }
 
-    ## COMMENT (AR): TODO Maybe implement some safety sanitization of the spectra?
+    ## COMMENT (AR): TODO Maybe implement sanitization of the spectra?
     ## Can be very slow otherwise
 
     log_debug("Applying initial intensity filter to query spectra")
@@ -240,7 +248,10 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             ),
           no = target_inchikey_2D
         ),
-        structure_smiles_2D = tidytable::coalesce(target_smiles_2D, target_smiles)
+        structure_smiles_2D = tidytable::coalesce(
+          target_smiles_2D,
+          target_smiles
+        )
       ) |>
       tidytable::select(tidytable::any_of(
         c(
@@ -305,7 +316,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       df_final <- df_empty
     }
   } else {
-    log_debug("No spectra matched the given polarity, returning an empty dataframe")
+    log_debug("No spectra matched the given polarity,
+              returning an empty dataframe")
     df_final <- df_empty
   }
 

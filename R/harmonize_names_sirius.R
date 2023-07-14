@@ -1,10 +1,12 @@
 #' @title Harmonize names sirius
 #'
-#' @description This function harmonizes the names of Sirius outputs to make them compatible
+#' @description This function harmonizes the names of Sirius
+#'    outputs to make them compatible
 #'
 #' @param x Character string containing a name
 #'
-#' @return Character string with the name modified according to the rules specified in the function
+#' @return Character string with the name modified according
+#'    to the rules specified in the function
 #'
 #' @export
 #'

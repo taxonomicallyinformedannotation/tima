@@ -26,8 +26,12 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-create_adducts_neg <- function(masses_table = get("masses_table", envir = parent.frame()),
-                               adducts_table = get("adducts_table", envir = parent.frame())) {
+create_adducts_neg <- function(masses_table = get("masses_table",
+                                 envir = parent.frame()
+                               ),
+                               adducts_table = get("adducts_table",
+                                 envir = parent.frame()
+                               )) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- masses_table |>
     tidytable::tidytable() |>
@@ -52,7 +56,8 @@ create_adducts_neg <- function(masses_table = get("masses_table", envir = parent
     ) |>
     tidytable::select(-colnames(adducts_table))
 
-  ## Pivot the adducts_neg table to get a long format with adduct and adduct mass as columns
+  ## Pivot the adducts_neg table to get a long format
+  ## with adduct and adduct mass as columns
   n <- ncol(adducts_neg)
   adducts_neg <- adducts_neg |>
     tidytable::pivot_longer(2:tidytable::all_of(n)) |>

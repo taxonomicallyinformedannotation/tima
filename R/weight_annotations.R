@@ -33,28 +33,50 @@ utils::globalVariables(
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_chemical Weight for the biological score
 #' @param weight_biological Weight for the chemical consistency score
-#' @param score_biological_domain Score for a `domain` match (should be lower than `kingdom`)
-#' @param score_biological_kingdom Score for a `kingdom` match (should be lower than `phylum`)
-#' @param score_biological_phylum Score for a `phylum` match (should be lower than `class`)
-#' @param score_biological_class Score for a `class` match (should be lower than `order`)
-#' @param score_biological_order Score for a `order` match (should be lower than `infraorder`)
-#' @param score_biological_infraorder Score for a `infraorder` match (should be lower than `order`)
-#' @param score_biological_family Score for a `family` match (should be lower than `subfamily`)
-#' @param score_biological_subfamily Score for a `subfamily` match (should be lower than `family`)
-#' @param score_biological_tribe Score for a `tribe` match (should be lower than `subtribe`)
-#' @param score_biological_subtribe Score for a `subtribe` match (should be lower than `genus`)
-#' @param score_biological_genus Score for a `genus` match (should be lower than `subgenus`)
-#' @param score_biological_subgenus Score for a `subgenus` match (should be lower than `species`)
-#' @param score_biological_species Score for a `species` match (should be lower than `subspecies`)
-#' @param score_biological_subspecies Score for a `subspecies` match (should be lower than `variety`)
-#' @param score_biological_variety Score for a `variety` match (should be the highest)
-#' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match (should be lower than ` Classyfire superclass`)
-#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match (should be lower than `Classyfire class`)
-#' @param score_chemical_cla_class Score for a `Classyfire class` match (should be lower than `Classyfire parent`)
-#' @param score_chemical_cla_parent Score for a `Classyfire parent` match (should be the highest)
-#' @param score_chemical_npc_pathway Score for a `NPC pathway` match (should be lower than ` NPC superclass`)
-#' @param score_chemical_npc_superclass Score for a `NPC superclass` match (should be lower than `NPC class`)
-#' @param score_chemical_npc_class Score for a `NPC class` match (should be the highest)
+#' @param score_biological_domain Score for a `domain` match
+#' (should be lower than `kingdom`)
+#' @param score_biological_kingdom Score for a `kingdom` match
+#' (should be lower than `phylum`)
+#' @param score_biological_phylum Score for a `phylum` match
+#' (should be lower than `class`)
+#' @param score_biological_class Score for a `class` match
+#' (should be lower than `order`)
+#' @param score_biological_order Score for a `order` match
+#' (should be lower than `infraorder`)
+#' @param score_biological_infraorder Score for a `infraorder` match
+#' (should be lower than `order`)
+#' @param score_biological_family Score for a `family` match
+#' (should be lower than `subfamily`)
+#' @param score_biological_subfamily Score for a `subfamily` match
+#' (should be lower than `family`)
+#' @param score_biological_tribe Score for a `tribe` match
+#' (should be lower than `subtribe`)
+#' @param score_biological_subtribe Score for a `subtribe` match
+#' (should be lower than `genus`)
+#' @param score_biological_genus Score for a `genus` match
+#' (should be lower than `subgenus`)
+#' @param score_biological_subgenus Score for a `subgenus` match
+#' (should be lower than `species`)
+#' @param score_biological_species Score for a `species` match
+#' (should be lower than `subspecies`)
+#' @param score_biological_subspecies Score for a `subspecies` match
+#' (should be lower than `variety`)
+#' @param score_biological_variety Score for a `variety` match
+#' (should be the highest)
+#' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match
+#' (should be lower than ` Classyfire superclass`)
+#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match
+#' (should be lower than `Classyfire class`)
+#' @param score_chemical_cla_class Score for a `Classyfire class` match
+#' (should be lower than `Classyfire parent`)
+#' @param score_chemical_cla_parent Score for a `Classyfire parent` match
+#' (should be the highest)
+#' @param score_chemical_npc_pathway Score for a `NPC pathway` match
+#' (should be lower than ` NPC superclass`)
+#' @param score_chemical_npc_superclass Score for a `NPC superclass`
+#' match (should be lower than `NPC class`)
+#' @param score_chemical_npc_class Score for a `NPC class` match
+#' (should be the highest)
 #' @param force Force parameters. Use it at your own risk
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
@@ -219,7 +241,8 @@ weight_annotations <-
     annot_table_wei_bio |>
       decorate_bio()
 
-    log_debug(x = "cleaning taxonomically informed results and preparing for chemically informed scoring")
+    log_debug(x = "cleaning taxonomically informed results and
+              preparing for chemically informed scoring")
     annot_table_wei_bio_clean <- clean_bio()
 
     log_debug(x = "performing chemically informed scoring")
@@ -233,7 +256,10 @@ weight_annotations <-
 
     log_debug(x = "Exporting ...")
     time <- format(Sys.time(), "%y%m%d_%H%M%OS")
-    dir_time <- file.path(paths$data$processed$path, paste0(time, "_", pattern))
+    dir_time <- file.path(
+      paths$data$processed$path,
+      paste0(time, "_", pattern)
+    )
     final_output <- file.path(
       dir_time,
       output

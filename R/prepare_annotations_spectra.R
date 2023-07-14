@@ -28,7 +28,8 @@ utils::globalVariables(
 
 #' @title Prepare annotations MS2
 #'
-#' @description This function prepares the spectral matches obtained previously to make them compatible
+#' @description This function prepares the spectral matches
+#'    obtained previously to make them compatible
 #'
 #' @include export_output.R
 #' @include export_params.R

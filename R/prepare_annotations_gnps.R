@@ -45,7 +45,7 @@ utils::globalVariables(
 
 #' @title Prepare annotations GNPS
 #'
-#' @description This function prepares GNPS obtained annotations for further use
+#' @description This function prepares GNPS obtained annotations
 #'
 #' @include export_output.R
 #' @include export_params.R

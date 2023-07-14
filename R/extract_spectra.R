@@ -59,7 +59,8 @@ extract_spectra <- function(object) {
       .fns = as.integer
     ))
 
-  ## Select all columns except those specified in 'incoherent_colnames', and rename the remaining columns using the names in 'incoherent_colnames'
+  ## Select all columns except those specified in 'incoherent_colnames',
+  ## and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
     dplyr::select(-c(dplyr::any_of(incoherent_colnames))) |>
     dplyr::rename(dplyr::any_of(incoherent_colnames))

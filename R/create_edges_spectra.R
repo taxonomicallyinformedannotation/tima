@@ -7,7 +7,8 @@ utils::globalVariables(c(
 
 #' @title Create edges spectra
 #'
-#' @description This function create edges based on fragmentation spectra similarity
+#' @description This function create edges
+#'    based on fragmentation spectra similarity
 #'
 #' @include create_edges_parallel.R
 #' @include import_spectra.R
@@ -25,8 +26,9 @@ utils::globalVariables(c(
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param npeaks Absolute minimum number of peaks to be matched
 #' @param rpeaks Relative minimum number of peaks to be matched
-#' @param condition Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).
-#' @param qutoff Intensity under which ms2 fragments will be removed previous to comparison.
+#' @param condition Condition to be fulfilled.
+#'    Either 'OR' or 'AND' (mass and peaks minima).
+#' @param qutoff Intensity under which ms2 fragments will be removed.
 #' @param parallel Boolean. Process in parallel
 #' @param fast Boolean. Do it fast
 #' @param parameters Params
@@ -53,14 +55,16 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
                                  parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot(
-    "Your similarity is not supported, supported similarities are 'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" = method %in%
-      c(
-        "gnps",
-        "navdist",
-        "ndotproduct",
-        "neuclidean",
-        "nspectraangle"
-      )
+    "Your similarity is not supported, supported similarities are
+    'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" =
+      method %in%
+        c(
+          "gnps",
+          "navdist",
+          "ndotproduct",
+          "neuclidean",
+          "nspectraangle"
+        )
   )
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -166,10 +170,12 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
       ))
   } else {
     log_debug(
-      "The computation of all vs all spectra is very expensive, skipping it to get quick results."
+      "The computation of all vs all spectra is very expensive,
+      skipping it to get quick results."
     )
     log_debug(
-      "Chemical consistency will only be calculated based on the mass edges, no spectral edges taken into account."
+      "Chemical consistency will only be calculated based on the mass edges,
+      no spectral edges taken into account."
     )
     log_debug("Pre-computed GNPS edges are a way to go.")
     edges <- data.frame(

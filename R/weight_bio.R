@@ -60,22 +60,35 @@ utils::globalVariables(
 
 #' @title Weight bio
 #'
-#' @description This function weights the eventually MS1 complemented annotations according their biological source
+#' @description This function weights the eventually MS1
+#' complemented annotations according their biological source
 #'
-#' @param annotation_table_taxed Table containing the initial annotation eventually complemented by additional MS1 annotations
-#' @param structure_organism_pairs_table Table containing the structure - organism pairs
+#' @param annotation_table_taxed Table containing the initial annotation
+#' eventually complemented by additional MS1 annotations
+#' @param structure_organism_pairs_table Table containing the
+#' structure - organism pairs
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_biological Weight for the biological score
-#' @param score_biological_domain Score for a `domain` match (should be lower than `kingdom`)
-#' @param score_biological_kingdom Score for a `kingdom` match (should be lower than `phylum`)
-#' @param score_biological_phylum Score for a `phylum` match (should be lower than `class`)
-#' @param score_biological_class Score for a `class` match (should be lower than `order`)
-#' @param score_biological_order Score for a `order` match (should be lower than `family`)
-#' @param score_biological_family Score for a `family` match (should be lower than `tribe`)
-#' @param score_biological_tribe Score for a `tribe` match (should be lower than `genus`)
-#' @param score_biological_genus Score for a `genus` match (should be lower than `species`)
-#' @param score_biological_species Score for a `species` match (should be lower than `variety`)
-#' @param score_biological_variety Score for a `variety` match (should be the highest)
+#' @param score_biological_domain Score for a `domain` match
+#' (should be lower than `kingdom`)
+#' @param score_biological_kingdom Score for a `kingdom` match
+#'  (should be lower than `phylum`)
+#' @param score_biological_phylum Score for a `phylum` match
+#'  (should be lower than `class`)
+#' @param score_biological_class Score for a `class` match
+#' (should be lower than `order`)
+#' @param score_biological_order Score for a `order` match
+#' (should be lower than `family`)
+#' @param score_biological_family Score for a `family` match
+#' (should be lower than `tribe`)
+#' @param score_biological_tribe Score for a `tribe` match
+#' (should be lower than `genus`)
+#' @param score_biological_genus Score for a `genus` match
+#' (should be lower than `species`)
+#' @param score_biological_species Score for a `species` match
+#'  (should be lower than `variety`)
+#' @param score_biological_variety Score for a `variety` match
+#' (should be the highest)
 #'
 #' @return A table containing the biologically weighted annotation
 #'
@@ -83,20 +96,62 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_bio <-
-  function(annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
-           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
-           weight_spectral = get("weight_spectral", envir = parent.frame()),
-           weight_biological = get("weight_biological", envir = parent.frame()),
-           score_biological_domain = get("score_biological_domain", envir = parent.frame()),
-           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
-           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
-           score_biological_class = get("score_biological_class", envir = parent.frame()),
-           score_biological_order = get("score_biological_order", envir = parent.frame()),
-           score_biological_family = get("score_biological_family", envir = parent.frame()),
-           score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
-           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
-           score_biological_species = get("score_biological_species", envir = parent.frame()),
-           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
+  function(annotation_table_taxed = get(
+             "annotation_table_taxed",
+             envir = parent.frame()
+           ),
+           structure_organism_pairs_table = get(
+             "structure_organism_pairs_table",
+             envir = parent.frame()
+           ),
+           weight_spectral = get(
+             "weight_spectral",
+             envir = parent.frame()
+           ),
+           weight_biological = get(
+             "weight_biological",
+             envir = parent.frame()
+           ),
+           score_biological_domain = get(
+             "score_biological_domain",
+             envir = parent.frame()
+           ),
+           score_biological_kingdom = get(
+             "score_biological_kingdom",
+             envir = parent.frame()
+           ),
+           score_biological_phylum = get(
+             "score_biological_phylum",
+             envir = parent.frame()
+           ),
+           score_biological_class = get(
+             "score_biological_class",
+             envir = parent.frame()
+           ),
+           score_biological_order = get(
+             "score_biological_order",
+             envir = parent.frame()
+           ),
+           score_biological_family = get(
+             "score_biological_family",
+             envir = parent.frame()
+           ),
+           score_biological_tribe = get(
+             "score_biological_tribe",
+             envir = parent.frame()
+           ),
+           score_biological_genus = get(
+             "score_biological_genus",
+             envir = parent.frame()
+           ),
+           score_biological_species = get(
+             "score_biological_species",
+             envir = parent.frame()
+           ),
+           score_biological_variety = get(
+             "score_biological_variety",
+             envir = parent.frame()
+           )) {
     metadata <- annotation_table_taxed |>
       tidytable::select(
         feature_id,
@@ -355,7 +410,10 @@ weight_bio <-
     step_dom <- tidytable::left_join(sample_domain, candidate_domain) |>
       tidyft::filter(candidate_organism_01_domain != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_01_domain, str = sample_organism_01_domain)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_01_domain,
+          str = sample_organism_01_domain
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_domain) |>
       tidytable::left_join(
@@ -380,7 +438,10 @@ weight_bio <-
     step_kin <- tidytable::left_join(step_kin, candidate_kingdom) |>
       tidyft::filter(candidate_organism_02_kingdom != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_02_kingdom, str = sample_organism_02_kingdom)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_02_kingdom,
+          str = sample_organism_02_kingdom
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_kingdom) |>
       tidytable::left_join(
@@ -405,7 +466,10 @@ weight_bio <-
     step_phy <- tidytable::left_join(step_phy, candidate_phylum) |>
       tidyft::filter(candidate_organism_03_phylum != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_03_phylum, str = sample_organism_03_phylum)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_03_phylum,
+          str = sample_organism_03_phylum
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_phylum) |>
       tidytable::left_join(
@@ -430,7 +494,10 @@ weight_bio <-
     step_cla <- tidytable::left_join(step_cla, candidate_class) |>
       tidyft::filter(candidate_organism_04_class != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_04_class, str = sample_organism_04_class)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_04_class,
+          str = sample_organism_04_class
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_class) |>
       tidytable::left_join(
@@ -455,7 +522,10 @@ weight_bio <-
     step_ord <- tidytable::left_join(step_ord, candidate_order) |>
       tidyft::filter(candidate_organism_05_order != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_05_order, str = sample_organism_05_order)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_05_order,
+          str = sample_organism_05_order
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_order) |>
       tidytable::left_join(
@@ -479,7 +549,9 @@ weight_bio <-
     ##   tidytable::left_join(step_ord2, candidate_infraorder) |>
     ##   tidyft::filter(candidate_organism_05_1_infraorder != "notClassified") |>
     ##   dplyr::filter(
-    ##     stringi::stri_detect_regex(pattern = candidate_organism_05_1_infraorder, str = sample_organism_05_1_infraorder)
+    ##     stringi::stri_detect_regex(
+    ## pattern = candidate_organism_05_1_infraorder,
+    ## str = sample_organism_05_1_infraorder)
     ##   ) |>
     ##   dplyr::mutate(score_biological = scoreBiologicalInfraorder) |>
     ##   tidytable::left_join(
@@ -501,7 +573,10 @@ weight_bio <-
     step_fam <- tidytable::left_join(step_fam, candidate_family) |>
       tidyft::filter(candidate_organism_06_family != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_06_family, str = sample_organism_06_family)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_06_family,
+          str = sample_organism_06_family
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_family) |>
       tidytable::left_join(
@@ -524,7 +599,9 @@ weight_bio <-
     ## step_fam2 <- tidytable::left_join(step_fam2, candidate_subfamily) |>
     ##   tidyft::filter(candidate_organism_06_1_subfamily != "notClassified") |>
     ##   dplyr::filter(
-    ##     stringi::stri_detect_regex(pattern = candidate_organism_06_1_subfamily, str = sample_organism_06_1_subfamily)
+    ##     stringi::stri_detect_regex(
+    ## pattern = candidate_organism_06_1_subfamily,
+    ## str = sample_organism_06_1_subfamily)
     ##   ) |>
     ##   dplyr::mutate(score_biological = scoreBiologicalSubfamily) |>
     ##   tidytable::left_join(
@@ -546,7 +623,10 @@ weight_bio <-
     step_tri <- tidytable::left_join(step_tri, candidate_tribe) |>
       tidyft::filter(candidate_organism_07_tribe != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_07_tribe, str = sample_organism_07_tribe)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_07_tribe,
+          str = sample_organism_07_tribe
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_tribe) |>
       tidytable::left_join(
@@ -571,7 +651,9 @@ weight_bio <-
     ## step_tri2 <- tidytable::left_join(step_tri2, candidate_subtribe) |>
     ##   tidyft::filter(candidate_organism_07_1_subtribe != "notClassified") |>
     ##   dplyr::filter(
-    ##     stringi::stri_detect_regex(pattern = candidate_organism_07_1_subtribe, str = sample_organism_07_1_subtribe)
+    ##     stringi::stri_detect_regex(
+    ## pattern = candidate_organism_07_1_subtribe,
+    ## str = sample_organism_07_1_subtribe)
     ##   ) |>
     ##   dplyr::mutate(score_biological = scoreBiologicalSubtribe) |>
     ##   tidytable::left_join(
@@ -593,7 +675,10 @@ weight_bio <-
     step_gen <- tidytable::left_join(step_gen, candidate_genus) |>
       tidyft::filter(candidate_organism_08_genus != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_08_genus, str = sample_organism_08_genus)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_08_genus,
+          str = sample_organism_08_genus
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_genus) |>
       tidytable::left_join(
@@ -617,7 +702,9 @@ weight_bio <-
     ##   tidytable::left_join(step_gen2, candidate_subgenus) |>
     ##   tidyft::filter(candidate_organism_08_1_subgenus != "notClassified") |>
     ##   dplyr::filter(
-    ##     stringi::stri_detect_regex(pattern = candidate_organism_08_1_subgenus, str = sample_organism_08_1_subgenus)
+    ##     stringi::stri_detect_regex(
+    ## pattern = candidate_organism_08_1_subgenus,
+    ## str = sample_organism_08_1_subgenus)
     ##   ) |>
     ##   dplyr::mutate(score_biological = scoreBiologicalSubgenus) |>
     ##   tidytable::left_join(
@@ -639,7 +726,10 @@ weight_bio <-
     step_spe <- tidytable::left_join(step_spe, candidate_species) |>
       tidyft::filter(candidate_organism_09_species != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_09_species, str = sample_organism_09_species)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_09_species,
+          str = sample_organism_09_species
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_species) |>
       tidytable::left_join(
@@ -663,7 +753,9 @@ weight_bio <-
     ##   tidytable::left_join(step_spe2, candidate_subspecies) |>
     ##   tidyft::filter(candidate_organism_09_1_subspecies != "notClassified") |>
     ##   dplyr::filter(
-    ##     stringi::stri_detect_regex(pattern = candidate_organism_09_1_subspecies, str = sample_organism_09_1_subspecies)
+    ##     stringi::stri_detect_regex(
+    ## pattern = candidate_organism_09_1_subspecies,
+    ## str = sample_organism_09_1_subspecies)
     ##   ) |>
     ##   dplyr::mutate(score_biological = scoreBiologicalSubspecies) |>
     ##   tidytable::left_join(
@@ -685,7 +777,10 @@ weight_bio <-
     step_var <- tidytable::left_join(step_var, candidate_varietas) |>
       tidyft::filter(candidate_organism_10_varietas != "notClassified") |>
       dplyr::filter(
-        stringi::stri_detect_regex(pattern = candidate_organism_10_varietas, str = sample_organism_10_varietas)
+        stringi::stri_detect_regex(
+          pattern = candidate_organism_10_varietas,
+          str = sample_organism_10_varietas
+        )
       ) |>
       dplyr::mutate(score_biological = score_biological_variety) |>
       tidytable::left_join(

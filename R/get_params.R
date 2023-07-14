@@ -11,7 +11,8 @@ utils::globalVariables(
 
 #' @title Get parameters
 #'
-#' @description This function gets the parameters for the job. Combination of cli and yaml parameters
+#' @description This function gets the parameters for the job.
+#'    Combination of cli and yaml parameters
 #'
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R

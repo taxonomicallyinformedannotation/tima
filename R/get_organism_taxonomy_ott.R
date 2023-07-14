@@ -7,7 +7,8 @@ utils::globalVariables(c(
 
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
 #'
-#' @description This function retrieves taxonomy from the Open Tree of Life taxonomy
+#' @description This function retrieves taxonomy
+#'    from the Open Tree of Life taxonomy
 #'
 #' @param df Dataframe containing your organism(s) name(s)
 #' @param url url of the ott api (for testing purposes)
@@ -18,9 +19,10 @@ utils::globalVariables(c(
 #' @export
 #'
 #' @examples NULL
-get_organism_taxonomy_ott <- function(df,
-                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about",
-                                      retry = TRUE) {
+get_organism_taxonomy_ott <- function(
+    df,
+    url = "https://api.opentreeoflife.org/v3/taxonomy/about",
+    retry = TRUE) {
   organism_table <- df |>
     dplyr::mutate(organism = organism |>
       trimws()) |>
