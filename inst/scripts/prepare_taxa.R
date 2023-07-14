@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "prepare_taxa"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green("informs taxonomically features")
@@ -22,7 +18,6 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-# prepare_taxa()
 targets::tar_make(names = matches("tax_pre"))
 
 end <- Sys.time()

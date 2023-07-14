@@ -4,10 +4,10 @@ source(file = "R/save_input.R")
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 server <- function(input, output, session) {
-  # Observe helpers
+  ## Observe helpers
   shinyhelper::observe_helpers()
 
-  # Enable the Submit button when all mandatory fields are filled out
+  ## Enable the Submit button when all mandatory fields are filled out
   shiny::observe(x = {
     mandatory_filled <-
       vapply(
@@ -27,7 +27,7 @@ server <- function(input, output, session) {
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
   })
 
-  # Special check for taxon name
+  ## Special check for taxon name
   iv <- InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
     if (!grepl(pattern = "^[[:upper:]]", x = taxon)) {
@@ -44,16 +44,16 @@ server <- function(input, output, session) {
   })
   iv$enable()
 
-  # When the Save button is clicked, save the response
+  ## When the Save button is clicked, save the response
   shiny::observeEvent(
     eventExpr = input$save,
     handlerExpr = {
-      # User-experience stuff
+      ## User-experience stuff
       shinyjs::show("save_msg")
       shinyjs::enable("launch")
       shinyjs::hide("error")
 
-      # Save the data (show an error message in case of error)
+      ## Save the data (show an error message in case of error)
       tryCatch(
         expr = {
           save_input(input = input)
@@ -93,7 +93,6 @@ server <- function(input, output, session) {
           display = "graph",
           displays = c("summary", "graph"),
           degree_from = 10,
-          # level_separation = 500,
           outdated = TRUE,
           targets_only = TRUE,
           supervise = TRUE,

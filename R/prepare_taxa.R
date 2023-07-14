@@ -108,7 +108,7 @@ prepare_taxa <-
     log_debug(x = "... filtering top K intensities per feature")
     top_n <- feature_table |>
       tidyfst::rn_col() |>
-      tidytable::pivot_longer(cols = 1:ncol(feature_table) + 1) |>
+      tidytable::pivot_longer(cols = seq_len(ncol(feature_table)) + 1) |>
       dplyr::filter(value != 0) |>
       dplyr::mutate(rank = rank(-value), .by = c(rowname)) |>
       dplyr::filter(rank <= top_k) |>

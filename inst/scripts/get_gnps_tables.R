@@ -5,8 +5,6 @@ require(
   quietly = TRUE
 )
 
-# paths <- parse_yaml_paths()
-
 log_debug(
   "This script",
   crayon::green("prepares adducts")
@@ -14,7 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# get_gnps_tables()
 targets::tar_make(names = matches("gnps_tables"))
 
 end <- Sys.time()

@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "prepare_libraries_sop_closed"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green("prepares closed referenced structure-organism pairs \n")
@@ -16,7 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# prepare_libraries_sop_closed()
 targets::tar_make(names = matches("lib_sop_clo_pre"))
 
 end <- Sys.time()

@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "prepare_features_tables"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script",
   crayon::green("prepares features")
@@ -16,7 +12,6 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-# prepare_features_tables()
 targets::tar_make(names = matches("fea_pre"))
 
 end <- Sys.time()

@@ -5,10 +5,6 @@ require(
   quietly = TRUE
 )
 
-# step <- "weight_annotations"
-# paths <- parse_yaml_paths()
-# params <- get_params(step = step)
-
 log_debug(
   "This script performs",
   crayon::green("taxonomically informed scoring"),
@@ -24,7 +20,6 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-# weight_annotations()
 targets::tar_make(names = matches("ann_pre$"))
 
 end <- Sys.time()

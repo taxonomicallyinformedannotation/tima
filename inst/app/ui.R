@@ -1229,10 +1229,6 @@ ui <- fluidPage(
     shinyjs::hidden(div(
       id = "job_msg",
       h3("Job is running!")
-      # h4("You can follow it at", a(
-      #   href = "http://localhost:3839/",
-      #   "http://localhost:3839/"
-      # ))
     )),
     shinyjs::hidden(div(
       targets::tar_watch_ui(
