@@ -18,7 +18,8 @@ export_params(
 \item{step}{step identifier to be included in the YAML file name}
 }
 \description{
-This function writes the parameters to a YAML file in the specified directory.
+This function writes the parameters
+to a YAML file in the specified directory.
 }
 \examples{
 NULL

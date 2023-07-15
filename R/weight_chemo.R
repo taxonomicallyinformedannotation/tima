@@ -58,13 +58,15 @@ utils::globalVariables(
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
-#' @param annot_table_wei_bio_clean Table containing the biologically weighted annotation
+#' @param annot_table_wei_bio_clean Table containing the biologically
+#' weighted annotation
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_biological Weight for the biological score
 #' @param weight_chemical Weight for the chemical consistency score
 #' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match
 #' (should be lower than ` Classyfire superclass`)
-#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match
+#' @param score_chemical_cla_superclass Score for a `Classyfire superclass`
+#'  match
 #'  (should be lower than `Classyfire class`)
 #' @param score_chemical_cla_class Score for a `Classyfire class` match
 #' (should be lower than `Classyfire parent`)

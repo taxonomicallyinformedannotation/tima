@@ -17,7 +17,8 @@ dist_get(d, idx1, idx2)
 Distance between the two elements
 }
 \description{
-This function calculates the distance between two elements in a distance matrix
+This function calculates the distance between
+two elements in a distance matrix
 }
 \details{
 Credit goes to usedist package

@@ -43,9 +43,10 @@ create_edges_spectra(
 
 \item{rpeaks}{Relative minimum number of peaks to be matched}
 
-\item{condition}{Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).}
+\item{condition}{Condition to be fulfilled.
+Either 'OR' or 'AND' (mass and peaks minima).}
 
-\item{qutoff}{Intensity under which ms2 fragments will be removed previous to comparison.}
+\item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{parallel}{Boolean. Process in parallel}
 
@@ -54,7 +55,8 @@ create_edges_spectra(
 \item{parameters}{Params}
 }
 \description{
-This function create edges based on fragmentation spectra similarity
+This function create edges
+based on fragmentation spectra similarity
 }
 \examples{
 NULL

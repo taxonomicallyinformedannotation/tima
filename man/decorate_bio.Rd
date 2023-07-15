@@ -36,7 +36,8 @@ decorate_bio(
 \item{score_biological_variety}{Variety score}
 }
 \value{
-Message indicating the number of annotations weighted at each biological level
+Message indicating the number of annotations
+weighted at each biological level
 }
 \description{
 This function outputs information about biological weighting

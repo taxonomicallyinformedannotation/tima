@@ -7,7 +7,8 @@
 parse_yaml_paths(file = "inst/paths.yaml")
 }
 \arguments{
-\item{file}{The file name of the YAML file containing the paths (default is "inst/paths.yaml")}
+\item{file}{The file name of the YAML file containing the paths
+(default is "inst/paths.yaml")}
 }
 \value{
 A list containing the paths specified in the YAML file

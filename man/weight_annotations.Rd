@@ -79,49 +79,71 @@ weight_annotations(
 
 \item{weight_biological}{Weight for the chemical consistency score}
 
-\item{score_biological_domain}{Score for a \code{domain} match (should be lower than \code{kingdom})}
+\item{score_biological_domain}{Score for a \code{domain} match
+(should be lower than \code{kingdom})}
 
-\item{score_biological_kingdom}{Score for a \code{kingdom} match (should be lower than \code{phylum})}
+\item{score_biological_kingdom}{Score for a \code{kingdom} match
+(should be lower than \code{phylum})}
 
-\item{score_biological_phylum}{Score for a \code{phylum} match (should be lower than \code{class})}
+\item{score_biological_phylum}{Score for a \code{phylum} match
+(should be lower than \code{class})}
 
-\item{score_biological_class}{Score for a \code{class} match (should be lower than \code{order})}
+\item{score_biological_class}{Score for a \code{class} match
+(should be lower than \code{order})}
 
-\item{score_biological_order}{Score for a \code{order} match (should be lower than \code{infraorder})}
+\item{score_biological_order}{Score for a \code{order} match
+(should be lower than \code{infraorder})}
 
-\item{score_biological_infraorder}{Score for a \code{infraorder} match (should be lower than \code{order})}
+\item{score_biological_infraorder}{Score for a \code{infraorder} match
+(should be lower than \code{order})}
 
-\item{score_biological_family}{Score for a \code{family} match (should be lower than \code{subfamily})}
+\item{score_biological_family}{Score for a \code{family} match
+(should be lower than \code{subfamily})}
 
-\item{score_biological_subfamily}{Score for a \code{subfamily} match (should be lower than \code{family})}
+\item{score_biological_subfamily}{Score for a \code{subfamily} match
+(should be lower than \code{family})}
 
-\item{score_biological_tribe}{Score for a \code{tribe} match (should be lower than \code{subtribe})}
+\item{score_biological_tribe}{Score for a \code{tribe} match
+(should be lower than \code{subtribe})}
 
-\item{score_biological_subtribe}{Score for a \code{subtribe} match (should be lower than \code{genus})}
+\item{score_biological_subtribe}{Score for a \code{subtribe} match
+(should be lower than \code{genus})}
 
-\item{score_biological_genus}{Score for a \code{genus} match (should be lower than \code{subgenus})}
+\item{score_biological_genus}{Score for a \code{genus} match
+(should be lower than \code{subgenus})}
 
-\item{score_biological_subgenus}{Score for a \code{subgenus} match (should be lower than \code{species})}
+\item{score_biological_subgenus}{Score for a \code{subgenus} match
+(should be lower than \code{species})}
 
-\item{score_biological_species}{Score for a \code{species} match (should be lower than \code{subspecies})}
+\item{score_biological_species}{Score for a \code{species} match
+(should be lower than \code{subspecies})}
 
-\item{score_biological_subspecies}{Score for a \code{subspecies} match (should be lower than \code{variety})}
+\item{score_biological_subspecies}{Score for a \code{subspecies} match
+(should be lower than \code{variety})}
 
-\item{score_biological_variety}{Score for a \code{variety} match (should be the highest)}
+\item{score_biological_variety}{Score for a \code{variety} match
+(should be the highest)}
 
-\item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match (should be lower than \verb{ Classyfire superclass})}
+\item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match
+(should be lower than \verb{ Classyfire superclass})}
 
-\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass} match (should be lower than \verb{Classyfire class})}
+\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass} match
+(should be lower than \verb{Classyfire class})}
 
-\item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match (should be lower than \verb{Classyfire parent})}
+\item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match
+(should be lower than \verb{Classyfire parent})}
 
-\item{score_chemical_cla_parent}{Score for a \verb{Classyfire parent} match (should be the highest)}
+\item{score_chemical_cla_parent}{Score for a \verb{Classyfire parent} match
+(should be the highest)}
 
-\item{score_chemical_npc_pathway}{Score for a \verb{NPC pathway} match (should be lower than \verb{ NPC superclass})}
+\item{score_chemical_npc_pathway}{Score for a \verb{NPC pathway} match
+(should be lower than \verb{ NPC superclass})}
 
-\item{score_chemical_npc_superclass}{Score for a \verb{NPC superclass} match (should be lower than \verb{NPC class})}
+\item{score_chemical_npc_superclass}{Score for a \verb{NPC superclass}
+match (should be lower than \verb{NPC class})}
 
-\item{score_chemical_npc_class}{Score for a \verb{NPC class} match (should be the highest)}
+\item{score_chemical_npc_class}{Score for a \verb{NPC class} match
+(should be the highest)}
 
 \item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 

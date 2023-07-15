@@ -222,7 +222,8 @@ prepare_libraries_sop_merged <-
         tidytable::distinct()
 
       stopifnot(
-        "Your filter led to no entries, try to change it." = nrow(table_keys) != 0
+        "Your filter led to no entries,
+        try to change it." = nrow(table_keys) != 0
       )
     }
 

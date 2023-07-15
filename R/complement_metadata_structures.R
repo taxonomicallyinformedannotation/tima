@@ -162,11 +162,16 @@ complement_metadata_structures <- function(df,
   ) |>
     tidytable::select(
       structure_inchikey_2D,
-      structure_taxonomy_classyfire_chemontid_i = structure_taxonomy_classyfire_chemontid,
-      structure_taxonomy_classyfire_01kingdom_i = structure_taxonomy_classyfire_01kingdom,
-      structure_taxonomy_classyfire_02superclass_i = structure_taxonomy_classyfire_02superclass,
-      structure_taxonomy_classyfire_03class_i = structure_taxonomy_classyfire_03class,
-      structure_taxonomy_classyfire_04directparent_i = structure_taxonomy_classyfire_04directparent
+      structure_taxonomy_classyfire_chemontid_i =
+        structure_taxonomy_classyfire_chemontid,
+      structure_taxonomy_classyfire_01kingdom_i =
+        structure_taxonomy_classyfire_01kingdom,
+      structure_taxonomy_classyfire_02superclass_i =
+        structure_taxonomy_classyfire_02superclass,
+      structure_taxonomy_classyfire_03class_i =
+        structure_taxonomy_classyfire_03class,
+      structure_taxonomy_classyfire_04directparent_i =
+        structure_taxonomy_classyfire_04directparent
     ) |>
     tidytable::distinct(structure_inchikey_2D, .keep_all = TRUE)
 
@@ -176,9 +181,12 @@ complement_metadata_structures <- function(df,
   ) |>
     tidytable::select(
       structure_smiles_2D,
-      structure_taxonomy_npclassifier_01pathway_s = structure_taxonomy_npclassifier_01pathway,
-      structure_taxonomy_npclassifier_02superclass_s = structure_taxonomy_npclassifier_02superclass,
-      structure_taxonomy_npclassifier_03class_s = structure_taxonomy_npclassifier_03class,
+      structure_taxonomy_npclassifier_01pathway_s =
+        structure_taxonomy_npclassifier_01pathway,
+      structure_taxonomy_npclassifier_02superclass_s =
+        structure_taxonomy_npclassifier_02superclass,
+      structure_taxonomy_npclassifier_03class_s =
+        structure_taxonomy_npclassifier_03class,
     ) |>
     tidytable::distinct(structure_smiles_2D, .keep_all = TRUE)
 

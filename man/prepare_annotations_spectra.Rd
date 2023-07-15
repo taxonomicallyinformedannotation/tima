@@ -33,7 +33,8 @@ prepare_annotations_spectra(
 \item{parameters}{Params}
 }
 \description{
-This function prepares the spectral matches obtained previously to make them compatible
+This function prepares the spectral matches
+obtained previously to make them compatible
 }
 \examples{
 NULL

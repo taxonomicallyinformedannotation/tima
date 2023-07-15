@@ -72,7 +72,8 @@ prepare_libraries_spectra(
 \item{parameters}{Params}
 }
 \description{
-This function prepares spectra to be used for spectral matching
+This function prepares spectra
+to be used for spectral matching
 }
 \examples{
 NULL

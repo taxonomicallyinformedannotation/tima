@@ -10,10 +10,12 @@ harmonize_names_sirius(x)
 \item{x}{Character string containing a name}
 }
 \value{
-Character string with the name modified according to the rules specified in the function
+Character string with the name modified according
+to the rules specified in the function
 }
 \description{
-This function harmonizes the names of Sirius outputs to make them compatible
+This function harmonizes the names of Sirius
+outputs to make them compatible
 }
 \examples{
 harmonized_name <- harmonize_names_sirius("My_name")

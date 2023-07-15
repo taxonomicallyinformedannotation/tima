@@ -13,7 +13,8 @@ utils::globalVariables(
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example
 #' @param filename Name of the file
-#' @param workflow Character string indicating the type of workflow, either "fbmn" or "classical"
+#' @param workflow Character string indicating the type of workflow,
+#'    either "fbmn" or "classical"
 #' @param path_features Path to features
 #' @param path_metadata Path to metadata
 #' @param path_spectra Path to spectra
@@ -43,9 +44,16 @@ get_gnps_tables <-
       }
     }
     if (!is.null(gnps_job_id)) {
-      stopifnot("Your GNPS job ID is invalid" = stringi::stri_length(str = gnps_job_id) == 32)
       stopifnot(
-        "Your workflow is not supported, supported workflows are 'fbmn' and 'classical'" = workflow %in% c("fbmn", "classical")
+        "Your GNPS job ID is invalid" =
+          stringi::stri_length(
+            str = gnps_job_id
+          ) == 32
+      )
+      stopifnot(
+        "Your workflow is not supported,
+        supported workflows are 'fbmn' and 'classical'" =
+          workflow %in% c("fbmn", "classical")
       )
 
       gnps_url <-

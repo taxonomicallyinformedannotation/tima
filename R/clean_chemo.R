@@ -104,7 +104,8 @@ clean_chemo <-
            features_table = get("features_table",
              envir = parent.frame()
            ),
-           structure_organism_pairs_table = get("structure_organism_pairs_table",
+           structure_organism_pairs_table = get(
+             "structure_organism_pairs_table",
              envir = parent.frame()
            ),
            candidates_final = get("candidates_final",
@@ -170,13 +171,20 @@ clean_chemo <-
         structure_inchikey_2D,
         structure_smiles_2D,
         structure_name,
-        structure_01_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
-        structure_01_npc_pathway = structure_taxonomy_npclassifier_01pathway,
-        structure_02_cla_superclass = structure_taxonomy_classyfire_02superclass,
-        structure_02_npc_superclass = structure_taxonomy_npclassifier_02superclass,
-        structure_03_cla_class = structure_taxonomy_classyfire_03class,
-        structure_03_npc_class = structure_taxonomy_npclassifier_03class,
-        structure_04_cla_parent = structure_taxonomy_classyfire_04directparent,
+        structure_01_cla_kingdom =
+          structure_taxonomy_classyfire_01kingdom,
+        structure_01_npc_pathway =
+          structure_taxonomy_npclassifier_01pathway,
+        structure_02_cla_superclass =
+          structure_taxonomy_classyfire_02superclass,
+        structure_02_npc_superclass =
+          structure_taxonomy_npclassifier_02superclass,
+        structure_03_cla_class =
+          structure_taxonomy_classyfire_03class,
+        structure_03_npc_class =
+          structure_taxonomy_npclassifier_03class,
+        structure_04_cla_parent =
+          structure_taxonomy_classyfire_04directparent,
         library,
         error_mz,
         error_rt,

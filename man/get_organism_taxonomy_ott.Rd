@@ -18,7 +18,8 @@ get_organism_taxonomy_ott(
 \item{retry}{Boolean. Retry with generic epithet}
 }
 \description{
-This function retrieves taxonomy from the Open Tree of Life taxonomy
+This function retrieves taxonomy
+from the Open Tree of Life taxonomy
 }
 \examples{
 NULL

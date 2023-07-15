@@ -12,10 +12,13 @@ dist_groups(d, g)
 \item{g}{A grouping vector for the distance object}
 }
 \value{
-A data frame containing distance information between pairs of observations
-in the distance object, with columns for the names or indices of the observations,
-the group labels for each observation, and the distance between the observations.
-The label column indicates whether the distance is within a group or between groups.
+A data frame containing distance information
+between pairs of observations in the distance object,
+with columns for the names or indices of the observations,
+the group labels for each observation,
+and the distance between the observations.
+The label column indicates whether the distance is
+within a group or between groups.
 }
 \description{
 This function gets distances per group

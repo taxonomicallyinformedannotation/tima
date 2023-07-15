@@ -25,9 +25,11 @@ prepare_libraries_sop_merged(
 
 \item{filter}{Boolean. TRUE or FALSE if you want to filter the library}
 
-\item{level}{Biological rank to be filtered. Kingdom, phylum, family, genus, ...}
+\item{level}{Biological rank to be filtered.
+Kingdom, phylum, family, genus, ...}
 
-\item{value}{Name of the taxon or taxa to be kept, e.g. 'Gentianaceae|Apocynaceae'}
+\item{value}{Name of the taxon or taxa to be kept,
+e.g. 'Gentianaceae|Apocynaceae'}
 
 \item{output_key}{Output file for keys}
 
@@ -46,10 +48,12 @@ prepare_libraries_sop_merged(
 \item{parameters}{Param}
 }
 \description{
-This function prepares the libraries made of all sub-libraries containing structure-organism pairs
+This function prepares the libraries made of
+all sub-libraries containing structure-organism pairs
 }
 \details{
-It can be restricted to specific taxa to have more biologically meaningful annotation.
+It can be restricted to specific taxa to have
+more biologically meaningful annotation.
 }
 \examples{
 NULL

@@ -12,7 +12,8 @@ export_output(x, file = output)
 \item{file}{path to the output file}
 }
 \description{
-This function creates the output directory if it doesn't exist and exports the data frame to a tab-delimited file.
+This function creates the output directory
+if it doesn't exist and exports the data frame to a tab-delimited file.
 }
 \examples{
 export_output(x = data.frame(), file = "output/file.tsv")

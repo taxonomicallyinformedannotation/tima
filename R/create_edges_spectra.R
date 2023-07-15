@@ -38,21 +38,22 @@ utils::globalVariables(c(
 #' @export
 #'
 #' @examples NULL
-create_edges_spectra <- function(input = params$files$spectral$raw,
-                                 output = params$files$networks$spectral$edges$raw,
-                                 name_source = params$names$source,
-                                 name_target = params$names$target,
-                                 method = params$annotations$ms2$method,
-                                 threshold = params$annotations$ms2$thresholds$similarity,
-                                 ppm = params$ms$tolerances$mass$ppm$ms2,
-                                 dalton = params$ms$tolerances$mass$dalton$ms2,
-                                 npeaks = params$annotations$ms2$thresholds$peaks$absolute,
-                                 rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
-                                 condition = params$annotations$ms2$thresholds$condition,
-                                 qutoff = params$ms$intensity$thresholds$ms2,
-                                 parallel = params$options$parallel,
-                                 fast = params$options$fast,
-                                 parameters = params) {
+create_edges_spectra <- function(
+    input = params$files$spectral$raw,
+    output = params$files$networks$spectral$edges$raw,
+    name_source = params$names$source,
+    name_target = params$names$target,
+    method = params$annotations$ms2$method,
+    threshold = params$annotations$ms2$thresholds$similarity,
+    ppm = params$ms$tolerances$mass$ppm$ms2,
+    dalton = params$ms$tolerances$mass$dalton$ms2,
+    npeaks = params$annotations$ms2$thresholds$peaks$absolute,
+    rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
+    condition = params$annotations$ms2$thresholds$condition,
+    qutoff = params$ms$intensity$thresholds$ms2,
+    parallel = params$options$parallel,
+    fast = params$options$fast,
+    parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot(
     "Your similarity is not supported, supported similarities are
@@ -89,7 +90,9 @@ create_edges_spectra <- function(input = params$files$spectral$raw,
 
     log_debug("Performing spectral comparison")
     log_debug(
-      "As we do not bin the spectra, nor limit the precursors delta, expect a long processing time."
+      "As we do not bin the spectra,
+      nor limit the precursors delta,
+      expect a long processing time."
     )
     log_debug("Take yourself a break, you deserve it.")
 

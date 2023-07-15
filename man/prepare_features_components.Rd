@@ -18,7 +18,8 @@ prepare_features_components(
 \item{parameters}{Params}
 }
 \description{
-This function prepares the components (clusters in molecular network) for further use
+This function prepares the components
+(clusters in molecular network) for further use
 }
 \examples{
 NULL
