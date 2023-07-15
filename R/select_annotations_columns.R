@@ -113,5 +113,4 @@ select_annotations_columns <- function(df,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     )
-  return(df)
 }

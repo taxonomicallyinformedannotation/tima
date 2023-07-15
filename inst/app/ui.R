@@ -252,7 +252,8 @@ ui <- fluidPage(
               as.character(
                 tags$a(
                   "https://github.com/rformassspectrometry/MsCoreUtils/pull/33",
-                  href = "https://github.com/rformassspectrometry/MsCoreUtils/pull/33"
+                  href =
+                    "https://github.com/rformassspectrometry/MsCoreUtils/pull/33"
                 )
               ),
               "for more info"
@@ -491,7 +492,8 @@ ui <- fluidPage(
               as.character(
                 tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
-                  href = "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
                 )
               )
             )
@@ -531,7 +533,8 @@ ui <- fluidPage(
               as.character(
                 tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
-                  href = "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
                 )
               )
             )
@@ -542,7 +545,8 @@ ui <- fluidPage(
         h3("Organisms-related parameters"),
         textInput(
           inputId = "org_tax",
-          label = "OPTIONAL. Force all features to be attributed to a taxon (e.g. Gentiana lutea)",
+          label = "OPTIONAL. Force all features to be attributed to a taxon
+          (e.g. Gentiana lutea)",
           value = NULL
         ) |>
           shinyhelper::helper(
@@ -552,7 +556,8 @@ ui <- fluidPage(
               "Will be used for the weighting of your annotations",
               "Example: Gentiana lutea",
               "All features will be attributed to this source.",
-              "For finer attribution, you need to provide a metadata file in the `Files` panel."
+              "For finer attribution,
+              you need to provide a metadata file in the `Files` panel."
             )
           ),
         sliderInput(
@@ -567,25 +572,32 @@ ui <- fluidPage(
           shinyhelper::helper(
             type = "inline",
             content = c(
-              "Only has impact if you provided a metadata file in the `Files` panel.",
-              "In this case, it will take the intensity matrix of your features",
+              "Only has impact if you provided a metadata file in the
+              `Files` panel.",
+              "In this case,
+              it will take the intensity matrix of your features",
               "and attribute the n organisms where the highest intensity",
               "was observed as source to your features.",
-              "Useful when your experiment contains different biological sources.",
-              "As the organisms where the measure intensity is the highest are also the ones",
-              "with higher likelihood of the corresponding compounds being isolated,",
+              "Useful when your experiment contains
+              different biological sources.",
+              "As the organisms where the measured intensity
+              is the highest are also the ones",
+              "with higher likelihood of the
+              corresponding compounds being isolated,",
               "the number of organisms can be kept low."
             )
           ),
         checkboxInput(
           inputId = "org_fil_mod",
-          label = "Filter library to restrict it to a portion of organisms only",
+          label = "Filter library to restrict it to a
+          portion of organisms only",
           value = FALSE
         ) |>
           shinyhelper::helper(
             type = "inline",
             content = c(
-              "If you want, you can restrict your structure-organism pairs library",
+              "If you want, you can restrict your
+              structure-organism pairs library",
               "to given taxa only.",
               "We do not advise doing so, but you are free to."
             )
@@ -729,7 +741,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Weight attributed to the biological score.",
-              "Depends on the organism you are studying, and how specialized its metabolome is.",
+              "Depends on the organism you are studying,
+              and how specialized its metabolome is.",
               "Also depends if you favor novelty over previous knowledge.",
               "We advise this value to be high."
             )
@@ -1037,7 +1050,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Score for a `superclass (classyfire)` match.",
-              "We advise this value to be higher than the one of `kingdom (classyfire)`."
+              "We advise this value to be higher
+              than the one of `kingdom (classyfire)`."
             )
           ),
         sliderInput(
@@ -1053,7 +1067,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Score for a `class (classyfire)` match.",
-              "We advise this value to be higher than the one of `superclass (classyfire)`."
+              "We advise this value to be higher
+              than the one of `superclass (classyfire)`."
             )
           ),
         sliderInput(
@@ -1069,7 +1084,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Score for a `parent (classyfire)` match.",
-              "We advise this value to be higher than the one of `class (classyfire)`."
+              "We advise this value to be higher
+              than the one of `class (classyfire)`."
             )
           ),
         sliderInput(
@@ -1101,7 +1117,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Score for a `superclass (npclassifier)` match.",
-              "We advise this value to be higher than the one of `pathway (npclassifier)`."
+              "We advise this value to be higher
+              than the one of `pathway (npclassifier)`."
             )
           ),
         sliderInput(
@@ -1117,7 +1134,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Score for a `class (npclassifier)` match.",
-              "We advise this value to be higher than the one of `superclass (npclassifier)`."
+              "We advise this value to be higher
+              than the one of `superclass (npclassifier)`."
             )
           )
       ),
@@ -1132,9 +1150,11 @@ ui <- fluidPage(
           shinyhelper::helper(
             type = "inline",
             content = c(
-              "Some steps can be very long to perform without dramatic added value.",
+              "Some steps can be very long to perform
+              without dramatic added value.",
               "By default, we try to avoid them.",
-              "If you are not restricted by computation time, feel free to uncheck it."
+              "If you are not restricted by computation time,
+              feel free to uncheck it."
             )
           ),
         checkboxInput(
@@ -1146,7 +1166,8 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "Really, do not use it.",
-              "Corresponds to a `--force` parameter, allowing for crazy things that can crash.",
+              "Corresponds to a `--force` parameter,
+              allowing for crazy things that can crash.",
               "Really, do not use it."
             )
           ),
@@ -1172,7 +1193,8 @@ ui <- fluidPage(
             content = c(
               "If checked, the output will be a Cytoscape-ready table,",
               "with multiple candidates per line, separated by pipes (|).",
-              "If unchecked, will output multiple lines per features (one per candidate)."
+              "If unchecked, will output multiple lines per features
+              (one per candidate)."
             )
           )
       ),
@@ -1189,7 +1211,8 @@ ui <- fluidPage(
             content = c(
               "Your GNPS job ID.",
               "If you provide one, all files will be taken from there.",
-              "You still need to provide a path for where we will store the files,",
+              "You still need to provide a path for
+              where we will store the files,",
               "in case your GNPS job gets deleted for you to find them back.",
               "Annotations will also be downloaded."
             )
@@ -1202,7 +1225,8 @@ ui <- fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("We advise `fbmn`, but we also support `classical` jobs.")
+            content = c("We advise `fbmn`,
+                        but we also support `classical` jobs.")
           )
       )
     )

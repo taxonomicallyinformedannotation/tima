@@ -62,22 +62,23 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-annotate_spectra <- function(input = params$files$spectral$raw,
-                             library = params$files$libraries$spectral$exp,
-                             polarity = params$ms$polarity,
-                             output = params$files$annotations$raw$spectral,
-                             method = params$annotations$ms2$method,
-                             threshold = params$annotations$ms2$thresholds$similarity,
-                             ppm = params$ms$tolerances$mass$ppm$ms2,
-                             dalton = params$ms$tolerances$mass$dalton$ms2,
-                             npeaks = params$annotations$ms2$thresholds$peaks$absolute,
-                             rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
-                             condition = params$annotations$ms2$thresholds$condition,
-                             qutoff = params$ms$intensity$thresholds$ms2,
-                             parallel = params$options$parallel,
-                             fast = params$options$fast,
-                             approx = params$annotations$ms2$approx,
-                             parameters = params) {
+annotate_spectra <- function(
+    input = params$files$spectral$raw,
+    library = params$files$libraries$spectral$exp,
+    polarity = params$ms$polarity,
+    output = params$files$annotations$raw$spectral,
+    method = params$annotations$ms2$method,
+    threshold = params$annotations$ms2$thresholds$similarity,
+    ppm = params$ms$tolerances$mass$ppm$ms2,
+    dalton = params$ms$tolerances$mass$dalton$ms2,
+    npeaks = params$annotations$ms2$thresholds$peaks$absolute,
+    rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
+    condition = params$annotations$ms2$thresholds$condition,
+    qutoff = params$ms$intensity$thresholds$ms2,
+    parallel = params$options$parallel,
+    fast = params$options$fast,
+    approx = params$annotations$ms2$approx,
+    parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists

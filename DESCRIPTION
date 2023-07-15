@@ -113,6 +113,7 @@ Collate:
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
+    'select_sirius_columns.R'
     'prepare_annotations_sirius.R'
     'prepare_annotations_spectra.R'
     'prepare_features_components.R'
