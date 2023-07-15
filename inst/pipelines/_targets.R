@@ -52,7 +52,11 @@ list(
       tar_file(
         name = dic_neu_los,
         command = {
-          dic_neu_los <- system.file("extdata", "neutral_losses.tsv", package = "timaR")
+          dic_neu_los <- system.file(
+            "extdata",
+            "neutral_losses.tsv",
+            package = "timaR"
+          )
         }
       )
     )
@@ -1124,8 +1128,10 @@ list(
             #   metad = CompoundDb::make_metadata(
             #     source = "LOTUS",
             #     url = "https://doi.org/10.5281/zenodo.5607185",
-            #     source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-            #     source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            # source_version = jsonlite::fromJSON(
+            #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
+            # source_date = jsonlite::fromJSON(
+            #   txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
             #     organism = "Life"
             #   )
             # )
@@ -1162,8 +1168,10 @@ list(
             #   metad = CompoundDb::make_metadata(
             #     source = "LOTUS",
             #     url = "https://doi.org/10.5281/zenodo.5607185",
-            #     source_version = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")$doi_url,
-            #     source_date = jsonlite::fromJSON(txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            # source_version = jsonlite::fromJSON(
+            #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
+            # source_date = jsonlite::fromJSON(
+            #   txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
             #     organism = "Life"
             #   ),
             #   polarity = "neg"
@@ -1708,11 +1716,13 @@ list(
         score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
         score_biological_variety = par_wei_ann$weights$biological$variety,
         score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_superclass =
+          par_wei_ann$weights$chemical$cla$superclass,
         score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
         score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
         score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_superclass =
+          par_wei_ann$weights$chemical$npc$superclass,
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
@@ -1764,11 +1774,13 @@ list(
         score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
         score_biological_variety = par_wei_ann$weights$biological$variety,
         score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_superclass =
+          par_wei_ann$weights$chemical$cla$superclass,
         score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
         score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
         score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_superclass =
+          par_wei_ann$weights$chemical$npc$superclass,
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,

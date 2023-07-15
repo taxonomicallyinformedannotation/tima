@@ -25,9 +25,10 @@ log_debug("Contributors: ...")
 #' @export
 #'
 #' @examples NULL
-prepare_libraries_sop_hmdb <- function(input = paths$data$source$libraries$sop$hmdb,
-                                       output = paths$data$interim$libraries$sop$hmdb,
-                                       output_minimal = paths$data$interim$libraries$sop$hmdb_minimal) {
+prepare_libraries_sop_hmdb <- function(
+    input = paths$data$source$libraries$sop$hmdb,
+    output = paths$data$interim$libraries$sop$hmdb,
+    output_minimal = paths$data$interim$libraries$sop$hmdb_minimal) {
   log_debug("Unzipping HMDB (6.5GB)")
   unzip(
     zipfile = input,

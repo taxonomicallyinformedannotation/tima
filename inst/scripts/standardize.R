@@ -34,7 +34,12 @@ parse.inchi <- function(inchis) {
         "org/openscience/cdk/interfaces/IAtomContainer"
       )
     } else {
-      warning(paste0("InChI parsing error for ", inchi, ": ", status$toString()))
+      warning(paste0(
+        "InChI parsing error for ",
+        inchi,
+        ": ",
+        status$toString()
+      ))
       return(NULL)
     }
   })
@@ -53,7 +58,14 @@ standardize_mol <- function(mol) {
     mol <- mol |>
       rcdk::remove.hydrogens()
     smiles_2D <- mol |>
-      rcdk::get.smiles(flavor = rcdk::smiles.flavors(c("Canonical", "UseAromaticSymbols")))
+      rcdk::get.smiles(
+        flavor = rcdk::smiles.flavors(
+          c(
+            "Canonical",
+            "UseAromaticSymbols"
+          )
+        )
+      )
     inchi_2D <- mol |>
       rinchi::get.inchi()
     inchikey_2D <- mol |>

@@ -37,7 +37,13 @@ prepare_isdb_hmdb <-
 
     log_debug("Loading proton mass")
     proton <-
-      readr::read_tsv(file = system.file("extdata", "adducts.tsv", package = "timaR")) |>
+      readr::read_tsv(
+        file = system.file(
+          "extdata",
+          "adducts.tsv",
+          package = "timaR"
+        )
+      ) |>
       tidytable::filter(adduct == "H (proton)") |>
       tidytable::pull("mass")
 
