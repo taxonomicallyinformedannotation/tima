@@ -99,9 +99,27 @@ annotate_masses <-
            name_source = params$names$source,
            name_target = params$names$target,
            library = paths$data$interim$libraries$sop$merged$keys,
-           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
-           str_met = params$files$libraries$sop$merged$structures$metadata,
-           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_2d_3d = params$
+             files$
+             libraries$
+             sop$
+             merged$
+             structures$
+             dd_ddd,
+           str_met = params$
+             files$
+             libraries$
+             sop$
+             merged$
+             structures$
+             metadata,
+           str_nam = params$
+             files$
+             libraries$
+             sop$
+             merged$
+             structures$
+             names,
            str_tax_cla = params$
              files$
              libraries$

@@ -24,7 +24,8 @@ get_gnps_tables(
 
 \item{filename}{Name of the file}
 
-\item{workflow}{Character string indicating the type of workflow, either "fbmn" or "classical"}
+\item{workflow}{Character string indicating the type of workflow,
+either "fbmn" or "classical"}
 
 \item{path_features}{Path to features}
 

@@ -21,7 +21,8 @@ weight_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_bio_clean}{Table containing the biologically weighted annotation}
+\item{annot_table_wei_bio_clean}{Table containing the biologically
+weighted annotation}
 
 \item{weight_spectral}{Weight for the spectral score}
 
@@ -32,7 +33,8 @@ weight_chemo(
 \item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match
 (should be lower than \verb{ Classyfire superclass})}
 
-\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass} match
+\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass}
+match
 (should be lower than \verb{Classyfire class})}
 
 \item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match

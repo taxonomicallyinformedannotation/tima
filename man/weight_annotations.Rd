@@ -160,7 +160,7 @@ match (should be lower than \verb{NPC class})}
 \item{parameters}{Params}
 }
 \description{
-This function weights and eventually complements initial annotations.
+This function weights initial annotations.
 }
 \examples{
 NULL
