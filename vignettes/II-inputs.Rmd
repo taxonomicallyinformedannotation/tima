@@ -317,7 +317,9 @@ We are currently working to get all MONA and GNPS experimental spectra easily av
 
 However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.
 
-So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available.
+So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `inst/scripts/prepare_libraries_spectra_exp_mona.R` and `inst/scripts/prepare_libraries_spectra_is_hmdb.R`, respectively).
+
+In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `inst/params/user/prepare_libraries_spectra.yaml` and `inst/params/user/annotate_spectra.yaml`.
 
 ##### *In silico*
 

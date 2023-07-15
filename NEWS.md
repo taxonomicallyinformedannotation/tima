@@ -6,6 +6,7 @@
 * [renv](https://rstudio.github.io/renv/index.html) removal
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Github Actions improvement
+* Documentation improvement
 * Reduced warnings (CRAN and jscpd)
 
 # timaR 2.8.1
