@@ -8,7 +8,7 @@ utils::globalVariables(
 
 #' @title Weight annotations
 #'
-#' @description This function weights and eventually complements initial annotations.
+#' @description This function weights initial annotations.
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
@@ -65,7 +65,8 @@ utils::globalVariables(
 #' (should be the highest)
 #' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match
 #' (should be lower than ` Classyfire superclass`)
-#' @param score_chemical_cla_superclass Score for a `Classyfire superclass` match
+#' @param score_chemical_cla_superclass
+#' Score for a `Classyfire superclass` match
 #' (should be lower than `Classyfire class`)
 #' @param score_chemical_cla_class Score for a `Classyfire class` match
 #' (should be lower than `Classyfire parent`)
@@ -143,11 +144,13 @@ weight_annotations <-
            score_biological_subspecies = params$weights$biological$subspecies,
            score_biological_variety = params$weights$biological$variety,
            score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
-           score_chemical_cla_superclass = params$weights$chemical$cla$superclass,
+           score_chemical_cla_superclass =
+             params$weights$chemical$cla$superclass,
            score_chemical_cla_class = params$weights$chemical$cla$class,
            score_chemical_cla_parent = params$weights$chemical$cla$parent,
            score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
-           score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
+           score_chemical_npc_superclass =
+             params$weights$chemical$npc$superclass,
            score_chemical_npc_class = params$weights$chemical$npc$class,
            minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
            minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,

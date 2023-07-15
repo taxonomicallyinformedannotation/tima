@@ -20,7 +20,8 @@ prepare_taxa(
 \arguments{
 \item{input}{File containing your features intensities}
 
-\item{extension}{Does your column names contain the file extension? (MZmine mainly)}
+\item{extension}{Does your column names contain the file extension?
+(MZmine mainly)}
 
 \item{name_features}{Name of the features column in the features data}
 
@@ -34,16 +35,20 @@ prepare_taxa(
 
 \item{output}{Output file}
 
-\item{taxon}{If you want to enforce all features to a given taxon, put its name here.}
+\item{taxon}{If you want to enforce all features to a given taxon,
+put its name here.}
 
 \item{parameters}{Params}
 }
 \description{
-This function performs taxon name preparation to match the Open Tree of Life taxonomy
+This function performs taxon name preparation
+to match the Open Tree of Life taxonomy
 }
 \details{
-Depending if the features are aligned between samples originating from various organisms or not,
-It can either attribute all features to a single organism, or attribute them to multiple ones,
+Depending if the features are aligned between samples
+originating from various organisms or not,
+It can either attribute all features to a single organism,
+or attribute them to multiple ones,
 according to their relative intensities among the samples.
 }
 \examples{

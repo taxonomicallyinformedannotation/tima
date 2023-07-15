@@ -10,7 +10,7 @@ split_tables_sop(table)
 \item{table}{Table to split}
 }
 \description{
-This function splits the structure organism table for efficiency.
+This function splits the structure organism table.
 }
 \examples{
 NULL

@@ -291,7 +291,8 @@ weight_bio <-
         candidate_organism_03_phylum = organism_taxonomy_03phylum,
         candidate_organism_04_class = organism_taxonomy_04class,
         candidate_organism_05_order = organism_taxonomy_05order,
-        ## candidate_organism_05_1_infraorder = organism_taxonomy_05_1infraorder,
+        ## candidate_organism_05_1_infraorder =
+        ## organism_taxonomy_05_1infraorder,
         candidate_organism_06_family = organism_taxonomy_06family,
         ## candidate_organism_06_1_subfamily = organism_taxonomy_06_1subfamily,
         candidate_organism_07_tribe = organism_taxonomy_07tribe,
@@ -299,7 +300,8 @@ weight_bio <-
         candidate_organism_08_genus = organism_taxonomy_08genus,
         ## candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
         candidate_organism_09_species = organism_taxonomy_09species,
-        ## candidate_organism_09_1_subspecies = organism_taxonomy_09_1subspecies,
+        ## candidate_organism_09_1_subspecies =
+        ## organism_taxonomy_09_1subspecies,
         candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
       tidytable::distinct() |>
@@ -547,7 +549,8 @@ weight_bio <-
     ##                   sample_organism_05_1_infraorder)
     ## step_ord2 <-
     ##   tidytable::left_join(step_ord2, candidate_infraorder) |>
-    ##   tidyft::filter(candidate_organism_05_1_infraorder != "notClassified") |>
+    ##   tidyft::filter(candidate_organism_05_1_infraorder !=
+    ## "notClassified") |>
     ##   dplyr::filter(
     ##     stringi::stri_detect_regex(
     ## pattern = candidate_organism_05_1_infraorder,
@@ -751,7 +754,8 @@ weight_bio <-
     ##                   sample_organism_09_1_subspecies)
     ## step_spe2 <-
     ##   tidytable::left_join(step_spe2, candidate_subspecies) |>
-    ##   tidyft::filter(candidate_organism_09_1_subspecies != "notClassified") |>
+    ##   tidyft::filter(candidate_organism_09_1_subspecies !=
+    ## "notClassified") |>
     ##   dplyr::filter(
     ##     stringi::stri_detect_regex(
     ## pattern = candidate_organism_09_1_subspecies,

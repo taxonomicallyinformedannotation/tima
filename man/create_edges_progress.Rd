@@ -18,7 +18,8 @@ create_edges_progress(target, query, s1, fragments, precursors)
 \item{precursors}{Precursors}
 }
 \description{
-This function is slow so it outputs the progression of the creation of edges
+This function is slow so it outputs
+the progression of the creation of edges
 }
 \examples{
 NULL

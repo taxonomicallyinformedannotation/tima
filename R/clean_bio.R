@@ -119,13 +119,20 @@ clean_bio <-
 
     df <- df03 |>
       dplyr::mutate(
-        candidate_structure_1_cla_kingdom = structure_taxonomy_classyfire_01kingdom,
-        candidate_structure_1_npc_pathway = structure_taxonomy_npclassifier_01pathway,
-        candidate_structure_2_cla_superclass = structure_taxonomy_classyfire_02superclass,
-        candidate_structure_2_npc_superclass = structure_taxonomy_npclassifier_02superclass,
-        candidate_structure_3_cla_class = structure_taxonomy_classyfire_03class,
-        candidate_structure_3_npc_class = structure_taxonomy_npclassifier_03class,
-        candidate_structure_4_cla_parent = structure_taxonomy_classyfire_04directparent
+        candidate_structure_1_cla_kingdom =
+          structure_taxonomy_classyfire_01kingdom,
+        candidate_structure_1_npc_pathway =
+          structure_taxonomy_npclassifier_01pathway,
+        candidate_structure_2_cla_superclass =
+          structure_taxonomy_classyfire_02superclass,
+        candidate_structure_2_npc_superclass =
+          structure_taxonomy_npclassifier_02superclass,
+        candidate_structure_3_cla_class =
+          structure_taxonomy_classyfire_03class,
+        candidate_structure_3_npc_class =
+          structure_taxonomy_npclassifier_03class,
+        candidate_structure_4_cla_parent =
+          structure_taxonomy_classyfire_04directparent
       ) |>
       tidytable::distinct(
         structure_inchikey_2D,
@@ -145,20 +152,10 @@ clean_bio <-
     ## Loosing CANOPUS from SIRIUS
     ## TODO improve
     # log_debug("adding \"notAnnotated\" \n")
-    # df$candidate_structure_1_cla_kingdom[df["structure_inchikey_2D"] == "notAnnotated"] <-
+    # df$candidate_structure_1_cla_kingdom
+    # [df["structure_inchikey_2D"] == "notAnnotated"] <-
     #   "notAnnotated"
-    # df$candidate_structure_1_npc_pathway[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # df$candidate_structure_2_cla_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # df$candidate_structure_2_npc_superclass[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # df$candidate_structure_3_cla_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # df$candidate_structure_3_npc_class[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # df$candidate_structure_4_cla_parent[df["structure_inchikey_2D"] == "notAnnotated"] <-
-    #   "notAnnotated"
+    # and so on ...
 
     log_debug("adding \"notClassified\" \n")
     df[is.character(is.na(df))] <- "notClassified"

@@ -26,7 +26,8 @@ annotate_spectra(
 \arguments{
 \item{input}{Query file containing spectra. Currently an '.mgf' file}
 
-\item{library}{Library containing spectra to match against. Can be '.mgf' or '.sqlite' (Spectra formatted)}
+\item{library}{Library containing spectra to match against.
+Can be '.mgf' or '.sqlite' (Spectra formatted)}
 
 \item{polarity}{MS polarity. Must be 'pos' or 'neg'.}
 
@@ -44,9 +45,10 @@ annotate_spectra(
 
 \item{rpeaks}{Relative minimum number of peaks to be matched}
 
-\item{condition}{Condition to be fulfilled. Either 'OR' or 'AND' (mass and peaks minima).}
+\item{condition}{Condition to be fulfilled.
+Either 'OR' or 'AND' (mass and peaks minima).}
 
-\item{qutoff}{Intensity under which ms2 fragments will be removed previous to comparison.}
+\item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{parallel}{Boolean. Process in parallel}
 
@@ -60,10 +62,13 @@ annotate_spectra(
 This function annotates spectra
 }
 \details{
-It takes two files as input. A query file that will be matched against a library file.
+It takes two files as input.
+A query file that will be matched against a library file.
 Multiple comparison distances are available
-('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle' (See MsCoreUtils for details)).
-Number of matched peaks and their ratio are also available (See MatchForwardReverseParam for details).
+('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle')
+(See MsCoreUtils for details).
+Number of matched peaks and their ratio are also available
+(See MatchForwardReverseParam for details).
 Parallel processing is also made available.
 }
 \examples{

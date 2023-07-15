@@ -17,13 +17,15 @@ clean_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{Table containing your chemically weighted annotation}
+\item{annot_table_wei_chemo}{Table containing your
+chemically weighted annotation}
 
 \item{components_table}{Prepared components file}
 
 \item{features_table}{Prepared features file}
 
-\item{structure_organism_pairs_table}{Table containing the structure - organism pairs}
+\item{structure_organism_pairs_table}{Table containing the
+structure - organism pairs}
 
 \item{candidates_final}{Number of final candidates to keep}
 
@@ -34,10 +36,12 @@ clean_chemo(
 \item{summarise}{Boolean. summarise results (1 row per feature)}
 }
 \value{
-A table containing the chemically weighted annotation where only a given number of initial candidates are kept
+A table containing the chemically weighted annotation
+where only a given number of initial candidates are kept
 }
 \description{
-This function cleans the results obtained after chemical weighting
+This function cleans the results
+obtained after chemical weighting
 }
 \examples{
 NULL

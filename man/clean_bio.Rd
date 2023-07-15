@@ -12,19 +12,23 @@ clean_bio(
 )
 }
 \arguments{
-\item{annot_table_wei_bio}{Table containing your biologically weighted annotation}
+\item{annot_table_wei_bio}{Table containing your
+biologically weighted annotation}
 
 \item{edges_table}{Table containing the edges between features}
 
 \item{candidates_initial}{Number of initial candidates to keep}
 
-\item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
+\item{minimal_ms1_bio}{Minimal biological score
+to keep MS1 based annotation}
 }
 \value{
-A table containing the biologically weighted annotation where only a given number of initial candidates are kept
+A table containing the biologically weighted annotation
+where only a given number of initial candidates are kept
 }
 \description{
-This function cleans the results obtained after biological weighting
+This function cleans the results
+obtained after biological weighting
 }
 \examples{
 NULL

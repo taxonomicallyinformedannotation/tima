@@ -213,11 +213,13 @@ prepare_annotations_sirius <-
             "NPC#class Probability",
             "structure_taxonomy_classyfire_01kingdom" = "ClassyFire#TODO",
             "ClassyFire#TODO Probability",
-            "structure_taxonomy_classyfire_02superclass" = "ClassyFire#superclass",
+            "structure_taxonomy_classyfire_02superclass" =
+              "ClassyFire#superclass",
             "ClassyFire#superclass probability",
             "structure_taxonomy_classyfire_03class" = "ClassyFire#class",
             "ClassyFire#class Probability",
-            "structure_taxonomy_classyfire_04directparent" = "ClassyFire#most specific class",
+            "structure_taxonomy_classyfire_04directparent" =
+              "ClassyFire#most specific class",
             "ClassyFire#most specific class Probability"
           )
         ))

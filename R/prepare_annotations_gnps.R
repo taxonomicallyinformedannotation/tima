@@ -137,7 +137,8 @@ prepare_annotations_gnps <-
           structure_inchikey = InChIKey,
           structure_inchikey_2D = `InChIKey-Planar`,
           structure_taxonomy_npclassifier_01pathway = npclassifier_pathway,
-          structure_taxonomy_npclassifier_02superclass = npclassifier_superclass,
+          structure_taxonomy_npclassifier_02superclass =
+            npclassifier_superclass,
           structure_taxonomy_npclassifier_03class = npclassifier_class,
           structure_exact_mass = ExactMass,
           ## Only partially present

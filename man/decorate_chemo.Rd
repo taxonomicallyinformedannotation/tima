@@ -35,7 +35,8 @@ decorate_chemo(
 \item{score_chemical_npc_class}{NPC class score}
 }
 \value{
-Message indicating the number of annotations weighted at each chemical level
+Message indicating the number of annotations
+weighted at each chemical level
 }
 \description{
 This function outputs information about chemical weighting

@@ -10,7 +10,8 @@ get_params(step)
 \item{step}{Name of the step being performed}
 }
 \description{
-This function gets the parameters for the job. Combination of cli and yaml parameters
+This function gets the parameters for the job.
+Combination of cli and yaml parameters
 }
 \examples{
 NULL

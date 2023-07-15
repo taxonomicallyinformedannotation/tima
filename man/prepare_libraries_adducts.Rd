@@ -23,9 +23,9 @@ prepare_libraries_adducts(
 
 \item{output_name}{Name of the file where adducts will be saved}
 
-\item{masses_pos_output_path}{Path where positive adducts masses will be saved}
+\item{masses_pos_output_path}{Path where pos adducts masses will be saved}
 
-\item{masses_neg_output_path}{Path where negative adducts masses will be saved}
+\item{masses_neg_output_path}{Path where neg adducts masses will be saved}
 
 \item{parameters}{Parameters}
 }

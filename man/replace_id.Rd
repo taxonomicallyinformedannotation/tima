@@ -21,11 +21,17 @@ replace_id(
 \item{example_gnps}{an example value for a GNPS job ID}
 }
 \value{
-Character string with the GNPS job ID modified according to the rules specified in the function
+Character string with the GNPS job ID modified according
+to the rules specified in the function
 }
 \description{
-This function replaces the default ID in the example by a user-specified one
+This function replaces the default ID
+in the example by a user-specified one
 }
 \examples{
-replace_id(x = "example/123456_features.tsv", user_gnps = NULL, user_filename = "Foo")
+replace_id(
+  x = "example/123456_features.tsv",
+  user_gnps = NULL,
+  user_filename = "Foo"
+)
 }

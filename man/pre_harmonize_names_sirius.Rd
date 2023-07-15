@@ -10,10 +10,12 @@ pre_harmonize_names_sirius(x)
 \item{x}{Character string containing a name}
 }
 \value{
-Character string with the name modified according to the rules specified in the function
+Character string with the name modified according
+to the rules specified in the function
 }
 \description{
-This function pre harmonizes Sirius names to make them compatible
+This function pre harmonizes Sirius names
+to make them compatible
 }
 \examples{
 prepared_name <- pre_harmonize_names_sirius("My name/suffix")

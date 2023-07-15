@@ -33,7 +33,7 @@ prepare_annotations_gnps(
 \item{parameters}{Parameters}
 }
 \description{
-This function prepares GNPS obtained annotations for further use
+This function prepares GNPS obtained annotations
 }
 \examples{
 NULL
