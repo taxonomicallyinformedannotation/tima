@@ -860,8 +860,8 @@ weight_bio <-
         .keep_all = TRUE
       ) |>
       dplyr::mutate(
-        rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
-        rank_final = tidytable::dense_rank(-score_pondered_bio),
+        rank_initial = dplyr::dense_rank(-as.numeric(score_input)),
+        rank_final = dplyr::dense_rank(-score_pondered_bio),
         .by = c(feature_id)
       ) |>
       tidytable::arrange(
