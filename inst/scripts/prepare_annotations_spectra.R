@@ -7,13 +7,13 @@ require(
 
 log_debug(
   "This script",
-  crayon::green("formats ISDB results")
+  crayon::green("formats spectral annotations results")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 ## Not ann_spe because of `ann_spe_int` (see #69)
-targets::tar_make(names = c(matches("ann_spe_exp_g"), matches("ann_spe_is")))
+targets::tar_make(names = c(matches("ann_spe_is")))
 
 end <- Sys.time()
 

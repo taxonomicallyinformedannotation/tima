@@ -299,9 +299,9 @@ weight_chemo <-
         structure_smiles_2D,
         .keep_all = TRUE
       ) |>
-      tidyft::mutate(
-        rank_initial = (tidytable::dense_rank(-as.numeric(score_input))),
-        rank_final = (tidytable::dense_rank(-score_pondered_chemo)),
+      dplyr::mutate(
+        rank_initial = dplyr::dense_rank(-as.numeric(score_input)),
+        rank_final = dplyr::dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
       ) |>
       tidytable::arrange(rank_final) |>
