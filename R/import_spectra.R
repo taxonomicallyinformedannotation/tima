@@ -38,6 +38,7 @@ import_spectra <- function(file) {
     },
     "rds" = {
       readRDS(file = file) |>
+        data.frame() |>
         Spectra::Spectra() |>
         ## TODO change it as soon as
         ## https://github.com/RforMassSpectrometry/MsBackendSql
