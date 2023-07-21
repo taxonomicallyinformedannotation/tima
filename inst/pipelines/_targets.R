@@ -1914,29 +1914,29 @@ list(
         benchmark_edg_spe_pos <- create_edges_spectra(
           input = benchmark_pre_mgf_pos,
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
-          name_source = par_cre_edg_spe$names$source,
-          name_target = par_cre_edg_spe$names$target,
-          method = par_cre_edg_spe$annotations$ms2$method,
-          threshold = par_cre_edg_spe$
+          name_source = par_def_cre_edg_spe$names$source,
+          name_target = par_def_cre_edg_spe$names$target,
+          method = par_def_cre_edg_spe$annotations$ms2$method,
+          threshold = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             similarity,
-          ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_cre_edg_spe$
+          ppm = par_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             absolute,
-          rpeaks = par_cre_edg_spe$
+          rpeaks = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             ratio,
-          condition = par_cre_edg_spe$
+          condition = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
@@ -1944,7 +1944,7 @@ list(
           qutoff = 0,
           parallel = TRUE,
           fast = FALSE,
-          parameters = par_cre_edg_spe
+          parameters = par_def_cre_edg_spe
         )
       }
     ),
@@ -1954,29 +1954,29 @@ list(
         benchmark_edg_spe_neg <- create_edges_spectra(
           input = benchmark_pre_mgf_neg,
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
-          name_source = par_cre_edg_spe$names$source,
-          name_target = par_cre_edg_spe$names$target,
-          method = par_cre_edg_spe$annotations$ms2$method,
-          threshold = par_cre_edg_spe$
+          name_source = par_def_cre_edg_spe$names$source,
+          name_target = par_def_cre_edg_spe$names$target,
+          method = par_def_cre_edg_spe$annotations$ms2$method,
+          threshold = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             similarity,
-          ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_cre_edg_spe$
+          ppm = par_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             absolute,
-          rpeaks = par_cre_edg_spe$
+          rpeaks = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             ratio,
-          condition = par_cre_edg_spe$
+          condition = par_def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
@@ -1984,7 +1984,7 @@ list(
           qutoff = 0,
           parallel = TRUE,
           fast = FALSE,
-          parameters = par_cre_edg_spe
+          parameters = par_def_cre_edg_spe
         )
       }
     ),
@@ -1994,7 +1994,7 @@ list(
         benchmark_com_pos <- create_components(
           input = benchmark_edg_spe_pos,
           output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
-          parameters = par_cre_com
+          parameters = par_def_cre_com
         )
       }
     ),
@@ -2004,7 +2004,125 @@ list(
         benchmark_com_neg <- create_components(
           input = benchmark_edg_spe_neg,
           output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
-          parameters = par_cre_com
+          parameters = par_def_cre_com
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_ms1_pre_pos,
+      command = {
+        benchmark_ann_ms1_pre_pos <-
+          annotate_masses(
+            features = benchmark_pre_meta_pos,
+            library = lib_mer_key,
+            output_annotations = "bla",
+            output_edges = "bla",
+            name_source = par_def_ann_mas$names$source,
+            name_target = par_def_ann_mas$names$target,
+            str_2d_3d = lib_mer_str_2d_3d,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            name = lib_add["pos"],
+            adducts_list = par_def_ann_mas$ms$adducts,
+            adducts_masses_list = dic_add,
+            neutral_losses_list = dic_neu_los,
+            ms_mode = "pos",
+            tolerance_ppm = par_def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = par_def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = par_def_ann_mas
+          )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_ms1_pre_neg,
+      command = {
+        benchmark_ann_ms1_pre_neg <-
+          annotate_masses(
+            features = benchmark_pre_meta_pos,
+            library = lib_mer_key,
+            output_annotations = "bla",
+            output_edges = "bla",
+            name_source = par_def_ann_mas$names$source,
+            name_target = par_def_ann_mas$names$target,
+            str_2d_3d = lib_mer_str_2d_3d,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            name = lib_add["neg"],
+            adducts_list = par_def_ann_mas$ms$adducts,
+            adducts_masses_list = dic_add,
+            neutral_losses_list = dic_neu_los,
+            ms_mode = "neg",
+            tolerance_ppm = par_def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = par_def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = par_def_ann_mas
+          )
+      }
+    ),
+    tar_file(
+      name = benchmark_edg_pre_pos,
+      command = {
+        benchmark_edg_pre_pos <- prepare_features_edges(
+          input = list(benchmark_ann_ms1_pre_pos, benchmark_edg_pos),
+          output = par_def_pre_fea_edg$
+            files$
+            networks$
+            spectral$
+            edges$
+            prepared,
+          name_source = par_def_pre_fea_edg$names$source,
+          name_target = par_def_pre_fea_edg$names$target,
+          parameters = par_def_pre_fea_edg
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_edg_pre_neg,
+      command = {
+        benchmark_edg_pre_neg <- prepare_features_edges(
+          input = list(benchmark_ann_ms1_pre_neg, benchmark_edg_neg),
+          output = par_def_pre_fea_edg$
+            files$
+            networks$
+            spectral$
+            edges$
+            prepared,
+          name_source = par_def_pre_fea_edg$names$source,
+          name_target = par_def_pre_fea_edg$names$target,
+          parameters = par_def_pre_fea_edg
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_pre_pos,
+      command = {
+        benchmark_com_pre_pos <- prepare_features_components(
+          input = benchmark_com_pos,
+          output = params$
+            files$
+            networks$
+            spectral$
+            components$
+            prepared,
+          parameters = par_def_pre_fea_com
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_pre_neg,
+      command = {
+        benchmark_com_pre_neg <- prepare_features_components(
+          input = benchmark_com_neg,
+          output = params$
+            files$
+            networks$
+            spectral$
+            components$
+            prepared,
+          parameters = par_def_pre_fea_com
         )
       }
     )
