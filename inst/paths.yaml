@@ -67,6 +67,10 @@ data:
     spectra: data/source/example_spectra.mgf
     benchmark:
       path: data/source/benchmark
+      copy: data/interim/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2_copy.msp
+      mgf: 
+        neg: data/interim/benchmark/benchmark_neg.mgf
+        pos: data/interim/benchmark/benchmark_pos.mgf
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
     libraries:
       path: data/source/libraries

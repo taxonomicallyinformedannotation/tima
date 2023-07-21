@@ -534,7 +534,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
-      "version": ">= 1.7.6",
+      "version": ">= 1.7.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",

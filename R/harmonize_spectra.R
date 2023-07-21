@@ -104,7 +104,9 @@ harmonize_spectra <- function(spectra,
       "synonyms" = co_sy,
       "xlogp" = co_xl
     )
-  columns_missing <- columns[!columns %in% names(columns_full)]
+  columns_full <- columns_full[!is.na((columns_full))]
+  columns_missing <-
+    columns[!columns %in% names(columns_full)]
   names(columns_missing) <- columns_missing
 
   spectra_missing <- columns_missing |>
@@ -173,7 +175,8 @@ harmonize_spectra <- function(spectra,
         yes = name,
         no = compound_id
       )
-    )
+    ) |>
+    data.frame()
 
   return(spectra_harmonized)
 }
