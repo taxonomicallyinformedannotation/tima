@@ -1792,7 +1792,222 @@ list(
         parameters = par_wei_ann
       )
     }
+  ),
+  list(
+    ## Benchmark
+    tar_target(
+      name = benchmark_path_url,
+      command = {
+        benchmark_path_url <- paths$urls$benchmarking_set
+      }
+    ),
+    tar_file(
+      name = benchmark_path_export,
+      command = {
+        benchmark_path_export <- paths$data$source$benchmark$set
+      }
+    ),
+    tar_file(
+      name = benchmark_path_copy,
+      command = {
+        benchmark_path_copy <- paths$data$source$benchmark$copy
+      }
+    ),
+    tar_file(
+      name = benchmark_path_mgf_neg,
+      command = {
+        benchmark_path_mgf_neg <- paths$data$source$benchmark$mgf$neg
+      }
+    ),
+    tar_file(
+      name = benchmark_path_mgf_pos,
+      command = {
+        benchmark_path_mgf_pos <- paths$data$source$benchmark$mgf$pos
+      }
+    ),
+    tar_file(
+      name = benchmark_file,
+      command = {
+        benchmark_file <- get_file(
+          url = benchmark_path_url,
+          export = benchmark_path_export
+        )
+        return(benchmark_path_export)
+      }
+    ),
+    tar_file(
+      name = benchmark_copy,
+      command = {
+        con <- file(benchmark_file, "r")
+        text <- readLines(con)
+        close(con)
+        text_corrected <- text |>
+          gsub(pattern = "(\\()([0-9]{1,9}.[0-9]{1,9})(, None\\))", replacement = "\\2")
+        text_corrected |>
+          writeLines(con = benchmark_path_copy)
+        return(benchmark_path_copy)
+      }
+    ),
+    tar_file(
+      name = benchmark_prepared,
+      command = {
+        benchmark_prepared <-
+          sp <- benchmark_copy |>
+          Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
+          Spectra::setBackend(Spectra::MsBackendMemory())
+
+        sp |> sanitize_spectra_benchmark(
+          mgf_pos_path = benchmark_path_mgf_pos,
+          mgf_neg_path = benchmark_path_mgf_neg
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_pre_mgf_pos,
+      command = {
+        benchmark_pre_mgf_pos <- benchmark_prepared[[1]]
+      }
+    ),
+    tar_file(
+      name = benchmark_pre_mgf_neg,
+      command = {
+        benchmark_pre_mgf_neg <- benchmark_prepared[[2]]
+      }
+    ),
+    tar_file(
+      name = benchmark_pre_meta_pos,
+      command = {
+        benchmark_pre_meta_pos <- benchmark_prepared[[3]]
+      }
+    ),
+    tar_file(
+      name = benchmark_pre_meta_neg,
+      command = {
+        benchmark_pre_meta_neg <- benchmark_prepared[[4]]
+      }
+    ),
+    tar_file(
+      name = benchmark_taxed_pos,
+      command = {
+        benchmark_taxed_pos <- benchmark_pre_meta_pos |>
+          taxize_spectra_benchmark(
+            keys = lib_mer_key,
+            org_tax_ott = lib_mer_org_tax_ott,
+            output = "data/interim/benchmark/benchmark_taxed_pos.tsv.gz"
+          )
+      }
+    ),
+    tar_file(
+      name = benchmark_taxed_neg,
+      command = {
+        benchmark_taxed_neg <- benchmark_pre_meta_neg |>
+          taxize_spectra_benchmark(
+            keys = lib_mer_key,
+            org_tax_ott = lib_mer_org_tax_ott,
+            output = "data/interim/benchmark/benchmark_taxed_neg.tsv.gz"
+          )
+      }
+    ),
+    tar_file(
+      name = benchmark_edg_spe_pos,
+      command = {
+        benchmark_edg_spe_pos <- create_edges_spectra(
+          input = benchmark_pre_mgf_pos,
+          output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
+          name_source = par_cre_edg_spe$names$source,
+          name_target = par_cre_edg_spe$names$target,
+          method = par_cre_edg_spe$annotations$ms2$method,
+          threshold = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            similarity,
+          ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            absolute,
+          rpeaks = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            ratio,
+          condition = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            condition,
+          qutoff = 0,
+          parallel = TRUE,
+          fast = FALSE,
+          parameters = par_cre_edg_spe
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_edg_spe_neg,
+      command = {
+        benchmark_edg_spe_neg <- create_edges_spectra(
+          input = benchmark_pre_mgf_neg,
+          output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
+          name_source = par_cre_edg_spe$names$source,
+          name_target = par_cre_edg_spe$names$target,
+          method = par_cre_edg_spe$annotations$ms2$method,
+          threshold = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            similarity,
+          ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            absolute,
+          rpeaks = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            ratio,
+          condition = par_cre_edg_spe$
+            annotations$
+            ms2$
+            thresholds$
+            condition,
+          qutoff = 0,
+          parallel = TRUE,
+          fast = FALSE,
+          parameters = par_cre_edg_spe
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_pos,
+      command = {
+        benchmark_com_pos <- create_components(
+          input = benchmark_edg_spe_pos,
+          output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
+          parameters = par_cre_com
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_neg,
+      command = {
+        benchmark_com_neg <- create_components(
+          input = benchmark_edg_spe_neg,
+          output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
+          parameters = par_cre_com
+        )
+      }
+    )
+    ## TODO Add benchmark
   )
 )
-
-## TODO Add benchmark

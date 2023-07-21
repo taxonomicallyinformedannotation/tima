@@ -34,7 +34,7 @@ Imports:
     stats,
     stringi (>= 1.7.12),
     tidytable (>= 0.10.1),
-    tidyfst (>= 1.7.6),
+    tidyfst (>= 1.7.7),
     tidyft (>= 0.5.7),
     utils,
     yaml (>= 2.3.7)
@@ -129,7 +129,9 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
+    'sanitize_spectra_benchmark.R'
     'select_sop_columns.R'
+    'taxize_spectra_benchmark.R'
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
