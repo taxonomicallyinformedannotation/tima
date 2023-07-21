@@ -179,6 +179,7 @@ testthat::test_that("Whole process", {
   ### LOTUS
   col_args <- list(
     col_ce = NULL,
+    col_ci = "FILENAME",
     col_em = "EXACTMASS",
     col_in = NULL,
     col_io = "INCHI",
@@ -211,7 +212,6 @@ testthat::test_that("Whole process", {
     what = prepare_libraries_spectra,
     args = c(
       col_args,
-      col_ci = "FILENAME",
       input = params$files$libraries$spectral$is$raw[[2]] |>
         gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
       output = params$files$libraries$spectral$is$pos
@@ -229,7 +229,6 @@ testthat::test_that("Whole process", {
     what = prepare_libraries_spectra,
     args = c(
       col_args,
-      col_ci = "FILENAME",
       input = params$files$libraries$spectral$is$raw[[1]] |>
         gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
       output = params$files$libraries$spectral$is$neg,

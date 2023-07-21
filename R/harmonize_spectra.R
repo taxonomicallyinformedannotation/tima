@@ -29,22 +29,22 @@ utils::globalVariables(
 #'
 #' @param spectra Spectra object to be harmonized
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
-#' @param co_ce Name of the collision energy in mgf
-#' @param co_ci Name of the compound id in mgf
-#' @param co_em Name of the exact mass in mgf
-#' @param co_in Name of the InChI in mgf
-#' @param co_io Name of the InChI 2D in mgf
-#' @param co_ik Name of the InChIKey in mgf
-#' @param co_il Name of the InChIKey 2D in mgf
-#' @param co_mf Name of the molecular formula in mgf
-#' @param co_na Name of the name in mgf
-#' @param co_po Name of the polarity in mgf
-#' @param co_sm Name of the SMILES in mgf
-#' @param co_sn Name of the SMILES 2D in mgf
-#' @param co_si Name of the spectrum id in mgf
-#' @param co_sp Name of the SPLASH in mgf
-#' @param co_sy Name of the synonyms in mgf
-#' @param co_xl Name of the xlogp in mgf
+#' @param col_ce Name of the collision energy in mgf
+#' @param col_ci Name of the compound id in mgf
+#' @param col_em Name of the exact mass in mgf
+#' @param col_in Name of the InChI in mgf
+#' @param col_io Name of the InChI 2D in mgf
+#' @param col_ik Name of the InChIKey in mgf
+#' @param col_il Name of the InChIKey 2D in mgf
+#' @param col_mf Name of the molecular formula in mgf
+#' @param col_na Name of the name in mgf
+#' @param col_po Name of the polarity in mgf
+#' @param col_sm Name of the SMILES in mgf
+#' @param col_sn Name of the SMILES 2D in mgf
+#' @param col_si Name of the spectrum id in mgf
+#' @param col_sp Name of the SPLASH in mgf
+#' @param col_sy Name of the synonyms in mgf
+#' @param col_xl Name of the xlogp in mgf
 #'
 #' @return NULL
 #'
@@ -53,22 +53,70 @@ utils::globalVariables(
 #' @examples NULL
 harmonize_spectra <- function(spectra,
                               mode,
-                              co_ce,
-                              co_ci,
-                              co_em,
-                              co_in,
-                              co_io,
-                              co_ik,
-                              co_il,
-                              co_mf,
-                              co_na,
-                              co_po,
-                              co_sm,
-                              co_sn,
-                              co_si,
-                              co_sp,
-                              co_sy,
-                              co_xl) {
+                              col_ce = get(
+                                "col_ce",
+                                envir = parent.frame()
+                              ),
+                              col_ci = get(
+                                "col_ci",
+                                envir = parent.frame()
+                              ),
+                              col_em = get(
+                                "col_em",
+                                envir = parent.frame()
+                              ),
+                              col_in = get(
+                                "col_in",
+                                envir = parent.frame()
+                              ),
+                              col_io = get(
+                                "col_io",
+                                envir = parent.frame()
+                              ),
+                              col_ik = get(
+                                "col_ik",
+                                envir = parent.frame()
+                              ),
+                              col_il = get(
+                                "col_il",
+                                envir = parent.frame()
+                              ),
+                              col_mf = get(
+                                "col_mf",
+                                envir = parent.frame()
+                              ),
+                              col_na = get(
+                                "col_na",
+                                envir = parent.frame()
+                              ),
+                              col_po = get(
+                                "col_po",
+                                envir = parent.frame()
+                              ),
+                              col_sm = get(
+                                "col_sm",
+                                envir = parent.frame()
+                              ),
+                              col_sn = get(
+                                "col_sn",
+                                envir = parent.frame()
+                              ),
+                              col_si = get(
+                                "col_si",
+                                envir = parent.frame()
+                              ),
+                              col_sp = get(
+                                "col_sp",
+                                envir = parent.frame()
+                              ),
+                              col_sy = get(
+                                "col_sy",
+                                envir = parent.frame()
+                              ),
+                              col_xl = get(
+                                "col_xl",
+                                envir = parent.frame()
+                              )) {
   columns <- c(
     "collision_energy",
     "compound_id",
@@ -88,21 +136,21 @@ harmonize_spectra <- function(spectra,
   )
   columns_full <-
     c(
-      "collision_energy" = co_ce,
-      "compound_id" = co_ci,
-      "exactmass" = co_em,
-      "formula" = co_mf,
-      "inchi" = co_in,
-      "inchi_2D" = co_io,
-      "inchikey" = co_ik,
-      "inchikey_2D" = co_il,
-      "name" = co_na,
-      "smiles" = co_sm,
-      "smiles_2D" = co_sn,
-      "spectrum_id" = co_si,
-      "splash" = co_sp,
-      "synonyms" = co_sy,
-      "xlogp" = co_xl
+      "collision_energy" = col_ce,
+      "compound_id" = col_ci,
+      "exactmass" = col_em,
+      "formula" = col_mf,
+      "inchi" = col_in,
+      "inchi_2D" = col_io,
+      "inchikey" = col_ik,
+      "inchikey_2D" = col_il,
+      "name" = col_na,
+      "smiles" = col_sm,
+      "smiles_2D" = col_sn,
+      "spectrum_id" = col_si,
+      "splash" = col_sp,
+      "synonyms" = col_sy,
+      "xlogp" = col_xl
     )
   columns_full <- columns_full[!is.na((columns_full))]
   columns_missing <-
@@ -124,7 +172,7 @@ harmonize_spectra <- function(spectra,
   spectra_filtered <- spectra |>
     dplyr::filter(grepl(
       pattern = mode,
-      x = !!as.name(co_po),
+      x = !!as.name(col_po),
       ignore.case = TRUE
     )) |>
     dplyr::select(
@@ -163,6 +211,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
+    data.frame() |>
     dplyr::mutate(
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
@@ -175,8 +224,7 @@ harmonize_spectra <- function(spectra,
         yes = name,
         no = compound_id
       )
-    ) |>
-    data.frame()
+    )
 
   return(spectra_harmonized)
 }
