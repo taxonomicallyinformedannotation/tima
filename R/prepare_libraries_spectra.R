@@ -80,22 +80,6 @@ prepare_libraries_spectra <-
       spectra_harmonized <- spectra |>
         extract_spectra() |>
         harmonize_spectra(
-          co_ce = col_ce,
-          co_ci = col_ci,
-          co_em = col_em,
-          co_in = col_in,
-          co_io = col_io,
-          co_ik = col_ik,
-          co_il = col_il,
-          co_mf = col_mf,
-          co_na = col_na,
-          co_po = col_po,
-          co_sm = col_sm,
-          co_sn = col_sn,
-          co_si = col_si,
-          co_sp = col_sp,
-          co_sy = col_sy,
-          co_xl = col_xl,
           mode = polarity
         ) |>
         ## TODO report the issue as otherwise precursorMz is lost
