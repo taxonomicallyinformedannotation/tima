@@ -103,7 +103,7 @@ create_edges_spectra <- function(
       precs = precz,
       nspecs = nspecz
     ) |>
-      tidytable::bind_rows()
+      dplyr::bind_rows()
 
     ## old version, keep in case
     # par <- if (parallel) {

@@ -1131,7 +1131,8 @@ list(
             # source_version = jsonlite::fromJSON(
             #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
             # source_date = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            #   txt = "https://zenodo.org/api/records/5607185")
+            # [["metadata"]][["publication_date"]],
             #     organism = "Life"
             #   )
             # )
@@ -1171,7 +1172,8 @@ list(
             # source_version = jsonlite::fromJSON(
             #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
             # source_date = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")[["metadata"]][["publication_date"]],
+            #   txt = "https://zenodo.org/api/records/5607185")
+            # [["metadata"]][["publication_date"]],
             #     organism = "Life"
             #   ),
             #   polarity = "neg"
