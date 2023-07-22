@@ -83,11 +83,6 @@ create_edges_spectra <- function(
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
-    log_debug("Extracting fragments and precursors...")
-    fragments_norm <- spectra@backend@peaksData
-    precursors <- spectra$precursorMz
-    nspe <- length(spectra)
-
     log_debug("Performing spectral comparison")
     log_debug(
       "As we do not bin the spectra,
@@ -95,19 +90,19 @@ create_edges_spectra <- function(
       expect a long processing time."
     )
     log_debug("Take yourself a break, you deserve it.")
-
+    nspecz <- length(spectra)
+    precz <- spectra$precursorMz
+    fragz <- spectra@backend@peaksData
     ## Originally written with future but too slow...TODO investigate
-    matches_sim <- pbmcapply::pbmclapply(
-      X = 1:(nspe - 1),
+    edges <- pbmcapply::pbmclapply(
+      X = 1:(nspecz - 1),
       mc.cores = parallelly::availableCores(),
       ignore.interactive = TRUE,
       FUN = create_edges_parallel,
-      frags = fragments_norm,
-      precs = precursors,
-      nspecs = nspe
-    )
-
-    edges <- matches_sim |>
+      frags = fragz,
+      precs = precz,
+      nspecs = nspecz
+    ) |>
       tidytable::bind_rows()
 
     ## old version, keep in case
