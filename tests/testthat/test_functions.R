@@ -301,17 +301,17 @@ testthat::test_that("Whole process", {
     import_spectra()
   spectra <- spectra |>
     sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
-  single_pair <- spectra@backend@peaksData[1:2]
+  frags <- spectra@backend@peaksData[1:2]
   # single_pair[[1]] <- single_pair[[1]] |>
   #   normalize_peaks()
   # single_pair[[2]] <- single_pair[[2]] |>
   #   normalize_peaks()
-  precursors <- spectra$precursorMz[1:2]
-  nspe <- length(single_pair)
+  precs <- spectra$precursorMz[1:2]
+  nspecs <- length(frags)
   create_edges_parallel(1,
-    frags = single_pair,
-    precs = precursors,
-    nspecs = nspe
+    frags = frags,
+    precs = precs,
+    nspecs = nspecs
   )
   ##
 

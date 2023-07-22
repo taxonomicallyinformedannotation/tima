@@ -23,8 +23,9 @@ create_edges_parallel <- function(index,
     FUN = create_edges_progress,
     query = index,
     s1 = cbind(mz = frags[[index]][, 1], intensity = frags[[index]][, 2]),
-    fragments = frags,
-    precursors = precs
-  )
+    frags = frags,
+    precs = precs
+  ) |>
+    tidytable::bind_rows()
   return(list)
 }

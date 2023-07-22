@@ -1801,25 +1801,25 @@ list(
         benchmark_path_url <- paths$urls$benchmarking_set
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_path_export,
       command = {
         benchmark_path_export <- paths$data$source$benchmark$set
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_path_copy,
       command = {
         benchmark_path_copy <- paths$data$source$benchmark$copy
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_path_mgf_neg,
       command = {
         benchmark_path_mgf_neg <- paths$data$source$benchmark$mgf$neg
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_path_mgf_pos,
       command = {
         benchmark_path_mgf_pos <- paths$data$source$benchmark$mgf$pos
@@ -1842,7 +1842,11 @@ list(
         text <- readLines(con)
         close(con)
         text_corrected <- text |>
-          gsub(pattern = "(\\()([0-9]{1,9}.[0-9]{1,9})(, None\\))", replacement = "\\2")
+          gsub(
+            pattern =
+              "(\\()([0-9]{1,9}.[0-9]{1,9})(, None\\))",
+            replacement = "\\2"
+          )
         text_corrected |>
           writeLines(con = benchmark_path_copy)
         return(benchmark_path_copy)
@@ -1908,35 +1912,44 @@ list(
           )
       }
     ),
+    tar_target(
+      name = def_cre_edg_spe,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_cre_edg_spe,
+          usr = par_def_cre_edg_spe
+        )
+      }
+    ),
     tar_file(
       name = benchmark_edg_spe_pos,
       command = {
         benchmark_edg_spe_pos <- create_edges_spectra(
           input = benchmark_pre_mgf_pos,
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
-          name_source = par_def_cre_edg_spe$names$source,
-          name_target = par_def_cre_edg_spe$names$target,
-          method = par_def_cre_edg_spe$annotations$ms2$method,
-          threshold = par_def_cre_edg_spe$
+          name_source = def_cre_edg_spe$names$source,
+          name_target = def_cre_edg_spe$names$target,
+          method = def_cre_edg_spe$annotations$ms2$method,
+          threshold = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             similarity,
-          ppm = par_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_def_cre_edg_spe$
+          ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             absolute,
-          rpeaks = par_def_cre_edg_spe$
+          rpeaks = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             ratio,
-          condition = par_def_cre_edg_spe$
+          condition = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
@@ -1944,7 +1957,7 @@ list(
           qutoff = 0,
           parallel = TRUE,
           fast = FALSE,
-          parameters = par_def_cre_edg_spe
+          parameters = def_cre_edg_spe
         )
       }
     ),
@@ -1954,29 +1967,29 @@ list(
         benchmark_edg_spe_neg <- create_edges_spectra(
           input = benchmark_pre_mgf_neg,
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
-          name_source = par_def_cre_edg_spe$names$source,
-          name_target = par_def_cre_edg_spe$names$target,
-          method = par_def_cre_edg_spe$annotations$ms2$method,
-          threshold = par_def_cre_edg_spe$
+          name_source = def_cre_edg_spe$names$source,
+          name_target = def_cre_edg_spe$names$target,
+          method = def_cre_edg_spe$annotations$ms2$method,
+          threshold = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             similarity,
-          ppm = par_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_def_cre_edg_spe$
+          ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             absolute,
-          rpeaks = par_def_cre_edg_spe$
+          rpeaks = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             ratio,
-          condition = par_def_cre_edg_spe$
+          condition = def_cre_edg_spe$
             annotations$
             ms2$
             thresholds$
@@ -1984,7 +1997,16 @@ list(
           qutoff = 0,
           parallel = TRUE,
           fast = FALSE,
-          parameters = par_def_cre_edg_spe
+          parameters = def_cre_edg_spe
+        )
+      }
+    ),
+    tar_target(
+      name = def_cre_com,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_cre_com,
+          usr = par_def_cre_com
         )
       }
     ),
@@ -1994,7 +2016,7 @@ list(
         benchmark_com_pos <- create_components(
           input = benchmark_edg_spe_pos,
           output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
-          parameters = par_def_cre_com
+          parameters = def_cre_com
         )
       }
     ),
@@ -2004,7 +2026,16 @@ list(
         benchmark_com_neg <- create_components(
           input = benchmark_edg_spe_neg,
           output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
-          parameters = par_def_cre_com
+          parameters = def_cre_com
+        )
+      }
+    ),
+    tar_target(
+      name = def_ann_mas,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_ann_mas,
+          usr = par_def_ann_mas
         )
       }
     ),
@@ -2017,21 +2048,21 @@ list(
             library = lib_mer_key,
             output_annotations = "bla",
             output_edges = "bla",
-            name_source = par_def_ann_mas$names$source,
-            name_target = par_def_ann_mas$names$target,
+            name_source = def_ann_mas$names$source,
+            name_target = def_ann_mas$names$target,
             str_2d_3d = lib_mer_str_2d_3d,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["pos"],
-            adducts_list = par_def_ann_mas$ms$adducts,
+            adducts_list = def_ann_mas$ms$adducts,
             adducts_masses_list = dic_add,
             neutral_losses_list = dic_neu_los,
             ms_mode = "pos",
-            tolerance_ppm = par_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = par_def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = par_def_ann_mas
+            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = def_ann_mas
           )
       }
     ),
@@ -2040,26 +2071,35 @@ list(
       command = {
         benchmark_ann_ms1_pre_neg <-
           annotate_masses(
-            features = benchmark_pre_meta_pos,
+            features = benchmark_pre_meta_neg,
             library = lib_mer_key,
             output_annotations = "bla",
             output_edges = "bla",
-            name_source = par_def_ann_mas$names$source,
-            name_target = par_def_ann_mas$names$target,
+            name_source = def_ann_mas$names$source,
+            name_target = def_ann_mas$names$target,
             str_2d_3d = lib_mer_str_2d_3d,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["neg"],
-            adducts_list = par_def_ann_mas$ms$adducts,
+            adducts_list = def_ann_mas$ms$adducts,
             adducts_masses_list = dic_add,
             neutral_losses_list = dic_neu_los,
             ms_mode = "neg",
-            tolerance_ppm = par_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = par_def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = par_def_ann_mas
+            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = def_ann_mas
           )
+      }
+    ),
+    tar_target(
+      name = def_pre_fea_edg,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_pre_fea_edg,
+          usr = par_def_pre_fea_edg
+        )
       }
     ),
     tar_file(
@@ -2067,15 +2107,15 @@ list(
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
           input = list(benchmark_ann_ms1_pre_pos, benchmark_edg_pos),
-          output = par_def_pre_fea_edg$
+          output = def_pre_fea_edg$
             files$
             networks$
             spectral$
             edges$
             prepared,
-          name_source = par_def_pre_fea_edg$names$source,
-          name_target = par_def_pre_fea_edg$names$target,
-          parameters = par_def_pre_fea_edg
+          name_source = def_pre_fea_edg$names$source,
+          name_target = def_pre_fea_edg$names$target,
+          parameters = def_pre_fea_edg
         )
       }
     ),
@@ -2084,15 +2124,24 @@ list(
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
           input = list(benchmark_ann_ms1_pre_neg, benchmark_edg_neg),
-          output = par_def_pre_fea_edg$
+          output = def_pre_fea_edg$
             files$
             networks$
             spectral$
             edges$
             prepared,
-          name_source = par_def_pre_fea_edg$names$source,
-          name_target = par_def_pre_fea_edg$names$target,
-          parameters = par_def_pre_fea_edg
+          name_source = def_pre_fea_edg$names$source,
+          name_target = def_pre_fea_edg$names$target,
+          parameters = def_pre_fea_edg
+        )
+      }
+    ),
+    tar_target(
+      name = def_pre_fea_com,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_pre_fea_com,
+          usr = par_def_pre_fea_com
         )
       }
     ),
@@ -2107,7 +2156,7 @@ list(
             spectral$
             components$
             prepared,
-          parameters = par_def_pre_fea_com
+          parameters = def_pre_fea_com
         )
       }
     ),
@@ -2122,7 +2171,7 @@ list(
             spectral$
             components$
             prepared,
-          parameters = par_def_pre_fea_com
+          parameters = def_pre_fea_com
         )
       }
     )
