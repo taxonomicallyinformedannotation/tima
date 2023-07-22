@@ -152,10 +152,9 @@ harmonize_spectra <- function(spectra,
       "synonyms" = col_sy,
       "xlogp" = col_xl
     )
-  # columns_full <- columns_full[!is.na((columns_full))]
-  # columns_missing <-
-  #   columns[!columns %in% names(columns_full)]
-  columns_missing <- columns[!columns %in% names(columns_full)]
+  columns_full <- columns_full[!is.na((columns_full))]
+  columns_missing <-
+    columns[!columns %in% names(columns_full)]
   names(columns_missing) <- columns_missing
 
   spectra_missing <- columns_missing |>
@@ -214,17 +213,18 @@ harmonize_spectra <- function(spectra,
     ) |>
     dplyr::mutate(
       exactmass = as.numeric(exactmass),
-      spectrum_id = ifelse(
-        test = is.na(spectrum_id),
-        yes = dplyr::row_number(),
-        no = as.numeric(spectrum_id)
+      spectrum_id = tidytable::if_else(
+        condition = is.na(spectrum_id),
+        true = dplyr::row_number(),
+        false = as.numeric(spectrum_id)
       ),
-      compound_id = ifelse(
-        test = is.na(compound_id),
-        yes = name,
-        no = compound_id
+      compound_id = tidytable::if_else(
+        condition = is.na(compound_id),
+        true = name,
+        false = compound_id
       )
-    )
+    ) |>
+    data.frame()
 
   return(spectra_harmonized)
 }
