@@ -26,6 +26,6 @@ create_edges_parallel <- function(index,
     frags = frags,
     precs = precs
   ) |>
-    dplyr::bind_rows()
+    tidytable::bind_rows()
   return(list)
 }
