@@ -129,7 +129,6 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
-    'sanitize_spectra_benchmark.R'
     'select_sop_columns.R'
     'taxize_spectra_benchmark.R'
     'weight_chemo.R'
