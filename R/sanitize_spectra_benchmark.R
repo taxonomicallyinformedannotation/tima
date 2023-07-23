@@ -28,8 +28,6 @@ sanitize_spectra_benchmark <-
            meta_neg_path = "data/interim/benchmark/benchmark_meta_neg.tsv") {
     sp$precursorMz <- as.numeric(sp$PRECURSOR_MZ)
     sp$precursorCharge <- as.integer(sp$CHARGE)
-    sp$acquisitionNum <- as.integer(sp$SCANS)
-    sp$scanIndex <- as.integer(sp$SCANS)
 
     sp_clean <- sp |>
       Spectra::addProcessing(remove_above_precursor(),
@@ -114,8 +112,8 @@ sanitize_spectra_benchmark <-
     sp_neg <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_neg$ccmslib]
     sp_pos$feature_id <- df_clean_pos$feature_id
     sp_neg$feature_id <- df_clean_neg$feature_id
-    sp_pos$SCANS <- df_clean_pos$feature_id
-    sp_neg$SCANS <- df_clean_neg$feature_id
+    sp_pos$spectrum_id <- df_clean_pos$feature_id
+    sp_neg$spectrum_id <- df_clean_neg$feature_id
 
     spectra_harmonized_pos <- sp_pos |>
       extract_spectra() |>
@@ -134,7 +132,7 @@ sanitize_spectra_benchmark <-
         col_po = "polarity",
         col_sm = "smiles",
         col_sn = NA,
-        col_si = "SPECTRUMID",
+        col_si = "spectrum_id",
         col_sp = NA,
         col_sy = NA,
         col_xl = NA,
@@ -158,12 +156,19 @@ sanitize_spectra_benchmark <-
         col_po = "polarity",
         col_sm = "smiles",
         col_sn = NA,
-        col_si = "SPECTRUMID",
+        col_si = "spectrum_id",
         col_sp = NA,
         col_sy = NA,
         col_xl = NA,
         mode = "neg"
       )
+
+    spectra_harmonized_pos$acquisitionNum <-
+      spectra_harmonized_pos$spectrum_id |>
+      as.integer()
+    spectra_harmonized_neg$acquisitionNum <-
+      spectra_harmonized_neg$spectrum_id |>
+      as.integer()
 
     log_debug("Exporting")
     spectra_harmonized_pos |>
