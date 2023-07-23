@@ -1728,7 +1728,6 @@ list(
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
-        ## TODO ADD CONDITION
         ms1_only = par_wei_ann$annotations$ms1only,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
@@ -1786,7 +1785,6 @@ list(
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
-        ## TODO ADD CONDITION
         ms1_only = par_wei_ann$annotations$ms1only,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
@@ -1843,6 +1841,13 @@ list(
         con <- file(benchmark_file, "r")
         text <- readLines(con)
         close(con)
+        ## To get both pos and neg
+        text_1 <- text |>
+          head(10097)
+        text_2 <- text |>
+          tail(9817)
+        text <- text_1 |>
+          append(text_2)
         text_corrected <- text |>
           gsub(
             pattern =
@@ -1915,6 +1920,73 @@ list(
       }
     ),
     tar_target(
+      name = def_ann_mas,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_ann_mas,
+          usr = par_def_ann_mas
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_ms1_pre_pos,
+      command = {
+        benchmark_ann_ms1_pre_pos <-
+          annotate_masses(
+            features = benchmark_pre_meta_pos,
+            library = lib_mer_key,
+            output_annotations =
+              "data/interim/benchmark/benchmark_ms1_pos.tsv.gz",
+            output_edges =
+              "data/interim/benchmark/benchmark_edges_ms1_pos.tsv.gz",
+            name_source = def_ann_mas$names$source,
+            name_target = def_ann_mas$names$target,
+            str_2d_3d = lib_mer_str_2d_3d,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            name = lib_add["pos"],
+            adducts_list = def_ann_mas$ms$adducts,
+            adducts_masses_list = dic_add,
+            neutral_losses_list = dic_neu_los,
+            ms_mode = "pos",
+            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = def_ann_mas
+          )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_ms1_pre_neg,
+      command = {
+        benchmark_ann_ms1_pre_neg <-
+          annotate_masses(
+            features = benchmark_pre_meta_neg,
+            library = lib_mer_key,
+            output_annotations =
+              "data/interim/benchmark/benchmark_ann_ms1_neg.tsv.gz",
+            output_edges =
+              "data/interim/benchmark/benchmark_edges_ms1_neg.tsv.gz",
+            name_source = def_ann_mas$names$source,
+            name_target = def_ann_mas$names$target,
+            str_2d_3d = lib_mer_str_2d_3d,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            name = lib_add["neg"],
+            adducts_list = def_ann_mas$ms$adducts,
+            adducts_masses_list = dic_add,
+            neutral_losses_list = dic_neu_los,
+            ms_mode = "neg",
+            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
+            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
+            parameters = def_ann_mas
+          )
+      }
+    ),
+    tar_target(
       name = def_cre_edg_spe,
       command = {
         def_cre_edg_spe <- parse_yaml_params(
@@ -1928,7 +2000,7 @@ list(
       command = {
         benchmark_edg_spe_pos <- create_edges_spectra(
           input = benchmark_pre_mgf_pos,
-          output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
+          output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = def_cre_edg_spe$names$source,
           name_target = def_cre_edg_spe$names$target,
           method = def_cre_edg_spe$annotations$ms2$method,
@@ -1968,7 +2040,7 @@ list(
       command = {
         benchmark_edg_spe_neg <- create_edges_spectra(
           input = benchmark_pre_mgf_neg,
-          output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
+          output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = def_cre_edg_spe$names$source,
           name_target = def_cre_edg_spe$names$target,
           method = def_cre_edg_spe$annotations$ms2$method,
@@ -2004,98 +2076,6 @@ list(
       }
     ),
     tar_target(
-      name = def_cre_com,
-      command = {
-        def_cre_edg_spe <- parse_yaml_params(
-          def = par_def_cre_com,
-          usr = par_def_cre_com
-        )
-      }
-    ),
-    tar_file(
-      name = benchmark_com_pos,
-      command = {
-        benchmark_com_pos <- create_components(
-          input = benchmark_edg_spe_pos,
-          output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
-          parameters = def_cre_com
-        )
-      }
-    ),
-    tar_file(
-      name = benchmark_com_neg,
-      command = {
-        benchmark_com_neg <- create_components(
-          input = benchmark_edg_spe_neg,
-          output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
-          parameters = def_cre_com
-        )
-      }
-    ),
-    tar_target(
-      name = def_ann_mas,
-      command = {
-        def_cre_edg_spe <- parse_yaml_params(
-          def = par_def_ann_mas,
-          usr = par_def_ann_mas
-        )
-      }
-    ),
-    tar_file(
-      name = benchmark_ann_ms1_pre_pos,
-      command = {
-        benchmark_ann_ms1_pre_pos <-
-          annotate_masses(
-            features = benchmark_pre_meta_pos,
-            library = lib_mer_key,
-            output_annotations = "bla",
-            output_edges = "bla",
-            name_source = def_ann_mas$names$source,
-            name_target = def_ann_mas$names$target,
-            str_2d_3d = lib_mer_str_2d_3d,
-            str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
-            str_tax_cla = lib_mer_str_tax_cla,
-            str_tax_npc = lib_mer_str_tax_npc,
-            name = lib_add["pos"],
-            adducts_list = def_ann_mas$ms$adducts,
-            adducts_masses_list = dic_add,
-            neutral_losses_list = dic_neu_los,
-            ms_mode = "pos",
-            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = def_ann_mas
-          )
-      }
-    ),
-    tar_file(
-      name = benchmark_ann_ms1_pre_neg,
-      command = {
-        benchmark_ann_ms1_pre_neg <-
-          annotate_masses(
-            features = benchmark_pre_meta_neg,
-            library = lib_mer_key,
-            output_annotations = "bla",
-            output_edges = "bla",
-            name_source = def_ann_mas$names$source,
-            name_target = def_ann_mas$names$target,
-            str_2d_3d = lib_mer_str_2d_3d,
-            str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
-            str_tax_cla = lib_mer_str_tax_cla,
-            str_tax_npc = lib_mer_str_tax_npc,
-            name = lib_add["neg"],
-            adducts_list = def_ann_mas$ms$adducts,
-            adducts_masses_list = dic_add,
-            neutral_losses_list = dic_neu_los,
-            ms_mode = "neg",
-            tolerance_ppm = def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = def_ann_mas
-          )
-      }
-    ),
-    tar_target(
       name = def_pre_fea_edg,
       command = {
         def_cre_edg_spe <- parse_yaml_params(
@@ -2125,7 +2105,7 @@ list(
       name = benchmark_edg_pre_neg,
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = list(benchmark_ann_ms1_pre_neg, benchmark_edg_neg),
+          input = list(benchmark_ann_ms1_pre_neg[[2]], benchmark_edg_spe_neg),
           output = def_pre_fea_edg$
             files$
             networks$
@@ -2135,6 +2115,35 @@ list(
           name_source = def_pre_fea_edg$names$source,
           name_target = def_pre_fea_edg$names$target,
           parameters = def_pre_fea_edg
+        )
+      }
+    ),
+    tar_target(
+      name = def_cre_com,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_cre_com,
+          usr = par_def_cre_com
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_pos,
+      command = {
+        benchmark_com_pos <- create_components(
+          input = benchmark_edg_spe_pre_pos,
+          output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
+          parameters = def_cre_com
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_com_neg,
+      command = {
+        benchmark_com_neg <- create_components(
+          input = benchmark_edg_pre_neg,
+          output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
+          parameters = def_cre_com
         )
       }
     ),
@@ -2176,7 +2185,113 @@ list(
           parameters = def_pre_fea_com
         )
       }
+    ),
+    tar_file(
+      name = benchmark_ann_spe_is_lot_neg,
+      command = {
+        benchmark_ann_spe_is_lot_neg <- annotate_spectra(
+          input = benchmark_pre_mgf_neg,
+          library = lib_spe_is_lot_pre_neg,
+          polarity = "neg",
+          output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
+          method = par_ann_spe$annotations$ms2$method,
+          threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+          ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = par_ann_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            absolute,
+          rpeaks = par_ann_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            ratio,
+          condition = par_ann_spe$annotations$ms2$thresholds$condition,
+          qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
+          parallel = par_ann_spe$options$parallel,
+          fast = par_ann_spe$options$fast,
+          approx = par_ann_spe$annotations$ms2$approx,
+          parameters = par_ann_spe
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_spe_is_pre,
+      command = {
+        benchmark_ann_spe_is_pre <- prepare_annotations_spectra(
+          input = list(
+            benchmark_ann_spe_is_lot_neg
+          ),
+          output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
+          str_2d_3d = lib_mer_str_2d_3d,
+          str_met = lib_mer_str_met,
+          str_nam = lib_mer_str_nam,
+          str_tax_cla = lib_mer_str_tax_cla,
+          str_tax_npc = lib_mer_str_tax_npc,
+          parameters = par_pre_ann_spe # todo
+        )
+      }
     )
+  ),
+  ## todo ann spe neg new
+  ## todo par wei new
+  tar_file(
+    name = benchmark_ann_pre_1_neg,
+    command = {
+      benchmark_ann_pre_1_neg <- weight_annotations(
+        library = lib_mer_key,
+        str_2d_3d = lib_mer_str_2d_3d,
+        annotations = list(
+          benchmark_ann_spe_is_pre,
+          benchmark_ann_ms1_pre_neg[[1]]
+        ),
+        components = benchmark_com_pre_neg,
+        edges = benchmark_edg_pre_neg,
+        features = benchmark_pre_meta_neg,
+        taxa = benchmark_taxed_neg,
+        output = "tadaaam.tsv",
+        candidates_initial = par_wei_ann$annotations$candidates$initial,
+        candidates_final = par_wei_ann$annotations$candidates$final,
+        weight_spectral = par_wei_ann$weights$global$spectral,
+        weight_chemical = par_wei_ann$weights$global$chemical,
+        weight_biological = par_wei_ann$weights$global$biological,
+        score_biological_domain = par_wei_ann$weights$biological$domain,
+        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
+        score_biological_phylum = par_wei_ann$weights$biological$phylum,
+        score_biological_class = par_wei_ann$weights$biological$class,
+        score_biological_order = par_wei_ann$weights$biological$order,
+        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
+        score_biological_family = par_wei_ann$weights$biological$family,
+        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
+        score_biological_tribe = par_wei_ann$weights$biological$tribe,
+        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
+        score_biological_genus = par_wei_ann$weights$biological$genus,
+        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
+        score_biological_species = par_wei_ann$weights$biological$species,
+        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
+        score_biological_variety = par_wei_ann$weights$biological$variety,
+        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
+        score_chemical_cla_superclass =
+          par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
+        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
+        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
+        score_chemical_npc_superclass =
+          par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
+        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
+        ms1_only = par_wei_ann$annotations$ms1only,
+        summarise = par_wei_ann$options$summarise,
+        pattern = par_wei_ann$files$pattern,
+        force = par_wei_ann$options$force,
+        parameters = par_wei_ann
+      )
+    }
     ## TODO Add benchmark
   )
 )

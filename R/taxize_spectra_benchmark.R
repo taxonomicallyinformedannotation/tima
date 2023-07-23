@@ -53,8 +53,16 @@ taxize_spectra_benchmark <-
         )) |>
       tidytable::select(
         feature_id,
-        contains("organism_taxonomy_"),
-        -contains("ott")
+        sample_organism_01_domain = organism_taxonomy_01domain,
+        sample_organism_02_kingdom = organism_taxonomy_02kingdom,
+        sample_organism_03_phylum = organism_taxonomy_03phylum,
+        sample_organism_04_class = organism_taxonomy_04class,
+        sample_organism_05_order = organism_taxonomy_05order,
+        sample_organism_06_family = organism_taxonomy_06family,
+        sample_organism_07_tribe = organism_taxonomy_07tribe,
+        sample_organism_08_genus = organism_taxonomy_08genus,
+        sample_organism_09_species = organism_taxonomy_09species,
+        sample_organism_10_varietas = organism_taxonomy_10varietas
       )
 
     export_output(x = features_taxed, file = output)
