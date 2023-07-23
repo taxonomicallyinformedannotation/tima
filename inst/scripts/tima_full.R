@@ -8,7 +8,7 @@ log_debug(
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
 
-targets::tar_make(names = matches("ann_pre_crazy"))
+targets::tar_make(names = matches("^ann_pre_crazy"))
 
 end <- Sys.time()
 
