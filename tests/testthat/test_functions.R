@@ -376,6 +376,16 @@ testthat::test_that("Whole process", {
     df = fake_taxon_df,
     url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
   )
+  ## Stupid tests for benchmark
+  data.frame(feature_id = 1, organism_name = "Gentiana lutea") |>
+    export_output("data/interim/benchmark/bench_test_in.tsv.gz")
+  taxize_spectra_benchmark(
+    input = "data/interim/benchmark/bench_test_in.tsv.gz",
+    keys = paths$data$interim$libraries$sop$merged$keys,
+    org_tax_ott =
+      paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
+    output = "data/interim/benchmark/bench_test_out.tsv.gz"
+  )
 
   ## Perform TIMA
   step <- "weight_annotations"

@@ -2016,18 +2016,18 @@ list(
           Spectra::Spectra() |>
           Spectra::export(
             backend = MsBackendMgf::MsBackendMgf(),
-            file = mgf_pos_path
+            file = benchmark_path_mgf_pos
           )
         spectra_harmonized_neg |>
           Spectra::Spectra() |>
           Spectra::export(
             backend = MsBackendMgf::MsBackendMgf(),
-            file = mgf_neg_path
+            file = benchmark_path_mgf_neg
           )
         df_clean_pos |>
-          export_output(meta_pos_path)
+          export_output("data/interim/benchmark/benchmark_meta_pos.tsv")
         df_clean_neg |>
-          export_output(meta_neg_path)
+          export_output("data/interim/benchmark/benchmark_meta_neg.tsv")
 
         return(
           c(
@@ -2254,7 +2254,7 @@ list(
       name = benchmark_edg_pre_pos,
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = list(benchmark_ann_ms1_pre_pos, benchmark_edg_pos),
+          input = list(benchmark_ann_ms1_pre_pos[[2]], benchmark_edg_spe_pos),
           output = def_pre_fea_edg$
             files$
             networks$
@@ -2297,7 +2297,7 @@ list(
       name = benchmark_com_pos,
       command = {
         benchmark_com_pos <- create_components(
-          input = benchmark_edg_spe_pre_pos,
+          input = benchmark_edg_pre_pos,
           output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
           parameters = def_cre_com
         )
@@ -2352,6 +2352,48 @@ list(
         )
       }
     ),
+    tar_target(
+      name = def_ann_spe,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_ann_spe,
+          usr = par_def_ann_spe
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_spe_is_lot_pos,
+      command = {
+        benchmark_ann_spe_is_lot_pos <- annotate_spectra(
+          input = benchmark_pre_mgf_pos,
+          library = lib_spe_is_lot_pre_pos,
+          polarity = "pos",
+          output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
+          method = def_ann_spe$annotations$ms2$method,
+          threshold = def_ann_spe$annotations$ms2$thresholds$similarity,
+          ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = def_ann_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            absolute,
+          rpeaks = def_ann_spe$
+            annotations$
+            ms2$
+            thresholds$
+            peaks$
+            ratio,
+          condition = def_ann_spe$annotations$ms2$thresholds$condition,
+          qutoff = def_ann_spe$ms$intensity$thresholds$ms2,
+          parallel = def_ann_spe$options$parallel,
+          fast = def_ann_spe$options$fast,
+          approx = def_ann_spe$annotations$ms2$approx,
+          parameters = def_ann_spe
+        )
+      }
+    ),
     tar_file(
       name = benchmark_ann_spe_is_lot_neg,
       command = {
@@ -2360,35 +2402,61 @@ list(
           library = lib_spe_is_lot_pre_neg,
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
-          method = par_ann_spe$annotations$ms2$method,
-          threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
-          ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_ann_spe$
+          method = def_ann_spe$annotations$ms2$method,
+          threshold = def_ann_spe$annotations$ms2$thresholds$similarity,
+          ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
+          dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
+          npeaks = def_ann_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             absolute,
-          rpeaks = par_ann_spe$
+          rpeaks = def_ann_spe$
             annotations$
             ms2$
             thresholds$
             peaks$
             ratio,
-          condition = par_ann_spe$annotations$ms2$thresholds$condition,
-          qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-          parallel = par_ann_spe$options$parallel,
-          fast = par_ann_spe$options$fast,
-          approx = par_ann_spe$annotations$ms2$approx,
-          parameters = par_ann_spe
+          condition = def_ann_spe$annotations$ms2$thresholds$condition,
+          qutoff = def_ann_spe$ms$intensity$thresholds$ms2,
+          parallel = def_ann_spe$options$parallel,
+          fast = def_ann_spe$options$fast,
+          approx = def_ann_spe$annotations$ms2$approx,
+          parameters = def_ann_spe
+        )
+      }
+    ),
+    tar_target(
+      name = def_pre_ann_spe,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_pre_ann_spe,
+          usr = par_def_pre_ann_spe
         )
       }
     ),
     tar_file(
-      name = benchmark_ann_spe_is_pre,
+      name = benchmark_ann_spe_is_pre_pos,
       command = {
-        benchmark_ann_spe_is_pre <- prepare_annotations_spectra(
+        benchmark_ann_spe_is_pre_pos <- prepare_annotations_spectra(
+          input = list(
+            benchmark_ann_spe_is_lot_pos
+          ),
+          output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
+          str_2d_3d = lib_mer_str_2d_3d,
+          str_met = lib_mer_str_met,
+          str_nam = lib_mer_str_nam,
+          str_tax_cla = lib_mer_str_tax_cla,
+          str_tax_npc = lib_mer_str_tax_npc,
+          parameters = def_pre_ann_spe
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_spe_is_pre_neg,
+      command = {
+        benchmark_ann_spe_is_pre_neg <- prepare_annotations_spectra(
           input = list(
             benchmark_ann_spe_is_lot_neg
           ),
@@ -2398,66 +2466,126 @@ list(
           str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
           str_tax_npc = lib_mer_str_tax_npc,
-          parameters = par_pre_ann_spe # todo
+          parameters = def_pre_ann_spe
+        )
+      }
+    ),
+    tar_target(
+      name = def_wei_ann,
+      command = {
+        def_cre_edg_spe <- parse_yaml_params(
+          def = par_def_wei_ann,
+          usr = par_def_wei_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_pre_1_pos,
+      command = {
+        benchmark_ann_pre_1_pos <- weight_annotations(
+          library = lib_mer_key,
+          str_2d_3d = lib_mer_str_2d_3d,
+          annotations = list(
+            benchmark_ann_spe_is_pre_pos,
+            benchmark_ann_ms1_pre_pos[[1]]
+          ),
+          components = benchmark_com_pre_pos,
+          edges = benchmark_edg_pre_pos,
+          features = benchmark_pre_meta_pos,
+          taxa = benchmark_taxed_pos,
+          output = "tadaaam_pos.tsv",
+          candidates_initial = def_wei_ann$annotations$candidates$initial,
+          candidates_final = def_wei_ann$annotations$candidates$final,
+          weight_spectral = def_wei_ann$weights$global$spectral,
+          weight_chemical = def_wei_ann$weights$global$chemical,
+          weight_biological = def_wei_ann$weights$global$biological,
+          score_biological_domain = def_wei_ann$weights$biological$domain,
+          score_biological_kingdom = def_wei_ann$weights$biological$kingdom,
+          score_biological_phylum = def_wei_ann$weights$biological$phylum,
+          score_biological_class = def_wei_ann$weights$biological$class,
+          score_biological_order = def_wei_ann$weights$biological$order,
+          score_biological_infraorder = def_wei_ann$weights$biological$infraorder,
+          score_biological_family = def_wei_ann$weights$biological$family,
+          score_biological_subfamily = def_wei_ann$weights$biological$subfamily,
+          score_biological_tribe = def_wei_ann$weights$biological$tribe,
+          score_biological_subtribe = def_wei_ann$weights$biological$subtribe,
+          score_biological_genus = def_wei_ann$weights$biological$genus,
+          score_biological_subgenus = def_wei_ann$weights$biological$subgenus,
+          score_biological_species = def_wei_ann$weights$biological$species,
+          score_biological_subspecies = def_wei_ann$weights$biological$subspecies,
+          score_biological_variety = def_wei_ann$weights$biological$variety,
+          score_chemical_cla_kingdom = def_wei_ann$weights$chemical$cla$kingdom,
+          score_chemical_cla_superclass =
+            def_wei_ann$weights$chemical$cla$superclass,
+          score_chemical_cla_class = def_wei_ann$weights$chemical$cla$class,
+          score_chemical_cla_parent = def_wei_ann$weights$chemical$cla$parent,
+          score_chemical_npc_pathway = def_wei_ann$weights$chemical$npc$pathway,
+          score_chemical_npc_superclass =
+            def_wei_ann$weights$chemical$npc$superclass,
+          score_chemical_npc_class = def_wei_ann$weights$chemical$npc$class,
+          minimal_ms1_bio = def_wei_ann$annotations$ms1$thresholds$biological,
+          minimal_ms1_chemo = def_wei_ann$annotations$ms1$thresholds$chemical,
+          ms1_only = def_wei_ann$annotations$ms1only,
+          summarise = def_wei_ann$options$summarise,
+          pattern = def_wei_ann$files$pattern,
+          force = def_wei_ann$options$force,
+          parameters = def_wei_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_pre_1_neg,
+      command = {
+        benchmark_ann_pre_1_neg <- weight_annotations(
+          library = lib_mer_key,
+          str_2d_3d = lib_mer_str_2d_3d,
+          annotations = list(
+            benchmark_ann_spe_is_pre_neg,
+            benchmark_ann_ms1_pre_neg[[1]]
+          ),
+          components = benchmark_com_pre_neg,
+          edges = benchmark_edg_pre_neg,
+          features = benchmark_pre_meta_neg,
+          taxa = benchmark_taxed_neg,
+          output = "tadaaam_neg.tsv",
+          candidates_initial = def_wei_ann$annotations$candidates$initial,
+          candidates_final = def_wei_ann$annotations$candidates$final,
+          weight_spectral = def_wei_ann$weights$global$spectral,
+          weight_chemical = def_wei_ann$weights$global$chemical,
+          weight_biological = def_wei_ann$weights$global$biological,
+          score_biological_domain = def_wei_ann$weights$biological$domain,
+          score_biological_kingdom = def_wei_ann$weights$biological$kingdom,
+          score_biological_phylum = def_wei_ann$weights$biological$phylum,
+          score_biological_class = def_wei_ann$weights$biological$class,
+          score_biological_order = def_wei_ann$weights$biological$order,
+          score_biological_infraorder = def_wei_ann$weights$biological$infraorder,
+          score_biological_family = def_wei_ann$weights$biological$family,
+          score_biological_subfamily = def_wei_ann$weights$biological$subfamily,
+          score_biological_tribe = def_wei_ann$weights$biological$tribe,
+          score_biological_subtribe = def_wei_ann$weights$biological$subtribe,
+          score_biological_genus = def_wei_ann$weights$biological$genus,
+          score_biological_subgenus = def_wei_ann$weights$biological$subgenus,
+          score_biological_species = def_wei_ann$weights$biological$species,
+          score_biological_subspecies = def_wei_ann$weights$biological$subspecies,
+          score_biological_variety = def_wei_ann$weights$biological$variety,
+          score_chemical_cla_kingdom = def_wei_ann$weights$chemical$cla$kingdom,
+          score_chemical_cla_superclass =
+            def_wei_ann$weights$chemical$cla$superclass,
+          score_chemical_cla_class = def_wei_ann$weights$chemical$cla$class,
+          score_chemical_cla_parent = def_wei_ann$weights$chemical$cla$parent,
+          score_chemical_npc_pathway = def_wei_ann$weights$chemical$npc$pathway,
+          score_chemical_npc_superclass =
+            def_wei_ann$weights$chemical$npc$superclass,
+          score_chemical_npc_class = def_wei_ann$weights$chemical$npc$class,
+          minimal_ms1_bio = def_wei_ann$annotations$ms1$thresholds$biological,
+          minimal_ms1_chemo = def_wei_ann$annotations$ms1$thresholds$chemical,
+          ms1_only = def_wei_ann$annotations$ms1only,
+          summarise = def_wei_ann$options$summarise,
+          pattern = def_wei_ann$files$pattern,
+          force = def_wei_ann$options$force,
+          parameters = def_wei_ann
         )
       }
     )
-  ),
-  ## todo ann spe neg new
-  ## todo par wei new
-  tar_file(
-    name = benchmark_ann_pre_1_neg,
-    command = {
-      benchmark_ann_pre_1_neg <- weight_annotations(
-        library = lib_mer_key,
-        str_2d_3d = lib_mer_str_2d_3d,
-        annotations = list(
-          benchmark_ann_spe_is_pre,
-          benchmark_ann_ms1_pre_neg[[1]]
-        ),
-        components = benchmark_com_pre_neg,
-        edges = benchmark_edg_pre_neg,
-        features = benchmark_pre_meta_neg,
-        taxa = benchmark_taxed_neg,
-        output = "tadaaam.tsv",
-        candidates_initial = par_wei_ann$annotations$candidates$initial,
-        candidates_final = par_wei_ann$annotations$candidates$final,
-        weight_spectral = par_wei_ann$weights$global$spectral,
-        weight_chemical = par_wei_ann$weights$global$chemical,
-        weight_biological = par_wei_ann$weights$global$biological,
-        score_biological_domain = par_wei_ann$weights$biological$domain,
-        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
-        score_biological_phylum = par_wei_ann$weights$biological$phylum,
-        score_biological_class = par_wei_ann$weights$biological$class,
-        score_biological_order = par_wei_ann$weights$biological$order,
-        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
-        score_biological_family = par_wei_ann$weights$biological$family,
-        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
-        score_biological_tribe = par_wei_ann$weights$biological$tribe,
-        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
-        score_biological_genus = par_wei_ann$weights$biological$genus,
-        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
-        score_biological_species = par_wei_ann$weights$biological$species,
-        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
-        score_biological_variety = par_wei_ann$weights$biological$variety,
-        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass =
-          par_wei_ann$weights$chemical$cla$superclass,
-        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
-        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
-        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass =
-          par_wei_ann$weights$chemical$npc$superclass,
-        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
-        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
-        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
-        ms1_only = par_wei_ann$annotations$ms1only,
-        summarise = par_wei_ann$options$summarise,
-        pattern = par_wei_ann$files$pattern,
-        force = par_wei_ann$options$force,
-        parameters = par_wei_ann
-      )
-    }
-    ## TODO Add benchmark
   )
 )
