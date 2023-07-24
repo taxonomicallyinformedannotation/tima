@@ -22,7 +22,7 @@ create_edges_parallel <- function(index,
     X = (index + 1):nspecs,
     FUN = create_edges_progress,
     query = index,
-    s1 = frags[[index]],
+    s1 = cbind(mz = frags[[index]][, 1], intensity = frags[[index]][, 2]),
     frags = frags,
     precs = precs
   ) |>
