@@ -74,6 +74,7 @@ pos
 pre
 renv
 reproducibility
+sanitization
 silico
 sirius
 sqlite
