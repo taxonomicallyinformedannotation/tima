@@ -4,14 +4,12 @@
 \alias{keep_peaks}
 \title{Keep peaks}
 \usage{
-keep_peaks(x, prop, deep)
+keep_peaks(x, prop)
 }
 \arguments{
 \item{x}{PeakData}
 
 \item{prop}{Minimal ratio to the max peak}
-
-\item{deep}{Deeper sanitization}
 }
 \description{
 This function keeps a proportion of peaks

@@ -23,10 +23,21 @@ sanitize_spectra <-
            deeper = FALSE) {
     log_debug("Applying initial filters to query spectra")
 
+    if (deeper) {
+      spectra <- spectra |>
+        Spectra::filterIntensity(
+          intensity = function(x) {
+            ## eventually go to 25%
+            x <- x > quantile(x)[1]
+          }
+        ) |>
+        Spectra::applyProcessing()
+    }
+
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
       Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
-      Spectra::filterIntensity(intensity = keep_peaks, prop = ratio, deep = deeper) |>
+      Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
       Spectra::applyProcessing()
 
     lengths <- lapply(spectra@backend@peaksData, length)

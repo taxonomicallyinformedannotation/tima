@@ -1866,7 +1866,7 @@ list(
           sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
           Spectra::setBackend(Spectra::MsBackendMemory()) |>
-          sanitize_spectra(cutoff = 0)
+          sanitize_spectra(cutoff = 0, ratio = 1000, deeper = TRUE)
 
         sp$precursorMz <- as.numeric(sp$PRECURSOR_MZ)
         sp$precursorCharge <- as.integer(sp$CHARGE)
@@ -1890,6 +1890,7 @@ list(
         smiles <- sp_clean$smiles
         ccmslib <- sp_clean$SPECTRUMID
         charge <- sp_clean$precursorCharge
+        name <- sp_clean$name
 
         df_meta <- tidytable::tidytable(
           adduct,
@@ -1899,7 +1900,8 @@ list(
           pepmass,
           smiles,
           ccmslib,
-          charge
+          charge,
+          name
         ) |>
           tidyft::mutate_vars(
             is.character,
@@ -1910,13 +1912,20 @@ list(
 
         df_clean <- df_meta |>
           dplyr::filter(!is.na(inchikey)) |>
-          dplyr::filter(fragments >= 6) |>
-          dplyr::filter(fragments <= 300) |>
+          dplyr::filter(fragments >= 5) |>
+          dplyr::filter(fragments <= 100) |>
           dplyr::filter(!grepl(
             pattern = "QQQ",
             x = instrument,
             fixed = TRUE
           )) |>
+          ## fragments are nominal mass
+          dplyr::filter(!grepl(
+            pattern = "ReSpect",
+            x = name,
+            fixed = TRUE
+          )) |>
+          dplyr::select(-name) |>
           dplyr::mutate(mass = pepmass) |>
           tidyr::separate(
             col = mass,
@@ -1939,15 +1948,11 @@ list(
           dplyr::ungroup()
 
         df_clean_neg <- df_clean |>
-          dplyr::filter(grepl(
-            pattern = "-",
-            x = charge,
-            fixed = TRUE
-          )) |>
+          dplyr::filter(grepl(pattern = "]-", x = adduct, fixed = TRUE)) |>
           dplyr::mutate(feature_id = dplyr::row_number())
 
         df_clean_pos <- df_clean |>
-          dplyr::anti_join(df_clean_neg) |>
+          dplyr::filter(grepl(pattern = "]+", x = adduct, fixed = TRUE)) |>
           dplyr::mutate(feature_id = dplyr::row_number())
 
         sp_pos <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_pos$ccmslib]
