@@ -25,8 +25,7 @@ create_edges_progress <- function(target,
                                   s1,
                                   frags,
                                   precs) {
-  s2 <-
-    cbind(mz = frags[[target]][, 1], intensity = frags[[target]][, 2])
+  s2 <- frags[[target]]
   map <-
     MsCoreUtils::join_gnps(
       x = s1[, 1],
@@ -37,7 +36,6 @@ create_edges_progress <- function(target,
       ppm = params$ms$tolerances$mass$ppm$ms2
     )
   matched_peaks_count <- length((map$x * map$y)[!is.na(map$x * map$y)])
-  presence_ratio <-
     return(
       data.frame(
         "feature_id" = query,

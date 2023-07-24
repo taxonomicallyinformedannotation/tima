@@ -1842,12 +1842,12 @@ list(
         text <- readLines(con)
         close(con)
         ## To get both pos and neg
-        text_1 <- text |>
-          head(10097)
-        text_2 <- text |>
-          tail(9817)
-        text <- text_1 |>
-          append(text_2)
+        # text_1 <- text |>
+        #   head(100471)
+        # text_2 <- text |>
+        #   tail(100387)
+        # text <- text_1 |>
+        #   append(text_2)
         text_corrected <- text |>
           gsub(
             pattern =
@@ -1909,8 +1909,8 @@ list(
 
         df_clean <- df_meta |>
           dplyr::filter(!is.na(inchikey)) |>
-          dplyr::filter(fragments > 5) |>
-          dplyr::filter(fragments <= 1000) |>
+          dplyr::filter(fragments >= 6) |>
+          dplyr::filter(fragments <= 300) |>
           dplyr::filter(!grepl(
             pattern = "QQQ",
             x = instrument,
@@ -2386,7 +2386,7 @@ list(
             peaks$
             ratio,
           condition = def_ann_spe$annotations$ms2$thresholds$condition,
-          qutoff = def_ann_spe$ms$intensity$thresholds$ms2,
+          qutoff = 0,
           parallel = def_ann_spe$options$parallel,
           fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
@@ -2419,7 +2419,7 @@ list(
             peaks$
             ratio,
           condition = def_ann_spe$annotations$ms2$thresholds$condition,
-          qutoff = def_ann_spe$ms$intensity$thresholds$ms2,
+          qutoff = 0,
           parallel = def_ann_spe$options$parallel,
           fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
