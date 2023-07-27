@@ -4,19 +4,15 @@
 \alias{create_edges_parallel}
 \title{Create edges parallel}
 \usage{
-create_edges_parallel(index, frags, precs, nspecs)
-}
-\arguments{
-\item{index}{Indices}
-
-\item{frags}{Fragments}
-
-\item{precs}{Precursors}
-
-\item{nspecs}{Number of spectra}
+create_edges_parallel(
+  spectra,
+  ms2_tolerance = params$ms$tolerances$mass$dalton$ms2,
+  ppm_tolerance = params$ms$tolerances$mass$ppm$ms2,
+  parallel = params$options$parallel
+)
 }
 \description{
-This function part of the creation of edges
+This function is part of the creation of edges
 }
 \examples{
 NULL

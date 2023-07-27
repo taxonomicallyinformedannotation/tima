@@ -2393,7 +2393,7 @@ list(
             ratio,
           condition = def_ann_spe$annotations$ms2$thresholds$condition,
           qutoff = 0,
-          parallel = def_ann_spe$options$parallel,
+          parallel = TRUE,
           fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
@@ -2426,7 +2426,7 @@ list(
             ratio,
           condition = def_ann_spe$annotations$ms2$thresholds$condition,
           qutoff = 0,
-          parallel = def_ann_spe$options$parallel,
+          parallel = TRUE,
           fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
