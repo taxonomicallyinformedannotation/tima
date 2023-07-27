@@ -13,6 +13,7 @@ utils::globalVariables(
 #' @param precs Precursors
 #' @param nspecs Number of spectra
 #' @param p Progressor
+#' @param parallel Parallel
 #'
 #' @return NULL
 #'
@@ -25,8 +26,12 @@ create_edges_progress <- function(index,
                                   nspecs,
                                   ms2_tolerance,
                                   ppm_tolerance,
-                                  p) {
-  p(sprintf("spectra=%g", nspecs))
+                                  p = NA,
+                                  parallel) {
+  if (parallel) {
+    p(sprintf("spectra=%g", nspecs))
+  }
+
   s1 <- frags[[index]]
   query_prec <- precs[index]
 
