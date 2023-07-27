@@ -293,27 +293,14 @@ testthat::test_that("Whole process", {
     fast = FALSE,
     condition = "AND"
   )
+  ### Semi slow
+  create_edges_spectra(
+    parallel = TRUE,
+    fast = FALSE,
+    condition = "AND"
+  )
   ### Normal
   create_edges_spectra(condition = "OR")
-
-  ## additional test not covered by lapply
-  spectra <- params$files$spectral$raw |>
-    import_spectra()
-  spectra <- spectra |>
-    sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
-  frags <- spectra@backend@peaksData[1:2]
-  # single_pair[[1]] <- single_pair[[1]] |>
-  #   normalize_peaks()
-  # single_pair[[2]] <- single_pair[[2]] |>
-  #   normalize_peaks()
-  precs <- spectra$precursorMz[1:2]
-  nspecs <- length(frags)
-  create_edges_parallel(1,
-    frags = frags,
-    precs = precs,
-    nspecs = nspecs
-  )
-  ##
 
   ### GNPS results
   step <- "prepare_annotations_gnps"

@@ -91,29 +91,8 @@ create_edges_spectra <- function(
       expect a long processing time."
     )
     log_debug("Take yourself a break, you deserve it.")
-    nspecz <- length(spectra)
-    precz <- spectra$precursorMz
-    fragz <- spectra@backend@peaksData
-    ## Originally written with future but too slow...TODO investigate
-    ## TODO investigate weird error
-    zzz <- lapply(
-      X = 2:1,
-      FUN = create_edges_progress,
-      query = 1,
-      s1 = cbind(mz = fragz[[1]][, 1], intensity = fragz[[1]][, 2]),
-      frags = fragz,
-      precs = precz
-    )
-    edges <- pbmcapply::pbmclapply(
-      X = 1:(nspecz - 1),
-      mc.cores = parallelly::availableCores(),
-      ignore.interactive = TRUE,
-      FUN = create_edges_parallel,
-      frags = fragz,
-      precs = precz,
-      nspecs = nspecz
-    ) |>
-      tidytable::bind_rows()
+    edges <- spectra |>
+      create_edges_parallel()
 
     ## old version, keep in case
     # par <- if (parallel) {

@@ -4,22 +4,26 @@
 \alias{create_edges_progress}
 \title{Create edges progress}
 \usage{
-create_edges_progress(target, query, s1, frags, precs)
+create_edges_progress(
+  index,
+  frags,
+  precs,
+  nspecs,
+  ms2_tolerance,
+  ppm_tolerance
+)
 }
 \arguments{
-\item{target}{Indices of target spectra}
-
-\item{query}{Index of query spectra}
-
-\item{s1}{Query spectrum}
+\item{index}{Indices}
 
 \item{frags}{Fragments}
 
 \item{precs}{Precursors}
+
+\item{nspecs}{Number of spectra}
 }
 \description{
-This function is slow so it outputs
-the progression of the creation of edges
+This function is slow so it had to be parallelized
 }
 \examples{
 NULL

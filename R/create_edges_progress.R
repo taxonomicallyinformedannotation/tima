@@ -6,43 +6,50 @@ utils::globalVariables(
 
 #' @title Create edges progress
 #'
-#' @description This function is slow so it outputs
-#'    the progression of the creation of edges
+#' @description This function is slow so it had to be parallelized
 #'
-#' @param target Indices of target spectra
-#' @param query Index of query spectra
-#' @param s1 Query spectrum
+#' @param index Indices
 #' @param frags Fragments
 #' @param precs Precursors
+#' @param nspecs Number of spectra
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-create_edges_progress <- function(target,
-                                  query,
-                                  s1,
+create_edges_progress <- function(index,
                                   frags,
-                                  precs) {
-  s2 <- cbind(mz = frags[[target]][, 1], intensity = frags[[target]][, 2])
-  map <-
-    MsCoreUtils::join_gnps(
+                                  precs,
+                                  nspecs,
+                                  ms2_tolerance,
+                                  ppm_tolerance) {
+  s1 <- frags[[index]]
+  query_prec <- precs[index]
+
+  inner_list <- list()
+
+  for (target in (index + 1):nspecs) {
+    s2 <- frags[[target]]
+    map <- MsCoreUtils::join_gnps(
       x = s1[, 1],
       y = s2[, 1],
-      xPrecursorMz = precs[query],
+      xPrecursorMz = query_prec,
       yPrecursorMz = precs[target],
-      tolerance = params$ms$tolerances$mass$dalton$ms2,
-      ppm = params$ms$tolerances$mass$ppm$ms2
+      tolerance = ms2_tolerance,
+      ppm = ppm_tolerance
     )
-  matched_peaks_count <- length((map$x * map$y)[!is.na(map$x * map$y)])
-  return(
-    data.frame(
-      "feature_id" = query,
+    xy_product <- map$x * map$y
+    matched_peaks_count <- sum(!is.na(xy_product))
+
+    inner_list[[target - index]] <- list(
+      "feature_id" = index,
       "target_id" = target,
       "score" = MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ]),
       "matched_peaks_count" = matched_peaks_count,
       "presence_ratio" = matched_peaks_count / length(map$y)
     )
-  )
+  }
+
+  return(inner_list)
 }
