@@ -371,6 +371,32 @@
     },
     "8": {
       "@type": "SoftwareApplication",
+      "identifier": "future",
+      "name": "future",
+      "version": ">= 1.33.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "future.apply",
+      "name": "future.apply",
+      "version": ">= 1.11.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future.apply"
+    },
+    "10": {
+      "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
       "version": ">= 1.5.0.1",
@@ -382,7 +408,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "9": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -395,7 +421,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "10": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboAnnotation",
       "name": "MetaboAnnotation",
@@ -408,7 +434,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboAnnotation.html"
     },
-    "11": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -421,7 +447,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "12": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
@@ -434,33 +460,20 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
     },
-    "13": {
-      "@type": "SoftwareApplication",
-      "identifier": "parallelly",
-      "name": "parallelly",
-      "version": ">= 1.36.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=parallelly"
-    },
-    "14": {
-      "@type": "SoftwareApplication",
-      "identifier": "pbmcapply",
-      "name": "pbmcapply",
-      "version": ">= 1.5.1",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=pbmcapply"
-    },
     "15": {
+      "@type": "SoftwareApplication",
+      "identifier": "progressr",
+      "name": "progressr",
+      "version": ">= 0.13.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=progressr"
+    },
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
@@ -473,7 +486,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=R.utils"
     },
-    "16": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -486,7 +499,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "17": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -499,12 +512,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "18": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "19": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -517,7 +530,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "20": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -530,7 +543,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "21": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -543,7 +556,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "22": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "tidyft",
       "name": "tidyft",
@@ -556,12 +569,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyft"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",

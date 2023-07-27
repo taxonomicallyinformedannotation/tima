@@ -2,7 +2,8 @@
 
 # timaR 2.8.2
 
-* fix empty chemical classes
+* Change from pbmclapply to future.lapply
+* Fix empty chemical classes
 * [renv](https://rstudio.github.io/renv/index.html) removal
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Github Actions improvement

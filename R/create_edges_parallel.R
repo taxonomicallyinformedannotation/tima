@@ -23,17 +23,18 @@ create_edges_parallel <- function(spectra,
   ppmz <- ppm_tolerance
 
   if (parallel) {
-    result_list <-
-      pbmcapply::pbmclapply(
-        X = 1:(nspecz - 1),
-        FUN = create_edges_progress,
-        mc.cores = parallelly::availableCores(),
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = msz,
-        ppm_tolerance = ppmz
-      )
+    future::plan(future::multisession)
+    progressr::handlers("progress")
+    result_list <- future.apply::future_lapply(
+      X = 1:(nspecz - 1),
+      FUN = create_edges_progress,
+      p = progressr::progressor(along = 1:(nspecz - 1)),
+      frags = fragz,
+      precs = precz,
+      nspecs = nspecz,
+      ms2_tolerance = msz,
+      ppm_tolerance = ppmz
+    )
   } else {
     result_list <-
       lapply(

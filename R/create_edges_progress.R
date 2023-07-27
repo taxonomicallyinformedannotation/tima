@@ -12,6 +12,7 @@ utils::globalVariables(
 #' @param frags Fragments
 #' @param precs Precursors
 #' @param nspecs Number of spectra
+#' @param p Progressor
 #'
 #' @return NULL
 #'
@@ -23,7 +24,9 @@ create_edges_progress <- function(index,
                                   precs,
                                   nspecs,
                                   ms2_tolerance,
-                                  ppm_tolerance) {
+                                  ppm_tolerance,
+                                  p) {
+  p(sprintf("spectra=%g", nspecs))
   s1 <- frags[[index]]
   query_prec <- precs[index]
 
