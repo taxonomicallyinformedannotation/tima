@@ -33,7 +33,8 @@ create_edges_parallel <- function(spectra,
       precs = precz,
       nspecs = nspecz,
       ms2_tolerance = msz,
-      ppm_tolerance = ppmz
+      ppm_tolerance = ppmz,
+      parallel = parallel
     )
   } else {
     result_list <-
@@ -44,7 +45,9 @@ create_edges_parallel <- function(spectra,
         precs = precz,
         nspecs = nspecz,
         ms2_tolerance = msz,
-        ppm_tolerance = ppmz
+        ppm_tolerance = ppmz,
+        p = NA,
+        parallel = parallel
       )
   }
 

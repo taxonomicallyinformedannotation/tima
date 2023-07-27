@@ -302,6 +302,40 @@ testthat::test_that("Whole process", {
   ### Normal
   create_edges_spectra(condition = "OR")
 
+  ## additional test not covered by lapply
+  spectra <- params$files$spectral$raw |>
+    import_spectra()
+  spectra <- spectra |>
+    sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
+  frags <- spectra@backend@peaksData[1:2]
+  # single_pair[[1]] <- single_pair[[1]] |>
+  #   normalize_peaks()
+  # single_pair[[2]] <- single_pair[[2]] |>
+  #   normalize_peaks()
+  precs <- spectra$precursorMz[1:2]
+  nspecs <- length(frags)
+  create_edges_progress(
+    index = 1,
+    frags = frags,
+    precs = precs,
+    nspecs = nspecs,
+    ms2_tolerance = 0.01,
+    ppm = 5,
+    p = NA,
+    parallel = FALSE
+  )
+  progressr::with_progress(create_edges_progress(
+    index = 1,
+    frags = frags,
+    precs = precs,
+    nspecs = nspecs,
+    ms2_tolerance = 0.01,
+    ppm = 5,
+    p = progressr::progressor(along = 1),
+    parallel = TRUE
+  ))
+  ##
+
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)

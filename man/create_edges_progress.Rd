@@ -11,7 +11,8 @@ create_edges_progress(
   nspecs,
   ms2_tolerance,
   ppm_tolerance,
-  p
+  p = NA,
+  parallel
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ create_edges_progress(
 \item{nspecs}{Number of spectra}
 
 \item{p}{Progressor}
+
+\item{parallel}{Parallel}
 }
 \description{
 This function is slow so it had to be parallelized
