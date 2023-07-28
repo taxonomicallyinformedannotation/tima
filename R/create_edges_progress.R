@@ -48,7 +48,7 @@ create_edges_progress <- function(index,
       ppm = ppm_tolerance
     )
     xy_product <- map$x * map$y
-    matched_peaks_count <- sum(!is.na(xy_product))
+    count_peaks_matched <- sum(!is.na(xy_product))
     score <- MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ])
 
     ## Can be very large otherwise
@@ -57,8 +57,8 @@ create_edges_progress <- function(index,
         "feature_id" = index,
         "target_id" = target,
         "score" = score,
-        "matched_peaks_count" = matched_peaks_count,
-        "presence_ratio" = matched_peaks_count / length(map$y)
+        "count_peaks_matched" = count_peaks_matched,
+        "presence_ratio" = count_peaks_matched / length(map$y)
       )
     }
   }
