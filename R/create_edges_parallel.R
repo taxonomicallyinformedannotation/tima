@@ -24,18 +24,28 @@ create_edges_parallel <- function(spectra,
 
   if (parallel) {
     future::plan(future::multisession)
-    progressr::handlers("progress")
-    result_list <- future.apply::future_lapply(
-      X = 1:(nspecz - 1),
-      FUN = create_edges_progress,
-      p = progressr::progressor(along = 1:(nspecz - 1)),
-      frags = fragz,
-      precs = precz,
-      nspecs = nspecz,
-      ms2_tolerance = msz,
-      ppm_tolerance = ppmz,
-      parallel = parallel
+    progressr::handlers(
+      list(
+        progressr::handler_progress(
+          format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
+        )
+      )
     )
+
+    result_list <-
+      future.apply::future_lapply(
+        X = 1:(nspecz - 1),
+        FUN = create_edges_progress,
+        p = progressr::progressor(along = 1:(nspecz - 1)),
+        future.chunk.size = structure(TRUE, ordering = "random"),
+        frags = fragz,
+        precs = precz,
+        nspecs = nspecz,
+        ms2_tolerance = msz,
+        ppm_tolerance = ppmz,
+        parallel = parallel
+      ) |>
+      progressr::with_progress()
   } else {
     result_list <-
       lapply(

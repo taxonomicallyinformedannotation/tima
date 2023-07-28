@@ -287,15 +287,15 @@ testthat::test_that("Whole process", {
   ## Create MS2 based edges
   step <- "create_edges_spectra"
   params <- get_params(step = step)
-  ### Slow
-  create_edges_spectra(
-    parallel = FALSE,
-    fast = FALSE,
-    condition = "AND"
-  )
   ### Semi slow
   create_edges_spectra(
     parallel = TRUE,
+    fast = FALSE,
+    condition = "AND"
+  )
+  ### Slow
+  create_edges_spectra(
+    parallel = FALSE,
     fast = FALSE,
     condition = "AND"
   )
@@ -324,7 +324,7 @@ testthat::test_that("Whole process", {
     p = NA,
     parallel = FALSE
   )
-  progressr::with_progress(create_edges_progress(
+  create_edges_progress(
     index = 1,
     frags = frags,
     precs = precs,
@@ -333,7 +333,8 @@ testthat::test_that("Whole process", {
     ppm = 5,
     p = progressr::progressor(along = 1),
     parallel = TRUE
-  ))
+  ) |>
+    progressr::with_progress()
   ##
 
   ### GNPS results
