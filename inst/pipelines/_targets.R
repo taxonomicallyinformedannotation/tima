@@ -2261,12 +2261,7 @@ list(
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
           input = list(benchmark_ann_ms1_pre_pos[[2]], benchmark_edg_spe_pos),
-          output = def_pre_fea_edg$
-            files$
-            networks$
-            spectral$
-            edges$
-            prepared,
+          output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = def_pre_fea_edg$names$source,
           name_target = def_pre_fea_edg$names$target,
           parameters = def_pre_fea_edg
@@ -2278,12 +2273,7 @@ list(
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
           input = list(benchmark_ann_ms1_pre_neg[[2]], benchmark_edg_spe_neg),
-          output = def_pre_fea_edg$
-            files$
-            networks$
-            spectral$
-            edges$
-            prepared,
+          output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = def_pre_fea_edg$names$source,
           name_target = def_pre_fea_edg$names$target,
           parameters = def_pre_fea_edg
@@ -2519,7 +2509,6 @@ list(
           score_chemical_npc_class = def_wei_ann$weights$chemical$npc$class,
           minimal_ms1_bio = def_wei_ann$annotations$ms1$thresholds$biological,
           minimal_ms1_chemo = def_wei_ann$annotations$ms1$thresholds$chemical,
-          ms1_only = def_wei_ann$annotations$ms1only,
           summarise = def_wei_ann$options$summarise,
           pattern = def_wei_ann$files$pattern,
           force = def_wei_ann$options$force,
@@ -2561,6 +2550,7 @@ list(
     #           weight_spectral = def_wei_ann$weights$global$spectral,
     #           weight_chemical = def_wei_ann$weights$global$chemical,
     #           weight_biological = def_wei_ann$weights$global$biological,
+    #           ms1_only = TRUE,
     #           output = "benchmark_lotus_ms1_pos.tsv.gz"
     #         )
     #       )
@@ -2578,31 +2568,38 @@ list(
               weight_spectral = 0.333,
               weight_chemical = 0,
               weight_biological = 0.666,
+              ms1_only = FALSE,
               output = "benchmark_lotus_ms2_bio_pos.tsv.gz"
             )
           )
       }
     ),
-    # tar_file(
-    #   name = benchmark_ann_pre_ms1_ms2_b_pos,
-    #   command = {
-    #     benchmark_ann_pre_ms1_ms2_b_pos <-
-    #       do.call(
-    #         what = weight_annotations,
-    #         args = c(benchmark_wei_par,
-    #           benchmark_files_pos,
-    #           annotations = list(
-    #             benchmark_ann_spe_is_pre_pos,
-    #             benchmark_ann_ms1_pre_pos[[1]]
-    #           ),
-    #           weight_spectral = 0.333,
-    #           weight_chemical = 0,
-    #           weight_biological = 0.666,
-    #           output = "benchmark_lotus_ms1_ms2_bio_pos.tsv.gz"
-    #         )
-    #       )
-    #   }
-    # ),
+    tar_file(
+      name = benchmark_ann_pre_ms1_ms2_b_pos,
+      command = {
+        benchmark_ann_pre_ms1_ms2_b_pos <-
+          do.call(
+            what = weight_annotations,
+            args = c(
+              benchmark_wei_par |>
+                append(
+                  list(
+                    annotations = list(
+                      benchmark_ann_spe_is_pre_pos,
+                      benchmark_ann_ms1_pre_pos[[1]]
+                    )
+                  )
+                ),
+              benchmark_files_pos,
+              ms1_only = FALSE,
+              weight_spectral = 0.333,
+              weight_chemical = 0,
+              weight_biological = 0.666,
+              output = "benchmark_lotus_ms1_ms2_bio_pos.tsv.gz"
+            )
+          )
+      }
+    ),
     tar_file(
       name = benchmark_ann_pre_ms2_b_c_pos,
       command = {
@@ -2612,6 +2609,7 @@ list(
             args = c(benchmark_wei_par,
               benchmark_files_pos,
               annotations = benchmark_ann_spe_is_pre_pos,
+              ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
               weight_biological = 0.500,
@@ -2620,26 +2618,32 @@ list(
           )
       }
     ),
-    # tar_file(
-    #   name = benchmark_ann_pre_ms1_ms2_b_c_pos,
-    #   command = {
-    #     benchmark_ann_pre_ms1_ms2_b_c_pos <-
-    #       do.call(
-    #         what = weight_annotations,
-    #         args = c(benchmark_wei_par,
-    #           benchmark_files_pos,
-    #           annotations = list(
-    #             benchmark_ann_spe_is_pre_pos,
-    #             benchmark_ann_ms1_pre_pos[[1]]
-    #           ),
-    #           weight_spectral = 0.333,
-    #           weight_chemical = 0.166,
-    #           weight_biological = 0.500,
-    #           output = "benchmark_lotus_ms1_ms2_bio_chemo_pos.tsv.gz"
-    #         )
-    #       )
-    #   }
-    # ),
+    tar_file(
+      name = benchmark_ann_pre_ms1_ms2_b_c_pos,
+      command = {
+        benchmark_ann_pre_ms1_ms2_b_c_pos <-
+          do.call(
+            what = weight_annotations,
+            args = c(
+              benchmark_wei_par |>
+                append(
+                  list(
+                    annotations = list(
+                      benchmark_ann_spe_is_pre_pos,
+                      benchmark_ann_ms1_pre_pos[[1]]
+                    )
+                  )
+                ),
+              benchmark_files_pos,
+              ms1_only = FALSE,
+              weight_spectral = 0.333,
+              weight_chemical = 0.166,
+              weight_biological = 0.500,
+              output = "benchmark_lotus_ms1_ms2_bio_chemo_pos.tsv.gz"
+            )
+          )
+      }
+    ),
     # tar_file(
     #   name = benchmark_ann_pre_ms1_neg,
     #   command = {
@@ -2649,6 +2653,7 @@ list(
     #         args = c(benchmark_wei_par,
     #           benchmark_files_neg,
     #           annotations = benchmark_ann_ms1_pre_neg[[1]],
+    #           ms1_only = TRUE,
     #           weight_spectral = def_wei_ann$weights$global$spectral,
     #           weight_chemical = def_wei_ann$weights$global$chemical,
     #           weight_biological = def_wei_ann$weights$global$biological,
@@ -2666,6 +2671,7 @@ list(
             args = c(benchmark_wei_par,
               benchmark_files_neg,
               annotations = benchmark_ann_spe_is_pre_neg,
+              ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0,
               weight_biological = 0.666,
@@ -2674,26 +2680,32 @@ list(
           )
       }
     ),
-    # tar_file(
-    #   name = benchmark_ann_pre_ms1_ms2_b_neg,
-    #   command = {
-    #     benchmark_ann_pre_ms1_ms2_b_neg <-
-    #       do.call(
-    #         what = weight_annotations,
-    #         args = c(benchmark_wei_par,
-    #           benchmark_files_neg,
-    #           annotations = list(
-    #             benchmark_ann_spe_is_pre_neg,
-    #             benchmark_ann_ms1_pre_neg[[1]]
-    #           ),
-    #           weight_spectral = 0.333,
-    #           weight_chemical = 0,
-    #           weight_biological = 0.666,
-    #           output = "benchmark_lotus_ms1_ms2_bio_neg.tsv.gz"
-    #         )
-    #       )
-    #   }
-    # ),
+    tar_file(
+      name = benchmark_ann_pre_ms1_ms2_b_neg,
+      command = {
+        benchmark_ann_pre_ms1_ms2_b_neg <-
+          do.call(
+            what = weight_annotations,
+            args = c(
+              benchmark_wei_par |>
+                append(
+                  list(
+                    annotations = list(
+                      benchmark_ann_spe_is_pre_neg,
+                      benchmark_ann_ms1_pre_neg[[1]]
+                    )
+                  )
+                ),
+              benchmark_files_neg,
+              ms1_only = FALSE,
+              weight_spectral = 0.333,
+              weight_chemical = 0,
+              weight_biological = 0.666,
+              output = "benchmark_lotus_ms1_ms2_bio_neg.tsv.gz"
+            )
+          )
+      }
+    ),
     tar_file(
       name = benchmark_ann_pre_ms2_b_c_neg,
       command = {
@@ -2703,6 +2715,7 @@ list(
             args = c(benchmark_wei_par,
               benchmark_files_neg,
               annotations = benchmark_ann_spe_is_pre_neg,
+              ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
               weight_biological = 0.500,
@@ -2710,26 +2723,32 @@ list(
             )
           )
       }
+    ),
+    tar_file(
+      name = benchmark_ann_pre_ms1_ms2_b_c_neg,
+      command = {
+        benchmark_ann_pre_ms1_ms2_b_c_neg <-
+          do.call(
+            what = weight_annotations,
+            args = c(
+              benchmark_wei_par |>
+                append(
+                  list(
+                    annotations = list(
+                      benchmark_ann_spe_is_pre_neg,
+                      benchmark_ann_ms1_pre_neg[[1]]
+                    )
+                  )
+                ),
+              benchmark_files_neg,
+              ms1_only = FALSE,
+              weight_spectral = 0.333,
+              weight_chemical = 0.166,
+              weight_biological = 0.500,
+              output = "benchmark_lotus_ms1_ms2_bio_chemo_neg.tsv.gz"
+            )
+          )
+      }
     )
-    # tar_file(
-    #   name = benchmark_ann_pre_ms1_ms2_b_c_neg,
-    #   command = {
-    #     benchmark_ann_pre_ms1_ms2_b_c_neg <-
-    #       do.call(
-    #         what = weight_annotations,
-    #         args = c(benchmark_wei_par,
-    #           benchmark_files_neg,
-    #           annotations = list(
-    #             benchmark_ann_spe_is_pre_neg,
-    #             benchmark_ann_ms1_pre_neg[[1]]
-    #           ),
-    #           weight_spectral = 0.333,
-    #           weight_chemical = 0.166,
-    #           weight_biological = 0.500,
-    #           output = "benchmark_lotus_ms1_ms2_bio_chemo_neg.tsv.gz"
-    #         )
-    #       )
-    #   }
-    # )
   )
 )
