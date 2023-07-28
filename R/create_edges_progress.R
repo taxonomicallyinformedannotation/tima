@@ -49,14 +49,18 @@ create_edges_progress <- function(index,
     )
     xy_product <- map$x * map$y
     matched_peaks_count <- sum(!is.na(xy_product))
+    score <- MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ])
 
-    inner_list[[target - index]] <- list(
-      "feature_id" = index,
-      "target_id" = target,
-      "score" = MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ]),
-      "matched_peaks_count" = matched_peaks_count,
-      "presence_ratio" = matched_peaks_count / length(map$y)
-    )
+    ## Can be very large otherwise
+    inner_list[[target - index]] <- if (score != 0) {
+      list(
+        "feature_id" = index,
+        "target_id" = target,
+        "score" = score,
+        "matched_peaks_count" = matched_peaks_count,
+        "presence_ratio" = matched_peaks_count / length(map$y)
+      )
+    }
   }
 
   return(inner_list)
