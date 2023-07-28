@@ -1866,7 +1866,12 @@ list(
           sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
           Spectra::setBackend(Spectra::MsBackendMemory()) |>
-          sanitize_spectra(cutoff = 0, ratio = 1000, deeper = TRUE)
+          sanitize_spectra(
+            cutoff = 0,
+            ratio = 10000,
+            fragments = 5,
+            deeper = FALSE
+          )
 
         sp$precursorMz <- as.numeric(sp$PRECURSOR_MZ)
         sp$precursorCharge <- as.integer(sp$CHARGE)
