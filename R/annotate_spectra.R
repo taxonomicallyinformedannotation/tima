@@ -290,6 +290,11 @@ annotate_spectra <- function(
         dplyr::filter(score >= threshold) |>
         dplyr::filter(count_peaks_matched >= npeaks) |>
         dplyr::filter(presence_ratio >= rpeaks)
+    } else {
+      df_final <- df_final |>
+        dplyr::filter(score >= threshold |
+          count_peaks_matched >= npeaks |
+          presence_ratio >= rpeaks)
     }
 
     log_debug(

@@ -171,7 +171,7 @@ create_edges_spectra <- function(
       "score" = NA,
       "reverse_score" = NA,
       "presence_ratio" = NA,
-      "matched_peaks_count" = NA
+      "count_peaks_matched" = NA
     )
   }
 
@@ -185,7 +185,7 @@ create_edges_spectra <- function(
   } else {
     edges <- edges |>
       dplyr::filter(score >= threshold |
-        matched_peaks_count >= npeaks |
+        count_peaks_matched >= npeaks |
         presence_ratio >= rpeaks)
   }
 
