@@ -13,7 +13,7 @@ annotations:
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
       #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
-      condition: AND
+      condition: OR
 
       #' For peaks.
       peaks:

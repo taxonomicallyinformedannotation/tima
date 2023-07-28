@@ -178,9 +178,9 @@ create_edges_spectra <- function(
   if (condition == "AND") {
     edges <- edges |>
       dplyr::filter(
-        score >= threshold,
-        matched_peaks_count >= npeaks,
-        presence_ratio >= rpeaks
+        score >= threshold &
+          count_peaks_matched >= npeaks &
+          presence_ratio >= rpeaks
       )
   } else {
     edges <- edges |>
