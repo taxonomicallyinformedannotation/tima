@@ -1,8 +1,8 @@
 utils::globalVariables(
   c(
     "acquisitionNum",
+    "count_peaks_matched",
     "feature_id",
-    "matched_peaks_count",
     "params",
     "paths",
     "precursorMz",
@@ -268,7 +268,7 @@ annotate_spectra <- function(
           "score",
           "reverse_score",
           "presence_ratio",
-          "count_peaks_matched" = "matched_peaks_count"
+          "count_peaks_matched"
         )
       ))
 

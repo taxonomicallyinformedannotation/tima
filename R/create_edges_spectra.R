@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "matched_peaks_count",
+  "count_peaks_matched",
   "params",
   "presence_ratio",
   "score"
@@ -152,7 +152,7 @@ create_edges_spectra <- function(
           "score",
           "reverse_score",
           "presence_ratio",
-          "matched_peaks_count"
+          "count_peaks_matched"
         )
       ))
   } else {
