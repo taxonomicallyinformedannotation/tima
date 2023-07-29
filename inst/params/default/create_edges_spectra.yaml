@@ -1,6 +1,8 @@
 ---
 #' Annotations related parameters.
 annotations:
+  #' MS2 annotation related parameters.
+  ms2:
     #' Thresholds
     thresholds:
       #' Similarity threhsold. FLOAT
