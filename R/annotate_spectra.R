@@ -128,29 +128,12 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
-    log_debug("Performing spectral comparison")
-
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
     query_rts <- spectra@backend@spectraData$rtime
 
     if (approx == FALSE) {
       log_debug("Reducing library size...")
-      log_debug("Round 1...")
-      lib_precursors <-
-        spectral_library@backend@spectraData$precursorMz
-
-      minimal <- pmin(
-        lib_precursors - dalton,
-        lib_precursors * (1 - (10^-6 * ppm))
-      )
-      maximal <- pmax(
-        lib_precursors + dalton,
-        lib_precursors * (1 + (10^-6 * ppm))
-      )
-      spectral_library <- spectral_library[minimal >= min(query_precursors) &
-        max(query_precursors) >= maximal]
-      log_debug("Round 2...")
       lib_precursors <-
         spectral_library@backend@spectraData$precursorMz
 
@@ -269,6 +252,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                       "target_precursorMz" = lib_precursors[indices][[index]],
                       "score" = as.numeric(score),
                       "count_peaks_matched" = NA_integer_,
+                      "reverse_score" = NA_real_,
                       "presence_ratio" = NA_real_
                     )
                   } else {
@@ -282,6 +266,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             return(inner_list)
           }
 
+        log_debug("Performing spectral comparison")
         if (parallel) {
           options(future.globals.onReference = "error")
           future::plan(future::multisession)
@@ -352,17 +337,13 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         return(dplyr::bind_rows(outer_list))
       }
 
-    result <-
+    df_final <-
       calculate_entropy_score(
         spectra = spectra,
         spectral_library = spectral_library,
         dalton = dalton,
         ppm = ppm
-      )
-
-    # Call the function with the required arguments
-    df_final <-
-      result |>
+      ) |>
       tidytable::tidytable()
 
     df_final <- df_final |>
@@ -403,19 +384,10 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         )
       ))
 
-    log_debug("Adding columns if they do not exist")
-    df_add <-
-      data.frame(
-        reverse_score = NA,
-        presence_ratio = NA,
-        count_peaks_matched = NA
-      )
-    df_final <- df_final |>
-      tidytable::bind_rows(df_add)
-
     ## COMMENT AR: Not doing it because of thresholding
     ## df_final[is.na(df_final)] <- 0
 
+    log_debug("Filtering results above threshold only...")
     df_final <- df_final |>
       dplyr::filter(score >= threshold)
 
