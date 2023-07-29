@@ -180,10 +180,22 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     )
 
     lib_inchikey <- spectral_library@backend@spectraData$inchikey
+    if (is.null(lib_inchikey)) {
+      lib_inchikey <- rep(NA_character_, length(spectral_library))
+    }
     lib_inchikey2D <-
       spectral_library@backend@spectraData$inchikey_2D
+    if (is.null(lib_inchikey2D)) {
+      lib_inchikey2D <- rep(NA_character_, length(spectral_library))
+    }
     lib_smiles <- spectral_library@backend@spectraData$smiles
+    if (is.null(lib_smiles)) {
+      lib_smiles <- rep(NA_character_, length(spectral_library))
+    }
     lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
+    if (is.null(lib_smiles2D)) {
+      lib_smiles2D <- rep(NA_character_, length(spectral_library))
+    }
     lib_rts <- spectral_library@backend@spectraData$rtime
     if (is.null(lib_rts)) {
       lib_rts <- rep(NA_real_, length(spectral_library))
