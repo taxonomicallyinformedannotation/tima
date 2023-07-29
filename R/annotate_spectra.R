@@ -81,9 +81,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     library <- library[[polarity]]
   }
 
-  log_debug("Collecting garbage ...")
-  gc()
-
   log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra() |>
@@ -92,9 +89,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     } else {
       c(-1, -2, -3)
     })
-
-  log_debug("Collecting garbage ...")
-  gc()
 
   df_empty <- data.frame(
     feature_id = NA,
@@ -116,29 +110,25 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     log_debug("Loading spectral library")
     spectral_library <- lapply(library, import_spectra) |>
       Spectra::concatenateSpectra() |>
+      sanitize_spectra() |>
       Spectra::addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
-
-    log_debug("Collecting garbage ...")
-    gc()
 
     ## COMMENT (AR): TODO Maybe implement sanitization of the spectra?
     ## Can be very slow otherwise
 
     log_debug("Applying initial intensity filter to query spectra")
     spectra <- spectra |>
+      sanitize_spectra() |>
       Spectra::filterIntensity(intensity = c(qutoff, Inf)) |>
       Spectra::addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
-
-    log_debug("Collecting garbage ...")
-    gc()
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
@@ -173,9 +163,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
       spectral_library <-
         spectral_library[lib_precursors %in% df_3$lib_precursors]
-
-      log_debug("Collecting garbage ...")
-      gc()
     }
 
     lib_precursors <-
@@ -226,14 +213,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                    maximal,
                    daz = dalton,
                    ppmz = ppm) {
-            log_debug("Collecting garbage ...")
-            gc()
-
             indices <- minimal <= precursor & precursor <= maximal
             spectral_lib <- lib_spectra[indices]
-
-            log_debug("Collecting garbage ...")
-            gc()
 
             inner_list <-
               lapply(
@@ -285,8 +266,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             return(inner_list)
           }
 
-        log_debug("Collecting garbage ...")
-        gc()
         log_debug("Performing spectral comparison")
         if (parallel) {
           options(future.globals.onReference = "error")

@@ -49,9 +49,6 @@ create_edges_spectra <- function(
 
   params <<- parameters
 
-  log_debug("Collecting garbage ...")
-  gc()
-
   log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra() |>
@@ -62,9 +59,6 @@ create_edges_spectra <- function(
     ) |>
     Spectra::addProcessing(normalize_peaks()) |>
     Spectra::applyProcessing()
-
-  log_debug("Collecting garbage ...")
-  gc()
 
   log_debug("Performing spectral comparison")
   log_debug(

@@ -46,6 +46,7 @@ source(file = "inst/scripts/annotate_masses.R")
 targets::tar_visnetwork(
   names = starts_with("ann_ms1"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -77,6 +78,7 @@ source(file = "inst/scripts/prepare_annotations_spectra.R")
 targets::tar_visnetwork(
   names = starts_with("ann_spe_is"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -103,6 +105,7 @@ You now have all your spectral annotations:
 targets::tar_visnetwork(
   names = starts_with("ann_spe"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -146,6 +149,7 @@ source(file = "inst/scripts/prepare_annotations_sirius.R")
 targets::tar_visnetwork(
   names = starts_with("ann_s"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -221,6 +225,7 @@ You are almost there! See already all the steps accomplished!
 targets::tar_visnetwork(
   names = starts_with("fea"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
