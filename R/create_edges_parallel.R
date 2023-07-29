@@ -23,6 +23,7 @@ create_edges_parallel <- function(spectra,
   ppmz <- ppm_tolerance
 
   if (parallel) {
+    options(future.globals.onReference = "error")
     future::plan(future::multisession)
     progressr::handlers(
       list(

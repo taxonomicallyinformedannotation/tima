@@ -57,7 +57,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                              library = params$files$libraries$spectral$exp,
                              polarity = params$ms$polarity,
                              output = params$files$annotations$raw$spectral,
-                             threshold = params$annotations$ms2$thresholds$similarity,
+                             threshold =
+                               params$annotations$ms2$thresholds$similarity,
                              ppm = params$ms$tolerances$mass$ppm$ms2,
                              dalton = params$ms$tolerances$mass$dalton$ms2,
                              qutoff = params$ms$intensity$thresholds$ms2,
@@ -282,9 +283,12 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           }
 
         if (parallel) {
+          options(future.globals.onReference = "error")
           future::plan(future::multisession)
           progressr::handlers(list(
-            progressr::handler_progress(format = ":current/:total [:bar] :percent in :elapsed ETA: :eta")
+            progressr::handler_progress(
+              format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
+            )
           ))
           outer_list <-
             future.apply::future_lapply(
