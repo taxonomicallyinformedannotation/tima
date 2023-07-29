@@ -148,6 +148,7 @@ we provide it here as a starting point for your structure-organism pairs library
 targets::tar_visnetwork(
   names = starts_with("input"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -180,6 +181,7 @@ source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
 targets::tar_visnetwork(
   names = matches("lib_sop_lot"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -206,6 +208,7 @@ source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
 targets::tar_visnetwork(
   names = matches("lib_sop_ecm"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -262,6 +265,7 @@ You now should have a nice custom structure-organism pairs library for the next 
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -279,6 +283,7 @@ As a main limitation of current annotation tools is adducts detection and covera
 targets::tar_visnetwork(
   names = starts_with("lib_add"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -346,6 +351,7 @@ source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
 targets::tar_visnetwork(
   names = starts_with("lib_spe"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),
@@ -370,6 +376,7 @@ You are finally ready for the next step, with all dictionaries, inputs, and libr
 targets::tar_visnetwork(
   names = starts_with("lib"),
   exclude = c(
+    contains("benchmark"),
     contains("par_"),
     contains("paths")
   ),

@@ -275,6 +275,8 @@ clean_chemo <-
       tidytable::arrange(rank_final)
 
     if (summarise == TRUE) {
+      log_debug("Collecting garbage ...")
+      gc()
       log_debug("summarizing results \n")
       df4 <- df3 |>
         dplyr::group_by(feature_id) |>
