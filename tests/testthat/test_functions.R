@@ -195,18 +195,6 @@ testthat::test_that("Whole process", {
     col_sy = NULL,
     col_xl = NULL
   )
-  ## Cannot pass it as such to do.call
-  meta_args <- CompoundDb::make_metadata(
-    source = "LOTUS",
-    url = "https://doi.org/10.5281/zenodo.5607185",
-    source_version = jsonlite::fromJSON(
-      txt = "https://zenodo.org/api/records/5607185"
-    )$doi_url,
-    source_date = jsonlite::fromJSON(
-      txt = "https://zenodo.org/api/records/5607185"
-    )[["metadata"]][["publication_date"]],
-    organism = "Life"
-  )
   ## Pos
   do.call(
     what = prepare_libraries_spectra,
@@ -221,8 +209,7 @@ testthat::test_that("Whole process", {
   prepare_libraries_spectra(
     input = params$files$libraries$spectral$is$raw[[2]] |>
       gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-    output = params$files$libraries$spectral$is$pos,
-    metad = meta_args
+    output = params$files$libraries$spectral$is$pos
   )
   ## Neg & without metadata
   do.call(
