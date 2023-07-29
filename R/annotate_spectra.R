@@ -133,6 +133,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
     query_rts <- spectra@backend@spectraData$rtime
+    if (is.null(query_rts)) {
+      query_rts <- rep(NA_real_, length(spectra))
+    }
 
     if (approx == FALSE) {
       log_debug("Reducing library size...")
@@ -182,6 +185,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     lib_smiles <- spectral_library@backend@spectraData$smiles
     lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
     lib_rts <- spectral_library@backend@spectraData$rtime
+    if (is.null(lib_rts)) {
+      lib_rts <- rep(NA_real_, length(spectral_library))
+    }
     lib_name <- spectral_library@backend@spectraData$name
     lib_mf <- spectral_library@backend@spectraData$formula
     lib_mass <- spectral_library@backend@spectraData$exactmass
