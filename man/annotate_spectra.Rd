@@ -9,16 +9,11 @@ annotate_spectra(
   library = params$files$libraries$spectral$exp,
   polarity = params$ms$polarity,
   output = params$files$annotations$raw$spectral,
-  method = params$annotations$ms2$method,
   threshold = params$annotations$ms2$thresholds$similarity,
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
-  npeaks = params$annotations$ms2$thresholds$peaks$absolute,
-  rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
-  condition = params$annotations$ms2$thresholds$condition,
   qutoff = params$ms$intensity$thresholds$ms2,
   parallel = params$options$parallel,
-  fast = params$options$fast,
   approx = params$annotations$ms2$approx,
   parameters = params
 )
@@ -33,30 +28,22 @@ Can be '.mgf' or '.sqlite' (Spectra formatted)}
 
 \item{output}{Output file.}
 
-\item{method}{Method to be used to perform spectral comparison}
-
 \item{threshold}{Minimal similarity to report}
 
 \item{ppm}{Relative ppm tolerance to be used}
 
 \item{dalton}{Absolute Dalton tolerance to be used}
 
-\item{npeaks}{Absolute minimum number of peaks to be matched}
-
-\item{rpeaks}{Relative minimum number of peaks to be matched}
-
-\item{condition}{Condition to be fulfilled.
-Either 'OR' or 'AND' (mass and peaks minima).}
-
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{parallel}{Boolean. Process in parallel}
 
-\item{fast}{Boolean. Do it fast}
-
 \item{approx}{Perform matching without precursor match}
 
 \item{parameters}{Params}
+
+\item{condition}{Condition to be fulfilled.
+Either 'OR' or 'AND' (mass and peaks minima).}
 }
 \description{
 This function annotates spectra
@@ -64,11 +51,6 @@ This function annotates spectra
 \details{
 It takes two files as input.
 A query file that will be matched against a library file.
-Multiple comparison distances are available
-('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle')
-(See MsCoreUtils for details).
-Number of matched peaks and their ratio are also available
-(See MatchForwardReverseParam for details).
 Parallel processing is also made available.
 }
 \examples{

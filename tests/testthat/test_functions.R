@@ -273,34 +273,22 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   ### Negative
   annotate_spectra(
-    polarity = "neg",
-    parallel = FALSE
+    polarity = "neg"
   )
-  ### Slow
-  annotate_spectra(
-    fast = FALSE,
-    condition = "AND"
-  )
-  ### Normal
-  annotate_spectra()
+  ### Appox
+  annotate_spectra(approx = TRUE)
+  ### Positive
+  annotate_spectra(parallel = FALSE)
 
   ## Create MS2 based edges
   step <- "create_edges_spectra"
   params <- get_params(step = step)
-  ### Semi slow
-  create_edges_spectra(
-    parallel = TRUE,
-    fast = FALSE,
-    condition = "AND"
-  )
   ### Slow
   create_edges_spectra(
-    parallel = FALSE,
-    fast = FALSE,
-    condition = "AND"
+    parallel = FALSE
   )
   ### Normal
-  create_edges_spectra(condition = "OR")
+  create_edges_spectra()
 
   ## additional test not covered by lapply
   spectra <- params$files$spectral$raw |>
@@ -314,6 +302,7 @@ testthat::test_that("Whole process", {
   #   normalize_peaks()
   precs <- spectra$precursorMz[1:2]
   nspecs <- length(frags)
+  ## TODO Change create_edges_parallel
   create_edges_progress(
     index = 1,
     frags = frags,
@@ -435,10 +424,6 @@ testthat::test_that("Whole process", {
   arguments$ann_ms1_thr_che <<- "x"
   arguments$ann_ms1_thr_con <<- "x"
   arguments$ann_ms2_app <<- "x"
-  arguments$ann_ms2_met <<- "x"
-  arguments$ann_ms2_thr_con <<- "x"
-  arguments$ann_ms2_thr_pea_abs <<- "x"
-  arguments$ann_ms2_thr_pea_rat <<- "x"
   arguments$ann_ms2_thr_sim <<- "x"
   arguments$fil_pat <<- "x"
   arguments$fil_ann_raw_spe <<- "x"
@@ -534,7 +519,6 @@ testthat::test_that("Whole process", {
   arguments$wei_che_21 <<- "x"
   arguments$wei_che_22 <<- "x"
   arguments$wei_che_23 <<- "x"
-  arguments$fast <<- "x"
   arguments$force <<- "x"
   arguments$parallel <<- "x"
   arguments$summarise <<- "x"

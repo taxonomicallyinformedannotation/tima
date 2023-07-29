@@ -233,64 +233,6 @@ ui <- fluidPage(
               "Takes a lot of time."
             )
           ),
-        selectInput(
-          inputId = "ann_ms2_met",
-          label = "Similarity method to be used to compare spectra",
-          choices = c(
-            "gnps",
-            "navdist",
-            "ndotproduct",
-            "neuclidean",
-            "nspectraangle"
-          ),
-          selected = "gnps"
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "See",
-              as.character(
-                tags$a(
-                  "https://github.com/rformassspectrometry/MsCoreUtils/pull/33",
-                  href =
-                    "https://github.com/rformassspectrometry/MsCoreUtils/pull/33"
-                )
-              ),
-              "for more info"
-            )
-          ),
-        sliderInput(
-          inputId = "ann_ms2_thr_pea_abs",
-          label = "Minimal shared peaks (absolute)",
-          min = 1,
-          max = 100,
-          step = 1,
-          value = 6,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Minimum number of shared peaks (absolute) between spectra.",
-              "See condition below."
-            )
-          ),
-        sliderInput(
-          inputId = "ann_ms2_thr_pea_rat",
-          label = "Minimal shared peaks (ratio)",
-          min = 0.05,
-          max = 1,
-          step = 0.05,
-          value = 0.2,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Minimum ratio of shared peaks (relative) between spectra.",
-              "See condition below."
-            )
-          ),
         sliderInput(
           inputId = "ann_ms2_thr_sim",
           label = "Minimal similarity score",
@@ -305,20 +247,6 @@ ui <- fluidPage(
             content = c(
               "Minimum similarity score between spectra.",
               "See condition below."
-            )
-          ),
-        selectInput(
-          inputId = "ann_ms2_thr_con",
-          label = "Condition to be used to retain candidates",
-          choices = c("AND", "OR"),
-          selected = "OR"
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "If an MS2 candidate has a sim score of 0.9, 2 shared peaks",
-              "the above thresholds set at 0.7 and 6 respectively",
-              "keeps it if the condition is `OR` but discard it if `AND`."
             )
           )
       ),
@@ -1142,21 +1070,6 @@ ui <- fluidPage(
       tabPanel(
         title = "Options",
         h3("Options parameters"),
-        checkboxInput(
-          inputId = "fast",
-          label = "Skip time-consuming steps",
-          value = TRUE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Some steps can be very long to perform
-              without dramatic added value.",
-              "By default, we try to avoid them.",
-              "If you are not restricted by computation time,
-              feel free to uncheck it."
-            )
-          ),
         checkboxInput(
           inputId = "force",
           label = "Do not use it!",

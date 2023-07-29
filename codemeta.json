@@ -293,32 +293,6 @@
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "BiocParallel",
-      "name": "BiocParallel",
-      "version": ">= 1.34.2",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocParallel.html"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
-      "identifier": "CompoundDb",
-      "name": "CompoundDb",
-      "version": ">= 1.4.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/CompoundDb.html"
-    },
-    "4": {
-      "@type": "SoftwareApplication",
       "identifier": "crayon",
       "name": "crayon",
       "version": ">= 1.5.2",
@@ -330,7 +304,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=crayon"
     },
-    "5": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
@@ -343,7 +317,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "6": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -356,7 +330,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "7": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
@@ -369,7 +343,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr"
     },
-    "8": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "future",
       "name": "future",
@@ -382,7 +356,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=future"
     },
-    "9": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "future.apply",
       "name": "future.apply",
@@ -395,7 +369,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=future.apply"
     },
-    "10": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -408,7 +382,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "11": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -421,20 +395,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "12": {
-      "@type": "SoftwareApplication",
-      "identifier": "MetaboAnnotation",
-      "name": "MetaboAnnotation",
-      "version": ">= 1.4.1",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboAnnotation.html"
-    },
-    "13": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -447,20 +408,20 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "14": {
+    "11": {
       "@type": "SoftwareApplication",
-      "identifier": "MsCoreUtils",
-      "name": "MsCoreUtils",
-      "version": ">= 1.12.0",
+      "identifier": "msentropy",
+      "name": "msentropy",
+      "version": ">= 0.1.3",
       "provider": {
-        "@id": "https://www.bioconductor.org",
+        "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
+      "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "15": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "progressr",
       "name": "progressr",
@@ -473,7 +434,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=progressr"
     },
-    "16": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
@@ -486,7 +447,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=R.utils"
     },
-    "17": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -499,7 +460,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "18": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -512,12 +473,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "19": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "20": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -530,7 +491,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "21": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -543,7 +504,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "22": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -556,7 +517,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "23": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "tidyft",
       "name": "tidyft",
@@ -569,12 +530,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyft"
     },
-    "24": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "25": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",

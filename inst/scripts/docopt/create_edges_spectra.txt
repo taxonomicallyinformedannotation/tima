@@ -1,14 +1,10 @@
 You can use this script with the following example:
-  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.02 --ms-tol-mas-ppm-ms2 10 --ann-ms2-met gnps --ann-ms2-thr-sim 0.2 --ann-ms2-thr-pea-abs 6 --ann-ms2-thr-pea-rat 0.2 --ann-ms2-thr-con OR --ms-int-thr-ms2 0 --parallel true --fast true
+  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.02 --ms-tol-mas-ppm-ms2 10 --ann-ms2-thr-sim 0.2 --ms-int-thr-ms2 0 --parallel true
 
 Usage: 
   create_edges_spectra.R [--ann-ms2-met=<ann-ms2-met>] [--ann-ms2-thr-con=<ann-ms2-thr-con>] [--ann-ms2-thr-pea-abs=<ann-ms2-thr-pea-abs>] [--ann-ms2-thr-pea-rat=<ann-ms2-thr-pea-rat>] [--ann-ms2-thr-sim=<ann-ms2-thr-sim>] [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-int-thr-ms2=<ms-int-thr-ms2>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--fast=<fast>] [--parallel=<parallel>]
 
 Arguments:
-  ann-ms2-met                The MS similarity method to be used to compare spectra. Currently "gnps", "navdist", "ndotproduct", "neuclidean", "nspectraangle" supported. STRING
-  ann-ms2-thr-con           Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 6 peaks AND 0.2 similarity. STRING
-  ann-ms2-thr-pea-abs        Minimal shared peaks (absolute). INTEGER
-  ann-ms2-thr-pea-rat        Minimal shared peaks (ratio). FLOAT
   ann-ms2-thr-sim            Similarity threhsold. FLOAT
 
   fil-net-spe-edg-raw        Raw edges file. STRING
@@ -19,7 +15,6 @@ Arguments:
   ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
 
-  fast                       Skip time-consuming steps. BOOLEAN
   parallel                   Execute processes in parallel when available. BOOLEAN
 
 Options:

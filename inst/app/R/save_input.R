@@ -33,7 +33,6 @@ save_input <- function(input) {
   ms_tol_rt_min <<- shiny::isolate(input$ms_tol_rt_min)
   names_source <<- shiny::isolate(input$names_source)
   names_target <<- shiny::isolate(input$names_target)
-  fast <<- shiny::isolate(input$fast)
   forceps <<- shiny::isolate(input$force)
   parallel <<- shiny::isolate(input$parallel)
   summarise <<- shiny::isolate(input$summarise)
@@ -128,32 +127,6 @@ save_input <- function(input) {
     ms2$
     approx <-
     shiny::isolate(input$ann_ms2_app)
-  ## for spectral matching, we let default, modify if needed (expert mode)
-  # yamls_params$annotate_spectra$annotations$ms2$method <-
-  #   shiny::isolate(input$ann_ms2_met)
-  yamls_params$
-    annotate_spectra$
-    annotations$
-    ms2$
-    thresholds$
-    condition <-
-    shiny::isolate(input$ann_ms2_thr_con)
-  yamls_params$
-    annotate_spectra$
-    annotations$
-    ms2$
-    thresholds$
-    peaks$
-    absolute <-
-    shiny::isolate(input$ann_ms2_thr_pea_abs)
-  yamls_params$
-    annotate_spectra$
-    annotations$
-    ms2$
-    thresholds$
-    peaks$
-    ratio <-
-    shiny::isolate(input$ann_ms2_thr_pea_rat)
   yamls_params$
     annotate_spectra$
     annotations$
@@ -192,7 +165,6 @@ save_input <- function(input) {
     rt$
     minutes <-
     ms_tol_rt_min
-  yamls_params$annotate_spectra$options$fast <- fast
   yamls_params$annotate_spectra$options$parallel <- parallel
 
   yamls_params$
@@ -270,7 +242,6 @@ save_input <- function(input) {
     ms_tol_rt_min
   yamls_params$create_edges_spectra$names$source <- names_source
   yamls_params$create_edges_spectra$names$target <- names_target
-  yamls_params$create_edges_spectra$options$fast <- fast
   yamls_params$
     create_edges_spectra$
     options$
