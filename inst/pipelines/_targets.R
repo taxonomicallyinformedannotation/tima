@@ -1332,26 +1332,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = par_ann_spe$annotations$ms2$method,
               threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              npeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                absolute,
-              rpeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                ratio,
-              condition = par_ann_spe$annotations$ms2$thresholds$condition,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
               parallel = par_ann_spe$options$parallel,
-              fast = par_ann_spe$options$fast,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1370,26 +1355,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = par_ann_spe$annotations$ms2$method,
               threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              npeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                absolute,
-              rpeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                ratio,
-              condition = par_ann_spe$annotations$ms2$thresholds$condition,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
               parallel = par_ann_spe$options$parallel,
-              fast = par_ann_spe$options$fast,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1437,26 +1407,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = par_ann_spe$annotations$ms2$method,
               threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              npeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                absolute,
-              rpeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                ratio,
-              condition = par_ann_spe$annotations$ms2$thresholds$condition,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
               parallel = par_ann_spe$options$parallel,
-              fast = par_ann_spe$options$fast,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1475,26 +1430,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              method = par_ann_spe$annotations$ms2$method,
               threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              npeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                absolute,
-              rpeaks = par_ann_spe$
-                annotations$
-                ms2$
-                thresholds$
-                peaks$
-                ratio,
-              condition = par_ann_spe$annotations$ms2$thresholds$condition,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
               parallel = par_ann_spe$options$parallel,
-              fast = par_ann_spe$options$fast,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1550,7 +1490,6 @@ list(
           output = par_cre_edg_spe$files$networks$spectral$edges$raw,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
-          method = par_cre_edg_spe$annotations$ms2$method,
           threshold = par_cre_edg_spe$
             annotations$
             ms2$
@@ -1558,26 +1497,8 @@ list(
             similarity,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = par_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            absolute,
-          rpeaks = par_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            ratio,
-          condition = par_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            condition,
           qutoff = par_cre_edg_spe$ms$intensity$thresholds$ms2,
           parallel = par_cre_edg_spe$options$parallel,
-          fast = par_cre_edg_spe$options$fast,
           parameters = par_cre_edg_spe
         )
       }
@@ -2180,7 +2101,6 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = def_cre_edg_spe$names$source,
           name_target = def_cre_edg_spe$names$target,
-          method = def_cre_edg_spe$annotations$ms2$method,
           threshold = def_cre_edg_spe$
             annotations$
             ms2$
@@ -2188,26 +2108,8 @@ list(
             similarity,
           ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            absolute,
-          rpeaks = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            ratio,
-          condition = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            condition,
           qutoff = 0,
           parallel = TRUE,
-          fast = FALSE,
           parameters = def_cre_edg_spe
         )
       }
@@ -2220,7 +2122,6 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = def_cre_edg_spe$names$source,
           name_target = def_cre_edg_spe$names$target,
-          method = def_cre_edg_spe$annotations$ms2$method,
           threshold = def_cre_edg_spe$
             annotations$
             ms2$
@@ -2228,26 +2129,8 @@ list(
             similarity,
           ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            absolute,
-          rpeaks = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            ratio,
-          condition = def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            condition,
           qutoff = 0,
           parallel = TRUE,
-          fast = FALSE,
           parameters = def_cre_edg_spe
         )
       }
@@ -2370,26 +2253,11 @@ list(
           library = lib_spe_is_lot_pre_pos,
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
-          method = def_ann_spe$annotations$ms2$method,
           threshold = def_ann_spe$annotations$ms2$thresholds$similarity,
           ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = def_ann_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            absolute,
-          rpeaks = def_ann_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            ratio,
-          condition = def_ann_spe$annotations$ms2$thresholds$condition,
           qutoff = 0,
           parallel = TRUE,
-          fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
         )
@@ -2403,26 +2271,11 @@ list(
           library = lib_spe_is_lot_pre_neg,
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
-          method = def_ann_spe$annotations$ms2$method,
           threshold = def_ann_spe$annotations$ms2$thresholds$similarity,
           ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
-          npeaks = def_ann_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            absolute,
-          rpeaks = def_ann_spe$
-            annotations$
-            ms2$
-            thresholds$
-            peaks$
-            ratio,
-          condition = def_ann_spe$annotations$ms2$thresholds$condition,
           qutoff = 0,
           parallel = TRUE,
-          fast = def_ann_spe$options$fast,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
         )
