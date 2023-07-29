@@ -535,9 +535,6 @@ weights:
 
 #' Options.
 options:
-  #' Skip time-consuming steps. BOOLEAN
-  fast: yes
-
   #' Do not use it. BOOLEAN
   force: no
 

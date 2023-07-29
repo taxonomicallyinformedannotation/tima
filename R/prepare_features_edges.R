@@ -51,7 +51,8 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      tidyft::filter(feature_source != feature_target)
+      tidyft::filter(feature_source != feature_target) |>
+      tidytable::distinct()
 
     ## Export edges table
     log_debug(x = "Exporting ...")

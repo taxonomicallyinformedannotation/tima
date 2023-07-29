@@ -44,21 +44,6 @@ parse_cli_params <- function() {
     if (!is.null(arguments$ann_ms2_app)) {
       params$annotations$ms2$approx <- as.logical(arguments$ann_ms2_app)
     }
-    if (!is.null(arguments$ann_ms2_met)) {
-      params$annotations$ms2$method <- as.character(arguments$ann_ms2_met)
-    }
-    if (!is.null(arguments$ann_ms2_thr_con)) {
-      params$annotations$ms2$thresholds$condition <-
-        as.character(arguments$ann_ms2_thr_con)
-    }
-    if (!is.null(arguments$ann_ms2_thr_pea_abs)) {
-      params$annotations$ms2$thresholds$peaks$absolute <-
-        as.numeric(arguments$ann_ms2_thr_pea_abs)
-    }
-    if (!is.null(arguments$ann_ms2_thr_pea_rat)) {
-      params$annotations$ms2$thresholds$peaks$ratio <-
-        as.numeric(arguments$ann_ms2_thr_pea_rat)
-    }
     if (!is.null(arguments$ann_ms2_thr_sim)) {
       params$annotations$ms2$thresholds$similarity <-
         as.numeric(arguments$ann_ms2_thr_sim)

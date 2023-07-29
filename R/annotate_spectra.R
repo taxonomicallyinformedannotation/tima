@@ -27,11 +27,6 @@ utils::globalVariables(
 #'
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
-#'    Multiple comparison distances are available
-#'    ('gnps', 'navdist','ndotproduct','neuclidean', 'nspectraangle')
-#'    (See MsCoreUtils for details).
-#'    Number of matched peaks and their ratio are also available
-#'    (See MatchForwardReverseParam for details).
 #'    Parallel processing is also made available.
 #'
 #' @include export_output.R
@@ -43,17 +38,13 @@ utils::globalVariables(
 #'    Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
-#' @param method Method to be used to perform spectral comparison
 #' @param threshold Minimal similarity to report
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
-#' @param npeaks Absolute minimum number of peaks to be matched
-#' @param rpeaks Relative minimum number of peaks to be matched
 #' @param condition Condition to be fulfilled.
 #'    Either 'OR' or 'AND' (mass and peaks minima).
 #' @param qutoff Intensity under which ms2 fragments will be removed.
 #' @param parallel Boolean. Process in parallel
-#' @param fast Boolean. Do it fast
 #' @param approx Perform matching without precursor match
 #' @param parameters Params
 #'
@@ -62,23 +53,17 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-annotate_spectra <- function(
-    input = params$files$spectral$raw,
-    library = params$files$libraries$spectral$exp,
-    polarity = params$ms$polarity,
-    output = params$files$annotations$raw$spectral,
-    method = params$annotations$ms2$method,
-    threshold = params$annotations$ms2$thresholds$similarity,
-    ppm = params$ms$tolerances$mass$ppm$ms2,
-    dalton = params$ms$tolerances$mass$dalton$ms2,
-    npeaks = params$annotations$ms2$thresholds$peaks$absolute,
-    rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
-    condition = params$annotations$ms2$thresholds$condition,
-    qutoff = params$ms$intensity$thresholds$ms2,
-    parallel = params$options$parallel,
-    fast = params$options$fast,
-    approx = params$annotations$ms2$approx,
-    parameters = params) {
+annotate_spectra <- function(input = params$files$spectral$raw,
+                             library = params$files$libraries$spectral$exp,
+                             polarity = params$ms$polarity,
+                             output = params$files$annotations$raw$spectral,
+                             threshold = params$annotations$ms2$thresholds$similarity,
+                             ppm = params$ms$tolerances$mass$ppm$ms2,
+                             dalton = params$ms$tolerances$mass$dalton$ms2,
+                             qutoff = params$ms$intensity$thresholds$ms2,
+                             parallel = params$options$parallel,
+                             approx = params$annotations$ms2$approx,
+                             parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
@@ -87,35 +72,12 @@ annotate_spectra <- function(
       rep(TRUE, length(unlist(library))) ==
         lapply(X = unlist(library), file.exists)
   )
-  stopifnot(
-    "Your similarity is not supported,
-    supported similarities are
-    'gnps', 'navdist', 'ndotproduct', 'neuclidean', 'nspectraangle'" =
-      method %in%
-        c(
-          "gnps",
-          "navdist",
-          "ndotproduct",
-          "neuclidean",
-          "nspectraangle"
-        )
-  )
 
   ## Not checking for ppm and Da limits, everyone is free.
 
   params <<- parameters
   if (length(library) > 1) {
     library <- library[[polarity]]
-  }
-
-  par <- if (parallel) {
-    if (.Platform$OS.type == "windows") {
-      BiocParallel::SnowParam(progressbar = TRUE)
-    } else {
-      BiocParallel::MulticoreParam(progressbar = TRUE)
-    }
-  } else {
-    BiocParallel::SerialParam(progressbar = TRUE)
   }
 
   log_debug("Loading spectra...")
@@ -153,42 +115,6 @@ annotate_spectra <- function(
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
-    sim_fun <- switch(
-      EXPR = method,
-      "gnps" = MsCoreUtils::gnps,
-      "navdist" = MsCoreUtils::navdist,
-      "ndotproduct" = MsCoreUtils::ndotproduct,
-      "neuclidean" = MsCoreUtils::neuclidean,
-      "nspectraangle" = MsCoreUtils::nspectraangle
-    )
-
-    match_args <- list(
-      ppm = ppm,
-      tolerance = dalton,
-      MAPFUN = Spectra::joinPeaksGnps,
-      FUN = sim_fun,
-      requirePrecursor = ifelse(test = approx,
-        yes = FALSE,
-        no = TRUE
-      ),
-      THRESHFUN = function(x) {
-        which(x >= threshold)
-      },
-      BPPARAM = par
-    )
-    if (fast) {
-      params_sim <- do.call(
-        what = MetaboAnnotation::CompareSpectraParam,
-        args = match_args
-      )
-    } else {
-      params_sim <-
-        do.call(
-          what = MetaboAnnotation::MatchForwardReverseParam,
-          args = match_args
-        )
-    }
-
     ## COMMENT (AR): TODO Maybe implement sanitization of the spectra?
     ## Can be very slow otherwise
 
@@ -202,38 +128,239 @@ annotate_spectra <- function(
       Spectra::applyProcessing()
 
     log_debug("Performing spectral comparison")
-    log_debug(
-      "If you do not need the number/ratio of matched peaks,
-    computation can be much faster by setting the parameter fast to TRUE"
-    )
-    log_debug(
-      "If you need it, the score threshold greatly impacts speed.
-    A higher threshold will lead to faster results."
-    )
-    matches_sim <- MetaboAnnotation::matchSpectra(
-      query = spectra,
-      target = spectral_library,
-      param = params_sim
-    )
 
-    log_debug("Collecting results")
-    df_final <- matches_sim |>
-      MetaboAnnotation::matchedData() |>
-      data.frame() |>
-      tidytable::tidytable() |>
-      tidyft::filter(!is.na(score))
+    query_precursors <- spectra@backend@spectraData$precursorMz
+    query_spectra <- spectra@backend@peaksData
+    query_rts <- spectra@backend@spectraData$rtime
 
-    is_slaw <- "SLAW_ID" %in% colnames(df_final)
+    if (approx == FALSE) {
+      log_debug("Reducing library size...")
+      log_debug("Round 1...")
+      lib_precursors <-
+        spectral_library@backend@spectraData$precursorMz
 
-    if (is_slaw) {
-      df_final <- df_final |>
-        dplyr::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(SLAW_ID))
-    } else {
-      df_final <- df_final |>
-        dplyr::rowwise() |>
-        dplyr::mutate(feature_id = as.numeric(acquisitionNum))
+      minimal <- pmin(
+        lib_precursors - dalton,
+        lib_precursors * (1 - (10^-6 * ppm))
+      )
+      maximal <- pmax(
+        lib_precursors + dalton,
+        lib_precursors * (1 + (10^-6 * ppm))
+      )
+      spectral_library <- spectral_library[minimal >= min(query_precursors) &
+        max(query_precursors) >= maximal]
+      log_debug("Round 2...")
+      lib_precursors <-
+        spectral_library@backend@spectraData$precursorMz
+
+      minimal <- pmin(
+        lib_precursors - dalton,
+        lib_precursors * (1 - (10^-6 * ppm))
+      )
+      maximal <- pmax(
+        lib_precursors + dalton,
+        lib_precursors * (1 + (10^-6 * ppm))
+      )
+
+      df_1 <- tidytable::tidytable(minimal, maximal, lib_precursors)
+      df_2 <- tidytable::tidytable(val = unique(query_precursors))
+
+      df_3 <- dplyr::inner_join(
+        df_1,
+        df_2,
+        by = dplyr::join_by(
+          minimal < val,
+          maximal > val
+        )
+      ) |>
+        dplyr::distinct(minimal, .keep_all = TRUE)
+
+      spectral_library <-
+        spectral_library[lib_precursors %in% df_3$lib_precursors]
     }
+
+    lib_precursors <-
+      spectral_library@backend@spectraData$precursorMz
+    minimal <- pmin(
+      lib_precursors - dalton,
+      lib_precursors * (1 - (10^-6 * ppm))
+    )
+    maximal <- pmax(
+      lib_precursors + dalton,
+      lib_precursors * (1 + (10^-6 * ppm))
+    )
+
+    lib_inchikey <- spectral_library@backend@spectraData$inchikey
+    lib_inchikey2D <-
+      spectral_library@backend@spectraData$inchikey_2D
+    lib_smiles <- spectral_library@backend@spectraData$smiles
+    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
+    lib_rts <- spectral_library@backend@spectraData$rtime
+    lib_name <- spectral_library@backend@spectraData$name
+    lib_mf <- spectral_library@backend@spectraData$formula
+    lib_mass <- spectral_library@backend@spectraData$exactmass
+    lib_xlogp <- spectral_library@backend@spectraData$xlogp
+    lib_spectra <- spectral_library@backend@peaksData
+
+    calculate_entropy_score <-
+      function(spectra,
+               spectral_library,
+               dalton,
+               ppm) {
+        calculate_score_and_create_inner_list <-
+          function(spectrum,
+                   precursor,
+                   spectral_lib,
+                   query_spectra,
+                   query_rts,
+                   lib_inchikey,
+                   lib_inchikey2D,
+                   lib_smiles,
+                   lib_smiles2D,
+                   lib_rts,
+                   lib_name,
+                   lib_mf,
+                   lib_mass,
+                   lib_xlogp,
+                   lib_precursors,
+                   minimal,
+                   maximal,
+                   daz = dalton,
+                   ppmz = ppm) {
+            indices <- minimal <= precursor & precursor <= maximal
+            spectral_lib <- lib_spectra[indices]
+
+            inner_list <-
+              lapply(
+                X = seq_along(spectral_lib),
+                FUN = function(index,
+                               sp = spectrum,
+                               spectra = query_spectra,
+                               lib = spectral_lib,
+                               dalton = daz,
+                               ppm = ppmz) {
+                  score <- msentropy::calculate_entropy_similarity(
+                    peaks_a = spectra[[sp]],
+                    peaks_b = lib[[index]],
+                    min_mz = 0,
+                    max_mz = 5000,
+                    noise_threshold = 0,
+                    ms2_tolerance_in_da = dalton,
+                    ms2_tolerance_in_ppm = ppm,
+                    max_peak_num = -1,
+                    clean_spectra = TRUE
+                  )
+
+                  if (score >= 0.1) {
+                    list(
+                      "feature_id" = spectrum,
+                      "precursorMz" = precursor,
+                      "rtime" = query_rts[[spectrum]],
+                      "target_inchikey" = lib_inchikey[indices][[index]],
+                      "target_inchikey_2D" = lib_inchikey2D[indices][[index]],
+                      "target_smiles" = lib_smiles[indices][[index]],
+                      "target_smiles_2D" = lib_smiles2D[indices][[index]],
+                      "target_rtime" = lib_rts[indices][[index]],
+                      "target_name" = lib_name[indices][[index]],
+                      "target_formula" = lib_mf[indices][[index]],
+                      "target_exactmass" = lib_mass[indices][[index]],
+                      "target_xlogp" = lib_xlogp[indices][[index]],
+                      "target_precursorMz" = lib_precursors[indices][[index]],
+                      "score" = as.numeric(score),
+                      "count_peaks_matched" = NA_integer_,
+                      "presence_ratio" = NA_real_
+                    )
+                  } else {
+                    NULL
+                  }
+                }
+              )
+
+            inner_list <- Filter(Negate(is.null), inner_list)
+            inner_list <- dplyr::bind_rows(inner_list)
+            return(inner_list)
+          }
+
+        if (parallel) {
+          future::plan(future::multisession)
+          progressr::handlers(list(
+            progressr::handler_progress(format = ":current/:total [:bar] :percent in :elapsed ETA: :eta")
+          ))
+          outer_list <-
+            future.apply::future_lapply(
+              X = seq_along(spectra),
+              p = progressr::progressor(along = seq_along(spectra)),
+              future.seed = TRUE,
+              FUN = function(spectrum, qp = query_precursors, p) {
+                p(sprintf("spectra=%g", length(qp)))
+                precursor <- qp[spectrum]
+                calculate_score_and_create_inner_list(
+                  spectrum = spectrum,
+                  precursor = precursor,
+                  spectral_lib = lib_spectra,
+                  query_spectra = query_spectra,
+                  query_rts = query_rts,
+                  lib_inchikey = lib_inchikey,
+                  lib_inchikey2D = lib_inchikey2D,
+                  lib_smiles = lib_smiles,
+                  lib_smiles2D = lib_smiles2D,
+                  lib_rts = lib_rts,
+                  lib_name = lib_name,
+                  lib_mf = lib_mf,
+                  lib_mass = lib_mass,
+                  lib_xlogp = lib_xlogp,
+                  lib_precursors = lib_precursors,
+                  minimal = minimal,
+                  maximal = maximal
+                )
+              }
+            ) |>
+            progressr::with_progress()
+        } else {
+          outer_list <-
+            lapply(
+              X = seq_along(spectra),
+              FUN = function(spectrum, qp = query_precursors) {
+                precursor <- qp[spectrum]
+                calculate_score_and_create_inner_list(
+                  spectrum = spectrum,
+                  precursor = precursor,
+                  spectral_lib = lib_spectra,
+                  query_spectra = query_spectra,
+                  query_rts = query_rts,
+                  lib_inchikey = lib_inchikey,
+                  lib_inchikey2D = lib_inchikey2D,
+                  lib_smiles = lib_smiles,
+                  lib_smiles2D = lib_smiles2D,
+                  lib_rts = lib_rts,
+                  lib_name = lib_name,
+                  lib_mf = lib_mf,
+                  lib_mass = lib_mass,
+                  lib_xlogp = lib_xlogp,
+                  lib_precursors = lib_precursors,
+                  minimal = minimal,
+                  maximal = maximal
+                )
+              }
+            )
+        }
+
+        return(dplyr::bind_rows(outer_list))
+      }
+
+    result <-
+      calculate_entropy_score(
+        spectra = spectra,
+        spectral_library = spectral_library,
+        dalton = dalton,
+        ppm = ppm
+      )
+
+    # Call the function with the required arguments
+    df_final <-
+      result |>
+      tidytable::tidytable()
+
     df_final <- df_final |>
       tidytable::rowwise() |>
       dplyr::mutate(
@@ -285,17 +412,8 @@ annotate_spectra <- function(
     ## COMMENT AR: Not doing it because of thresholding
     ## df_final[is.na(df_final)] <- 0
 
-    if (condition == "AND") {
-      df_final <- df_final |>
-        dplyr::filter(score >= threshold) |>
-        dplyr::filter(count_peaks_matched >= npeaks) |>
-        dplyr::filter(presence_ratio >= rpeaks)
-    } else {
-      df_final <- df_final |>
-        dplyr::filter(score >= threshold |
-          count_peaks_matched >= npeaks |
-          presence_ratio >= rpeaks)
-    }
+    df_final <- df_final |>
+      dplyr::filter(score >= threshold)
 
     log_debug(
       nrow(
@@ -308,14 +426,7 @@ annotate_spectra <- function(
         tidytable::distinct(feature_id)),
       "features, with at least",
       threshold,
-      "similarity score",
-      condition,
-      "at least",
-      npeaks,
-      "(absolute)",
-      condition,
-      rpeaks,
-      "(relative) matched peaks."
+      "similarity score."
     )
     if (nrow(df_final) == 0) {
       log_debug("No spectra were matched, returning an empty dataframe")

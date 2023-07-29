@@ -32,33 +32,30 @@ create_edges_progress <- function(index,
     p(sprintf("spectra=%g", nspecs))
   }
 
-  s1 <- frags[[index]]
-  query_prec <- precs[index]
-
   inner_list <- list()
 
   for (target in (index + 1):nspecs) {
-    s2 <- frags[[target]]
-    map <- MsCoreUtils::join_gnps(
-      x = s1[, 1],
-      y = s2[, 1],
-      xPrecursorMz = query_prec,
-      yPrecursorMz = precs[target],
-      tolerance = ms2_tolerance,
-      ppm = ppm_tolerance
-    )
-    xy_product <- map$x * map$y
-    count_peaks_matched <- sum(!is.na(xy_product))
-    score <- MsCoreUtils::gnps(s1[map$x, ], s2[map$y, ])
+    score <-
+      msentropy::calculate_entropy_similarity(
+        frags[[index]],
+        frags[[target]],
+        min_mz = 0,
+        max_mz = 5000,
+        noise_threshold = 0,
+        ms2_tolerance_in_da = ms2_tolerance,
+        ms2_tolerance_in_ppm = ppm_tolerance,
+        max_peak_num = -1,
+        clean_spectra = TRUE
+      )
 
     ## Can be very large otherwise
-    inner_list[[target - index]] <- if (score != 0) {
+    inner_list[[target - index]] <- if (score >= 0.1) {
       list(
         "feature_id" = index,
         "target_id" = target,
-        "score" = score,
-        "count_peaks_matched" = count_peaks_matched,
-        "presence_ratio" = count_peaks_matched / length(map$y)
+        "score" = as.numeric(score),
+        "count_peaks_matched" = NA_integer_,
+        "presence_ratio" = NA_real_
       )
     }
   }

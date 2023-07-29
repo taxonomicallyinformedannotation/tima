@@ -1,28 +1,8 @@
 ---
 #' Annotations related parameters.
 annotations:
-  #' MS2 annotation related parameters.
-  ms2:
-    #' Similarity method to be used to compare spectra.
-    #' Currently "gnps", "navdist", "ndotproduct",
-    # "neuclidean", "nspectraangle" supported. STRING
-    method: gnps
-
     #' Thresholds
     thresholds:
-      #' Condition to be used to retain candidates.
-      #' Must be "OR" or "AND".
-      #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
-      condition: OR
-
-      #' For peaks.
-      peaks:
-        #' Minimal shared peaks (absolute). INTEGER
-        absolute: 6
-
-        #' Minimal shared peaks (ratio). FLOAT
-        ratio: 0.2
-
       #' Similarity threhsold. FLOAT
       similarity: 0.7
 
@@ -76,8 +56,5 @@ names:
 
 #' Options.
 options:
-  #' Skip time-consuming steps. BOOLEAN
-  fast: yes
-
   #' Execute processes in parallel when available. BOOLEAN
   parallel: yes

@@ -9,16 +9,11 @@ create_edges_spectra(
   output = params$files$networks$spectral$edges$raw,
   name_source = params$names$source,
   name_target = params$names$target,
-  method = params$annotations$ms2$method,
   threshold = params$annotations$ms2$thresholds$similarity,
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
-  npeaks = params$annotations$ms2$thresholds$peaks$absolute,
-  rpeaks = params$annotations$ms2$thresholds$peaks$ratio,
-  condition = params$annotations$ms2$thresholds$condition,
   qutoff = params$ms$intensity$thresholds$ms2,
   parallel = params$options$parallel,
-  fast = params$options$fast,
   parameters = params
 )
 }
@@ -31,28 +26,19 @@ create_edges_spectra(
 
 \item{name_target}{Name of the target features column}
 
-\item{method}{Method to be used to perform spectral comparison}
-
 \item{threshold}{Minimal similarity to report}
 
 \item{ppm}{Relative ppm tolerance to be used}
 
 \item{dalton}{Absolute Dalton tolerance to be used}
 
-\item{npeaks}{Absolute minimum number of peaks to be matched}
-
-\item{rpeaks}{Relative minimum number of peaks to be matched}
-
-\item{condition}{Condition to be fulfilled.
-Either 'OR' or 'AND' (mass and peaks minima).}
-
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{parallel}{Boolean. Process in parallel}
 
-\item{fast}{Boolean. Do it fast}
-
 \item{parameters}{Params}
+
+\item{method}{Method to be used to perform spectral comparison}
 }
 \description{
 This function create edges
