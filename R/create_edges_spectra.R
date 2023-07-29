@@ -49,6 +49,8 @@ create_edges_spectra <- function(
 
   params <<- parameters
 
+  log_debug("Collecting garbage ...")
+  gc()
 
   log_debug("Loading spectra...")
   spectra <- input |>
@@ -61,6 +63,9 @@ create_edges_spectra <- function(
     Spectra::addProcessing(normalize_peaks()) |>
     Spectra::applyProcessing()
 
+  log_debug("Collecting garbage ...")
+  gc()
+
   log_debug("Performing spectral comparison")
   log_debug(
     "As we do not bin the spectra,
@@ -70,6 +75,9 @@ create_edges_spectra <- function(
   log_debug("Take yourself a break, you deserve it.")
   edges <- spectra |>
     create_edges_parallel()
+
+  log_debug("Collecting garbage ...")
+  gc()
 
   edges <- edges |>
     tidytable::select(
@@ -89,7 +97,6 @@ create_edges_spectra <- function(
         "count_peaks_matched"
       )
     ))
-
 
   edges <- edges |>
     dplyr::filter(
