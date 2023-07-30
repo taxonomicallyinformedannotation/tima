@@ -282,35 +282,13 @@ testthat::test_that("Whole process", {
     import_spectra()
   spectra <- spectra |>
     sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
-  frags <- spectra@backend@peaksData[1:2]
-  # single_pair[[1]] <- single_pair[[1]] |>
-  #   normalize_peaks()
-  # single_pair[[2]] <- single_pair[[2]] |>
-  #   normalize_peaks()
-  precs <- spectra$precursorMz[1:2]
-  nspecs <- length(frags)
-  ## TODO Change create_edges_parallel
-  create_edges_progress(
-    index = 1,
-    frags = frags,
-    precs = precs,
-    nspecs = nspecs,
+  spectra <- spectra[1:2]
+  create_edges_parallel(
+    spectra = spectra,
     ms2_tolerance = 0.01,
-    ppm = 5,
-    p = NA,
+    ppm_tolerance = 5,
     parallel = FALSE
   )
-  create_edges_progress(
-    index = 1,
-    frags = frags,
-    precs = precs,
-    nspecs = nspecs,
-    ms2_tolerance = 0.01,
-    ppm = 5,
-    p = progressr::progressor(along = 1),
-    parallel = TRUE
-  ) |>
-    progressr::with_progress()
   ##
 
   ### GNPS results
