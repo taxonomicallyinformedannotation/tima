@@ -179,31 +179,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       lib_precursors * (1 + (10^-6 * ppm))
     )
 
-    lib_inchikey <- spectral_library@backend@spectraData$inchikey
-    if (is.null(lib_inchikey)) {
-      lib_inchikey <- rep(NA_character_, length(spectral_library))
-    }
-    lib_inchikey2D <-
-      spectral_library@backend@spectraData$inchikey_2D
-    if (is.null(lib_inchikey2D)) {
-      lib_inchikey2D <- rep(NA_character_, length(spectral_library))
-    }
-    lib_smiles <- spectral_library@backend@spectraData$smiles
-    if (is.null(lib_smiles)) {
-      lib_smiles <- rep(NA_character_, length(spectral_library))
-    }
-    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
-    if (is.null(lib_smiles2D)) {
-      lib_smiles2D <- rep(NA_character_, length(spectral_library))
-    }
-    lib_rts <- spectral_library@backend@spectraData$rtime
-    if (is.null(lib_rts)) {
-      lib_rts <- rep(NA_real_, length(spectral_library))
-    }
-    lib_name <- spectral_library@backend@spectraData$name
-    lib_mf <- spectral_library@backend@spectraData$formula
-    lib_mass <- spectral_library@backend@spectraData$exactmass
-    lib_xlogp <- spectral_library@backend@spectraData$xlogp
+    lib_id <- spectral_library@backend@spectraData$spectrum_id
     lib_spectra <- spectral_library@backend@peaksData
 
     calculate_entropy_score <-
@@ -217,16 +193,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                    spectral_lib,
                    query_spectra,
                    query_rts,
-                   lib_inchikey,
-                   lib_inchikey2D,
-                   lib_smiles,
-                   lib_smiles2D,
-                   lib_rts,
-                   lib_name,
-                   lib_mf,
-                   lib_mass,
-                   lib_xlogp,
-                   lib_precursors,
+                   lib_id,
                    minimal,
                    maximal,
                    daz = dalton,
@@ -260,16 +227,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                       "feature_id" = spectrum,
                       "precursorMz" = precursor,
                       "rtime" = query_rts[[spectrum]],
-                      "target_inchikey" = lib_inchikey[indices][[index]],
-                      "target_inchikey_2D" = lib_inchikey2D[indices][[index]],
-                      "target_smiles" = lib_smiles[indices][[index]],
-                      "target_smiles_2D" = lib_smiles2D[indices][[index]],
-                      "target_rtime" = lib_rts[indices][[index]],
-                      "target_name" = lib_name[indices][[index]],
-                      "target_formula" = lib_mf[indices][[index]],
-                      "target_exactmass" = lib_mass[indices][[index]],
-                      "target_xlogp" = lib_xlogp[indices][[index]],
-                      "target_precursorMz" = lib_precursors[indices][[index]],
+                      "target_id" = lib_id[indices][[index]],
                       "score" = as.numeric(score),
                       "count_peaks_matched" = NA_integer_,
                       "reverse_score" = NA_real_,
@@ -307,16 +265,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                   spectral_lib = lib_spectra,
                   query_spectra = query_spectra,
                   query_rts = query_rts,
-                  lib_inchikey = lib_inchikey,
-                  lib_inchikey2D = lib_inchikey2D,
-                  lib_smiles = lib_smiles,
-                  lib_smiles2D = lib_smiles2D,
-                  lib_rts = lib_rts,
-                  lib_name = lib_name,
-                  lib_mf = lib_mf,
-                  lib_mass = lib_mass,
-                  lib_xlogp = lib_xlogp,
-                  lib_precursors = lib_precursors,
+                  lib_id = lib_id,
                   minimal = minimal,
                   maximal = maximal
                 )
@@ -335,16 +284,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                   spectral_lib = lib_spectra,
                   query_spectra = query_spectra,
                   query_rts = query_rts,
-                  lib_inchikey = lib_inchikey,
-                  lib_inchikey2D = lib_inchikey2D,
-                  lib_smiles = lib_smiles,
-                  lib_smiles2D = lib_smiles2D,
-                  lib_rts = lib_rts,
-                  lib_name = lib_name,
-                  lib_mf = lib_mf,
-                  lib_mass = lib_mass,
-                  lib_xlogp = lib_xlogp,
-                  lib_precursors = lib_precursors,
+                  lib_id = lib_id,
                   minimal = minimal,
                   maximal = maximal
                 )
@@ -363,6 +303,61 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         ppm = ppm
       ) |>
       tidytable::tidytable()
+
+    lib_inchikey <- spectral_library@backend@spectraData$inchikey
+    if (is.null(lib_inchikey)) {
+      lib_inchikey <- rep(NA_character_, length(spectral_library))
+    }
+    lib_inchikey2D <-
+      spectral_library@backend@spectraData$inchikey_2D
+    if (is.null(lib_inchikey2D)) {
+      lib_inchikey2D <- rep(NA_character_, length(spectral_library))
+    }
+    lib_smiles <- spectral_library@backend@spectraData$smiles
+    if (is.null(lib_smiles)) {
+      lib_smiles <- rep(NA_character_, length(spectral_library))
+    }
+    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
+    if (is.null(lib_smiles2D)) {
+      lib_smiles2D <- rep(NA_character_, length(spectral_library))
+    }
+    lib_rts <- spectral_library@backend@spectraData$rtime
+    if (is.null(lib_rts)) {
+      lib_rts <- rep(NA_real_, length(spectral_library))
+    }
+    lib_name <- spectral_library@backend@spectraData$name
+    if (is.null(lib_name)) {
+      lib_name <- rep(NA_character_, length(spectral_library))
+    }
+    lib_mf <- spectral_library@backend@spectraData$formula
+    if (is.null(lib_mf)) {
+      lib_mf <- rep(NA_character_, length(spectral_library))
+    }
+    lib_mass <- spectral_library@backend@spectraData$exactmass
+    if (is.null(lib_mass)) {
+      lib_mass <- rep(NA_real_, length(spectral_library))
+    }
+    lib_xlogp <- spectral_library@backend@spectraData$xlogp
+    if (is.null(lib_xlogp)) {
+      lib_xlogp <- rep(NA_real_, length(spectral_library))
+    }
+
+    df_meta <- tidytable::tidytable(
+      "target_id" = lib_id,
+      "target_inchikey" = lib_inchikey,
+      "target_inchikey_2D" = lib_inchikey2D,
+      "target_smiles" = lib_smiles,
+      "target_smiles_2D" = lib_smiles2D,
+      "target_rtime" = lib_rts,
+      "target_name" = lib_name,
+      "target_formula" = lib_mf,
+      "target_exactmass" = lib_mass,
+      "target_xlogp" = lib_xlogp,
+      "target_precursorMz" = lib_precursors
+    )
+    df_final <- df_final |>
+      tidytable::left_join(df_meta) |>
+      tidytable::select(-target_id)
 
     df_final <- df_final |>
       tidytable::rowwise() |>
