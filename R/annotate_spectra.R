@@ -243,7 +243,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           }
 
         log_debug("Performing spectral comparison")
-        if (parallel) {
+        ## TODO investigate issue with Windows
+        if (parallel && Sys.info()[["sysname"]] != "Windows") {
           options(future.globals.onReference = "error")
           future::plan(future::multisession)
           progressr::handlers(list(
