@@ -1,71 +1,44 @@
+utils::globalVariables(
+  c(
+    "params"
+  )
+)
+
 #' @title Create edges parallel
 #'
-#' @description This function is part of the creation of edges
+#' @description This function is slow so it had to be parallelized
 #'
-#' @include create_edges_progress.R
+#' @include calculate_entropy.R
+#'
+#' @param index Indices
+#' @param frags Fragments
+#' @param precs Precursors
+#' @param nspecs Number of spectra
+#' @param ms2_tolerance MS2 tolerance
+#' @param ppm_tolerance ppm tolerance
+#' @param p Progressor
+#' @param parallel Parallel
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-create_edges_parallel <- function(spectra,
-                                  ms2_tolerance =
-                                    params$ms$tolerances$mass$dalton$ms2,
-                                  ppm_tolerance =
-                                    params$ms$tolerances$mass$ppm$ms2,
-                                  parallel =
-                                    params$options$parallel) {
-  nspecz <- length(spectra)
-  precz <- spectra$precursorMz
-  fragz <- spectra@backend@peaksData
-  msz <- ms2_tolerance
-  ppmz <- ppm_tolerance
-
+create_edges_parallel <- function(index,
+                                  frags,
+                                  precs,
+                                  nspecs,
+                                  ms2_tolerance,
+                                  ppm_tolerance,
+                                  p = NA,
+                                  parallel) {
   if (parallel) {
-    options(future.globals.onReference = "error")
-    future::plan(future::multisession)
-    progressr::handlers(
-      list(
-        progressr::handler_progress(
-          format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
-        )
-      )
-    )
-
-    result_list <-
-      future.apply::future_lapply(
-        X = 1:(nspecz - 1),
-        FUN = create_edges_progress,
-        p = progressr::progressor(along = 1:(nspecz - 1)),
-        future.seed = TRUE,
-        future.chunk.size = structure(TRUE, ordering = "random"),
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = msz,
-        ppm_tolerance = ppmz,
-        parallel = parallel
-      ) |>
-      progressr::with_progress()
-  } else {
-    result_list <-
-      lapply(
-        X = 1:(nspecz - 1),
-        FUN = create_edges_progress,
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = msz,
-        ppm_tolerance = ppmz,
-        p = NA,
-        parallel = parallel
-      )
+    p(sprintf("spectra=%g", nspecs))
   }
+  # Calculate the similarity using lapply
+  inner_list <- lapply(X = (index + 1):nspecs, FUN = function(target) {
+    calculate_entropy_similarity(index, target, frags, ms2_tolerance, ppm_tolerance)
+  })
 
-  # Combine the results into a single matrix
-  edges <-
-    do.call(rbind, unlist(result_list, recursive = FALSE)) |>
-    data.frame()
-  return(edges)
+  return(inner_list)
 }

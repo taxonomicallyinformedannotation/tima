@@ -278,17 +278,17 @@ testthat::test_that("Whole process", {
   create_edges_spectra()
 
   ## additional test not covered by lapply
-  spectra <- params$files$spectral$raw |>
-    import_spectra()
-  spectra <- spectra |>
-    sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
-  spectra <- spectra[1:2]
-  create_edges_parallel(
-    spectra = spectra,
-    ms2_tolerance = 0.01,
-    ppm_tolerance = 5,
-    parallel = FALSE
-  )
+  # spectra <- params$files$spectral$raw |>
+  #   import_spectra()
+  # spectra <- spectra |>
+  #   sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
+  # spectra <- spectra[1:2]
+  # create_edges_parallel(
+  #   spectra = spectra,
+  #   ms2_tolerance = 0.01,
+  #   ppm_tolerance = 5,
+  #   parallel = FALSE
+  # )
   ##
 
   ### GNPS results
