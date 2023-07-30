@@ -5,14 +5,35 @@
 \title{Create edges parallel}
 \usage{
 create_edges_parallel(
-  spectra,
-  ms2_tolerance = params$ms$tolerances$mass$dalton$ms2,
-  ppm_tolerance = params$ms$tolerances$mass$ppm$ms2,
-  parallel = params$options$parallel
+  index,
+  frags,
+  precs,
+  nspecs,
+  ms2_tolerance,
+  ppm_tolerance,
+  p = NA,
+  parallel
 )
 }
+\arguments{
+\item{index}{Indices}
+
+\item{frags}{Fragments}
+
+\item{precs}{Precursors}
+
+\item{nspecs}{Number of spectra}
+
+\item{ms2_tolerance}{MS2 tolerance}
+
+\item{ppm_tolerance}{ppm tolerance}
+
+\item{p}{Progressor}
+
+\item{parallel}{Parallel}
+}
 \description{
-This function is part of the creation of edges
+This function is slow so it had to be parallelized
 }
 \examples{
 NULL

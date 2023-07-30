@@ -67,8 +67,54 @@ create_edges_spectra <- function(
       expect a long processing time."
   )
   log_debug("Take yourself a break, you deserve it.")
-  edges <- spectra |>
-    create_edges_parallel()
+  nspecz <- length(spectra)
+  precz <- spectra$precursorMz
+  fragz <- spectra@backend@peaksData
+
+  if (parallel) {
+    options(future.globals.onReference = "error")
+    future::plan(future::multisession)
+    progressr::handlers(
+      list(
+        progressr::handler_progress(
+          format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
+        )
+      )
+    )
+    result_list <-
+      future.apply::future_lapply(
+        X = 1:(nspecz - 1),
+        FUN = create_edges_parallel,
+        p = progressr::progressor(along = 1:(nspecz - 1)),
+        future.seed = TRUE,
+        future.chunk.size = structure(TRUE, ordering = "random"),
+        frags = fragz,
+        precs = precz,
+        nspecs = nspecz,
+        ms2_tolerance = dalton,
+        ppm_tolerance = ppm,
+        parallel = parallel
+      ) |>
+      progressr::with_progress()
+  } else {
+    result_list <-
+      lapply(
+        X = 1:(nspecz - 1),
+        FUN = create_edges_parallel,
+        frags = fragz,
+        precs = precz,
+        nspecs = nspecz,
+        ms2_tolerance = dalton,
+        ppm_tolerance = ppm,
+        p = NA,
+        parallel = parallel
+      )
+  }
+  edges <- do.call(
+    what = rbind,
+    args = unlist(result_list, recursive = FALSE)
+  ) |>
+    data.frame()
 
   log_debug("Collecting garbage ...")
   gc()
