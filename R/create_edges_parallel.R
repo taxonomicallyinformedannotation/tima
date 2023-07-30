@@ -37,7 +37,7 @@ create_edges_parallel <- function(index,
   }
   # Calculate the similarity using lapply
   inner_list <- lapply(X = (index + 1):nspecs, FUN = function(target) {
-    calculate_entropy_similarity(index, target, frags, ms2_tolerance, ppm_tolerance)
+    calculate_entropy(index, target, frags, ms2_tolerance, ppm_tolerance)
   })
 
   return(inner_list)
