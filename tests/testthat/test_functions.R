@@ -265,16 +265,11 @@ testthat::test_that("Whole process", {
   ### Appox
   annotate_spectra(approx = TRUE)
   ### Positive
-  annotate_spectra(parallel = FALSE)
+  annotate_spectra()
 
   ## Create MS2 based edges
   step <- "create_edges_spectra"
   params <- get_params(step = step)
-  ### Slow
-  create_edges_spectra(
-    parallel = FALSE
-  )
-  ### Normal
   create_edges_spectra()
 
   ## additional test not covered by lapply
@@ -283,11 +278,10 @@ testthat::test_that("Whole process", {
   # spectra <- spectra |>
   #   sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
   # spectra <- spectra[1:2]
-  # create_edges_parallel(
+  # create_edges(
   #   spectra = spectra,
   #   ms2_tolerance = 0.01,
-  #   ppm_tolerance = 5,
-  #   parallel = FALSE
+  #   ppm_tolerance = 5
   # )
   ##
 
@@ -485,7 +479,6 @@ testthat::test_that("Whole process", {
   arguments$wei_che_22 <<- "x"
   arguments$wei_che_23 <<- "x"
   arguments$force <<- "x"
-  arguments$parallel <<- "x"
   arguments$summarise <<- "x"
 
   parse_cli_params()

@@ -7,6 +7,7 @@
 #' @param frags Fragments
 #' @param ms2_tolerance MS2 tolerance
 #' @param ppm_tolerance ppm tolerance
+#' @param threshold Threshold
 #'
 #' @return NULL
 #'
@@ -17,7 +18,8 @@ calculate_entropy <- function(index,
                               target,
                               frags,
                               ms2_tolerance,
-                              ppm_tolerance) {
+                              ppm_tolerance,
+                              threshold = 0.1) {
   score <-
     msentropy::calculate_entropy_similarity(
       frags[[index]],
@@ -31,7 +33,7 @@ calculate_entropy <- function(index,
       clean_spectra = TRUE
     )
 
-  if (score >= 0.1) {
+  if (score >= threshold) {
     return(
       list(
         "feature_id" = index,

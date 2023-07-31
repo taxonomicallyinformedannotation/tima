@@ -1336,7 +1336,6 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              parallel = par_ann_spe$options$parallel,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1359,7 +1358,6 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              parallel = par_ann_spe$options$parallel,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )

@@ -55,8 +55,3 @@ names:
 
   #' Name of "target IDs" variable in the input. STRING
   target: CLUSTERID2
-
-#' Options.
-options:
-  #' Execute processes in parallel when available. BOOLEAN
-  parallel: yes

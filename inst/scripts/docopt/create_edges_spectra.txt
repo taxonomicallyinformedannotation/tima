@@ -1,8 +1,8 @@
 You can use this script with the following example:
-  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.02 --ms-tol-mas-ppm-ms2 10 --ann-ms2-thr-sim 0.2 --ms-int-thr-ms2 0 --parallel true
+  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.02 --ms-tol-mas-ppm-ms2 10 --ann-ms2-thr-sim 0.2 --ms-int-thr-ms2 0
 
 Usage: 
-  create_edges_spectra.R [--ann-ms2-met=<ann-ms2-met>] [--ann-ms2-thr-con=<ann-ms2-thr-con>] [--ann-ms2-thr-pea-abs=<ann-ms2-thr-pea-abs>] [--ann-ms2-thr-pea-rat=<ann-ms2-thr-pea-rat>] [--ann-ms2-thr-sim=<ann-ms2-thr-sim>] [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-int-thr-ms2=<ms-int-thr-ms2>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--fast=<fast>] [--parallel=<parallel>]
+  create_edges_spectra.R [--ann-ms2-thr-sim=<ann-ms2-thr-sim>] [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-int-thr-ms2=<ms-int-thr-ms2>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
 
 Arguments:
   ann-ms2-thr-sim            Similarity threhsold. FLOAT
@@ -14,8 +14,6 @@ Arguments:
   ms-tol-mas-ppm-ms2         Relative mass tolerance for MS2 in ppm. FLOAT
   ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
-
-  parallel                   Execute processes in parallel when available. BOOLEAN
 
 Options:
   -h --help                  Shows this screen.

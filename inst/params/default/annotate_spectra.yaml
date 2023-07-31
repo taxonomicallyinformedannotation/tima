@@ -80,8 +80,3 @@ ms:
     rt:
       #' Retention time tolerance in minutes. FLOAT
       minutes: 0.05
-
-#' Options.
-options:
-  #' Execute processes in parallel when available. BOOLEAN
-  parallel: yes
