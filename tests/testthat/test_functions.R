@@ -272,19 +272,6 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   create_edges_spectra()
 
-  ## additional test not covered by lapply
-  # spectra <- params$files$spectral$raw |>
-  #   import_spectra()
-  # spectra <- spectra |>
-  #   sanitize_spectra(cutoff = params$ms$intensity$thresholds$ms2)
-  # spectra <- spectra[1:2]
-  # create_edges(
-  #   spectra = spectra,
-  #   ms2_tolerance = 0.01,
-  #   ppm_tolerance = 5
-  # )
-  ##
-
   ### GNPS results
   step <- "prepare_annotations_gnps"
   params <- get_params(step = step)
