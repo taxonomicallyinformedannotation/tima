@@ -65,8 +65,10 @@ In order to perform MS^2^ annotation based on an **I**n **S**ilico **D**ata**B**
 source(file = "inst/scripts/annotate_spectra.R")
 ```
 
+We use the `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
+
 In case, a python implementation of the spectral matching steps is also available at: <https://github.com/mandelbrot-project/spectral_lib_matcher>.
-The python version also includes more elaborated similarity measures.
+The python version also includes other similarity measures.
 
 And as before:
 
@@ -179,6 +181,8 @@ If no network was generated previously on GNPS (no GNPS job ID provided), it can
 ```{r create-edges, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/create_edges_spectra.R")
 ```
+
+Again, the edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
 
