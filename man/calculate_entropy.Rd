@@ -4,7 +4,14 @@
 \alias{calculate_entropy}
 \title{Calculate entropy}
 \usage{
-calculate_entropy(index, target, frags, ms2_tolerance, ppm_tolerance)
+calculate_entropy(
+  index,
+  target,
+  frags,
+  ms2_tolerance,
+  ppm_tolerance,
+  threshold = 0.1
+)
 }
 \arguments{
 \item{index}{Index}
@@ -16,6 +23,8 @@ calculate_entropy(index, target, frags, ms2_tolerance, ppm_tolerance)
 \item{ms2_tolerance}{MS2 tolerance}
 
 \item{ppm_tolerance}{ppm tolerance}
+
+\item{threshold}{Threshold}
 }
 \description{
 This function is part of the creation of edges

@@ -34,7 +34,6 @@ save_input <- function(input) {
   names_source <<- shiny::isolate(input$names_source)
   names_target <<- shiny::isolate(input$names_target)
   forceps <<- shiny::isolate(input$force)
-  parallel <<- shiny::isolate(input$parallel)
   summarise <<- shiny::isolate(input$summarise)
 
   ## Change 1
@@ -165,7 +164,6 @@ save_input <- function(input) {
     rt$
     minutes <-
     ms_tol_rt_min
-  yamls_params$annotate_spectra$options$parallel <- parallel
 
   yamls_params$
     create_edges_spectra$
@@ -242,10 +240,6 @@ save_input <- function(input) {
     ms_tol_rt_min
   yamls_params$create_edges_spectra$names$source <- names_source
   yamls_params$create_edges_spectra$names$target <- names_target
-  yamls_params$
-    create_edges_spectra$
-    options$
-    parallel <- parallel
 
   yamls_params$prepare_features_edges$names$source <- names_source
   yamls_params$prepare_features_edges$names$target <- names_target

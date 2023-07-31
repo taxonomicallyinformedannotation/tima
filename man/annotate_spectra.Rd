@@ -13,7 +13,6 @@ annotate_spectra(
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
   qutoff = params$ms$intensity$thresholds$ms2,
-  parallel = params$options$parallel,
   approx = params$annotations$ms2$approx,
   parameters = params
 )
@@ -36,8 +35,6 @@ Can be '.mgf' or '.sqlite' (Spectra formatted)}
 
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
-\item{parallel}{Boolean. Process in parallel}
-
 \item{approx}{Perform matching without precursor match}
 
 \item{parameters}{Params}
@@ -51,7 +48,6 @@ This function annotates spectra
 \details{
 It takes two files as input.
 A query file that will be matched against a library file.
-Parallel processing is also made available.
 }
 \examples{
 NULL

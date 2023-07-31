@@ -345,32 +345,6 @@
     },
     "6": {
       "@type": "SoftwareApplication",
-      "identifier": "future",
-      "name": "future",
-      "version": ">= 1.33.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=future"
-    },
-    "7": {
-      "@type": "SoftwareApplication",
-      "identifier": "future.apply",
-      "name": "future.apply",
-      "version": ">= 1.11.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=future.apply"
-    },
-    "8": {
-      "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
       "version": ">= 1.5.0.1",
@@ -382,7 +356,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "9": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -395,7 +369,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "10": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -408,7 +382,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "11": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -421,20 +395,20 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "12": {
+    "10": {
       "@type": "SoftwareApplication",
-      "identifier": "progressr",
-      "name": "progressr",
-      "version": ">= 0.13.0",
+      "identifier": "pbapply",
+      "name": "pbapply",
+      "version": ">= 1.7.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=progressr"
+      "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "13": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
@@ -447,7 +421,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=R.utils"
     },
-    "14": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -460,7 +434,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "15": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -473,12 +447,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "16": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "17": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -491,7 +465,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "18": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -504,7 +478,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "19": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -517,7 +491,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "20": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "tidyft",
       "name": "tidyft",
@@ -530,12 +504,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyft"
     },
-    "21": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "22": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",

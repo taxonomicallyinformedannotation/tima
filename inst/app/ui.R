@@ -1085,18 +1085,6 @@ ui <- fluidPage(
             )
           ),
         checkboxInput(
-          inputId = "parallel",
-          label = "Execute processes in parallel when available",
-          value = TRUE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "When available, parallelize computation.",
-              "Note: parallelization is not properly handled on Windows."
-            )
-          ),
-        checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
           value = TRUE

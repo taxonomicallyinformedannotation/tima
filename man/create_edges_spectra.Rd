@@ -13,7 +13,6 @@ create_edges_spectra(
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
   qutoff = params$ms$intensity$thresholds$ms2,
-  parallel = params$options$parallel,
   parameters = params
 )
 }
@@ -33,8 +32,6 @@ create_edges_spectra(
 \item{dalton}{Absolute Dalton tolerance to be used}
 
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
-
-\item{parallel}{Boolean. Process in parallel}
 
 \item{parameters}{Params}
 

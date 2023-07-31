@@ -19,13 +19,11 @@ Imports:
     docopt (>= 0.7.1),
     dplyr (>= 1.1.2),
     httr (>= 1.4.6),
-    future (>= 1.33.0),
-    future.apply (>= 1.11.0),
     igraph (>= 1.5.0.1),
     jsonlite (>= 1.8.7),
     MsBackendMgf (>= 1.8.0),
     msentropy (>= 0.1.3),
-    progressr (>= 0.13.0),
+    pbapply (>= 1.7.2),
     R.utils (>= 2.12.2),
     rotl (>= 3.1.0),
     Spectra (>= 1.10.1),
@@ -81,7 +79,7 @@ Collate:
     'create_adducts_neg.R'
     'create_adducts_pos.R'
     'create_components.R'
-    'create_edges_parallel.R'
+    'create_edges.R'
     'keep_peaks.R'
     'sanitize_spectra.R'
     'remove_above_precursor.R'

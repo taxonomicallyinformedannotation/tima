@@ -10,7 +10,7 @@ utils::globalVariables(c(
 #' @description This function create edges
 #'    based on fragmentation spectra similarity
 #'
-#' @include create_edges_parallel.R
+#' @include create_edges.R
 #' @include import_spectra.R
 #' @include normalize_peaks.R
 #' @include remove_above_precursor.R
@@ -25,7 +25,6 @@ utils::globalVariables(c(
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param qutoff Intensity under which ms2 fragments will be removed.
-#' @param parallel Boolean. Process in parallel
 #' @param parameters Params
 #'
 #' @return NULL
@@ -42,7 +41,6 @@ create_edges_spectra <- function(
     ppm = params$ms$tolerances$mass$ppm$ms2,
     dalton = params$ms$tolerances$mass$dalton$ms2,
     qutoff = params$ms$intensity$thresholds$ms2,
-    parallel = params$options$parallel,
     parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
   ## Not checking for ppm and Da limits, everyone is free.
@@ -62,62 +60,26 @@ create_edges_spectra <- function(
 
   log_debug("Performing spectral comparison")
   log_debug(
-    "As we do not bin the spectra,
-      nor limit the precursors delta,
-      expect a long processing time."
+    "As we do not limit the precursors delta,
+      expect a (relatively) long processing time."
   )
   log_debug("Take yourself a break, you deserve it.")
   nspecz <- length(spectra)
   precz <- spectra$precursorMz
   fragz <- spectra@backend@peaksData
 
-  if (parallel) {
-    options(future.globals.onReference = "error")
-    future::plan(future::multisession)
-    progressr::handlers(
-      list(
-        progressr::handler_progress(
-          format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
-        )
-      )
-    )
-    result_list <-
-      future.apply::future_lapply(
-        X = 1:(nspecz - 1),
-        FUN = create_edges_parallel,
-        p = progressr::progressor(along = 1:(nspecz - 1)),
-        future.seed = TRUE,
-        future.chunk.size = structure(TRUE, ordering = "random"),
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = dalton,
-        ppm_tolerance = ppm,
-        parallel = parallel
-      ) |>
-      progressr::with_progress()
-  } else {
-    result_list <-
-      lapply(
-        X = 1:(nspecz - 1),
-        FUN = create_edges_parallel,
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = dalton,
-        ppm_tolerance = ppm,
-        p = NA,
-        parallel = parallel
-      )
-  }
-  edges <- do.call(
-    what = rbind,
-    args = unlist(result_list, recursive = FALSE)
-  ) |>
-    data.frame()
-
-  log_debug("Collecting garbage ...")
-  gc()
+  edges <-
+    pbapply::pblapply(
+      X = 1:(nspecz - 1),
+      FUN = create_edges,
+      frags = fragz,
+      precs = precz,
+      nspecs = nspecz,
+      ms2_tolerance = dalton,
+      ppm_tolerance = ppm,
+      threshold = threshold
+    ) |>
+    dplyr::bind_rows()
 
   edges <- edges |>
     tidytable::select(

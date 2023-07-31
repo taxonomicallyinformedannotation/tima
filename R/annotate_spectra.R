@@ -27,7 +27,6 @@ utils::globalVariables(
 #'
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
-#'    Parallel processing is also made available.
 #'
 #' @include export_output.R
 #' @include export_params.R
@@ -44,7 +43,6 @@ utils::globalVariables(
 #' @param condition Condition to be fulfilled.
 #'    Either 'OR' or 'AND' (mass and peaks minima).
 #' @param qutoff Intensity under which ms2 fragments will be removed.
-#' @param parallel Boolean. Process in parallel
 #' @param approx Perform matching without precursor match
 #' @param parameters Params
 #'
@@ -62,7 +60,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                              ppm = params$ms$tolerances$mass$ppm$ms2,
                              dalton = params$ms$tolerances$mass$dalton$ms2,
                              qutoff = params$ms$intensity$thresholds$ms2,
-                             parallel = params$options$parallel,
                              approx = params$annotations$ms2$approx,
                              parameters = params) {
   stopifnot("Your input file does not exist." = file.exists(input))
@@ -235,65 +232,34 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                     )
                   }
                 }
-              )
+              ) |>
+              Filter(f = Negate(is.null)) |>
+              dplyr::bind_rows()
 
-            inner_list <- Filter(Negate(is.null), inner_list)
-            inner_list <- dplyr::bind_rows(inner_list)
             return(inner_list)
           }
 
         log_debug("Performing spectral comparison")
-        ## TODO investigate issue with Windows
-        if (parallel && Sys.info()[["sysname"]] != "Windows") {
-          options(future.globals.onReference = "error")
-          future::plan(future::multisession)
-          progressr::handlers(list(
-            progressr::handler_progress(
-              format = ":current/:total [:bar] :percent in :elapsed ETA: :eta"
-            )
-          ))
-          outer_list <-
-            future.apply::future_lapply(
-              X = seq_along(spectra),
-              p = progressr::progressor(along = seq_along(spectra)),
-              future.seed = TRUE,
-              FUN = function(spectrum, qp = query_precursors, p) {
-                p(sprintf("spectra=%g", length(qp)))
-                precursor <- qp[spectrum]
-                calculate_score_and_create_inner_list(
-                  spectrum = spectrum,
-                  precursor = precursor,
-                  spectral_lib = lib_spectra,
-                  query_spectra = query_spectra,
-                  query_rts = query_rts,
-                  lib_id = lib_id,
-                  minimal = minimal,
-                  maximal = maximal
-                )
-              }
-            ) |>
-            progressr::with_progress()
-        } else {
-          outer_list <-
-            lapply(
-              X = seq_along(spectra),
-              FUN = function(spectrum, qp = query_precursors) {
-                precursor <- qp[spectrum]
-                calculate_score_and_create_inner_list(
-                  spectrum = spectrum,
-                  precursor = precursor,
-                  spectral_lib = lib_spectra,
-                  query_spectra = query_spectra,
-                  query_rts = query_rts,
-                  lib_id = lib_id,
-                  minimal = minimal,
-                  maximal = maximal
-                )
-              }
-            )
-        }
+        outer_list <-
+          pbapply::pblapply(
+            X = seq_along(spectra),
+            FUN = function(spectrum, qp = query_precursors) {
+              precursor <- qp[spectrum]
+              calculate_score_and_create_inner_list(
+                spectrum = spectrum,
+                precursor = precursor,
+                spectral_lib = lib_spectra,
+                query_spectra = query_spectra,
+                query_rts = query_rts,
+                lib_id = lib_id,
+                minimal = minimal,
+                maximal = maximal
+              )
+            }
+          ) |>
+          dplyr::bind_rows()
 
-        return(dplyr::bind_rows(outer_list))
+        return(outer_list)
       }
 
     df_final <-

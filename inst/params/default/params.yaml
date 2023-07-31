@@ -538,8 +538,5 @@ options:
   #' Do not use it. BOOLEAN
   force: no
 
-  #' Execute processes in parallel when available. BOOLEAN
-  parallel: yes
-
   #' Summarise results to one row per feature. BOOLEAN
   summarise: yes
