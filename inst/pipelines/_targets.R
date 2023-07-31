@@ -1409,7 +1409,6 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              parallel = par_ann_spe$options$parallel,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1432,7 +1431,6 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              parallel = par_ann_spe$options$parallel,
               approx = par_ann_spe$annotations$ms2$approx,
               parameters = par_ann_spe
             )
@@ -1496,7 +1494,6 @@ list(
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$intensity$thresholds$ms2,
-          parallel = par_cre_edg_spe$options$parallel,
           parameters = par_cre_edg_spe
         )
       }
@@ -2107,7 +2104,6 @@ list(
           ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          parallel = TRUE,
           parameters = def_cre_edg_spe
         )
       }
@@ -2128,7 +2124,6 @@ list(
           ppm = def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          parallel = TRUE,
           parameters = def_cre_edg_spe
         )
       }
@@ -2255,7 +2250,6 @@ list(
           ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          parallel = TRUE,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
         )
@@ -2273,7 +2267,6 @@ list(
           ppm = def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          parallel = TRUE,
           approx = def_ann_spe$annotations$ms2$approx,
           parameters = def_ann_spe
         )
