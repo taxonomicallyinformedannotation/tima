@@ -38,6 +38,7 @@ Suggests:
     BiocManager,
     bs4Dash,
     clustermq,
+    DT,
     future,
     gt,
     knitr,
