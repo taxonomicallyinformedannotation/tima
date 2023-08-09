@@ -130,6 +130,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
     query_rts <- spectra@backend@spectraData$rtime
+    ## TODO find a way to have consistency in spectrum IDs
+    query_ids <- spectra@backend@spectraData$acquisitionNum
     if (is.null(query_rts)) {
       query_rts <- rep(NA_real_, length(spectra))
     }
@@ -188,6 +190,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           function(spectrum,
                    precursor,
                    spectral_lib,
+                   query_ids,
                    query_spectra,
                    query_rts,
                    lib_id,
@@ -221,7 +224,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
                   if (score >= 0.1) {
                     list(
-                      "feature_id" = spectrum,
+                      "feature_id" = query_ids[[spectrum]],
                       "precursorMz" = precursor,
                       "rtime" = query_rts[[spectrum]],
                       "target_id" = lib_id[indices][[index]],
@@ -249,6 +252,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                 spectrum = spectrum,
                 precursor = precursor,
                 spectral_lib = lib_spectra,
+                query_ids = query_ids,
                 query_spectra = query_spectra,
                 query_rts = query_rts,
                 lib_id = lib_id,
