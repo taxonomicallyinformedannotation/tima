@@ -2029,7 +2029,7 @@ list(
             features = benchmark_pre_meta_pos,
             library = lib_mer_key,
             output_annotations =
-              "data/interim/benchmark/benchmark_ms1_pos.tsv.gz",
+              "data/interim/benchmark/benchmark_ann_ms1_pos.tsv.gz",
             output_edges =
               "data/interim/benchmark/benchmark_edges_ms1_pos.tsv.gz",
             name_source = def_ann_mas$names$source,
