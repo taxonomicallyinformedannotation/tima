@@ -91,7 +91,7 @@ create_edges_spectra <- function(
   ## TODO find a way to have consistency in spectrum IDs
   idz <- spectra@backend@spectraData$acquisitionNum
   edges <- edges |>
-    tidytable::mutate(
+    dplyr::mutate(
       name_source = idz[name_source],
       name_target = idz[name_target]
     )
