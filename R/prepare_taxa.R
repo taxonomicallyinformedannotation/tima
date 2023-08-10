@@ -206,7 +206,7 @@ prepare_taxa <-
         tidytable::left_join(
           top_n,
           metadata_table,
-          by = c("name" = "Sample Name")
+          by = c("name" = "filename")
         ) |>
         tidytable::select(feature_id := rowname,
           organismOriginal = tidytable::all_of(colname),
