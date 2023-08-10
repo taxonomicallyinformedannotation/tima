@@ -1778,7 +1778,7 @@ list(
     tar_file(
       name = benchmark_prepared,
       command = {
-          sp <- benchmark_copy |>
+        sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
           Spectra::setBackend(Spectra::MsBackendMemory()) |>
           sanitize_spectra(
