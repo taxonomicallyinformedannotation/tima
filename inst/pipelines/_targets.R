@@ -1778,7 +1778,6 @@ list(
     tar_file(
       name = benchmark_prepared,
       command = {
-        benchmark_prepared <-
           sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
           Spectra::setBackend(Spectra::MsBackendMemory()) |>
@@ -2015,7 +2014,7 @@ list(
     tar_target(
       name = def_ann_mas,
       command = {
-        def_cre_edg_spe <- parse_yaml_params(
+        def_ann_mas <- parse_yaml_params(
           def = par_def_ann_mas,
           usr = par_def_ann_mas
         )
