@@ -113,6 +113,12 @@ prepare_taxa <-
         replacement = "",
         vectorize_all = FALSE
       )
+    colnames(feature_table) <- colnames(feature_table) |>
+      stringi::stri_replace_all_fixed(
+        pattern = "quant_",
+        replacement = "",
+        vectorize_all = FALSE
+      )
     log_debug(x = "... filtering top K intensities per feature")
     top_n <- feature_table |>
       tidyfst::rn_col() |>
@@ -200,7 +206,7 @@ prepare_taxa <-
         tidytable::left_join(
           top_n,
           metadata_table,
-          by = c("name" = "filename")
+          by = c("name" = "Sample Name")
         ) |>
         tidytable::select(feature_id := rowname,
           organismOriginal = tidytable::all_of(colname),
