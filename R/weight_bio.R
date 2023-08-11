@@ -438,7 +438,13 @@ weight_bio <-
         ) |
           sample_organism_01_domain == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_domain) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_01_domain != "notClassified",
+          yes = score_biological_domain,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -467,7 +473,13 @@ weight_bio <-
         ) |
           sample_organism_02_kingdom == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_kingdom) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_02_kingdom != "notClassified",
+          yes = score_biological_kingdom,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -496,7 +508,13 @@ weight_bio <-
         ) |
           sample_organism_03_phylum == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_phylum) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_03_phylum != "notClassified",
+          yes = score_biological_phylum,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -525,7 +543,13 @@ weight_bio <-
         ) |
           sample_organism_04_class == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_class) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_04_class != "notClassified",
+          yes = score_biological_class,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -554,7 +578,13 @@ weight_bio <-
         ) |
           sample_organism_05_order == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_order) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_05_order != "notClassified",
+          yes = score_biological_order,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -581,7 +611,11 @@ weight_bio <-
     ## str = sample_organism_05_1_infraorder) |
     ## sample_organism_05_1_infraorder == "notClassified"
     ##   ) |>
-    ##   dplyr::mutate(score_biological = scoreBiologicalInfraorder) |>
+    ## dplyr::mutate(
+    ##   score_biological = ifelse(
+    ##     test = sample_organism_05_1_infraorder != "notClassified",
+    ##     yes = score_biological_infraorder,
+    ##     no = 0)) |>
     ##   tidytable::left_join(
     ##     metadata |> tidytable::distinct(feature_id,
     ##                                 structure_inchikey_2D,
@@ -607,7 +641,13 @@ weight_bio <-
         ) |
           sample_organism_06_family == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_family) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_06_family != "notClassified",
+          yes = score_biological_family,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -633,7 +673,11 @@ weight_bio <-
     ## str = sample_organism_06_1_subfamily) |
     ## sample_organism_06_1_subfamily == "notClassified"
     ##   ) |>
-    ##   dplyr::mutate(score_biological = scoreBiologicalSubfamily) |>
+    ## dplyr::mutate(
+    ##   score_biological = ifelse(
+    ##     test = sample_organism_06_1_subfamily != "notClassified",
+    ##     yes = score_biological_subfamily,
+    ##     no = 0)) |>
     ##   tidytable::left_join(
     ##     metadata |> tidytable::distinct(feature_id,
     ##                                 structure_inchikey_2D,
@@ -659,7 +703,13 @@ weight_bio <-
         ) |
           sample_organism_07_tribe == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_tribe) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_07_tribe != "notClassified",
+          yes = score_biological_tribe,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -687,7 +737,11 @@ weight_bio <-
     ## str = sample_organism_07_1_subtribe) |
     ## sample_organism_07_1_subtribe == "notClassified"
     ##   ) |>
-    ##   dplyr::mutate(score_biological = scoreBiologicalSubtribe) |>
+    ## dplyr::mutate(
+    ##   score_biological = ifelse(
+    ##     test = sample_organism_07_1_subtribe != "notClassified",
+    ##     yes = score_biological_subtribe,
+    ##     no = 0)) |>
     ##   tidytable::left_join(
     ##     metadata |> tidytable::distinct(feature_id,
     ##                                 structure_inchikey_2D,
@@ -713,7 +767,13 @@ weight_bio <-
         ) |
           sample_organism_08_genus == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_genus) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_08_genus != "notClassified",
+          yes = score_biological_genus,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -740,7 +800,11 @@ weight_bio <-
     ## str = sample_organism_08_1_subgenus) |
     ## sample_organism_08_1_subgenus == "notClassified"
     ##   ) |>
-    ##   dplyr::mutate(score_biological = scoreBiologicalSubgenus) |>
+    ## dplyr::mutate(
+    ##   score_biological = ifelse(
+    ##     test = sample_organism_08_1_subgenus != "notClassified",
+    ##     yes = score_biological_subgenus,
+    ##     no = 0)) |>
     ##   tidytable::left_join(
     ##     metadata |> tidytable::distinct(feature_id,
     ##                                 structure_inchikey_2D,
@@ -766,7 +830,13 @@ weight_bio <-
         ) |
           sample_organism_09_species == "notClassified"
       ) |>
-      dplyr::mutate(score_biological = score_biological_species) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_09_species != "notClassified",
+          yes = score_biological_species,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
@@ -793,7 +863,11 @@ weight_bio <-
     ## str = sample_organism_09_1_subspecies) |
     ## sample_organism_09_1_subspecies == "notClassified"
     ##   ) |>
-    ##   dplyr::mutate(score_biological = scoreBiologicalSubspecies) |>
+    ## dplyr::mutate(
+    ##   score_biological = ifelse(
+    ##     test = sample_organism_09_1_subspecies != "notClassified",
+    ##     yes = score_biological_subspecies,
+    ##     no = 0)) |>
     ##   tidytable::left_join(
     ##     metadata |> tidytable::distinct(feature_id,
     ##                                 structure_inchikey_2D,
@@ -818,7 +892,13 @@ weight_bio <-
           str = sample_organism_10_varietas
         )
       ) |>
-      dplyr::mutate(score_biological = score_biological_variety) |>
+      dplyr::mutate(
+        score_biological = ifelse(
+          test = sample_organism_10_varietas != "notClassified",
+          yes = score_biological_variety,
+          no = 0
+        )
+      ) |>
       tidytable::left_join(
         metadata |> tidytable::distinct(
           feature_id,
