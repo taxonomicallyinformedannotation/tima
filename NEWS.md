@@ -4,7 +4,9 @@
 
 * Change from pbmclapply to pblapply
 * Added spectral entropy
+* Added MS1 only possibility
 * Fix empty chemical classes
+* Fix not classified taxa
 * [renv](https://rstudio.github.io/renv/index.html) removal
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Github Actions improvement
