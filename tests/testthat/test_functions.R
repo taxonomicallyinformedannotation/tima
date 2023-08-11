@@ -407,6 +407,7 @@ testthat::test_that("Whole process", {
   arguments$ms_tol_rt_min <<- "x"
   arguments$names_extension <<- "x"
   arguments$names_features <<- "x"
+  arguments$names_filename <<- "x"
   arguments$names_mgf_ce <<- "x"
   arguments$names_mgf_ci <<- "x"
   arguments$names_mgf_em <<- "x"

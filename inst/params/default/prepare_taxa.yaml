@@ -36,6 +36,9 @@ names:
   #' Name of "feature IDs" variable in the input. STRING
   features: row ID
 
+  #' Name of "filename" variable in the input. STRING
+  filename: filename
+
   #' Name of the "taxon name" variable in the input. STRING
   taxon: ATTRIBUTE_species
 

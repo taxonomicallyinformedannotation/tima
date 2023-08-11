@@ -31,7 +31,8 @@ utils::globalVariables(
 #' @param input File containing your features intensities
 #' @param extension Does your column names contain the file extension?
 #'    (MZmine mainly)
-#' @param name_features Name of the features column in the features data
+#' @param name_features Name of the features column in the features file
+#' @param name_filename Name of the file name column in the metadata file
 #' @param colname Name of the column containing biological source information
 #' @param metadata File containing your metadata including biological source
 #' @param top_k Number of organisms to be retained per feature top intensities
@@ -50,6 +51,7 @@ prepare_taxa <-
   function(input = params$files$features$raw,
            extension = params$names$extension,
            name_features = params$names$features,
+           name_filename = params$names$filename,
            colname = params$names$taxon,
            metadata = params$files$taxa$raw,
            top_k = params$organisms$candidates,
@@ -206,7 +208,7 @@ prepare_taxa <-
         tidytable::left_join(
           top_n,
           metadata_table,
-          by = c("name" = "filename")
+          by = c("name" = name_filename)
         ) |>
         tidytable::select(feature_id := rowname,
           organismOriginal = tidytable::all_of(colname),
