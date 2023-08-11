@@ -79,8 +79,14 @@ testthat::test_that("Whole process", {
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  # get_file(url = paths$urls$examples$spectra,
-  #               export = paths$data$source$spectra)
+  get_file(
+    url = paths$urls$examples$spectra_ms1,
+    export = paths$data$source$spectra |>
+      gsub(
+        pattern = "example_spectra",
+        replacement = "example_spectra_ms1"
+      )
+  )
 
   ### Spectral library with rt
   get_file(
@@ -271,6 +277,10 @@ testthat::test_that("Whole process", {
   step <- "create_edges_spectra"
   params <- get_params(step = step)
   create_edges_spectra()
+  ## if MS1 only
+  create_edges_spectra(
+    input = "data/source/example_spectra_ms1.mgf"
+  )
 
   ### GNPS results
   step <- "prepare_annotations_gnps"
