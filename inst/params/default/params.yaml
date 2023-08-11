@@ -329,6 +329,9 @@ names:
   #' Name of "feature IDs" variable in the input. STRING
   features: feature_id
 
+  #' Name of "filename" variable in the input. STRING
+  filename: filename
+
   #' Name of fields present in the MGF.
   mgf:
     #' Name of "collision energy" in MGF. STRING

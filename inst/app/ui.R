@@ -576,6 +576,19 @@ ui <- fluidPage(
               "If using SLAW, please input 'slaw_id'"
             )
           ),
+        textInput(
+          inputId = "names_filename",
+          label = "Name of \"filename\" variable in the input",
+          value = "filename"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `file name` column in your metadata file.",
+              "The default is filename.",
+              "If using Sequencer, please input 'Sample Name'"
+            )
+          ),
         checkboxInput(
           inputId = "names_extension",
           label = "The file(s) extension is present in the sample name",

@@ -8,6 +8,7 @@ prepare_taxa(
   input = params$files$features$raw,
   extension = params$names$extension,
   name_features = params$names$features,
+  name_filename = params$names$filename,
   colname = params$names$taxon,
   metadata = params$files$taxa$raw,
   top_k = params$organisms$candidates,
@@ -23,7 +24,9 @@ prepare_taxa(
 \item{extension}{Does your column names contain the file extension?
 (MZmine mainly)}
 
-\item{name_features}{Name of the features column in the features data}
+\item{name_features}{Name of the features column in the features file}
+
+\item{name_filename}{Name of the file name column in the metadata file}
 
 \item{colname}{Name of the column containing biological source information}
 

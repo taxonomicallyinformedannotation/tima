@@ -166,6 +166,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$names_features)) {
       params$names$features <- as.character(arguments$names_features)
     }
+    if (!is.null(arguments$names_filename)) {
+      params$names$filename <- as.character(arguments$names_filename)
+    }
     if (!is.null(arguments$names_mgf_ce)) {
       params$names$mgf$collision_energy <- as.character(arguments$names_mgf_ce)
     }

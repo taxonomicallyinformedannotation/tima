@@ -299,6 +299,8 @@ save_input <- function(input) {
     shiny::isolate(input$names_extension)
   yamls_params$prepare_taxa$names$features <-
     shiny::isolate(input$names_features)
+  yamls_params$prepare_taxa$names$filename <-
+    shiny::isolate(input$names_filename)
   yamls_params$prepare_taxa$names$taxon <-
     shiny::isolate(input$names_taxon)
   yamls_params$prepare_taxa$organisms$candidates <-
