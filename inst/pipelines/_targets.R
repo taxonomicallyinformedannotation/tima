@@ -1764,23 +1764,55 @@ list(
         #   tail(100387)
         # text <- text_1 |>
         #   append(text_2)
+
+        ## reduce size
         text_corrected <- text |>
           gsub(
             pattern =
               "(\\()([0-9]{1,9}.[0-9]{1,9})(, None\\))",
             replacement = "\\2"
           )
-        text_corrected |>
+
+        patterns_to_remove <- c(
+          "FILENAME:",
+          "SEQ:",
+          "IONMODE:",
+          "ORGANISM:",
+          "PI:",
+          "DATACOLLECTOR:",
+          "INCHIAUX:",
+          "PUBMED:",
+          "SUBMITUSER:",
+          "LIBRARYQUALITY:",
+          "PARENT_MASS:"
+        )
+
+        text_corrected_2 <- text_corrected[!grepl(
+          pattern = paste(patterns_to_remove, collapse = "|"),
+          x = text_corrected
+        )]
+
+        text_corrected_2 |>
           writeLines(con = benchmark_path_copy)
         return(benchmark_path_copy)
       }
     ),
     tar_file(
-      name = benchmark_prepared,
+      name = benchmark_converted,
       command = {
         sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
-          Spectra::setBackend(Spectra::MsBackendMemory()) |>
+          Spectra::setBackend(Spectra::MsBackendMemory())
+        sp |>
+          saveRDS(file = "data/interim/benchmark/benchmark_spectra.rds")
+        return("data/interim/benchmark/benchmark_spectra.rds")
+      }
+    ),
+    tar_file(
+      name = benchmark_prepared,
+      command = {
+        sp <- benchmark_converted |>
+          readRDS() |>
           sanitize_spectra(
             cutoff = 0,
             ratio = 10000,
@@ -1788,9 +1820,11 @@ list(
             deeper = FALSE
           )
 
-        sp$precursorMz <- as.numeric(sp$PRECURSOR_MZ)
-        sp$precursorCharge <- as.integer(sp$CHARGE)
+        sp@backend@spectraData$precursorMz <-
+          sp@backend@spectraData$PRECURSOR_MZ |>
+          as.numeric()
 
+        log_debug("Imported")
         sp_clean <- sp |>
           Spectra::addProcessing(remove_above_precursor(),
             spectraVariables = c("precursorMz")
@@ -1798,30 +1832,20 @@ list(
           Spectra::addProcessing(normalize_peaks()) |>
           Spectra::applyProcessing()
 
-        adduct <- sp_clean$ADDUCT
-        inchikey <- sp_clean$inchikey
-        instrument <- sp_clean$SOURCE_INSTRUMENT
-        # fragments <- sp_clean$NUM.PEAKS
-        fragments <- lapply(sp_clean@backend@peaksData, length) |>
-          as.character() |>
-          as.numeric() / 2
-        # pepmass <- gsub("\\[|\\]", "", sp_clean$PARENT_MASS)
-        pepmass <- sp_clean$PEPMASS
-        smiles <- sp_clean$smiles
-        ccmslib <- sp_clean$SPECTRUMID
-        charge <- sp_clean$precursorCharge
-        name <- sp_clean$name
-
+        log_debug("Cleaned")
         df_meta <- tidytable::tidytable(
-          adduct,
-          inchikey,
-          instrument,
-          fragments,
-          pepmass,
-          smiles,
-          ccmslib,
-          charge,
-          name
+          adduct = sp_clean$ADDUCT,
+          inchikey = sp_clean$inchikey,
+          instrument = sp_clean$SOURCE_INSTRUMENT,
+          fragments = lapply(sp_clean@backend@peaksData, length) |>
+            as.character() |>
+            as.numeric() / 2,
+          precursorMz = sp_clean$precursorMz,
+          pepmass = sp_clean$PEPMASS,
+          smiles = sp_clean$smiles,
+          ccmslib = sp_clean$SPECTRUMID,
+          charge = sp_clean$precursorCharge,
+          name = sp_clean$name
         ) |>
           tidyft::mutate_vars(
             is.character,
@@ -1830,6 +1854,7 @@ list(
             }
           )
 
+        log_debug("Framed")
         df_clean <- df_meta |>
           dplyr::filter(!is.na(inchikey)) |>
           dplyr::filter(fragments >= 5) |>
@@ -1845,15 +1870,27 @@ list(
             x = name,
             fixed = TRUE
           )) |>
+          ## remove spectral matches
+          dplyr::filter(!grepl(
+            pattern = "Spectral Match to",
+            x = name,
+            fixed = TRUE
+          )) |>
+          ## remove putatives
+          dplyr::filter(!grepl(
+            pattern = "putative",
+            x = name,
+            fixed = TRUE
+          )) |>
           dplyr::select(-name) |>
-          dplyr::mutate(mass = pepmass) |>
+          dplyr::mutate(mass = precursorMz) |>
           tidyr::separate(
             col = mass,
             sep = "\\.",
             into = c("a", "b")
           ) |>
           dplyr::filter(!is.na(b)) |>
-          dplyr::filter(stringr::str_length(b) > 1) |>
+          dplyr::filter(stringr::str_length(as.numeric(b)) > 1) |>
           dplyr::select(-a, -b) |>
           dplyr::mutate(inchikey_2D = gsub(
             pattern = "-.*",
@@ -1861,81 +1898,94 @@ list(
             x = inchikey
           )) |>
           dplyr::distinct(inchikey_2D, adduct, .keep_all = TRUE) |>
-          dplyr::mutate(mz = pepmass) |>
+          dplyr::mutate(mz = precursorMz) |>
           dplyr::group_by(inchikey_2D) |>
           ## Weird way to have some kind of retention time
           dplyr::mutate(rt = dplyr::cur_group_id()) |>
           dplyr::ungroup()
 
         df_clean_neg <- df_clean |>
-          dplyr::filter(grepl(pattern = "]-", x = adduct, fixed = TRUE)) |>
-          dplyr::mutate(feature_id = dplyr::row_number())
+          dplyr::filter(grepl(pattern = "]-", x = adduct, fixed = TRUE))
 
         df_clean_pos <- df_clean |>
-          dplyr::filter(grepl(pattern = "]+", x = adduct, fixed = TRUE)) |>
-          dplyr::mutate(feature_id = dplyr::row_number())
+          dplyr::filter(grepl(pattern = "]+", x = adduct, fixed = TRUE))
 
         sp_pos <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_pos$ccmslib]
         sp_neg <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_neg$ccmslib]
-        sp_pos$feature_id <- df_clean_pos$feature_id
-        sp_neg$feature_id <- df_clean_neg$feature_id
-        sp_pos$spectrum_id <- df_clean_pos$feature_id
-        sp_neg$spectrum_id <- df_clean_neg$feature_id
+
+        extract_benchmark_spectra <- function(x, mode) {
+          df <- x |>
+            extract_spectra() |>
+            dplyr::mutate(acquisitionNum = dplyr::row_number()) |>
+            dplyr::mutate(spectrum_id = acquisitionNum) |>
+            dplyr::mutate(short_ik = gsub(
+              pattern = "-.*",
+              replacement = "",
+              inchikey
+            )) |>
+            dplyr::group_by(short_ik) |>
+            dplyr::mutate(rtime = dplyr::cur_group_id()) |>
+            dplyr::mutate(
+              precursorCharge = ifelse(
+                test = mode == "pos",
+                yes = as.integer(1),
+                no = as.integer(-1)
+              )
+            ) |>
+            dplyr::ungroup() |>
+            dplyr::select(
+              SCANS,
+              acquisitionNum,
+              precursorCharge,
+              precursorMz,
+              MSLEVEL,
+              rtime,
+              name,
+              smiles,
+              inchi,
+              inchikey,
+              adduct = ADDUCT,
+              instrument = SOURCE_INSTRUMENT,
+              ccmslib = SPECTRUMID,
+              spectrum_id = acquisitionNum,
+              mz,
+              intensity
+            )
+          return(df)
+        }
 
         spectra_harmonized_pos <- sp_pos |>
-          extract_spectra() |>
-          dplyr::mutate(polarity = "pos") |>
-          harmonize_spectra(
-            col_ce = NA,
-            col_ci = NA,
-            col_em = "PARENT_MASS",
-            col_in = "inchi",
-            col_io = NA,
-            col_ik = "inchikey",
-            col_il = NA,
-            # col_mf = "formula",
-            col_mf = NA,
-            col_na = "name",
-            col_po = "polarity",
-            col_sm = "smiles",
-            col_sn = NA,
-            col_si = "spectrum_id",
-            col_sp = NA,
-            col_sy = NA,
-            col_xl = NA,
-            mode = "pos"
-          )
+          extract_benchmark_spectra(mode = "pos")
 
         spectra_harmonized_neg <- sp_neg |>
-          extract_spectra() |>
-          dplyr::mutate(polarity = "neg") |>
-          harmonize_spectra(
-            col_ce = NA,
-            col_ci = NA,
-            col_em = "PARENT_MASS",
-            col_in = "inchi",
-            col_io = NA,
-            col_ik = "inchikey",
-            col_il = NA,
-            # col_mf = "formula",
-            col_mf = NA,
-            col_na = "name",
-            col_po = "polarity",
-            col_sm = "smiles",
-            col_sn = NA,
-            col_si = "spectrum_id",
-            col_sp = NA,
-            col_sy = NA,
-            col_xl = NA,
-            mode = "neg"
-          )
+          extract_benchmark_spectra(mode = "neg")
 
-        spectra_harmonized_pos$acquisitionNum <-
-          spectra_harmonized_pos$spectrum_id |>
-          as.integer()
-        spectra_harmonized_neg$acquisitionNum <-
-          spectra_harmonized_neg$spectrum_id |>
-          as.integer()
+        select_benchmark_columns <- function(x) {
+          df <- x |>
+            dplyr::select(
+              adduct,
+              inchikey,
+              instrument,
+              smiles,
+              ccmslib,
+              charge = precursorCharge,
+              mz = precursorMz,
+              rt = rtime,
+              feature_id = spectrum_id
+            ) |>
+            dplyr::mutate(inchikey_2D = gsub(
+              pattern = "-.*",
+              replacement = "",
+              x = inchikey
+            ))
+          return(df)
+        }
+
+        df_clean_pos <- spectra_harmonized_pos |>
+          select_benchmark_columns()
+
+        df_clean_neg <- spectra_harmonized_neg |>
+          select_benchmark_columns()
 
         log_debug("Exporting")
         spectra_harmonized_pos |>

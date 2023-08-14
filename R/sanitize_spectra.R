@@ -21,7 +21,7 @@ sanitize_spectra <-
            cutoff = 0,
            fragments = 3,
            deeper = FALSE) {
-    log_debug("Applying initial filters to query spectra")
+    log_debug("Applying sanitization of the spectra")
 
     if (deeper) {
       spectra <- spectra |>

@@ -132,6 +132,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     query_rts <- spectra@backend@spectraData$rtime
     ## TODO find a way to have consistency in spectrum IDs
     query_ids <- spectra@backend@spectraData$acquisitionNum
+    if (is.null(query_ids)) {
+      query_ids <- spectra@backend@spectraData$spectrum_id
+    }
     if (is.null(query_rts)) {
       query_rts <- rep(NA_real_, length(spectra))
     }
