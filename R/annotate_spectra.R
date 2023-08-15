@@ -150,8 +150,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       df_1 <- tidytable::tidytable(minimal, maximal, lib_precursors)
       df_2 <- tidytable::tidytable(val = unique(query_precursors))
 
-      df_3 <- dplyr::inner_join(
-        df_1,
+      df_3 <- dplyr::inner_join(df_1,
         df_2,
         by = dplyr::join_by(
           minimal < val,

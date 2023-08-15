@@ -294,7 +294,10 @@ clean_chemo <-
 
       df5 <- df4 |>
         tidytable::left_join(df3 |>
-          tidytable::select("feature_id", !colnames(df4)) |>
+          tidytable::select(
+            "feature_id",
+            !colnames(df4)
+          ) |>
           tidytable::distinct())
     } else {
       df5 <- df3
@@ -363,7 +366,10 @@ clean_chemo <-
     df10 <- tidytable::left_join(
       df9,
       annot_table_wei_chemo |>
-        dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+        dplyr::mutate(dplyr::across(
+          dplyr::everything(),
+          as.character
+        ))
     ) |>
       tidytable::select(tidytable::any_of(
         c(

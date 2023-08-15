@@ -28,13 +28,7 @@ log_debug("Contributors: ...")
 #'
 #' @examples NULL
 prepare_mona <-
-  function(input = paths$
-             data$
-             source$
-             libraries$
-             spectra$
-             exp$
-             mona_lcmsms,
+  function(input = paths$data$source$libraries$spectra$exp$mona_lcmsms,
            output_pos = paths$data$interim$libraries$spectra$exp$mona$pos,
            output_neg = paths$data$interim$libraries$spectra$exp$mona$neg) {
     log_debug("Loading standardization function (temp)")
@@ -42,7 +36,8 @@ prepare_mona <-
 
     ## SDF import from zip not working
     log_debug("Loading spectra (might take long)")
-    mona_data <- CompoundDb::import_mona_sdf(x = input, nonStop = TRUE)
+    mona_data <-
+      CompoundDb::import_mona_sdf(x = input, nonStop = TRUE)
 
     cpd <- mona_data$compound
 

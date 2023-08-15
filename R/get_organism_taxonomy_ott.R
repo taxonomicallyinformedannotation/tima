@@ -19,10 +19,9 @@ utils::globalVariables(c(
 #' @export
 #'
 #' @examples NULL
-get_organism_taxonomy_ott <- function(
-    df,
-    url = "https://api.opentreeoflife.org/v3/taxonomy/about",
-    retry = TRUE) {
+get_organism_taxonomy_ott <- function(df,
+                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about",
+                                      retry = TRUE) {
   organism_table <- df |>
     dplyr::mutate(organism = organism |>
       trimws()) |>
@@ -104,7 +103,8 @@ get_organism_taxonomy_ott <- function(
       tidyft::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
+    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
+      retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         tidyft::filter(!is.na(ott_id))

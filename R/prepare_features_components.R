@@ -1,10 +1,8 @@
-utils::globalVariables(
-  c(
-    "cluster index",
-    "componentindex",
-    "params"
-  )
-)
+utils::globalVariables(c(
+  "cluster index",
+  "componentindex",
+  "params"
+))
 
 #' @title Prepare features components
 #'
@@ -25,12 +23,7 @@ utils::globalVariables(
 #' @examples NULL
 prepare_features_components <-
   function(input = params$files$networks$spectral$components$raw,
-           output = params$
-             files$
-             networks$
-             spectral$
-             components$
-             prepared,
+           output = params$files$networks$spectral$components$prepared,
            parameters = params) {
     stopifnot(
       "Input file(s) do(es) not exist" =

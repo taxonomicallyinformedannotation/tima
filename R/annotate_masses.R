@@ -98,52 +98,18 @@ annotate_masses <-
            name_source = params$names$source,
            name_target = params$names$target,
            library = paths$data$interim$libraries$sop$merged$keys,
-           str_2d_3d = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           str_met = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           str_nam = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             names,
-           str_tax_cla = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             cla,
-           str_tax_npc = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             npc,
+           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            name = params$files$libraries$adducts$prepared,
            adducts_list = params$ms$adducts,
-           adducts_masses_list = system.file(
-             "extdata",
+           adducts_masses_list = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
-           neutral_losses_list = system.file(
-             "extdata",
+           neutral_losses_list = system.file("extdata",
              "neutral_losses.tsv",
              package = "timaR"
            ),
@@ -151,14 +117,10 @@ annotate_masses <-
            tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
            tolerance_rt = params$ms$tolerances$rt$minutes,
            parameters = params) {
-    stopifnot(
-      "Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
-        20
-    )
-    stopifnot(
-      "Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
-        0.05
-    )
+    stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
+      20)
+    stopifnot("Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
+      0.05)
 
     paths <<- parse_yaml_paths()
     params <<- parameters
@@ -410,13 +372,10 @@ annotate_masses <-
         label_dest
       ) |>
       tidytable::select(
-        feature_id := !!as.name(
-          paste(
-            "feature_id",
-            "dest",
-            sep = "_"
-          )
-        ),
+        feature_id := !!as.name(paste("feature_id",
+          "dest",
+          sep = "_"
+        )),
         label = label_dest
       )
 
@@ -463,9 +422,7 @@ annotate_masses <-
           mz_1 <= value_max
         )
       ) |>
-      dplyr::mutate(
-        error_mz = adduct_mass - mz_1
-      ) |>
+      dplyr::mutate(error_mz = adduct_mass - mz_1) |>
       tidytable::select(
         feature_id,
         rt,
@@ -552,15 +509,15 @@ annotate_masses <-
       tidytable::select(
         structure_molecular_formula,
         library,
-        tidytable::everything(), -exact_mass
+        tidytable::everything(),
+        -exact_mass
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       tidytable::distinct()
 
     log_debug("adding adduct mass to get back to [1M] \n")
     df15 <-
-      tidytable::left_join(
-        df14,
+      tidytable::left_join(df14,
         adducts_table,
         by = stats::setNames("adduct", "library")
       ) |>
@@ -730,9 +687,7 @@ annotate_masses <-
         mz_max
       )
 
-    log_debug(
-      "joining within given mz tol and filtering possible adducts \n"
-    )
+    log_debug("joining within given mz tol and filtering possible adducts \n")
     df21 <- df20_a |>
       dplyr::inner_join(df2,
         by = dplyr::join_by(
@@ -760,13 +715,13 @@ annotate_masses <-
         df13,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
-      dplyr::mutate(
-        score_input = 0
-      ) |>
+      dplyr::mutate(score_input = 0) |>
       tidytable::select(
         structure_molecular_formula,
         library = library_name,
-        tidytable::everything(), -exact_mass, -adduct_value
+        tidytable::everything(),
+        -exact_mass,
+        -adduct_value
       ) |>
       dplyr::filter(library %ni% forbidden_adducts) |>
       dplyr::mutate(library = as.character(library)) |>
@@ -810,9 +765,12 @@ annotate_masses <-
           structure_taxonomy_classyfire_04directparent
         )
     ) |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "")
-      })
+      tidyft::mutate_vars(
+        is.character,
+        .func = function(x) {
+          tidytable::na_if(x, "")
+        }
+      )
 
     df25 |>
       decorate_masses()
@@ -821,16 +779,14 @@ annotate_masses <-
       df9 |>
         dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct(),
       df9_d |>
         dplyr::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct()
