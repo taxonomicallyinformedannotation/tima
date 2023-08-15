@@ -8,10 +8,9 @@ weight_annotations(
   library = paths$data$interim$libraries$sop$merged$keys,
   org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
   str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-  annotations = params$files$annotations$prepared,
+  annotations = params$files$annotations$filtered,
   components = params$files$networks$spectral$components$prepared,
   edges = params$files$networks$spectral$edges$prepared,
-  features = params$files$features$prepared,
   taxa = params$files$taxa$prepared,
   output = params$files$annotations$processed,
   candidates_initial = params$annotations$candidates$initial,
@@ -62,8 +61,6 @@ weight_annotations(
 \item{components}{Prepared components file}
 
 \item{edges}{Prepared edges file}
-
-\item{features}{Prepared features file}
 
 \item{taxa}{Prepared taxed features file}
 
@@ -160,7 +157,7 @@ match (should be lower than \verb{NPC class})}
 \item{parameters}{Params}
 }
 \description{
-This function weights initial annotations.
+This function weights annotations.
 }
 \examples{
 NULL

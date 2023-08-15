@@ -59,6 +59,9 @@ parse_cli_params <- function() {
       params$files$annotations$raw$sirius <-
         as.character(arguments$fil_ann_raw_sir)
     }
+    if (!is.null(arguments$fil_ann_fil)) {
+      params$files$annotations$filtered <- as.character(arguments$fil_ann_fil)
+    }
     if (!is.null(arguments$fil_ann_pre)) {
       params$files$annotations$prepared <- as.character(arguments$fil_ann_pre)
     }
@@ -199,12 +202,13 @@ parse_cli_params <- function() {
     if (!is.null(arguments$names_mgf_po)) {
       params$names$mgf$polarity <- as.character(arguments$names_mgf_po)
     }
-    if (!is.null(arguments$names_mgf_pc)) {
-      params$names$mgf$precursor_charge <- as.character(arguments$names_mgf_pc)
-    }
-    if (!is.null(arguments$names_mgf_pm)) {
-      params$names$mgf$precursor_mz <- as.character(arguments$names_mgf_pm)
-    }
+    # if (!is.null(arguments$names_mgf_pc)) {
+    #   params$names$mgf$precursor_charge <-
+    #     as.character(arguments$names_mgf_pc)
+    # }
+    # if (!is.null(arguments$names_mgf_pm)) {
+    #   params$names$mgf$precursor_mz <- as.character(arguments$names_mgf_pm)
+    # }
     if (!is.null(arguments$names_mgf_sm)) {
       params$names$mgf$smiles <- as.character(arguments$names_mgf_sm)
     }
@@ -269,6 +273,9 @@ parse_cli_params <- function() {
     }
     if (!is.null(arguments$too_tax_che)) {
       params$tools$taxonomies$chemical <- as.character(arguments$too_tax_che)
+    }
+    if (!is.null(arguments$units_rt)) {
+      params$units$rt <- as.character(arguments$units_rt)
     }
     if (!is.null(arguments$wei_glo_bio)) {
       params$weights$global$biological <- as.numeric(arguments$wei_glo_bio)

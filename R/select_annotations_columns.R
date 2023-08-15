@@ -59,7 +59,6 @@ select_annotations_columns <- function(df,
     tidytable::select(
       feature_id,
       error_mz,
-      error_rt,
       structure_name,
       # structure_inchikey,
       structure_inchikey_2D,

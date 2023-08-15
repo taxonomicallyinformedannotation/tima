@@ -7,7 +7,6 @@ utils::globalVariables(
     "delta_min",
     "Distance",
     "error_mz",
-    "error_rt",
     "exact_mass",
     "feature_id",
     "feature_id_dest",
@@ -157,8 +156,8 @@ annotate_masses <-
         20
     )
     stopifnot(
-      "Your rt tolerance must be lower or equal to 0.1" = tolerance_rt <=
-        0.1
+      "Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
+        0.05
     )
 
     paths <<- parse_yaml_paths()
@@ -465,8 +464,7 @@ annotate_masses <-
         )
       ) |>
       dplyr::mutate(
-        error_mz = adduct_mass - mz_1,
-        error_rt = NA_real_
+        error_mz = adduct_mass - mz_1
       ) |>
       tidytable::select(
         feature_id,
@@ -474,7 +472,6 @@ annotate_masses <-
         mz,
         score_input,
         error_mz,
-        error_rt,
         exact_mass,
         adduct,
         adduct_mass,
@@ -497,7 +494,6 @@ annotate_masses <-
         score_input,
         library,
         error_mz,
-        error_rt,
         exact_mass
       ) |>
       tidyft::filter(!is.na(exact_mass))
@@ -786,7 +782,6 @@ annotate_masses <-
       tidytable::distinct(
         feature_id,
         error_mz,
-        error_rt,
         structure_name,
         structure_inchikey_2D,
         structure_smiles_2D,

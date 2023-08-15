@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/weight_annotations.R
 
-Usage: 
+Usage:
   weight_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-11=<wei-che-11>] [--wei-che-12=<wei-che-12>] [--wei-che-13=<wei-che-13>]  [--wei-che-14=<wei-che-14>] [--wei-che-21=<wei-che-21>] [--wei-che-22=<wei-che-22>] [--wei-che-23=<wei-che-23>] [--summarise=<summarise>] [--force=<force>]
 
 Arguments:
@@ -12,6 +12,7 @@ Arguments:
   ann-ms1-thr-che            Minimal chemical score to keep MS1 only annotation. FLOAT
   ann-ms1-thr-con            Condition to be used to retain candidates. Must be "OR" or "AND". Example: Minimum 0.5 biological AND 0.5 chemical. STRING
   
+  fil-ann-fil                Filtered annotation file. STRING
   fil-ann-pro                Final results file. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
   fil-net-spe-edg-pro        Prepared edges file. STRING

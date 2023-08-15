@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/annotate_masses.R
 
-Usage: 
+Usage:
   annotate_masses.R [--fil-ann-pre=<fil-ann-pre>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-int-thr-ms1=<ms-int-thr-ms1>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--force=<force>]
 
 Arguments:

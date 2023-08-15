@@ -157,13 +157,6 @@ save_input <- function(input) {
     dalton$
     ms2 <-
     shiny::isolate(input$ms_tol_mas_dal_ms2)
-  yamls_params$
-    annotate_spectra$
-    ms$
-    tolerances$
-    rt$
-    minutes <-
-    ms_tol_rt_min
 
   yamls_params$
     create_edges_spectra$
@@ -231,15 +224,16 @@ save_input <- function(input) {
     dalton$
     ms2 <-
     shiny::isolate(input$ms_tol_mas_dal_ms2)
+  yamls_params$create_edges_spectra$names$source <- names_source
+  yamls_params$create_edges_spectra$names$target <- names_target
+
   yamls_params$
-    create_edges_spectra$
+    filter_annotations$
     ms$
     tolerances$
     rt$
     minutes <-
     ms_tol_rt_min
-  yamls_params$create_edges_spectra$names$source <- names_source
-  yamls_params$create_edges_spectra$names$target <- names_target
 
   yamls_params$prepare_features_edges$names$source <- names_source
   yamls_params$prepare_features_edges$names$target <- names_target
@@ -262,6 +256,9 @@ save_input <- function(input) {
     shiny::isolate(input$names_precursor)
   yamls_params$prepare_features_tables$names$rt <-
     shiny::isolate(input$names_rt)
+
+  yamls_params$prepare_libraries_rt$names$rt <-
+    shiny::isolate(input$names_rt_2)
 
   yamls_params$
     prepare_libraries_sop_merged$

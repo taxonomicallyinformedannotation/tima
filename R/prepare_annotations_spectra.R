@@ -3,7 +3,6 @@ utils::globalVariables(
     "count_peaks_explained",
     "count_peaks_matched",
     "error_mz",
-    "error_rt",
     "feature_id",
     "params",
     "score",
@@ -109,7 +108,6 @@ prepare_annotations_spectra <-
       tidytable::distinct(
         feature_id,
         error_mz,
-        error_rt,
         structure_name,
         structure_inchikey_2D,
         structure_smiles_2D,

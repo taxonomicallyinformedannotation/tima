@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.8.2
+Version: 2.9.0
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -18,7 +18,7 @@ Imports:
     crayon (>= 1.5.2),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.2),
-    httr (>= 1.4.6),
+    httr (>= 1.4.7),
     igraph (>= 1.5.1),
     jsonlite (>= 1.8.7),
     MsBackendMgf (>= 1.8.0),
@@ -93,6 +93,7 @@ Collate:
     'extract_spectra.R'
     'fake_annotations_columns.R'
     'fake_sop_columns.R'
+    'filter_annotations.R'
     'get_file.R'
     'get_example_sirius.R'
     'get_gnps_tables.R'
@@ -117,6 +118,7 @@ Collate:
     'prepare_features_edges.R'
     'prepare_features_tables.R'
     'prepare_libraries_adducts.R'
+    'prepare_libraries_rt.R'
     'prepare_libraries_sop_closed.R'
     'prepare_libraries_sop_ecmdb.R'
     'prepare_libraries_sop_lotus.R'
