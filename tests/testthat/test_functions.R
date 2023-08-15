@@ -251,7 +251,12 @@ testthat::test_that("Whole process", {
   ### Retention time
   step <- "prepare_libraries_rt"
   params <- get_params(step = step)
-  prepare_libraries_rt()
+  prepare_libraries_rt(
+    mgf_exp = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    )
+  )
 
   ### Features
   step <- "prepare_features_tables"
