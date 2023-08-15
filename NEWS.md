@@ -5,6 +5,7 @@
 * Change from pbmclapply to pblapply
 * Added spectral entropy
 * Added MS1 only possibility
+* Added Fluorine adduct
 * Fix empty chemical classes
 * Fix not classified taxa
 * [renv](https://rstudio.github.io/renv/index.html) removal
