@@ -52,8 +52,7 @@ list(
       tar_file(
         name = dic_neu_los,
         command = {
-          dic_neu_los <- system.file(
-            "extdata",
+          dic_neu_los <- system.file("extdata",
             "neutral_losses.tsv",
             package = "timaR"
           )
@@ -943,12 +942,7 @@ list(
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
                 ## TODO improve
-                input = par_pre_lib_sop_clo$
-                  files$
-                  libraries$
-                  sop$
-                  raw$
-                  closed,
+                input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
                 output = par_pre_lib_sop_clo$files$libraries$sop$prepared,
                 parameters = par_pre_lib_sop_clo
               )
@@ -998,57 +992,12 @@ list(
               level = par_pre_lib_sop_mer$organisms$filter$level,
               value = par_pre_lib_sop_mer$organisms$filter$value,
               output_key = paths$data$interim$libraries$sop$merged$keys,
-              output_org_tax_ott = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                organisms$
-                taxonomies$
-                ott,
-              output_str_2d_3d = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                structures$
-                dd_ddd,
-              output_str_met = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                structures$
-                metadata,
-              output_str_nam = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                structures$
-                names,
-              output_str_tax_cla = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                structures$
-                taxonomies$
-                classyfire,
-              output_str_tax_npc = paths$
-                data$
-                interim$
-                libraries$
-                sop$
-                merged$
-                structures$
-                taxonomies$
-                npc,
+              output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
+              output_str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+              output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
+              output_str_nam = paths$data$interim$libraries$sop$merged$structures$names,
+              output_str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
+              output_str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
               parameters = par_pre_lib_sop_mer
             )
           }
@@ -1325,14 +1274,12 @@ list(
       command = {
         lib_rt <- prepare_libraries_rt(
           ## TODO refactor to avoid "pos/neg"
-          mgf_exp = list(
-            # "neg" = lib_spe_exp_int_pre_neg,
+          mgf_exp = list( # "neg" = lib_spe_exp_int_pre_neg,
             # "pos" = lib_spe_exp_int_pre_pos
             "neg" = NULL,
             "pos" = NULL
           ),
-          mgf_is = list(
-            # "neg" = lib_spe_is_lot_pre_neg,
+          mgf_is = list( # "neg" = lib_spe_is_lot_pre_neg,
             # "pos" = lib_spe_is_lot_pre_pos
             "neg" = NULL,
             "pos" = NULL
@@ -1585,11 +1532,7 @@ list(
           output = par_cre_edg_spe$files$networks$spectral$edges$raw,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
-          threshold = par_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            similarity,
+          threshold = par_cre_edg_spe$annotations$ms2$thresholds$similarity,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$intensity$thresholds$ms2,
@@ -1602,12 +1545,7 @@ list(
       command = {
         fea_com <- create_components(
           input = fea_edg_pre,
-          output = par_cre_com$
-            files$
-            networks$
-            spectral$
-            components$
-            raw,
+          output = par_cre_com$files$networks$spectral$components$raw,
           parameters = par_cre_com
         )
       }
@@ -1640,12 +1578,7 @@ list(
       command = {
         fea_edg_pre <- prepare_features_edges(
           input = list(ann_ms1_pre_edg, edg_spe),
-          output = par_pre_fea_edg$
-            files$
-            networks$
-            spectral$
-            edges$
-            prepared,
+          output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target,
           parameters = par_pre_fea_edg
@@ -1657,12 +1590,7 @@ list(
       command = {
         fea_com_pre <- prepare_features_components(
           input = int_com,
-          output = params$
-            files$
-            networks$
-            spectral$
-            components$
-            prepared,
+          output = params$files$networks$spectral$components$prepared,
           parameters = par_pre_fea_com
         )
       }
@@ -2028,13 +1956,23 @@ list(
           dplyr::ungroup()
 
         df_clean_neg <- df_clean |>
-          dplyr::filter(grepl(pattern = "]-", x = adduct, fixed = TRUE))
+          dplyr::filter(grepl(
+            pattern = "]-",
+            x = adduct,
+            fixed = TRUE
+          ))
 
         df_clean_pos <- df_clean |>
-          dplyr::filter(grepl(pattern = "]+", x = adduct, fixed = TRUE))
+          dplyr::filter(grepl(
+            pattern = "]+",
+            x = adduct,
+            fixed = TRUE
+          ))
 
-        sp_pos <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_pos$ccmslib]
-        sp_neg <- sp_clean[sp_clean$SPECTRUMID %in% df_clean_neg$ccmslib]
+        sp_pos <-
+          sp_clean[sp_clean$SPECTRUMID %in% df_clean_pos$ccmslib]
+        sp_neg <-
+          sp_clean[sp_clean$SPECTRUMID %in% df_clean_neg$ccmslib]
 
         extract_benchmark_spectra <- function(x, mode) {
           df <- x |>
@@ -2048,13 +1986,11 @@ list(
             )) |>
             dplyr::group_by(short_ik) |>
             dplyr::mutate(rtime = dplyr::cur_group_id()) |>
-            dplyr::mutate(
-              precursorCharge = ifelse(
-                test = mode == "pos",
-                yes = as.integer(1),
-                no = as.integer(-1)
-              )
-            ) |>
+            dplyr::mutate(precursorCharge = ifelse(
+              test = mode == "pos",
+              yes = as.integer(1),
+              no = as.integer(-1)
+            )) |>
             dplyr::ungroup() |>
             dplyr::select(
               SCANS,
@@ -2268,11 +2204,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$ms2$thresholds$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2288,11 +2220,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$
-            annotations$
-            ms2$
-            thresholds$
-            similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$ms2$thresholds$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2376,12 +2304,7 @@ list(
       command = {
         benchmark_com_pre_pos <- prepare_features_components(
           input = benchmark_com_pos,
-          output = params$
-            files$
-            networks$
-            spectral$
-            components$
-            prepared,
+          output = params$files$networks$spectral$components$prepared,
           parameters = benchmark_def_pre_fea_com
         )
       }
@@ -2391,12 +2314,7 @@ list(
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
-          output = params$
-            files$
-            networks$
-            spectral$
-            components$
-            prepared,
+          output = params$files$networks$spectral$components$prepared,
           parameters = benchmark_def_pre_fea_com
         )
       }
@@ -2459,9 +2377,7 @@ list(
       name = benchmark_ann_spe_is_pre_pos,
       command = {
         benchmark_ann_spe_is_pre_pos <- prepare_annotations_spectra(
-          input = list(
-            benchmark_ann_spe_is_lot_pos
-          ),
+          input = list(benchmark_ann_spe_is_lot_pos),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
           str_2d_3d = lib_mer_str_2d_3d,
           str_met = lib_mer_str_met,
@@ -2476,9 +2392,7 @@ list(
       name = benchmark_ann_spe_is_pre_neg,
       command = {
         benchmark_ann_spe_is_pre_neg <- prepare_annotations_spectra(
-          input = list(
-            benchmark_ann_spe_is_lot_neg
-          ),
+          input = list(benchmark_ann_spe_is_lot_neg),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
           str_2d_3d = lib_mer_str_2d_3d,
           str_met = lib_mer_str_met,
@@ -2605,7 +2519,8 @@ list(
         benchmark_ann_pre_ms2_b_pos <-
           do.call(
             what = weight_annotations,
-            args = c(benchmark_wei_par,
+            args = c(
+              benchmark_wei_par,
               benchmark_files_pos,
               annotations = benchmark_ann_spe_is_pre_pos,
               weight_spectral = 0.333,
@@ -2625,14 +2540,12 @@ list(
             what = weight_annotations,
             args = c(
               benchmark_wei_par |>
-                append(
-                  list(
-                    annotations = list(
-                      benchmark_ann_spe_is_pre_pos,
-                      benchmark_ann_ms1_pre_pos[[1]]
-                    )
+                append(list(
+                  annotations = list(
+                    benchmark_ann_spe_is_pre_pos,
+                    benchmark_ann_ms1_pre_pos[[1]]
                   )
-                ),
+                )),
               benchmark_files_pos,
               ms1_only = FALSE,
               weight_spectral = 0.333,
@@ -2649,7 +2562,8 @@ list(
         benchmark_ann_pre_ms2_b_c_pos <-
           do.call(
             what = weight_annotations,
-            args = c(benchmark_wei_par,
+            args = c(
+              benchmark_wei_par,
               benchmark_files_pos,
               annotations = benchmark_ann_spe_is_pre_pos,
               ms1_only = FALSE,
@@ -2669,14 +2583,12 @@ list(
             what = weight_annotations,
             args = c(
               benchmark_wei_par |>
-                append(
-                  list(
-                    annotations = list(
-                      benchmark_ann_spe_is_pre_pos,
-                      benchmark_ann_ms1_pre_pos[[1]]
-                    )
+                append(list(
+                  annotations = list(
+                    benchmark_ann_spe_is_pre_pos,
+                    benchmark_ann_ms1_pre_pos[[1]]
                   )
-                ),
+                )),
               benchmark_files_pos,
               ms1_only = FALSE,
               weight_spectral = 0.333,
@@ -2711,7 +2623,8 @@ list(
         benchmark_ann_pre_ms2_b_neg <-
           do.call(
             what = weight_annotations,
-            args = c(benchmark_wei_par,
+            args = c(
+              benchmark_wei_par,
               benchmark_files_neg,
               annotations = benchmark_ann_spe_is_pre_neg,
               ms1_only = FALSE,
@@ -2731,14 +2644,12 @@ list(
             what = weight_annotations,
             args = c(
               benchmark_wei_par |>
-                append(
-                  list(
-                    annotations = list(
-                      benchmark_ann_spe_is_pre_neg,
-                      benchmark_ann_ms1_pre_neg[[1]]
-                    )
+                append(list(
+                  annotations = list(
+                    benchmark_ann_spe_is_pre_neg,
+                    benchmark_ann_ms1_pre_neg[[1]]
                   )
-                ),
+                )),
               benchmark_files_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,
@@ -2755,7 +2666,8 @@ list(
         benchmark_ann_pre_ms2_b_c_neg <-
           do.call(
             what = weight_annotations,
-            args = c(benchmark_wei_par,
+            args = c(
+              benchmark_wei_par,
               benchmark_files_neg,
               annotations = benchmark_ann_spe_is_pre_neg,
               ms1_only = FALSE,
@@ -2775,14 +2687,12 @@ list(
             what = weight_annotations,
             args = c(
               benchmark_wei_par |>
-                append(
-                  list(
-                    annotations = list(
-                      benchmark_ann_spe_is_pre_neg,
-                      benchmark_ann_ms1_pre_neg[[1]]
-                    )
+                append(list(
+                  annotations = list(
+                    benchmark_ann_spe_is_pre_neg,
+                    benchmark_ann_ms1_pre_neg[[1]]
                   )
-                ),
+                )),
               benchmark_files_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,

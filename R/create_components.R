@@ -1,11 +1,9 @@
-utils::globalVariables(
-  c(
-    "cluster index",
-    "ComponentIndex",
-    "feature_target",
-    "params"
-  )
-)
+utils::globalVariables(c(
+  "cluster index",
+  "ComponentIndex",
+  "feature_target",
+  "params"
+))
 
 #' @title Create components
 #'

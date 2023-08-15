@@ -71,43 +71,13 @@ utils::globalVariables(
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            output = params$files$annotations$prepared,
-           str_2d_3d = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           str_met = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           str_nam = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             names,
-           str_tax_cla = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             cla,
-           str_tax_npc = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             npc,
+           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla =
+             params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc =
+             params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     params <<- parameters
     if (file.exists(input_directory)) {

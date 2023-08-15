@@ -67,43 +67,13 @@ utils::globalVariables(
 prepare_annotations_gnps <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$prepared,
-           str_2d_3d = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           str_met = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           str_nam = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             names,
-           str_tax_cla = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             cla,
-           str_tax_npc = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             npc,
+           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla =
+             params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc =
+             params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
@@ -118,11 +88,9 @@ prepare_annotations_gnps <-
         na.strings = c("", "NA")
       ) |>
         tidytable::bind_rows() |>
-        dplyr::mutate(
-          error_mz = as.numeric(MZErrorPPM) *
-            1E-6 *
-            as.numeric(Precursor_MZ)
-        ) |>
+        dplyr::mutate(error_mz = as.numeric(MZErrorPPM) *
+          1E-6 *
+          as.numeric(Precursor_MZ)) |>
         tidytable::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,

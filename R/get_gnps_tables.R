@@ -1,8 +1,4 @@
-utils::globalVariables(
-  c(
-    "paths"
-  )
-)
+utils::globalVariables(c("paths"))
 
 #' @title Get GNPS Tables
 #'
@@ -46,9 +42,7 @@ get_gnps_tables <-
     if (!is.null(gnps_job_id)) {
       stopifnot(
         "Your GNPS job ID is invalid" =
-          stringi::stri_length(
-            str = gnps_job_id
-          ) == 32
+          stringi::stri_length(str = gnps_job_id) == 32
       )
       stopifnot(
         "Your workflow is not supported,
@@ -156,7 +150,10 @@ get_gnps_tables <-
       log_debug("... Components")
       file_components <- file.path(
         path_interim_f,
-        paste0(names(gnps_job_id), "_components.tsv")
+        paste0(
+          names(gnps_job_id),
+          "_components.tsv"
+        )
       )
       if (!file.exists(file_components)) {
         get_file(

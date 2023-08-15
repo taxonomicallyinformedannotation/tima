@@ -39,38 +39,38 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-decorate_chemo <- function(annot_table_wei_chemo = get(
-                             "annot_table_wei_chemo",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_cla_kingdom = get(
-                             "score_chemical_cla_kingdom",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_cla_superclass = get(
-                             "score_chemical_cla_superclass",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_cla_class = get(
-                             "score_chemical_cla_class",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_cla_parent = get(
-                             "score_chemical_cla_parent",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_npc_pathway = get(
-                             "score_chemical_npc_pathway",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_npc_superclass = get(
-                             "score_chemical_npc_superclass",
-                             envir = parent.frame()
-                           ),
-                           score_chemical_npc_class = get(
-                             "score_chemical_npc_class",
-                             envir = parent.frame()
-                           )) {
+decorate_chemo <- function(annot_table_wei_chemo =
+                             get("annot_table_wei_chemo",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_cla_kingdom =
+                             get("score_chemical_cla_kingdom",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_cla_superclass =
+                             get("score_chemical_cla_superclass",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_cla_class =
+                             get("score_chemical_cla_class",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_cla_parent =
+                             get("score_chemical_cla_parent",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_npc_pathway =
+                             get("score_chemical_npc_pathway",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_npc_superclass =
+                             get("score_chemical_npc_superclass",
+                               envir = parent.frame()
+                             ),
+                           score_chemical_npc_class =
+                             get("score_chemical_npc_class",
+                               envir = parent.frame()
+                             )) {
   df_cla_kin <- annot_table_wei_chemo |>
     dplyr::filter(score_chemical >= score_chemical_cla_kingdom) |>
     dplyr::filter(
@@ -124,38 +124,52 @@ decorate_chemo <- function(annot_table_wei_chemo = get(
   log_debug(
     x = paste(
       "chemically informed scoring led to \n",
-      crayon::silver(nrow(df_cla_kin |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::silver(nrow(
+        df_cla_kin |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::silver("(classyfire) kingdom"),
       "level, \n",
-      crayon::cyan(nrow(df_npc_pat |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::cyan(nrow(
+        df_npc_pat |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::cyan("(NPC) pathway"),
       "level, \n",
-      crayon::magenta(nrow(df_cla_sup |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::magenta(nrow(
+        df_cla_sup |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::magenta("(classyfire) superclass"),
       "level, \n",
-      crayon::blue(nrow(df_npc_sup |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::blue(nrow(
+        df_npc_sup |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::blue("(NPC) superclass"),
       "level, \n",
-      crayon::yellow(nrow(df_cla_cla |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::yellow(nrow(
+        df_cla_cla |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::yellow("(classyfire) class"),
       "level, \n",
-      crayon::green(nrow(df_npc_cla |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::green(nrow(
+        df_npc_cla |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::green("(NPC) class"),
       "level, and \n",
-      crayon::red(nrow(df_cla_par |>
-        tidytable::distinct(structure_inchikey_2D))),
+      crayon::red(nrow(
+        df_cla_par |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
       "annotations reranked at the",
       crayon::red("(classyfire) parent"),
       "level. \n"
