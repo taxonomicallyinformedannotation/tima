@@ -7,7 +7,6 @@ utils::globalVariables(
     "paths",
     "precursorMz",
     "presence_ratio",
-    "rtime",
     "score",
     "SLAW_ID",
     "structure_inchikey_2D",
@@ -90,7 +89,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
   df_empty <- data.frame(
     feature_id = NA,
     error_mz = NA,
-    error_rt = NA,
     structure_name = NA,
     structure_inchikey_2D = NA,
     structure_smiles_2D = NA,
@@ -129,14 +127,10 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
-    query_rts <- spectra@backend@spectraData$rtime
     ## TODO find a way to have consistency in spectrum IDs
     query_ids <- spectra@backend@spectraData$acquisitionNum
     if (is.null(query_ids)) {
       query_ids <- spectra@backend@spectraData$spectrum_id
-    }
-    if (is.null(query_rts)) {
-      query_rts <- rep(NA_real_, length(spectra))
     }
 
     if (approx == FALSE) {
@@ -195,7 +189,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                    spectral_lib,
                    query_ids,
                    query_spectra,
-                   query_rts,
                    lib_id,
                    minimal,
                    maximal,
@@ -229,7 +222,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                     list(
                       "feature_id" = query_ids[[spectrum]],
                       "precursorMz" = precursor,
-                      "rtime" = query_rts[[spectrum]],
                       "target_id" = lib_id[indices][[index]],
                       "score" = as.numeric(score),
                       "count_peaks_matched" = NA_integer_,
@@ -257,7 +249,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                 spectral_lib = lib_spectra,
                 query_ids = query_ids,
                 query_spectra = query_spectra,
-                query_rts = query_rts,
                 lib_id = lib_id,
                 minimal = minimal,
                 maximal = maximal
@@ -295,10 +286,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (is.null(lib_smiles2D)) {
       lib_smiles2D <- rep(NA_character_, length(spectral_library))
     }
-    lib_rts <- spectral_library@backend@spectraData$rtime
-    if (is.null(lib_rts)) {
-      lib_rts <- rep(NA_real_, length(spectral_library))
-    }
     lib_name <- spectral_library@backend@spectraData$name
     if (is.null(lib_name)) {
       lib_name <- rep(NA_character_, length(spectral_library))
@@ -322,7 +309,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       "target_inchikey_2D" = lib_inchikey2D,
       "target_smiles" = lib_smiles,
       "target_smiles_2D" = lib_smiles2D,
-      "target_rtime" = lib_rts,
       "target_name" = lib_name,
       "target_formula" = lib_mf,
       "target_exactmass" = lib_mass,
@@ -336,8 +322,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     df_final <- df_final |>
       tidytable::rowwise() |>
       dplyr::mutate(
-        ## Working in minutes
-        error_rt = (target_rtime - rtime) / 60,
         error_mz = target_precursorMz - precursorMz,
         structure_inchikey_2D = ifelse(
           test = is.na(target_inchikey_2D),
@@ -357,7 +341,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         c(
           "feature_id",
           "error_mz",
-          "error_rt",
           "structure_name" = "target_name",
           "structure_inchikey_2D",
           "structure_smiles_2D",

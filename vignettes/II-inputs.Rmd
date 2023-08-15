@@ -300,6 +300,34 @@ Before running the corresponding code, do not forget to modify `inst/params/user
 source(file = "inst/scripts/prepare_libraries_adducts.R")
 ```
 
+#### Retention times
+
+The next library you might want is a retention times library.
+This library is **optional**.
+As no standard LC method is shared (for now) among laboratories, this library
+will be heavily laboratory-dependent.
+It could also be a library of in silico predicted retention times.
+
+```{r rts-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("lib_rt"),
+  exclude = c(
+    contains("benchmark"),
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
+
+We only use the previously generated library to fill up missing InChIKeys.
+Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_rt.yaml`.
+
+```{r adducts-2, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_rt.R")
+```
+
 #### Spectra
 
 Finally, you need a spectral library to perform MS^2^-based annotation.

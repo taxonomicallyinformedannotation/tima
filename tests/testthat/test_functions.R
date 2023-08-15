@@ -248,6 +248,11 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   prepare_libraries_adducts()
 
+  ### Retention time
+  step <- "prepare_libraries_rt"
+  params <- get_params(step = step)
+  prepare_libraries_rt()
+
   ### Features
   step <- "prepare_features_tables"
   params <- get_params(step = step)
@@ -354,6 +359,11 @@ testthat::test_that("Whole process", {
     output = "data/interim/benchmark/bench_test_out.tsv.gz"
   )
 
+  ## Filter annotations
+  step <- "filter_annotations"
+  params <- get_params(step = step)
+  filter_annotations()
+
   ## Perform TIMA
   step <- "weight_annotations"
   params <- get_params(step = step)
@@ -428,8 +438,8 @@ testthat::test_that("Whole process", {
   arguments$names_mgf_mf <<- "x"
   arguments$names_mgf_na <<- "x"
   arguments$names_mgf_po <<- "x"
-  arguments$names_mgf_pc <<- "x"
-  arguments$names_mgf_pm <<- "x"
+  # arguments$names_mgf_pc <<- "x"
+  # arguments$names_mgf_pm <<- "x"
   arguments$names_mgf_sm <<- "x"
   arguments$names_mgf_sn <<- "x"
   arguments$names_mgf_si <<- "x"
@@ -451,6 +461,7 @@ testthat::test_that("Whole process", {
   arguments$too_net_spe_edg <<- "x"
   arguments$too_tax_bio <<- "x"
   arguments$too_tax_che <<- "x"
+  arguments$units_rt <<- "x"
   arguments$wei_glo_bio <<- "x"
   arguments$wei_glo_che <<- "x"
   arguments$wei_glo_spe <<- "x"

@@ -5,7 +5,6 @@ utils::globalVariables(
     "count_peaks_matched",
     "CSI:FingerIDScore",
     "error_mz",
-    "error_rt",
     "explainedIntensity",
     "feature_id",
     "id",
@@ -251,7 +250,6 @@ prepare_annotations_sirius <-
         tidytable::left_join(canopus_npc_prepared) |>
         tidytable::distinct() |>
         tidyft::mutate(
-          error_rt = NA,
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
           ## mirror spectral match

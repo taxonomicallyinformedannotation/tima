@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_libraries_sop_closed.R --fil-lib-sop-raw-clo ../lotus-processor/data/processed/220226_closed_metadata.csv.gz --fil-lib-sop-pre data/interim/libraries/sop/closed_prepared.tsv.gz
 
-Usage: 
+Usage:
   prepare_libraries_sop_closed.R [--fil-lib-sop-raw-clo=<fil-lib-sop-raw-clo>] [--fil-lib-sop-pre=<fil-lib-sop-pre>]
 
 Arguments:

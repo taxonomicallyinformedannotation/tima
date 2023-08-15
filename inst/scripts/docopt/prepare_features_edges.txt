@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_features_edges.R --fil-net-spe-edg-pro data/interim/features/example_edges.tsv.gz
 
-Usage: 
+Usage:
   prepare_features_edges.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--names-source=<names-source>] [--names-target=<names-target>]
 
 Arguments:

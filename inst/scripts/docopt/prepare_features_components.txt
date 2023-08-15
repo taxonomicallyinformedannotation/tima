@@ -1,6 +1,6 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_features_components.R --fil-ann-pre data/interim/annotations/example_gnps_prepared.tsv.gz --fil-ann-pre data/interim/annotations/example_isdb_prepared.tsv.gz --fil-ann-pre data/interim/annotations/example_sirius_prepared.tsv.gz --fil-ann-fil data/interim/annotations/example_filled.tsv.gz
-Usage: 
+Usage:
   prepare_features_components.R [--fil-ann-pre=<fil-ann-pre>] [--fil-ann-fil=<fil-ann-fil>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>] [--too-net-spe-com=<too-net-spe-com>]
 
 Arguments:

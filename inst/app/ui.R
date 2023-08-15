@@ -618,7 +618,7 @@ ui <- fluidPage(
           ),
         textInput(
           inputId = "names_rt",
-          label = "Name of \"retention time\" variable in the input",
+          label = "Name of \"retention time\" variable in the feature table",
           value = "row retention time"
         ) |>
           shinyhelper::helper(
@@ -628,6 +628,17 @@ ui <- fluidPage(
               "The default corresponds to the default in MZmine.",
               "If using SLAW, please input 'rt'",
               "Assumed to be in minutes."
+            )
+          ),
+        textInput(
+          inputId = "names_rt_2",
+          label = "Name of \"retention time\" variable in the rt library",
+          value = "rt"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `retention time` column in your rt library file."
             )
           ),
         textInput(

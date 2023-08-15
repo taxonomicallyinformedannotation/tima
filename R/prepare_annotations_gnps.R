@@ -5,7 +5,6 @@ utils::globalVariables(
     "count_peaks_explained",
     "count_peaks_matched",
     "error_mz",
-    "error_rt",
     "ExactMass",
     "feature_id",
     "INCHI",
@@ -122,13 +121,11 @@ prepare_annotations_gnps <-
         dplyr::mutate(
           error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
-            as.numeric(Precursor_MZ),
-          error_rt = NA
+            as.numeric(Precursor_MZ)
         ) |>
         tidytable::select(
           feature_id = `#Scan#`,
           error_mz = MassDiff,
-          error_rt,
           library = LibraryName,
           structure_name = Compound_Name,
           score_input = MQScore,
