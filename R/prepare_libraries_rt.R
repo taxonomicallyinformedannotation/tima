@@ -1,3 +1,11 @@
+utils::globalVariables(
+  c(
+    "inchikey.x",
+    "inchikey.y",
+    "type"
+  )
+)
+
 #' @title Prepare libraries of retention times
 #'
 #' @description This function prepares retention times libraries
@@ -105,7 +113,7 @@ prepare_libraries_rt <-
         rts <- tab |>
           lapply(FUN = tidytable::fread) |>
           tidytable::bind_rows() |>
-          tidytable::select(any_of(
+          tidytable::select(tidytable::any_of(
             c(
               rt = name_rt,
               inchikey = name_inchikey,
@@ -159,7 +167,7 @@ prepare_libraries_rt <-
       get_inchikey <- function(smiles, toolkit = "rdkit") {
         url <- paste0(
           "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
-          URLencode(smiles),
+          utils::URLencode(smiles),
           "&toolkit=",
           toolkit
         )

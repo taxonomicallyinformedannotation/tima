@@ -11,12 +11,14 @@ utils::globalVariables(
     "SLAW_ID",
     "structure_inchikey_2D",
     "structure_smiles_2D",
+    "target_id",
     "target_inchikey",
     "target_inchikey_2D",
     "target_precursorMz",
     "target_rtime",
     "target_smiles",
-    "target_smiles_2D"
+    "target_smiles_2D",
+    "val"
   )
 )
 
@@ -39,8 +41,6 @@ utils::globalVariables(
 #' @param threshold Minimal similarity to report
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
-#' @param condition Condition to be fulfilled.
-#'    Either 'OR' or 'AND' (mass and peaks minima).
 #' @param qutoff Intensity under which ms2 fragments will be removed.
 #' @param approx Perform matching without precursor match
 #' @param parameters Params

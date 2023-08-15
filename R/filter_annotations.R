@@ -1,4 +1,10 @@
-utils::globalVariables(c("params"))
+utils::globalVariables(
+  c(
+    "params",
+    "rt_target",
+    "type"
+  )
+)
 
 #' @title Filter annotations
 #'
