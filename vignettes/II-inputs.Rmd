@@ -324,7 +324,7 @@ targets::tar_visnetwork(
 We only use the previously generated library to fill up missing InChIKeys.
 Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_rt.yaml`.
 
-```{r adducts-2, results="hide", message=FALSE, warning=FALSE}
+```{r rts-2, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_rt.R")
 ```
 

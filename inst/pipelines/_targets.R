@@ -1326,12 +1326,16 @@ list(
         lib_rt <- prepare_libraries_rt(
           ## TODO refactor to avoid "pos/neg"
           mgf_exp = list(
-            "neg" = lib_spe_exp_int_pre_neg,
-            "pos" = lib_spe_exp_int_pre_pos
+            # "neg" = lib_spe_exp_int_pre_neg,
+            # "pos" = lib_spe_exp_int_pre_pos
+            "neg" = NULL,
+            "pos" = NULL
           ),
           mgf_is = list(
-            "neg" = lib_spe_is_lot_pre_neg,
-            "pos" = lib_spe_is_lot_pre_pos
+            # "neg" = lib_spe_is_lot_pre_neg,
+            # "pos" = lib_spe_is_lot_pre_pos
+            "neg" = NULL,
+            "pos" = NULL
           ),
           temp_exp = NULL,
           temp_is = NULL,

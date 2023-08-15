@@ -8,12 +8,10 @@ files:
       #' Experimental libraries
       exp:
         #' List of negative experimental spectral libraries. STRING
-        neg:
-          - data/interim/libraries/spectra/exp/internal_neg.rds
+        neg: []
 
         #' List of positive experimental spectral libraries. STRING
-        pos:
-          - data/interim/libraries/spectra/exp/internal_pos.rds
+        pos: []
 
       #' In silico libraries
       is:
