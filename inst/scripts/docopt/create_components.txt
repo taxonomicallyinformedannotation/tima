@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/create_components.R --fil-net-spe-edg-pro data/interim/features/example_edges.tsv.gz --fil-net-spe-com-raw data/interim/features/example_components.tsv.gz
 
-Usage: 
+Usage:
   create_components.R [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>]
 
 Arguments:

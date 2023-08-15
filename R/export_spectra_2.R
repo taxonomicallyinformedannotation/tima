@@ -1,8 +1,4 @@
-utils::globalVariables(
-  c(
-    "compound_id"
-  )
-)
+utils::globalVariables(c("compound_id"))
 
 #' @title Export spectra 2
 #'

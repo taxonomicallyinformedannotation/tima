@@ -28,7 +28,7 @@ sanitize_spectra <-
         Spectra::filterIntensity(
           intensity = function(x) {
             ## eventually go to 25%
-            x <- x > quantile(x)[1]
+            x <- x > stats::quantile(x)[1]
           }
         ) |>
         Spectra::applyProcessing()

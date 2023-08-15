@@ -1,0 +1,62 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Spectral libraries. STRING
+    spectral:
+      #' Experimental libraries
+      exp:
+        #' List of negative experimental spectral libraries. STRING
+        neg: []
+
+        #' List of positive experimental spectral libraries. STRING
+        pos: []
+
+      #' In silico libraries
+      is:
+        #' List of negative in silico spectral libraries. STRING
+        neg: []
+
+        #' List of positive in silico spectral libraries. STRING
+        pos: []
+
+    #' Temporal libraries. STRING
+    temporal:
+      #' List of experimental temporal libraries. STRING
+      exp: []
+
+      #' List of in silico temporal libraries. STRING
+      is: []
+
+      #' List of prepared temporal libraries. STRING
+      prepared:
+        - data/interim/libraries/rt/prepared.tsv.gz
+
+#' Names of the different variables in the input files.
+names:
+  #' Name of "InChIKey" variable in the input. STRING
+  inchikey: inchikey
+
+  #' Name of fields present in the MGF.
+  mgf:
+    #' Name of "InChIKey" in MGF. STRING
+    inchikey: ~
+
+    #' Name of "retention time" in MGF. STRING
+    retention_time: RTINSECONDS
+
+    #' Name of "SMILES" in MGF. STRING
+    smiles: SMILES
+
+  #' Name of "retention time" variable in the input. STRING
+  rt: rt
+
+  #' Name of "SMILES" variable in the input. STRING
+  smiles: smiles
+
+#' Units of the different variables in the input files.
+units:
+  #' Unit of the "retention time" variable in the input files. 
+  #' Must be "seconds" or "minutes". STRING
+  rt: seconds

@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_libraries_adducts.R --fil-lib-add-pro library
 
-Usage: 
+Usage:
   prepare_libraries_adducts.R [--fil-lib-add-pro=<fil-lib-add-pro>]
 
 Arguments:

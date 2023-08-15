@@ -38,9 +38,6 @@ Can be '.mgf' or '.sqlite' (Spectra formatted)}
 \item{approx}{Perform matching without precursor match}
 
 \item{parameters}{Params}
-
-\item{condition}{Condition to be fulfilled.
-Either 'OR' or 'AND' (mass and peaks minima).}
 }
 \description{
 This function annotates spectra

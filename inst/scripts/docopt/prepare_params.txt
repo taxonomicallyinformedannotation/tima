@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_params.R
 
-Usage: 
+Usage:
   prepare_params.R  [--fil-pat=<fil-pat>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>] [--ms-pol=<ms-pol>] [--org-tax=<org-tax>]
 
 Arguments:

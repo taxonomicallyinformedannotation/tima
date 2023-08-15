@@ -119,6 +119,8 @@ params:
       components: inst/params/default/create_components.yaml
       edges:
         spectra: inst/params/default/create_edges_spectra.yaml
+    filter:
+      annotations: inst/params/default/filter_annotations.yaml
     prepare:
       features:
         components: inst/params/default/prepare_features_components.yaml
@@ -126,6 +128,7 @@ params:
         tables: inst/params/default/prepare_features_tables.yaml
       libraries:
         adducts: inst/params/default/prepare_libraries_adducts.yaml
+        rt: inst/params/default/prepare_libraries_rt.yaml
         sop:
           closed: inst/params/default/prepare_libraries_sop_closed.yaml
           ecmdb: inst/params/default/prepare_libraries_sop_ecmdb.yaml
@@ -150,6 +153,8 @@ params:
       components: inst/params/user/create_components.yaml
       edges:
         spectra: inst/params/user/create_edges_spectra.yaml
+    filter:
+      annotations: inst/params/user/filter_annotations.yaml
     prepare:
       features:
         components: inst/params/user/prepare_features_components.yaml
@@ -157,6 +162,7 @@ params:
         tables: inst/params/user/prepare_features_tables.yaml
       libraries:
         adducts: inst/params/user/prepare_libraries_adducts.yaml
+        rt: inst/params/user/prepare_libraries_rt.yaml
         sop:
           closed: inst/params/user/prepare_libraries_sop_closed.yaml
           ecmdb: inst/params/user/prepare_libraries_sop_ecmdb.yaml
@@ -209,4 +215,4 @@ urls:
     pattern:
       pos: isdb_pos.mgf
       neg: isdb_neg.mgf
-version: 2.8.2
+version: 2.9.0

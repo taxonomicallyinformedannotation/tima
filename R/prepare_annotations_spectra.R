@@ -3,7 +3,6 @@ utils::globalVariables(
     "count_peaks_explained",
     "count_peaks_matched",
     "error_mz",
-    "error_rt",
     "feature_id",
     "params",
     "score",
@@ -52,43 +51,13 @@ utils::globalVariables(
 prepare_annotations_spectra <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$prepared,
-           str_2d_3d = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           str_met = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           str_nam = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             names,
-           str_tax_cla = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             cla,
-           str_tax_npc = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             npc,
+           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_met = params$files$libraries$sop$merged$structures$metadata,
+           str_nam = params$files$libraries$sop$merged$structures$names,
+           str_tax_cla =
+             params$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc =
+             params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     stopifnot(
       "Input file(s) do(es) not exist" =
@@ -109,7 +78,6 @@ prepare_annotations_spectra <-
       tidytable::distinct(
         feature_id,
         error_mz,
-        error_rt,
         structure_name,
         structure_inchikey_2D,
         structure_smiles_2D,

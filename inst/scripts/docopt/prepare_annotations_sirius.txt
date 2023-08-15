@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre data/interim/annotations/example_sirius_prepared.tsv.gz
 
-Usage: 
+Usage:
   prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre=<fil-ann-pre>]
 
 Arguments:

@@ -1,7 +1,7 @@
 You can use this script with the following example:
 Rscript inst/scripts/prepare_libraries_spectra.R --fil-lib-spe-raw data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf --fil-lib-spe-pos data/interim/libraries/spectra/exp/internal_pos.sqlite --ms-pol pos
 
-Usage: 
+Usage:
   prepare_libraries_spectra.R [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-lib-spe-raw=<fil-lib-spe-raw>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>]
 
 Arguments:

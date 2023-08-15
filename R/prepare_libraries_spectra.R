@@ -79,9 +79,7 @@ prepare_libraries_spectra <-
       log_debug("Harmonizing")
       spectra_harmonized <- spectra |>
         extract_spectra() |>
-        harmonize_spectra(
-          mode = polarity
-        ) |>
+        harmonize_spectra(mode = polarity) |>
         ## TODO report the issue as otherwise precursorMz is lost
         dplyr::mutate(precursor_mz = precursorMz)
 

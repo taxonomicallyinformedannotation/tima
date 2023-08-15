@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.9.0
+
+* Refactored RT matching (#76)
+
 # timaR 2.8.2
 
 * Change from pbmclapply to pblapply
