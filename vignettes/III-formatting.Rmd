@@ -232,7 +232,7 @@ If you do not have one, it will simply group the annotations of all tools.
 
 Before running the corresponding code, do not forget to modify `inst/params/user/filter_annotations.yaml`.
 
-```{r prepare-taxa, results="hide", message=FALSE, warning=FALSE}
+```{r filter-annotations, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/filter_annotations.R")
 ```
 
