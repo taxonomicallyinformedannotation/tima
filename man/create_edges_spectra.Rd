@@ -34,8 +34,6 @@ create_edges_spectra(
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{parameters}{Params}
-
-\item{method}{Method to be used to perform spectral comparison}
 }
 \description{
 This function create edges
