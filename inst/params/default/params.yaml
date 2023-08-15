@@ -35,26 +35,8 @@ annotations:
     #' Perform approximative matching without precursor matching? BOOLEAN
     approx: no
 
-    #' Similarity method to be used to compare spectra.
-    #' Currently "gnps", "navdist", "ndotproduct",
-    # "neuclidean", "nspectraangle" supported. STRING
-    method: gnps
-
     #' Thresholds
     thresholds:
-      #' Condition to be used to retain candidates.
-      #' Must be "OR" or "AND".
-      #' Example: Minimum 6 peaks AND 0.2 similarity. STRING
-      condition: OR
-
-      #' For peaks.
-      peaks:
-        #' Minimal shared peaks (absolute). INTEGER
-        absolute: 6
-
-        #' Minimal shared peaks (ratio). FLOAT
-        ratio: 0.2
-
       #' For similarity. FLOAT
       similarity: 0.2
 
@@ -74,6 +56,10 @@ files:
 
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius/
+
+    #' List of filtered annotations. STRING
+    filtered:
+      - data/interim/annotations/example_annotations_filtered.tsv.gz
 
     #' List of prepared annotations. STRING
     prepared:
@@ -175,6 +161,22 @@ files:
         #' List of positive in silico spectral libraries. STRING
         pos:
           - data/interim/libraries/spectra/is/lotus_pos.rds
+
+    #' Temporal libraries. STRING
+    temporal:
+      #' Experimental libraries
+      exp:
+        #' List of experimental temporal libraries. STRING
+        - data/interim/libraries/rt/internal.tsv
+
+      #' In silico libraries
+      is:
+        #' List of in silico temporal libraries. STRING
+        - data/interim/libraries/rt/predicted.tsv
+
+      #' List of prepared temporal libraries. STRING
+      prepared:
+        - data/interim/libraries/rt/prepared.tsv.gz
 
   #' Networks files.
   networks:
@@ -333,6 +335,9 @@ names:
   #' Name of "filename" variable in the input. STRING
   filename: filename
 
+  #' Name of "InChIKey" variable in the input. STRING
+  inchikey: inchikey
+
   #' Name of fields present in the MGF.
   mgf:
     #' Name of "collision energy" in MGF. STRING
@@ -365,6 +370,9 @@ names:
     #' Name of "polarity" in MGF. STRING
     polarity: IONMODE
 
+    #' Name of "retention time" in MGF. STRING
+    retention_time: ~
+
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
 
@@ -388,6 +396,9 @@ names:
 
   #' Name of "retention time" variable in the input. STRING
   rt: rt
+
+  #' Name of "SMILES" variable in the input. STRING
+  smiles: smiles
 
   #' Name of "source IDs" variable in the input. STRING
   source: CLUSTERID1
@@ -449,6 +460,11 @@ tools:
     #' Chemical taxonomy used for matching.
     #' Currently only "npc" or supported. STRING
     chemical: npc
+
+#' Units of the different variables in the input files.
+units:
+  #' Unit of the "retention time" variable in the input files. STRING
+  rt: minutes
 
 #' Weights to apply to each part of the final score.
 weights:

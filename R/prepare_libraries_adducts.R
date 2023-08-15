@@ -1,12 +1,10 @@
-utils::globalVariables(
-  c(
-    "adduct",
-    "exact_mass",
-    "params",
-    "paths",
-    "structure_exact_mass"
-  )
-)
+utils::globalVariables(c(
+  "adduct",
+  "exact_mass",
+  "params",
+  "paths",
+  "structure_exact_mass"
+))
 
 #' @title Prepare libraries of adducts
 #'
@@ -31,15 +29,8 @@ utils::globalVariables(
 #'
 #' @examples NULL
 prepare_libraries_adducts <-
-  function(str_met = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           adducts_masses = system.file(
-             "extdata",
+  function(str_met = params$files$libraries$sop$merged$structures$metadata,
+           adducts_masses = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
@@ -49,7 +40,8 @@ prepare_libraries_adducts <-
            masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
            parameters = params) {
     stopifnot(
-      "Your structure metadata file does not exist" = file.exists(str_met)
+      "Your structure metadata file does not exist" =
+        file.exists(str_met)
     )
     params <<- parameters
     log_debug("Loading files ...")

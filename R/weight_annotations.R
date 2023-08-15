@@ -8,7 +8,7 @@ utils::globalVariables(
 
 #' @title Weight annotations
 #'
-#' @description This function weights initial annotations.
+#' @description This function weights annotations.
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
@@ -25,7 +25,6 @@ utils::globalVariables(
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file
 #' @param edges Prepared edges file
-#' @param features Prepared features file
 #' @param taxa Prepared taxed features file
 #' @param output Output file
 #' @param candidates_initial Number of initial candidates to keep
@@ -112,7 +111,7 @@ weight_annotations <-
              merged$
              structures$
              dd_ddd,
-           annotations = params$files$annotations$prepared,
+           annotations = params$files$annotations$filtered,
            components = params$
              files$
              networks$
@@ -120,7 +119,6 @@ weight_annotations <-
              components$
              prepared,
            edges = params$files$networks$spectral$edges$prepared,
-           features = params$files$features$prepared,
            taxa = params$files$taxa$prepared,
            output = params$files$annotations$processed,
            candidates_initial = params$annotations$candidates$initial,
@@ -168,26 +166,12 @@ weight_annotations <-
     stopifnot("Your library file does not exist." = file.exists(library))
     stopifnot("Your components file does not exist." = file.exists(components))
     stopifnot("Your edges file does not exist." = file.exists(edges))
-    stopifnot("Your features file does not exist." = file.exists(features))
     stopifnot("Your taxa file does not exist." = file.exists(taxa))
 
     paths <<- parse_yaml_paths()
     params <<- parameters
 
     log_debug(x = "... files ...")
-    log_debug(x = "... features")
-    features_table <- tidytable::fread(
-      file = features,
-      colClasses = "character",
-      na.strings = c("", "NA")
-    )
-    log_debug(x = "... components")
-    components_table <- tidytable::fread(
-      file = components,
-      colClasses = "character",
-      na.strings = c("", "NA")
-    )
-
     log_debug(x = "... annotations")
     annotation_table <- lapply(
       X = annotations,
@@ -197,21 +181,28 @@ weight_annotations <-
     ) |>
       tidytable::bind_rows()
 
-    log_debug(x = "... metadata_table_biological_annotation")
-    taxed_features_table <- tidytable::fread(
-      file = taxa,
+    log_debug(x = "... components")
+    components_table <- tidytable::fread(
+      file = components,
       colClasses = "character",
       na.strings = c("", "NA")
     )
 
-    log_debug(x = "... edges table")
+    log_debug(x = "... edges")
     edges_table <- tidytable::fread(
       file = edges,
       colClasses = "character",
       na.strings = c("", "NA")
     )
 
-    log_debug(x = "... structure-organism pairs table")
+    log_debug(x = "... taxa")
+    taxed_features_table <- tidytable::fread(
+      file = taxa,
+      colClasses = "character",
+      na.strings = c("", "NA")
+    )
+
+    log_debug(x = "... structure-organism pairs")
     structure_organism_pairs_table <-
       tidytable::fread(
         file = library,
@@ -228,6 +219,10 @@ weight_annotations <-
         colClasses = "character",
         na.strings = c("", "NA")
       ))
+
+    log_debug(x = "... features")
+    features_table <- annotation_table |>
+      tidytable::distinct(feature_id, rt, mz)
 
     if (ms1_only == TRUE) {
       annotation_table <- annotation_table |>

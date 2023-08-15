@@ -1,10 +1,8 @@
-utils::globalVariables(
-  c(
-    "feature_source",
-    "feature_target",
-    "params"
-  )
-)
+utils::globalVariables(c(
+  "feature_source",
+  "feature_target",
+  "params"
+))
 
 #' @title Prepare features edges
 #'
@@ -39,7 +37,8 @@ prepare_features_edges <-
     ## Load edges table
     log_debug(x = "Loading edge table")
     edges_table <- lapply(
-      X = input, FUN = tidytable::fread,
+      X = input,
+      FUN = tidytable::fread,
       na.strings = c("", "NA")
     ) |>
       tidytable::bind_rows()

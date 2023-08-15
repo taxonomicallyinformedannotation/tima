@@ -34,13 +34,9 @@ files:
 
   #' Annotations files.
   annotations:
-    #' List of prepared annotations. STRING
-    prepared:
-      - data/interim/annotations/example_ms1_prepared.tsv.gz
-      - data/interim/annotations/example_gnps_prepared.tsv.gz
-      - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
-      - data/interim/annotations/example_sirius_prepared.tsv.gz
-      # - data/interim/annotations/example_exp_rt_prepared.tsv.gz
+    #' List of filtered annotations. STRING
+    filtered:
+      - data/interim/annotations/example_annotations_filtered.tsv.gz
 
     #' Final results file. STRING
     processed: annotations.tsv
@@ -49,11 +45,6 @@ files:
     sop:
       #' Merged structure organism pairs library. STRING
       merged: data/interim/libraries/keys.tsv.gz
-
-  #' Features files.
-  features:
-    #' Prepared features file. STRING
-    prepared: data/interim/features/example_features.tsv.gz
 
   #' Networks files.
   networks:

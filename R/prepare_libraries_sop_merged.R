@@ -51,57 +51,18 @@ prepare_libraries_sop_merged <-
            ## document it above in case
            # output_org_nam =
            # paths$data$interim$libraries$sop$merged$organisms$names,
-           output_org_tax_ott = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             organisms$
-             taxonomies$
-             ott,
-           output_str_2d_3d = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           output_str_met = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             metadata,
-           output_str_nam = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             names,
-           output_str_tax_cla = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             classyfire,
-           output_str_tax_npc = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             taxonomies$
-             npc,
+           output_org_tax_ott =
+             paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
+           output_str_2d_3d =
+             paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+           output_str_met =
+             paths$data$interim$libraries$sop$merged$structures$metadata,
+           output_str_nam =
+             paths$data$interim$libraries$sop$merged$structures$names,
+           output_str_tax_cla =
+             paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
+           output_str_tax_npc =
+             paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     stopifnot(
       "Your filter parameter must be 'true' or 'false'" =
@@ -172,11 +133,13 @@ prepare_libraries_sop_merged <-
 
       table_org_tax_ott <-
         table_org_tax_ott |>
-        tidytable::bind_rows(table_org_tax_ott_full |>
-          tidytable::tidytable() |>
-          tidyft::mutate_vars(is.numeric, .func = as.character) |>
-          tidyft::mutate_vars(is.list, .func = as.character) |>
-          tidyft::mutate_vars(is.logical, .func = as.character))
+        tidytable::bind_rows(
+          table_org_tax_ott_full |>
+            tidytable::tidytable() |>
+            tidyft::mutate_vars(is.numeric, .func = as.character) |>
+            tidyft::mutate_vars(is.list, .func = as.character) |>
+            tidyft::mutate_vars(is.logical, .func = as.character)
+        )
     }
 
     log_debug(x = "Keeping structures")
@@ -221,10 +184,8 @@ prepare_libraries_sop_merged <-
         ) |>
         tidytable::distinct()
 
-      stopifnot(
-        "Your filter led to no entries,
-        try to change it." = nrow(table_keys) != 0
-      )
+      stopifnot("Your filter led to no entries,
+        try to change it." = nrow(table_keys) != 0)
     }
 
     log_debug(x = "Exporting ...")

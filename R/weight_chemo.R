@@ -85,48 +85,37 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_chemo <-
-  function(annot_table_wei_bio_clean = get(
-             "annot_table_wei_bio_clean",
+  function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean",
              envir = parent.frame()
            ),
-           weight_spectral = get(
-             "weight_spectral",
+           weight_spectral = get("weight_spectral",
              envir = parent.frame()
            ),
-           weight_biological = get(
-             "weight_biological",
+           weight_biological = get("weight_biological",
              envir = parent.frame()
            ),
-           weight_chemical = get(
-             "weight_chemical",
+           weight_chemical = get("weight_chemical",
              envir = parent.frame()
            ),
-           score_chemical_cla_kingdom = get(
-             "score_chemical_cla_kingdom",
+           score_chemical_cla_kingdom = get("score_chemical_cla_kingdom",
              envir = parent.frame()
            ),
-           score_chemical_cla_superclass = get(
-             "score_chemical_cla_superclass",
+           score_chemical_cla_superclass = get("score_chemical_cla_superclass",
              envir = parent.frame()
            ),
-           score_chemical_cla_class = get(
-             "score_chemical_cla_class",
+           score_chemical_cla_class = get("score_chemical_cla_class",
              envir = parent.frame()
            ),
-           score_chemical_cla_parent = get(
-             "score_chemical_cla_parent",
+           score_chemical_cla_parent = get("score_chemical_cla_parent",
              envir = parent.frame()
            ),
-           score_chemical_npc_pathway = get(
-             "score_chemical_npc_pathway",
+           score_chemical_npc_pathway = get("score_chemical_npc_pathway",
              envir = parent.frame()
            ),
-           score_chemical_npc_superclass = get(
-             "score_chemical_npc_superclass",
+           score_chemical_npc_superclass = get("score_chemical_npc_superclass",
              envir = parent.frame()
            ),
-           score_chemical_npc_class = get(
-             "score_chemical_npc_class",
+           score_chemical_npc_class = get("score_chemical_npc_class",
              envir = parent.frame()
            )) {
     log_debug("calculating chemical score ... \n")

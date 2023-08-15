@@ -20,7 +20,6 @@ utils::globalVariables(c(
 #' @param output Output file.
 #' @param name_source Name of the source features column
 #' @param name_target Name of the target features column
-#' @param method Method to be used to perform spectral comparison
 #' @param threshold Minimal similarity to report
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used

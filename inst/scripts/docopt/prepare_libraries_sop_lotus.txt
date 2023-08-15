@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_libraries_sop_lotus.R --fil-lib-sop-raw-ecm data/source/libraries/sop/lotus.csv.gz --fil-lib-sop-pro data/interim/libraries/sop/lotus_prepared.tsv.gz
 
-Usage: 
+Usage:
   prepare_libraries_sop_ecmdb.R [--fil-lib-sop-raw-ecm=<fil-lib-sop-raw-ecm>] [--fil-lib-sop-pro=<fil-lib-sop-pro>]
 
 Arguments:

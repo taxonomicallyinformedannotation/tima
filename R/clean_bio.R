@@ -677,37 +677,56 @@ clean_bio <-
     df4 <-
       tidytable::left_join(df,
         freq_cla_kin,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_npc_pat,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_cla_sup,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_npc_sup,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_cla_cla,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_npc_cla,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::left_join(freq_cla_par,
-        by = stats::setNames("feature_source", "feature_id")
+        by = stats::setNames(
+          "feature_source",
+          "feature_id"
+        )
       ) |>
       tidytable::select(
         feature_id,
         tidytable::everything()
       ) |>
       ## In case there are no consensus at all because no network
-      tidytable::mutate(
-        tidytable::across(
-          tidytable::where(is.logical),
-          as.character
-        )
-      ) |>
+      tidytable::mutate(tidytable::across(
+        tidytable::where(is.logical),
+        as.character
+      )) |>
       data.frame() |>
       tidytable::tidytable()
 
@@ -716,90 +735,111 @@ clean_bio <-
               with less than 2 neighbors \n")
     dummy_consistency <- df4 |>
       tidyft::mutate(
-        consensus_structure_cla_kin = tidytable::coalesce(
-          consensus_structure_cla_kin,
-          "dummy"
-        ),
-        consistency_structure_cla_kin = tidytable::coalesce(
-          consistency_structure_cla_kin,
-          1
-        ),
-        consistency_score_chemical_1_cla_kingdom = tidytable::coalesce(
-          consistency_score_chemical_1_cla_kingdom,
-          0
-        ),
-        consensus_structure_npc_pat = tidytable::coalesce(
-          consensus_structure_npc_pat,
-          "dummy"
-        ),
-        consistency_structure_npc_pat = tidytable::coalesce(
-          consistency_structure_npc_pat,
-          1
-        ),
-        consistency_score_chemical_1_npc_pathway = tidytable::coalesce(
-          consistency_score_chemical_1_npc_pathway,
-          0
-        ),
-        consensus_structure_cla_sup = tidytable::coalesce(
-          consensus_structure_cla_sup,
-          "dummy"
-        ),
-        consistency_structure_cla_sup = tidytable::coalesce(
-          consistency_structure_cla_sup,
-          1
-        ),
-        consistency_score_chemical_2_cla_superclass = tidytable::coalesce(
-          consistency_score_chemical_2_cla_superclass,
-          0
-        ),
-        consensus_structure_npc_sup = tidytable::coalesce(
-          consensus_structure_npc_sup,
-          "dummy"
-        ),
-        consistency_structure_npc_sup = tidytable::coalesce(
-          consistency_structure_npc_sup,
-          1
-        ),
-        consistency_score_chemical_2_npc_superclass = tidytable::coalesce(
-          consistency_score_chemical_2_npc_superclass,
-          0
-        ),
-        consensus_structure_cla_cla = tidytable::coalesce(
-          consensus_structure_cla_cla,
-          "dummy"
-        ),
-        consistency_structure_cla_cla = tidytable::coalesce(
-          consistency_structure_cla_cla,
-          1
-        ),
-        consistency_score_chemical_3_cla_class = tidytable::coalesce(
-          consistency_score_chemical_3_cla_class,
-          0
-        ),
-        consensus_structure_npc_cla = tidytable::coalesce(
-          consensus_structure_npc_cla,
-          "dummy"
-        ),
-        consistency_structure_npc_cla = tidytable::coalesce(
-          consistency_structure_npc_cla,
-          1
-        ),
-        consistency_score_chemical_3_npc_class = tidytable::coalesce(
-          consistency_score_chemical_3_npc_class,
-          0
-        ),
-        consensus_structure_cla_par = tidytable::coalesce(
-          consensus_structure_cla_par,
-          "dummy"
-        ),
-        consistency_structure_cla_par = tidytable::coalesce(
-          consistency_structure_cla_par,
-          1
-        ),
-        consistency_score_chemical_4_cla_parent = tidytable::coalesce(
-          consistency_score_chemical_4_cla_parent,
-          0
-        )
+        consensus_structure_cla_kin =
+          tidytable::coalesce(
+            consensus_structure_cla_kin,
+            "dummy"
+          ),
+        consistency_structure_cla_kin =
+          tidytable::coalesce(
+            consistency_structure_cla_kin,
+            1
+          ),
+        consistency_score_chemical_1_cla_kingdom =
+          tidytable::coalesce(
+            consistency_score_chemical_1_cla_kingdom,
+            0
+          ),
+        consensus_structure_npc_pat =
+          tidytable::coalesce(
+            consensus_structure_npc_pat,
+            "dummy"
+          ),
+        consistency_structure_npc_pat =
+          tidytable::coalesce(
+            consistency_structure_npc_pat,
+            1
+          ),
+        consistency_score_chemical_1_npc_pathway =
+          tidytable::coalesce(
+            consistency_score_chemical_1_npc_pathway,
+            0
+          ),
+        consensus_structure_cla_sup =
+          tidytable::coalesce(
+            consensus_structure_cla_sup,
+            "dummy"
+          ),
+        consistency_structure_cla_sup =
+          tidytable::coalesce(
+            consistency_structure_cla_sup,
+            1
+          ),
+        consistency_score_chemical_2_cla_superclass =
+          tidytable::coalesce(
+            consistency_score_chemical_2_cla_superclass,
+            0
+          ),
+        consensus_structure_npc_sup =
+          tidytable::coalesce(
+            consensus_structure_npc_sup,
+            "dummy"
+          ),
+        consistency_structure_npc_sup =
+          tidytable::coalesce(
+            consistency_structure_npc_sup,
+            1
+          ),
+        consistency_score_chemical_2_npc_superclass =
+          tidytable::coalesce(
+            consistency_score_chemical_2_npc_superclass,
+            0
+          ),
+        consensus_structure_cla_cla =
+          tidytable::coalesce(
+            consensus_structure_cla_cla,
+            "dummy"
+          ),
+        consistency_structure_cla_cla =
+          tidytable::coalesce(
+            consistency_structure_cla_cla,
+            1
+          ),
+        consistency_score_chemical_3_cla_class =
+          tidytable::coalesce(
+            consistency_score_chemical_3_cla_class,
+            0
+          ),
+        consensus_structure_npc_cla =
+          tidytable::coalesce(
+            consensus_structure_npc_cla,
+            "dummy"
+          ),
+        consistency_structure_npc_cla =
+          tidytable::coalesce(
+            consistency_structure_npc_cla,
+            1
+          ),
+        consistency_score_chemical_3_npc_class =
+          tidytable::coalesce(
+            consistency_score_chemical_3_npc_class,
+            0
+          ),
+        consensus_structure_cla_par =
+          tidytable::coalesce(
+            consensus_structure_cla_par,
+            "dummy"
+          ),
+        consistency_structure_cla_par =
+          tidytable::coalesce(
+            consistency_structure_cla_par,
+            1
+          ),
+        consistency_score_chemical_4_cla_parent =
+          tidytable::coalesce(
+            consistency_score_chemical_4_cla_parent,
+            0
+          )
       )
 
     return(dummy_consistency)

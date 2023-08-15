@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_libraries_sop_merged.R --fil-lib-sop-pro data/interim/libraries/sop/lotus_prepared.tsv.gz --fil-lib-sop-mer bitter_db.tsv.gz --org-fil-mod TRUE --org-fil-lev family --org-fil-val 'Simaroubaceae|Gentianaceae'
 
-Usage: 
+Usage:
   prepare_libraries_sop_merged.R [--fil-lib-sop-pro=<fil-lib-sop-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--org-fil-mod=<org-fil-mod>] [--org-fil-lev=<org-fil-lev>] [--org-fil-val=<org-fil-val>]
 
 Arguments:

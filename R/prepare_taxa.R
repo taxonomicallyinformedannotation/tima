@@ -55,14 +55,8 @@ prepare_taxa <-
            colname = params$names$taxon,
            metadata = params$files$taxa$raw,
            top_k = params$organisms$candidates,
-           org_tax_ott = params$
-             files$
-             libraries$
-             sop$
-             merged$
-             organisms$
-             taxonomies$
-             ott,
+           org_tax_ott =
+             params$files$libraries$sop$merged$organisms$taxonomies$ott,
            output = params$files$taxa$prepared,
            taxon = params$organisms$taxon,
            parameters = params) {
@@ -205,12 +199,12 @@ prepare_taxa <-
       )
     } else {
       metadata_table_joined <-
-        tidytable::left_join(
-          top_n,
+        tidytable::left_join(top_n,
           metadata_table,
           by = c("name" = name_filename)
         ) |>
-        tidytable::select(feature_id := rowname,
+        tidytable::select(
+          feature_id := rowname,
           organismOriginal = tidytable::all_of(colname),
           tidytable::everything()
         )
@@ -239,18 +233,20 @@ prepare_taxa <-
       ) |>
       dplyr::mutate_all(as.character) |>
       dplyr::group_by(feature_id) |>
-      clean_collapse(cols = c(
-        "sample_organism_01_domain",
-        "sample_organism_02_kingdom",
-        "sample_organism_03_phylum",
-        "sample_organism_04_class",
-        "sample_organism_05_order",
-        "sample_organism_06_family",
-        "sample_organism_07_tribe",
-        "sample_organism_08_genus",
-        "sample_organism_09_species",
-        "sample_organism_10_varietas"
-      )) |>
+      clean_collapse(
+        cols = c(
+          "sample_organism_01_domain",
+          "sample_organism_02_kingdom",
+          "sample_organism_03_phylum",
+          "sample_organism_04_class",
+          "sample_organism_05_order",
+          "sample_organism_06_family",
+          "sample_organism_07_tribe",
+          "sample_organism_08_genus",
+          "sample_organism_09_species",
+          "sample_organism_10_varietas"
+        )
+      ) |>
       dplyr::ungroup() |>
       tidytable::tidytable()
 

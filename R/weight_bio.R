@@ -96,60 +96,46 @@ utils::globalVariables(
 #'
 #' @examples NULL
 weight_bio <-
-  function(annotation_table_taxed = get(
-             "annotation_table_taxed",
+  function(annotation_table_taxed = get("annotation_table_taxed",
              envir = parent.frame()
            ),
-           structure_organism_pairs_table = get(
-             "structure_organism_pairs_table",
+           structure_organism_pairs_table = get("structure_organism_pairs_table",
              envir = parent.frame()
            ),
-           weight_spectral = get(
-             "weight_spectral",
+           weight_spectral = get("weight_spectral",
              envir = parent.frame()
            ),
-           weight_biological = get(
-             "weight_biological",
+           weight_biological = get("weight_biological",
              envir = parent.frame()
            ),
-           score_biological_domain = get(
-             "score_biological_domain",
+           score_biological_domain = get("score_biological_domain",
              envir = parent.frame()
            ),
-           score_biological_kingdom = get(
-             "score_biological_kingdom",
+           score_biological_kingdom = get("score_biological_kingdom",
              envir = parent.frame()
            ),
-           score_biological_phylum = get(
-             "score_biological_phylum",
+           score_biological_phylum = get("score_biological_phylum",
              envir = parent.frame()
            ),
-           score_biological_class = get(
-             "score_biological_class",
+           score_biological_class = get("score_biological_class",
              envir = parent.frame()
            ),
-           score_biological_order = get(
-             "score_biological_order",
+           score_biological_order = get("score_biological_order",
              envir = parent.frame()
            ),
-           score_biological_family = get(
-             "score_biological_family",
+           score_biological_family = get("score_biological_family",
              envir = parent.frame()
            ),
-           score_biological_tribe = get(
-             "score_biological_tribe",
+           score_biological_tribe = get("score_biological_tribe",
              envir = parent.frame()
            ),
-           score_biological_genus = get(
-             "score_biological_genus",
+           score_biological_genus = get("score_biological_genus",
              envir = parent.frame()
            ),
-           score_biological_species = get(
-             "score_biological_species",
+           score_biological_species = get("score_biological_species",
              envir = parent.frame()
            ),
-           score_biological_variety = get(
-             "score_biological_variety",
+           score_biological_variety = get("score_biological_variety",
              envir = parent.frame()
            )) {
     metadata <- annotation_table_taxed |>
@@ -305,9 +291,12 @@ weight_bio <-
         candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
       tidytable::distinct() |>
-      tidyft::mutate_vars(is.character, .func = function(x) {
-        tidytable::na_if(x, "")
-      })
+      tidyft::mutate_vars(
+        is.character,
+        .func = function(x) {
+          tidytable::na_if(x, "")
+        }
+      )
 
     log_debug("keeping distinct candidates per taxonomical rank \n")
 
@@ -429,7 +418,8 @@ weight_bio <-
     log_debug("calculating biological scores ... \n")
 
     log_debug("... domain \n")
-    step_dom <- tidytable::left_join(sample_domain, candidate_domain) |>
+    step_dom <-
+      tidytable::left_join(sample_domain, candidate_domain) |>
       tidyft::filter(!is.na(sample_organism_01_domain)) |>
       dplyr::filter(
         stringi::stri_detect_regex(
@@ -884,7 +874,8 @@ weight_bio <-
         structure_inchikey_2D,
         sample_organism_10_varietas
       )
-    step_var <- tidytable::left_join(step_var, candidate_varietas) |>
+    step_var <-
+      tidytable::left_join(step_var, candidate_varietas) |>
       tidyft::filter(!is.na(candidate_organism_10_varietas)) |>
       dplyr::filter(
         stringi::stri_detect_regex(

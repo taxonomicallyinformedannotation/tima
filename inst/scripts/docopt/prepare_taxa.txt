@@ -1,7 +1,7 @@
 You can use this script with the following example:
   Rscript inst/scripts/prepare_taxa.R --fil-tax-pro data/interim/taxa/example_taxed.tsv.gz --org-can 1 --names-extension TRUE --names-features "row ID" --names-filename filename --names-taxon ATTRIBUTE_species
 
-Usage: 
+Usage:
   prepare_taxa.R [--fil-fea-raw=<fil-fea-raw>] [--fil-tax-raw=<fil-tax-raw>] [--fil-tax-pro=<fil-tax-pro>] [--gnps-id=<gnps-id>] [--names-extension=<names-extension>] [--names-features=<names-features>] [--names-filename=<names-filename>] [--names-taxon=<names-taxon>] [--org-can=<org-can>] [--org-tax=<org-tax>] [--too-met=<too-met>]
 
 Arguments:

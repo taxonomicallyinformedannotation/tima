@@ -75,8 +75,3 @@ ms:
       dalton:
         #' Absolute mass tolerance for MS2 in Dalton. FLOAT
         ms2: 0.01
-
-    #' For retention time.
-    rt:
-      #' Retention time tolerance in minutes. FLOAT
-      minutes: 0.05
