@@ -166,7 +166,6 @@ weight_annotations <-
     stopifnot("Your library file does not exist." = file.exists(library))
     stopifnot("Your components file does not exist." = file.exists(components))
     stopifnot("Your edges file does not exist." = file.exists(edges))
-    stopifnot("Your features file does not exist." = file.exists(features))
     stopifnot("Your taxa file does not exist." = file.exists(taxa))
 
     paths <<- parse_yaml_paths()
