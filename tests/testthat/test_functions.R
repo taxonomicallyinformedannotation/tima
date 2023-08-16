@@ -360,7 +360,9 @@ testthat::test_that("Whole process", {
   prepare_taxa()
   ## Tests for ott API
   fake_taxon_df <- data.frame("organism" = "Gentiana lutea")
+  wrong_taxon_df <- data.frame("organism" = "Gentiano luteo")
   get_organism_taxonomy_ott(df = fake_taxon_df)
+  get_organism_taxonomy_ott(df = wrong_taxon_df)
   get_organism_taxonomy_ott(
     df = fake_taxon_df,
     url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
