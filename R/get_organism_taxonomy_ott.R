@@ -193,6 +193,7 @@ get_organism_taxonomy_ott <- function(df,
         dplyr::mutate(ott_id = as.integer(ott_id)) |>
         data.frame()
     } else {
+      log_debug("Nothing found, returning empty dataframe")
       otl <-
         data.frame(
           id = NA_integer_,
