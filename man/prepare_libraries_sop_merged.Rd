@@ -9,14 +9,13 @@ prepare_libraries_sop_merged(
   filter = params$organisms$filter$mode,
   level = params$organisms$filter$level,
   value = params$organisms$filter$value,
-  output_key = paths$data$interim$libraries$sop$merged$keys,
-  output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
-  output_str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-  output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-  output_str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-  output_str_tax_cla =
-    paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-  output_str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+  output_key = params$files$libraries$sop$merged$keys,
+  output_org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
+  output_str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+  output_str_met = params$files$libraries$sop$merged$structures$metadata,
+  output_str_nam = params$files$libraries$sop$merged$structures$names,
+  output_str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
+  output_str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
   parameters = params
 )
 }

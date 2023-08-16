@@ -97,7 +97,7 @@ annotate_masses <-
            output_edges = params$files$networks$spectral$edges$raw,
            name_source = params$names$source,
            name_target = params$names$target,
-           library = paths$data$interim$libraries$sop$merged$keys,
+           library = params$files$libraries$sop$merged$keys,
            str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
@@ -105,6 +105,8 @@ annotate_masses <-
            str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
            name = params$files$libraries$adducts$prepared,
            adducts_list = params$ms$adducts,
+           adducts_neg = params$files$libraries$adducts$neg,
+           adducts_pos = params$files$libraries$adducts$pos,
            adducts_masses_list = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
@@ -138,9 +140,9 @@ annotate_masses <-
 
     log_debug("... single charge adducts table")
     if (ms_mode == "pos") {
-      adduct_file <- paths$data$interim$libraries$adducts$pos
+      adduct_file <- adducts_pos
     } else {
-      adduct_file <- paths$data$interim$libraries$adducts$neg
+      adduct_file <- adducts_neg
     }
 
     adducts_table <- tidytable::fread(
