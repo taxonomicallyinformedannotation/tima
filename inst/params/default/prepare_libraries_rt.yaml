@@ -21,6 +21,13 @@ files:
         #' List of positive in silico spectral libraries. STRING
         pos: []
 
+    #' Structure organism pairs libraries.
+    sop:
+      #' Merged structure organism pairs library.
+      merged:
+        #' Merged structure organism pairs library keys. STRING
+        keys: data/interim/libraries/sop/merged/keys.tsv.gz
+
     #' Temporal libraries. STRING
     temporal:
       #' List of experimental temporal libraries. STRING

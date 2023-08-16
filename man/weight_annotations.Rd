@@ -5,9 +5,9 @@
 \title{Weight annotations}
 \usage{
 weight_annotations(
-  library = paths$data$interim$libraries$sop$merged$keys,
-  org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
-  str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+  library = params$files$libraries$sop$merged$keys,
+  org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
+  str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
   annotations = params$files$annotations$filtered,
   components = params$files$networks$spectral$components$prepared,
   edges = params$files$networks$spectral$edges$prepared,
@@ -42,6 +42,7 @@ weight_annotations(
   score_chemical_npc_class = params$weights$chemical$npc$class,
   minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
+  minimal_ms1_condition = params$annotations$ms1$thresholds$condition,
   ms1_only = params$annotations$ms1only,
   summarise = params$options$summarise,
   pattern = params$files$pattern,

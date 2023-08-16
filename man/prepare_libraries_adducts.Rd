@@ -9,8 +9,8 @@ prepare_libraries_adducts(
   adducts_masses = system.file("extdata", "adducts.tsv", package = "timaR"),
   adducts_output_path = paths$data$interim$libraries$adducts$path,
   output_name = params$files$libraries$adducts$prepared,
-  masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
-  masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
+  masses_pos_output_path = params$files$libraries$adducts$pos,
+  masses_neg_output_path = params$files$libraries$adducts$neg,
   parameters = params
 )
 }

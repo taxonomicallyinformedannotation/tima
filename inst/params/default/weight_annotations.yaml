@@ -41,10 +41,26 @@ files:
     #' Final results file. STRING
     processed: annotations.tsv
 
+  #' Libraries files.
+  libraries:
     #' Structure organism pairs libraries.
     sop:
-      #' Merged structure organism pairs library. STRING
-      merged: data/interim/libraries/keys.tsv.gz
+      #' Merged structure organism pairs library.
+      merged:
+        #' Merged structure organism pairs library keys. STRING
+        keys: data/interim/libraries/sop/merged/keys.tsv.gz
+
+        #' Organisms libraries.
+        organisms:
+          #' Organisms taxonomies.
+          taxonomies:
+            #' OTT organisms taxonomy. STRING
+            ott: data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
+
+        #' Structures libraries.
+        structures:
+          #' Structures 2D and 3D. STRING
+          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
 
   #' Networks files.
   networks:
