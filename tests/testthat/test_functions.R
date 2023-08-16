@@ -93,6 +93,11 @@ testthat::test_that("Whole process", {
     url = paths$urls$examples$spectral_lib_mini$with_rt,
     export = paths$data$source$libraries$spectra$exp$with_rt
   )
+  ### Temporal library
+  get_file(
+    url = paths$urls$examples$lib_mini$rt,
+    export = paths$data$source$libraries$rt$example_mini
+  )
 
   #### SIRIUS
   ## mini version for tests
@@ -255,8 +260,15 @@ testthat::test_that("Whole process", {
     mgf_exp = list(
       "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
       "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
-    )
+    ),
+    mgf_is = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
+    temp_exp = paths$data$source$libraries$rt$example_mini,
+    temp_is = paths$data$source$libraries$rt$example_mini
   )
+  prepare_libraries_rt()
 
   ### Features
   step <- "prepare_features_tables"
