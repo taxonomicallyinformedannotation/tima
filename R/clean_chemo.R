@@ -117,6 +117,9 @@ clean_chemo <-
            minimal_ms1_chemo = get("minimal_ms1_chemo",
              envir = parent.frame()
            ),
+           minimal_ms1_condition = get("minimal_ms1_condition",
+             envir = parent.frame()
+           ),
            summarise = get("summarise",
              envir = parent.frame()
            )) {
@@ -125,19 +128,37 @@ clean_chemo <-
       candidates_final,
       " candidates and keeping only MS1 candidates with minimum \n",
       minimal_ms1_bio,
-      " biological score or \n",
+      " biological score \n",
+      minimal_ms1_condition,
       minimal_ms1_chemo,
       "chemical score \n"
     )
-    df1 <- annot_table_wei_chemo |>
-      dplyr::filter(
-        score_input > 0 |
-          ## Those lines are to keep ms1 annotation
-          score_biological >= minimal_ms1_bio |
-          ## Only if a good biological
-          score_chemical >= minimal_ms1_chemo
-        ## Or chemical consistency score is obtained
-      ) |>
+    if (minimal_ms1_condition == "OR") {
+      df1 <- annot_table_wei_chemo |>
+        dplyr::filter(
+          score_input > 0 | (
+            ## Those lines are to keep ms1 annotation
+            score_biological >= minimal_ms1_bio |
+              ## Only if a good biological
+              score_chemical >= minimal_ms1_chemo
+          )
+          ## Or chemical consistency score is obtained
+        )
+    }
+    if (minimal_ms1_condition == "AND") {
+      df1 <- annot_table_wei_chemo |>
+        dplyr::filter(
+          score_input > 0 | (
+            ## Those lines are to keep ms1 annotation
+            score_biological >= minimal_ms1_bio &
+              ## Only if a good biological
+              score_chemical >= minimal_ms1_chemo
+          )
+          ## Or chemical consistency score is obtained
+        )
+    }
+
+    df1 <- df1 |>
       tidytable::distinct(feature_id,
         structure_inchikey_2D,
         .keep_all = TRUE

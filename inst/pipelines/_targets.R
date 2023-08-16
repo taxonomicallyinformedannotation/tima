@@ -991,13 +991,13 @@ list(
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
               level = par_pre_lib_sop_mer$organisms$filter$level,
               value = par_pre_lib_sop_mer$organisms$filter$value,
-              output_key = paths$data$interim$libraries$sop$merged$keys,
-              output_org_tax_ott = paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
-              output_str_2d_3d = paths$data$interim$libraries$sop$merged$structures$dd_ddd,
-              output_str_met = paths$data$interim$libraries$sop$merged$structures$metadata,
-              output_str_nam = paths$data$interim$libraries$sop$merged$structures$names,
-              output_str_tax_cla = paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
-              output_str_tax_npc = paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+              output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
+              output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
+              output_str_2d_3d = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$dd_ddd,
+              output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
+              output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
+              output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
+              output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc,
               parameters = par_pre_lib_sop_mer
             )
           }
@@ -1034,8 +1034,8 @@ list(
           adducts_masses = dic_add,
           adducts_output_path = paths$data$interim$libraries$adducts$path,
           output_name = par_pre_lib_add$files$libraries$adducts$prepared,
-          masses_pos_output_path = paths$data$interim$libraries$adducts$pos,
-          masses_neg_output_path = paths$data$interim$libraries$adducts$neg,
+          masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
+          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg,
           parameters = par_pre_lib_add
         )
       }
@@ -1702,6 +1702,8 @@ list(
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
+        minimal_ms1_condition =
+          par_wei_ann$annotations$ms1$thresholds$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
@@ -1752,6 +1754,8 @@ list(
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
+        minimal_ms1_condition =
+          par_wei_ann$annotations$ms1$thresholds$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
@@ -2468,6 +2472,8 @@ list(
             benchmark_def_wei_ann$annotations$ms1$thresholds$biological,
           minimal_ms1_chemo =
             benchmark_def_wei_ann$annotations$ms1$thresholds$chemical,
+          minimal_ms1_condition =
+            benchmark_def_wei_ann$annotations$ms1$thresholds$condition,
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,
           force = benchmark_def_wei_ann$options$force,

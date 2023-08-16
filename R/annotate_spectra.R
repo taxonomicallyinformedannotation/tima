@@ -4,7 +4,6 @@ utils::globalVariables(
     "count_peaks_matched",
     "feature_id",
     "params",
-    "paths",
     "precursorMz",
     "presence_ratio",
     "score",
