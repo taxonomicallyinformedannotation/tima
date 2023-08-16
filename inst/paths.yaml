@@ -74,6 +74,9 @@ data:
       set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
     libraries:
       path: data/source/libraries
+      rt:
+        path: data/source/libraries/rt
+        example_mini: data/source/libraries/rt/example_lib_mini_rt.tsv
       sop:
         path: data/source/libraries/sop
         closed: ../lotus-processor/data/processed/230224_closed_metadata.csv.gz
@@ -184,6 +187,8 @@ urls:
   benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
   examples:
     features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv
+    lib_mini:
+      rt: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_lib_mini_rt.tsv
     metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv
     sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius.zip
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf
