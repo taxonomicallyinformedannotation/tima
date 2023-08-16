@@ -6,11 +6,11 @@
 \usage{
 complement_metadata_structures(
   df,
-  str_2d_3d = paths$data$interim$libraries$merged$structures$dd_ddd,
-  str_met = paths$data$interim$libraries$merged$structures$metadata,
-  str_nam = paths$data$interim$libraries$merged$structures$names,
-  str_tax_cla = paths$data$interim$libraries$merged$structures$taxonomies$classyfire,
-  str_tax_npc = paths$data$interim$libraries$merged$structures$taxonomies$npc
+  str_2d_3d = params$files$libraries$merged$structures$dd_ddd,
+  str_met = params$files$libraries$merged$structures$metadata,
+  str_nam = params$files$libraries$merged$structures$names,
+  str_tax_cla = params$files$libraries$merged$structures$taxonomies$cla,
+  str_tax_npc = params$files$libraries$merged$structures$taxonomies$npc
 )
 }
 \arguments{

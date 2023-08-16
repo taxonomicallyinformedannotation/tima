@@ -180,7 +180,8 @@ testthat::test_that("Whole process", {
   prepare_libraries_sop_merged(
     filter = TRUE,
     level = "family",
-    value = "Simaroubaceae|Gentianaceae"
+    value = "Simaroubaceae|Gentianaceae",
+    output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
   )
   prepare_libraries_sop_merged()
 
@@ -374,7 +375,7 @@ testthat::test_that("Whole process", {
     input = "data/interim/benchmark/bench_test_in.tsv.gz",
     keys = paths$data$interim$libraries$sop$merged$keys,
     org_tax_ott =
-      paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
+      params$files$libraries$sop$merged$organisms$taxonomies$ott,
     output = "data/interim/benchmark/bench_test_out.tsv.gz"
   )
 

@@ -47,22 +47,22 @@ prepare_libraries_sop_merged <-
            filter = params$organisms$filter$mode,
            level = params$organisms$filter$level,
            value = params$organisms$filter$value,
-           output_key = paths$data$interim$libraries$sop$merged$keys,
+           output_key = params$files$libraries$sop$merged$keys,
            ## document it above in case
            # output_org_nam =
-           # paths$data$interim$libraries$sop$merged$organisms$names,
+           # params$files$libraries$sop$merged$organisms$names,
            output_org_tax_ott =
-             paths$data$interim$libraries$sop$merged$organisms$taxonomies$ott,
+             params$files$libraries$sop$merged$organisms$taxonomies$ott,
            output_str_2d_3d =
-             paths$data$interim$libraries$sop$merged$structures$dd_ddd,
+             params$files$libraries$sop$merged$structures$dd_ddd,
            output_str_met =
-             paths$data$interim$libraries$sop$merged$structures$metadata,
+             params$files$libraries$sop$merged$structures$metadata,
            output_str_nam =
-             paths$data$interim$libraries$sop$merged$structures$names,
+             params$files$libraries$sop$merged$structures$names,
            output_str_tax_cla =
-             paths$data$interim$libraries$sop$merged$structures$taxonomies$classyfire,
+             params$files$libraries$sop$merged$structures$taxonomies$cla,
            output_str_tax_npc =
-             paths$data$interim$libraries$sop$merged$structures$taxonomies$npc,
+             params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
     stopifnot(
       "Your filter parameter must be 'true' or 'false'" =

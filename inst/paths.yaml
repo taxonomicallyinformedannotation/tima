@@ -37,7 +37,7 @@ data:
             names: data/interim/libraries/sop/merged/structures/names.tsv.gz
             taxonomies:
               path: data/interim/libraries/sop/merged/structures/taxonomies
-              classyfire: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+              cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
               npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
       spectra:
         path: data/interim/libraries/spectra

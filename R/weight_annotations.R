@@ -92,184 +92,166 @@ utils::globalVariables(
 #' @seealso annotate_masses weight_bio weight_chemo
 #'
 #' @examples NULL
-weight_annotations <-
-  function(library = paths$data$interim$libraries$sop$merged$keys,
-           org_tax_ott = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             organisms$
-             taxonomies$
-             ott,
-           str_2d_3d = paths$
-             data$
-             interim$
-             libraries$
-             sop$
-             merged$
-             structures$
-             dd_ddd,
-           annotations = params$files$annotations$filtered,
-           components = params$
-             files$
-             networks$
-             spectral$
-             components$
-             prepared,
-           edges = params$files$networks$spectral$edges$prepared,
-           taxa = params$files$taxa$prepared,
-           output = params$files$annotations$processed,
-           candidates_initial = params$annotations$candidates$initial,
-           candidates_final = params$annotations$candidates$final,
-           weight_spectral = params$weights$global$spectral,
-           weight_chemical = params$weights$global$chemical,
-           weight_biological = params$weights$global$biological,
-           score_biological_domain = params$weights$biological$domain,
-           score_biological_kingdom = params$weights$biological$kingdom,
-           score_biological_phylum = params$weights$biological$phylum,
-           score_biological_class = params$weights$biological$class,
-           score_biological_order = params$weights$biological$order,
-           score_biological_infraorder = params$weights$biological$infraorder,
-           score_biological_family = params$weights$biological$family,
-           score_biological_subfamily = params$weights$biological$subfamily,
-           score_biological_tribe = params$weights$biological$tribe,
-           score_biological_subtribe = params$weights$biological$subtribe,
-           score_biological_genus = params$weights$biological$genus,
-           score_biological_subgenus = params$weights$biological$subgenus,
-           score_biological_species = params$weights$biological$species,
-           score_biological_subspecies = params$weights$biological$subspecies,
-           score_biological_variety = params$weights$biological$variety,
-           score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
-           score_chemical_cla_superclass =
-             params$weights$chemical$cla$superclass,
-           score_chemical_cla_class = params$weights$chemical$cla$class,
-           score_chemical_cla_parent = params$weights$chemical$cla$parent,
-           score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
-           score_chemical_npc_superclass =
-             params$weights$chemical$npc$superclass,
-           score_chemical_npc_class = params$weights$chemical$npc$class,
-           minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
-           minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
-           # TODO ADD CONDITION,
-           ms1_only = params$annotations$ms1only,
-           summarise = params$options$summarise,
-           pattern = params$files$pattern,
-           force = params$options$force,
-           parameters = params) {
-    stopifnot(
-      "Annotations file(s) do(es) not exist" =
-        rep(TRUE, length(annotations)) ==
-          lapply(X = annotations, file.exists)
-    )
-    stopifnot("Your library file does not exist." = file.exists(library))
-    stopifnot("Your components file does not exist." = file.exists(components))
-    stopifnot("Your edges file does not exist." = file.exists(edges))
-    stopifnot("Your taxa file does not exist." = file.exists(taxa))
+weight_annotations <- function(
+    library = params$files$libraries$sop$merged$keys,
+    org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
+    str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+    annotations = params$files$annotations$filtered,
+    components = params$files$networks$spectral$components$prepared,
+    edges = params$files$networks$spectral$edges$prepared,
+    taxa = params$files$taxa$prepared,
+    output = params$files$annotations$processed,
+    candidates_initial = params$annotations$candidates$initial,
+    candidates_final = params$annotations$candidates$final,
+    weight_spectral = params$weights$global$spectral,
+    weight_chemical = params$weights$global$chemical,
+    weight_biological = params$weights$global$biological,
+    score_biological_domain = params$weights$biological$domain,
+    score_biological_kingdom = params$weights$biological$kingdom,
+    score_biological_phylum = params$weights$biological$phylum,
+    score_biological_class = params$weights$biological$class,
+    score_biological_order = params$weights$biological$order,
+    score_biological_infraorder = params$weights$biological$infraorder,
+    score_biological_family = params$weights$biological$family,
+    score_biological_subfamily = params$weights$biological$subfamily,
+    score_biological_tribe = params$weights$biological$tribe,
+    score_biological_subtribe = params$weights$biological$subtribe,
+    score_biological_genus = params$weights$biological$genus,
+    score_biological_subgenus = params$weights$biological$subgenus,
+    score_biological_species = params$weights$biological$species,
+    score_biological_subspecies = params$weights$biological$subspecies,
+    score_biological_variety = params$weights$biological$variety,
+    score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
+    score_chemical_cla_superclass = params$weights$chemical$cla$superclass,
+    score_chemical_cla_class = params$weights$chemical$cla$class,
+    score_chemical_cla_parent = params$weights$chemical$cla$parent,
+    score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
+    score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
+    score_chemical_npc_class = params$weights$chemical$npc$class,
+    minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
+    minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
+    minimal_ms1_condition = params$annotations$ms1$thresholds$condition,
+    ms1_only = params$annotations$ms1only,
+    summarise = params$options$summarise,
+    pattern = params$files$pattern,
+    force = params$options$force,
+    parameters = params) {
+  stopifnot(
+    "Annotations file(s) do(es) not exist" =
+      rep(TRUE, length(annotations)) ==
+        lapply(X = annotations, file.exists)
+  )
+  stopifnot("Your library file does not exist." = file.exists(library))
+  stopifnot("Your components file does not exist." = file.exists(components))
+  stopifnot("Your edges file does not exist." = file.exists(edges))
+  stopifnot("Your taxa file does not exist." = file.exists(taxa))
+  stopifnot(
+    "Condition must be 'OR' or 'AND'." =
+      minimal_ms1_condition %in% c("OR", "AND")
+  )
 
-    paths <<- parse_yaml_paths()
-    params <<- parameters
+  paths <<- parse_yaml_paths()
+  params <<- parameters
 
-    log_debug(x = "... files ...")
-    log_debug(x = "... annotations")
-    annotation_table <- lapply(
-      X = annotations,
-      FUN = tidytable::fread,
+  log_debug(x = "... files ...")
+  log_debug(x = "... annotations")
+  annotation_table <- lapply(
+    X = annotations,
+    FUN = tidytable::fread,
+    colClasses = "character",
+    na.strings = c("", "NA")
+  ) |>
+    tidytable::bind_rows()
+
+  log_debug(x = "... components")
+  components_table <- tidytable::fread(
+    file = components,
+    colClasses = "character",
+    na.strings = c("", "NA")
+  )
+
+  log_debug(x = "... edges")
+  edges_table <- tidytable::fread(
+    file = edges,
+    colClasses = "character",
+    na.strings = c("", "NA")
+  )
+
+  log_debug(x = "... taxa")
+  taxed_features_table <- tidytable::fread(
+    file = taxa,
+    colClasses = "character",
+    na.strings = c("", "NA")
+  )
+
+  log_debug(x = "... structure-organism pairs")
+  structure_organism_pairs_table <-
+    tidytable::fread(
+      file = library,
       colClasses = "character",
       na.strings = c("", "NA")
     ) |>
-      tidytable::bind_rows()
-
-    log_debug(x = "... components")
-    components_table <- tidytable::fread(
-      file = components,
+    tidytable::left_join(tidytable::fread(
+      file = str_2d_3d,
       colClasses = "character",
       na.strings = c("", "NA")
-    )
-
-    log_debug(x = "... edges")
-    edges_table <- tidytable::fread(
-      file = edges,
+    )) |>
+    tidytable::left_join(tidytable::fread(
+      file = org_tax_ott,
       colClasses = "character",
       na.strings = c("", "NA")
-    )
+    ))
 
-    log_debug(x = "... taxa")
-    taxed_features_table <- tidytable::fread(
-      file = taxa,
-      colClasses = "character",
-      na.strings = c("", "NA")
-    )
+  log_debug(x = "... features")
+  features_table <- annotation_table |>
+    tidytable::distinct(feature_id, rt, mz)
 
-    log_debug(x = "... structure-organism pairs")
-    structure_organism_pairs_table <-
-      tidytable::fread(
-        file = library,
-        colClasses = "character",
-        na.strings = c("", "NA")
-      ) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_2d_3d,
-        colClasses = "character",
-        na.strings = c("", "NA")
-      )) |>
-      tidytable::left_join(tidytable::fread(
-        file = org_tax_ott,
-        colClasses = "character",
-        na.strings = c("", "NA")
-      ))
-
-    log_debug(x = "... features")
-    features_table <- annotation_table |>
-      tidytable::distinct(feature_id, rt, mz)
-
-    if (ms1_only == TRUE) {
-      annotation_table <- annotation_table |>
-        tidyft::filter(score_input == 0)
-    }
-
-    log_debug(x = "adding biological organism metadata")
-    annotation_table_taxed <- annotation_table |>
-      tidytable::left_join(taxed_features_table)
-
-    log_debug(x = "performing taxonomically informed scoring")
-    annot_table_wei_bio <- weight_bio()
-
-    annot_table_wei_bio |>
-      decorate_bio()
-
-    log_debug(x = "cleaning taxonomically informed results and
-              preparing for chemically informed scoring")
-    annot_table_wei_bio_clean <- clean_bio()
-
-    log_debug(x = "performing chemically informed scoring")
-    annot_table_wei_chemo <- weight_chemo()
-
-    annot_table_wei_chemo |>
-      decorate_chemo()
-
-    log_debug(x = "cleaning for export")
-    results <- clean_chemo()
-
-    log_debug(x = "Exporting ...")
-    time <- format(Sys.time(), "%y%m%d_%H%M%OS")
-    dir_time <- file.path(
-      paths$data$processed$path,
-      paste0(time, "_", pattern)
-    )
-    final_output <- file.path(
-      dir_time,
-      output
-    )
-    export_params(
-      directory = dir_time,
-      step = "weight_annotations"
-    )
-    export_output(
-      x = results,
-      file = final_output
-    )
-
-    return(final_output)
+  if (ms1_only == TRUE) {
+    annotation_table <- annotation_table |>
+      tidyft::filter(score_input == 0)
   }
+
+  log_debug(x = "adding biological organism metadata")
+  annotation_table_taxed <- annotation_table |>
+    tidytable::left_join(taxed_features_table)
+
+  log_debug(x = "performing taxonomically informed scoring")
+  annot_table_wei_bio <- weight_bio()
+
+  annot_table_wei_bio |>
+    decorate_bio()
+
+  log_debug(x = "cleaning taxonomically informed results and
+              preparing for chemically informed scoring")
+  annot_table_wei_bio_clean <- clean_bio()
+
+  log_debug(x = "performing chemically informed scoring")
+  annot_table_wei_chemo <- weight_chemo()
+
+  annot_table_wei_chemo |>
+    decorate_chemo()
+
+  log_debug(x = "cleaning for export")
+  results <- clean_chemo()
+
+  log_debug(x = "Exporting ...")
+  time <- format(Sys.time(), "%y%m%d_%H%M%OS")
+  dir_time <- file.path(
+    paths$data$processed$path,
+    paste0(time, "_", pattern)
+  )
+  final_output <- file.path(
+    dir_time,
+    output
+  )
+  export_params(
+    directory = dir_time,
+    step = "weight_annotations"
+  )
+  export_output(
+    x = results,
+    file = final_output
+  )
+
+  return(final_output)
+}

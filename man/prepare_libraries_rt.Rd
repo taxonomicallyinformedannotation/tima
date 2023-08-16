@@ -10,7 +10,7 @@ prepare_libraries_rt(
   temp_exp = params$files$libraries$temporal$exp,
   temp_is = params$files$libraries$temporal$is,
   output = params$files$libraries$temporal$prepared,
-  library = paths$data$interim$libraries$sop$merged$keys,
+  library = params$files$libraries$sop$merged$keys,
   col_ik = params$names$mgf$inchikey,
   col_rt = params$names$mgf$retention_time,
   col_sm = params$names$mgf$smiles,

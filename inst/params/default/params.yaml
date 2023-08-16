@@ -82,6 +82,12 @@ files:
   libraries:
     #' Adducts libraries.
     adducts:
+      #' Negative adducts. STRING
+      neg: data/interim/libraries/adducts/neg.tsv.gz
+
+      #' Positive adducts library. STRING
+      pos: data/interim/libraries/adducts/pos.tsv.gz
+
       #' Prepared adducts library. STRING
       prepared: library
 

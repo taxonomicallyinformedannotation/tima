@@ -54,44 +54,14 @@ utils::globalVariables(
 #' @export
 #'
 #' @examples NULL
-complement_metadata_structures <- function(df,
-                                           str_2d_3d = paths$
-                                             data$
-                                             interim$
-                                             libraries$
-                                             merged$
-                                             structures$
-                                             dd_ddd,
-                                           str_met = paths$
-                                             data$
-                                             interim$
-                                             libraries$
-                                             merged$
-                                             structures$
-                                             metadata,
-                                           str_nam = paths$
-                                             data$
-                                             interim$
-                                             libraries$
-                                             merged$
-                                             structures$
-                                             names,
-                                           str_tax_cla = paths$
-                                             data$
-                                             interim$
-                                             libraries$
-                                             merged$
-                                             structures$
-                                             taxonomies$
-                                             classyfire,
-                                           str_tax_npc = paths$
-                                             data$
-                                             interim$
-                                             libraries$
-                                             merged$
-                                             structures$
-                                             taxonomies$
-                                             npc) {
+complement_metadata_structures <- function(
+    df,
+    str_2d_3d = params$files$libraries$merged$structures$dd_ddd,
+    str_met = params$files$libraries$merged$structures$metadata,
+    str_nam = params$files$libraries$merged$structures$names,
+    str_tax_cla =
+      params$files$libraries$merged$structures$taxonomies$cla,
+    str_tax_npc = params$files$libraries$merged$structures$taxonomies$npc) {
   log_debug("Trying to look for already computed metadata")
   dd_ddd <- tidytable::fread(str_2d_3d,
     na.strings = c("", "NA"),
