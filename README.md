@@ -4,9 +4,9 @@
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
 [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
 [![License report action test](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![MegaLinter](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/MegaLinter/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/mega-linter.yml)
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/R-CMD-check/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+<!-- [![MegaLinter](https://github.com/taxonomicallyinformedannotation/tima-r/workflows/MegaLinter/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/mega-linter.yml) -->
 <!-- badges: end -->
 
 The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.
