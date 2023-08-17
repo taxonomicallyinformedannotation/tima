@@ -2408,6 +2408,109 @@ list(
       }
     ),
     tar_target(
+      name = benchmark_def_fil_ann,
+      command = {
+        benchmark_def_fil_ann <- parse_yaml_params(
+          def = par_def_fil_ann,
+          usr = par_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_spe_neg,
+      command = {
+        benchmark_ann_fil_spe_neg <- filter_annotations(
+          annotations = list(
+            benchmark_ann_spe_is_pre_neg
+          ),
+          features = benchmark_pre_meta_neg,
+          rts = lib_rt,
+          output = "data/interim/benchmark/benchmark_ann_spe_fil_neg.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_spe_ms1_neg,
+      command = {
+        benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
+          annotations = list(
+            benchmark_ann_spe_is_pre_neg,
+            benchmark_ann_ms1_pre_neg[[1]]
+          ),
+          features = benchmark_pre_meta_neg,
+          rts = lib_rt,
+          output =
+            "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_ms1_neg,
+      command = {
+        benchmark_ann_fil_ms1_neg <- filter_annotations(
+          annotations = list(
+            benchmark_ann_ms1_pre_neg[[1]]
+          ),
+          features = benchmark_pre_meta_neg,
+          rts = lib_rt,
+          output = "data/interim/benchmark/benchmark_ann_ms1_fil_neg.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_spe_pos,
+      command = {
+        benchmark_ann_fil_spe_pos <- filter_annotations(
+          annotations = list(
+            benchmark_ann_spe_is_pre_pos
+          ),
+          features = benchmark_pre_meta_pos,
+          rts = lib_rt,
+          output = "data/interim/benchmark/benchmark_ann_spe_fil_pos.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_spe_ms1_pos,
+      command = {
+        benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
+          annotations = list(
+            benchmark_ann_spe_is_pre_pos,
+            benchmark_ann_ms1_pre_pos[[1]]
+          ),
+          features = benchmark_pre_meta_pos,
+          rts = lib_rt,
+          output =
+            "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_fil_ms1_pos,
+      command = {
+        benchmark_ann_fil_ms1_pos <- filter_annotations(
+          annotations = list(
+            benchmark_ann_ms1_pre_pos[[1]]
+          ),
+          features = benchmark_pre_meta_pos,
+          rts = lib_rt,
+          output = "data/interim/benchmark/benchmark_ann_ms1_fil_pos.tsv.gz",
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
+          parameters = benchmark_def_fil_ann
+        )
+      }
+    ),
+    tar_target(
       name = benchmark_def_wei_ann,
       command = {
         benchmark_def_wei_ann <- parse_yaml_params(
@@ -2477,7 +2580,7 @@ list(
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,
           force = benchmark_def_wei_ann$options$force,
-          parameters = def_wei_ann
+          parameters = benchmark_def_wei_ann
         )
       }
     ),
@@ -2509,10 +2612,11 @@ list(
     #         what = weight_annotations,
     #         args = c(benchmark_wei_par,
     #           benchmark_files_pos,
-    #           annotations = benchmark_ann_ms1_pre_pos[[1]],
-    #           weight_spectral = def_wei_ann$weights$global$spectral,
-    #           weight_chemical = def_wei_ann$weights$global$chemical,
-    #           weight_biological = def_wei_ann$weights$global$biological,
+    #           annotations = benchmark_ann_fil_ms1_pos,
+    #           weight_spectral = benchmark_def_wei_ann$weights$global$spectral,
+    #           weight_chemical = benchmark_def_wei_ann$weights$global$chemical,
+    #           weight_biological =
+    # benchmark_def_wei_ann$weights$global$biological,
     #           ms1_only = TRUE,
     #           output = "benchmark_lotus_ms1_pos.tsv.gz"
     #         )
@@ -2528,7 +2632,7 @@ list(
             args = c(
               benchmark_wei_par,
               benchmark_files_pos,
-              annotations = benchmark_ann_spe_is_pre_pos,
+              annotations = benchmark_ann_fil_spe_pos,
               weight_spectral = 0.333,
               weight_chemical = 0,
               weight_biological = 0.666,
@@ -2545,14 +2649,9 @@ list(
           do.call(
             what = weight_annotations,
             args = c(
-              benchmark_wei_par |>
-                append(list(
-                  annotations = list(
-                    benchmark_ann_spe_is_pre_pos,
-                    benchmark_ann_ms1_pre_pos[[1]]
-                  )
-                )),
+              benchmark_wei_par,
               benchmark_files_pos,
+              annotations = benchmark_ann_fil_spe_ms1_pos,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0,
@@ -2571,7 +2670,7 @@ list(
             args = c(
               benchmark_wei_par,
               benchmark_files_pos,
-              annotations = benchmark_ann_spe_is_pre_pos,
+              annotations = benchmark_ann_fil_spe_pos,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
@@ -2588,14 +2687,9 @@ list(
           do.call(
             what = weight_annotations,
             args = c(
-              benchmark_wei_par |>
-                append(list(
-                  annotations = list(
-                    benchmark_ann_spe_is_pre_pos,
-                    benchmark_ann_ms1_pre_pos[[1]]
-                  )
-                )),
+              benchmark_wei_par,
               benchmark_files_pos,
+              annotations = benchmark_ann_fil_spe_ms1_pos,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
@@ -2613,11 +2707,12 @@ list(
     #         what = weight_annotations,
     #         args = c(benchmark_wei_par,
     #           benchmark_files_neg,
-    #           annotations = benchmark_ann_ms1_pre_neg[[1]],
+    #           annotations = benchmark_ann_fil_ms1_neg,
     #           ms1_only = TRUE,
-    #           weight_spectral = def_wei_ann$weights$global$spectral,
-    #           weight_chemical = def_wei_ann$weights$global$chemical,
-    #           weight_biological = def_wei_ann$weights$global$biological,
+    #           weight_spectral = benchmark_def_wei_ann$weights$global$spectral,
+    #           weight_chemical = benchmark_def_wei_ann$weights$global$chemical,
+    #           weight_biological =
+    # benchmark_def_wei_ann$weights$global$biological,
     #           output = "benchmark_lotus_ms1_neg.tsv.gz"
     #         )
     #       )
@@ -2632,7 +2727,7 @@ list(
             args = c(
               benchmark_wei_par,
               benchmark_files_neg,
-              annotations = benchmark_ann_spe_is_pre_neg,
+              annotations = benchmark_ann_fil_spe_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0,
@@ -2649,14 +2744,9 @@ list(
           do.call(
             what = weight_annotations,
             args = c(
-              benchmark_wei_par |>
-                append(list(
-                  annotations = list(
-                    benchmark_ann_spe_is_pre_neg,
-                    benchmark_ann_ms1_pre_neg[[1]]
-                  )
-                )),
+              benchmark_wei_par,
               benchmark_files_neg,
+              annotations = benchmark_ann_fil_spe_ms1_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0,
@@ -2675,7 +2765,7 @@ list(
             args = c(
               benchmark_wei_par,
               benchmark_files_neg,
-              annotations = benchmark_ann_spe_is_pre_neg,
+              annotations = benchmark_ann_fil_spe_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
@@ -2692,14 +2782,9 @@ list(
           do.call(
             what = weight_annotations,
             args = c(
-              benchmark_wei_par |>
-                append(list(
-                  annotations = list(
-                    benchmark_ann_spe_is_pre_neg,
-                    benchmark_ann_ms1_pre_neg[[1]]
-                  )
-                )),
+              benchmark_wei_par,
               benchmark_files_neg,
+              annotations = benchmark_ann_fil_spe_ms1_neg,
               ms1_only = FALSE,
               weight_spectral = 0.333,
               weight_chemical = 0.166,
