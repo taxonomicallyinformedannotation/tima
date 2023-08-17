@@ -280,29 +280,57 @@ testthat::test_that("Whole process", {
   step <- "annotate_masses"
   params <- get_params(step = step)
   ### Negative
-  annotate_masses(ms_mode = "neg")
+  annotate_masses(
+    ## shallow tolerance to speed up tests
+    tolerance_ppm = 1,
+    tolerance_rt = 0.01,
+    ms_mode = "neg"
+    )
   ### Positive
-  annotate_masses(ms_mode = "pos")
+  annotate_masses(
+    ## shallow tolerance to speed up tests
+    tolerance_ppm = 1,
+    tolerance_rt = 0.01,
+    ms_mode = "pos"
+    )
 
   ## Performing MS2 annotation
   step <- "annotate_spectra"
   params <- get_params(step = step)
   ### Negative
   annotate_spectra(
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001,
     polarity = "neg"
   )
   ### Appox
-  annotate_spectra(approx = TRUE)
+  annotate_spectra(
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001,
+    approx = TRUE)
   ### Positive
-  annotate_spectra()
+  annotate_spectra(
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001
+  )
 
   ## Create MS2 based edges
   step <- "create_edges_spectra"
   params <- get_params(step = step)
-  create_edges_spectra()
+  create_edges_spectra(
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001
+  )
   ## if MS1 only
   create_edges_spectra(
-    input = "data/source/example_spectra_ms1.mgf"
+    input = "data/source/example_spectra_ms1.mgf",
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001
   )
 
   ### GNPS results
