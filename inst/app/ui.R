@@ -236,10 +236,10 @@ ui <- fluidPage(
         sliderInput(
           inputId = "ann_ms2_thr_sim",
           label = "Minimal similarity score",
-          min = 0.05,
+          min = 0,
           max = 1,
           step = 0.05,
-          value = 0.2,
+          value = 0.1,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -284,8 +284,7 @@ ui <- fluidPage(
           label = "Intensity threshold for MS2",
           min = 0,
           max = 1E4,
-          value = 50,
-          step = 10,
+          value = 5,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -300,7 +299,7 @@ ui <- fluidPage(
           label = "Relative mass tolerance for MS1 in ppm",
           min = 0.1,
           max = 20,
-          value = 5,
+          value = 10,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -324,7 +323,7 @@ ui <- fluidPage(
           label = "Relative mass tolerance for MS2 in ppm",
           min = 0.1,
           max = 20,
-          value = 5,
+          value = 10,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
