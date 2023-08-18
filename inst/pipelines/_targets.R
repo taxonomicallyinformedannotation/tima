@@ -1274,18 +1274,16 @@ list(
       command = {
         lib_rt <- prepare_libraries_rt(
           ## TODO refactor to avoid "pos/neg"
-          mgf_exp = list( # "neg" = lib_spe_exp_int_pre_neg,
-            # "pos" = lib_spe_exp_int_pre_pos
-            "neg" = NULL,
-            "pos" = NULL
+          mgf_exp = list(
+            "neg" = par_pre_lib_rt$files$libraries$spectral$exp$neg,
+            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
           ),
-          mgf_is = list( # "neg" = lib_spe_is_lot_pre_neg,
-            # "pos" = lib_spe_is_lot_pre_pos
-            "neg" = NULL,
-            "pos" = NULL
+          mgf_is = list(
+            "neg" = par_pre_lib_rt$files$libraries$spectral$is$neg,
+            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
           ),
-          temp_exp = NULL,
-          temp_is = NULL,
+          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
+          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
           output = par_pre_lib_rt$files$libraries$temporal$prepared,
           library = lib_mer_key,
           col_ik = par_pre_lib_rt$names$mgf$inchikey,
