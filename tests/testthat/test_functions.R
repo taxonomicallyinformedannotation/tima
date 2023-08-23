@@ -285,14 +285,14 @@ testthat::test_that("Whole process", {
     tolerance_ppm = 1,
     tolerance_rt = 0.01,
     ms_mode = "neg"
-    )
+  )
   ### Positive
   annotate_masses(
     ## shallow tolerance to speed up tests
     tolerance_ppm = 1,
     tolerance_rt = 0.01,
     ms_mode = "pos"
-    )
+  )
 
   ## Performing MS2 annotation
   step <- "annotate_spectra"
@@ -309,7 +309,8 @@ testthat::test_that("Whole process", {
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
-    approx = TRUE)
+    approx = TRUE
+  )
   ### Positive
   annotate_spectra(
     ## shallow tolerance to speed up tests

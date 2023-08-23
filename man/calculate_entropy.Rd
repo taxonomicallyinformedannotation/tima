@@ -14,20 +14,24 @@ calculate_entropy(
 )
 }
 \arguments{
-\item{index}{Index}
+\item{index}{Index of the first spectrum}
 
-\item{target}{Target}
+\item{target}{Index of the second spectrum}
 
-\item{frags}{Fragments}
+\item{frags}{List of fragments}
 
 \item{ms2_tolerance}{MS2 tolerance}
 
 \item{ppm_tolerance}{ppm tolerance}
 
-\item{threshold}{Threshold}
+\item{threshold}{Threshold value for the score}
+}
+\value{
+A list containing the calculated entropy similarity values
+or NULL if the score is below the threshold
 }
 \description{
-This function is part of the creation of edges
+This function calculates entropy similarity between two spectra
 }
 \examples{
 NULL

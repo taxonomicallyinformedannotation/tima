@@ -31,17 +31,18 @@ create_edges <- function(index,
                          ms2_tolerance,
                          ppm_tolerance,
                          threshold) {
-  # Calculate the similarity using lapply
-  inner_list <- lapply(X = (index + 1):nspecs, FUN = function(target) {
-    calculate_entropy(
-      index,
-      target,
-      frags,
-      ms2_tolerance,
-      ppm_tolerance,
-      threshold
-    )
-  }) |>
+  # Calculate the similarity using tidytable::lapply
+  inner_list <- (index + 1):nspecs |>
+    lapply(function(target) {
+      calculate_entropy(
+        index,
+        target,
+        frags,
+        ms2_tolerance,
+        ppm_tolerance,
+        threshold
+      )
+    }) |>
     dplyr::bind_rows()
 
   return(inner_list)

@@ -3,9 +3,9 @@
 #' @description This function collapses a grouped dataframe and trims it
 #'
 #' @param grouped_df Grouped dataframe
-#' @param cols Column to apply collapse to
+#' @param cols Column(s) to apply collapse to
 #'
-#' @return NULL
+#' @return Cleaned and collapsed dataframe
 #'
 #' @export
 #'
