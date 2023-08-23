@@ -48,12 +48,10 @@ taxize_spectra_benchmark <-
         ))
     set.seed(42)
     features_sampled <- features_pretaxed |>
-      dplyr::filter(!is.na(organism_name)) |>
-      dplyr::group_by(feature_id) |>
-      dplyr::sample_n(1) |>
-      dplyr::ungroup() |>
-      dplyr::bind_rows(features_pretaxed |>
-        dplyr::filter(is.na(organism_name)))
+      tidytable::filter(!is.na(organism_name)) |>
+      tidytable::slice_sample(n = 1, .by = feature_id) |>
+      tidytable::bind_rows(features_pretaxed |>
+        tidytable::filter(is.na(organism_name)))
 
     features_taxed <- features_sampled |>
       tidytable::left_join(taxo |>
