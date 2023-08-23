@@ -30,7 +30,7 @@ Imports:
     stats,
     stringi (>= 1.7.12),
     tidytable (>= 0.10.1),
-    tidyft (>= 0.5.7),
+    tidyfst (>= 1.7.7),
     utils,
     yaml (>= 2.3.7)
 Suggests: 
