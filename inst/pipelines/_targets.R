@@ -2306,7 +2306,7 @@ list(
       command = {
         benchmark_com_pre_pos <- prepare_features_components(
           input = benchmark_com_pos,
-          output = params$files$networks$spectral$components$prepared,
+          output = "data/interim/benchmark/benchmark_com_pre_pos.tsv.gz",
           parameters = benchmark_def_pre_fea_com
         )
       }
@@ -2316,7 +2316,7 @@ list(
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
-          output = params$files$networks$spectral$components$prepared,
+          output =  "data/interim/benchmark/benchmark_com_pre_neg.tsv.gz",
           parameters = benchmark_def_pre_fea_com
         )
       }
@@ -2422,7 +2422,7 @@ list(
             benchmark_ann_spe_is_pre_neg
           ),
           features = benchmark_pre_meta_neg,
-          rts = lib_rt,
+          rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_neg.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
           parameters = benchmark_def_fil_ann
@@ -2438,7 +2438,7 @@ list(
             benchmark_ann_ms1_pre_neg[[1]]
           ),
           features = benchmark_pre_meta_neg,
-          rts = lib_rt,
+          rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
@@ -2454,7 +2454,7 @@ list(
             benchmark_ann_ms1_pre_neg[[1]]
           ),
           features = benchmark_pre_meta_neg,
-          rts = lib_rt,
+          rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_neg.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
           parameters = benchmark_def_fil_ann
@@ -2469,7 +2469,7 @@ list(
             benchmark_ann_spe_is_pre_pos
           ),
           features = benchmark_pre_meta_pos,
-          rts = lib_rt,
+          rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_pos.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
           parameters = benchmark_def_fil_ann
@@ -2485,7 +2485,7 @@ list(
             benchmark_ann_ms1_pre_pos[[1]]
           ),
           features = benchmark_pre_meta_pos,
-          rts = lib_rt,
+          rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
@@ -2501,7 +2501,7 @@ list(
             benchmark_ann_ms1_pre_pos[[1]]
           ),
           features = benchmark_pre_meta_pos,
-          rts = lib_rt,
+          rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_pos.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
           parameters = benchmark_def_fil_ann
