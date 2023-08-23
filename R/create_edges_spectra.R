@@ -80,7 +80,6 @@ create_edges_spectra <- function(
         ppm_tolerance = ppm,
         threshold = threshold
       ) |>
-      tidytable::as_tidytable() |>
       tidytable::bind_rows()
 
     edges <- edges |>
