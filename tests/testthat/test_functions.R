@@ -411,6 +411,8 @@ testthat::test_that("Whole process", {
   ## Filter annotations
   step <- "filter_annotations"
   params <- get_params(step = step)
+  ## case when no RT lib
+  filter_annotations(rts = list())
   filter_annotations()
 
   ## Perform TIMA

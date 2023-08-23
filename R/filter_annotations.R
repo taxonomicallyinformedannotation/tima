@@ -44,6 +44,10 @@ filter_annotations <-
     paths <<- parse_yaml_paths()
     params <<- parameters
 
+    if (length(rts) == 0) {
+      rts <- NULL
+    }
+
     log_debug(x = "... features")
     features_table <- tidytable::fread(
       file = features,
@@ -59,39 +63,49 @@ filter_annotations <-
     ) |>
       tidytable::bind_rows()
     log_debug(x = "... retention times")
-    rt_table <- lapply(
-      X = rts,
-      FUN = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ) |>
-      tidytable::bind_rows() |>
-      tidytable::rename(rt_target = rt)
+    if (!is.null(rts)) {
+      rt_table <- lapply(
+        X = rts,
+        FUN = tidytable::fread,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+        tidytable::bind_rows() |>
+        tidytable::rename(rt_target = rt)
+    }
 
-    log_debug(
-      "Filtering annotations outside of",
-      tolerance_rt * 3,
-      "minutes tolerance"
-    )
-    features_annotated_table <- features_table |>
-      tidytable::left_join(annotation_table) |>
-      tidytable::left_join(rt_table) |>
-      tidytable::mutate(
-        error_rt = as.numeric(rt) -
-          as.numeric(rt_target)
-      ) |>
-      tidytable::arrange(abs(error_rt)) |>
-      tidytable::distinct(-error_rt, -rt_target,
-        .keep_all = TRUE
-      ) |>
-      ## TODO adapt for types and improve the * 3
-      tidytable::filter(abs(error_rt) <= abs(tolerance_rt * 3) |
-        is.na(error_rt)) |>
-      tidytable::select(-rt_target, -type)
+    features_annotated_table_1 <- features_table |>
+      tidytable::left_join(annotation_table)
+
+    if (!is.null(rts)) {
+      log_debug(
+        "Filtering annotations outside of",
+        tolerance_rt * 3,
+        "minutes tolerance"
+      )
+      features_annotated_table_2 <- features_annotated_table_1 |>
+        tidytable::left_join(rt_table) |>
+        tidytable::mutate(
+          error_rt = as.numeric(rt) -
+            as.numeric(rt_target)
+        ) |>
+        tidytable::arrange(abs(error_rt)) |>
+        tidytable::distinct(-error_rt, -rt_target,
+          .keep_all = TRUE
+        ) |>
+        ## TODO adapt for types and improve the * 3
+        tidytable::filter(abs(error_rt) <= abs(tolerance_rt * 3) |
+          is.na(error_rt)) |>
+        tidytable::select(-rt_target, -type)
+    } else {
+      log_debug("No RT library provided, not filtering anything")
+      features_annotated_table_2 <- features_annotated_table_1 |>
+        tidytable::mutate(error_rt = NA)
+    }
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
-      tidytable::left_join(features_annotated_table)
+      tidytable::left_join(features_annotated_table_2)
 
     export_params(step = "filter_annotations")
     export_output(
