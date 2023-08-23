@@ -1111,7 +1111,7 @@ ui <- fluidPage(
         checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
-          value = TRUE
+          value = FALSE
         ) |>
           shinyhelper::helper(
             type = "inline",
