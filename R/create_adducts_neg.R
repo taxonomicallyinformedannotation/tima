@@ -35,8 +35,7 @@ create_adducts_neg <- function(masses_table = get("masses_table",
                                )) {
   ## Calculate the masses for various negative adducts
   adducts_neg <- masses_table |>
-    tidytable::tidytable() |>
-    dplyr::mutate(
+    tidytable::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
       `[1M-(H)2]2-` = (exact_mass - 2 * proton) / 2,
       `[1M-(H)1]1-` = exact_mass - proton,
@@ -67,3 +66,6 @@ create_adducts_neg <- function(masses_table = get("masses_table",
 
   return(adducts_neg)
 }
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE

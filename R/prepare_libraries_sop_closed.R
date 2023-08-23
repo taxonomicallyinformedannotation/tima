@@ -56,12 +56,13 @@ prepare_libraries_sop_closed <-
       log_debug(x = "Loading closed resources")
       closed <- input |>
         tidytable::fread(
-          na.strings = c("", "NA")
+          na.strings = c("", "NA"),
+          colClasses = "character"
         )
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        tidyft::mutate(
+        tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = structure_inchikey,
             from = 1,
@@ -69,7 +70,7 @@ prepare_libraries_sop_closed <-
           )
         ) |>
         tidytable::rename(structure_name = structure_nameTraditional) |>
-        tidyft::mutate(reference_doi = NA) |>
+        tidytable::mutate(reference_doi = NA) |>
         select_sop_columns() |>
         round_reals() |>
         tidytable::distinct()

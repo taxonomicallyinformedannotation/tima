@@ -85,10 +85,11 @@ prepare_annotations_gnps <-
       table <- lapply(
         X = input,
         FUN = tidytable::fread,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
         tidytable::bind_rows() |>
-        dplyr::mutate(error_mz = as.numeric(MZErrorPPM) *
+        tidytable::mutate(error_mz = as.numeric(MZErrorPPM) *
           1E-6 *
           as.numeric(Precursor_MZ)) |>
         tidytable::select(
@@ -111,7 +112,7 @@ prepare_annotations_gnps <-
           structure_taxonomy_classyfire_03class = class,
           structure_taxonomy_classyfire_04directparent = subclass
         ) |>
-        dplyr::mutate(
+        tidytable::mutate(
           error_rt = NA,
           structure_smiles_2D = NA,
           structure_molecular_formula = structure_inchi |>

@@ -129,13 +129,21 @@ annotate_masses <-
 
     features_table <- tidytable::fread(
       file = features,
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     )
 
     neutral_losses <-
       tidytable::fread(
         file = neutral_losses_list,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("mass"),
+          .fns = as.numeric
+        )
       )
 
     log_debug("... single charge adducts table")
@@ -147,14 +155,28 @@ annotate_masses <-
 
     adducts_table <- tidytable::fread(
       file = adduct_file,
-      na.strings = c("", "NA")
-    )
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("adduct_mass"),
+          .fns = as.numeric
+        )
+      )
 
     log_debug("... adducts masses for in source dimers and multicharged")
     adducts_mass_table <-
       tidytable::fread(
         file = adducts_masses_list,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("mass"),
+          .fns = as.numeric
+        )
       )
 
     log_debug("... neutral lossses")
@@ -193,7 +215,8 @@ annotate_masses <-
     structure_exact_mass_table <-
       tidytable::fread(
         file = adduct_db_file,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )
 
     adducts <- unlist(adducts_list[[ms_mode]])
@@ -202,54 +225,76 @@ annotate_masses <-
     structure_organism_pairs_table <-
       tidytable::fread(
         file = library,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
       tidytable::left_join(tidytable::fread(
         file = str_2d_3d,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )) |>
       tidytable::left_join(tidytable::fread(
         file = str_met,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )) |>
       tidytable::left_join(tidytable::fread(
         file = str_nam,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )) |>
       tidytable::left_join(tidytable::fread(
         file = str_tax_cla,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )) |>
       tidytable::left_join(tidytable::fread(
         file = str_tax_npc,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       )) |>
-      tidyft::filter(!is.na(structure_exact_mass)) |>
+      tidytable::filter(!is.na(structure_exact_mass)) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("structure_exact_mass"),
+          .fns = as.numeric
+        )
+      ) |>
       round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
     df2 <- structure_exact_mass_table |>
-      tidyft::filter(!is.na(exact_mass)) |>
-      dplyr::filter(adduct %in% adducts) |>
-      dplyr::mutate(
+      tidytable::filter(!is.na(exact_mass)) |>
+      tidytable::filter(adduct %in% adducts) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("adduct_mass", "exact_mass"),
+          .fns = as.numeric
+        )
+      ) |>
+      tidytable::mutate(
         value_min = adduct_mass - (1E-6 * tolerance_ppm * adduct_mass),
         value_max = adduct_mass + (1E-6 * tolerance_ppm * adduct_mass)
       ) |>
-      tidyft::filter(!is.na(value_min)) |>
-      tidyft::filter(value_min > 0)
+      tidytable::filter(!is.na(value_min)) |>
+      tidytable::filter(value_min > 0)
 
     df3 <- features_table |>
-      tidyft::mutate_vars(
-        .cols = c("mz"),
-        .func = as.numeric
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("mz"),
+          .fns = as.numeric
+        )
       ) |>
       tidytable::distinct(feature_id, .keep_all = TRUE)
 
     if (any(names(features_table) == "rt")) {
       df3 <- df3 |>
-        tidyft::mutate_vars(
-          .cols = c("rt"),
-          .func = as.numeric
+        tidytable::mutate(
+          tidytable::across(
+            .cols = c("rt"),
+            .fns = as.numeric
+          )
         )
     } else {
       df3[, "rt"] <- df3[, "feature_id"]
@@ -257,11 +302,7 @@ annotate_masses <-
 
     log_debug("adding rt tolerance ... \n")
     df4 <- df3 |>
-      tidyft::mutate_vars(
-        .cols = c("rt"),
-        .func = as.numeric
-      ) |>
-      dplyr::mutate(
+      tidytable::mutate(
         rt_min = as.numeric(rt - tolerance_rt),
         rt_max = as.numeric(rt + tolerance_rt)
       )
@@ -286,10 +327,10 @@ annotate_masses <-
         feature_id_dest,
         mz_dest
       ) |>
-      tidyft::filter(feature_id != feature_id_dest) |>
+      tidytable::filter(feature_id != feature_id_dest) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
-      tidyft::filter(mz >= mz_dest) |>
-      dplyr::mutate(
+      tidytable::filter(mz >= mz_dest) |>
+      tidytable::mutate(
         delta_min = ifelse(
           test = mz >= mz_dest,
           yes = abs(mz -
@@ -330,7 +371,7 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      tidyft::filter(!is.na(loss)) |>
+      tidytable::filter(!is.na(loss)) |>
       tidytable::distinct(
         feature_id,
         loss,
@@ -349,12 +390,14 @@ annotate_masses <-
           delta_max >= Distance
         )
       ) |>
-      tidyft::filter(!is.na(Group1)) |>
-      tidyft::mutate_vars(
-        .cols = c("rt"),
-        .func = as.character
+      tidytable::filter(!is.na(Group1)) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("rt"),
+          .fns = as.character
+        )
       ) |>
-      tidyft::mutate(
+      tidytable::mutate(
         label = as.character(Group1),
         label_dest = as.character(Group2)
       ) |>
@@ -384,7 +427,7 @@ annotate_masses <-
     ## Always considering [1M+H]+ and [1M-H]- ions by default
     df9_ion <- df3 |>
       tidytable::distinct(feature_id) |>
-      dplyr::mutate(label = switch(ms_mode,
+      tidytable::mutate(label = switch(ms_mode,
         "pos" = "[1M+(H)1]1+",
         "neg" = "[1M-(H)1]1-"
       ))
@@ -397,20 +440,20 @@ annotate_masses <-
       tidytable::distinct()
 
     log_debug("joining with initial results (adducts) \n")
-    df10 <- tidytable::left_join(
-      df3 |>
-        tidytable::distinct(
-          feature_id,
-          rt,
-          mz
-        ),
-      df9_c
-    ) |>
-      dplyr::mutate(score_input = 0)
+    df10 <- df3 |>
+      tidytable::distinct(
+        feature_id,
+        rt,
+        mz
+      ) |>
+      tidytable::left_join(
+        df9_c
+      ) |>
+      tidytable::mutate(score_input = 0)
 
     log_debug("joining with initial results (neutral losses) \n")
     df10_a <- tidytable::left_join(df10, df9_e) |>
-      dplyr::mutate(mz_1 = ifelse(
+      tidytable::mutate(mz_1 = ifelse(
         test = !is.na(loss),
         yes = mz + mass,
         no = mz
@@ -424,7 +467,7 @@ annotate_masses <-
           mz_1 <= value_max
         )
       ) |>
-      dplyr::mutate(error_mz = adduct_mass - mz_1) |>
+      tidytable::mutate(error_mz = adduct_mass - mz_1) |>
       tidytable::select(
         feature_id,
         rt,
@@ -436,13 +479,13 @@ annotate_masses <-
         adduct_mass,
         loss
       ) |>
-      dplyr::mutate(library = ifelse(
+      tidytable::mutate(library = ifelse(
         test = !is.na(loss),
         yes = paste0(adduct, " - ", loss),
         no = adduct
       )) |>
       tidytable::distinct() |>
-      tidyft::filter(!is.na(library))
+      tidytable::filter(!is.na(library))
 
     log_debug("cleaning results \n")
     df12 <- df11 |>
@@ -455,17 +498,15 @@ annotate_masses <-
         error_mz,
         exact_mass
       ) |>
-      tidyft::filter(!is.na(exact_mass))
+      tidytable::filter(!is.na(exact_mass))
 
     log_debug("keeping unique adducts per exact mass \n")
     df13 <- structure_organism_pairs_table |>
-      tidyft::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_exact_mass,
         structure_molecular_formula
       )
     df13_b <- structure_organism_pairs_table |>
-      tidyft::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(
         structure_name,
         structure_inchikey_2D,
@@ -482,7 +523,12 @@ annotate_masses <-
         structure_xlogp,
         .keep_all = TRUE
       ) |>
-      tidyft::mutate_vars(is.numeric, .func = as.character)
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::where(is.numeric),
+          .fns = as.character
+        )
+      )
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
@@ -514,7 +560,7 @@ annotate_masses <-
         tidytable::everything(),
         -exact_mass
       ) |>
-      dplyr::filter(library %ni% forbidden_adducts) |>
+      tidytable::filter(library %ni% forbidden_adducts) |>
       tidytable::distinct()
 
     log_debug("adding adduct mass to get back to [1M] \n")
@@ -528,7 +574,7 @@ annotate_masses <-
         feature_id,
         adduct_mass
       ) |>
-      tidyft::filter(!is.na(adduct_mass))
+      tidytable::filter(!is.na(adduct_mass))
 
     log_debug("keeping ions for exploration starting from [1M] \n")
     df16 <- tidytable::inner_join(df3, df15)
@@ -543,7 +589,7 @@ annotate_masses <-
           adduct_mass
         ) |>
         tidytable::rowwise() |>
-        dplyr::mutate(
+        tidytable::mutate(
           `[1M+(H)3]3+` = (mz - adduct_mass + 3 * add_m["H (proton)"]) / 3,
           `[1M+(H)2(Na)1]3+` = (mz - adduct_mass +
             2 * add_m["H (proton)"] +
@@ -617,7 +663,7 @@ annotate_masses <-
           adduct_mass
         ) |>
         tidytable::rowwise() |>
-        dplyr::mutate(
+        tidytable::mutate(
           `[1M-(H)3]3-` = (mz + adduct_mass -
             3 * add_m["H (proton)"]) / 3,
           `[1M-(H)2]2-` = (mz + adduct_mass -
@@ -641,7 +687,7 @@ annotate_masses <-
     }
 
     df17 <- df17 |>
-      dplyr::mutate(
+      tidytable::mutate(
         mz_min = value - (1E-6 * tolerance_ppm * value),
         mz_max = value + (1E-6 * tolerance_ppm * value),
         rt_min = rt - tolerance_rt,
@@ -656,12 +702,12 @@ annotate_masses <-
           rt_max >= rt
         )
       ) |>
-      tidytable::tidytable() |>
-      dplyr::mutate(
+      tidytable::as_tidytable() |>
+      tidytable::mutate(
         delta_min = mz.x - mz_max,
         delta_max = mz.x - mz_min
       ) |>
-      dplyr::filter(delta_max > min(neutral_losses$mass) |
+      tidytable::filter(delta_max > min(neutral_losses$mass) |
         (mz.x >= mz_min & mz.x <= mz_max))
 
     df20_a <- df20 |>
@@ -671,10 +717,10 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      tidyft::filter(!is.na(loss) |
+      tidytable::filter(!is.na(loss) |
         (mz.x >= mz_min &
           mz.x <= mz_max)) |>
-      tidyft::mutate(name = ifelse(
+      tidytable::mutate(name = ifelse(
         test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
         no = name
@@ -697,11 +743,12 @@ annotate_masses <-
           adduct_value <= value_max
         )
       ) |>
-      dplyr::filter(stringi::stri_detect_fixed(
+      tidytable::as_tidytable() |>
+      tidytable::filter(stringi::stri_detect_fixed(
         pattern = paste(adduct, "", sep = " "),
         str = library_name
       )) |>
-      dplyr::mutate(error_mz = adduct_mass - adduct_value) |>
+      tidytable::mutate(error_mz = adduct_mass - adduct_value) |>
       tidytable::distinct(
         feature_id,
         rt,
@@ -717,7 +764,7 @@ annotate_masses <-
         df13,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
-      dplyr::mutate(score_input = 0) |>
+      tidytable::mutate(score_input = 0) |>
       tidytable::select(
         structure_molecular_formula,
         library = library_name,
@@ -725,8 +772,8 @@ annotate_masses <-
         -exact_mass,
         -adduct_value
       ) |>
-      dplyr::filter(library %ni% forbidden_adducts) |>
-      dplyr::mutate(library = as.character(library)) |>
+      tidytable::filter(library %ni% forbidden_adducts) |>
+      tidytable::mutate(library = as.character(library)) |>
       tidytable::distinct()
 
     log_debug("joining single adducts, neutral losses, and multicharged \n")
@@ -735,7 +782,7 @@ annotate_masses <-
       df22
     ) |>
       tidytable::left_join(df13_b) |>
-      tidyft::filter(!is.na(structure_inchikey_2D)) |>
+      tidytable::filter(!is.na(structure_inchikey_2D)) |>
       tidytable::distinct(
         feature_id,
         error_mz,
@@ -767,11 +814,13 @@ annotate_masses <-
           structure_taxonomy_classyfire_04directparent
         )
     ) |>
-      tidyft::mutate_vars(
-        is.character,
-        .func = function(x) {
-          tidytable::na_if(x, "")
-        }
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::where(is.character),
+          .fns = function(x) {
+            tidytable::na_if(x, "")
+          }
+        )
       )
 
     df25 |>
@@ -779,14 +828,14 @@ annotate_masses <-
 
     edges <- tidytable::bind_rows(
       df9 |>
-        dplyr::mutate(label = paste0(label, " _ ", label_dest)) |>
+        tidytable::mutate(label = paste0(label, " _ ", label_dest)) |>
         tidytable::select(
           !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct(),
       df9_d |>
-        dplyr::mutate(label = paste0(loss, " loss")) |>
+        tidytable::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
           !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label

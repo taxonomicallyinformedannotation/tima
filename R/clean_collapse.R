@@ -12,25 +12,36 @@
 #' @examples NULL
 clean_collapse <- function(grouped_df, cols = NA) {
   clean_collapse_df <- grouped_df |>
-    dplyr::reframe(dplyr::across(
+    tidytable::reframe(tidytable::across(
       .cols = ifelse(
         test = is.na(cols),
-        yes = dplyr::everything(),
+        yes = tidytable::everything(),
         no = cols
       ),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
     )) |>
-    tidytable::tidytable() |>
     tidytable::ungroup() |>
-    tidyft::mutate_vars(is.list, .func = as.character) |>
-    tidyft::mutate_vars(is.character, .func = trimws) |>
-    tidyft::mutate_vars(
-      is.character,
-      .func = function(x) {
-        tidytable::na_if(x, "")
-      }
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.list),
+        .fns = as.character
+      )
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = trimws
+      )
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::na_if(x, "")
+        }
+      )
     )
 
   return(clean_collapse_df)

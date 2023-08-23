@@ -85,26 +85,37 @@ select_annotations_columns <- function(df,
       structure_taxonomy_classyfire_03class,
       structure_taxonomy_classyfire_04directparent
     ) |>
-    tidyft::mutate_vars(
-      is.character,
-      .func = function(x) {
-        tidytable::na_if(x, "N/A")
-      }
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::na_if(x, "N/A")
+        }
+      )
     ) |>
-    tidyft::mutate_vars(
-      is.character,
-      .func = function(x) {
-        tidytable::na_if(x, "null")
-      }
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::na_if(x, "null")
+        }
+      )
     ) |>
-    tidyft::mutate_vars(
-      is.character,
-      .func = function(x) {
-        tidytable::na_if(x, "")
-      }
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::na_if(x, "")
+        }
+      )
     ) |>
     round_reals() |>
-    tidyft::mutate_vars(is.numeric, .func = as.character) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.numeric),
+        .fns = as.character
+      )
+    ) |>
     complement_metadata_structures(
       str_2d_3d = str_2d_3d,
       str_met = str_met,

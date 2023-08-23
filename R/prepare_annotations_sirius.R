@@ -107,7 +107,8 @@ prepare_annotations_sirius <-
             input_directory,
             "canopus_compound_summary.tsv"
           ),
-          na.strings = c("", "NA")
+          na.strings = c("", "NA"),
+          colClasses = "character"
         )
 
       formula <-
@@ -116,7 +117,8 @@ prepare_annotations_sirius <-
             input_directory,
             "formula_identifications.tsv"
           ),
-          na.strings = c("", "NA")
+          na.strings = c("", "NA"),
+          colClasses = "character"
         )
 
       formula_adducts <-
@@ -125,7 +127,8 @@ prepare_annotations_sirius <-
             input_directory,
             "formula_identifications_adducts.tsv"
           ),
-          na.strings = c("", "NA")
+          na.strings = c("", "NA"),
+          colClasses = "character"
         )
 
       # compound <-
@@ -133,7 +136,8 @@ prepare_annotations_sirius <-
       #     input_directory,
       #     "compound_identifications.tsv"
       #   ),
-      #         na.strings = c("","NA"))
+      #         na.strings = c("","NA")),
+      #     colClasses = "character"
 
       compound_adducts <-
         tidytable::fread(
@@ -141,7 +145,8 @@ prepare_annotations_sirius <-
             input_directory,
             "compound_identifications_adducts.tsv"
           ),
-          na.strings = c("", "NA")
+          na.strings = c("", "NA"),
+          colClasses = "character"
         )
 
       compound_summary <- lapply(
@@ -171,7 +176,7 @@ prepare_annotations_sirius <-
         tidytable::bind_rows(.id = "feature_id")
 
       canopus_npc_prepared <- canopus |>
-        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidytable::select(tidytable::any_of(
           c(
             "feature_id",
@@ -198,7 +203,7 @@ prepare_annotations_sirius <-
         select_sirius_columns()
 
       compound_adducts_prepared <- compound_adducts |>
-        tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
+        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
         select_sirius_columns()
 
       formula_prepared <- formula |>
@@ -219,7 +224,7 @@ prepare_annotations_sirius <-
         tidytable::left_join(formulas_prepared) |>
         tidytable::left_join(canopus_npc_prepared) |>
         tidytable::distinct() |>
-        tidyft::mutate(
+        tidytable::mutate(
           structure_taxonomy_classyfire_chemontid = NA,
           structure_taxonomy_classyfire_01kingdom = NA,
           ## mirror spectral match

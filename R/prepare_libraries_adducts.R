@@ -49,7 +49,8 @@ prepare_libraries_adducts <-
     masses <- tidytable::fread(
       file = str_met,
       select = "structure_exact_mass",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "numeric"
     ) |>
       tidytable::select(exact_mass = structure_exact_mass) |>
       tidytable::distinct()
@@ -58,14 +59,15 @@ prepare_libraries_adducts <-
     adducts_t <-
       tidytable::fread(
         file = adducts_masses,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
-      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
+      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = ".* \\(",
         replacement = ""
       )) |>
-      tidyft::mutate(adduct = stringi::stri_replace_all_regex(
+      tidytable::mutate(adduct = stringi::stri_replace_all_regex(
         str = adduct,
         pattern = "\\)",
         replacement = ""
@@ -74,12 +76,17 @@ prepare_libraries_adducts <-
     log_debug("Treating adducts table")
     adducts_table <- t(adducts_t) |>
       data.frame() |>
-      tidytable::tidytable()
+      tidytable::as_tidytable()
 
     colnames(adducts_table) <- adducts_table[1, ] |> as.character()
 
     adducts_table <- adducts_table[2, ] |>
-      tidyft::mutate_vars(is.character, .func = as.numeric)
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::where(is.character),
+          .fns = as.numeric
+        )
+      )
 
     masses_table <- cbind(masses, adducts_table, row.names = NULL)
 
@@ -97,9 +104,9 @@ prepare_libraries_adducts <-
       cbind(data.frame(exact_mass = 0), adducts_table)
 
     log_debug("... positive")
-    pure_pos <-
-      create_adducts_pos(masses_table = mass_null) |>
-      tidyft::filter(grepl(
+    pure_pos <- mass_null |>
+      create_adducts_pos() |>
+      tidytable::filter(grepl(
         pattern = "]1+",
         x = adduct,
         fixed = TRUE
@@ -107,9 +114,9 @@ prepare_libraries_adducts <-
       tidytable::select(-exact_mass)
 
     log_debug("... negative")
-    pure_neg <-
-      create_adducts_neg(masses_table = mass_null) |>
-      tidyft::filter(grepl(
+    pure_neg <- mass_null |>
+      create_adducts_neg() |>
+      tidytable::filter(grepl(
         pattern = "]1-",
         x = adduct,
         fixed = TRUE
