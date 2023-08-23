@@ -22,7 +22,7 @@ utils::globalVariables(
 #' @param masses_table Table containing the masses of the adducts
 #' @param adducts_table Table containing the adducts
 #'
-#' @return NULL
+#' @return A tidytable with columns "adduct" and "adduct_mass"
 #'
 #' @export
 #'
@@ -36,9 +36,9 @@ create_adducts_neg <- function(masses_table = get("masses_table",
   ## Calculate the masses for various negative adducts
   adducts_neg <- masses_table |>
     tidytable::tidytable() |>
-    dplyr::mutate(
+    tidytable::mutate(
       `[1M-(H)3]3-` = (exact_mass - 3 * proton) / 3,
-      `[1M-(H)2]2-` = ((exact_mass - 2 * proton) / 2),
+      `[1M-(H)2]2-` = (exact_mass - 2 * proton) / 2,
       `[1M-(H)1]1-` = exact_mass - proton,
       `[1M+(F)1]1-` = exact_mass + fluorine,
       `[1M+(Na)1-(H)2]1-` = exact_mass + sodium - 2 * proton,
@@ -54,16 +54,15 @@ create_adducts_neg <- function(masses_table = get("masses_table",
       `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
       `[3M-(H)1]1-` = 3 * exact_mass - proton
     ) |>
-    tidytable::select(-colnames(adducts_table))
+    tidytable::select(-tidytable::all_of(colnames(adducts_table)))
 
   ## Pivot the adducts_neg table to get a long format
   ## with adduct and adduct mass as columns
-  n <- ncol(adducts_neg)
   adducts_neg <- adducts_neg |>
-    tidytable::pivot_longer(2:tidytable::all_of(n)) |>
-    tidytable::select(tidytable::everything(),
-      adduct = name,
-      adduct_mass = value
+    tidytable::pivot_longer(
+      -exact_mass,
+      names_to = "adduct",
+      values_to = "adduct_mass"
     )
 
   return(adducts_neg)

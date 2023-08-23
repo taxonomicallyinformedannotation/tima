@@ -14,6 +14,9 @@ create_adducts_pos(
 
 \item{adducts_table}{Table containing the adducts}
 }
+\value{
+A tidytable with columns "adduct" and "adduct_mass"
+}
 \description{
 This function creates positive adducts
 }

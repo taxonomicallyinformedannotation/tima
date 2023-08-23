@@ -13,18 +13,22 @@
 create_dir <- function(export) {
   ## Check if the export path includes a file name
   if (grepl(pattern = ".", x = export, fixed = TRUE)) {
-    ## Create the directory at the specified path if it does not exist
-    ifelse(
-      test = !dir.exists(paths = dirname(path = export)),
-      yes = dir.create(path = dirname(path = export), recursive = TRUE),
-      no = paste(dirname(path = export), "exists")
-    )
+    dirname_path <- dirname(export)
+    file_name <- basename(export)
   } else {
-    ## Create the directory at the specified path if it does not exist
-    ifelse(
-      test = !dir.exists(paths = export),
-      yes = dir.create(path = export, recursive = TRUE),
-      no = paste(export, "exists")
-    )
+    dirname_path <- export
+    file_name <- ""
+  }
+
+  ## Create the directory at the specified path if it does not exist
+  if (!dir.exists(dirname_path)) {
+    dir.create(dirname_path, recursive = TRUE)
+    log_debug("Directory", dirname_path, "created.")
+  } else {
+    log_debug("Directory", dirname_path, "already exists.")
+  }
+
+  if (file_name != "") {
+    log_debug("File", file_name, "will be saved in the directory", dirname_path)
   }
 }

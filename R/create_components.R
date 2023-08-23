@@ -29,25 +29,22 @@ create_components <-
     )
     params <<- parameters
 
-    edges <- lapply(
-      X = input,
-      FUN = tidytable::fread,
-      na.strings = c("", "NA")
-    ) |>
+    edges <- input |>
+      lapply(
+        FUN = tidytable::fread,
+        na.strings = c("", "NA")
+      ) |>
       tidytable::bind_rows() |>
       tidytable::select(feature_source, feature_target) |>
       tidytable::distinct()
 
-    g <- igraph::graph.data.frame(
-      d = edges,
-      directed = FALSE
-    )
+    g <- edges |>
+      igraph::graph_from_data_frame(directed = FALSE)
 
-    feature_source <- split(
-      igraph::V(graph = g) |>
-        names(),
-      igraph::components(graph = g)$membership
-    )
+    feature_source <- g |>
+      igraph::V() |>
+      names() |>
+      split(igraph::components(graph = g)$membership)
 
     clusters_ready <- feature_source |>
       rbind() |>
