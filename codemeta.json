@@ -505,23 +505,10 @@
     },
     "18": {
       "@type": "SoftwareApplication",
-      "identifier": "tidyft",
-      "name": "tidyft",
-      "version": ">= 0.5.7",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=tidyft"
-    },
-    "19": {
-      "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
