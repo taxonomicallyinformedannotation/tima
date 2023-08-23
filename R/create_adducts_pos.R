@@ -38,8 +38,7 @@ create_adducts_pos <- function(masses_table = get("masses_table",
                                )) {
   ## Calculate the masses for various positive adducts
   adducts_pos <- masses_table |>
-    tidytable::tidytable() |>
-    dplyr::mutate(
+    tidytable::mutate(
       `[1M+(H)3]3+` = (exact_mass + 3 * proton) / 3,
       `[1M+(H)2(Na)1]3+` = (exact_mass + 2 * proton + sodium) / 3,
       `[1M+(H)1(Na)2]3+` = (exact_mass + proton + 2 * sodium) / 3,
@@ -94,3 +93,6 @@ create_adducts_pos <- function(masses_table = get("masses_table",
 
   return(adducts_pos)
 }
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE

@@ -156,7 +156,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           maximal > val
         )
       ) |>
-        dplyr::distinct(minimal, .keep_all = TRUE)
+        tidytable::distinct(minimal, .keep_all = TRUE)
 
       spectral_library <-
         spectral_library[lib_precursors %in% df_3$lib_precursors]
@@ -265,7 +265,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
         dalton = dalton,
         ppm = ppm
       ) |>
-      tidytable::tidytable()
+      tidytable::as_tidytable()
 
     lib_inchikey <- spectral_library@backend@spectraData$inchikey
     if (is.null(lib_inchikey)) {
@@ -319,7 +319,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     df_final <- df_final |>
       tidytable::rowwise() |>
-      dplyr::mutate(
+      tidytable::mutate(
         error_mz = target_precursorMz - precursorMz,
         structure_inchikey_2D = ifelse(
           test = is.na(target_inchikey_2D),
@@ -357,7 +357,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     log_debug("Filtering results above threshold only...")
     df_final <- df_final |>
-      dplyr::filter(score >= threshold)
+      tidytable::filter(score >= threshold)
 
     log_debug(
       nrow(

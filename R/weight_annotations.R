@@ -158,48 +158,48 @@ weight_annotations <- function(
   annotation_table <- lapply(
     X = annotations,
     FUN = tidytable::fread,
-    colClasses = "character",
-    na.strings = c("", "NA")
+    na.strings = c("", "NA"),
+    colClasses = "character"
   ) |>
     tidytable::bind_rows()
 
   log_debug(x = "... components")
   components_table <- tidytable::fread(
     file = components,
-    colClasses = "character",
-    na.strings = c("", "NA")
+    na.strings = c("", "NA"),
+    colClasses = "character"
   )
 
   log_debug(x = "... edges")
   edges_table <- tidytable::fread(
     file = edges,
-    colClasses = "character",
-    na.strings = c("", "NA")
+    na.strings = c("", "NA"),
+    colClasses = "character"
   )
 
   log_debug(x = "... taxa")
   taxed_features_table <- tidytable::fread(
     file = taxa,
-    colClasses = "character",
-    na.strings = c("", "NA")
+    na.strings = c("", "NA"),
+    colClasses = "character"
   )
 
   log_debug(x = "... structure-organism pairs")
   structure_organism_pairs_table <-
     tidytable::fread(
       file = library,
-      colClasses = "character",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ) |>
     tidytable::left_join(tidytable::fread(
       file = str_2d_3d,
-      colClasses = "character",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     )) |>
     tidytable::left_join(tidytable::fread(
       file = org_tax_ott,
-      colClasses = "character",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ))
 
   log_debug(x = "... features")
@@ -208,7 +208,7 @@ weight_annotations <- function(
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
-      tidyft::filter(score_input == 0)
+      tidytable::filter(score_input == 0)
   }
 
   log_debug(x = "adding biological organism metadata")

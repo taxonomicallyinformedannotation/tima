@@ -16,8 +16,8 @@ decorate_masses <- function(annotation_table_ms1 =
                                 envir = parent.frame()
                               )) {
   df_1 <- annotation_table_ms1 |>
-    tidyft::filter(score_input == 0) |>
-    tidyft::filter(!is.na(structure_inchikey_2D) |
+    tidytable::filter(score_input == 0) |>
+    tidytable::filter(!is.na(structure_inchikey_2D) |
       structure_inchikey_2D != "notAnnotated")
   log_debug(
     "MS1 annotation led to \n",

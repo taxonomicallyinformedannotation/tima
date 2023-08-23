@@ -1900,11 +1900,13 @@ list(
           charge = sp_clean$precursorCharge,
           name = sp_clean$name
         ) |>
-          tidyft::mutate_vars(
-            is.character,
-            .func = function(x) {
-              tidytable::na_if(x, "")
-            }
+          tidytable::mutate(
+            tidytable::across(
+              .cols = tidytable::where(is.character),
+              .funs = function(x) {
+                tidytable::na_if(x, "")
+              }
+            )
           )
 
         log_debug("Framed")

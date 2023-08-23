@@ -80,7 +80,8 @@ create_edges_spectra <- function(
         ppm_tolerance = ppm,
         threshold = threshold
       ) |>
-      dplyr::bind_rows()
+      tidytable::as_tidytable() |>
+      tidytable::bind_rows()
 
     edges <- edges |>
       tidytable::select(
@@ -92,7 +93,7 @@ create_edges_spectra <- function(
     ## TODO find a way to have consistency in spectrum IDs
     idz <- spectra@backend@spectraData$acquisitionNum
     edges <- edges |>
-      dplyr::mutate(
+      tidytable::mutate(
         name_source = idz[name_source],
         name_target = idz[name_target]
       )
@@ -110,7 +111,7 @@ create_edges_spectra <- function(
       ))
 
     edges <- edges |>
-      dplyr::filter(
+      tidytable::filter(
         score >= threshold
       )
   } else {

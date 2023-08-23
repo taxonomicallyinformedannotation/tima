@@ -54,16 +54,16 @@ filter_annotations <-
     annotation_table <- lapply(
       X = annotations,
       FUN = tidytable::fread,
-      colClasses = "character",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ) |>
       tidytable::bind_rows()
     log_debug(x = "... retention times")
     rt_table <- lapply(
       X = rts,
       FUN = tidytable::fread,
-      colClasses = "character",
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ) |>
       tidytable::bind_rows() |>
       tidytable::rename(rt_target = rt)
@@ -76,18 +76,17 @@ filter_annotations <-
     features_annotated_table <- features_table |>
       tidytable::left_join(annotation_table) |>
       tidytable::left_join(rt_table) |>
-      data.frame() |>
-      dplyr::mutate(error_rt = as.numeric(rt) - as.numeric(rt_target)) |>
-      dplyr::arrange(abs(error_rt)) |>
-      tidytable::tidytable() |>
+      tidytable::mutate(
+        error_rt = as.numeric(rt) -
+          as.numeric(rt_target)
+      ) |>
+      tidytable::arrange(abs(error_rt)) |>
       tidytable::distinct(-error_rt, -rt_target,
         .keep_all = TRUE
       ) |>
-      data.frame() |>
       ## TODO adapt for types and improve the * 3
-      dplyr::filter(abs(error_rt) <= abs(tolerance_rt * 3) |
+      tidytable::filter(abs(error_rt) <= abs(tolerance_rt * 3) |
         is.na(error_rt)) |>
-      tidytable::tidytable() |>
       tidytable::select(-rt_target, -type)
 
     ## in case some features had a single filtered annotation

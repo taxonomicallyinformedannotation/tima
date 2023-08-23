@@ -52,12 +52,12 @@ prepare_libraries_sop_ecmdb <-
           filename = file
         )) |>
           data.frame() |>
-          tidytable::tidytable()
+          tidytable::as_tidytable()
       })
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
-        dplyr::mutate(
+        tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
             str = moldb_inchikey,
             from = 1,

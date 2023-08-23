@@ -50,9 +50,9 @@ split_tables_sop <- function(table) {
   log_debug(x = "Splitting the concatenated library into smaller pieces")
 
   table_keys <- table |>
-    tidyft::filter(!is.na(structure_inchikey)) |>
-    tidyft::filter(!is.na(structure_smiles)) |>
-    tidyft::filter(!is.na(organism_name)) |>
+    tidytable::filter(!is.na(structure_inchikey)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
@@ -63,7 +63,7 @@ split_tables_sop <- function(table) {
     tidytable::group_by(structure_inchikey, structure_smiles, organism_name) |>
     tidytable::add_count() |>
     tidytable::ungroup() |>
-    tidyft::filter(!is.na(reference_doi) | n == 1) |>
+    tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
   log_debug(
     x = "Led to",
@@ -72,10 +72,10 @@ split_tables_sop <- function(table) {
   )
 
   table_structures_2d_3d <- table |>
-    tidyft::filter(!is.na(structure_inchikey)) |>
-    tidyft::filter(!is.na(structure_smiles)) |>
-    tidyft::filter(!is.na(structure_inchikey_2D)) |>
-    tidyft::filter(!is.na(structure_smiles_2D)) |>
+    tidytable::filter(!is.na(structure_inchikey)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::filter(!is.na(structure_inchikey_2D)) |>
+    tidytable::filter(!is.na(structure_smiles_2D)) |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
@@ -98,11 +98,11 @@ split_tables_sop <- function(table) {
   )
 
   table_structures_metadata <- table |>
-    tidyft::filter(!is.na(structure_inchikey)) |>
-    tidyft::filter(!is.na(structure_smiles)) |>
-    tidyft::filter(!is.na(structure_molecular_formula)) |>
-    tidyft::filter(!is.na(structure_exact_mass)) |>
-    tidyft::filter(!is.na(structure_xlogp)) |>
+    tidytable::filter(!is.na(structure_inchikey)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::filter(!is.na(structure_molecular_formula)) |>
+    tidytable::filter(!is.na(structure_exact_mass)) |>
+    tidytable::filter(!is.na(structure_xlogp)) |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
@@ -113,24 +113,24 @@ split_tables_sop <- function(table) {
     tidytable::distinct()
 
   table_structures_names <- table |>
-    tidyft::filter(!is.na(structure_inchikey)) |>
-    tidyft::filter(!is.na(structure_smiles)) |>
-    tidyft::filter(!is.na(structure_name)) |>
+    tidytable::filter(!is.na(structure_inchikey)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::filter(!is.na(structure_name)) |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
       structure_name
     ) |>
     tidytable::distinct() |>
-    dplyr::group_by(
+    tidytable::group_by(
       structure_inchikey,
       structure_smiles
     ) |>
-    clean_collapse()
+    clean_collapse(cols = c("structure_name"))
 
   table_structures_taxonomy_npc <- table |>
-    tidyft::filter(!is.na(structure_smiles_2D)) |>
-    dplyr::filter(
+    tidytable::filter(!is.na(structure_smiles_2D)) |>
+    tidytable::filter(
       !is.na(structure_taxonomy_npclassifier_01pathway) |
         !is.na(structure_taxonomy_npclassifier_02superclass) |
         !is.na(structure_taxonomy_npclassifier_03class)
@@ -142,19 +142,24 @@ split_tables_sop <- function(table) {
       structure_taxonomy_npclassifier_03class
     ) |>
     tidytable::distinct() |>
-    dplyr::group_by(structure_smiles_2D) |>
+    tidytable::group_by(structure_smiles_2D) |>
     clean_collapse(cols = c(
       "structure_taxonomy_npclassifier_01pathway",
       "structure_taxonomy_npclassifier_02superclass",
       "structure_taxonomy_npclassifier_03class"
     )) |>
-    tidyft::mutate_vars(is.character, .func = function(x) {
-      tidytable::replace_na(x, "notClassified")
-    })
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::replace_na(x, "notClassified")
+        }
+      )
+    )
 
   table_structures_taxonomy_cla <- table |>
-    tidyft::filter(!is.na(structure_inchikey_2D)) |>
-    tidyft::filter(!is.na(structure_taxonomy_classyfire_chemontid)) |>
+    tidytable::filter(!is.na(structure_inchikey_2D)) |>
+    tidytable::filter(!is.na(structure_taxonomy_classyfire_chemontid)) |>
     tidytable::select(
       structure_inchikey_2D,
       structure_taxonomy_classyfire_chemontid,
@@ -164,20 +169,25 @@ split_tables_sop <- function(table) {
       structure_taxonomy_classyfire_04directparent
     ) |>
     tidytable::distinct() |>
-    tidyft::mutate_vars(is.character, .func = function(x) {
-      tidytable::replace_na(x, "notClassified")
-    })
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::replace_na(x, "notClassified")
+        }
+      )
+    )
 
   table_organisms_names <- table |>
-    tidyft::filter(!is.na(organism_name)) |>
+    tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
   log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
 
   table_org_tax_ott <- table |>
-    tidyft::filter(!is.na(organism_name)) |>
-    tidyft::filter(!is.na(organism_taxonomy_ottid)) |>
+    tidytable::filter(!is.na(organism_name)) |>
+    tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
     tidytable::select(
       organism_name,
       organism_taxonomy_ottid,
@@ -193,9 +203,14 @@ split_tables_sop <- function(table) {
       organism_taxonomy_10varietas
     ) |>
     tidytable::distinct() |>
-    tidyft::mutate_vars(is.character, .func = function(x) {
-      tidytable::replace_na(x, "notClassified")
-    })
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::replace_na(x, "notClassified")
+        }
+      )
+    )
 
   tables <-
     list(

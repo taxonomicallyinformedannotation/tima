@@ -35,7 +35,8 @@ prepare_features_tables <-
     log_debug("Preparing features table")
     features_prepared <- features |>
       tidytable::fread(
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
       tidytable::select(tidytable::all_of(c(
         feature_id = name_features,

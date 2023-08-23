@@ -109,8 +109,6 @@ prepare_libraries_sop_merged <-
     }
 
     tables <- tidytable::bind_rows(libraries) |>
-      data.frame() |>
-      tidytable::tidytable() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -135,10 +133,25 @@ prepare_libraries_sop_merged <-
         table_org_tax_ott |>
         tidytable::bind_rows(
           table_org_tax_ott_full |>
-            tidytable::tidytable() |>
-            tidyft::mutate_vars(is.numeric, .func = as.character) |>
-            tidyft::mutate_vars(is.list, .func = as.character) |>
-            tidyft::mutate_vars(is.logical, .func = as.character)
+            tidytable::as_tidytable() |>
+            tidytable::mutate(
+              tidytable::across(
+                .cols = tidytable::where(is.numeric),
+                .fns = as.character
+              )
+            ) |>
+            tidytable::mutate(
+              tidytable::across(
+                .cols = tidytable::where(is.list),
+                .fns = as.character
+              )
+            ) |>
+            tidytable::mutate(
+              tidytable::across(
+                .cols = tidytable::where(is.logical),
+                .fns = as.character
+              )
+            )
         )
     }
 
@@ -169,7 +182,7 @@ prepare_libraries_sop_merged <-
         tidytable::left_join(table_org_tax_ott)
 
       table_keys <- table_keys |>
-        dplyr::filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys)

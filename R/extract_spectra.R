@@ -24,46 +24,48 @@ extract_spectra <- function(object) {
   peaks <- object |>
     Spectra::peaksData() |>
     data.frame() |>
-    dplyr::group_by(group) |>
-    dplyr::reframe(dplyr::across(
-      .cols = dplyr::everything(),
+    tidytable::as_tidytable() |>
+    tidytable::group_by(group) |>
+    tidytable::reframe(tidytable::across(
+      .cols = tidytable::everything(),
       .fns = list
     ))
 
   ## Extract spectra data and transform it into a data frame
   spectra <- object |>
     Spectra::spectraData() |>
-    data.frame()
+    data.frame() |>
+    tidytable::as_tidytable()
 
   ## Add 'mz' and 'intensity' columns from peaks data
   spectra$mz <- peaks$mz
   spectra$intensity <- peaks$intensity
 
   ## Synonyms issue
-  spectra <- spectra |>
-    dplyr::group_by(dplyr::across(c(-dplyr::any_of("synonym")))) |>
-    dplyr::reframe(dplyr::across(
-      .cols = dplyr::where(is.list),
-      .fns = as.character
-    )) |>
-    dplyr::ungroup()
+  # spectra <- spectra |>
+  # tidytable::group_by(c(-tidytable::any_of("synonym"))) |>
+  # tidytable::reframe(tidytable::across(
+  # .cols = tidytable::where(is.list),
+  # .fns = as.character
+  # )) |>
+  # tidytable::ungroup()
 
   ## Columns types issue
   spectra <- spectra |>
-    dplyr::mutate(dplyr::across(
-      .cols = dplyr::any_of(incoherent_logical),
+    tidytable::mutate(tidytable::across(
+      .cols = tidytable::any_of(incoherent_logical),
       .fns = as.logical
     )) |>
-    dplyr::mutate(dplyr::across(
-      .cols = dplyr::any_of(incoherent_integer),
+    tidytable::mutate(tidytable::across(
+      .cols = tidytable::any_of(incoherent_integer),
       .fns = as.integer
     ))
 
   ## Select all columns except those specified in 'incoherent_colnames',
   ## and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
-    dplyr::select(-c(dplyr::any_of(incoherent_colnames))) |>
-    dplyr::rename(dplyr::any_of(incoherent_colnames))
+    tidytable::select(-c(tidytable::any_of(incoherent_colnames))) |>
+    tidytable::rename(tidytable::any_of(incoherent_colnames))
 
   return(spectra)
 }

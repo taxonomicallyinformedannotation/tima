@@ -32,7 +32,8 @@ create_components <-
     edges <- input |>
       lapply(
         FUN = tidytable::fread,
-        na.strings = c("", "NA")
+        na.strings = c("", "NA"),
+        colClasses = "character"
       ) |>
       tidytable::bind_rows() |>
       tidytable::select(feature_source, feature_target) |>
@@ -56,7 +57,12 @@ create_components <-
         `cluster index` = feature_source,
         componentindex = ComponentIndex
       ) |>
-      tidyft::mutate_vars(is.character, .func = as.numeric) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::where(is.character),
+          .fns = as.numeric
+        )
+      ) |>
       tidytable::arrange(`cluster index`)
 
     log_debug(x = "Exporting ...")

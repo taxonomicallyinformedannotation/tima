@@ -43,13 +43,15 @@ select_sirius_columns <- function(df) {
 #' @examples NULL
 select_sirius_columns_2 <- function(df) {
   df |>
-    tidyft::mutate(feature_id = harmonize_names_sirius(id)) |>
-    tidyft::mutate(
-      structure_exact_mass = ionMass -
-        `massErrorPrecursor(ppm)` *
-          ionMass *
+    tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
+    tidytable::mutate(
+      structure_exact_mass = as.numeric(ionMass) -
+        as.numeric(`massErrorPrecursor(ppm)`) *
+          as.numeric(ionMass) *
           1E-6,
-      error_mz = ionMass * `massErrorPrecursor(ppm)` * 1E-6
+      error_mz = as.numeric(ionMass) *
+        as.numeric(`massErrorPrecursor(ppm)`) *
+        1E-6
     ) |>
     tidytable::distinct(
       feature_id,

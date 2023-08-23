@@ -95,10 +95,10 @@ prepare_libraries_rt <-
           tidytable::bind_rows(
             spectra$neg@backend@spectraData |>
               data.frame() |>
-              tidytable::tidytable(),
+              tidytable::as_tidytable(),
             spectra$pos@backend@spectraData |>
               data.frame() |>
-              tidytable::tidytable()
+              tidytable::as_tidytable()
           ) |>
           tidytable::select(tidytable::any_of(c(
             rt = col_rt,
@@ -128,26 +128,25 @@ prepare_libraries_rt <-
                unit = unit_rt) {
         df_polished <- df |>
           data.frame() |>
-          dplyr::mutate(type = type) |>
-          dplyr::rowwise() |>
-          dplyr::mutate(rt = ifelse(unit == "seconds",
+          tidytable::mutate(type = type) |>
+          tidytable::rowwise() |>
+          tidytable::mutate(rt = ifelse(unit == "seconds",
             yes = rt / 60,
             no = rt
           )) |>
-          dplyr::bind_rows(data.frame(
+          tidytable::bind_rows(data.frame(
             inchikey = NA_character_,
             smiles = NA_character_
           )) |>
-          dplyr::filter(!is.na(as.numeric(rt))) |>
-          dplyr::distinct() |>
-          tidytable::tidytable()
+          tidytable::filter(!is.na(as.numeric(rt))) |>
+          tidytable::distinct()
         return(df_polished)
       }
     complete_df <- function(df, library = keys) {
       log_debug(
         "There are",
         nrow(df |>
-          dplyr::filter(is.na(inchikey))),
+          tidytable::filter(is.na(inchikey))),
         "entries without InChIKey.",
         "We would recommend you adding them but will try completing."
       )
@@ -192,15 +191,16 @@ prepare_libraries_rt <-
 
       df_completed <- df_completed_smiles |>
         tidytable::bind_rows(df_empty_smiles) |>
-        tidyft::mutate_vars(
-          is.character,
-          .func = function(x) {
-            tidytable::na_if(x, "NA")
-          }
+        tidytable::mutate(
+          tidytable::across(
+            .cols = tidytable::where(is.character),
+            .fns = function(x) {
+              tidytable::replace_na(x, "NA")
+            }
+          )
         )
       df_completed <- df_completed |>
-        data.frame() |>
-        dplyr::mutate(
+        tidytable::mutate(
           structure_smiles = smiles,
           structure_inchikey = tidytable::coalesce(
             inchikey,
@@ -208,7 +208,6 @@ prepare_libraries_rt <-
             inchikey.y
           ),
         ) |>
-        tidytable::tidytable() |>
         tidytable::select(
           rt,
           structure_smiles,
@@ -219,7 +218,7 @@ prepare_libraries_rt <-
       log_debug(
         "There were still",
         nrow(df_completed |>
-          dplyr::filter(is.na(
+          tidytable::filter(is.na(
             structure_inchikey
           ))),
         "entries for which no InChIKey could not be found in the end."
@@ -281,23 +280,23 @@ prepare_libraries_rt <-
       rts_is_2 <- empty_df
     }
 
-    rts <- dplyr::bind_rows(
+    rts <- tidytable::bind_rows(
       rts_exp_1,
       rts_exp_2,
       rts_is_1,
       rts_is_2
     ) |>
-      dplyr::filter(!is.na(as.numeric(rt))) |>
-      dplyr::filter(!is.na((structure_inchikey))) |>
-      dplyr::select(-structure_smiles) |>
-      dplyr::distinct() |>
-      dplyr::mutate(structure_inchikey_2D = gsub(
+      tidytable::filter(!is.na(as.numeric(rt))) |>
+      tidytable::filter(!is.na((structure_inchikey))) |>
+      tidytable::select(-structure_smiles) |>
+      tidytable::distinct() |>
+      tidytable::mutate(structure_inchikey_2D = gsub(
         pattern = "-.*",
         replacement = "",
         x = structure_inchikey
       )) |>
       ## TODO REMINDER FOR NOW
-      dplyr::select(-structure_inchikey)
+      tidytable::select(-structure_inchikey)
 
     if (nrow(rts) == 0) {
       log_debug("No retention time library found, returning an empty table.")

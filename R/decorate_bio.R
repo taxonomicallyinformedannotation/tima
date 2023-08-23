@@ -63,21 +63,21 @@ decorate_bio <-
              envir = parent.frame()
            )) {
     df_kin <- annot_table_wei_bio |>
-      dplyr::filter(score_biological >= score_biological_kingdom)
+      tidytable::filter(score_biological >= score_biological_kingdom)
     df_phy <- df_kin |>
-      dplyr::filter(score_biological >= score_biological_phylum)
+      tidytable::filter(score_biological >= score_biological_phylum)
     df_cla <- df_phy |>
-      dplyr::filter(score_biological >= score_biological_class)
+      tidytable::filter(score_biological >= score_biological_class)
     df_ord <- df_cla |>
-      dplyr::filter(score_biological >= score_biological_order)
+      tidytable::filter(score_biological >= score_biological_order)
     df_fam <- df_ord |>
-      dplyr::filter(score_biological >= score_biological_family)
+      tidytable::filter(score_biological >= score_biological_family)
     df_gen <- df_fam |>
-      dplyr::filter(score_biological >= score_biological_genus)
+      tidytable::filter(score_biological >= score_biological_genus)
     df_spe <- df_gen |>
-      dplyr::filter(score_biological >= score_biological_species)
+      tidytable::filter(score_biological >= score_biological_species)
     df_var <- df_spe |>
-      dplyr::filter(score_biological >= score_biological_variety)
+      tidytable::filter(score_biological >= score_biological_variety)
 
     log_debug(
       "taxonomically informed scoring led to \n",

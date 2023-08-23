@@ -152,73 +152,73 @@ weight_chemo <-
 
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_1_cla_kingdom,
           str = consensus_structure_cla_kin
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_cla_kingdom)
+      tidytable::mutate(score_chemical = score_chemical_cla_kingdom)
 
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_1_npc_pathway,
           str = consensus_structure_npc_pat
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_npc_pathway)
+      tidytable::mutate(score_chemical = score_chemical_npc_pathway)
 
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- step_cla_kin |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_2_cla_superclass,
           str = consensus_structure_cla_sup
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_cla_superclass)
+      tidytable::mutate(score_chemical = score_chemical_cla_superclass)
 
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- step_npc_pat |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_2_npc_superclass,
           str = consensus_structure_npc_sup
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_npc_superclass)
+      tidytable::mutate(score_chemical = score_chemical_npc_superclass)
 
     log_debug("... (classyfire) class \n")
     step_cla_cla <- step_cla_sup |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_3_cla_class,
           str = consensus_structure_cla_cla
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_cla_class)
+      tidytable::mutate(score_chemical = score_chemical_cla_class)
 
     log_debug("... (NPC) class \n")
     step_npc_cla <- step_npc_sup |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_3_npc_class,
           str = consensus_structure_npc_cla
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_npc_class)
+      tidytable::mutate(score_chemical = score_chemical_npc_class)
 
     log_debug("... (classyfire) parent \n")
     step_cla_par <- step_cla_cla |>
-      dplyr::filter(
+      tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_structure_4_cla_parent,
           str = consensus_structure_cla_par
         )
       ) |>
-      dplyr::mutate(score_chemical = score_chemical_cla_parent)
+      tidytable::mutate(score_chemical = score_chemical_cla_parent)
 
     log_debug("... outputting best score \n")
     df3 <-
@@ -231,7 +231,7 @@ weight_chemo <-
         step_npc_cla,
         step_cla_par
       ) |>
-      dplyr::mutate(score_chemical = ifelse(
+      tidytable::mutate(score_chemical = ifelse(
         test = is.na(score_chemical),
         yes = 0,
         no = score_chemical
@@ -255,8 +255,7 @@ weight_chemo <-
 
     log_debug("... cleaning \n")
     df4 <- df4 |>
-      dplyr::rowwise() |>
-      dplyr::mutate(
+      tidytable::mutate(
         score_pondered_chemo = (
           (1 / (
             weight_chemical +
@@ -288,13 +287,13 @@ weight_chemo <-
         structure_smiles_2D,
         .keep_all = TRUE
       ) |>
-      dplyr::mutate(
-        rank_initial = dplyr::dense_rank(-as.numeric(score_input)),
-        rank_final = dplyr::dense_rank(-score_pondered_chemo),
+      tidytable::mutate(
+        rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
+        rank_final = tidytable::dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
       ) |>
       tidytable::arrange(rank_final) |>
-      dplyr::arrange(as.numeric(feature_id)) |>
+      tidytable::arrange(as.numeric(feature_id)) |>
       data.frame()
 
     return(df4)

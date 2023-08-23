@@ -74,7 +74,7 @@ prepare_annotations_spectra <-
         colClasses = "character"
       ) |>
       tidytable::bind_rows() |>
-      tidyft::filter(!is.na(feature_id)) |>
+      tidytable::filter(!is.na(feature_id)) |>
       tidytable::distinct(
         feature_id,
         error_mz,
@@ -88,7 +88,7 @@ prepare_annotations_spectra <-
         count_peaks_matched
       ) |>
       ## Add new columns
-      tidyft::mutate(
+      tidytable::mutate(
         library = "ISDB",
         structure_exact_mass = as.numeric(structure_exact_mass),
         structure_taxonomy_npclassifier_01pathway = NA_character_,

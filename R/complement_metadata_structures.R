@@ -111,13 +111,17 @@ complement_metadata_structures <- function(
       structure_smiles_2D,
       structure_name
     ) |>
-    dplyr::group_by(
+    tidytable::group_by(
       structure_inchikey_2D,
       structure_smiles_2D
     ) |>
-    clean_collapse() |>
-    tidytable::tidytable() |>
-    tidyft::mutate_vars(is.character, .func = trimws) |>
+    clean_collapse(cols = c("structure_name")) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = trimws
+      )
+    ) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_2D,
       .keep_all = TRUE
@@ -195,12 +199,12 @@ complement_metadata_structures <- function(
   table_final <- df |>
     tidytable::left_join(dd_ddd_i) |>
     tidytable::left_join(dd_ddd_s) |>
-    dplyr::mutate(
-      structure_smiles_2D = dplyr::coalesce(
+    tidytable::mutate(
+      structure_smiles_2D = tidytable::coalesce(
         structure_smiles_2D_i,
         structure_smiles_2D
       ),
-      structure_inchikey_2D = dplyr::coalesce(
+      structure_inchikey_2D = tidytable::coalesce(
         structure_inchikey_2D_s,
         structure_inchikey_2D
       )
@@ -208,18 +212,18 @@ complement_metadata_structures <- function(
     tidytable::select(-structure_smiles_2D_i, -structure_inchikey_2D_s) |>
     tidytable::left_join(met_i) |>
     tidytable::left_join(met_s) |>
-    dplyr::mutate(
-      structure_molecular_formula = dplyr::coalesce(
+    tidytable::mutate(
+      structure_molecular_formula = tidytable::coalesce(
         structure_molecular_formula_s,
         structure_molecular_formula_i,
         structure_molecular_formula
       ),
-      structure_exact_mass = dplyr::coalesce(
+      structure_exact_mass = tidytable::coalesce(
         structure_exact_mass_s,
         structure_exact_mass_i,
         structure_exact_mass
       ),
-      structure_xlogp = dplyr::coalesce(
+      structure_xlogp = tidytable::coalesce(
         structure_xlogp_s,
         structure_xlogp_i,
         structure_xlogp
@@ -235,23 +239,23 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::left_join(nam_i) |>
     tidytable::left_join(nam_s) |>
-    dplyr::mutate(structure_name = dplyr::coalesce(
+    tidytable::mutate(structure_name = tidytable::coalesce(
       structure_name_s,
       structure_name_i,
       structure_name
     )) |>
     tidytable::select(-structure_name_s, -structure_name_i) |>
     tidytable::left_join(tax_npc) |>
-    dplyr::mutate(
-      structure_taxonomy_npclassifier_01pathway = dplyr::coalesce(
+    tidytable::mutate(
+      structure_taxonomy_npclassifier_01pathway = tidytable::coalesce(
         structure_taxonomy_npclassifier_01pathway_s,
         structure_taxonomy_npclassifier_01pathway
       ),
-      structure_taxonomy_npclassifier_02superclass = dplyr::coalesce(
+      structure_taxonomy_npclassifier_02superclass = tidytable::coalesce(
         structure_taxonomy_npclassifier_02superclass_s,
         structure_taxonomy_npclassifier_02superclass
       ),
-      structure_taxonomy_npclassifier_03class = dplyr::coalesce(
+      structure_taxonomy_npclassifier_03class = tidytable::coalesce(
         structure_taxonomy_npclassifier_03class_s,
         structure_taxonomy_npclassifier_03class
       ),
@@ -262,24 +266,24 @@ complement_metadata_structures <- function(
       -structure_taxonomy_npclassifier_03class_s
     ) |>
     tidytable::left_join(tax_cla) |>
-    dplyr::mutate(
-      structure_taxonomy_classyfire_chemontid = dplyr::coalesce(
+    tidytable::mutate(
+      structure_taxonomy_classyfire_chemontid = tidytable::coalesce(
         structure_taxonomy_classyfire_chemontid_i,
         structure_taxonomy_classyfire_chemontid
       ),
-      structure_taxonomy_classyfire_01kingdom = dplyr::coalesce(
+      structure_taxonomy_classyfire_01kingdom = tidytable::coalesce(
         structure_taxonomy_classyfire_01kingdom_i,
         structure_taxonomy_classyfire_01kingdom
       ),
-      structure_taxonomy_classyfire_02superclass = dplyr::coalesce(
+      structure_taxonomy_classyfire_02superclass = tidytable::coalesce(
         structure_taxonomy_classyfire_02superclass_i,
         structure_taxonomy_classyfire_02superclass
       ),
-      structure_taxonomy_classyfire_03class = dplyr::coalesce(
+      structure_taxonomy_classyfire_03class = tidytable::coalesce(
         structure_taxonomy_classyfire_03class_i,
         structure_taxonomy_classyfire_03class
       ),
-      structure_taxonomy_classyfire_04directparent = dplyr::coalesce(
+      structure_taxonomy_classyfire_04directparent = tidytable::coalesce(
         structure_taxonomy_classyfire_04directparent_i,
         structure_taxonomy_classyfire_04directparent
       )
@@ -291,9 +295,14 @@ complement_metadata_structures <- function(
       -structure_taxonomy_classyfire_03class_i,
       -structure_taxonomy_classyfire_04directparent_i
     ) |>
-    tidyft::mutate_vars(is.character, .func = function(x) {
-      tidytable::na_if(x, "")
-    })
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidytable::where(is.character),
+        .fns = function(x) {
+          tidytable::na_if(x, "")
+        }
+      )
+    )
 
   ## TODO if (quickmode == FALSE){...}
 

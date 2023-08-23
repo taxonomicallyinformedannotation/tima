@@ -20,16 +20,25 @@ taxize_spectra_benchmark <-
            org_tax_ott,
            output) {
     features <- input |>
-      tidytable::fread(na.strings = c("", "NA"))
+      tidytable::fread(
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
     sop <- keys |>
-      tidytable::fread(na.strings = c("", "NA")) |>
-      tidyft::mutate(inchikey_2D = stringi::stri_sub(
+      tidytable::fread(
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(inchikey_2D = stringi::stri_sub(
         str = structure_inchikey,
         from = 1,
         to = 14
       ))
     taxo <- org_tax_ott |>
-      tidytable::fread(na.strings = c("", "NA"))
+      tidytable::fread(
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
 
     features_pretaxed <- features |>
       tidytable::left_join(sop |>

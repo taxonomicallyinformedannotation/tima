@@ -48,7 +48,7 @@ prepare_mona <-
       tidytable::left_join(cpd) |>
       tidytable::filter(spectrum_type == "MS2") |>
       ## COMMENT (AR): CURATING NON-STANDARD InChIs
-      tidyft::mutate(inchi = gsub(
+      tidytable::mutate(inchi = gsub(
         pattern = "InChI=1/",
         replacement = "InChI=1S/",
         x = inchi,
@@ -57,7 +57,7 @@ prepare_mona <-
       ## COMMENT (AR): Dropped the idea
       ## too many things to do (mainly replace u by ?)
       ## COMMENT (AR): No way
-      tidyft::mutate(inchi = gsub(
+      tidytable::mutate(inchi = gsub(
         pattern = " ",
         replacement = "",
         x = inchi,
@@ -71,7 +71,7 @@ prepare_mona <-
         x = inchi,
         fixed = TRUE
       )) |>
-      tidyft::mutate(ionmode = ifelse(
+      tidytable::mutate(ionmode = ifelse(
         test = polarity == 1,
         yes = "POSITIVE",
         no = "NEGATIVE"
@@ -94,7 +94,7 @@ prepare_mona <-
         grepl(pattern = "]\\+\\+", x = precursor_type) |
           grepl(pattern = "]2\\+", x = precursor_type)
       ) |>
-      tidyft::mutate(precursorCharge = 2L)
+      tidytable::mutate(precursorCharge = 2L)
     spctra_enhanced_2 <- spctra_enhanced |>
       tidytable::filter(
         grepl(pattern = "]\\+$", x = precursor_type) |
@@ -105,13 +105,13 @@ prepare_mona <-
           grepl(pattern = "M\\+NH4$", x = precursor_type) |
           grepl(pattern = "M\\+$", x = precursor_type)
       ) |>
-      tidyft::mutate(precursorCharge = 1L)
+      tidytable::mutate(precursorCharge = 1L)
     spctra_enhanced_3 <- spctra_enhanced |>
       tidytable::filter(
         grepl(pattern = "]\\-\\-", x = precursor_type) |
           grepl(pattern = "]2\\-", x = precursor_type)
       ) |>
-      tidyft::mutate(precursorCharge = -2L)
+      tidytable::mutate(precursorCharge = -2L)
     spctra_enhanced_4 <- spctra_enhanced |>
       tidytable::filter(
         grepl(pattern = "]\\-$", x = precursor_type) |
@@ -119,15 +119,15 @@ prepare_mona <-
           grepl(pattern = "M\\-H$", x = precursor_type) |
           grepl(pattern = "M\\+Cl$", x = precursor_type)
       ) |>
-      tidyft::mutate(precursorCharge = -1L)
+      tidytable::mutate(precursorCharge = -1L)
 
     spctra_enhanced_5 <- spctra_enhanced |>
       tidytable::anti_join(spctra_enhanced_1) |>
       tidytable::anti_join(spctra_enhanced_2) |>
       tidytable::anti_join(spctra_enhanced_3) |>
       tidytable::anti_join(spctra_enhanced_4) |>
-      tidyft::mutate(diff = exactmass - precursor_mz) |>
-      tidyft::mutate(precursorCharge = ifelse(
+      tidytable::mutate(diff = exactmass - precursor_mz) |>
+      tidytable::mutate(precursorCharge = ifelse(
         test = ionmode == "POSITIVE",
         yes = 1L,
         no = -1L

@@ -39,7 +39,8 @@ prepare_features_edges <-
     edges_table <- lapply(
       X = input,
       FUN = tidytable::fread,
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ) |>
       tidytable::bind_rows()
 
@@ -50,7 +51,7 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      tidyft::filter(feature_source != feature_target) |>
+      tidytable::filter(feature_source != feature_target) |>
       tidytable::distinct()
 
     ## Export edges table

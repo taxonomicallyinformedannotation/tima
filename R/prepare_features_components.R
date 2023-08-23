@@ -37,7 +37,8 @@ prepare_features_components <-
     table <- lapply(
       X = input,
       FUN = tidytable::fread,
-      na.strings = c("", "NA")
+      na.strings = c("", "NA"),
+      colClasses = "character"
     ) |>
       tidytable::bind_rows() |>
       tidytable::select(
