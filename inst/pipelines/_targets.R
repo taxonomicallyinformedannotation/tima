@@ -1810,7 +1810,7 @@ list(
         con <- file(benchmark_file, "r")
         text <- readLines(con)
         close(con)
-        ## To get both pos and neg
+        # # To get both pos and neg
         # text_1 <- text |>
         #   head(100471)
         # text_2 <- text |>
@@ -1911,63 +1911,61 @@ list(
 
         log_debug("Framed")
         df_clean <- df_meta |>
-          dplyr::filter(!is.na(inchikey)) |>
-          dplyr::filter(fragments >= 5) |>
-          dplyr::filter(fragments <= 100) |>
-          dplyr::filter(!grepl(
+          tidytable::filter(!is.na(inchikey)) |>
+          tidytable::filter(fragments >= 5) |>
+          tidytable::filter(fragments <= 100) |>
+          tidytable::filter(!grepl(
             pattern = "QQQ",
             x = instrument,
             fixed = TRUE
           )) |>
           ## fragments are nominal mass
-          dplyr::filter(!grepl(
+          tidytable::filter(!grepl(
             pattern = "ReSpect",
             x = name,
             fixed = TRUE
           )) |>
           ## remove spectral matches
-          dplyr::filter(!grepl(
+          tidytable::filter(!grepl(
             pattern = "Spectral Match to",
             x = name,
             fixed = TRUE
           )) |>
           ## remove putatives
-          dplyr::filter(!grepl(
+          tidytable::filter(!grepl(
             pattern = "putative",
             x = name,
             fixed = TRUE
           )) |>
-          dplyr::select(-name) |>
-          dplyr::mutate(mass = precursorMz) |>
-          tidyr::separate(
+          tidytable::select(-name) |>
+          tidytable::mutate(mass = precursorMz) |>
+          tidytable::separate(
             col = mass,
             sep = "\\.",
             into = c("a", "b")
           ) |>
-          dplyr::filter(!is.na(b)) |>
-          dplyr::filter(stringr::str_length(as.numeric(b)) > 1) |>
-          dplyr::select(-a, -b) |>
-          dplyr::mutate(inchikey_2D = gsub(
+          tidytable::filter(!is.na(b)) |>
+          tidytable::filter(stringr::str_length(as.numeric(b)) > 1) |>
+          tidytable::select(-a, -b) |>
+          tidytable::mutate(inchikey_2D = gsub(
             pattern = "-.*",
             replacement = "",
             x = inchikey
           )) |>
-          dplyr::distinct(inchikey_2D, adduct, .keep_all = TRUE) |>
-          dplyr::mutate(mz = precursorMz) |>
-          dplyr::group_by(inchikey_2D) |>
+          tidytable::distinct(inchikey_2D, adduct, .keep_all = TRUE) |>
+          tidytable::mutate(mz = precursorMz) |>
           ## Weird way to have some kind of retention time
-          dplyr::mutate(rt = dplyr::cur_group_id()) |>
-          dplyr::ungroup()
+          tidytable::mutate(rt = tidytable::cur_group_id(), .by = "inchikey_2D")
 
         df_clean_neg <- df_clean |>
-          dplyr::filter(grepl(
+          tidytable::filter(grepl(
             pattern = "]-",
             x = adduct,
             fixed = TRUE
           ))
 
         df_clean_pos <- df_clean |>
-          dplyr::filter(grepl(
+          tidytable::filter(grepl(
             pattern = "]+",
             x = adduct,
             fixed = TRUE
@@ -1981,22 +1979,20 @@ list(
         extract_benchmark_spectra <- function(x, mode) {
           df <- x |>
             extract_spectra() |>
-            dplyr::mutate(acquisitionNum = dplyr::row_number()) |>
-            dplyr::mutate(spectrum_id = acquisitionNum) |>
-            dplyr::mutate(short_ik = gsub(
+            tidytable::mutate(acquisitionNum = tidytable::row_number()) |>
+            tidytable::mutate(spectrum_id = acquisitionNum) |>
+            tidytable::mutate(short_ik = gsub(
               pattern = "-.*",
               replacement = "",
               inchikey
             )) |>
-            dplyr::group_by(short_ik) |>
-            dplyr::mutate(rtime = dplyr::cur_group_id()) |>
-            dplyr::mutate(precursorCharge = ifelse(
+            tidytable::mutate(rtime = tidytable::cur_group_id(), .by = "short_ik") |>
+            tidytable::mutate(precursorCharge = ifelse(
               test = mode == "pos",
               yes = as.integer(1),
               no = as.integer(-1)
             )) |>
-            dplyr::ungroup() |>
-            dplyr::select(
+            tidytable::select(
               SCANS,
               acquisitionNum,
               precursorCharge,
@@ -2013,7 +2009,8 @@ list(
               spectrum_id = acquisitionNum,
               mz,
               intensity
-            )
+            ) |>
+            data.frame()
           return(df)
         }
 
@@ -2025,7 +2022,7 @@ list(
 
         select_benchmark_columns <- function(x) {
           df <- x |>
-            dplyr::select(
+            tidytable::select(
               adduct,
               inchikey,
               instrument,
@@ -2036,11 +2033,12 @@ list(
               rt = rtime,
               feature_id = spectrum_id
             ) |>
-            dplyr::mutate(inchikey_2D = gsub(
+            tidytable::mutate(inchikey_2D = gsub(
               pattern = "-.*",
               replacement = "",
               x = inchikey
-            ))
+            )) |>
+            data.frame()
           return(df)
         }
 
