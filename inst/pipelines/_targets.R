@@ -2316,7 +2316,7 @@ list(
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
-          output =  "data/interim/benchmark/benchmark_com_pre_neg.tsv.gz",
+          output = "data/interim/benchmark/benchmark_com_pre_neg.tsv.gz",
           parameters = benchmark_def_pre_fea_com
         )
       }
