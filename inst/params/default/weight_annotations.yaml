@@ -170,6 +170,9 @@ weights:
 
 #' Options.
 options:
+  #' Report compounds names. Can be very large. BOOLEAN
+  compounds_names: no
+  
   #' Do not use it. BOOLEAN
   force: no
 

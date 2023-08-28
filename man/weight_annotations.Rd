@@ -44,6 +44,7 @@ weight_annotations(
   minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
   minimal_ms1_condition = params$annotations$ms1$thresholds$condition,
   ms1_only = params$annotations$ms1only,
+  compounds_names = params$options$compounds_names,
   summarise = params$options$summarise,
   pattern = params$files$pattern,
   force = params$options$force,
@@ -150,6 +151,8 @@ match (should be lower than \verb{NPC class})}
 \item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
 
 \item{ms1_only}{Boolean. Keep only MS1 annotations}
+
+\item{compounds_names}{Report compounds names. Can be very large. BOOLEAN}
 
 \item{summarise}{Boolean. Summarize results (1 row per feature)}
 

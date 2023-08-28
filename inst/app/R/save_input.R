@@ -35,6 +35,8 @@ save_input <- function(input) {
   names_target <<- shiny::isolate(input$names_target)
   forceps <<- shiny::isolate(input$force)
   summarise <<- shiny::isolate(input$summarise)
+  compound_names <<- shiny::isolate(input$compounds_names)
+
 
   ## Change 1
   timaR::log_debug(x = "Changing parameters")
@@ -500,6 +502,7 @@ save_input <- function(input) {
     class <-
     shiny::isolate(input$wei_che_13)
   yamls_params$weight_annotations$options$force <- forceps
+  yamls_params$weight_annotations$options$compound_names <- compound_names
   yamls_params$weight_annotations$options$summarise <- summarise
   yamls_params$weight_annotations$files$pattern <- filename
 

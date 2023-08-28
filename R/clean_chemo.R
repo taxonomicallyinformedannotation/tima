@@ -182,60 +182,58 @@ clean_chemo <-
           sep = "\u00a7"
         )
       ) |>
-      tidytable::distinct(
-        feature_id,
-        component_id,
-        rt,
-        mz,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        structure_name,
-        structure_01_cla_kingdom =
-          structure_taxonomy_classyfire_01kingdom,
-        structure_01_npc_pathway =
-          structure_taxonomy_npclassifier_01pathway,
-        structure_02_cla_superclass =
-          structure_taxonomy_classyfire_02superclass,
-        structure_02_npc_superclass =
-          structure_taxonomy_npclassifier_02superclass,
-        structure_03_cla_class =
-          structure_taxonomy_classyfire_03class,
-        structure_03_npc_class =
-          structure_taxonomy_npclassifier_03class,
-        structure_04_cla_parent =
-          structure_taxonomy_classyfire_04directparent,
-        library,
-        error_mz,
-        error_rt,
-        rank_initial,
-        rank_final,
-        score_input,
-        score_biological,
-        score_interim = score_pondered_bio,
-        score_chemical,
-        score_final = score_pondered_chemo,
-        count_peaks_explained,
-        count_peaks_matched,
-        best_candidate_organism = best_candidate,
-        best_candidate_structure,
-        consensus_structure_cla_kin,
-        consistency_structure_cla_kin,
-        consensus_structure_npc_pat,
-        consistency_structure_npc_pat,
-        consensus_structure_cla_sup,
-        consistency_structure_cla_sup,
-        consensus_structure_npc_sup,
-        consistency_structure_npc_sup,
-        consensus_structure_cla_cla,
-        consistency_structure_cla_cla,
-        consensus_structure_npc_cla,
-        consistency_structure_npc_cla,
-        consensus_structure_cla_par,
-        consistency_structure_cla_par
-      )
+      tidytable::select(tidytable::any_of(c(
+        "feature_id",
+        "component_id",
+        "rt",
+        "mz",
+        "structure_molecular_formula",
+        "structure_exact_mass",
+        "structure_xlogp",
+        "structure_inchikey_2D",
+        "structure_smiles_2D",
+        "structure_name",
+        "structure_01_cla_kingdom" = "structure_taxonomy_classyfire_01kingdom",
+        "structure_01_npc_pathway" =
+          "structure_taxonomy_npclassifier_01pathway",
+        "structure_02_cla_superclass" =
+          "structure_taxonomy_classyfire_02superclass",
+        "structure_02_npc_superclass" =
+          "structure_taxonomy_npclassifier_02superclass",
+        "structure_03_cla_class" = "structure_taxonomy_classyfire_03class",
+        "structure_03_npc_class" = "structure_taxonomy_npclassifier_03class",
+        "structure_04_cla_parent" =
+          "structure_taxonomy_classyfire_04directparent",
+        "library",
+        "error_mz",
+        "error_rt",
+        "rank_initial",
+        "rank_final",
+        "score_input",
+        "score_biological",
+        "score_interim" = "score_pondered_bio",
+        "score_chemical",
+        "score_final" = "score_pondered_chemo",
+        "count_peaks_explained",
+        "count_peaks_matched",
+        "best_candidate_organism" = "best_candidate",
+        "best_candidate_structure",
+        "consensus_structure_cla_kin",
+        "consistency_structure_cla_kin",
+        "consensus_structure_npc_pat",
+        "consistency_structure_npc_pat",
+        "consensus_structure_cla_sup",
+        "consistency_structure_cla_sup",
+        "consensus_structure_npc_sup",
+        "consistency_structure_npc_sup",
+        "consensus_structure_cla_cla",
+        "consistency_structure_cla_cla",
+        "consensus_structure_npc_cla",
+        "consistency_structure_npc_cla",
+        "consensus_structure_cla_par",
+        "consistency_structure_cla_par"
+      ))) |>
+      tidytable::distinct()
 
     references <- structure_organism_pairs_table |>
       tidytable::select(
@@ -258,41 +256,41 @@ clean_chemo <-
       tidytable::left_join(references) |>
       tidytable::group_by(c(-reference_doi)) |>
       clean_collapse(cols = c("reference_doi")) |>
-      tidytable::select(
-        feature_id,
-        component_id,
-        rt,
-        mz,
-        structure_molecular_formula,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        structure_name,
-        structure_exact_mass,
-        structure_xlogp,
-        structure_01_cla_kingdom,
-        structure_01_npc_pathway,
-        structure_02_cla_superclass,
-        structure_02_npc_superclass,
-        structure_03_cla_class,
-        structure_03_npc_class,
-        structure_04_cla_parent,
-        score_input,
-        score_biological,
-        score_chemical,
-        count_peaks_matched,
-        count_peaks_explained,
-        library,
-        error_mz,
-        error_rt,
-        score_interim,
-        score_final,
-        rank_initial,
-        rank_final,
-        best_candidate_organism,
-        best_candidate_structure,
-        reference_doi,
+      tidytable::select(tidytable::any_of(c(
+        "feature_id",
+        "component_id",
+        "rt",
+        "mz",
+        "structure_molecular_formula",
+        "structure_inchikey_2D",
+        "structure_smiles_2D",
+        "structure_name",
+        "structure_exact_mass",
+        "structure_xlogp",
+        "structure_01_cla_kingdom",
+        "structure_01_npc_pathway",
+        "structure_02_cla_superclass",
+        "structure_02_npc_superclass",
+        "structure_03_cla_class",
+        "structure_03_npc_class",
+        "structure_04_cla_parent",
+        "score_input",
+        "score_biological",
+        "score_chemical",
+        "count_peaks_matched",
+        "count_peaks_explained",
+        "library",
+        "error_mz",
+        "error_rt",
+        "score_interim",
+        "score_final",
+        "rank_initial",
+        "rank_final",
+        "best_candidate_organism",
+        "best_candidate_structure",
+        "reference_doi",
         tidytable::everything()
-      ) |>
+      ))) |>
       tidytable::arrange(rank_final)
 
     if (summarise == TRUE) {
@@ -302,7 +300,7 @@ clean_chemo <-
       df4 <- df3 |>
         tidytable::group_by(feature_id) |>
         tidytable::reframe(tidytable::across(
-          .cols = colnames(df3)[5:32],
+          .cols = colnames(df3)[5:ncol(df3)],
           .fns = function(x) {
             gsub(
               pattern = "\\bNA\\b",

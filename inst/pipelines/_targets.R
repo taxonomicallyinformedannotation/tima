@@ -1703,6 +1703,7 @@ list(
         minimal_ms1_condition =
           par_wei_ann$annotations$ms1$thresholds$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
+        compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force,
@@ -1755,6 +1756,7 @@ list(
         minimal_ms1_condition =
           par_wei_ann$annotations$ms1$thresholds$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
+        compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force,
@@ -2575,6 +2577,7 @@ list(
             benchmark_def_wei_ann$annotations$ms1$thresholds$chemical,
           minimal_ms1_condition =
             benchmark_def_wei_ann$annotations$ms1$thresholds$condition,
+          compounds_names = benchmark_def_wei_ann$options$compounds_names,
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,
           force = benchmark_def_wei_ann$options$force,

@@ -352,6 +352,9 @@ parse_cli_params <- function() {
     if (!is.null(arguments$wei_che_23)) {
       params$weights$chemical$npc$class <- as.numeric(arguments$wei_che_23)
     }
+    if (!is.null(arguments$compounds_names)) {
+      params$options$compounds_names <- as.logical(arguments$compounds_names)
+    }
     if (!is.null(arguments$force)) {
       params$options$force <- as.logical(arguments$force)
     }
