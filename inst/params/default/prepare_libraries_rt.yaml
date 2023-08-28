@@ -64,6 +64,6 @@ names:
 
 #' Units of the different variables in the input files.
 units:
-  #' Unit of the "retention time" variable in the input files. 
+  #' Unit of the "retention time" variable in the input files.
   #' Must be "seconds" or "minutes". STRING
   rt: seconds
