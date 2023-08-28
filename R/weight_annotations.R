@@ -195,7 +195,16 @@ weight_annotations <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
-    tidytable::bind_rows()
+    tidytable::bind_rows() |>
+    ## keep best score per structure (example if annotated by MS1 and MS2)
+    tidytable::arrange(tidytable::desc(score_input)) |>
+    tidytable::distinct(
+      feature_id,
+      structure_inchikey_2D,
+      structure_smiles_2D,
+      structure_taxonomy_classyfire_chemontid,
+      .keep_all = TRUE
+    )
 
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
