@@ -20,7 +20,7 @@ annotations:
       biological: 0.5
 
       #' Minimal chemical score to keep MS1 only annotation. FLOAT
-      chemical: 0.5
+      chemical: 0.666
 
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
