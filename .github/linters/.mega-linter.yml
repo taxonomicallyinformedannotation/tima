@@ -16,3 +16,6 @@ MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
 PRE_COMMANDS:
   - command: R --slave -e 'install.packages(c("lintr"))'
     cwd: "root"
+REPOSITORY_DEVSKIM_PRE_COMMANDS:
+  - command:  git config --global --add safe.directory /github/workspace/.git
+    cwd: "root"
