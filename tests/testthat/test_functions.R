@@ -429,7 +429,7 @@ testthat::test_that("Whole process", {
     summarise = FALSE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
-    minimal_ms1_condition == "AND"
+    minimal_ms1_condition = "AND"
   )
 
   ## CLI arguments check
