@@ -147,6 +147,8 @@ match (should be lower than \verb{NPC class})}
 
 \item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
+\item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
+
 \item{ms1_only}{Boolean. Keep only MS1 annotations}
 
 \item{summarise}{Boolean. Summarize results (1 row per feature)}
