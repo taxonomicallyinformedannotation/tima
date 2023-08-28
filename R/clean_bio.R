@@ -39,7 +39,6 @@ utils::globalVariables(
     "feature_id",
     "feature_source",
     "feature_target",
-    "minimal_ms1_bio",
     "n",
     "rank_avg_cla",
     "rank_avg_par",
@@ -68,8 +67,6 @@ utils::globalVariables(
 #'    biologically weighted annotation
 #' @param edges_table Table containing the edges between features
 #' @param candidates_initial Number of initial candidates to keep
-#' @param minimal_ms1_bio Minimal biological score
-#'    to keep MS1 based annotation
 #'
 #' @return A table containing the biologically weighted annotation
 #'    where only a given number of initial candidates are kept
@@ -88,36 +85,8 @@ clean_bio <-
            ),
            candidates_initial = get("candidates_initial",
              envir = parent.frame()
-           ),
-           minimal_ms1_bio = get("minimal_ms1_bio",
-             envir = parent.frame()
            )) {
-    log_debug(
-      "keeping only MS1 candidates with minimum \n",
-      minimal_ms1_bio,
-      " biological score \n"
-    )
-
-    df01 <- annot_table_wei_bio |>
-      tidytable::filter(score_input > 0 |
-        ## Those lines are to keep ms1 annotation
-        score_biological >= minimal_ms1_bio)
-
-    log_debug("erasing other MS1 candidates \n")
-    df02 <-
-      tidytable::anti_join(
-        annot_table_wei_bio |>
-          tidytable::distinct(feature_id,
-            structure_inchikey_2D,
-            .keep_all = TRUE
-          ),
-        df01
-      ) |>
-      tidytable::mutate(structure_inchikey_2D = "notAnnotated")
-
-    df03 <- tidytable::bind_rows(df01, df02)
-
-    df <- df03 |>
+    df <- annot_table_wei_bio |>
       tidytable::mutate(
         candidate_structure_1_cla_kingdom =
           structure_taxonomy_classyfire_01kingdom,
@@ -204,6 +173,13 @@ clean_bio <-
 
     log_debug("... at the (classyfire) kingdom level \n")
     freq_cla_kin <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_1_cla_kingdom,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_kin = tidytable::n_distinct(feature_target),
         .by = c(
@@ -219,14 +195,7 @@ clean_bio <-
         consistency_structure_cla_kin = count_kin / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_1_cla_kingdom
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_1_cla_kingdom,
         .keep_all = TRUE
@@ -270,6 +239,13 @@ clean_bio <-
 
     log_debug("... at the (NPC) pathway level \n")
     freq_npc_pat <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_1_npc_pathway,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_pat = tidytable::n_distinct(feature_target),
         .by = c(
@@ -285,14 +261,7 @@ clean_bio <-
         consistency_structure_npc_pat = count_pat / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_1_npc_pathway
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_1_npc_pathway,
         .keep_all = TRUE
@@ -337,6 +306,13 @@ clean_bio <-
 
     log_debug("... at the (classyfire) superclass level \n")
     freq_cla_sup <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_2_cla_superclass,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_sup = tidytable::n_distinct(feature_target),
         .by = c(
@@ -352,14 +328,7 @@ clean_bio <-
         consistency_structure_cla_sup = count_sup / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_2_cla_superclass
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_2_cla_superclass,
         .keep_all = TRUE
@@ -404,6 +373,13 @@ clean_bio <-
 
     log_debug("... at the (NPC) superclass level \n")
     freq_npc_sup <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_2_npc_superclass,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_sup = tidytable::n_distinct(feature_target),
         .by = c(
@@ -419,14 +395,7 @@ clean_bio <-
         consistency_structure_npc_sup = count_sup / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_2_npc_superclass
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_2_npc_superclass,
         .keep_all = TRUE
@@ -471,6 +440,13 @@ clean_bio <-
 
     log_debug("... at the (classyfire) class level \n")
     freq_cla_cla <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_3_cla_class,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_cla = tidytable::n_distinct(feature_target),
         .by = c(
@@ -486,14 +462,7 @@ clean_bio <-
         consistency_structure_cla_cla = count_cla / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_3_cla_class
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_3_cla_class,
         .keep_all = TRUE
@@ -538,6 +507,13 @@ clean_bio <-
 
     log_debug("... at the (NPC) class level \n")
     freq_npc_cla <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_3_npc_class,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_cla = tidytable::n_distinct(feature_target),
         .by = c(
@@ -553,14 +529,7 @@ clean_bio <-
         consistency_structure_npc_cla = count_cla / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_3_npc_class
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_3_npc_class,
         .keep_all = TRUE
@@ -605,6 +574,13 @@ clean_bio <-
 
     log_debug("... at the (classyfire) parent level \n")
     freq_cla_par <- df3 |>
+      tidytable::distinct(
+        feature_source,
+        feature_target,
+        structure_inchikey_2D,
+        candidate_structure_4_cla_parent,
+        rank_final
+      ) |>
       tidytable::mutate(
         count_par = tidytable::n_distinct(feature_target),
         .by = c(
@@ -620,14 +596,7 @@ clean_bio <-
         consistency_structure_cla_par = count_par / sum,
         .by = c(feature_source)
       ) |>
-      tidytable::mutate(
-        rank_final = as.numeric(rank_final),
-        .by = c(
-          feature_target,
-          candidate_structure_4_cla_parent
-        )
-      ) |>
-      tidytable::arrange(rank_final) |>
+      tidytable::arrange(as.numeric(rank_final)) |>
       tidytable::distinct(feature_source,
         candidate_structure_4_cla_parent,
         .keep_all = TRUE
