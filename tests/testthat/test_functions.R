@@ -428,7 +428,8 @@ testthat::test_that("Whole process", {
     ms1_only = TRUE,
     summarise = FALSE,
     candidates_final = 1,
-    minimal_ms1_bio = 0.8
+    minimal_ms1_bio = 0.8,
+    minimal_ms1_condition == "AND"
   )
 
   ## CLI arguments check
