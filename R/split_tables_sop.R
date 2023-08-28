@@ -169,6 +169,14 @@ split_tables_sop <- function(table) {
       structure_taxonomy_classyfire_04directparent
     ) |>
     tidytable::distinct() |>
+    tidytable::group_by(structure_inchikey_2D) |>
+    clean_collapse(cols = c(
+      "structure_taxonomy_classyfire_chemontid",
+      "structure_taxonomy_classyfire_01kingdom",
+      "structure_taxonomy_classyfire_02superclass",
+      "structure_taxonomy_classyfire_03class",
+      "structure_taxonomy_classyfire_04directparent"
+    )) |>
     tidytable::mutate(
       tidytable::across(
         .cols = tidytable::where(is.character),

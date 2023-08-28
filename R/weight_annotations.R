@@ -202,7 +202,6 @@ weight_annotations <- function(
       feature_id,
       structure_inchikey_2D,
       structure_smiles_2D,
-      structure_taxonomy_classyfire_chemontid,
       .keep_all = TRUE
     )
 
