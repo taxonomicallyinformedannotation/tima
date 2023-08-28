@@ -18,4 +18,4 @@ PRE_COMMANDS:
     cwd: "root"
 REPOSITORY_DEVSKIM_PRE_COMMANDS:
   - command:  git config --global --add safe.directory /github/workspace/.git
-    cwd: "root"
+    cwd: "workspace"
