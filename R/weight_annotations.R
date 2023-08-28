@@ -80,6 +80,7 @@ utils::globalVariables(
 #' @param force Force parameters. Use it at your own risk
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
+#' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param ms1_only Boolean. Keep only MS1 annotations
 #' @param summarise Boolean. Summarize results (1 row per feature)
 #' @param pattern Pattern to identify your job. STRING

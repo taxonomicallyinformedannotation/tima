@@ -84,6 +84,7 @@ utils::globalVariables(
 #' @param candidates_final Number of final candidates to keep
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
+#' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param summarise Boolean. summarise results (1 row per feature)
 #'
 #' @return A table containing the chemically weighted annotation

@@ -2,7 +2,8 @@ utils::globalVariables(c(
   "canonical_name",
   "organism",
   "ott_id",
-  "search_string"
+  "search_string",
+  "unique_name"
 ))
 
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
@@ -205,7 +206,7 @@ get_organism_taxonomy_ott <- function(df,
         tidytable::mutate(ott_id = as.integer(ott_id)) |>
         ## feeling it is better that way
         tidytable::mutate(n = tidytable::row_number()) |>
-        tidytable::arrange(desc(n)) |>
+        tidytable::arrange(tidytable::desc(n)) |>
         tidytable::select(-n)
     } else {
       log_debug("Nothing found, returning empty dataframe")
