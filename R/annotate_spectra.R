@@ -216,8 +216,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                     clean_spectra = TRUE
                   )
 
-                  if (score >= 0.1) {
-                    list(
+                  if (score >= threshold) {
+                    tidytable::tidytable(
                       "feature_id" = query_ids[[spectrum]],
                       "precursorMz" = precursor,
                       "target_id" = lib_id[indices][[index]],
@@ -228,9 +228,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                     )
                   }
                 }
-              ) |>
-              Filter(f = Negate(is.null)) |>
-              dplyr::bind_rows()
+              )
 
             return(inner_list)
           }
@@ -253,7 +251,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
               )
             }
           ) |>
-          dplyr::bind_rows()
+          tidytable::bind_rows()
 
         return(outer_list)
       }
