@@ -78,6 +78,8 @@ utils::globalVariables(
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
+#' @param adducts_neg Negative adducts to be used
+#' @param adducts_pos Positive adducts to be used
 #' @param adducts_masses_list Adducts masses
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param name Name of the adducts library
