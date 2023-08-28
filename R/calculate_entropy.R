@@ -35,7 +35,7 @@ calculate_entropy <- function(index,
 
   if (score >= threshold) {
     return(
-      list(
+      tidytable::tidytable(
         feature_id = index,
         target_id = target,
         score = as.numeric(score),

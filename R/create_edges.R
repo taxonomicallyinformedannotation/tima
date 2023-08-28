@@ -43,7 +43,7 @@ create_edges <- function(index,
         threshold
       )
     }) |>
-    dplyr::bind_rows()
+    tidytable::bind_rows()
 
   return(inner_list)
 }

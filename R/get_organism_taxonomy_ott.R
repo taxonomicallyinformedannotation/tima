@@ -189,7 +189,7 @@ get_organism_taxonomy_ott <- function(df,
       list_df <- list()
 
       for (i in seq_along(taxon_lineage)) {
-        list_df[[i]] <- dplyr::bind_rows(
+        list_df[[i]] <- tidytable::bind_rows(
           data.frame(
             id = otts[i],
             rank = taxon_info[[i]]$rank,
@@ -201,13 +201,16 @@ get_organism_taxonomy_ott <- function(df,
         )
       }
 
-      otl <- dplyr::bind_rows(list_df) |>
-        dplyr::mutate(ott_id = as.integer(ott_id)) |>
-        data.frame()
+      otl <- tidytable::bind_rows(list_df) |>
+        tidytable::mutate(ott_id = as.integer(ott_id)) |>
+        ## feeling it is better that way
+        tidytable::mutate(n = tidytable::row_number()) |>
+        tidytable::arrange(desc(n)) |>
+        tidytable::select(-n)
     } else {
       log_debug("Nothing found, returning empty dataframe")
       otl <-
-        data.frame(
+        tidytable::tidytable(
           id = NA_integer_,
           rank = NA_character_,
           name = NA_character_,
@@ -217,9 +220,16 @@ get_organism_taxonomy_ott <- function(df,
     }
 
     biological_metadata <-
-      dplyr::left_join(organism_table, new_matched_otl_exact) |>
-      dplyr::left_join(otl, by = c("ott_id" = "id")) |>
-      dplyr::filter(
+      tidytable::left_join(organism_table, new_matched_otl_exact) |>
+      tidytable::left_join(
+        otl |>
+          tidytable::rename(
+            unique_name.y = unique_name,
+            ott_id.y = ott_id
+          ),
+        by = c("ott_id" = "id")
+      ) |>
+      tidytable::filter(
         rank %in% c(
           "domain",
           "kingdom",
@@ -238,9 +248,7 @@ get_organism_taxonomy_ott <- function(df,
           "varietas"
         )
       ) |>
-      dplyr::distinct() |>
-      dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
-      ## feeling it is better that way
+      tidytable::distinct() |>
       tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
 
     if (nrow(biological_metadata) != 0) {
@@ -253,38 +261,41 @@ get_organism_taxonomy_ott <- function(df,
         tidytable::select(
           organism_name = canonical_name,
           organism_taxonomy_ottid = ott_id,
-          organism_taxonomy_01domain = dplyr::matches("name_domain"),
-          organism_taxonomy_02kingdom = dplyr::matches("name_kingdom"),
-          organism_taxonomy_03phylum = dplyr::matches("name_phylum"),
-          organism_taxonomy_04class = dplyr::matches("name_class"),
-          organism_taxonomy_05order = dplyr::matches("name_order"),
-          organism_taxonomy_06family = dplyr::matches("name_family"),
-          organism_taxonomy_07tribe = dplyr::matches("name_tribe"),
-          organism_taxonomy_08genus = dplyr::matches("name_genus"),
-          organism_taxonomy_09species = dplyr::matches("name_species"),
-          organism_taxonomy_10varietas = dplyr::matches("name_varietas")
-        ) |>
-        dplyr::arrange(dplyr::desc(dplyr::row_number())) |>
-        dplyr::coalesce() |>
-        data.frame()
+          organism_taxonomy_01domain = tidytable::matches("name_domain"),
+          organism_taxonomy_02kingdom = tidytable::matches("name_kingdom"),
+          organism_taxonomy_03phylum = tidytable::matches("name_phylum"),
+          organism_taxonomy_04class = tidytable::matches("name_class"),
+          organism_taxonomy_05order = tidytable::matches("name_order"),
+          organism_taxonomy_06family = tidytable::matches("name_family"),
+          organism_taxonomy_07tribe = tidytable::matches("name_tribe"),
+          organism_taxonomy_08genus = tidytable::matches("name_genus"),
+          organism_taxonomy_09species = tidytable::matches("name_species"),
+          organism_taxonomy_10varietas = tidytable::matches("name_varietas")
+        )
 
-      biological_metadata[dplyr::setdiff(
-        x = c(
-          "organism_name",
-          "organism_taxonomy_ottid",
-          "organism_taxonomy_01domain",
-          "organism_taxonomy_02kingdom",
-          "organism_taxonomy_03phylum",
-          "organism_taxonomy_04class",
-          "organism_taxonomy_05order",
-          "organism_taxonomy_06family",
-          "organism_taxonomy_07tribe",
-          "organism_taxonomy_08genus",
-          "organism_taxonomy_09species",
-          "organism_taxonomy_10varietas"
-        ),
-        y = names(biological_metadata)
-      )] <- NA
+      cols_to_set <- c(
+        "organism_name",
+        "organism_taxonomy_ottid",
+        "organism_taxonomy_01domain",
+        "organism_taxonomy_02kingdom",
+        "organism_taxonomy_03phylum",
+        "organism_taxonomy_04class",
+        "organism_taxonomy_05order",
+        "organism_taxonomy_06family",
+        "organism_taxonomy_07tribe",
+        "organism_taxonomy_08genus",
+        "organism_taxonomy_09species",
+        "organism_taxonomy_10varietas"
+      )
+
+      new_cols <- setdiff(cols_to_set, colnames(biological_metadata))
+      # Add new columns if they don't exist
+      if (length(new_cols) > 0) {
+        tidyfst::setDT(biological_metadata)
+        tidyfst::set(biological_metadata, NULL, new_cols, NA_character_)
+        biological_metadata |>
+          tidytable::as_tidytable()
+      }
     }
 
     log_debug("Got OTTaxonomy!")

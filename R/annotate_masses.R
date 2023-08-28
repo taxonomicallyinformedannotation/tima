@@ -546,8 +546,6 @@ annotate_masses <-
       "[1M+(H)2(ACN)3]2+ - NH3"
     )
 
-    "%ni%" <- Negate("%in%")
-
     log_debug("joining exact masses with single charge adducts \n")
     df14 <- tidytable::left_join(
       x = df12,
@@ -560,7 +558,7 @@ annotate_masses <-
         tidytable::everything(),
         -exact_mass
       ) |>
-      tidytable::filter(library %ni% forbidden_adducts) |>
+      tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::distinct()
 
     log_debug("adding adduct mass to get back to [1M] \n")
@@ -772,7 +770,7 @@ annotate_masses <-
         -exact_mass,
         -adduct_value
       ) |>
-      tidytable::filter(library %ni% forbidden_adducts) |>
+      tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::mutate(library = as.character(library)) |>
       tidytable::distinct()
 
