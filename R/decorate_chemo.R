@@ -175,4 +175,5 @@ decorate_chemo <- function(annot_table_wei_chemo =
       "level. \n"
     )
   )
+  return(annot_table_wei_chemo)
 }

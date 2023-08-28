@@ -33,4 +33,5 @@ decorate_masses <- function(annotation_table_ms1 =
     )),
     crayon::blue("features")
   )
+  return(annotation_table_ms1)
 }
