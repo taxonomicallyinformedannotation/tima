@@ -34,6 +34,8 @@ structure - organism pairs}
 
 \item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
+\item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
+
 \item{summarise}{Boolean. summarise results (1 row per feature)}
 }
 \value{

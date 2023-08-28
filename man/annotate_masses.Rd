@@ -55,6 +55,10 @@ annotate_masses(
 
 \item{adducts_list}{List of adducts to be used}
 
+\item{adducts_neg}{Negative adducts to be used}
+
+\item{adducts_pos}{Positive adducts to be used}
+
 \item{adducts_masses_list}{Adducts masses}
 
 \item{neutral_losses_list}{List of neutral losses to be used}
