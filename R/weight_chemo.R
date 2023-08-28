@@ -119,10 +119,8 @@ weight_chemo <-
              envir = parent.frame()
            )) {
     log_debug("calculating chemical score ... \n")
-    df1 <- annot_table_wei_bio_clean
-
     log_debug("... adding metadata \n")
-    df2 <- df1 |>
+    df2 <- annot_table_wei_bio_clean |>
       tidytable::distinct(
         feature_id,
         structure_inchikey_2D,
@@ -241,15 +239,22 @@ weight_chemo <-
         structure_inchikey_2D,
         structure_smiles_2D,
         score_chemical
+      ) |>
+      tidytable::arrange(tidytable::desc(score_chemical)) |>
+      ## Keep only one chemical score
+      tidytable::distinct(
+        feature_id,
+        structure_inchikey_2D,
+        structure_smiles_2D,
+        .keep_all = TRUE
       )
 
     log_debug("... joining \n")
     df4 <- tidytable::left_join(
-      df1 |>
+      annot_table_wei_bio_clean |>
         tidytable::select(-tidytable::contains("candidate_structure")),
       df3
-    ) |>
-      data.frame()
+    )
 
     df4$score_chemical[is.na(df4$score_chemical)] <- 0
 
@@ -293,8 +298,7 @@ weight_chemo <-
         .by = c(feature_id)
       ) |>
       tidytable::arrange(rank_final) |>
-      tidytable::arrange(as.numeric(feature_id)) |>
-      data.frame()
+      tidytable::arrange(as.numeric(feature_id))
 
     return(df4)
   }

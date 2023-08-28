@@ -139,4 +139,5 @@ decorate_bio <-
       crayon::red("variety"),
       "level. \n"
     )
+    return(annot_table_wei_bio)
   }

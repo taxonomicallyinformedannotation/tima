@@ -154,15 +154,7 @@ weight_annotations <- function(
   paths <<- parse_yaml_paths()
   params <<- parameters
 
-  log_debug(x = "... files ...")
-  log_debug(x = "... annotations")
-  annotation_table <- lapply(
-    X = annotations,
-    FUN = tidytable::fread,
-    na.strings = c("", "NA"),
-    colClasses = "character"
-  ) |>
-    tidytable::bind_rows()
+  log_debug(x = "Loading files ...")
 
   log_debug(x = "... components")
   components_table <- tidytable::fread(
@@ -174,13 +166,6 @@ weight_annotations <- function(
   log_debug(x = "... edges")
   edges_table <- tidytable::fread(
     file = edges,
-    na.strings = c("", "NA"),
-    colClasses = "character"
-  )
-
-  log_debug(x = "... taxa")
-  taxed_features_table <- tidytable::fread(
-    file = taxa,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
@@ -203,7 +188,15 @@ weight_annotations <- function(
       colClasses = "character"
     ))
 
-  log_debug(x = "... features")
+  log_debug(x = "... annotations")
+  annotation_table <- lapply(
+    X = annotations,
+    FUN = tidytable::fread,
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  ) |>
+    tidytable::bind_rows()
+
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
 
@@ -214,26 +207,20 @@ weight_annotations <- function(
 
   log_debug(x = "adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
-    tidytable::left_join(taxed_features_table)
+    tidytable::left_join(tidytable::fread(
+      file = taxa,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ))
+  rm(annotation_table)
 
   log_debug(x = "performing taxonomically informed scoring")
-  annot_table_wei_bio <- weight_bio()
-
-  annot_table_wei_bio |>
-    decorate_bio()
-
-  log_debug(x = "cleaning taxonomically informed results and
-              preparing for chemically informed scoring")
-  annot_table_wei_bio_clean <- clean_bio()
-
-  log_debug(x = "performing chemically informed scoring")
-  annot_table_wei_chemo <- weight_chemo()
-
-  annot_table_wei_chemo |>
-    decorate_chemo()
-
-  log_debug(x = "cleaning for export")
-  results <- clean_chemo()
+  results <- weight_bio() |>
+    decorate_bio() |>
+    clean_bio() |>
+    weight_chemo() |>
+    decorate_chemo() |>
+    clean_chemo()
 
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
