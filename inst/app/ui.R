@@ -1095,6 +1095,19 @@ ui <- fluidPage(
         title = "Options",
         h3("Options parameters"),
         checkboxInput(
+          inputId = "compounds_names",
+          label = "Compound names",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If ticked, compounds names will be reported.",
+              "This will require much more memory,
+              as they are the longest strings."
+            )
+          ),
+        checkboxInput(
           inputId = "force",
           label = "Do not use it!",
           value = FALSE

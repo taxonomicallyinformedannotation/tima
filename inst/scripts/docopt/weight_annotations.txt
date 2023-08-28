@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/weight_annotations.R
 
 Usage:
-  weight_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-11=<wei-che-11>] [--wei-che-12=<wei-che-12>] [--wei-che-13=<wei-che-13>]  [--wei-che-14=<wei-che-14>] [--wei-che-21=<wei-che-21>] [--wei-che-22=<wei-che-22>] [--wei-che-23=<wei-che-23>] [--summarise=<summarise>] [--force=<force>]
+  weight_annotations.R [--ann-can-ini=<ann-can-ini>] [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-ms1-thr-bio=<ann-ms1-thr-bio>] [--ann-ms1-thr-che=<ann-ms1-thr-che>] [--ann-ms1-thr-con=<ann-ms1-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-11=<wei-che-11>] [--wei-che-12=<wei-che-12>] [--wei-che-13=<wei-che-13>]  [--wei-che-14=<wei-che-14>] [--wei-che-21=<wei-che-21>] [--wei-che-22=<wei-che-22>] [--wei-che-23=<wei-che-23>] [--compounds-names=<compounds-names>] [--summarise=<summarise>] [--force=<force>]
 
 Arguments:
   ann-can-ini                Number of initial candidates. INTEGER
@@ -46,6 +46,7 @@ Arguments:
   wei-che-22                 Score for a chemical NPC superclass match. FLOAT
   wei-che-23                 Score for a chemical NPC class match. FLOAT
 
+  compounds-names            Report compounds names. Can be very large. BOOLEAN
   force                      Do not use it. BOOLEAN
   summarise                  Summarize results (1 row per feature). BOOLEAN
 

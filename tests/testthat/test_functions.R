@@ -429,7 +429,8 @@ testthat::test_that("Whole process", {
     summarise = FALSE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
-    minimal_ms1_condition = "AND"
+    minimal_ms1_condition = "AND",
+    compounds_names = TRUE
   )
 
   ## CLI arguments check
@@ -539,6 +540,7 @@ testthat::test_that("Whole process", {
   arguments$wei_che_21 <<- "x"
   arguments$wei_che_22 <<- "x"
   arguments$wei_che_23 <<- "x"
+  arguments$compounds_names <<- "x"
   arguments$force <<- "x"
   arguments$summarise <<- "x"
 

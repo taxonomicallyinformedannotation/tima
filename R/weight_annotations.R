@@ -82,6 +82,7 @@ utils::globalVariables(
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param ms1_only Boolean. Keep only MS1 annotations
+#' @param compounds_names Report compounds names. Can be very large. BOOLEAN
 #' @param summarise Boolean. Summarize results (1 row per feature)
 #' @param pattern Pattern to identify your job. STRING
 #' @param parameters Params
@@ -133,6 +134,7 @@ weight_annotations <- function(
     minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
     minimal_ms1_condition = params$annotations$ms1$thresholds$condition,
     ms1_only = params$annotations$ms1only,
+    compounds_names = params$options$compounds_names,
     summarise = params$options$summarise,
     pattern = params$files$pattern,
     force = params$options$force,
@@ -211,6 +213,10 @@ weight_annotations <- function(
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
       tidytable::filter(score_input == 0)
+  }
+  if (compounds_names == FALSE) {
+    annotation_table <- annotation_table |>
+      tidytable::select(-structure_name)
   }
 
   log_debug(x = "adding biological organism metadata")
