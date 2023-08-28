@@ -254,8 +254,7 @@ prepare_taxa <-
           "sample_organism_09_species",
           "sample_organism_10_varietas"
         )
-      ) |>
-      tidytable::ungroup()
+      )
 
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 

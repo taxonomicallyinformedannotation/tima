@@ -258,7 +258,6 @@ clean_chemo <-
       tidytable::left_join(references) |>
       tidytable::group_by(c(-reference_doi)) |>
       clean_collapse(cols = c("reference_doi")) |>
-      tidytable::ungroup() |>
       tidytable::select(
         feature_id,
         component_id,

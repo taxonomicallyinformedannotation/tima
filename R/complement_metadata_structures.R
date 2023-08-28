@@ -116,12 +116,6 @@ complement_metadata_structures <- function(
       structure_smiles_2D
     ) |>
     clean_collapse(cols = c("structure_name")) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
-        .fns = trimws
-      )
-    ) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_2D,
       .keep_all = TRUE
