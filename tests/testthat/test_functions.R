@@ -148,65 +148,10 @@ testthat::test_that("Whole process", {
   )
 
   ## Prepare libraries
-
-  ### Retention time
-  step <- "prepare_libraries_rt"
-  params <- get_params(step = step)
-  prepare_libraries_rt(
-    mgf_exp = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
-    ),
-    mgf_is = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
-    ),
-    temp_exp = paths$data$source$libraries$rt$example_mini,
-    temp_is = paths$data$source$libraries$rt$example_mini
-  )
-  prepare_libraries_rt()
-
-  ### Closed
-  step <- "prepare_libraries_sop_closed"
-  params <- get_params(step = step)
-  ## To do as if there was an input
-  prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
-  ## When there is no input
-  prepare_libraries_sop_closed()
-
-  ### ECMDB
-  step <- "prepare_libraries_sop_ecmdb"
-  params <- get_params(step = step)
-  ## To do as if there was an input
-  prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
-  ## When there is no input
-  prepare_libraries_sop_ecmdb()
-
-  ### HMDB
-  # step <- "prepare_libraries_sop_hmdb"
-  # params <- get_params(step = step)
-  # prepare_libraries_sop_hmdb()
-
-  ### LOTUS
-  step <- "prepare_libraries_sop_lotus"
-  params <- get_params(step = step)
-  prepare_libraries_sop_lotus()
-
-  ### SOP library
-  step <- "prepare_libraries_sop_merged"
-  params <- get_params(step = step)
-  prepare_libraries_sop_merged(
-    filter = TRUE,
-    level = "family",
-    value = "Simaroubaceae|Gentianaceae",
-    output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
-  )
-  prepare_libraries_sop_merged()
-
-  ## Prepare spectra
+  ### Spectra
   step <- "prepare_libraries_spectra"
   params <- get_params(step = step)
-  ### LOTUS
+  #### LOTUS
   col_args <- list(
     col_ce = NULL,
     col_ci = "FILENAME",
@@ -225,7 +170,7 @@ testthat::test_that("Whole process", {
     col_sy = NULL,
     col_xl = NULL
   )
-  ## Pos
+  ##### Pos
   do.call(
     what = prepare_libraries_spectra,
     args = c(
@@ -235,13 +180,13 @@ testthat::test_that("Whole process", {
       output = params$files$libraries$spectral$is$pos
     )
   )
-  ## Check the library already exists warning
+  ##### Check the library already exists warning
   prepare_libraries_spectra(
     input = params$files$libraries$spectral$is$raw[[2]] |>
       gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
     output = params$files$libraries$spectral$is$pos
   )
-  ## Neg & without metadata
+  ##### Neg & without metadata
   do.call(
     what = prepare_libraries_spectra,
     args = c(
@@ -252,7 +197,7 @@ testthat::test_that("Whole process", {
       polarity = "neg"
     )
   )
-  ## Classical
+  #### Classical
   prepare_libraries_spectra()
   prepare_libraries_spectra(polarity = "neg")
   prepare_libraries_spectra(
@@ -261,11 +206,66 @@ testthat::test_that("Whole process", {
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
 
-  ### HMDB
+  #### HMDB
   # prepare_isdb_hmdb()
 
-  ### Closed
+  #### Closed
   # prepare_mona()
+
+  ### Retention time
+  step <- "prepare_libraries_rt"
+  params <- get_params(step = step)
+  prepare_libraries_rt(
+    mgf_exp = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
+    mgf_is = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
+    temp_exp = paths$data$source$libraries$rt$example_mini,
+    temp_is = paths$data$source$libraries$rt$example_mini
+  )
+  prepare_libraries_rt()
+
+  ### SOP
+  #### Closed
+  step <- "prepare_libraries_sop_closed"
+  params <- get_params(step = step)
+  ## To do as if there was an input
+  prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
+  ## When there is no input
+  prepare_libraries_sop_closed()
+
+  #### ECMDB
+  step <- "prepare_libraries_sop_ecmdb"
+  params <- get_params(step = step)
+  ## To do as if there was an input
+  prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
+  ## When there is no input
+  prepare_libraries_sop_ecmdb()
+
+  #### HMDB
+  # step <- "prepare_libraries_sop_hmdb"
+  # params <- get_params(step = step)
+  # prepare_libraries_sop_hmdb()
+
+  #### LOTUS
+  step <- "prepare_libraries_sop_lotus"
+  params <- get_params(step = step)
+  prepare_libraries_sop_lotus()
+
+  #### MERGED
+  step <- "prepare_libraries_sop_merged"
+  params <- get_params(step = step)
+  prepare_libraries_sop_merged(
+    filter = TRUE,
+    level = "family",
+    value = "Simaroubaceae|Gentianaceae",
+    output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
+  )
+  prepare_libraries_sop_merged()
 
   ### Adducts
   step <- "prepare_libraries_adducts"
