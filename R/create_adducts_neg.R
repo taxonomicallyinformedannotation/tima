@@ -7,6 +7,7 @@ utils::globalVariables(
     "fluorine",
     "formic",
     "name",
+    "phosphoric",
     "potassium",
     "proton",
     "sodium",
@@ -46,8 +47,19 @@ create_adducts_neg <- function(masses_table = get("masses_table",
       `[1M+(FA)1-(H)1]1-` = exact_mass + formic - proton,
       `[1M+(Hac)1-(H)1]1-` = exact_mass + acetic - proton,
       `[1M+(Na)1(FA)1-(H)2]1-` = exact_mass + formic + sodium - 2 * proton,
+      `[1M+(K)1(FA)1-(H)2]1-` = exact_mass + formic + potassium - 2 * proton,
+      `[1M+(Na)1(Cl)1-(H)1]1-` = exact_mass + sodium + chlorine - proton,
       `[1M+(Br)1]1-` = exact_mass + bromine,
+      `[1M+(H2PO4)1-(H)1]1-` = exact_mass + phosphoric - proton,
+      `[1M+(Na)1(H2PO4)1-(H)2]1-` = exact_mass + phosphoric + sodium -
+        2 * proton,
+      `[1M+(K)1(H2PO4)1-(H)2]1-` = exact_mass + phosphoric + potassium -
+        2 * proton,
       `[1M+(TFA)1-(H)1]1-` = exact_mass + tfa - proton,
+      `[1M+(Na)2(Cl)2-(H)1]1-` = exact_mass + 2 * sodium + 2 * chlorine -
+        proton,
+      `[1M+(Na)3(Cl)3-(H)1]1-` = exact_mass + 3 * sodium + 3 * chlorine -
+        proton,
       `[2M-(H)1]1-` = 2 * exact_mass - proton,
       `[2M+(FA)1-(H)1]1-` = 2 * exact_mass + formic - proton,
       `[2M+(Hac)1-(H)1]1-` = 2 * exact_mass + acetic - proton,
