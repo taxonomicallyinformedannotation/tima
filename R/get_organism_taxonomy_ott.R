@@ -83,7 +83,7 @@ get_organism_taxonomy_ott <- function(df,
     ## cutting in smaller requests
     cut <- 100
     organisms_split <-
-      lapply(seq(1, length(organisms), cut), function(i) {
+      lapply(X = seq(1, length(organisms), cut), FUN = function(i) {
         organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
       })
     new_matched_otl_exact_list <- organisms_split |>
@@ -141,7 +141,7 @@ get_organism_taxonomy_ott <- function(df,
       ## TODO make it cleaner
       cut <- 100
       organisms_new_split <-
-        lapply(seq(1, length(organisms_new), cut), function(i) {
+        lapply(X = seq(1, length(organisms_new), cut), FUN = function(i) {
           organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
         })
       log_debug("Retrying with", organisms_new)
@@ -187,20 +187,19 @@ get_organism_taxonomy_ott <- function(df,
       taxon_lineage <- taxon_info |>
         rotl::tax_lineage()
 
-      list_df <- list()
-
-      for (i in seq_along(taxon_lineage)) {
-        list_df[[i]] <- tidytable::bind_rows(
-          data.frame(
-            id = otts[i],
-            rank = taxon_info[[i]]$rank,
-            name = taxon_info[[i]]$name,
-            unique_name = taxon_info[[i]]$unique_name,
-            ott_id = as.character(taxon_info[[i]]$ott_id)
-          ),
-          data.frame(id = otts[i], taxon_lineage[[i]])
-        )
-      }
+      list_df <- seq_along(taxon_lineage) |>
+        lapply(FUN = function(x) {
+          tidytable::bind_rows(
+            data.frame(
+              id = otts[x],
+              rank = taxon_info[[x]]$rank,
+              name = taxon_info[[x]]$name,
+              unique_name = taxon_info[[x]]$unique_name,
+              ott_id = as.character(taxon_info[[x]]$ott_id)
+            ),
+            data.frame(id = otts[x], taxon_lineage[[x]])
+          )
+        })
 
       otl <- tidytable::bind_rows(list_df) |>
         tidytable::mutate(ott_id = as.integer(ott_id)) |>

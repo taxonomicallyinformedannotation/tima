@@ -171,7 +171,7 @@ clean_chemo <-
       tidytable::filter(rank_final <= candidates_final, .by = c(feature_id))
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
-    df2 <- features_table |>
+    df3 <- features_table |>
       tidytable::left_join(df1) |>
       tidytable::left_join(components_table) |>
       tidytable::mutate(
@@ -233,27 +233,23 @@ clean_chemo <-
         "consensus_structure_cla_par",
         "consistency_structure_cla_par"
       ))) |>
-      tidytable::distinct()
-
-    references <- structure_organism_pairs_table |>
-      tidytable::select(
-        structure_inchikey_2D,
-        reference_doi,
-        organism_name,
-        tidytable::contains("organism_taxonomy_")
-      ) |>
       tidytable::distinct() |>
-      tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
-      tidytable::filter(!is.na(value)) |>
-      tidytable::filter(value != "notClassified") |>
-      tidytable::distinct(structure_inchikey_2D,
-        best_candidate_organism = value,
-        reference_doi
-      )
-
-    log_debug("adding references \n")
-    df3 <- df2 |>
-      tidytable::left_join(references) |>
+      log_pipe("adding references \n") |>
+      tidytable::left_join(structure_organism_pairs_table |>
+        tidytable::select(
+          structure_inchikey_2D,
+          reference_doi,
+          organism_name,
+          tidytable::contains("organism_taxonomy_")
+        ) |>
+        tidytable::distinct() |>
+        tidytable::pivot_longer(tidytable::contains("organism_taxonomy_")) |>
+        tidytable::filter(!is.na(value)) |>
+        tidytable::filter(value != "notClassified") |>
+        tidytable::distinct(structure_inchikey_2D,
+          best_candidate_organism = value,
+          reference_doi
+        )) |>
       tidytable::group_by(c(-reference_doi)) |>
       clean_collapse(cols = c("reference_doi")) |>
       tidytable::select(tidytable::any_of(c(
@@ -318,9 +314,11 @@ clean_chemo <-
             !colnames(df4)
           ) |>
           tidytable::distinct())
+      rm(df4)
     } else {
       df5 <- df3
     }
+    rm(df3)
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
@@ -387,55 +385,54 @@ clean_chemo <-
       ))
 
     log_debug("adding consensus again to droped candidates \n")
-    df8 <- df6 |>
-      tidytable::filter(!is.na(structure_inchikey_2D))
-
-    df9 <- df6 |>
-      tidytable::filter(is.na(structure_inchikey_2D))
-
-    df10 <- tidytable::left_join(
-      df9,
-      annot_table_wei_chemo |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidytable::everything(),
-          .fns = as.character
-        ))
+    results <- tidytable::bind_rows(
+      df6 |>
+        tidytable::filter(!is.na(structure_inchikey_2D)),
+      tidytable::left_join(
+        df6 |>
+          tidytable::filter(is.na(structure_inchikey_2D)),
+        annot_table_wei_chemo |>
+          tidytable::mutate(tidytable::across(
+            .cols = tidytable::everything(),
+            .fns = as.character
+          ))
+      ) |>
+        tidytable::select(tidytable::any_of(
+          c(
+            "feature_id",
+            "component_id",
+            "mz",
+            "rt",
+            "consensus_structure_cla_kin",
+            "consistency_structure_cla_kin",
+            "consensus_structure_npc_pat",
+            "consistency_structure_npc_pat",
+            "consensus_structure_cla_sup",
+            "consistency_structure_cla_sup",
+            "consensus_structure_npc_sup",
+            "consistency_structure_npc_sup",
+            "consensus_structure_cla_cla",
+            "consistency_structure_cla_cla",
+            "consensus_structure_npc_cla",
+            "consistency_structure_npc_cla",
+            "consensus_structure_cla_par",
+            "consistency_structure_cla_par"
+          )
+        )) |>
+        tidytable::distinct()
     ) |>
-      tidytable::select(tidytable::any_of(
-        c(
-          "feature_id",
-          "component_id",
-          "mz",
-          "rt",
-          "consensus_structure_cla_kin",
-          "consistency_structure_cla_kin",
-          "consensus_structure_npc_pat",
-          "consistency_structure_npc_pat",
-          "consensus_structure_cla_sup",
-          "consistency_structure_cla_sup",
-          "consensus_structure_npc_sup",
-          "consistency_structure_npc_sup",
-          "consensus_structure_cla_cla",
-          "consistency_structure_cla_cla",
-          "consensus_structure_npc_cla",
-          "consistency_structure_npc_cla",
-          "consensus_structure_cla_par",
-          "consistency_structure_cla_par"
-        )
-      )) |>
-      tidytable::distinct()
-
-    df11 <- tidytable::bind_rows(df8, df10) |>
       tidytable::arrange(as.numeric(feature_id))
 
+    rm(df6)
+
     ## Because cytoscape import fails otherwise
-    colnames(df11) <-
+    colnames(results) <-
       stringi::stri_replace_all_fixed(
-        str = colnames(df11),
+        str = colnames(results),
         pattern = "_structure",
         replacement = "",
         vectorize_all = FALSE
       )
 
-    return(df11)
+    return(results)
   }

@@ -72,7 +72,9 @@ decorate_bio <-
       tidytable::filter(score_biological >= score_biological_order)
     df_fam <- df_ord |>
       tidytable::filter(score_biological >= score_biological_family)
-    df_gen <- df_fam |>
+    df_tri <- df_fam |>
+      tidytable::filter(score_biological >= score_biological_tribe)
+    df_gen <- df_tri |>
       tidytable::filter(score_biological >= score_biological_genus)
     df_spe <- df_gen |>
       tidytable::filter(score_biological >= score_biological_species)
@@ -116,6 +118,13 @@ decorate_bio <-
       "annotations reranked at the",
       crayon::blue("family"),
       "level, \n",
+      crayon::blue(nrow(
+        df_tri |>
+          tidytable::distinct(structure_inchikey_2D)
+      )),
+      "annotations reranked at the",
+      crayon::blue("tribe"),
+      "level, \n",
       crayon::yellow(nrow(
         df_gen |>
           tidytable::distinct(structure_inchikey_2D)
@@ -138,6 +147,17 @@ decorate_bio <-
       "annotations reranked at the",
       crayon::red("variety"),
       "level. \n"
+    )
+    rm(
+      df_kin,
+      df_phy,
+      df_cla,
+      df_ord,
+      df_fam,
+      df_tri,
+      df_gen,
+      df_spe,
+      df_var
     )
     return(annot_table_wei_bio)
   }

@@ -416,6 +416,7 @@ weight_bio <-
         structure_inchikey_2D,
         candidate_organism_10_varietas
       )
+    rm(candidates)
 
     log_debug("calculating biological scores ... \n")
 
@@ -905,8 +906,100 @@ weight_bio <-
         score_biological
       )
 
+    rm(metadata)
+    rm(
+      candidate_domain,
+      sample_domain,
+      candidate_kingdom,
+      sample_kingdom,
+      candidate_phylum,
+      sample_phylum,
+      candidate_class,
+      sample_class,
+      candidate_order,
+      sample_order,
+      # candidate_infraorder,
+      # sample_infraoder,
+      candidate_family,
+      sample_family,
+      # candidate_subfamily,
+      # sample_subfamily,
+      candidate_tribe,
+      sample_tribe,
+      # candidate_subtribe,
+      # sample_subtribe,
+      candidate_genus,
+      sample_genus,
+      # candidate_subgenus,
+      # sample_subgenus,
+      candidate_species,
+      sample_species,
+      # candidate_subspecies,
+      # sample_subspecies,
+      candidate_varietas,
+      sample_varietas
+    )
+
+    step_dom <- step_dom |>
+      tidytable::filter(score_biological > 0)
+    step_kin <- step_kin |>
+      tidytable::filter(score_biological > 0)
+    step_phy <- step_phy |>
+      tidytable::filter(score_biological > 0)
+    step_cla <- step_cla |>
+      tidytable::filter(score_biological > 0)
+    step_ord <- step_ord |>
+      tidytable::filter(score_biological > 0)
+    # step_ord2 <- step_ord2 |>
+    #   tidytable::filter(score_biological > 0)
+    step_fam <- step_fam |>
+      tidytable::filter(score_biological > 0)
+    # step_fam2 <- step_fam2 |>
+    #   tidytable::filter(score_biological > 0)
+    step_tri <- step_tri |>
+      tidytable::filter(score_biological > 0)
+    # step_tri2 <- step_tri2 |>
+    #   tidytable::filter(score_biological > 0)
+    step_gen <- step_gen |>
+      tidytable::filter(score_biological > 0)
+    # step_gen2 <- step_gen2 |>
+    #   tidytable::filter(score_biological > 0)
+    step_spe <- step_spe |>
+      tidytable::filter(score_biological > 0)
+    # step_spe2 <- step_spe2 |>
+    #   tidytable::filter(score_biological > 0)
+    step_var <- step_var |>
+      tidytable::filter(score_biological > 0)
+
     log_debug("keeping best biological score only \n")
-    biologically_weighted <- tidytable::bind_rows(
+    annot_table_wei_bio <- annotation_table_taxed |>
+      tidytable::select(-tidytable::contains("sample_")) |>
+      tidytable::left_join(
+        tidytable::bind_rows(
+          step_dom,
+          step_kin,
+          step_phy,
+          step_cla,
+          step_ord,
+          ## step_ord2,
+          step_fam,
+          ## step_fam2,
+          step_tri,
+          ## step_tri2,
+          step_gen,
+          ## step_gen2,
+          step_spe,
+          ## step_spe2,
+          step_var
+        ) |>
+          tidytable::arrange(tidytable::desc(score_biological)) |>
+          tidytable::distinct(feature_id,
+            structure_inchikey_2D,
+            .keep_all = TRUE
+          )
+      )
+
+    rm(
       step_dom,
       step_kin,
       step_phy,
@@ -915,30 +1008,19 @@ weight_bio <-
       ## step_ord2,
       step_fam,
       ## step_fam2,
+      step_tri,
+      ## step_tri2,
       step_gen,
       ## step_gen2,
       step_spe,
       ## step_spe2,
       step_var
-    ) |>
-      tidytable::arrange(tidytable::desc(score_biological)) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        .keep_all = TRUE
-      )
+    )
 
-    log_debug("joining with initial results \n")
-    biologically_weighted_full <-
-      tidytable::left_join(
-        annotation_table_taxed |>
-          tidytable::select(-tidytable::contains("sample_")),
-        biologically_weighted
-      )
-
-    biologically_weighted_full$score_biological[is.na(biologically_weighted_full$score_biological)] <-
+    annot_table_wei_bio$score_biological[is.na(annot_table_wei_bio$score_biological)] <-
       0
 
-    biologically_weighted_full <- biologically_weighted_full |>
+    annot_table_wei_bio <- annot_table_wei_bio |>
       tidytable::mutate(
         score_pondered_bio = (
           (1 / (weight_biological + weight_spectral)) *
@@ -950,10 +1032,10 @@ weight_bio <-
         )
       )
 
-    biologically_weighted_full$score_pondered_bio[is.na(biologically_weighted_full$score_pondered_bio)] <-
+    annot_table_wei_bio$score_pondered_bio[is.na(annot_table_wei_bio$score_pondered_bio)] <-
       0
 
-    biologically_weighted_full <- biologically_weighted_full |>
+    annot_table_wei_bio <- annot_table_wei_bio |>
       tidytable::arrange(tidytable::desc(score_pondered_bio)) |>
       tidytable::distinct(
         feature_id,
@@ -975,5 +1057,5 @@ weight_bio <-
       ) |>
       tidytable::arrange(as.numeric(feature_id))
 
-    return(biologically_weighted_full)
+    return(annot_table_wei_bio)
   }

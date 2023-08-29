@@ -639,8 +639,10 @@ clean_bio <-
         )
       )
 
+    rm(df3)
+
     log_debug("joining all except -1 together \n")
-    df4 <-
+    annot_table_wei_bio_clean <-
       tidytable::left_join(df,
         freq_cla_kin,
         by = stats::setNames(
@@ -692,12 +694,9 @@ clean_bio <-
       tidytable::mutate(tidytable::across(
         .cols = tidytable::where(is.logical),
         .fns = as.character
-      ))
-
-    ## TODO Think about better scoring option
-    log_debug("adding dummy consistency for features
-              with less than 2 neighbors \n")
-    dummy_consistency <- df4 |>
+      )) |>
+      log_pipe("adding dummy consistency for features
+              with less than 2 neighbors \n") |>
       tidytable::mutate(
         consensus_structure_cla_kin =
           tidytable::coalesce(
@@ -806,5 +805,5 @@ clean_bio <-
           )
       )
 
-    return(dummy_consistency)
+    return(annot_table_wei_bio_clean)
   }

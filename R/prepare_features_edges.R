@@ -31,7 +31,7 @@ prepare_features_edges <-
     stopifnot(
       "Your input file(s) do(es) not exist" =
         rep(TRUE, length(unlist(input))) ==
-          lapply(X = unlist(input), file.exists)
+          lapply(X = unlist(input), FUN = file.exists)
     )
     params <<- parameters
     ## Load edges table

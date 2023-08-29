@@ -33,5 +33,6 @@ decorate_masses <- function(annotation_table_ms1 =
     )),
     crayon::blue("features")
   )
+  rm(df_1)
   return(annotation_table_ms1)
 }

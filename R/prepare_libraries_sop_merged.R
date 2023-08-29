@@ -99,14 +99,12 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Loading and concatenating prepared libraries")
     params <<- parameters
-    libraries <- list()
-    for (i in seq_along(files)) {
-      libraries[[i]] <- tidytable::fread(
-        file = files[[i]],
+    libraries <- files |>
+      lapply(
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       )
-    }
 
     tables <- tidytable::bind_rows(libraries) |>
       split_tables_sop()

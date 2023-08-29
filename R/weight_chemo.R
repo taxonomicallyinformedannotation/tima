@@ -118,8 +118,6 @@ weight_chemo <-
            score_chemical_npc_class = get("score_chemical_npc_class",
              envir = parent.frame()
            )) {
-    log_debug("calculating chemical score ... \n")
-    log_debug("... adding metadata \n")
     df2 <- annot_table_wei_bio_clean |>
       tidytable::distinct(
         feature_id,
@@ -147,7 +145,7 @@ weight_chemo <-
         consensus_structure_cla_par,
         consistency_score_chemical_4_cla_parent
       )
-
+    log_debug("calculating chemical score at all levels ... \n")
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
       tidytable::filter(
@@ -218,8 +216,12 @@ weight_chemo <-
       ) |>
       tidytable::mutate(score_chemical = score_chemical_cla_parent)
 
-    log_debug("... outputting best score \n")
-    df3 <-
+    rm(df2)
+
+    log_debug("... joining best score \n")
+    annot_table_wei_chemo <- tidytable::left_join(
+      annot_table_wei_bio_clean |>
+        tidytable::select(-tidytable::contains("candidate_structure")),
       tidytable::bind_rows(
         step_cla_kin,
         step_npc_pat,
@@ -229,37 +231,41 @@ weight_chemo <-
         step_npc_cla,
         step_cla_par
       ) |>
-      tidytable::mutate(score_chemical = ifelse(
-        test = is.na(score_chemical),
-        yes = 0,
-        no = score_chemical
-      )) |>
-      tidytable::select(
-        feature_id,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        score_chemical
-      ) |>
-      tidytable::arrange(tidytable::desc(score_chemical)) |>
-      ## Keep only one chemical score
-      tidytable::distinct(
-        feature_id,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        .keep_all = TRUE
-      )
-
-    log_debug("... joining \n")
-    df4 <- tidytable::left_join(
-      annot_table_wei_bio_clean |>
-        tidytable::select(-tidytable::contains("candidate_structure")),
-      df3
+        tidytable::mutate(score_chemical = ifelse(
+          test = is.na(score_chemical),
+          yes = 0,
+          no = score_chemical
+        )) |>
+        tidytable::select(
+          feature_id,
+          structure_inchikey_2D,
+          structure_smiles_2D,
+          score_chemical
+        ) |>
+        tidytable::arrange(tidytable::desc(score_chemical)) |>
+        ## Keep only one chemical score
+        tidytable::distinct(
+          feature_id,
+          structure_inchikey_2D,
+          structure_smiles_2D,
+          .keep_all = TRUE
+        )
     )
 
-    df4$score_chemical[is.na(df4$score_chemical)] <- 0
+    rm(
+      step_cla_kin,
+      step_npc_pat,
+      step_cla_sup,
+      step_npc_sup,
+      step_cla_cla,
+      step_npc_cla,
+      step_cla_par
+    )
+
+    annot_table_wei_chemo$score_chemical[is.na(annot_table_wei_chemo$score_chemical)] <- 0
 
     log_debug("... cleaning \n")
-    df4 <- df4 |>
+    annot_table_wei_chemo <- annot_table_wei_chemo |>
       tidytable::mutate(
         score_pondered_chemo = (
           (1 / (
@@ -300,5 +306,5 @@ weight_chemo <-
       tidytable::arrange(rank_final) |>
       tidytable::arrange(as.numeric(feature_id))
 
-    return(df4)
+    return(annot_table_wei_chemo)
   }

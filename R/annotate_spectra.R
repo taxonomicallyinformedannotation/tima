@@ -66,7 +66,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
   stopifnot(
     "Library file(s) do(es) not exist" =
       rep(TRUE, length(unlist(library))) ==
-        lapply(X = unlist(library), file.exists)
+        lapply(X = unlist(library), FUN = file.exists)
   )
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -102,7 +102,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
-    spectral_library <- lapply(library, import_spectra) |>
+    spectral_library <- library |>
+      lapply(FUN = import_spectra) |>
       Spectra::concatenateSpectra() |>
       sanitize_spectra() |>
       Spectra::addProcessing(remove_above_precursor(),

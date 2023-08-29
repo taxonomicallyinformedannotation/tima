@@ -175,5 +175,14 @@ decorate_chemo <- function(annot_table_wei_chemo =
       "level. \n"
     )
   )
+  rm(
+    df_cla_kin,
+    df_npc_pat,
+    df_cla_sup,
+    df_npc_sup,
+    df_cla_cla,
+    df_npc_cla,
+    df_cla_par
+  )
   return(annot_table_wei_chemo)
 }

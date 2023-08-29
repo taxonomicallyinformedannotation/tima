@@ -32,12 +32,12 @@ filter_annotations <-
     stopifnot(
       "Annotations file(s) do(es) not exist" =
         rep(TRUE, length(annotations)) ==
-          lapply(X = annotations, file.exists)
+          lapply(X = annotations, FUN = file.exists)
     )
     stopifnot(
       "Retention time file(s) do(es) not exist" =
         rep(TRUE, length(rts)) ==
-          lapply(X = rts, file.exists)
+          lapply(X = rts, FUN = file.exists)
     )
     stopifnot("Your features file does not exist." = file.exists(features))
 
