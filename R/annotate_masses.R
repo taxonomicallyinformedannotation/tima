@@ -557,7 +557,7 @@ annotate_masses <-
       "[1M+(K)2(H2PO4)1-(H)1]1+ - H3PO4",
       "[1M+(H2PO4)1-(H)1]1- - H3PO4",
       "[1M+(Na)1(H2PO4)1-(H)2]1- - H3PO4",
-      "[1M+(K)1(H2PO4)1-(H)2]1- - H3PO4",
+      "[1M+(K)1(H2PO4)1-(H)2]1- - H3PO4"
     )
 
     log_debug("joining exact masses with single charge adducts \n")
