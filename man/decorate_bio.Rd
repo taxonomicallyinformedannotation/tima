@@ -11,6 +11,7 @@ decorate_bio(
   score_biological_class = get("score_biological_class", envir = parent.frame()),
   score_biological_order = get("score_biological_order", envir = parent.frame()),
   score_biological_family = get("score_biological_family", envir = parent.frame()),
+  score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
   score_biological_genus = get("score_biological_genus", envir = parent.frame()),
   score_biological_species = get("score_biological_species", envir = parent.frame()),
   score_biological_variety = get("score_biological_variety", envir = parent.frame())

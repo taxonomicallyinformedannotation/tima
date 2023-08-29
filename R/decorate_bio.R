@@ -53,6 +53,9 @@ decorate_bio <-
            score_biological_family = get("score_biological_family",
              envir = parent.frame()
            ),
+           score_biological_tribe = get("score_biological_tribe",
+             envir = parent.frame()
+           ),
            score_biological_genus = get("score_biological_genus",
              envir = parent.frame()
            ),
