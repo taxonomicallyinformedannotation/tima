@@ -3,6 +3,7 @@
 # timaR 2.9.0
 
 * Added compounds names as parameter
+* New adducts (#79, #80)
 * Refactored RT matching (#76)
 * Multiple fixes (#71, #81)
 

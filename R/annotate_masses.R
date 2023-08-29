@@ -534,6 +534,10 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
+      "[1M+(H)2(ACN)1]2+ - NH3",
+      "[1M+(H)2(NH3)1]2+ - NH3",
+      "[1M+(H)2(ACN)2]2+ - NH3",
+      "[1M+(H)2(ACN)3]2+ - NH3",
       "[1M+(H)1(ACN)1]1+ - NH3",
       "[1M+(H)1(NH3)1]1+ - NH3",
       "[1M+(H)1(C2H7N)1]1+ - NH3",
@@ -542,10 +546,18 @@ annotate_masses <-
       "[1M+(H)1(CH3OH)1]1+ - O",
       "[1M+(H)1(ACN)2]1+ - NH3",
       "[1M+(Na)1(ACN)1]1+ - NH3",
-      "[1M+(H)2(ACN)1]2+ - NH3",
-      "[1M+(H)2(NH3)1]2+ - NH3",
-      "[1M+(H)2(ACN)2]2+ - NH3",
-      "[1M+(H)2(ACN)3]2+ - NH3"
+      "[1M+(H)1(Na)1(H2PO4)2]2+ - H3PO4",
+      "[1M+(H)1(K)1(H2PO4)2]2+ - H3PO4",
+      "[1M+(Na)2(H2PO4)2]2+ - H3PO4",
+      "[1M+(K)2(H2PO4)2]2+ - H3PO4",
+      "[1M+(H)1(H2PO4)1]1+ - H3PO4",
+      "[1M+(Na)1(H2PO4)1]1+ - H3PO4",
+      "[1M+(K)1(H2PO4)1]1+ - H3PO4",
+      "[1M+(Na)2(H2PO4)1-(H)1]1+ - H3PO4",
+      "[1M+(K)2(H2PO4)1-(H)1]1+ - H3PO4",
+      "[1M+(H2PO4)1-(H)1]1- - H3PO4",
+      "[1M+(Na)1(H2PO4)1-(H)2]1- - H3PO4",
+      "[1M+(K)1(H2PO4)1-(H)2]1- - H3PO4",
     )
 
     log_debug("joining exact masses with single charge adducts \n")
