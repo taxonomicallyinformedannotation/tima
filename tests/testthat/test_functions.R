@@ -148,6 +148,24 @@ testthat::test_that("Whole process", {
   )
 
   ## Prepare libraries
+
+  ### Retention time
+  step <- "prepare_libraries_rt"
+  params <- get_params(step = step)
+  prepare_libraries_rt(
+    mgf_exp = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
+    mgf_is = list(
+      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
+    temp_exp = paths$data$source$libraries$rt$example_mini,
+    temp_is = paths$data$source$libraries$rt$example_mini
+  )
+  prepare_libraries_rt()
+
   ### Closed
   step <- "prepare_libraries_sop_closed"
   params <- get_params(step = step)
@@ -253,23 +271,6 @@ testthat::test_that("Whole process", {
   step <- "prepare_libraries_adducts"
   params <- get_params(step = step)
   prepare_libraries_adducts()
-
-  ### Retention time
-  step <- "prepare_libraries_rt"
-  params <- get_params(step = step)
-  prepare_libraries_rt(
-    mgf_exp = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
-    ),
-    mgf_is = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
-    ),
-    temp_exp = paths$data$source$libraries$rt$example_mini,
-    temp_is = paths$data$source$libraries$rt$example_mini
-  )
-  prepare_libraries_rt()
 
   ### Features
   step <- "prepare_features_tables"

@@ -898,6 +898,47 @@ list(
   ),
   ## libraries
   list(
+    ## Retention times
+    list(tar_file(
+      name = lib_rt,
+      command = {
+        lib_rt <- prepare_libraries_rt(
+          ## TODO refactor to avoid "pos/neg"
+          mgf_exp = list(
+            "neg" = par_pre_lib_rt$files$libraries$spectral$exp$neg,
+            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
+          ),
+          mgf_is = list(
+            "neg" = par_pre_lib_rt$files$libraries$spectral$is$neg,
+            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
+          ),
+          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
+          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
+          output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
+          output_sop = par_pre_lib_rt$files$libraries$sop$prepared,
+          col_ik = par_pre_lib_rt$names$mgf$inchikey,
+          col_rt = par_pre_lib_rt$names$mgf$retention_time,
+          col_sm = par_pre_lib_rt$names$mgf$smiles,
+          name_inchikey = par_pre_lib_rt$names$inchikey,
+          name_rt = par_pre_lib_rt$names$rt,
+          name_smiles = par_pre_lib_rt$names$smiles,
+          unit_rt = par_pre_lib_rt$units$rt,
+          parameters = par_pre_lib_rt
+        )
+      }
+    )),
+    tar_file(
+      name = lib_rt_rts,
+      command = {
+        lib_rt_rts <- lib_rt[[1]]
+      }
+    ),
+    tar_file(
+      name = lib_rt_sop,
+      command = {
+        lib_rt_sop <- lib_rt[[2]]
+      }
+    ),
     ## Structure organism pairs
     list(
       ## Raw
@@ -986,7 +1027,8 @@ list(
                 lib_sop_ecm_pre,
                 ## TODO
                 # lib_sop_hmd_pre,
-                lib_sop_lot_pre
+                lib_sop_lot_pre,
+                lib_rt_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
               level = par_pre_lib_sop_mer$organisms$filter$level,
@@ -1267,36 +1309,7 @@ list(
           )
         )
       )
-    ),
-    ## Retention times
-    list(tar_file(
-      name = lib_rt,
-      command = {
-        lib_rt <- prepare_libraries_rt(
-          ## TODO refactor to avoid "pos/neg"
-          mgf_exp = list(
-            "neg" = par_pre_lib_rt$files$libraries$spectral$exp$neg,
-            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
-          ),
-          mgf_is = list(
-            "neg" = par_pre_lib_rt$files$libraries$spectral$is$neg,
-            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
-          ),
-          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
-          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
-          output = par_pre_lib_rt$files$libraries$temporal$prepared,
-          library = lib_mer_key,
-          col_ik = par_pre_lib_rt$names$mgf$inchikey,
-          col_rt = par_pre_lib_rt$names$mgf$retention_time,
-          col_sm = par_pre_lib_rt$names$mgf$smiles,
-          name_inchikey = par_pre_lib_rt$names$inchikey,
-          name_rt = par_pre_lib_rt$names$rt,
-          name_smiles = par_pre_lib_rt$names$smiles,
-          unit_rt = par_pre_lib_rt$units$rt,
-          parameters = par_pre_lib_rt
-        )
-      }
-    ))
+    )
   ),
   ## Annotations
   list(
@@ -1632,7 +1645,7 @@ list(
           ann_ms1_pre_ann
         ),
         features = fea_pre,
-        rts = lib_rt,
+        rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
         tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes,
         parameters = par_fil_ann
@@ -1651,7 +1664,7 @@ list(
           ann_ms1_pre_ann
         ),
         features = fea_pre,
-        rts = lib_rt,
+        rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
         tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes,
         parameters = par_fil_ann
