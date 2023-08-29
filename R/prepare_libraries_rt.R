@@ -135,7 +135,7 @@ prepare_libraries_rt <-
             smiles = NA_character_
           )) |>
           tidytable::filter(!is.na(as.numeric(rt))) |>
-          tidytable::filter(!is.na(smiles))  |>
+          tidytable::filter(!is.na(smiles)) |>
           tidytable::distinct()
         return(df_polished)
       }
@@ -265,7 +265,7 @@ prepare_libraries_rt <-
         structure_smiles,
         structure_inchikey,
         organism_name = type
-             ) |>
+      ) |>
       tidytable::distinct()
 
     rts <- df_rts |>

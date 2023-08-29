@@ -9,8 +9,8 @@ prepare_libraries_rt(
   mgf_is = params$files$libraries$spectral$is,
   temp_exp = params$files$libraries$temporal$exp,
   temp_is = params$files$libraries$temporal$is,
-  output = params$files$libraries$temporal$prepared,
-  library = params$files$libraries$sop$merged$keys,
+  output_rt = params$files$libraries$temporal$prepared,
+  output_sop = params$files$libraries$sop$prepared,
   col_ik = params$names$mgf$inchikey,
   col_rt = params$names$mgf$retention_time,
   col_sm = params$names$mgf$smiles,
@@ -30,9 +30,9 @@ prepare_libraries_rt(
 
 \item{temp_is}{File containing in silico predicted retention times}
 
-\item{output}{Output file}
+\item{output_rt}{Output retention time file}
 
-\item{library}{Library containing the keys}
+\item{output_sop}{Output pseudo sop file}
 
 \item{col_ik}{Name of the InChIKey in mgf}
 
