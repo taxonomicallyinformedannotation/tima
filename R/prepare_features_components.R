@@ -28,7 +28,7 @@ prepare_features_components <-
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
-          lapply(X = input, file.exists)
+          lapply(X = input, FUN = file.exists)
     )
     params <<- parameters
 

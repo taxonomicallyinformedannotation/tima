@@ -142,7 +142,7 @@ weight_annotations <- function(
   stopifnot(
     "Annotations file(s) do(es) not exist" =
       rep(TRUE, length(annotations)) ==
-        lapply(X = annotations, file.exists)
+        lapply(X = annotations, FUN = file.exists)
   )
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot("Your components file does not exist." = file.exists(components))

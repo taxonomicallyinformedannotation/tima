@@ -40,7 +40,7 @@ sanitize_spectra <-
       Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
       Spectra::applyProcessing()
 
-    lengths <- lapply(spectra@backend@peaksData, length)
+    lengths <- lapply(X = spectra@backend@peaksData, FUN = length)
     spectra <- spectra[lengths >= fragments * 2]
 
     return(spectra)

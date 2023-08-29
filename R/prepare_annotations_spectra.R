@@ -62,7 +62,7 @@ prepare_annotations_spectra <-
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
-          lapply(X = input, file.exists)
+          lapply(X = input, FUN = file.exists)
     )
     params <<- parameters
     log_debug(x = "Loading and formatting spectral matches")
