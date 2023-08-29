@@ -1,7 +1,5 @@
 utils::globalVariables(
   c(
-    "inchikey.x",
-    "inchikey.y",
     "type"
   )
 )
@@ -15,8 +13,8 @@ utils::globalVariables(
 #' @param mgf_is MGF containing in silico predicted retention times
 #' @param temp_exp File containing experimental retention times
 #' @param temp_is File containing in silico predicted retention times
-#' @param output Output file
-#' @param library Library containing the keys
+#' @param output_rt Output retention time file
+#' @param output_sop Output pseudo sop file
 #' @param col_ik Name of the InChIKey in mgf
 #' @param col_rt Name of the retention time in mgf
 #' @param col_sm Name of the SMILES in mgf
@@ -36,8 +34,8 @@ prepare_libraries_rt <-
            mgf_is = params$files$libraries$spectral$is,
            temp_exp = params$files$libraries$temporal$exp,
            temp_is = params$files$libraries$temporal$is,
-           output = params$files$libraries$temporal$prepared,
-           library = params$files$libraries$sop$merged$keys,
+           output_rt = params$files$libraries$temporal$prepared,
+           output_sop = params$files$libraries$sop$prepared,
            col_ik = params$names$mgf$inchikey,
            col_rt = params$names$mgf$retention_time,
            col_sm = params$names$mgf$smiles,
@@ -46,8 +44,6 @@ prepare_libraries_rt <-
            name_smiles = params$names$smiles,
            unit_rt = params$units$rt,
            parameters = params) {
-    stopifnot("Your library file does not exist." = file.exists(library))
-
     params <<- parameters
 
     ## default transforms from `Spectra`
@@ -139,30 +135,24 @@ prepare_libraries_rt <-
             smiles = NA_character_
           )) |>
           tidytable::filter(!is.na(as.numeric(rt))) |>
+          tidytable::filter(!is.na(smiles))  |>
           tidytable::distinct()
         return(df_polished)
       }
-    complete_df <- function(df, library = keys) {
+    complete_df <- function(df) {
+      df_full <- df |>
+        tidytable::filter(!is.na(inchikey))
+      df_missing <- df |>
+        tidytable::filter(is.na(inchikey))
       log_debug(
         "There are",
-        nrow(df |>
-          tidytable::filter(is.na(inchikey))),
+        nrow(df_missing),
         "entries without InChIKey.",
-        "We would recommend you adding them but will try completing."
-      )
-      log_debug("Completing with existing metadata...")
-      df_completed_smiles <- df |>
-        tidytable::inner_join(library, by = c("smiles" = "smiles"))
-      df_empty_smiles <- df |>
-        tidytable::anti_join(library, by = c("smiles" = "smiles"))
-      log_debug(
-        "There are still",
-        nrow(df_empty_smiles),
-        "entries without InChIKey.",
+        "We would recommend you adding them but will try completing.",
         "We will query them on the fly, this might take some time."
       )
       ## TODO change with a small dependency
-      smiles <- unique(df_empty_smiles$smiles)
+      smiles <- unique(df_missing$smiles)
       get_inchikey <- function(smiles, toolkit = "rdkit") {
         url <- paste0(
           "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
@@ -182,36 +172,28 @@ prepare_libraries_rt <-
         FUN = get_inchikey
       ) |>
         as.character()
-      df_empty_smiles <- df_empty_smiles |>
+      df_missing <- df_missing |>
         tidytable::select(-inchikey) |>
         tidytable::left_join(tidytable::tidytable(
           smiles,
           inchikey
         ))
 
-      df_completed <- df_completed_smiles |>
-        tidytable::bind_rows(df_empty_smiles) |>
+      df_completed <- df_full |>
+        tidytable::bind_rows(df_missing) |>
         tidytable::mutate(
           tidytable::across(
             .cols = tidytable::where(is.character),
             .fns = function(x) {
-              tidytable::replace_na(x, "NA")
+              tidytable::na_if(x, "NA")
             }
           )
         )
       df_completed <- df_completed |>
-        tidytable::mutate(
-          structure_smiles = smiles,
-          structure_inchikey = tidytable::coalesce(
-            inchikey,
-            inchikey.x,
-            inchikey.y
-          ),
-        ) |>
         tidytable::select(
           rt,
-          structure_smiles,
-          structure_inchikey,
+          structure_smiles = smiles,
+          structure_inchikey = inchikey,
           type
         ) |>
         tidytable::distinct()
@@ -225,17 +207,6 @@ prepare_libraries_rt <-
       )
       return(df_completed)
     }
-
-    keys <- library |>
-      tidytable::fread(select = c(
-        "structure_inchikey",
-        "structure_smiles"
-      )) |>
-      tidytable::distinct() |>
-      tidytable::select(
-        inchikey = structure_inchikey,
-        smiles = structure_smiles
-      )
 
     empty_df <- tidytable::tidytable(
       rt = NA_real_,
@@ -280,14 +251,24 @@ prepare_libraries_rt <-
       rts_is_2 <- empty_df
     }
 
-    rts <- tidytable::bind_rows(
+    df_rts <- tidytable::bind_rows(
       rts_exp_1,
       rts_exp_2,
       rts_is_1,
       rts_is_2
     ) |>
       tidytable::filter(!is.na(as.numeric(rt))) |>
-      tidytable::filter(!is.na((structure_inchikey))) |>
+      tidytable::filter(!is.na((structure_inchikey)))
+
+    sop <- df_rts |>
+      tidytable::select(
+        structure_smiles,
+        structure_inchikey,
+        organism_name = type
+             ) |>
+      tidytable::distinct()
+
+    rts <- df_rts |>
       tidytable::select(-structure_smiles) |>
       tidytable::distinct() |>
       tidytable::mutate(structure_inchikey_2D = gsub(
@@ -299,7 +280,16 @@ prepare_libraries_rt <-
       tidytable::select(-structure_inchikey)
 
     if (nrow(rts) == 0) {
-      log_debug("No retention time library found, returning an empty table.")
+      log_debug("No retention time library found, returning empty table.")
+      sop <- tidytable::tidytable(
+        structure_smiles = NA_character_,
+        structure_inchikey_2D = NA_character_,
+        organism_name = NA_character_
+      )
+    }
+
+    if (nrow(rts) == 0) {
+      log_debug("No retention time library found, returning empty tables")
       rts <- tidytable::tidytable(
         rt = NA_real_,
         structure_inchikey_2D = NA_character_,
@@ -307,6 +297,12 @@ prepare_libraries_rt <-
       )
     }
     export_params(step = "prepare_libraries_rt")
-    export_output(x = rts, file = output)
-    return(output)
+    export_output(x = rts, file = output_rt)
+    export_output(x = sop, file = output_sop)
+    return(
+      c(
+        "rt" = output_rt,
+        "sop" = output_sop
+      )
+    )
   }

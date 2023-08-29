@@ -23,10 +23,9 @@ files:
 
     #' Structure organism pairs libraries.
     sop:
-      #' Merged structure organism pairs library.
-      merged:
-        #' Merged structure organism pairs library keys. STRING
-        keys: data/interim/libraries/sop/merged/keys.tsv.gz
+      #' List of prepared structure organism pairs libraries. STRING
+      prepared:
+        - data/interim/libraries/sop/rt_prepared.tsv.gz
 
     #' Temporal libraries. STRING
     temporal:
