@@ -172,7 +172,23 @@ ui <- fluidPage(
             )
           ),
         sliderInput(
-          inputId = "ann_ms1_thr_bio",
+          inputId = "ann_thr_con",
+          label = "Minimal consistency score (chemical) to consider a class",
+          min = 0,
+          max = 1,
+          value = 0.0,
+          step = 0.05,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimal consistency score (chemical) to consider a class.",
+              "Everything below will be considered as not consistent."
+            )
+          ),
+        sliderInput(
+          inputId = "ann_thr_ms1_bio",
           label = "Minimal biological score to keep MS1 only annotation",
           min = 0,
           max = 1,
@@ -189,7 +205,7 @@ ui <- fluidPage(
             )
           ),
         sliderInput(
-          inputId = "ann_ms1_thr_che",
+          inputId = "ann_thr_ms1_che",
           label = "Minimal chemical score to keep MS1 only annotation",
           min = 0,
           max = 1,
@@ -206,7 +222,7 @@ ui <- fluidPage(
             )
           ),
         selectInput(
-          inputId = "ann_ms1_thr_con",
+          inputId = "ann_thr_ms1_con",
           label = "Condition to be used to retain candidates",
           choices = c("AND", "OR"),
           selected = "OR"
@@ -234,7 +250,7 @@ ui <- fluidPage(
             )
           ),
         sliderInput(
-          inputId = "ann_ms2_thr_sim",
+          inputId = "ann_thr_ms2_sim",
           label = "Minimal similarity score (annotation)",
           min = 0,
           max = 1,
@@ -250,7 +266,7 @@ ui <- fluidPage(
             )
           ),
         sliderInput(
-          inputId = "edg_ms2_thr_sim",
+          inputId = "edg_thr_ms2_sim",
           label = "Minimal similarity score (edges)",
           min = 0.5,
           max = 1,
@@ -280,7 +296,7 @@ ui <- fluidPage(
             content = c("Polarity of the MS experiment.")
           ),
         sliderInput(
-          inputId = "ms_int_thr_ms1",
+          inputId = "ms_thr_ms1_int",
           label = "Intensity threshold for MS1",
           min = 0,
           max = 1E6,
@@ -296,7 +312,7 @@ ui <- fluidPage(
             )
           ),
         sliderInput(
-          inputId = "ms_int_thr_ms2",
+          inputId = "ms_thr_ms2_int",
           label = "Intensity threshold for MS2",
           min = 0,
           max = 1E4,

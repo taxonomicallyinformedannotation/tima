@@ -1,11 +1,11 @@
 ---
 #' Annotations related parameters.
 annotations:
-  #' MS2 annotation related parameters.
-  ms2:
-    #' Thresholds
-    thresholds:
-      #' Similarity threhsold. FLOAT
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS2 annotation related parameters.
+    ms2:
+      #' For similarity. FLOAT
       similarity: 0.7
 
 #' Files.
@@ -27,12 +27,12 @@ files:
 
 #' MS related parameters.
 ms:
-  #' Intensity related parameters.
-  intensity:
-    #' Thresholds related parameters.
-    thresholds:
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS2 related parameters.
+    ms2:
       #' Intensity threshold for MS2. INTEGER
-      ms2: 5
+      intensity: 5
 
   #' Tolerances.
   tolerances:

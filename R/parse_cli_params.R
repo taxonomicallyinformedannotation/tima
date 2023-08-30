@@ -26,27 +26,28 @@ parse_cli_params <- function() {
     if (!is.null(arguments$ann_ms1only)) {
       params$annotations$ms1only <- as.logical(arguments$ann_ms1only)
     }
-    if (!is.null(arguments$ann_ms1_ann)) {
-      params$annotations$ms1$annotate <- as.logical(arguments$ann_ms1_ann)
+    if (!is.null(arguments$ann_thr_con)) {
+      params$annotations$thresholds$consistency <-
+        as.numeric(arguments$ann_thr_con)
     }
-    if (!is.null(arguments$ann_ms1_thr_bio)) {
-      params$annotations$ms1$thresholds$biological <-
-        as.numeric(arguments$ann_ms1_thr_bio)
+    if (!is.null(arguments$ann_thr_ms1_bio)) {
+      params$annotations$thresholds$ms1$biological <-
+        as.numeric(arguments$ann_thr_ms1_bio)
     }
-    if (!is.null(arguments$ann_ms1_thr_che)) {
-      params$annotations$ms1$thresholds$chemical <-
-        as.numeric(arguments$ann_ms1_thr_che)
+    if (!is.null(arguments$ann_thr_ms1_che)) {
+      params$annotations$thresholds$ms1$chemical <-
+        as.numeric(arguments$ann_thr_ms1_che)
     }
-    if (!is.null(arguments$ann_ms1_thr_con)) {
-      params$annotations$ms1$thresholds$condition <-
-        as.character(arguments$ann_ms1_thr_con)
+    if (!is.null(arguments$ann_thr_ms1_con)) {
+      params$annotations$thresholds$ms1$condition <-
+        as.character(arguments$ann_thr_ms1_con)
     }
     if (!is.null(arguments$ann_ms2_app)) {
-      params$annotations$ms2$approx <- as.logical(arguments$ann_ms2_app)
+      params$annotations$ms2approx <- as.logical(arguments$ann_ms2_app)
     }
-    if (!is.null(arguments$ann_ms2_thr_sim)) {
-      params$annotations$ms2$thresholds$similarity <-
-        as.numeric(arguments$ann_ms2_thr_sim)
+    if (!is.null(arguments$ann_thr_ms2_sim)) {
+      params$annotations$thresholds$ms2$similarity <-
+        as.numeric(arguments$ann_thr_ms2_sim)
     }
     if (!is.null(arguments$fil_pat)) {
       params$files$pattern <- as.character(arguments$fil_pat)
@@ -135,14 +136,14 @@ parse_cli_params <- function() {
     if (!is.null(arguments$ms_add_pos)) {
       params$ms$adducts$pos <- as.character(arguments$ms_add_pos)
     }
-    if (!is.null(arguments$ms_int_thr_ms1)) {
-      params$ms$intensity$thresholds$ms1 <- as.numeric(arguments$ms_int_thr_ms1)
-    }
-    if (!is.null(arguments$ms_int_thr_ms2)) {
-      params$ms$intensity$thresholds$ms2 <- as.numeric(arguments$ms_int_thr_ms2)
-    }
     if (!is.null(arguments$ms_pol)) {
       params$ms$polarity <- as.character(arguments$ms_pol)
+    }
+    if (!is.null(arguments$ms_thr_ms1_int)) {
+      params$ms$thresholds$ms1$intensity <- as.numeric(arguments$ms_thr_ms1_int)
+    }
+    if (!is.null(arguments$ms_thr_ms2_int)) {
+      params$ms$thresholds$ms2$intensity <- as.numeric(arguments$ms_thr_ms2_int)
     }
     if (!is.null(arguments$ms_tol_mas_ppm_ms1)) {
       params$ms$tolerances$mass$ppm$ms1 <-

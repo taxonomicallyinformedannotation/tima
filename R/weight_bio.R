@@ -22,7 +22,6 @@ utils::globalVariables(
     "organism_taxonomy_08genus",
     "organism_taxonomy_09species",
     "organism_taxonomy_10varietas",
-    "rank_final",
     "sample_organism_01_domain",
     "sample_organism_02_kingdom",
     "sample_organism_03_phylum",
@@ -1048,11 +1047,9 @@ weight_bio <-
       ) |>
       tidytable::mutate(
         rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
-        rank_final = tidytable::dense_rank(-score_pondered_bio),
         .by = c(feature_id)
       ) |>
       tidytable::arrange(
-        rank_final,
         score_pondered_bio
       ) |>
       tidytable::arrange(as.numeric(feature_id))

@@ -146,12 +146,12 @@ ms:
       - "[2M+(H)1(ACN)1]1+"
       - "[2M+(Na)1(ACN)1]1+"
 
-  #' Intensity related parameters.
-  intensity:
-    #' Thresholds related parameters.
-    thresholds:
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS1 related parameters.
+    ms1:
       #' Intensity threshold for MS1. INTEGER
-      ms1: 1000000
+      intensity: 1000000
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos

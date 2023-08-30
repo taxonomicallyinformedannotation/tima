@@ -7,7 +7,7 @@
 clean_bio(
   annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
   edges_table = get("edges_table", envir = parent.frame()),
-  candidates_initial = get("candidates_initial", envir = parent.frame())
+  minimal_consistency = get("minimal_consistency", envir = parent.frame())
 )
 }
 \arguments{
@@ -16,7 +16,7 @@ biologically weighted annotation}
 
 \item{edges_table}{Table containing the edges between features}
 
-\item{candidates_initial}{Number of initial candidates to keep}
+\item{minimal_consistency}{Minimal consistency score for a class. FLOAT}
 }
 \value{
 A table containing the biologically weighted annotation
