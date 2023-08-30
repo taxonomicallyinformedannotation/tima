@@ -32,12 +32,12 @@ ui <- fluidPage(
   fluidPage(div(
     id = "params",
     navlistPanel(
-      widths = c(4, 4),
+      widths = c(4, 5),
       "Parameters",
       tabPanel(
         title = "Files",
         h3("Required files"),
-        h5("They MUST be located in `data/source`"),
+        h5("They SHOULD be located in `data/source`"),
         div(
           fileInput(
             inputId = "fil_spe_raw",
@@ -49,7 +49,7 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "The MGF file containing your spectra.",
-              "Must be located in `data/source`.",
+              "Should be located in `data/source`.",
               "Reason therefore is to find it in the future.",
               "If you have a GNPS job ID, the spectra will be stored there."
             )
@@ -70,7 +70,7 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "The csv or tsv file containing your features",
-              "Must be located in `data/source`.",
+              "Should be located in `data/source`.",
               "Reason therefore is to find it in the future.",
               "If you have a GNPS job ID, the spectra will be stored there."
             )
@@ -91,7 +91,7 @@ ui <- fluidPage(
             type = "inline",
             content = c(
               "The csv or tsv file containing the metadata of your experiment.",
-              "Must be located in `data/source`.",
+              "Should be located in `data/source`.",
               "Reason therefore is to find it in the future.",
               "If you have a GNPS job ID, the spectra will be stored there.",
               "Do not forget to change the `name` in the corresponding tab."
@@ -136,8 +136,8 @@ ui <- fluidPage(
           label = "Number of final candidates",
           min = 1,
           max = 500,
-          step = 1,
           value = 3,
+          step = 1,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -176,8 +176,8 @@ ui <- fluidPage(
           label = "Minimal biological score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.5,
-          step = 0.1,
+          value = 0.6,
+          step = 0.05,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -193,7 +193,7 @@ ui <- fluidPage(
           label = "Minimal chemical score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.5,
+          value = 0.6,
           step = 0.1,
           ticks = FALSE
         ) |>
@@ -239,7 +239,7 @@ ui <- fluidPage(
           min = 0,
           max = 1,
           step = 0.05,
-          value = 0.1,
+          value = 0.0,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
