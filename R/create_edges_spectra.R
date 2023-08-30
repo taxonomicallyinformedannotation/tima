@@ -51,7 +51,6 @@ create_edges_spectra <- function(
     import_spectra()
   if (length(spectra) > 0) {
     spectra <- spectra |>
-      ## TODO make it a param
       sanitize_spectra(cutoff = qutoff, deeper = TRUE) |>
       Spectra::addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
