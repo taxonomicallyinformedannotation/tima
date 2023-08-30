@@ -446,10 +446,7 @@ prepare_params <- function(filename = params$files$pattern,
   }
 
   log_debug(x = "Exporting params ...")
-  log_debug(x = "... checking directory")
   create_dir(export = yaml_export[[1]])
-
-  log_debug(x = "Exporting")
   export_params(step = "prepare_params")
   lapply(
     X = seq_along(yamls_params),
