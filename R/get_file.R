@@ -26,15 +26,7 @@ get_file <-
            limit = 3600) {
     if (!file.exists(export)) {
       options(timeout = limit)
-      message(
-        "Timeout for download is ",
-        getOption("timeout") / 60,
-        " minutes"
-      )
-
       create_dir(export = export)
-
-      message("Downloading")
       utils::download.file(
         url = url,
         destfile = export
@@ -42,6 +34,5 @@ get_file <-
     } else {
       message("File already exists. Skipping.")
     }
-
     return(export)
   }
