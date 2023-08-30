@@ -17,10 +17,10 @@ annotations:
     #' Thresholds related parameters.
     thresholds:
       #' Minimal biological score to keep MS1 only annotation. FLOAT
-      biological: 0.5
+      biological: 0.6
 
       #' Minimal chemical score to keep MS1 only annotation. FLOAT
-      chemical: 0.666
+      chemical: 0.6
 
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
