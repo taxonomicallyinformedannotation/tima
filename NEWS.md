@@ -3,9 +3,12 @@
 # timaR 2.9.0
 
 * Added compounds names as parameter
+* Allow files outside `data/source` (#89)
 * Added RT library as annotation library (#86)
+* Internal variables refactoring
 * New adducts (#79, #80)
 * Refactored RT matching (#76)
+* Multiple Shiny fixes
 * Multiple fixes (#71, #81)
 
 # timaR 2.8.2

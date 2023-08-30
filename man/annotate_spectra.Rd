@@ -9,11 +9,11 @@ annotate_spectra(
   library = params$files$libraries$spectral$exp,
   polarity = params$ms$polarity,
   output = params$files$annotations$raw$spectral,
-  threshold = params$annotations$ms2$thresholds$similarity,
+  threshold = params$annotations$thresholds$ms2$similarity,
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
-  qutoff = params$ms$intensity$thresholds$ms2,
-  approx = params$annotations$ms2$approx,
+  qutoff = params$ms$thresholds$ms2$intensity,
+  approx = params$annotations$ms2approx,
   parameters = params
 )
 }

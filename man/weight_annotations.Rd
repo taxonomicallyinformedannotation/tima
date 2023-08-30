@@ -13,7 +13,6 @@ weight_annotations(
   edges = params$files$networks$spectral$edges$prepared,
   taxa = params$files$taxa$prepared,
   output = params$files$annotations$processed,
-  candidates_initial = params$annotations$candidates$initial,
   candidates_final = params$annotations$candidates$final,
   weight_spectral = params$weights$global$spectral,
   weight_chemical = params$weights$global$chemical,
@@ -40,9 +39,10 @@ weight_annotations(
   score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
   score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
   score_chemical_npc_class = params$weights$chemical$npc$class,
-  minimal_ms1_bio = params$annotations$ms1$thresholds$biological,
-  minimal_ms1_chemo = params$annotations$ms1$thresholds$chemical,
-  minimal_ms1_condition = params$annotations$ms1$thresholds$condition,
+  minimal_consistency = params$annotations$thresholds$consistency,
+  minimal_ms1_bio = params$annotations$thresholds$ms1$biological,
+  minimal_ms1_chemo = params$annotations$thresholds$ms1$chemical,
+  minimal_ms1_condition = params$annotations$thresholds$ms1$condition,
   ms1_only = params$annotations$ms1only,
   compounds_names = params$options$compounds_names,
   summarise = params$options$summarise,
@@ -67,8 +67,6 @@ weight_annotations(
 \item{taxa}{Prepared taxed features file}
 
 \item{output}{Output file}
-
-\item{candidates_initial}{Number of initial candidates to keep}
 
 \item{candidates_final}{Number of final candidates to keep}
 
@@ -143,6 +141,8 @@ match (should be lower than \verb{NPC class})}
 
 \item{score_chemical_npc_class}{Score for a \verb{NPC class} match
 (should be the highest)}
+
+\item{minimal_consistency}{Minimal consistency score for a class. FLOAT}
 
 \item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
 

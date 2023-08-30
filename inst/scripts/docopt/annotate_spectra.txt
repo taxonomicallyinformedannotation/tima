@@ -1,20 +1,20 @@
 You can use this script with the following example:
-  Rscript inst/scripts/annotate_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-lib-spe-pos data/interim/libraries/spectra/is/lotus_pos.sqlite --fil-ann-raw-spe data/interim/annotations/example_isdb.tsv.gz --ms-tol-mas-dal-ms2 0.02 --ms-tol-mas-ppm-ms2 10 --ann-ms2-thr-sim 0.2 --ms-int-thr-ms2 0 --ann-ms2-app false
+  Rscript inst/scripts/annotate_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-lib-spe-pos data/interim/libraries/spectra/is/lotus_pos.sqlite --fil-ann-raw-spe data/interim/annotations/example_isdb.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ann-thr-ms2-sim 0.0 --ms-thr-ms2-int 5 --ann-ms2-app false
 
 Usage:
-  annotate_spectra.R [--ann-ms2-app=<ann-ms2-app>] [--ann-ms2-thr-sim=<ann-ms2-thr-sim>] [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-spe-raw=<fil-spe-raw>] [--ms-int-thr-ms2=<ms-int-thr-ms2>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
+  annotate_spectra.R [--ann-ms2-app=<ann-ms2-app>] [--ann-thr-ms2-sim=<ann-thr-ms2-sim>] [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
 
 Arguments:
   ann-ms2-app                Perform approximative matching without precursor matching? BOOLEAN
-  ann-ms2-thr-sim            Similarity threhsold. FLOAT
+  ann-thr-ms2-sim            Similarity threhsold. FLOAT
 
   fil-ann-raw-spe            List of spectral matching results. STRING
   fil-lib-spe-neg            List of negative spectral libraries. STRING
   fil-lib-spe-pos            List of positive spectral libraries. STRING
   fil-spe-raw                Raw spectral file. STRING
 
-  ms-int-thr-ms2             Intensity threshold for MS2. INTEGER
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+  ms-thr-ms2-int             Intensity threshold for MS2. INTEGER
   ms-tol-mas-ppm-ms2         Relative mass tolerance for MS2 in ppm. FLOAT
   ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT

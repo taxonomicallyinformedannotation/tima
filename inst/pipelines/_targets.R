@@ -1389,11 +1389,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              approx = par_ann_spe$annotations$ms2$approx,
+              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              approx = par_ann_spe$annotations$ms2approx,
               parameters = par_ann_spe
             )
           }
@@ -1411,11 +1411,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              approx = par_ann_spe$annotations$ms2$approx,
+              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              approx = par_ann_spe$annotations$ms2approx,
               parameters = par_ann_spe
             )
           }
@@ -1462,11 +1462,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              approx = par_ann_spe$annotations$ms2$approx,
+              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              approx = par_ann_spe$annotations$ms2approx,
               parameters = par_ann_spe
             )
           }
@@ -1484,11 +1484,11 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$ms2$thresholds$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$intensity$thresholds$ms2,
-              approx = par_ann_spe$annotations$ms2$approx,
+              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              approx = par_ann_spe$annotations$ms2approx,
               parameters = par_ann_spe
             )
           }
@@ -1543,10 +1543,10 @@ list(
           output = par_cre_edg_spe$files$networks$spectral$edges$raw,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
-          threshold = par_cre_edg_spe$annotations$ms2$thresholds$similarity,
+          threshold = par_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = par_cre_edg_spe$ms$intensity$thresholds$ms2,
+          qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity,
           parameters = par_cre_edg_spe
         )
       }
@@ -1682,7 +1682,6 @@ list(
         edges = fea_edg_pre,
         taxa = tax_pre,
         output = par_wei_ann$files$annotations$processed,
-        candidates_initial = par_wei_ann$annotations$candidates$initial,
         candidates_final = par_wei_ann$annotations$candidates$final,
         weight_spectral = par_wei_ann$weights$global$spectral,
         weight_chemical = par_wei_ann$weights$global$chemical,
@@ -1711,10 +1710,11 @@ list(
         score_chemical_npc_superclass =
           par_wei_ann$weights$chemical$npc$superclass,
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
-        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
-        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
+        minimal_consistency = par_wei_ann$annotations$thresholds$consistency,
+        minimal_ms1_bio = par_wei_ann$annotations$thresholds$ms1$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$thresholds$ms1$chemical,
         minimal_ms1_condition =
-          par_wei_ann$annotations$ms1$thresholds$condition,
+          par_wei_ann$annotations$thresholds$ms1$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
@@ -1735,7 +1735,6 @@ list(
         edges = fea_edg_pre,
         taxa = tax_pre,
         output = par_wei_ann$files$annotations$processed,
-        candidates_initial = par_wei_ann$annotations$candidates$initial,
         candidates_final = par_wei_ann$annotations$candidates$final,
         weight_spectral = par_wei_ann$weights$global$spectral,
         weight_chemical = par_wei_ann$weights$global$chemical,
@@ -1764,10 +1763,11 @@ list(
         score_chemical_npc_superclass =
           par_wei_ann$weights$chemical$npc$superclass,
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
-        minimal_ms1_bio = par_wei_ann$annotations$ms1$thresholds$biological,
-        minimal_ms1_chemo = par_wei_ann$annotations$ms1$thresholds$chemical,
+        minimal_consistency = par_wei_ann$annotations$thresholds$consistency,
+        minimal_ms1_bio = par_wei_ann$annotations$thresholds$ms1$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$thresholds$ms1$chemical,
         minimal_ms1_condition =
-          par_wei_ann$annotations$ms1$thresholds$condition,
+          par_wei_ann$annotations$thresholds$ms1$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
@@ -2221,7 +2221,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$ms2$thresholds$similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2237,7 +2237,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$ms2$thresholds$similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2354,11 +2354,11 @@ list(
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
           threshold =
-            benchmark_def_ann_spe$annotations$ms2$thresholds$similarity,
+            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          approx = benchmark_def_ann_spe$annotations$ms2$approx,
+          approx = benchmark_def_ann_spe$annotations$ms2approx,
           parameters = benchmark_def_ann_spe
         )
       }
@@ -2372,11 +2372,11 @@ list(
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
           threshold =
-            benchmark_def_ann_spe$annotations$ms2$thresholds$similarity,
+            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          approx = benchmark_def_ann_spe$annotations$ms2$approx,
+          approx = benchmark_def_ann_spe$annotations$ms2approx,
           parameters = benchmark_def_ann_spe
         )
       }
@@ -2538,7 +2538,6 @@ list(
         benchmark_wei_par <- list(
           library = lib_mer_key,
           str_2d_3d = lib_mer_str_2d_3d,
-          candidates_initial = 500,
           candidates_final = 500,
           score_biological_domain =
             benchmark_def_wei_ann$weights$biological$domain,
@@ -2584,12 +2583,14 @@ list(
             benchmark_def_wei_ann$weights$chemical$npc$superclass,
           score_chemical_npc_class =
             benchmark_def_wei_ann$weights$chemical$npc$class,
+          minimal_consistency =
+            benchmark_def_wei_ann$annotations$thresholds$consistency,
           minimal_ms1_bio =
-            benchmark_def_wei_ann$annotations$ms1$thresholds$biological,
+            benchmark_def_wei_ann$annotations$thresholds$ms1$biological,
           minimal_ms1_chemo =
-            benchmark_def_wei_ann$annotations$ms1$thresholds$chemical,
+            benchmark_def_wei_ann$annotations$thresholds$ms1$chemical,
           minimal_ms1_condition =
-            benchmark_def_wei_ann$annotations$ms1$thresholds$condition,
+            benchmark_def_wei_ann$annotations$thresholds$ms1$condition,
           compounds_names = benchmark_def_wei_ann$options$compounds_names,
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,

@@ -3,40 +3,35 @@
 annotations:
   #' Number of candidates to keep per feature.
   candidates:
-    #' Number of initial candidates. INTEGER
-    initial: 50
-
     #' Number of final candidates. INTEGER
     final: 3
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: no
 
-  #' MS1 annotation related parameters.
-  ms1:
-    #' Perform MS1 annotation. BOOLEAN
-    annotate: yes
+  #' Perform approximative matching without precursor matching? BOOLEAN
+  ms2approx: no
 
-    #' Thresholds related parameters.
-    thresholds:
+  #' Thresholds related parameters.
+  thresholds:
+    #' Minimal consistency score (chemical) to consider a class. FLOAT
+    consistency: 0.0
+
+    #' MS1 annotation related parameters.
+    ms1:
       #' Minimal biological score to keep MS1 only annotation. FLOAT
-      biological: 0.5
+      biological: 0.6
 
       #' Minimal chemical score to keep MS1 only annotation. FLOAT
-      chemical: 0.5
+      chemical: 0.6
 
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
       #' Example: Minimum 0.5 biological AND 0.666 chemical. STRING
       condition: OR
 
-  #' MS2 annotation related parameters.
-  ms2:
-    #' Perform approximative matching without precursor matching? BOOLEAN
-    approx: no
-
-    #' Thresholds
-    thresholds:
+    #' MS2 annotation related parameters.
+    ms2:
       #' For similarity. FLOAT
       similarity: 0.2
 
@@ -292,15 +287,17 @@ ms:
       - "[2M+(H)1(ACN)1]1+"
       - "[2M+(Na)1(ACN)1]1+"
 
-  #' Intensity related parameters.
-  intensity:
-    #' Thresholds related parameters.
-    thresholds:
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS1 related parameters.
+    ms1:
       #' Intensity threshold for MS1. INTEGER
-      ms1: 1000000
+      intensity: 1000000
 
+    #' MS2 related parameters.  
+    ms2:
       #' Intensity threshold for MS2. INTEGER
-      ms2: 10
+      intensity: 5
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos
@@ -312,10 +309,10 @@ ms:
       #' Relative in ppm.
       ppm:
         #' Relative mass tolerance for MS1 in ppm. FLOAT
-        ms1: 5
+        ms1: 10
 
         #' Relative mass tolerance for MS2 in ppm. FLOAT
-        ms2: 5
+        ms2: 10
 
       #' Absolute in Dalton.
       dalton:

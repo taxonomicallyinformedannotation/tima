@@ -3,19 +3,19 @@
 annotations:
   #' Number of candidates to keep per feature.
   candidates:
-    #' Number of initial candidates. INTEGER
-    initial: 50
-
     #' Number of final candidates. INTEGER
     final: 3
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: no
 
-  #' MS1 annotation related parameters.
-  ms1:
-    #' Thresholds related parameters.
-    thresholds:
+  #' Thresholds related parameters.
+  thresholds:
+    #' Minimal consistency score (chemical) to consider a class. FLOAT
+    consistency: 0.0
+
+    #' MS1 annotation related parameters.
+    ms1:
       #' Minimal biological score to keep MS1 only annotation. FLOAT
       biological: 0.6
 

@@ -9,10 +9,10 @@ create_edges_spectra(
   output = params$files$networks$spectral$edges$raw,
   name_source = params$names$source,
   name_target = params$names$target,
-  threshold = params$annotations$ms2$thresholds$similarity,
+  threshold = params$annotations$thresholds$ms2$similarity,
   ppm = params$ms$tolerances$mass$ppm$ms2,
   dalton = params$ms$tolerances$mass$dalton$ms2,
-  qutoff = params$ms$intensity$thresholds$ms2,
+  qutoff = params$ms$thresholds$ms2$intensity,
   parameters = params
 )
 }

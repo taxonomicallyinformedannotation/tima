@@ -105,10 +105,10 @@ save_input <- function(input) {
   yamls_params$
     annotate_masses$
     ms$
-    intensity$
     thresholds$
-    ms1 <-
-    shiny::isolate(input$ms_int_thr_ms1)
+    ms1$
+    intensity <-
+    shiny::isolate(input$ms_thr_ms1_int)
   yamls_params$annotate_masses$ms$polarity <- ms_mode
   yamls_params$
     annotate_masses$
@@ -147,17 +147,17 @@ save_input <- function(input) {
   yamls_params$
     annotate_spectra$
     annotations$
-    ms2$
     thresholds$
+    ms2$
     similarity <-
-    shiny::isolate(input$ann_ms2_thr_sim)
+    shiny::isolate(input$ann_thr_ms2_sim)
   yamls_params$
     annotate_spectra$
     ms$
-    intensity$
     thresholds$
-    ms2 <-
-    shiny::isolate(input$ms_int_thr_ms2)
+    ms2$
+    intensity <-
+    shiny::isolate(input$ms_thr_ms2_int)
   yamls_params$annotate_spectra$ms$polarity <- ms_mode
   yamls_params$
     annotate_spectra$
@@ -190,40 +190,17 @@ save_input <- function(input) {
   yamls_params$
     create_edges_spectra$
     annotations$
-    ms2$
     thresholds$
-    condition <-
-    shiny::isolate(input$ann_ms2_met)
-  yamls_params$
-    create_edges_spectra$
-    annotations$
     ms2$
-    thresholds$
-    peaks$
-    absolute <-
-    shiny::isolate(input$ann_ms2_thr_pea_abs)
-  yamls_params$
-    create_edges_spectra$
-    annotations$
-    ms2$
-    thresholds$
-    peaks$
-    ratio <-
-    shiny::isolate(input$ann_ms2_thr_pea_rat)
-  yamls_params$
-    create_edges_spectra$
-    annotations$
-    ms2$
-    thresholds$
     similarity <-
-    shiny::isolate(input$edg_ms2_thr_sim)
+    shiny::isolate(input$edg_thr_ms2_sim)
   yamls_params$
     create_edges_spectra$
     ms$
-    intensity$
     thresholds$
-    ms2 <-
-    shiny::isolate(input$ms_int_thr_ms2)
+    ms2$
+    intensity <-
+    shiny::isolate(input$ms_thr_ms2_int)
   yamls_params$create_edges_spectra$ms$polarity <- ms_mode
   yamls_params$
     create_edges_spectra$
@@ -338,24 +315,30 @@ save_input <- function(input) {
   yamls_params$
     weight_annotations$
     annotations$
-    ms1$
     thresholds$
+    consistency <-
+    shiny::isolate(input$ann_thr_con)
+  yamls_params$
+    weight_annotations$
+    annotations$
+    thresholds$
+    ms1$
     biological <-
-    shiny::isolate(input$ann_ms1_thr_bio)
+    shiny::isolate(input$ann_thr_ms1_bio)
   yamls_params$
     weight_annotations$
     annotations$
-    ms1$
     thresholds$
+    ms1$
     chemical <-
-    shiny::isolate(input$ann_ms1_thr_che)
+    shiny::isolate(input$ann_thr_ms1_che)
   yamls_params$
     weight_annotations$
     annotations$
-    ms1$
     thresholds$
+    ms1$
     condition <-
-    shiny::isolate(input$ann_ms1_thr_con)
+    shiny::isolate(input$ann_thr_ms1_con)
   yamls_params$
     weight_annotations$
     weights$
