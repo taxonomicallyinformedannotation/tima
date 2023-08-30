@@ -30,6 +30,8 @@ decorate_bio(
 
 \item{score_biological_family}{Family score}
 
+\item{score_biological_tribe}{Tribe score}
+
 \item{score_biological_genus}{Genus score}
 
 \item{score_biological_species}{Species score}

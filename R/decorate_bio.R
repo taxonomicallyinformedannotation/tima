@@ -9,6 +9,7 @@ utils::globalVariables(
     "score_biological_order",
     "score_biological_phylum",
     "score_biological_species",
+    "score_biological_tribe",
     "score_biological_variety",
     "structure_inchikey_2D"
   )
@@ -24,6 +25,7 @@ utils::globalVariables(
 #' @param score_biological_class  Class score
 #' @param score_biological_order  Order score
 #' @param score_biological_family Family score
+#' @param score_biological_tribe Tribe score
 #' @param score_biological_genus Genus score
 #' @param score_biological_species Species score
 #' @param score_biological_variety Variety score
