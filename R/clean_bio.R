@@ -110,7 +110,7 @@ clean_bio <-
         score_pondered_bio,
         .keep_all = TRUE
       ) |>
-      tidytable::arrange(desc(score_pondered_bio))
+      tidytable::arrange(tidytable::desc(score_pondered_bio))
 
     ## Loosing CANOPUS from SIRIUS
     ## TODO improve
