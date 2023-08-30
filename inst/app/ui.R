@@ -249,22 +249,22 @@ ui <- fluidPage(
               "To keep MS2 annotation."
             )
           ),
-      sliderInput(
-        inputId = "edg_ms2_thr_sim",
-        label = "Minimal similarity score (edges)",
-        min = 0.5,
-        max = 1,
-        step = 0.05,
-        value = 0.7,
-        ticks = FALSE
-      ) |>
-        shinyhelper::helper(
-          type = "inline",
-          content = c(
-            "Minimum similarity score between spectra.",
-            "To keep MS2 similarity edge."
+        sliderInput(
+          inputId = "edg_ms2_thr_sim",
+          label = "Minimal similarity score (edges)",
+          min = 0.5,
+          max = 1,
+          step = 0.05,
+          value = 0.7,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimum similarity score between spectra.",
+              "To keep MS2 similarity edge."
+            )
           )
-        )
       ),
       tabPanel(
         title = "MS",
