@@ -112,9 +112,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
-    ## COMMENT (AR): TODO Maybe implement sanitization of the spectra?
-    ## Can be very slow otherwise
-
     log_debug("Applying initial intensity filter to query spectra")
     spectra <- spectra |>
       sanitize_spectra() |>
