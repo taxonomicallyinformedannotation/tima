@@ -1,10 +1,16 @@
 ---
-title: "4 Performing Taxonomically Informed Metabolite Annotation"
+title: "3 Performing Taxonomically Informed Metabolite Annotation"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+opengraph:
+    image:
+      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{4 Performing Taxonomically Informed Metabolite Annotation}
+  %\VignetteIndexEntry{3 Performing Taxonomically Informed Metabolite Annotation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

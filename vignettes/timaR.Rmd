@@ -1,10 +1,16 @@
 ---
-title: "1 General comments about the infrastructure"
+title: "General comments about the infrastructure"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+opengraph:
+    image:
+      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{1 General comments about the infrastructure}
+  %\VignetteIndexEntry{General comments about the infrastructure}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -79,4 +85,4 @@ git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-inputs.html).
+We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-inputs.html).

@@ -2,6 +2,10 @@
 home:
   title: Taxonomically Informed Metabolite Annotation
   description: Taxonomically Informed Metabolite Annotation
+
+figure:
+  fig.ext: svg
+
 template:
   bootstrap: 5
   params:
@@ -12,6 +16,5 @@ template:
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
+
 url: https://taxonomicallyinformedannotation.github.io/tima-r
-figure:
-  fig.ext: svg
