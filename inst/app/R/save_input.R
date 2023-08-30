@@ -216,7 +216,7 @@ save_input <- function(input) {
     ms2$
     thresholds$
     similarity <-
-    shiny::isolate(input$ann_ms2_thr_sim)
+    shiny::isolate(input$edg_ms2_thr_sim)
   yamls_params$
     create_edges_spectra$
     ms$
