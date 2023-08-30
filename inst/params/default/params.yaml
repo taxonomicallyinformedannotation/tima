@@ -294,7 +294,7 @@ ms:
       #' Intensity threshold for MS1. INTEGER
       intensity: 1000000
 
-    #' MS2 related parameters.  
+    #' MS2 related parameters.
     ms2:
       #' Intensity threshold for MS2. INTEGER
       intensity: 5
