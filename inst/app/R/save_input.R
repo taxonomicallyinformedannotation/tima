@@ -15,9 +15,28 @@ save_input <- function(input) {
   timaR::load_yaml_files()
 
   ## Params occurring more than once
-  fil_fea_raw <<- shiny::isolate(input$fil_fea_raw)[[1]]
-  fil_spe_raw <<- shiny::isolate(input$fil_spe_raw)[[1]]
-  fil_tax_raw <<- shiny::isolate(input$fil_tax_raw)[[1]]
+  ## This allows to keep files correctly placed in `data/source` clean
+  prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
+  prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
+  prefil_tax_raw <- shiny::isolate(input$fil_tax_raw)
+  prefil_fea_raw_1 <- file.path(paths_data_source,prefil_fea_raw[[1]])
+  prefil_spe_raw_1 <- file.path(paths_data_source,prefil_spe_raw[[1]])
+  prefil_tax_raw_1 <- file.path(paths_data_source,prefil_tax_raw[[1]])
+  if (file.exists(prefil_fea_raw_1)) {
+    fil_fea_raw <<- prefil_fea_raw_1
+  } else {
+    fil_fea_raw <<- prefil_fea_raw[[4]]
+  }
+  if (file.exists(prefil_spe_raw_1)) {
+    fil_spe_raw <<- prefil_spe_raw_1
+  } else {
+    fil_fea_raw <<- prefil_spe_raw[[4]]
+  }
+  if (file.exists(prefil_tax_raw_1)) {
+    fil_tax_raw <<- prefil_tax_raw_1
+  } else {
+    fil_tax_raw <<- prefil_tax_raw[[4]]
+  }
 
   filename <<- shiny::isolate(input$fil_pat)
   gnps_job_id <<- shiny::isolate(input$gnps_id)
@@ -48,14 +67,12 @@ save_input <- function(input) {
     `inst/params/prepare_params`$
     files$
     features$
-    raw <-
-    file.path(paths_data_source, fil_fea_raw)
+    raw <- fil_fea_raw
   yamls_params$
     `inst/params/prepare_params`$
     files$
     spectral$
-    raw <-
-    file.path(paths_data_source, fil_spe_raw)
+    raw <- fil_spe_raw
   yamls_params$`inst/params/prepare_params`$gnps$id <- gnps_job_id
   yamls_params$
     `inst/params/prepare_params`$
@@ -120,8 +137,7 @@ save_input <- function(input) {
   yamls_params$annotate_masses$names$target <- names_target
   yamls_params$annotate_masses$options$force <- forceps
 
-  yamls_params$annotate_spectra$files$spectral$raw <-
-    file.path(paths_data_source, fil_spe_raw)
+  yamls_params$annotate_spectra$files$spectral$raw <- fil_spe_raw
   yamls_params$
     annotate_spectra$
     annotations$
@@ -164,8 +180,7 @@ save_input <- function(input) {
     create_edges_spectra$
     files$
     spectral$
-    raw <-
-    file.path(paths_data_source, fil_spe_raw)
+    raw <- fil_spe_raw
   yamls_params$
     create_edges_spectra$
     annotations$
@@ -244,8 +259,7 @@ save_input <- function(input) {
     prepare_features_tables$
     files$
     features$
-    raw <-
-    file.path(paths_data_source, fil_fea_raw)
+    raw <- fil_fea_raw
   yamls_params$
     prepare_features_tables$
     names$
@@ -286,10 +300,8 @@ save_input <- function(input) {
     ms$
     polarity <- ms_mode
 
-  yamls_params$prepare_taxa$files$features$raw <-
-    file.path(paths_data_source, fil_fea_raw)
-  yamls_params$prepare_taxa$files$taxa$raw <-
-    file.path(paths_data_source, fil_tax_raw)
+  yamls_params$prepare_taxa$files$features$raw <- fil_fea_raw
+  yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw
   if (!is.null(gnps_job_id)) {
     yamls_params$prepare_taxa$files$taxa$raw <-
       file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
