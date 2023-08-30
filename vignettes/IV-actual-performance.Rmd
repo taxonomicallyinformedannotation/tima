@@ -1,10 +1,16 @@
 ---
-title: "5 Actual Performance"
+title: "4 Actual Performance"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+opengraph:
+    image:
+      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{5 Actual Performance}
+  %\VignetteIndexEntry{4 Actual Performance}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 resource_files:

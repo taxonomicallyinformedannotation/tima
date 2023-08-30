@@ -1,10 +1,16 @@
 ---
-title: "2 Inputs: Getting everything you need"
+title: "1 Inputs: Getting everything you need"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+opengraph:
+    image:
+      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{2 Inputs: Getting everything you need}
+  %\VignetteIndexEntry{1 Inputs: Getting everything you need}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,10 +1,16 @@
 ---
-title: "3 Formatting all inputs"
+title: "2 Formatting all inputs"
 author: "Adriano Rutz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+opengraph:
+    image:
+      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      alt: "Taxonomically Informed Metabolite Annotation"
+    twitter:
+      creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{3 Formatting all inputs}
+  %\VignetteIndexEntry{2 Formatting all inputs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
