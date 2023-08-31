@@ -21,6 +21,9 @@ annotate_masses(
   adducts_neg = params$files$libraries$adducts$neg,
   adducts_pos = params$files$libraries$adducts$pos,
   adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
+  clusters_neg = params$ms$clusters$neg,
+  clusters_pos = params$ms$clusters$pos,
+  clusters_list = system.file("extdata", "clusters.tsv", package = "timaR"),
   neutral_losses_list = system.file("extdata", "neutral_losses.tsv", package = "timaR"),
   ms_mode = params$ms$polarity,
   tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
@@ -60,6 +63,12 @@ annotate_masses(
 \item{adducts_pos}{Positive adducts to be used}
 
 \item{adducts_masses_list}{Adducts masses}
+
+\item{clusters_neg}{Negative clusters to be used}
+
+\item{clusters_pos}{Positive clusters to be used}
+
+\item{clusters_list}{List of clusters to be used}
 
 \item{neutral_losses_list}{List of neutral losses to be used}
 

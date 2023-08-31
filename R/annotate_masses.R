@@ -81,6 +81,9 @@ utils::globalVariables(
 #' @param adducts_neg Negative adducts to be used
 #' @param adducts_pos Positive adducts to be used
 #' @param adducts_masses_list Adducts masses
+#' @param clusters_list List of clusters to be used
+#' @param clusters_neg Negative clusters to be used
+#' @param clusters_pos Positive clusters to be used
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param name Name of the adducts library
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
@@ -111,6 +114,12 @@ annotate_masses <-
            adducts_pos = params$files$libraries$adducts$pos,
            adducts_masses_list = system.file("extdata",
              "adducts.tsv",
+             package = "timaR"
+           ),
+           clusters_neg = params$ms$clusters$neg,
+           clusters_pos = params$ms$clusters$pos,
+           clusters_list = system.file("extdata",
+             "clusters.tsv",
              package = "timaR"
            ),
            neutral_losses_list = system.file("extdata",
@@ -148,13 +157,39 @@ annotate_masses <-
         )
       )
 
-    log_debug("... single charge adducts table")
     if (ms_mode == "pos") {
       adduct_file <- adducts_pos
+      adduct_db_file <-
+        file.path(
+          paths$data$interim$libraries$adducts$path,
+          paste0(name, "_pos.tsv.gz")
+        )
+      clusters_allowed <- clusters_pos
     } else {
       adduct_file <- adducts_neg
+      adduct_db_file <-
+        file.path(
+          paths$data$interim$libraries$adducts$path,
+          paste0(name, "_neg.tsv.gz")
+        )
+      clusters_allowed <- clusters_neg
     }
 
+    clusters <-
+      tidytable::fread(
+        file = clusters_list,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("mass"),
+          .fns = as.numeric
+        )
+      ) |>
+      tidytable::filter(cluster %in% clusters_allowed)
+
+    log_debug("... single charge adducts table")
     adducts_table <- tidytable::fread(
       file = adduct_file,
       na.strings = c("", "NA"),
@@ -185,20 +220,6 @@ annotate_masses <-
 
     add_m <- adducts_mass_table$mass
     names(add_m) <- adducts_mass_table$adduct
-
-    if (ms_mode == "pos") {
-      adduct_db_file <-
-        file.path(
-          paths$data$interim$libraries$adducts$path,
-          paste0(name, "_pos.tsv.gz")
-        )
-    } else {
-      adduct_db_file <-
-        file.path(
-          paths$data$interim$libraries$adducts$path,
-          paste0(name, "_neg.tsv.gz")
-        )
-    }
 
     ## TODO remove this dirty fix
     adduct_db_file <- adduct_db_file |>
@@ -310,7 +331,7 @@ annotate_masses <-
       )
 
     log_debug("joining within given rt tolerance \n")
-    df7 <- df4 |>
+    df5 <- df4 |>
       dplyr::inner_join(df3,
         by = dplyr::join_by(
           rt_min <= rt,
@@ -357,16 +378,44 @@ annotate_masses <-
         )
       )
 
+    log_debug("forming clusters \n")
+    df6 <- adducts_table |>
+      tidytable::bind_rows(
+        clusters |>
+          tidytable::rename(
+            adduct = cluster,
+            adduct_mass = mass
+          ) |>
+          tidytable::mutate(
+            adduct = paste("[1M+(H)1]1+", "+", adduct),
+            adduct_mass = 1.00728 + adduct_mass
+          )
+      )
+
+    df7 <- df2 |>
+      tidytable::filter(adduct == "[1M+(H)1]1+") |>
+      tidytable::mutate(join = "x") |>
+      tidytable::left_join(clusters |>
+        tidytable::mutate(join = "x")) |>
+      tidytable::mutate(
+        adduct = paste("[1M+(H)1]1+", "+", cluster),
+        adduct_mass = adduct_mass + mass,
+        value_min = value_min + mass,
+        value_max = value_max + mass
+      ) |>
+      tidytable::select(colnames(df2)) |>
+      tidytable::bind_rows(df2)
+
     log_debug("calculating delta mz for single charge adducts \n")
     df8 <-
       dist_groups(
-        d = stats::dist(adducts_table$adduct_mass),
-        g = adducts_table$adduct
+        d = stats::dist(df6$adduct_mass),
+        g = df6$adduct
       ) |>
       tidytable::select(-Item1, -Item2, -Label)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
-    df9_d <- df7 |>
+    df9_d <- df5 |>
       dplyr::inner_join(neutral_losses,
         by = dplyr::join_by(
           delta_min <= mass,
@@ -385,7 +434,7 @@ annotate_masses <-
       tidytable::distinct(feature_id, loss, mass)
 
     log_debug("joining within given delta mz tolerance (adducts) \n")
-    df9 <- df7 |>
+    df9 <- df5 |>
       dplyr::inner_join(df8,
         by = dplyr::join_by(
           delta_min <= Distance,
@@ -463,7 +512,7 @@ annotate_masses <-
 
     log_debug("joining within given mz tol and filtering single charges \n")
     df11 <- df10_a |>
-      dplyr::inner_join(df2,
+      dplyr::inner_join(df7,
         by = dplyr::join_by(
           mz_1 >= value_min,
           mz_1 <= value_max
@@ -488,6 +537,8 @@ annotate_masses <-
       )) |>
       tidytable::distinct() |>
       tidytable::filter(!is.na(library))
+
+    ## TODO ADD library type
 
     log_debug("cleaning results \n")
     df12 <- df11 |>
@@ -534,30 +585,16 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
-      "[1M+(H)2(ACN)1]2+ - NH3",
-      "[1M+(H)2(NH3)1]2+ - NH3",
-      "[1M+(H)2(ACN)2]2+ - NH3",
-      "[1M+(H)2(ACN)3]2+ - NH3",
-      "[1M+(H)1(ACN)1]1+ - NH3",
-      "[1M+(H)1(NH3)1]1+ - NH3",
-      "[1M+(H)1(C2H7N)1]1+ - NH3",
-      "[1M+(H)1(CH3OH)1]1+ - CH3COOH",
-      "[1M+(H)1(CH3OH)1]1+ - H2O",
-      "[1M+(H)1(CH3OH)1]1+ - O",
-      "[1M+(H)1(ACN)2]1+ - NH3",
-      "[1M+(Na)1(ACN)1]1+ - NH3",
-      "[1M+(H)1(Na)1(H2PO4)2]2+ - H3PO4",
-      "[1M+(H)1(K)1(H2PO4)2]2+ - H3PO4",
-      "[1M+(Na)2(H2PO4)2]2+ - H3PO4",
-      "[1M+(K)2(H2PO4)2]2+ - H3PO4",
-      "[1M+(H)1(H2PO4)1]1+ - H3PO4",
-      "[1M+(Na)1(H2PO4)1]1+ - H3PO4",
-      "[1M+(K)1(H2PO4)1]1+ - H3PO4",
-      "[1M+(Na)2(H2PO4)1-(H)1]1+ - H3PO4",
-      "[1M+(K)2(H2PO4)1-(H)1]1+ - H3PO4",
-      "[1M+(H2PO4)1-(H)1]1- - H3PO4",
-      "[1M+(Na)1(H2PO4)1-(H)2]1- - H3PO4",
-      "[1M+(K)1(H2PO4)1-(H)2]1- - H3PO4"
+      "[1M-(H)1]1- + NH3 (ammonia) - H3N (ammonia)",
+      "[1M-(H)1]1- + H2O (water) - H2O (water)",
+      "[1M-(H)1]1- + H2PO4 (phosphoric) - H3O4P (phosphoric)",
+      "[1M-(H)1]1- + C2H7N (ethylamine) - H3N (ammonia)",
+      "[1M-(H)1]1- + C2H3N (acetonitrile) - H3N (ammonia)",
+      "[1M+(H)1]1+ + NH3 (ammonia) - H3N (ammonia)",
+      "[1M+(H)1]1+ + H2O (water) - H2O (water)",
+      "[1M+(H)1]1+ + H2PO4 (phosphoric) - H3O4P (phosphoric)",
+      "[1M+(H)1]1+ + C2H7N (ethylamine) - H3N (ammonia)",
+      "[1M+(H)1]1+ + C2H3N (acetonitrile) - H3N (ammonia)"
     )
 
     log_debug("joining exact masses with single charge adducts \n")

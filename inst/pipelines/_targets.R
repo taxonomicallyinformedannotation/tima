@@ -50,6 +50,15 @@ list(
         }
       ),
       tar_file(
+        name = dic_clu,
+        command = {
+          dic_clu <- system.file("extdata",
+            "clusters.tsv",
+            package = "timaR"
+          )
+        }
+      ),
+      tar_file(
         name = dic_neu_los,
         command = {
           dic_neu_los <- system.file("extdata",
@@ -1333,7 +1342,12 @@ list(
               str_tax_npc = lib_mer_str_tax_npc,
               name = lib_add[par_ann_mas$ms$polarity],
               adducts_list = par_ann_mas$ms$adducts,
+              # adducts_neg = par_ann_mas$files$libraries$adducts$neg,
+              # adducts_pos = par_ann_mas$files$libraries$adducts$pos,
               adducts_masses_list = dic_add,
+              clusters_neg = par_ann_mas$ms$clusters$neg,
+              clusters_pos = par_ann_mas$ms$clusters$pos,
+              clusters_list = dic_clu,
               neutral_losses_list = dic_neu_los,
               ms_mode = par_ann_mas$ms$polarity,
               tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
@@ -2166,7 +2180,12 @@ list(
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["pos"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
+            # adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
+            # adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
+            clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
+            clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
+            clusters_list = dic_clu,
             neutral_losses_list = dic_neu_los,
             ms_mode = "pos",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
@@ -2195,7 +2214,12 @@ list(
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["neg"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
+            # adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
+            # adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
+            clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
+            clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
+            clusters_list = dic_clu,
             neutral_losses_list = dic_neu_los,
             ms_mode = "neg",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
