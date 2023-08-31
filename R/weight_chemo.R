@@ -262,6 +262,7 @@ weight_chemo <-
       step_cla_par
     )
 
+    ## TODO check if still useful
     annot_table_wei_chemo$score_chemical[is.na(annot_table_wei_chemo$score_chemical)] <- 0
 
     log_debug("... cleaning \n")
