@@ -472,6 +472,8 @@ testthat::test_that("Whole process", {
   arguments$gnps_workflow <<- "x"
   arguments$ms_add_neg <<- "x"
   arguments$ms_add_pos <<- "x"
+  arguments$ms_clu_neg <<- "x"
+  arguments$ms_clu_pos <<- "x"
   arguments$ms_pol <<- "x"
   arguments$ms_thr_ms1_int <<- "x"
   arguments$ms_thr_ms2_int <<- "x"

@@ -136,6 +136,12 @@ parse_cli_params <- function() {
     if (!is.null(arguments$ms_add_pos)) {
       params$ms$adducts$pos <- as.character(arguments$ms_add_pos)
     }
+    if (!is.null(arguments$ms_clu_neg)) {
+      params$ms$clusters$neg <- as.character(arguments$ms_clu_neg)
+    }
+    if (!is.null(arguments$ms_clu_pos)) {
+      params$ms$clusters$pos <- as.character(arguments$ms_clu_pos)
+    }
     if (!is.null(arguments$ms_pol)) {
       params$ms$polarity <- as.character(arguments$ms_pol)
     }

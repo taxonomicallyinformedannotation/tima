@@ -7,6 +7,8 @@
 * Added RT library as annotation library (#86)
 * Internal variables refactoring
 * New adducts (#79, #80)
+* Refactored adducts, clusters and neutral losses
+* Refactored biological and chemical score
 * Refactored RT matching (#76)
 * Multiple Shiny fixes
 * Multiple fixes (#71, #81)
