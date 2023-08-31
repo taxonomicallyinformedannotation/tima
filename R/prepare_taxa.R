@@ -256,6 +256,7 @@ prepare_taxa <-
         )
       )
 
+    ## TODO change to mutate
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
     log_debug(x = "Exporting ...")
