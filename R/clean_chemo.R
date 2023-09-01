@@ -137,7 +137,7 @@ clean_chemo <-
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          score_input > 0 | (
+          as.numeric(score_input) > 0 | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio |
               ## Only if a good biological
@@ -149,7 +149,7 @@ clean_chemo <-
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          score_input > 0 | (
+          as.numeric(score_input) > 0 | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio &
               ## Only if a good biological
@@ -160,15 +160,17 @@ clean_chemo <-
     }
 
     df1 <- df1 |>
+      tidytable::arrange(tidytable::desc(score_pondered_chemo)) |>
       tidytable::distinct(feature_id,
         structure_inchikey_2D,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        rank_final = (tidytable::dense_rank(-score_pondered_chemo)),
+        rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
+        rank_final = tidytable::dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
       ) |>
-      tidytable::filter(rank_final <= candidates_final, .by = c(feature_id))
+      tidytable::filter(rank_final <= candidates_final)
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df3 <- features_table |>
@@ -288,6 +290,7 @@ clean_chemo <-
         tidytable::everything()
       ))) |>
       tidytable::arrange(rank_final)
+    rm(df1)
 
     if (summarise == TRUE) {
       log_debug("Collecting garbage ...")
@@ -383,6 +386,7 @@ clean_chemo <-
           "reference_doi"
         )
       ))
+    rm(df5)
 
     log_debug("adding consensus again to droped candidates \n")
     results <- tidytable::bind_rows(
@@ -423,7 +427,7 @@ clean_chemo <-
     ) |>
       tidytable::arrange(as.numeric(feature_id))
 
-    rm(df6)
+    rm(annot_table_wei_chemo, df6)
 
     ## Because cytoscape import fails otherwise
     colnames(results) <-
