@@ -137,292 +137,141 @@ weight_bio <-
            score_biological_variety = get("score_biological_variety",
              envir = parent.frame()
            )) {
-    metadata <- annotation_table_taxed |>
+    df0 <- annotation_table_taxed |>
+      tidytable::distinct(
+        structure_taxonomy_classyfire_01kingdom,
+        structure_taxonomy_npclassifier_01pathway,
+        structure_taxonomy_classyfire_02superclass,
+        structure_taxonomy_npclassifier_02superclass,
+        structure_taxonomy_classyfire_03class,
+        structure_taxonomy_npclassifier_03class,
+        structure_taxonomy_classyfire_04directparent
+      ) |>
+      tidytable::mutate(
+        candidate_structure_1_cla_kingdom =
+          structure_taxonomy_classyfire_01kingdom,
+        candidate_structure_1_npc_pathway =
+          structure_taxonomy_npclassifier_01pathway,
+        candidate_structure_2_cla_superclass =
+          structure_taxonomy_classyfire_02superclass,
+        candidate_structure_2_npc_superclass =
+          structure_taxonomy_npclassifier_02superclass,
+        candidate_structure_3_cla_class =
+          structure_taxonomy_classyfire_03class,
+        candidate_structure_3_npc_class =
+          structure_taxonomy_npclassifier_03class,
+        candidate_structure_4_cla_parent =
+          structure_taxonomy_classyfire_04directparent
+      ) |>
+      log_pipe("adding \"notClassified\" \n") |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::matches("candidate_structure_"),
+          .fns = function(x) {
+            tidytable::replace_na(x, "notClassified")
+          }
+        )
+      )
+
+    df1 <- annotation_table_taxed |>
       tidytable::select(
-        feature_id,
-        structure_molecular_formula,
         structure_inchikey_2D,
-        structure_smiles_2D,
         score_input,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
         sample_organism_04_class,
         sample_organism_05_order,
-        ## sample_organism_05_1_infraorder,
+        # sample_organism_05_1_infraorder,
         sample_organism_06_family,
-        ## sample_organism_06_1_subfamily,
+        # sample_organism_06_1_subfamily,
         sample_organism_07_tribe,
-        ## sample_organism_07_1_subtribe,
+        # sample_organism_07_1_subtribe,
         sample_organism_08_genus,
-        ## sample_organism_08_1_subgenus,
+        # sample_organism_08_1_subgenus,
         sample_organism_09_species,
-        ## sample_organism_09_1_subspecies,
+        # sample_organism_09_1_subspecies,
         sample_organism_10_varietas
-      )
-
-    sample_domain <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_01_domain != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_01_domain
-      )
-
-    sample_kingdom <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_02_kingdom != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_02_kingdom
-      )
-
-    sample_phylum <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_03_phylum != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_03_phylum
-      )
-
-    sample_class <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_04_class != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_04_class
-      )
-
-    sample_order <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_05_order != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_05_order
-      )
-
-    ## sample_infraorder <- annotation_table_taxed |>
-    ##   tidytable::filter(sample_organism_05_1_infraorder != "ND") |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_05_1_infraorder
-    ##   )
-
-    sample_family <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_06_family != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_06_family
-      )
-
-    ## sample_subfamily <- annotation_table_taxed |>
-    ##   tidytable::filter(sample_organism_06_1_subfamily != "ND") |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_06_1_subfamily
-    ##   )
-
-    sample_tribe <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_07_tribe != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_07_tribe
-      )
-
-    ## sample_subtribe <- annotation_table_taxed |>
-    ##   tidytable::filter(sample_organism_07_1_subtribe != "ND") |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_07_1_subtribe
-    ##   )
-
-    sample_genus <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_08_genus != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_08_genus
-      )
-
-    ## sample_subgenus <- annotation_table_taxed |>
-    ##   tidytable::filter(sample_organism_08_1_subgenus != "ND") |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_08_1_subgenus
-    ##   )
-
-    sample_species <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_09_species != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_09_species
-      )
-
-    ## sample_subspecies <- annotation_table_taxed |>
-    ##   tidytable::filter(sample_organism_09_1_subspecies != "ND") |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_09_1_subspecies
-    ##   )
-
-    sample_varietas <- annotation_table_taxed |>
-      tidytable::filter(sample_organism_10_varietas != "ND") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        sample_organism_10_varietas
-      )
-
-    log_debug("selecting DB columns \n")
-    candidates <- structure_organism_pairs_table |>
-      tidytable::filter(!is.na(structure_inchikey_2D)) |>
-      tidytable::select(
-        structure_inchikey_2D,
-        candidate_organism_01_domain = organism_taxonomy_01domain,
-        candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
-        candidate_organism_03_phylum = organism_taxonomy_03phylum,
-        candidate_organism_04_class = organism_taxonomy_04class,
-        candidate_organism_05_order = organism_taxonomy_05order,
-        ## candidate_organism_05_1_infraorder =
-        ## organism_taxonomy_05_1infraorder,
-        candidate_organism_06_family = organism_taxonomy_06family,
-        ## candidate_organism_06_1_subfamily = organism_taxonomy_06_1subfamily,
-        candidate_organism_07_tribe = organism_taxonomy_07tribe,
-        ## candidate_organism_07_1_subtribe = organism_taxonomy_07_1subtribe,
-        candidate_organism_08_genus = organism_taxonomy_08genus,
-        ## candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
-        candidate_organism_09_species = organism_taxonomy_09species,
-        ## candidate_organism_09_1_subspecies =
-        ## organism_taxonomy_09_1subspecies,
-        candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
       tidytable::distinct() |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::where(is.character),
-          .fns = function(x) {
-            tidytable::na_if(x, "")
-          }
-        )
+      tidytable::left_join(
+        structure_organism_pairs_table |>
+          tidytable::filter(!is.na(structure_inchikey_2D)) |>
+          tidytable::select(
+            structure_inchikey_2D,
+            candidate_organism_01_domain = organism_taxonomy_01domain,
+            candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
+            candidate_organism_03_phylum = organism_taxonomy_03phylum,
+            candidate_organism_04_class = organism_taxonomy_04class,
+            candidate_organism_05_order = organism_taxonomy_05order,
+            # candidate_organism_05_1_infraorder =
+            # organism_taxonomy_05_1infraorder,
+            candidate_organism_06_family = organism_taxonomy_06family,
+            # candidate_organism_06_1_subfamily =
+            # organism_taxonomy_06_1subfamily,
+            candidate_organism_07_tribe = organism_taxonomy_07tribe,
+            # candidate_organism_07_1_subtribe = organism_taxonomy_07_1subtribe,
+            candidate_organism_08_genus = organism_taxonomy_08genus,
+            # candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
+            candidate_organism_09_species = organism_taxonomy_09species,
+            # candidate_organism_09_1_subspecies =
+            # organism_taxonomy_09_1subspecies,
+            candidate_organism_10_varietas = organism_taxonomy_10varietas
+          ) |>
+          tidytable::distinct() |>
+          tidytable::mutate(tidytable::across(
+            .cols = tidytable::where(is.character),
+            .fns = function(x) {
+              tidytable::na_if(x, "")
+            }
+          ))
       )
 
-    log_debug("keeping distinct candidates per taxonomical rank \n")
-
-    candidate_domain <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_01_domain)) |>
-      tidytable::filter(candidate_organism_01_domain != "notClassified") |>
+    df2 <- df1 |>
       tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_01_domain
-      )
-
-    candidate_kingdom <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_02_kingdom)) |>
-      tidytable::filter(candidate_organism_02_kingdom != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_02_kingdom
-      )
-
-    candidate_phylum <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_03_phylum)) |>
-      tidytable::filter(candidate_organism_03_phylum != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_03_phylum
-      )
-
-    candidate_class <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_04_class)) |>
-      tidytable::filter(candidate_organism_04_class != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_04_class
-      )
-
-    candidate_order <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_05_order)) |>
-      tidytable::filter(candidate_organism_05_order != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_05_order
-      )
-
-    ## candidate_infraorder <- candidates |>
-    ##   tidytable::filter(!is.na(candidate_organism_05_1_infraorder)) |>
-    ## .  tidytable::filter(candidate_organism_05_1_infraorder
-    ## .   != "notClassified") |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   candidate_organism_05_1_infraorder)
-
-    candidate_family <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_06_family)) |>
-      tidytable::filter(candidate_organism_06_family != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_06_family
-      )
-
-    ## candidate_subfamily <- candidates |>
-    ##   tidytable::filter(!is.na(candidate_organism_06_1_subfamily)) |>
-    ## .  tidytable::filter(candidate_organism_06_1_subfamily
-    ## .   != "notClassified") |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   candidate_organism_06_1_subfamily)
-
-    candidate_tribe <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_07_tribe)) |>
-      tidytable::filter(candidate_organism_07_tribe != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_07_tribe
-      )
-
-    ## candidate_subtribe <- candidates |>
-    ##   tidytable::filter(!is.na(candidate_organism_07_1_subtribe)) |>
-    ## .  tidytable::filter(candidate_organism_07_1_subtribe
-    ## .   != "notClassified") |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   candidate_organism_07_1_subtribe)
-
-    candidate_genus <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_08_genus)) |>
-      tidytable::filter(candidate_organism_08_genus != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_08_genus
-      )
-
-    ## candidate_subgenus <- candidates |>
-    ##   tidytable::filter(!is.na(candidate_organism_08_1_subgenus)) |>
-    ## .  tidytable::filter(candidate_organism_08_1_subgenus
-    ## .   != "notClassified") |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   candidate_organism_08_1_subgenus)
-
-    candidate_species <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_09_species)) |>
-      tidytable::filter(candidate_organism_09_species != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
-        candidate_organism_09_species
-      )
-
-    ## candidate_subspecies <- candidates |>
-    ##   tidytable::filter(!is.na(candidate_organism_09_1_subspecies)) |>
-    ## .  tidytable::filter(candidate_organism_09_1_subspecies
-    ## .   != "notClassified") |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   candidate_organism_09_1_subspecies)
-
-    candidate_varietas <- candidates |>
-      tidytable::filter(!is.na(candidate_organism_10_varietas)) |>
-      tidytable::filter(candidate_organism_10_varietas != "notClassified") |>
-      tidytable::distinct(
-        structure_inchikey_2D,
+        sample_organism_01_domain,
+        sample_organism_02_kingdom,
+        sample_organism_03_phylum,
+        sample_organism_04_class,
+        sample_organism_05_order,
+        # sample_organism_05_1_infraorder,
+        sample_organism_06_family,
+        # sample_organism_06_1_subfamily,
+        sample_organism_07_tribe,
+        # sample_organism_07_1_subtribe,
+        sample_organism_08_genus,
+        # sample_organism_08_1_subgenus,
+        sample_organism_09_species,
+        # sample_organism_09_1_subspecies,
+        sample_organism_10_varietas,
+        candidate_organism_01_domain,
+        candidate_organism_02_kingdom,
+        candidate_organism_03_phylum,
+        candidate_organism_04_class,
+        candidate_organism_05_order,
+        # candidate_organism_05_1_infraorder,
+        candidate_organism_06_family,
+        # candidate_organism_06_1_subfamily,
+        candidate_organism_07_tribe,
+        # candidate_organism_07_1_subtribe,
+        candidate_organism_08_genus,
+        # candidate_organism_08_1_subgenus,
+        candidate_organism_09_species,
+        # candidate_organism_09_1_subspecies,
         candidate_organism_10_varietas
       )
-    rm(candidates)
 
-    log_debug("calculating biological scores ... \n")
-
+    log_debug("calculating biological score at all levels ... \n")
     log_debug("... domain \n")
-    step_dom <-
-      tidytable::left_join(sample_domain, candidate_domain) |>
+    step_dom <- df2 |>
+      tidytable::distinct(
+        candidate_organism_01_domain,
+        sample_organism_01_domain
+      ) |>
       tidytable::filter(!is.na(sample_organism_01_domain)) |>
+      tidytable::filter(sample_organism_01_domain != "ND") |>
+      tidytable::filter(!is.na(candidate_organism_01_domain)) |>
+      tidytable::filter(candidate_organism_01_domain != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_01_domain,
@@ -431,33 +280,23 @@ weight_bio <-
           sample_organism_01_domain == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_01 = ifelse(
           test = sample_organism_01_domain != "notClassified",
-          yes = score_biological_domain,
+          yes = score_biological_domain * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_01_domain
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_01_domain,
-        score_biological
       )
 
     log_debug("... kingdom \n")
-    step_kin <- tidytable::full_join(step_dom, sample_kingdom) |>
+    step_kin <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_02_kingdom,
         sample_organism_02_kingdom
-      )
-    step_kin <- tidytable::left_join(step_kin, candidate_kingdom) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_02_kingdom)) |>
+      tidytable::filter(sample_organism_02_kingdom != "ND") |>
       tidytable::filter(!is.na(candidate_organism_02_kingdom)) |>
+      tidytable::filter(candidate_organism_02_kingdom != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_02_kingdom,
@@ -466,33 +305,23 @@ weight_bio <-
           sample_organism_02_kingdom == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_02 = ifelse(
           test = sample_organism_02_kingdom != "notClassified",
-          yes = score_biological_kingdom,
+          yes = score_biological_kingdom * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_02_kingdom
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_02_kingdom,
-        score_biological
       )
 
     log_debug("... phylum \n")
-    step_phy <- tidytable::full_join(step_kin, sample_phylum) |>
+    step_phy <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_03_phylum,
         sample_organism_03_phylum
-      )
-    step_phy <- tidytable::left_join(step_phy, candidate_phylum) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_03_phylum)) |>
+      tidytable::filter(sample_organism_03_phylum != "ND") |>
       tidytable::filter(!is.na(candidate_organism_03_phylum)) |>
+      tidytable::filter(candidate_organism_03_phylum != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_03_phylum,
@@ -501,33 +330,23 @@ weight_bio <-
           sample_organism_03_phylum == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_03 = ifelse(
           test = sample_organism_03_phylum != "notClassified",
-          yes = score_biological_phylum,
+          yes = score_biological_phylum * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_03_phylum
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_03_phylum,
-        score_biological
       )
 
     log_debug("... class \n")
-    step_cla <- tidytable::full_join(step_phy, sample_class) |>
+    step_cla <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_04_class,
         sample_organism_04_class
-      )
-    step_cla <- tidytable::left_join(step_cla, candidate_class) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_04_class)) |>
+      tidytable::filter(sample_organism_04_class != "ND") |>
       tidytable::filter(!is.na(candidate_organism_04_class)) |>
+      tidytable::filter(candidate_organism_04_class != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_04_class,
@@ -536,33 +355,23 @@ weight_bio <-
           sample_organism_04_class == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_04 = ifelse(
           test = sample_organism_04_class != "notClassified",
-          yes = score_biological_class,
+          yes = score_biological_class * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_04_class
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_04_class,
-        score_biological
       )
 
     log_debug("... order \n")
-    step_ord <- tidytable::full_join(step_cla, sample_order) |>
+    step_ord <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_05_order,
         sample_organism_05_order
-      )
-    step_ord <- tidytable::left_join(step_ord, candidate_order) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_05_order)) |>
+      tidytable::filter(sample_organism_05_order != "ND") |>
       tidytable::filter(!is.na(candidate_organism_05_order)) |>
+      tidytable::filter(candidate_organism_05_order != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_05_order,
@@ -571,61 +380,46 @@ weight_bio <-
           sample_organism_05_order == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_05 = ifelse(
           test = sample_organism_05_order != "notClassified",
-          yes = score_biological_order,
+          yes = score_biological_order * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_05_order
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_05_order,
-        score_biological
       )
 
     ## log_debug("... infraorder \n")
-    ## step_ord2 <- tidytable::full_join(step_ord, sample_infraorder) |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   sample_organism_05_1_infraorder)
-    ## step_ord2 <-
-    ##   tidytable::left_join(step_ord2, candidate_infraorder) |>
-    ## tidytable::filter(!is.na(candidate_organism_05_1_infraorder)) |>
-    ##   tidytable::filter(
-    ##     stringi::stri_detect_regex(
-    ## pattern = candidate_organism_05_1_infraorder,
-    ## str = sample_organism_05_1_infraorder) |
-    ## sample_organism_05_1_infraorder == "notClassified"
-    ##   ) |>
-    ## tidytable::mutate(
-    ##   score_biological = ifelse(
-    ##     test = sample_organism_05_1_infraorder != "notClassified",
-    ##     yes = score_biological_infraorder,
-    ##     no = 0)) |>
-    ##   tidytable::left_join(
-    ##     metadata |> tidytable::distinct(feature_id,
-    ##                                 structure_inchikey_2D,
-    ##                                 sample_organism_05_1_infraorder)
-    ##   ) |>
-    ##   tidytable::distinct(feature_id,
-    ##                   structure_inchikey_2D,
-    ##                   best_candidate = candidate_organism_05_1_infraorder,
-    ##                   score_biological)
+    # step_ord2 <- df2 |>
+    #   tidytable::distinct(candidate_infraorder,
+    #                       sample_organism_05_1_infraorder) |>
+    #   tidytable::filter(!is.na(sample_organism_05_order)) |>
+    #   tidytable::filter(sample_organism_05_1_infraorder != "ND") |>
+    #   tidytable::filter(!is.na(candidate_infraorder)) |>
+    #   tidytable::filter(candidate_infraorder != "notClassified") |>
+    #   tidytable::filter(
+    #     stringi::stri_detect_regex(
+    #       pattern = candidate_infraorder,
+    #       str = sample_organism_05_1_infraorder
+    #     ) |
+    #       sample_organism_05_1_infraorder == "notClassified"
+    #   ) |>
+    #   tidytable::mutate(
+    #     score_biological_05_1 = ifelse(
+    #       test = sample_organism_05_1_infraorder != "notClassified",
+    #       yes = score_biological_infraorder * 1,
+    #       no = 0
+    #     )
+    #   )
 
     log_debug("... family \n")
-    step_fam <- tidytable::full_join(step_ord, sample_family) |>
+    step_fam <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_06_family,
         sample_organism_06_family
-      )
-    step_fam <- tidytable::left_join(step_fam, candidate_family) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_06_family)) |>
+      tidytable::filter(sample_organism_06_family != "ND") |>
       tidytable::filter(!is.na(candidate_organism_06_family)) |>
+      tidytable::filter(candidate_organism_06_family != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_06_family,
@@ -634,60 +428,47 @@ weight_bio <-
           sample_organism_06_family == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_06 = ifelse(
           test = sample_organism_06_family != "notClassified",
-          yes = score_biological_family,
+          yes = score_biological_family * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_06_family
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_06_family,
-        score_biological
       )
 
-    ## log_debug("... subfamily \n")
-    ## step_fam2 <- tidytable::full_join(step_fam, sample_subfamily) |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   sample_organism_06_1_subfamily)
-    ## step_fam2 <- tidytable::left_join(step_fam2, candidate_subfamily) |>
-    ## tidytable::filter(!is.na(candidate_organism_06_1_subfamily)) |>
-    ##   tidytable::filter(
-    ##     stringi::stri_detect_regex(
-    ## pattern = candidate_organism_06_1_subfamily,
-    ## str = sample_organism_06_1_subfamily) |
-    ## sample_organism_06_1_subfamily == "notClassified"
-    ##   ) |>
-    ## tidytable::mutate(
-    ##   score_biological = ifelse(
-    ##     test = sample_organism_06_1_subfamily != "notClassified",
-    ##     yes = score_biological_subfamily,
-    ##     no = 0)) |>
-    ##   tidytable::left_join(
-    ##     metadata |> tidytable::distinct(feature_id,
-    ##                                 structure_inchikey_2D,
-    ##                                 sample_organism_06_1_subfamily)
-    ##   ) |>
-    ##   tidytable::distinct(feature_id,
-    ##                   structure_inchikey_2D,
-    ##                   best_candidate = candidate_organism_06_1_subfamily,
-    ##                   score_biological)
+    # log_debug("... subfamily \n")
+    # step_fam2 <- df2 |>
+    #   tidytable::distinct(candidate_organism_06_1_subfamily,
+    #                       sample_organism_06_1_subfamily) |>
+    #   tidytable::filter(!is.na(sample_organism_06_1_subfamily)) |>
+    #   tidytable::filter(sample_organism_06_1_subfamily != "ND") |>
+    #   tidytable::filter(!is.na(candidate_organism_06_1_subfamily)) |>
+    #   tidytable::filter(candidate_organism_06_1_subfamily !=
+    # "notClassified") |>
+    #   tidytable::filter(
+    #     stringi::stri_detect_regex(
+    #       pattern = candidate_organism_06_1_subfamily,
+    #       str = sample_organism_06_1_subfamily
+    #     ) |
+    #       sample_organism_06_1_subfamily == "notClassified"
+    #   ) |>
+    #   tidytable::mutate(
+    #     score_biological_06_1 = ifelse(
+    #       test = sample_organism_06_1_subfamily != "notClassified",
+    #       yes = score_biological_subfamily * 1,
+    #       no = 0
+    #     )
+    #   )
 
     log_debug("... tribe \n")
-    step_tri <- tidytable::full_join(step_fam, sample_tribe) |>
+    step_tri <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_07_tribe,
         sample_organism_07_tribe
-      )
-    step_tri <- tidytable::left_join(step_tri, candidate_tribe) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_07_tribe)) |>
+      tidytable::filter(sample_organism_07_tribe != "ND") |>
       tidytable::filter(!is.na(candidate_organism_07_tribe)) |>
+      tidytable::filter(candidate_organism_07_tribe != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_07_tribe,
@@ -696,62 +477,47 @@ weight_bio <-
           sample_organism_07_tribe == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_07 = ifelse(
           test = sample_organism_07_tribe != "notClassified",
-          yes = score_biological_tribe,
+          yes = score_biological_tribe * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_07_tribe
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_07_tribe,
-        score_biological
       )
 
-    ## log_debug("... subtribe \n")
-    ## step_tri2 <- tidytable::full_join(step_tri, sample_subtribe) |>
-    ##   tidytable::distinct(
-    ##     structure_inchikey_2D,
-    ##     sample_organism_07_1_subtribe
-    ##   )
-    ## step_tri2 <- tidytable::left_join(step_tri2, candidate_subtribe) |>
-    ## tidytable::filter(!is.na(candidate_organism_07_1_subtribe)) |>
-    ##   tidytable::filter(
-    ##     stringi::stri_detect_regex(
-    ## pattern = candidate_organism_07_1_subtribe,
-    ## str = sample_organism_07_1_subtribe) |
-    ## sample_organism_07_1_subtribe == "notClassified"
-    ##   ) |>
-    ## tidytable::mutate(
-    ##   score_biological = ifelse(
-    ##     test = sample_organism_07_1_subtribe != "notClassified",
-    ##     yes = score_biological_subtribe,
-    ##     no = 0)) |>
-    ##   tidytable::left_join(
-    ##     metadata |> tidytable::distinct(feature_id,
-    ##                                 structure_inchikey_2D,
-    ##                                 sample_organism_07_1_subtribe)
-    ##   ) |>
-    ##   tidytable::distinct(feature_id,
-    ##                   structure_inchikey_2D,
-    ##                   best_candidate = candidate_organism_07_1_subtribe,
-    ##                   score_biological)
+    # log_debug("... subtribe \n")
+    # step_tri2 <- df2 |>
+    #   tidytable::distinct(candidate_organism_07_1_subtribe,
+    #                       sample_organism_07_1_subtribe) |>
+    #   tidytable::filter(!is.na(sample_organism_07_1_subtribe)) |>
+    #   tidytable::filter(sample_organism_07_1_subtribe != "ND") |>
+    #   tidytable::filter(!is.na(candidate_organism_07_1_subtribe)) |>
+    #   tidytable::filter(candidate_organism_07_1_subtribe !=
+    # "notClassified") |>
+    #   tidytable::filter(
+    #     stringi::stri_detect_regex(
+    #       pattern = candidate_organism_07_1_subtribe,
+    #       str = sample_organism_07_1_subtribe
+    #     ) |
+    #       sample_organism_07_1_subtribe == "notClassified"
+    #   ) |>
+    #   tidytable::mutate(
+    #     score_biological_07_1 = ifelse(
+    #       test = sample_organism_07_1_subtribe != "notClassified",
+    #       yes = score_biological_subtribe * 1,
+    #       no = 0
+    #     )
+    #   )
 
     log_debug("... genus \n")
-    step_gen <- tidytable::full_join(step_tri, sample_genus) |>
+    step_gen <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_08_genus,
         sample_organism_08_genus
-      )
-    step_gen <- tidytable::left_join(step_gen, candidate_genus) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_08_genus)) |>
+      tidytable::filter(sample_organism_08_genus != "ND") |>
       tidytable::filter(!is.na(candidate_organism_08_genus)) |>
+      tidytable::filter(candidate_organism_08_genus != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_08_genus,
@@ -760,61 +526,47 @@ weight_bio <-
           sample_organism_08_genus == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_08 = ifelse(
           test = sample_organism_08_genus != "notClassified",
-          yes = score_biological_genus,
+          yes = score_biological_genus * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_08_genus
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_08_genus,
-        score_biological
       )
 
-    ## log_debug("... subgenus \n")
-    ## step_gen2 <- tidytable::full_join(step_gen, sample_subgenus) |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   sample_organism_08_1_subgenus)
-    ## step_gen2 <-
-    ##   tidytable::left_join(step_gen2, candidate_subgenus) |>
-    ## tidytable::filter(!is.na(sample_organism_08_1_subgenus)) |>
-    ##   tidytable::filter(
-    ##     stringi::stri_detect_regex(
-    ## pattern = candidate_organism_08_1_subgenus,
-    ## str = sample_organism_08_1_subgenus) |
-    ## sample_organism_08_1_subgenus == "notClassified"
-    ##   ) |>
-    ## tidytable::mutate(
-    ##   score_biological = ifelse(
-    ##     test = sample_organism_08_1_subgenus != "notClassified",
-    ##     yes = score_biological_subgenus,
-    ##     no = 0)) |>
-    ##   tidytable::left_join(
-    ##     metadata |> tidytable::distinct(feature_id,
-    ##                                 structure_inchikey_2D,
-    ##                                 sample_organism_08_1_subgenus)
-    ##   ) |>
-    ##   tidytable::distinct(feature_id,
-    ##                   structure_inchikey_2D,
-    ##                   best_candidate = candidate_organism_08_1_subgenus,
-    ##                   score_biological)
+    # log_debug("... subgenus \n")
+    # step_gen2 <- df2 |>
+    #   tidytable::distinct(candidate_organism_08_1_subgenus,
+    #                       sample_organism_08_1_subgenus) |>
+    #   tidytable::filter(!is.na(sample_organism_08_1_subgenus)) |>
+    #   tidytable::filter(sample_organism_08_1_subgenus != "ND") |>
+    #   tidytable::filter(!is.na(candidate_organism_08_1_subgenus)) |>
+    #   tidytable::filter(candidate_organism_08_1_subgenus !=
+    # "notClassified") |>
+    #   tidytable::filter(
+    #     stringi::stri_detect_regex(
+    #       pattern = candidate_organism_08_1_subgenus,
+    #       str = sample_organism_08_1_subgenus
+    #     ) |
+    #       sample_organism_08_1_subgenus == "notClassified"
+    #   ) |>
+    #   tidytable::mutate(
+    #     score_biological_08_1 = ifelse(
+    #       test = sample_organism_08_1_subgenus != "notClassified",
+    #       yes = score_biological_subgenus * 1,
+    #       no = 0
+    #     )
+    #   )
 
     log_debug("... species \n")
-    step_spe <- tidytable::full_join(step_gen, sample_species) |>
+    step_spe <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_09_species,
         sample_organism_09_species
-      )
-    step_spe <- tidytable::left_join(step_spe, candidate_species) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_09_species)) |>
+      tidytable::filter(sample_organism_09_species != "ND") |>
       tidytable::filter(!is.na(candidate_organism_09_species)) |>
+      tidytable::filter(candidate_organism_09_species != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_09_species,
@@ -823,182 +575,180 @@ weight_bio <-
           sample_organism_09_species == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_09 = ifelse(
           test = sample_organism_09_species != "notClassified",
-          yes = score_biological_species,
+          yes = score_biological_species * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_09_species
-        )
-      ) |>
-      tidytable::distinct(feature_id,
-        structure_inchikey_2D,
-        best_candidate = candidate_organism_09_species,
-        score_biological
       )
 
-    ## log_debug("... subspecies \n")
-    ## step_spe2 <- tidytable::full_join(step_spe, sample_subspecies) |>
-    ##   tidytable::distinct(structure_inchikey_2D,
-    ##                   sample_organism_09_1_subspecies)
-    ## step_spe2 <-
-    ##   tidytable::left_join(step_spe2, candidate_subspecies) |>
-    ## tidytable::filter(!is.na(candidate_organism_09_1_subspecies)) |>
-    ##   tidytable::filter(
-    ##     stringi::stri_detect_regex(
-    ## pattern = candidate_organism_09_1_subspecies,
-    ## str = sample_organism_09_1_subspecies) |
-    ## sample_organism_09_1_subspecies == "notClassified"
-    ##   ) |>
-    ## tidytable::mutate(
-    ##   score_biological = ifelse(
-    ##     test = sample_organism_09_1_subspecies != "notClassified",
-    ##     yes = score_biological_subspecies,
-    ##     no = 0)) |>
-    ##   tidytable::left_join(
-    ##     metadata |> tidytable::distinct(feature_id,
-    ##                                 structure_inchikey_2D,
-    ##                                 sample_organism_09_1_subspecies)
-    ##   ) |>
-    ##   tidytable::distinct(feature_id,
-    ##                   structure_inchikey_2D,
-    ##                   best_candidate = candidate_organism_09_1_subspecies,
-    ##                   score_biological)
+    # log_debug("... subspecies \n")
+    # step_spe2 <- df2 |>
+    #   tidytable::distinct(candidate_organism_09_1_subspecies,
+    #                       sample_organism_09_1_subspecies) |>
+    #   tidytable::filter(!is.na(sample_organism_09_1_subspecies)) |>
+    #   tidytable::filter(sample_organism_09_1_subspecies != "ND") |>
+    #   tidytable::filter(!is.na(candidate_organism_09_1_subspecies)) |>
+    #   tidytable::filter(candidate_organism_09_1_subspecies !=
+    # "notClassified") |>
+    #   tidytable::filter(
+    #     stringi::stri_detect_regex(
+    #       pattern = candidate_organism_09_1_subspecies,
+    #       str = sample_organism_09_1_subspecies
+    #     ) |
+    #       sample_organism_09_1_subspecies == "notClassified"
+    #   ) |>
+    #   tidytable::mutate(
+    #     score_biological_09_1 = ifelse(
+    #       test = sample_organism_09_1_subspecies != "notClassified",
+    #       yes = score_biological_subspecies * 1,
+    #       no = 0
+    #     )
+    #   )
 
     log_debug("... varietas \n")
-    step_var <- tidytable::full_join(step_spe, sample_varietas) |>
+    step_var <- df2 |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        candidate_organism_10_varietas,
         sample_organism_10_varietas
-      )
-    step_var <-
-      tidytable::left_join(step_var, candidate_varietas) |>
+      ) |>
+      tidytable::filter(!is.na(sample_organism_10_varietas)) |>
+      tidytable::filter(sample_organism_10_varietas != "ND") |>
       tidytable::filter(!is.na(candidate_organism_10_varietas)) |>
+      tidytable::filter(candidate_organism_10_varietas != "notClassified") |>
       tidytable::filter(
         stringi::stri_detect_regex(
           pattern = candidate_organism_10_varietas,
           str = sample_organism_10_varietas
-        )
+        ) |
+          sample_organism_10_varietas == "notClassified"
       ) |>
       tidytable::mutate(
-        score_biological = ifelse(
+        score_biological_10 = ifelse(
           test = sample_organism_10_varietas != "notClassified",
-          yes = score_biological_variety,
+          yes = score_biological_variety * 1,
           no = 0
         )
-      ) |>
-      tidytable::left_join(
-        metadata |> tidytable::distinct(
-          feature_id,
-          structure_inchikey_2D,
-          sample_organism_10_varietas
+      )
+
+    log_debug("... keeping best chemical score \n")
+    annot_table_wei_bio <- df2 |>
+      tidytable::left_join(step_dom) |>
+      tidytable::left_join(step_kin) |>
+      tidytable::left_join(step_phy) |>
+      tidytable::left_join(step_cla) |>
+      tidytable::left_join(step_ord) |>
+      # tidytable::left_join(step_ord2) |>
+      tidytable::left_join(step_fam) |>
+      # tidytable::left_join(step_fam2) |>
+      tidytable::left_join(step_tri) |>
+      # tidytable::left_join(step_tri2) |>
+      tidytable::left_join(step_gen) |>
+      # tidytable::left_join(step_gen2) |>
+      tidytable::left_join(step_spe) |>
+      # tidytable::left_join(step_spe2) |>
+      tidytable::left_join(step_var) |>
+      tidytable::mutate(
+        score_biological = pmax(
+          score_biological_01,
+          score_biological_02,
+          score_biological_03,
+          score_biological_04,
+          score_biological_05,
+          # score_biological_05_1,
+          score_biological_06,
+          # score_biological_06_1,
+          score_biological_07,
+          # score_biological_07_1,
+          score_biological_08,
+          # score_biological_08_1,
+          score_biological_09,
+          # score_biological_09_1,
+          score_biological_10,
+          0,
+          na.rm = TRUE
         )
       ) |>
-      tidytable::distinct(feature_id,
+      tidytable::select(
+        -tidytable::contains("score_biological_")
+      ) |>
+      tidytable::mutate(best_candidate = tidytable::case_when(
+        score_biological == score_biological_domain
+        ~ candidate_organism_01_domain,
+        score_biological == score_biological_kingdom
+        ~ candidate_organism_02_kingdom,
+        score_biological == score_biological_phylum
+        ~ candidate_organism_03_phylum,
+        score_biological == score_biological_class
+        ~ candidate_organism_04_class,
+        score_biological == score_biological_order
+        ~ candidate_organism_05_order,
+        # score_biological == score_biological_05_1 ~
+        # candidate_organism_05_1_infraorder,
+        score_biological == score_biological_family
+        ~ candidate_organism_06_family,
+        # score_biological == score_biological_06_1 ~
+        # candidate_organism_06_1_subfamily,
+        score_biological == score_biological_tribe
+        ~ candidate_organism_07_tribe,
+        # score_biological == score_biological_07_1 ~
+        # candidate_organism_07_1_subtribe,
+        score_biological == score_biological_genus
+        ~ candidate_organism_08_genus,
+        # score_biological == score_biological_08_1 ~
+        # candidate_organism_08_1_subgenus,
+        score_biological == score_biological_species
+        ~ candidate_organism_09_species,
+        # score_biological == score_biological_09_1 ~
+        # candidate_organism_09_1_subspecies,
+        score_biological == score_biological_variety ~
+          candidate_organism_10_varietas,
+        .default = NA_character_
+      )) |>
+      tidytable::right_join(df1) |>
+      tidytable::arrange(tidytable::desc(score_biological)) |>
+      tidytable::distinct(
         structure_inchikey_2D,
-        best_candidate = candidate_organism_10_varietas,
-        score_biological
-      )
-
-    rm(metadata)
-    rm(
-      candidate_domain,
-      sample_domain,
-      candidate_kingdom,
-      sample_kingdom,
-      candidate_phylum,
-      sample_phylum,
-      candidate_class,
-      sample_class,
-      candidate_order,
-      sample_order,
-      # candidate_infraorder,
-      # sample_infraoder,
-      candidate_family,
-      sample_family,
-      # candidate_subfamily,
-      # sample_subfamily,
-      candidate_tribe,
-      sample_tribe,
-      # candidate_subtribe,
-      # sample_subtribe,
-      candidate_genus,
-      sample_genus,
-      # candidate_subgenus,
-      # sample_subgenus,
-      candidate_species,
-      sample_species,
-      # candidate_subspecies,
-      # sample_subspecies,
-      candidate_varietas,
-      sample_varietas
-    )
-
-    step_dom <- step_dom |>
-      tidytable::filter(score_biological > 0)
-    step_kin <- step_kin |>
-      tidytable::filter(score_biological > 0)
-    step_phy <- step_phy |>
-      tidytable::filter(score_biological > 0)
-    step_cla <- step_cla |>
-      tidytable::filter(score_biological > 0)
-    step_ord <- step_ord |>
-      tidytable::filter(score_biological > 0)
-    # step_ord2 <- step_ord2 |>
-    #   tidytable::filter(score_biological > 0)
-    step_fam <- step_fam |>
-      tidytable::filter(score_biological > 0)
-    # step_fam2 <- step_fam2 |>
-    #   tidytable::filter(score_biological > 0)
-    step_tri <- step_tri |>
-      tidytable::filter(score_biological > 0)
-    # step_tri2 <- step_tri2 |>
-    #   tidytable::filter(score_biological > 0)
-    step_gen <- step_gen |>
-      tidytable::filter(score_biological > 0)
-    # step_gen2 <- step_gen2 |>
-    #   tidytable::filter(score_biological > 0)
-    step_spe <- step_spe |>
-      tidytable::filter(score_biological > 0)
-    # step_spe2 <- step_spe2 |>
-    #   tidytable::filter(score_biological > 0)
-    step_var <- step_var |>
-      tidytable::filter(score_biological > 0)
-
-    log_debug("keeping best biological score only \n")
-    annot_table_wei_bio <- annotation_table_taxed |>
-      tidytable::select(-tidytable::contains("sample_")) |>
-      tidytable::left_join(
-        tidytable::bind_rows(
-          step_dom,
-          step_kin,
-          step_phy,
-          step_cla,
-          step_ord,
-          ## step_ord2,
-          step_fam,
-          ## step_fam2,
-          step_tri,
-          ## step_tri2,
-          step_gen,
-          ## step_gen2,
-          step_spe,
-          ## step_spe2,
-          step_var
-        ) |>
-          tidytable::arrange(tidytable::desc(score_biological)) |>
-          tidytable::distinct(feature_id,
-            structure_inchikey_2D,
-            .keep_all = TRUE
-          )
+        score_input,
+        sample_organism_01_domain,
+        sample_organism_02_kingdom,
+        sample_organism_03_phylum,
+        sample_organism_04_class,
+        sample_organism_05_order,
+        # sample_organism_05_1_infraorder,
+        sample_organism_06_family,
+        # sample_organism_06_1_subfamily,
+        sample_organism_07_tribe,
+        # sample_organism_07_1_subtribe,
+        sample_organism_08_genus,
+        # sample_organism_08_1_subgenus,
+        sample_organism_09_species,
+        # sample_organism_09_1_subspecies,
+        sample_organism_10_varietas,
+        .keep_all = TRUE
+      ) |>
+      tidytable::inner_join(annotation_table_taxed) |>
+      tidytable::select(
+        -tidytable::contains("candidate_organism"),
+        -tidytable::contains("sample_organism")
+      ) |>
+      tidytable::left_join(df0) |>
+      log_pipe("... calculating weighted biological score \n") |>
+      tidytable::mutate(
+        score_pondered_bio =
+          (1 / (weight_biological + weight_spectral)) *
+            weight_biological *
+            score_biological +
+            (1 / (weight_biological + weight_spectral)) *
+              weight_spectral *
+              as.numeric(score_input)
       )
 
     rm(
+      annotation_table_taxed,
+      df0,
+      df1,
+      df2,
       step_dom,
       step_kin,
       step_phy,
@@ -1015,44 +765,6 @@ weight_bio <-
       ## step_spe2,
       step_var
     )
-
-    annot_table_wei_bio$score_biological[is.na(annot_table_wei_bio$score_biological)] <-
-      0
-
-    annot_table_wei_bio <- annot_table_wei_bio |>
-      tidytable::mutate(
-        score_pondered_bio = (
-          (1 / (weight_biological + weight_spectral)) *
-            weight_biological *
-            score_biological +
-            (1 / (weight_biological + weight_spectral)) *
-              weight_spectral *
-              as.numeric(score_input)
-        )
-      )
-
-    annot_table_wei_bio$score_pondered_bio[is.na(annot_table_wei_bio$score_pondered_bio)] <-
-      0
-
-    annot_table_wei_bio <- annot_table_wei_bio |>
-      tidytable::arrange(tidytable::desc(score_pondered_bio)) |>
-      tidytable::distinct(
-        feature_id,
-        structure_inchikey_2D,
-        structure_smiles_2D,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_npclassifier_03class,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
-        .by = c(feature_id)
-      ) |>
-      tidytable::arrange(
-        score_pondered_bio
-      ) |>
-      tidytable::arrange(as.numeric(feature_id))
 
     return(annot_table_wei_bio)
   }

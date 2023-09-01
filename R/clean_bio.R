@@ -81,22 +81,6 @@ clean_bio <-
              envir = parent.frame()
            )) {
     df <- annot_table_wei_bio |>
-      tidytable::mutate(
-        candidate_structure_1_cla_kingdom =
-          structure_taxonomy_classyfire_01kingdom,
-        candidate_structure_1_npc_pathway =
-          structure_taxonomy_npclassifier_01pathway,
-        candidate_structure_2_cla_superclass =
-          structure_taxonomy_classyfire_02superclass,
-        candidate_structure_2_npc_superclass =
-          structure_taxonomy_npclassifier_02superclass,
-        candidate_structure_3_cla_class =
-          structure_taxonomy_classyfire_03class,
-        candidate_structure_3_npc_class =
-          structure_taxonomy_npclassifier_03class,
-        candidate_structure_4_cla_parent =
-          structure_taxonomy_classyfire_04directparent
-      ) |>
       tidytable::distinct(
         feature_id,
         structure_inchikey_2D,
@@ -109,16 +93,6 @@ clean_bio <-
         candidate_structure_4_cla_parent,
         score_pondered_bio,
         .keep_all = TRUE
-      ) |>
-      tidytable::arrange(tidytable::desc(score_pondered_bio)) |>
-      log_pipe("adding \"notClassified\" \n") |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::matches("candidate_structure_"),
-          .fns = function(x) {
-            tidytable::replace_na(x, "notClassified")
-          }
-        )
       )
 
     ## Loosing CANOPUS from SIRIUS
@@ -519,8 +493,6 @@ clean_bio <-
         )
       )
 
-    rm(df3)
-
     log_debug("joining all except -1 together \n")
     annot_table_wei_bio_clean <-
       tidytable::left_join(df,
@@ -684,6 +656,12 @@ clean_bio <-
             0
           )
       )
+
+    rm(
+      annot_table_wei_bio,
+      df,
+      df3
+    )
 
     return(annot_table_wei_bio_clean)
   }
