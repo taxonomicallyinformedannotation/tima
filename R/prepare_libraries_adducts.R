@@ -1,11 +1,3 @@
-utils::globalVariables(c(
-  "adduct",
-  "exact_mass",
-  "params",
-  "paths",
-  "structure_exact_mass"
-))
-
 #' @title Prepare libraries of adducts
 #'
 #' @description This function prepares adducts for further use

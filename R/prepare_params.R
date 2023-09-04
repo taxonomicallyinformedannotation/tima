@@ -1,10 +1,3 @@
-utils::globalVariables(
-  c(
-    "params",
-    "paths"
-  )
-)
-
 #' @title Prepare params
 #'
 #' @description This function prepares main parameters

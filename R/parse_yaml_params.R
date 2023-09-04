@@ -1,10 +1,3 @@
-utils::globalVariables(
-  c(
-    "default_path",
-    "user_path"
-  )
-)
-
 #' @title Parse YAML parameters
 #'
 #' @description This function parses YAML parameters

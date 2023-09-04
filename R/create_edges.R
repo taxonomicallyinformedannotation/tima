@@ -1,9 +1,3 @@
-utils::globalVariables(
-  c(
-    "params"
-  )
-)
-
 #' @title Create edges
 #'
 #' @description This function applies similarity calculation to a list of

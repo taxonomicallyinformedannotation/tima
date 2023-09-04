@@ -1,57 +1,3 @@
-utils::globalVariables(
-  c(
-    "annot_table_wei_bio",
-    "candidate_structure_1_cla_kingdom",
-    "candidate_structure_1_npc_pathway",
-    "candidate_structure_2_cla_superclass",
-    "candidate_structure_2_npc_superclass",
-    "candidate_structure_3_cla_class",
-    "candidate_structure_3_npc_class",
-    "candidate_structure_4_cla_parent",
-    "consensus_structure_cla_cla",
-    "consensus_structure_cla_kin",
-    "consensus_structure_cla_par",
-    "consensus_structure_cla_sup",
-    "consensus_structure_npc_cla",
-    "consensus_structure_npc_pat",
-    "consensus_structure_npc_sup",
-    "consistency_score_chemical_1_cla_kingdom",
-    "consistency_score_chemical_1_npc_pathway",
-    "consistency_score_chemical_2_cla_superclass",
-    "consistency_score_chemical_2_npc_superclass",
-    "consistency_score_chemical_3_cla_class",
-    "consistency_score_chemical_3_npc_class",
-    "consistency_score_chemical_4_cla_parent",
-    "consistency_structure_cla_cla",
-    "consistency_structure_cla_kin",
-    "consistency_structure_cla_par",
-    "consistency_structure_cla_sup",
-    "consistency_structure_npc_cla",
-    "consistency_structure_npc_pat",
-    "consistency_structure_npc_sup",
-    "count_cla",
-    "count_kin",
-    "count_par",
-    "count_pat",
-    "count_sup",
-    "edges_table",
-    "feature_id",
-    "feature_source",
-    "feature_target",
-    "n",
-    "score_biological",
-    "score_input",
-    "structure_inchikey_2D",
-    "structure_taxonomy_classyfire_01kingdom",
-    "structure_taxonomy_classyfire_02superclass",
-    "structure_taxonomy_classyfire_03class",
-    "structure_taxonomy_classyfire_04directparent",
-    "structure_taxonomy_npclassifier_01pathway",
-    "structure_taxonomy_npclassifier_02superclass",
-    "structure_taxonomy_npclassifier_03class"
-  )
-)
-
 #' @title Clean bio
 #'
 #' @description This function cleans the results
@@ -83,7 +29,7 @@ clean_bio <-
     df <- annot_table_wei_bio |>
       tidytable::distinct(
         feature_id,
-        structure_inchikey_2D,
+        structure_inchikey_no_stereo,
         candidate_structure_1_cla_kingdom,
         candidate_structure_1_npc_pathway,
         candidate_structure_2_cla_superclass,
@@ -99,7 +45,7 @@ clean_bio <-
     ## TODO improve
     # log_debug("adding \"notAnnotated\" \n")
     # df$candidate_structure_1_cla_kingdom
-    # [df["structure_inchikey_2D"] == "notAnnotated"] <-
+    # [df["structure_inchikey_no_stereo"] == "notAnnotated"] <-
     #   "notAnnotated"
     # and so on ...
 
@@ -108,7 +54,7 @@ clean_bio <-
     #   tidytable::filter(component_id != -1) |>
     #   tidytable::group_by(component_id) |>
     #   tidytable::distinct(feature_id,
-    #     structure_inchikey_2D,
+    #     structure_inchikey_no_stereo,
     #     .keep_all = TRUE
     #   ) |>
     #   tidytable::add_count() |>

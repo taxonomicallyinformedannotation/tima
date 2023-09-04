@@ -14,8 +14,8 @@ select_sirius_columns <- function(df) {
     tidytable::select(
       feature_id,
       structure_name = name,
-      structure_smiles_2D = smiles,
-      structure_inchikey_2D = InChIkey2D,
+      structure_smiles_no_stereo = smiles,
+      structure_inchikey_no_stereo = InChIkey2D,
       structure_molecular_formula = molecularFormula,
       structure_xlogp = xlogp,
       score_input = ConfidenceScore,
@@ -23,6 +23,7 @@ select_sirius_columns <- function(df) {
     ) |>
     tidytable::mutate(
       library = "SIRIUS",
+      ## TODO library_type = "TODO",
       inchikey = NA_character_,
       smiles = NA_character_
     )

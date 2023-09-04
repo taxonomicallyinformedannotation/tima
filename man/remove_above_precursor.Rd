@@ -12,6 +12,10 @@ remove_above_precursor(tol_mz = 0.5)
 \description{
 This function remove peaks above precursor in MS2 spectra
 }
+\details{
+Credit goes to Carolin Huber (0000-0002-9355-8948)
+With fine tuning of Michele Stravs (0000-0002-1426-8572)
+}
 \examples{
 NULL
 }

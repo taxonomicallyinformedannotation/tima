@@ -1,10 +1,3 @@
-utils::globalVariables(c(
-  "cluster index",
-  "ComponentIndex",
-  "feature_target",
-  "params"
-))
-
 #' @title Create components
 #'
 #' @description This function create components from edges

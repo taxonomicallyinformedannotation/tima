@@ -79,7 +79,7 @@ prepare_mona <-
       ## COMMENT (AR): FILTERING MISSING PRECURSOR MZS
       tidytable::filter(!is.na(precursor_mz))
 
-    log_debug("Standardizing 2D chemical structures")
+    log_debug("Standardizing chemical structures without stereo")
     inchis <- unique(spctra_enhanced$inchi)
 
     df_clean <- lapply(X = inchis, FUN = standardize_inchi) |>
@@ -147,7 +147,7 @@ prepare_mona <-
       spctra_enhanced_4,
       spctra_enhanced_5
     ) |>
-      tidytable::filter(!is.na(inchikey_2D))
+      tidytable::filter(!is.na(inchikey_no_stereo))
 
     log_debug("Formatting")
     colnames_mona <- c(
@@ -155,13 +155,13 @@ prepare_mona <-
       colname_compound_id = NA,
       colname_exact_mass = "exactmass",
       colname_formula = "formula",
-      colname_inchi = "inchi_2D",
-      colname_inchikey = "inchikey_2D",
+      colname_inchi = "inchi_no_stereo",
+      colname_inchikey = "inchikey_no_stereo",
       colname_mode = "ionmode",
-      colname_name = "inchikey_2D",
+      colname_name = "inchikey_no_stereo",
       colname_precursorMz = "precursor_mz",
       colname_precursorCharge = "precursorCharge",
-      colname_smiles = "smiles_2D",
+      colname_smiles = "smiles_no_stereo",
       colname_spectrum_id = NA,
       colname_splash = NA,
       colname_synonyms = NA

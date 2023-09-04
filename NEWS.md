@@ -5,6 +5,7 @@
 * Added compounds names as parameter
 * Allow files outside `data/source` (#89)
 * Added RT library as annotation library (#86)
+* Improved naming (#91)
 * Internal variables refactoring
 * New adducts (#79, #80)
 * Refactored adducts, clusters and neutral losses

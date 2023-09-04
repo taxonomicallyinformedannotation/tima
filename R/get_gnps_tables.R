@@ -1,5 +1,3 @@
-utils::globalVariables(c("paths"))
-
 #' @title Get GNPS Tables
 #'
 #' @description This function gets GNPS tables from corresponding job ID.

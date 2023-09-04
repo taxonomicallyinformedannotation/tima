@@ -1,21 +1,3 @@
-utils::globalVariables(
-  c(
-    "acetic",
-    "bromine",
-    "chlorine",
-    "exact_mass",
-    "fluorine",
-    "formic",
-    "name",
-    "phosphoric",
-    "potassium",
-    "proton",
-    "sodium",
-    "tfa",
-    "value"
-  )
-)
-
 #' @title Create adducts negative
 #'
 #' @description This function creates negative adducts

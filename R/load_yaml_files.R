@@ -1,9 +1,3 @@
-utils::globalVariables(c(
-  "yaml_files",
-  "yaml_names",
-  "yamls_default"
-))
-
 #' @title Load yaml files
 #'
 #' @description This function load yaml files

@@ -54,14 +54,14 @@ standardize_mol <- function(mol) {
   if (mol$isEmpty()) {
     list <-
       list(
-        smiles_2D = NA_character_,
-        inchi_2D = NA_character_,
-        inchikey_2D = NA_character_
+        smiles_no_stereo = NA_character_,
+        inchi_no_stereo = NA_character_,
+        inchikey_no_stereo = NA_character_
       )
   } else {
     mol <- mol |>
       rcdk::remove.hydrogens()
-    smiles_2D <- mol |>
+    smiles_no_stereo <- mol |>
       rcdk::get.smiles(
         flavor = rcdk::smiles.flavors(
           c(
@@ -70,27 +70,27 @@ standardize_mol <- function(mol) {
           )
         )
       )
-    inchi_2D <- mol |>
+    inchi_no_stereo <- mol |>
       rinchi::get.inchi()
-    inchikey_2D <- mol |>
+    inchikey_no_stereo <- mol |>
       rinchi::get.inchi.key() |>
       gsub(pattern = "-.*", replacement = "")
 
     return(list(
-      smiles_2D = ifelse(
-        test = smiles_2D == "",
+      smiles_no_stereo = ifelse(
+        test = smiles_no_stereo == "",
         yes = NA_character_,
-        no = smiles_2D
+        no = smiles_no_stereo
       ),
-      inchi_2D = ifelse(
-        test = is.null(inchi_2D),
+      inchi_no_stereo = ifelse(
+        test = is.null(inchi_no_stereo),
         yes = NA_character_,
-        no = inchi_2D
+        no = inchi_no_stereo
       ),
-      inchikey_2D = ifelse(
-        test = identical(x = inchikey_2D, y = character(0)),
+      inchikey_no_stereo = ifelse(
+        test = identical(x = inchikey_no_stereo, y = character(0)),
         yes = NA_character_,
-        no = inchikey_2D
+        no = inchikey_no_stereo
       )
     ))
   }
@@ -106,9 +106,9 @@ standardize_smiles <- function(smiles) {
       standardize_mol()
   } else {
     list <- list(
-      smiles_2D = NA_character_,
-      inchi_2D = NA_character_,
-      inchikey_2D = NA_character_
+      smiles_no_stereo = NA_character_,
+      inchi_no_stereo = NA_character_,
+      inchikey_no_stereo = NA_character_
     )
   }
 
@@ -122,9 +122,9 @@ standardize_inchi <- function(inchi) {
       standardize_mol()
   } else {
     list <- list(
-      smiles_2D = NA_character_,
-      inchi_2D = NA_character_,
-      inchikey_2D = NA_character_
+      smiles_no_stereo = NA_character_,
+      inchi_no_stereo = NA_character_,
+      inchikey_no_stereo = NA_character_
     )
   }
 

@@ -1,17 +1,3 @@
-utils::globalVariables(
-  c(
-    "moldb_formula",
-    "moldb_inchikey",
-    "moldb_logp",
-    "moldb_mono_mass",
-    "moldb_smiles",
-    "name",
-    "params",
-    "structure_inchikey_2D",
-    "structure_smiles_2D"
-  )
-)
-
 #' @title Prepare libraries of structure organism pairs ECMDB
 #'
 #' @include export_output.R

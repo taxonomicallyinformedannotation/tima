@@ -1,9 +1,3 @@
-utils::globalVariables(
-  c(
-    "arguments"
-  )
-)
-
 #' @title Parse CLI parameters
 #'
 #' @description This function parses command line parameters
@@ -192,13 +186,13 @@ parse_cli_params <- function() {
       params$names$mgf$inchi <- as.character(arguments$names_mgf_in)
     }
     if (!is.null(arguments$names_mgf_io)) {
-      params$names$mgf$inchi_2D <- as.character(arguments$names_mgf_io)
+      params$names$mgf$inchi_no_stereo <- as.character(arguments$names_mgf_io)
     }
     if (!is.null(arguments$names_mgf_ik)) {
       params$names$mgf$inchikey <- as.character(arguments$names_mgf_ik)
     }
     if (!is.null(arguments$names_mgf_il)) {
-      params$names$mgf$inchikey_2D <- as.character(arguments$names_mgf_il)
+      params$names$mgf$inchikey_no_stereo <- as.character(arguments$names_mgf_il)
     }
     if (!is.null(arguments$names_mgf_mf)) {
       params$names$mgf$molecular_formula <- as.character(arguments$names_mgf_mf)
@@ -220,7 +214,7 @@ parse_cli_params <- function() {
       params$names$mgf$smiles <- as.character(arguments$names_mgf_sm)
     }
     if (!is.null(arguments$names_mgf_sn)) {
-      params$names$mgf$smiles_2D <- as.character(arguments$names_mgf_sn)
+      params$names$mgf$smiles_no_stereo <- as.character(arguments$names_mgf_sn)
     }
     if (!is.null(arguments$names_mgf_si)) {
       params$names$mgf$spectrum_id <- as.character(arguments$names_mgf_si)

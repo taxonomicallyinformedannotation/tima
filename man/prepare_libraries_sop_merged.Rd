@@ -11,7 +11,7 @@ prepare_libraries_sop_merged(
   value = params$organisms$filter$value,
   output_key = params$files$libraries$sop$merged$keys,
   output_org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output_str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+  output_str_stereo = params$files$libraries$sop$merged$structures$stereo,
   output_str_met = params$files$libraries$sop$merged$structures$metadata,
   output_str_nam = params$files$libraries$sop$merged$structures$names,
   output_str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -34,7 +34,7 @@ e.g. 'Gentianaceae|Apocynaceae'}
 
 \item{output_org_tax_ott}{Output file for organisms taxonomy (OTT)}
 
-\item{output_str_2d_3d}{Output file for structures (2D + 3D)}
+\item{output_str_stereo}{Output file for structures stereo}
 
 \item{output_str_met}{Output file for structures metadata}
 

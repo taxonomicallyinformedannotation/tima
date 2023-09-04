@@ -1,48 +1,3 @@
-utils::globalVariables(
-  c(
-    "ConfidenceScore",
-    "count_peaks_explained",
-    "count_peaks_matched",
-    "CSI:FingerIDScore",
-    "error_mz",
-    "explainedIntensity",
-    "feature_id",
-    "id",
-    "inchikey_2D",
-    "InChIkey2D",
-    "ionMass",
-    "IsotopeScore",
-    "massErrorPrecursor(ppm)",
-    "molecular_formula",
-    "molecularFormula",
-    "name",
-    "numExplainedPeaks",
-    "params",
-    "score_input",
-    # "score_input_normalized",
-    # "score_sirius_csi",
-    # "score_sirius_sirius",
-    # "score_sirius_zodiac",
-    "SiriusScore",
-    "smiles",
-    "smiles_2D",
-    "structure_exact_mass",
-    "structure_name",
-    "structure_taxonomy_classyfire_01kingdom",
-    "structure_taxonomy_classyfire_02superclass",
-    "structure_taxonomy_classyfire_03class",
-    "structure_taxonomy_classyfire_04directparent",
-    "structure_taxonomy_classyfire_chemontid",
-    "structure_taxonomy_npclassifier_01pathway",
-    "structure_taxonomy_npclassifier_02superclass",
-    "structure_taxonomy_npclassifier_03class",
-    "structure_xlogp",
-    "TreeScore",
-    "xlogp",
-    "ZodiacScore"
-  )
-)
-
 #' @title Prepare annotations SIRIUS
 #'
 #' @description This function prepares Sirius results to make them compatible
@@ -56,7 +11,7 @@ utils::globalVariables(
 #'
 #' @param input_directory Directory containing the Sirius results
 #' @param output Output where to save prepared results
-#' @param str_2d_3d File containing 2D and 3D structures
+#' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -71,7 +26,7 @@ utils::globalVariables(
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
            output = params$files$annotations$prepared,
-           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_stereo = params$files$libraries$sop$merged$structures$stereo,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
            str_tax_cla =
@@ -180,20 +135,20 @@ prepare_annotations_sirius <-
         tidytable::select(tidytable::any_of(
           c(
             "feature_id",
-            "structure_taxonomy_npclassifier_01pathway" = "NPC#pathway",
+            "structure_tax_npc_01pat" = "NPC#pathway",
             "NPC#pathway Probability",
-            "structure_taxonomy_npclassifier_02superclass" = "NPC#superclass",
+            "structure_tax_npc_02sup" = "NPC#superclass",
             "NPC#superclass Probability",
-            "structure_taxonomy_npclassifier_03class" = "NPC#class",
+            "structure_tax_npc_03cla" = "NPC#class",
             "NPC#class Probability",
-            "structure_taxonomy_classyfire_01kingdom" = "ClassyFire#TODO",
+            "structure_tax_cla_01kin" = "ClassyFire#TODO",
             "ClassyFire#TODO Probability",
-            "structure_taxonomy_classyfire_02superclass" =
+            "structure_tax_cla_02sup" =
               "ClassyFire#superclass",
             "ClassyFire#superclass probability",
-            "structure_taxonomy_classyfire_03class" = "ClassyFire#class",
+            "structure_tax_cla_03cla" = "ClassyFire#class",
             "ClassyFire#class Probability",
-            "structure_taxonomy_classyfire_04directparent" =
+            "structure_tax_cla_04dirpar" =
               "ClassyFire#most specific class",
             "ClassyFire#most specific class Probability"
           )
@@ -225,13 +180,13 @@ prepare_annotations_sirius <-
         tidytable::left_join(canopus_npc_prepared) |>
         tidytable::distinct() |>
         tidytable::mutate(
-          structure_taxonomy_classyfire_chemontid = NA,
-          structure_taxonomy_classyfire_01kingdom = NA,
+          structure_tax_cla_chemontid = NA,
+          structure_tax_cla_01kin = NA,
           ## mirror spectral match
           count_peaks_matched = NA
         ) |>
         select_annotations_columns(
-          str_2d_3d = str_2d_3d,
+          str_stereo = str_stereo,
           str_met = str_met,
           str_nam = str_nam,
           str_tax_cla = str_tax_cla,

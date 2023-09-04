@@ -1,9 +1,10 @@
-#' Credit goes to partially to https://inbo.github.io/inborutils/
-
 #' @title Get last version from Zenodo
 #'
 #' @description This function gets the last version
 #'    of a file from a Zenodo record
+#'
+#' @details Credit goes to partially to
+#'    https://inbo.github.io/inborutils/
 #'
 #' @param doi DOI of the Zenodo record
 #' @param pattern Pattern to identify the file to download

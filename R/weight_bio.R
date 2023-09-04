@@ -45,13 +45,13 @@ utils::globalVariables(
     "score_biological_variety",
     "score_input",
     "score_pondered_bio",
-    "structure_inchikey_2D",
+    "structure_inchikey_no_stereo",
     "structure_molecular_formula",
     "structure_organism_pairs_table",
-    "structure_smiles_2D",
-    "structure_taxonomy_npclassifier_01pathway",
-    "structure_taxonomy_npclassifier_02superclass",
-    "structure_taxonomy_npclassifier_03class",
+    "structure_smiles_no_stereo",
+    "structure_tax_npc_01pat",
+    "structure_tax_npc_02sup",
+    "structure_tax_npc_03cla",
     "weight_biological",
     "weight_spectral"
   )
@@ -139,29 +139,29 @@ weight_bio <-
            )) {
     df0 <- annotation_table_taxed |>
       tidytable::distinct(
-        structure_taxonomy_classyfire_01kingdom,
-        structure_taxonomy_npclassifier_01pathway,
-        structure_taxonomy_classyfire_02superclass,
-        structure_taxonomy_npclassifier_02superclass,
-        structure_taxonomy_classyfire_03class,
-        structure_taxonomy_npclassifier_03class,
-        structure_taxonomy_classyfire_04directparent
+        structure_tax_cla_01kin,
+        structure_tax_npc_01pat,
+        structure_tax_cla_02sup,
+        structure_tax_npc_02sup,
+        structure_tax_cla_03cla,
+        structure_tax_npc_03cla,
+        structure_tax_cla_04dirpar
       ) |>
       tidytable::mutate(
         candidate_structure_1_cla_kingdom =
-          structure_taxonomy_classyfire_01kingdom,
+          structure_tax_cla_01kin,
         candidate_structure_1_npc_pathway =
-          structure_taxonomy_npclassifier_01pathway,
+          structure_tax_npc_01pat,
         candidate_structure_2_cla_superclass =
-          structure_taxonomy_classyfire_02superclass,
+          structure_tax_cla_02sup,
         candidate_structure_2_npc_superclass =
-          structure_taxonomy_npclassifier_02superclass,
+          structure_tax_npc_02sup,
         candidate_structure_3_cla_class =
-          structure_taxonomy_classyfire_03class,
+          structure_tax_cla_03cla,
         candidate_structure_3_npc_class =
-          structure_taxonomy_npclassifier_03class,
+          structure_tax_npc_03cla,
         candidate_structure_4_cla_parent =
-          structure_taxonomy_classyfire_04directparent
+          structure_tax_cla_04dirpar
       ) |>
       log_pipe("adding \"notClassified\" \n") |>
       tidytable::mutate(
@@ -175,7 +175,7 @@ weight_bio <-
 
     df1 <- annotation_table_taxed |>
       tidytable::select(
-        structure_inchikey_2D,
+        structure_inchikey_no_stereo,
         score_input,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
@@ -196,9 +196,9 @@ weight_bio <-
       tidytable::distinct() |>
       tidytable::left_join(
         structure_organism_pairs_table |>
-          tidytable::filter(!is.na(structure_inchikey_2D)) |>
+          tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
           tidytable::select(
-            structure_inchikey_2D,
+            structure_inchikey_no_stereo,
             candidate_organism_01_domain = organism_taxonomy_01domain,
             candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
             candidate_organism_03_phylum = organism_taxonomy_03phylum,
@@ -708,7 +708,7 @@ weight_bio <-
       tidytable::right_join(df1) |>
       tidytable::arrange(tidytable::desc(score_biological)) |>
       tidytable::distinct(
-        structure_inchikey_2D,
+        structure_inchikey_no_stereo,
         score_input,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
