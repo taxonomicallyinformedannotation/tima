@@ -53,57 +53,57 @@ decorate_chemo <- function(annot_table_wei_chemo =
     tidytable::filter(score_chemical >= score_chemical_cla_kingdom *
       1) |>
     tidytable::filter(
-      consensus_structure_cla_kin != "notAnnotated" &
-        consensus_structure_cla_kin != "notConsistent" &
-        consensus_structure_cla_kin != "dummy"
+      feature_pred_tax_cla_01kin_val != "notAnnotated" &
+        feature_pred_tax_cla_01kin_val != "notConsistent" &
+        feature_pred_tax_cla_01kin_val != "dummy"
     )
   df_npc_pat <- annot_table_wei_chemo |>
     tidytable::filter(score_chemical >= score_chemical_npc_pathway *
       1) |>
     tidytable::filter(
-      consensus_structure_npc_pat != "notAnnotated" &
-        consensus_structure_npc_pat != "notConsistent" &
-        consensus_structure_npc_pat != "dummy"
+      feature_pred_tax_npc_01pat_val != "notAnnotated" &
+        feature_pred_tax_npc_01pat_val != "notConsistent" &
+        feature_pred_tax_npc_01pat_val != "dummy"
     )
   df_cla_sup <- df_cla_kin |>
     tidytable::filter(score_chemical >= score_chemical_cla_superclass *
       1) |>
     tidytable::filter(
-      consensus_structure_cla_sup != "notAnnotated" &
-        consensus_structure_cla_sup != "notConsistent" &
-        consensus_structure_cla_sup != "dummy"
+      feature_pred_tax_cla_02sup_val != "notAnnotated" &
+        feature_pred_tax_cla_02sup_val != "notConsistent" &
+        feature_pred_tax_cla_02sup_val != "dummy"
     )
   df_npc_sup <- df_npc_pat |>
     tidytable::filter(score_chemical >= score_chemical_npc_superclass *
       1) |>
     tidytable::filter(
-      consensus_structure_npc_sup != "notAnnotated" &
-        consensus_structure_npc_sup != "notConsistent" &
-        consensus_structure_npc_sup != "dummy"
+      feature_pred_tax_npc_02sup_val != "notAnnotated" &
+        feature_pred_tax_npc_02sup_val != "notConsistent" &
+        feature_pred_tax_npc_02sup_val != "dummy"
     )
   df_cla_cla <- df_cla_sup |>
     tidytable::filter(score_chemical >= score_chemical_cla_class *
       1) |>
     tidytable::filter(
-      consensus_structure_cla_cla != "notAnnotated" &
-        consensus_structure_cla_cla != "notConsistent" &
-        consensus_structure_cla_cla != "dummy"
+      feature_pred_tax_cla_03cla_val != "notAnnotated" &
+        feature_pred_tax_cla_03cla_val != "notConsistent" &
+        feature_pred_tax_cla_03cla_val != "dummy"
     )
   df_npc_cla <- df_npc_sup |>
     tidytable::filter(score_chemical >= score_chemical_npc_class *
       1) |>
     tidytable::filter(
-      consensus_structure_npc_cla != "notAnnotated" &
-        consensus_structure_npc_cla != "notConsistent" &
-        consensus_structure_npc_cla != "dummy"
+      feature_pred_tax_npc_03cla_val != "notAnnotated" &
+        feature_pred_tax_npc_03cla_val != "notConsistent" &
+        feature_pred_tax_npc_03cla_val != "dummy"
     )
   df_cla_par <- df_cla_cla |>
     tidytable::filter(score_chemical >= score_chemical_cla_parent *
       1) |>
     tidytable::filter(
-      consensus_structure_cla_par != "notAnnotated" &
-        consensus_structure_cla_par != "notConsistent" &
-        consensus_structure_cla_par != "dummy"
+      feature_pred_tax_cla_04dirpar_val != "notAnnotated" &
+        feature_pred_tax_cla_04dirpar_val != "notConsistent" &
+        feature_pred_tax_cla_04dirpar_val != "dummy"
     )
 
   log_debug(
@@ -111,49 +111,49 @@ decorate_chemo <- function(annot_table_wei_chemo =
       "chemically informed scoring led to \n",
       crayon::silver(nrow(
         df_cla_kin |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::silver("(classyfire) kingdom"),
       "level, \n",
       crayon::cyan(nrow(
         df_npc_pat |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::cyan("(NPC) pathway"),
       "level, \n",
       crayon::magenta(nrow(
         df_cla_sup |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::magenta("(classyfire) superclass"),
       "level, \n",
       crayon::blue(nrow(
         df_npc_sup |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::blue("(NPC) superclass"),
       "level, \n",
       crayon::yellow(nrow(
         df_cla_cla |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::yellow("(classyfire) class"),
       "level, \n",
       crayon::green(nrow(
         df_npc_cla |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::green("(NPC) class"),
       "level, and \n",
       crayon::red(nrow(
         df_cla_par |>
-          tidytable::distinct(structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
       crayon::red("(classyfire) parent"),

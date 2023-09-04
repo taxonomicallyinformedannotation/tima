@@ -50,39 +50,32 @@ prepare_annotations_spectra <-
       tidytable::filter(!is.na(feature_id)) |>
       tidytable::distinct(
         feature_id,
-        error_mz,
-        structure_name,
-        structure_inchikey_no_stereo,
-        structure_smiles_no_stereo,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
-        score_input = score,
-        count_peaks_matched
+        candidate_structure_error_mz,
+        candidate_structure_name,
+        candidate_structure_inchikey_no_stereo,
+        candidate_structure_smiles_no_stereo,
+        candidate_structure_molecular_formula,
+        candidate_structure_exact_mass,
+        candidate_structure_xlogp,
+        candidate_score_similarity,
+        candidate_count_similarity_peaks_matched
       ) |>
       ## Add new columns
       tidytable::mutate(
-        library = "ISDB",
-        ## TODO library_type = "TODO",
-        structure_exact_mass = as.numeric(structure_exact_mass),
-        structure_tax_npc_01pat = NA_character_,
-        structure_tax_npc_02sup = NA_character_,
-        structure_tax_npc_03cla = NA_character_,
-        structure_tax_cla_chemontid = NA_character_,
-        structure_tax_cla_01kin = NA_character_,
-        structure_tax_cla_02sup = NA_character_,
-        structure_tax_cla_03cla = NA_character_,
-        structure_tax_cla_04dirpar = NA_character_,
-        ## mirror sirius
-        count_peaks_explained = NA
+        candidate_library = "ISDB",
+        ## TODO candidate_library_type = "TODO",
+        candidate_structure_exact_mass =
+          as.numeric(candidate_structure_exact_mass),
+        candidate_structure_tax_npc_01pat = NA_character_,
+        candidate_structure_tax_npc_02sup = NA_character_,
+        candidate_structure_tax_npc_03cla = NA_character_,
+        candidate_structure_tax_cla_chemontid = NA_character_,
+        candidate_structure_tax_cla_01kin = NA_character_,
+        candidate_structure_tax_cla_02sup = NA_character_,
+        candidate_structure_tax_cla_03cla = NA_character_,
+        candidate_structure_tax_cla_04dirpar = NA_character_,
       ) |>
-      select_annotations_columns(
-        str_stereo = str_stereo,
-        str_met = str_met,
-        str_nam = str_nam,
-        str_tax_cla = str_tax_cla,
-        str_tax_npc = str_tax_npc
-      )
+      select_annotations_columns()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_annotations_spectra")

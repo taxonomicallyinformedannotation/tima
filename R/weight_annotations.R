@@ -191,11 +191,11 @@ weight_annotations <- function(
   ) |>
     tidytable::bind_rows() |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
-    tidytable::arrange(tidytable::desc(score_input)) |>
+    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
     tidytable::distinct(
       feature_id,
-      structure_inchikey_no_stereo,
-      structure_smiles_no_stereo,
+      candidate_structure_inchikey_no_stereo,
+      candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
 
@@ -204,11 +204,12 @@ weight_annotations <- function(
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
-      tidytable::filter(score_input == 0)
+      tidytable::filter(candidate_score_similarity == 0 |
+        candidate_score_sirius_csi == 0)
   }
   if (compounds_names == FALSE) {
     annotation_table <- annotation_table |>
-      tidytable::select(-structure_name)
+      tidytable::select(-candidate_structure_name)
   }
 
   log_debug(x = "adding biological organism metadata")

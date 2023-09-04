@@ -94,26 +94,22 @@ create_edges_spectra <- function(
         c(
           name_source,
           name_target,
-          "score",
-          "reverse_score",
-          "presence_ratio",
-          "count_peaks_matched"
+          "candidate_score_similarity" = "score",
+          "candidate_count_similarity_peaks_matched"
         )
       ))
 
     edges <- edges |>
       tidytable::filter(
-        score >= threshold
+        candidate_score_similarity >= threshold
       )
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")
     edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
       !!as.name(name_target) := NA,
-      "score" = NA,
-      "reverse_score" = NA,
-      "presence_ratio" = NA,
-      "count_peaks_matched" = NA
+      "candidate_score_similarity" = NA,
+      "candidate_count_similarity_peaks_matched" = NA
     )
   }
 

@@ -64,17 +64,15 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   df_empty <- data.frame(
     feature_id = NA,
-    error_mz = NA,
-    structure_name = NA,
-    structure_inchikey_no_stereo = NA,
-    structure_smiles_no_stereo = NA,
-    structure_molecular_formula = NA,
-    structure_exact_mass = NA,
-    structure_xlogp = NA,
-    score = NA,
-    reverse_score = NA,
-    presence_ratio = NA,
-    count_peaks_matched = NA
+    candidate_error_mz = NA,
+    candidate_structure_name = NA,
+    candidate_structure_inchikey_no_stereo = NA,
+    candidate_structure_smiles_no_stereo = NA,
+    candidate_structure_molecular_formula = NA,
+    candidate_structure_exact_mass = NA,
+    candidate_structure_xlogp = NA,
+    candidate_score_similarity = NA,
+    candidate_count_similarity_peaks_matched = NA
   )
 
   if (length(spectra) > 0) {
@@ -196,10 +194,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                       "feature_id" = query_ids[[spectrum]],
                       "precursorMz" = precursor,
                       "target_id" = lib_id[indices][[index]],
-                      "score" = as.numeric(score),
-                      "count_peaks_matched" = NA_integer_,
-                      "reverse_score" = NA_real_,
-                      "presence_ratio" = NA_real_
+                      "candidate_score_similarity" = as.numeric(score),
+                      ## TODO
+                      "candidate_count_similarity_peaks_matched" = NA_integer_
                     )
                   }
                 }
@@ -293,8 +290,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     df_final <- df_final |>
       tidytable::rowwise() |>
       tidytable::mutate(
-        error_mz = target_precursorMz - precursorMz,
-        structure_inchikey_no_stereo = ifelse(
+        candidate_structure_error_mz = target_precursorMz - precursorMz,
+        candidate_structure_inchikey_no_stereo = ifelse(
           test = is.na(target_inchikey_no_stereo),
           yes = target_inchikey |>
             gsub(
@@ -303,7 +300,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
             ),
           no = target_inchikey_no_stereo
         ),
-        structure_smiles_no_stereo = tidytable::coalesce(
+        candidate_structure_smiles_no_stereo = tidytable::coalesce(
           target_smiles_no_stereo,
           target_smiles
         )
@@ -311,17 +308,15 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::select(tidytable::any_of(
         c(
           "feature_id",
-          "error_mz",
-          "structure_name" = "target_name",
-          "structure_inchikey_no_stereo",
-          "structure_smiles_no_stereo",
-          "structure_molecular_formula" = "target_formula",
-          "structure_exact_mass" = "target_exactmass",
-          "structure_xlogp" = "target_xlogp",
-          "score",
-          "reverse_score",
-          "presence_ratio",
-          "count_peaks_matched"
+          "candidate_structure_error_mz",
+          "candidate_structure_name" = "target_name",
+          "candidate_structure_inchikey_no_stereo",
+          "candidate_structure_smiles_no_stereo",
+          "candidate_structure_molecular_formula" = "target_formula",
+          "candidate_structure_exact_mass" = "target_exactmass",
+          "candidate_structure_xlogp" = "target_xlogp",
+          "candidate_score_similarity",
+          "candidate_count_similarity_peaks_matched"
         )
       ))
 
@@ -330,13 +325,16 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
     log_debug("Filtering results above threshold only...")
     df_final <- df_final |>
-      tidytable::filter(score >= threshold)
+      tidytable::filter(candidate_score_similarity >= threshold)
 
     log_debug(
       nrow(
         df_final |>
           ## else doesn't work if some are empty
-          tidytable::distinct(structure_inchikey_no_stereo, structure_smiles_no_stereo)
+          tidytable::distinct(
+            candidate_structure_inchikey_no_stereo,
+            candidate_structure_smiles_no_stereo
+          )
       ),
       "Candidates were annotated on",
       nrow(df_final |>

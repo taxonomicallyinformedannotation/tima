@@ -6,11 +6,11 @@
 \usage{
 complement_metadata_structures(
   df,
-  str_stereo = params$files$libraries$merged$structures$stereo,
-  str_met = params$files$libraries$merged$structures$metadata,
-  str_nam = params$files$libraries$merged$structures$names,
-  str_tax_cla = params$files$libraries$merged$structures$taxonomies$cla,
-  str_tax_npc = params$files$libraries$merged$structures$taxonomies$npc
+  str_stereo = get("str_stereo", envir = parent.frame()),
+  str_met = get("str_met", envir = parent.frame()),
+  str_nam = get("str_nam", envir = parent.frame()),
+  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
+  str_tax_npc = get("str_tax_npc", envir = parent.frame())
 )
 }
 \arguments{

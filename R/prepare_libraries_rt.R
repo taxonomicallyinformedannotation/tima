@@ -265,19 +265,23 @@ prepare_libraries_rt <-
     rts <- df_rts |>
       tidytable::select(-structure_smiles) |>
       tidytable::distinct() |>
-      tidytable::mutate(structure_inchikey_no_stereo = gsub(
+      tidytable::mutate(candidate_structure_inchikey_no_stereo = gsub(
         pattern = "-.*",
         replacement = "",
         x = structure_inchikey
       )) |>
       ## TODO REMINDER FOR NOW
-      tidytable::select(-structure_inchikey)
+      tidytable::distinct(
+        rt,
+        candidate_structure_inchikey_no_stereo,
+        type
+      )
 
     if (nrow(rts) == 0) {
       log_debug("No retention time library found, returning empty table.")
       sop <- tidytable::tidytable(
         structure_smiles = NA_character_,
-        structure_inchikey_no_stereo = NA_character_,
+        structure_inchikey = NA_character_,
         organism_name = NA_character_
       )
     }
@@ -286,7 +290,7 @@ prepare_libraries_rt <-
       log_debug("No retention time library found, returning empty tables")
       rts <- tidytable::tidytable(
         rt = NA_real_,
-        structure_inchikey_no_stereo = NA_character_,
+        candidate_structure_inchikey_no_stereo = NA_character_,
         type = NA_character_
       )
     }

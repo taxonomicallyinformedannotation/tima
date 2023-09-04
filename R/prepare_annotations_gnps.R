@@ -45,50 +45,44 @@ prepare_annotations_gnps <-
         colClasses = "character"
       ) |>
         tidytable::bind_rows() |>
-        tidytable::mutate(error_mz = as.numeric(MZErrorPPM) *
-          1E-6 *
-          as.numeric(Precursor_MZ)) |>
-        tidytable::select(
-          feature_id = `#Scan#`,
-          error_mz = MassDiff,
-          library = LibraryName,
-          ## TODO library_type = TODO,
-          structure_name = Compound_Name,
-          score_input = MQScore,
-          count_peaks_matched = SharedPeaks,
-          structure_inchi = INCHI,
-          structure_inchikey = InChIKey,
-          structure_inchikey_no_stereo = `InChIKey-Planar`,
-          structure_tax_npc_01pat = npclassifier_pathway,
-          structure_tax_npc_02sup = npclassifier_superclass,
-          structure_tax_npc_03cla = npclassifier_class,
-          structure_exact_mass = ExactMass,
-          ## Only partially present
-          structure_tax_cla_02sup = superclass,
-          structure_tax_cla_03cla = class,
-          structure_tax_cla_04dirpar = subclass
-        ) |>
         tidytable::mutate(
-          error_rt = NA,
-          structure_smiles_no_stereo = NA,
-          structure_molecular_formula = structure_inchi |>
+          candidate_structure_error_mz = as.numeric(MZErrorPPM) *
+            1E-6 *
+            as.numeric(Precursor_MZ)
+        ) |>
+        tidytable::select(tidytable::any_of(c(
+          "feature_id" = "#Scan#",
+          ## TODO check which one is correct
+          # "candidate_structure_error_mz" = "MassDiff",
+          "candidate_library" = "LibraryName",
+          ## TODO "candidate_library_type" = "TODO",
+          "candidate_structure_name" = "Compound_Name",
+          "candidate_score_similarity" = "MQScore",
+          "candidate_count_similarity_peaks_matched" = "SharedPeaks",
+          "candidate_structure_inchi" = "INCHI",
+          "candidate_structure_inchikey" = "InChIKey",
+          "candidate_structure_inchikey_no_stereo" = "InChIKey-Planar",
+          "candidate_structure_tax_npc_01pat" = "npclassifier_pathway",
+          "candidate_structure_tax_npc_02sup" = "npclassifier_superclass",
+          "candidate_structure_tax_npc_03cla" = "npclassifier_class",
+          "candidate_structure_exact_mass" = "ExactMass",
+          ## Only partially present
+          "candidate_structure_tax_cla_02sup" = "superclass",
+          "candidate_structure_tax_cla_03cla" = "class",
+          "candidate_structure_tax_cla_04dirpar" = "subclass"
+        ))) |>
+        tidytable::mutate(
+          candidate_structure_smiles_no_stereo = NA,
+          candidate_structure_molecular_formula = candidate_structure_inchi |>
             ## really dirty
             gsub(pattern = ".*\\/C", replacement = "C") |>
             gsub(pattern = "\\/.*", replacement = ""),
-          structure_xlogp = NA,
+          candidate_structure_xlogp = NA,
           ## Only partially present
-          structure_tax_cla_chemontid = NA,
-          structure_tax_cla_01kin = NA,
-          ## mirror sirius
-          count_peaks_explained = NA
+          candidate_structure_tax_cla_chemontid = NA,
+          candidate_structure_tax_cla_01kin = NA
         ) |>
-        select_annotations_columns(
-          str_stereo = str_stereo,
-          str_met = str_met,
-          str_nam = str_nam,
-          str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc
-        )
+        select_annotations_columns()
     } else {
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- fake_annotations_columns()

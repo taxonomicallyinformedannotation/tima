@@ -29,14 +29,14 @@ clean_bio <-
     df <- annot_table_wei_bio |>
       tidytable::distinct(
         feature_id,
-        structure_inchikey_no_stereo,
-        candidate_structure_1_cla_kingdom,
-        candidate_structure_1_npc_pathway,
-        candidate_structure_2_cla_superclass,
-        candidate_structure_2_npc_superclass,
-        candidate_structure_3_cla_class,
-        candidate_structure_3_npc_class,
-        candidate_structure_4_cla_parent,
+        candidate_structure_inchikey_no_stereo,
+        candidate_structure_tax_cla_01kin,
+        candidate_structure_tax_npc_01pat,
+        candidate_structure_tax_cla_02sup,
+        candidate_structure_tax_npc_02sup,
+        candidate_structure_tax_cla_03cla,
+        candidate_structure_tax_npc_03cla,
+        candidate_structure_tax_cla_04dirpar,
         score_pondered_bio,
         .keep_all = TRUE
       )
@@ -90,13 +90,13 @@ clean_bio <-
         df |>
           tidytable::distinct(
             feature_id,
-            candidate_structure_1_cla_kingdom,
-            candidate_structure_1_npc_pathway,
-            candidate_structure_2_cla_superclass,
-            candidate_structure_2_npc_superclass,
-            candidate_structure_3_cla_class,
-            candidate_structure_3_npc_class,
-            candidate_structure_4_cla_parent,
+            candidate_structure_tax_cla_01kin,
+            candidate_structure_tax_npc_01pat,
+            candidate_structure_tax_cla_02sup,
+            candidate_structure_tax_npc_02sup,
+            candidate_structure_tax_cla_03cla,
+            candidate_structure_tax_npc_03cla,
+            candidate_structure_tax_cla_04dirpar,
             score_pondered_bio
           ),
         by = stats::setNames("feature_id", "feature_target")
@@ -108,14 +108,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_1_cla_kingdom,
+        candidate_structure_tax_cla_01kin,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_kin = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_1_cla_kingdom
+          candidate_structure_tax_cla_01kin
         )
       ) |>
       tidytable::mutate(
@@ -124,29 +124,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_1_cla_kingdom,
+        candidate_structure_tax_cla_01kin,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_1_cla_kingdom =
+        feature_pred_tax_cla_01kin_score =
           consistency_structure_cla_kin * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_1_cla_kingdom
+          candidate_structure_tax_cla_01kin
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_1_cla_kingdom) |>
+      tidytable::arrange(-feature_pred_tax_cla_01kin_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_cla_kin = candidate_structure_1_cla_kingdom,
+        feature_pred_tax_cla_01kin_val = candidate_structure_tax_cla_01kin,
         consistency_structure_cla_kin,
-        consistency_score_chemical_1_cla_kingdom
+        feature_pred_tax_cla_01kin_score
       ) |>
       tidytable::mutate(
-        consensus_structure_cla_kin = ifelse(
-          test = consistency_score_chemical_1_cla_kingdom >= minimal_consistency,
-          yes = consensus_structure_cla_kin,
+        feature_pred_tax_cla_01kin_val = ifelse(
+          test = feature_pred_tax_cla_01kin_score >= minimal_consistency,
+          yes = feature_pred_tax_cla_01kin_val,
           no = "notConsistent"
         )
       )
@@ -156,14 +156,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_1_npc_pathway,
+        candidate_structure_tax_npc_01pat,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_pat = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_1_npc_pathway
+          candidate_structure_tax_npc_01pat
         )
       ) |>
       tidytable::mutate(
@@ -172,29 +172,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_1_npc_pathway,
+        candidate_structure_tax_npc_01pat,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_1_npc_pathway =
+        feature_pred_tax_npc_01pat_score =
           consistency_structure_npc_pat * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_1_npc_pathway
+          candidate_structure_tax_npc_01pat
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_1_npc_pathway) |>
+      tidytable::arrange(-feature_pred_tax_npc_01pat_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_npc_pat = candidate_structure_1_npc_pathway,
+        feature_pred_tax_npc_01pat_val = candidate_structure_tax_npc_01pat,
         consistency_structure_npc_pat,
-        consistency_score_chemical_1_npc_pathway
+        feature_pred_tax_npc_01pat_score
       ) |>
       tidytable::mutate(
-        consensus_structure_npc_pat = ifelse(
-          test = consistency_score_chemical_1_npc_pathway >= minimal_consistency,
-          yes = consensus_structure_npc_pat,
+        feature_pred_tax_npc_01pat_val = ifelse(
+          test = feature_pred_tax_npc_01pat_score >= minimal_consistency,
+          yes = feature_pred_tax_npc_01pat_val,
           no = "notConsistent"
         )
       )
@@ -204,14 +204,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_2_cla_superclass,
+        candidate_structure_tax_cla_02sup,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_sup = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_2_cla_superclass
+          candidate_structure_tax_cla_02sup
         )
       ) |>
       tidytable::mutate(
@@ -220,29 +220,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_2_cla_superclass,
+        candidate_structure_tax_cla_02sup,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_2_cla_superclass =
+        feature_pred_tax_cla_02sup_score =
           consistency_structure_cla_sup * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_2_cla_superclass
+          candidate_structure_tax_cla_02sup
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_2_cla_superclass) |>
+      tidytable::arrange(-feature_pred_tax_cla_02sup_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_cla_sup = candidate_structure_2_cla_superclass,
+        feature_pred_tax_cla_02sup_val = candidate_structure_tax_cla_02sup,
         consistency_structure_cla_sup,
-        consistency_score_chemical_2_cla_superclass
+        feature_pred_tax_cla_02sup_score
       ) |>
       tidytable::mutate(
-        consensus_structure_cla_sup = ifelse(
-          test = consistency_score_chemical_2_cla_superclass >= minimal_consistency,
-          yes = consensus_structure_cla_sup,
+        feature_pred_tax_cla_02sup_val = ifelse(
+          test = feature_pred_tax_cla_02sup_score >= minimal_consistency,
+          yes = feature_pred_tax_cla_02sup_val,
           no = "notConsistent"
         )
       )
@@ -252,14 +252,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_2_npc_superclass,
+        candidate_structure_tax_npc_02sup,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_sup = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_2_npc_superclass
+          candidate_structure_tax_npc_02sup
         )
       ) |>
       tidytable::mutate(
@@ -268,29 +268,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_2_npc_superclass,
+        candidate_structure_tax_npc_02sup,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_2_npc_superclass =
+        feature_pred_tax_npc_02sup_score =
           consistency_structure_npc_sup * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_2_npc_superclass
+          candidate_structure_tax_npc_02sup
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_2_npc_superclass) |>
+      tidytable::arrange(-feature_pred_tax_npc_02sup_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_npc_sup = candidate_structure_2_npc_superclass,
+        feature_pred_tax_npc_02sup_val = candidate_structure_tax_npc_02sup,
         consistency_structure_npc_sup,
-        consistency_score_chemical_2_npc_superclass
+        feature_pred_tax_npc_02sup_score
       ) |>
       tidytable::mutate(
-        consensus_structure_npc_sup = ifelse(
-          test = consistency_score_chemical_2_npc_superclass >= minimal_consistency,
-          yes = consensus_structure_npc_sup,
+        feature_pred_tax_npc_02sup_val = ifelse(
+          test = feature_pred_tax_npc_02sup_score >= minimal_consistency,
+          yes = feature_pred_tax_npc_02sup_val,
           no = "notConsistent"
         )
       )
@@ -300,14 +300,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_3_cla_class,
+        candidate_structure_tax_cla_03cla,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_cla = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_3_cla_class
+          candidate_structure_tax_cla_03cla
         )
       ) |>
       tidytable::mutate(
@@ -316,29 +316,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_3_cla_class,
+        candidate_structure_tax_cla_03cla,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_3_cla_class =
+        feature_pred_tax_cla_03cla_score =
           consistency_structure_cla_cla * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_3_cla_class
+          candidate_structure_tax_cla_03cla
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_3_cla_class) |>
+      tidytable::arrange(-feature_pred_tax_cla_03cla_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_cla_cla = candidate_structure_3_cla_class,
+        feature_pred_tax_cla_03cla_val = candidate_structure_tax_cla_03cla,
         consistency_structure_cla_cla,
-        consistency_score_chemical_3_cla_class
+        feature_pred_tax_cla_03cla_score
       ) |>
       tidytable::mutate(
-        consensus_structure_cla_cla = ifelse(
-          test = consistency_score_chemical_3_cla_class >= minimal_consistency,
-          yes = consensus_structure_cla_cla,
+        feature_pred_tax_cla_03cla_val = ifelse(
+          test = feature_pred_tax_cla_03cla_score >= minimal_consistency,
+          yes = feature_pred_tax_cla_03cla_val,
           no = "notConsistent"
         )
       )
@@ -348,14 +348,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_3_npc_class,
+        candidate_structure_tax_npc_03cla,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_cla = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_3_npc_class
+          candidate_structure_tax_npc_03cla
         )
       ) |>
       tidytable::mutate(
@@ -364,29 +364,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_3_npc_class,
+        candidate_structure_tax_npc_03cla,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_3_npc_class =
+        feature_pred_tax_npc_03cla_score =
           consistency_structure_npc_cla * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_3_npc_class
+          candidate_structure_tax_npc_03cla
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_3_npc_class) |>
+      tidytable::arrange(-feature_pred_tax_npc_03cla_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_npc_cla = candidate_structure_3_npc_class,
+        feature_pred_tax_npc_03cla_val = candidate_structure_tax_npc_03cla,
         consistency_structure_npc_cla,
-        consistency_score_chemical_3_npc_class
+        feature_pred_tax_npc_03cla_score
       ) |>
       tidytable::mutate(
-        consensus_structure_npc_cla = ifelse(
-          test = consistency_score_chemical_3_npc_class >= minimal_consistency,
-          yes = consensus_structure_npc_cla,
+        feature_pred_tax_npc_03cla_val = ifelse(
+          test = feature_pred_tax_npc_03cla_score >= minimal_consistency,
+          yes = feature_pred_tax_npc_03cla_val,
           no = "notConsistent"
         )
       )
@@ -396,14 +396,14 @@ clean_bio <-
       tidytable::distinct(
         feature_source,
         feature_target,
-        candidate_structure_4_cla_parent,
+        candidate_structure_tax_cla_04dirpar,
         score_pondered_bio
       ) |>
       tidytable::mutate(
         count_par = tidytable::n_distinct(feature_target),
         .by = c(
           feature_source,
-          candidate_structure_4_cla_parent
+          candidate_structure_tax_cla_04dirpar
         )
       ) |>
       tidytable::mutate(
@@ -412,29 +412,29 @@ clean_bio <-
         .by = c(feature_source)
       ) |>
       tidytable::distinct(feature_source,
-        candidate_structure_4_cla_parent,
+        candidate_structure_tax_cla_04dirpar,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        consistency_score_chemical_4_cla_parent =
+        feature_pred_tax_cla_04dirpar_score =
           consistency_structure_cla_par * score_pondered_bio,
         .by = c(
           feature_source,
-          candidate_structure_4_cla_parent
+          candidate_structure_tax_cla_04dirpar
         )
       ) |>
-      tidytable::arrange(-consistency_score_chemical_4_cla_parent) |>
+      tidytable::arrange(-feature_pred_tax_cla_04dirpar_score) |>
       tidytable::distinct(feature_source, .keep_all = TRUE) |>
       tidytable::select(
         feature_source,
-        consensus_structure_cla_par = candidate_structure_4_cla_parent,
+        feature_pred_tax_cla_04dirpar_val = candidate_structure_tax_cla_04dirpar,
         consistency_structure_cla_par,
-        consistency_score_chemical_4_cla_parent
+        feature_pred_tax_cla_04dirpar_score
       ) |>
       tidytable::mutate(
-        consensus_structure_cla_par = ifelse(
-          test = consistency_score_chemical_4_cla_parent >= minimal_consistency,
-          yes = consensus_structure_cla_par,
+        feature_pred_tax_cla_04dirpar_val = ifelse(
+          test = feature_pred_tax_cla_04dirpar_score >= minimal_consistency,
+          yes = feature_pred_tax_cla_04dirpar_val,
           no = "notConsistent"
         )
       )
@@ -496,9 +496,9 @@ clean_bio <-
       log_pipe("adding dummy consistency for features
               with less than 2 neighbors \n") |>
       tidytable::mutate(
-        consensus_structure_cla_kin =
+        feature_pred_tax_cla_01kin_val =
           tidytable::coalesce(
-            consensus_structure_cla_kin,
+            feature_pred_tax_cla_01kin_val,
             "dummy"
           ),
         consistency_structure_cla_kin =
@@ -506,14 +506,14 @@ clean_bio <-
             consistency_structure_cla_kin,
             1
           ),
-        consistency_score_chemical_1_cla_kingdom =
+        feature_pred_tax_cla_01kin_score =
           tidytable::coalesce(
-            consistency_score_chemical_1_cla_kingdom,
+            feature_pred_tax_cla_01kin_score,
             0
           ),
-        consensus_structure_npc_pat =
+        feature_pred_tax_npc_01pat_val =
           tidytable::coalesce(
-            consensus_structure_npc_pat,
+            feature_pred_tax_npc_01pat_val,
             "dummy"
           ),
         consistency_structure_npc_pat =
@@ -521,14 +521,14 @@ clean_bio <-
             consistency_structure_npc_pat,
             1
           ),
-        consistency_score_chemical_1_npc_pathway =
+        feature_pred_tax_npc_01pat_score =
           tidytable::coalesce(
-            consistency_score_chemical_1_npc_pathway,
+            feature_pred_tax_npc_01pat_score,
             0
           ),
-        consensus_structure_cla_sup =
+        feature_pred_tax_cla_02sup_val =
           tidytable::coalesce(
-            consensus_structure_cla_sup,
+            feature_pred_tax_cla_02sup_val,
             "dummy"
           ),
         consistency_structure_cla_sup =
@@ -536,14 +536,14 @@ clean_bio <-
             consistency_structure_cla_sup,
             1
           ),
-        consistency_score_chemical_2_cla_superclass =
+        feature_pred_tax_cla_02sup_score =
           tidytable::coalesce(
-            consistency_score_chemical_2_cla_superclass,
+            feature_pred_tax_cla_02sup_score,
             0
           ),
-        consensus_structure_npc_sup =
+        feature_pred_tax_npc_02sup_val =
           tidytable::coalesce(
-            consensus_structure_npc_sup,
+            feature_pred_tax_npc_02sup_val,
             "dummy"
           ),
         consistency_structure_npc_sup =
@@ -551,14 +551,14 @@ clean_bio <-
             consistency_structure_npc_sup,
             1
           ),
-        consistency_score_chemical_2_npc_superclass =
+        feature_pred_tax_npc_02sup_score =
           tidytable::coalesce(
-            consistency_score_chemical_2_npc_superclass,
+            feature_pred_tax_npc_02sup_score,
             0
           ),
-        consensus_structure_cla_cla =
+        feature_pred_tax_cla_03cla_val =
           tidytable::coalesce(
-            consensus_structure_cla_cla,
+            feature_pred_tax_cla_03cla_val,
             "dummy"
           ),
         consistency_structure_cla_cla =
@@ -566,14 +566,14 @@ clean_bio <-
             consistency_structure_cla_cla,
             1
           ),
-        consistency_score_chemical_3_cla_class =
+        feature_pred_tax_cla_03cla_score =
           tidytable::coalesce(
-            consistency_score_chemical_3_cla_class,
+            feature_pred_tax_cla_03cla_score,
             0
           ),
-        consensus_structure_npc_cla =
+        feature_pred_tax_npc_03cla_val =
           tidytable::coalesce(
-            consensus_structure_npc_cla,
+            feature_pred_tax_npc_03cla_val,
             "dummy"
           ),
         consistency_structure_npc_cla =
@@ -581,14 +581,14 @@ clean_bio <-
             consistency_structure_npc_cla,
             1
           ),
-        consistency_score_chemical_3_npc_class =
+        feature_pred_tax_npc_03cla_score =
           tidytable::coalesce(
-            consistency_score_chemical_3_npc_class,
+            feature_pred_tax_npc_03cla_score,
             0
           ),
-        consensus_structure_cla_par =
+        feature_pred_tax_cla_04dirpar_val =
           tidytable::coalesce(
-            consensus_structure_cla_par,
+            feature_pred_tax_cla_04dirpar_val,
             "dummy"
           ),
         consistency_structure_cla_par =
@@ -596,9 +596,9 @@ clean_bio <-
             consistency_structure_cla_par,
             1
           ),
-        consistency_score_chemical_4_cla_parent =
+        feature_pred_tax_cla_04dirpar_score =
           tidytable::coalesce(
-            consistency_score_chemical_4_cla_parent,
+            feature_pred_tax_cla_04dirpar_score,
             0
           )
       )

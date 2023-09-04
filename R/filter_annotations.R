@@ -78,22 +78,25 @@ filter_annotations <-
       features_annotated_table_2 <- features_annotated_table_1 |>
         tidytable::left_join(rt_table) |>
         tidytable::mutate(
-          error_rt = as.numeric(rt) -
+          candidate_structure_error_rt = as.numeric(rt) -
             as.numeric(rt_target)
         ) |>
-        tidytable::arrange(abs(error_rt)) |>
-        tidytable::distinct(-error_rt, -rt_target,
+        tidytable::arrange(abs(candidate_structure_error_rt)) |>
+        tidytable::distinct(-candidate_structure_error_rt, -rt_target,
           .keep_all = TRUE
         ) |>
         ## TODO adapt for types and improve the * 3
-        tidytable::filter(abs(error_rt) <= abs(tolerance_rt * 3) |
-          is.na(error_rt)) |>
+        tidytable::filter(abs(candidate_structure_error_rt) <=
+          abs(tolerance_rt * 3) |
+          is.na(candidate_structure_error_rt)) |>
         tidytable::select(-rt_target, -type)
     } else {
       log_debug("No RT library provided, not filtering anything")
       features_annotated_table_2 <- features_annotated_table_1 |>
-        tidytable::mutate(error_rt = NA)
+        tidytable::mutate(candidate_structure_error_rt = NA)
     }
+
+    ## TODO print how many were filtered
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>

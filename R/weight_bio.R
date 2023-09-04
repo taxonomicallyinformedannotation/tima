@@ -1,62 +1,3 @@
-utils::globalVariables(
-  c(
-    "annotation_table_taxed",
-    "candidate_organism_01_domain",
-    "candidate_organism_02_kingdom",
-    "candidate_organism_03_phylum",
-    "candidate_organism_04_class",
-    "candidate_organism_05_order",
-    "candidate_organism_06_family",
-    "candidate_organism_07_tribe",
-    "candidate_organism_08_genus",
-    "candidate_organism_09_species",
-    "candidate_organism_10_varietas",
-    "feature_id",
-    "organism_taxonomy_01domain",
-    "organism_taxonomy_02kingdom",
-    "organism_taxonomy_03phylum",
-    "organism_taxonomy_04class",
-    "organism_taxonomy_05order",
-    "organism_taxonomy_06family",
-    "organism_taxonomy_07tribe",
-    "organism_taxonomy_08genus",
-    "organism_taxonomy_09species",
-    "organism_taxonomy_10varietas",
-    "sample_organism_01_domain",
-    "sample_organism_02_kingdom",
-    "sample_organism_03_phylum",
-    "sample_organism_04_class",
-    "sample_organism_05_order",
-    "sample_organism_06_family",
-    "sample_organism_07_tribe",
-    "sample_organism_08_genus",
-    "sample_organism_09_species",
-    "sample_organism_10_varietas",
-    "score_biological",
-    "score_biological_class",
-    "score_biological_domain",
-    "score_biological_family",
-    "score_biological_genus",
-    "score_biological_kingdom",
-    "score_biological_order",
-    "score_biological_phylum",
-    "score_biological_species",
-    "score_biological_tribe",
-    "score_biological_variety",
-    "score_input",
-    "score_pondered_bio",
-    "structure_inchikey_no_stereo",
-    "structure_molecular_formula",
-    "structure_organism_pairs_table",
-    "structure_smiles_no_stereo",
-    "structure_tax_npc_01pat",
-    "structure_tax_npc_02sup",
-    "structure_tax_npc_03cla",
-    "weight_biological",
-    "weight_spectral"
-  )
-)
-
 #' @title Weight bio
 #'
 #' @description This function weights the eventually MS1
@@ -139,29 +80,13 @@ weight_bio <-
            )) {
     df0 <- annotation_table_taxed |>
       tidytable::distinct(
-        structure_tax_cla_01kin,
-        structure_tax_npc_01pat,
-        structure_tax_cla_02sup,
-        structure_tax_npc_02sup,
-        structure_tax_cla_03cla,
-        structure_tax_npc_03cla,
-        structure_tax_cla_04dirpar
-      ) |>
-      tidytable::mutate(
-        candidate_structure_1_cla_kingdom =
-          structure_tax_cla_01kin,
-        candidate_structure_1_npc_pathway =
-          structure_tax_npc_01pat,
-        candidate_structure_2_cla_superclass =
-          structure_tax_cla_02sup,
-        candidate_structure_2_npc_superclass =
-          structure_tax_npc_02sup,
-        candidate_structure_3_cla_class =
-          structure_tax_cla_03cla,
-        candidate_structure_3_npc_class =
-          structure_tax_npc_03cla,
-        candidate_structure_4_cla_parent =
-          structure_tax_cla_04dirpar
+        candidate_structure_tax_cla_01kin,
+        candidate_structure_tax_npc_01pat,
+        candidate_structure_tax_cla_02sup,
+        candidate_structure_tax_npc_02sup,
+        candidate_structure_tax_cla_03cla,
+        candidate_structure_tax_npc_03cla,
+        candidate_structure_tax_cla_04dirpar
       ) |>
       log_pipe("adding \"notClassified\" \n") |>
       tidytable::mutate(
@@ -175,8 +100,8 @@ weight_bio <-
 
     df1 <- annotation_table_taxed |>
       tidytable::select(
-        structure_inchikey_no_stereo,
-        score_input,
+        candidate_structure_inchikey_no_stereo,
+        candidate_score_similarity,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -198,7 +123,7 @@ weight_bio <-
         structure_organism_pairs_table |>
           tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
           tidytable::select(
-            structure_inchikey_no_stereo,
+            candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
             candidate_organism_01_domain = organism_taxonomy_01domain,
             candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
             candidate_organism_03_phylum = organism_taxonomy_03phylum,
@@ -631,7 +556,7 @@ weight_bio <-
         )
       )
 
-    log_debug("... keeping best chemical score \n")
+    log_debug("... keeping best biological score \n")
     annot_table_wei_bio <- df2 |>
       tidytable::left_join(step_dom) |>
       tidytable::left_join(step_kin) |>
@@ -672,7 +597,7 @@ weight_bio <-
       tidytable::select(
         -tidytable::contains("score_biological_")
       ) |>
-      tidytable::mutate(best_candidate = tidytable::case_when(
+      tidytable::mutate(candidate_structure_organism_occurrence_closest = tidytable::case_when(
         score_biological == score_biological_domain
         ~ candidate_organism_01_domain,
         score_biological == score_biological_kingdom
@@ -708,8 +633,8 @@ weight_bio <-
       tidytable::right_join(df1) |>
       tidytable::arrange(tidytable::desc(score_biological)) |>
       tidytable::distinct(
-        structure_inchikey_no_stereo,
-        score_input,
+        candidate_structure_inchikey_no_stereo,
+        candidate_score_similarity,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -734,6 +659,15 @@ weight_bio <-
       ) |>
       tidytable::left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
+      ## TODO TEMP
+      tidytable::mutate(
+        candidate_score_similarity =
+          ifelse(
+            test = is.na(candidate_score_similarity),
+            yes = as.character(0),
+            no = candidate_score_similarity
+          )
+      ) |>
       tidytable::mutate(
         score_pondered_bio =
           (1 / (weight_biological + weight_spectral)) *
@@ -741,7 +675,7 @@ weight_bio <-
             score_biological +
             (1 / (weight_biological + weight_spectral)) *
               weight_spectral *
-              as.numeric(score_input)
+              as.numeric(candidate_score_similarity)
       )
 
     rm(

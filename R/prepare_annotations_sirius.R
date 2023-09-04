@@ -143,8 +143,7 @@ prepare_annotations_sirius <-
             "NPC#class Probability",
             "structure_tax_cla_01kin" = "ClassyFire#TODO",
             "ClassyFire#TODO Probability",
-            "structure_tax_cla_02sup" =
-              "ClassyFire#superclass",
+            "structure_tax_cla_02sup" = "ClassyFire#superclass",
             "ClassyFire#superclass probability",
             "structure_tax_cla_03cla" = "ClassyFire#class",
             "ClassyFire#class Probability",
@@ -180,18 +179,10 @@ prepare_annotations_sirius <-
         tidytable::left_join(canopus_npc_prepared) |>
         tidytable::distinct() |>
         tidytable::mutate(
-          structure_tax_cla_chemontid = NA,
-          structure_tax_cla_01kin = NA,
-          ## mirror spectral match
-          count_peaks_matched = NA
+          candidate_structure_tax_cla_chemontid = NA,
+          candidate_structure_tax_cla_01kin = NA
         ) |>
-        select_annotations_columns(
-          str_stereo = str_stereo,
-          str_met = str_met,
-          str_nam = str_nam,
-          str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc
-        )
+        select_annotations_columns()
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")
