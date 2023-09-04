@@ -427,7 +427,7 @@ testthat::test_that("Whole process", {
   ### Only MS1
   weight_annotations(
     ms1_only = TRUE,
-    summarise = FALSE,
+    summarise = TRUE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
     minimal_ms1_condition = "AND",
