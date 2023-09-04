@@ -1,26 +1,3 @@
-utils::globalVariables(
-  c(
-    "acquisitionNum",
-    "count_peaks_matched",
-    "feature_id",
-    "params",
-    "precursorMz",
-    "presence_ratio",
-    "score",
-    "SLAW_ID",
-    "structure_inchikey_2D",
-    "structure_smiles_2D",
-    "target_id",
-    "target_inchikey",
-    "target_inchikey_2D",
-    "target_precursorMz",
-    "target_rtime",
-    "target_smiles",
-    "target_smiles_2D",
-    "val"
-  )
-)
-
 #' @title Annotate spectra
 #'
 #' @description This function annotates spectra
@@ -89,8 +66,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     feature_id = NA,
     error_mz = NA,
     structure_name = NA,
-    structure_inchikey_2D = NA,
-    structure_smiles_2D = NA,
+    structure_inchikey_no_stereo = NA,
+    structure_smiles_no_stereo = NA,
     structure_molecular_formula = NA,
     structure_exact_mass = NA,
     structure_xlogp = NA,
@@ -268,7 +245,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       lib_inchikey <- rep(NA_character_, length(spectral_library))
     }
     lib_inchikey2D <-
-      spectral_library@backend@spectraData$inchikey_2D
+      spectral_library@backend@spectraData$inchikey_no_stereo
     if (is.null(lib_inchikey2D)) {
       lib_inchikey2D <- rep(NA_character_, length(spectral_library))
     }
@@ -276,7 +253,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (is.null(lib_smiles)) {
       lib_smiles <- rep(NA_character_, length(spectral_library))
     }
-    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
+    lib_smiles2D <- spectral_library@backend@spectraData$smiles_no_stereo
     if (is.null(lib_smiles2D)) {
       lib_smiles2D <- rep(NA_character_, length(spectral_library))
     }
@@ -300,9 +277,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     df_meta <- tidytable::tidytable(
       "target_id" = lib_id,
       "target_inchikey" = lib_inchikey,
-      "target_inchikey_2D" = lib_inchikey2D,
+      "target_inchikey_no_stereo" = lib_inchikey2D,
       "target_smiles" = lib_smiles,
-      "target_smiles_2D" = lib_smiles2D,
+      "target_smiles_no_stereo" = lib_smiles2D,
       "target_name" = lib_name,
       "target_formula" = lib_mf,
       "target_exactmass" = lib_mass,
@@ -317,17 +294,17 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::rowwise() |>
       tidytable::mutate(
         error_mz = target_precursorMz - precursorMz,
-        structure_inchikey_2D = ifelse(
-          test = is.na(target_inchikey_2D),
+        structure_inchikey_no_stereo = ifelse(
+          test = is.na(target_inchikey_no_stereo),
           yes = target_inchikey |>
             gsub(
               pattern = "-.*",
               replacement = ""
             ),
-          no = target_inchikey_2D
+          no = target_inchikey_no_stereo
         ),
-        structure_smiles_2D = tidytable::coalesce(
-          target_smiles_2D,
+        structure_smiles_no_stereo = tidytable::coalesce(
+          target_smiles_no_stereo,
           target_smiles
         )
       ) |>
@@ -336,8 +313,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "feature_id",
           "error_mz",
           "structure_name" = "target_name",
-          "structure_inchikey_2D",
-          "structure_smiles_2D",
+          "structure_inchikey_no_stereo",
+          "structure_smiles_no_stereo",
           "structure_molecular_formula" = "target_formula",
           "structure_exact_mass" = "target_exactmass",
           "structure_xlogp" = "target_xlogp",
@@ -359,7 +336,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       nrow(
         df_final |>
           ## else doesn't work if some are empty
-          tidytable::distinct(structure_inchikey_2D, structure_smiles_2D)
+          tidytable::distinct(structure_inchikey_no_stereo, structure_smiles_no_stereo)
       ),
       "Candidates were annotated on",
       nrow(df_final |>

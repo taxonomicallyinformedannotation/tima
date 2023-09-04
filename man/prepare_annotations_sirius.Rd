@@ -7,7 +7,7 @@
 prepare_annotations_sirius(
   input_directory = params$files$annotations$raw$sirius,
   output = params$files$annotations$prepared,
-  str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+  str_stereo = params$files$libraries$sop$merged$structures$stereo,
   str_met = params$files$libraries$sop$merged$structures$metadata,
   str_nam = params$files$libraries$sop$merged$structures$names,
   str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -20,7 +20,7 @@ prepare_annotations_sirius(
 
 \item{output}{Output where to save prepared results}
 
-\item{str_2d_3d}{File containing 2D and 3D structures}
+\item{str_stereo}{File containing structures stereo}
 
 \item{str_met}{File containing structures metadata}
 

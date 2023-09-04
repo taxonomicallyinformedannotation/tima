@@ -1,11 +1,3 @@
-utils::globalVariables(
-  c(
-    "params",
-    "paths",
-    "score_input"
-  )
-)
-
 #' @title Weight annotations
 #'
 #' @description This function weights annotations.
@@ -21,7 +13,7 @@ utils::globalVariables(
 #'
 #' @param library Library containing the keys
 #' @param org_tax_ott File containing organisms taxonomy (OTT)
-#' @param str_2d_3d File containing 2D and 3D structures
+#' @param str_stereo File containing structures stereo
 #' @param annotations Prepared annotations file
 #' @param components Prepared components file
 #' @param edges Prepared edges file
@@ -97,7 +89,7 @@ utils::globalVariables(
 weight_annotations <- function(
     library = params$files$libraries$sop$merged$keys,
     org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
-    str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+    str_stereo = params$files$libraries$sop$merged$structures$stereo,
     annotations = params$files$annotations$filtered,
     components = params$files$networks$spectral$components$prepared,
     edges = params$files$networks$spectral$edges$prepared,
@@ -180,7 +172,7 @@ weight_annotations <- function(
       colClasses = "character"
     ) |>
     tidytable::left_join(tidytable::fread(
-      file = str_2d_3d,
+      file = str_stereo,
       na.strings = c("", "NA"),
       colClasses = "character"
     )) |>
@@ -202,8 +194,8 @@ weight_annotations <- function(
     tidytable::arrange(tidytable::desc(score_input)) |>
     tidytable::distinct(
       feature_id,
-      structure_inchikey_2D,
-      structure_smiles_2D,
+      structure_inchikey_no_stereo,
+      structure_smiles_no_stereo,
       .keep_all = TRUE
     )
 

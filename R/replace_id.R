@@ -1,10 +1,3 @@
-utils::globalVariables(
-  c(
-    "gnps_example_id",
-    "gnps_job_id"
-  )
-)
-
 #' @title Replace ID in file paths
 #'
 #' @description This function replaces the default ID

@@ -1,8 +1,3 @@
-utils::globalVariables(
-  c(
-    "params"
-  )
-)
 #' @title Prepare features table
 #'
 #' @description This function prepares features

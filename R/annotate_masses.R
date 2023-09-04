@@ -1,61 +1,3 @@
-utils::globalVariables(
-  c(
-    "adduct",
-    "adduct_mass",
-    "adduct_value",
-    "delta_max",
-    "delta_min",
-    "Distance",
-    "error_mz",
-    "exact_mass",
-    "feature_id",
-    "feature_id_dest",
-    "feature_id.x",
-    "feature_id.y",
-    "Group1",
-    "Group2",
-    "Item1",
-    "Item2",
-    "label",
-    "Label",
-    "label_dest",
-    "library_name",
-    "loss",
-    "mass",
-    "mz",
-    "mz_1",
-    "mz_dest",
-    "mz_max",
-    "mz_min",
-    "mz.x",
-    "mz.y",
-    "params",
-    "paths",
-    "rt",
-    "rt_max",
-    "rt_min",
-    "rt.x",
-    "score_input",
-    "structure_exact_mass",
-    "structure_inchikey_2D",
-    "structure_molecular_formula",
-    "structure_name",
-    "structure_smiles_2D",
-    "structure_taxonomy_classyfire_01kingdom",
-    "structure_taxonomy_classyfire_02superclass",
-    "structure_taxonomy_classyfire_03class",
-    "structure_taxonomy_classyfire_04directparent",
-    "structure_taxonomy_classyfire_chemontid",
-    "structure_taxonomy_npclassifier_01pathway",
-    "structure_taxonomy_npclassifier_02superclass",
-    "structure_taxonomy_npclassifier_03class",
-    "structure_xlogp",
-    "value",
-    "value_max",
-    "value_min"
-  )
-)
-
 #' @title Annotate masses
 #'
 #' @description This function annotates masses
@@ -72,7 +14,7 @@ utils::globalVariables(
 #' @param name_source Name of the source features column
 #' @param name_target Name of the target features column
 #' @param library Library containing the keys
-#' @param str_2d_3d File containing 2D and 3D structures
+#' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -103,7 +45,7 @@ annotate_masses <-
            name_source = params$names$source,
            name_target = params$names$target,
            library = params$files$libraries$sop$merged$keys,
-           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_stereo = params$files$libraries$sop$merged$structures$stereo,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
            str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -252,7 +194,7 @@ annotate_masses <-
         colClasses = "character"
       ) |>
       tidytable::left_join(tidytable::fread(
-        file = str_2d_3d,
+        file = str_stereo,
         na.strings = c("", "NA"),
         colClasses = "character"
       )) |>
@@ -562,15 +504,15 @@ annotate_masses <-
     df13_b <- structure_organism_pairs_table |>
       tidytable::distinct(
         structure_name,
-        structure_inchikey_2D,
-        structure_smiles_2D,
+        structure_inchikey_no_stereo,
+        structure_smiles_no_stereo,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp
       ) |>
       ## Avoid SMILES redundancy
       tidytable::distinct(
-        structure_inchikey_2D,
+        structure_inchikey_no_stereo,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
@@ -831,13 +773,13 @@ annotate_masses <-
       df22
     ) |>
       tidytable::left_join(df13_b) |>
-      tidytable::filter(!is.na(structure_inchikey_2D)) |>
+      tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
       tidytable::distinct(
         feature_id,
         error_mz,
         structure_name,
-        structure_inchikey_2D,
-        structure_smiles_2D,
+        structure_inchikey_no_stereo,
+        structure_smiles_no_stereo,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
@@ -850,17 +792,17 @@ annotate_masses <-
       df24,
       structure_organism_pairs_table |>
         tidytable::distinct(
-          structure_inchikey_2D,
-          structure_smiles_2D,
-          structure_taxonomy_npclassifier_01pathway,
-          structure_taxonomy_npclassifier_02superclass,
-          structure_taxonomy_npclassifier_03class,
+          structure_inchikey_no_stereo,
+          structure_smiles_no_stereo,
+          structure_tax_npc_01pat,
+          structure_tax_npc_02sup,
+          structure_tax_npc_03cla,
           ## TODO until better
-          structure_taxonomy_classyfire_chemontid,
-          structure_taxonomy_classyfire_01kingdom,
-          structure_taxonomy_classyfire_02superclass,
-          structure_taxonomy_classyfire_03class,
-          structure_taxonomy_classyfire_04directparent
+          structure_tax_cla_chemontid,
+          structure_tax_cla_01kin,
+          structure_tax_cla_02sup,
+          structure_tax_cla_03cla,
+          structure_tax_cla_04dirpar
         )
     ) |>
       tidytable::mutate(

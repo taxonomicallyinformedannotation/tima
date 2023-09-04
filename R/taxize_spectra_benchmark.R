@@ -29,7 +29,7 @@ taxize_spectra_benchmark <-
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::mutate(inchikey_2D = stringi::stri_sub(
+      tidytable::mutate(inchikey_no_stereo = stringi::stri_sub(
         str = structure_inchikey,
         from = 1,
         to = 14
@@ -44,7 +44,7 @@ taxize_spectra_benchmark <-
       tidytable::left_join(sop |>
         tidytable::distinct(
           organism_name,
-          inchikey_2D
+          inchikey_no_stereo
         ))
     set.seed(42)
     features_sampled <- features_pretaxed |>

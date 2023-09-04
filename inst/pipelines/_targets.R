@@ -1044,7 +1044,7 @@ list(
               value = par_pre_lib_sop_mer$organisms$filter$value,
               output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
               output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
-              output_str_2d_3d = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$dd_ddd,
+              output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,
               output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
               output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
               output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -1059,8 +1059,8 @@ list(
         tar_file(name = lib_mer_org_tax_ott, command = {
           lib_mer_org_tax_ott <- lib_sop_mer[[2]]
         }),
-        tar_file(name = lib_mer_str_2d_3d, command = {
-          lib_mer_str_2d_3d <- lib_sop_mer[[3]]
+        tar_file(name = lib_mer_str_stereo, command = {
+          lib_mer_str_stereo <- lib_sop_mer[[3]]
         }),
         tar_file(name = lib_mer_str_met, command = {
           lib_mer_str_met <- lib_sop_mer[[4]]
@@ -1272,14 +1272,14 @@ list(
                   col_ci = par_pre_lib_spe$names$mgf$compound_id,
                   col_em = par_pre_lib_spe$names$mgf$exact_mass,
                   col_in = par_pre_lib_spe$names$mgf$inchi,
-                  col_io = par_pre_lib_spe$names$mgf$inchi_2D,
+                  col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
                   col_ik = par_pre_lib_spe$names$mgf$inchikey,
-                  col_il = par_pre_lib_spe$names$mgf$inchikey_2D,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
                   col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
                   col_na = par_pre_lib_spe$names$mgf$name,
                   col_po = par_pre_lib_spe$names$mgf$polarity,
                   col_sm = par_pre_lib_spe$names$mgf$smiles,
-                  col_sn = par_pre_lib_spe$names$mgf$smiles_2D,
+                  col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
                   col_si = par_pre_lib_spe$names$mgf$spectrum_id,
                   col_sp = par_pre_lib_spe$names$mgf$splash,
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
@@ -1300,14 +1300,14 @@ list(
                   col_ci = par_pre_lib_spe$names$mgf$compound_id,
                   col_em = par_pre_lib_spe$names$mgf$exact_mass,
                   col_in = par_pre_lib_spe$names$mgf$inchi,
-                  col_io = par_pre_lib_spe$names$mgf$inchi_2D,
+                  col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
                   col_ik = par_pre_lib_spe$names$mgf$inchikey,
-                  col_il = par_pre_lib_spe$names$mgf$inchikey_2D,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
                   col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
                   col_na = par_pre_lib_spe$names$mgf$name,
                   col_po = par_pre_lib_spe$names$mgf$polarity,
                   col_sm = par_pre_lib_spe$names$mgf$smiles,
-                  col_sn = par_pre_lib_spe$names$mgf$smiles_2D,
+                  col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
                   col_si = par_pre_lib_spe$names$mgf$spectrum_id,
                   col_sp = par_pre_lib_spe$names$mgf$splash,
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
@@ -1335,7 +1335,7 @@ list(
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
               name_source = par_ann_mas$names$source,
               name_target = par_ann_mas$names$target,
-              str_2d_3d = lib_mer_str_2d_3d,
+              str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
@@ -1381,7 +1381,7 @@ list(
               prepare_annotations_gnps(
                 input = gnps_annotations,
                 output = par_pre_ann_gnp$files$annotations$prepared,
-                str_2d_3d = lib_mer_str_2d_3d,
+                str_stereo = lib_mer_str_stereo,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
@@ -1449,7 +1449,7 @@ list(
                   x = par_pre_ann_spe$files$annotations$prepared,
                   fixed = TRUE
                 ),
-                str_2d_3d = lib_mer_str_2d_3d,
+                str_stereo = lib_mer_str_stereo,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
@@ -1517,7 +1517,7 @@ list(
                 ann_spe_is_lot_pos
               ),
               output = par_pre_ann_spe$files$annotations$prepared,
-              str_2d_3d = lib_mer_str_2d_3d,
+              str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
@@ -1536,7 +1536,7 @@ list(
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
             output = par_pre_ann_sir$files$annotations$prepared,
-            str_2d_3d = lib_mer_str_2d_3d,
+            str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
@@ -1690,7 +1690,7 @@ list(
     command = {
       ann_pre <- weight_annotations(
         library = lib_mer_key,
-        str_2d_3d = lib_mer_str_2d_3d,
+        str_stereo = lib_mer_str_stereo,
         annotations = ann_fil,
         components = fea_com_pre,
         edges = fea_edg_pre,
@@ -1743,7 +1743,7 @@ list(
     command = {
       ann_pre_crazy <- weight_annotations(
         library = lib_mer_key,
-        str_2d_3d = lib_mer_str_2d_3d,
+        str_stereo = lib_mer_str_stereo,
         annotations = ann_fil_crazy,
         components = fea_com_pre,
         edges = fea_edg_pre,
@@ -1976,15 +1976,15 @@ list(
           tidytable::filter(!is.na(b)) |>
           tidytable::filter(stringr::str_length(as.numeric(b)) > 1) |>
           tidytable::select(-a, -b) |>
-          tidytable::mutate(inchikey_2D = gsub(
+          tidytable::mutate(inchikey_no_stereo = gsub(
             pattern = "-.*",
             replacement = "",
             x = inchikey
           )) |>
-          tidytable::distinct(inchikey_2D, adduct, .keep_all = TRUE) |>
+          tidytable::distinct(inchikey_no_stereo, adduct, .keep_all = TRUE) |>
           tidytable::mutate(mz = precursorMz) |>
           ## Weird way to have some kind of retention time
-          tidytable::mutate(rt = tidytable::cur_group_id(), .by = "inchikey_2D")
+          tidytable::mutate(rt = tidytable::cur_group_id(), .by = "inchikey_no_stereo")
 
         df_clean_neg <- df_clean |>
           tidytable::filter(grepl(
@@ -2062,7 +2062,7 @@ list(
               rt = rtime,
               feature_id = spectrum_id
             ) |>
-            tidytable::mutate(inchikey_2D = gsub(
+            tidytable::mutate(inchikey_no_stereo = gsub(
               pattern = "-.*",
               replacement = "",
               x = inchikey
@@ -2173,7 +2173,7 @@ list(
               "data/interim/benchmark/benchmark_edges_ms1_pos.tsv.gz",
             name_source = benchmark_def_ann_mas$names$source,
             name_target = benchmark_def_ann_mas$names$target,
-            str_2d_3d = lib_mer_str_2d_3d,
+            str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
@@ -2207,7 +2207,7 @@ list(
               "data/interim/benchmark/benchmark_edges_ms1_neg.tsv.gz",
             name_source = benchmark_def_ann_mas$names$source,
             name_target = benchmark_def_ann_mas$names$target,
-            str_2d_3d = lib_mer_str_2d_3d,
+            str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
@@ -2420,7 +2420,7 @@ list(
         benchmark_ann_spe_is_pre_pos <- prepare_annotations_spectra(
           input = list(benchmark_ann_spe_is_lot_pos),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
-          str_2d_3d = lib_mer_str_2d_3d,
+          str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
           str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
@@ -2435,7 +2435,7 @@ list(
         benchmark_ann_spe_is_pre_neg <- prepare_annotations_spectra(
           input = list(benchmark_ann_spe_is_lot_neg),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
-          str_2d_3d = lib_mer_str_2d_3d,
+          str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
           str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
@@ -2561,7 +2561,7 @@ list(
       command = {
         benchmark_wei_par <- list(
           library = lib_mer_key,
-          str_2d_3d = lib_mer_str_2d_3d,
+          str_stereo = lib_mer_str_stereo,
           candidates_final = 500,
           score_biological_domain =
             benchmark_def_wei_ann$weights$biological$domain,

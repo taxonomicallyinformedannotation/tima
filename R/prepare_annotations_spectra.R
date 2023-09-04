@@ -1,30 +1,3 @@
-utils::globalVariables(
-  c(
-    "count_peaks_explained",
-    "count_peaks_matched",
-    "error_mz",
-    "feature_id",
-    "params",
-    "score",
-    "score_input",
-    # "score_input_normalized",
-    "structure_exact_mass",
-    "structure_inchikey_2D",
-    "structure_molecular_formula",
-    "structure_name",
-    "structure_smiles_2D",
-    "structure_taxonomy_classyfire_01kingdom",
-    "structure_taxonomy_classyfire_02superclass",
-    "structure_taxonomy_classyfire_03class",
-    "structure_taxonomy_classyfire_04directparent",
-    "structure_taxonomy_classyfire_chemontid",
-    "structure_taxonomy_npclassifier_01pathway",
-    "structure_taxonomy_npclassifier_02superclass",
-    "structure_taxonomy_npclassifier_03class",
-    "structure_xlogp"
-  )
-)
-
 #' @title Prepare annotations MS2
 #'
 #' @description This function prepares the spectral matches
@@ -36,7 +9,7 @@ utils::globalVariables(
 #'
 #' @param input Input file
 #' @param output Output file
-#' @param str_2d_3d File containing 2D and 3D structures
+#' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -51,7 +24,7 @@ utils::globalVariables(
 prepare_annotations_spectra <-
   function(input = params$files$annotations$raw$spectral,
            output = params$files$annotations$prepared,
-           str_2d_3d = params$files$libraries$sop$merged$structures$dd_ddd,
+           str_stereo = params$files$libraries$sop$merged$structures$stereo,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
            str_tax_cla =
@@ -79,8 +52,8 @@ prepare_annotations_spectra <-
         feature_id,
         error_mz,
         structure_name,
-        structure_inchikey_2D,
-        structure_smiles_2D,
+        structure_inchikey_no_stereo,
+        structure_smiles_no_stereo,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
@@ -90,20 +63,21 @@ prepare_annotations_spectra <-
       ## Add new columns
       tidytable::mutate(
         library = "ISDB",
+        ## TODO library_type = "TODO",
         structure_exact_mass = as.numeric(structure_exact_mass),
-        structure_taxonomy_npclassifier_01pathway = NA_character_,
-        structure_taxonomy_npclassifier_02superclass = NA_character_,
-        structure_taxonomy_npclassifier_03class = NA_character_,
-        structure_taxonomy_classyfire_chemontid = NA_character_,
-        structure_taxonomy_classyfire_01kingdom = NA_character_,
-        structure_taxonomy_classyfire_02superclass = NA_character_,
-        structure_taxonomy_classyfire_03class = NA_character_,
-        structure_taxonomy_classyfire_04directparent = NA_character_,
+        structure_tax_npc_01pat = NA_character_,
+        structure_tax_npc_02sup = NA_character_,
+        structure_tax_npc_03cla = NA_character_,
+        structure_tax_cla_chemontid = NA_character_,
+        structure_tax_cla_01kin = NA_character_,
+        structure_tax_cla_02sup = NA_character_,
+        structure_tax_cla_03cla = NA_character_,
+        structure_tax_cla_04dirpar = NA_character_,
         ## mirror sirius
         count_peaks_explained = NA
       ) |>
       select_annotations_columns(
-        str_2d_3d = str_2d_3d,
+        str_stereo = str_stereo,
         str_met = str_met,
         str_nam = str_nam,
         str_tax_cla = str_tax_cla,

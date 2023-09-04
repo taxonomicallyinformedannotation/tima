@@ -1,28 +1,3 @@
-utils::globalVariables(
-  c(
-    "collision_energy",
-    "compound_id",
-    "exactmass",
-    "formula",
-    "inchi",
-    "inchi_2D",
-    "inchikey",
-    "inchikey_2D",
-    "intensity",
-    "mz",
-    "name",
-    "precursorCharge",
-    "precursorMz",
-    "rtime",
-    "smiles",
-    "smiles_2D",
-    "spectrum_id",
-    "splash",
-    "synonyms",
-    "xlogp"
-  )
-)
-
 #' @title Harmonize spectra
 #'
 #' @description This function harmonizes spectra headers
@@ -33,14 +8,14 @@ utils::globalVariables(
 #' @param col_ci Name of the compound id in mgf
 #' @param col_em Name of the exact mass in mgf
 #' @param col_in Name of the InChI in mgf
-#' @param col_io Name of the InChI 2D in mgf
+#' @param col_io Name of the InChI without stereo in mgf
 #' @param col_ik Name of the InChIKey in mgf
-#' @param col_il Name of the InChIKey 2D in mgf
+#' @param col_il Name of the InChIKey without stereo in mgf
 #' @param col_mf Name of the molecular formula in mgf
 #' @param col_na Name of the name in mgf
 #' @param col_po Name of the polarity in mgf
 #' @param col_sm Name of the SMILES in mgf
-#' @param col_sn Name of the SMILES 2D in mgf
+#' @param col_sn Name of the SMILES without stereo in mgf
 #' @param col_si Name of the spectrum id in mgf
 #' @param col_sp Name of the SPLASH in mgf
 #' @param col_sy Name of the synonyms in mgf
@@ -123,12 +98,12 @@ harmonize_spectra <- function(spectra,
     "exactmass",
     "formula",
     "inchi",
-    "inchi_2D",
+    "inchi_no_stereo",
     "inchikey",
-    "inchikey_2D",
+    "inchikey_no_stereo",
     "name",
     "smiles",
-    "smiles_2D",
+    "smiles_no_stereo",
     "spectrum_id",
     "splash",
     "synonyms",
@@ -141,12 +116,12 @@ harmonize_spectra <- function(spectra,
       "exactmass" = col_em,
       "formula" = col_mf,
       "inchi" = col_in,
-      "inchi_2D" = col_io,
+      "inchi_no_stereo" = col_io,
       "inchikey" = col_ik,
-      "inchikey_2D" = col_il,
+      "inchikey_no_stereo" = col_il,
       "name" = col_na,
       "smiles" = col_sm,
-      "smiles_2D" = col_sn,
+      "smiles_no_stereo" = col_sn,
       "spectrum_id" = col_si,
       "splash" = col_sp,
       "synonyms" = col_sy,
@@ -190,14 +165,14 @@ harmonize_spectra <- function(spectra,
       exactmass,
       formula,
       inchi,
-      inchi_2D,
+      inchi_no_stereo,
       inchikey,
-      inchikey_2D,
+      inchikey_no_stereo,
       name,
       precursorMz,
       precursorCharge,
       smiles,
-      smiles_2D,
+      smiles_no_stereo,
       spectrum_id,
       splash,
       synonyms,

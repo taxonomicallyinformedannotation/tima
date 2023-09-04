@@ -1,9 +1,3 @@
-utils::globalVariables(c(
-  "cluster index",
-  "componentindex",
-  "params"
-))
-
 #' @title Prepare features components
 #'
 #' @description This function prepares the components

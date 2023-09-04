@@ -1,14 +1,3 @@
-utils::globalVariables(
-  c(
-    "organism_name",
-    "params",
-    "paths",
-    "reference_doi",
-    "structure_inchikey",
-    "structure_smiles"
-  )
-)
-
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function prepares the libraries made of
@@ -30,7 +19,7 @@ utils::globalVariables(
 #'    e.g. 'Gentianaceae|Apocynaceae'
 #' @param output_key Output file for keys
 #' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
-#' @param output_str_2d_3d Output file for structures (2D + 3D)
+#' @param output_str_stereo Output file for structures stereo
 #' @param output_str_met Output file for structures metadata
 #' @param output_str_nam Output file for structures names
 #' @param output_str_tax_cla Output file for structures taxonomy (Classyfire)
@@ -53,8 +42,8 @@ prepare_libraries_sop_merged <-
            # params$files$libraries$sop$merged$organisms$names,
            output_org_tax_ott =
              params$files$libraries$sop$merged$organisms$taxonomies$ott,
-           output_str_2d_3d =
-             params$files$libraries$sop$merged$structures$dd_ddd,
+           output_str_stereo =
+             params$files$libraries$sop$merged$structures$stereo,
            output_str_met =
              params$files$libraries$sop$merged$structures$metadata,
            output_str_nam =
@@ -106,7 +95,8 @@ prepare_libraries_sop_merged <-
         colClasses = "character"
       )
 
-    tables <- tidytable::bind_rows(libraries) |>
+    tables <- libraries |>
+      tidytable::bind_rows() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -154,7 +144,7 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Keeping structures")
-    table_structures_2d_3d <- tables$str_2d_3d
+    table_structures_stereo <- tables$str_stereo
     table_structures_metadata <- tables$str_met
     table_structures_names <- tables$str_nam
     table_structures_taxonomy_cla <- tables$str_tax_cla
@@ -210,8 +200,8 @@ prepare_libraries_sop_merged <-
       file = output_org_tax_ott
     )
     export_output(
-      x = table_structures_2d_3d,
-      file = output_str_2d_3d
+      x = table_structures_stereo,
+      file = output_str_stereo
     )
     export_output(
       x = table_structures_metadata,
@@ -234,7 +224,7 @@ prepare_libraries_sop_merged <-
       c(
         "key" = output_key,
         "org_tax_ott" = output_org_tax_ott,
-        "str_2d_3d" = output_str_2d_3d,
+        "str_stereo" = output_str_stereo,
         "str_met" = output_str_met,
         "str_name" = output_str_nam,
         "str_tax_cla" = output_str_tax_cla,

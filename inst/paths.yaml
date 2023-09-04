@@ -32,7 +32,7 @@ data:
               ott: data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
           structures:
             path: data/interim/libraries/sop/merged/structures
-            dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+            stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
             metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
             names: data/interim/libraries/sop/merged/structures/names.tsv.gz
             taxonomies:

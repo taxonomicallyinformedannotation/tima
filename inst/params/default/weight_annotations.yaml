@@ -59,8 +59,8 @@ files:
 
         #' Structures libraries.
         structures:
-          #' Structures 2D and 3D. STRING
-          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+          #' Structures stereo. STRING
+          stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
 
   #' Networks files.
   networks:

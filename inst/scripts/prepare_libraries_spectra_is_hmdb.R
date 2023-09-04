@@ -90,7 +90,7 @@ prepare_isdb_hmdb <-
         )
       )
 
-    log_debug("Standardizing 2D chemical structures")
+    log_debug("Standardizing chemical structures without stereo")
     smiles <- unique(spctra_enhanced$smiles)
     df_clean <- lapply(X = smiles, FUN = standardize_smiles) |>
       tidytable::bind_rows()
@@ -103,13 +103,13 @@ prepare_isdb_hmdb <-
       co_em = "monisotopic_molecular_weight",
       co_mf = "chemical_formula",
       co_in = "inchi",
-      co_io = "inchi_2D",
+      co_io = "inchi_no_stereo",
       co_ik = "inchikey",
-      co_il = "inchikey_2D",
+      co_il = "inchikey_no_stereo",
       co_po = "ionmode",
       co_na = "name",
       co_sm = "smiles",
-      co_sn = "smiles_2D",
+      co_sn = "smiles_no_stereo",
       co_si = NULL,
       co_sp = "splash",
       co_sy = "iupac_name",

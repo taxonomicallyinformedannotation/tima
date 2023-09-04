@@ -1,14 +1,3 @@
-utils::globalVariables(
-  c(
-    "arguments",
-    "default_path",
-    "doc",
-    "doc_path",
-    "params",
-    "user_path"
-  )
-)
-
 #' @title Get parameters
 #'
 #' @description This function gets the parameters for the job.

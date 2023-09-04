@@ -1,9 +1,3 @@
-utils::globalVariables(
-  c(
-    "output"
-  )
-)
-
 #' @title Export output
 #'
 #' @description This function creates the output directory

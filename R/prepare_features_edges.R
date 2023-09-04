@@ -1,9 +1,3 @@
-utils::globalVariables(c(
-  "feature_source",
-  "feature_target",
-  "params"
-))
-
 #' @title Prepare features edges
 #'
 #' @description This function prepares edges for further use

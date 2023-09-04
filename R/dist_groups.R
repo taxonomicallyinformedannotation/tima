@@ -1,9 +1,9 @@
-#' Credit goes to usedist package
-
 #' @title Get the distance between two elements in a distance matrix
 #'
 #' @description This function calculates the distance between
 #'    two elements in a distance matrix
+#'
+#' @details Credit goes to usedist package
 #'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element

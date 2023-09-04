@@ -121,11 +121,8 @@ files:
 
         #' Structures libraries.
         structures:
-          #' Structures 2D. STRING
-          dd: data/interim/libraries/sop/merged/structures/2D.tsv.gz
-
-          #' Structures 2D and 3D. STRING
-          dd_ddd: data/interim/libraries/sop/merged/structures/2D_3D.tsv.gz
+          #' Structures stereo. STRING
+          stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
 
           #' Structures metadata. STRING
           metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
@@ -354,14 +351,14 @@ names:
     #' Name of "InChI" in MGF. STRING
     inchi: INCHI
 
-    #' Name of "InChI 2D" in MGF. STRING
-    inchi_2D: ~
+    #' Name of "InChI without stereo" in MGF. STRING
+    inchi_no_stereo: ~
 
     #' Name of "InChIKey" in MGF. STRING
     inchikey: ~
 
-    #' Name of "InChIKey 2D" in MGF. STRING
-    inchikey_2D: ~
+    #' Name of "InChIKey without stereo" in MGF. STRING
+    inchikey_no_stereo: ~
 
     #' Name of "molecular formula" in MGF. STRING
     molecular_formula: ~
@@ -378,8 +375,8 @@ names:
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
 
-    #' Name of "SMILES 2D" in MGF. STRING
-    smiles_2D: ~
+    #' Name of "SMILES without stereo" in MGF. STRING
+    smiles_no_stereo: ~
 
     #' Name of "spectrum ID" in MGF. STRING
     spectrum_id: SPECTRUMID

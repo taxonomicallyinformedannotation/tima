@@ -6,7 +6,7 @@
 #' @include round_reals.R
 #'
 #' @param df Dataframe
-#' @param str_2d_3d File containing 2D and 3D structures
+#' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
@@ -18,13 +18,13 @@
 #'
 #' @examples NULL
 select_annotations_columns <- function(df,
-                                       str_2d_3d = paths$
+                                       str_stereo = paths$
                                          data$
                                          interim$
                                          libraries$
                                          merged$
                                          structures$
-                                         dd_ddd,
+                                         stereo,
                                        str_met = paths$
                                          data$
                                          interim$
@@ -61,13 +61,14 @@ select_annotations_columns <- function(df,
       error_mz,
       structure_name,
       # structure_inchikey,
-      structure_inchikey_2D,
+      structure_inchikey_no_stereo,
       # structure_smiles,
-      structure_smiles_2D,
+      structure_smiles_no_stereo,
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp,
       library,
+      ## TODO library_type,
       score_input,
       # score_input_normalized,
       # score_sirius_csi,
@@ -75,15 +76,15 @@ select_annotations_columns <- function(df,
       # score_sirius_sirius,
       count_peaks_matched,
       count_peaks_explained,
-      structure_taxonomy_npclassifier_01pathway,
-      structure_taxonomy_npclassifier_02superclass,
-      structure_taxonomy_npclassifier_03class,
+      structure_tax_npc_01pat,
+      structure_tax_npc_02sup,
+      structure_tax_npc_03cla,
       ## TODO until better
-      structure_taxonomy_classyfire_chemontid,
-      structure_taxonomy_classyfire_01kingdom,
-      structure_taxonomy_classyfire_02superclass,
-      structure_taxonomy_classyfire_03class,
-      structure_taxonomy_classyfire_04directparent
+      structure_tax_cla_chemontid,
+      structure_tax_cla_01kin,
+      structure_tax_cla_02sup,
+      structure_tax_cla_03cla,
+      structure_tax_cla_04dirpar
     ) |>
     tidytable::mutate(
       tidytable::across(
@@ -117,7 +118,7 @@ select_annotations_columns <- function(df,
       )
     ) |>
     complement_metadata_structures(
-      str_2d_3d = str_2d_3d,
+      str_stereo = str_stereo,
       str_met = str_met,
       str_nam = str_nam,
       str_tax_cla = str_tax_cla,

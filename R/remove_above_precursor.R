@@ -1,9 +1,9 @@
-## Credit goes to Carolin Huber (0000-0002-9355-8948) @chufz
-## With fine tuning of Michele Stravs (0000-0002-1426-8572) @meowcat
-
 #' @title Remove peaks above precursor in MS2 spectra
 #'
 #' @description This function remove peaks above precursor in MS2 spectra
+#'
+#' @details Credit goes to Carolin Huber (0000-0002-9355-8948)
+#'    With fine tuning of Michele Stravs (0000-0002-1426-8572)
 #'
 #' @param tol_mz m/z tolerance
 #'

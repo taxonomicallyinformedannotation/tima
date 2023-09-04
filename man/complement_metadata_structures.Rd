@@ -6,7 +6,7 @@
 \usage{
 complement_metadata_structures(
   df,
-  str_2d_3d = params$files$libraries$merged$structures$dd_ddd,
+  str_stereo = params$files$libraries$merged$structures$stereo,
   str_met = params$files$libraries$merged$structures$metadata,
   str_nam = params$files$libraries$merged$structures$names,
   str_tax_cla = params$files$libraries$merged$structures$taxonomies$cla,
@@ -16,7 +16,7 @@ complement_metadata_structures(
 \arguments{
 \item{df}{Data frame with structural metadata to be complemented}
 
-\item{str_2d_3d}{File containing 2D and 3D structures}
+\item{str_stereo}{File containing structures stereo}
 
 \item{str_met}{File containing structures metadata}
 

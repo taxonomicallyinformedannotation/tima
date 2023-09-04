@@ -1,11 +1,3 @@
-utils::globalVariables(
-  c(
-    "params",
-    "rt_target",
-    "type"
-  )
-)
-
 #' @title Filter annotations
 #'
 #' @description This function filters initial annotations.

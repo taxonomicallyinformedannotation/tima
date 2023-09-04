@@ -1,10 +1,3 @@
-utils::globalVariables(c(
-  "count_peaks_matched",
-  "params",
-  "presence_ratio",
-  "score"
-))
-
 #' @title Create edges spectra
 #'
 #' @description This function create edges

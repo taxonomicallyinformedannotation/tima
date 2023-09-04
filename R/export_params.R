@@ -1,9 +1,3 @@
-utils::globalVariables(
-  c(
-    "params"
-  )
-)
-
 #' @title Export parameters
 #'
 #' @description This function writes the parameters

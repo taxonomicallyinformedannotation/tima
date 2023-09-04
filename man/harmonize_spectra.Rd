@@ -38,11 +38,11 @@ harmonize_spectra(
 
 \item{col_in}{Name of the InChI in mgf}
 
-\item{col_io}{Name of the InChI 2D in mgf}
+\item{col_io}{Name of the InChI without stereo in mgf}
 
 \item{col_ik}{Name of the InChIKey in mgf}
 
-\item{col_il}{Name of the InChIKey 2D in mgf}
+\item{col_il}{Name of the InChIKey without stereo in mgf}
 
 \item{col_mf}{Name of the molecular formula in mgf}
 
@@ -52,7 +52,7 @@ harmonize_spectra(
 
 \item{col_sm}{Name of the SMILES in mgf}
 
-\item{col_sn}{Name of the SMILES 2D in mgf}
+\item{col_sn}{Name of the SMILES without stereo in mgf}
 
 \item{col_si}{Name of the spectrum id in mgf}
 

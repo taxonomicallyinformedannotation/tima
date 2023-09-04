@@ -35,8 +35,6 @@ utils::globalVariables(
     "score_chemical_npc_superclass",
     "score_input",
     "score_pondered_chemo",
-    "structure_inchikey_2D",
-    "structure_smiles_2D",
     "weight_biological",
     "weight_chemical",
     "weight_spectral"
