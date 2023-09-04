@@ -55,6 +55,8 @@ clean_chemo <-
            summarise = get("summarise",
              envir = parent.frame()
            )) {
+    model <- columns_model()
+
     log_debug(
       "filtering top ",
       candidates_final,
@@ -66,12 +68,10 @@ clean_chemo <-
       "chemical score \n"
     )
 
-    model <- columns_model()
-
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          as.numeric(score_input) > 0 | (
+          as.numeric(candidate_score_similarity) > 0 | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio |
               ## Only if a good biological
@@ -83,7 +83,7 @@ clean_chemo <-
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          as.numeric(score_input) > 0 | (
+          as.numeric(candidate_score_similarity) > 0 | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio &
               ## Only if a good biological
@@ -96,11 +96,13 @@ clean_chemo <-
     df1 <- df1 |>
       tidytable::arrange(tidytable::desc(score_pondered_chemo)) |>
       tidytable::distinct(feature_id,
-        structure_inchikey_no_stereo,
+        candidate_structure_inchikey_no_stereo,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
-        rank_initial = tidytable::dense_rank(-as.numeric(score_input)),
+        rank_initial = tidytable::dense_rank(
+          -as.numeric(candidate_score_similarity)
+        ),
         rank_final = tidytable::dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
       ) |>
@@ -110,73 +112,38 @@ clean_chemo <-
     df3 <- features_table |>
       tidytable::left_join(df1) |>
       tidytable::left_join(components_table) |>
-      tidytable::mutate(
-        candidate_structure_tax_cla = paste(
-          structure_tax_cla_01kin,
-          structure_tax_cla_02sup,
-          structure_tax_cla_03cla,
-          structure_tax_cla_04dirpar,
-          sep = "\u00a7"
-        ),
-        candidate_structure_tax_npc = paste(
-          structure_tax_npc_01pat,
-          structure_tax_npc_02sup,
-          structure_tax_npc_03cla,
-          sep = "\u00a7"
-        )
-      ) |>
+      # tidytable::mutate(
+      #   candidate_structure_tax_cla = paste(
+      #     structure_tax_cla_01kin,
+      #     structure_tax_cla_02sup,
+      #     structure_tax_cla_03cla,
+      #     structure_tax_cla_04dirpar,
+      #     sep = "\u00a7"
+      #   ),
+      #   candidate_structure_tax_npc = paste(
+      #     structure_tax_npc_01pat,
+      #     structure_tax_npc_02sup,
+      #     structure_tax_npc_03cla,
+      #     sep = "\u00a7"
+      #   )
+      # ) |>
       tidytable::select(tidytable::any_of(c(
         "feature_id",
         "feature_rt" = "rt",
         "feature_mz" = "mz",
-        "feature_spectrum_entropy",
-        "feature_pred_tax_cla_01kin_val" = "consensus_structure_cla_kin",
-        "feature_pred_tax_cla_01kin_score" = "consistency_structure_cla_kin",
-        "feature_pred_tax_cla_02sup_val" = "consensus_structure_cla_sup",
-        "feature_pred_tax_cla_02sup_score" = "consistency_structure_cla_sup",
-        "feature_pred_tax_cla_03cla_val" = "consensus_structure_cla_cla",
-        "feature_pred_tax_cla_03cla_score" = "consistency_structure_cla_cla",
-        "feature_pred_tax_cla_04dirpar_val" = "consensus_structure_cla_par",
-        "feature_pred_tax_cla_04dirpar_score" = "consistency_structure_cla_par",
-        "feature_pred_tax_npc_01pat_val" = "consensus_structure_npc_pat",
-        "feature_pred_tax_npc_01pat_score" = "consistency_structure_npc_pat",
-        "feature_pred_tax_npc_02sup_val" = "consensus_structure_npc_sup",
-        "feature_pred_tax_npc_02sup_score" = "consistency_structure_npc_sup",
-        "feature_pred_tax_npc_03cla_val" = "consensus_structure_npc_cla",
-        "feature_pred_tax_npc_03cla_score" = "consistency_structure_npc_cla",
-        "component_id",
-        "candidate_spectrum_entropy",
-        "candidate_structure_molecular_formula" = "structure_molecular_formula",
-        "candidate_structure_exact_mass" = "structure_exact_mass",
-        "candidate_structure_xlogp" = "structure_xlogp",
-        "candidate_structure_inchikey_no_stereo" =
-          "structure_inchikey_no_stereo",
-        "candidate_structure_smiles_no_stereo" = "structure_smiles_no_stereo",
-        "candidate_structure_name" = "structure_name",
-        "candidate_structure_tax_cla",
-        "candidate_structure_tax_npc",
-        "candidate_library" = "library",
-        ## TODO "library_type",
-        "candidate_count_similarity_peaks_matched" = "count_peaks_matched",
-        "candidate_score_similarity",
-        "candidate_count_sirius_peaks_explained" = "count_peaks_explained",
-        "candidate_score_sirius_intensity",
-        "candidate_score_sirius_isotope",
-        "candidate_score_sirius_sirius",
-        "candidate_score_sirius_tree",
-        "candidate_score_sirius_zodiac",
-        "candidate_score_sirius_confidence",
-        "candidate_score_sirius_csi",
-        "candidate_structure_error_mz" = "error_mz",
-        "candidate_structure_error_rt" = "error_rt",
-        "rank_initial",
-        "rank_final",
-        "score_initial" = "score_input",
+        model$features_calculated_columns,
+        model$components_columns,
+        model$candidates_calculated_columns,
+        model$candidates_sirius_formula_columns,
+        model$candidates_sirius_structural_columns,
+        model$candidates_spectra_columns,
+        model$candidates_structures_columns,
+        model$rank_columns,
+        "score_initial" = "candidate_score_similarity",
         "score_biological",
         "score_interim" = "score_pondered_bio",
         "score_chemical",
-        "score_final" = "score_pondered_chemo",
-        "best_can_org" = "best_candidate"
+        "score_final" = "score_pondered_chemo"
       ))) |>
       tidytable::distinct() |>
       log_pipe("adding references \n") |>
@@ -194,30 +161,24 @@ clean_chemo <-
         tidytable::filter(value != "notClassified") |>
         tidytable::distinct(
           candidate_structure_inchikey_no_stereo,
-          best_can_org = value,
-          reference_doi
+          candidate_structure_organism_occurrence_closest = value,
+          candidate_structure_organism_occurrence_reference = reference_doi
         )) |>
-      tidytable::group_by(c(-reference_doi)) |>
-      clean_collapse(cols = c("reference_doi")) |>
+      tidytable::group_by(
+        c(-candidate_structure_organism_occurrence_reference)
+      ) |>
+      clean_collapse(
+        cols = c("candidate_structure_organism_occurrence_reference")
+      ) |>
       tidytable::select(tidytable::any_of(c(
         model$features_columns,
         model$features_calculated_columns,
         model$components_columns,
+        model$candidates_calculated_columns,
         model$candidates_sirius_formula_columns,
         model$candidates_sirius_structural_columns,
         model$candidates_spectra_columns,
-        "candidate_structure_molecular_formula",
-        "candidate_structure_exact_mass",
-        "candidate_structure_xlogp",
-        "candidate_structure_inchikey_no_stereo",
-        "candidate_structure_smiles_no_stereo",
-        "candidate_structure_name",
-        "candidate_structure_tax_cla",
-        "candidate_structure_tax_npc",
-        "candidate_structure_organism_occurrence_closest" = "best_can_org",
-        "candidate_structure_organism_occurrence_reference" = "reference_doi",
-        "candidate_structure_error_mz",
-        "candidate_structure_error_rt",
+        model$candidates_structures_columns,
         model$rank_columns,
         model$score_columns
       ))) |>
@@ -285,6 +246,7 @@ clean_chemo <-
           model$features_columns,
           model$features_calculated_columns,
           model$components_columns,
+          model$candidates_calculated_columns,
           model$candidates_sirius_formula_columns,
           model$candidates_sirius_structural_columns,
           model$candidates_spectra_columns,

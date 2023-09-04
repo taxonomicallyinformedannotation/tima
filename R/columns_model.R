@@ -63,6 +63,7 @@ columns_model <- function() {
     "candidate_structure_xlogp",
     "candidate_structure_inchikey_no_stereo",
     "candidate_structure_smiles_no_stereo",
+    "candidate_structure_tax_cla_chemontid",
     "candidate_structure_tax_cla_01kin",
     "candidate_structure_tax_cla_02sup",
     "candidate_structure_tax_cla_03cla",

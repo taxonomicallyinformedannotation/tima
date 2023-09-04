@@ -441,8 +441,7 @@ annotate_masses <-
       ) |>
       tidytable::left_join(
         df9_c
-      ) |>
-      tidytable::mutate(score_input = 0)
+      )
 
     log_debug("joining with initial results (neutral losses) \n")
     df10_a <- tidytable::left_join(df10, df9_e) |>
@@ -465,7 +464,6 @@ annotate_masses <-
         feature_id,
         rt,
         mz,
-        score_input,
         error_mz,
         exact_mass,
         adduct,
@@ -488,7 +486,6 @@ annotate_masses <-
         feature_id,
         rt,
         mz,
-        score_input,
         library,
         error_mz,
         exact_mass
@@ -755,7 +752,6 @@ annotate_masses <-
         df13,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
-      tidytable::mutate(score_input = 0) |>
       tidytable::select(
         structure_molecular_formula,
         library = library_name,
@@ -774,35 +770,35 @@ annotate_masses <-
     ) |>
       tidytable::left_join(df13_b) |>
       tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-      tidytable::distinct(
+      tidytable::select(
         feature_id,
-        error_mz,
-        structure_name,
-        structure_inchikey_no_stereo,
-        structure_smiles_no_stereo,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
-        library,
-        score_input
-      )
+        candidate_structure_error_mz = error_mz,
+        candidate_structure_name = structure_name,
+        candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+        candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+        candidate_structure_molecular_formula = structure_molecular_formula,
+        candidate_structure_exact_mass = structure_exact_mass,
+        candidate_structure_xlogp = structure_xlogp,
+        candidate_library = library
+      ) |>
+      tidytable::distinct()
 
     log_debug("adding chemical classification")
     df25 <- tidytable::left_join(
       df24,
       structure_organism_pairs_table |>
         tidytable::distinct(
-          structure_inchikey_no_stereo,
-          structure_smiles_no_stereo,
-          structure_tax_npc_01pat,
-          structure_tax_npc_02sup,
-          structure_tax_npc_03cla,
+          candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+          candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+          candidate_structure_tax_npc_01pat = structure_tax_npc_01pat,
+          candidate_structure_tax_npc_02sup = structure_tax_npc_02sup,
+          candidate_structure_tax_npc_03cla = structure_tax_npc_03cla,
           ## TODO until better
-          structure_tax_cla_chemontid,
-          structure_tax_cla_01kin,
-          structure_tax_cla_02sup,
-          structure_tax_cla_03cla,
-          structure_tax_cla_04dirpar
+          candidate_structure_tax_cla_chemontid = structure_tax_cla_chemontid,
+          candidate_structure_tax_cla_01kin = structure_tax_cla_01kin,
+          candidate_structure_tax_cla_02sup = structure_tax_cla_02sup,
+          candidate_structure_tax_cla_03cla = structure_tax_cla_03cla,
+          candidate_structure_tax_cla_04dirpar = structure_tax_cla_04dirpar
         )
     ) |>
       tidytable::mutate(
@@ -821,14 +817,16 @@ annotate_masses <-
       df9 |>
         tidytable::mutate(label = paste0(label, " _ ", label_dest)) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct(),
       df9_d |>
         tidytable::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct()

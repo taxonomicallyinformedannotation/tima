@@ -1,46 +1,3 @@
-utils::globalVariables(
-  c(
-    "annot_table_wei_bio_clean",
-    "candidate_structure_1_cla_kingdom",
-    "candidate_structure_1_npc_pathway",
-    "candidate_structure_2_cla_superclass",
-    "candidate_structure_2_npc_superclass",
-    "candidate_structure_3_cla_class",
-    "candidate_structure_3_npc_class",
-    "candidate_structure_4_cla_parent",
-    "consensus_structure_cla_cla",
-    "consensus_structure_cla_kin",
-    "consensus_structure_cla_par",
-    "consensus_structure_cla_sup",
-    "consensus_structure_npc_cla",
-    "consensus_structure_npc_pat",
-    "consensus_structure_npc_sup",
-    "consistency_score_chemical_1_cla_kingdom",
-    "consistency_score_chemical_1_npc_pathway",
-    "consistency_score_chemical_2_cla_superclass",
-    "consistency_score_chemical_2_npc_superclass",
-    "consistency_score_chemical_3_cla_class",
-    "consistency_score_chemical_3_npc_class",
-    "consistency_score_chemical_4_cla_parent",
-    "feature_id",
-    "rank_final",
-    "score_biological",
-    "score_chemical",
-    "score_chemical_cla_class",
-    "score_chemical_cla_kingdom",
-    "score_chemical_cla_parent",
-    "score_chemical_cla_superclass",
-    "score_chemical_npc_class",
-    "score_chemical_npc_pathway",
-    "score_chemical_npc_superclass",
-    "score_input",
-    "score_pondered_chemo",
-    "weight_biological",
-    "weight_chemical",
-    "weight_spectral"
-  )
-)
-
 #' @title Weight chemo
 #'
 #' @description This function weights the biologically weighted annotations
@@ -108,41 +65,41 @@ weight_chemo <-
            )) {
     df2 <- annot_table_wei_bio_clean |>
       tidytable::distinct(
-        candidate_structure_1_cla_kingdom,
-        candidate_structure_1_npc_pathway,
-        candidate_structure_2_cla_superclass,
-        candidate_structure_2_npc_superclass,
-        candidate_structure_3_cla_class,
-        candidate_structure_3_npc_class,
-        candidate_structure_4_cla_parent,
-        consensus_structure_cla_kin,
-        consistency_score_chemical_1_cla_kingdom,
-        consensus_structure_npc_pat,
-        consistency_score_chemical_1_npc_pathway,
-        consensus_structure_cla_sup,
-        consistency_score_chemical_2_cla_superclass,
-        consensus_structure_npc_sup,
-        consistency_score_chemical_2_npc_superclass,
-        consensus_structure_cla_cla,
-        consistency_score_chemical_3_cla_class,
-        consensus_structure_npc_cla,
-        consistency_score_chemical_3_npc_class,
-        consensus_structure_cla_par,
-        consistency_score_chemical_4_cla_parent
+        candidate_structure_tax_cla_01kin,
+        candidate_structure_tax_npc_01pat,
+        candidate_structure_tax_cla_02sup,
+        candidate_structure_tax_npc_02sup,
+        candidate_structure_tax_cla_03cla,
+        candidate_structure_tax_npc_03cla,
+        candidate_structure_tax_cla_04dirpar,
+        feature_pred_tax_cla_01kin_val,
+        feature_pred_tax_cla_01kin_score,
+        feature_pred_tax_npc_01pat_val,
+        feature_pred_tax_npc_01pat_score,
+        feature_pred_tax_cla_02sup_val,
+        feature_pred_tax_cla_02sup_score,
+        feature_pred_tax_npc_02sup_val,
+        feature_pred_tax_npc_02sup_score,
+        feature_pred_tax_cla_03cla_val,
+        feature_pred_tax_cla_03cla_score,
+        feature_pred_tax_npc_03cla_val,
+        feature_pred_tax_npc_03cla_score,
+        feature_pred_tax_cla_04dirpar_val,
+        feature_pred_tax_cla_04dirpar_score
       )
 
     log_debug("calculating chemical score at all levels ... \n")
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
       tidytable::distinct(
-        candidate_structure_1_cla_kingdom,
-        consensus_structure_cla_kin,
-        consistency_score_chemical_1_cla_kingdom
+        candidate_structure_tax_cla_01kin,
+        feature_pred_tax_cla_01kin_val,
+        feature_pred_tax_cla_01kin_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_1_cla_kingdom,
-          str = consensus_structure_cla_kin
+          pattern = candidate_structure_tax_cla_01kin,
+          str = feature_pred_tax_cla_01kin_val
         )
       ) |>
       tidytable::mutate(score_chemical_1 = score_chemical_cla_kingdom *
@@ -151,14 +108,14 @@ weight_chemo <-
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
       tidytable::distinct(
-        candidate_structure_1_npc_pathway,
-        consensus_structure_npc_pat,
-        consistency_score_chemical_1_npc_pathway
+        candidate_structure_tax_npc_01pat,
+        feature_pred_tax_npc_01pat_val,
+        feature_pred_tax_npc_01pat_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_1_npc_pathway,
-          str = consensus_structure_npc_pat
+          pattern = candidate_structure_tax_npc_01pat,
+          str = feature_pred_tax_npc_01pat_val
         )
       ) |>
       tidytable::mutate(score_chemical_2 = score_chemical_npc_pathway *
@@ -167,14 +124,14 @@ weight_chemo <-
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- df2 |>
       tidytable::distinct(
-        candidate_structure_2_cla_superclass,
-        consensus_structure_cla_sup,
-        consistency_score_chemical_2_cla_superclass
+        candidate_structure_tax_cla_02sup,
+        feature_pred_tax_cla_02sup_val,
+        feature_pred_tax_cla_02sup_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_2_cla_superclass,
-          str = consensus_structure_cla_sup
+          pattern = candidate_structure_tax_cla_02sup,
+          str = feature_pred_tax_cla_02sup_val
         )
       ) |>
       tidytable::mutate(score_chemical_3 = score_chemical_cla_superclass *
@@ -183,14 +140,14 @@ weight_chemo <-
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- df2 |>
       tidytable::distinct(
-        candidate_structure_2_npc_superclass,
-        consensus_structure_npc_sup,
-        consistency_score_chemical_2_npc_superclass
+        candidate_structure_tax_npc_02sup,
+        feature_pred_tax_npc_02sup_val,
+        feature_pred_tax_npc_02sup_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_2_npc_superclass,
-          str = consensus_structure_npc_sup
+          pattern = candidate_structure_tax_npc_02sup,
+          str = feature_pred_tax_npc_02sup_val
         )
       ) |>
       tidytable::mutate(score_chemical_4 = score_chemical_npc_superclass *
@@ -199,14 +156,14 @@ weight_chemo <-
     log_debug("... (classyfire) class \n")
     step_cla_cla <- df2 |>
       tidytable::distinct(
-        candidate_structure_3_cla_class,
-        consensus_structure_cla_cla,
-        consistency_score_chemical_3_cla_class
+        candidate_structure_tax_cla_03cla,
+        feature_pred_tax_cla_03cla_val,
+        feature_pred_tax_cla_03cla_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_3_cla_class,
-          str = consensus_structure_cla_cla
+          pattern = candidate_structure_tax_cla_03cla,
+          str = feature_pred_tax_cla_03cla_val
         )
       ) |>
       tidytable::mutate(score_chemical_5 = score_chemical_cla_class *
@@ -215,14 +172,14 @@ weight_chemo <-
     log_debug("... (NPC) class \n")
     step_npc_cla <- df2 |>
       tidytable::distinct(
-        candidate_structure_3_npc_class,
-        consensus_structure_npc_cla,
-        consistency_score_chemical_3_npc_class
+        candidate_structure_tax_npc_03cla,
+        feature_pred_tax_npc_03cla_val,
+        feature_pred_tax_npc_03cla_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_3_npc_class,
-          str = consensus_structure_npc_cla
+          pattern = candidate_structure_tax_npc_03cla,
+          str = feature_pred_tax_npc_03cla_val
         )
       ) |>
       tidytable::mutate(score_chemical_6 = score_chemical_npc_class *
@@ -231,18 +188,18 @@ weight_chemo <-
     log_debug("... (classyfire) parent \n")
     step_cla_par <- df2 |>
       tidytable::distinct(
-        candidate_structure_4_cla_parent,
-        consensus_structure_cla_par,
-        consistency_score_chemical_4_cla_parent
+        candidate_structure_tax_cla_04dirpar,
+        feature_pred_tax_cla_04dirpar_val,
+        feature_pred_tax_cla_04dirpar_score
       ) |>
       tidytable::filter(
         stringi::stri_detect_regex(
-          pattern = candidate_structure_4_cla_parent,
-          str = consensus_structure_cla_par
+          pattern = candidate_structure_tax_cla_04dirpar,
+          str = feature_pred_tax_cla_04dirpar_val
         )
       ) |>
       tidytable::mutate(score_chemical_7 = score_chemical_cla_parent *
-        consistency_score_chemical_4_cla_parent)
+        1)
 
     log_debug("... keeping best chemical score \n")
     annot_table_wei_chemo <- df2 |>
@@ -293,7 +250,7 @@ weight_chemo <-
                 weight_spectral
             )) *
               weight_spectral *
-              as.numeric(score_input)
+              as.numeric(candidate_score_similarity)
       )
 
     rm(

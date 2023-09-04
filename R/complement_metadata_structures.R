@@ -18,12 +18,11 @@
 #' @examples NULL
 complement_metadata_structures <- function(
     df,
-    str_stereo = params$files$libraries$merged$structures$stereo,
-    str_met = params$files$libraries$merged$structures$metadata,
-    str_nam = params$files$libraries$merged$structures$names,
-    str_tax_cla =
-      params$files$libraries$merged$structures$taxonomies$cla,
-    str_tax_npc = params$files$libraries$merged$structures$taxonomies$npc) {
+    str_stereo = get("str_stereo", envir = parent.frame()),
+    str_met = get("str_met", envir = parent.frame()),
+    str_nam = get("str_nam", envir = parent.frame()),
+    str_tax_cla = get("str_tax_cla", envir = parent.frame()),
+    str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
   log_debug("Trying to look for already computed metadata")
   stereo <- tidytable::fread(str_stereo,
     na.strings = c("", "NA"),
@@ -32,16 +31,20 @@ complement_metadata_structures <- function(
 
   stereo_s <- stereo |>
     tidytable::select(
-      structure_inchikey_no_stereo_s = structure_inchikey_no_stereo,
-      structure_smiles_no_stereo
+      candidate_structure_inchikey_no_stereo_s = structure_inchikey_no_stereo,
+      candidate_structure_smiles_no_stereo = structure_smiles_no_stereo
     ) |>
-    tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
 
   stereo_i <- stereo |>
-    tidytable::select(structure_inchikey_no_stereo,
-      structure_smiles_no_stereo_i = structure_smiles_no_stereo
+    tidytable::select(
+      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_smiles_no_stereo_i = structure_smiles_no_stereo
     ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_inchikey_no_stereo,
+      .keep_all = TRUE
+    )
 
   met_2d <- tidytable::fread(str_met,
     na.strings = c("", "NA"),
@@ -91,64 +94,81 @@ complement_metadata_structures <- function(
     colClasses = "character"
   ) |>
     tidytable::select(
-      structure_inchikey_no_stereo,
-      structure_tax_cla_chemontid_i =
+      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_tax_cla_chemontid_i =
         structure_tax_cla_chemontid,
-      structure_tax_cla_01kin_i =
+      candidate_structure_tax_cla_01kin_i =
         structure_tax_cla_01kin,
-      structure_tax_cla_02sup_i =
+      candidate_structure_tax_cla_02sup_i =
         structure_tax_cla_02sup,
-      structure_tax_cla_03cla_i =
+      candidate_structure_tax_cla_03cla_i =
         structure_tax_cla_03cla,
-      structure_tax_cla_04dirpar_i =
+      candidate_structure_tax_cla_04dirpar_i =
         structure_tax_cla_04dirpar
     ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_inchikey_no_stereo,
+      .keep_all = TRUE
+    )
 
   tax_npc <- tidytable::fread(str_tax_npc,
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
     tidytable::select(
-      structure_smiles_no_stereo,
-      structure_tax_npc_01pat_s =
+      candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+      candidate_structure_tax_npc_01pat_s =
         structure_tax_npc_01pat,
-      structure_tax_npc_02sup_s =
+      candidate_structure_tax_npc_02sup_s =
         structure_tax_npc_02sup,
-      structure_tax_npc_03cla_s =
+      candidate_structure_tax_npc_03cla_s =
         structure_tax_npc_03cla,
     ) |>
-    tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
 
   met_i <- met_2d |>
     tidytable::select(
-      structure_inchikey_no_stereo,
-      structure_molecular_formula_i = structure_molecular_formula,
-      structure_exact_mass_i = structure_exact_mass,
-      structure_xlogp_i = structure_xlogp
+      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_molecular_formula_i = structure_molecular_formula,
+      candidate_structure_exact_mass_i = structure_exact_mass,
+      candidate_structure_xlogp_i = structure_xlogp
     ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_inchikey_no_stereo,
+      .keep_all = TRUE
+    )
 
   met_s <- met_2d |>
     tidytable::select(
-      structure_smiles_no_stereo,
-      structure_molecular_formula_s = structure_molecular_formula,
-      structure_exact_mass_s = structure_exact_mass,
-      structure_xlogp_s = structure_xlogp
+      candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+      candidate_structure_molecular_formula_s = structure_molecular_formula,
+      candidate_structure_exact_mass_s = structure_exact_mass,
+      candidate_structure_xlogp_s = structure_xlogp
     ) |>
-    tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
 
   nam_i <- nam_2d |>
-    tidytable::select(structure_inchikey_no_stereo,
-      structure_name_i = structure_name
+    tidytable::select(
+      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_name_i = structure_name
     ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_inchikey_no_stereo,
+      .keep_all = TRUE
+    )
 
   nam_s <- nam_2d |>
-    tidytable::select(structure_smiles_no_stereo,
-      structure_name_s = structure_name
+    tidytable::select(
+      candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+      candidate_structure_name_s = structure_name
     ) |>
-    tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
 
   ## Always returning preferentially internal values
   ## (smiles > inchikey > external)
@@ -156,100 +176,106 @@ complement_metadata_structures <- function(
     tidytable::left_join(stereo_i) |>
     tidytable::left_join(stereo_s) |>
     tidytable::mutate(
-      structure_smiles_no_stereo = tidytable::coalesce(
-        structure_smiles_no_stereo_i,
-        structure_smiles_no_stereo
+      candidate_structure_smiles_no_stereo = tidytable::coalesce(
+        candidate_structure_smiles_no_stereo_i,
+        candidate_structure_smiles_no_stereo
       ),
-      structure_inchikey_no_stereo = tidytable::coalesce(
-        structure_inchikey_no_stereo_s,
-        structure_inchikey_no_stereo
+      candidate_structure_inchikey_no_stereo = tidytable::coalesce(
+        candidate_structure_inchikey_no_stereo_s,
+        candidate_structure_inchikey_no_stereo
       )
     ) |>
-    tidytable::select(-structure_smiles_no_stereo_i, -structure_inchikey_no_stereo_s) |>
+    tidytable::select(
+      -candidate_structure_smiles_no_stereo_i,
+      -candidate_structure_inchikey_no_stereo_s
+    ) |>
     tidytable::left_join(met_i) |>
     tidytable::left_join(met_s) |>
     tidytable::mutate(
-      structure_molecular_formula = tidytable::coalesce(
-        structure_molecular_formula_s,
-        structure_molecular_formula_i,
-        structure_molecular_formula
+      candidate_structure_molecular_formula = tidytable::coalesce(
+        candidate_structure_molecular_formula_s,
+        candidate_structure_molecular_formula_i,
+        candidate_structure_molecular_formula
       ),
-      structure_exact_mass = tidytable::coalesce(
-        structure_exact_mass_s,
-        structure_exact_mass_i,
-        structure_exact_mass
+      candidate_structure_exact_mass = tidytable::coalesce(
+        candidate_structure_exact_mass_s,
+        candidate_structure_exact_mass_i,
+        candidate_structure_exact_mass
       ),
-      structure_xlogp = tidytable::coalesce(
-        structure_xlogp_s,
-        structure_xlogp_i,
-        structure_xlogp
+      candidate_structure_xlogp = tidytable::coalesce(
+        candidate_structure_xlogp_s,
+        candidate_structure_xlogp_i,
+        candidate_structure_xlogp
       )
     ) |>
     tidytable::select(
-      -structure_molecular_formula_s,
-      -structure_molecular_formula_i,
-      -structure_exact_mass_s,
-      -structure_exact_mass_i,
-      -structure_xlogp_s,
-      -structure_xlogp_i
+      -candidate_structure_molecular_formula_s,
+      -candidate_structure_molecular_formula_i,
+      -candidate_structure_exact_mass_s,
+      -candidate_structure_exact_mass_i,
+      -candidate_structure_xlogp_s,
+      -candidate_structure_xlogp_i
     ) |>
     tidytable::left_join(nam_i) |>
     tidytable::left_join(nam_s) |>
-    tidytable::mutate(structure_name = tidytable::coalesce(
-      structure_name_s,
-      structure_name_i,
-      structure_name
+    tidytable::mutate(candidate_structure_name = tidytable::coalesce(
+      candidate_structure_name_s,
+      candidate_structure_name_i,
+      candidate_structure_name
     )) |>
-    tidytable::select(-structure_name_s, -structure_name_i) |>
+    tidytable::select(
+      -candidate_structure_name_s,
+      -candidate_structure_name_i
+    ) |>
     tidytable::left_join(tax_npc) |>
     tidytable::mutate(
-      structure_tax_npc_01pat = tidytable::coalesce(
-        structure_tax_npc_01pat_s,
-        structure_tax_npc_01pat
+      candidate_structure_tax_npc_01pat = tidytable::coalesce(
+        candidate_structure_tax_npc_01pat_s,
+        candidate_structure_tax_npc_01pat
       ),
-      structure_tax_npc_02sup = tidytable::coalesce(
-        structure_tax_npc_02sup_s,
-        structure_tax_npc_02sup
+      candidate_structure_tax_npc_02sup = tidytable::coalesce(
+        candidate_structure_tax_npc_02sup_s,
+        candidate_structure_tax_npc_02sup
       ),
-      structure_tax_npc_03cla = tidytable::coalesce(
-        structure_tax_npc_03cla_s,
-        structure_tax_npc_03cla
+      candidate_structure_tax_npc_03cla = tidytable::coalesce(
+        candidate_structure_tax_npc_03cla_s,
+        candidate_structure_tax_npc_03cla
       ),
     ) |>
     tidytable::select(
-      -structure_tax_npc_01pat_s,
-      -structure_tax_npc_02sup_s,
-      -structure_tax_npc_03cla_s
+      -candidate_structure_tax_npc_01pat_s,
+      -candidate_structure_tax_npc_02sup_s,
+      -candidate_structure_tax_npc_03cla_s
     ) |>
     tidytable::left_join(tax_cla) |>
     tidytable::mutate(
-      structure_tax_cla_chemontid = tidytable::coalesce(
-        structure_tax_cla_chemontid_i,
-        structure_tax_cla_chemontid
+      candidate_structure_tax_cla_chemontid = tidytable::coalesce(
+        candidate_structure_tax_cla_chemontid_i,
+        candidate_structure_tax_cla_chemontid
       ),
-      structure_tax_cla_01kin = tidytable::coalesce(
-        structure_tax_cla_01kin_i,
-        structure_tax_cla_01kin
+      candidate_structure_tax_cla_01kin = tidytable::coalesce(
+        candidate_structure_tax_cla_01kin_i,
+        candidate_structure_tax_cla_01kin
       ),
-      structure_tax_cla_02sup = tidytable::coalesce(
-        structure_tax_cla_02sup_i,
-        structure_tax_cla_02sup
+      candidate_structure_tax_cla_02sup = tidytable::coalesce(
+        candidate_structure_tax_cla_02sup_i,
+        candidate_structure_tax_cla_02sup
       ),
-      structure_tax_cla_03cla = tidytable::coalesce(
-        structure_tax_cla_03cla_i,
-        structure_tax_cla_03cla
+      candidate_structure_tax_cla_03cla = tidytable::coalesce(
+        candidate_structure_tax_cla_03cla_i,
+        candidate_structure_tax_cla_03cla
       ),
-      structure_tax_cla_04dirpar = tidytable::coalesce(
-        structure_tax_cla_04dirpar_i,
-        structure_tax_cla_04dirpar
+      candidate_structure_tax_cla_04dirpar = tidytable::coalesce(
+        candidate_structure_tax_cla_04dirpar_i,
+        candidate_structure_tax_cla_04dirpar
       )
     ) |>
     tidytable::select(
-      -structure_tax_cla_chemontid_i,
-      -structure_tax_cla_01kin_i,
-      -structure_tax_cla_02sup_i,
-      -structure_tax_cla_03cla_i,
-      -structure_tax_cla_04dirpar_i
+      -candidate_structure_tax_cla_chemontid_i,
+      -candidate_structure_tax_cla_01kin_i,
+      -candidate_structure_tax_cla_02sup_i,
+      -candidate_structure_tax_cla_03cla_i,
+      -candidate_structure_tax_cla_04dirpar_i
     ) |>
     tidytable::mutate(
       tidytable::across(

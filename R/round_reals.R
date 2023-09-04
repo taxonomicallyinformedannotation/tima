@@ -13,8 +13,8 @@ round_reals <- function(df, dig = 5) {
     ## Round to 5 digits to avoid small discrepancies
     tidytable::mutate(tidytable::across(
       .cols = c(
-        "structure_exact_mass",
-        "structure_xlogp"
+        tidytable::contains("structure_exact_mass"),
+        tidytable::contains("structure_xlogp")
       ),
       .fns = \(x) round(as.numeric(x), digits = dig)
     ))
