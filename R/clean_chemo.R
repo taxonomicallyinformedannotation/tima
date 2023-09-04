@@ -4,6 +4,7 @@
 #'    obtained after chemical weighting
 #'
 #' @include clean_collapse.R
+#' @include columns_model.R
 #'
 #' @param annot_table_wei_chemo Table containing your
 #'    chemically weighted annotation
@@ -64,6 +65,9 @@ clean_chemo <-
       minimal_ms1_chemo,
       "chemical score \n"
     )
+
+    model <- columns_model()
+
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
@@ -131,9 +135,9 @@ clean_chemo <-
         "feature_pred_tax_cla_02sup_val" = "consensus_structure_cla_sup",
         "feature_pred_tax_cla_02sup_score" = "consistency_structure_cla_sup",
         "feature_pred_tax_cla_03cla_val" = "consensus_structure_cla_cla",
-        "feature_pred_tax_cla_03cla_score" = "consensus_structure_cla_cla",
+        "feature_pred_tax_cla_03cla_score" = "consistency_structure_cla_cla",
         "feature_pred_tax_cla_04dirpar_val" = "consensus_structure_cla_par",
-        "feature_pred_tax_cla_04dirpar_score" = "consensus_structure_cla_par",
+        "feature_pred_tax_cla_04dirpar_score" = "consistency_structure_cla_par",
         "feature_pred_tax_npc_01pat_val" = "consensus_structure_npc_pat",
         "feature_pred_tax_npc_01pat_score" = "consistency_structure_npc_pat",
         "feature_pred_tax_npc_02sup_val" = "consensus_structure_npc_sup",
@@ -141,10 +145,12 @@ clean_chemo <-
         "feature_pred_tax_npc_03cla_val" = "consensus_structure_npc_cla",
         "feature_pred_tax_npc_03cla_score" = "consistency_structure_npc_cla",
         "component_id",
+        "candidate_spectrum_entropy",
         "candidate_structure_molecular_formula" = "structure_molecular_formula",
         "candidate_structure_exact_mass" = "structure_exact_mass",
         "candidate_structure_xlogp" = "structure_xlogp",
-        "candidate_structure_inchikey_no_stereo" = "structure_inchikey_no_stereo",
+        "candidate_structure_inchikey_no_stereo" =
+          "structure_inchikey_no_stereo",
         "candidate_structure_smiles_no_stereo" = "structure_smiles_no_stereo",
         "candidate_structure_name" = "structure_name",
         "candidate_structure_tax_cla",
@@ -194,25 +200,12 @@ clean_chemo <-
       tidytable::group_by(c(-reference_doi)) |>
       clean_collapse(cols = c("reference_doi")) |>
       tidytable::select(tidytable::any_of(c(
-        "feature_id",
-        "feature_rt",
-        "feature_mz",
-        "feature_spectrum_entropy",
-        "feature_pred_tax_cla_01kin_val",
-        "feature_pred_tax_cla_01kin_score",
-        "feature_pred_tax_cla_02sup_val",
-        "feature_pred_tax_cla_02sup_score",
-        "feature_pred_tax_cla_03cla_val",
-        "feature_pred_tax_cla_03cla_score",
-        "feature_pred_tax_cla_04dirpar_val",
-        "feature_pred_tax_cla_04dirpar_score",
-        "feature_pred_tax_npc_01pat_val",
-        "feature_pred_tax_npc_01pat_score",
-        "feature_pred_tax_npc_02sup_val",
-        "feature_pred_tax_npc_02sup_score",
-        "feature_pred_tax_npc_03cla_val",
-        "feature_pred_tax_npc_03cla_score",
-        "component_id",
+        model$features_columns,
+        model$features_calculated_columns,
+        model$components_columns,
+        model$candidates_sirius_formula_columns,
+        model$candidates_sirius_structural_columns,
+        model$candidates_spectra_columns,
         "candidate_structure_molecular_formula",
         "candidate_structure_exact_mass",
         "candidate_structure_xlogp",
@@ -223,27 +216,10 @@ clean_chemo <-
         "candidate_structure_tax_npc",
         "candidate_structure_organism_occurrence_closest" = "best_can_org",
         "candidate_structure_organism_occurrence_reference" = "reference_doi",
-        "candidate_library",
-        ## TODO "library_type",
-        "candidate_count_similarity_peaks_matched",
-        "candidate_score_similarity",
-        "candidate_count_sirius_peaks_explained",
-        "candidate_score_sirius_intensity",
-        "candidate_score_sirius_isotope",
-        "candidate_score_sirius_sirius",
-        "candidate_score_sirius_tree",
-        "candidate_score_sirius_zodiac",
-        "candidate_score_sirius_confidence",
-        "candidate_score_sirius_csi",
         "candidate_structure_error_mz",
         "candidate_structure_error_rt",
-        "rank_initial",
-        "rank_final",
-        "score_initial",
-        "score_biological",
-        # "score_interim",
-        "score_chemical",
-        "score_final"
+        model$rank_columns,
+        model$score_columns
       ))) |>
       tidytable::arrange(rank_final)
     rm(df1)
@@ -306,56 +282,15 @@ clean_chemo <-
       ) |>
       tidytable::select(tidytable::any_of(
         c(
-          "feature_id",
-          "feature_rt",
-          "feature_mz",
-          "feature_spectrum_entropy",
-          "feature_pred_tax_cla_01kin_val",
-          "feature_pred_tax_cla_01kin_score",
-          "feature_pred_tax_cla_02sup_val",
-          "feature_pred_tax_cla_02sup_score",
-          "feature_pred_tax_cla_03cla_val",
-          "feature_pred_tax_cla_03cla_score",
-          "feature_pred_tax_cla_04dirpar_val",
-          "feature_pred_tax_cla_04dirpar_score",
-          "feature_pred_tax_npc_01pat_val",
-          "feature_pred_tax_npc_01pat_score",
-          "feature_pred_tax_npc_02sup_val",
-          "feature_pred_tax_npc_02sup_score",
-          "feature_pred_tax_npc_03cla_val",
-          "feature_pred_tax_npc_03cla_score",
-          "component_id",
-          "candidate_structure_molecular_formula",
-          "candidate_structure_exact_mass",
-          "candidate_structure_xlogp",
-          "candidate_structure_inchikey_no_stereo",
-          "candidate_structure_smiles_no_stereo",
-          "candidate_structure_name",
-          "candidate_structure_tax_cla",
-          "candidate_structure_tax_npc",
-          "candidate_structure_organism_occurrence_closest" = "best_can_org",
-          "candidate_structure_organism_occurrence_reference" = "reference_doi",
-          "candidate_library",
-          ## TODO "library_type",
-          "candidate_count_similarity_peaks_matched",
-          "candidate_score_similarity",
-          "candidate_count_sirius_peaks_explained",
-          "candidate_score_sirius_intensity",
-          "candidate_score_sirius_isotope",
-          "candidate_score_sirius_sirius",
-          "candidate_score_sirius_tree",
-          "candidate_score_sirius_zodiac",
-          "candidate_score_sirius_confidence",
-          "candidate_score_sirius_csi",
-          "candidate_structure_error_mz",
-          "candidate_structure_error_rt",
-          "rank_initial",
-          "rank_final",
-          "score_initial",
-          "score_biological",
-          # "score_interim",
-          "score_chemical",
-          "score_final"
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_sirius_formula_columns,
+          model$candidates_sirius_structural_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          model$score_columns
         )
       ))
     rm(df5)
@@ -375,25 +310,9 @@ clean_chemo <-
       ) |>
         tidytable::select(tidytable::any_of(
           c(
-            "feature_id",
-            "feature_rt",
-            "feature_mz",
-            "feature_spectrum_entropy",
-            "feature_pred_tax_cla_01kin_val",
-            "feature_pred_tax_cla_01kin_score",
-            "feature_pred_tax_cla_02sup_val",
-            "feature_pred_tax_cla_02sup_score",
-            "feature_pred_tax_cla_03cla_val",
-            "feature_pred_tax_cla_03cla_score",
-            "feature_pred_tax_cla_04dirpar_val",
-            "feature_pred_tax_cla_04dirpar_score",
-            "feature_pred_tax_npc_01pat_val",
-            "feature_pred_tax_npc_01pat_score",
-            "feature_pred_tax_npc_02sup_val",
-            "feature_pred_tax_npc_02sup_score",
-            "feature_pred_tax_npc_03cla_val",
-            "feature_pred_tax_npc_03cla_score",
-            "component_id"
+            model$features_columns,
+            model$features_calculated_columns,
+            model$components_columns
           )
         )) |>
         tidytable::distinct()
@@ -401,15 +320,6 @@ clean_chemo <-
       tidytable::arrange(as.numeric(feature_id))
 
     rm(annot_table_wei_chemo, df6)
-
-    ## Because cytoscape import fails otherwise
-    colnames(results) <-
-      stringi::stri_replace_all_fixed(
-        str = colnames(results),
-        pattern = "_structure",
-        replacement = "",
-        vectorize_all = FALSE
-      )
 
     return(results)
   }
