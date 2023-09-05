@@ -97,6 +97,7 @@ prepare_libraries_rt <-
           )))
         return(rts)
       }
+
     rts_from_tab <-
       function(tab) {
         log_debug("Importing file ...")
@@ -112,6 +113,7 @@ prepare_libraries_rt <-
           ))
         return(rts)
       }
+
     polish_df <-
       function(df,
                type = "experimental",
@@ -133,6 +135,7 @@ prepare_libraries_rt <-
           tidytable::distinct()
         return(df_polished)
       }
+
     complete_df <- function(df) {
       df_full <- df |>
         tidytable::filter(!is.na(inchikey))
@@ -147,6 +150,7 @@ prepare_libraries_rt <-
       )
       ## TODO change with a small dependency
       smiles <- unique(df_missing$smiles)
+
       get_inchikey <- function(smiles, toolkit = "rdkit") {
         url <- paste0(
           "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
@@ -161,6 +165,7 @@ prepare_libraries_rt <-
           }
         )
       }
+
       inchikey <- pbapply::pblapply(
         X = smiles,
         FUN = get_inchikey
