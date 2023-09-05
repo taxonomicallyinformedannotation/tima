@@ -30,23 +30,34 @@ prepare_features_edges <-
     params <<- parameters
     ## Load edges table
     log_debug(x = "Loading edge table")
-    edges_table <- lapply(
+    edges_tables <- lapply(
       X = input,
       FUN = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
-    ) |>
-      tidytable::bind_rows()
+    )
+
+    ## TODO secure the order
+    edges_ms2 <- edges_tables[[1]]
+    edges_ms1 <- edges_tables[[2]]
+    features_entropy <- edges_ms2 |>
+      tidytable::select(
+        tidytable::all_of(c(
+          name_source
+        )),
+        feature_spectrum_entropy
+      ) |>
+      tidytable::distinct()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
-    edges_table_treated <- edges_table |>
-      tidytable::select(
+    edges_table_treated <- edges_ms1 |>
+      tidytable::full_join(features_entropy) |>
+      tidytable::full_join(edges_ms2) |>
+      tidytable::rename(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
-      ) |>
-      tidytable::filter(feature_source != feature_target) |>
-      tidytable::distinct()
+      )
 
     ## Export edges table
     log_debug(x = "Exporting ...")

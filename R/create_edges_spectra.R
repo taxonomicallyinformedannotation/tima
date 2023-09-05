@@ -74,6 +74,15 @@ create_edges_spectra <- function(
       ) |>
       tidytable::bind_rows()
 
+    log_debug("Calculating features entropy")
+    entropy <- pbapply::pblapply(
+      X = seq_along(1:nspecz),
+      FUN = function(x, peaks = fragz) {
+        entropy <- peaks[[x]] |>
+          msentropy::calculate_spectral_entropy()
+      }
+    )
+
     edges <- edges |>
       tidytable::select(
         !!as.name(name_source) := "feature_id",
@@ -87,6 +96,19 @@ create_edges_spectra <- function(
       tidytable::mutate(
         name_source = idz[name_source],
         name_target = idz[name_target]
+      )
+    entropy_df <- tidytable::tidytable(entropy) |>
+      tidyfst::rn_col(var = name_source) |>
+      tidytable::mutate(
+        name_source = idz[name_source],
+        feature_spectrum_entropy = as.character(entropy)
+      ) |>
+      tidytable::mutate(
+        !!as.name(name_source) := as.integer(!!as.name(name_source))
+      ) |>
+      tidytable::distinct(
+        !!as.name(name_source),
+        feature_spectrum_entropy
       )
 
     edges <- edges |>
@@ -103,10 +125,14 @@ create_edges_spectra <- function(
       tidytable::filter(
         candidate_score_similarity >= threshold
       )
+
+    edges <- edges |>
+      tidytable::full_join(entropy_df)
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")
     edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
+      "feature_spectrum_entropy" = NA,
       !!as.name(name_target) := NA,
       "candidate_score_similarity" = NA,
       "candidate_count_similarity_peaks_matched" = NA
