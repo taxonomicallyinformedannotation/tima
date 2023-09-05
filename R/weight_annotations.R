@@ -221,6 +221,7 @@ weight_annotations <- function(
   annotation_table_1 <- annotation_table |>
     tidytable::select(tidytable::any_of(c(
       model$features_columns,
+      model$candidates_calculated_columns,
       model$candidates_spectra_columns,
       model$candidates_structures_columns
     ))) |>
@@ -248,7 +249,14 @@ weight_annotations <- function(
   annotation_table <- annotation_table_1 |>
     tidytable::full_join(annotation_table_2) |>
     tidytable::full_join(formula_table) |>
-    tidytable::full_join(canopus_table)
+    tidytable::full_join(canopus_table) |>
+    tidytable::left_join(
+      edges_table |>
+        tidytable::distinct(
+          feature_id = feature_source,
+          feature_spectrum_entropy
+        )
+    )
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>

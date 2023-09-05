@@ -188,12 +188,19 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                     max_peak_num = -1,
                     clean_spectra = TRUE
                   )
+                  ## more efficient to do it when creating edges
+                  # entropy_query <- spectra[[sp]] |>
+                  #   msentropy::calculate_spectral_entropy()
+                  entropy_target <- lib[[index]] |>
+                    msentropy::calculate_spectral_entropy()
 
                   if (score >= threshold) {
                     tidytable::tidytable(
                       "feature_id" = query_ids[[spectrum]],
+                      # "feature_spectrum_entropy" = entropy_query,
                       "precursorMz" = precursor,
                       "target_id" = lib_id[indices][[index]],
+                      "candidate_spectrum_entropy" = entropy_target,
                       "candidate_score_similarity" = as.numeric(score),
                       ## TODO
                       "candidate_count_similarity_peaks_matched" = NA_integer_
@@ -315,6 +322,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
           "candidate_structure_molecular_formula" = "target_formula",
           "candidate_structure_exact_mass" = "target_exactmass",
           "candidate_structure_xlogp" = "target_xlogp",
+          "candidate_spectrum_entropy",
           "candidate_score_similarity",
           "candidate_count_similarity_peaks_matched"
         )

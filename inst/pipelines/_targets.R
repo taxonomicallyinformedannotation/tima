@@ -1613,7 +1613,7 @@ list(
       name = fea_edg_pre,
       command = {
         fea_edg_pre <- prepare_features_edges(
-          input = list(ann_ms1_pre_edg, edg_spe),
+          input = list(edg_spe, ann_ms1_pre_edg),
           output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target,
@@ -2300,7 +2300,7 @@ list(
       name = benchmark_edg_pre_pos,
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = list(benchmark_ann_ms1_pre_pos[[2]], benchmark_edg_spe_pos),
+          input = list(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target,
@@ -2312,7 +2312,7 @@ list(
       name = benchmark_edg_pre_neg,
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = list(benchmark_ann_ms1_pre_neg[[2]], benchmark_edg_spe_neg),
+          input = list(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target,
