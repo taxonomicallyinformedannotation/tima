@@ -57,8 +57,17 @@ parse_cli_params <- function() {
     if (!is.null(arguments$fil_ann_fil)) {
       params$files$annotations$filtered <- as.character(arguments$fil_ann_fil)
     }
+    if (!is.null(arguments$fil_ann_pre_can)) {
+      params$files$annotations$prepared$canopus <-
+        as.character(arguments$fil_ann_pre_can)
+    }
+    if (!is.null(arguments$fil_ann_pre_for)) {
+      params$files$annotations$prepared$formula <-
+        as.character(arguments$fil_ann_pre_for)
+    }
     if (!is.null(arguments$fil_ann_pre_str)) {
-      params$files$annotations$prepared$structural <- as.character(arguments$fil_ann_pre_str)
+      params$files$annotations$prepared$structural <-
+        as.character(arguments$fil_ann_pre_str)
     }
     if (!is.null(arguments$fil_ann_pro)) {
       params$files$annotations$processed <- as.character(arguments$fil_ann_pro)
@@ -192,7 +201,8 @@ parse_cli_params <- function() {
       params$names$mgf$inchikey <- as.character(arguments$names_mgf_ik)
     }
     if (!is.null(arguments$names_mgf_il)) {
-      params$names$mgf$inchikey_no_stereo <- as.character(arguments$names_mgf_il)
+      params$names$mgf$inchikey_no_stereo <-
+        as.character(arguments$names_mgf_il)
     }
     if (!is.null(arguments$names_mgf_mf)) {
       params$names$mgf$molecular_formula <- as.character(arguments$names_mgf_mf)

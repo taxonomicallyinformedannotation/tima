@@ -6,7 +6,9 @@
 \usage{
 prepare_annotations_sirius(
   input_directory = params$files$annotations$raw$sirius,
-  output = params$files$annotations$prepared$structural,
+  output_ann = params$files$annotations$prepared$structural,
+  output_can = params$files$annotations$prepared$canopus,
+  output_for = params$files$annotations$prepared$formula,
   str_stereo = params$files$libraries$sop$merged$structures$stereo,
   str_met = params$files$libraries$sop$merged$structures$metadata,
   str_nam = params$files$libraries$sop$merged$structures$names,
@@ -18,7 +20,11 @@ prepare_annotations_sirius(
 \arguments{
 \item{input_directory}{Directory containing the Sirius results}
 
-\item{output}{Output where to save prepared results}
+\item{output_ann}{Output where to save prepared annotation results}
+
+\item{output_can}{Output where to save prepared canopus results}
+
+\item{output_for}{Output where to save prepared formula results}
 
 \item{str_stereo}{File containing structures stereo}
 

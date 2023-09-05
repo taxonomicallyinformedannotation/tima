@@ -38,6 +38,14 @@ files:
     filtered:
       - data/interim/annotations/example_annotations_filtered.tsv.gz
 
+    #' List of prepared annotations.
+    prepared:
+      #' List of prepared canopus annotations. STRING
+      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+
+      #' List of prepared formula annotations. STRING
+      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+
     #' Final results file. STRING
     processed: annotations.tsv
 

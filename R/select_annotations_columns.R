@@ -29,6 +29,7 @@ select_annotations_columns <- function(
   df <- df |>
     tidytable::select(tidytable::any_of(c(
       "feature_id",
+      model$features_calculated_columns,
       model$candidates_sirius_formula_columns,
       model$candidates_sirius_structural_columns,
       model$candidates_spectra_columns,

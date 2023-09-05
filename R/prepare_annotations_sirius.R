@@ -10,7 +10,9 @@
 #' @include select_sirius_columns.R
 #'
 #' @param input_directory Directory containing the Sirius results
-#' @param output Output where to save prepared results
+#' @param output_ann Output where to save prepared annotation results
+#' @param output_can Output where to save prepared canopus results
+#' @param output_for Output where to save prepared formula results
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
@@ -25,7 +27,9 @@
 #' @examples NULL
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
-           output = params$files$annotations$prepared$structural,
+           output_ann = params$files$annotations$prepared$structural,
+           output_can = params$files$annotations$prepared$canopus,
+           output_for = params$files$annotations$prepared$formula,
            str_stereo = params$files$libraries$sop$merged$structures$stereo,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,
@@ -130,26 +134,29 @@ prepare_annotations_sirius <-
       compound_summary_ready <- compound_summary |>
         tidytable::bind_rows(.id = "feature_id")
 
-      canopus_npc_prepared <- canopus |>
+      canopus_prepared <- canopus |>
         tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
         tidytable::select(tidytable::any_of(
           c(
             "feature_id",
-            "structure_tax_npc_01pat" = "NPC#pathway",
-            "NPC#pathway Probability",
-            "structure_tax_npc_02sup" = "NPC#superclass",
-            "NPC#superclass Probability",
-            "structure_tax_npc_03cla" = "NPC#class",
-            "NPC#class Probability",
-            "structure_tax_cla_01kin" = "ClassyFire#TODO",
-            "ClassyFire#TODO Probability",
-            "structure_tax_cla_02sup" = "ClassyFire#superclass",
-            "ClassyFire#superclass probability",
-            "structure_tax_cla_03cla" = "ClassyFire#class",
-            "ClassyFire#class Probability",
-            "structure_tax_cla_04dirpar" =
+            "candidate_structure_molecular_formula" = "molecularFormula",
+            "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
+            "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
+            "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
+            "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
+            "feature_pred_tax_npc_03cla_val" = "NPC#class",
+            "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
+            "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
+            "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
+            "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
+            "feature_pred_tax_cla_02sup_score" =
+              "ClassyFire#superclass probability",
+            "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
+            "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
+            "feature_pred_tax_cla_04dirpar_val" =
               "ClassyFire#most specific class",
-            "ClassyFire#most specific class Probability"
+            "feature_pred_tax_cla_04dirpar_score" =
+              "ClassyFire#most specific class Probability"
           )
         ))
 
@@ -176,7 +183,7 @@ prepare_annotations_sirius <-
 
       table <- compounds_prepared |>
         tidytable::left_join(formulas_prepared) |>
-        tidytable::left_join(canopus_npc_prepared) |>
+        tidytable::left_join(canopus_prepared) |>
         tidytable::distinct() |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA,
@@ -186,11 +193,60 @@ prepare_annotations_sirius <-
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")
-      table <- fake_annotations_columns()
+      table <- fake_annotations_columns() |>
+        tidytable::mutate(
+          feature_pred_tax_cla_02sup_val = NA,
+          feature_pred_tax_cla_02sup_score = NA,
+          feature_pred_tax_cla_03cla_val = NA,
+          feature_pred_tax_cla_03cla_score = NA,
+          feature_pred_tax_cla_04dirpar_val = NA,
+          feature_pred_tax_cla_04dirpar_score = NA,
+          feature_pred_tax_npc_01pat_val = NA,
+          feature_pred_tax_npc_01pat_score = NA,
+          feature_pred_tax_npc_02sup_val = NA,
+          feature_pred_tax_npc_02sup_score = NA,
+          feature_pred_tax_npc_03cla_val = NA,
+          feature_pred_tax_npc_03cla_score = NA,
+          candidate_count_sirius_peaks_explained = NA,
+          candidate_score_sirius_intensity = NA,
+          candidate_score_sirius_isotope = NA,
+          candidate_score_sirius_sirius = NA,
+          candidate_score_sirius_tree = NA,
+          candidate_score_sirius_zodiac = NA,
+          candidate_score_sirius_confidence = NA,
+          candidate_score_sirius_csi = NA
+        ) |>
+        tidytable::select(
+          -candidate_structure_error_rt,
+          -candidate_score_similarity,
+          -candidate_count_similarity_peaks_matched
+        )
     }
+    log_debug("Splitting SIRIUS results")
+    table_can <- table |>
+      tidytable::select(
+        tidytable::contains("feature")
+      )
+    table_for <- table |>
+      tidytable::select(
+        colnames(formula_prepared)
+      )
+    table_str <- table |>
+      tidytable::select(
+        colnames(compound_prepared)
+      )
+
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_annotations_sirius")
-    export_output(x = table, file = output[[1]])
+    export_output(x = table_can, file = output_can)
+    export_output(x = table_for, file = output_for)
+    export_output(x = table_str, file = output_ann[[1]])
 
-    return(output[[1]])
+    return(
+      c(
+        "canopus" = output_can,
+        "formula" = output_for,
+        "structural" = output_ann[[1]]
+      )
+    )
   }

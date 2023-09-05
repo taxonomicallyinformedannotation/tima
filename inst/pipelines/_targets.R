@@ -1535,7 +1535,9 @@ list(
         ann_sir_pre <-
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
-            output = par_pre_ann_sir$files$annotations$prepared$structural,
+            output_ann = par_pre_ann_sir$files$annotations$prepared$structural,
+            output_can = par_pre_ann_sir$files$annotations$prepared$canopus,
+            output_for = par_pre_ann_sir$files$annotations$prepared$formula,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
@@ -1545,6 +1547,15 @@ list(
           )
       }
     ),
+    tar_file(name = ann_sir_pre_can, command = {
+      ann_sir_pre_can <- ann_sir_pre[[1]]
+    }),
+    tar_file(name = ann_sir_pre_for, command = {
+      ann_sir_pre_for <- ann_sir_pre[[2]]
+    }),
+    tar_file(name = ann_sir_pre_str, command = {
+      ann_sir_pre_str <- ann_sir_pre[[3]]
+    }),
     list()
   ),
   ## Features
@@ -1674,7 +1685,7 @@ list(
           ann_spe_exp_gnp_pre,
           ann_spe_exp_int_pre,
           ann_spe_is_pre,
-          ann_sir_pre,
+          ann_sir_pre_str,
           ann_ms1_pre_ann
         ),
         features = fea_pre,
