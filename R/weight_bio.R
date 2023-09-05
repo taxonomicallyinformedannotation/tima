@@ -659,7 +659,7 @@ weight_bio <-
       ) |>
       tidytable::left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
-      ## TODO TEMP
+      ## TODO Decide if using similarity score or something else
       tidytable::mutate(
         candidate_score_similarity =
           ifelse(
