@@ -63,7 +63,7 @@ files:
 
       #' List of prepared formula annotations. STRING
       formula: data/interim/annotations/example_formula_prepared.tsv.gz
-      
+
       #' List of prepared structural annotations. STRING
       structural:
         - data/interim/annotations/example_gnps_prepared.tsv.gz
