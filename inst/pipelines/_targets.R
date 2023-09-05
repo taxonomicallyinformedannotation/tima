@@ -1666,7 +1666,10 @@ list(
     command = {
       ann_fil <- filter_annotations(
         annotations = list(
+          ann_spe_exp_gnp_pre,
+          # ann_spe_exp_int_pre,
           ann_spe_is_pre,
+          ann_sir_pre_str,
           ann_ms1_pre_ann
         ),
         features = fea_pre,
@@ -1703,6 +1706,8 @@ list(
         library = lib_mer_key,
         str_stereo = lib_mer_str_stereo,
         annotations = ann_fil,
+        canopus = ann_sir_pre_can,
+        formula = ann_sir_pre_for,
         components = fea_com_pre,
         edges = fea_edg_pre,
         taxa = tax_pre,
@@ -1756,6 +1761,8 @@ list(
         library = lib_mer_key,
         str_stereo = lib_mer_str_stereo,
         annotations = ann_fil_crazy,
+        canopus = ann_sir_pre_can,
+        formula = ann_sir_pre_for,
         components = fea_com_pre,
         edges = fea_edg_pre,
         taxa = tax_pre,
