@@ -226,15 +226,26 @@ prepare_annotations_sirius <-
     table_can <- table |>
       tidytable::select(
         tidytable::contains("feature")
-      )
+      ) |>
+      tidytable::distinct()
+
     table_for <- table |>
       tidytable::select(
         colnames(formula_prepared)
-      )
+      ) |>
+      tidytable::select(
+        -candidate_structure_exact_mass,
+        -candidate_structure_error_mz
+      ) |>
+      tidytable::distinct()
+
     table_str <- table |>
       tidytable::select(
-        colnames(compound_prepared)
-      )
+        colnames(compound_prepared),
+        candidate_structure_exact_mass,
+        candidate_structure_error_mz
+      ) |>
+      tidytable::distinct()
 
     log_debug(x = "Exporting ...")
     export_params(step = "prepare_annotations_sirius")

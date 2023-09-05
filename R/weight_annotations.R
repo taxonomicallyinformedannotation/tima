@@ -4,6 +4,7 @@
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
+#' @include column_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
 #' @include export_output.R
@@ -15,6 +16,8 @@
 #' @param org_tax_ott File containing organisms taxonomy (OTT)
 #' @param str_stereo File containing structures stereo
 #' @param annotations Prepared annotations file
+#' @param canopus Prepared canopus file
+#' @param formula Prepared formula file
 #' @param components Prepared components file
 #' @param edges Prepared edges file
 #' @param taxa Prepared taxed features file
@@ -91,6 +94,8 @@ weight_annotations <- function(
     org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
     str_stereo = params$files$libraries$sop$merged$structures$stereo,
     annotations = params$files$annotations$filtered,
+    canopus = params$files$annotations$prepared$canopus,
+    formula = params$files$annotations$prepared$formula,
     components = params$files$networks$spectral$components$prepared,
     edges = params$files$networks$spectral$edges$prepared,
     taxa = params$files$taxa$prepared,
@@ -182,6 +187,22 @@ weight_annotations <- function(
       colClasses = "character"
     ))
 
+  log_debug(x = "... canopus")
+  canopus_table <-
+    tidytable::fread(
+      file = canopus,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+
+  log_debug(x = "... formula")
+  formula_table <-
+    tidytable::fread(
+      file = formula,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+
   log_debug(x = "... annotations")
   annotation_table <- lapply(
     X = annotations,
@@ -189,7 +210,20 @@ weight_annotations <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
-    tidytable::bind_rows() |>
+    tidytable::bind_rows()
+
+  features_table <- annotation_table |>
+    tidytable::distinct(feature_id, rt, mz)
+
+  log_debug(x = "Re-arranging annotations")
+  model <- columns_model()
+
+  annotation_table_1 <- annotation_table |>
+    tidytable::select(tidytable::any_of(c(
+      model$features_columns,
+      model$candidates_spectra_columns,
+      model$candidates_structures_columns
+    ))) |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
     tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
     tidytable::distinct(
@@ -198,9 +232,23 @@ weight_annotations <- function(
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
+  annotation_table_2 <- annotation_table |>
+    tidytable::select(
+      tidytable::any_of(c(
+        model$features_columns,
+        model$candidates_sirius_structural_columns,
+        model$candidates_structures_columns
+      )),
+      -candidate_structure_error_mz,
+      -candidate_structure_error_rt
+    ) |>
+    tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
+    tidytable::distinct()
 
-  features_table <- annotation_table |>
-    tidytable::distinct(feature_id, rt, mz)
+  annotation_table <- annotation_table_1 |>
+    tidytable::full_join(annotation_table_2) |>
+    tidytable::full_join(formula_table) |>
+    tidytable::full_join(canopus_table)
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
