@@ -267,7 +267,10 @@ weight_annotations <- function(
       na.strings = c("", "NA"),
       colClasses = "character"
     ))
-  rm(annotation_table)
+
+  rm(annotation_table,
+     annotation_table_1,
+     annotation_table_2)
 
   log_debug(x = "performing taxonomically informed scoring")
   results <- weight_bio() |>

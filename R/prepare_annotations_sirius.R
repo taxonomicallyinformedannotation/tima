@@ -2,6 +2,7 @@
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
+#' @include columns_model.R
 #' @include export_output.R
 #' @include export_params.R
 #' @include harmonize_names_sirius.R
@@ -223,28 +224,29 @@ prepare_annotations_sirius <-
         )
     }
     log_debug("Splitting SIRIUS results")
+    model <- columns_model()
+
     table_can <- table |>
-      tidytable::select(
-        tidytable::contains("feature")
-      ) |>
+      tidytable::select(tidytable::any_of(c(
+        model$features_columns,
+        model$features_calculated_columns
+      ))) |>
       tidytable::distinct()
 
     table_for <- table |>
-      tidytable::select(
-        colnames(formula_prepared)
-      ) |>
-      tidytable::select(
-        -candidate_structure_exact_mass,
-        -candidate_structure_error_mz
-      ) |>
+      tidytable::select(tidytable::any_of(c(
+        model$features_columns,
+        model$candidates_sirius_formula_columns
+      ))) |>
       tidytable::distinct()
 
     table_str <- table |>
-      tidytable::select(
-        colnames(compound_prepared),
-        candidate_structure_exact_mass,
-        candidate_structure_error_mz
-      ) |>
+      tidytable::select(tidytable::any_of(c(
+        model$features_columns,
+        model$candidates_structures_columns,
+        model$candidates_spectra_columns,
+        model$candidates_sirius_structural_columns
+      ))) |>
       tidytable::distinct()
 
     log_debug(x = "Exporting ...")
