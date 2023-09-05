@@ -41,40 +41,6 @@ clean_bio <-
         .keep_all = TRUE
       )
 
-    ## Loosing CANOPUS from SIRIUS
-    ## TODO improve
-    # log_debug("adding \"notAnnotated\" \n")
-    # df$candidate_structure_1_cla_kingdom
-    # [df["structure_inchikey_no_stereo"] == "notAnnotated"] <-
-    #   "notAnnotated"
-    # and so on ...
-
-    # log_debug("keeping clusters with at least 3 features  \n")
-    # df1 <- df |>
-    #   tidytable::filter(component_id != -1) |>
-    #   tidytable::group_by(component_id) |>
-    #   tidytable::distinct(feature_id,
-    #     structure_inchikey_no_stereo,
-    #     .keep_all = TRUE
-    #   ) |>
-    #   tidytable::add_count() |>
-    #   tidytable::ungroup() |>
-    #   tidytable::filter(n >= 3) |>
-    #   tidytable::select(-n)
-    #
-    # log_debug("keeping clusters with less than 3 features \n")
-    # df2 <- tidytable::full_join(
-    #   x = df |>
-    #     tidytable::filter(component_id == -1),
-    #   y = df |>
-    #     tidytable::group_by(component_id) |>
-    #     tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    #     tidytable::add_count() |>
-    #     tidytable::ungroup() |>
-    #     tidytable::filter(n <= 2) |>
-    #     tidytable::select(-n)
-    # )
-
     log_debug("calculating chemical consistency
               features with at least 2 neighbors ... \n")
 
@@ -439,9 +405,21 @@ clean_bio <-
         )
       )
 
+    log_debug("splitting already computed predictions \n")
+    df1 <- df |>
+      tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
+
+    df1b <- df1 |>
+      tidytable::select(-tidytable::contains("feature_pred_tax"))
+
+    df2 <- df |>
+      tidytable::select(-tidytable::contains("feature_pred_tax")) |>
+      tidytable::anti_join(df1) |>
+      tidytable::bind_rows(df1b)
+
     log_debug("joining all except -1 together \n")
-    annot_table_wei_bio_clean <-
-      tidytable::left_join(df,
+    annot_table_wei_bio_preclean <-
+      tidytable::left_join(df2,
         freq_cla_kin,
         by = stats::setNames(
           "feature_source",
@@ -603,9 +581,18 @@ clean_bio <-
           )
       )
 
+    log_debug("adding already computed predictions back \n")
+    annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
+      tidytable::anti_join(df1b) |>
+      tidytable::bind_rows(df1)
+
     rm(
       annot_table_wei_bio,
+      annot_table_wei_bio_preclean,
       df,
+      df1,
+      df1b,
+      df2,
       df3
     )
 
