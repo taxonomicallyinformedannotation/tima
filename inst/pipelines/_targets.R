@@ -2463,6 +2463,42 @@ list(
       }
     ),
     tar_target(
+      name = benchmark_def_pre_ann_sir,
+      command = {
+        benchmark_def_pre_ann_sir <- parse_yaml_params(
+          def = par_def_pre_ann_sir,
+          usr = par_def_pre_ann_sir
+        )
+      }
+    ),
+    tar_file(
+      name = benchmark_ann_sir_pre,
+      command = {
+        benchmark_ann_sir_pre <-
+          prepare_annotations_sirius(
+            input_directory = "doesNotExist4Now",
+            output_ann = "data/interim/benchmark/benchmark_ann_sir_pre.tsv.gz",
+            output_can = "data/interim/benchmark/benchmark_ann_sir_pre_can.tsv.gz",
+            output_for = "data/interim/benchmark/benchmark_ann_sir_pre_for.tsv.gz",
+            str_stereo = lib_mer_str_stereo,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc,
+            parameters = benchmark_def_pre_ann_sir
+          )
+      }
+    ),
+    tar_file(name = benchmark_ann_sir_pre_can, command = {
+      benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
+    }),
+    tar_file(name = benchmark_ann_sir_pre_for, command = {
+      benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
+    }),
+    tar_file(name = benchmark_ann_sir_pre_str, command = {
+      benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
+    }),
+    tar_target(
       name = benchmark_def_fil_ann,
       command = {
         benchmark_def_fil_ann <- parse_yaml_params(
@@ -2476,7 +2512,8 @@ list(
       command = {
         benchmark_ann_fil_spe_neg <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_neg
+            benchmark_ann_spe_is_pre_neg,
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
           rts = list(),
@@ -2492,7 +2529,8 @@ list(
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
           annotations = list(
             benchmark_ann_spe_is_pre_neg,
-            benchmark_ann_ms1_pre_neg[[1]]
+            benchmark_ann_ms1_pre_neg[[1]],
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
           rts = list(),
@@ -2508,7 +2546,8 @@ list(
       command = {
         benchmark_ann_fil_ms1_neg <- filter_annotations(
           annotations = list(
-            benchmark_ann_ms1_pre_neg[[1]]
+            benchmark_ann_ms1_pre_neg[[1]],
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
           rts = list(),
@@ -2523,7 +2562,8 @@ list(
       command = {
         benchmark_ann_fil_spe_pos <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_pos
+            benchmark_ann_spe_is_pre_pos,
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,
           rts = list(),
@@ -2539,7 +2579,8 @@ list(
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
           annotations = list(
             benchmark_ann_spe_is_pre_pos,
-            benchmark_ann_ms1_pre_pos[[1]]
+            benchmark_ann_ms1_pre_pos[[1]],
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,
           rts = list(),
@@ -2555,7 +2596,8 @@ list(
       command = {
         benchmark_ann_fil_ms1_pos <- filter_annotations(
           annotations = list(
-            benchmark_ann_ms1_pre_pos[[1]]
+            benchmark_ann_ms1_pre_pos[[1]],
+            benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,
           rts = list(),
@@ -2578,6 +2620,8 @@ list(
       name = benchmark_wei_par,
       command = {
         benchmark_wei_par <- list(
+          canopus = benchmark_ann_sir_pre_can,
+          formula = benchmark_ann_sir_pre_for,
           library = lib_mer_key,
           str_stereo = lib_mer_str_stereo,
           candidates_final = 500,

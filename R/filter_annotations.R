@@ -100,7 +100,7 @@ filter_annotations <-
       crayon::green(nrow(features_annotated_table_1) -
         nrow(features_annotated_table_2)),
       "Candidates were removed based on retention time."
-      )
+    )
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
