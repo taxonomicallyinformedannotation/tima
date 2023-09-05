@@ -96,11 +96,22 @@ filter_annotations <-
         tidytable::mutate(candidate_structure_error_rt = NA)
     }
 
-    ## TODO print how many were filtered
+    log_debug(
+      crayon::green(nrow(features_annotated_table_1) -
+        nrow(features_annotated_table_2)),
+      "Candidates were removed based on retention time."
+      )
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
       tidytable::left_join(features_annotated_table_2)
+
+    rm(
+      features_table,
+      annotation_table,
+      features_annotated_table_1,
+      features_annotated_table_2
+    )
 
     export_params(step = "filter_annotations")
     export_output(
