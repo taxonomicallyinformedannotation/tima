@@ -3,9 +3,11 @@
 files:
   #' Annotations files.
   annotations:
-    #' List of prepared annotations. STRING
+    #' List of prepared annotations.
     prepared:
-      - data/interim/annotations/example_ms1_prepared.tsv.gz
+      #' List of prepared structural annotations. STRING
+      structural:
+        - data/interim/annotations/example_ms1_prepared.tsv.gz
 
   #' Features files.
   features:

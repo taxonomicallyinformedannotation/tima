@@ -449,7 +449,7 @@ testthat::test_that("Whole process", {
   arguments$fil_pat <<- "x"
   arguments$fil_ann_raw_spe <<- "x"
   arguments$fil_ann_raw_sir <<- "x"
-  arguments$fil_ann_pre <<- "x"
+  arguments$fil_ann_pre_str <<- "x"
   arguments$fil_ann_fil <<- "x"
   arguments$fil_ann_pro <<- "x"
   arguments$fil_fea_raw <<- "x"

@@ -8,9 +8,17 @@ files:
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius
 
-    #' List of prepared annotations. STRING
+    #' List of prepared annotations.
     prepared:
-      - data/interim/annotations/example_sirius_prepared.tsv.gz
+      #' List of prepared canopus annotations. STRING
+      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+
+      #' List of prepared formula annotations. STRING
+      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+
+      #' List of prepared structural annotations. STRING
+      structural:
+        - data/interim/annotations/example_sirius_prepared.tsv.gz
 
   #' Libraries files.
   libraries:

@@ -6,7 +6,7 @@
 \usage{
 prepare_annotations_spectra(
   input = params$files$annotations$raw$spectral,
-  output = params$files$annotations$prepared,
+  output = params$files$annotations$prepared$structural,
   str_stereo = params$files$libraries$sop$merged$structures$stereo,
   str_met = params$files$libraries$sop$merged$structures$metadata,
   str_nam = params$files$libraries$sop$merged$structures$names,

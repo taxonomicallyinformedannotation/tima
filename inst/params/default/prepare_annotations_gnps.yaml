@@ -9,9 +9,11 @@ files:
       spectral:
         - data/interim/annotations/example_gnps.tsv
 
-    #' List of prepared annotations. STRING
+    #' List of prepared annotations.
     prepared:
-      - data/interim/annotations/example_gnps_prepared.tsv.gz
+      #' List of prepared structural annotations. STRING
+      structural:
+        - data/interim/annotations/example_gnps_prepared.tsv.gz
 
   #' Libraries files.
   libraries:

@@ -1331,7 +1331,7 @@ list(
             annotate_masses(
               features = fea_pre,
               library = lib_mer_key,
-              output_annotations = par_ann_mas$files$annotations$prepared,
+              output_annotations = par_ann_mas$files$annotations$prepared$structural,
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
               name_source = par_ann_mas$names$source,
               name_target = par_ann_mas$names$target,
@@ -1380,7 +1380,7 @@ list(
             ann_spe_exp_gnp_pre <-
               prepare_annotations_gnps(
                 input = gnps_annotations,
-                output = par_pre_ann_gnp$files$annotations$prepared,
+                output = par_pre_ann_gnp$files$annotations$prepared$structural,
                 str_stereo = lib_mer_str_stereo,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
@@ -1446,7 +1446,7 @@ list(
                 output = gsub(
                   pattern = "_prepared.tsv.gz",
                   replacement = "_exp_rt_prepared.tsv.gz",
-                  x = par_pre_ann_spe$files$annotations$prepared,
+                  x = par_pre_ann_spe$files$annotations$prepared$structural,
                   fixed = TRUE
                 ),
                 str_stereo = lib_mer_str_stereo,
@@ -1516,7 +1516,7 @@ list(
                 ## TODO add is hmdb
                 ann_spe_is_lot_pos
               ),
-              output = par_pre_ann_spe$files$annotations$prepared,
+              output = par_pre_ann_spe$files$annotations$prepared$structural,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
@@ -1535,7 +1535,7 @@ list(
         ann_sir_pre <-
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
-            output = par_pre_ann_sir$files$annotations$prepared,
+            output = par_pre_ann_sir$files$annotations$prepared$structural,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
