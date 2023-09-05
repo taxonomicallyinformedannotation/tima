@@ -11,6 +11,7 @@
 * Refactored adducts, clusters and neutral losses
 * Refactored biological and chemical score
 * Refactored RT matching (#76)
+* Refactored Sirius scores (#92)
 * Multiple Shiny fixes
 * Multiple fixes (#71, #81)
 
