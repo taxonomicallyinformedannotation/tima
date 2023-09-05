@@ -40,7 +40,7 @@
 #' @examples NULL
 annotate_masses <-
   function(features = params$files$features$prepared,
-           output_annotations = params$files$annotations$prepared,
+           output_annotations = params$files$annotations$prepared$structural,
            output_edges = params$files$networks$spectral$edges$raw,
            name_source = params$names$source,
            name_target = params$names$target,

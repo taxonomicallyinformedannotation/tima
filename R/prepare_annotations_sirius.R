@@ -25,7 +25,7 @@
 #' @examples NULL
 prepare_annotations_sirius <-
   function(input_directory = params$files$annotations$raw$sirius,
-           output = params$files$annotations$prepared,
+           output = params$files$annotations$prepared$structural,
            str_stereo = params$files$libraries$sop$merged$structures$stereo,
            str_met = params$files$libraries$sop$merged$structures$metadata,
            str_nam = params$files$libraries$sop$merged$structures$names,

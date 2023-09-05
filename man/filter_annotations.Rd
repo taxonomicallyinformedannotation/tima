@@ -5,7 +5,7 @@
 \title{Filter annotations}
 \usage{
 filter_annotations(
-  annotations = params$files$annotations$prepared,
+  annotations = params$files$annotations$prepared$structural,
   features = params$files$features$prepared,
   rts = params$files$libraries$temporal$prepared,
   output = params$files$annotations$filtered,

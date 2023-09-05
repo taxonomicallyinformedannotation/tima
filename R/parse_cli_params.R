@@ -57,8 +57,8 @@ parse_cli_params <- function() {
     if (!is.null(arguments$fil_ann_fil)) {
       params$files$annotations$filtered <- as.character(arguments$fil_ann_fil)
     }
-    if (!is.null(arguments$fil_ann_pre)) {
-      params$files$annotations$prepared <- as.character(arguments$fil_ann_pre)
+    if (!is.null(arguments$fil_ann_pre_str)) {
+      params$files$annotations$prepared$structural <- as.character(arguments$fil_ann_pre_str)
     }
     if (!is.null(arguments$fil_ann_pro)) {
       params$files$annotations$processed <- as.character(arguments$fil_ann_pro)

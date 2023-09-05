@@ -2,10 +2,10 @@ You can use this script with the following example:
   Rscript inst/scripts/annotate_masses.R
 
 Usage:
-  annotate_masses.R [--fil-ann-pre=<fil-ann-pre>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-clu-neg=<ms-clu-neg>] [--ms-clu-pos=<ms-clu-pos>] [--ms-pol=<ms-pol>] [--ms-thr-ms1-int=<ms-thr-ms1-int>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--force=<force>]
+  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-clu-neg=<ms-clu-neg>] [--ms-clu-pos=<ms-clu-pos>] [--ms-pol=<ms-pol>] [--ms-thr-ms1-int=<ms-thr-ms1-int>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--force=<force>]
 
 Arguments:
-  fil-ann-pre                List of prepared annotations. STRING
+  fil-ann-pre-str            List of prepared structural annotations. STRING
   fil-fea-pre                Prepared features file. STRING
   fil-lib-add-neg            Negative adducts. STRING
   fil-lib-add-pos            Positive adducts. STRING

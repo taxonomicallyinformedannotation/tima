@@ -15,7 +15,7 @@
 #'
 #' @examples NULL
 filter_annotations <-
-  function(annotations = params$files$annotations$prepared,
+  function(annotations = params$files$annotations$prepared$structural,
            features = params$files$features$prepared,
            rts = params$files$libraries$temporal$prepared,
            output = params$files$annotations$filtered,
