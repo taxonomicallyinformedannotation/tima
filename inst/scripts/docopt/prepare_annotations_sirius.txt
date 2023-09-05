@@ -1,11 +1,13 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-str data/interim/annotations/example_sirius_prepared.tsv.gz
+  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-can data/interim/annotations/example_canopus_prepared.tsv.gz --fil-ann-pre-for data/interim/annotations/example_formula_prepared.tsv.gz --fil-ann-pre-str data/interim/annotations/example_sirius_prepared.tsv.gz
 
 Usage:
-  prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre-str=<fil-ann-pre-str>]
+  prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pre-str=<fil-ann-pre-str>]
 
 Arguments:
   fil-ann-raw-sir            Directory containing the sirius results. STRING
+  fil-ann-pre-can            List of prepared canopus annotations. STRING
+  fil-ann-pre-for            List of prepared formula annotations. STRING
   fil-ann-pre-str            List of prepared structural annotations. STRING
   
 Options:
