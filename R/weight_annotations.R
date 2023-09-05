@@ -4,7 +4,7 @@
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
-#' @include column_model.R
+#' @include columns_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
 #' @include export_output.R

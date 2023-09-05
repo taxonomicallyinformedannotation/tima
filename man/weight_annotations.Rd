@@ -9,6 +9,8 @@ weight_annotations(
   org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
   str_stereo = params$files$libraries$sop$merged$structures$stereo,
   annotations = params$files$annotations$filtered,
+  canopus = params$files$annotations$prepared$canopus,
+  formula = params$files$annotations$prepared$formula,
   components = params$files$networks$spectral$components$prepared,
   edges = params$files$networks$spectral$edges$prepared,
   taxa = params$files$taxa$prepared,
@@ -59,6 +61,10 @@ weight_annotations(
 \item{str_stereo}{File containing structures stereo}
 
 \item{annotations}{Prepared annotations file}
+
+\item{canopus}{Prepared canopus file}
+
+\item{formula}{Prepared formula file}
 
 \item{components}{Prepared components file}
 
