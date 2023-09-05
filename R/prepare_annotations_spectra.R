@@ -50,6 +50,7 @@ prepare_annotations_spectra <-
       tidytable::filter(!is.na(feature_id)) |>
       tidytable::distinct(
         feature_id,
+        candidate_spectrum_entropy,
         candidate_structure_error_mz,
         candidate_structure_name,
         candidate_structure_inchikey_no_stereo,
