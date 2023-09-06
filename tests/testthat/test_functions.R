@@ -305,6 +305,7 @@ testthat::test_that("Whole process", {
   params <- get_params(step = step)
   ### Negative
   annotate_spectra(
+    library = list("data/interim/libraries/spectra/exp/internal_neg.rds"),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
@@ -312,6 +313,7 @@ testthat::test_that("Whole process", {
   )
   ### Appox
   annotate_spectra(
+    library = list("data/interim/libraries/spectra/exp/internal_pos.rds"),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
@@ -319,6 +321,7 @@ testthat::test_that("Whole process", {
   )
   ### Positive
   annotate_spectra(
+    library = list("data/interim/libraries/spectra/exp/internal_pos.rds"),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001
