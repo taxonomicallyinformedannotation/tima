@@ -14,8 +14,7 @@ testthat::test_that("Whole process", {
 
   ## Prepare parameters
   paths <- parse_yaml_paths()
-  step <- "prepare_params"
-  params <- get_params(step = step)
+  params <- get_params(step = "prepare_params")
   ## Prepare config for a single step only
   prepare_params(step = "weight_annotations")
   ## For all steps
@@ -154,8 +153,6 @@ testthat::test_that("Whole process", {
 
   ## Prepare libraries
   ### Spectra
-  step <- "prepare_libraries_spectra"
-  params <- get_params(step = step)
   #### LOTUS
   col_args <- list(
     col_ce = NULL,
@@ -218,8 +215,6 @@ testthat::test_that("Whole process", {
   # prepare_mona()
 
   ### Retention time
-  step <- "prepare_libraries_rt"
-  params <- get_params(step = step)
   prepare_libraries_rt(
     mgf_exp = list(
       "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
@@ -236,34 +231,24 @@ testthat::test_that("Whole process", {
 
   ### SOP
   #### Closed
-  step <- "prepare_libraries_sop_closed"
-  params <- get_params(step = step)
   ## To do as if there was an input
   prepare_libraries_sop_closed(input = paths$data$source$libraries$sop$lotus)
   ## When there is no input
   prepare_libraries_sop_closed()
 
   #### ECMDB
-  step <- "prepare_libraries_sop_ecmdb"
-  params <- get_params(step = step)
   ## To do as if there was an input
   prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
   ## When there is no input
   prepare_libraries_sop_ecmdb()
 
   #### HMDB
-  # step <- "prepare_libraries_sop_hmdb"
-  # params <- get_params(step = step)
   # prepare_libraries_sop_hmdb()
 
   #### LOTUS
-  step <- "prepare_libraries_sop_lotus"
-  params <- get_params(step = step)
   prepare_libraries_sop_lotus()
 
   #### MERGED
-  step <- "prepare_libraries_sop_merged"
-  params <- get_params(step = step)
   prepare_libraries_sop_merged(
     filter = TRUE,
     level = "family",
@@ -273,18 +258,12 @@ testthat::test_that("Whole process", {
   prepare_libraries_sop_merged()
 
   ### Adducts
-  step <- "prepare_libraries_adducts"
-  params <- get_params(step = step)
   prepare_libraries_adducts()
 
   ### Features
-  step <- "prepare_features_tables"
-  params <- get_params(step = step)
   prepare_features_tables()
 
   ## Performing MS1 annotation
-  step <- "annotate_masses"
-  params <- get_params(step = step)
   ### Negative
   annotate_masses(
     ## shallow tolerance to speed up tests
@@ -301,8 +280,6 @@ testthat::test_that("Whole process", {
   )
 
   ## Performing MS2 annotation
-  step <- "annotate_spectra"
-  params <- get_params(step = step)
   ### Negative
   annotate_spectra(
     library = list("data/interim/libraries/spectra/exp/internal_neg.rds"),
@@ -328,8 +305,6 @@ testthat::test_that("Whole process", {
   )
 
   ## Create MS2 based edges
-  step <- "create_edges_spectra"
-  params <- get_params(step = step)
   create_edges_spectra(
     ## shallow tolerance to speed up tests
     ppm = 1,
@@ -344,15 +319,11 @@ testthat::test_that("Whole process", {
   )
 
   ### GNPS results
-  step <- "prepare_annotations_gnps"
-  params <- get_params(step = step)
   prepare_annotations_gnps(input = "fileDoesNotExist")
   prepare_annotations_gnps(input = NULL)
   prepare_annotations_gnps()
 
   ### SIRIUS results
-  step <- "prepare_annotations_sirius"
-  params <- get_params(step = step)
   ## To do as if there was no input
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
@@ -362,28 +333,18 @@ testthat::test_that("Whole process", {
   )
 
   ### ISDB results
-  step <- "prepare_annotations_spectra"
-  params <- get_params(step = step)
   prepare_annotations_spectra()
 
   ### Edges
-  step <- "prepare_features_edges"
-  params <- get_params(step = step)
   prepare_features_edges()
 
   ## Create components
-  step <- "create_components"
-  params <- get_params(step = step)
   create_components()
 
   ### Features components
-  step <- "prepare_features_components"
-  params <- get_params(step = step)
   prepare_features_components()
 
   ### Taxa
-  step <- "prepare_taxa"
-  params <- get_params(step = step)
   ## Forcing all features to a single source organism
   prepare_taxa(taxon = "Homo sapiens")
   ## When empty
@@ -418,15 +379,11 @@ testthat::test_that("Whole process", {
   )
 
   ## Filter annotations
-  step <- "filter_annotations"
-  params <- get_params(step = step)
   ## case when no RT lib
   filter_annotations(rts = list())
   filter_annotations()
 
   ## Perform TIMA
-  step <- "weight_annotations"
-  params <- get_params(step = step)
   ### Normal
   weight_annotations(
     candidates_final = 1,
