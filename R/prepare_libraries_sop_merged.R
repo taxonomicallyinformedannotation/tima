@@ -6,8 +6,6 @@
 #' @details It can be restricted to specific taxa to have
 #'    more biologically meaningful annotation.
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include get_organism_taxonomy_ott.R
 #' @include split_tables_sop.R
 #'
@@ -87,7 +85,7 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Loading and concatenating prepared libraries")
-    params <<- parameters
+    params <- parameters
     libraries <- files |>
       lapply(
         FUN = tidytable::fread,

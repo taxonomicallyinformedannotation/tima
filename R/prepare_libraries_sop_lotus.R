@@ -2,8 +2,6 @@
 #'
 #' @description This function prepares the LOTUS structure-organism pairs
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include round_reals.R
 #'
 #' @param input Input file

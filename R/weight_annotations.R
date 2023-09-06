@@ -7,8 +7,6 @@
 #' @include columns_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
-#' @include export_output.R
-#' @include export_params.R
 #' @include weight_bio.R
 #' @include weight_chemo.R
 #'
@@ -149,9 +147,8 @@ weight_annotations <- function(
     "Condition must be 'OR' or 'AND'." =
       minimal_ms1_condition %in% c("OR", "AND")
   )
-
-  paths <<- parse_yaml_paths()
-  params <<- parameters
+  paths <- parse_yaml_paths()
+  params <- parameters
 
   log_debug(x = "Loading files ...")
 

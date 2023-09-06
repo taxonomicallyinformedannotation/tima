@@ -4,6 +4,7 @@
 #'    if it doesn't exist and exports the data frame to a tab-delimited file.
 #'
 #' @include create_dir.R
+#'
 #' @param x data frame to be exported
 #' @param file path to the output file
 #'

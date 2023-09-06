@@ -20,7 +20,7 @@ create_components <-
         rep(TRUE, length(unlist(input))) ==
           lapply(X = unlist(input), FUN = file.exists)
     )
-    params <<- parameters
+    params <- parameters
 
     edges <- input |>
       lapply(

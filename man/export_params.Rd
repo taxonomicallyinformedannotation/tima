@@ -5,7 +5,7 @@
 \title{Export parameters}
 \usage{
 export_params(
-  parameters = params,
+  parameters = get("parameters", envir = parent.frame()),
   directory = paths$data$interim$params$path,
   step
 )

@@ -10,8 +10,6 @@
 #'    according to their relative intensities among the samples.
 #'
 #' @include clean_collapse.R
-#' @include export_output.R
-#' @include export_params.R
 #' @include get_organism_taxonomy_ott.R
 #'
 #' @param input File containing your features intensities
@@ -60,8 +58,8 @@ prepare_taxa <-
       "Your top k organisms parameter should be lower or equal to 5" =
         top_k <= 5
     )
+    params <- parameters
 
-    params <<- parameters
 
     log_debug(x = "Loading feature table")
     feature_table_0 <- tidytable::fread(
@@ -85,7 +83,7 @@ prepare_taxa <-
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
       tidytable::select(
-        tidytable::all_of(name_features),
+        tidytable::all_of(c(name_features)),
         tidytable::matches(" Peak area"),
         tidytable::matches("quant_"),
       ) |>

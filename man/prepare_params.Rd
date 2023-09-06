@@ -14,6 +14,7 @@ prepare_params(
   taxon = params$organisms$taxon,
   summarise = params$options$summarise,
   parameters = params,
+  paths = parse_yaml_paths(),
   step = NA
 )
 }

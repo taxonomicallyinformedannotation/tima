@@ -2,9 +2,6 @@
 #'
 #' @description This function prepares features
 #'
-#' @include export_output.R
-#' @include export_params.R
-#'
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
 #' @param name_features Name of the features column in the features data
@@ -24,7 +21,7 @@ prepare_features_tables <-
            name_rt = params$names$rt,
            name_mz = params$names$precursor,
            parameters = params) {
-    params <<- parameters
+    params <- parameters
     stopifnot("Your features file does not exist" = file.exists(features))
 
     log_debug("Preparing features table")

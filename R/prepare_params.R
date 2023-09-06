@@ -31,6 +31,7 @@ prepare_params <- function(filename = params$files$pattern,
                            taxon = params$organisms$taxon,
                            summarise = params$options$summarise,
                            parameters = params,
+                           paths = parse_yaml_paths(),
                            step = NA) {
   ## TODO 'step' actually not taken into account
 

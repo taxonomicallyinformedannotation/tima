@@ -22,28 +22,28 @@ get_params <- function(step) {
 
   stopifnot("Your step does not exist." = step %in% steps)
 
-  doc_path <<-
+  doc_path <-
     file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
-  default_path <<-
+  default_path <-
     if (step != "prepare_params") {
       file.path(paths$params$default$path, paste0(step, ".yaml"))
     } else {
       file.path(paths$params$prepare_params)
     }
 
-  user_path <<-
+  user_path <-
     file.path(paths$params$user$path, paste0(step, ".yaml"))
 
-  doc <<- readChar(
+  doc <- readChar(
     con = doc_path,
     nchars = file.info(doc_path)$size
   )
 
   arguments <<- docopt::docopt(doc = doc, version = paths$version)
 
-  params <<- parse_yaml_params()
+  params <- parse_yaml_params()
 
-  params <<- parse_cli_params()
+  params <- parse_cli_params()
 
   return(params)
 }

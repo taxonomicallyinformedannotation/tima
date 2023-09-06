@@ -37,7 +37,7 @@ create_edges_spectra <- function(
   stopifnot("Your input file does not exist." = file.exists(input))
   ## Not checking for ppm and Da limits, everyone is free.
 
-  params <<- parameters
+  params <- parameters
 
   log_debug("Loading spectra...")
   spectra <- input |>
