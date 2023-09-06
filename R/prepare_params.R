@@ -14,7 +14,6 @@
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
 #' @param summarise Summarise results to one row per feature. BOOLEAN
-#' @param paths Paths
 #' @param step Step
 #'
 #' @return NULL
@@ -30,8 +29,6 @@ prepare_params <- function(filename = get_params(step = "prepare_params")$files$
                            ms_mode = get_params(step = "prepare_params")$ms$polarity,
                            taxon = get_params(step = "prepare_params")$organisms$taxon,
                            summarise = get_params(step = "prepare_params")$options$summarise,
-                           parameters = get_params(step = "prepare_params"),
-                           paths = parse_yaml_paths(),
                            step = NA) {
   ## TODO 'step' actually not taken into account
   params <- parameters

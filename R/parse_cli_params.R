@@ -2,6 +2,8 @@
 #'
 #' @description This function parses command line parameters
 #'
+#' @param parameters Parameters
+#'
 #' @return NULL
 #'
 #' @export

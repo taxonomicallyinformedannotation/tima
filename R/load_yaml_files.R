@@ -1,7 +1,9 @@
 #' @title Load yaml files
 #'
 #' @description This function load yaml files
-
+#'
+#' @param paths Paths
+#'
 #' @return NULL
 #'
 #' @export

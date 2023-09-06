@@ -6,6 +6,9 @@
 \usage{
 parse_cli_params(parameters)
 }
+\arguments{
+\item{parameters}{Parameters}
+}
 \description{
 This function parses command line parameters
 }

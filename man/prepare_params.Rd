@@ -13,8 +13,6 @@ prepare_params(
   ms_mode = get_params(step = "prepare_params")$ms$polarity,
   taxon = get_params(step = "prepare_params")$organisms$taxon,
   summarise = get_params(step = "prepare_params")$options$summarise,
-  parameters = get_params(step = "prepare_params"),
-  paths = parse_yaml_paths(),
   step = NA
 )
 }
@@ -34,8 +32,6 @@ prepare_params(
 \item{taxon}{Name of a taxon you want to enforce}
 
 \item{summarise}{Summarise results to one row per feature. BOOLEAN}
-
-\item{paths}{Paths}
 
 \item{step}{Step}
 }
