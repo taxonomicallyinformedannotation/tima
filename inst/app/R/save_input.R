@@ -1,18 +1,13 @@
-utils::globalVariables(
-  c(
-    "paths",
-    "paths_data_source"
-  )
-)
-
 # save the results to a file
 save_input <- function(input) {
   setwd("../../")
 
-  paths <<- timaR::parse_yaml_paths()
-  paths_data_source <<- paths$data$source$path
+  paths_data_source <- timaR::parse_yaml_paths()$data$source$path
 
-  timaR::load_yaml_files()
+  list <- timaR::load_yaml_files()
+  yamls_params <- list$yaml_params
+  yaml_files <- list$yaml_files
+  yaml_names <- list$yaml_names
 
   ## Params occurring more than once
   ## This allows to keep files correctly placed in `data/source` clean

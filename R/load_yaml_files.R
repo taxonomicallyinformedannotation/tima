@@ -48,5 +48,11 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
 
   yamls_params <- yamls_default
 
-  return(list(yamls_params, yaml_files, yaml_names))
+  return(
+    list(
+      "yamls_params" = yamls_params,
+      "yaml_files" = yaml_files,
+      "yaml_names" = yaml_names
+    )
+  )
 }
