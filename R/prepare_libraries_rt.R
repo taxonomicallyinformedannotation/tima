@@ -16,7 +16,6 @@
 #' @param name_rt Name of the retention time in file
 #' @param name_smiles Name of the SMILES in file
 #' @param unit_rt Unit of the retention time. Must be "seconds" or "minutes"
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -24,20 +23,19 @@
 #'
 #' @examples NULL
 prepare_libraries_rt <-
-  function(mgf_exp = params$files$libraries$spectral$exp,
-           mgf_is = params$files$libraries$spectral$is,
-           temp_exp = params$files$libraries$temporal$exp,
-           temp_is = params$files$libraries$temporal$is,
-           output_rt = params$files$libraries$temporal$prepared,
-           output_sop = params$files$libraries$sop$prepared,
-           col_ik = params$names$mgf$inchikey,
-           col_rt = params$names$mgf$retention_time,
-           col_sm = params$names$mgf$smiles,
-           name_inchikey = params$names$inchikey,
-           name_rt = params$names$rt,
-           name_smiles = params$names$smiles,
-           unit_rt = params$units$rt,
-           parameters = params) {
+  function(mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$exp,
+           mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$is,
+           temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp,
+           temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is,
+           output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
+           output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared,
+           col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
+           col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
+           col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
+           name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
+           name_rt = get_params(step = "prepare_libraries_rt")$names$rt,
+           name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
+           unit_rt = get_params(step = "prepare_libraries_rt")$units$rt) {
     ## default transforms from `Spectra`
     if (col_rt == "RTINSECONDS") {
       col_rt <- "rtime"
@@ -297,7 +295,7 @@ prepare_libraries_rt <-
         type = NA_character_
       )
     }
-    export_params(step = "prepare_libraries_rt")
+    export_params(parameters = get_params(step = "prepare_libraries_rt"), step = "prepare_libraries_rt")
     export_output(x = rts, file = output_rt)
     export_output(x = sop, file = output_sop)
     return(

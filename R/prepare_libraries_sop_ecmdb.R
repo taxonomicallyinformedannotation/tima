@@ -4,7 +4,6 @@
 #'
 #' @param input Input file
 #' @param output Output file
-#' @param parameters params
 #'
 #' @return NULL
 #'
@@ -12,9 +11,8 @@
 #'
 #' @examples NULL
 prepare_libraries_sop_ecmdb <-
-  function(input = params$files$libraries$sop$raw$ecmdb,
-           output = params$files$libraries$sop$prepared,
-           parameters = params) {
+  function(input = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$raw$ecmdb,
+           output = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared) {
     if (file.exists(input)) {
       log_debug(x = "Loading ECMDB resources")
 
@@ -91,7 +89,7 @@ prepare_libraries_sop_ecmdb <-
     }
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_libraries_sop_closed")
+    export_params(parameters = get_params(step = "prepare_libraries_sop_ecmdb"), step = "prepare_libraries_sop_closed")
     export_output(x = ecmdb_prepared, file = output)
     return(output)
   }

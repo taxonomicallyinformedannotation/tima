@@ -6,15 +6,15 @@
 \usage{
 get_gnps_tables(
   gnps_job_id,
-  gnps_job_example = paths$gnps$example,
+  gnps_job_example = parse_yaml_paths()$gnps$example,
   filename,
   workflow = "fbmn",
   path_features,
   path_metadata,
   path_spectra,
-  path_source = paths$data$source$path,
-  path_interim_a = paths$data$interim$annotations$path,
-  path_interim_f = paths$data$interim$features$path
+  path_source = parse_yaml_paths()$data$source$path,
+  path_interim_a = parse_yaml_paths()$data$interim$annotations$path,
+  path_interim_f = parse_yaml_paths()$data$interim$features$path
 )
 }
 \arguments{

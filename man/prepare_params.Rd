@@ -5,15 +5,15 @@
 \title{Prepare params}
 \usage{
 prepare_params(
-  filename = params$files$pattern,
-  features = params$files$features$raw,
-  spectra = params$files$spectral$raw,
-  gnps_job_id = params$gnps$id,
-  gnps_example_id = paths$gnps$example,
-  ms_mode = params$ms$polarity,
-  taxon = params$organisms$taxon,
-  summarise = params$options$summarise,
-  parameters = params,
+  filename = get_params(step = "prepare_params")$files$pattern,
+  features = get_params(step = "prepare_params")$files$features$raw,
+  spectra = get_params(step = "prepare_params")$files$spectral$raw,
+  gnps_job_id = get_params(step = "prepare_params")$gnps$id,
+  gnps_example_id = parse_yaml_paths()$gnps$example,
+  ms_mode = get_params(step = "prepare_params")$ms$polarity,
+  taxon = get_params(step = "prepare_params")$organisms$taxon,
+  summarise = get_params(step = "prepare_params")$options$summarise,
+  parameters = get_params(step = "prepare_params"),
   paths = parse_yaml_paths(),
   step = NA
 )
@@ -35,7 +35,7 @@ prepare_params(
 
 \item{summarise}{Summarise results to one row per feature. BOOLEAN}
 
-\item{parameters}{Params}
+\item{paths}{Paths}
 
 \item{step}{Step}
 }

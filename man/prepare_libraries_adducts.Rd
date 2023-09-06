@@ -5,13 +5,16 @@
 \title{Prepare libraries of adducts}
 \usage{
 prepare_libraries_adducts(
-  str_met = params$files$libraries$sop$merged$structures$metadata,
+  str_met = get_params(step =
+    "prepare_libraries_adducts")$files$libraries$sop$merged$structures$metadata,
   adducts_masses = system.file("extdata", "adducts.tsv", package = "timaR"),
-  adducts_output_path = paths$data$interim$libraries$adducts$path,
-  output_name = params$files$libraries$adducts$prepared,
-  masses_pos_output_path = params$files$libraries$adducts$pos,
-  masses_neg_output_path = params$files$libraries$adducts$neg,
-  parameters = params
+  adducts_output_path = parse_yaml_paths()$data$interim$libraries$adducts$path,
+  output_name = get_params(step =
+    "prepare_libraries_adducts")$files$libraries$adducts$prepared,
+  masses_pos_output_path = get_params(step =
+    "prepare_libraries_adducts")$files$libraries$adducts$pos,
+  masses_neg_output_path = get_params(step =
+    "prepare_libraries_adducts")$files$libraries$adducts$neg
 )
 }
 \arguments{
@@ -26,8 +29,6 @@ prepare_libraries_adducts(
 \item{masses_pos_output_path}{Path where pos adducts masses will be saved}
 
 \item{masses_neg_output_path}{Path where neg adducts masses will be saved}
-
-\item{parameters}{Parameters}
 }
 \description{
 This function prepares adducts for further use

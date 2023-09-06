@@ -11,7 +11,6 @@
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
-#' @param parameters Parameters
 #'
 #' @return NULL
 #'
@@ -19,16 +18,15 @@
 #'
 #' @examples NULL
 prepare_annotations_gnps <-
-  function(input = params$files$annotations$raw$spectral,
-           output = params$files$annotations$prepared$structural,
-           str_stereo = params$files$libraries$sop$merged$structures$stereo,
-           str_met = params$files$libraries$sop$merged$structures$metadata,
-           str_nam = params$files$libraries$sop$merged$structures$names,
+  function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral,
+           output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural,
+           str_stereo = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$stereo,
+           str_met = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$metadata,
+           str_nam = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$names,
            str_tax_cla =
-             params$files$libraries$sop$merged$structures$taxonomies$cla,
+             get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc =
-             params$files$libraries$sop$merged$structures$taxonomies$npc,
-           parameters = params) {
+             get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
     }
@@ -83,7 +81,7 @@ prepare_annotations_gnps <-
       table <- fake_annotations_columns()
     }
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_annotations_gnps")
+    export_params(parameters = get_params(step = "prepare_annotations_gnps"), step = "prepare_annotations_gnps")
     export_output(x = table, file = output[[1]])
     return(output[[1]])
   }

@@ -17,7 +17,6 @@
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param qutoff Intensity under which ms2 fragments will be removed.
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -25,15 +24,14 @@
 #'
 #' @examples NULL
 create_edges_spectra <- function(
-    input = params$files$spectral$raw,
-    output = params$files$networks$spectral$edges$raw,
-    name_source = params$names$source,
-    name_target = params$names$target,
-    threshold = params$annotations$thresholds$ms2$similarity,
-    ppm = params$ms$tolerances$mass$ppm$ms2,
-    dalton = params$ms$tolerances$mass$dalton$ms2,
-    qutoff = params$ms$thresholds$ms2$intensity,
-    parameters = params) {
+    input = get_params(step = "create_edges_spectra")$files$spectral$raw,
+    output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
+    name_source = get_params(step = "create_edges_spectra")$names$source,
+    name_target = get_params(step = "create_edges_spectra")$names$target,
+    threshold = get_params(step = "create_edges_spectra")$annotations$thresholds$ms2$similarity,
+    ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
+    dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
+    qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity) {
   stopifnot("Your input file does not exist." = file.exists(input))
   ## Not checking for ppm and Da limits, everyone is free.
 
@@ -137,7 +135,7 @@ create_edges_spectra <- function(
     )
   }
 
-  export_params(step = "create_edges_spectra")
+  export_params(parameters = get_params(step = "create_edges_spectra"), step = "create_edges_spectra")
   export_output(x = edges, file = output[[1]])
 
   return(output[[1]])

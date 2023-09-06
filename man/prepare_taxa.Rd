@@ -5,17 +5,17 @@
 \title{Prepare taxa}
 \usage{
 prepare_taxa(
-  input = params$files$features$raw,
-  extension = params$names$extension,
-  name_features = params$names$features,
-  name_filename = params$names$filename,
-  colname = params$names$taxon,
-  metadata = params$files$taxa$raw,
-  top_k = params$organisms$candidates,
-  org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output = params$files$taxa$prepared,
-  taxon = params$organisms$taxon,
-  parameters = params
+  input = get_params(step = "prepare_taxa")$files$features$raw,
+  extension = get_params(step = "prepare_taxa")$names$extension,
+  name_features = get_params(step = "prepare_taxa")$names$features,
+  name_filename = get_params(step = "prepare_taxa")$names$filename,
+  colname = get_params(step = "prepare_taxa")$names$taxon,
+  metadata = get_params(step = "prepare_taxa")$files$taxa$raw,
+  top_k = get_params(step = "prepare_taxa")$organisms$candidates,
+  org_tax_ott = get_params(step =
+    "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
+  output = get_params(step = "prepare_taxa")$files$taxa$prepared,
+  taxon = get_params(step = "prepare_taxa")$organisms$taxon
 )
 }
 \arguments{
@@ -40,8 +40,6 @@ prepare_taxa(
 
 \item{taxon}{If you want to enforce all features to a given taxon,
 put its name here.}
-
-\item{parameters}{Params}
 }
 \description{
 This function performs taxon name preparation

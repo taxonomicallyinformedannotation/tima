@@ -7,7 +7,6 @@
 #' @param rts Prepared retention time library
 #' @param output Output file
 #' @param tolerance_rt Tolerance to filter retention time
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -15,12 +14,12 @@
 #'
 #' @examples NULL
 filter_annotations <-
-  function(annotations = params$files$annotations$prepared$structural,
-           features = params$files$features$prepared,
-           rts = params$files$libraries$temporal$prepared,
-           output = params$files$annotations$filtered,
-           tolerance_rt = params$ms$tolerances$rt$minutes,
-           parameters = params) {
+  function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
+           features = get_params(step = "filter_annotations")$files$features$prepared,
+           rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
+           output = get_params(step = "filter_annotations")$files$annotations$filtered,
+           tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes,
+           parameters = get_params(step = "filter_annotations")) {
     stopifnot(
       "Annotations file(s) do(es) not exist" =
         rep(TRUE, length(annotations)) ==
@@ -33,7 +32,6 @@ filter_annotations <-
     )
     stopifnot("Your features file does not exist." = file.exists(features))
 
-    paths <- parse_yaml_paths()
     if (length(rts) == 0) {
       rts <- NULL
     }
@@ -111,7 +109,10 @@ filter_annotations <-
       features_annotated_table_2
     )
 
-    export_params(step = "filter_annotations")
+    export_params(
+      parameters = get_params(step = "filter_annotations"),
+      step = "filter_annotations"
+    )
     export_output(
       x = final_table,
       file = output[[1]]

@@ -4,7 +4,6 @@
 #'
 #' @param input Input file
 #' @param output Output file
-#' @param parameters params
 #'
 #' @return NULL
 #'
@@ -12,9 +11,8 @@
 #'
 #' @examples NULL
 prepare_libraries_sop_closed <-
-  function(input = params$files$libraries$sop$raw$closed,
-           output = params$files$libraries$sop$prepared,
-           parameters = params) {
+  function(input = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
+           output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared) {
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
@@ -44,7 +42,7 @@ prepare_libraries_sop_closed <-
     }
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_libraries_sop_closed")
+    export_params(parameters = get_params(step = "prepare_libraries_sop_closed"), step = "prepare_libraries_sop_closed")
     export_output(x = closed_prepared, file = output)
     return(output)
   }

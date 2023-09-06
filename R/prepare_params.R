@@ -14,7 +14,7 @@
 #' @param ms_mode MS ionization mode. 'pos' or 'neg'
 #' @param taxon Name of a taxon you want to enforce
 #' @param summarise Summarise results to one row per feature. BOOLEAN
-#' @param parameters Params
+#' @param paths Paths
 #' @param step Step
 #'
 #' @return NULL
@@ -22,18 +22,27 @@
 #' @export
 #'
 #' @examples NULL
-prepare_params <- function(filename = params$files$pattern,
-                           features = params$files$features$raw,
-                           spectra = params$files$spectral$raw,
-                           gnps_job_id = params$gnps$id,
-                           gnps_example_id = paths$gnps$example,
-                           ms_mode = params$ms$polarity,
-                           taxon = params$organisms$taxon,
-                           summarise = params$options$summarise,
-                           parameters = params,
+prepare_params <- function(filename = get_params(step = "prepare_params")$files$pattern,
+                           features = get_params(step = "prepare_params")$files$features$raw,
+                           spectra = get_params(step = "prepare_params")$files$spectral$raw,
+                           gnps_job_id = get_params(step = "prepare_params")$gnps$id,
+                           gnps_example_id = parse_yaml_paths()$gnps$example,
+                           ms_mode = get_params(step = "prepare_params")$ms$polarity,
+                           taxon = get_params(step = "prepare_params")$organisms$taxon,
+                           summarise = get_params(step = "prepare_params")$options$summarise,
+                           parameters = get_params(step = "prepare_params"),
                            paths = parse_yaml_paths(),
                            step = NA) {
   ## TODO 'step' actually not taken into account
+  params <- parameters
+  filename <<- filename
+  features <- features
+  spectra <- spectra
+  gnps_job_id <<- gnps_job_id
+  gnps_example_id <<- gnps_example_id
+  ms_mode <- ms_mode
+  taxon <- taxon
+  summarise <- summarise
 
   stopifnot(
     "Either 'filename' or 'GNPS' have to be filled" = !is.null(filename) |
@@ -54,15 +63,8 @@ prepare_params <- function(filename = params$files$pattern,
       ms_mode %in% c("pos", "neg")
   )
 
-  params <- parameters
-  filename <<- filename
-  features <<- features
-  spectra <<- spectra
-  gnps_job_id <<- gnps_job_id
-  paths <<- parse_yaml_paths()
-  gnps_example_id <<- paths$gnps$example
-
-  load_yaml_files()
+  list <- load_yaml_files()
+  yamls_params <- list[[1]]
 
   log_debug(x = "Changing params")
 
@@ -423,9 +425,9 @@ prepare_params <- function(filename = params$files$pattern,
     prepared |>
     lapply(FUN = replace_id)
 
-  yaml_export <- yaml_files |>
+  yaml_export <- list[[2]] |>
     gsub(pattern = "default", replacement = "user")
-  names(yaml_export) <- yaml_names
+  names(yaml_export) <- list[[3]]
 
   if (!is.na(step)) {
     ## The dollar is for steps having similar names separated by underscores
@@ -441,7 +443,7 @@ prepare_params <- function(filename = params$files$pattern,
 
   log_debug(x = "Exporting params ...")
   create_dir(export = yaml_export[[1]])
-  export_params(step = "prepare_params")
+  # export_params(step = "prepare_params")
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {

@@ -5,12 +5,13 @@
 \title{Filter annotations}
 \usage{
 filter_annotations(
-  annotations = params$files$annotations$prepared$structural,
-  features = params$files$features$prepared,
-  rts = params$files$libraries$temporal$prepared,
-  output = params$files$annotations$filtered,
-  tolerance_rt = params$ms$tolerances$rt$minutes,
-  parameters = params
+  annotations = get_params(step =
+    "filter_annotations")$files$annotations$prepared$structural,
+  features = get_params(step = "filter_annotations")$files$features$prepared,
+  rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
+  output = get_params(step = "filter_annotations")$files$annotations$filtered,
+  tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes,
+  parameters = get_params(step = "filter_annotations")
 )
 }
 \arguments{
@@ -23,8 +24,6 @@ filter_annotations(
 \item{output}{Output file}
 
 \item{tolerance_rt}{Tolerance to filter retention time}
-
-\item{parameters}{Params}
 }
 \description{
 This function filters initial annotations.

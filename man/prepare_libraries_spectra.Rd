@@ -5,27 +5,26 @@
 \title{Prepare libraries of spectra}
 \usage{
 prepare_libraries_spectra(
-  input = params$files$libraries$spectral$exp$raw,
-  output = params$files$libraries$spectral$exp,
-  polarity = params$ms$polarity,
+  input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$raw,
+  output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp,
+  polarity = get_params(step = "prepare_libraries_spectra")$ms$polarity,
   metad = "myLib",
-  col_ce = params$names$mgf$collision_energy,
-  col_ci = params$names$mgf$compound_id,
-  col_em = params$names$mgf$exact_mass,
-  col_in = params$names$mgf$inchi,
-  col_io = params$names$mgf$inchi_no_stereo,
-  col_ik = params$names$mgf$inchikey,
-  col_il = params$names$mgf$inchikey_no_stereo,
-  col_mf = params$names$mgf$molecular_formula,
-  col_na = params$names$mgf$name,
-  col_po = params$names$mgf$polarity,
-  col_sm = params$names$mgf$smiles,
-  col_sn = params$names$mgf$smiles_no_stereo,
-  col_si = params$names$mgf$spectrum_id,
-  col_sp = params$names$mgf$splash,
-  col_sy = params$names$mgf$synonyms,
-  col_xl = params$names$mgf$xlogp,
-  parameters = params
+  col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
+  col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
+  col_em = get_params(step = "prepare_libraries_spectra")$names$mgf$exact_mass,
+  col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
+  col_io = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi_no_stereo,
+  col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
+  col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_no_stereo,
+  col_mf = get_params(step = "prepare_libraries_spectra")$names$mgf$molecular_formula,
+  col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
+  col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
+  col_sm = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles,
+  col_sn = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles_no_stereo,
+  col_si = get_params(step = "prepare_libraries_spectra")$names$mgf$spectrum_id,
+  col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
+  col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
+  col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
 )
 }
 \arguments{
@@ -68,8 +67,6 @@ prepare_libraries_spectra(
 \item{col_sy}{Name of the synonyms in mgf}
 
 \item{col_xl}{Name of the xlogp in mgf}
-
-\item{parameters}{Params}
 }
 \description{
 This function prepares spectra

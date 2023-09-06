@@ -4,7 +4,6 @@
 #'
 #' @param input Input file(s) containing edges
 #' @param output Output file.
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -12,9 +11,8 @@
 #'
 #' @examples NULL
 create_components <-
-  function(input = params$files$networks$spectral$edges$prepared,
-           output = params$files$networks$spectral$components$raw,
-           parameters = params) {
+  function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
+           output = get_params(step = "create_components")$files$networks$spectral$components$raw) {
     stopifnot(
       "Your input file(s) do(es) not exist" =
         rep(TRUE, length(unlist(input))) ==
@@ -58,7 +56,10 @@ create_components <-
       tidytable::arrange(`cluster index`)
 
     log_debug(x = "Exporting ...")
-    export_params(step = "create_components")
+    export_params(
+      parameters = get_params(step = "create_components"),
+      step = "create_components"
+    )
     export_output(
       x = clusters_ready,
       file = output

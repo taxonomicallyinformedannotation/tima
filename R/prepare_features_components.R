@@ -5,7 +5,6 @@
 #'
 #' @param input Input file
 #' @param output Output file
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -13,9 +12,8 @@
 #'
 #' @examples NULL
 prepare_features_components <-
-  function(input = params$files$networks$spectral$components$raw,
-           output = params$files$networks$spectral$components$prepared,
-           parameters = params) {
+  function(input = get_params(step = "prepare_features_components")$files$networks$spectral$components$raw,
+           output = get_params(step = "prepare_features_components")$files$networks$spectral$components$prepared) {
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
@@ -38,7 +36,7 @@ prepare_features_components <-
       tidytable::distinct()
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_features_components")
+    export_params(parameters = get_params(step = "prepare_features_components"), step = "prepare_features_components")
     export_output(x = table, file = output)
 
     return(output)

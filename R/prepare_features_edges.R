@@ -6,7 +6,6 @@
 #' @param output Output file
 #' @param name_source Name of the source features column
 #' @param name_target Name of the target features column
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -14,11 +13,10 @@
 #'
 #' @examples NULL
 prepare_features_edges <-
-  function(input = params$files$networks$spectral$edges$raw,
-           output = params$files$networks$spectral$edges$prepared,
-           name_source = params$names$source,
-           name_target = params$names$target,
-           parameters = params) {
+  function(input = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$raw,
+           output = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$prepared,
+           name_source = get_params(step = "prepare_features_edges")$names$source,
+           name_target = get_params(step = "prepare_features_edges")$names$target) {
     stopifnot(
       "Your input file(s) do(es) not exist" =
         rep(TRUE, length(unlist(input))) ==
@@ -57,7 +55,7 @@ prepare_features_edges <-
 
     ## Export edges table
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_features_edges")
+    export_params(parameters = get_params(step = "prepare_features_edges"), step = "prepare_features_edges")
     export_output(x = edges_table_treated, file = output)
 
     return(output)

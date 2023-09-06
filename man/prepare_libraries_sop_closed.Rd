@@ -5,17 +5,15 @@
 \title{Prepare libraries of structure organism pairs CLOSED}
 \usage{
 prepare_libraries_sop_closed(
-  input = params$files$libraries$sop$raw$closed,
-  output = params$files$libraries$sop$prepared,
-  parameters = params
+  input = get_params(step =
+    "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
+  output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared
 )
 }
 \arguments{
 \item{input}{Input file}
 
 \item{output}{Output file}
-
-\item{parameters}{params}
 }
 \description{
 Prepare libraries of structure organism pairs CLOSED

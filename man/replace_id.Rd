@@ -6,9 +6,9 @@
 \usage{
 replace_id(
   x,
-  user_filename = filename,
-  user_gnps = gnps_job_id,
-  example_gnps = gnps_example_id
+  user_filename = get("filename", envir = parent.frame()),
+  user_gnps = get("gnps_job_id", envir = parent.frame()),
+  example_gnps = get("gnps_example_id", envir = parent.frame())
 )
 }
 \arguments{

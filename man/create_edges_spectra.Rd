@@ -5,15 +5,15 @@
 \title{Create edges spectra}
 \usage{
 create_edges_spectra(
-  input = params$files$spectral$raw,
-  output = params$files$networks$spectral$edges$raw,
-  name_source = params$names$source,
-  name_target = params$names$target,
-  threshold = params$annotations$thresholds$ms2$similarity,
-  ppm = params$ms$tolerances$mass$ppm$ms2,
-  dalton = params$ms$tolerances$mass$dalton$ms2,
-  qutoff = params$ms$thresholds$ms2$intensity,
-  parameters = params
+  input = get_params(step = "create_edges_spectra")$files$spectral$raw,
+  output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
+  name_source = get_params(step = "create_edges_spectra")$names$source,
+  name_target = get_params(step = "create_edges_spectra")$names$target,
+  threshold = get_params(step =
+    "create_edges_spectra")$annotations$thresholds$ms2$similarity,
+  ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
+  dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
+  qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
 )
 }
 \arguments{
@@ -32,8 +32,6 @@ create_edges_spectra(
 \item{dalton}{Absolute Dalton tolerance to be used}
 
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
-
-\item{parameters}{Params}
 }
 \description{
 This function create edges

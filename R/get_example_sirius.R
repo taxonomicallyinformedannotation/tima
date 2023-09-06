@@ -13,8 +13,8 @@
 #'
 #' @examples NULL
 get_example_sirius <-
-  function(url = paths$urls$examples$sirius,
-           export = paths$data$interim$annotations$example_sirius) {
+  function(url = parse_yaml_paths()$urls$examples$sirius,
+           export = parse_yaml_paths()$data$interim$annotations$example_sirius) {
     get_file(
       url = url,
       export = export

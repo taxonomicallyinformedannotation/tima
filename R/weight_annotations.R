@@ -78,7 +78,6 @@
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
 #' @param summarise Boolean. Summarize results (1 row per feature)
 #' @param pattern Pattern to identify your job. STRING
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -88,52 +87,51 @@
 #'
 #' @examples NULL
 weight_annotations <- function(
-    library = params$files$libraries$sop$merged$keys,
-    org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
-    str_stereo = params$files$libraries$sop$merged$structures$stereo,
-    annotations = params$files$annotations$filtered,
-    canopus = params$files$annotations$prepared$canopus,
-    formula = params$files$annotations$prepared$formula,
-    components = params$files$networks$spectral$components$prepared,
-    edges = params$files$networks$spectral$edges$prepared,
-    taxa = params$files$taxa$prepared,
-    output = params$files$annotations$processed,
-    candidates_final = params$annotations$candidates$final,
-    weight_spectral = params$weights$global$spectral,
-    weight_chemical = params$weights$global$chemical,
-    weight_biological = params$weights$global$biological,
-    score_biological_domain = params$weights$biological$domain,
-    score_biological_kingdom = params$weights$biological$kingdom,
-    score_biological_phylum = params$weights$biological$phylum,
-    score_biological_class = params$weights$biological$class,
-    score_biological_order = params$weights$biological$order,
-    score_biological_infraorder = params$weights$biological$infraorder,
-    score_biological_family = params$weights$biological$family,
-    score_biological_subfamily = params$weights$biological$subfamily,
-    score_biological_tribe = params$weights$biological$tribe,
-    score_biological_subtribe = params$weights$biological$subtribe,
-    score_biological_genus = params$weights$biological$genus,
-    score_biological_subgenus = params$weights$biological$subgenus,
-    score_biological_species = params$weights$biological$species,
-    score_biological_subspecies = params$weights$biological$subspecies,
-    score_biological_variety = params$weights$biological$variety,
-    score_chemical_cla_kingdom = params$weights$chemical$cla$kingdom,
-    score_chemical_cla_superclass = params$weights$chemical$cla$superclass,
-    score_chemical_cla_class = params$weights$chemical$cla$class,
-    score_chemical_cla_parent = params$weights$chemical$cla$parent,
-    score_chemical_npc_pathway = params$weights$chemical$npc$pathway,
-    score_chemical_npc_superclass = params$weights$chemical$npc$superclass,
-    score_chemical_npc_class = params$weights$chemical$npc$class,
-    minimal_consistency = params$annotations$thresholds$consistency,
-    minimal_ms1_bio = params$annotations$thresholds$ms1$biological,
-    minimal_ms1_chemo = params$annotations$thresholds$ms1$chemical,
-    minimal_ms1_condition = params$annotations$thresholds$ms1$condition,
-    ms1_only = params$annotations$ms1only,
-    compounds_names = params$options$compounds_names,
-    summarise = params$options$summarise,
-    pattern = params$files$pattern,
-    force = params$options$force,
-    parameters = params) {
+    library = get_params(step = "weight_annotations")$files$libraries$sop$merged$keys,
+    org_tax_ott = get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott,
+    str_stereo = get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo,
+    annotations = get_params(step = "weight_annotations")$files$annotations$filtered,
+    canopus = get_params(step = "weight_annotations")$files$annotations$prepared$canopus,
+    formula = get_params(step = "weight_annotations")$files$annotations$prepared$formula,
+    components = get_params(step = "weight_annotations")$files$networks$spectral$components$prepared,
+    edges = get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared,
+    taxa = get_params(step = "weight_annotations")$files$taxa$prepared,
+    output = get_params(step = "weight_annotations")$files$annotations$processed,
+    candidates_final = get_params(step = "weight_annotations")$annotations$candidates$final,
+    weight_spectral = get_params(step = "weight_annotations")$weights$global$spectral,
+    weight_chemical = get_params(step = "weight_annotations")$weights$global$chemical,
+    weight_biological = get_params(step = "weight_annotations")$weights$global$biological,
+    score_biological_domain = get_params(step = "weight_annotations")$weights$biological$domain,
+    score_biological_kingdom = get_params(step = "weight_annotations")$weights$biological$kingdom,
+    score_biological_phylum = get_params(step = "weight_annotations")$weights$biological$phylum,
+    score_biological_class = get_params(step = "weight_annotations")$weights$biological$class,
+    score_biological_order = get_params(step = "weight_annotations")$weights$biological$order,
+    score_biological_infraorder = get_params(step = "weight_annotations")$weights$biological$infraorder,
+    score_biological_family = get_params(step = "weight_annotations")$weights$biological$family,
+    score_biological_subfamily = get_params(step = "weight_annotations")$weights$biological$subfamily,
+    score_biological_tribe = get_params(step = "weight_annotations")$weights$biological$tribe,
+    score_biological_subtribe = get_params(step = "weight_annotations")$weights$biological$subtribe,
+    score_biological_genus = get_params(step = "weight_annotations")$weights$biological$genus,
+    score_biological_subgenus = get_params(step = "weight_annotations")$weights$biological$subgenus,
+    score_biological_species = get_params(step = "weight_annotations")$weights$biological$species,
+    score_biological_subspecies = get_params(step = "weight_annotations")$weights$biological$subspecies,
+    score_biological_variety = get_params(step = "weight_annotations")$weights$biological$variety,
+    score_chemical_cla_kingdom = get_params(step = "weight_annotations")$weights$chemical$cla$kingdom,
+    score_chemical_cla_superclass = get_params(step = "weight_annotations")$weights$chemical$cla$superclass,
+    score_chemical_cla_class = get_params(step = "weight_annotations")$weights$chemical$cla$class,
+    score_chemical_cla_parent = get_params(step = "weight_annotations")$weights$chemical$cla$parent,
+    score_chemical_npc_pathway = get_params(step = "weight_annotations")$weights$chemical$npc$pathway,
+    score_chemical_npc_superclass = get_params(step = "weight_annotations")$weights$chemical$npc$superclass,
+    score_chemical_npc_class = get_params(step = "weight_annotations")$weights$chemical$npc$class,
+    minimal_consistency = get_params(step = "weight_annotations")$annotations$thresholds$consistency,
+    minimal_ms1_bio = get_params(step = "weight_annotations")$annotations$thresholds$ms1$biological,
+    minimal_ms1_chemo = get_params(step = "weight_annotations")$annotations$thresholds$ms1$chemical,
+    minimal_ms1_condition = get_params(step = "weight_annotations")$annotations$thresholds$ms1$condition,
+    ms1_only = get_params(step = "weight_annotations")$annotations$ms1only,
+    compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
+    summarise = get_params(step = "weight_annotations")$options$summarise,
+    pattern = get_params(step = "weight_annotations")$files$pattern,
+    force = get_params(step = "weight_annotations")$options$force) {
   stopifnot(
     "Annotations file(s) do(es) not exist" =
       rep(TRUE, length(annotations)) ==
@@ -147,8 +145,6 @@ weight_annotations <- function(
     "Condition must be 'OR' or 'AND'." =
       minimal_ms1_condition %in% c("OR", "AND")
   )
-  paths <- parse_yaml_paths()
-
   log_debug(x = "Loading files ...")
 
   log_debug(x = "... components")
@@ -289,7 +285,7 @@ weight_annotations <- function(
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(
-    paths$data$processed$path,
+    parse_yaml_paths()$data$processed$path,
     paste0(time, "_", pattern)
   )
   final_output <- file.path(
@@ -297,6 +293,7 @@ weight_annotations <- function(
     output
   )
   export_params(
+    parameters = get_params(step = "weight_annotations"),
     directory = dir_time,
     step = "weight_annotations"
   )
