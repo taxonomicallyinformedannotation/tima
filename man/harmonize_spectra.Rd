@@ -6,6 +6,7 @@
 \usage{
 harmonize_spectra(
   spectra,
+  metad = get("metad", envir = parent.frame()),
   mode,
   col_ce = get("col_ce", envir = parent.frame()),
   col_ci = get("col_ci", envir = parent.frame()),
@@ -27,6 +28,8 @@ harmonize_spectra(
 }
 \arguments{
 \item{spectra}{Spectra object to be harmonized}
+
+\item{metad}{Metadata to identify the library}
 
 \item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
 

@@ -3,6 +3,7 @@
 # timaR 2.9.0
 
 * Added compounds names as parameter
+* Added MassBank spectral library (#77)
 * Allow files outside `data/source` (#89)
 * Added RT library as annotation library (#86)
 * Improved naming (#91)
@@ -13,7 +14,7 @@
 * Refactored RT matching (#76)
 * Refactored Sirius scores (#92)
 * Multiple Shiny fixes
-* Multiple fixes (#71, #81)
+* Multiple fixes (#71, #81, #82)
 
 # timaR 2.8.2
 
