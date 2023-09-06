@@ -35,6 +35,7 @@ columns_model <- function() {
   candidates_calculated_columns <- c("candidate_spectrum_entropy")
 
   candidates_sirius_formula_columns <- c(
+    "candidate_structure_molecular_formula",
     "candidate_count_sirius_peaks_explained",
     "candidate_score_sirius_intensity",
     "candidate_score_sirius_isotope",
