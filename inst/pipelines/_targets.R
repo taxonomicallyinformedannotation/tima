@@ -1416,8 +1416,8 @@ list(
               str_tax_npc = lib_mer_str_tax_npc,
               name = lib_add[par_ann_mas$ms$polarity],
               adducts_list = par_ann_mas$ms$adducts,
-              # adducts_neg = par_ann_mas$files$libraries$adducts$neg,
-              # adducts_pos = par_ann_mas$files$libraries$adducts$pos,
+              adducts_neg = par_ann_mas$files$libraries$adducts$neg,
+              adducts_pos = par_ann_mas$files$libraries$adducts$pos,
               adducts_masses_list = dic_add,
               clusters_neg = par_ann_mas$ms$clusters$neg,
               clusters_pos = par_ann_mas$ms$clusters$pos,
@@ -1671,10 +1671,11 @@ list(
         name = int_com,
         command = {
           int_com <-
-            ifelse(test = file.exists(fea_com),
-              yes = fea_com,
-              no = gnps_components
-            )
+            if(file.exists(fea_com)){
+              fea_com
+            } else {
+                gnps_components
+              }
         }
       ),
       tar_file(
@@ -1705,7 +1706,7 @@ list(
       command = {
         fea_com_pre <- prepare_features_components(
           input = int_com,
-          output = params$files$networks$spectral$components$prepared,
+          output = par_pre_fea_com$files$networks$spectral$components$prepared,
           parameters = par_pre_fea_com
         )
       }
@@ -1729,6 +1730,8 @@ list(
     command = {
       tax_pre <- prepare_taxa(
         input = input_features,
+        name_features = par_pre_tax$names$features,
+        name_filename = par_pre_tax$names$filename,
         extension = par_pre_tax$names$extension,
         colname = par_pre_tax$names$taxon,
         metadata = input_metadata,
@@ -1783,6 +1786,7 @@ list(
     command = {
       ann_pre <- weight_annotations(
         library = lib_mer_key,
+        org_tax_ott = lib_mer_org_tax_ott,
         str_stereo = lib_mer_str_stereo,
         annotations = ann_fil,
         canopus = ann_sir_pre_can,
@@ -1838,6 +1842,7 @@ list(
     command = {
       ann_pre_crazy <- weight_annotations(
         library = lib_mer_key,
+        org_tax_ott = lib_mer_org_tax_ott,
         str_stereo = lib_mer_str_stereo,
         annotations = ann_fil_crazy,
         canopus = ann_sir_pre_can,
