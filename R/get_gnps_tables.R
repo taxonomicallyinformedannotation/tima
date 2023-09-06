@@ -91,8 +91,14 @@ get_gnps_tables <-
         log_debug("Checking response...")
         if (url |>
           httr2::request() |>
+          httr2::req_method("GET") |>
+          httr2::req_error(
+            is_error = function(resp) {
+              return(FALSE)
+            }
+          ) |>
           httr2::req_perform() |>
-          httr2::resp_status() == 200) {
+          httr2::resp_status_desc() == "OK") {
           log_debug("Status OK!")
           get_file(
             url = url,
