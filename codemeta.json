@@ -81,6 +81,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "CompoundDb",
+      "name": "CompoundDb",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/CompoundDb.html"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "DT",
       "name": "DT",
       "provider": {
@@ -545,7 +557,7 @@
     "taxonomicdistance",
     "specializedmetabolome"
   ],
-  "fileSize": "2665.504KB",
+  "fileSize": "2696.114KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
