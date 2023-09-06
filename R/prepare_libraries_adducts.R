@@ -33,7 +33,6 @@ prepare_libraries_adducts <-
       "Your structure metadata file does not exist" =
         file.exists(str_met)
     )
-    params <- parameters
     log_debug("Loading files ...")
     log_debug("... exact masses")
     masses <- tidytable::fread(

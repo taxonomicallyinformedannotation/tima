@@ -21,7 +21,6 @@ prepare_features_tables <-
            name_rt = params$names$rt,
            name_mz = params$names$precursor,
            parameters = params) {
-    params <- parameters
     stopifnot("Your features file does not exist" = file.exists(features))
 
     log_debug("Preparing features table")

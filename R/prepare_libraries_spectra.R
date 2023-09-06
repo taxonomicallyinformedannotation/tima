@@ -62,7 +62,6 @@ prepare_libraries_spectra <-
       "Polarity must be 'pos' or 'neg'." =
         polarity %in% c("pos", "neg")
     )
-    params <- parameters
 
     if (length(output) > 1) {
       output <- output[output |>

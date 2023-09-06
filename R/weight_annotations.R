@@ -148,7 +148,6 @@ weight_annotations <- function(
       minimal_ms1_condition %in% c("OR", "AND")
   )
   paths <- parse_yaml_paths()
-  params <- parameters
 
   log_debug(x = "Loading files ...")
 

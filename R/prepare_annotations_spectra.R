@@ -35,7 +35,6 @@ prepare_annotations_spectra <-
         rep(TRUE, length(input)) ==
           lapply(X = input, FUN = file.exists)
     )
-    params <- parameters
     log_debug(x = "Loading and formatting spectral matches")
     table <-
       lapply(

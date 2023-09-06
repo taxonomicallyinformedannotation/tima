@@ -58,8 +58,6 @@ prepare_taxa <-
       "Your top k organisms parameter should be lower or equal to 5" =
         top_k <= 5
     )
-    params <- parameters
-
 
     log_debug(x = "Loading feature table")
     feature_table_0 <- tidytable::fread(

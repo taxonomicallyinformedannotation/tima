@@ -46,7 +46,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   ## Not checking for ppm and Da limits, everyone is free.
 
-  params <- parameters
   if (length(library) > 1) {
     library <- library[grepl(polarity, library)]
   }

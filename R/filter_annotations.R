@@ -34,7 +34,6 @@ filter_annotations <-
     stopifnot("Your features file does not exist." = file.exists(features))
 
     paths <- parse_yaml_paths()
-    params <- parameters
     if (length(rts) == 0) {
       rts <- NULL
     }
