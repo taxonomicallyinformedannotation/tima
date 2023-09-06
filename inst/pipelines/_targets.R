@@ -1250,13 +1250,23 @@ list(
       ## Experimental
       list(
         ## RAW
-        list(tar_file(
-          name = lib_spe_exp_int_raw,
-          command = {
-            lib_spe_exp_int_raw <-
-              par_pre_lib_spe$files$libraries$spectral$exp$raw
-          }
-        )),
+        list(
+          ### JLW
+          tar_file(
+            name = lib_spe_exp_int_raw,
+            command = {
+              lib_spe_exp_int_raw <-
+                par_pre_lib_spe$files$libraries$spectral$exp$raw
+            }
+          ),
+          ### MassBank
+          tar_file(
+            name = lib_spe_exp_mb_raw,
+            command = {
+              lib_spe_exp_mb_raw <- get_massbank_spectra()
+            }
+          )
+        ),
         ## Prepared
         list(
           ## TODO improve polarity handling, suboptimal
@@ -1266,8 +1276,10 @@ list(
               lib_spe_exp_int_pre_pos <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_int_raw,
-                  output = par_pre_lib_spe$files$libraries$spectral$exp,
+                  output =
+                    "data/interim/libraries/spectra/exp/internal_pos.rds",
                   polarity = "pos",
+                  metad = "JLW",
                   col_ce = par_pre_lib_spe$names$mgf$collision_energy,
                   col_ci = par_pre_lib_spe$names$mgf$compound_id,
                   col_em = par_pre_lib_spe$names$mgf$exact_mass,
@@ -1294,8 +1306,10 @@ list(
               lib_spe_exp_int_pre_neg <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_int_raw,
-                  output = par_pre_lib_spe$files$libraries$spectral$exp,
+                  output =
+                    "data/interim/libraries/spectra/exp/internal_neg.rds",
                   polarity = "neg",
+                  metad = "JLW",
                   col_ce = par_pre_lib_spe$names$mgf$collision_energy,
                   col_ci = par_pre_lib_spe$names$mgf$compound_id,
                   col_em = par_pre_lib_spe$names$mgf$exact_mass,
@@ -1312,6 +1326,66 @@ list(
                   col_sp = par_pre_lib_spe$names$mgf$splash,
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
                   col_xl = par_pre_lib_spe$names$mgf$xlogp,
+                  parameters = par_pre_lib_spe
+                )
+            }
+          ),
+          tar_file(
+            name = lib_spe_exp_mb_pre_neg,
+            command = {
+              lib_spe_exp_mb_pre_neg <-
+                prepare_libraries_spectra(
+                  input = lib_spe_exp_mb_raw,
+                  output =
+                    "data/interim/libraries/spectra/exp/massbank_neg.rds",
+                  polarity = "neg",
+                  metad = "massBank",
+                  col_ce = "collisionEnergy_text",
+                  col_ci = NULL,
+                  col_em = "exactmass",
+                  col_in = "inchi",
+                  col_io = NULL,
+                  col_ik = "inchikey",
+                  col_il = NULL,
+                  col_mf = "formula",
+                  col_na = "name",
+                  col_po = "polarity",
+                  col_sm = "smiles",
+                  col_sn = NULL,
+                  col_si = "spectrum_id",
+                  col_sp = "splash",
+                  col_sy = NULL,
+                  col_xl = NULL,
+                  parameters = par_pre_lib_spe
+                )
+            }
+          ),
+          tar_file(
+            name = lib_spe_exp_mb_pre_pos,
+            command = {
+              lib_spe_exp_mb_pre_pos <-
+                prepare_libraries_spectra(
+                  input = lib_spe_exp_mb_raw,
+                  output =
+                    "data/interim/libraries/spectra/exp/massbank_pos.rds",
+                  polarity = "pos",
+                  metad = "massBank",
+                  col_ce = "collisionEnergy_text",
+                  col_ci = NULL,
+                  col_em = "exactmass",
+                  col_in = "inchi",
+                  col_io = NULL,
+                  col_ik = "inchikey",
+                  col_il = NULL,
+                  col_mf = "formula",
+                  col_na = "name",
+                  col_po = "polarity",
+                  col_sm = "smiles",
+                  col_sn = NULL,
+                  col_si = "spectrum_id",
+                  col_sp = "splash",
+                  col_sy = NULL,
+                  col_xl = NULL,
                   parameters = par_pre_lib_spe
                 )
             }
@@ -1459,16 +1533,16 @@ list(
           }
         )
       ),
-      ## In silico
+      ## Classic
       list(
-        ## TODO add HMDB is spectral matches
         ## TODO improve polarity handling, suboptimal
         tar_file(
-          name = ann_spe_is_lot_pos,
+          name = ann_spe_pos,
           command = {
-            ann_spe_is_lot_pos <- annotate_spectra(
+            ann_spe_pos <- annotate_spectra(
               input = input_spectra,
-              library = lib_spe_is_lot_pre_pos,
+              library = list(lib_spe_is_lot_pre_pos,
+                             lib_spe_exp_mb_pre_pos),
               polarity = "pos",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -1486,11 +1560,12 @@ list(
           }
         ),
         tar_file(
-          name = ann_spe_is_lot_neg,
+          name = ann_spe_neg,
           command = {
-            ann_spe_is_lot_neg <- annotate_spectra(
+            ann_spe_neg <- annotate_spectra(
               input = input_spectra,
-              library = lib_spe_is_lot_pre_neg,
+              library = list(lib_spe_is_lot_pre_neg,
+                             lib_spe_exp_mb_pre_neg),
               polarity = "neg",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -1508,13 +1583,13 @@ list(
           }
         ),
         tar_file(
-          name = ann_spe_is_pre,
+          name = ann_spe_pre,
           command = {
-            ann_spe_is_pre <- prepare_annotations_spectra(
+            ann_spe_pre <- prepare_annotations_spectra(
               input = list(
-                ann_spe_is_lot_neg,
+                ann_spe_neg,
                 ## TODO add is hmdb
-                ann_spe_is_lot_pos
+                ann_spe_pos
               ),
               output = par_pre_ann_spe$files$annotations$prepared$structural,
               str_stereo = lib_mer_str_stereo,
@@ -1668,7 +1743,7 @@ list(
         annotations = list(
           ann_spe_exp_gnp_pre,
           # ann_spe_exp_int_pre,
-          ann_spe_is_pre,
+          ann_spe_pre,
           ann_sir_pre_str,
           ann_ms1_pre_ann
         ),
@@ -1687,7 +1762,7 @@ list(
         annotations = list(
           ann_spe_exp_gnp_pre,
           ann_spe_exp_int_pre,
-          ann_spe_is_pre,
+          ann_spe_pre,
           ann_sir_pre_str,
           ann_ms1_pre_ann
         ),
@@ -2388,11 +2463,12 @@ list(
       }
     ),
     tar_file(
-      name = benchmark_ann_spe_is_lot_pos,
+      name = benchmark_ann_spe_pos,
       command = {
-        benchmark_ann_spe_is_lot_pos <- annotate_spectra(
+        benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
-          library = lib_spe_is_lot_pre_pos,
+          library = list(lib_spe_is_lot_pre_pos,
+                         lib_spe_exp_mb_pre_pos),
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
           threshold =
@@ -2406,11 +2482,12 @@ list(
       }
     ),
     tar_file(
-      name = benchmark_ann_spe_is_lot_neg,
+      name = benchmark_ann_spe_neg,
       command = {
-        benchmark_ann_spe_is_lot_neg <- annotate_spectra(
+        benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
-          library = lib_spe_is_lot_pre_neg,
+          library = list(lib_spe_is_lot_pre_neg,
+                         lib_spe_exp_mb_pre_neg),
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
           threshold =
@@ -2433,10 +2510,10 @@ list(
       }
     ),
     tar_file(
-      name = benchmark_ann_spe_is_pre_pos,
+      name = benchmark_ann_spe_pre_pos,
       command = {
-        benchmark_ann_spe_is_pre_pos <- prepare_annotations_spectra(
-          input = list(benchmark_ann_spe_is_lot_pos),
+        benchmark_ann_spe_pre_pos <- prepare_annotations_spectra(
+          input = list(benchmark_ann_spe_pos),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
@@ -2448,10 +2525,10 @@ list(
       }
     ),
     tar_file(
-      name = benchmark_ann_spe_is_pre_neg,
+      name = benchmark_ann_spe_pre_neg,
       command = {
-        benchmark_ann_spe_is_pre_neg <- prepare_annotations_spectra(
-          input = list(benchmark_ann_spe_is_lot_neg),
+        benchmark_ann_spe_pre_neg <- prepare_annotations_spectra(
+          input = list(benchmark_ann_spe_neg),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
@@ -2512,7 +2589,7 @@ list(
       command = {
         benchmark_ann_fil_spe_neg <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_neg,
+            benchmark_ann_spe_pre_neg,
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
@@ -2528,7 +2605,7 @@ list(
       command = {
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_neg,
+            benchmark_ann_spe_pre_neg,
             benchmark_ann_ms1_pre_neg[[1]],
             benchmark_ann_sir_pre_str
           ),
@@ -2562,7 +2639,7 @@ list(
       command = {
         benchmark_ann_fil_spe_pos <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_pos,
+            benchmark_ann_spe_pre_pos,
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,
@@ -2578,7 +2655,7 @@ list(
       command = {
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
           annotations = list(
-            benchmark_ann_spe_is_pre_pos,
+            benchmark_ann_spe_pre_pos,
             benchmark_ann_ms1_pre_pos[[1]],
             benchmark_ann_sir_pre_str
           ),

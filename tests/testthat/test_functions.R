@@ -147,6 +147,11 @@ testthat::test_that("Whole process", {
     export = paths$data$source$libraries$spectra$is$lotus$neg
   )
 
+  #### MassBank
+  get_massbank_spectra()
+  ## test it does not download it a second time
+  get_massbank_spectra()
+
   ## Prepare libraries
   ### Spectra
   step <- "prepare_libraries_spectra"
