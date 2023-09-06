@@ -1541,8 +1541,10 @@ list(
           command = {
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
-              library = list(lib_spe_is_lot_pre_pos,
-                             lib_spe_exp_mb_pre_pos),
+              library = list(
+                lib_spe_is_lot_pre_pos,
+                lib_spe_exp_mb_pre_pos
+              ),
               polarity = "pos",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -1564,8 +1566,10 @@ list(
           command = {
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
-              library = list(lib_spe_is_lot_pre_neg,
-                             lib_spe_exp_mb_pre_neg),
+              library = list(
+                lib_spe_is_lot_pre_neg,
+                lib_spe_exp_mb_pre_neg
+              ),
               polarity = "neg",
               output = gsub(
                 pattern = ".tsv.gz",
@@ -2467,8 +2471,10 @@ list(
       command = {
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
-          library = list(lib_spe_is_lot_pre_pos,
-                         lib_spe_exp_mb_pre_pos),
+          library = list(
+            lib_spe_is_lot_pre_pos,
+            lib_spe_exp_mb_pre_pos
+          ),
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
           threshold =
@@ -2486,8 +2492,10 @@ list(
       command = {
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
-          library = list(lib_spe_is_lot_pre_neg,
-                         lib_spe_exp_mb_pre_neg),
+          library = list(
+            lib_spe_is_lot_pre_neg,
+            lib_spe_exp_mb_pre_neg
+          ),
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
           threshold =
