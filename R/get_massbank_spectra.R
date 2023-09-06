@@ -22,6 +22,7 @@ get_massbank_spectra <-
 
     log_debug("Checking if a previous MassBank version already exists")
     if (!file.exists(export)) {
+      create_dir(export)
       log_debug("Downloading most recent MassBank version available ...")
       mb_sp <- AnnotationHub::AnnotationHub()[[mb_last]] |>
         Spectra::Spectra()
