@@ -38,7 +38,6 @@ prepare_libraries_rt <-
            name_smiles = params$names$smiles,
            unit_rt = params$units$rt,
            parameters = params) {
-    params <- parameters
     ## default transforms from `Spectra`
     if (col_rt == "RTINSECONDS") {
       col_rt <- "rtime"

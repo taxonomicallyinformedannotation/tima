@@ -85,7 +85,6 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Loading and concatenating prepared libraries")
-    params <- parameters
     libraries <- files |>
       lapply(
         FUN = tidytable::fread,

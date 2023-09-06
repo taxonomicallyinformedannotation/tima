@@ -21,7 +21,6 @@ prepare_features_components <-
         rep(TRUE, length(input)) ==
           lapply(X = input, FUN = file.exists)
     )
-    params <- parameters
 
     log_debug(x = "Loading files ...")
     log_debug(x = "... components table")

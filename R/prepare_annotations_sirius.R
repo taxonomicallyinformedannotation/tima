@@ -37,7 +37,6 @@ prepare_annotations_sirius <-
            str_tax_npc =
              params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
-    params <- parameters
     if (file.exists(input_directory)) {
       stopifnot("Your npc summary file must be named
                 'canopus_compound_summary.tsv" = file.exists(

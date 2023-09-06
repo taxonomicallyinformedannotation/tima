@@ -15,7 +15,6 @@ prepare_libraries_sop_ecmdb <-
   function(input = params$files$libraries$sop$raw$ecmdb,
            output = params$files$libraries$sop$prepared,
            parameters = params) {
-    params <- parameters
     if (file.exists(input)) {
       log_debug(x = "Loading ECMDB resources")
 

@@ -76,7 +76,6 @@ annotate_masses <-
       0.05)
 
     paths <- parse_yaml_paths()
-    params <- parameters
 
     features_table <- tidytable::fread(
       file = features,

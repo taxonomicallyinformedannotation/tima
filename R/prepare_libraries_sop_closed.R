@@ -15,7 +15,6 @@ prepare_libraries_sop_closed <-
   function(input = params$files$libraries$sop$raw$closed,
            output = params$files$libraries$sop$prepared,
            parameters = params) {
-    params <- parameters
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
