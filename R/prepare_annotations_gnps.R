@@ -52,10 +52,8 @@ prepare_annotations_gnps <-
         ) |>
         tidytable::select(tidytable::any_of(c(
           "feature_id" = "#Scan#",
-          ## TODO check which one is correct
           "candidate_structure_error_mz" = "MassDiff",
           "candidate_library" = "LibraryName",
-          ## TODO "candidate_library_type" = "TODO",
           "candidate_structure_name" = "Compound_Name",
           "candidate_score_similarity" = "MQScore",
           "candidate_count_similarity_peaks_matched" = "SharedPeaks",

@@ -478,8 +478,6 @@ annotate_masses <-
       tidytable::distinct() |>
       tidytable::filter(!is.na(library))
 
-    ## TODO ADD library type
-
     log_debug("cleaning results \n")
     df12 <- df11 |>
       tidytable::select(

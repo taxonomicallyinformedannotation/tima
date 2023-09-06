@@ -19,7 +19,6 @@ fake_annotations_columns <- function() {
     candidate_structure_exact_mass = NA,
     candidate_structure_xlogp = NA,
     candidate_library = NA,
-    ## TODO candidate_library_type = NA,
     candidate_score_similarity = NA,
     candidate_count_similarity_peaks_matched = NA,
     candidate_structure_tax_npc_01pat = NA,
