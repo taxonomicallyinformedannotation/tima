@@ -50,7 +50,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   params <<- parameters
   if (length(library) > 1) {
-    library <- library[[polarity]]
+    library <- library[grepl(polarity, library)]
   }
 
   log_debug("Loading spectra...")
@@ -64,6 +64,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   df_empty <- data.frame(
     feature_id = NA,
+    candidate_library = NA,
     candidate_error_mz = NA,
     candidate_structure_name = NA,
     candidate_structure_inchikey_no_stereo = NA,
@@ -146,7 +147,8 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       lib_precursors * (1 + (10^-6 * ppm))
     )
 
-    lib_id <- spectral_library@backend@spectraData$spectrum_id
+    lib_id <- seq_along(1:length(spectral_library))
+    spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
 
     calculate_entropy_score <-
@@ -259,7 +261,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       lib_inchikey <- rep(NA_character_, length(spectral_library))
     }
     lib_inchikey2D <-
-      spectral_library@backend@spectraData$inchikey_no_stereo
+      spectral_library@backend@spectraData$inchikey_2D
     if (is.null(lib_inchikey2D)) {
       lib_inchikey2D <- rep(NA_character_, length(spectral_library))
     }
@@ -267,7 +269,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (is.null(lib_smiles)) {
       lib_smiles <- rep(NA_character_, length(spectral_library))
     }
-    lib_smiles2D <- spectral_library@backend@spectraData$smiles_no_stereo
+    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
     if (is.null(lib_smiles2D)) {
       lib_smiles2D <- rep(NA_character_, length(spectral_library))
     }
@@ -310,7 +312,6 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::select(-target_id)
 
     df_final <- df_final |>
-      tidytable::rowwise() |>
       tidytable::mutate(
         candidate_structure_error_mz = target_precursorMz - precursorMz,
         candidate_structure_inchikey_no_stereo = ifelse(

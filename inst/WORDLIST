@@ -20,6 +20,7 @@ InChI
 InChIKey
 Lifecycle
 MatchForwardReverseParam
+MassBank
 MGF
 MegaLinter
 MsCoreUtils
