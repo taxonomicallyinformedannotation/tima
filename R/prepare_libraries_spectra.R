@@ -88,5 +88,6 @@ prepare_libraries_spectra <-
     }
     export_params(parameters = get_params(step = "prepare_libraries_spectra"), step = "prepare_libraries_spectra")
 
+    rm(spectra, spectra_harmonized)
     return(output)
   }

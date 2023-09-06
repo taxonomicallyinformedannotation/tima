@@ -35,6 +35,6 @@ prepare_libraries_sop_lotus <-
 
     log_debug(x = "Exporting ...")
     export_output(x = lotus_prepared, file = output)
-
+    rm(lotus_prepared)
     return(output)
   }

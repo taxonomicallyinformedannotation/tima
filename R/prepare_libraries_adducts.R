@@ -130,6 +130,7 @@ prepare_libraries_adducts <-
     )
     export_output(x = pure_pos, file = masses_pos_output_path)
     export_output(x = pure_neg, file = masses_neg_output_path)
+    rm(adducts_pos, adducts_neg, pure_pos, pure_neg)
 
     return(c("pos" = output_pos, "neg" = output_neg))
   }

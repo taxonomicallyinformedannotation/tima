@@ -298,6 +298,7 @@ prepare_libraries_rt <-
     export_params(parameters = get_params(step = "prepare_libraries_rt"), step = "prepare_libraries_rt")
     export_output(x = rts, file = output_rt)
     export_output(x = sop, file = output_sop)
+    rm(rts, sop)
     return(
       c(
         "rt" = output_rt,

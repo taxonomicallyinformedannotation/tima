@@ -57,6 +57,7 @@ prepare_features_edges <-
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_features_edges"), step = "prepare_features_edges")
     export_output(x = edges_table_treated, file = output)
+    rm(edges_table_treated)
 
     return(output)
   }
