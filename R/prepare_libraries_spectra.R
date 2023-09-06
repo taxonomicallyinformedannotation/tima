@@ -12,7 +12,7 @@
 #' @param input File containing spectra
 #' @param output Output file
 #' @param polarity MS polarity
-#' @param metad Optional. Metadata as in 'CompoundDb' package
+#' @param metad Metadata to identify the library
 #' @param col_ce Name of the collision energy in mgf
 #' @param col_ci Name of the compound id in mgf
 #' @param col_em Name of the exact mass in mgf
@@ -40,7 +40,7 @@ prepare_libraries_spectra <-
   function(input = params$files$libraries$spectral$exp$raw,
            output = params$files$libraries$spectral$exp,
            polarity = params$ms$polarity,
-           metad = NULL,
+           metad = "myLib",
            col_ce = params$names$mgf$collision_energy,
            col_ci = params$names$mgf$compound_id,
            col_em = params$names$mgf$exact_mass,

@@ -3,6 +3,7 @@
 #' @description This function harmonizes spectra headers
 #'
 #' @param spectra Spectra object to be harmonized
+#' @param metad Metadata to identify the library
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
 #' @param col_ce Name of the collision energy in mgf
 #' @param col_ci Name of the compound id in mgf
@@ -27,6 +28,10 @@
 #'
 #' @examples NULL
 harmonize_spectra <- function(spectra,
+                              metad = get(
+                                "metad",
+                                envir = parent.frame()
+                              ),
                               mode,
                               col_ce = get(
                                 "col_ce",
@@ -142,11 +147,21 @@ harmonize_spectra <- function(spectra,
   spectra_filtered <- spectra |>
     data.frame() |>
     tidytable::as_tidytable() |>
-    tidytable::filter(grepl(
-      pattern = mode,
-      x = !!as.name(col_po),
-      ignore.case = TRUE
-    )) |>
+    tidytable::filter(
+      grepl(
+        pattern = mode,
+        x = !!as.name(col_po),
+        ignore.case = TRUE
+      ) | grepl(
+        pattern = if (mode == "pos") {
+          1
+        } else {
+          0
+        },
+        x = !!as.name(col_po),
+        ignore.case = TRUE
+      )
+    ) |>
     tidytable::select(
       tidytable::any_of(c(columns_full)),
       precursorCharge,
@@ -182,6 +197,7 @@ harmonize_spectra <- function(spectra,
       intensity
     ) |>
     tidytable::mutate(
+      library = metad,
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),

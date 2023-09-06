@@ -50,6 +50,7 @@ prepare_annotations_spectra <-
       tidytable::filter(!is.na(feature_id)) |>
       tidytable::distinct(
         feature_id,
+        candidate_library,
         candidate_spectrum_entropy,
         candidate_structure_error_mz,
         candidate_structure_name,
@@ -63,8 +64,6 @@ prepare_annotations_spectra <-
       ) |>
       ## Add new columns
       tidytable::mutate(
-        candidate_library = "ISDB",
-        ## TODO candidate_library_type = "TODO",
         candidate_structure_exact_mass =
           as.numeric(candidate_structure_exact_mass),
         candidate_structure_tax_npc_01pat = NA_character_,
