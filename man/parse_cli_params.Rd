@@ -4,7 +4,7 @@
 \alias{parse_cli_params}
 \title{Parse CLI parameters}
 \usage{
-parse_cli_params()
+parse_cli_params(params = get("params", envir = parent.frame()))
 }
 \description{
 This function parses command line parameters

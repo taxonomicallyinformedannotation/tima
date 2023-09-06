@@ -10,18 +10,19 @@
 #' @export
 #'
 #' @examples NULL
-parse_yaml_params <- function(def = default_path, usr = user_path) {
+parse_yaml_params <- function(def = get("default_path",
+                                envir = parent.frame()
+                              ),
+                              usr = get("user_path",
+                                envir = parent.frame()
+                              )) {
   ## Read the default YAML file
-  suppressWarnings(
-    params <- yaml::read_yaml(file = def)
-  )
+  suppressWarnings(params <- yaml::read_yaml(file = def))
 
   ## If a user-specified YAML file exists,
   ## read it and overwrite the default values with the user-specified ones
   if (file.exists(usr)) {
-    suppressWarnings(
-      params <- yaml::read_yaml(file = usr)
-    )
+    suppressWarnings(params <- yaml::read_yaml(file = usr))
   }
 
   ## Return the final list of parameters

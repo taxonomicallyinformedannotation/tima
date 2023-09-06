@@ -1671,11 +1671,11 @@ list(
         name = int_com,
         command = {
           int_com <-
-            if(file.exists(fea_com)){
+            if (file.exists(fea_com)) {
               fea_com
             } else {
-                gnps_components
-              }
+              gnps_components
+            }
         }
       ),
       tar_file(

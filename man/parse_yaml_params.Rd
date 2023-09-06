@@ -4,7 +4,10 @@
 \alias{parse_yaml_params}
 \title{Parse YAML parameters}
 \usage{
-parse_yaml_params(def = default_path, usr = user_path)
+parse_yaml_params(
+  def = get("default_path", envir = parent.frame()),
+  usr = get("user_path", envir = parent.frame())
+)
 }
 \arguments{
 \item{def}{Default path}
