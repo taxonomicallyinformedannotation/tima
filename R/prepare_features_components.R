@@ -38,6 +38,7 @@ prepare_features_components <-
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_features_components"), step = "prepare_features_components")
     export_output(x = table, file = output)
+    rm(table)
 
     return(output)
   }

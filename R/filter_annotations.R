@@ -117,5 +117,6 @@ filter_annotations <-
       file = output[[1]]
     )
 
+    rm(final_table)
     return(output[[1]])
   }

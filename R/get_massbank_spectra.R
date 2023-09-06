@@ -27,7 +27,7 @@ get_massbank_spectra <-
       mb_sp <- AnnotationHub::AnnotationHub()[[mb_last]] |>
         Spectra::Spectra()
       log_debug("Removing faulty columns")
-      mb_sp_2 <- mb_sp |>
+      mb_sp |>
         Spectra::selectSpectraVariables(
           Spectra::spectraVariables(mb_sp)[!grepl(
             pattern = "synonym",
@@ -39,6 +39,7 @@ get_massbank_spectra <-
           backend = MsBackendMgf::MsBackendMgf(),
           file = export
         )
+      rm(mb_sp)
     } else {
       log_debug(
         "It appears you already have",

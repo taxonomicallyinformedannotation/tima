@@ -215,6 +215,15 @@ prepare_libraries_sop_merged <-
       file = output_str_tax_npc
     )
 
+    rm(
+      table_keys,
+      table_org_tax_ott,
+      table_structures_stereo,
+      table_structures_metadata,
+      table_structures_names,
+      table_structures_taxonomy_cla,
+      table_structures_taxonomy_npc
+    )
     return(
       c(
         "key" = output_key,

@@ -86,7 +86,6 @@ server <- function(input, output, session) {
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
       tryCatch(expr = {
-        setwd("../..")
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
           port = 3839,
@@ -118,6 +117,9 @@ server <- function(input, output, session) {
             "benchmark_ann_pre_ms2_b_neg",
             "benchmark_ann_pre_ms2_b_pos",
             "benchmark_ann_sir_pre",
+            "benchmark_ann_sir_pre_can",
+            "benchmark_ann_sir_pre_for",
+            "benchmark_ann_sir_pre_str",
             "benchmark_ann_spe_neg",
             "benchmark_ann_spe_pos",
             "benchmark_ann_spe_pre_neg",
@@ -159,6 +161,7 @@ server <- function(input, output, session) {
             "benchmark_taxed_pos",
             "benchmark_wei_par",
             "paths",
+            "path_gnps_example_id",
             "par_def_ann_mas",
             "par_def_ann_spe",
             "par_def_cre_com",

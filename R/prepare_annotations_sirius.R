@@ -250,6 +250,7 @@ prepare_annotations_sirius <-
     export_output(x = table_for, file = output_for)
     export_output(x = table_str, file = output_ann[[1]])
 
+    rm(table_can, table_for, table_str)
     return(
       c(
         "canopus" = output_can,
