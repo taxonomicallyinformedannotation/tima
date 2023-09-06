@@ -3,9 +3,6 @@
 #' @description This function prepares the components
 #'    (clusters in molecular network) for further use
 #'
-#' @include export_output.R
-#' @include export_params.R
-#'
 #' @param input Input file
 #' @param output Output file
 #' @param parameters Params
@@ -24,7 +21,7 @@ prepare_features_components <-
         rep(TRUE, length(input)) ==
           lapply(X = input, FUN = file.exists)
     )
-    params <<- parameters
+    params <- parameters
 
     log_debug(x = "Loading files ...")
     log_debug(x = "... components table")

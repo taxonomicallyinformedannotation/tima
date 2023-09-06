@@ -3,8 +3,6 @@
 #' @description This function prepares the spectral matches
 #'    obtained previously to make them compatible
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file
@@ -37,7 +35,7 @@ prepare_annotations_spectra <-
         rep(TRUE, length(input)) ==
           lapply(X = input, FUN = file.exists)
     )
-    params <<- parameters
+    params <- parameters
     log_debug(x = "Loading and formatting spectral matches")
     table <-
       lapply(

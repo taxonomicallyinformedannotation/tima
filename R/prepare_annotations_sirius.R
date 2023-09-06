@@ -3,8 +3,6 @@
 #' @description This function prepares Sirius results to make them compatible
 #'
 #' @include columns_model.R
-#' @include export_output.R
-#' @include export_params.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
 #' @include select_annotations_columns.R
@@ -39,7 +37,7 @@ prepare_annotations_sirius <-
            str_tax_npc =
              params$files$libraries$sop$merged$structures$taxonomies$npc,
            parameters = params) {
-    params <<- parameters
+    params <- parameters
     if (file.exists(input_directory)) {
       stopifnot("Your npc summary file must be named
                 'canopus_compound_summary.tsv" = file.exists(

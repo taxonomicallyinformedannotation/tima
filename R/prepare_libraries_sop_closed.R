@@ -1,7 +1,5 @@
 #' @title Prepare libraries of structure organism pairs CLOSED
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include round_reals.R
 #'
 #' @param input Input file
@@ -17,7 +15,7 @@ prepare_libraries_sop_closed <-
   function(input = params$files$libraries$sop$raw$closed,
            output = params$files$libraries$sop$prepared,
            parameters = params) {
-    params <<- parameters
+    params <- parameters
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>

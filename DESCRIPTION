@@ -65,9 +65,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Collate:
     'round_reals.R'
-    'export_params.R'
-    'create_dir.R'
-    'export_output.R'
     'dist_groups.R'
     'decorate_masses.R'
     'annotate_masses.R'
@@ -82,6 +79,7 @@ Collate:
     'create_adducts_neg.R'
     'create_adducts_pos.R'
     'create_components.R'
+    'create_dir.R'
     'create_edges.R'
     'keep_peaks.R'
     'sanitize_spectra.R'
@@ -90,6 +88,8 @@ Collate:
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'
+    'export_output.R'
+    'export_params.R'
     'export_spectra.R'
     'export_spectra_2.R'
     'extract_spectra.R'

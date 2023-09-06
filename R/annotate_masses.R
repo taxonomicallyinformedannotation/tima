@@ -4,8 +4,6 @@
 #'
 #' @include decorate_masses.R
 #' @include dist_groups.R
-#' @include export_output.R
-#' @include export_params.R
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
@@ -77,8 +75,8 @@ annotate_masses <-
     stopifnot("Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
       0.05)
 
-    paths <<- parse_yaml_paths()
-    params <<- parameters
+    paths <- parse_yaml_paths()
+    params <- parameters
 
     features_table <- tidytable::fread(
       file = features,

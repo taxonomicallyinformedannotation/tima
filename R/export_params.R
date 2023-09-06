@@ -13,7 +13,9 @@
 #'
 #' @examples NULL
 export_params <-
-  function(parameters = params,
+  function(parameters = get("parameters",
+             envir = parent.frame()
+           ),
            directory = paths$data$interim$params$path,
            step) {
     paths <- parse_yaml_paths()

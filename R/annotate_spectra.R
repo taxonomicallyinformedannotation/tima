@@ -5,8 +5,6 @@
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include import_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
@@ -48,7 +46,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
 
   ## Not checking for ppm and Da limits, everyone is free.
 
-  params <<- parameters
+  params <- parameters
   if (length(library) > 1) {
     library <- library[grepl(polarity, library)]
   }

@@ -3,7 +3,6 @@
 #' @description This function prepares spectra
 #'    to be used for spectral matching
 #'
-#' @include export_params.R
 #' @include export_spectra_2.R
 #' @include extract_spectra.R
 #' @include harmonize_spectra.R
@@ -63,7 +62,7 @@ prepare_libraries_spectra <-
       "Polarity must be 'pos' or 'neg'." =
         polarity %in% c("pos", "neg")
     )
-    params <<- parameters
+    params <- parameters
 
     if (length(output) > 1) {
       output <- output[output |>

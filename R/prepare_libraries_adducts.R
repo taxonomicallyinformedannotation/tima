@@ -4,8 +4,6 @@
 #'
 #' @include create_adducts_neg.R
 #' @include create_adducts_pos.R
-#' @include export_output.R
-#' @include export_params.R
 #'
 #' @param str_met File containing structures metadata
 #' @param adducts_masses Table of adducts taken as input
@@ -35,7 +33,7 @@ prepare_libraries_adducts <-
       "Your structure metadata file does not exist" =
         file.exists(str_met)
     )
-    params <<- parameters
+    params <- parameters
     log_debug("Loading files ...")
     log_debug("... exact masses")
     masses <- tidytable::fread(

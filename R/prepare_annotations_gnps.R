@@ -2,8 +2,6 @@
 #'
 #' @description This function prepares GNPS obtained annotations
 #'
-#' @include export_output.R
-#' @include export_params.R
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file
@@ -35,7 +33,7 @@ prepare_annotations_gnps <-
       input <- "w1llN3v3r3v3r3x1st"
     }
     if (rep(TRUE, length(input)) == lapply(X = input, FUN = file.exists)) {
-      params <<- parameters
+      params <- parameters
       log_debug("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(

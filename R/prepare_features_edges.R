@@ -2,9 +2,6 @@
 #'
 #' @description This function prepares edges for further use
 #'
-#' @include export_output.R
-#' @include export_params.R
-#'
 #' @param input Input file if 'manual'
 #' @param output Output file
 #' @param name_source Name of the source features column
@@ -27,7 +24,7 @@ prepare_features_edges <-
         rep(TRUE, length(unlist(input))) ==
           lapply(X = unlist(input), FUN = file.exists)
     )
-    params <<- parameters
+    params <- parameters
     ## Load edges table
     log_debug(x = "Loading edge table")
     edges_tables <- lapply(
