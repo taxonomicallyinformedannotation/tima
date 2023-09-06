@@ -271,9 +271,9 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     if (is.null(lib_smiles2D)) {
       lib_smiles2D <- rep(NA_character_, length(spectral_library))
     }
-    lib_name <- spectral_library@backend@spectraData$name
-    if (is.null(lib_name)) {
-      lib_name <- rep(NA_character_, length(spectral_library))
+    lib_library <- spectral_library@backend@spectraData$library
+    if (is.null(lib_library)) {
+      lib_library <- rep(NA_character_, length(spectral_library))
     }
     lib_mf <- spectral_library@backend@spectraData$formula
     if (is.null(lib_mf)) {
@@ -282,6 +282,10 @@ annotate_spectra <- function(input = params$files$spectral$raw,
     lib_mass <- spectral_library@backend@spectraData$exactmass
     if (is.null(lib_mass)) {
       lib_mass <- rep(NA_real_, length(spectral_library))
+    }
+    lib_name <- spectral_library@backend@spectraData$name
+    if (is.null(lib_name)) {
+      lib_name <- rep(NA_character_, length(spectral_library))
     }
     lib_xlogp <- spectral_library@backend@spectraData$xlogp
     if (is.null(lib_xlogp)) {
@@ -294,9 +298,10 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       "target_inchikey_no_stereo" = lib_inchikey2D,
       "target_smiles" = lib_smiles,
       "target_smiles_no_stereo" = lib_smiles2D,
-      "target_name" = lib_name,
+      "target_library" = lib_library,
       "target_formula" = lib_mf,
       "target_exactmass" = lib_mass,
+      "target_name" = lib_name,
       "target_xlogp" = lib_xlogp,
       "target_precursorMz" = lib_precursors
     )
@@ -325,6 +330,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
       tidytable::select(tidytable::any_of(
         c(
           "feature_id",
+          "candidate_library" = "target_library",
           "candidate_structure_error_mz",
           "candidate_structure_name" = "target_name",
           "candidate_structure_inchikey_no_stereo",
