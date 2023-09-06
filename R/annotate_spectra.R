@@ -194,6 +194,17 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                   entropy_target <- lib[[index]] |>
                     msentropy::calculate_spectral_entropy()
 
+                  ## number of matched peaks (only Da for now)
+                  matched <- sum(
+                    abs(
+                      outer(
+                        X = spectra[[sp]],
+                        Y = lib[[index]],
+                        FUN = "-"
+                      )
+                    ) <= dalton
+                  )
+
                   if (score >= threshold) {
                     tidytable::tidytable(
                       "feature_id" = query_ids[[spectrum]],
@@ -202,8 +213,7 @@ annotate_spectra <- function(input = params$files$spectral$raw,
                       "target_id" = lib_id[indices][[index]],
                       "candidate_spectrum_entropy" = entropy_target,
                       "candidate_score_similarity" = as.numeric(score),
-                      ## TODO
-                      "candidate_count_similarity_peaks_matched" = NA_integer_
+                      "candidate_count_similarity_peaks_matched" = matched
                     )
                   }
                 }
