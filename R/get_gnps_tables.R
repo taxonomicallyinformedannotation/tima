@@ -87,11 +87,14 @@ get_gnps_tables <-
           gnps_block,
           "metadata_table/"
         )
-        res <- httr::GET(url)
-        status <- res |>
-          httr::http_status()
 
-        if (status$category == "Success") {
+        log_debug("Checking response...")
+        if (url |>
+          httr2::request() |>
+          httr2::req_method("GET") |>
+          httr2::req_perform() |>
+          httr2::resp_status() == 200) {
+          log_debug("Status OK!")
           get_file(
             url = url,
             export = file_metadata

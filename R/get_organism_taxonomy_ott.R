@@ -50,10 +50,11 @@ get_organism_taxonomy_ott <- function(df,
   organisms <- organism_table$canonical_name
 
   log_debug("Testing if Open Tree of Life API is up")
-  res <- httr::POST(url = url)
-  status <- res |>
-    httr::http_status()
-  if (status$category != "Success") {
+  if (url |>
+    httr2::request() |>
+    httr2::req_method("POST") |>
+    httr2::req_perform() |>
+    httr2::resp_status() != 200) {
     log_debug("Sorry, Open Tree of Life API is down")
     log_debug("Failing gracefuly and returning empty results")
     new_matched_otl_exact <-

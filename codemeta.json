@@ -333,7 +333,7 @@
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
-      "version": ">= 1.1.2",
+      "version": ">= 1.1.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -344,16 +344,16 @@
     },
     "5": {
       "@type": "SoftwareApplication",
-      "identifier": "httr",
-      "name": "httr",
-      "version": ">= 1.4.7",
+      "identifier": "httr2",
+      "name": "httr2",
+      "version": ">= 0.2.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=httr"
+      "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
     "6": {
       "@type": "SoftwareApplication",
@@ -602,7 +602,7 @@
       }
     }
   ],
-  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/master/NEWS.md",
+  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/README.md",
   "contIntegration": [
     "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main",
