@@ -31,7 +31,6 @@ prepare_params <- function(filename = get_params(step = "prepare_params")$files$
                            summarise = get_params(step = "prepare_params")$options$summarise,
                            step = NA) {
   ## TODO 'step' actually not taken into account
-  params <- parameters
   filename <<- filename
   features <- features
   spectra <- spectra
@@ -61,7 +60,7 @@ prepare_params <- function(filename = get_params(step = "prepare_params")$files$
   )
 
   list <- load_yaml_files()
-  yamls_params <- list[[1]]
+  yamls_params <- list$yamls_params
 
   log_debug(x = "Changing params")
 
@@ -422,9 +421,9 @@ prepare_params <- function(filename = get_params(step = "prepare_params")$files$
     prepared |>
     lapply(FUN = replace_id)
 
-  yaml_export <- list[[2]] |>
+  yaml_export <- list$yaml_files |>
     gsub(pattern = "default", replacement = "user")
-  names(yaml_export) <- list[[3]]
+  names(yaml_export) <- list$yaml_names
 
   if (!is.na(step)) {
     ## The dollar is for steps having similar names separated by underscores

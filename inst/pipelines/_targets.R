@@ -39,6 +39,12 @@ list(
         command = {
           paths <- parse_yaml_paths(file = yaml_paths)
         }
+      ),
+      tar_target(
+        name = path_gnps_example_id,
+        command = {
+          path_gnps_example_id <- paths$gnps$example
+        }
       )
     ),
     ## Dictionaries
@@ -242,10 +248,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
-                parameters = par_fin_par,
                 step = "annotate_masses"
               )
           }
@@ -259,9 +265,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "annotate_spectra"
               )
           }
@@ -275,9 +282,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "create_components"
               )
           }
@@ -291,9 +299,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "filter_annotations"
               )
           }
@@ -307,9 +316,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "create_edges_spectra"
               )
           }
@@ -323,9 +333,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_annotations_gnps"
               )
           }
@@ -339,9 +350,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_annotations_sirius"
               )
           }
@@ -355,9 +367,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_annotations_spectra"
               )
           }
@@ -371,9 +384,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_features_components"
               )
           }
@@ -387,9 +401,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_features_edges"
               )
           }
@@ -403,9 +418,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_features_tables"
               )
           }
@@ -419,9 +435,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_adducts"
               )
           }
@@ -435,9 +452,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_rt"
               )
           }
@@ -451,9 +469,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_sop_closed"
               )
           }
@@ -467,9 +486,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_sop_ecmdb"
               )
           }
@@ -483,9 +503,10 @@ list(
         #         features = par_fin_par$files$features$raw,
         #         spectra = par_fin_par$files$spectral$raw,
         #         gnps_job_id = par_fin_par$gnps$id,
+        #         gnps_example_id = path_gnps_example_id,
         #         ms_mode = par_fin_par$ms$polarity,
         #         taxon = par_fin_par$organisms$taxon,
-        #         parameters = par_fin_par,
+        # .        summarise = par_fin_par$options$summarise,
         #         step = "prepare_libraries_sop_hmdb"
         #       )
         #   }
@@ -499,9 +520,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_sop_lotus"
               )
           }
@@ -515,9 +537,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_sop_merged"
               )
           }
@@ -531,9 +554,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_libraries_spectra"
               )
           }
@@ -547,9 +571,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "prepare_taxa"
               )
           }
@@ -563,9 +588,10 @@ list(
                 features = par_fin_par$files$features$raw,
                 spectra = par_fin_par$files$spectral$raw,
                 gnps_job_id = par_fin_par$gnps$id,
+                gnps_example_id = path_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
-                parameters = par_fin_par,
+                summarise = par_fin_par$options$summarise,
                 step = "weight_annotations"
               )
           }
