@@ -177,25 +177,25 @@ testthat::test_that("Whole process", {
     what = prepare_libraries_spectra,
     args = c(
       col_args,
-      input = params$files$libraries$spectral$is$raw[[2]] |>
+      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
         gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-      output = params$files$libraries$spectral$is$pos
+      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos
     )
   )
   ##### Check the library already exists warning
   prepare_libraries_spectra(
-    input = params$files$libraries$spectral$is$raw[[2]] |>
+    input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
       gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-    output = params$files$libraries$spectral$is$pos
+    output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos
   )
   ##### Neg & without metadata
   do.call(
     what = prepare_libraries_spectra,
     args = c(
       col_args,
-      input = params$files$libraries$spectral$is$raw[[1]] |>
+      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
         gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
-      output = params$files$libraries$spectral$is$neg,
+      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg,
       polarity = "neg"
     )
   )
@@ -305,8 +305,7 @@ testthat::test_that("Whole process", {
   )
 
   ## Create MS2 based edges
-  create_edges_spectra(
-    ## shallow tolerance to speed up tests
+  create_edges_spectra( ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001
   )
@@ -329,7 +328,7 @@ testthat::test_that("Whole process", {
   ## When there is an input
   prepare_annotations_sirius(
     input_directory =
-      params$files$annotations$raw$sirius
+      get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius
   )
 
   ### ISDB results
@@ -374,7 +373,7 @@ testthat::test_that("Whole process", {
     input = "data/interim/benchmark/bench_test_in.tsv.gz",
     keys = paths$data$interim$libraries$sop$merged$keys,
     org_tax_ott =
-      params$files$libraries$sop$merged$organisms$taxonomies$ott,
+      get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
     output = "data/interim/benchmark/bench_test_out.tsv.gz"
   )
 
