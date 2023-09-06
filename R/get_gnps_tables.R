@@ -91,7 +91,6 @@ get_gnps_tables <-
         log_debug("Checking response...")
         if (url |>
           httr2::request() |>
-          httr2::req_method("GET") |>
           httr2::req_perform() |>
           httr2::resp_status() == 200) {
           log_debug("Status OK!")
