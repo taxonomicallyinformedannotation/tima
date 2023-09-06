@@ -11,7 +11,6 @@
 #' @param output_name Name of the file where adducts will be saved
 #' @param masses_pos_output_path Path where pos adducts masses will be saved
 #' @param masses_neg_output_path Path where neg adducts masses will be saved
-#' @param parameters Parameters
 #'
 #' @return NULL
 #'
@@ -19,16 +18,15 @@
 #'
 #' @examples NULL
 prepare_libraries_adducts <-
-  function(str_met = params$files$libraries$sop$merged$structures$metadata,
+  function(str_met = get_params(step = "prepare_libraries_adducts")$files$libraries$sop$merged$structures$metadata,
            adducts_masses = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
-           adducts_output_path = paths$data$interim$libraries$adducts$path,
-           output_name = params$files$libraries$adducts$prepared,
-           masses_pos_output_path = params$files$libraries$adducts$pos,
-           masses_neg_output_path = params$files$libraries$adducts$neg,
-           parameters = params) {
+           adducts_output_path = parse_yaml_paths()$data$interim$libraries$adducts$path,
+           output_name = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$prepared,
+           masses_pos_output_path = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$pos,
+           masses_neg_output_path = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$neg) {
     stopifnot(
       "Your structure metadata file does not exist" =
         file.exists(str_met)
@@ -113,7 +111,7 @@ prepare_libraries_adducts <-
       tidytable::select(-exact_mass)
 
     log_debug("Exporting ...")
-    export_params(step = "prepare_libraries_adducts")
+    export_params(parameters = get_params(step = "prepare_libraries_adducts"), step = "prepare_libraries_adducts")
     output_pos <- file.path(
       adducts_output_path,
       paste0(output_name, "_pos.tsv.gz")

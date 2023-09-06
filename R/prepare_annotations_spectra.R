@@ -12,7 +12,6 @@
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -20,16 +19,15 @@
 #'
 #' @examples NULL
 prepare_annotations_spectra <-
-  function(input = params$files$annotations$raw$spectral,
-           output = params$files$annotations$prepared$structural,
-           str_stereo = params$files$libraries$sop$merged$structures$stereo,
-           str_met = params$files$libraries$sop$merged$structures$metadata,
-           str_nam = params$files$libraries$sop$merged$structures$names,
+  function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral,
+           output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural,
+           str_stereo = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$stereo,
+           str_met = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$metadata,
+           str_nam = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,
            str_tax_cla =
-             params$files$libraries$sop$merged$structures$taxonomies$cla,
+             get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc =
-             params$files$libraries$sop$merged$structures$taxonomies$npc,
-           parameters = params) {
+             get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$npc) {
     stopifnot(
       "Input file(s) do(es) not exist" =
         rep(TRUE, length(input)) ==
@@ -75,7 +73,7 @@ prepare_annotations_spectra <-
       select_annotations_columns()
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_annotations_spectra")
+    export_params(parameters = get_params(step = "prepare_annotations_spectra"), step = "prepare_annotations_spectra")
     export_output(x = table, file = output[[1]])
 
     return(output[[1]])

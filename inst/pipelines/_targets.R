@@ -931,8 +931,7 @@ list(
           name_inchikey = par_pre_lib_rt$names$inchikey,
           name_rt = par_pre_lib_rt$names$rt,
           name_smiles = par_pre_lib_rt$names$smiles,
-          unit_rt = par_pre_lib_rt$units$rt,
-          parameters = par_pre_lib_rt
+          unit_rt = par_pre_lib_rt$units$rt
         )
       }
     )),
@@ -993,8 +992,7 @@ list(
               prepare_libraries_sop_closed(
                 ## TODO improve
                 input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
-                output = par_pre_lib_sop_clo$files$libraries$sop$prepared,
-                parameters = par_pre_lib_sop_clo
+                output = par_pre_lib_sop_clo$files$libraries$sop$prepared
               )
           }
         ),
@@ -1004,8 +1002,7 @@ list(
             lib_sop_ecm_pre <-
               prepare_libraries_sop_ecmdb(
                 input = lib_sop_ecm,
-                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared,
-                parameters = par_pre_lib_sop_ecm
+                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared
               )
           }
         ),
@@ -1048,8 +1045,7 @@ list(
               output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
               output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
               output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
-              output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc,
-              parameters = par_pre_lib_sop_mer
+              output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
             )
           }
         ),
@@ -1086,8 +1082,7 @@ list(
           adducts_output_path = paths$data$interim$libraries$adducts$path,
           output_name = par_pre_lib_add$files$libraries$adducts$prepared,
           masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
-          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg,
-          parameters = par_pre_lib_add
+          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
         )
       }
     )),
@@ -1295,8 +1290,7 @@ list(
                   col_si = par_pre_lib_spe$names$mgf$spectrum_id,
                   col_sp = par_pre_lib_spe$names$mgf$splash,
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
-                  col_xl = par_pre_lib_spe$names$mgf$xlogp,
-                  parameters = par_pre_lib_spe
+                  col_xl = par_pre_lib_spe$names$mgf$xlogp
                 )
             }
           ),
@@ -1325,8 +1319,7 @@ list(
                   col_si = par_pre_lib_spe$names$mgf$spectrum_id,
                   col_sp = par_pre_lib_spe$names$mgf$splash,
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
-                  col_xl = par_pre_lib_spe$names$mgf$xlogp,
-                  parameters = par_pre_lib_spe
+                  col_xl = par_pre_lib_spe$names$mgf$xlogp
                 )
             }
           ),
@@ -1355,8 +1348,7 @@ list(
                   col_si = "spectrum_id",
                   col_sp = "splash",
                   col_sy = NULL,
-                  col_xl = NULL,
-                  parameters = par_pre_lib_spe
+                  col_xl = NULL
                 )
             }
           ),
@@ -1385,8 +1377,7 @@ list(
                   col_si = "spectrum_id",
                   col_sp = "splash",
                   col_sy = NULL,
-                  col_xl = NULL,
-                  parameters = par_pre_lib_spe
+                  col_xl = NULL
                 )
             }
           )
@@ -1425,8 +1416,7 @@ list(
               neutral_losses_list = dic_neu_los,
               ms_mode = par_ann_mas$ms$polarity,
               tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
-              tolerance_rt = par_ann_mas$ms$tolerances$rt$minutes,
-              parameters = par_ann_mas
+              tolerance_rt = par_ann_mas$ms$tolerances$rt$minutes
             )
         }
       ),
@@ -1459,8 +1449,7 @@ list(
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
-                str_tax_npc = lib_mer_str_tax_npc,
-                parameters = par_pre_ann_gnp
+                str_tax_npc = lib_mer_str_tax_npc
               )
           }
         ),
@@ -1481,8 +1470,7 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx,
-              parameters = par_ann_spe
+              approx = par_ann_spe$annotations$ms2approx
             )
           }
         ),
@@ -1503,8 +1491,7 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx,
-              parameters = par_ann_spe
+              approx = par_ann_spe$annotations$ms2approx
             )
           }
         ),
@@ -1527,8 +1514,7 @@ list(
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
                 str_tax_cla = lib_mer_str_tax_cla,
-                str_tax_npc = lib_mer_str_tax_npc,
-                parameters = par_pre_ann_spe
+                str_tax_npc = lib_mer_str_tax_npc
               )
           }
         )
@@ -1556,8 +1542,7 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx,
-              parameters = par_ann_spe
+              approx = par_ann_spe$annotations$ms2approx
             )
           }
         ),
@@ -1581,8 +1566,7 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx,
-              parameters = par_ann_spe
+              approx = par_ann_spe$annotations$ms2approx
             )
           }
         ),
@@ -1600,8 +1584,7 @@ list(
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
-              str_tax_npc = lib_mer_str_tax_npc,
-              parameters = par_pre_ann_spe
+              str_tax_npc = lib_mer_str_tax_npc
             )
           }
         )
@@ -1621,8 +1604,7 @@ list(
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
-            str_tax_npc = lib_mer_str_tax_npc,
-            parameters = par_pre_ann_sir
+            str_tax_npc = lib_mer_str_tax_npc
           )
       }
     ),
@@ -1650,8 +1632,7 @@ list(
           threshold = par_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity,
-          parameters = par_cre_edg_spe
+          qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
         )
       }
     ),
@@ -1660,8 +1641,7 @@ list(
       command = {
         fea_com <- create_components(
           input = fea_edg_pre,
-          output = par_cre_com$files$networks$spectral$components$raw,
-          parameters = par_cre_com
+          output = par_cre_com$files$networks$spectral$components$raw
         )
       }
     ),
@@ -1696,8 +1676,7 @@ list(
           input = list(edg_spe, ann_ms1_pre_edg),
           output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
-          name_target = par_pre_fea_edg$names$target,
-          parameters = par_pre_fea_edg
+          name_target = par_pre_fea_edg$names$target
         )
       }
     ),
@@ -1706,8 +1685,7 @@ list(
       command = {
         fea_com_pre <- prepare_features_components(
           input = int_com,
-          output = par_pre_fea_com$files$networks$spectral$components$prepared,
-          parameters = par_pre_fea_com
+          output = par_pre_fea_com$files$networks$spectral$components$prepared
         )
       }
     ),
@@ -1719,8 +1697,7 @@ list(
           output = par_pre_fea_tab$files$features$prepared,
           name_features = par_pre_fea_tab$names$features,
           name_rt = par_pre_fea_tab$names$rt,
-          name_mz = par_pre_fea_tab$names$precursor,
-          parameters = par_pre_fea_tab
+          name_mz = par_pre_fea_tab$names$precursor
         )
       }
     )
@@ -1738,8 +1715,7 @@ list(
         top_k = par_pre_tax$organisms$candidates,
         org_tax_ott = lib_mer_org_tax_ott,
         output = par_pre_tax$files$taxa$prepared,
-        taxon = par_pre_tax$organisms$taxon,
-        parameters = par_pre_tax
+        taxon = par_pre_tax$organisms$taxon
       )
     }
   ),
@@ -1757,8 +1733,7 @@ list(
         features = fea_pre,
         rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
-        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes,
-        parameters = par_fil_ann
+        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
       )
     }
   ),
@@ -1776,8 +1751,7 @@ list(
         features = fea_pre,
         rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
-        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes,
-        parameters = par_fil_ann
+        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
       )
     }
   ),
@@ -1832,8 +1806,7 @@ list(
         compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
-        force = par_wei_ann$options$force,
-        parameters = par_wei_ann
+        force = par_wei_ann$options$force
       )
     }
   ),
@@ -1888,8 +1861,7 @@ list(
         compounds_names = par_wei_ann$options$compounds_names,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
-        force = par_wei_ann$options$force,
-        parameters = par_wei_ann
+        force = par_wei_ann$options$force
       )
     }
   ),
@@ -2282,8 +2254,8 @@ list(
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["pos"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
-            # adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
-            # adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
+            adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
+            adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
             clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
             clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
@@ -2291,8 +2263,7 @@ list(
             neutral_losses_list = dic_neu_los,
             ms_mode = "pos",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = benchmark_def_ann_mas
+            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
           )
       }
     ),
@@ -2316,8 +2287,8 @@ list(
             str_tax_npc = lib_mer_str_tax_npc,
             name = lib_add["neg"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
-            # adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
-            # adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
+            adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
+            adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
             clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
             clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
@@ -2325,8 +2296,7 @@ list(
             neutral_losses_list = dic_neu_los,
             ms_mode = "neg",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes,
-            parameters = benchmark_def_ann_mas
+            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
           )
       }
     ),
@@ -2350,8 +2320,7 @@ list(
           threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0,
-          parameters = benchmark_def_cre_edg_spe
+          qutoff = 0
         )
       }
     ),
@@ -2366,8 +2335,7 @@ list(
           threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0,
-          parameters = benchmark_def_cre_edg_spe
+          qutoff = 0
         )
       }
     ),
@@ -2387,8 +2355,7 @@ list(
           input = list(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
-          name_target = benchmark_def_pre_fea_edg$names$target,
-          parameters = benchmark_def_pre_fea_edg
+          name_target = benchmark_def_pre_fea_edg$names$target
         )
       }
     ),
@@ -2399,8 +2366,7 @@ list(
           input = list(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
-          name_target = benchmark_def_pre_fea_edg$names$target,
-          parameters = benchmark_def_pre_fea_edg
+          name_target = benchmark_def_pre_fea_edg$names$target
         )
       }
     ),
@@ -2418,8 +2384,7 @@ list(
       command = {
         benchmark_com_pos <- create_components(
           input = benchmark_edg_pre_pos,
-          output = "data/interim/benchmark/benchmark_components_pos.tsv.gz",
-          parameters = benchmark_def_cre_edg_com
+          output = "data/interim/benchmark/benchmark_components_pos.tsv.gz"
         )
       }
     ),
@@ -2428,8 +2393,7 @@ list(
       command = {
         benchmark_com_neg <- create_components(
           input = benchmark_edg_pre_neg,
-          output = "data/interim/benchmark/benchmark_components_neg.tsv.gz",
-          parameters = benchmark_def_cre_edg_com
+          output = "data/interim/benchmark/benchmark_components_neg.tsv.gz"
         )
       }
     ),
@@ -2447,8 +2411,7 @@ list(
       command = {
         benchmark_com_pre_pos <- prepare_features_components(
           input = benchmark_com_pos,
-          output = "data/interim/benchmark/benchmark_com_pre_pos.tsv.gz",
-          parameters = benchmark_def_pre_fea_com
+          output = "data/interim/benchmark/benchmark_com_pre_pos.tsv.gz"
         )
       }
     ),
@@ -2457,8 +2420,7 @@ list(
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
-          output = "data/interim/benchmark/benchmark_com_pre_neg.tsv.gz",
-          parameters = benchmark_def_pre_fea_com
+          output = "data/interim/benchmark/benchmark_com_pre_neg.tsv.gz"
         )
       }
     ),
@@ -2487,8 +2449,7 @@ list(
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          approx = benchmark_def_ann_spe$annotations$ms2approx,
-          parameters = benchmark_def_ann_spe
+          approx = benchmark_def_ann_spe$annotations$ms2approx
         )
       }
     ),
@@ -2508,8 +2469,7 @@ list(
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
-          approx = benchmark_def_ann_spe$annotations$ms2approx,
-          parameters = benchmark_def_ann_spe
+          approx = benchmark_def_ann_spe$annotations$ms2approx
         )
       }
     ),
@@ -2532,8 +2492,7 @@ list(
           str_met = lib_mer_str_met,
           str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
-          str_tax_npc = lib_mer_str_tax_npc,
-          parameters = benchmark_def_pre_ann_spe
+          str_tax_npc = lib_mer_str_tax_npc
         )
       }
     ),
@@ -2547,8 +2506,7 @@ list(
           str_met = lib_mer_str_met,
           str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
-          str_tax_npc = lib_mer_str_tax_npc,
-          parameters = benchmark_def_pre_ann_spe
+          str_tax_npc = lib_mer_str_tax_npc
         )
       }
     ),
@@ -2574,8 +2532,7 @@ list(
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
-            str_tax_npc = lib_mer_str_tax_npc,
-            parameters = benchmark_def_pre_ann_sir
+            str_tax_npc = lib_mer_str_tax_npc
           )
       }
     ),
@@ -2608,8 +2565,7 @@ list(
           features = benchmark_pre_meta_neg,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2626,8 +2582,7 @@ list(
           rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2642,8 +2597,7 @@ list(
           features = benchmark_pre_meta_neg,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2658,8 +2612,7 @@ list(
           features = benchmark_pre_meta_pos,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2676,8 +2629,7 @@ list(
           rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2692,8 +2644,7 @@ list(
           features = benchmark_pre_meta_pos,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes,
-          parameters = benchmark_def_fil_ann
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
         )
       }
     ),
@@ -2713,6 +2664,7 @@ list(
           canopus = benchmark_ann_sir_pre_can,
           formula = benchmark_ann_sir_pre_for,
           library = lib_mer_key,
+          org_tax_ott = lib_mer_org_tax_ott,
           str_stereo = lib_mer_str_stereo,
           candidates_final = 500,
           score_biological_domain =
@@ -2770,8 +2722,7 @@ list(
           compounds_names = benchmark_def_wei_ann$options$compounds_names,
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,
-          force = benchmark_def_wei_ann$options$force,
-          parameters = benchmark_def_wei_ann
+          force = benchmark_def_wei_ann$options$force
         )
       }
     ),

@@ -5,17 +5,16 @@
 \title{Prepare features components}
 \usage{
 prepare_features_components(
-  input = params$files$networks$spectral$components$raw,
-  output = params$files$networks$spectral$components$prepared,
-  parameters = params
+  input = get_params(step =
+    "prepare_features_components")$files$networks$spectral$components$raw,
+  output = get_params(step =
+    "prepare_features_components")$files$networks$spectral$components$prepared
 )
 }
 \arguments{
 \item{input}{Input file}
 
 \item{output}{Output file}
-
-\item{parameters}{Params}
 }
 \description{
 This function prepares the components

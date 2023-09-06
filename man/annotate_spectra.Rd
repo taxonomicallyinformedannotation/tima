@@ -5,16 +5,15 @@
 \title{Annotate spectra}
 \usage{
 annotate_spectra(
-  input = params$files$spectral$raw,
-  library = params$files$libraries$spectral$exp,
-  polarity = params$ms$polarity,
-  output = params$files$annotations$raw$spectral,
-  threshold = params$annotations$thresholds$ms2$similarity,
-  ppm = params$ms$tolerances$mass$ppm$ms2,
-  dalton = params$ms$tolerances$mass$dalton$ms2,
-  qutoff = params$ms$thresholds$ms2$intensity,
-  approx = params$annotations$ms2approx,
-  parameters = params
+  input = get_params(step = "annotate_spectra")$files$spectral$raw,
+  library = get_params(step = "annotate_spectra")$files$libraries$spectral$exp,
+  polarity = get_params(step = "annotate_spectra")$ms$polarity,
+  output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral,
+  threshold = get_params(step = "annotate_spectra")$annotations$thresholds$ms2$similarity,
+  ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
+  dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
+  qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 )
 }
 \arguments{
@@ -36,8 +35,6 @@ Can be '.mgf' or '.sqlite' (Spectra formatted)}
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 
 \item{approx}{Perform matching without precursor match}
-
-\item{parameters}{Params}
 }
 \description{
 This function annotates spectra

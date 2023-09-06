@@ -5,17 +5,14 @@
 \title{Create components}
 \usage{
 create_components(
-  input = params$files$networks$spectral$edges$prepared,
-  output = params$files$networks$spectral$components$raw,
-  parameters = params
+  input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
+  output = get_params(step = "create_components")$files$networks$spectral$components$raw
 )
 }
 \arguments{
 \item{input}{Input file(s) containing edges}
 
 \item{output}{Output file.}
-
-\item{parameters}{Params}
 }
 \description{
 This function create components from edges

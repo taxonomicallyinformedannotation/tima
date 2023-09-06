@@ -5,16 +5,24 @@
 \title{Prepare annotations SIRIUS}
 \usage{
 prepare_annotations_sirius(
-  input_directory = params$files$annotations$raw$sirius,
-  output_ann = params$files$annotations$prepared$structural,
-  output_can = params$files$annotations$prepared$canopus,
-  output_for = params$files$annotations$prepared$formula,
-  str_stereo = params$files$libraries$sop$merged$structures$stereo,
-  str_met = params$files$libraries$sop$merged$structures$metadata,
-  str_nam = params$files$libraries$sop$merged$structures$names,
-  str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
-  str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-  parameters = params
+  input_directory = get_params(step =
+    "prepare_annotations_sirius")$files$annotations$raw$sirius,
+  output_ann = get_params(step =
+    "prepare_annotations_sirius")$files$annotations$prepared$structural,
+  output_can = get_params(step =
+    "prepare_annotations_sirius")$files$annotations$prepared$canopus,
+  output_for = get_params(step =
+    "prepare_annotations_sirius")$files$annotations$prepared$formula,
+  str_stereo = get_params(step =
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,
+  str_met = get_params(step =
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$metadata,
+  str_nam = get_params(step =
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$names,
+  str_tax_cla = get_params(step =
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = get_params(step =
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc
 )
 }
 \arguments{
@@ -35,8 +43,6 @@ prepare_annotations_sirius(
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
-
-\item{parameters}{Params}
 }
 \description{
 This function prepares Sirius results to make them compatible

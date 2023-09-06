@@ -24,7 +24,6 @@
 #' @param output Output file
 #' @param taxon If you want to enforce all features to a given taxon,
 #'    put its name here.
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -32,18 +31,17 @@
 #'
 #' @examples NULL
 prepare_taxa <-
-  function(input = params$files$features$raw,
-           extension = params$names$extension,
-           name_features = params$names$features,
-           name_filename = params$names$filename,
-           colname = params$names$taxon,
-           metadata = params$files$taxa$raw,
-           top_k = params$organisms$candidates,
+  function(input = get_params(step = "prepare_taxa")$files$features$raw,
+           extension = get_params(step = "prepare_taxa")$names$extension,
+           name_features = get_params(step = "prepare_taxa")$names$features,
+           name_filename = get_params(step = "prepare_taxa")$names$filename,
+           colname = get_params(step = "prepare_taxa")$names$taxon,
+           metadata = get_params(step = "prepare_taxa")$files$taxa$raw,
+           top_k = get_params(step = "prepare_taxa")$organisms$candidates,
            org_tax_ott =
-             params$files$libraries$sop$merged$organisms$taxonomies$ott,
-           output = params$files$taxa$prepared,
-           taxon = params$organisms$taxon,
-           parameters = params) {
+             get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
+           output = get_params(step = "prepare_taxa")$files$taxa$prepared,
+           taxon = get_params(step = "prepare_taxa")$organisms$taxon) {
     if (!is.null(taxon)) {
       if (taxon == "") {
         taxon <- NULL
@@ -242,7 +240,7 @@ prepare_taxa <-
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_taxa")
+    export_params(parameters = get_params(step = "prepare_taxa"), step = "prepare_taxa")
     export_output(x = taxed_features_table, file = output)
 
     return(output)

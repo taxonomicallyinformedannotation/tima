@@ -13,8 +13,8 @@
 #'
 #' @examples NULL
 prepare_libraries_sop_lotus <-
-  function(input = params$files$libraries$sop$raw$lotus,
-           output = params$files$libraries$sop$prepared) {
+  function(input = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$raw$lotus,
+           output = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$prepared) {
     log_debug(x = "Loading and preparing LOTUS")
     lotus_prepared <- input |>
       tidytable::fread(

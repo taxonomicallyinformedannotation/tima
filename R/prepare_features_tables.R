@@ -7,7 +7,6 @@
 #' @param name_features Name of the features column in the features data
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
-#' @param parameters params
 #'
 #' @return NULL
 #'
@@ -15,12 +14,11 @@
 #'
 #' @examples NULL
 prepare_features_tables <-
-  function(features = params$files$features$raw,
-           output = params$files$features$prepared,
-           name_features = params$names$features,
-           name_rt = params$names$rt,
-           name_mz = params$names$precursor,
-           parameters = params) {
+  function(features = get_params(step = "prepare_features_tables")$files$features$raw,
+           output = get_params(step = "prepare_features_tables")$files$features$prepared,
+           name_features = get_params(step = "prepare_features_tables")$names$features,
+           name_rt = get_params(step = "prepare_features_tables")$names$rt,
+           name_mz = get_params(step = "prepare_features_tables")$names$precursor) {
     stopifnot("Your features file does not exist" = file.exists(features))
 
     log_debug("Preparing features table")
@@ -36,7 +34,7 @@ prepare_features_tables <-
       )))
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_features_tables")
+    export_params(parameters = get_params(step = "prepare_features_tables"), step = "prepare_features_tables")
     export_output(x = features_prepared, file = output)
 
     return(output)

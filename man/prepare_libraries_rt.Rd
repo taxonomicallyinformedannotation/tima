@@ -5,20 +5,19 @@
 \title{Prepare libraries of retention times}
 \usage{
 prepare_libraries_rt(
-  mgf_exp = params$files$libraries$spectral$exp,
-  mgf_is = params$files$libraries$spectral$is,
-  temp_exp = params$files$libraries$temporal$exp,
-  temp_is = params$files$libraries$temporal$is,
-  output_rt = params$files$libraries$temporal$prepared,
-  output_sop = params$files$libraries$sop$prepared,
-  col_ik = params$names$mgf$inchikey,
-  col_rt = params$names$mgf$retention_time,
-  col_sm = params$names$mgf$smiles,
-  name_inchikey = params$names$inchikey,
-  name_rt = params$names$rt,
-  name_smiles = params$names$smiles,
-  unit_rt = params$units$rt,
-  parameters = params
+  mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$exp,
+  mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$is,
+  temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp,
+  temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is,
+  output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
+  output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared,
+  col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
+  col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
+  col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
+  name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
+  name_rt = get_params(step = "prepare_libraries_rt")$names$rt,
+  name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
+  unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
 )
 }
 \arguments{
@@ -47,8 +46,6 @@ prepare_libraries_rt(
 \item{name_smiles}{Name of the SMILES in file}
 
 \item{unit_rt}{Unit of the retention time. Must be "seconds" or "minutes"}
-
-\item{parameters}{Params}
 }
 \description{
 This function prepares retention times libraries

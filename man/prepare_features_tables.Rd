@@ -5,12 +5,11 @@
 \title{Prepare features table}
 \usage{
 prepare_features_tables(
-  features = params$files$features$raw,
-  output = params$files$features$prepared,
-  name_features = params$names$features,
-  name_rt = params$names$rt,
-  name_mz = params$names$precursor,
-  parameters = params
+  features = get_params(step = "prepare_features_tables")$files$features$raw,
+  output = get_params(step = "prepare_features_tables")$files$features$prepared,
+  name_features = get_params(step = "prepare_features_tables")$names$features,
+  name_rt = get_params(step = "prepare_features_tables")$names$rt,
+  name_mz = get_params(step = "prepare_features_tables")$names$precursor
 )
 }
 \arguments{
@@ -23,8 +22,6 @@ prepare_features_tables(
 \item{name_rt}{Name of the retention time column in the features data}
 
 \item{name_mz}{Name of the m/z column in the features data}
-
-\item{parameters}{params}
 }
 \description{
 This function prepares features

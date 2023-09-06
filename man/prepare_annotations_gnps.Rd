@@ -5,14 +5,19 @@
 \title{Prepare annotations GNPS}
 \usage{
 prepare_annotations_gnps(
-  input = params$files$annotations$raw$spectral,
-  output = params$files$annotations$prepared$structural,
-  str_stereo = params$files$libraries$sop$merged$structures$stereo,
-  str_met = params$files$libraries$sop$merged$structures$metadata,
-  str_nam = params$files$libraries$sop$merged$structures$names,
-  str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
-  str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-  parameters = params
+  input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral,
+  output = get_params(step =
+    "prepare_annotations_gnps")$files$annotations$prepared$structural,
+  str_stereo = get_params(step =
+    "prepare_annotations_gnps")$files$libraries$sop$merged$structures$stereo,
+  str_met = get_params(step =
+    "prepare_annotations_gnps")$files$libraries$sop$merged$structures$metadata,
+  str_nam = get_params(step =
+    "prepare_annotations_gnps")$files$libraries$sop$merged$structures$names,
+  str_tax_cla = get_params(step =
+    "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = get_params(step =
+    "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$npc
 )
 }
 \arguments{
@@ -29,8 +34,6 @@ prepare_annotations_gnps(
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
-
-\item{parameters}{Parameters}
 }
 \description{
 This function prepares GNPS obtained annotations

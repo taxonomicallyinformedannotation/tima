@@ -5,30 +5,35 @@
 \title{Annotate masses}
 \usage{
 annotate_masses(
-  features = params$files$features$prepared,
-  output_annotations = params$files$annotations$prepared$structural,
-  output_edges = params$files$networks$spectral$edges$raw,
-  name_source = params$names$source,
-  name_target = params$names$target,
-  library = params$files$libraries$sop$merged$keys,
-  str_stereo = params$files$libraries$sop$merged$structures$stereo,
-  str_met = params$files$libraries$sop$merged$structures$metadata,
-  str_nam = params$files$libraries$sop$merged$structures$names,
-  str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
-  str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-  name = params$files$libraries$adducts$prepared,
-  adducts_list = params$ms$adducts,
-  adducts_neg = params$files$libraries$adducts$neg,
-  adducts_pos = params$files$libraries$adducts$pos,
+  features = get_params(step = "annotate_masses")$files$features$prepared,
+  output_annotations = get_params(step =
+    "annotate_masses")$files$annotations$prepared$structural,
+  output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
+  name_source = get_params(step = "annotate_masses")$names$source,
+  name_target = get_params(step = "annotate_masses")$names$target,
+  library = get_params(step = "annotate_masses")$files$libraries$sop$merged$keys,
+  str_stereo = get_params(step =
+    "annotate_masses")$files$libraries$sop$merged$structures$stereo,
+  str_met = get_params(step =
+    "annotate_masses")$files$libraries$sop$merged$structures$metadata,
+  str_nam = get_params(step =
+    "annotate_masses")$files$libraries$sop$merged$structures$names,
+  str_tax_cla = get_params(step =
+    "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = get_params(step =
+    "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
+  name = get_params(step = "annotate_masses")$files$libraries$adducts$prepared,
+  adducts_list = get_params(step = "annotate_masses")$ms$adducts,
+  adducts_neg = get_params(step = "annotate_masses")$files$libraries$adducts$neg,
+  adducts_pos = get_params(step = "annotate_masses")$files$libraries$adducts$pos,
   adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
-  clusters_neg = params$ms$clusters$neg,
-  clusters_pos = params$ms$clusters$pos,
+  clusters_neg = get_params(step = "annotate_masses")$ms$clusters$neg,
+  clusters_pos = get_params(step = "annotate_masses")$ms$clusters$pos,
   clusters_list = system.file("extdata", "clusters.tsv", package = "timaR"),
   neutral_losses_list = system.file("extdata", "neutral_losses.tsv", package = "timaR"),
-  ms_mode = params$ms$polarity,
-  tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
-  tolerance_rt = params$ms$tolerances$rt$minutes,
-  parameters = params
+  ms_mode = get_params(step = "annotate_masses")$ms$polarity,
+  tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
+  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes
 )
 }
 \arguments{
@@ -77,8 +82,6 @@ annotate_masses(
 \item{tolerance_ppm}{Tolerance to perform annotation. Should be ≤ 10 ppm}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be ≤ 0.1min}
-
-\item{parameters}{params}
 }
 \value{
 A table containing MS1 annotations based on exact mass

@@ -16,9 +16,8 @@ export_params <-
   function(parameters = get("parameters",
              envir = parent.frame()
            ),
-           directory = paths$data$interim$params$path,
+           directory = parse_yaml_paths()$data$interim$params$path,
            step) {
-    paths <- parse_yaml_paths()
     # € Create directory if it does not exist
     create_dir(export = directory)
 
@@ -33,7 +32,7 @@ export_params <-
           format(Sys.time(), "%y%m%d_%H%M%OS"),
           "_",
           "tima",
-          paths$version,
+          parse_yaml_paths()$version,
           "_",
           step,
           ".yaml"

@@ -29,7 +29,6 @@
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerance_ppm Tolerance to perform annotation. Should be ≤ 10 ppm
 #' @param tolerance_rt Tolerance to group adducts. Should be ≤ 0.1min
-#' @param parameters params
 #'
 #' @return A table containing MS1 annotations based on exact mass
 #'
@@ -37,27 +36,27 @@
 #'
 #' @examples NULL
 annotate_masses <-
-  function(features = params$files$features$prepared,
-           output_annotations = params$files$annotations$prepared$structural,
-           output_edges = params$files$networks$spectral$edges$raw,
-           name_source = params$names$source,
-           name_target = params$names$target,
-           library = params$files$libraries$sop$merged$keys,
-           str_stereo = params$files$libraries$sop$merged$structures$stereo,
-           str_met = params$files$libraries$sop$merged$structures$metadata,
-           str_nam = params$files$libraries$sop$merged$structures$names,
-           str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-           name = params$files$libraries$adducts$prepared,
-           adducts_list = params$ms$adducts,
-           adducts_neg = params$files$libraries$adducts$neg,
-           adducts_pos = params$files$libraries$adducts$pos,
+  function(features = get_params(step = "annotate_masses")$files$features$prepared,
+           output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural,
+           output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
+           name_source = get_params(step = "annotate_masses")$names$source,
+           name_target = get_params(step = "annotate_masses")$names$target,
+           library = get_params(step = "annotate_masses")$files$libraries$sop$merged$keys,
+           str_stereo = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$stereo,
+           str_met = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$metadata,
+           str_nam = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$names,
+           str_tax_cla = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
+           name = get_params(step = "annotate_masses")$files$libraries$adducts$prepared,
+           adducts_list = get_params(step = "annotate_masses")$ms$adducts,
+           adducts_neg = get_params(step = "annotate_masses")$files$libraries$adducts$neg,
+           adducts_pos = get_params(step = "annotate_masses")$files$libraries$adducts$pos,
            adducts_masses_list = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
-           clusters_neg = params$ms$clusters$neg,
-           clusters_pos = params$ms$clusters$pos,
+           clusters_neg = get_params(step = "annotate_masses")$ms$clusters$neg,
+           clusters_pos = get_params(step = "annotate_masses")$ms$clusters$pos,
            clusters_list = system.file("extdata",
              "clusters.tsv",
              package = "timaR"
@@ -66,16 +65,13 @@ annotate_masses <-
              "neutral_losses.tsv",
              package = "timaR"
            ),
-           ms_mode = params$ms$polarity,
-           tolerance_ppm = params$ms$tolerances$mass$ppm$ms1,
-           tolerance_rt = params$ms$tolerances$rt$minutes,
-           parameters = params) {
+           ms_mode = get_params(step = "annotate_masses")$ms$polarity,
+           tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
+           tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
     stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
       20)
     stopifnot("Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
       0.05)
-
-    paths <- parse_yaml_paths()
 
     features_table <- tidytable::fread(
       file = features,
@@ -100,7 +96,7 @@ annotate_masses <-
       adduct_file <- adducts_pos
       adduct_db_file <-
         file.path(
-          paths$data$interim$libraries$adducts$path,
+          parse_yaml_paths()$data$interim$libraries$adducts$path,
           paste0(name, "_pos.tsv.gz")
         )
       clusters_allowed <- clusters_pos
@@ -108,7 +104,7 @@ annotate_masses <-
       adduct_file <- adducts_neg
       adduct_db_file <-
         file.path(
-          paths$data$interim$libraries$adducts$path,
+          parse_yaml_paths()$data$interim$libraries$adducts$path,
           paste0(name, "_neg.tsv.gz")
         )
       clusters_allowed <- clusters_neg
@@ -827,7 +823,7 @@ annotate_masses <-
         tidytable::distinct()
     )
 
-    export_params(step = "annotate_masses")
+    export_params(parameters = get_params(step = "annotate_masses"), step = "annotate_masses")
     export_output(x = edges, file = output_edges[[1]])
     export_output(x = df25, file = output_annotations[[1]])
 

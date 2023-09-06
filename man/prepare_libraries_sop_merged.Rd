@@ -5,18 +5,24 @@
 \title{Prepare merged structure organism pairs libraries}
 \usage{
 prepare_libraries_sop_merged(
-  files = params$files$libraries$sop$prepared,
-  filter = params$organisms$filter$mode,
-  level = params$organisms$filter$level,
-  value = params$organisms$filter$value,
-  output_key = params$files$libraries$sop$merged$keys,
-  output_org_tax_ott = params$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output_str_stereo = params$files$libraries$sop$merged$structures$stereo,
-  output_str_met = params$files$libraries$sop$merged$structures$metadata,
-  output_str_nam = params$files$libraries$sop$merged$structures$names,
-  output_str_tax_cla = params$files$libraries$sop$merged$structures$taxonomies$cla,
-  output_str_tax_npc = params$files$libraries$sop$merged$structures$taxonomies$npc,
-  parameters = params
+  files = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared,
+  filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,
+  level = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$level,
+  value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
+  output_key = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
+  output_org_tax_ott = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$taxonomies$ott,
+  output_str_stereo = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$stereo,
+  output_str_met = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$metadata,
+  output_str_nam = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$names,
+  output_str_tax_cla = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$cla,
+  output_str_tax_npc = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$npc
 )
 }
 \arguments{
@@ -43,8 +49,6 @@ e.g. 'Gentianaceae|Apocynaceae'}
 \item{output_str_tax_cla}{Output file for structures taxonomy (Classyfire)}
 
 \item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
-
-\item{parameters}{Param}
 }
 \description{
 This function prepares the libraries made of

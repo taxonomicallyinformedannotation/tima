@@ -17,7 +17,6 @@
 #' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
-#' @param parameters Params
 #'
 #' @return NULL
 #'
@@ -25,18 +24,17 @@
 #'
 #' @examples NULL
 prepare_annotations_sirius <-
-  function(input_directory = params$files$annotations$raw$sirius,
-           output_ann = params$files$annotations$prepared$structural,
-           output_can = params$files$annotations$prepared$canopus,
-           output_for = params$files$annotations$prepared$formula,
-           str_stereo = params$files$libraries$sop$merged$structures$stereo,
-           str_met = params$files$libraries$sop$merged$structures$metadata,
-           str_nam = params$files$libraries$sop$merged$structures$names,
+  function(input_directory = get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
+           output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural,
+           output_can = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$canopus,
+           output_for = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$formula,
+           str_stereo = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,
+           str_met = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$metadata,
+           str_nam = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$names,
            str_tax_cla =
-             params$files$libraries$sop$merged$structures$taxonomies$cla,
+             get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc =
-             params$files$libraries$sop$merged$structures$taxonomies$npc,
-           parameters = params) {
+             get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (file.exists(input_directory)) {
       stopifnot("Your npc summary file must be named
                 'canopus_compound_summary.tsv" = file.exists(
@@ -247,7 +245,7 @@ prepare_annotations_sirius <-
       tidytable::distinct()
 
     log_debug(x = "Exporting ...")
-    export_params(step = "prepare_annotations_sirius")
+    export_params(parameters = get_params(step = "prepare_annotations_sirius"), step = "prepare_annotations_sirius")
     export_output(x = table_can, file = output_can)
     export_output(x = table_for, file = output_for)
     export_output(x = table_str, file = output_ann[[1]])

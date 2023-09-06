@@ -6,7 +6,7 @@
 \usage{
 export_params(
   parameters = get("parameters", envir = parent.frame()),
-  directory = paths$data$interim$params$path,
+  directory = parse_yaml_paths()$data$interim$params$path,
   step
 )
 }
