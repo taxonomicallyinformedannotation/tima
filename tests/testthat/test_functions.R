@@ -558,7 +558,7 @@ testthat::test_that("Whole process", {
   arguments$force <<- "x"
   arguments$summarise <<- "x"
 
-  parse_cli_params()
+  parse_cli_params(parameters = params)
 
   succeed()
 })

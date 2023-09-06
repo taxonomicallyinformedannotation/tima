@@ -43,7 +43,7 @@ get_params <- function(step) {
 
   params <- parse_yaml_params()
 
-  params <- parse_cli_params()
+  params <- parse_cli_params(parameters = params)
 
   return(params)
 }
