@@ -54,7 +54,7 @@ prepare_params <- function(filename = params$files$pattern,
       ms_mode %in% c("pos", "neg")
   )
 
-  params <<- parameters
+  params <- parameters
   filename <<- filename
   features <<- features
   spectra <<- spectra
