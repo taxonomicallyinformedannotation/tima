@@ -165,6 +165,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "R.utils",
+      "name": "R.utils",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=R.utils"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "rstudioapi",
       "name": "rstudioapi",
       "provider": {
@@ -447,19 +459,6 @@
     },
     "12": {
       "@type": "SoftwareApplication",
-      "identifier": "R.utils",
-      "name": "R.utils",
-      "version": ">= 2.12.2",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=R.utils"
-    },
-    "13": {
-      "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
       "version": ">= 3.1.0",
@@ -471,7 +470,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "14": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -484,12 +483,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "15": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "16": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -502,7 +501,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "17": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -515,7 +514,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "18": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -528,12 +527,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "19": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
