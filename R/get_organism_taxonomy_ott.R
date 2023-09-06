@@ -53,8 +53,14 @@ get_organism_taxonomy_ott <- function(df,
   if (url |>
     httr2::request() |>
     httr2::req_method("POST") |>
+    ## weird hack to avoid error
+    httr2::req_error(
+      is_error = function(resp) {
+        return(FALSE)
+      }
+    ) |>
     httr2::req_perform() |>
-    httr2::resp_status() != 200) {
+    httr2::resp_status_desc() != "OK") {
     log_debug("Sorry, Open Tree of Life API is down")
     log_debug("Failing gracefuly and returning empty results")
     new_matched_otl_exact <-
