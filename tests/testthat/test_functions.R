@@ -13,7 +13,7 @@ testthat::test_that("Whole process", {
   )
 
   ## Prepare parameters
-  paths <<- parse_yaml_paths()
+  paths <- parse_yaml_paths()
   step <- "prepare_params"
   params <- get_params(step = step)
   ## Prepare config for a single step only

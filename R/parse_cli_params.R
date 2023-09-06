@@ -7,7 +7,9 @@
 #' @export
 #'
 #' @examples NULL
-parse_cli_params <- function() {
+parse_cli_params <- function(params = get("params",
+                               envir = parent.frame()
+                             )) {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {
@@ -374,7 +376,5 @@ parse_cli_params <- function() {
     }
   }
 
-  if (exists("params")) {
-    return(params)
-  }
+  return(params)
 }
