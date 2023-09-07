@@ -2,6 +2,7 @@
 #'
 #' @description This function parses command line parameters
 #'
+#' @param arguments CLI arguments
 #' @param parameters Parameters
 #'
 #' @return NULL
@@ -9,7 +10,7 @@
 #' @export
 #'
 #' @examples NULL
-parse_cli_params <- function(parameters) {
+parse_cli_params <- function(arguments, parameters) {
   log_debug("Loading command line arguments")
 
   if (exists("arguments")) {

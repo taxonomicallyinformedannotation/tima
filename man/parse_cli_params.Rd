@@ -4,9 +4,11 @@
 \alias{parse_cli_params}
 \title{Parse CLI parameters}
 \usage{
-parse_cli_params(parameters)
+parse_cli_params(arguments, parameters)
 }
 \arguments{
+\item{arguments}{CLI arguments}
+
 \item{parameters}{Parameters}
 }
 \description{
