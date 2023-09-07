@@ -204,7 +204,7 @@ testthat::test_that("Whole process", {
   prepare_libraries_spectra(polarity = "neg")
   prepare_libraries_spectra(
     polarity = "neg",
-    output = params$files$libraries$spectral$exp |>
+    output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp |>
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
 
