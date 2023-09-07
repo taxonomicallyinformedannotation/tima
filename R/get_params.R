@@ -39,11 +39,12 @@ get_params <- function(step) {
     nchars = file.info(doc_path)$size
   )
 
-  arguments <<- docopt::docopt(doc = doc, version = paths$version)
-
   params <- parse_yaml_params()
 
-  params <- parse_cli_params(parameters = params)
+  params <- parse_cli_params(
+    arguments = docopt::docopt(doc = doc, version = paths$version),
+    parameters = params
+  )
 
   return(params)
 }
