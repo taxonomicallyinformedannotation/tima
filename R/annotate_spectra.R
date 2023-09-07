@@ -345,7 +345,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
     log_debug("Filtering results above threshold only...")
     df_final <- df_final |>
-      tidytable::filter(candidate_score_similarity >= threshold)
+      tidytable::filter(candidate_score_similarity >= threshold) |>
+      tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+      ## keep only the best result (per library for now)
+      tidytable::distinct(
+        feature_id,
+        candidate_library,
+        candidate_structure_inchikey_no_stereo,
+        .keep_all = TRUE
+      )
 
     log_debug(
       nrow(
