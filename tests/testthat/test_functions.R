@@ -207,6 +207,10 @@ testthat::test_that("Whole process", {
     output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp |>
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
+  ## for msp reading test
+  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"),
+    full.names = TRUE, pattern = "msp$"
+  )[1L])
 
   #### HMDB
   # prepare_isdb_hmdb()
