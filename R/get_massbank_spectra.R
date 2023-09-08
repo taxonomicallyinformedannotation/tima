@@ -3,6 +3,9 @@
 #' @description This function gets MassBank spectra
 #'
 #' @param output_dir Output where to store the spectra
+#' @param mb_file MassBank file
+#' @param mb_url MassBank URL
+#' @param mb_version MassBank version
 #'
 #' @return NULL
 #'
