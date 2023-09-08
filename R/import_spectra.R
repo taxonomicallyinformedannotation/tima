@@ -28,21 +28,20 @@ import_spectra <- function(file) {
       ## https://github.com/RforMassSpectrometry/MsBackendSql
       ## will be available
     },
+    "msp" = {
+      MsBackendMsp::readMsp(f = file) |>
+        Spectra::Spectra() |>
+        Spectra::filterMsLevel(2)
+    },
     # "sqlite" = {
     #   CompoundDb::CompDb(x = file) |>
     #     CompoundDb::Spectra() |>
-    #     ## TODO change it as soon as
-    #     ## https://github.com/RforMassSpectrometry/MsBackendSql
-    #     ## will be available
     #     Spectra::setBackend(Spectra::MsBackendMemory())
     # },
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
         Spectra::Spectra()
-      ## TODO change it as soon as
-      ## https://github.com/RforMassSpectrometry/MsBackendSql
-      ## will be available
     }
   )
 }

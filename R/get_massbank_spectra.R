@@ -10,36 +10,23 @@
 #'
 #' @examples NULL
 get_massbank_spectra <-
-  function(output_dir = "data/source/libraries/spectra/exp/") {
-    log_debug("Loading last AnnotationHub version ...")
-    ah <- AnnotationHub::AnnotationHub()
-
-    log_debug("Querying for most recent MassBank version available ...")
-    ahmb <- AnnotationHub::query(ah, "MassBank")
-    mb_last <- ahmb$ah_id |> tail(1)
-
-    export <- file.path(output_dir, paste0(mb_last, ".mgf"))
-
+  function(output_dir = "data/source/libraries/spectra/exp",
+           mb_file = parse_yaml_paths()$urls$massbank$file,
+           mb_url = parse_yaml_paths()$urls$massbank$url,
+           mb_version = parse_yaml_paths()$urls$massbank$version) {
     log_debug("Checking if a previous MassBank version already exists")
+    export <- file.path(output_dir, paste(mb_version, mb_file, sep = "_"))
     if (!file.exists(export)) {
-      create_dir(export)
-      log_debug("Downloading most recent MassBank version available ...")
-      mb_sp <- AnnotationHub::AnnotationHub()[[mb_last]] |>
-        Spectra::Spectra()
-      log_debug("Removing faulty columns")
-      mb_sp |>
-        Spectra::selectSpectraVariables(
-          Spectra::spectraVariables(mb_sp)[!grepl(
-            pattern = "synonym",
-            x = Spectra::spectraVariables(mb_sp)
-          )]
-        ) |>
-        log_pipe("Exporting") |>
-        Spectra::export(
-          backend = MsBackendMgf::MsBackendMgf(),
-          file = export
-        )
-      rm(mb_sp)
+      log_debug("Downloading MassBank", mb_version)
+      get_file(
+        url = paste(
+          mb_url,
+          mb_version,
+          mb_file,
+          sep = "/"
+        ),
+        export = export
+      )
     } else {
       log_debug(
         "It appears you already have",
