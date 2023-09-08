@@ -45,6 +45,120 @@ list(
         command = {
           paths_gnps_example_id <- paths$gnps$example
         }
+      ),
+      tar_target(
+        name = paths_source,
+        command = {
+          paths_source <- paths$data$source$path
+        }
+      ),
+      tar_target(
+        name = paths_interim_a,
+        command = {
+          paths_interim_a <- paths$data$interim$annotations$path
+        }
+      ),
+      tar_target(
+        name = paths_interim_f,
+        command = {
+          paths_interim_f <- paths$data$interim$features$path
+        }
+      ),
+      tar_target(
+        name = paths_test_mode,
+        command = {
+          paths_test_mode <- paths$tests$mode
+        }
+      ),
+      tar_target(
+        name = paths_urls_massbank_file,
+        command = {
+          paths_urls_massbank_file <- paths$urls$massbank$file
+        }
+      ),
+      tar_target(
+        name = paths_urls_massbank_url,
+        command = {
+          paths_urls_massbank_url <- paths$urls$massbank$url
+        }
+      ),
+      tar_target(
+        name = paths_urls_massbank_version,
+        command = {
+          paths_urls_massbank_version <- paths$urls$massbank$version
+        }
+      ),
+      tar_target(
+        name = paths_urls_examples_spectra_mini,
+        command = {
+          paths_urls_examples_spectra_mini <- paths$urls$examples$spectra_mini
+        }
+      ),
+      tar_target(
+        name = paths_data_source_spectra,
+        command = {
+          paths_data_source_spectra <- paths$data$source$spectra
+        }
+      ),
+      tar_target(
+        name = paths_urls_ecmdb_metabolites,
+        command = {
+          paths_urls_ecmdb_metabolites <- paths$urls$ecmdb$metabolites
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_sop_ecmdb,
+        command = {
+          paths_data_source_libraries_sop_ecmdb <-
+            paths$data$source$libraries$sop$ecmdb
+        }
+      ),
+      tar_target(
+        name = paths_urls_lotus_doi,
+        command = {
+          paths_urls_lotus_doi <- paths$urls$lotus$doi
+        }
+      ),
+      tar_target(
+        name = paths_urls_lotus_pattern,
+        command = {
+          paths_urls_lotus_pattern <- paths$urls$lotus$pattern
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_sop_lotus,
+        command = {
+          paths_data_source_libraries_sop_lotus <-
+            paths$data$source$libraries$sop$lotus
+        }
+      ),
+      tar_target(
+        name = paths_urls_examples_spectral_lib_pos,
+        command = {
+          paths_urls_examples_spectral_lib_pos <-
+            paths$urls$examples$spectral_lib$pos
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_spectra_is_lotus_pos,
+        command = {
+          paths_data_source_libraries_spectra_is_lotus_pos <-
+            paths$data$source$libraries$spectra$is$lotus$pos
+        }
+      ),
+      tar_target(
+        name = paths_urls_examples_spectral_lib_neg,
+        command = {
+          paths_urls_examples_spectral_lib_neg <-
+            paths$urls$examples$spectral_lib$neg
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_spectra_is_lotus_neg,
+        command = {
+          paths_data_source_libraries_spectra_is_lotus_neg <-
+            paths$data$source$libraries$spectra$is$lotus$neg
+        }
       )
     ),
     ## Dictionaries
@@ -825,9 +939,9 @@ list(
           path_features = par_pre_fea_tab$files$features$raw,
           path_metadata = par_pre_tax$files$taxa$raw,
           path_spectra = par_ann_spe$files$spectral$raw,
-          path_source = paths$data$source$path,
-          path_interim_a = paths$data$interim$annotations$path,
-          path_interim_f = paths$data$interim$features$path
+          path_source = paths_source,
+          path_interim_a = paths_interim_a,
+          path_interim_f = paths_interim_f
         )
       }
     ),
@@ -893,7 +1007,7 @@ list(
       command = {
         input_spectra <-
           ifelse(
-            test = paths$tests$mode == FALSE,
+            test = paths_test_mode == FALSE,
             yes = ifelse(
               test = !is.null(gnps_spectra),
               yes =
@@ -906,10 +1020,9 @@ list(
             ),
             no = {
               get_file(
-                url = paths$urls$examples$spectra_mini,
-                export = paths$data$source$spectra
+                url = paths_urls_examples_spectra_mini,
+                export = paths_data_source_spectra
               )
-              return(paths$data$source$spectra)
             }
           )
       }
@@ -989,8 +1102,8 @@ list(
           name = lib_sop_ecm,
           command = {
             lib_sop_ecm <- get_file(
-              url = paths$urls$ecmdb$metabolites,
-              export = paths$data$source$libraries$sop$ecmdb
+              url = paths_urls_ecmdb_metabolites,
+              export = paths_data_source_libraries_sop_ecmdb
             )
           }
         ),
@@ -999,9 +1112,9 @@ list(
           name = lib_sop_lot,
           command = {
             lib_sop_lot <- get_last_version_from_zenodo(
-              doi = paths$urls$lotus$doi,
-              pattern = paths$urls$lotus$pattern,
-              path = paths$data$source$libraries$sop$lotus
+              doi = paths_urls_lotus_doi,
+              pattern = paths_urls_lotus_pattern,
+              path = paths_data_source_libraries_sop_lotus
             )
           },
           ## To always check if a newest version is available
@@ -1038,10 +1151,10 @@ list(
           command = {
             lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
-                input = if (paths$tests$mode == FALSE) {
+                input = if (paths_test_mode == FALSE) {
                   lib_sop_lot
                 } else {
-                  paths$data$source$libraries$sop$lotus
+                  paths_data_source_libraries_sop_lotus
                 },
                 output = par_pre_lib_sop_lot$files$libraries$sop$prepared
               )
@@ -1121,24 +1234,24 @@ list(
             name = lib_spe_is_lot_pos,
             command = {
               lib_spe_is_lot_pos <-
-                # if (paths$tests$mode == FALSE) {
+                # if (paths_test_mode == FALSE) {
                 get_file(
-                  url = paths$urls$examples$spectral_lib$pos,
-                  export = paths$data$source$libraries$spectra$is$lotus$pos |>
+                  url = paths_urls_examples_spectral_lib_pos,
+                  export = paths_data_source_libraries_spectra_is_lotus_pos |>
                     gsub(
                       pattern = "isdb_pos.mgf",
                       replacement = "lotus_pos.rds"
                     )
                 )
               # get_last_version_from_zenodo(
-              #   doi = paths$urls$lotus_isdb$doi,
-              #   pattern = paths$urls$lotus_isdb$pattern$pos,
-              #   path = paths$data$source$libraries$spectra$is$lotus$pos
+              #   doi = paths_urls_lotus_isdb_doi,
+              #   pattern = paths_urls_lotus_isdb_pattern_pos,
+              #   path = paths_data_source_libraries_spectra_is_lotus_pos
               # )
               # } else {
               #   get_file(
-              #     url = paths$urls$examples$spectral_lib$pos,
-              #     export = paths$data$source$libraries$spectra$is$lotus$pos
+              #     url = paths_urls_examples_spectral_lib_pos,
+              #     export = paths_data_source_libraries_spectra_is_lotus_pos
               #   )
               # }
             }
@@ -1151,24 +1264,24 @@ list(
             name = lib_spe_is_lot_neg,
             command = {
               lib_spe_is_lot_neg <-
-                # if (paths$tests$mode == FALSE) {
+                # if (paths_test_mode == FALSE) {
                 get_file(
-                  url = paths$urls$examples$spectral_lib$neg,
-                  export = paths$data$source$libraries$spectra$is$lotus$neg |>
+                  url = paths_urls_examples_spectral_lib_neg,
+                  export = paths_data_source_libraries_spectra_is_lotus_neg |>
                     gsub(
                       pattern = "isdb_neg.mgf",
                       replacement = "lotus_neg.rds"
                     )
                 )
               # get_last_version_from_zenodo(
-              #   doi = paths$urls$lotus_isdb$doi,
-              #   pattern = paths$urls$lotus_isdb$pattern$neg,
-              #   path = paths$data$source$libraries$spectra$is$lotus$neg
+              #   doi = paths_urls_lotus_isdb_doi,
+              #   pattern = paths_urls_lotus_isdb_pattern_neg,
+              #   path = paths_data_source_libraries_spectra_is_lotus_neg
               # )
               # } else {
               #   get_file(
-              #     url = paths$urls$examples$spectral_lib$neg,
-              #     export = paths$data$source$libraries$spectra$is$lotus$neg
+              #     url = paths_urls_examples_spectral_lib_neg,
+              #     export = paths_data_source_libraries_spectra_is_lotus_neg
               #   )
               # }
             }
@@ -1189,10 +1302,10 @@ list(
             lib_spe_is_lot_pre_pos <-
               lib_spe_is_lot_pos
             # lib_spe_is_lot_pre_pos <- prepare_libraries_spectra(
-            #   input = if (paths$tests$mode == FALSE) {
+            #   input = if (paths_test_mode == FALSE) {
             #     lib_spe_is_lot_pos
             #   } else {
-            #     paths$data$source$libraries$spectra$is$lotus$pos
+            #     paths_data_source_libraries_spectra_is_lotus_pos
             #   },
             #   output = paths$data$interim$libraries$spectra$is$lotus$pos,
             #   col_ce = NULL,
@@ -1231,7 +1344,7 @@ list(
             lib_spe_is_lot_pre_neg <-
               lib_spe_is_lot_neg
             # lib_spe_is_lot_pre_neg <- prepare_libraries_spectra(
-            #   input = if (paths$tests$mode == FALSE) {
+            #   input = if (paths_test_mode == FALSE) {
             #     lib_spe_is_lot_neg
             #   } else {
             #     paths$data$source$libraries$spectra$is$lotus$neg
@@ -1285,9 +1398,9 @@ list(
             name = lib_spe_exp_mb_raw,
             command = {
               lib_spe_exp_mb_raw <- get_massbank_spectra(
-                mb_file = paths$urls$massbank$file,
-                mb_url = paths$urls$massbank$url,
-                mb_version = paths$urls$massbank$version
+                mb_file = paths_urls_massbank_file,
+                mb_url = paths_urls_massbank_url,
+                mb_version = paths_urls_massbank_version
               )
             }
           )
@@ -1363,7 +1476,7 @@ list(
                     "data/interim/libraries/spectra/exp/massbank_neg.rds",
                   polarity = "neg",
                   metad = paste("MassBank",
-                    paths$urls$massbank$version,
+                    paths_urls_massbank_version,
                     sep = " - "
                   ),
                   col_ce = "Collision_energy",
@@ -1395,7 +1508,7 @@ list(
                     "data/interim/libraries/spectra/exp/massbank_pos.rds",
                   polarity = "pos",
                   metad = paste("MassBank",
-                    paths$urls$massbank$version,
+                    paths_urls_massbank_version,
                     sep = " - "
                   ),
                   col_ce = "Collision_energy",
