@@ -1,6 +1,6 @@
+library(timaR)
 # save the results to a file
 save_input <- function(input) {
-  pkgload::load_all()
   setwd("../../")
 
   paths_data_source <- parse_yaml_paths()$data$source$path
