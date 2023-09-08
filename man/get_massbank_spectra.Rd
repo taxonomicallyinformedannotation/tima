@@ -4,7 +4,12 @@
 \alias{get_massbank_spectra}
 \title{Get MassBank spectra}
 \usage{
-get_massbank_spectra(output_dir = "data/source/libraries/spectra/exp/")
+get_massbank_spectra(
+  output_dir = "data/source/libraries/spectra/exp",
+  mb_file = parse_yaml_paths()$urls$massbank$file,
+  mb_url = parse_yaml_paths()$urls$massbank$url,
+  mb_version = parse_yaml_paths()$urls$massbank$version
+)
 }
 \arguments{
 \item{output_dir}{Output where to store the spectra}

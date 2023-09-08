@@ -13,10 +13,12 @@ extract_spectra <- function(object) {
   ## issues
   incoherent_colnames <- c(
     ms_level = "msLevel",
-    precursor_intensity = "precursorIntensity"
+    precursor_intensity = "precursorIntensity",
+    precursorMz = "PrecursorMZ"
   )
   incoherent_logical <- c("predicted")
   incoherent_integer <- c("spectrum_id")
+  incoherent_numeric <- c("PrecursorMZ")
 
   ## Extract peaks data and transform it into a data frame
   peaks <- object |>
@@ -57,12 +59,16 @@ extract_spectra <- function(object) {
     tidytable::mutate(tidytable::across(
       .cols = tidytable::any_of(incoherent_integer),
       .fns = as.integer
+    )) |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidytable::any_of(incoherent_numeric),
+      .fns = as.numeric
     ))
 
   ## Select all columns except those specified in 'incoherent_colnames',
   ## and rename the remaining columns using the names in 'incoherent_colnames'
   spectra <- spectra |>
-    tidytable::select(-c(tidytable::any_of(incoherent_colnames))) |>
+    tidytable::select(-c(tidytable::any_of(names(incoherent_colnames)))) |>
     tidytable::rename(tidytable::any_of(incoherent_colnames))
 
   return(spectra)

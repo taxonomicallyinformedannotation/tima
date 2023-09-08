@@ -81,18 +81,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "CompoundDb",
-      "name": "CompoundDb",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/CompoundDb.html"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "DT",
       "name": "DT",
       "provider": {
@@ -329,19 +317,6 @@
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "AnnotationHub",
-      "name": "AnnotationHub",
-      "version": ">= 3.8.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/AnnotationHub.html"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
       "identifier": "crayon",
       "name": "crayon",
       "version": ">= 1.5.2",
@@ -353,7 +328,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=crayon"
     },
-    "4": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
@@ -366,7 +341,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "5": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -379,7 +354,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -392,7 +367,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -405,7 +380,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -418,7 +393,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -430,6 +405,19 @@
         "url": "https://www.bioconductor.org"
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "MsBackendMsp",
+      "name": "MsBackendMsp",
+      "version": ">= 1.4.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
     },
     "10": {
       "@type": "SoftwareApplication",
