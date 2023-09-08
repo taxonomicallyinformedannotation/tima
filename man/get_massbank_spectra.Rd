@@ -13,6 +13,12 @@ get_massbank_spectra(
 }
 \arguments{
 \item{output_dir}{Output where to store the spectra}
+
+\item{mb_file}{MassBank file}
+
+\item{mb_url}{MassBank URL}
+
+\item{mb_version}{MassBank version}
 }
 \description{
 This function gets MassBank spectra
