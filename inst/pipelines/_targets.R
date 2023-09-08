@@ -819,7 +819,7 @@ list(
       command = {
         gnps_tables <- get_gnps_tables(
           gnps_job_id = par_fin_par$gnps$id,
-          gnps_job_example = paths$gnps$example,
+          gnps_job_example = paths_gnps_example_id,
           filename = par_fin_par$files$pattern,
           workflow = par_fin_par$gnps$workflow,
           path_features = par_pre_fea_tab$files$features$raw,
@@ -1536,7 +1536,7 @@ list(
           command = {
             ann_spe_exp_int_pre <-
               prepare_annotations_spectra(
-                input = list(
+                input = c(
                   ann_spe_exp_int_neg,
                   ann_spe_exp_int_pos
                 ),
@@ -1563,7 +1563,7 @@ list(
           command = {
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
-              library = list(
+              library = c(
                 lib_spe_is_lot_pre_pos,
                 lib_spe_exp_mb_pre_pos
               ),
@@ -1587,7 +1587,7 @@ list(
           command = {
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
-              library = list(
+              library = c(
                 lib_spe_is_lot_pre_neg,
                 lib_spe_exp_mb_pre_neg
               ),
@@ -1610,7 +1610,7 @@ list(
           name = ann_spe_pre,
           command = {
             ann_spe_pre <- prepare_annotations_spectra(
-              input = list(
+              input = c(
                 ann_spe_neg,
                 ## TODO add is hmdb
                 ann_spe_pos
@@ -1709,7 +1709,7 @@ list(
       name = fea_edg_pre,
       command = {
         fea_edg_pre <- prepare_features_edges(
-          input = list(edg_spe, ann_ms1_pre_edg),
+          input = c(edg_spe, ann_ms1_pre_edg),
           output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target
@@ -1759,7 +1759,7 @@ list(
     name = ann_fil,
     command = {
       ann_fil <- filter_annotations(
-        annotations = list(
+        annotations = c(
           ann_spe_exp_gnp_pre,
           # ann_spe_exp_int_pre,
           ann_spe_pre,
@@ -1777,7 +1777,7 @@ list(
     name = ann_fil_crazy,
     command = {
       ann_fil_crazy <- filter_annotations(
-        annotations = list(
+        annotations = c(
           ann_spe_exp_gnp_pre,
           ann_spe_exp_int_pre,
           ann_spe_pre,
@@ -2388,7 +2388,7 @@ list(
       name = benchmark_edg_pre_pos,
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = list(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
+          input = c(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2399,7 +2399,7 @@ list(
       name = benchmark_edg_pre_neg,
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = list(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
+          input = c(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2474,7 +2474,7 @@ list(
       command = {
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
-          library = list(
+          library = c(
             lib_spe_is_lot_pre_pos,
             lib_spe_exp_mb_pre_pos
           ),
@@ -2494,7 +2494,7 @@ list(
       command = {
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
-          library = list(
+          library = c(
             lib_spe_is_lot_pre_neg,
             lib_spe_exp_mb_pre_neg
           ),
@@ -2522,7 +2522,7 @@ list(
       name = benchmark_ann_spe_pre_pos,
       command = {
         benchmark_ann_spe_pre_pos <- prepare_annotations_spectra(
-          input = list(benchmark_ann_spe_pos),
+          input = c(benchmark_ann_spe_pos),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
@@ -2536,7 +2536,7 @@ list(
       name = benchmark_ann_spe_pre_neg,
       command = {
         benchmark_ann_spe_pre_neg <- prepare_annotations_spectra(
-          input = list(benchmark_ann_spe_neg),
+          input = c(benchmark_ann_spe_neg),
           output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
@@ -2594,7 +2594,7 @@ list(
       name = benchmark_ann_fil_spe_neg,
       command = {
         benchmark_ann_fil_spe_neg <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_spe_pre_neg,
             benchmark_ann_sir_pre_str
           ),
@@ -2609,7 +2609,7 @@ list(
       name = benchmark_ann_fil_spe_ms1_neg,
       command = {
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_spe_pre_neg,
             benchmark_ann_ms1_pre_neg[[1]],
             benchmark_ann_sir_pre_str
@@ -2626,7 +2626,7 @@ list(
       name = benchmark_ann_fil_ms1_neg,
       command = {
         benchmark_ann_fil_ms1_neg <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_ms1_pre_neg[[1]],
             benchmark_ann_sir_pre_str
           ),
@@ -2641,7 +2641,7 @@ list(
       name = benchmark_ann_fil_spe_pos,
       command = {
         benchmark_ann_fil_spe_pos <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_spe_pre_pos,
             benchmark_ann_sir_pre_str
           ),
@@ -2656,7 +2656,7 @@ list(
       name = benchmark_ann_fil_spe_ms1_pos,
       command = {
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_spe_pre_pos,
             benchmark_ann_ms1_pre_pos[[1]],
             benchmark_ann_sir_pre_str
@@ -2673,7 +2673,7 @@ list(
       name = benchmark_ann_fil_ms1_pos,
       command = {
         benchmark_ann_fil_ms1_pos <- filter_annotations(
-          annotations = list(
+          annotations = c(
             benchmark_ann_ms1_pre_pos[[1]],
             benchmark_ann_sir_pre_str
           ),
