@@ -13,24 +13,24 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
   log_debug(x = "Loading default params")
   yaml_files <- c(
     list.files(
-      path = file.path(paths$params$default),
+      path = file.path(parse_yaml_paths()$params$default),
       pattern = ".yaml",
       full.names = TRUE
     ),
-    paths$params$prepare_params
+    parse_yaml_paths()$params$prepare_params
   )
 
-  if (length(list.files(paths$params$user$path)) >=
-    length(list.files(paths$params$default$path)) -
+  if (length(list.files(parse_yaml_paths()$params$user$path)) >=
+    length(list.files(parse_yaml_paths()$params$default$path)) -
       ## because of params.yaml
       1) {
     yaml_files <- c(
       list.files(
-        path = file.path(paths$params$user),
+        path = file.path(parse_yaml_paths()$params$user),
         pattern = ".yaml",
         full.names = TRUE
       ),
-      paths$params$prepare_params
+      parse_yaml_paths()$params$prepare_params
     )
   }
 

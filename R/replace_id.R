@@ -21,15 +21,9 @@
 #' )
 replace_id <-
   function(x,
-           user_filename = get("filename",
-             envir = parent.frame()
-           ),
-           user_gnps = get("gnps_job_id",
-             envir = parent.frame()
-           ),
-           example_gnps = get("gnps_example_id",
-             envir = parent.frame()
-           )) {
+           user_filename = get_params(step = "prepare_params")$files$pattern,
+           user_gnps = get_params(step = "prepare_params")$gnps$id,
+           example_gnps = parse_yaml_paths()$gnps$example) {
     if (length(user_gnps) != 0) {
       if (user_gnps == "") {
         user_gnps <- NULL

@@ -31,11 +31,11 @@ prepare_params <- function(filename = get_params(step = "prepare_params")$files$
                            summarise = get_params(step = "prepare_params")$options$summarise,
                            step = NA) {
   ## TODO 'step' actually not taken into account
-  filename <<- filename
+  filename <- filename
   features <- features
   spectra <- spectra
-  gnps_job_id <<- gnps_job_id
-  gnps_example_id <<- gnps_example_id
+  gnps_job_id <- gnps_job_id
+  gnps_example_id <- gnps_example_id
   ms_mode <- ms_mode
   taxon <- taxon
   summarise <- summarise

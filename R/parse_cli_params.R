@@ -11,8 +11,6 @@
 #'
 #' @examples NULL
 parse_cli_params <- function(arguments, parameters) {
-  log_debug("Loading command line arguments")
-
   if (exists("arguments")) {
     if (!is.null(arguments$ann_can_ini)) {
       parameters$annotations$candidates$initial <- as.numeric(arguments$ann_can_ini)
@@ -376,6 +374,5 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$options$summarise <- as.logical(arguments$summarise)
     }
   }
-
   return(parameters)
 }

@@ -161,7 +161,7 @@ server <- function(input, output, session) {
             "benchmark_taxed_pos",
             "benchmark_wei_par",
             "paths",
-            "path_gnps_example_id",
+            "paths_gnps_example_id",
             "par_def_ann_mas",
             "par_def_ann_spe",
             "par_def_cre_com",

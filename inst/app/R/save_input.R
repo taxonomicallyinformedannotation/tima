@@ -2,9 +2,9 @@
 save_input <- function(input) {
   setwd("../../")
 
-  paths_data_source <- timaR::parse_yaml_paths()$data$source$path
+  paths_data_source <- parse_yaml_paths()$data$source$path
 
-  list <- timaR::load_yaml_files()
+  list <- load_yaml_files()
   yamls_params <- list$yaml_params
   yaml_files <- list$yaml_files
   yaml_names <- list$yaml_names
@@ -16,44 +16,47 @@ save_input <- function(input) {
   prefil_tax_raw <- shiny::isolate(input$fil_tax_raw)
   prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
-  prefil_tax_raw_1 <- file.path(paths_data_source, prefil_tax_raw[[1]])
+  if (!is.null(prefil_tax_raw)) {
+    prefil_tax_raw_1 <- file.path(paths_data_source, prefil_tax_raw[[1]])
+  }
   if (file.exists(prefil_fea_raw_1)) {
-    fil_fea_raw <<- prefil_fea_raw_1
+    fil_fea_raw <- prefil_fea_raw_1
   } else {
-    fil_fea_raw <<- prefil_fea_raw[[4]]
+    fil_fea_raw <- prefil_fea_raw[[4]]
   }
   if (file.exists(prefil_spe_raw_1)) {
-    fil_spe_raw <<- prefil_spe_raw_1
+    fil_spe_raw <- prefil_spe_raw_1
   } else {
-    fil_fea_raw <<- prefil_spe_raw[[4]]
+    fil_fea_raw <- prefil_spe_raw[[4]]
   }
-  if (file.exists(prefil_tax_raw_1)) {
-    fil_tax_raw <<- prefil_tax_raw_1
-  } else {
-    fil_tax_raw <<- prefil_tax_raw[[4]]
+  if (!is.null(prefil_tax_raw)) {
+    if (file.exists(prefil_tax_raw_1)) {
+      fil_tax_raw <- prefil_tax_raw_1
+    } else {
+      fil_tax_raw <- prefil_tax_raw[[4]]
+    }
   }
 
-  filename <<- shiny::isolate(input$fil_pat)
-  gnps_job_id <<- shiny::isolate(input$gnps_id)
+  filename <- shiny::isolate(input$fil_pat)
+  gnps_job_id <- shiny::isolate(input$gnps_id)
   if (gnps_job_id == "") {
-    gnps_job_id <<- NULL
+    gnps_job_id <- NULL
   }
-  gnps_workflow <<- shiny::isolate(input$gnps_workflow)
-  org_tax <<- shiny::isolate(input$org_tax)
+  gnps_workflow <- shiny::isolate(input$gnps_workflow)
+  org_tax <- shiny::isolate(input$org_tax)
   if (org_tax == "") {
-    org_tax <<- NULL
+    org_tax <- NULL
   }
-  ms_mode <<- shiny::isolate(input$ms_pol)
-  ms_tol_rt_min <<- shiny::isolate(input$ms_tol_rt_min)
-  names_source <<- shiny::isolate(input$names_source)
-  names_target <<- shiny::isolate(input$names_target)
-  forceps <<- shiny::isolate(input$force)
-  summarise <<- shiny::isolate(input$summarise)
-  compound_names <<- shiny::isolate(input$compounds_names)
-
+  ms_mode <- shiny::isolate(input$ms_pol)
+  ms_tol_rt_min <- shiny::isolate(input$ms_tol_rt_min)
+  names_source <- shiny::isolate(input$names_source)
+  names_target <- shiny::isolate(input$names_target)
+  forceps <- shiny::isolate(input$force)
+  summarise <- shiny::isolate(input$summarise)
+  compound_names <- shiny::isolate(input$compounds_names)
 
   ## Change 1
-  timaR::log_debug(x = "Changing parameters")
+  log_debug(x = "Changing parameters")
   yamls_params$
     `inst/params/prepare_params`$
     files$
@@ -273,7 +276,9 @@ save_input <- function(input) {
     polarity <- ms_mode
 
   yamls_params$prepare_taxa$files$features$raw <- fil_fea_raw
-  yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw
+  if (!is.null(prefil_tax_raw)) {
+    yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw
+  }
   if (!is.null(gnps_job_id)) {
     yamls_params$prepare_taxa$files$taxa$raw <-
       file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
@@ -497,7 +502,7 @@ save_input <- function(input) {
   yamls_params$weight_annotations$files$pattern <- filename
 
   # Change 3
-  timaR::log_debug(x = "Changing filenames")
+  log_debug(x = "Changing filenames")
 
   # yamls_params$annotate_masses$files$annotations$prepared$structural <-
   #   yamls_params$annotate_masses$files$annotations$prepared$structural |>
@@ -664,7 +669,7 @@ save_input <- function(input) {
     gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
 
-  timaR::create_dir(export = yaml_export[[1]])
+  create_dir(export = yaml_export[[1]])
 
   lapply(
     X = seq_along(yamls_params),
