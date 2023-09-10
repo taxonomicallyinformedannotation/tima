@@ -67,7 +67,7 @@ extract_spectra <- function(object) {
 
   ## Select all columns except those specified in 'incoherent_colnames',
   ## and rename the remaining columns using the names in 'incoherent_colnames'
-  incoherent_colnames <- 
+  incoherent_colnames <-
     incoherent_colnames[unname(incoherent_colnames) %in% colnames(spectra)]
   spectra <- spectra |>
     tidytable::select(-c(tidytable::any_of(names(incoherent_colnames)))) |>
