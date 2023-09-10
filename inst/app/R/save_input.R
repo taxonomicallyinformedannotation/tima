@@ -6,7 +6,7 @@ save_input <- function(input) {
   paths_data_source <- parse_yaml_paths()$data$source$path
 
   list <- load_yaml_files()
-  yamls_params <- list$yaml_params
+  yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
   yaml_names <- list$yaml_names
 
