@@ -334,12 +334,12 @@ source(file = "inst/scripts/prepare_libraries_adducts.R")
 
 #### Spectra
 
-Finally, you need a spectral library to perform MS^2^-based annotation.
+Finally, you need spectral libraries to perform MS^2^-based annotation.
 
 ##### Experimental
 
 You can of course use your own experimental spectral library to perform MS^2^ annotation.
-We currently only support spectral libraries in MGF format.
+We currently support spectral libraries in MSP or MGF format.
 
 To get a small example:
 
@@ -348,6 +348,14 @@ get_file(
   url = paths$urls$examples$spectral_lib_mini$with_rt,
   export = paths$data$source$libraries$spectra$exp$with_rt
 )
+```
+
+###### MassBank
+
+MassBank can be easily accessed downloaded using:
+
+```{r spectra-mb, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_massbank_spectra.R")
 ```
 
 We are currently working to get all MONA and GNPS experimental spectra easily available.
