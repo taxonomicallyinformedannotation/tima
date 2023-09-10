@@ -231,6 +231,16 @@ testthat::test_that("Whole process", {
     temp_exp = paths$data$source$libraries$rt$example_mini,
     temp_is = paths$data$source$libraries$rt$example_mini
   )
+  ## Check wrong SMILES
+  tidytable::tidytable(
+    "rt" = 0.1,
+    "smiles" = "wrongSMILES",
+    "inchikey" = NA
+  ) |>
+    tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
+  prepare_libraries_rt(
+    temp_exp = "data/source/libraries/rt/example_bad.tsv"
+  )
   prepare_libraries_rt()
 
   ### SOP
