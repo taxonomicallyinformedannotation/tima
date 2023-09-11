@@ -41,23 +41,5 @@ services:
       - "./inst:/inst"
     command: Rscript inst/scripts/run_app_docker.R
 
-  tima-mini:
-    build: "."
-    deploy:
-      resources:
-        limits:
-          cpus: "0.8"
-          memory: 8G
-    image: adafede/tima-r
-    networks:
-      - service-service-frontend
-    security_opt:
-      - apparmor:unconfined
-      - no-new-privileges:true
-    volumes:
-      - "./data:/data"
-      - "./inst:/inst"
-    command: Rscript inst/scripts/tima_mini.R
-
 networks:
   service-service-frontend:

@@ -66,8 +66,10 @@ files:
 
       #' List of prepared structural annotations. STRING
       structural:
+        - data/interim/annotations/example_ms1_prepared.tsv.gz
         - data/interim/annotations/example_gnps_prepared.tsv.gz
-        - data/interim/annotations/example_isdb_prepared.tsv.gz
+        - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+        - data/interim/annotations/example_spectral_matches_exp_int_prepared.tsv.gz
         - data/interim/annotations/example_sirius_prepared.tsv.gz
 
     #' Final results file. STRING
@@ -153,12 +155,12 @@ files:
         #' List of negative experimental spectral libraries. STRING
         neg:
           - data/interim/libraries/spectra/exp/massbank_neg.rds
-          # - data/interim/libraries/spectra/exp/internal_neg.rds
+          - data/interim/libraries/spectra/exp/internal_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
           - data/interim/libraries/spectra/exp/massbank_pos.rds
-          # - data/interim/libraries/spectra/exp/internal_pos.rds
+          - data/interim/libraries/spectra/exp/internal_pos.rds
 
       #' In silico libraries
       is:

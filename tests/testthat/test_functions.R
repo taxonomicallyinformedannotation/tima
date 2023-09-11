@@ -199,6 +199,8 @@ testthat::test_that("Whole process", {
       polarity = "neg"
     )
   )
+  #### If does not exist
+  prepare_libraries_spectra(input = "doesNotExists.txt")
   #### Classical
   prepare_libraries_spectra()
   prepare_libraries_spectra(polarity = "neg")

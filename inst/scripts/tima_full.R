@@ -7,8 +7,9 @@ log_debug(
   crayon::green("does everything you ever dreamt of. \n")
 )
 log_debug("Authors: ", crayon::green("AR"), "\n")
+log_debug("Contributors: ", crayon::blue("PMA"), "\n")
 
-targets::tar_make(names = matches("^ann_pre_crazy"))
+targets::tar_make(names = matches("^ann_pre$"))
 
 end <- Sys.time()
 

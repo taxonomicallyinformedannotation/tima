@@ -73,7 +73,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
-    spectral_library <- library |>
+    spectral_library <- unlist(library) |>
       lapply(FUN = import_spectra) |>
       Spectra::concatenateSpectra() |>
       sanitize_spectra() |>
