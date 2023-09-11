@@ -200,7 +200,10 @@ testthat::test_that("Whole process", {
     )
   )
   #### If does not exist
-  prepare_libraries_spectra(input = "doesNotExists.txt")
+  prepare_libraries_spectra(
+    input = "doesNotExists.txt",
+    output = "data/interim/libraries/spectra/exp/nope.rds"
+  )
   #### Classical
   prepare_libraries_spectra()
   prepare_libraries_spectra(polarity = "neg")
@@ -304,19 +307,17 @@ testthat::test_that("Whole process", {
     dalton = 0.001,
     polarity = "neg"
   )
-  ### Appox
+  ### Empty
+  annotate_spectra(
+    library = list("data/interim/libraries/spectra/exp/nope.rds")
+  )
+  ### Approx
   annotate_spectra(
     library = list("data/interim/libraries/spectra/exp/internal_pos.rds"),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
     approx = TRUE
-  )
-  ### Positive
-  annotate_spectra(
-    ## shallow tolerance to speed up tests
-    ppm = 1,
-    dalton = 0.001
   )
 
   ## Create MS2 based edges
