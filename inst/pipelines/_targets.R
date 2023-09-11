@@ -2632,7 +2632,6 @@ list(
     ),
     tar_target(
       name = benchmark_def_ann_spe,
-      format = "file_fast",
       command = {
         benchmark_def_ann_spe <- parse_yaml_params(
           def = par_def_ann_spe,
