@@ -5,13 +5,16 @@
 
 # Load packages required to define the pipeline:
 library(targets)
-library(tarchetypes)
+# library(tarchetypes)
 
 # Set target options:
 tar_option_set(
   packages = "timaR",
   memory = "transient",
-  garbage_collection = TRUE
+  garbage_collection = TRUE,
+  resources = tar_resources(
+    qs = tar_resources_qs(preset = "fast")
+  )
 )
 
 # tar_make_clustermq() configuration (okay to leave alone):
@@ -28,8 +31,9 @@ list(
   ## Architecture
   list( ## Paths
     list(
-      tar_file(
+      tar_target(
         name = yaml_paths,
+        format = "file_fast",
         command = {
           yaml_paths <- "inst/paths.yaml"
         }
@@ -205,14 +209,16 @@ list(
     ),
     ## Dictionaries
     list(
-      tar_file(
+      tar_target(
         name = dic_add,
+        format = "file_fast",
         command = {
           dic_add <- system.file("extdata", "adducts.tsv", package = "timaR")
         }
       ),
-      tar_file(
+      tar_target(
         name = dic_clu,
+        format = "file_fast",
         command = {
           dic_clu <- system.file("extdata",
             "clusters.tsv",
@@ -220,8 +226,9 @@ list(
           )
         }
       ),
-      tar_file(
+      tar_target(
         name = dic_neu_los,
+        format = "file_fast",
         command = {
           dic_neu_los <- system.file("extdata",
             "neutral_losses.tsv",
@@ -235,140 +242,161 @@ list(
   list(
     ## Default
     list(
-      tar_file(
+      tar_target(
         name = par_def_ann_mas,
+        format = "file_fast",
         command = {
           par_def_ann_mas <- paths$params$default$annotate$masses
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_ann_spe,
+        format = "file_fast",
         command = {
           par_def_ann_spe <- paths$params$default$annotate$spectra
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_cre_com,
+        format = "file_fast",
         command = {
           par_def_cre_com <- paths$params$default$create$components
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_cre_edg_spe,
+        format = "file_fast",
         command = {
           par_def_cre_edg_spe <- paths$params$default$create$edges$spectra
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_fil_ann,
+        format = "file_fast",
         command = {
           par_def_fil_ann <-
             paths$params$default$filter$annotations
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_ann_gnp,
+        format = "file_fast",
         command = {
           par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_ann_sir,
+        format = "file_fast",
         command = {
           par_def_pre_ann_sir <-
             paths$params$default$prepare$annotations$sirius
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_ann_spe,
+        format = "file_fast",
         command = {
           par_def_pre_ann_spe <-
             paths$params$default$prepare$annotations$spectra
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_fea_com,
+        format = "file_fast",
         command = {
           par_def_pre_fea_com <-
             paths$params$default$prepare$features$components
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_fea_edg,
+        format = "file_fast",
         command = {
           par_def_pre_fea_edg <- paths$params$default$prepare$features$edges
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_fea_tab,
+        format = "file_fast",
         command = {
           par_def_pre_fea_tab <- paths$params$default$prepare$features$tables
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_add,
+        format = "file_fast",
         command = {
           par_def_pre_lib_add <-
             paths$params$default$prepare$libraries$adducts
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_rt,
+        format = "file_fast",
         command = {
           par_def_pre_lib_rt <-
             paths$params$default$prepare$libraries$rt
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_sop_clo,
+        format = "file_fast",
         command = {
           par_def_pre_lib_sop_clo <-
             paths$params$default$prepare$libraries$sop$closed
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_sop_ecm,
+        format = "file_fast",
         command = {
           par_def_pre_lib_sop_ecm <-
             paths$params$default$prepare$libraries$sop$ecmdb
         }
       ),
-      # tar_file(
+      # tar_target(
       #   name = par_def_pre_lib_sop_hmd,
+      # .  format = "file_fast",
       #   command = {
       #     par_def_pre_lib_sop_hmd <-
       #       paths$params$default$prepare$libraries$sop$hmdb
       #   }
       # ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_sop_lot,
+        format = "file_fast",
         command = {
           par_def_pre_lib_sop_lot <-
             paths$params$default$prepare$libraries$sop$lotus
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_sop_mer,
+        format = "file_fast",
         command = {
           par_def_pre_lib_sop_mer <-
             paths$params$default$prepare$libraries$sop$merged
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_lib_spe,
+        format = "file_fast",
         command = {
           par_def_pre_lib_spe <-
             paths$params$default$prepare$libraries$spectra
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_pre_tax,
+        format = "file_fast",
         command = {
           par_def_pre_tax <- paths$params$default$prepare$taxa
         }
       ),
-      tar_file(
+      tar_target(
         name = par_def_wei_ann,
+        format = "file_fast",
         command = {
           par_def_wei_ann <- paths$params$default$weight$annotations
         }
@@ -377,8 +405,9 @@ list(
     list(
       ## Prepare params
       list(
-        tar_file(
+        tar_target(
           name = par_pre_par,
+          format = "file_fast",
           command = {
             par_pre_par <- paths$params$prepare_params
           }
@@ -395,8 +424,9 @@ list(
       ),
       ## User
       list(
-        tar_file(
+        tar_target(
           name = par_usr_ann_mas,
+          format = "file_fast",
           command = {
             par_usr_ann_mas <-
               prepare_params(
@@ -412,8 +442,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_ann_spe,
+          format = "file_fast",
           command = {
             par_usr_ann_spe <-
               prepare_params(
@@ -429,8 +460,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_cre_com,
+          format = "file_fast",
           command = {
             par_usr_cre_com <-
               prepare_params(
@@ -446,8 +478,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_fil_ann,
+          format = "file_fast",
           command = {
             par_usr_fil_ann <-
               prepare_params(
@@ -463,8 +496,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_cre_edg_spe,
+          format = "file_fast",
           command = {
             par_usr_cre_edg_spe <-
               prepare_params(
@@ -480,8 +514,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_ann_gnp,
+          format = "file_fast",
           command = {
             par_usr_pre_ann_gnp <-
               prepare_params(
@@ -497,8 +532,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_ann_sir,
+          format = "file_fast",
           command = {
             par_usr_pre_ann_sir <-
               prepare_params(
@@ -514,8 +550,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_ann_spe,
+          format = "file_fast",
           command = {
             par_usr_pre_ann_spe <-
               prepare_params(
@@ -531,8 +568,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_fea_com,
+          format = "file_fast",
           command = {
             par_usr_pre_fea_com <-
               prepare_params(
@@ -548,8 +586,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_fea_edg,
+          format = "file_fast",
           command = {
             par_usr_pre_fea_edg <-
               prepare_params(
@@ -565,8 +604,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_fea_tab,
+          format = "file_fast",
           command = {
             par_usr_pre_fea_tab <-
               prepare_params(
@@ -582,8 +622,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_add,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_add <-
               prepare_params(
@@ -599,8 +640,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_rt,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_rt <-
               prepare_params(
@@ -616,8 +658,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_sop_clo,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_sop_clo <-
               prepare_params(
@@ -633,8 +676,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_sop_ecm,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_sop_ecm <-
               prepare_params(
@@ -650,8 +694,9 @@ list(
               )
           }
         ),
-        # tar_file(
+        # tar_target(
         #   name = par_usr_pre_lib_sop_hmd,
+        # .  format = "file_fast",
         #   command = {
         #     par_usr_pre_lib_sop_hmd <-
         #       prepare_params(
@@ -667,8 +712,9 @@ list(
         #       )
         #   }
         # ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_sop_lot,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_sop_lot <-
               prepare_params(
@@ -684,8 +730,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_sop_mer,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_sop_mer <-
               prepare_params(
@@ -701,8 +748,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_lib_spe,
+          format = "file_fast",
           command = {
             par_usr_pre_lib_spe <-
               prepare_params(
@@ -718,8 +766,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_pre_tax,
+          format = "file_fast",
           command = {
             par_usr_pre_tax <-
               prepare_params(
@@ -735,8 +784,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = par_usr_wei_ann,
+          format = "file_fast",
           command = {
             par_usr_wei_ann <-
               prepare_params(
@@ -970,8 +1020,9 @@ list(
   ),
   ## GNPS
   list(
-    tar_file(
+    tar_target(
       name = gnps_tables,
+      format = "file_fast",
       command = {
         gnps_tables <- get_gnps_tables(
           gnps_job_id = par_fin_par$gnps$id,
@@ -988,38 +1039,44 @@ list(
       }
     ),
     list(
-      tar_file(
+      tar_target(
         name = gnps_features,
+        format = "file_fast",
         command = {
           gnps_features <- gnps_tables[[1]]
         }
       ),
-      tar_file(
+      tar_target(
         name = gnps_metadata,
+        format = "file_fast",
         command = {
           gnps_metadata <- gnps_tables[[2]]
         }
       ),
-      tar_file(
+      tar_target(
         name = gnps_spectra,
+        format = "file_fast",
         command = {
           gnps_spectra <- gnps_tables[[3]]
         }
       ),
-      tar_file(
+      tar_target(
         name = gnps_annotations,
+        format = "file_fast",
         command = {
           gnps_annotations <- gnps_tables[[4]]
         }
       ),
-      tar_file(
+      tar_target(
         name = gnps_components,
+        format = "file_fast",
         command = {
           gnps_components <- gnps_tables[[5]]
         }
       ),
-      tar_file(
+      tar_target(
         name = gnps_edges,
+        format = "file_fast",
         command = {
           gnps_edges <- gnps_tables[[6]]
         }
@@ -1028,8 +1085,9 @@ list(
   ),
   ## Inputs
   list(
-    tar_file(
+    tar_target(
       name = input_features,
+      format = "file_fast",
       command = {
         input_features <-
           ifelse(
@@ -1044,8 +1102,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = input_spectra,
+      format = "file_fast",
       command = {
         input_spectra <-
           ifelse(
@@ -1069,8 +1128,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = input_metadata,
+      format = "file_fast",
       command = {
         input_metadata <-
           ifelse(
@@ -1089,8 +1149,9 @@ list(
   ## libraries
   list(
     ## Retention times
-    list(tar_file(
+    list(tar_target(
       name = lib_rt,
+      format = "file_fast",
       command = {
         lib_rt <- prepare_libraries_rt(
           ## TODO refactor to avoid "pos/neg"
@@ -1116,14 +1177,16 @@ list(
         )
       }
     )),
-    tar_file(
+    tar_target(
       name = lib_rt_rts,
+      format = "file_fast",
       command = {
         lib_rt_rts <- lib_rt[[1]]
       }
     ),
-    tar_file(
+    tar_target(
       name = lib_rt_sop,
+      format = "file_fast",
       command = {
         lib_rt_sop <- lib_rt[[2]]
       }
@@ -1134,14 +1197,16 @@ list(
       list(
         ## This does not work as it forces the file to exist.
         ## So targets will not check if the input file changed automatically.
-        # tar_file(
+        # tar_target(
         #   name = lib_sop_clo,
+        # .  format = "file_fast",
         #   command = {
         #     lib_sop_clo <- paths$data$source$libraries$sop$closed
         #   }
         # ),
-        tar_file(
+        tar_target(
           name = lib_sop_ecm,
+          format = "file_fast",
           command = {
             lib_sop_ecm <- get_file(
               url = paths_urls_ecmdb_metabolites,
@@ -1150,8 +1215,9 @@ list(
           }
         ),
         ## TODO ADD  GET HMDB
-        tar_file(
+        tar_target(
           name = lib_sop_lot,
+          format = "file_fast",
           command = {
             lib_sop_lot <- get_last_version_from_zenodo(
               doi = paths_urls_lotus_doi,
@@ -1166,8 +1232,9 @@ list(
       ),
       ## Prepared
       list(
-        tar_file(
+        tar_target(
           name = lib_sop_clo_pre,
+          format = "file_fast",
           command = {
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
@@ -1177,8 +1244,9 @@ list(
               )
           }
         ),
-        tar_file(
+        tar_target(
           name = lib_sop_ecm_pre,
+          format = "file_fast",
           command = {
             lib_sop_ecm_pre <-
               prepare_libraries_sop_ecmdb(
@@ -1188,8 +1256,9 @@ list(
           }
         ),
         ## TODO ADD HMDB PREPARED
-        tar_file(
+        tar_target(
           name = lib_sop_lot_pre,
+          format = "file_fast",
           command = {
             lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
@@ -1205,8 +1274,9 @@ list(
       ),
       ## Merged
       list(
-        tar_file(
+        tar_target(
           name = lib_sop_mer,
+          format = "file_fast",
           command = {
             lib_sop_mer <- prepare_libraries_sop_merged(
               files = c(
@@ -1230,32 +1300,54 @@ list(
             )
           }
         ),
-        tar_file(name = lib_mer_key, command = {
-          lib_mer_key <- lib_sop_mer[[1]]
-        }),
-        tar_file(name = lib_mer_org_tax_ott, command = {
-          lib_mer_org_tax_ott <- lib_sop_mer[[2]]
-        }),
-        tar_file(name = lib_mer_str_stereo, command = {
-          lib_mer_str_stereo <- lib_sop_mer[[3]]
-        }),
-        tar_file(name = lib_mer_str_met, command = {
-          lib_mer_str_met <- lib_sop_mer[[4]]
-        }),
-        tar_file(name = lib_mer_str_nam, command = {
-          lib_mer_str_nam <- lib_sop_mer[[5]]
-        }),
-        tar_file(name = lib_mer_str_tax_cla, command = {
-          lib_mer_str_tax_cla <- lib_sop_mer[[6]]
-        }),
-        tar_file(name = lib_mer_str_tax_npc, command = {
-          lib_mer_str_tax_npc <- lib_sop_mer[[7]]
-        })
+        tar_target(
+          name = lib_mer_key,
+          format = "file_fast", command = {
+            lib_mer_key <- lib_sop_mer[[1]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_org_tax_ott,
+          format = "file_fast", command = {
+            lib_mer_org_tax_ott <- lib_sop_mer[[2]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_stereo,
+          format = "file_fast", command = {
+            lib_mer_str_stereo <- lib_sop_mer[[3]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_met,
+          format = "file_fast", command = {
+            lib_mer_str_met <- lib_sop_mer[[4]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_nam,
+          format = "file_fast", command = {
+            lib_mer_str_nam <- lib_sop_mer[[5]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_tax_cla,
+          format = "file_fast", command = {
+            lib_mer_str_tax_cla <- lib_sop_mer[[6]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_tax_npc,
+          format = "file_fast", command = {
+            lib_mer_str_tax_npc <- lib_sop_mer[[7]]
+          }
+        )
       )
     ),
     ## Adducts
-    list(tar_file(
+    list(tar_target(
       name = lib_add,
+      format = "file_fast",
       command = {
         lib_add <- prepare_libraries_adducts(
           str_met = lib_mer_str_met,
@@ -1272,8 +1364,9 @@ list(
       list( ## Raw
         list(
           ## TODO ADD ISDB HMDB,
-          tar_file(
+          tar_target(
             name = lib_spe_is_lot_pos,
+            format = "file_fast",
             command = {
               lib_spe_is_lot_pos <-
                 # if (paths_test_mode == FALSE) {
@@ -1302,8 +1395,9 @@ list(
             cue = tar_cue(mode = "always")
             # cue = tar_cue(mode = "thorough")
           ),
-          tar_file(
+          tar_target(
             name = lib_spe_is_lot_neg,
+            format = "file_fast",
             command = {
               lib_spe_is_lot_neg <-
                 # if (paths_test_mode == FALSE) {
@@ -1338,8 +1432,9 @@ list(
       list(
         ## TODO ADD IS HMDB PREPARED,
         ## TODO improve polarity handling, suboptimal
-        tar_file(
+        tar_target(
           name = lib_spe_is_lot_pre_pos,
+          format = "file_fast",
           command = {
             lib_spe_is_lot_pre_pos <-
               lib_spe_is_lot_pos
@@ -1380,8 +1475,9 @@ list(
             # )
           }
         ),
-        tar_file(
+        tar_target(
           name = lib_spe_is_lot_pre_neg,
+          format = "file_fast",
           command = {
             lib_spe_is_lot_pre_neg <-
               lib_spe_is_lot_neg
@@ -1430,16 +1526,18 @@ list(
           ### Internal
           ## This does not work as it forces the file to exist.
           ## So targets will not check if the input file changed automatically.
-          # tar_file(
+          # tar_target(
           #   name = lib_spe_exp_int_raw,
+          # .  format = "file_fast",
           #   command = {
           #     lib_spe_exp_int_raw <-
           #       par_pre_lib_spe$files$libraries$spectral$exp$raw
           #   }
           # ),
           ### MassBank
-          tar_file(
+          tar_target(
             name = lib_spe_exp_mb_raw,
+            format = "file_fast",
             command = {
               lib_spe_exp_mb_raw <- get_massbank_spectra(
                 mb_file = paths_urls_massbank_file,
@@ -1452,8 +1550,9 @@ list(
         ## Prepared
         list(
           ## TODO improve polarity handling, suboptimal
-          tar_file(
+          tar_target(
             name = lib_spe_exp_int_pre_pos,
+            format = "file_fast",
             command = {
               lib_spe_exp_int_pre_pos <-
                 prepare_libraries_spectra(
@@ -1481,8 +1580,9 @@ list(
                 )
             }
           ),
-          tar_file(
+          tar_target(
             name = lib_spe_exp_int_pre_neg,
+            format = "file_fast",
             command = {
               lib_spe_exp_int_pre_neg <-
                 prepare_libraries_spectra(
@@ -1510,8 +1610,9 @@ list(
                 )
             }
           ),
-          tar_file(
+          tar_target(
             name = lib_spe_exp_mb_pre_neg,
+            format = "file_fast",
             command = {
               lib_spe_exp_mb_pre_neg <-
                 prepare_libraries_spectra(
@@ -1542,8 +1643,9 @@ list(
                 )
             }
           ),
-          tar_file(
+          tar_target(
             name = lib_spe_exp_mb_pre_pos,
+            format = "file_fast",
             command = {
               lib_spe_exp_mb_pre_pos <-
                 prepare_libraries_spectra(
@@ -1582,8 +1684,9 @@ list(
   list(
     ## MS1
     list(
-      tar_file(
+      tar_target(
         name = ann_ms1_pre,
+        format = "file_fast",
         command = {
           ann_ms1_pre <-
             annotate_masses(
@@ -1613,15 +1716,17 @@ list(
             )
         }
       ),
-      tar_file(
+      tar_target(
         name = ann_ms1_pre_ann,
+        format = "file_fast",
         command = {
           ann_ms1_pre_ann <-
             ann_ms1_pre[[1]]
         }
       ),
-      tar_file(
+      tar_target(
         name = ann_ms1_pre_edg,
+        format = "file_fast",
         command = {
           ann_ms1_pre_edg <- ann_ms1_pre[[2]]
         }
@@ -1631,8 +1736,9 @@ list(
     list(
       ## GNPS
       list(
-        tar_file(
+        tar_target(
           name = ann_spe_exp_gnp_pre,
+          format = "file_fast",
           command = {
             ann_spe_exp_gnp_pre <-
               prepare_annotations_gnps(
@@ -1650,8 +1756,9 @@ list(
       ## Classic
       list(
         ## TODO improve polarity handling, suboptimal
-        tar_file(
+        tar_target(
           name = ann_spe_pos,
+          format = "file_fast",
           command = {
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
@@ -1676,8 +1783,9 @@ list(
             )
           }
         ),
-        tar_file(
+        tar_target(
           name = ann_spe_neg,
+          format = "file_fast",
           command = {
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
@@ -1702,8 +1810,9 @@ list(
             )
           }
         ),
-        tar_file(
+        tar_target(
           name = ann_spe_pre,
+          format = "file_fast",
           command = {
             ann_spe_pre <- prepare_annotations_spectra(
               input = c(
@@ -1722,8 +1831,9 @@ list(
       )
     ),
     # SIRIUS
-    tar_file(
+    tar_target(
       name = ann_sir_pre,
+      format = "file_fast",
       command = {
         ann_sir_pre <-
           prepare_annotations_sirius(
@@ -1739,21 +1849,31 @@ list(
           )
       }
     ),
-    tar_file(name = ann_sir_pre_can, command = {
-      ann_sir_pre_can <- ann_sir_pre[[1]]
-    }),
-    tar_file(name = ann_sir_pre_for, command = {
-      ann_sir_pre_for <- ann_sir_pre[[2]]
-    }),
-    tar_file(name = ann_sir_pre_str, command = {
-      ann_sir_pre_str <- ann_sir_pre[[3]]
-    }),
+    tar_target(
+      name = ann_sir_pre_can,
+      format = "file_fast", command = {
+        ann_sir_pre_can <- ann_sir_pre[[1]]
+      }
+    ),
+    tar_target(
+      name = ann_sir_pre_for,
+      format = "file_fast", command = {
+        ann_sir_pre_for <- ann_sir_pre[[2]]
+      }
+    ),
+    tar_target(
+      name = ann_sir_pre_str,
+      format = "file_fast", command = {
+        ann_sir_pre_str <- ann_sir_pre[[3]]
+      }
+    ),
     list()
   ),
   ## Features
   list(
-    tar_file(
+    tar_target(
       name = fea_edg_spe,
+      format = "file_fast",
       command = {
         fea_edg_spe <- create_edges_spectra(
           input = input_spectra,
@@ -1767,8 +1887,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = fea_com,
+      format = "file_fast",
       command = {
         fea_com <- create_components(
           input = fea_edg_pre,
@@ -1778,8 +1899,9 @@ list(
     ),
     ## Interim
     list(
-      tar_file(
+      tar_target(
         name = int_com,
+        format = "file_fast",
         command = {
           int_com <-
             if (file.exists(fea_com)) {
@@ -1789,8 +1911,9 @@ list(
             }
         }
       ),
-      tar_file(
+      tar_target(
         name = edg_spe,
+        format = "file_fast",
         command = {
           edg_spe <-
             ifelse(test = file.exists(fea_edg_spe),
@@ -1800,8 +1923,9 @@ list(
         }
       )
     ),
-    tar_file(
+    tar_target(
       name = fea_edg_pre,
+      format = "file_fast",
       command = {
         fea_edg_pre <- prepare_features_edges(
           input = c(edg_spe, ann_ms1_pre_edg),
@@ -1811,8 +1935,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = fea_com_pre,
+      format = "file_fast",
       command = {
         fea_com_pre <- prepare_features_components(
           input = int_com,
@@ -1820,8 +1945,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = fea_pre,
+      format = "file_fast",
       command = {
         fea_pre <- prepare_features_tables(
           features = input_features,
@@ -1833,8 +1959,9 @@ list(
       }
     )
   ),
-  tar_file(
+  tar_target(
     name = tax_pre,
+    format = "file_fast",
     command = {
       tax_pre <- prepare_taxa(
         input = input_features,
@@ -1850,8 +1977,9 @@ list(
       )
     }
   ),
-  tar_file(
+  tar_target(
     name = ann_fil,
+    format = "file_fast",
     command = {
       ann_fil <- filter_annotations(
         annotations = c(
@@ -1867,8 +1995,9 @@ list(
       )
     }
   ),
-  tar_file(
+  tar_target(
     name = ann_pre,
+    format = "file_fast",
     command = {
       ann_pre <- weight_annotations(
         library = lib_mer_key,
@@ -1954,8 +2083,9 @@ list(
         benchmark_path_mgf_pos <- paths_data_source_benchmark_mgf_pos
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_file,
+      format = "file_fast",
       command = {
         benchmark_file <- get_file(
           url = benchmark_path_url,
@@ -1964,8 +2094,9 @@ list(
         return(benchmark_path_export)
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_copy,
+      format = "file_fast",
       command = {
         con <- file(benchmark_file, "r")
         text <- readLines(con)
@@ -2010,8 +2141,9 @@ list(
         return(benchmark_path_copy)
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_converted,
+      format = "file_fast",
       command = {
         sp <- benchmark_copy |>
           Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
@@ -2021,8 +2153,9 @@ list(
         return("data/interim/benchmark/benchmark_spectra.rds")
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_prepared,
+      format = "file_fast",
       command = {
         sp <- benchmark_converted |>
           readRDS() |>
@@ -2236,32 +2369,37 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_pre_mgf_pos,
+      format = "file_fast",
       command = {
         benchmark_pre_mgf_pos <- benchmark_prepared[[1]]
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_pre_mgf_neg,
+      format = "file_fast",
       command = {
         benchmark_pre_mgf_neg <- benchmark_prepared[[2]]
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_pre_meta_pos,
+      format = "file_fast",
       command = {
         benchmark_pre_meta_pos <- benchmark_prepared[[3]]
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_pre_meta_neg,
+      format = "file_fast",
       command = {
         benchmark_pre_meta_neg <- benchmark_prepared[[4]]
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_taxed_pos,
+      format = "file_fast",
       command = {
         benchmark_taxed_pos <- benchmark_pre_meta_pos |>
           taxize_spectra_benchmark(
@@ -2271,8 +2409,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_taxed_neg,
+      format = "file_fast",
       command = {
         benchmark_taxed_neg <- benchmark_pre_meta_neg |>
           taxize_spectra_benchmark(
@@ -2291,8 +2430,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_ms1_pre_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_ms1_pre_pos <-
           annotate_masses(
@@ -2324,8 +2464,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_ms1_pre_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_ms1_pre_neg <-
           annotate_masses(
@@ -2366,8 +2507,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_edg_spe_pos,
+      format = "file_fast",
       command = {
         benchmark_edg_spe_pos <- create_edges_spectra(
           input = benchmark_pre_mgf_pos,
@@ -2381,8 +2523,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_edg_spe_neg,
+      format = "file_fast",
       command = {
         benchmark_edg_spe_neg <- create_edges_spectra(
           input = benchmark_pre_mgf_neg,
@@ -2405,8 +2548,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_edg_pre_pos,
+      format = "file_fast",
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
           input = c(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
@@ -2416,8 +2560,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_edg_pre_neg,
+      format = "file_fast",
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
           input = c(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
@@ -2436,8 +2581,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_com_pos,
+      format = "file_fast",
       command = {
         benchmark_com_pos <- create_components(
           input = benchmark_edg_pre_pos,
@@ -2445,8 +2591,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_com_neg,
+      format = "file_fast",
       command = {
         benchmark_com_neg <- create_components(
           input = benchmark_edg_pre_neg,
@@ -2463,8 +2610,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_com_pre_pos,
+      format = "file_fast",
       command = {
         benchmark_com_pre_pos <- prepare_features_components(
           input = benchmark_com_pos,
@@ -2472,8 +2620,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_com_pre_neg,
+      format = "file_fast",
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
@@ -2483,6 +2632,7 @@ list(
     ),
     tar_target(
       name = benchmark_def_ann_spe,
+      format = "file_fast",
       command = {
         benchmark_def_ann_spe <- parse_yaml_params(
           def = par_def_ann_spe,
@@ -2490,8 +2640,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_spe_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
@@ -2510,8 +2661,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_spe_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
@@ -2539,8 +2691,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_spe_pre_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_spe_pre_pos <- prepare_annotations_spectra(
           input = c(benchmark_ann_spe_pos),
@@ -2553,8 +2706,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_spe_pre_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_spe_pre_neg <- prepare_annotations_spectra(
           input = c(benchmark_ann_spe_neg),
@@ -2576,8 +2730,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_sir_pre,
+      format = "file_fast",
       command = {
         benchmark_ann_sir_pre <-
           prepare_annotations_sirius(
@@ -2593,15 +2748,24 @@ list(
           )
       }
     ),
-    tar_file(name = benchmark_ann_sir_pre_can, command = {
-      benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
-    }),
-    tar_file(name = benchmark_ann_sir_pre_for, command = {
-      benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
-    }),
-    tar_file(name = benchmark_ann_sir_pre_str, command = {
-      benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
-    }),
+    tar_target(
+      name = benchmark_ann_sir_pre_can,
+      format = "file_fast", command = {
+        benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
+      }
+    ),
+    tar_target(
+      name = benchmark_ann_sir_pre_for,
+      format = "file_fast", command = {
+        benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
+      }
+    ),
+    tar_target(
+      name = benchmark_ann_sir_pre_str,
+      format = "file_fast", command = {
+        benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
+      }
+    ),
     tar_target(
       name = benchmark_def_fil_ann,
       command = {
@@ -2611,8 +2775,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_spe_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_spe_neg <- filter_annotations(
           annotations = c(
@@ -2626,8 +2791,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_spe_ms1_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
           annotations = c(
@@ -2643,8 +2809,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_ms1_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_ms1_neg <- filter_annotations(
           annotations = c(
@@ -2658,8 +2825,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_spe_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_spe_pos <- filter_annotations(
           annotations = c(
@@ -2673,8 +2841,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_spe_ms1_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
           annotations = c(
@@ -2690,8 +2859,9 @@ list(
         )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_fil_ms1_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_fil_ms1_pos <- filter_annotations(
           annotations = c(
@@ -2803,8 +2973,9 @@ list(
         )
       }
     ),
-    # tar_file(
+    # tar_target(
     #   name = benchmark_ann_pre_ms1_pos,
+    # .  format = "file_fast",
     #   command = {
     #     benchmark_ann_pre_ms1_pos <-
     #       do.call(
@@ -2822,8 +2993,9 @@ list(
     #       )
     #   }
     # ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms2_b_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms2_b_pos <-
           do.call(
@@ -2841,8 +3013,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms1_ms2_b_pos <-
           do.call(
@@ -2860,8 +3033,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms2_b_c_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms2_b_c_pos <-
           do.call(
@@ -2879,8 +3053,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_c_pos,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms1_ms2_b_c_pos <-
           do.call(
@@ -2898,8 +3073,9 @@ list(
           )
       }
     ),
-    # tar_file(
+    # tar_target(
     #   name = benchmark_ann_pre_ms1_neg,
+    # .  format = "file_fast",
     #   command = {
     #     benchmark_ann_pre_ms1_neg <-
     #       do.call(
@@ -2917,8 +3093,9 @@ list(
     #       )
     #   }
     # ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms2_b_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms2_b_neg <-
           do.call(
@@ -2936,8 +3113,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms1_ms2_b_neg <-
           do.call(
@@ -2955,8 +3133,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms2_b_c_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms2_b_c_neg <-
           do.call(
@@ -2974,8 +3153,9 @@ list(
           )
       }
     ),
-    tar_file(
+    tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_c_neg,
+      format = "file_fast",
       command = {
         benchmark_ann_pre_ms1_ms2_b_c_neg <-
           do.call(
