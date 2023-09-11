@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_SERVICE: "tima-mini"
+  DOCKER_SERVICE: "tima-full"
   LATEST_TAG: "adafede/tima-r:latest"
 
 jobs:
