@@ -101,7 +101,6 @@ weight_bio <-
     df1 <- annotation_table_taxed |>
       tidytable::select(
         candidate_structure_inchikey_no_stereo,
-        candidate_score_similarity,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -634,7 +633,6 @@ weight_bio <-
       tidytable::arrange(tidytable::desc(score_biological)) |>
       tidytable::distinct(
         candidate_structure_inchikey_no_stereo,
-        candidate_score_similarity,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -659,15 +657,20 @@ weight_bio <-
       ) |>
       tidytable::left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
-      ## TODO Decide if using similarity score or something else
-      tidytable::mutate(
-        candidate_score_similarity =
-          ifelse(
-            test = is.na(candidate_score_similarity),
-            yes = as.character(0),
-            no = candidate_score_similarity
-          )
-      ) |>
+      ## TODO suboptimal
+      tidytable::mutate(interim = -10 /
+        as.numeric(candidate_score_sirius_csi)) |>
+      tidytable::mutate(interim_2 = ifelse(test = interim > 1,
+        yes = 1,
+        no = interim
+      )) |>
+      tidytable::mutate(candidate_score_pseudo_initial = tidytable::case_when(
+        !is.na(candidate_score_similarity) & !is.na(interim_2) ~ (as.numeric(candidate_score_similarity) + interim_2) / 2,
+        !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
+        !is.na(interim_2) ~ interim_2,
+        TRUE ~ 0
+      )) |>
+      tidytable::select(-interim, -interim_2) |>
       tidytable::mutate(
         score_pondered_bio =
           (1 / (weight_biological + weight_spectral)) *
@@ -675,7 +678,7 @@ weight_bio <-
             score_biological +
             (1 / (weight_biological + weight_spectral)) *
               weight_spectral *
-              as.numeric(candidate_score_similarity)
+              candidate_score_pseudo_initial
       )
 
     rm(

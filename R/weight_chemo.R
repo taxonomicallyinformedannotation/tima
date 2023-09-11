@@ -250,7 +250,7 @@ weight_chemo <-
                 weight_spectral
             )) *
               weight_spectral *
-              as.numeric(candidate_score_similarity)
+              candidate_score_pseudo_initial
       )
 
     rm(
