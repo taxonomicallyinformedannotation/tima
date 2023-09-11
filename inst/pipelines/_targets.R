@@ -1427,7 +1427,7 @@ list(
       list(
         ## RAW
         list(
-          ### JLW
+          ### Internal
           tar_file(
             name = lib_spe_exp_int_raw,
             command = {
@@ -1459,23 +1459,23 @@ list(
                   output =
                     "data/interim/libraries/spectra/exp/internal_pos.rds",
                   polarity = "pos",
-                  metad = "WolfenderLab",
-                  col_ce = par_pre_lib_spe$names$mgf$collision_energy,
-                  col_ci = par_pre_lib_spe$names$mgf$compound_id,
-                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
-                  col_in = par_pre_lib_spe$names$mgf$inchi,
-                  col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
-                  col_ik = par_pre_lib_spe$names$mgf$inchikey,
-                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
-                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
-                  col_na = par_pre_lib_spe$names$mgf$name,
-                  col_po = par_pre_lib_spe$names$mgf$polarity,
-                  col_sm = par_pre_lib_spe$names$mgf$smiles,
-                  col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
-                  col_si = par_pre_lib_spe$names$mgf$spectrum_id,
-                  col_sp = par_pre_lib_spe$names$mgf$splash,
-                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
-                  col_xl = par_pre_lib_spe$names$mgf$xlogp
+                  metad = "InternalLib",
+                  col_ce = NULL,
+                  col_ci = "FILENAME",
+                  col_em = "EXACTMASS",
+                  col_in = "INCHI",
+                  col_io = NULL,
+                  col_ik = NULL,
+                  col_il = NULL,
+                  col_mf = NULL,
+                  col_na = "NAME",
+                  col_po = "IONMODE",
+                  col_sm = "SMILES",
+                  col_sn = NULL,
+                  col_si = "SPECTRUMID",
+                  col_sp = NULL,
+                  col_sy = NULL,
+                  col_xl = NULL
                 )
             }
           ),
@@ -1488,23 +1488,23 @@ list(
                   output =
                     "data/interim/libraries/spectra/exp/internal_neg.rds",
                   polarity = "neg",
-                  metad = "WolfenderLab",
-                  col_ce = par_pre_lib_spe$names$mgf$collision_energy,
-                  col_ci = par_pre_lib_spe$names$mgf$compound_id,
-                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
-                  col_in = par_pre_lib_spe$names$mgf$inchi,
-                  col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
-                  col_ik = par_pre_lib_spe$names$mgf$inchikey,
-                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
-                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
-                  col_na = par_pre_lib_spe$names$mgf$name,
-                  col_po = par_pre_lib_spe$names$mgf$polarity,
-                  col_sm = par_pre_lib_spe$names$mgf$smiles,
-                  col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
-                  col_si = par_pre_lib_spe$names$mgf$spectrum_id,
-                  col_sp = par_pre_lib_spe$names$mgf$splash,
-                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
-                  col_xl = par_pre_lib_spe$names$mgf$xlogp
+                  metad = "InternalLib",
+                  col_ce = NULL,
+                  col_ci = "FILENAME",
+                  col_em = "EXACTMASS",
+                  col_in = "INCHI",
+                  col_io = NULL,
+                  col_ik = NULL,
+                  col_il = NULL,
+                  col_mf = NULL,
+                  col_na = "NAME",
+                  col_po = "IONMODE",
+                  col_sm = "SMILES",
+                  col_sn = NULL,
+                  col_si = "SPECTRUMID",
+                  col_sp = NULL,
+                  col_sy = NULL,
+                  col_xl = NULL
                 )
             }
           ),
@@ -1653,7 +1653,7 @@ list(
               polarity = "pos",
               output = gsub(
                 pattern = "matches.tsv.gz",
-                replacement = "matches_exp_rt_pos.tsv.gz",
+                replacement = "matches_exp_int_pos.tsv.gz",
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
@@ -1674,7 +1674,7 @@ list(
               polarity = "neg",
               output = gsub(
                 pattern = "matches.tsv.gz",
-                replacement = "matches_exp_rt_neg.tsv.gz",
+                replacement = "matches_exp_int_neg.tsv.gz",
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
@@ -1697,7 +1697,7 @@ list(
                 ),
                 output = gsub(
                   pattern = "_prepared.tsv.gz",
-                  replacement = "_exp_rt_prepared.tsv.gz",
+                  replacement = "_exp_int_prepared.tsv.gz",
                   x = par_pre_ann_spe$files$annotations$prepared$structural,
                   fixed = TRUE
                 ),
@@ -1916,24 +1916,6 @@ list(
       ann_fil <- filter_annotations(
         annotations = c(
           ann_spe_exp_gnp_pre,
-          # ann_spe_exp_int_pre,
-          ann_spe_pre,
-          ann_sir_pre_str,
-          ann_ms1_pre_ann
-        ),
-        features = fea_pre,
-        rts = lib_rt_rts,
-        output = par_fil_ann$files$annotations$filtered,
-        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
-      )
-    }
-  ),
-  tar_file(
-    name = ann_fil_crazy,
-    command = {
-      ann_fil_crazy <- filter_annotations(
-        annotations = c(
-          ann_spe_exp_gnp_pre,
           ann_spe_exp_int_pre,
           ann_spe_pre,
           ann_sir_pre_str,
@@ -1954,61 +1936,6 @@ list(
         org_tax_ott = lib_mer_org_tax_ott,
         str_stereo = lib_mer_str_stereo,
         annotations = ann_fil,
-        canopus = ann_sir_pre_can,
-        formula = ann_sir_pre_for,
-        components = fea_com_pre,
-        edges = fea_edg_pre,
-        taxa = tax_pre,
-        output = par_wei_ann$files$annotations$processed,
-        candidates_final = par_wei_ann$annotations$candidates$final,
-        weight_spectral = par_wei_ann$weights$global$spectral,
-        weight_chemical = par_wei_ann$weights$global$chemical,
-        weight_biological = par_wei_ann$weights$global$biological,
-        score_biological_domain = par_wei_ann$weights$biological$domain,
-        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
-        score_biological_phylum = par_wei_ann$weights$biological$phylum,
-        score_biological_class = par_wei_ann$weights$biological$class,
-        score_biological_order = par_wei_ann$weights$biological$order,
-        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
-        score_biological_family = par_wei_ann$weights$biological$family,
-        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
-        score_biological_tribe = par_wei_ann$weights$biological$tribe,
-        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
-        score_biological_genus = par_wei_ann$weights$biological$genus,
-        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
-        score_biological_species = par_wei_ann$weights$biological$species,
-        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
-        score_biological_variety = par_wei_ann$weights$biological$variety,
-        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass =
-          par_wei_ann$weights$chemical$cla$superclass,
-        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
-        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
-        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass =
-          par_wei_ann$weights$chemical$npc$superclass,
-        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
-        minimal_consistency = par_wei_ann$annotations$thresholds$consistency,
-        minimal_ms1_bio = par_wei_ann$annotations$thresholds$ms1$biological,
-        minimal_ms1_chemo = par_wei_ann$annotations$thresholds$ms1$chemical,
-        minimal_ms1_condition =
-          par_wei_ann$annotations$thresholds$ms1$condition,
-        ms1_only = par_wei_ann$annotations$ms1only,
-        compounds_names = par_wei_ann$options$compounds_names,
-        summarise = par_wei_ann$options$summarise,
-        pattern = par_wei_ann$files$pattern,
-        force = par_wei_ann$options$force
-      )
-    }
-  ),
-  tar_file(
-    name = ann_pre_crazy,
-    command = {
-      ann_pre_crazy <- weight_annotations(
-        library = lib_mer_key,
-        org_tax_ott = lib_mer_org_tax_ott,
-        str_stereo = lib_mer_str_stereo,
-        annotations = ann_fil_crazy,
         canopus = ann_sir_pre_can,
         formula = ann_sir_pre_for,
         components = fea_com_pre,
@@ -2197,8 +2124,9 @@ list(
           tidytable::mutate(
             tidytable::across(
               .cols = tidytable::everything(),
-              .funs = tidytable::na_if,
-              ""
+              .fns = function(x) {
+                tidytable::na_if(x, "")
+              }
             )
           )
 
@@ -2206,7 +2134,7 @@ list(
         df_clean <- df_meta |>
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::filter(fragments >= 5) |>
-          tidytable::filter(fragments <= 100) |>
+          tidytable::filter(fragments <= 250) |>
           tidytable::filter(!grepl(
             pattern = "QQQ",
             x = instrument,

@@ -76,7 +76,6 @@ docker pull adafede/tima-r
 
 ```bash
 docker compose up tima-gui
-# docker compose up tima-mini
 # docker compose up tima-full
 ```
 

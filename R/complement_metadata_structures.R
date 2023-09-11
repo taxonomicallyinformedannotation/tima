@@ -34,12 +34,16 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_no_stereo_s = structure_inchikey_no_stereo,
       candidate_structure_smiles_no_stereo = structure_smiles_no_stereo
     ) |>
+    tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
 
   stereo_i <- stereo |>
     tidytable::select(
       candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
       candidate_structure_smiles_no_stereo_i = structure_smiles_no_stereo
+    ) |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_no_stereo)
     ) |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
@@ -58,6 +62,8 @@ complement_metadata_structures <- function(
       structure_xlogp,
       structure_molecular_formula
     ) |>
+    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
+      !is.na(structure_smiles_no_stereo)) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_no_stereo,
       .keep_all = TRUE
@@ -71,6 +77,8 @@ complement_metadata_structures <- function(
     colClasses = "character"
   ) |>
     tidytable::left_join(stereo) |>
+    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
+      !is.na(structure_smiles_no_stereo)) |>
     tidytable::distinct(
       structure_inchikey_no_stereo,
       structure_smiles_no_stereo,
@@ -106,6 +114,9 @@ complement_metadata_structures <- function(
       candidate_structure_tax_cla_04dirpar_i =
         structure_tax_cla_04dirpar
     ) |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_no_stereo)
+    ) |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
       .keep_all = TRUE
@@ -124,6 +135,7 @@ complement_metadata_structures <- function(
       candidate_structure_tax_npc_03cla_s =
         structure_tax_npc_03cla,
     ) |>
+    tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
 
   met_i <- met_2d |>
@@ -133,6 +145,7 @@ complement_metadata_structures <- function(
       candidate_structure_exact_mass_i = structure_exact_mass,
       candidate_structure_xlogp_i = structure_xlogp
     ) |>
+    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
       .keep_all = TRUE
@@ -145,6 +158,7 @@ complement_metadata_structures <- function(
       candidate_structure_exact_mass_s = structure_exact_mass,
       candidate_structure_xlogp_s = structure_xlogp
     ) |>
+    tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
@@ -155,6 +169,7 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
       candidate_structure_name_i = structure_name
     ) |>
+    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
       .keep_all = TRUE
@@ -165,6 +180,7 @@ complement_metadata_structures <- function(
       candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
       candidate_structure_name_s = structure_name
     ) |>
+    tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
