@@ -1629,7 +1629,7 @@ list(
     ),
     ## Spectral
     list(
-      ## Experimental
+      ## GNPS
       list(
         tar_file(
           name = ann_spe_exp_gnp_pre,
@@ -1638,71 +1638,6 @@ list(
               prepare_annotations_gnps(
                 input = gnps_annotations,
                 output = par_pre_ann_gnp$files$annotations$prepared$structural,
-                str_stereo = lib_mer_str_stereo,
-                str_met = lib_mer_str_met,
-                str_nam = lib_mer_str_nam,
-                str_tax_cla = lib_mer_str_tax_cla,
-                str_tax_npc = lib_mer_str_tax_npc
-              )
-          }
-        ),
-        tar_file(
-          name = ann_spe_exp_int_pos,
-          command = {
-            ann_spe_exp_int_pos <- annotate_spectra(
-              input = input_spectra,
-              library = lib_spe_exp_int_pre_pos,
-              polarity = "pos",
-              output = gsub(
-                pattern = "matches.tsv.gz",
-                replacement = "matches_exp_int_pos.tsv.gz",
-                x = par_ann_spe$files$annotations$raw$spectral,
-                fixed = TRUE
-              ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
-              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
-              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx
-            )
-          }
-        ),
-        tar_file(
-          name = ann_spe_exp_int_neg,
-          command = {
-            ann_spe_exp_int_neg <- annotate_spectra(
-              input = input_spectra,
-              library = lib_spe_exp_int_pre_neg,
-              polarity = "neg",
-              output = gsub(
-                pattern = "matches.tsv.gz",
-                replacement = "matches_exp_int_neg.tsv.gz",
-                x = par_ann_spe$files$annotations$raw$spectral,
-                fixed = TRUE
-              ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
-              ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
-              dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx
-            )
-          }
-        ),
-        tar_file(
-          name = ann_spe_exp_int_pre,
-          command = {
-            ann_spe_exp_int_pre <-
-              prepare_annotations_spectra(
-                input = c(
-                  ann_spe_exp_int_neg,
-                  ann_spe_exp_int_pos
-                ),
-                output = gsub(
-                  pattern = "_prepared.tsv.gz",
-                  replacement = "_exp_int_prepared.tsv.gz",
-                  x = par_pre_ann_spe$files$annotations$prepared$structural,
-                  fixed = TRUE
-                ),
                 str_stereo = lib_mer_str_stereo,
                 str_met = lib_mer_str_met,
                 str_nam = lib_mer_str_nam,
@@ -1722,6 +1657,8 @@ list(
               input = input_spectra,
               library = c(
                 lib_spe_is_lot_pre_pos,
+                ## TODO add is hmdb
+                lib_spe_exp_int_pre_pos,
                 lib_spe_exp_mb_pre_pos
               ),
               polarity = "pos",
@@ -1746,6 +1683,8 @@ list(
               input = input_spectra,
               library = c(
                 lib_spe_is_lot_pre_neg,
+                ## TODO add is hmdb
+                lib_spe_exp_int_pre_neg,
                 lib_spe_exp_mb_pre_neg
               ),
               polarity = "neg",
@@ -1769,7 +1708,6 @@ list(
             ann_spe_pre <- prepare_annotations_spectra(
               input = c(
                 ann_spe_neg,
-                ## TODO add is hmdb
                 ann_spe_pos
               ),
               output = par_pre_ann_spe$files$annotations$prepared$structural,
@@ -1918,7 +1856,6 @@ list(
       ann_fil <- filter_annotations(
         annotations = c(
           ann_spe_exp_gnp_pre,
-          ann_spe_exp_int_pre,
           ann_spe_pre,
           ann_sir_pre_str,
           ann_ms1_pre_ann
