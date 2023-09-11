@@ -314,7 +314,6 @@ testthat::test_that("Whole process", {
   )
   ### Positive
   annotate_spectra(
-    library = list("data/interim/libraries/spectra/exp/internal_pos.rds"),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001
