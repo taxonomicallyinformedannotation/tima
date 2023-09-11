@@ -15,7 +15,6 @@ files:
         - data/interim/annotations/example_gnps_prepared.tsv.gz
         - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
         - data/interim/annotations/example_sirius_prepared.tsv.gz
-        - data/interim/annotations/example_exp_int_prepared.tsv.gz
 
   #' Features files.
   features:
