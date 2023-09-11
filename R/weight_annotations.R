@@ -252,8 +252,8 @@ weight_annotations <- function(
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
-      tidytable::filter(candidate_score_similarity == 0 |
-        candidate_score_sirius_csi == 0)
+      tidytable::filter(is.na(candidate_score_similarity) &
+        is.na(candidate_score_sirius_csi))
   }
   if (compounds_names == FALSE) {
     annotation_table <- annotation_table |>

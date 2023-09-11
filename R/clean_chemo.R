@@ -71,7 +71,9 @@ clean_chemo <-
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          as.numeric(candidate_score_similarity) > 0 | (
+          (!is.na(candidate_score_similarity) |
+            !is.na(candidate_score_sirius_csi)
+          ) | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio |
               ## Only if a good biological
@@ -83,7 +85,9 @@ clean_chemo <-
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          as.numeric(candidate_score_similarity) > 0 | (
+          (!is.na(candidate_score_similarity) |
+            !is.na(candidate_score_sirius_csi)
+          ) | (
             ## Those lines are to keep ms1 annotation
             score_biological >= minimal_ms1_bio &
               ## Only if a good biological
@@ -101,7 +105,7 @@ clean_chemo <-
       ) |>
       tidytable::mutate(
         rank_initial = tidytable::dense_rank(
-          -as.numeric(candidate_score_similarity)
+          -candidate_score_pseudo_initial
         ),
         rank_final = tidytable::dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
@@ -139,7 +143,7 @@ clean_chemo <-
         model$candidates_spectra_columns,
         model$candidates_structures_columns,
         model$rank_columns,
-        "score_initial" = "candidate_score_similarity",
+        "score_initial" = "candidate_score_pseudo_initial",
         "score_biological",
         "score_interim" = "score_pondered_bio",
         "score_chemical",
@@ -263,7 +267,8 @@ clean_chemo <-
         tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)),
       tidytable::left_join(
         df6 |>
-          tidytable::filter(is.na(candidate_structure_inchikey_no_stereo)),
+          tidytable::filter(is.na(candidate_structure_inchikey_no_stereo)) |>
+          tidytable::distinct(model$features_columns),
         annot_table_wei_chemo |>
           tidytable::mutate(tidytable::across(
             .cols = tidytable::everything(),
