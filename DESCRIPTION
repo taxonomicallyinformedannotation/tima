@@ -29,33 +29,21 @@ Imports:
     Spectra (>= 1.10.2),
     stats,
     stringi (>= 1.7.12),
+    targets (>= 1.3.0),
     tidytable (>= 0.10.1),
     tidyfst (>= 1.7.7),
     utils,
     yaml (>= 2.3.7)
 Suggests: 
     BiocManager,
-    bs4Dash,
-    clustermq,
-    DT,
-    future,
-    gt,
     knitr,
-    markdown,
-    pingr,
     R.utils,
-    rstudioapi,
     shiny,
-    shinyWidgets,
-    shinybusy,
     shinyhelper,
     shinyjs,
     shinyvalidate,
     spelling,
-    targets,
-    tarchetypes,
-    testthat,
-    visNetwork
+    testthat
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
