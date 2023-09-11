@@ -2196,10 +2196,9 @@ list(
         ) |>
           tidytable::mutate(
             tidytable::across(
-              .cols = tidytable::where(is.character),
-              .funs = function(x) {
-                tidytable::na_if(x, "")
-              }
+              .cols = tidytable::everything(),
+              .funs = tidytable::na_if,
+              ""
             )
           )
 
