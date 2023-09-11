@@ -59,8 +59,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
   df_empty <- data.frame(
     feature_id = NA,
+    candidate_spectrum_entropy = NA,
     candidate_library = NA,
-    candidate_error_mz = NA,
+    candidate_structure_error_mz = NA,
     candidate_structure_name = NA,
     candidate_structure_inchikey_no_stereo = NA,
     candidate_structure_smiles_no_stereo = NA,
@@ -142,237 +143,243 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       lib_precursors * (1 + (10^-6 * ppm))
     )
 
-    lib_id <- seq_along(1:length(spectral_library))
+    lib_id <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
+    safety <- lib_spectra[lapply(X = lib_spectra, length) != 0]
+    if (length(safety) != 0) {
+      calculate_entropy_score <-
+        function(spectra,
+                 spectral_library,
+                 dalton,
+                 ppm) {
+          calculate_score_and_create_inner_list <-
+            function(spectrum,
+                     precursor,
+                     spectral_lib,
+                     query_ids,
+                     query_spectra,
+                     lib_id,
+                     minimal,
+                     maximal,
+                     daz = dalton,
+                     ppmz = ppm) {
+              indices <- minimal <= precursor & precursor <= maximal
+              spectral_lib <- lib_spectra[indices]
 
-    calculate_entropy_score <-
-      function(spectra,
-               spectral_library,
-               dalton,
-               ppm) {
-        calculate_score_and_create_inner_list <-
-          function(spectrum,
-                   precursor,
-                   spectral_lib,
-                   query_ids,
-                   query_spectra,
-                   lib_id,
-                   minimal,
-                   maximal,
-                   daz = dalton,
-                   ppmz = ppm) {
-            indices <- minimal <= precursor & precursor <= maximal
-            spectral_lib <- lib_spectra[indices]
-
-            inner_list <-
-              lapply(
-                X = seq_along(spectral_lib),
-                FUN = function(index,
-                               sp = spectrum,
-                               spectra = query_spectra,
-                               lib = spectral_lib,
-                               dalton = daz,
-                               ppm = ppmz) {
-                  score <- msentropy::calculate_entropy_similarity(
-                    peaks_a = spectra[[sp]],
-                    peaks_b = lib[[index]],
-                    min_mz = 0,
-                    max_mz = 5000,
-                    noise_threshold = 0,
-                    ms2_tolerance_in_da = dalton,
-                    ms2_tolerance_in_ppm = ppm,
-                    max_peak_num = -1,
-                    clean_spectra = TRUE
-                  )
-                  ## more efficient to do it when creating edges
-                  # entropy_query <- spectra[[sp]] |>
-                  #   msentropy::calculate_spectral_entropy()
-                  entropy_target <- lib[[index]] |>
-                    msentropy::calculate_spectral_entropy()
-
-                  ## number of matched peaks (only Da for now)
-                  matched <- sum(
-                    abs(
-                      outer(
-                        X = spectra[[sp]],
-                        Y = lib[[index]],
-                        FUN = "-"
-                      )
-                    ) <= dalton
-                  )
-
-                  if (score >= threshold) {
-                    tidytable::tidytable(
-                      "feature_id" = query_ids[[spectrum]],
-                      # "feature_spectrum_entropy" = entropy_query,
-                      "precursorMz" = precursor,
-                      "target_id" = lib_id[indices][[index]],
-                      "candidate_spectrum_entropy" = entropy_target,
-                      "candidate_score_similarity" = as.numeric(score),
-                      "candidate_count_similarity_peaks_matched" = matched
+              inner_list <-
+                lapply(
+                  X = seq_along(spectral_lib),
+                  FUN = function(index,
+                                 sp = spectrum,
+                                 spectra = query_spectra,
+                                 lib = spectral_lib,
+                                 dalton = daz,
+                                 ppm = ppmz) {
+                    score <- msentropy::calculate_entropy_similarity(
+                      peaks_a = spectra[[sp]],
+                      peaks_b = lib[[index]],
+                      min_mz = 0,
+                      max_mz = 5000,
+                      noise_threshold = 0,
+                      ms2_tolerance_in_da = dalton,
+                      ms2_tolerance_in_ppm = ppm,
+                      max_peak_num = -1,
+                      clean_spectra = TRUE
                     )
+                    ## more efficient to do it when creating edges
+                    # entropy_query <- spectra[[sp]] |>
+                    #   msentropy::calculate_spectral_entropy()
+                    entropy_target <- lib[[index]] |>
+                      msentropy::calculate_spectral_entropy()
+
+                    ## number of matched peaks (only Da for now)
+                    matched <- sum(
+                      abs(
+                        outer(
+                          X = spectra[[sp]],
+                          Y = lib[[index]],
+                          FUN = "-"
+                        )
+                      ) <= dalton
+                    )
+
+                    if (score >= threshold) {
+                      tidytable::tidytable(
+                        "feature_id" = query_ids[[spectrum]],
+                        # "feature_spectrum_entropy" = entropy_query,
+                        "precursorMz" = precursor,
+                        "target_id" = lib_id[indices][[index]],
+                        "candidate_spectrum_entropy" = entropy_target,
+                        "candidate_score_similarity" = as.numeric(score),
+                        "candidate_count_similarity_peaks_matched" = matched
+                      )
+                    }
                   }
-                }
-              )
+                )
 
-            return(inner_list)
-          }
-
-        log_debug("Performing spectral comparison")
-        outer_list <-
-          pbapply::pblapply(
-            X = seq_along(spectra),
-            FUN = function(spectrum, qp = query_precursors) {
-              precursor <- qp[spectrum]
-              calculate_score_and_create_inner_list(
-                spectrum = spectrum,
-                precursor = precursor,
-                spectral_lib = lib_spectra,
-                query_ids = query_ids,
-                query_spectra = query_spectra,
-                lib_id = lib_id,
-                minimal = minimal,
-                maximal = maximal
-              )
+              return(inner_list)
             }
-          ) |>
-          tidytable::bind_rows()
 
-        return(outer_list)
+          log_debug("Performing spectral comparison")
+          outer_list <-
+            pbapply::pblapply(
+              X = seq_along(spectra),
+              FUN = function(spectrum, qp = query_precursors) {
+                precursor <- qp[spectrum]
+                calculate_score_and_create_inner_list(
+                  spectrum = spectrum,
+                  precursor = precursor,
+                  spectral_lib = lib_spectra,
+                  query_ids = query_ids,
+                  query_spectra = query_spectra,
+                  lib_id = lib_id,
+                  minimal = minimal,
+                  maximal = maximal
+                )
+              }
+            ) |>
+            tidytable::bind_rows()
+
+          return(outer_list)
+        }
+
+      df_final <-
+        calculate_entropy_score(
+          spectra = spectra,
+          spectral_library = spectral_library,
+          dalton = dalton,
+          ppm = ppm
+        ) |>
+        tidytable::as_tidytable()
+
+      lib_inchikey <- spectral_library@backend@spectraData$inchikey
+      if (is.null(lib_inchikey)) {
+        lib_inchikey <- rep(NA_character_, length(spectral_library))
+      }
+      lib_inchikey2D <-
+        spectral_library@backend@spectraData$inchikey_2D
+      if (is.null(lib_inchikey2D)) {
+        lib_inchikey2D <- rep(NA_character_, length(spectral_library))
+      }
+      lib_smiles <- spectral_library@backend@spectraData$smiles
+      if (is.null(lib_smiles)) {
+        lib_smiles <- rep(NA_character_, length(spectral_library))
+      }
+      lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
+      if (is.null(lib_smiles2D)) {
+        lib_smiles2D <- rep(NA_character_, length(spectral_library))
+      }
+      lib_library <- spectral_library@backend@spectraData$library
+      if (is.null(lib_library)) {
+        lib_library <- rep(NA_character_, length(spectral_library))
+      }
+      lib_mf <- spectral_library@backend@spectraData$formula
+      if (is.null(lib_mf)) {
+        lib_mf <- rep(NA_character_, length(spectral_library))
+      }
+      lib_mass <- spectral_library@backend@spectraData$exactmass
+      if (is.null(lib_mass)) {
+        lib_mass <- rep(NA_real_, length(spectral_library))
+      }
+      lib_name <- spectral_library@backend@spectraData$name
+      if (is.null(lib_name)) {
+        lib_name <- rep(NA_character_, length(spectral_library))
+      }
+      lib_xlogp <- spectral_library@backend@spectraData$xlogp
+      if (is.null(lib_xlogp)) {
+        lib_xlogp <- rep(NA_real_, length(spectral_library))
       }
 
-    df_final <-
-      calculate_entropy_score(
-        spectra = spectra,
-        spectral_library = spectral_library,
-        dalton = dalton,
-        ppm = ppm
-      ) |>
-      tidytable::as_tidytable()
-
-    lib_inchikey <- spectral_library@backend@spectraData$inchikey
-    if (is.null(lib_inchikey)) {
-      lib_inchikey <- rep(NA_character_, length(spectral_library))
-    }
-    lib_inchikey2D <-
-      spectral_library@backend@spectraData$inchikey_2D
-    if (is.null(lib_inchikey2D)) {
-      lib_inchikey2D <- rep(NA_character_, length(spectral_library))
-    }
-    lib_smiles <- spectral_library@backend@spectraData$smiles
-    if (is.null(lib_smiles)) {
-      lib_smiles <- rep(NA_character_, length(spectral_library))
-    }
-    lib_smiles2D <- spectral_library@backend@spectraData$smiles_2D
-    if (is.null(lib_smiles2D)) {
-      lib_smiles2D <- rep(NA_character_, length(spectral_library))
-    }
-    lib_library <- spectral_library@backend@spectraData$library
-    if (is.null(lib_library)) {
-      lib_library <- rep(NA_character_, length(spectral_library))
-    }
-    lib_mf <- spectral_library@backend@spectraData$formula
-    if (is.null(lib_mf)) {
-      lib_mf <- rep(NA_character_, length(spectral_library))
-    }
-    lib_mass <- spectral_library@backend@spectraData$exactmass
-    if (is.null(lib_mass)) {
-      lib_mass <- rep(NA_real_, length(spectral_library))
-    }
-    lib_name <- spectral_library@backend@spectraData$name
-    if (is.null(lib_name)) {
-      lib_name <- rep(NA_character_, length(spectral_library))
-    }
-    lib_xlogp <- spectral_library@backend@spectraData$xlogp
-    if (is.null(lib_xlogp)) {
-      lib_xlogp <- rep(NA_real_, length(spectral_library))
-    }
-
-    df_meta <- tidytable::tidytable(
-      "target_id" = lib_id,
-      "target_inchikey" = lib_inchikey,
-      "target_inchikey_no_stereo" = lib_inchikey2D,
-      "target_smiles" = lib_smiles,
-      "target_smiles_no_stereo" = lib_smiles2D,
-      "target_library" = lib_library,
-      "target_formula" = lib_mf,
-      "target_exactmass" = lib_mass,
-      "target_name" = lib_name,
-      "target_xlogp" = lib_xlogp,
-      "target_precursorMz" = lib_precursors
-    )
-    df_final <- df_final |>
-      tidytable::left_join(df_meta) |>
-      tidytable::select(-target_id)
-
-    df_final <- df_final |>
-      tidytable::mutate(
-        candidate_structure_error_mz = target_precursorMz - precursorMz,
-        candidate_structure_inchikey_no_stereo = ifelse(
-          test = is.na(target_inchikey_no_stereo),
-          yes = target_inchikey |>
-            gsub(
-              pattern = "-.*",
-              replacement = ""
-            ),
-          no = target_inchikey_no_stereo
-        ),
-        candidate_structure_smiles_no_stereo = tidytable::coalesce(
-          target_smiles_no_stereo,
-          target_smiles
-        )
-      ) |>
-      tidytable::select(tidytable::any_of(
-        c(
-          "feature_id",
-          "candidate_library" = "target_library",
-          "candidate_structure_error_mz",
-          "candidate_structure_name" = "target_name",
-          "candidate_structure_inchikey_no_stereo",
-          "candidate_structure_smiles_no_stereo",
-          "candidate_structure_molecular_formula" = "target_formula",
-          "candidate_structure_exact_mass" = "target_exactmass",
-          "candidate_structure_xlogp" = "target_xlogp",
-          "candidate_spectrum_entropy",
-          "candidate_score_similarity",
-          "candidate_count_similarity_peaks_matched"
-        )
-      ))
-
-    ## COMMENT AR: Not doing it because of thresholding
-    ## df_final[is.na(df_final)] <- 0
-
-    log_debug("Filtering results above threshold only...")
-    df_final <- df_final |>
-      tidytable::filter(candidate_score_similarity >= threshold) |>
-      tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
-      ## keep only the best result (per library for now)
-      tidytable::distinct(
-        feature_id,
-        candidate_library,
-        candidate_structure_inchikey_no_stereo,
-        .keep_all = TRUE
+      df_meta <- tidytable::tidytable(
+        "target_id" = lib_id,
+        "target_inchikey" = lib_inchikey,
+        "target_inchikey_no_stereo" = lib_inchikey2D,
+        "target_smiles" = lib_smiles,
+        "target_smiles_no_stereo" = lib_smiles2D,
+        "target_library" = lib_library,
+        "target_formula" = lib_mf,
+        "target_exactmass" = lib_mass,
+        "target_name" = lib_name,
+        "target_xlogp" = lib_xlogp,
+        "target_precursorMz" = lib_precursors
       )
+      df_final <- df_final |>
+        tidytable::left_join(df_meta) |>
+        tidytable::select(-target_id)
 
-    log_debug(
-      nrow(
-        df_final |>
-          ## else doesn't work if some are empty
-          tidytable::distinct(
-            candidate_structure_inchikey_no_stereo,
-            candidate_structure_smiles_no_stereo
+      df_final <- df_final |>
+        tidytable::mutate(
+          candidate_structure_error_mz = target_precursorMz - precursorMz,
+          candidate_structure_inchikey_no_stereo = ifelse(
+            test = is.na(target_inchikey_no_stereo),
+            yes = target_inchikey |>
+              gsub(
+                pattern = "-.*",
+                replacement = ""
+              ),
+            no = target_inchikey_no_stereo
+          ),
+          candidate_structure_smiles_no_stereo = tidytable::coalesce(
+            target_smiles_no_stereo,
+            target_smiles
           )
-      ),
-      "Candidates were annotated on",
-      nrow(df_final |>
-        tidytable::distinct(feature_id)),
-      "features, with at least",
-      threshold,
-      "similarity score."
-    )
-    if (nrow(df_final) == 0) {
-      log_debug("No spectra were matched, returning an empty dataframe")
+        ) |>
+        tidytable::select(tidytable::any_of(
+          c(
+            "feature_id",
+            "candidate_library" = "target_library",
+            "candidate_structure_error_mz",
+            "candidate_structure_name" = "target_name",
+            "candidate_structure_inchikey_no_stereo",
+            "candidate_structure_smiles_no_stereo",
+            "candidate_structure_molecular_formula" = "target_formula",
+            "candidate_structure_exact_mass" = "target_exactmass",
+            "candidate_structure_xlogp" = "target_xlogp",
+            "candidate_spectrum_entropy",
+            "candidate_score_similarity",
+            "candidate_count_similarity_peaks_matched"
+          )
+        ))
+
+      ## COMMENT AR: Not doing it because of thresholding
+      ## df_final[is.na(df_final)] <- 0
+
+      log_debug("Filtering results above threshold only...")
+      df_final <- df_final |>
+        tidytable::filter(candidate_score_similarity >= threshold) |>
+        tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+        ## keep only the best result (per library for now)
+        tidytable::distinct(
+          feature_id,
+          candidate_library,
+          candidate_structure_inchikey_no_stereo,
+          .keep_all = TRUE
+        )
+
+      log_debug(
+        nrow(
+          df_final |>
+            ## else doesn't work if some are empty
+            tidytable::distinct(
+              candidate_structure_inchikey_no_stereo,
+              candidate_structure_smiles_no_stereo
+            )
+        ),
+        "Candidates were annotated on",
+        nrow(df_final |>
+          tidytable::distinct(feature_id)),
+        "features, with at least",
+        threshold,
+        "similarity score."
+      )
+      if (nrow(df_final) == 0) {
+        log_debug("No spectra were matched, returning an empty dataframe")
+        df_final <- df_empty
+      }
+    } else {
+      log_debug("No spectra left in the library,
+              returning an empty dataframe")
       df_final <- df_empty
     }
   } else {

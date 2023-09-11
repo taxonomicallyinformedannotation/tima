@@ -83,6 +83,7 @@ prepare_libraries_sop_ecmdb <-
         select_sop_columns() |>
         round_reals() |>
         tidytable::distinct()
+      rm(ecmdb)
     } else {
       log_debug("Sorry, ECMDB not found, returning an empty file instead")
       ecmdb_prepared <- fake_sop_columns()
@@ -91,6 +92,6 @@ prepare_libraries_sop_ecmdb <-
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_libraries_sop_ecmdb"), step = "prepare_libraries_sop_closed")
     export_output(x = ecmdb_prepared, file = output)
-    rm(ecmdb, ecmdb_prepared)
+    rm(ecmdb_prepared)
     return(output)
   }

@@ -89,7 +89,7 @@ prepare_libraries_spectra <-
           "inchikey" = NA_character_,
           "inchikey_no_stereo" = NA_character_,
           "name" = NA_character_,
-          "precursorMz" = NA_real_,
+          "precursorMz" = 0,
           "precursorCharge" = NA_integer_,
           "smiles" = NA_character_,
           "smiles_no_stereo" = NA_character_,
@@ -101,7 +101,7 @@ prepare_libraries_spectra <-
           "mz" = c(1, 2, 3) |> list(),
           "intensity" = c(1, 2, 3) |> list(),
           "library" = NA_character_,
-          "precursor_mz" = NA_real_
+          "precursor_mz" = 0
         )
       }
       log_debug("Exporting")

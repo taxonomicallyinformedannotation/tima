@@ -1428,13 +1428,15 @@ list(
         ## RAW
         list(
           ### Internal
-          tar_file(
-            name = lib_spe_exp_int_raw,
-            command = {
-              lib_spe_exp_int_raw <-
-                par_pre_lib_spe$files$libraries$spectral$exp$raw
-            }
-          ),
+          ## This does not work as it forces the file to exist.
+          ## So targets will not check if the input file changed automatically.
+          # tar_file(
+          #   name = lib_spe_exp_int_raw,
+          #   command = {
+          #     lib_spe_exp_int_raw <-
+          #       par_pre_lib_spe$files$libraries$spectral$exp$raw
+          #   }
+          # ),
           ### MassBank
           tar_file(
             name = lib_spe_exp_mb_raw,
@@ -1455,7 +1457,7 @@ list(
             command = {
               lib_spe_exp_int_pre_pos <-
                 prepare_libraries_spectra(
-                  input = lib_spe_exp_int_raw,
+                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
                   output =
                     "data/interim/libraries/spectra/exp/internal_pos.rds",
                   polarity = "pos",
@@ -1484,7 +1486,7 @@ list(
             command = {
               lib_spe_exp_int_pre_neg <-
                 prepare_libraries_spectra(
-                  input = lib_spe_exp_int_raw,
+                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
                   output =
                     "data/interim/libraries/spectra/exp/internal_neg.rds",
                   polarity = "neg",
