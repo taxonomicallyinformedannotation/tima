@@ -159,6 +159,48 @@ list(
           paths_data_source_libraries_spectra_is_lotus_neg <-
             paths$data$source$libraries$spectra$is$lotus$neg
         }
+      ),
+      tar_target(
+        name = paths_data_interim_libraries_adducts_path,
+        command = {
+          paths_data_interim_libraries_adducts_path <-
+            paths$data$interim$libraries$adducts$path
+        }
+      ),
+      tar_target(
+        name = paths_urls_benchmarking_set,
+        command = {
+          paths_urls_benchmarking_set <-
+            paths$urls$benchmarking_set
+        }
+      ),
+      tar_target(
+        name = paths_data_source_benchmark_set,
+        command = {
+          paths_data_source_benchmark_set <-
+            paths$data$source$benchmark$set
+        }
+      ),
+      tar_target(
+        name = paths_data_source_benchmark_copy,
+        command = {
+          paths_data_source_benchmark_copy <-
+            paths$data$source$benchmark$copy
+        }
+      ),
+      tar_target(
+        name = paths_data_source_benchmark_mgf_neg,
+        command = {
+          paths_data_source_benchmark_mgf_neg <-
+            paths$data$source$benchmark$mgf$neg
+        }
+      ),
+      tar_target(
+        name = paths_data_source_benchmark_mgf_pos,
+        command = {
+          paths_data_source_benchmark_mgf_pos <-
+            paths$data$source$benchmark$mgf$pos
+        }
       )
     ),
     ## Dictionaries
@@ -1218,7 +1260,7 @@ list(
         lib_add <- prepare_libraries_adducts(
           str_met = lib_mer_str_met,
           adducts_masses = dic_add,
-          adducts_output_path = paths$data$interim$libraries$adducts$path,
+          adducts_output_path = paths_data_interim_libraries_adducts_path,
           output_name = par_pre_lib_add$files$libraries$adducts$prepared,
           masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
           masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
@@ -2019,31 +2061,31 @@ list(
     tar_target(
       name = benchmark_path_url,
       command = {
-        benchmark_path_url <- paths$urls$benchmarking_set
+        benchmark_path_url <- paths_urls_benchmarking_set
       }
     ),
     tar_target(
       name = benchmark_path_export,
       command = {
-        benchmark_path_export <- paths$data$source$benchmark$set
+        benchmark_path_export <- paths_data_source_benchmark_set
       }
     ),
     tar_target(
       name = benchmark_path_copy,
       command = {
-        benchmark_path_copy <- paths$data$source$benchmark$copy
+        benchmark_path_copy <- paths_data_source_benchmark_copy
       }
     ),
     tar_target(
       name = benchmark_path_mgf_neg,
       command = {
-        benchmark_path_mgf_neg <- paths$data$source$benchmark$mgf$neg
+        benchmark_path_mgf_neg <- paths_data_source_benchmark_mgf_neg
       }
     ),
     tar_target(
       name = benchmark_path_mgf_pos,
       command = {
-        benchmark_path_mgf_pos <- paths$data$source$benchmark$mgf$pos
+        benchmark_path_mgf_pos <- paths_data_source_benchmark_mgf_pos
       }
     ),
     tar_file(
