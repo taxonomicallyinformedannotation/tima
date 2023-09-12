@@ -27,7 +27,7 @@ prepare_features_tables <-
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::select(tidytable::all_of(c(
+      tidytable::select(tidytable::any_of(c(
         feature_id = name_features,
         rt = name_rt,
         mz = name_mz
