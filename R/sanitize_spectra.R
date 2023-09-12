@@ -8,7 +8,6 @@
 #' @param ratio Minimal ratio to the max peak
 #' @param cutoff Absolute minimal intensity
 #' @param fragments Minimal number of fragments
-#' @param deeper Deep sanitization using quantiles
 #'
 #' @return NULL
 #'
@@ -19,26 +18,26 @@ sanitize_spectra <-
   function(spectra,
            ratio = 10000,
            cutoff = 0,
-           fragments = 3,
-           deeper = FALSE) {
+           fragments = 3) {
     log_debug("Applying sanitization of the spectra")
 
-    if (deeper) {
-      spectra <- spectra |>
-        Spectra::filterIntensity(
-          intensity = function(x) {
-            ## eventually go to 25%
-            x <- x > stats::quantile(x)[1]
-          }
-        ) |>
-        Spectra::applyProcessing()
-    }
+    spectra@backend@peaksData <- spectra@backend@peaksData |>
+      lapply(FUN = Spectra:::.peaks_remove_fft_artifact)
 
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
       Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
       Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
       Spectra::applyProcessing()
+
+    # spectra <- spectra |>
+    #   Spectra::filterIntensity(
+    #     intensity = function(x) {
+    #       ## eventually go to 25%
+    #       x <- x > stats::quantile(x)[1]
+    #     }
+    #   ) |>
+    #   Spectra::applyProcessing()
 
     lengths <- lapply(X = spectra@backend@peaksData, FUN = length)
     spectra <- spectra[lengths >= fragments * 2]

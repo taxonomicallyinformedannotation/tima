@@ -4,13 +4,7 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(
-  spectra,
-  ratio = 10000,
-  cutoff = 0,
-  fragments = 3,
-  deeper = FALSE
-)
+sanitize_spectra(spectra, ratio = 10000, cutoff = 0, fragments = 3)
 }
 \arguments{
 \item{spectra}{Spectra object}
@@ -20,8 +14,6 @@ sanitize_spectra(
 \item{cutoff}{Absolute minimal intensity}
 
 \item{fragments}{Minimal number of fragments}
-
-\item{deeper}{Deep sanitization using quantiles}
 }
 \description{
 This function sanitizes spectra

@@ -7,6 +7,7 @@
 #' @include extract_spectra.R
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
+#' @include sanitize_spectra.R
 #'
 #' @param input File containing spectra
 #' @param output Output file
@@ -70,13 +71,17 @@ prepare_libraries_spectra <-
         spectra <- input |>
           import_spectra()
 
+        log_debug("Sanitizing")
+        spectra_sanitized <- spectra |>
+          sanitize_spectra()
+
         log_debug("Harmonizing")
-        spectra_harmonized <- spectra |>
+        spectra_harmonized <- spectra_sanitized |>
           extract_spectra() |>
           harmonize_spectra(mode = polarity) |>
           ## TODO report the issue as otherwise precursorMz is lost
           tidytable::mutate(precursor_mz = precursorMz)
-        rm(spectra)
+        rm(spectra, spectra_sanitized)
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
         spectra_harmonized <- tidytable::tidytable(
