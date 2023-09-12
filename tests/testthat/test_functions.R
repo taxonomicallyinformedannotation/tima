@@ -293,17 +293,18 @@ testthat::test_that("Whole process", {
     "row m/z" = 123.4567,
     "sample.mzML Peak area" = 98765.43
   ) |>
-    tidytable::fwrite("data/source/example_features_nort.csv")
+    tidytable::fwrite("data/source/example_features_no_rt.csv")
   prepare_features_tables(
-    features = "data/source/example_features_nort.csv",
-    name_rt = NULL
+    features = "data/source/example_features_no_rt.csv",
+    output = "data/interim/features/example_features_no_rt.tsv.gz"
   )
   #### classical
   prepare_features_tables()
 
   ## Performing MS1 annotation
-  ### Negative
+  ### Negative and no RT
   annotate_masses(
+    features = "data/interim/features/example_features_no_rt.tsv.gz",
     ## shallow tolerance to speed up tests
     tolerance_ppm = 1,
     tolerance_rt = 0.01,
