@@ -204,17 +204,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                       ) <= dalton
                     )
 
-                    if (score >= threshold) {
-                      tidytable::tidytable(
-                        "feature_id" = query_ids[[spectrum]],
-                        # "feature_spectrum_entropy" = entropy_query,
-                        "precursorMz" = precursor,
-                        "target_id" = lib_id[indices][[index]],
-                        "candidate_spectrum_entropy" = entropy_target,
-                        "candidate_score_similarity" = as.numeric(score),
-                        "candidate_count_similarity_peaks_matched" = matched
-                      )
-                    }
+                    tidytable::tidytable(
+                      "feature_id" = query_ids[[spectrum]],
+                      # "feature_spectrum_entropy" = entropy_query,
+                      "precursorMz" = precursor,
+                      "target_id" = lib_id[indices][[index]],
+                      "candidate_spectrum_entropy" = entropy_target,
+                      "candidate_score_similarity" = as.numeric(score),
+                      "candidate_count_similarity_peaks_matched" = matched
+                    )
                   }
                 )
 
