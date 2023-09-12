@@ -24,6 +24,13 @@ testthat::test_that("Whole process", {
   ## When previous params exist
   prepare_params()
 
+  ## replace id
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = "",
+    user_filename = "Foo"
+  )
+
   ## Get all files
   ### Features table
   get_gnps_tables(
@@ -280,6 +287,18 @@ testthat::test_that("Whole process", {
   prepare_libraries_adducts()
 
   ### Features
+  #### if no RT
+  tidytable::tidytable(
+    "row ID" = 1,
+    "row m/z" = 123.4567,
+    "sample.mzML Peak area" = 98765.43
+  ) |>
+    tidytable::fwrite("data/source/example_features_nort.csv")
+  prepare_features_tables(
+    features = "data/source/example_features_nort.csv",
+    name_rt = NULL
+  )
+  #### classical
   prepare_features_tables()
 
   ## Performing MS1 annotation
@@ -301,7 +320,10 @@ testthat::test_that("Whole process", {
   ## Performing MS2 annotation
   ### Negative
   annotate_spectra(
-    library = list("data/interim/libraries/spectra/exp/internal_neg.rds"),
+    library = list(
+      "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
@@ -317,6 +339,7 @@ testthat::test_that("Whole process", {
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
+    threshold = 2,
     approx = TRUE
   )
 
