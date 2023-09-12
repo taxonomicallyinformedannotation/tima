@@ -255,7 +255,8 @@ annotate_masses <-
           )
         )
     } else {
-      df3[, "rt"] <- df3[, "feature_id"]
+      df3[, "rt"] <- df3[, "feature_id"] |>
+        as.numeric()
     }
 
     log_debug("adding rt tolerance ... \n")
