@@ -2162,8 +2162,7 @@ list(
           sanitize_spectra(
             cutoff = 0,
             ratio = 10000,
-            fragments = 5,
-            deeper = FALSE
+            fragments = 5
           )
 
         sp@backend@spectraData$precursorMz <-
