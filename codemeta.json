@@ -57,6 +57,42 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "bs4Dash",
+      "name": "bs4Dash",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=bs4Dash"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "DT",
+      "name": "DT",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=DT"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "gt",
+      "name": "gt",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=gt"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
       "provider": {
@@ -81,51 +117,39 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shiny",
-      "name": "shiny",
+      "identifier": "shinybusy",
+      "name": "shinybusy",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=shiny"
+      "sameAs": "https://CRAN.R-project.org/package=shinybusy"
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shinyhelper",
-      "name": "shinyhelper",
+      "identifier": "shinytest2",
+      "name": "shinytest2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=shinyhelper"
+      "sameAs": "https://CRAN.R-project.org/package=shinytest2"
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shinyjs",
-      "name": "shinyjs",
+      "identifier": "shinyWidgets",
+      "name": "shinyWidgets",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=shinyjs"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "shinyvalidate",
-      "name": "shinyvalidate",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
+      "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
     {
       "@type": "SoftwareApplication",
@@ -150,6 +174,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "visNetwork",
+      "name": "visNetwork",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     }
   ],
   "softwareRequirements": {
@@ -304,6 +340,58 @@
     },
     "13": {
       "@type": "SoftwareApplication",
+      "identifier": "shiny",
+      "name": "shiny",
+      "version": ">= 1.7.5",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shiny"
+    },
+    "14": {
+      "@type": "SoftwareApplication",
+      "identifier": "shinyhelper",
+      "name": "shinyhelper",
+      "version": ">= 0.3.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyhelper"
+    },
+    "15": {
+      "@type": "SoftwareApplication",
+      "identifier": "shinyjs",
+      "name": "shinyjs",
+      "version": ">= 2.1.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyjs"
+    },
+    "16": {
+      "@type": "SoftwareApplication",
+      "identifier": "shinyvalidate",
+      "name": "shinyvalidate",
+      "version": ">= 0.1.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
+    },
+    "17": {
+      "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
       "version": ">= 1.10.2",
@@ -315,12 +403,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "14": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "15": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -333,7 +421,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "16": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -346,7 +434,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "17": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -359,7 +447,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "18": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -372,12 +460,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "19": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "20": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
