@@ -13,7 +13,7 @@
 * Refactored biological and chemical score
 * Refactored RT matching (#76)
 * Refactored Sirius scores (#92)
-* Multiple Shiny fixes
+* Multiple Shiny fixes and tests addition (#60)
 * Multiple fixes (#71, #81, #82)
 
 # timaR 2.8.2

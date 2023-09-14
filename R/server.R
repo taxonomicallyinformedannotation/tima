@@ -1,11 +1,13 @@
-library(shinyvalidate)
-source(file = "R/save_input.R")
-
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
+
+#' @noRd
 server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()
+
+  ## Mandatory fields
+  fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
 
   ## Enable the Submit button when all mandatory fields are filled out
   shiny::observe(x = {
@@ -28,7 +30,7 @@ server <- function(input, output, session) {
   })
 
   ## Special check for taxon name
-  iv <- InputValidator$new()
+  iv <- shinyvalidate::InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
     if (!grepl(pattern = "^[[:upper:]]", x = taxon)) {
       "Please provide your taxon name with capital letter"
@@ -86,7 +88,6 @@ server <- function(input, output, session) {
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
       tryCatch(expr = {
-        setwd("../..")
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
           port = 3839,
@@ -257,7 +258,6 @@ server <- function(input, output, session) {
           garbage_collection = TRUE,
           reporter = "verbose_positives"
         )
-        setwd("inst/app")
       }, finally = {
         shiny::stopApp()
       })
