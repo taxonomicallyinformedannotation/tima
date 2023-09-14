@@ -1,45 +1,50 @@
-source(file = "R/app_css.R")
-source(file = "R/fields_mandatory.R")
-source(file = "R/label_mandatory.R")
+app_css <-
+  ".mandatory_star { color: red; }
+     .shiny-input-container { margin-top: 25px; }
+     #submit_msg { margin-left: 15px; }
+     #error { color: red; }
+     body { background: #fcfcfc; }
+     #header { margin: -20px -15px 0; padding: 15px 15px 10px; }
+    "
 
-ui <- fluidPage(
+ui <- shiny::fluidPage(
   shinyjs::useShinyjs(),
   shinyjs::inlineCSS(rules = app_css),
   title = "Taxonomically Informed Metabolite Annotation",
-  div(
+  shiny::div(
     id = "header",
-    h1("Taxonomically Informed Metabolite Annotation"),
-    h4(
+    shiny::h1("Taxonomically Informed Metabolite Annotation"),
+    shiny::h4(
       "This app helps performing TIMA as described in the",
-      a(
+      shiny::a(
         href = "https://taxonomicallyinformedannotation.github.io/tima-r/",
         "following documentation"
       )
     ),
-    strong(
-      span("Created by "),
-      a("Adriano Rutz", href = "https://adafede.github.io/"),
-      HTML("&bull;"),
-      a("Main publication", href = "https://doi.org/10.3389/fpls.2019.01329"),
-      HTML("&bull;"),
-      span("Code"),
-      a(
+    shiny::strong(
+      shiny::span("Created by "),
+      shiny::a("Adriano Rutz", href = "https://adafede.github.io/"),
+      shiny::HTML("&bull;"),
+      shiny::a("Main publication", href = "https://doi.org/10.3389/fpls.2019.01329"),
+      shiny::HTML("&bull;"),
+      shiny::span("Code"),
+      shiny::a(
         "on GitHub",
         href = "https://github.com/taxonomicallyinformedannotation/tima-r/"
       )
     )
   ),
-  fluidPage(div(
+  shiny::fluidPage(shiny::div(
     id = "params",
-    navlistPanel(
+    shiny::navlistPanel(
       widths = c(4, 5),
       "Parameters",
-      tabPanel(
+      shiny::tabPanel(
         title = "Files",
-        h3("Required files"),
-        h5("They SHOULD be located in `data/source`"),
-        div(
-          fileInput(
+        shiny::h3("Required files"),
+        shiny::h5("They SHOULD be located in `data/source`"),
+        shiny::div(
+          shiny::fileInput(
             inputId = "fil_spe_raw",
             label = label_mandatory("MGF file"),
             accept = ".mgf"
@@ -54,7 +59,7 @@ ui <- fluidPage(
               "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        fileInput(
+        shiny::fileInput(
           inputId = "fil_fea_raw",
           label = label_mandatory("Features table"),
           accept = c(
@@ -75,7 +80,7 @@ ui <- fluidPage(
               "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        fileInput(
+        shiny::fileInput(
           inputId = "fil_tax_raw",
           label = "Metadata table (mandatory if no taxon name)",
           accept = c(
@@ -97,7 +102,7 @@ ui <- fluidPage(
               "Do not forget to change the `name` in the corresponding tab."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "fil_pat",
           label = label_mandatory("Pattern to identify your job locally"),
           value = "example"
@@ -112,10 +117,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "Annotations",
-        h3("Annotations-related parameters"),
-        sliderInput(
+        shiny::h3("Annotations-related parameters"),
+        shiny::sliderInput(
           inputId = "ann_can_ini",
           label = "Number of initial candidates",
           min = 1,
@@ -131,7 +136,7 @@ ui <- fluidPage(
               "For 12 candidates, with 10, only the first 10 will be kept."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ann_can_fin",
           label = "Number of final candidates",
           min = 1,
@@ -148,7 +153,7 @@ ui <- fluidPage(
               "This can end to more than n candidates, if some are ex aequo."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "ann_ms1only",
           label = "Erase MS2 results and keep MS1 only",
           value = FALSE
@@ -160,7 +165,7 @@ ui <- fluidPage(
               "Usually not needed, for benchmarking mainly."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "ann_ms1_ann",
           label = "Perform MS1 annotation",
           value = TRUE
@@ -171,7 +176,7 @@ ui <- fluidPage(
               "Options to complement previous results at the MS1 level."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ann_thr_con",
           label = "Minimal consistency score (chemical) to consider a class",
           min = 0,
@@ -187,7 +192,7 @@ ui <- fluidPage(
               "Everything below will be considered as not consistent."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ann_thr_ms1_bio",
           label = "Minimal biological score to keep MS1 only annotation",
           min = 0,
@@ -204,7 +209,7 @@ ui <- fluidPage(
               "Check the sub-scores and weights in the `weights` panel."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ann_thr_ms1_che",
           label = "Minimal chemical score to keep MS1 only annotation",
           min = 0,
@@ -221,7 +226,7 @@ ui <- fluidPage(
               "Check the sub-scores and weights in the `weights` panel."
             )
           ),
-        selectInput(
+        shiny::selectInput(
           inputId = "ann_thr_ms1_con",
           label = "Condition to be used to retain candidates",
           choices = c("AND", "OR"),
@@ -235,7 +240,7 @@ ui <- fluidPage(
               "keeps it if the condition is `OR` but discard it if `AND`."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "ann_ms2_app",
           label = "Perform matching without precursor? (can be very long)",
           value = FALSE
@@ -249,7 +254,7 @@ ui <- fluidPage(
               "Takes a lot of time."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ann_thr_ms2_sim",
           label = "Minimal similarity score (annotation)",
           min = 0,
@@ -265,7 +270,7 @@ ui <- fluidPage(
               "To keep MS2 annotation."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "edg_thr_ms2_sim",
           label = "Minimal similarity score (edges)",
           min = 0.5,
@@ -282,10 +287,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "MS",
-        h3("MS-related parameters"),
-        selectInput(
+        shiny::h3("MS-related parameters"),
+        shiny::selectInput(
           inputId = "ms_pol",
           label = "Polarity used",
           choices = c("pos", "neg"),
@@ -295,7 +300,7 @@ ui <- fluidPage(
             type = "inline",
             content = c("Polarity of the MS experiment.")
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_thr_ms1_int",
           label = "Intensity threshold for MS1",
           min = 0,
@@ -311,7 +316,7 @@ ui <- fluidPage(
               "Features below this threshold will not be annotated."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_thr_ms2_int",
           label = "Intensity threshold for MS2",
           min = 0,
@@ -326,7 +331,7 @@ ui <- fluidPage(
               "Fragments below this threshold will be removed from spectra."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_tol_mas_ppm_ms1",
           label = "Relative mass tolerance for MS1 in ppm",
           min = 0.1,
@@ -338,7 +343,7 @@ ui <- fluidPage(
             type = "inline",
             content = c("Mass tolerance (in ppm) used for MS1 annotation.")
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_tol_mas_dal_ms1",
           label = "Absolute mass tolerance for MS1 in Dalton",
           min = 0.005,
@@ -350,7 +355,7 @@ ui <- fluidPage(
             type = "inline",
             content = c("Mass tolerance (in Da) used for MS1 annotation.")
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_tol_mas_ppm_ms2",
           label = "Relative mass tolerance for MS2 in ppm",
           min = 0.1,
@@ -362,7 +367,7 @@ ui <- fluidPage(
             type = "inline",
             content = c("Mass tolerance (in ppm) used for MS2 annotation.")
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_tol_mas_dal_ms2",
           label = "Absolute mass tolerance for MS2 in Dalton",
           min = 0.005,
@@ -374,7 +379,7 @@ ui <- fluidPage(
             type = "inline",
             content = c("Mass tolerance (in Da) used for MS2 annotation.")
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "ms_tol_rt_min",
           label = "Retention time tolerance in minutes",
           min = 0.01,
@@ -390,7 +395,7 @@ ui <- fluidPage(
               "If no experimental library is given, does not impact results."
             )
           ),
-        checkboxGroupInput(
+        shiny::checkboxGroupInput(
           inputId = "ms_add_pos",
           label = "List of adducts to be used in positive",
           choices = list(
@@ -430,7 +435,7 @@ ui <- fluidPage(
               "If a very important adduct everyone should have is missing,",
               "please open an issue at:",
               as.character(
-                tags$a(
+                shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
                   href =
                     "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
@@ -438,7 +443,7 @@ ui <- fluidPage(
               )
             )
           ),
-        checkboxGroupInput(
+        shiny::checkboxGroupInput(
           inputId = "ms_add_neg",
           label = "List of adducts to be used in negative",
           choices = list(
@@ -466,7 +471,7 @@ ui <- fluidPage(
               "If a very important adduct everyone should have is missing,",
               "please open an issue at:",
               as.character(
-                tags$a(
+                shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
                   href =
                     "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
@@ -475,10 +480,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "Organisms",
-        h3("Organisms-related parameters"),
-        textInput(
+        shiny::h3("Organisms-related parameters"),
+        shiny::textInput(
           inputId = "org_tax",
           label = "OPTIONAL. Force all features to be attributed to a taxon
           (e.g. Gentiana lutea)",
@@ -495,7 +500,7 @@ ui <- fluidPage(
               you need to provide a metadata file in the `Files` panel."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "org_can",
           label = "Number of organisms to keep per feature",
           min = 1,
@@ -522,7 +527,7 @@ ui <- fluidPage(
               "the number of organisms can be kept low."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "org_fil_mod",
           label = "Filter library to restrict it to a
           portion of organisms only",
@@ -537,7 +542,7 @@ ui <- fluidPage(
               "We do not advise doing so, but you are free to."
             )
           ),
-        selectInput(
+        shiny::selectInput(
           inputId = "org_fil_lev",
           label = "Level at which the library will be filtered",
           choices = c(
@@ -553,7 +558,7 @@ ui <- fluidPage(
           ),
           selected = "phylum"
         ),
-        textInput(
+        shiny::textInput(
           inputId = "org_fil_val",
           label = "Value to be applied for filtering",
           value = "Streptophyta"
@@ -567,10 +572,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "Names",
-        h3("Variable names parameters"),
-        textInput(
+        shiny::h3("Variable names parameters"),
+        shiny::textInput(
           inputId = "names_features",
           label = "Name of \"feature IDs\" variable in the input",
           value = "row ID"
@@ -583,7 +588,7 @@ ui <- fluidPage(
               "If using SLAW, please input 'slaw_id'"
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_filename",
           label = "Name of \"filename\" variable in the input",
           value = "filename"
@@ -596,7 +601,7 @@ ui <- fluidPage(
               "If using Sequencer, please input 'Sample Name'"
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "names_extension",
           label = "The file(s) extension is present in the sample name",
           value = TRUE
@@ -609,7 +614,7 @@ ui <- fluidPage(
               "The default corresponds to the default in MZmine."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_precursor",
           label = "Name of \"precursor m/z\" variable in the input",
           value = "row m/z"
@@ -622,7 +627,7 @@ ui <- fluidPage(
               "If using SLAW, please input 'mz'"
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_rt",
           label = "Name of \"retention time\" variable in the feature table",
           value = "row retention time"
@@ -636,7 +641,7 @@ ui <- fluidPage(
               "Assumed to be in minutes."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_rt_2",
           label = "Name of \"retention time\" variable in the rt library",
           value = "rt"
@@ -647,7 +652,7 @@ ui <- fluidPage(
               "Name of the `retention time` column in your rt library file."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_source",
           label = "Name of \"source IDs\" variable in the input",
           value = "CLUSTERID1"
@@ -659,7 +664,7 @@ ui <- fluidPage(
               "The default corresponds to the default in GNPS."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_target",
           label = "Name of \"target IDs\" variable in the input",
           value = "CLUSTERID2"
@@ -671,7 +676,7 @@ ui <- fluidPage(
               "The default corresponds to the default in GNPS."
             )
           ),
-        textInput(
+        shiny::textInput(
           inputId = "names_taxon",
           label = "Name of \"taxon name\" variable in the input",
           value = "ATTRIBUTE_species"
@@ -684,10 +689,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "Weights",
-        h3("Weights-related parameters"),
-        sliderInput(
+        shiny::h3("Weights-related parameters"),
+        shiny::sliderInput(
           inputId = "wei_glo_bio",
           label = "Weight for the biological part",
           min = 0,
@@ -706,7 +711,7 @@ ui <- fluidPage(
               "We advise this value to be high."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_glo_che",
           label = "Weight for the chemical part",
           min = 0,
@@ -723,7 +728,7 @@ ui <- fluidPage(
               "Current chemical taxonomies do not perform well."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_glo_spe",
           label = "Weight for the spectral part",
           min = 0,
@@ -740,7 +745,7 @@ ui <- fluidPage(
               "We advise this value to be medium to high."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_01",
           label = "Score for a biological domain match",
           min = 0,
@@ -756,7 +761,7 @@ ui <- fluidPage(
               "We advise this value to be the lowest."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_02",
           label = "Score for a biological kingdom match",
           min = 0,
@@ -772,7 +777,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `domain`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_03",
           label = "Score for a biological phylum match",
           min = 0,
@@ -788,7 +793,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `kingdom`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_04",
           label = "Score for a biological class match",
           min = 0,
@@ -804,7 +809,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `phylum`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_05",
           label = "Score for a biological order match",
           min = 0,
@@ -820,7 +825,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `class`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_06",
           label = "Score for a biological infraorder match",
           min = 0,
@@ -836,7 +841,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `order`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_07",
           label = "Score for a biological family match",
           min = 0,
@@ -852,7 +857,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `infraorder`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_08",
           label = "Score for a biological subfamily match",
           min = 0,
@@ -868,7 +873,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `family`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_09",
           label = "Score for a biological tribe match",
           min = 0,
@@ -884,7 +889,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `subfamily`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_10",
           label = "Score for a biological subtribe match",
           min = 0,
@@ -900,7 +905,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `tribe`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_11",
           label = "Score for a biological genus match",
           min = 0,
@@ -916,7 +921,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `subtribe`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_12",
           label = "Score for a biological subgenus match",
           min = 0,
@@ -932,7 +937,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `genus`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_13",
           label = "Score for a biological species match",
           min = 0,
@@ -948,7 +953,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `subgenus`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_14",
           label = "Score for a biological subspecies match",
           min = 0,
@@ -964,7 +969,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `species`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_bio_15",
           label = "Score for a biological variety match",
           min = 0,
@@ -980,7 +985,7 @@ ui <- fluidPage(
               "We advise this value to be higher than the one of `subspecies`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_11",
           label = "Score for a (classyfire) chemical kingdom match",
           min = 0,
@@ -996,7 +1001,7 @@ ui <- fluidPage(
               "We advise this value to be the lowest."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_12",
           label = "Score for a (classyfire) chemical superclass match",
           min = 0,
@@ -1013,7 +1018,7 @@ ui <- fluidPage(
               than the one of `kingdom (classyfire)`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_13",
           label = "Score for a (classyfire) chemical class match",
           min = 0,
@@ -1030,7 +1035,7 @@ ui <- fluidPage(
               than the one of `superclass (classyfire)`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_14",
           label = "Score for a (classyfire) chemical parent match",
           min = 0,
@@ -1047,7 +1052,7 @@ ui <- fluidPage(
               than the one of `class (classyfire)`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_21",
           label = "Score for a (NPC) chemical pathway match",
           min = 0,
@@ -1063,7 +1068,7 @@ ui <- fluidPage(
               "We advise this value to be the lowest."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_22",
           label = "Score for a (NPC) chemical superclass match",
           min = 0,
@@ -1080,7 +1085,7 @@ ui <- fluidPage(
               than the one of `pathway (npclassifier)`."
             )
           ),
-        sliderInput(
+        shiny::sliderInput(
           inputId = "wei_che_23",
           label = "Score for a (NPC) chemical class match",
           min = 0,
@@ -1098,10 +1103,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "Options",
-        h3("Options parameters"),
-        checkboxInput(
+        shiny::h3("Options parameters"),
+        shiny::checkboxInput(
           inputId = "compounds_names",
           label = "Compound names",
           value = FALSE
@@ -1114,7 +1119,7 @@ ui <- fluidPage(
               as they are the longest strings."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "force",
           label = "Do not use it!",
           value = FALSE
@@ -1128,7 +1133,7 @@ ui <- fluidPage(
               "Really, do not use it."
             )
           ),
-        checkboxInput(
+        shiny::checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
           value = FALSE
@@ -1143,10 +1148,10 @@ ui <- fluidPage(
             )
           )
       ),
-      tabPanel(
+      shiny::tabPanel(
         title = "GNPS (optional)",
-        h3("GNPS parameters"),
-        textInput(
+        shiny::h3("GNPS parameters"),
+        shiny::textInput(
           inputId = "gnps_id",
           label = "GNPS job ID",
           value = NULL
@@ -1162,7 +1167,7 @@ ui <- fluidPage(
               "Annotations will also be downloaded."
             )
           ),
-        selectInput(
+        shiny::selectInput(
           inputId = "gnps_workflow",
           label = "Workflow used within GNPS",
           choices = c("classical", "fbmn"),
@@ -1176,30 +1181,30 @@ ui <- fluidPage(
       )
     )
   )),
-  fluidPage(
-    div(
+  shiny::fluidPage(
+    shiny::div(
       id = "form",
-      actionButton(inputId = "save", "Save parameters", class = "btn-primary"),
+      shiny::actionButton(inputId = "save", "Save parameters", class = "btn-primary"),
       shinyjs::hidden(
-        span(id = "save_msg", "Saving parameters..."),
-        div(
+        shiny::span(id = "save_msg", "Saving parameters..."),
+        shiny::div(
           id = "error",
-          div(
-            br(), tags$b("Error: "), span(id = "error_msg")
+          shiny::div(
+            shiny::br(), shiny::tags$b("Error: "), shiny::span(id = "error_msg")
           )
         )
       ),
-      actionButton(inputId = "launch", "Launch job", class = "btn-primary"),
+      shiny::actionButton(inputId = "launch", "Launch job", class = "btn-primary"),
     ),
-    shinyjs::hidden(div(
+    shinyjs::hidden(shiny::div(
       id = "thankyou_msg",
-      h3("Thanks, your parameters were saved successfully!")
+      shiny::h3("Thanks, your parameters were saved successfully!")
     )),
-    shinyjs::hidden(div(
+    shinyjs::hidden(shiny::div(
       id = "job_msg",
-      h3("Job is running!")
+      shiny::h3("Job is running!")
     )),
-    shinyjs::hidden(div(
+    shinyjs::hidden(shiny::div(
       targets::tar_watch_ui(
         id = "tar_watch",
         label = "Live Show",

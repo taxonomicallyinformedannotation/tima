@@ -26,6 +26,10 @@ Imports:
     msentropy (>= 0.1.4),
     pbapply (>= 1.7.2),
     rotl (>= 3.1.0),
+    shiny (>= 1.7.5),
+    shinyhelper (>= 0.3.2),
+    shinyjs (>= 2.1.0),
+    shinyvalidate (>= 0.1.2),
     Spectra (>= 1.10.2),
     stats,
     stringi (>= 1.7.12),
@@ -38,10 +42,7 @@ Suggests:
     BiocManager,
     knitr,
     R.utils,
-    shiny,
-    shinyhelper,
-    shinyjs,
-    shinyvalidate,
+    shinytest2,
     spelling,
     testthat
 Config/testthat/edition: 3
@@ -96,6 +97,7 @@ Collate:
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
+    'label_mandatory.R'
     'load_yaml_files.R'
     'log_debug.R'
     'log_pipe.R'
@@ -119,8 +121,11 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
+    'save_input.R'
     'select_sop_columns.R'
+    'server.R'
     'taxize_spectra_benchmark.R'
+    'ui.R'
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
