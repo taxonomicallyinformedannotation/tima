@@ -1,5 +1,5 @@
 ## need to do all in one because of outputs needed in the same temp dir
-testthat::test_that("Whole process", {
+testthat::test_that("Test functions", {
   setwd("../../")
   cat(list.files())
   system(
