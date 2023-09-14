@@ -1,7 +1,5 @@
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
-
-#' @noRd
 server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()

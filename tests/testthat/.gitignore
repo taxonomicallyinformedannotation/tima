@@ -4,5 +4,6 @@
 # But not these files...
 !.gitignore
 !setup-shinytest2.R
+!test_app.R
 !test_functions.R
 !test-shinytest2.R
