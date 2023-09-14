@@ -40,11 +40,17 @@ Imports:
     yaml (>= 2.3.7)
 Suggests: 
     BiocManager,
+    bs4Dash,
+    DT,
+    gt,
     knitr,
     R.utils,
+    shinybusy,
     shinytest2,
+    shinyWidgets,
     spelling,
-    testthat
+    testthat,
+    visNetwork
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
