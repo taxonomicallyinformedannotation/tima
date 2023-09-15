@@ -1,3 +1,5 @@
+source("R/save_input.R")
+
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 server <- function(input, output, session) {
@@ -256,7 +258,6 @@ server <- function(input, output, session) {
           garbage_collection = TRUE,
           reporter = "verbose_positives"
         )
-        setwd("inst/app")
       }, finally = {
         shiny::stopApp()
       })

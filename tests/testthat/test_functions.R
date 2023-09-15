@@ -1,12 +1,10 @@
 ## need to do all in one because of outputs needed in the same temp dir
 testthat::test_that("Test functions", {
   setwd("../../")
-  cat(list.files())
   system(
     command =
       "
     mkdir inst
-    cp -R app inst/app
     cp -R params inst/params
     cp -R scripts inst/scripts ## because of docopt steps
     cp paths.yaml inst/paths.yaml
