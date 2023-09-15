@@ -3,7 +3,7 @@ library(testthat)
 library(timaR)
 
 ## Test the package
-# testthat::test_check(package = "timaR")
+testthat::test_check(package = "timaR")
 
 ## Test the app
 setwd("../../")
@@ -14,6 +14,7 @@ system(
     cp -R inst/ inst/app/tests/shinytest/inst/
     "
 )
+shinytest::installDependencies()
 shinytest::testApp(appDir = dirname(list.files(
   pattern = "^app.R$", recursive = TRUE
 )))
