@@ -1,8 +1,8 @@
 library(shiny)
 library(timaR)
 
-source(file = "inst/app/ui.R")
-source(file = "inst/app/server.R")
+source(file = "R/ui.R")
+source(file = "R/server.R")
 
 shinyApp(
   ui = ui,

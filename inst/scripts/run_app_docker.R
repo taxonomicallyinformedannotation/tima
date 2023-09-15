@@ -1,4 +1,4 @@
 shiny::runApp(
-  port = 3838,
+  appDir = "inst/app",
   host = "0.0.0.0"
 )

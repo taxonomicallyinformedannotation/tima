@@ -86,9 +86,9 @@ server <- function(input, output, session) {
       shinyjs::hide("form")
       shinyjs::show("tar_watch")
       tryCatch(expr = {
+        setwd("../..")
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
-          port = 3839,
           display = "graph",
           displays = c("summary", "graph"),
           degree_from = 10,
@@ -256,6 +256,7 @@ server <- function(input, output, session) {
           garbage_collection = TRUE,
           reporter = "verbose_positives"
         )
+        setwd("inst/app")
       }, finally = {
         shiny::stopApp()
       })

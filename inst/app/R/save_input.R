@@ -1,5 +1,6 @@
 # save the results to a file
 save_input <- function(input) {
+  setwd("../../")
   paths_data_source <- parse_yaml_paths()$data$source$path
 
   list <- load_yaml_files()
@@ -678,4 +679,5 @@ save_input <- function(input) {
       )
     }
   )
+  setwd("inst/app/")
 }

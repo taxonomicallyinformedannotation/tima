@@ -559,5 +559,5 @@ testthat::test_that("Test functions", {
     parameters = params
   )
 
-  succeed()
+  testthat::succeed()
 })
