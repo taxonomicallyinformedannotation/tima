@@ -91,6 +91,7 @@ server <- function(input, output, session) {
         setwd("../..")
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
+          port = 3839,
           display = "graph",
           displays = c("summary", "graph"),
           degree_from = 10,
