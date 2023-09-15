@@ -1,3 +1,5 @@
+source("R/label_mandatory.R")
+
 app_css <-
   ".mandatory_star { color: red; }
      .shiny-input-container { margin-top: 25px; }

@@ -6,4 +6,4 @@ library(timaR)
 testthat::test_check(package = "timaR")
 
 ## Test the app
-shinytest::testApp(appDir = "inst/app")
+shinytest::testApp(appDir = list.dirs()[grepl(pattern = "app$", list.dirs())])
