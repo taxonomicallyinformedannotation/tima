@@ -49,7 +49,7 @@ Suggests:
     BiocManager,
     knitr,
     R.utils,
-    shinytest2,
+    shinytest,
     spelling,
     testthat
 Config/testthat/edition: 3
@@ -104,7 +104,6 @@ Collate:
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
-    'label_mandatory.R'
     'load_yaml_files.R'
     'log_debug.R'
     'log_pipe.R'
@@ -128,7 +127,6 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
-    'save_input.R'
     'select_sop_columns.R'
     'taxize_spectra_benchmark.R'
     'weight_chemo.R'

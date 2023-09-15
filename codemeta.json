@@ -81,15 +81,15 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shinytest2",
-      "name": "shinytest2",
+      "identifier": "shinytest",
+      "name": "shinytest",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=shinytest2"
+      "sameAs": "https://CRAN.R-project.org/package=shinytest"
     },
     {
       "@type": "SoftwareApplication",
@@ -499,16 +499,8 @@
     },
     "SystemRequirements": null
   },
-  "keywords": [
-    "metaboliteannotation",
-    "chemotaxonomy",
-    "scoringsystem",
-    "naturalproducts",
-    "computationalmetabolomics",
-    "taxonomicdistance",
-    "specializedmetabolome"
-  ],
-  "fileSize": "2696.114KB",
+  "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
+  "fileSize": "2831.624KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -578,13 +570,7 @@
       }
     }
   ],
-  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/README.md",
-  "contIntegration": [
-    "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main",
-    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml",
-    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/mega-linter.yml",
-    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"
-  ],
+  "contIntegration": ["https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
 }
