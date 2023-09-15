@@ -12,7 +12,8 @@ DISABLE_ERRORS_LINTERS:
 DISABLE_LINTERS:
   - SPELL_CSPELL
   - SPELL_LYCHEE
-MARKDOWN_FILTER_REGEX_EXCLUDE: '(LICENSE\.md|NEWS\.md|.*\.json|inst/app/tests/shinytest/test_app-expected/.*\.json)'
+FILTER_REGEX_EXCLUDE: '(codemeta\.json|inst/app/tests/shinytest/test_app-expected/.*\.json)'
+MARKDOWN_FILTER_REGEX_EXCLUDE: '(LICENSE\.md|NEWS\.md)'
 MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
 PRE_COMMANDS:
   - command: R --slave -e 'install.packages(c("lintr"))'
