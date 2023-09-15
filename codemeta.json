@@ -499,7 +499,15 @@
     },
     "SystemRequirements": null
   },
-  "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
+  "keywords": [
+    "metaboliteannotation",
+    "chemotaxonomy",
+    "scoringsystem",
+    "naturalproducts",
+    "computationalmetabolomics",
+    "taxonomicdistance",
+    "specializedmetabolome"
+  ],
   "fileSize": "2831.624KB",
   "citation": [
     {
@@ -571,6 +579,10 @@
     }
   ],
   "readme": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/README.md",
-  "contIntegration": ["https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"],
+  "contIntegration": [
+    "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main",
+    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml",
+    "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"
+  ],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
 }

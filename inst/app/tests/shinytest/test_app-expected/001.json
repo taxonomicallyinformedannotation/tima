@@ -13,50 +13,25 @@
     "compounds_names": false,
     "edg_thr_ms2_sim": 0.7,
     "fil_fea_raw": {
-      "name": [
-        "example_features.csv"
-      ],
-      "size": [
-        775595
-      ],
-      "type": [
-        "text/csv"
-      ],
-      "datapath": [
-        "0.csv"
-      ]
+      "name": ["example_features.csv"],
+      "size": [775595],
+      "type": ["text/csv"],
+      "datapath": ["0.csv"]
     },
     "fil_pat": "example",
     "fil_spe_raw": {
-      "name": [
-        "example_spectra.mgf"
-      ],
-      "size": [
-        16465
-      ],
-      "type": [
-        ""
-      ],
-      "datapath": [
-        "0.mgf"
-      ]
+      "name": ["example_spectra.mgf"],
+      "size": [16465],
+      "type": [""],
+      "datapath": ["0.mgf"]
     },
     "fil_tax_raw": null,
     "force": false,
     "gnps_id": "",
     "gnps_workflow": "fbmn",
     "launch": 0,
-    "ms_add_neg": [
-      "[1M-(H)2]2-",
-      "[1M-(H)1]1-",
-      "[2M-(H)1]1-"
-    ],
-    "ms_add_pos": [
-      "[1M+(H)2]2+",
-      "[1M+(H)1]1+",
-      "[1M+(Na)1]1+",
-      "[2M+(H)1]1+"
-    ],
+    "ms_add_neg": ["[1M-(H)2]2-", "[1M-(H)1]1-", "[2M-(H)1]1-"],
+    "ms_add_pos": ["[1M+(H)2]2+", "[1M+(H)1]1+", "[1M+(Na)1]1+", "[2M+(H)1]1+"],
     "ms_pol": "pos",
     "ms_thr_ms1_int": 100000,
     "ms_thr_ms2_int": 5,
@@ -116,10 +91,6 @@
     "wei_glo_che": 0.166,
     "wei_glo_spe": 0.333
   },
-  "output": {
-
-  },
-  "export": {
-
-  }
+  "output": {},
+  "export": {}
 }
