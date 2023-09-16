@@ -138,8 +138,7 @@ save_input <- function(input) {
   yamls_params$
     annotate_spectra$
     annotations$
-    ms2$
-    approx <-
+    ms2approx <-
     shiny::isolate(input$ann_ms2_app)
   yamls_params$
     annotate_spectra$
