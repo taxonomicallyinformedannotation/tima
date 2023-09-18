@@ -1351,8 +1351,9 @@ list(
       command = {
         lib_add <- prepare_libraries_adducts(
           str_met = lib_mer_str_met,
-          adducts_masses = dic_add,
+          adducts_masses_list = dic_add,
           adducts_output_path = paths_data_interim_libraries_adducts_path,
+          clusters_list = dic_clu,
           output_name = par_pre_lib_add$files$libraries$adducts$prepared,
           masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
           masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
