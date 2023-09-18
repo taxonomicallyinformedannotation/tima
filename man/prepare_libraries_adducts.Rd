@@ -7,8 +7,9 @@
 prepare_libraries_adducts(
   str_met = get_params(step =
     "prepare_libraries_adducts")$files$libraries$sop$merged$structures$metadata,
-  adducts_masses = system.file("extdata", "adducts.tsv", package = "timaR"),
+  adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
   adducts_output_path = parse_yaml_paths()$data$interim$libraries$adducts$path,
+  clusters_list = system.file("extdata", "clusters.tsv", package = "timaR"),
   output_name = get_params(step =
     "prepare_libraries_adducts")$files$libraries$adducts$prepared,
   masses_pos_output_path = get_params(step =
@@ -20,9 +21,11 @@ prepare_libraries_adducts(
 \arguments{
 \item{str_met}{File containing structures metadata}
 
-\item{adducts_masses}{Table of adducts taken as input}
+\item{adducts_masses_list}{Table of adducts taken as input}
 
 \item{adducts_output_path}{Path where the adducts will be saved}
+
+\item{clusters_list}{Table of clusters taken as input}
 
 \item{output_name}{Name of the file where adducts will be saved}
 

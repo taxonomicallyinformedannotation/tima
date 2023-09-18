@@ -2,12 +2,12 @@
 #'
 #' @description This function prepares adducts for further use
 #'
-#' @include create_adducts_neg.R
-#' @include create_adducts_pos.R
+#' @include create_adducts.R
 #'
 #' @param str_met File containing structures metadata
-#' @param adducts_masses Table of adducts taken as input
+#' @param adducts_masses_list Table of adducts taken as input
 #' @param adducts_output_path Path where the adducts will be saved
+#' @param clusters_list Table of clusters taken as input
 #' @param output_name Name of the file where adducts will be saved
 #' @param masses_pos_output_path Path where pos adducts masses will be saved
 #' @param masses_neg_output_path Path where neg adducts masses will be saved
@@ -19,11 +19,15 @@
 #' @examples NULL
 prepare_libraries_adducts <-
   function(str_met = get_params(step = "prepare_libraries_adducts")$files$libraries$sop$merged$structures$metadata,
-           adducts_masses = system.file("extdata",
+           adducts_masses_list = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
            adducts_output_path = parse_yaml_paths()$data$interim$libraries$adducts$path,
+           clusters_list = system.file("extdata",
+             "clusters.tsv",
+             package = "timaR"
+           ),
            output_name = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$prepared,
            masses_pos_output_path = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$pos,
            masses_neg_output_path = get_params(step = "prepare_libraries_adducts")$files$libraries$adducts$neg) {
@@ -45,7 +49,7 @@ prepare_libraries_adducts <-
     log_debug("... adducts")
     adducts_t <-
       tidytable::fread(
-        file = adducts_masses,
+        file = adducts_masses_list,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
@@ -60,8 +64,35 @@ prepare_libraries_adducts <-
         replacement = ""
       ))
 
+    log_debug("... clusters")
+    clusters <-
+      tidytable::fread(
+        file = clusters_list,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(cluster = stringi::stri_replace_all_regex(
+        str = cluster,
+        pattern = ".* \\(",
+        replacement = ""
+      )) |>
+      tidytable::mutate(cluster = stringi::stri_replace_all_regex(
+        str = cluster,
+        pattern = "\\)",
+        replacement = ""
+      )) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = c("mass"),
+          .fns = as.numeric
+        )
+      )
+
+    add_clu_t <- adducts_t |>
+      tidytable::bind_rows(clusters |> tidytable::rename(adduct = cluster))
+
     log_debug("Treating adducts table")
-    adducts_table <- t(adducts_t) |>
+    adducts_table <- t(add_clu_t) |>
       data.frame() |>
       tidytable::as_tidytable()
 
@@ -80,11 +111,11 @@ prepare_libraries_adducts <-
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")
     adducts_pos <-
-      create_adducts_pos()
+      create_adducts(ms_mode = "pos")
 
     log_debug("... negative")
     adducts_neg <-
-      create_adducts_neg()
+      create_adducts(ms_mode = "neg")
 
     log_debug("... pure adducts masses ...")
     mass_null <-
@@ -92,9 +123,16 @@ prepare_libraries_adducts <-
 
     log_debug("... positive")
     pure_pos <- mass_null |>
-      create_adducts_pos() |>
+      create_adducts(ms_mode = "pos") |>
+      tidytable::filter(grepl(pattern = "[1M", x = adduct, fixed = TRUE)) |>
       tidytable::filter(grepl(
         pattern = "]1+",
+        x = adduct,
+        fixed = TRUE
+      )) |>
+      ## do not take clusters
+      tidytable::filter(!grepl(
+        pattern = " + ",
         x = adduct,
         fixed = TRUE
       )) |>
@@ -102,9 +140,16 @@ prepare_libraries_adducts <-
 
     log_debug("... negative")
     pure_neg <- mass_null |>
-      create_adducts_neg() |>
+      create_adducts(ms_mode = "neg") |>
+      tidytable::filter(grepl(pattern = "[1M", x = adduct, fixed = TRUE)) |>
       tidytable::filter(grepl(
         pattern = "]1-",
+        x = adduct,
+        fixed = TRUE
+      )) |>
+      ## do not take clusters
+      tidytable::filter(!grepl(
+        pattern = " + ",
         x = adduct,
         fixed = TRUE
       )) |>
