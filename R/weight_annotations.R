@@ -301,6 +301,7 @@ weight_annotations <- function(
     x = results,
     file = final_output
   )
+  rm(results)
 
   return(final_output)
 }

@@ -165,8 +165,10 @@ annotate_masses <-
     log_debug("... neutral lossses")
     add_m <- adducts_mass_table$mass
     names(add_m) <- adducts_mass_table$adduct
+    rm(adducts_mass_table)
     clu_m <- clusters$mass
     names(clu_m) <- clusters$cluster
+    rm(clusters)
 
     ## TODO remove this dirty fix
     adduct_db_file <- adduct_db_file |>
@@ -249,6 +251,7 @@ annotate_masses <-
       ) |>
       tidytable::filter(!is.na(value_min)) |>
       tidytable::filter(value_min > 0)
+    rm(structure_exact_mass_table)
 
     df_fea_min <- features_table |>
       tidytable::mutate(
@@ -271,6 +274,7 @@ annotate_masses <-
       df_fea_min[, "rt"] <- df_fea_min[, "feature_id"] |>
         as.numeric()
     }
+    rm(features_table)
 
     log_debug("calculating rt tolerance ... \n")
     df_rt_tol <- df_fea_min |>
@@ -326,6 +330,7 @@ annotate_masses <-
             mz_dest)
         )
       )
+    rm(df_rt_tol)
 
     log_debug("calculating delta mz for single charge adducts \n")
     differences <-
@@ -339,6 +344,7 @@ annotate_masses <-
       tidytable::mutate(l = stringi::stri_length(Group1)) |>
       tidytable::arrange(l) |>
       tidytable::distinct(Distance, .keep_all = TRUE)
+    rm(adducts_table)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df_nl <- df_couples_diff |>
@@ -380,6 +386,7 @@ annotate_masses <-
         label,
         label_dest, !!as.name(paste("feature_id", "dest", sep = "_"))
       )
+    rm(df_couples_diff, differences)
 
     df_nl_min <- df_nl |>
       tidytable::distinct(feature_id, loss, mass)
@@ -415,6 +422,7 @@ annotate_masses <-
       df_add_enforced
     ) |>
       tidytable::distinct()
+    rm(df_add_a, df_add_b, df_add_enforced)
 
     log_debug("joining with initial results (adducts) \n")
     df_adducted <- df_fea_min |>
@@ -426,6 +434,7 @@ annotate_masses <-
       tidytable::left_join(
         df_add_full
       )
+    rm(df_add_full)
 
     log_debug("joining with initial results (neutral losses) \n")
     df_addlossed <- df_adducted |>
@@ -439,6 +448,7 @@ annotate_masses <-
         str = label, pattern =
           loss
       ) | is.na(loss))
+    rm(df_adducted, df_nl_min)
 
     log_debug("joining within given mz tol to exact mass library \n")
     df_addlossed_em <- df_addlossed |>
@@ -466,6 +476,7 @@ annotate_masses <-
         loss
       ) |>
       tidytable::distinct()
+    rm(df_addlossed)
 
     log_debug("keeping unique exact masses and molecular formulas \n")
     df_em_mf <- structure_organism_pairs_table |>
@@ -520,6 +531,7 @@ annotate_masses <-
     ) |>
       tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::distinct()
+    rm(df_addlossed_em)
 
     log_debug("calculating multicharged and in source dimers + mz tol \n")
     if (ms_mode == "pos") {
@@ -654,6 +666,7 @@ annotate_masses <-
       ) |>
       tidytable::filter(delta_max > min(neutral_losses$mass) |
         (mz >= mz_min & mz <= mz_max))
+    rm(df_fea_min, df_multi, df_multi_min)
 
     df_multi_nl <- df_multi_rt |>
       dplyr::inner_join(neutral_losses,
@@ -679,6 +692,7 @@ annotate_masses <-
         mz_min,
         mz_max
       )
+    rm(df_multi_rt, neutral_losses)
 
     log_debug("joining within given mz tol and filtering possible adducts \n")
     df_multi_nl_em <- df_multi_nl |>
@@ -703,6 +717,7 @@ annotate_masses <-
         error_mz,
         adduct_value
       )
+    rm(df_add_em, df_multi_nl)
 
     df_annotated_2 <-
       tidytable::left_join(df_multi_nl_em,
@@ -719,6 +734,7 @@ annotate_masses <-
       tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::mutate(library = as.character(library)) |>
       tidytable::distinct()
+    rm(df_em_mf, df_multi_nl_em)
 
     log_debug("joining single adducts, neutral losses, and multicharged \n")
     df_annotated_final <- tidytable::bind_rows(
@@ -739,6 +755,7 @@ annotate_masses <-
         candidate_library = library
       ) |>
       tidytable::distinct()
+    rm(df_annotated_1, df_annotated_2, df_str_unique)
 
     log_debug("adding chemical classification")
     df_final <- tidytable::left_join(
@@ -766,6 +783,7 @@ annotate_masses <-
           }
         )
       )
+    rm(df_annotated_final, structure_organism_pairs_table)
 
     df_final |>
       decorate_masses()
@@ -788,6 +806,7 @@ annotate_masses <-
         ) |>
         tidytable::distinct()
     )
+    rm(df_nl)
 
     export_params(parameters = get_params(step = "annotate_masses"), step = "annotate_masses")
     export_output(x = edges, file = output_edges[[1]])

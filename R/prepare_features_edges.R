@@ -34,6 +34,7 @@ prepare_features_edges <-
     ## TODO secure the order
     edges_ms2 <- edges_tables[[1]]
     edges_ms1 <- edges_tables[[2]]
+    rm(edges_tables)
     features_entropy <- edges_ms2 |>
       tidytable::select(
         tidytable::all_of(c(
@@ -52,6 +53,7 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       )
+    rm(edges_ms1, edges_ms2, features_entropy)
 
     ## Export edges table
     log_debug(x = "Exporting ...")

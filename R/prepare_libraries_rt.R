@@ -173,6 +173,7 @@ prepare_libraries_rt <-
           smiles,
           inchikey
         ))
+      rm(smiles)
 
       df_completed <- df_full |>
         tidytable::bind_rows(df_missing) |>
@@ -184,6 +185,7 @@ prepare_libraries_rt <-
             }
           )
         )
+      rm(df_full, df_missing)
       df_completed <- df_completed |>
         tidytable::select(
           rt,
@@ -254,6 +256,7 @@ prepare_libraries_rt <-
     ) |>
       tidytable::filter(!is.na(as.numeric(rt))) |>
       tidytable::filter(!is.na((structure_inchikey)))
+    rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
     sop <- df_rts |>
       tidytable::select(
@@ -277,6 +280,7 @@ prepare_libraries_rt <-
         candidate_structure_inchikey_no_stereo,
         type
       )
+    rm(df_rts)
 
     if (nrow(rts) == 0) {
       log_debug("No retention time library found, returning empty table.")

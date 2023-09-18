@@ -90,11 +90,13 @@ prepare_libraries_adducts <-
 
     add_clu_t <- adducts_t |>
       tidytable::bind_rows(clusters |> tidytable::rename(adduct = cluster))
+    rm(adducts_t, clusters)
 
     log_debug("Treating adducts table")
     adducts_table <- t(add_clu_t) |>
       data.frame() |>
       tidytable::as_tidytable()
+    rm(add_clu_t)
 
     colnames(adducts_table) <- adducts_table[1, ] |> as.character()
 
@@ -107,6 +109,7 @@ prepare_libraries_adducts <-
       )
 
     masses_table <- cbind(masses, adducts_table, row.names = NULL)
+    rm(masses)
 
     log_debug("Adding adducts to exact masses ...")
     log_debug("... positive")
@@ -154,6 +157,7 @@ prepare_libraries_adducts <-
         fixed = TRUE
       )) |>
       tidytable::select(-exact_mass)
+    rm(adducts_table, masses_table)
 
     log_debug("Exporting ...")
     export_params(parameters = get_params(step = "prepare_libraries_adducts"), step = "prepare_libraries_adducts")

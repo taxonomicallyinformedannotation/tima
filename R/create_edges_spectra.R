@@ -69,6 +69,7 @@ create_edges_spectra <- function(
         threshold = threshold
       ) |>
       tidytable::bind_rows()
+    rm(precz)
 
     log_debug("Calculating features entropy")
     entropy <- pbapply::pblapply(
@@ -78,6 +79,7 @@ create_edges_spectra <- function(
           msentropy::calculate_spectral_entropy()
       }
     )
+    rm(nspecz, fragz)
 
     edges <- edges |>
       tidytable::select(
@@ -88,6 +90,7 @@ create_edges_spectra <- function(
 
     ## TODO find a way to have consistency in spectrum IDs
     idz <- spectra@backend@spectraData$acquisitionNum
+    rm(spectra)
     edges <- edges |>
       tidytable::mutate(
         name_source = idz[name_source],
@@ -106,6 +109,7 @@ create_edges_spectra <- function(
         !!as.name(name_source),
         feature_spectrum_entropy
       )
+    rm(entropy, idz)
 
     edges <- edges |>
       tidytable::select(tidytable::any_of(
@@ -124,6 +128,7 @@ create_edges_spectra <- function(
 
     edges <- edges |>
       tidytable::full_join(entropy_df)
+    rm(entropy_df)
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")
     edges <- tidytable::tidytable(

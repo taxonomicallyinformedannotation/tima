@@ -116,11 +116,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         lib_precursors * (1 + (10^-6 * ppm))
       )
 
-      df_1 <- tidytable::tidytable(minimal, maximal, lib_precursors)
-      df_2 <- tidytable::tidytable(val = unique(query_precursors))
-
-      df_3 <- dplyr::inner_join(df_1,
-        df_2,
+      df_3 <- dplyr::inner_join(
+        tidytable::tidytable(minimal, maximal, lib_precursors),
+        tidytable::tidytable(val = unique(query_precursors)),
         by = dplyr::join_by(
           minimal < val,
           maximal > val
@@ -130,6 +128,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
       spectral_library <-
         spectral_library[lib_precursors %in% df_3$lib_precursors]
+      rm(df_3)
     }
 
     lib_precursors <-
@@ -250,6 +249,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
           ppm = ppm
         ) |>
         tidytable::as_tidytable()
+      rm(spectra)
 
       lib_inchikey <- spectral_library@backend@spectraData$inchikey
       if (is.null(lib_inchikey)) {
@@ -288,6 +288,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       if (is.null(lib_xlogp)) {
         lib_xlogp <- rep(NA_real_, length(spectral_library))
       }
+      rm(spectral_library)
 
       df_meta <- tidytable::tidytable(
         "target_id" = lib_id,
@@ -302,6 +303,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         "target_xlogp" = lib_xlogp,
         "target_precursorMz" = lib_precursors
       )
+      rm(lib_precursors)
       df_final <- df_final |>
         tidytable::left_join(df_meta) |>
         tidytable::select(-target_id)
@@ -380,6 +382,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               returning an empty dataframe")
       df_final <- df_empty
     }
+    rm(query_precursors, query_spectra, query_ids, minimal, maximal)
   } else {
     log_debug("No spectra matched the given polarity,
               returning an empty dataframe")

@@ -105,6 +105,7 @@ prepare_taxa <-
       tidytable::mutate(rank = rank(-as.numeric(value)), .by = c(rowname)) |>
       tidytable::filter(rank <= top_k) |>
       tidytable::arrange(rowname, rank)
+    rm(feature_table)
 
     if (!is.null(taxon)) {
       log_debug(x = "Forcing all features to given organism")
@@ -130,6 +131,7 @@ prepare_taxa <-
         ),
         by = c("organism" = "organism_name")
       )
+    rm(organism_table)
 
     log_debug(x = "Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
@@ -144,11 +146,13 @@ prepare_taxa <-
         tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism) |>
         tidytable::bind_rows(biological_metadata_1)
+      rm(biological_metadata_1)
     } else {
       biological_metadata <- organism_table_filled |>
         tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism)
     }
+    rm(organism_table_filled, organism_table_missing)
 
     if (is.null(taxon)) {
       if (extension == FALSE) {
@@ -192,6 +196,7 @@ prepare_taxa <-
           tidytable::everything()
         )
     }
+    rm(feature_table_0, metadata_table)
 
     log_debug(x = "Joining with cleaned taxonomy table")
     taxed_features_table <-
@@ -235,6 +240,7 @@ prepare_taxa <-
           "sample_organism_10_varietas"
         )
       )
+    rm(biological_metadata, metadata_table_joined)
 
     ## TODO change to mutate
     taxed_features_table[is.na(taxed_features_table)] <- "ND"
