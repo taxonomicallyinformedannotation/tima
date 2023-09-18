@@ -119,14 +119,10 @@ annotate_masses <-
       ) |>
       tidytable::mutate(cluster = stringi::stri_replace_all_regex(
         str = cluster,
-        pattern = ".* \\(",
+        pattern = "\\(.*",
         replacement = ""
       )) |>
-      tidytable::mutate(cluster = stringi::stri_replace_all_regex(
-        str = cluster,
-        pattern = "\\)",
-        replacement = ""
-      )) |>
+      tidytable::mutate(cluster = trimws(cluster)) |>
       tidytable::mutate(
         tidytable::across(
           .cols = c("mass"),
@@ -168,7 +164,6 @@ annotate_masses <-
     rm(adducts_mass_table)
     clu_m <- clusters$mass
     names(clu_m) <- clusters$cluster
-    rm(clusters)
 
     ## TODO remove this dirty fix
     adduct_db_file <- adduct_db_file |>
@@ -332,19 +327,39 @@ annotate_masses <-
       )
     rm(df_rt_tol)
 
-    log_debug("calculating delta mz for single charge adducts \n")
+    log_debug("forming clusters \n")
+    add_clu_table <- adducts_table |>
+      tidytable::mutate(join = "x") |>
+      tidytable::left_join(clusters |>
+        tidytable::mutate(join = "x")) |>
+      tidytable::bind_rows(adducts_table) |>
+      tidytable::mutate(
+        adduct = ifelse(
+          test = !is.na(cluster),
+          yes = paste(adduct, "+", paste0("(", cluster, ")1")),
+          no = adduct
+        ),
+        adduct_mass = ifelse(
+          test = !is.na(cluster),
+          yes = adduct_mass + mass,
+          no = adduct_mass
+        )
+      )
+    rm(adducts_table, clusters)
+
+    log_debug("calculating delta mz for single charge adducts and clusters \n")
     differences <-
       dist_groups(
-        d = stats::dist(adducts_table$adduct_mass),
-        g = adducts_table$adduct
+        d = stats::dist(add_clu_table$adduct_mass),
+        g = add_clu_table$adduct
       ) |>
       tidytable::select(-Item1, -Item2, -Label) |>
       ## remove redundancy among clusters
       ## Keep proton first
       tidytable::mutate(l = stringi::stri_length(Group1)) |>
       tidytable::arrange(l) |>
+      tidytable::select(-l) |>
       tidytable::distinct(Distance, .keep_all = TRUE)
-    rm(adducts_table)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df_nl <- df_couples_diff |>
@@ -458,6 +473,8 @@ annotate_masses <-
           mz_1 <= value_max
         )
       ) |>
+      ## Otherwise matching non-sense
+      tidytable::filter(adduct == label) |>
       tidytable::mutate(error_mz = adduct_mass - mz_1) |>
       tidytable::mutate(library = ifelse(
         test = !is.na(loss),
@@ -510,12 +527,12 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
-      "[1M-(H)1]1- + (NH3)1 - H3N (ammonia)",
+      "[1M-(H)1]1- + (HN3)1 - H3N (ammonia)",
       "[1M-(H)1]1- + (H2O)1 - H2O (water)",
       "[1M-(H)1]1- + (H2PO4)1 - H3O4P (phosphoric)",
       "[1M-(H)1]1- + (C2H7N)1 - H3N (ammonia)",
       "[1M-(H)1]1- + (C2H3N)1 - H3N (ammonia)",
-      "[1M+(H)1]1+ + (NH3)1 - H3N (ammonia)",
+      "[1M+(H)1]1+ + (HN3)1 - H3N (ammonia)",
       "[1M+(H)1]1+ + (H2O)1 - H2O (water)",
       "[1M+(H)1]1+ + (H2PO4)1 - H3O4P (phosphoric)",
       "[1M+(H)1]1+ + (C2H7N)1 - H3N (ammonia)",
@@ -553,9 +570,9 @@ annotate_masses <-
             2 * add_m["Na+ (sodium)"]) / 3,
           `[1M+(Na)3]3+` = (exact_mass + 3 * add_m["Na+ (sodium)"]) / 3,
           `[1M+(H)2]2+` = (exact_mass + 2 * add_m["H+ (proton)"]) / 2,
-          `[1M+(H)2]2+ + (NH3)1` = (exact_mass +
+          `[1M+(H)2]2+ + (HN3)1` = (exact_mass +
             2 * add_m["H+ (proton)"] +
-            clu_m["NH3"]) / 2,
+            clu_m["HN3"]) / 2,
           `[1M+(H)1(Na)1]2+` = (exact_mass +
             add_m["H+ (proton)"] +
             add_m["Na+ (sodium)"]) / 2,
@@ -587,9 +604,9 @@ annotate_masses <-
             add_m["Fe++ (iron)"]) / 2,
           `[2M+(H)1]1+` = 2 * (exact_mass) +
             add_m["H+ (proton)"],
-          `[2M+(H)1]1+ + (NH3)1` = 2 * (exact_mass) +
+          `[2M+(H)1]1+ + (HN3)1` = 2 * (exact_mass) +
             add_m["H+ (proton)"] +
-            clu_m["NH3"],
+            clu_m["HN3"],
           `[2M+(Na)1]1+` = 2 * (exact_mass) +
             add_m["Na+ (sodium)"],
           `[2M+(K)1]1+` = 2 * (mz - add_m["H+ (proton)"]) +

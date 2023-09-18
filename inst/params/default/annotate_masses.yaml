@@ -108,24 +108,24 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      - "water" # (H2O)
-      - "formic" # (CH2O2)
-      - "sodium chloride" # (NaCl)
-      - "acetic" # (C2H4O2)
-      - "phosphoric" # (H2PO4)
-      - "tfa" # (C2HF3O2)
+      - "H2O" # (water)
+      - "CH2O2" # (formic)
+      - "NaCl" # (sodium chloride)
+      - "C2H4O2" # (acetic)
+      - "H2PO4" # (phosphoric)
+      - "C2HF3O2" # (tfa)
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - "ammonia" # (NH3)
-      - "water" # (H2O)
-      # - "methanol" # (CH4O)
-      - "acetonitrile" # (C2H3N)
-      # - "ethylamine" # (C2H7N)
-      # - "ethanol" # (C2H6O)
-      - "sodium chloride" # (NaCl)
-      # - "isopropanol" # (C3H8O)
-      # - "dmso" # (C2H6OS)
+      - "HN3" # (ammonia)
+      - "H2O" # (water)
+      # - "CH4O" # (methanol)
+      - "C2H3N" # (acetonitrile)
+      # - "C2H7N" # (ethylamine)
+      # - "C2H6O" # (ethanol)
+      - "NaCl" # (sodium chloride)
+      # - "C3H8O" # (isopropanol)
+      # - "C2H6OS" # (dmso)
 
   #' Thresholds related parameters.
   thresholds:

@@ -480,6 +480,82 @@ ui <- shiny::fluidPage(
                 )
               )
             )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_clu_pos",
+          label = "List of clusters to be used in positive",
+          choices = list(
+            "HN3", # (ammonia)
+            "H2O", # (water)
+            # "CH4O", # (methanol)
+            "C2H3N", # (acetonitrile)
+            # "C2H7N", # (ethylamine)
+            # "C2H6O", # (ethanol)
+            "NaCl" # (sodium chloride)
+            # "C3H8O", # (isopropanol)
+            # "C2H6OS" # (dmso)
+          ),
+          selected = list(
+            "HN3", # (ammonia)
+            "H2O", # (water)
+            # "CH4O", # (methanol)
+            "C2H3N" # (acetonitrile)
+            # "C2H7N", # (ethylamine)
+            # "C2H6O", # (ethanol)
+            # "NaCl", # (sodium chloride)
+            # "C3H8O", # (isopropanol)
+            # "C2H6OS" # (dmso)
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important cluster everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_clu_neg",
+          label = "List of clusters to be used in negative",
+          choices = list(
+            "H2O", # (water)
+            "CH2O2", # (formic)
+            "NaCl", # (sodium chloride)
+            "C2H4O2", # (acetic)
+            "H2PO4", # (phosphoric)
+            "C2HF3O2" # (tfa)
+          ),
+          selected = list(
+            "H2O", # (water)
+            "CH2O2", # (formic)
+            # "NaCl", # (sodium chloride)
+            # "C2H4O2", # (acetic)
+            "H2PO4" # (phosphoric)
+            # "C2HF3O2" # (tfa)
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important cluster everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
           )
       ),
       shiny::tabPanel(

@@ -47,10 +47,10 @@ create_adducts <- function(masses_table = get("masses_table",
       ) |>
       ## clusters
       tidytable::mutate(
-        `[1M+(H)1]1+ + (NH3)1` = `[1M+(H)1]1+` + ammonia,
-        `[1M+(Na)1]1+ + (NH3)1` = `[1M+(Na)1]1+` + ammonia,
-        `[1M+(K)1]1+ + (NH3)1` = `[1M+(K)1]1+` + ammonia,
-        `[1M+(Cu)1]1+ + (NH3)1` = `[1M+(Cu)1]1+` + ammonia,
+        `[1M+(H)1]1+ + (HN3)1` = `[1M+(H)1]1+` + ammonia,
+        `[1M+(Na)1]1+ + (HN3)1` = `[1M+(Na)1]1+` + ammonia,
+        `[1M+(K)1]1+ + (HN3)1` = `[1M+(K)1]1+` + ammonia,
+        `[1M+(Cu)1]1+ + (HN3)1` = `[1M+(Cu)1]1+` + ammonia,
         `[1M+(H)1]1+ + (H2O)1` = `[1M+(H)1]1+` + water,
         `[1M+(Na)1]1+ + (H2O)1` = `[1M+(Na)1]1+` + water,
         `[1M+(K)1]1+ + (H2O)1` = `[1M+(K)1]1+` + water,
