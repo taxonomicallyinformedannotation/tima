@@ -473,7 +473,9 @@ annotate_masses <-
           mz_1 <= value_max
         )
       ) |>
-      ## Otherwise matching non-sense
+      ## Otherwise matching non-detected adducts
+      ## TODO Think how to integrate them the same, as some can be interesting
+      ## Eventually a parameter
       tidytable::filter(adduct == label) |>
       tidytable::mutate(error_mz = adduct_mass - mz_1) |>
       tidytable::mutate(library = ifelse(
