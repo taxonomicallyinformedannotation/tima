@@ -2,6 +2,8 @@
 save_input <- function(input) {
   setwd("../../")
   paths_data_source <- parse_yaml_paths()$data$source$path
+  ## safety
+  create_dir(paths_data_source)
 
   list <- load_yaml_files()
   yamls_params <- list$yamls_params
