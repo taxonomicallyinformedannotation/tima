@@ -31,11 +31,13 @@ create_components <-
 
     g <- edges |>
       igraph::graph_from_data_frame(directed = FALSE)
+    rm(edges)
 
     feature_source <- g |>
       igraph::V() |>
       names() |>
       split(igraph::components(graph = g)$membership)
+    rm(g)
 
     clusters_ready <- feature_source |>
       rbind() |>
@@ -54,6 +56,7 @@ create_components <-
         )
       ) |>
       tidytable::arrange(`cluster index`)
+    rm(feature_source)
 
     log_debug(x = "Exporting ...")
     export_params(
@@ -64,6 +67,7 @@ create_components <-
       x = clusters_ready,
       file = output
     )
+    rm(clusters_ready)
 
     return(output)
   }

@@ -39,8 +39,7 @@ sanitize_spectra <-
     #   ) |>
     #   Spectra::applyProcessing()
 
-    lengths <- lapply(X = spectra@backend@peaksData, FUN = length)
-    spectra <- spectra[lengths >= fragments * 2]
+    spectra <- spectra[lapply(X = spectra@backend@peaksData, FUN = length) >= fragments * 2]
 
     return(spectra)
   }

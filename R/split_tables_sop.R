@@ -184,6 +184,7 @@ split_tables_sop <- function(table) {
         }
       )
     )
+  rm(table)
 
   tables <-
     list(
@@ -197,5 +198,15 @@ split_tables_sop <- function(table) {
       "str_tax_npc" = table_structures_taxonomy_npc
     )
 
+  rm(
+    table_keys,
+    # table_organisms_names,
+    table_org_tax_ott,
+    table_structures_stereo,
+    table_structures_metadata,
+    table_structures_names,
+    table_structures_taxonomy_cla,
+    table_structures_taxonomy_npc
+  )
   return(tables)
 }

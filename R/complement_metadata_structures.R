@@ -163,6 +163,7 @@ complement_metadata_structures <- function(
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
+  rm(met_2d)
 
   nam_i <- nam_2d |>
     tidytable::select(
@@ -185,6 +186,7 @@ complement_metadata_structures <- function(
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
+  rm(nam_2d)
 
   ## Always returning preferentially internal values
   ## (smiles > inchikey > external)
@@ -301,6 +303,7 @@ complement_metadata_structures <- function(
         }
       )
     )
+  rm(met_i, met_s, nam_i, nam_s, stereo_i, stereo_s, tax_cla, tax_npc)
 
   ## TODO if (quickmode == FALSE){...}
 

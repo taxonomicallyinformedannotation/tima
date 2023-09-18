@@ -46,12 +46,14 @@ taxize_spectra_benchmark <-
           organism_name,
           inchikey_no_stereo
         ))
+    rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>
       tidytable::filter(!is.na(organism_name)) |>
       tidytable::slice_sample(n = 1, .by = feature_id) |>
       tidytable::bind_rows(features_pretaxed |>
         tidytable::filter(is.na(organism_name)))
+    rm(features_pretaxed)
 
     features_taxed <- features_sampled |>
       tidytable::left_join(taxo |>
@@ -71,8 +73,10 @@ taxize_spectra_benchmark <-
         sample_organism_09_species = organism_taxonomy_09species,
         sample_organism_10_varietas = organism_taxonomy_10varietas
       )
+    rm(features_sampled, taxo)
 
     export_output(x = features_taxed, file = output)
+    rm(features_taxed)
 
     return(c(output))
   }

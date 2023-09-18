@@ -211,6 +211,7 @@ harmonize_spectra <- function(spectra,
       )
     ) |>
     data.frame()
+  rm(spectra_filtered)
 
   return(spectra_harmonized)
 }

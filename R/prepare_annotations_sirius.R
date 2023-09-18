@@ -129,6 +129,7 @@ prepare_annotations_sirius <-
 
       compound_summary_ready <- compound_summary |>
         tidytable::bind_rows(.id = "feature_id")
+      rm(compound_summary)
 
       canopus_prepared <- canopus |>
         tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
@@ -155,27 +156,34 @@ prepare_annotations_sirius <-
               "ClassyFire#most specific class Probability"
           )
         ))
+      rm(canopus)
 
       compound_prepared <- compound_summary_ready |>
         select_sirius_columns()
+      rm(compound_summary_ready)
 
       compound_adducts_prepared <- compound_adducts |>
         tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
         select_sirius_columns()
+      rm(compound_adducts)
 
       formula_prepared <- formula |>
         select_sirius_columns_2()
+      rm(formula)
 
       formula_adducts_prepared <- formula_adducts |>
         select_sirius_columns_2()
+      rm(formula_adducts)
 
       compounds_prepared <-
         tidytable::bind_rows(compound_prepared, compound_adducts_prepared) |>
         tidytable::distinct()
+      rm(compound_prepared, compound_adducts_prepared)
 
       formulas_prepared <-
         tidytable::bind_rows(formula_prepared, formula_adducts_prepared) |>
         tidytable::distinct()
+      rm(formula_prepared, formula_adducts_prepared)
 
       table <- compounds_prepared |>
         tidytable::left_join(formulas_prepared) |>
@@ -186,6 +194,7 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_01kin = NA
         ) |>
         select_annotations_columns()
+      rm(compounds_prepared, formulas_prepared, canopus_prepared)
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")
@@ -243,6 +252,7 @@ prepare_annotations_sirius <-
         model$candidates_sirius_structural_columns
       ))) |>
       tidytable::distinct()
+    rm(table)
 
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_annotations_sirius"), step = "prepare_annotations_sirius")
