@@ -101,6 +101,10 @@ save_input <- function(input) {
     shiny::isolate(input$ms_add_neg)
   yamls_params$annotate_masses$ms$adducts$pos <-
     shiny::isolate(input$ms_add_pos)
+  yamls_params$annotate_masses$ms$clusters$neg <-
+    shiny::isolate(input$ms_clu_neg)
+  yamls_params$annotate_masses$ms$clusters$pos <-
+    shiny::isolate(input$ms_clu_pos)
   yamls_params$
     annotate_masses$
     ms$
