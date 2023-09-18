@@ -87,7 +87,7 @@ dist_groups <- function(d, g) {
       ),
       paste("Between", level1, "and", level2)
     )),
-    Distance = dist_get(d, idx1, idx2),
+    Distance = round(x = dist_get(d, idx1, idx2), digits = 5),
     stringsAsFactors = FALSE
   )
 }

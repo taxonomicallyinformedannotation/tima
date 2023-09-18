@@ -100,7 +100,8 @@ annotate_masses <-
           paste0(name, "_pos.tsv.gz")
         )
       clusters_allowed <- clusters_pos
-    } else {
+    }
+    if (ms_mode == "neg") {
       adduct_file <- adducts_neg
       adduct_db_file <-
         file.path(
@@ -116,6 +117,16 @@ annotate_masses <-
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
+      tidytable::mutate(cluster = stringi::stri_replace_all_regex(
+        str = cluster,
+        pattern = ".* \\(",
+        replacement = ""
+      )) |>
+      tidytable::mutate(cluster = stringi::stri_replace_all_regex(
+        str = cluster,
+        pattern = "\\)",
+        replacement = ""
+      )) |>
       tidytable::mutate(
         tidytable::across(
           .cols = c("mass"),
@@ -152,9 +163,10 @@ annotate_masses <-
       )
 
     log_debug("... neutral lossses")
-
     add_m <- adducts_mass_table$mass
     names(add_m) <- adducts_mass_table$adduct
+    clu_m <- clusters$mass
+    names(clu_m) <- clusters$cluster
 
     ## TODO remove this dirty fix
     adduct_db_file <- adduct_db_file |>
@@ -221,15 +233,16 @@ annotate_masses <-
       round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
-    df2 <- structure_exact_mass_table |>
+    df_add_em <- structure_exact_mass_table |>
       tidytable::filter(!is.na(exact_mass)) |>
-      tidytable::filter(adduct %in% adducts) |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = c("adduct_mass", "exact_mass"),
-          .fns = as.numeric
-        )
-      ) |>
+      tidytable::filter(!stringi::stri_detect_fixed(
+        str = adduct,
+        pattern = adducts
+      )) |>
+      tidytable::mutate(tidytable::across(
+        .cols = c("adduct_mass", "exact_mass"),
+        .fns = as.numeric
+      )) |>
       tidytable::mutate(
         value_min = adduct_mass - (1E-6 * tolerance_ppm * adduct_mass),
         value_max = adduct_mass + (1E-6 * tolerance_ppm * adduct_mass)
@@ -237,7 +250,7 @@ annotate_masses <-
       tidytable::filter(!is.na(value_min)) |>
       tidytable::filter(value_min > 0)
 
-    df3 <- features_table |>
+    df_fea_min <- features_table |>
       tidytable::mutate(
         tidytable::across(
           .cols = c("mz"),
@@ -247,7 +260,7 @@ annotate_masses <-
       tidytable::distinct(feature_id, .keep_all = TRUE)
 
     if (any(names(features_table) == "rt")) {
-      df3 <- df3 |>
+      df_fea_min <- df_fea_min |>
         tidytable::mutate(
           tidytable::across(
             .cols = c("rt"),
@@ -255,20 +268,20 @@ annotate_masses <-
           )
         )
     } else {
-      df3[, "rt"] <- df3[, "feature_id"] |>
+      df_fea_min[, "rt"] <- df_fea_min[, "feature_id"] |>
         as.numeric()
     }
 
-    log_debug("adding rt tolerance ... \n")
-    df4 <- df3 |>
+    log_debug("calculating rt tolerance ... \n")
+    df_rt_tol <- df_fea_min |>
       tidytable::mutate(
         rt_min = as.numeric(rt - tolerance_rt),
         rt_max = as.numeric(rt + tolerance_rt)
       )
 
     log_debug("joining within given rt tolerance \n")
-    df5 <- df4 |>
-      dplyr::inner_join(df3,
+    df_couples_diff <- df_rt_tol |>
+      dplyr::inner_join(df_fea_min,
         by = dplyr::join_by(
           rt_min <= rt,
           rt_max >= rt
@@ -314,44 +327,21 @@ annotate_masses <-
         )
       )
 
-    log_debug("forming clusters \n")
-    df6 <- adducts_table |>
-      tidytable::bind_rows(
-        clusters |>
-          tidytable::rename(
-            adduct = cluster,
-            adduct_mass = mass
-          ) |>
-          tidytable::mutate(
-            adduct = paste("[1M+(H)1]1+", "+", adduct),
-            adduct_mass = 1.00728 + adduct_mass
-          )
-      )
-
-    df7 <- df2 |>
-      tidytable::filter(adduct == "[1M+(H)1]1+") |>
-      tidytable::mutate(join = "x") |>
-      tidytable::left_join(clusters |>
-        tidytable::mutate(join = "x")) |>
-      tidytable::mutate(
-        adduct = paste("[1M+(H)1]1+", "+", cluster),
-        adduct_mass = adduct_mass + mass,
-        value_min = value_min + mass,
-        value_max = value_max + mass
-      ) |>
-      tidytable::select(colnames(df2)) |>
-      tidytable::bind_rows(df2)
-
     log_debug("calculating delta mz for single charge adducts \n")
-    df8 <-
+    differences <-
       dist_groups(
-        d = stats::dist(df6$adduct_mass),
-        g = df6$adduct
+        d = stats::dist(adducts_table$adduct_mass),
+        g = adducts_table$adduct
       ) |>
-      tidytable::select(-Item1, -Item2, -Label)
+      tidytable::select(-Item1, -Item2, -Label) |>
+      ## remove redundancy among clusters
+      ## Keep proton first
+      tidytable::mutate(l = stringi::stri_length(Group1)) |>
+      tidytable::arrange(l) |>
+      tidytable::distinct(Distance, .keep_all = TRUE)
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
-    df9_d <- df5 |>
+    df_nl <- df_couples_diff |>
       dplyr::inner_join(neutral_losses,
         by = dplyr::join_by(
           delta_min <= mass,
@@ -366,12 +356,9 @@ annotate_masses <-
         feature_id_dest
       )
 
-    df9_e <- df9_d |>
-      tidytable::distinct(feature_id, loss, mass)
-
     log_debug("joining within given delta mz tolerance (adducts) \n")
-    df9 <- df5 |>
-      dplyr::inner_join(df8,
+    df_add <- df_couples_diff |>
+      dplyr::inner_join(differences,
         by = dplyr::join_by(
           delta_min <= Distance,
           delta_max >= Distance
@@ -394,11 +381,14 @@ annotate_masses <-
         label_dest, !!as.name(paste("feature_id", "dest", sep = "_"))
       )
 
+    df_nl_min <- df_nl |>
+      tidytable::distinct(feature_id, loss, mass)
+
     log_debug("keeping initial and destination feature \n")
-    df9_a <- df9 |>
+    df_add_a <- df_add |>
       tidytable::distinct(feature_id, label)
 
-    df9_b <- df9 |>
+    df_add_b <- df_add |>
       tidytable::distinct(
         !!as.name(paste("feature_id", "dest", sep = "_")),
         label_dest
@@ -412,85 +402,78 @@ annotate_masses <-
       )
 
     ## Always considering [1M+H]+ and [1M-H]- ions by default
-    df9_ion <- df3 |>
+    df_add_enforced <- df_fea_min |>
       tidytable::distinct(feature_id) |>
       tidytable::mutate(label = switch(ms_mode,
         "pos" = "[1M+(H)1]1+",
         "neg" = "[1M-(H)1]1-"
       ))
 
-    df9_c <- tidytable::bind_rows(
-      df9_a,
-      df9_b,
-      df9_ion
+    df_add_full <- tidytable::bind_rows(
+      df_add_a,
+      df_add_b,
+      df_add_enforced
     ) |>
       tidytable::distinct()
 
     log_debug("joining with initial results (adducts) \n")
-    df10 <- df3 |>
+    df_adducted <- df_fea_min |>
       tidytable::distinct(
         feature_id,
         rt,
         mz
       ) |>
       tidytable::left_join(
-        df9_c
+        df_add_full
       )
 
     log_debug("joining with initial results (neutral losses) \n")
-    df10_a <- tidytable::left_join(df10, df9_e) |>
+    df_addlossed <- df_adducted |>
+      tidytable::left_join(df_nl_min) |>
       tidytable::mutate(mz_1 = ifelse(
         test = !is.na(loss),
         yes = mz + mass,
         no = mz
-      ))
+      )) |>
+      tidytable::filter(!stringi::stri_endswith_fixed(
+        str = label, pattern =
+          loss
+      ) | is.na(loss))
 
-    log_debug("joining within given mz tol and filtering single charges \n")
-    df11 <- df10_a |>
-      dplyr::inner_join(df7,
+    log_debug("joining within given mz tol to exact mass library \n")
+    df_addlossed_em <- df_addlossed |>
+      dplyr::inner_join(df_add_em,
         by = dplyr::join_by(
           mz_1 >= value_min,
           mz_1 <= value_max
         )
       ) |>
       tidytable::mutate(error_mz = adduct_mass - mz_1) |>
-      tidytable::select(
-        feature_id,
-        rt,
-        mz,
-        error_mz,
-        exact_mass,
-        adduct,
-        adduct_mass,
-        loss
-      ) |>
       tidytable::mutate(library = ifelse(
         test = !is.na(loss),
         yes = paste0(adduct, " - ", loss),
         no = adduct
       )) |>
-      tidytable::distinct() |>
-      tidytable::filter(!is.na(library))
-
-    log_debug("cleaning results \n")
-    df12 <- df11 |>
       tidytable::select(
         feature_id,
         rt,
         mz,
         library,
         error_mz,
-        exact_mass
+        exact_mass,
+        adduct,
+        adduct_mass,
+        loss
       ) |>
-      tidytable::filter(!is.na(exact_mass))
+      tidytable::distinct()
 
-    log_debug("keeping unique adducts per exact mass \n")
-    df13 <- structure_organism_pairs_table |>
+    log_debug("keeping unique exact masses and molecular formulas \n")
+    df_em_mf <- structure_organism_pairs_table |>
       tidytable::distinct(
         structure_exact_mass,
         structure_molecular_formula
       )
-    df13_b <- structure_organism_pairs_table |>
+    df_str_unique <- structure_organism_pairs_table |>
       tidytable::distinct(
         structure_name,
         structure_inchikey_no_stereo,
@@ -516,181 +499,163 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
-      "[1M-(H)1]1- + NH3 (ammonia) - H3N (ammonia)",
-      "[1M-(H)1]1- + H2O (water) - H2O (water)",
-      "[1M-(H)1]1- + H2PO4 (phosphoric) - H3O4P (phosphoric)",
-      "[1M-(H)1]1- + C2H7N (ethylamine) - H3N (ammonia)",
-      "[1M-(H)1]1- + C2H3N (acetonitrile) - H3N (ammonia)",
-      "[1M+(H)1]1+ + NH3 (ammonia) - H3N (ammonia)",
-      "[1M+(H)1]1+ + H2O (water) - H2O (water)",
-      "[1M+(H)1]1+ + H2PO4 (phosphoric) - H3O4P (phosphoric)",
-      "[1M+(H)1]1+ + C2H7N (ethylamine) - H3N (ammonia)",
-      "[1M+(H)1]1+ + C2H3N (acetonitrile) - H3N (ammonia)"
+      "[1M-(H)1]1- + (NH3)1 - H3N (ammonia)",
+      "[1M-(H)1]1- + (H2O)1 - H2O (water)",
+      "[1M-(H)1]1- + (H2PO4)1 - H3O4P (phosphoric)",
+      "[1M-(H)1]1- + (C2H7N)1 - H3N (ammonia)",
+      "[1M-(H)1]1- + (C2H3N)1 - H3N (ammonia)",
+      "[1M+(H)1]1+ + (NH3)1 - H3N (ammonia)",
+      "[1M+(H)1]1+ + (H2O)1 - H2O (water)",
+      "[1M+(H)1]1+ + (H2PO4)1 - H3O4P (phosphoric)",
+      "[1M+(H)1]1+ + (C2H7N)1 - H3N (ammonia)",
+      "[1M+(H)1]1+ + (C2H3N)1 - H3N (ammonia)"
     )
 
     log_debug("joining exact masses with single charge adducts \n")
-    df14 <- tidytable::left_join(
-      x = df12,
-      y = df13,
+    log_debug("Geting back to [1M] \n")
+    df_annotated_1 <- tidytable::left_join(
+      x = df_addlossed_em,
+      y = df_em_mf,
       by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
-      tidytable::select(
-        structure_molecular_formula,
-        library,
-        tidytable::everything(),
-        -exact_mass
-      ) |>
       tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::distinct()
 
-    log_debug("adding adduct mass to get back to [1M] \n")
-    df15 <-
-      tidytable::left_join(df14,
-        adducts_table,
-        by = stats::setNames("adduct", "library")
-      ) |>
-      tidytable::distinct(feature_id, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_id,
-        adduct_mass
-      ) |>
-      tidytable::filter(!is.na(adduct_mass))
-
-    log_debug("keeping ions for exploration starting from [1M] \n")
-    df16 <- tidytable::inner_join(df3, df15)
-
     log_debug("calculating multicharged and in source dimers + mz tol \n")
     if (ms_mode == "pos") {
-      df17 <- df16 |>
+      df_multi <- df_annotated_1 |>
         tidytable::select(
           feature_id,
           rt,
           mz,
-          adduct_mass
+          exact_mass
         ) |>
-        tidytable::rowwise() |>
+        tidytable::distinct() |>
         tidytable::mutate(
-          `[1M+(H)3]3+` = (mz - adduct_mass + 3 * add_m["H (proton)"]) / 3,
-          `[1M+(H)2(Na)1]3+` = (mz - adduct_mass +
-            2 * add_m["H (proton)"] +
-            add_m["Na (sodium)"]) / 3,
-          `[1M+(H)1(Na)2]3+` = (mz - adduct_mass +
-            add_m["H (proton)"] +
-            2 * add_m["Na (sodium)"]) / 3,
-          `[1M+(Na)3]3+` = (mz - adduct_mass + 3 * add_m["Na (sodium)"]) / 3,
-          `[1M+(H)2]2+` = (mz - adduct_mass + 2 * add_m["H (proton)"]) / 2,
-          `[1M+(H)2(NH3)1]2+` = (mz - adduct_mass +
-            2 * add_m["H (proton)"] +
-            add_m["NH4 (ammonium)"]) / 2,
-          `[1M+(H)1(Na)1]2+` = (mz - adduct_mass +
-            add_m["H (proton)"] +
-            add_m["Na (sodium)"]) / 2,
-          `[1M+(Mg)1]2+` = (mz - adduct_mass +
-            add_m["Mg (magnesium)"]) / 2,
-          `[1M+(H)1(K)1]2+` = (mz - adduct_mass +
-            add_m["H (proton)"] +
-            add_m["K (potassium)"]) / 2,
-          `[1M+(Ca)1]2+` = (mz - adduct_mass +
-            add_m["Ca (calcium)"]) / 2,
-          `[1M+(H)2(ACN)1]2+` = (mz - adduct_mass +
-            2 * add_m["H (proton)"] +
-            add_m["C2H3N (acetonitrile)"]) / 2,
-          `[1M+(Na)2]2+` = (mz - adduct_mass +
-            2 * add_m["Na (sodium)"]) / 2,
-          `[1M+(Fe)1]2+` = (mz - adduct_mass +
-            add_m["Fe (iron)"]) / 2,
-          `[1M+(H)2(ACN)2]2+` = (mz - adduct_mass +
-            2 * add_m["H (proton)"] +
-            2 * add_m["C2H3N (acetonitrile)"]) / 2,
-          `[1M+(H)2(ACN)3]2+` = (mz - adduct_mass +
-            2 * add_m["H (proton)"] +
-            3 * add_m["C2H3N (acetonitrile)"]) / 2,
-          `[2M+(Mg)1]2+` = (2 * (mz - adduct_mass) +
-            add_m["Mg (magnesium)"]) / 2,
-          `[2M+(Ca)1]2+` = (2 * (mz - adduct_mass) +
-            add_m["Ca (calcium)"]) / 2,
-          `[2M+(Fe)1]2+` = (2 * (mz - adduct_mass) +
-            add_m["Fe (iron)"]) / 2,
-          `[2M+(H)1]1+` = 2 * (mz - adduct_mass) +
-            add_m["H (proton)"],
-          `[2M+(H)1(NH3)1]1+` = 2 * (mz - adduct_mass) +
-            add_m["H (proton)"] +
-            add_m["NH4 (ammonium)"],
-          `[2M+(Na)1]1+` = 2 * (mz - adduct_mass) +
-            add_m["Na (sodium)"],
-          `[2M+(K)1]1+` = 2 * (mz - add_m["H (proton)"]) +
-            add_m["K (potassium)"],
-          `[2M+(H)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
-            add_m["H (proton)"] +
-            add_m["C2H3N (acetonitrile)"],
-          `[2M+(Na)1(ACN)1]1+` = 2 * (mz - adduct_mass) +
-            add_m["C2H3N (acetonitrile)"] +
-            add_m["Na (sodium)"]
+          `[1M+(H)3]3+` = (exact_mass + 3 * add_m["H+ (proton)"]) / 3,
+          `[1M+(H)2(Na)1]3+` = (exact_mass +
+            2 * add_m["H+ (proton)"] +
+            add_m["Na+ (sodium)"]) / 3,
+          `[1M+(H)1(Na)2]3+` = (exact_mass +
+            add_m["H+ (proton)"] +
+            2 * add_m["Na+ (sodium)"]) / 3,
+          `[1M+(Na)3]3+` = (exact_mass + 3 * add_m["Na+ (sodium)"]) / 3,
+          `[1M+(H)2]2+` = (exact_mass + 2 * add_m["H+ (proton)"]) / 2,
+          `[1M+(H)2]2+ + (NH3)1` = (exact_mass +
+            2 * add_m["H+ (proton)"] +
+            clu_m["NH3"]) / 2,
+          `[1M+(H)1(Na)1]2+` = (exact_mass +
+            add_m["H+ (proton)"] +
+            add_m["Na+ (sodium)"]) / 2,
+          `[1M+(Mg)1]2+` = (exact_mass +
+            add_m["Mg++ (magnesium)"]) / 2,
+          `[1M+(H)1(K)1]2+` = (exact_mass +
+            add_m["H+ (proton)"] +
+            add_m["K+ (potassium)"]) / 2,
+          `[1M+(Ca)1]2+` = (exact_mass +
+            add_m["Ca++ (calcium)"]) / 2,
+          `[1M+(H)2]2+ + (C2H3N)1` = (exact_mass +
+            2 * add_m["H+ (proton)"] +
+            clu_m["C2H3N"]) / 2,
+          `[1M+(Na)2]2+` = (exact_mass +
+            2 * add_m["Na+ (sodium)"]) / 2,
+          `[1M+(Fe)1]2+` = (exact_mass +
+            add_m["Fe++ (iron)"]) / 2,
+          `[1M+(H)2]2+ + (C2H3N)2` = (exact_mass +
+            2 * add_m["H+ (proton)"] +
+            2 * clu_m["C2H3N"]) / 2,
+          `[1M+(H)]2+ + (C2H3N)3` = (exact_mass +
+            2 * add_m["H+ (proton)"] +
+            3 * clu_m["C2H3N"]) / 2,
+          `[2M+(Mg)1]2+` = (2 * (exact_mass) +
+            add_m["Mg++ (magnesium)"]) / 2,
+          `[2M+(Ca)1]2+` = (2 * (exact_mass) +
+            add_m["Ca++ (calcium)"]) / 2,
+          `[2M+(Fe)1]2+` = (2 * (exact_mass) +
+            add_m["Fe++ (iron)"]) / 2,
+          `[2M+(H)1]1+` = 2 * (exact_mass) +
+            add_m["H+ (proton)"],
+          `[2M+(H)1]1+ + (NH3)1` = 2 * (exact_mass) +
+            add_m["H+ (proton)"] +
+            clu_m["NH3"],
+          `[2M+(Na)1]1+` = 2 * (exact_mass) +
+            add_m["Na+ (sodium)"],
+          `[2M+(K)1]1+` = 2 * (mz - add_m["H+ (proton)"]) +
+            add_m["K+ (potassium)"],
+          `[2M+(H)1]1+ + (C2H3N)1` = 2 * (exact_mass) +
+            add_m["H+ (proton)"] +
+            clu_m["C2H3N"],
+          `[2M+(Na)1]1+ + (C2H3N)1` = 2 * (exact_mass) +
+            add_m["Na+ (sodium)"] +
+            clu_m["C2H3N"]
         ) |>
-        tidytable::select(-adduct_mass) |>
+        tidytable::select(-exact_mass) |>
         tidytable::ungroup()
 
-      cols <- ncol(df17)
+      cols <- ncol(df_multi)
 
-      df17 <- df17 |>
+      df_multi <- df_multi |>
         tidytable::pivot_longer(cols = tidytable::all_of(4:cols))
-    } else {
-      df17 <- df16 |>
+    }
+    if (ms_mode == "neg") {
+      df_multi <- df_annotated_1 |>
         tidytable::select(
           feature_id,
           rt,
           mz,
-          adduct_mass
+          exact_mass
         ) |>
-        tidytable::rowwise() |>
         tidytable::mutate(
-          `[1M-(H)3]3-` = (mz + adduct_mass -
-            3 * add_m["H (proton)"]) / 3,
-          `[1M-(H)2]2-` = (mz + adduct_mass -
-            2 * add_m["H (proton)"]) / 2,
-          `[2M-(H)1]1-` = 2 * (mz + adduct_mass) -
-            add_m["H (proton)"],
-          `[2M+(FA)1-(H)1]1-` = 2 * (mz + adduct_mass) +
-            add_m["CH2O2 (formic)"] - add_m["H (proton)"],
-          `[2M+(Hac)1-(H)1]1-` = 2 * (mz + adduct_mass) +
-            add_m["C2H4O2 (acetic)"] - add_m["H (proton)"],
-          `[3M-(H)1]1-` = 3 * (mz + adduct_mass) -
-            add_m["H (proton)"]
+          `[1M-(H)3]3-` = (exact_mass -
+            3 * add_m["H+ (proton)"]) / 3,
+          `[1M-(H)2]2-` = (exact_mass -
+            2 * add_m["H+ (proton)"]) / 2,
+          `[2M-(H)1]1-` = 2 * (exact_mass) -
+            add_m["H+ (proton)"],
+          `[2M-(H)1]1- + (CH2O2)1` = 2 * (exact_mass) +
+            clu_m["CH2O2"] - add_m["H+ (proton)"],
+          `[2M-(H)1]1- + (C2H4O2)1` = 2 * (exact_mass) +
+            clu_m["C2H4O2"] - add_m["H+ (proton)"],
+          `[3M-(H)1]1-` = 3 * (exact_mass) -
+            add_m["H+ (proton)"]
         ) |>
-        tidytable::select(-adduct_mass) |>
+        tidytable::select(-exact_mass) |>
         tidytable::ungroup()
 
-      cols <- ncol(df17)
+      cols <- ncol(df_multi)
 
-      df17 <- df17 |>
+      df_multi <- df_multi |>
         tidytable::pivot_longer(cols = tidytable::all_of(4:cols))
     }
 
-    df17 <- df17 |>
+    df_multi <- df_multi |>
       tidytable::mutate(
         mz_min = value - (1E-6 * tolerance_ppm * value),
         mz_max = value + (1E-6 * tolerance_ppm * value),
         rt_min = rt - tolerance_rt,
         rt_max = rt + tolerance_rt
-      )
+      ) |>
+      tidytable::distinct()
+    df_multi_min <- df_multi |>
+      tidytable::distinct(feature_id, rt_min, rt_max)
 
     log_debug("joining within given rt tolerance \n")
-    df20 <- df17 |>
-      dplyr::inner_join(df3,
+    df_multi_rt <- df_multi_min |>
+      dplyr::inner_join(df_fea_min,
         by = dplyr::join_by(
           rt_min <= rt,
           rt_max >= rt
         )
       ) |>
-      tidytable::as_tidytable() |>
+      tidytable::inner_join(df_multi) |>
       tidytable::mutate(
-        delta_min = mz.x - mz_max,
-        delta_max = mz.x - mz_min
+        delta_min = mz - mz_max,
+        delta_max = mz - mz_min
       ) |>
       tidytable::filter(delta_max > min(neutral_losses$mass) |
-        (mz.x >= mz_min & mz.x <= mz_max))
+        (mz >= mz_min & mz <= mz_max))
 
-    df20_a <- df20 |>
+    df_multi_nl <- df_multi_rt |>
       dplyr::inner_join(neutral_losses,
         by = dplyr::join_by(
           delta_min <= mass,
@@ -698,17 +663,17 @@ annotate_masses <-
         )
       ) |>
       tidytable::filter(!is.na(loss) |
-        (mz.x >= mz_min &
-          mz.x <= mz_max)) |>
+        (mz >= mz_min &
+          mz <= mz_max)) |>
       tidytable::mutate(name = ifelse(
         test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
         no = name
       )) |>
       tidytable::select(
-        feature_id = feature_id.x,
-        rt = rt.x,
-        mz = mz.x,
+        feature_id,
+        rt,
+        mz,
         library_name = name,
         adduct_value = value,
         mz_min,
@@ -716,8 +681,8 @@ annotate_masses <-
       )
 
     log_debug("joining within given mz tol and filtering possible adducts \n")
-    df21 <- df20_a |>
-      dplyr::inner_join(df2,
+    df_multi_nl_em <- df_multi_nl |>
+      dplyr::inner_join(df_add_em,
         by = dplyr::join_by(
           adduct_value >= value_min,
           adduct_value <= value_max
@@ -739,9 +704,9 @@ annotate_masses <-
         adduct_value
       )
 
-    df22 <-
-      tidytable::left_join(df21,
-        df13,
+    df_annotated_2 <-
+      tidytable::left_join(df_multi_nl_em,
+        df_em_mf,
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
       tidytable::select(
@@ -756,11 +721,11 @@ annotate_masses <-
       tidytable::distinct()
 
     log_debug("joining single adducts, neutral losses, and multicharged \n")
-    df24 <- tidytable::bind_rows(
-      df14,
-      df22
+    df_annotated_final <- tidytable::bind_rows(
+      df_annotated_1,
+      df_annotated_2
     ) |>
-      tidytable::left_join(df13_b) |>
+      tidytable::left_join(df_str_unique) |>
       tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
       tidytable::select(
         feature_id,
@@ -776,8 +741,8 @@ annotate_masses <-
       tidytable::distinct()
 
     log_debug("adding chemical classification")
-    df25 <- tidytable::left_join(
-      df24,
+    df_final <- tidytable::left_join(
+      df_annotated_final,
       structure_organism_pairs_table |>
         tidytable::distinct(
           candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
@@ -802,11 +767,11 @@ annotate_masses <-
         )
       )
 
-    df25 |>
+    df_final |>
       decorate_masses()
 
     edges <- tidytable::bind_rows(
-      df9 |>
+      df_add |>
         tidytable::mutate(label = paste0(label, " _ ", label_dest)) |>
         tidytable::select(
           !!as.name(name_source) := feature_id,
@@ -814,7 +779,7 @@ annotate_masses <-
           label
         ) |>
         tidytable::distinct(),
-      df9_d |>
+      df_nl |>
         tidytable::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
           !!as.name(name_source) := feature_id,
@@ -826,9 +791,9 @@ annotate_masses <-
 
     export_params(parameters = get_params(step = "annotate_masses"), step = "annotate_masses")
     export_output(x = edges, file = output_edges[[1]])
-    export_output(x = df25, file = output_annotations[[1]])
+    export_output(x = df_final, file = output_annotations[[1]])
 
-    rm(edges, df25)
+    rm(edges, df_final)
     return(c(
       "annotations" = output_annotations[[1]],
       "edges" = output_edges[[1]]
