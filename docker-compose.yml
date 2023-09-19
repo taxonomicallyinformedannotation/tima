@@ -15,6 +15,7 @@ services:
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
+    user: tima-user
     volumes:
       - "./data:/data"
       - "./inst:/inst"
@@ -28,14 +29,15 @@ services:
           cpus: "0.8"
           memory: 8G
     ports:
-      - "127.0.0.1:3838:3838"
-      - "127.0.0.1:3839:3839"
+      - "3838:3838"
+      - "3839:3839"
     image: adafede/tima-r
     networks:
       - service-service-frontend
     security_opt:
       - apparmor:unconfined
       - no-new-privileges:true
+    user: tima-user
     volumes:
       - "./data:/data"
       - "./inst:/inst"

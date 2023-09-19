@@ -91,6 +91,7 @@ server <- function(input, output, session) {
         setwd("../..")
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
+          host = "0.0.0.0",
           port = 3839,
           display = "graph",
           displays = c("summary", "graph"),
@@ -259,6 +260,7 @@ server <- function(input, output, session) {
           garbage_collection = TRUE,
           reporter = "verbose_positives"
         )
+        setwd("inst/app")
       }, finally = {
         shiny::stopApp()
       })

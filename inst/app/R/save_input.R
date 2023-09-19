@@ -28,7 +28,7 @@ save_input <- function(input) {
   if (file.exists(prefil_spe_raw_1)) {
     fil_spe_raw <- prefil_spe_raw_1
   } else {
-    fil_fea_raw <- prefil_spe_raw[[4]]
+    fil_spe_raw <- prefil_spe_raw[[4]]
   }
   if (!is.null(prefil_tax_raw)) {
     if (file.exists(prefil_tax_raw_1)) {
@@ -92,6 +92,8 @@ save_input <- function(input) {
     options$
     summarise <-
     summarise
+
+  create_dir("inst/params")
   yaml::write_yaml(
     x = yamls_params$`inst/params/prepare_params`,
     file = "inst/params/prepare_params.yaml"
