@@ -9,8 +9,9 @@ RUN groupadd -r tima && useradd -r -g tima tima-user
 # To force bioconductor to install from source
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 COPY DESCRIPTION ./DESCRIPTION
-COPY R ./R
 COPY inst/scripts/install.R ./inst/scripts/install.R
+RUN Rscript ./inst/scripts/install.R
+COPY R ./R
 RUN Rscript ./inst/scripts/install.R
 
 # Copy files
