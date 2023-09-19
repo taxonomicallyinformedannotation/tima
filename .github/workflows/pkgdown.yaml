@@ -13,6 +13,21 @@ on:
       - "published"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  checks: write
+  contents: write
+  deployments: write
+  id-token: read
+  issues: read
+  discussions: read
+  packages: write
+  pages: write
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+
 name: pkgdown
 
 jobs:
