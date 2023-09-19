@@ -9,6 +9,11 @@ services:
         limits:
           cpus: "0.8"
           memory: 8G
+    healthcheck:
+      test: ["NONE"]
+      interval: 200s
+      timeout: 200s
+      retries: 5
     image: adafede/tima-r
     networks:
       - service-service-frontend
@@ -28,9 +33,14 @@ services:
         limits:
           cpus: "0.8"
           memory: 8G
+    healthcheck:
+      test: ["NONE"]
+      interval: 200s
+      timeout: 200s
+      retries: 5
     ports:
-      - "3838:3838"
-      - "3839:3839"
+      - "0.0.0.0:3838:3838"
+      - "0.0.0.0:3839:3839"
     image: adafede/tima-r
     networks:
       - service-service-frontend
