@@ -14,8 +14,7 @@ decorate_masses <- function(annotation_table_ms1 =
                                 envir = parent.frame()
                               )) {
   df_1 <- annotation_table_ms1 |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo) |
-      candidate_structure_inchikey_no_stereo != "notAnnotated")
+    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo) | candidate_structure_inchikey_no_stereo != "notAnnotated")
   log_debug(
     "MS1 annotation led to \n",
     crayon::green(nrow(

@@ -62,8 +62,7 @@ complement_metadata_structures <- function(
       structure_xlogp,
       structure_molecular_formula
     ) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
-      !is.na(structure_smiles_no_stereo)) |>
+    tidytable::filter(!is.na(structure_inchikey_no_stereo) | !is.na(structure_smiles_no_stereo)) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_no_stereo,
       .keep_all = TRUE
@@ -77,8 +76,7 @@ complement_metadata_structures <- function(
     colClasses = "character"
   ) |>
     tidytable::left_join(stereo) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
-      !is.na(structure_smiles_no_stereo)) |>
+    tidytable::filter(!is.na(structure_inchikey_no_stereo) | !is.na(structure_smiles_no_stereo)) |>
     tidytable::distinct(
       structure_inchikey_no_stereo,
       structure_smiles_no_stereo,

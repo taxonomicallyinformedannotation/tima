@@ -51,32 +51,23 @@ decorate_bio <-
              envir = parent.frame()
            )) {
     df_kin <- annot_table_wei_bio |>
-      tidytable::filter(score_biological >= score_biological_kingdom *
-        1)
+      tidytable::filter(score_biological >= score_biological_kingdom * 1)
     df_phy <- df_kin |>
-      tidytable::filter(score_biological >= score_biological_phylum *
-        1)
+      tidytable::filter(score_biological >= score_biological_phylum * 1)
     df_cla <- df_phy |>
-      tidytable::filter(score_biological >= score_biological_class *
-        1)
+      tidytable::filter(score_biological >= score_biological_class * 1)
     df_ord <- df_cla |>
-      tidytable::filter(score_biological >= score_biological_order *
-        1)
+      tidytable::filter(score_biological >= score_biological_order * 1)
     df_fam <- df_ord |>
-      tidytable::filter(score_biological >= score_biological_family *
-        1)
+      tidytable::filter(score_biological >= score_biological_family * 1)
     df_tri <- df_fam |>
-      tidytable::filter(score_biological >= score_biological_tribe *
-        1)
+      tidytable::filter(score_biological >= score_biological_tribe * 1)
     df_gen <- df_tri |>
-      tidytable::filter(score_biological >= score_biological_genus *
-        1)
+      tidytable::filter(score_biological >= score_biological_genus * 1)
     df_spe <- df_gen |>
-      tidytable::filter(score_biological >= score_biological_species *
-        1)
+      tidytable::filter(score_biological >= score_biological_species * 1)
     df_var <- df_spe |>
-      tidytable::filter(score_biological >= score_biological_variety *
-        1)
+      tidytable::filter(score_biological >= score_biological_variety * 1)
 
     log_debug(
       "taxonomically informed scoring led to \n",

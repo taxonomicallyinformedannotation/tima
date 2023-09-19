@@ -102,8 +102,7 @@ weight_chemo <-
           str = feature_pred_tax_cla_01kin_val
         )
       ) |>
-      tidytable::mutate(score_chemical_1 = score_chemical_cla_kingdom *
-        1)
+      tidytable::mutate(score_chemical_1 = score_chemical_cla_kingdom * 1)
 
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
@@ -118,8 +117,7 @@ weight_chemo <-
           str = feature_pred_tax_npc_01pat_val
         )
       ) |>
-      tidytable::mutate(score_chemical_2 = score_chemical_npc_pathway *
-        1)
+      tidytable::mutate(score_chemical_2 = score_chemical_npc_pathway * 1)
 
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- df2 |>
@@ -134,8 +132,7 @@ weight_chemo <-
           str = feature_pred_tax_cla_02sup_val
         )
       ) |>
-      tidytable::mutate(score_chemical_3 = score_chemical_cla_superclass *
-        1)
+      tidytable::mutate(score_chemical_3 = score_chemical_cla_superclass * 1)
 
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- df2 |>
@@ -150,8 +147,7 @@ weight_chemo <-
           str = feature_pred_tax_npc_02sup_val
         )
       ) |>
-      tidytable::mutate(score_chemical_4 = score_chemical_npc_superclass *
-        1)
+      tidytable::mutate(score_chemical_4 = score_chemical_npc_superclass * 1)
 
     log_debug("... (classyfire) class \n")
     step_cla_cla <- df2 |>
@@ -166,8 +162,7 @@ weight_chemo <-
           str = feature_pred_tax_cla_03cla_val
         )
       ) |>
-      tidytable::mutate(score_chemical_5 = score_chemical_cla_class *
-        1)
+      tidytable::mutate(score_chemical_5 = score_chemical_cla_class * 1)
 
     log_debug("... (NPC) class \n")
     step_npc_cla <- df2 |>
@@ -182,8 +177,7 @@ weight_chemo <-
           str = feature_pred_tax_npc_03cla_val
         )
       ) |>
-      tidytable::mutate(score_chemical_6 = score_chemical_npc_class *
-        1)
+      tidytable::mutate(score_chemical_6 = score_chemical_npc_class * 1)
 
     log_debug("... (classyfire) parent \n")
     step_cla_par <- df2 |>
@@ -198,8 +192,7 @@ weight_chemo <-
           str = feature_pred_tax_cla_04dirpar_val
         )
       ) |>
-      tidytable::mutate(score_chemical_7 = score_chemical_cla_parent *
-        1)
+      tidytable::mutate(score_chemical_7 = score_chemical_cla_parent * 1)
 
     log_debug("... keeping best chemical score \n")
     annot_table_wei_chemo <- df2 |>
@@ -229,28 +222,7 @@ weight_chemo <-
       tidytable::right_join(annot_table_wei_bio_clean) |>
       log_pipe("... calculating weighted chemical score \n") |>
       tidytable::mutate(
-        score_pondered_chemo =
-          (1 / (
-            weight_chemical +
-              weight_biological +
-              weight_spectral
-          )) *
-            weight_chemical *
-            score_chemical +
-            (1 / (
-              weight_chemical +
-                weight_biological +
-                weight_spectral
-            )) *
-              weight_biological *
-              score_biological +
-            (1 / (
-              weight_chemical +
-                weight_biological +
-                weight_spectral
-            )) *
-              weight_spectral *
-              candidate_score_pseudo_initial
+        score_pondered_chemo = (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_chemical * score_chemical + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )
 
     rm(

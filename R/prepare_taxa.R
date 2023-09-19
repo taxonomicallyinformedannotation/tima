@@ -38,8 +38,7 @@ prepare_taxa <-
            colname = get_params(step = "prepare_taxa")$names$taxon,
            metadata = get_params(step = "prepare_taxa")$files$taxa$raw,
            top_k = get_params(step = "prepare_taxa")$organisms$candidates,
-           org_tax_ott =
-             get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
+           org_tax_ott = get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
            output = get_params(step = "prepare_taxa")$files$taxa$prepared,
            taxon = get_params(step = "prepare_taxa")$organisms$taxon) {
     if (!is.null(taxon)) {

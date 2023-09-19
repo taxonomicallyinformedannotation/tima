@@ -5,7 +5,6 @@
 
 # Load packages required to define the pipeline:
 library(targets)
-# library(tarchetypes)
 
 # Set target options:
 tar_option_set(
@@ -1092,12 +1091,10 @@ list(
         input_features <-
           ifelse(
             test = !is.null(gnps_features),
-            yes =
-              ifelse(
-                test = file.exists(gnps_features),
-                yes = gnps_features,
-                no = par_pre_tax$files$features$raw
-              ),
+            yes = ifelse(test = file.exists(gnps_features),
+              yes = gnps_features,
+              no = par_pre_tax$files$features$raw
+            ),
             no = par_pre_tax$files$features$raw
           )
       }
@@ -1135,12 +1132,10 @@ list(
         input_metadata <-
           ifelse(
             test = !is.null(gnps_metadata),
-            yes =
-              ifelse(
-                test = file.exists(gnps_metadata),
-                yes = gnps_metadata,
-                no = par_pre_tax$files$taxa$raw
-              ),
+            yes = ifelse(test = file.exists(gnps_metadata),
+              yes = gnps_metadata,
+              no = par_pre_tax$files$taxa$raw
+            ),
             no = par_pre_tax$files$taxa$raw
           )
       }
@@ -1558,8 +1553,7 @@ list(
               lib_spe_exp_int_pre_pos <-
                 prepare_libraries_spectra(
                   input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output =
-                    "data/interim/libraries/spectra/exp/internal_pos.rds",
+                  output = "data/interim/libraries/spectra/exp/internal_pos.rds",
                   polarity = "pos",
                   metad = "InternalLib",
                   col_ce = NULL,
@@ -1588,8 +1582,7 @@ list(
               lib_spe_exp_int_pre_neg <-
                 prepare_libraries_spectra(
                   input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output =
-                    "data/interim/libraries/spectra/exp/internal_neg.rds",
+                  output = "data/interim/libraries/spectra/exp/internal_neg.rds",
                   polarity = "neg",
                   metad = "InternalLib",
                   col_ce = NULL,
@@ -1618,8 +1611,7 @@ list(
               lib_spe_exp_mb_pre_neg <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
-                  output =
-                    "data/interim/libraries/spectra/exp/massbank_neg.rds",
+                  output = "data/interim/libraries/spectra/exp/massbank_neg.rds",
                   polarity = "neg",
                   metad = paste("MassBank",
                     paths_urls_massbank_version,
@@ -1651,8 +1643,7 @@ list(
               lib_spe_exp_mb_pre_pos <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
-                  output =
-                    "data/interim/libraries/spectra/exp/massbank_pos.rds",
+                  output = "data/interim/libraries/spectra/exp/massbank_pos.rds",
                   polarity = "pos",
                   metad = paste("MassBank",
                     paths_urls_massbank_version,
@@ -2102,14 +2093,6 @@ list(
         con <- file(benchmark_file, "r")
         text <- readLines(con)
         close(con)
-        # # To get both pos and neg
-        # text_1 <- text |>
-        #   head(100471)
-        # text_2 <- text |>
-        #   tail(100387)
-        # text <- text_1 |>
-        #   append(text_2)
-
         ## reduce size
         text_corrected <- text |>
           gsub(
@@ -2248,7 +2231,10 @@ list(
           tidytable::distinct(inchikey_no_stereo, adduct, .keep_all = TRUE) |>
           tidytable::mutate(mz = precursorMz) |>
           ## Weird way to have some kind of retention time
-          tidytable::mutate(rt = tidytable::cur_group_id(), .by = "inchikey_no_stereo")
+          tidytable::mutate(
+            rt = tidytable::cur_group_id(),
+            .by = "inchikey_no_stereo"
+          )
 
         df_clean_neg <- df_clean |>
           tidytable::filter(grepl(
@@ -2279,7 +2265,10 @@ list(
               replacement = "",
               inchikey
             )) |>
-            tidytable::mutate(rtime = tidytable::cur_group_id(), .by = "short_ik") |>
+            tidytable::mutate(
+              rtime = tidytable::cur_group_id(),
+              .by = "short_ik"
+            ) |>
             tidytable::mutate(precursorCharge = ifelse(
               test = mode == "pos",
               yes = as.integer(1),
@@ -2438,10 +2427,8 @@ list(
           annotate_masses(
             features = benchmark_pre_meta_pos,
             library = lib_mer_key,
-            output_annotations =
-              "data/interim/benchmark/benchmark_ann_ms1_pos.tsv.gz",
-            output_edges =
-              "data/interim/benchmark/benchmark_edges_ms1_pos.tsv.gz",
+            output_annotations = "data/interim/benchmark/benchmark_ann_ms1_pos.tsv.gz",
+            output_edges = "data/interim/benchmark/benchmark_edges_ms1_pos.tsv.gz",
             name_source = benchmark_def_ann_mas$names$source,
             name_target = benchmark_def_ann_mas$names$target,
             str_stereo = lib_mer_str_stereo,
@@ -2472,10 +2459,8 @@ list(
           annotate_masses(
             features = benchmark_pre_meta_neg,
             library = lib_mer_key,
-            output_annotations =
-              "data/interim/benchmark/benchmark_ann_ms1_neg.tsv.gz",
-            output_edges =
-              "data/interim/benchmark/benchmark_edges_ms1_neg.tsv.gz",
+            output_annotations = "data/interim/benchmark/benchmark_ann_ms1_neg.tsv.gz",
+            output_edges = "data/interim/benchmark/benchmark_edges_ms1_neg.tsv.gz",
             name_source = benchmark_def_ann_mas$names$source,
             name_target = benchmark_def_ann_mas$names$target,
             str_stereo = lib_mer_str_stereo,

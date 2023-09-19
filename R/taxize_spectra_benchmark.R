@@ -51,15 +51,12 @@ taxize_spectra_benchmark <-
     features_sampled <- features_pretaxed |>
       tidytable::filter(!is.na(organism_name)) |>
       tidytable::slice_sample(n = 1, .by = feature_id) |>
-      tidytable::bind_rows(features_pretaxed |>
-        tidytable::filter(is.na(organism_name)))
+      tidytable::bind_rows(features_pretaxed |> tidytable::filter(is.na(organism_name)))
     rm(features_pretaxed)
 
     features_taxed <- features_sampled |>
       tidytable::left_join(taxo |>
-        tidytable::distinct(organism_name,
-          .keep_all = TRUE
-        )) |>
+        tidytable::distinct(organism_name, .keep_all = TRUE)) |>
       tidytable::select(
         feature_id,
         sample_organism_01_domain = organism_taxonomy_01domain,

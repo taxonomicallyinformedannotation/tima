@@ -14,9 +14,7 @@ create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {
     stopifnot(
-      "Your input file(s) do(es) not exist" =
-        rep(TRUE, length(unlist(input))) ==
-          lapply(X = unlist(input), FUN = file.exists)
+      "Your input file(s) do(es) not exist" = rep(TRUE, length(unlist(input))) == lapply(X = unlist(input), FUN = file.exists)
     )
 
     edges <- input |>

@@ -37,9 +37,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
   stopifnot(
-    "Library file(s) do(es) not exist" =
-      rep(TRUE, length(unlist(library))) ==
-        lapply(X = unlist(library), FUN = file.exists)
+    "Library file(s) do(es) not exist" = rep(TRUE, length(unlist(library))) == lapply(X = unlist(library), FUN = file.exists)
   )
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -367,8 +365,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
             )
         ),
         "Candidates were annotated on",
-        nrow(df_final |>
-          tidytable::distinct(feature_id)),
+        nrow(df_final |> tidytable::distinct(feature_id)),
         "features, with at least",
         threshold,
         "similarity score."

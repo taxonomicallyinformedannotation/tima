@@ -23,10 +23,8 @@ prepare_annotations_gnps <-
            str_stereo = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$stereo,
            str_met = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$metadata,
            str_nam = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$names,
-           str_tax_cla =
-             get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc =
-             get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$npc) {
+           str_tax_cla = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
     }

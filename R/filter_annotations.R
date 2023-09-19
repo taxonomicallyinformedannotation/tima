@@ -20,14 +20,10 @@ filter_annotations <-
            output = get_params(step = "filter_annotations")$files$annotations$filtered,
            tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes) {
     stopifnot(
-      "Annotations file(s) do(es) not exist" =
-        rep(TRUE, length(annotations)) ==
-          lapply(X = annotations, FUN = file.exists)
+      "Annotations file(s) do(es) not exist" = rep(TRUE, length(annotations)) == lapply(X = annotations, FUN = file.exists)
     )
     stopifnot(
-      "Retention time file(s) do(es) not exist" =
-        rep(TRUE, length(rts)) ==
-          lapply(X = rts, FUN = file.exists)
+      "Retention time file(s) do(es) not exist" = rep(TRUE, length(rts)) == lapply(X = rts, FUN = file.exists)
     )
     stopifnot("Your features file does not exist." = file.exists(features))
 
@@ -81,9 +77,7 @@ filter_annotations <-
           .keep_all = TRUE
         ) |>
         ## TODO adapt for types and improve the * 3
-        tidytable::filter(abs(candidate_structure_error_rt) <=
-          abs(tolerance_rt * 3) |
-          is.na(candidate_structure_error_rt)) |>
+        tidytable::filter(abs(candidate_structure_error_rt) <= abs(tolerance_rt * 3) | is.na(candidate_structure_error_rt)) |>
         tidytable::select(-rt_target, -type)
     } else {
       log_debug("No RT library provided, not filtering anything")
@@ -92,8 +86,9 @@ filter_annotations <-
     }
 
     log_debug(
-      crayon::green(nrow(features_annotated_table_1) -
-        nrow(features_annotated_table_2)),
+      crayon::green(
+        nrow(features_annotated_table_1) - nrow(features_annotated_table_2)
+      ),
       "Candidates were removed based on retention time."
     )
 

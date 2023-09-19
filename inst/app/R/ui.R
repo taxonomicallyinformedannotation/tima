@@ -27,7 +27,9 @@ ui <- shiny::fluidPage(
       shiny::span("Created by "),
       shiny::a("Adriano Rutz", href = "https://adafede.github.io/"),
       shiny::HTML("&bull;"),
-      shiny::a("Main publication", href = "https://doi.org/10.3389/fpls.2019.01329"),
+      shiny::a("Main publication",
+        href = "https://doi.org/10.3389/fpls.2019.01329"
+      ),
       shiny::HTML("&bull;"),
       shiny::span("Code"),
       shiny::a(
@@ -1262,17 +1264,27 @@ ui <- shiny::fluidPage(
   shiny::fluidPage(
     shiny::div(
       id = "form",
-      shiny::actionButton(inputId = "save", "Save parameters", class = "btn-primary"),
+      shiny::actionButton(
+        inputId = "save",
+        label = "Save parameters",
+        class = "btn-primary"
+      ),
       shinyjs::hidden(
         shiny::span(id = "save_msg", "Saving parameters..."),
         shiny::div(
           id = "error",
           shiny::div(
-            shiny::br(), shiny::tags$b("Error: "), shiny::span(id = "error_msg")
+            shiny::br(),
+            shiny::tags$b("Error: "),
+            shiny::span(id = "error_msg")
           )
         )
       ),
-      shiny::actionButton(inputId = "launch", "Launch job", class = "btn-primary"),
+      shiny::actionButton(
+        inputId = "launch",
+        label = "Launch job",
+        class = "btn-primary"
+      ),
     ),
     shinyjs::hidden(shiny::div(
       id = "thankyou_msg",

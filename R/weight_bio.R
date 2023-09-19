@@ -658,8 +658,7 @@ weight_bio <-
       tidytable::left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
       ## TODO suboptimal
-      tidytable::mutate(interim = -10 /
-        as.numeric(candidate_score_sirius_csi)) |>
+      tidytable::mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
       tidytable::mutate(interim_2 = ifelse(test = interim > 1,
         yes = 1,
         no = interim
@@ -672,13 +671,7 @@ weight_bio <-
       )) |>
       tidytable::select(-interim, -interim_2) |>
       tidytable::mutate(
-        score_pondered_bio =
-          (1 / (weight_biological + weight_spectral)) *
-            weight_biological *
-            score_biological +
-            (1 / (weight_biological + weight_spectral)) *
-              weight_spectral *
-              candidate_score_pseudo_initial
+        score_pondered_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )
 
     rm(
