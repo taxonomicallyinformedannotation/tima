@@ -3,7 +3,6 @@ FROM bioconductor/bioconductor_docker:3.17-R-4.3.0
 
 # Define workdir and user
 WORKDIR /tima
-RUN cd /tima
 RUN groupadd -r tima && useradd -r -g tima tima-user
 
 # Install R dependencies
@@ -15,7 +14,6 @@ COPY inst/scripts/install.R ./inst/scripts/install.R
 RUN Rscript ./inst/scripts/install.R
 
 # Copy files
-COPY data ./data
 COPY inst ./inst
 COPY docker-compose.yml ./docker-compose.yml
 COPY _targets.yaml ./_targets.yaml
