@@ -86,3 +86,17 @@ cd tima-r
 ```
 
 We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-inputs.html).
+
+### tl;dr
+
+If you do not feel like going through all the steps, then just do 🚀:
+
+```{bash eval=FALSE, include=TRUE}
+Rscript inst/scripts/run_app.R
+```
+
+If you do not even need a GUI ☠️:
+
+```{bash eval=FALSE, include=TRUE}
+Rscript inst/scripts/tima_full.R
+```
