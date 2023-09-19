@@ -59,9 +59,6 @@ dist_groups <- function(d, g) {
   ## Check that the length of g matches the number of observations in d
   dsize <- attr(d, "Size")
 
-  ## Get the labels of the observations in d
-  dlabels <- attr(d, "Labels")
-
   ## Get the combinations of indices for each pair of observations in d
   idxs <- utils::combn(dsize, 2)
   idx1 <- idxs[1, ]

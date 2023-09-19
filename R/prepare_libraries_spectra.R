@@ -61,9 +61,7 @@ prepare_libraries_spectra <-
         polarity %in% c("pos", "neg")
     )
     if (length(output) > 1) {
-      output <- output[output |>
-        grepl(pattern = polarity)] |>
-        as.character()
+      output <- output[output |> grepl(pattern = polarity)] |> as.character()
     }
     if (!file.exists(output)) {
       if (file.exists(input)) {

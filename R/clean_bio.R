@@ -474,111 +474,90 @@ clean_bio <-
       log_pipe("adding dummy consistency for features
               with less than 2 neighbors \n") |>
       tidytable::mutate(
-        feature_pred_tax_cla_01kin_val =
-          tidytable::coalesce(
-            feature_pred_tax_cla_01kin_val,
-            "dummy"
-          ),
-        consistency_structure_cla_kin =
-          tidytable::coalesce(
-            consistency_structure_cla_kin,
-            1
-          ),
-        feature_pred_tax_cla_01kin_score =
-          tidytable::coalesce(
-            feature_pred_tax_cla_01kin_score,
-            0
-          ),
-        feature_pred_tax_npc_01pat_val =
-          tidytable::coalesce(
-            feature_pred_tax_npc_01pat_val,
-            "dummy"
-          ),
-        consistency_structure_npc_pat =
-          tidytable::coalesce(
-            consistency_structure_npc_pat,
-            1
-          ),
-        feature_pred_tax_npc_01pat_score =
-          tidytable::coalesce(
-            feature_pred_tax_npc_01pat_score,
-            0
-          ),
-        feature_pred_tax_cla_02sup_val =
-          tidytable::coalesce(
-            feature_pred_tax_cla_02sup_val,
-            "dummy"
-          ),
-        consistency_structure_cla_sup =
-          tidytable::coalesce(
-            consistency_structure_cla_sup,
-            1
-          ),
-        feature_pred_tax_cla_02sup_score =
-          tidytable::coalesce(
-            feature_pred_tax_cla_02sup_score,
-            0
-          ),
-        feature_pred_tax_npc_02sup_val =
-          tidytable::coalesce(
-            feature_pred_tax_npc_02sup_val,
-            "dummy"
-          ),
-        consistency_structure_npc_sup =
-          tidytable::coalesce(
-            consistency_structure_npc_sup,
-            1
-          ),
-        feature_pred_tax_npc_02sup_score =
-          tidytable::coalesce(
-            feature_pred_tax_npc_02sup_score,
-            0
-          ),
-        feature_pred_tax_cla_03cla_val =
-          tidytable::coalesce(
-            feature_pred_tax_cla_03cla_val,
-            "dummy"
-          ),
-        consistency_structure_cla_cla =
-          tidytable::coalesce(
-            consistency_structure_cla_cla,
-            1
-          ),
-        feature_pred_tax_cla_03cla_score =
-          tidytable::coalesce(
-            feature_pred_tax_cla_03cla_score,
-            0
-          ),
-        feature_pred_tax_npc_03cla_val =
-          tidytable::coalesce(
-            feature_pred_tax_npc_03cla_val,
-            "dummy"
-          ),
-        consistency_structure_npc_cla =
-          tidytable::coalesce(
-            consistency_structure_npc_cla,
-            1
-          ),
-        feature_pred_tax_npc_03cla_score =
-          tidytable::coalesce(
-            feature_pred_tax_npc_03cla_score,
-            0
-          ),
-        feature_pred_tax_cla_04dirpar_val =
-          tidytable::coalesce(
-            feature_pred_tax_cla_04dirpar_val,
-            "dummy"
-          ),
-        consistency_structure_cla_par =
-          tidytable::coalesce(
-            consistency_structure_cla_par,
-            1
-          ),
-        feature_pred_tax_cla_04dirpar_score =
-          tidytable::coalesce(
-            feature_pred_tax_cla_04dirpar_score,
-            0
-          )
+        feature_pred_tax_cla_01kin_val = tidytable::coalesce(
+          feature_pred_tax_cla_01kin_val,
+          "dummy"
+        ),
+        consistency_structure_cla_kin = tidytable::coalesce(
+          consistency_structure_cla_kin,
+          1
+        ),
+        feature_pred_tax_cla_01kin_score = tidytable::coalesce(
+          feature_pred_tax_cla_01kin_score,
+          0
+        ),
+        feature_pred_tax_npc_01pat_val = tidytable::coalesce(
+          feature_pred_tax_npc_01pat_val,
+          "dummy"
+        ),
+        consistency_structure_npc_pat = tidytable::coalesce(
+          consistency_structure_npc_pat,
+          1
+        ),
+        feature_pred_tax_npc_01pat_score = tidytable::coalesce(
+          feature_pred_tax_npc_01pat_score,
+          0
+        ),
+        feature_pred_tax_cla_02sup_val = tidytable::coalesce(
+          feature_pred_tax_cla_02sup_val,
+          "dummy"
+        ),
+        consistency_structure_cla_sup = tidytable::coalesce(
+          consistency_structure_cla_sup,
+          1
+        ),
+        feature_pred_tax_cla_02sup_score = tidytable::coalesce(
+          feature_pred_tax_cla_02sup_score,
+          0
+        ),
+        feature_pred_tax_npc_02sup_val = tidytable::coalesce(
+          feature_pred_tax_npc_02sup_val,
+          "dummy"
+        ),
+        consistency_structure_npc_sup = tidytable::coalesce(
+          consistency_structure_npc_sup,
+          1
+        ),
+        feature_pred_tax_npc_02sup_score = tidytable::coalesce(
+          feature_pred_tax_npc_02sup_score,
+          0
+        ),
+        feature_pred_tax_cla_03cla_val = tidytable::coalesce(
+          feature_pred_tax_cla_03cla_val,
+          "dummy"
+        ),
+        consistency_structure_cla_cla = tidytable::coalesce(
+          consistency_structure_cla_cla,
+          1
+        ),
+        feature_pred_tax_cla_03cla_score = tidytable::coalesce(
+          feature_pred_tax_cla_03cla_score,
+          0
+        ),
+        feature_pred_tax_npc_03cla_val = tidytable::coalesce(
+          feature_pred_tax_npc_03cla_val,
+          "dummy"
+        ),
+        consistency_structure_npc_cla = tidytable::coalesce(
+          consistency_structure_npc_cla,
+          1
+        ),
+        feature_pred_tax_npc_03cla_score = tidytable::coalesce(
+          feature_pred_tax_npc_03cla_score,
+          0
+        ),
+        feature_pred_tax_cla_04dirpar_val = tidytable::coalesce(
+          feature_pred_tax_cla_04dirpar_val,
+          "dummy"
+        ),
+        consistency_structure_cla_par = tidytable::coalesce(
+          consistency_structure_cla_par,
+          1
+        ),
+        feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(
+          feature_pred_tax_cla_04dirpar_score,
+          0
+        )
       )
 
     log_debug("adding already computed predictions back \n")

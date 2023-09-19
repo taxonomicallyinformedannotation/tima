@@ -68,10 +68,8 @@ annotate_masses <-
            ms_mode = get_params(step = "annotate_masses")$ms$polarity,
            tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
            tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
-    stopifnot("Your ppm tolerance must be lower or equal to 20" = tolerance_ppm <=
-      20)
-    stopifnot("Your rt tolerance must be lower or equal to 0.05" = tolerance_rt <=
-      0.05)
+    stopifnot("Your ppm tolerance must be ≤ 20" = tolerance_ppm <= 20)
+    stopifnot("Your rt tolerance must be ≤ 0.05" = tolerance_rt <= 0.05)
 
     features_table <- tidytable::fread(
       file = features,
@@ -304,25 +302,13 @@ annotate_masses <-
       tidytable::mutate(
         delta_min = ifelse(
           test = mz >= mz_dest,
-          yes = abs(mz -
-            (1E-6 *
-              tolerance_ppm *
-              mz) -
-            mz_dest),
-          no = abs(mz + (1E-6 *
-            tolerance_ppm *
-            mz) - mz_dest)
+          yes = abs(mz - (1E-6 * tolerance_ppm * mz) - mz_dest),
+          no = abs(mz + (1E-6 * tolerance_ppm * mz) - mz_dest)
         ),
         delta_max = ifelse(
           test = mz >= mz_dest,
-          yes = abs(mz + (1E-6 *
-            tolerance_ppm *
-            mz) - mz_dest),
-          no = abs(mz -
-            (1E-6 *
-              tolerance_ppm *
-              mz) -
-            mz_dest)
+          yes = abs(mz + (1E-6 * tolerance_ppm * mz) - mz_dest),
+          no = abs(mz - (1E-6 * tolerance_ppm * mz) - mz_dest)
         )
       )
     rm(df_rt_tol)
@@ -330,8 +316,10 @@ annotate_masses <-
     log_debug("forming clusters \n")
     add_clu_table <- adducts_table |>
       tidytable::mutate(join = "x") |>
-      tidytable::left_join(clusters |>
-        tidytable::mutate(join = "x")) |>
+      tidytable::left_join(
+        clusters |>
+          tidytable::mutate(join = "x")
+      ) |>
       tidytable::bind_rows(adducts_table) |>
       tidytable::mutate(
         adduct = ifelse(
@@ -564,61 +552,29 @@ annotate_masses <-
         tidytable::distinct() |>
         tidytable::mutate(
           `[1M+(H)3]3+` = (exact_mass + 3 * add_m["H+ (proton)"]) / 3,
-          `[1M+(H)2(Na)1]3+` = (exact_mass +
-            2 * add_m["H+ (proton)"] +
-            add_m["Na+ (sodium)"]) / 3,
-          `[1M+(H)1(Na)2]3+` = (exact_mass +
-            add_m["H+ (proton)"] +
-            2 * add_m["Na+ (sodium)"]) / 3,
+          `[1M+(H)2(Na)1]3+` = (exact_mass + 2 * add_m["H+ (proton)"] + add_m["Na+ (sodium)"]) / 3,
+          `[1M+(H)1(Na)2]3+` = (exact_mass + add_m["H+ (proton)"] + 2 * add_m["Na+ (sodium)"]) / 3,
           `[1M+(Na)3]3+` = (exact_mass + 3 * add_m["Na+ (sodium)"]) / 3,
           `[1M+(H)2]2+` = (exact_mass + 2 * add_m["H+ (proton)"]) / 2,
-          `[1M+(H)2]2+ + (HN3)1` = (exact_mass +
-            2 * add_m["H+ (proton)"] +
-            clu_m["HN3"]) / 2,
-          `[1M+(H)1(Na)1]2+` = (exact_mass +
-            add_m["H+ (proton)"] +
-            add_m["Na+ (sodium)"]) / 2,
-          `[1M+(Mg)1]2+` = (exact_mass +
-            add_m["Mg++ (magnesium)"]) / 2,
-          `[1M+(H)1(K)1]2+` = (exact_mass +
-            add_m["H+ (proton)"] +
-            add_m["K+ (potassium)"]) / 2,
-          `[1M+(Ca)1]2+` = (exact_mass +
-            add_m["Ca++ (calcium)"]) / 2,
-          `[1M+(H)2]2+ + (C2H3N)1` = (exact_mass +
-            2 * add_m["H+ (proton)"] +
-            clu_m["C2H3N"]) / 2,
-          `[1M+(Na)2]2+` = (exact_mass +
-            2 * add_m["Na+ (sodium)"]) / 2,
-          `[1M+(Fe)1]2+` = (exact_mass +
-            add_m["Fe++ (iron)"]) / 2,
-          `[1M+(H)2]2+ + (C2H3N)2` = (exact_mass +
-            2 * add_m["H+ (proton)"] +
-            2 * clu_m["C2H3N"]) / 2,
-          `[1M+(H)]2+ + (C2H3N)3` = (exact_mass +
-            2 * add_m["H+ (proton)"] +
-            3 * clu_m["C2H3N"]) / 2,
-          `[2M+(Mg)1]2+` = (2 * (exact_mass) +
-            add_m["Mg++ (magnesium)"]) / 2,
-          `[2M+(Ca)1]2+` = (2 * (exact_mass) +
-            add_m["Ca++ (calcium)"]) / 2,
-          `[2M+(Fe)1]2+` = (2 * (exact_mass) +
-            add_m["Fe++ (iron)"]) / 2,
-          `[2M+(H)1]1+` = 2 * (exact_mass) +
-            add_m["H+ (proton)"],
-          `[2M+(H)1]1+ + (HN3)1` = 2 * (exact_mass) +
-            add_m["H+ (proton)"] +
-            clu_m["HN3"],
-          `[2M+(Na)1]1+` = 2 * (exact_mass) +
-            add_m["Na+ (sodium)"],
-          `[2M+(K)1]1+` = 2 * (mz - add_m["H+ (proton)"]) +
-            add_m["K+ (potassium)"],
-          `[2M+(H)1]1+ + (C2H3N)1` = 2 * (exact_mass) +
-            add_m["H+ (proton)"] +
-            clu_m["C2H3N"],
-          `[2M+(Na)1]1+ + (C2H3N)1` = 2 * (exact_mass) +
-            add_m["Na+ (sodium)"] +
-            clu_m["C2H3N"]
+          `[1M+(H)2]2+ + (HN3)1` = (exact_mass + 2 * add_m["H+ (proton)"] + clu_m["HN3"]) / 2,
+          `[1M+(H)1(Na)1]2+` = (exact_mass + add_m["H+ (proton)"] + add_m["Na+ (sodium)"]) / 2,
+          `[1M+(Mg)1]2+` = (exact_mass + add_m["Mg++ (magnesium)"]) / 2,
+          `[1M+(H)1(K)1]2+` = (exact_mass + add_m["H+ (proton)"] + add_m["K+ (potassium)"]) / 2,
+          `[1M+(Ca)1]2+` = (exact_mass + add_m["Ca++ (calcium)"]) / 2,
+          `[1M+(H)2]2+ + (C2H3N)1` = (exact_mass + 2 * add_m["H+ (proton)"] + clu_m["C2H3N"]) / 2,
+          `[1M+(Na)2]2+` = (exact_mass + 2 * add_m["Na+ (sodium)"]) / 2,
+          `[1M+(Fe)1]2+` = (exact_mass + add_m["Fe++ (iron)"]) / 2,
+          `[1M+(H)2]2+ + (C2H3N)2` = (exact_mass + 2 * add_m["H+ (proton)"] + 2 * clu_m["C2H3N"]) / 2,
+          `[1M+(H)]2+ + (C2H3N)3` = (exact_mass + 2 * add_m["H+ (proton)"] + 3 * clu_m["C2H3N"]) / 2,
+          `[2M+(Mg)1]2+` = (2 * (exact_mass) + add_m["Mg++ (magnesium)"]) / 2,
+          `[2M+(Ca)1]2+` = (2 * (exact_mass) + add_m["Ca++ (calcium)"]) / 2,
+          `[2M+(Fe)1]2+` = (2 * (exact_mass) + add_m["Fe++ (iron)"]) / 2,
+          `[2M+(H)1]1+` = 2 * (exact_mass) + add_m["H+ (proton)"],
+          `[2M+(H)1]1+ + (HN3)1` = 2 * (exact_mass) + add_m["H+ (proton)"] + clu_m["HN3"],
+          `[2M+(Na)1]1+` = 2 * (exact_mass) + add_m["Na+ (sodium)"],
+          `[2M+(K)1]1+` = 2 * (mz - add_m["H+ (proton)"]) + add_m["K+ (potassium)"],
+          `[2M+(H)1]1+ + (C2H3N)1` = 2 * (exact_mass) + add_m["H+ (proton)"] + clu_m["C2H3N"],
+          `[2M+(Na)1]1+ + (C2H3N)1` = 2 * (exact_mass) + add_m["Na+ (sodium)"] + clu_m["C2H3N"]
         ) |>
         tidytable::select(-exact_mass) |>
         tidytable::ungroup()
@@ -637,18 +593,12 @@ annotate_masses <-
           exact_mass
         ) |>
         tidytable::mutate(
-          `[1M-(H)3]3-` = (exact_mass -
-            3 * add_m["H+ (proton)"]) / 3,
-          `[1M-(H)2]2-` = (exact_mass -
-            2 * add_m["H+ (proton)"]) / 2,
-          `[2M-(H)1]1-` = 2 * (exact_mass) -
-            add_m["H+ (proton)"],
-          `[2M-(H)1]1- + (CH2O2)1` = 2 * (exact_mass) +
-            clu_m["CH2O2"] - add_m["H+ (proton)"],
-          `[2M-(H)1]1- + (C2H4O2)1` = 2 * (exact_mass) +
-            clu_m["C2H4O2"] - add_m["H+ (proton)"],
-          `[3M-(H)1]1-` = 3 * (exact_mass) -
-            add_m["H+ (proton)"]
+          `[1M-(H)3]3-` = (exact_mass - 3 * add_m["H+ (proton)"]) / 3,
+          `[1M-(H)2]2-` = (exact_mass - 2 * add_m["H+ (proton)"]) / 2,
+          `[2M-(H)1]1-` = 2 * (exact_mass) - add_m["H+ (proton)"],
+          `[2M-(H)1]1- + (CH2O2)1` = 2 * (exact_mass) + clu_m["CH2O2"] - add_m["H+ (proton)"],
+          `[2M-(H)1]1- + (C2H4O2)1` = 2 * (exact_mass) + clu_m["C2H4O2"] - add_m["H+ (proton)"],
+          `[3M-(H)1]1-` = 3 * (exact_mass) - add_m["H+ (proton)"]
         ) |>
         tidytable::select(-exact_mass) |>
         tidytable::ungroup()
@@ -683,8 +633,7 @@ annotate_masses <-
         delta_min = mz - mz_max,
         delta_max = mz - mz_min
       ) |>
-      tidytable::filter(delta_max > min(neutral_losses$mass) |
-        (mz >= mz_min & mz <= mz_max))
+      tidytable::filter(delta_max > min(neutral_losses$mass) | (mz >= mz_min & mz <= mz_max))
     rm(df_fea_min, df_multi, df_multi_min)
 
     df_multi_nl <- df_multi_rt |>
@@ -694,11 +643,8 @@ annotate_masses <-
           delta_max >= mass
         )
       ) |>
-      tidytable::filter(!is.na(loss) |
-        (mz >= mz_min &
-          mz <= mz_max)) |>
-      tidytable::mutate(name = ifelse(
-        test = !is.na(loss),
+      tidytable::filter(!is.na(loss) | (mz >= mz_min & mz <= mz_max)) |>
+      tidytable::mutate(name = ifelse(test = !is.na(loss),
         yes = paste(name, "-", loss, sep = " "),
         no = name
       )) |>

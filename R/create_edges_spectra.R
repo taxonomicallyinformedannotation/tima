@@ -75,8 +75,7 @@ create_edges_spectra <- function(
     entropy <- pbapply::pblapply(
       X = seq_along(1:nspecz),
       FUN = function(x, peaks = fragz) {
-        entropy <- peaks[[x]] |>
-          msentropy::calculate_spectral_entropy()
+        return(peaks[[x]] |> msentropy::calculate_spectral_entropy())
       }
     )
     rm(nspecz, fragz)

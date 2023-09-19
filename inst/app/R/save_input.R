@@ -1,11 +1,11 @@
 # save the results to a file
 save_input <- function(input) {
   setwd("../../")
-  paths_data_source <- parse_yaml_paths()$data$source$path
+  paths_data_source <- timaR::parse_yaml_paths()$data$source$path
   ## safety
-  create_dir(paths_data_source)
+  timaR::create_dir(paths_data_source)
 
-  list <- load_yaml_files()
+  list <- timaR::load_yaml_files()
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
   yaml_names <- list$yaml_names
@@ -57,7 +57,7 @@ save_input <- function(input) {
   compound_names <- shiny::isolate(input$compounds_names)
 
   ## Change 1
-  log_debug(x = "Changing parameters")
+  timaR::log_debug(x = "Changing parameters")
   yamls_params$
     `inst/params/prepare_params`$
     files$
@@ -93,7 +93,7 @@ save_input <- function(input) {
     summarise <-
     summarise
 
-  create_dir("inst/params")
+  timaR::create_dir("inst/params")
   yaml::write_yaml(
     x = yamls_params$`inst/params/prepare_params`,
     file = "inst/params/prepare_params.yaml"
@@ -507,175 +507,11 @@ save_input <- function(input) {
   yamls_params$weight_annotations$options$summarise <- summarise
   yamls_params$weight_annotations$files$pattern <- filename
 
-  # Change 3
-  log_debug(x = "Changing filenames")
-
-  # yamls_params$annotate_masses$files$annotations$prepared$structural <-
-  #   yamls_params$annotate_masses$files$annotations$prepared$structural |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$annotate_masses$files$features$prepared <-
-  #   yamls_params$annotate_masses$files$features$prepared |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$annotate_masses$files$networks$spectral$edges$raw <-
-  #   yamls_params$annotate_masses$files$networks$spectral$edges$raw |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$annotate_spectra$files$annotations$raw$spectral <-
-  #   yamls_params$annotate_spectra$files$annotations$raw$spectral |>
-  #   lapply(FUN = replace_id)
-  # # yamls_params$annotate_spectra$files$spectral$raw <-
-  # #   yamls_params$annotate_spectra$files$spectral$raw |>
-  # #   lapply(FUN = replace_id)
-  #
-  # yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
-  #   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw |>
-  #   lapply(FUN = replace_id)
-  # # yamls_params$create_edges_spectra$files$spectral$raw <-
-  # #   yamls_params$create_edges_spectra$files$spectral$raw |>
-  # #   lapply(FUN = replace_id)
-  #
-  # yamls_params$create_components$files$networks$spectral$edges$prepared <-
-  #   yamls_params$create_components$files$networks$spectral$edges$prepared |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$create_components$files$networks$spectral$components$raw <-
-  #   yamls_params$create_components$files$networks$spectral$components$raw |>
-  #   lapply(FUN = replace_id)
-  #
-  # # yamls_params$prepare_features_tables$files$features$raw <-
-  # #   yamls_params$prepare_features_tables$files$features$raw |>
-  # #   lapply(FUN = replace_id)
-  # yamls_params$prepare_features_tables$files$features$prepared <-
-  #   yamls_params$prepare_features_tables$files$features$prepared |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$
-  #   prepare_features_components$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   components$
-  #   raw <-
-  #   yamls_params$
-  #   prepare_features_components$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   components$
-  #   raw |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$
-  #   prepare_features_components$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   components$
-  #   prepared <-
-  #   yamls_params$
-  #   prepare_features_components$
-  #   files$networks$
-  #   spectral$
-  #   components$
-  #   prepared |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$
-  #   prepare_features_edges$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   edges$
-  #   raw <-
-  #   yamls_params$
-  #   prepare_features_edges$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   edges$
-  #   raw |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$
-  #   prepare_features_edges$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   edges$
-  #   prepared <-
-  #   yamls_params$
-  #   prepare_features_edges$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   edges$
-  #   prepared |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
-  #   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural <-
-  #   yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
-  #   yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural <-
-  #   yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral <-
-  #   yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural <-
-  #   yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural |>
-  #   lapply(FUN = replace_id)
-  #
-  # # yamls_params$prepare_taxa$files$features$raw <-
-  # #   yamls_params$prepare_taxa$files$features$raw |>
-  # #   lapply(FUN = replace_id)
-  # # yamls_params$prepare_taxa$files$taxa$raw <-
-  # #   yamls_params$prepare_taxa$files$taxa$raw |>
-  # #   lapply(FUN = replace_id)
-  # yamls_params$prepare_taxa$files$taxa$prepared <-
-  #   yamls_params$prepare_taxa$files$taxa$prepared |>
-  #   lapply(FUN = replace_id)
-  #
-  # yamls_params$weight_annotations$files$annotations$prepared$structural <-
-  #   yamls_params$weight_annotations$files$annotations$prepared$structural |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$weight_annotations$files$annotations$processed <-
-  #   yamls_params$weight_annotations$files$annotations$processed |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$weight_annotations$files$features$prepared <-
-  #   yamls_params$weight_annotations$files$features$prepared |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$
-  #   weight_annotations$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   components$
-  #   prepared <-
-  #   yamls_params$
-  #   weight_annotations$
-  #   files$
-  #   networks$
-  #   spectral$
-  #   components$
-  #   prepared |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$weight_annotations$files$networks$spectral$edges$prepared <-
-  #   yamls_params$weight_annotations$files$networks$spectral$edges$prepared |>
-  #   lapply(FUN = replace_id)
-  # yamls_params$weight_annotations$files$taxa$prepared <-
-  #   yamls_params$weight_annotations$files$taxa$prepared |>
-  #   lapply(FUN = replace_id)
-
   yaml_export <- yaml_files |>
     gsub(pattern = "default", replacement = "user")
   names(yaml_export) <- yaml_names
 
-  create_dir(export = yaml_export[[1]])
+  timaR::create_dir(export = yaml_export[[1]])
 
   lapply(
     X = seq_along(yamls_params),

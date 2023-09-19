@@ -68,32 +68,21 @@ clean_chemo <-
       "chemical score \n"
     )
 
+    ## Those lines are to keep ms1 annotation
+    ## Only if a good biological
+    ## Or chemical consistency score is obtained
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          (!is.na(candidate_score_similarity) |
-            !is.na(candidate_score_sirius_csi)
-          ) | (
-            ## Those lines are to keep ms1 annotation
-            score_biological >= minimal_ms1_bio |
-              ## Only if a good biological
-              score_chemical >= minimal_ms1_chemo
-          )
-          ## Or chemical consistency score is obtained
+          (!is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)) |
+            (score_biological >= minimal_ms1_bio | score_chemical >= minimal_ms1_chemo)
         )
     }
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          (!is.na(candidate_score_similarity) |
-            !is.na(candidate_score_sirius_csi)
-          ) | (
-            ## Those lines are to keep ms1 annotation
-            score_biological >= minimal_ms1_bio &
-              ## Only if a good biological
-              score_chemical >= minimal_ms1_chemo
-          )
-          ## Or chemical consistency score is obtained
+          (!is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)) |
+            (score_biological >= minimal_ms1_bio & score_chemical >= minimal_ms1_chemo)
         )
     }
 
@@ -138,8 +127,8 @@ clean_chemo <-
         model$features_calculated_columns,
         model$components_columns,
         model$candidates_calculated_columns,
-        model$candidates_sirius_formula_columns,
-        model$candidates_sirius_structural_columns,
+        model$candidates_sirius_for_columns,
+        model$candidates_sirius_str_columns,
         model$candidates_spectra_columns,
         model$candidates_structures_columns,
         model$rank_columns,
@@ -179,8 +168,8 @@ clean_chemo <-
         model$features_calculated_columns,
         model$components_columns,
         model$candidates_calculated_columns,
-        model$candidates_sirius_formula_columns,
-        model$candidates_sirius_structural_columns,
+        model$candidates_sirius_for_columns,
+        model$candidates_sirius_str_columns,
         model$candidates_spectra_columns,
         model$candidates_structures_columns,
         model$rank_columns,
@@ -251,8 +240,8 @@ clean_chemo <-
           model$features_calculated_columns,
           model$components_columns,
           model$candidates_calculated_columns,
-          model$candidates_sirius_formula_columns,
-          model$candidates_sirius_structural_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
           model$candidates_spectra_columns,
           model$candidates_structures_columns,
           model$rank_columns,

@@ -35,20 +35,13 @@ prepare_libraries_sop_merged <-
            value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
            output_key = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
            ## document it above in case
-           # output_org_nam =
-           # get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
-           output_org_tax_ott =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$taxonomies$ott,
-           output_str_stereo =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$stereo,
-           output_str_met =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$metadata,
-           output_str_nam =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$names,
-           output_str_tax_cla =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$cla,
-           output_str_tax_npc =
-             get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$npc) {
+           # output_org_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
+           output_org_tax_ott = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$taxonomies$ott,
+           output_str_stereo = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$stereo,
+           output_str_met = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$metadata,
+           output_str_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$names,
+           output_str_tax_cla = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$cla,
+           output_str_tax_npc = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$npc) {
     stopifnot(
       "Your filter parameter must be 'true' or 'false'" =
         filter %in% c(TRUE, FALSE)

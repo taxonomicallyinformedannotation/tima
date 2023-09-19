@@ -133,9 +133,7 @@ weight_annotations <- function(
     pattern = get_params(step = "weight_annotations")$files$pattern,
     force = get_params(step = "weight_annotations")$options$force) {
   stopifnot(
-    "Annotations file(s) do(es) not exist" =
-      rep(TRUE, length(annotations)) ==
-        lapply(X = annotations, FUN = file.exists)
+    "Annotations file(s) do(es) not exist" = rep(TRUE, length(annotations)) == lapply(X = annotations, FUN = file.exists)
   )
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot("Your components file does not exist." = file.exists(components))
@@ -229,7 +227,7 @@ weight_annotations <- function(
     tidytable::select(
       tidytable::any_of(c(
         model$features_columns,
-        model$candidates_sirius_structural_columns,
+        model$candidates_sirius_str_columns,
         model$candidates_structures_columns
       )),
       -candidate_structure_error_mz,
@@ -252,8 +250,7 @@ weight_annotations <- function(
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
-      tidytable::filter(is.na(candidate_score_similarity) &
-        is.na(candidate_score_sirius_csi))
+      tidytable::filter(is.na(candidate_score_similarity) & is.na(candidate_score_sirius_csi))
   }
   if (compounds_names == FALSE) {
     annotation_table <- annotation_table |>

@@ -34,7 +34,7 @@ columns_model <- function() {
 
   candidates_calculated_columns <- c("candidate_spectrum_entropy")
 
-  candidates_sirius_formula_columns <- c(
+  candidates_sirius_for_columns <- c(
     "candidate_structure_molecular_formula",
     "candidate_count_sirius_peaks_explained",
     "candidate_score_sirius_intensity",
@@ -44,7 +44,7 @@ columns_model <- function() {
     "candidate_score_sirius_zodiac"
   )
 
-  candidates_sirius_structural_columns <-
+  candidates_sirius_str_columns <-
     c(
       "candidate_score_sirius_confidence",
       "candidate_score_sirius_csi"
@@ -100,9 +100,9 @@ columns_model <- function() {
       "features_columns" = features_columns,
       "features_calculated_columns" = features_calculated_columns,
       "candidates_calculated_columns" = candidates_calculated_columns,
-      "candidates_sirius_formula_columns" = candidates_sirius_formula_columns,
-      "candidates_sirius_structural_columns" =
-        candidates_sirius_structural_columns,
+      "candidates_sirius_for_columns" = candidates_sirius_for_columns,
+      "candidates_sirius_str_columns" =
+        candidates_sirius_str_columns,
       "candidates_spectra_columns" = candidates_spectra_columns,
       "candidates_structures_columns" = candidates_structures_columns,
       "components_columns" = components_columns,

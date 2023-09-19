@@ -219,9 +219,7 @@ testthat::test_that("Test functions", {
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
   ## for msp reading test
-  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"),
-    full.names = TRUE, pattern = "msp$"
-  )[1L])
+  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"), full.names = TRUE, pattern = "msp$")[1L])
 
   #### HMDB
   # prepare_isdb_hmdb()

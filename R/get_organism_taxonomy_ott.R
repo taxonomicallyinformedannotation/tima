@@ -109,8 +109,7 @@ get_organism_taxonomy_ott <- function(df,
       tidytable::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
-      retry == TRUE) {
+    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         tidytable::filter(!is.na(ott_id))
