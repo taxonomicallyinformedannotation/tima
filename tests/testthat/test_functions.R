@@ -331,7 +331,7 @@ testthat::test_that("Test functions", {
   )
   ### Empty
   annotate_spectra(
-    library = list("data/interim/libraries/spectra/exp/nope.rds")
+    library = list("data/interim/libraries/spectra/exp/nope_pos.rds")
   )
   ### Approx
   annotate_spectra(
