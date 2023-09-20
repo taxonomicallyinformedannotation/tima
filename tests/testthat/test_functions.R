@@ -208,7 +208,7 @@ testthat::test_that("Test functions", {
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
         gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
-      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
+      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
   )
   #### If does not exist
@@ -219,10 +219,7 @@ testthat::test_that("Test functions", {
   )
   #### Classical
   prepare_libraries_spectra()
-  prepare_libraries_spectra(
-    output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp |>
-      gsub(pattern = ".sqlite", replacement = ".mgf")
-  )
+
   ## for msp reading test
   import_spectra(dir(system.file("extdata", package = "MsBackendMsp"), full.names = TRUE, pattern = "msp$")[1L])
 
