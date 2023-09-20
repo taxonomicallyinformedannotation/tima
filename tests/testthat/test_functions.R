@@ -178,43 +178,48 @@ testthat::test_that("Test functions", {
     col_sy = NULL,
     col_xl = NULL
   )
-  ##### Pos
+  ##### mgf
   do.call(
     what = prepare_libraries_spectra,
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
         gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos
+      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
+      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
   )
   ##### Check the library already exists warning
-  prepare_libraries_spectra(
-    input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-      gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
-    output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos
+  do.call(
+    what = prepare_libraries_spectra,
+    args = c(
+      col_args,
+      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
+        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
+      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
+      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
+    )
   )
-  ##### Neg & without metadata
+  ##### Without metadata
   do.call(
     what = prepare_libraries_spectra,
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
         gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
-      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg,
-      polarity = "neg"
+      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
+      output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
   )
   #### If does not exist
   prepare_libraries_spectra(
     input = "doesNotExists.txt",
-    output = "data/interim/libraries/spectra/exp/nope.rds"
+    output_pos = "data/interim/libraries/spectra/exp/nope_pos.rds",
+    output_neg = "data/interim/libraries/spectra/exp/nope_neg.rds",
   )
   #### Classical
   prepare_libraries_spectra()
-  prepare_libraries_spectra(polarity = "neg")
   prepare_libraries_spectra(
-    polarity = "neg",
     output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp |>
       gsub(pattern = ".sqlite", replacement = ".mgf")
   )
@@ -230,12 +235,12 @@ testthat::test_that("Test functions", {
   ### Retention time
   prepare_libraries_rt(
     mgf_exp = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+      "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "data/interim/libraries/spectra/exp/internal_pos.rds"
     ),
     mgf_is = list(
-      "neg" = "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "pos" = "data/interim/libraries/spectra/exp/internal_pos.rds"
+      "data/interim/libraries/spectra/exp/internal_neg.rds",
+      "data/interim/libraries/spectra/exp/internal_pos.rds"
     ),
     temp_exp = paths$data$source$libraries$rt$example_mini,
     temp_is = paths$data$source$libraries$rt$example_mini

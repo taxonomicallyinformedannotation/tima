@@ -20,10 +20,10 @@ filter_annotations <-
            output = get_params(step = "filter_annotations")$files$annotations$filtered,
            tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes) {
     stopifnot(
-      "Annotations file(s) do(es) not exist" = rep(TRUE, length(annotations)) == lapply(X = annotations, FUN = file.exists)
+      "Annotations file(s) do(es) not exist" = all(lapply(X = annotations, FUN = file.exists) |> unlist())
     )
     stopifnot(
-      "Retention time file(s) do(es) not exist" = rep(TRUE, length(rts)) == lapply(X = rts, FUN = file.exists)
+      "Retention time file(s) do(es) not exist" = all(lapply(X = rts, FUN = file.exists) |> unlist())
     )
     stopifnot("Your features file does not exist." = file.exists(features))
 

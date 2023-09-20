@@ -44,21 +44,33 @@ prepare_libraries_rt <-
       col_sm <- "smiles"
     }
 
-    ## TODO improve
-    if (length(mgf_exp$neg) == 0) {
-      mgf_exp$neg <- NULL
+    full_or_null <- function(x) {
+      if (length(x) == 0) {
+        NULL
+      } else {
+        x
+      }
     }
-    if (length(mgf_exp$pos) == 0) {
-      mgf_exp$pos <- NULL
-    }
+    mgf_exp <- mgf_exp |>
+      lapply(
+        FUN = full_or_null
+      )
+    mgf_exp <- mgf_exp[mgf_exp |>
+      lapply(FUN = function(x) {
+        !is.null(x)
+      }) |>
+      unlist()]
+    mgf_is <- mgf_is |>
+      lapply(
+        FUN = full_or_null
+      )
+    mgf_is <- mgf_is[mgf_is |>
+      lapply(FUN = function(x) {
+        !is.null(x)
+      }) |>
+      unlist()]
     if (length(mgf_exp) == 0) {
       mgf_exp <- NULL
-    }
-    if (length(mgf_is$neg) == 0) {
-      mgf_is$neg <- NULL
-    }
-    if (length(mgf_is$pos) == 0) {
-      mgf_is$pos <- NULL
     }
     if (length(mgf_is) == 0) {
       mgf_is <- NULL
@@ -76,16 +88,13 @@ prepare_libraries_rt <-
         spectra <- mgf |>
           lapply(FUN = import_spectra)
         log_debug("Extracting retention times...")
-        ## TODO refactor to avoid pos neg
-        rts <-
-          tidytable::bind_rows(
-            spectra$neg@backend@spectraData |>
-              data.frame() |>
-              tidytable::as_tidytable(),
-            spectra$pos@backend@spectraData |>
+        rts <- spectra |>
+          lapply(function(x) {
+            x@backend@spectraData |>
               data.frame() |>
               tidytable::as_tidytable()
-          ) |>
+          }) |>
+          tidytable::bind_rows() |>
           tidytable::select(tidytable::any_of(c(
             rt = col_rt,
             inchikey = col_ik,

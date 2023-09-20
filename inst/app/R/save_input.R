@@ -276,11 +276,6 @@ save_input <- function(input) {
     value <-
     shiny::isolate(input$org_fil_val)
 
-  yamls_params$
-    prepare_libraries_spectra$
-    ms$
-    polarity <- ms_mode
-
   yamls_params$prepare_taxa$files$features$raw <- fil_fea_raw
   if (!is.null(prefil_tax_raw)) {
     yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw

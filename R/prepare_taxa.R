@@ -238,11 +238,16 @@ prepare_taxa <-
           "sample_organism_09_species",
           "sample_organism_10_varietas"
         )
+      ) |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidytable::where(is.character),
+          .fns = function(x) {
+            tidytable::replace_na(x, "ND")
+          }
+        )
       )
     rm(biological_metadata, metadata_table_joined)
-
-    ## TODO change to mutate
-    taxed_features_table[is.na(taxed_features_table)] <- "ND"
 
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_taxa"), step = "prepare_taxa")
