@@ -34,11 +34,6 @@ files:
           - data/source/libraries/spectra/is/lotus_neg.rds
           - data/source/libraries/spectra/is/lotus_pos.rds
 
-#' MS related parameters.
-ms:
-  #' Polarity used. Must be "pos" or "neg". STRING
-  polarity: pos
-
 #' Names of the different variables in the input files.
 names:
   #' Name of fields present in the MGF.

@@ -1149,14 +1149,13 @@ list(
       format = "file",
       command = {
         lib_rt <- prepare_libraries_rt(
-          ## TODO refactor to avoid "pos/neg"
           mgf_exp = list(
-            "neg" = par_pre_lib_rt$files$libraries$spectral$exp$neg,
-            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
+            par_pre_lib_rt$files$libraries$spectral$exp$neg,
+            par_pre_lib_rt$files$libraries$spectral$exp$pos
           ),
           mgf_is = list(
-            "neg" = par_pre_lib_rt$files$libraries$spectral$is$neg,
-            "pos" = par_pre_lib_rt$files$libraries$spectral$exp$pos
+            par_pre_lib_rt$files$libraries$spectral$is$neg,
+            par_pre_lib_rt$files$libraries$spectral$is$pos
           ),
           temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
           temp_is = par_pre_lib_rt$files$libraries$temporal$is,
@@ -1233,7 +1232,6 @@ list(
           command = {
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
-                ## TODO improve
                 input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
                 output = par_pre_lib_sop_clo$files$libraries$sop$prepared
               )
@@ -1427,48 +1425,12 @@ list(
       ## Prepared
       list(
         ## TODO ADD IS HMDB PREPARED,
-        ## TODO improve polarity handling, suboptimal
         tar_target(
           name = lib_spe_is_lot_pre_pos,
           format = "file",
           command = {
             lib_spe_is_lot_pre_pos <-
               lib_spe_is_lot_pos
-            # lib_spe_is_lot_pre_pos <- prepare_libraries_spectra(
-            #   input = if (paths_test_mode == FALSE) {
-            #     lib_spe_is_lot_pos
-            #   } else {
-            #     paths_data_source_libraries_spectra_is_lotus_pos
-            #   },
-            #   output = paths$data$interim$libraries$spectra$is$lotus$pos,
-            #   col_ce = NULL,
-            #   col_ci = "FILENAME",
-            #   col_em = "EXACTMASS",
-            #   col_in = NULL,
-            #   col_io = "INCHI",
-            #   col_ik = NULL,
-            #   col_il = "NAME",
-            #   col_mf = "MOLECULAR_FORMULA",
-            #   col_na = NULL,
-            #   col_po = "IONMODE",
-            #   col_sm = NULL,
-            #   col_sn = "SMILES",
-            #   col_si = NULL,
-            #   col_sp = NULL,
-            #   col_sy = NULL,
-            #   col_xl = NULL,
-            #   polarity = "pos",
-            #   metad = CompoundDb::make_metadata(
-            #     source = "LOTUS",
-            #     url = "https://doi.org/10.5281/zenodo.5607185",
-            # source_version = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
-            # source_date = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")
-            # [["metadata"]][["publication_date"]],
-            #     organism = "Life"
-            #   )
-            # )
           }
         ),
         tar_target(
@@ -1477,41 +1439,6 @@ list(
           command = {
             lib_spe_is_lot_pre_neg <-
               lib_spe_is_lot_neg
-            # lib_spe_is_lot_pre_neg <- prepare_libraries_spectra(
-            #   input = if (paths_test_mode == FALSE) {
-            #     lib_spe_is_lot_neg
-            #   } else {
-            #     paths$data$source$libraries$spectra$is$lotus$neg
-            #   },
-            #   output = paths$data$interim$libraries$spectra$is$lotus$neg,
-            #   col_ce = NULL,
-            #   col_ci = "FILENAME",
-            #   col_em = "EXACTMASS",
-            #   col_in = NULL,
-            #   col_io = "INCHI",
-            #   col_ik = NULL,
-            #   col_il = "NAME",
-            #   col_mf = "MOLECULAR_FORMULA",
-            #   col_na = NULL,
-            #   col_po = "IONMODE",
-            #   col_sm = NULL,
-            #   col_sn = "SMILES",
-            #   col_si = NULL,
-            #   col_sp = NULL,
-            #   col_sy = NULL,
-            #   col_xl = NULL,
-            #   metad = CompoundDb::make_metadata(
-            #     source = "LOTUS",
-            #     url = "https://doi.org/10.5281/zenodo.5607185",
-            # source_version = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")$doi_url,
-            # source_date = jsonlite::fromJSON(
-            #   txt = "https://zenodo.org/api/records/5607185")
-            # [["metadata"]][["publication_date"]],
-            #     organism = "Life"
-            #   ),
-            #   polarity = "neg"
-            # )
           }
         )
       ),
@@ -1545,16 +1472,15 @@ list(
         ),
         ## Prepared
         list(
-          ## TODO improve polarity handling, suboptimal
           tar_target(
-            name = lib_spe_exp_int_pre_pos,
+            name = lib_spe_exp_int_pre,
             format = "file",
             command = {
-              lib_spe_exp_int_pre_pos <-
+              lib_spe_exp_int_pre <-
                 prepare_libraries_spectra(
                   input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output = "data/interim/libraries/spectra/exp/internal_pos.rds",
-                  polarity = "pos",
+                  output_pos = "data/interim/libraries/spectra/exp/internal_pos.rds",
+                  output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
                   metad = "InternalLib",
                   col_ce = NULL,
                   col_ci = "FILENAME",
@@ -1573,46 +1499,31 @@ list(
                   col_sy = NULL,
                   col_xl = NULL
                 )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_int_pre_pos,
+            format = "file",
+            command = {
+              lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
             }
           ),
           tar_target(
             name = lib_spe_exp_int_pre_neg,
             format = "file",
             command = {
-              lib_spe_exp_int_pre_neg <-
-                prepare_libraries_spectra(
-                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output = "data/interim/libraries/spectra/exp/internal_neg.rds",
-                  polarity = "neg",
-                  metad = "InternalLib",
-                  col_ce = NULL,
-                  col_ci = "FILENAME",
-                  col_em = "EXACTMASS",
-                  col_in = "INCHI",
-                  col_io = NULL,
-                  col_ik = NULL,
-                  col_il = NULL,
-                  col_mf = NULL,
-                  col_na = "NAME",
-                  col_po = "IONMODE",
-                  col_sm = "SMILES",
-                  col_sn = NULL,
-                  col_si = "SPECTRUMID",
-                  col_sp = NULL,
-                  col_sy = NULL,
-                  col_xl = NULL
-                )
+              lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
             }
           ),
           tar_target(
-            name = lib_spe_exp_mb_pre_neg,
+            name = lib_spe_exp_mb_pre,
             format = "file",
             command = {
-              lib_spe_exp_mb_pre_neg <-
+              lib_spe_exp_mb_pre <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
-                  output = "data/interim/libraries/spectra/exp/massbank_neg.rds",
-                  polarity = "neg",
+                  output_pos = "data/interim/libraries/spectra/exp/massbank_pos.rds",
+                  output_neg = "data/interim/libraries/spectra/exp/massbank_neg.rds",
                   metad = paste("MassBank",
                     paths_urls_massbank_version,
                     sep = " - "
@@ -1640,32 +1551,14 @@ list(
             name = lib_spe_exp_mb_pre_pos,
             format = "file",
             command = {
-              lib_spe_exp_mb_pre_pos <-
-                prepare_libraries_spectra(
-                  input = lib_spe_exp_mb_raw,
-                  output = "data/interim/libraries/spectra/exp/massbank_pos.rds",
-                  polarity = "pos",
-                  metad = paste("MassBank",
-                    paths_urls_massbank_version,
-                    sep = " - "
-                  ),
-                  col_ce = "Collision_energy",
-                  col_ci = NULL,
-                  col_em = "ExactMass",
-                  col_in = "InChI",
-                  col_io = NULL,
-                  col_ik = "InChIKey",
-                  col_il = NULL,
-                  col_mf = "Formula",
-                  col_na = "Name",
-                  col_po = "Ion_mode",
-                  col_sm = "smiles",
-                  col_sn = NULL,
-                  col_si = "accession",
-                  col_sp = "Splash",
-                  col_sy = "Synon",
-                  col_xl = NULL
-                )
+              lib_spe_exp_mb_pre_pos <- lib_spe_exp_mb_pre[[1]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mb_pre_neg,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
             }
           )
         )

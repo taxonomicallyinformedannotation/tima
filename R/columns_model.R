@@ -52,7 +52,6 @@ columns_model <- function() {
 
   candidates_spectra_columns <- c(
     "candidate_library",
-    ## TODO "candidate_library_type",
     "candidate_count_similarity_peaks_matched",
     "candidate_score_similarity"
   )

@@ -15,7 +15,7 @@ prepare_features_components <-
   function(input = get_params(step = "prepare_features_components")$files$networks$spectral$components$raw,
            output = get_params(step = "prepare_features_components")$files$networks$spectral$components$prepared) {
     stopifnot(
-      "Input file(s) do(es) not exist" = rep(TRUE, length(input)) == lapply(X = input, FUN = file.exists)
+      "Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
     )
 
     log_debug(x = "Loading files ...")

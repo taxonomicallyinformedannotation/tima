@@ -28,7 +28,7 @@ prepare_annotations_gnps <-
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
     }
-    if (rep(TRUE, length(input)) == lapply(X = input, FUN = file.exists)) {
+    if (all(lapply(X = input, FUN = file.exists) |> unlist())) {
       log_debug("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(

@@ -10,7 +10,8 @@
 #' @include sanitize_spectra.R
 #'
 #' @param input File containing spectra
-#' @param output Output file
+#' @param output_neg Negative output file
+#' @param output_pos Positive output file
 #' @param polarity MS polarity
 #' @param metad Metadata to identify the library
 #' @param col_ce Name of the collision energy in mgf
@@ -37,8 +38,8 @@
 #' @examples NULL
 prepare_libraries_spectra <-
   function(input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$raw,
-           output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp,
-           polarity = get_params(step = "prepare_libraries_spectra")$ms$polarity,
+           output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$neg,
+           output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
            metad = "myLib",
            col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
            col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
@@ -56,14 +57,7 @@ prepare_libraries_spectra <-
            col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
            col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
            col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp) {
-    stopifnot(
-      "Polarity must be 'pos' or 'neg'." =
-        polarity %in% c("pos", "neg")
-    )
-    if (length(output) > 1) {
-      output <- output[output |> grepl(pattern = polarity)] |> as.character()
-    }
-    if (!file.exists(output)) {
+    if (!all(lapply(X = list(output_neg, output_pos), FUN = file.exists) |> unlist())) {
       if (file.exists(input)) {
         log_debug("Importing")
         spectra <- input |>
@@ -73,16 +67,22 @@ prepare_libraries_spectra <-
         spectra_sanitized <- spectra |>
           sanitize_spectra()
         rm(spectra)
-        log_debug("Harmonizing")
-        spectra_harmonized <- spectra_sanitized |>
+        log_debug("Harmonizing ...")
+        log_debug("... pos")
+        spectra_harmonized_pos <- spectra_sanitized |>
           extract_spectra() |>
-          harmonize_spectra(mode = polarity) |>
+          harmonize_spectra(mode = "pos") |>
+          ## TODO report the issue as otherwise precursorMz is lost
+          tidytable::mutate(precursor_mz = precursorMz)
+        spectra_harmonized_neg <- spectra_sanitized |>
+          extract_spectra() |>
+          harmonize_spectra(mode = "neg") |>
           ## TODO report the issue as otherwise precursorMz is lost
           tidytable::mutate(precursor_mz = precursorMz)
         rm(spectra_sanitized)
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
-        spectra_harmonized <- tidytable::tidytable(
+        spectra_harmonized_pos <- tidytable::tidytable(
           "compound_id" = "fake_compound",
           "collision_energy" = NA_character_,
           "exactmass" = NA_real_,
@@ -106,19 +106,30 @@ prepare_libraries_spectra <-
           "library" = NA_character_,
           "precursor_mz" = 0
         )
+        spectra_harmonized_neg <- spectra_harmonized_pos
       }
       log_debug("Exporting")
       export_spectra_2(
-        file = output,
-        spectra = spectra_harmonized,
+        file = output_pos,
+        spectra = spectra_harmonized_pos,
         meta = metad
       )
-      rm(spectra_harmonized)
+      export_spectra_2(
+        file = output_neg,
+        spectra = spectra_harmonized_neg,
+        meta = metad
+      )
+      rm(spectra_harmonized_pos, spectra_harmonized_neg)
+    } else {
+      log_debug("Library already exists")
     }
     export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )
 
-    return(output)
+    return(c(
+      "pos" = output_pos,
+      "neg" = output_neg
+    ))
   }

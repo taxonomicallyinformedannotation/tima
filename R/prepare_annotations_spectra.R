@@ -27,7 +27,7 @@ prepare_annotations_spectra <-
            str_tax_cla = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$npc) {
     stopifnot(
-      "Input file(s) do(es) not exist" = rep(TRUE, length(input)) == lapply(X = input, FUN = file.exists)
+      "Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
     )
     log_debug(x = "Loading and formatting spectral matches")
     table <-

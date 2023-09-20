@@ -18,7 +18,7 @@ prepare_features_edges <-
            name_source = get_params(step = "prepare_features_edges")$names$source,
            name_target = get_params(step = "prepare_features_edges")$names$target) {
     stopifnot(
-      "Your input file(s) do(es) not exist" = rep(TRUE, length(unlist(input))) == lapply(X = unlist(input), FUN = file.exists)
+      "Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
     )
     ## Load edges table
     log_debug(x = "Loading edge table")

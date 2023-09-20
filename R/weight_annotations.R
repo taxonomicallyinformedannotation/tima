@@ -133,7 +133,7 @@ weight_annotations <- function(
     pattern = get_params(step = "weight_annotations")$files$pattern,
     force = get_params(step = "weight_annotations")$options$force) {
   stopifnot(
-    "Annotations file(s) do(es) not exist" = rep(TRUE, length(annotations)) == lapply(X = annotations, FUN = file.exists)
+    "Annotations file(s) do(es) not exist" = all(lapply(X = annotations, FUN = file.exists) |> unlist())
   )
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot("Your components file does not exist." = file.exists(components))

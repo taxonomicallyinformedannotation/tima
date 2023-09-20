@@ -6,8 +6,10 @@
 \usage{
 prepare_libraries_spectra(
   input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$raw,
-  output = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp,
-  polarity = get_params(step = "prepare_libraries_spectra")$ms$polarity,
+  output_neg = get_params(step =
+    "prepare_libraries_spectra")$files$libraries$spectral$exp$neg,
+  output_pos = get_params(step =
+    "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
   metad = "myLib",
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
@@ -30,9 +32,9 @@ prepare_libraries_spectra(
 \arguments{
 \item{input}{File containing spectra}
 
-\item{output}{Output file}
+\item{output_neg}{Negative output file}
 
-\item{polarity}{MS polarity}
+\item{output_pos}{Positive output file}
 
 \item{metad}{Metadata to identify the library}
 
@@ -67,6 +69,8 @@ prepare_libraries_spectra(
 \item{col_sy}{Name of the synonyms in mgf}
 
 \item{col_xl}{Name of the xlogp in mgf}
+
+\item{polarity}{MS polarity}
 }
 \description{
 This function prepares spectra
