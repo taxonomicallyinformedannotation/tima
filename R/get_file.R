@@ -24,6 +24,16 @@ get_file <-
   function(url,
            export,
            limit = 3600) {
+    # ## Use default system data directory
+    # export <- file.path(
+    #   rappdirs::user_data_dir(
+    #     appname = appname,
+    #     appauthor = appauthor,
+    #     version = version
+    #   ),
+    #   export
+    # )
+
     if (!file.exists(export)) {
       options(timeout = limit)
       create_dir(export = export)

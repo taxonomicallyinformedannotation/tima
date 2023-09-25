@@ -14,6 +14,16 @@
 #'
 #' @examples export_output(x = data.frame(), file = "output/file.tsv")
 export_output <- function(x, file = output) {
+  # ## Use default system data directory
+  # file <- file.path(
+  #   rappdirs::user_data_dir(
+  #     appname = appname,
+  #     appauthor = appauthor,
+  #     version = version
+  #   ),
+  #   file
+  # )
+
   ## Create the output directory if it doesn't exist
   create_dir(export = file)
 
@@ -30,4 +40,7 @@ export_output <- function(x, file = output) {
     sep = "\t",
     na = ""
   )
+
+  ## To track the correct path later
+  return(file)
 }
