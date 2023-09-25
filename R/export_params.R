@@ -18,7 +18,17 @@ export_params <-
            ),
            directory = parse_yaml_paths()$data$interim$params$path,
            step) {
-    # € Create directory if it does not exist
+    # ## Use default system data directory
+    # directory <- file.path(
+    #   rappdirs::user_data_dir(
+    #     appname = appname,
+    #     appauthor = appauthor,
+    #     version = version
+    #   ),
+    #   directory
+    # )
+
+    ## Create directory if it does not exist
     create_dir(export = directory)
 
     ## Log the path to the used parameters
@@ -31,8 +41,8 @@ export_params <-
         paste0(
           format(Sys.time(), "%y%m%d_%H%M%OS"),
           "_",
-          "tima",
-          parse_yaml_paths()$version,
+          desc::desc_get_field("Package"),
+          desc::desc_get_version(),
           "_",
           step,
           ".yaml"
