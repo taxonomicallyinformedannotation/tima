@@ -186,373 +186,149 @@ weight_bio <-
       )
 
     log_debug("calculating biological score at all levels ... \n")
+    score_per_level_bio <-
+      function(df, candidates, samples, score, score_name) {
+        score <- df |>
+          tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
+          tidytable::filter(!is.na(!!as.name(samples))) |>
+          tidytable::filter(!!as.name(samples) != "ND") |>
+          tidytable::filter(!is.na(!!as.name(candidates))) |>
+          tidytable::filter(!!as.name(candidates) != "notClassified") |>
+          tidytable::filter(
+            stringi::stri_detect_regex(
+              pattern = !!as.name(candidates),
+              str = !!as.name(samples)
+            ) |
+              !!as.name(samples) == "notClassified"
+          ) |>
+          tidytable::mutate(
+            !!as.name(score_name) := ifelse(
+              test = !!as.name(samples) != "notClassified",
+              yes = !!as.name(score) * 1,
+              no = 0
+            )
+          )
+      }
+
     log_debug("... domain \n")
     step_dom <- df2 |>
-      tidytable::distinct(
-        candidate_organism_01_domain,
-        sample_organism_01_domain
-      ) |>
-      tidytable::filter(!is.na(sample_organism_01_domain)) |>
-      tidytable::filter(sample_organism_01_domain != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_01_domain)) |>
-      tidytable::filter(candidate_organism_01_domain != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_01_domain,
-          str = sample_organism_01_domain
-        ) |
-          sample_organism_01_domain == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_01 = ifelse(
-          test = sample_organism_01_domain != "notClassified",
-          yes = score_biological_domain * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_01_domain",
+        samples = "sample_organism_01_domain",
+        score = "score_biological_domain",
+        score_name = "score_biological_01"
       )
-
     log_debug("... kingdom \n")
     step_kin <- df2 |>
-      tidytable::distinct(
-        candidate_organism_02_kingdom,
-        sample_organism_02_kingdom
-      ) |>
-      tidytable::filter(!is.na(sample_organism_02_kingdom)) |>
-      tidytable::filter(sample_organism_02_kingdom != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_02_kingdom)) |>
-      tidytable::filter(candidate_organism_02_kingdom != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_02_kingdom,
-          str = sample_organism_02_kingdom
-        ) |
-          sample_organism_02_kingdom == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_02 = ifelse(
-          test = sample_organism_02_kingdom != "notClassified",
-          yes = score_biological_kingdom * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_02_kingdom",
+        samples = "sample_organism_02_kingdom",
+        score = "score_biological_kingdom",
+        score_name = "score_biological_02"
       )
-
     log_debug("... phylum \n")
     step_phy <- df2 |>
-      tidytable::distinct(
-        candidate_organism_03_phylum,
-        sample_organism_03_phylum
-      ) |>
-      tidytable::filter(!is.na(sample_organism_03_phylum)) |>
-      tidytable::filter(sample_organism_03_phylum != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_03_phylum)) |>
-      tidytable::filter(candidate_organism_03_phylum != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_03_phylum,
-          str = sample_organism_03_phylum
-        ) |
-          sample_organism_03_phylum == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_03 = ifelse(
-          test = sample_organism_03_phylum != "notClassified",
-          yes = score_biological_phylum * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_03_phylum",
+        samples = "sample_organism_03_phylum",
+        score = "score_biological_phylum",
+        score_name = "score_biological_03"
       )
-
     log_debug("... class \n")
     step_cla <- df2 |>
-      tidytable::distinct(
-        candidate_organism_04_class,
-        sample_organism_04_class
-      ) |>
-      tidytable::filter(!is.na(sample_organism_04_class)) |>
-      tidytable::filter(sample_organism_04_class != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_04_class)) |>
-      tidytable::filter(candidate_organism_04_class != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_04_class,
-          str = sample_organism_04_class
-        ) |
-          sample_organism_04_class == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_04 = ifelse(
-          test = sample_organism_04_class != "notClassified",
-          yes = score_biological_class * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_04_class",
+        samples = "sample_organism_04_class",
+        score = "score_biological_class",
+        score_name = "score_biological_04"
       )
-
     log_debug("... order \n")
     step_ord <- df2 |>
-      tidytable::distinct(
-        candidate_organism_05_order,
-        sample_organism_05_order
-      ) |>
-      tidytable::filter(!is.na(sample_organism_05_order)) |>
-      tidytable::filter(sample_organism_05_order != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_05_order)) |>
-      tidytable::filter(candidate_organism_05_order != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_05_order,
-          str = sample_organism_05_order
-        ) |
-          sample_organism_05_order == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_05 = ifelse(
-          test = sample_organism_05_order != "notClassified",
-          yes = score_biological_order * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_05_order",
+        samples = "sample_organism_05_order",
+        score = "score_biological_order",
+        score_name = "score_biological_05"
       )
-
-    ## log_debug("... infraorder \n")
+    # log_debug("... infraorder \n")
     # step_ord2 <- df2 |>
-    #   tidytable::distinct(candidate_infraorder,
-    #                       sample_organism_05_1_infraorder) |>
-    #   tidytable::filter(!is.na(sample_organism_05_order)) |>
-    #   tidytable::filter(sample_organism_05_1_infraorder != "ND") |>
-    #   tidytable::filter(!is.na(candidate_infraorder)) |>
-    #   tidytable::filter(candidate_infraorder != "notClassified") |>
-    #   tidytable::filter(
-    #     stringi::stri_detect_regex(
-    #       pattern = candidate_infraorder,
-    #       str = sample_organism_05_1_infraorder
-    #     ) |
-    #       sample_organism_05_1_infraorder == "notClassified"
-    #   ) |>
-    #   tidytable::mutate(
-    #     score_biological_05_1 = ifelse(
-    #       test = sample_organism_05_1_infraorder != "notClassified",
-    #       yes = score_biological_infraorder * 1,
-    #       no = 0
-    #     )
+    #   score_per_level_bio(
+    #     candidates = "candidate_organism_05_1_infraorder",
+    #     samples = "sample_organism_05_1_infraorder",
+    #     score = "score_biological_infraorder",
+    #     score_name = "score_biological_05_1"
     #   )
-
     log_debug("... family \n")
     step_fam <- df2 |>
-      tidytable::distinct(
-        candidate_organism_06_family,
-        sample_organism_06_family
-      ) |>
-      tidytable::filter(!is.na(sample_organism_06_family)) |>
-      tidytable::filter(sample_organism_06_family != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_06_family)) |>
-      tidytable::filter(candidate_organism_06_family != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_06_family,
-          str = sample_organism_06_family
-        ) |
-          sample_organism_06_family == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_06 = ifelse(
-          test = sample_organism_06_family != "notClassified",
-          yes = score_biological_family * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_06_family",
+        samples = "sample_organism_06_family",
+        score = "score_biological_family",
+        score_name = "score_biological_06"
       )
-
     # log_debug("... subfamily \n")
     # step_fam2 <- df2 |>
-    #   tidytable::distinct(candidate_organism_06_1_subfamily,
-    #                       sample_organism_06_1_subfamily) |>
-    #   tidytable::filter(!is.na(sample_organism_06_1_subfamily)) |>
-    #   tidytable::filter(sample_organism_06_1_subfamily != "ND") |>
-    #   tidytable::filter(!is.na(candidate_organism_06_1_subfamily)) |>
-    #   tidytable::filter(candidate_organism_06_1_subfamily !=
-    # "notClassified") |>
-    #   tidytable::filter(
-    #     stringi::stri_detect_regex(
-    #       pattern = candidate_organism_06_1_subfamily,
-    #       str = sample_organism_06_1_subfamily
-    #     ) |
-    #       sample_organism_06_1_subfamily == "notClassified"
-    #   ) |>
-    #   tidytable::mutate(
-    #     score_biological_06_1 = ifelse(
-    #       test = sample_organism_06_1_subfamily != "notClassified",
-    #       yes = score_biological_subfamily * 1,
-    #       no = 0
-    #     )
+    #   score_per_level_bio(
+    #     candidates = "candidate_organism_06_1_subfamily",
+    #     samples = "sample_organism_06_1_subfamily",
+    #     score = "score_biological_subfamily",
+    #     score_name = "score_biological_06_1"
     #   )
-
     log_debug("... tribe \n")
     step_tri <- df2 |>
-      tidytable::distinct(
-        candidate_organism_07_tribe,
-        sample_organism_07_tribe
-      ) |>
-      tidytable::filter(!is.na(sample_organism_07_tribe)) |>
-      tidytable::filter(sample_organism_07_tribe != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_07_tribe)) |>
-      tidytable::filter(candidate_organism_07_tribe != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_07_tribe,
-          str = sample_organism_07_tribe
-        ) |
-          sample_organism_07_tribe == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_07 = ifelse(
-          test = sample_organism_07_tribe != "notClassified",
-          yes = score_biological_tribe * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_07_tribe",
+        samples = "sample_organism_07_tribe",
+        score = "score_biological_tribe",
+        score_name = "score_biological_07"
       )
-
     # log_debug("... subtribe \n")
     # step_tri2 <- df2 |>
-    #   tidytable::distinct(candidate_organism_07_1_subtribe,
-    #                       sample_organism_07_1_subtribe) |>
-    #   tidytable::filter(!is.na(sample_organism_07_1_subtribe)) |>
-    #   tidytable::filter(sample_organism_07_1_subtribe != "ND") |>
-    #   tidytable::filter(!is.na(candidate_organism_07_1_subtribe)) |>
-    #   tidytable::filter(candidate_organism_07_1_subtribe !=
-    # "notClassified") |>
-    #   tidytable::filter(
-    #     stringi::stri_detect_regex(
-    #       pattern = candidate_organism_07_1_subtribe,
-    #       str = sample_organism_07_1_subtribe
-    #     ) |
-    #       sample_organism_07_1_subtribe == "notClassified"
-    #   ) |>
-    #   tidytable::mutate(
-    #     score_biological_07_1 = ifelse(
-    #       test = sample_organism_07_1_subtribe != "notClassified",
-    #       yes = score_biological_subtribe * 1,
-    #       no = 0
-    #     )
+    #   score_per_level_bio(
+    #     candidates = "candidate_organism_07_1_subtribe",
+    #     samples = "sample_organism_07_1_subtribe",
+    #     score = "score_biological_subtribe",
+    #     score_name = "score_biological_07_1"
     #   )
-
     log_debug("... genus \n")
     step_gen <- df2 |>
-      tidytable::distinct(
-        candidate_organism_08_genus,
-        sample_organism_08_genus
-      ) |>
-      tidytable::filter(!is.na(sample_organism_08_genus)) |>
-      tidytable::filter(sample_organism_08_genus != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_08_genus)) |>
-      tidytable::filter(candidate_organism_08_genus != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_08_genus,
-          str = sample_organism_08_genus
-        ) |
-          sample_organism_08_genus == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_08 = ifelse(
-          test = sample_organism_08_genus != "notClassified",
-          yes = score_biological_genus * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_08_genus",
+        samples = "sample_organism_08_genus",
+        score = "score_biological_genus",
+        score_name = "score_biological_08"
       )
-
     # log_debug("... subgenus \n")
     # step_gen2 <- df2 |>
-    #   tidytable::distinct(candidate_organism_08_1_subgenus,
-    #                       sample_organism_08_1_subgenus) |>
-    #   tidytable::filter(!is.na(sample_organism_08_1_subgenus)) |>
-    #   tidytable::filter(sample_organism_08_1_subgenus != "ND") |>
-    #   tidytable::filter(!is.na(candidate_organism_08_1_subgenus)) |>
-    #   tidytable::filter(candidate_organism_08_1_subgenus !=
-    # "notClassified") |>
-    #   tidytable::filter(
-    #     stringi::stri_detect_regex(
-    #       pattern = candidate_organism_08_1_subgenus,
-    #       str = sample_organism_08_1_subgenus
-    #     ) |
-    #       sample_organism_08_1_subgenus == "notClassified"
-    #   ) |>
-    #   tidytable::mutate(
-    #     score_biological_08_1 = ifelse(
-    #       test = sample_organism_08_1_subgenus != "notClassified",
-    #       yes = score_biological_subgenus * 1,
-    #       no = 0
-    #     )
+    #   score_per_level_bio(
+    #     candidates = "candidate_organism_08_1_subgenus",
+    #     samples = "sample_organism_08_1_subgenus",
+    #     score = "score_biological_subgenus",
+    #     score_name = "score_biological_08_1"
     #   )
-
     log_debug("... species \n")
     step_spe <- df2 |>
-      tidytable::distinct(
-        candidate_organism_09_species,
-        sample_organism_09_species
-      ) |>
-      tidytable::filter(!is.na(sample_organism_09_species)) |>
-      tidytable::filter(sample_organism_09_species != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_09_species)) |>
-      tidytable::filter(candidate_organism_09_species != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_09_species,
-          str = sample_organism_09_species
-        ) |
-          sample_organism_09_species == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_09 = ifelse(
-          test = sample_organism_09_species != "notClassified",
-          yes = score_biological_species * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_09_species",
+        samples = "sample_organism_09_species",
+        score = "score_biological_species",
+        score_name = "score_biological_09"
       )
-
     # log_debug("... subspecies \n")
     # step_spe2 <- df2 |>
-    #   tidytable::distinct(candidate_organism_09_1_subspecies,
-    #                       sample_organism_09_1_subspecies) |>
-    #   tidytable::filter(!is.na(sample_organism_09_1_subspecies)) |>
-    #   tidytable::filter(sample_organism_09_1_subspecies != "ND") |>
-    #   tidytable::filter(!is.na(candidate_organism_09_1_subspecies)) |>
-    #   tidytable::filter(candidate_organism_09_1_subspecies !=
-    # "notClassified") |>
-    #   tidytable::filter(
-    #     stringi::stri_detect_regex(
-    #       pattern = candidate_organism_09_1_subspecies,
-    #       str = sample_organism_09_1_subspecies
-    #     ) |
-    #       sample_organism_09_1_subspecies == "notClassified"
-    #   ) |>
-    #   tidytable::mutate(
-    #     score_biological_09_1 = ifelse(
-    #       test = sample_organism_09_1_subspecies != "notClassified",
-    #       yes = score_biological_subspecies * 1,
-    #       no = 0
-    #     )
+    #   score_per_level_bio(
+    #     candidates = "candidate_organism_09_1_subspecies",
+    #     samples = "sample_organism_09_1_subspecies",
+    #     score = "score_biological_subspecies",
+    #     score_name = "score_biological_09_1"
     #   )
-
     log_debug("... varietas \n")
     step_var <- df2 |>
-      tidytable::distinct(
-        candidate_organism_10_varietas,
-        sample_organism_10_varietas
-      ) |>
-      tidytable::filter(!is.na(sample_organism_10_varietas)) |>
-      tidytable::filter(sample_organism_10_varietas != "ND") |>
-      tidytable::filter(!is.na(candidate_organism_10_varietas)) |>
-      tidytable::filter(candidate_organism_10_varietas != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_organism_10_varietas,
-          str = sample_organism_10_varietas
-        ) |
-          sample_organism_10_varietas == "notClassified"
-      ) |>
-      tidytable::mutate(
-        score_biological_10 = ifelse(
-          test = sample_organism_10_varietas != "notClassified",
-          yes = score_biological_variety * 1,
-          no = 0
-        )
+      score_per_level_bio(
+        candidates = "candidate_organism_10_varietas",
+        samples = "sample_organism_10_varietas",
+        score = "score_biological_variety",
+        score_name = "score_biological_10"
       )
 
     log_debug("... keeping best biological score \n")

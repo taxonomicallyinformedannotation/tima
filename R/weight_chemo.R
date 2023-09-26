@@ -89,110 +89,88 @@ weight_chemo <-
       )
 
     log_debug("calculating chemical score at all levels ... \n")
+    score_per_level_chemo <-
+      function(df,
+               candidates,
+               features_val,
+               features_score,
+               score,
+               score_name) {
+        score <- df |>
+          tidytable::distinct(
+            !!as.name(candidates),
+            !!as.name(features_val),
+            !!as.name(features_score)
+          ) |>
+          tidytable::filter(stringi::stri_detect_regex(
+            pattern = !!as.name(candidates),
+            str = !!as.name(features_val)
+          )) |>
+          tidytable::mutate(!!as.name(score_name) := !!as.name(score) * 1)
+      }
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_cla_01kin,
-        feature_pred_tax_cla_01kin_val,
-        feature_pred_tax_cla_01kin_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_cla_01kin,
-          str = feature_pred_tax_cla_01kin_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_1 = score_chemical_cla_kingdom * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_cla_01kin",
+        features_val = "feature_pred_tax_cla_01kin_val",
+        features_score = "feature_pred_tax_cla_01kin_score",
+        score = "score_chemical_cla_kingdom",
+        score_name = "score_chemical_1"
+      )
     log_debug("... (NPC) pathway \n")
     step_npc_pat <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_npc_01pat,
-        feature_pred_tax_npc_01pat_val,
-        feature_pred_tax_npc_01pat_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_npc_01pat,
-          str = feature_pred_tax_npc_01pat_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_2 = score_chemical_npc_pathway * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_npc_01pat",
+        features_val = "feature_pred_tax_npc_01pat_val",
+        features_score = "feature_pred_tax_npc_01pat_score",
+        score = "score_chemical_npc_pathway",
+        score_name = "score_chemical_2"
+      )
     log_debug("... (classyfire) superclass \n")
     step_cla_sup <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_cla_02sup,
-        feature_pred_tax_cla_02sup_val,
-        feature_pred_tax_cla_02sup_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_cla_02sup,
-          str = feature_pred_tax_cla_02sup_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_3 = score_chemical_cla_superclass * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_cla_02sup",
+        features_val = "feature_pred_tax_cla_02sup_val",
+        features_score = "feature_pred_tax_cla_02sup_score",
+        score = "score_chemical_cla_superclass",
+        score_name = "score_chemical_3"
+      )
     log_debug("... (NPC) superclass \n")
     step_npc_sup <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_npc_02sup,
-        feature_pred_tax_npc_02sup_val,
-        feature_pred_tax_npc_02sup_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_npc_02sup,
-          str = feature_pred_tax_npc_02sup_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_4 = score_chemical_npc_superclass * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_npc_02sup",
+        features_val = "feature_pred_tax_npc_02sup_val",
+        features_score = "feature_pred_tax_npc_02sup_score",
+        score = "score_chemical_npc_superclass",
+        score_name = "score_chemical_4"
+      )
     log_debug("... (classyfire) class \n")
     step_cla_cla <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_cla_03cla,
-        feature_pred_tax_cla_03cla_val,
-        feature_pred_tax_cla_03cla_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_cla_03cla,
-          str = feature_pred_tax_cla_03cla_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_5 = score_chemical_cla_class * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_cla_03cla",
+        features_val = "feature_pred_tax_cla_03cla_val",
+        features_score = "feature_pred_tax_cla_03cla_score",
+        score = "score_chemical_cla_class",
+        score_name = "score_chemical_5"
+      )
     log_debug("... (NPC) class \n")
     step_npc_cla <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_npc_03cla,
-        feature_pred_tax_npc_03cla_val,
-        feature_pred_tax_npc_03cla_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_npc_03cla,
-          str = feature_pred_tax_npc_03cla_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_6 = score_chemical_npc_class * 1)
-
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_npc_03cla",
+        features_val = "feature_pred_tax_npc_03cla_val",
+        features_score = "feature_pred_tax_npc_03cla_score",
+        score = "score_chemical_npc_class",
+        score_name = "score_chemical_6"
+      )
     log_debug("... (classyfire) parent \n")
     step_cla_par <- df2 |>
-      tidytable::distinct(
-        candidate_structure_tax_cla_04dirpar,
-        feature_pred_tax_cla_04dirpar_val,
-        feature_pred_tax_cla_04dirpar_score
-      ) |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = candidate_structure_tax_cla_04dirpar,
-          str = feature_pred_tax_cla_04dirpar_val
-        )
-      ) |>
-      tidytable::mutate(score_chemical_7 = score_chemical_cla_parent * 1)
+      score_per_level_chemo(
+        candidates = "candidate_structure_tax_cla_04dirpar",
+        features_val = "feature_pred_tax_cla_04dirpar_val",
+        features_score = "feature_pred_tax_cla_04dirpar_score",
+        score = "score_chemical_cla_parent",
+        score_name = "score_chemical_7"
+      )
 
     log_debug("... keeping best chemical score \n")
     annot_table_wei_chemo <- df2 |>
