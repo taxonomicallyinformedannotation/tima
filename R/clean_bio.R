@@ -43,8 +43,6 @@ clean_bio <-
 
     log_debug("calculating chemical consistency
               features with at least 2 neighbors ... \n")
-
-    log_debug("... among edges ... \n")
     df3 <-
       tidytable::right_join(
         edges_table |>
@@ -69,340 +67,116 @@ clean_bio <-
       ) |>
       tidytable::filter(!is.na(feature_source))
 
+    log_debug("... among all edges ... \n")
+    clean_per_level_bio <-
+      function(df,
+               candidates,
+               consistency_name,
+               feature_score_name,
+               feature_val_name) {
+        freq <- df |>
+          tidytable::distinct(
+            feature_source,
+            feature_target,
+            !!as.name(candidates),
+            score_pondered_bio
+          ) |>
+          tidytable::mutate(
+            count = tidytable::n_distinct(feature_target),
+            .by = c(
+              feature_source,
+              !!as.name(candidates)
+            )
+          ) |>
+          tidytable::mutate(
+            !!as.name(consistency_name) := count /
+              tidytable::n_distinct(feature_target),
+            .by = c(feature_source)
+          ) |>
+          tidytable::distinct(feature_source,
+            !!as.name(candidates),
+            .keep_all = TRUE
+          ) |>
+          tidytable::mutate(
+            !!as.name(feature_score_name) :=
+              !!as.name(consistency_name) * score_pondered_bio,
+            .by = c(
+              feature_source,
+              !!as.name(candidates)
+            )
+          ) |>
+          tidytable::arrange(-!!as.name(feature_score_name)) |>
+          tidytable::distinct(feature_source, .keep_all = TRUE) |>
+          tidytable::select(
+            feature_source,
+            !!as.name(feature_val_name) := !!as.name(candidates),
+            !!as.name(consistency_name),
+            !!as.name(feature_score_name)
+          ) |>
+          tidytable::mutate(
+            !!as.name(feature_val_name) := ifelse(
+              test = !!as.name(feature_score_name) >= minimal_consistency,
+              yes = !!as.name(feature_val_name),
+              no = "notConsistent"
+            )
+          )
+      }
+
     log_debug("... at the (classyfire) kingdom level \n")
     freq_cla_kin <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_cla_01kin,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_kin = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_01kin
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_cla_kin = count_kin /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_cla_01kin,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_01kin_score =
-          consistency_structure_cla_kin * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_01kin
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_cla_01kin_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_cla_01kin_val = candidate_structure_tax_cla_01kin,
-        consistency_structure_cla_kin,
-        feature_pred_tax_cla_01kin_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_01kin_val = ifelse(
-          test = feature_pred_tax_cla_01kin_score >= minimal_consistency,
-          yes = feature_pred_tax_cla_01kin_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_cla_01kin",
+        consistency_name = "consistency_structure_cla_kin",
+        feature_score_name = "feature_pred_tax_cla_01kin_score",
+        feature_val_name = "feature_pred_tax_cla_01kin_val"
       )
-
     log_debug("... at the (NPC) pathway level \n")
     freq_npc_pat <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_npc_01pat,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_pat = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_01pat
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_npc_pat = count_pat /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_npc_01pat,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_01pat_score =
-          consistency_structure_npc_pat * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_01pat
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_npc_01pat_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_npc_01pat_val = candidate_structure_tax_npc_01pat,
-        consistency_structure_npc_pat,
-        feature_pred_tax_npc_01pat_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_01pat_val = ifelse(
-          test = feature_pred_tax_npc_01pat_score >= minimal_consistency,
-          yes = feature_pred_tax_npc_01pat_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_npc_01pat",
+        consistency_name = "consistency_structure_npc_pat",
+        feature_score_name = "feature_pred_tax_npc_01pat_score",
+        feature_val_name = "feature_pred_tax_npc_01pat_val"
       )
-
     log_debug("... at the (classyfire) superclass level \n")
     freq_cla_sup <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_cla_02sup,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_sup = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_02sup
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_cla_sup = count_sup /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_cla_02sup,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_02sup_score =
-          consistency_structure_cla_sup * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_02sup
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_cla_02sup_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_cla_02sup_val = candidate_structure_tax_cla_02sup,
-        consistency_structure_cla_sup,
-        feature_pred_tax_cla_02sup_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_02sup_val = ifelse(
-          test = feature_pred_tax_cla_02sup_score >= minimal_consistency,
-          yes = feature_pred_tax_cla_02sup_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_cla_02sup",
+        consistency_name = "consistency_structure_cla_sup",
+        feature_score_name = "feature_pred_tax_cla_02sup_score",
+        feature_val_name = "feature_pred_tax_cla_02sup_val"
       )
-
     log_debug("... at the (NPC) superclass level \n")
     freq_npc_sup <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_npc_02sup,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_sup = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_02sup
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_npc_sup = count_sup /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_npc_02sup,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_02sup_score =
-          consistency_structure_npc_sup * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_02sup
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_npc_02sup_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_npc_02sup_val = candidate_structure_tax_npc_02sup,
-        consistency_structure_npc_sup,
-        feature_pred_tax_npc_02sup_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_02sup_val = ifelse(
-          test = feature_pred_tax_npc_02sup_score >= minimal_consistency,
-          yes = feature_pred_tax_npc_02sup_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_npc_02sup",
+        consistency_name = "consistency_structure_npc_sup",
+        feature_score_name = "feature_pred_tax_npc_02sup_score",
+        feature_val_name = "feature_pred_tax_npc_02sup_val"
       )
-
     log_debug("... at the (classyfire) class level \n")
     freq_cla_cla <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_cla_03cla,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_cla = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_03cla
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_cla_cla = count_cla /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_cla_03cla,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_03cla_score =
-          consistency_structure_cla_cla * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_03cla
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_cla_03cla_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_cla_03cla_val = candidate_structure_tax_cla_03cla,
-        consistency_structure_cla_cla,
-        feature_pred_tax_cla_03cla_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_03cla_val = ifelse(
-          test = feature_pred_tax_cla_03cla_score >= minimal_consistency,
-          yes = feature_pred_tax_cla_03cla_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_cla_03cla",
+        consistency_name = "consistency_structure_cla_cla",
+        feature_score_name = "feature_pred_tax_cla_03cla_score",
+        feature_val_name = "feature_pred_tax_cla_03cla_val"
       )
-
     log_debug("... at the (NPC) class level \n")
     freq_npc_cla <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_npc_03cla,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_cla = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_03cla
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_npc_cla = count_cla /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_npc_03cla,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_03cla_score =
-          consistency_structure_npc_cla * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_npc_03cla
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_npc_03cla_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_npc_03cla_val = candidate_structure_tax_npc_03cla,
-        consistency_structure_npc_cla,
-        feature_pred_tax_npc_03cla_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_npc_03cla_val = ifelse(
-          test = feature_pred_tax_npc_03cla_score >= minimal_consistency,
-          yes = feature_pred_tax_npc_03cla_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_npc_03cla",
+        consistency_name = "consistency_structure_npc_cla",
+        feature_score_name = "feature_pred_tax_npc_03cla_score",
+        feature_val_name = "feature_pred_tax_npc_03cla_val"
       )
-
     log_debug("... at the (classyfire) parent level \n")
     freq_cla_par <- df3 |>
-      tidytable::distinct(
-        feature_source,
-        feature_target,
-        candidate_structure_tax_cla_04dirpar,
-        score_pondered_bio
-      ) |>
-      tidytable::mutate(
-        count_par = tidytable::n_distinct(feature_target),
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_04dirpar
-        )
-      ) |>
-      tidytable::mutate(
-        consistency_structure_cla_par = count_par /
-          tidytable::n_distinct(feature_target),
-        .by = c(feature_source)
-      ) |>
-      tidytable::distinct(feature_source,
-        candidate_structure_tax_cla_04dirpar,
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_04dirpar_score =
-          consistency_structure_cla_par * score_pondered_bio,
-        .by = c(
-          feature_source,
-          candidate_structure_tax_cla_04dirpar
-        )
-      ) |>
-      tidytable::arrange(-feature_pred_tax_cla_04dirpar_score) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        feature_pred_tax_cla_04dirpar_val = candidate_structure_tax_cla_04dirpar,
-        consistency_structure_cla_par,
-        feature_pred_tax_cla_04dirpar_score
-      ) |>
-      tidytable::mutate(
-        feature_pred_tax_cla_04dirpar_val = ifelse(
-          test = feature_pred_tax_cla_04dirpar_score >= minimal_consistency,
-          yes = feature_pred_tax_cla_04dirpar_val,
-          no = "notConsistent"
-        )
+      clean_per_level_bio(
+        candidates = "candidate_structure_tax_cla_04dirpar",
+        consistency_name = "consistency_structure_cla_par",
+        feature_score_name = "feature_pred_tax_cla_04dirpar_score",
+        feature_val_name = "feature_pred_tax_cla_04dirpar_val"
       )
 
     log_debug("splitting already computed predictions \n")
