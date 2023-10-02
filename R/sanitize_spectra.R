@@ -21,11 +21,14 @@ sanitize_spectra <-
            fragments = 3) {
     log_debug("Applying sanitization of the spectra")
 
-    spectra@backend@peaksData <- spectra@backend@peaksData |>
-      lapply(FUN = Spectra:::.peaks_remove_fft_artifact)
+    ## Not needed anymore (fixed in Spectra 1.10.3)
+    ## see https://github.com/rformassspectrometry/Spectra/issues/302
+    # spectra@backend@peaksData <- spectra@backend@peaksData |>
+    # lapply(FUN = Spectra:::.peaks_remove_fft_artifact)
 
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
+      Spectra::filterFourierTransformArtefacts() |> # fixed in Spectra 1.10.3
       Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
       Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
       Spectra::applyProcessing()
