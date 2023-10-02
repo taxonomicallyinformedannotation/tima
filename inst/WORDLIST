@@ -54,6 +54,7 @@ benchmarking
 bioconductor
 canopus
 cli
+dr
 etabolite
 fastverse
 fbmn
@@ -91,6 +92,7 @@ summarise
 taxo
 tidytable
 tidyverse
+tl
 usedist
 xlogp
 yaml

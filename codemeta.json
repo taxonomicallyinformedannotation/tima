@@ -413,7 +413,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.10.2",
+      "version": ">= 1.10.3",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2814.273KB",
+  "fileSize": "2814.279KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -583,6 +583,7 @@
       }
     }
   ],
+  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/master/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/README.md",
   "contIntegration": ["https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/r-license-report.yml", "https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/check-standard.yaml"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
