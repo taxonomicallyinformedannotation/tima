@@ -50,6 +50,8 @@ get_last_version_from_zenodo <-
     indices <- grepl(pattern = pattern, x = filenames)
     fileurl <- fileurls[indices]
     filename <- filenames[indices]
+    ## Fix with new Zenodo (weird)
+    file <- paste0(record_new$url, "/files/", filename)
 
     ## Check size and not md5 as we rename the file
     ## a bit hacky
@@ -71,7 +73,8 @@ get_last_version_from_zenodo <-
         ")\n"
       )
       create_dir(export = path)
-      get_file(url = fileurl, export = path)
+      ## Fix with new Zenodo (weird)
+      get_file(url = file, export = path)
     } else {
       message("A file with the same size is already present. Skipping")
     }
