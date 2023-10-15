@@ -35,11 +35,24 @@ get_file <-
     # )
 
     if (!file.exists(export)) {
-      options(timeout = limit)
-      create_dir(export = export)
-      utils::download.file(
-        url = url,
-        destfile = export
+      tryCatch(
+        expr = {
+          httr2::request(base_url = url) |>
+            httr2::req_error(
+              is_error = function(resp) {
+                return(FALSE)
+              }
+            ) |>
+            httr2::req_perform()
+          options(timeout = limit)
+          create_dir(export = export)
+          utils::download.file(url = url,
+                               destfile = export)
+        },
+        error = function(e) {
+          cat("There was an unexpected problem downloading your file.")
+          return(export)
+        }
       )
     } else {
       message("File already exists. Skipping.")
