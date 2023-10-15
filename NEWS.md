@@ -6,6 +6,7 @@
 * Added MassBank spectral library (#77)
 * Allow files outside `data/source` (#89)
 * Added RT library as annotation library (#86)
+* Better handling of download errors
 * Improved naming (#91)
 * Internal variables refactoring
 * New adducts (#79, #80)
