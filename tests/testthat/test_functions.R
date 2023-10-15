@@ -111,6 +111,7 @@ testthat::test_that("Test functions", {
   ### Libraries
   #### ECMDB
   ## try exception because of external resource
+  fake_ecmdb(export = "fakeECMDB.json.zip")
   tryCatch(
     expr = {
       get_file(
@@ -128,6 +129,7 @@ testthat::test_that("Test functions", {
 
   #### LOTUS
   ## try exception because of external resource
+  fake_lotus(export = "fakeLotus.csv.gz")
   tryCatch(
     expr = {
       get_last_version_from_zenodo(
