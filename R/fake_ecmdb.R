@@ -1,0 +1,31 @@
+#' @title Fake ECMDB
+#'
+#' @description This function fakes ECMDB in case the download failed
+#'
+#' @param export Path to save the file to
+#'
+#' @return NULL
+#'
+#' @export
+#'
+#' @examples NULL
+fake_ecmdb <- function(export) {
+  log_debug("External error. Returning empty file instead.")
+  fake_export <- export |>
+    gsub(pattern = ".*/", replacement = "") |>
+    gsub(pattern = ".zip", replacement = "")
+  paste0(
+    "[{",
+    "\"name\":null,",
+    "\"moldb_inchikey\":null,",
+    "\"moldb_smiles\":null,",
+    "\"moldb_formula\":null,",
+    "\"moldb_mono_mass\":null,",
+    "\"moldb_logp\":null",
+    "}]"
+  ) |>
+    writeLines(fake_export)
+  system(paste("zip", export, fake_export))
+  unlink(fake_export)
+  return(export)
+}
