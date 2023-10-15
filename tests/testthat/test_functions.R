@@ -110,26 +110,35 @@ testthat::test_that("Test functions", {
 
   ### Libraries
   #### ECMDB
-  get_file(
-    url = paths$urls$ecmdb$metabolites,
-    export = paths$data$source$libraries$sop$ecmdb
-  )
+  ## try exception because of external resource
+  try(expr = {
+    get_file(
+      url = paths$urls$ecmdb$metabolites,
+      export = paths$data$source$libraries$sop$ecmdb
+    )
+  })
 
   #### HMDB
   # get_hmdb()
 
   #### LOTUS
-  get_last_version_from_zenodo(
-    doi = paths$urls$lotus$doi,
-    pattern = paths$urls$lotus$pattern,
-    path = paths$data$source$libraries$sop$lotus
-  )
+  ## try exception because of external resource
+  try(expr = {
+    get_last_version_from_zenodo(
+      doi = paths$urls$lotus$doi,
+      pattern = paths$urls$lotus$pattern,
+      path = paths$data$source$libraries$sop$lotus
+    )
+  })
   ## Check it does not download it a second time
-  get_last_version_from_zenodo(
-    doi = paths$urls$lotus$doi,
-    pattern = paths$urls$lotus$pattern,
-    path = paths$data$source$libraries$sop$lotus
-  )
+  ## try exception because of external resource
+  try(expr = {
+    get_last_version_from_zenodo(
+      doi = paths$urls$lotus$doi,
+      pattern = paths$urls$lotus$pattern,
+      path = paths$data$source$libraries$sop$lotus
+    )
+  })
 
   #### ISDB
   ## smaller version for testing
