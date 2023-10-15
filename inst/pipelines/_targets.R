@@ -1202,9 +1202,34 @@ list(
           name = lib_sop_ecm,
           format = "file",
           command = {
-            lib_sop_ecm <- get_file(
-              url = paths_urls_ecmdb_metabolites,
-              export = paths_data_source_libraries_sop_ecmdb
+            ## Because ECMDB certificate is expired
+            lib_sop_ecm <- tryCatch(
+              expr = {
+                get_file(
+                  url = paths_urls_ecmdb_metabolites,
+                  export = paths_data_source_libraries_sop_ecmdb
+                )
+              },
+              error = function(e) {
+                log_debug("Error. returning empty file instead")
+                fake_export <- paths_data_source_libraries_sop_ecmdb |>
+                  gsub(pattern = ".*/", replacement = "") |>
+                  gsub(pattern = ".zip", replacement = "")
+                paste0(
+                  "[{",
+                  "\"name\":null,",
+                  "\"moldb_inchikey\":null,",
+                  "\"moldb_smiles\":null,",
+                  "\"moldb_formula\":null,",
+                  "\"moldb_mono_mass\":null,",
+                  "\"moldb_logp\":null",
+                  "}]"
+                ) |>
+                  writeLines(fake_export)
+                system(paste("zip", paths_data_source_libraries_sop_ecmdb, fake_export))
+                unlink(fake_export)
+                return(paths_data_source_libraries_sop_ecmdb)
+              }
             )
           }
         ),
