@@ -27,8 +27,20 @@ get_last_version_from_zenodo <-
       )
 
     ## Retrieve file name by records call
-    base_url <- "https://zenodo.org/api/records/"
-    content <- jsonlite::fromJSON(txt = paste0(base_url, record))
+    base_url <- "https://zenodo.org/records/"
+    ## Fix with new Zenodo since the conceptdoi does not work anymore
+    base_url_api <- "https://zenodo.org/api/records/"
+    record_new <-
+      httr2::request(base_url = paste0(base_url, record, "/latest")) |>
+      httr2::req_perform()
+    content <- jsonlite::fromJSON(txt = paste0(
+      base_url_api,
+      gsub(
+        pattern = ".*/",
+        replacement = "",
+        x = record_new$url
+      )
+    ))
 
     ## Extract individual file names and urls
     fileurls <- content$files$links$download
