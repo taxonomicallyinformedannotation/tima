@@ -1211,24 +1211,7 @@ list(
                 )
               },
               error = function(e) {
-                log_debug("External error. Returning empty file instead.")
-                fake_export <- paths_data_source_libraries_sop_ecmdb |>
-                  gsub(pattern = ".*/", replacement = "") |>
-                  gsub(pattern = ".zip", replacement = "")
-                paste0(
-                  "[{",
-                  "\"name\":null,",
-                  "\"moldb_inchikey\":null,",
-                  "\"moldb_smiles\":null,",
-                  "\"moldb_formula\":null,",
-                  "\"moldb_mono_mass\":null,",
-                  "\"moldb_logp\":null",
-                  "}]"
-                ) |>
-                  writeLines(fake_export)
-                system(paste("zip", paths_data_source_libraries_sop_ecmdb, fake_export))
-                unlink(fake_export)
-                return(paths_data_source_libraries_sop_ecmdb)
+                fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb)
               }
             )
           }
@@ -1247,50 +1230,7 @@ list(
                 )
               },
               error = function(e) {
-                log_debug("External error. Returning empty file instead.")
-                tidytable::tidytable() |>
-                  tidytable::mutate(
-                    structure_wikidata = NA,
-                    structure_inchikey = NA,
-                    structure_inchi = NA,
-                    structure_smiles = NA,
-                    structure_molecular_formula = NA,
-                    structure_exact_mass = NA,
-                    structure_xlogp = NA,
-                    structure_smiles_2D = NA,
-                    structure_cid = NA,
-                    structure_nameIupac = NA,
-                    structure_nameTraditional = NA,
-                    structure_stereocenters_total = NA,
-                    structure_stereocenters_unspecified = NA,
-                    structure_taxonomy_npclassifier_01pathway = NA,
-                    structure_taxonomy_npclassifier_02superclass = NA,
-                    structure_taxonomy_npclassifier_03class = NA,
-                    structure_taxonomy_classyfire_01kingdom = NA,
-                    structure_taxonomy_classyfire_02superclass = NA,
-                    structure_taxonomy_classyfire_03class = NA,
-                    structure_taxonomy_classyfire_04directparent = NA,
-                    organism_wikidata = NA,
-                    organism_name = NA,
-                    organism_taxonomy_gbifid = NA,
-                    organism_taxonomy_ncbiid = NA,
-                    organism_taxonomy_ottid = NA,
-                    organism_taxonomy_01domain = NA,
-                    organism_taxonomy_02kingdom = NA,
-                    organism_taxonomy_03phylum = NA,
-                    organism_taxonomy_04class = NA,
-                    organism_taxonomy_05order = NA,
-                    organism_taxonomy_06family = NA,
-                    organism_taxonomy_07tribe = NA,
-                    organism_taxonomy_08genus = NA,
-                    organism_taxonomy_09species = NA,
-                    organism_taxonomy_10varietas = NA,
-                    reference_wikidata = NA,
-                    reference_doi = NA,
-                    manual_validation = NA
-                  ) |>
-                  tidytable::fwrite(paths_data_source_libraries_sop_lotus)
-                return(paths_data_source_libraries_sop_lotus)
+                fake_lotus(export = paths_data_source_libraries_sop_lotus)
               }
             )
           },

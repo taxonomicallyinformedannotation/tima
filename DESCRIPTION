@@ -89,6 +89,8 @@ Collate:
     'export_spectra_2.R'
     'extract_spectra.R'
     'fake_annotations_columns.R'
+    'fake_ecmdb.R'
+    'fake_lotus.R'
     'fake_sop_columns.R'
     'filter_annotations.R'
     'get_file.R'
