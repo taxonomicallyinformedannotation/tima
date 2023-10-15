@@ -271,6 +271,8 @@ testthat::test_that("Test functions", {
   # prepare_libraries_sop_hmdb()
 
   #### LOTUS
+  ## If LOTUS download failed
+  prepare_libraries_sop_lotus(input = "randomNonExistingFile")
   prepare_libraries_sop_lotus()
 
   #### MERGED
