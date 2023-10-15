@@ -43,15 +43,11 @@ get_last_version_from_zenodo <-
     ))
 
     ## Extract individual file names and urls
-    fileurls <- content$files$links$download
-    filenames <- stringi::stri_match(
-      str = fileurls,
-      pattern = ".+/([^/]+)",
-      regex = TRUE
-    )[, 2]
+    fileurls <- content$files$links$self
+    filenames <- content$files$filename
 
     ## Select the file URL and name matching the given pattern
-    indices <- grepl(pattern = pattern, x = fileurls)
+    indices <- grepl(pattern = pattern, x = filenames)
     fileurl <- fileurls[indices]
     filename <- filenames[indices]
 
