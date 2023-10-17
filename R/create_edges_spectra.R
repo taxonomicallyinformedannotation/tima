@@ -126,7 +126,13 @@ create_edges_spectra <- function(
       )
 
     edges <- edges |>
-      tidytable::left_join(entropy_df)
+      tidytable::full_join(entropy_df) |>
+      tidytable::mutate(
+        !!as.name(name_target) := tidytable::coalesce(
+          !!as.name(name_target),
+          !!as.name(name_source)
+        )
+      )
     rm(entropy_df)
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")

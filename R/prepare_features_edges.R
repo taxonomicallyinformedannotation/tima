@@ -50,6 +50,12 @@ prepare_features_edges <-
       tidytable::rename(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
+      ) |>
+      tidytable::mutate(
+        feature_target := tidytable::coalesce(
+          feature_target,
+          feature_source
+        )
       )
     rm(edges_ms1, edges_ms2, features_entropy)
 
