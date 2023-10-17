@@ -1,5 +1,5 @@
 shiny::runApp(
   appDir = "inst/app",
-  port = 3838,
-  launch.browser = TRUE
+  host = "0.0.0.0",
+  port = 3838
 )
