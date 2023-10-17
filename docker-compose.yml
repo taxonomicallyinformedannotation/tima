@@ -51,7 +51,7 @@ services:
     volumes:
       - "./data:/data"
       - "./inst:/inst"
-    command: Rscript inst/scripts/run_app_docker.R
+    command: Rscript inst/scripts/run_app.R
 
 networks:
   service-service-frontend:
