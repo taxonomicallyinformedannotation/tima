@@ -9,11 +9,11 @@ files:
       edges:
         #' Raw edges file. STRING
         raw:
-          - data/interim/features/example_edges_spectra.tsv.gz
-          - data/interim/features/example_edges_masses.tsv.gz
+          - data/interim/features/example_edges_spectra.tsv
+          - data/interim/features/example_edges_masses.tsv
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/example_edges.tsv.gz
+        prepared: data/interim/features/example_edges.tsv
 
 #' Names of the different variables in the input files.
 names:

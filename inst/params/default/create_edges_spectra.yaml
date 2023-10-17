@@ -18,7 +18,7 @@ files:
       edges:
         #' Raw edges file. STRING
         raw:
-          - data/interim/features/example_edges_spectra.tsv.gz
+          - data/interim/features/example_edges_spectra.tsv
 
   #' Spectral files. STRING
   spectral:
