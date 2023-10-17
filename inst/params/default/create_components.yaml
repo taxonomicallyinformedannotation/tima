@@ -8,9 +8,9 @@ files:
       #' Edges files.
       edges:
         #' Prepared edges file. STRING
-        prepared: data/interim/features/example_edges.tsv.gz
+        prepared: data/interim/features/example_edges.tsv
 
       #' Components files.
       components:
         #' Raw components file. STRING
-        raw: data/interim/features/example_components.tsv.gz
+        raw: data/interim/features/example_components.tsv

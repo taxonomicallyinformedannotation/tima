@@ -61,7 +61,7 @@ files:
       edges:
         #' Raw edges file. STRING
         raw:
-          - data/interim/features/example_edges_masses.tsv.gz
+          - data/interim/features/example_edges_masses.tsv
 
 #' MS related parameters.
 ms:
