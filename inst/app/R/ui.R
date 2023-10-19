@@ -1,4 +1,4 @@
-source("R/label_mandatory.R")
+options(shiny.host = "0.0.0.0")
 
 app_css <-
   ".mandatory_star { color: red; }
