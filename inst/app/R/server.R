@@ -1,5 +1,4 @@
-source("R/save_input.R")
-
+options(shiny.host = "0.0.0.0")
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 server <- function(input, output, session) {
