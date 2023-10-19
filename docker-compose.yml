@@ -39,8 +39,8 @@ services:
       timeout: 200s
       retries: 5
     ports:
-      - "0.0.0.0:3838:3838"
-      - "0.0.0.0:3839:3839"
+      - "3838:3838"
+      - "3839:3839"
     image: adafede/tima-r
     networks:
       - service-service-frontend
