@@ -1,4 +1,5 @@
 options(shiny.host = "0.0.0.0")
+options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 # save the results to a file
