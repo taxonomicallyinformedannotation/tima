@@ -6,6 +6,7 @@
 * Added MassBank spectral library (#77)
 * Allow files outside `data/source` (#89)
 * Added RT library as annotation library (#86)
+* Be less dependent of GNPS by default
 * Better handling of download errors
 * Improved naming (#91)
 * Internal variables refactoring

@@ -7,9 +7,8 @@
 prepare_params(
   filename = get_params(step = "prepare_params")$files$pattern,
   features = get_params(step = "prepare_params")$files$features$raw,
+  metadata = get_params(step = "prepare_params")$files$metadata,
   spectra = get_params(step = "prepare_params")$files$spectral$raw,
-  gnps_job_id = get_params(step = "prepare_params")$gnps$id,
-  gnps_example_id = parse_yaml_paths()$gnps$example,
   ms_mode = get_params(step = "prepare_params")$ms$polarity,
   taxon = get_params(step = "prepare_params")$organisms$taxon,
   summarise = get_params(step = "prepare_params")$options$summarise,
@@ -19,13 +18,9 @@ prepare_params(
 \arguments{
 \item{filename}{Name of the file}
 
-\item{features}{File containing the features table}
+\item{features}{File containing the metadata}
 
 \item{spectra}{File containing the spectra}
-
-\item{gnps_job_id}{GNPS job ID}
-
-\item{gnps_example_id}{GNPS example job ID}
 
 \item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
 

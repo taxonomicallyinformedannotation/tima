@@ -121,9 +121,9 @@ targets::tar_visnetwork(
 
 The most important file you need to provide is an MGF file containing the spectra you want to annotate.
 
-If you already ran a GNPS job, you can simply do:
 
-```{r get-gnps, results="hide", message=FALSE, warning=FALSE}
+```{r get-gnps, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results="hide"}
+# If you already ran a GNPS job, you can simply do:
 source(file = "inst/scripts/get_gnps_tables.R")
 ```
 

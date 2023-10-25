@@ -8,7 +8,7 @@ files:
 
   #' Taxa files.
   taxa:
-    #' OPTIONAL. If tool is "manual".
+    #' OPTIONAL. If not all features forced to a single taxon. (see below)
     #' Biological origin metadata file. STRING
     raw: data/source/example_metadata.tsv
 
