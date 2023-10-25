@@ -127,15 +127,19 @@ The most important file you need to provide is an MGF file containing the spectr
 source(file = "inst/scripts/get_gnps_tables.R")
 ```
 
-To get an example of an MGF file (corresponding to the spectra to annotate, not to to the library to query), just run:
+To get some example files (corresponding to the spectra to annotate, corresponding areas and metadta), just run:
 
 ```{r unlink-spectra, include = FALSE}
 unlink("data/source/example_spectra.mgf")
 ```
 
-```{r get-spectra, results="hide", message=FALSE, warning=FALSE}
+```{r get-files, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/get_example_features.R")
+source(file = "inst/scripts/get_example_metadata.R")
+# source(file = "inst/scripts/get_example_sirius.R")
 source(file = "inst/scripts/get_example_spectra.R")
 ```
+
 
 ### Libraries
 

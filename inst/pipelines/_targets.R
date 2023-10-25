@@ -277,13 +277,13 @@ list(
             paths$params$default$filter$annotations
         }
       ),
-      # tar_target(
-      #   name = par_def_pre_ann_gnp,
-      #   format = "file",
-      #   command = {
-      #     par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
-      #   }
-      # ),
+      tar_target(
+        name = par_def_pre_ann_gnp,
+        format = "file",
+        command = {
+          par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
+        }
+      ),
       tar_target(
         name = par_def_pre_ann_sir,
         format = "file",

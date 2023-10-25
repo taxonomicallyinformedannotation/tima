@@ -36,6 +36,12 @@ jobs:
       - name: Install package
         run: |
           Rscript inst/scripts/install.R
+      - name: Get example files
+        run: |
+          Rscript inst/scripts/get_example_spectra.R
+          Rscript inst/scripts/get_example_features.R
+          Rscript inst/scripts/get_example_metadata.R
+          # Rscript inst/scripts/get_example_sirius.R
       - name: Run tests
         run: |
           Rscript inst/scripts/tima_full.R

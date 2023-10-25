@@ -50,9 +50,9 @@ Once installed, you are ready to go through our [documentation](https://taxonomi
 In case you do not have your data ready, you can obtain some example data (set of 8,000 spectra) using:
 
 ```bash
-Rscript inst/scripts/get_example_spectra.R 
-Rscript inst/scripts/get_example_features.R 
-Rscript inst/scripts/get_example_metadata.R 
+Rscript inst/scripts/get_example_spectra.R
+Rscript inst/scripts/get_example_features.R
+Rscript inst/scripts/get_example_metadata.R
 # Rscript inst/scripts/get_example_sirius.R
 ```
 
@@ -71,7 +71,7 @@ Main commands are below:
 
 ```bash
 docker pull adafede/tima-r
-# docker build . -t adafede/tima-r 
+# docker build . -t adafede/tima-r
 ```
 
 ```bash
