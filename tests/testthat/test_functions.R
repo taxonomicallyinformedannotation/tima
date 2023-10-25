@@ -32,6 +32,10 @@ testthat::test_that("Test functions", {
 
   ## Get all files
   ### Features table
+  get_file(
+    url = paths$urls$examples$features,
+    export = paths$data$source$features
+  )
   get_gnps_tables(
     filename = "example",
     path_features = paths$data$source$features,
@@ -40,6 +44,10 @@ testthat::test_that("Test functions", {
     gnps_job_id = params$gnps$id
   )
   ### Metadata table
+  get_file(
+    url = paths$urls$examples$metadata,
+    export = paths$data$source$metadata
+  )
   get_file(
     url = paths$urls$examples$metadata |>
       gsub(pattern = ".tsv", replacement = "_unrecognized.tsv"),

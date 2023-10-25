@@ -127,7 +127,7 @@ The most important file you need to provide is an MGF file containing the spectr
 source(file = "inst/scripts/get_gnps_tables.R")
 ```
 
-To get some example files (corresponding to the spectra to annotate, corresponding areas and metadta), just run:
+To get some example files (corresponding to the spectra to annotate, corresponding areas and metadata), just run:
 
 ```{r unlink-spectra, include = FALSE}
 unlink("data/source/example_spectra.mgf")
