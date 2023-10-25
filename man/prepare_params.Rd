@@ -7,7 +7,7 @@
 prepare_params(
   filename = get_params(step = "prepare_params")$files$pattern,
   features = get_params(step = "prepare_params")$files$features$raw,
-  metadata = get_params(step = "prepare_params")$files$metadata,
+  metadata = get_params(step = "prepare_params")$files$metadata$raw,
   spectra = get_params(step = "prepare_params")$files$spectral$raw,
   ms_mode = get_params(step = "prepare_params")$ms$polarity,
   taxon = get_params(step = "prepare_params")$organisms$taxon,
