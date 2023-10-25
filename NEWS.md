@@ -8,6 +8,7 @@
 * Added RT library as annotation library (#86)
 * Be less dependent of GNPS by default
 * Better handling of download errors
+* Fixed Docker mount path
 * Improved naming (#91)
 * Internal variables refactoring
 * New adducts (#79, #80)

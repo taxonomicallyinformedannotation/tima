@@ -22,8 +22,8 @@ services:
       - no-new-privileges:true
     user: tima-user
     volumes:
-      - "./data:/data"
-      - "./inst:/inst"
+      - "./data:/tima/data"
+      - "./inst:/tima/inst"
     command: Rscript inst/scripts/tima_full.R
 
   tima-gui:
@@ -49,8 +49,8 @@ services:
       - no-new-privileges:true
     user: tima-user
     volumes:
-      - "./data:/data"
-      - "./inst:/inst"
+      - "./data:/tima/data"
+      - "./inst:/tima/inst"
     command: Rscript inst/scripts/run_app.R
 
 networks:
