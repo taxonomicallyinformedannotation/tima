@@ -43,12 +43,12 @@ list(
           paths <- parse_yaml_paths(file = yaml_paths)
         }
       ),
-      tar_target(
-        name = paths_gnps_example_id,
-        command = {
-          paths_gnps_example_id <- paths$gnps$example
-        }
-      ),
+      # tar_target(
+      #   name = paths_gnps_example_id,
+      #   command = {
+      #     paths_gnps_example_id <- paths$gnps$example
+      #   }
+      # ),
       tar_target(
         name = paths_source,
         command = {
@@ -277,13 +277,13 @@ list(
             paths$params$default$filter$annotations
         }
       ),
-      tar_target(
-        name = par_def_pre_ann_gnp,
-        format = "file",
-        command = {
-          par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
-        }
-      ),
+      # tar_target(
+      #   name = par_def_pre_ann_gnp,
+      #   format = "file",
+      #   command = {
+      #     par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
+      #   }
+      # ),
       tar_target(
         name = par_def_pre_ann_sir,
         format = "file",
@@ -431,9 +431,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -449,9 +450,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -467,9 +469,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -485,9 +488,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -503,9 +507,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -521,9 +526,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -539,9 +545,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -557,9 +564,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -575,9 +583,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -593,9 +602,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -611,9 +621,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -629,9 +640,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -647,9 +659,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -665,9 +678,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -683,9 +697,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -701,9 +716,10 @@ list(
         #       prepare_params(
         #         filename = par_fin_par$files$pattern,
         #         features = par_fin_par$files$features$raw,
+        #         metadata = par_fin_par$files$metadata$raw,
         #         spectra = par_fin_par$files$spectral$raw,
-        #         gnps_job_id = par_fin_par$gnps$id,
-        #         gnps_example_id = paths_gnps_example_id,
+        #         # gnps_job_id = par_fin_par$gnps$id,
+        #         # gnps_example_id = paths_gnps_example_id,
         #         ms_mode = par_fin_par$ms$polarity,
         #         taxon = par_fin_par$organisms$taxon,
         # .        summarise = par_fin_par$options$summarise,
@@ -719,9 +735,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -737,9 +754,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -755,9 +773,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -773,9 +792,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -791,9 +811,10 @@ list(
               prepare_params(
                 filename = par_fin_par$files$pattern,
                 features = par_fin_par$files$features$raw,
+                metadata = par_fin_par$files$metadata$raw,
                 spectra = par_fin_par$files$spectral$raw,
-                gnps_job_id = par_fin_par$gnps$id,
-                gnps_example_id = paths_gnps_example_id,
+                # gnps_job_id = par_fin_par$gnps$id,
+                # gnps_example_id = paths_gnps_example_id,
                 ms_mode = par_fin_par$ms$polarity,
                 taxon = par_fin_par$organisms$taxon,
                 summarise = par_fin_par$options$summarise,
@@ -1017,86 +1038,87 @@ list(
       )
     )
   ),
-  ## GNPS
-  list(
-    tar_target(
-      name = gnps_tables,
-      format = "file",
-      command = {
-        gnps_tables <- get_gnps_tables(
-          gnps_job_id = par_fin_par$gnps$id,
-          gnps_job_example = paths_gnps_example_id,
-          filename = par_fin_par$files$pattern,
-          workflow = par_fin_par$gnps$workflow,
-          path_features = par_pre_fea_tab$files$features$raw,
-          path_metadata = par_pre_tax$files$taxa$raw,
-          path_spectra = par_ann_spe$files$spectral$raw,
-          path_source = paths_source,
-          path_interim_a = paths_interim_a,
-          path_interim_f = paths_interim_f
-        )
-      }
-    ),
-    list(
-      tar_target(
-        name = gnps_features,
-        format = "file",
-        command = {
-          gnps_features <- gnps_tables[[1]]
-        }
-      ),
-      tar_target(
-        name = gnps_metadata,
-        format = "file",
-        command = {
-          gnps_metadata <- gnps_tables[[2]]
-        }
-      ),
-      tar_target(
-        name = gnps_spectra,
-        format = "file",
-        command = {
-          gnps_spectra <- gnps_tables[[3]]
-        }
-      ),
-      tar_target(
-        name = gnps_annotations,
-        format = "file",
-        command = {
-          gnps_annotations <- gnps_tables[[4]]
-        }
-      ),
-      tar_target(
-        name = gnps_components,
-        format = "file",
-        command = {
-          gnps_components <- gnps_tables[[5]]
-        }
-      ),
-      tar_target(
-        name = gnps_edges,
-        format = "file",
-        command = {
-          gnps_edges <- gnps_tables[[6]]
-        }
-      )
-    )
-  ),
+  # ## GNPS
+  # list(
+  #   tar_target(
+  #     name = gnps_tables,
+  #     format = "file",
+  #     command = {
+  #       gnps_tables <- get_gnps_tables(
+  #         gnps_job_id = par_fin_par$gnps$id,
+  #         gnps_job_example = paths_gnps_example_id,
+  #         filename = par_fin_par$files$pattern,
+  #         workflow = par_fin_par$gnps$workflow,
+  #         path_features = par_pre_fea_tab$files$features$raw,
+  #         path_metadata = par_pre_tax$files$taxa$raw,
+  #         path_spectra = par_ann_spe$files$spectral$raw,
+  #         path_source = paths_source,
+  #         path_interim_a = paths_interim_a,
+  #         path_interim_f = paths_interim_f
+  #       )
+  #     }
+  #   ),
+  #   list(
+  #     tar_target(
+  #       name = gnps_features,
+  #       format = "file",
+  #       command = {
+  #         gnps_features <- gnps_tables[[1]]
+  #       }
+  #     ),
+  #     tar_target(
+  #       name = gnps_metadata,
+  #       format = "file",
+  #       command = {
+  #         gnps_metadata <- gnps_tables[[2]]
+  #       }
+  #     ),
+  #     tar_target(
+  #       name = gnps_spectra,
+  #       format = "file",
+  #       command = {
+  #         gnps_spectra <- gnps_tables[[3]]
+  #       }
+  #     ),
+  #     tar_target(
+  #       name = gnps_annotations,
+  #       format = "file",
+  #       command = {
+  #         gnps_annotations <- gnps_tables[[4]]
+  #       }
+  #     ),
+  #     tar_target(
+  #       name = gnps_components,
+  #       format = "file",
+  #       command = {
+  #         gnps_components <- gnps_tables[[5]]
+  #       }
+  #     ),
+  #     tar_target(
+  #       name = gnps_edges,
+  #       format = "file",
+  #       command = {
+  #         gnps_edges <- gnps_tables[[6]]
+  #       }
+  #     )
+  #   )
+  # ),
   ## Inputs
   list(
     tar_target(
       name = input_features,
       format = "file",
       command = {
-        input_features <-
-          ifelse(
-            test = !is.null(gnps_features),
-            yes = ifelse(test = file.exists(gnps_features),
-              yes = gnps_features,
-              no = par_pre_tax$files$features$raw
-            ),
-            no = par_pre_tax$files$features$raw
-          )
+        input_features <- par_pre_tax$files$features$raw
+        # input_features <-
+        #   ifelse(
+        #     test = !is.null(gnps_features),
+        #     yes = ifelse(test = file.exists(gnps_features),
+        #       yes = gnps_features,
+        #       no = par_pre_tax$files$features$raw
+        #     ),
+        #     no = par_pre_tax$files$features$raw
+        #   )
       }
     ),
     tar_target(
@@ -1106,16 +1128,17 @@ list(
         input_spectra <-
           ifelse(
             test = paths_test_mode == FALSE,
-            yes = ifelse(
-              test = !is.null(gnps_spectra),
-              yes =
-                ifelse(
-                  test = file.exists(gnps_spectra),
-                  yes = gnps_spectra,
-                  no = par_ann_spe$files$spectral$raw
-                ),
-              no = par_ann_spe$files$spectral$raw
-            ),
+            yes = par_ann_spe$files$spectral$raw,
+            # yes = ifelse(
+            #   test = !is.null(gnps_spectra),
+            #   yes =
+            #     ifelse(
+            #       test = file.exists(gnps_spectra),
+            #       yes = gnps_spectra,
+            #       no = par_ann_spe$files$spectral$raw
+            #     ),
+            #   no = par_ann_spe$files$spectral$raw
+            # ),
             no = {
               get_file(
                 url = paths_urls_examples_spectra_mini,
@@ -1129,15 +1152,16 @@ list(
       name = input_metadata,
       format = "file",
       command = {
-        input_metadata <-
-          ifelse(
-            test = !is.null(gnps_metadata),
-            yes = ifelse(test = file.exists(gnps_metadata),
-              yes = gnps_metadata,
-              no = par_pre_tax$files$taxa$raw
-            ),
-            no = par_pre_tax$files$taxa$raw
-          )
+        input_metadata <- par_pre_tax$files$taxa$raw
+        # input_metadata <-
+        #   ifelse(
+        #     test = !is.null(gnps_metadata),
+        #     yes = ifelse(test = file.exists(gnps_metadata),
+        #       yes = gnps_metadata,
+        #       no = par_pre_tax$files$taxa$raw
+        #     ),
+        #     no = par_pre_tax$files$taxa$raw
+        #   )
       }
     )
   ),
@@ -1634,25 +1658,25 @@ list(
     ),
     ## Spectral
     list(
-      ## GNPS
-      list(
-        tar_target(
-          name = ann_spe_exp_gnp_pre,
-          format = "file",
-          command = {
-            ann_spe_exp_gnp_pre <-
-              prepare_annotations_gnps(
-                input = gnps_annotations,
-                output = par_pre_ann_gnp$files$annotations$prepared$structural,
-                str_stereo = lib_mer_str_stereo,
-                str_met = lib_mer_str_met,
-                str_nam = lib_mer_str_nam,
-                str_tax_cla = lib_mer_str_tax_cla,
-                str_tax_npc = lib_mer_str_tax_npc
-              )
-          }
-        )
-      ),
+      # ## GNPS
+      # list(
+      #   tar_target(
+      #     name = ann_spe_exp_gnp_pre,
+      #     format = "file",
+      #     command = {
+      #       ann_spe_exp_gnp_pre <-
+      #         prepare_annotations_gnps(
+      #           input = gnps_annotations,
+      #           output = par_pre_ann_gnp$files$annotations$prepared$structural,
+      #           str_stereo = lib_mer_str_stereo,
+      #           str_met = lib_mer_str_met,
+      #           str_nam = lib_mer_str_nam,
+      #           str_tax_cla = lib_mer_str_tax_cla,
+      #           str_tax_npc = lib_mer_str_tax_npc
+      #         )
+      #     }
+      #   )
+      # ),
       ## Classic
       list(
         ## TODO improve polarity handling, suboptimal
@@ -1803,23 +1827,25 @@ list(
         name = int_com,
         format = "file",
         command = {
-          int_com <-
-            if (file.exists(fea_com)) {
-              fea_com
-            } else {
-              gnps_components
-            }
+          int_com <- fea_com
+          # int_com <-
+          #   if (file.exists(fea_com)) {
+          #     fea_com
+          #   } else {
+          #     gnps_components
+          #   }
         }
       ),
       tar_target(
         name = edg_spe,
         format = "file",
         command = {
-          edg_spe <-
-            ifelse(test = file.exists(fea_edg_spe),
-              yes = fea_edg_spe,
-              no = gnps_edges
-            )
+          edg_spe <- fea_edg_spe
+          # edg_spe <-
+          #   ifelse(test = file.exists(fea_edg_spe),
+          #     yes = fea_edg_spe,
+          #     no = gnps_edges
+          #   )
         }
       )
     ),
@@ -1883,7 +1909,7 @@ list(
     command = {
       ann_fil <- filter_annotations(
         annotations = c(
-          ann_spe_exp_gnp_pre,
+          # ann_spe_exp_gnp_pre,
           ann_spe_pre,
           ann_sir_pre_str,
           ann_ms1_pre_ann

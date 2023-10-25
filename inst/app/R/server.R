@@ -43,11 +43,11 @@ save_input <- function(input) {
   }
 
   filename <- shiny::isolate(input$fil_pat)
-  gnps_job_id <- shiny::isolate(input$gnps_id)
-  if (gnps_job_id == "") {
-    gnps_job_id <- NULL
-  }
-  gnps_workflow <- shiny::isolate(input$gnps_workflow)
+  # gnps_job_id <- shiny::isolate(input$gnps_id)
+  # if (gnps_job_id == "") {
+  #   gnps_job_id <- NULL
+  # }
+  # gnps_workflow <- shiny::isolate(input$gnps_workflow)
   org_tax <- shiny::isolate(input$org_tax)
   if (org_tax == "") {
     org_tax <- NULL
@@ -76,12 +76,22 @@ save_input <- function(input) {
     files$
     spectral$
     raw <- fil_spe_raw
-  yamls_params$`inst/params/prepare_params`$gnps$id <- gnps_job_id
   yamls_params$
     `inst/params/prepare_params`$
-    gnps$
-    workflow <-
-    gnps_workflow
+    files$
+    spectral$
+    raw <- fil_spe_raw
+  # yamls_params$`inst/params/prepare_params`$gnps$id <- gnps_job_id
+  # yamls_params$
+  #   `inst/params/prepare_params`$
+  #   gnps$
+  #   workflow <-
+  #   gnps_workflow
+  yamls_params$
+    `inst/params/prepare_params`$
+    files$
+    metadata$
+    raw <- fil_tax_raw
   yamls_params$
     `inst/params/prepare_params`$
     ms$
@@ -90,7 +100,7 @@ save_input <- function(input) {
     `inst/params/prepare_params`$
     organisms$
     taxon <- org_tax
-  ## crazy
+  ## summarise
   yamls_params$
     `inst/params/prepare_params`$
     options$
@@ -284,10 +294,10 @@ save_input <- function(input) {
   if (!is.null(prefil_tax_raw)) {
     yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw
   }
-  if (!is.null(gnps_job_id)) {
-    yamls_params$prepare_taxa$files$taxa$raw <-
-      file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
-  }
+  # if (!is.null(gnps_job_id)) {
+  #   yamls_params$prepare_taxa$files$taxa$raw <-
+  #     file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
+  # }
   yamls_params$prepare_taxa$names$extension <-
     shiny::isolate(input$names_extension)
   yamls_params$prepare_taxa$names$features <-
@@ -697,7 +707,7 @@ server <- function(input, output, session) {
             "paths_data_source_libraries_spectra_is_lotus_pos",
             "paths_data_source_libraries_spectra_is_lotus_neg",
             "paths_data_source_spectra",
-            "paths_gnps_example_id",
+            # "paths_gnps_example_id",
             "paths_interim_a",
             "paths_interim_f",
             "paths_source",
