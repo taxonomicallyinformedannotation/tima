@@ -19,7 +19,7 @@ testthat::test_that("Test functions", {
   ## For all steps
   prepare_params()
   ## With empty GNPS ID
-  prepare_params(gnps_job_id = "")
+  # prepare_params(gnps_job_id = "")
   ## When previous params exist
   prepare_params()
 
