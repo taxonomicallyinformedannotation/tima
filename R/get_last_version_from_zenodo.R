@@ -44,7 +44,9 @@ get_last_version_from_zenodo <-
 
     ## Extract individual file names and urls
     fileurls <- content$files$links$self
-    filenames <- content$files$filename
+    ## See https://github.com/zenodo/zenodo-rdm/issues/639
+    # filenames <- content$files$filename
+    filenames <- content$files$key
 
     ## Select the file URL and name matching the given pattern
     indices <- grepl(pattern = pattern, x = filenames)
