@@ -29,6 +29,7 @@ fake_lotus <- function(export) {
       structure_taxonomy_npclassifier_01pathway = NA,
       structure_taxonomy_npclassifier_02superclass = NA,
       structure_taxonomy_npclassifier_03class = NA,
+      structure_taxonomy_classyfire_chemontid = NA,
       structure_taxonomy_classyfire_01kingdom = NA,
       structure_taxonomy_classyfire_02superclass = NA,
       structure_taxonomy_classyfire_03class = NA,
