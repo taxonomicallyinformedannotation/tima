@@ -57,7 +57,9 @@ get_last_version_from_zenodo <-
 
     ## Check size and not md5 as we rename the file
     ## a bit hacky
-    zenodo_size <- content$files$filesize[indices]
+    ## See https://github.com/zenodo/zenodo-rdm/issues/639
+    # zenodo_size <- content$files$filesize[indices]
+    zenodo_size <- content$files$size[indices]
     local_size <- file.size(path)
 
     ## If the local file does not exist or the sizes are different,
