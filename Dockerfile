@@ -1,6 +1,3 @@
-# Define user
-USER tima-user
-
 # Image
 FROM bioconductor/bioconductor_docker:3.18-R-4.3.1
 
@@ -28,6 +25,9 @@ EXPOSE 3839
 
 # Change the ownership of the app files to the user
 RUN chown -R tima-user:tima ./
+
+# Define user
+USER tima-user
 
 HEALTHCHECK NONE
 
