@@ -431,7 +431,7 @@
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
-      "version": ">= 1.7.12",
+      "version": ">= 1.8.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2818.798KB",
+  "fileSize": "2818.789KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

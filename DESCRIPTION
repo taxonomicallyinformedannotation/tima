@@ -39,7 +39,7 @@ Imports:
     shinyWidgets (>= 0.8.0),
     Spectra (>= 1.10.3),
     stats,
-    stringi (>= 1.7.12),
+    stringi (>= 1.8.1),
     targets (>= 1.3.2),
     tidytable (>= 0.10.2),
     tidyfst (>= 1.7.7),
