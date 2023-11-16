@@ -18,11 +18,11 @@ save_input <- function(input) {
   ## This allows to keep files correctly placed in `data/source` clean
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
-  prefil_tax_raw <- shiny::isolate(input$fil_tax_raw)
+  prefil_met_raw <- shiny::isolate(input$fil_met_raw)
   prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
-  if (!is.null(prefil_tax_raw)) {
-    prefil_tax_raw_1 <- file.path(paths_data_source, prefil_tax_raw[[1]])
+  if (!is.null(prefil_met_raw)) {
+    prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
   }
   if (file.exists(prefil_fea_raw_1)) {
     fil_fea_raw <- prefil_fea_raw_1
@@ -34,11 +34,11 @@ save_input <- function(input) {
   } else {
     fil_spe_raw <- prefil_spe_raw[[4]]
   }
-  if (!is.null(prefil_tax_raw)) {
-    if (file.exists(prefil_tax_raw_1)) {
-      fil_tax_raw <- prefil_tax_raw_1
+  if (!is.null(prefil_met_raw)) {
+    if (file.exists(prefil_met_raw_1)) {
+      fil_met_raw <- prefil_met_raw_1
     } else {
-      fil_tax_raw <- prefil_tax_raw[[4]]
+      fil_met_raw <- prefil_met_raw[[4]]
     }
   }
 
@@ -91,7 +91,7 @@ save_input <- function(input) {
     `inst/params/prepare_params`$
     files$
     metadata$
-    raw <- fil_tax_raw
+    raw <- fil_met_raw
   yamls_params$
     `inst/params/prepare_params`$
     ms$
@@ -291,11 +291,11 @@ save_input <- function(input) {
     shiny::isolate(input$org_fil_val)
 
   yamls_params$prepare_taxa$files$features$raw <- fil_fea_raw
-  if (!is.null(prefil_tax_raw)) {
-    yamls_params$prepare_taxa$files$taxa$raw <- fil_tax_raw
+  if (!is.null(prefil_met_raw)) {
+    yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
   }
   # if (!is.null(gnps_job_id)) {
-  #   yamls_params$prepare_taxa$files$taxa$raw <-
+  #   yamls_params$prepare_taxa$files$metadata$raw <-
   #     file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
   # }
   yamls_params$prepare_taxa$names$extension <-
@@ -310,12 +310,6 @@ save_input <- function(input) {
     shiny::isolate(input$org_can)
   yamls_params$prepare_taxa$organisms$taxon <- org_tax
 
-  yamls_params$
-    weight_annotations$
-    annotations$
-    candidates$
-    initial <-
-    shiny::isolate(input$ann_can_ini)
   yamls_params$
     weight_annotations$
     annotations$

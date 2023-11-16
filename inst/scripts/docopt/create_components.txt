@@ -1,11 +1,11 @@
 You can use this script with the following example:
-  Rscript inst/scripts/create_components.R --fil-net-spe-edg-pro data/interim/features/example_edges.tsv.gz --fil-net-spe-com-raw data/interim/features/example_components.tsv.gz
+  Rscript inst/scripts/create_components.R --fil-net-spe-edg-pre data/interim/features/example_edges.tsv.gz --fil-net-spe-com-raw data/interim/features/example_components.tsv.gz
 
 Usage:
-  create_components.R [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>]
+  create_components.R [--fil-net-spe-edg-pre=<fil-net-spe-edg-pre>] [--fil-net-spe-com-raw=<fil-net-spe-com-raw>]
 
 Arguments:
-  fil-net-spe-edg-pro        Prepared edges file. STRING
+  fil-net-spe-edg-pre        Prepared edges file. STRING
   fil-net-spe-com-raw        Raw components file. STRING
 
 Options:

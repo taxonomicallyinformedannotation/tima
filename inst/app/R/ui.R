@@ -104,7 +104,7 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::fileInput(
-          inputId = "fil_tax_raw",
+          inputId = "fil_met_raw",
           label = "Metadata table (mandatory if no taxon name)",
           accept = c(
             ".csv",
@@ -144,22 +144,6 @@ ui <- shiny::fluidPage(
         title = "Annotations",
         shiny::h3("Annotations-related parameters"),
         shiny::sliderInput(
-          inputId = "ann_can_ini",
-          label = "Number of initial candidates",
-          min = 1,
-          max = 500,
-          value = 50,
-          step = 1,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Number of initial candidates to consider.",
-              "For 12 candidates, with 10, only the first 10 will be kept."
-            )
-          ),
-        shiny::sliderInput(
           inputId = "ann_can_fin",
           label = "Number of final candidates",
           min = 1,
@@ -186,17 +170,6 @@ ui <- shiny::fluidPage(
             content = c(
               "Option to erase MS2 results.",
               "Usually not needed, for benchmarking mainly."
-            )
-          ),
-        shiny::checkboxInput(
-          inputId = "ann_ms1_ann",
-          label = "Perform MS1 annotation",
-          value = TRUE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Options to complement previous results at the MS1 level."
             )
           ),
         shiny::sliderInput(

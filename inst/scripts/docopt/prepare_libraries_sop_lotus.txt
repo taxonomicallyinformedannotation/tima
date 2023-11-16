@@ -1,12 +1,12 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_libraries_sop_lotus.R --fil-lib-sop-raw-ecm data/source/libraries/sop/lotus.csv.gz --fil-lib-sop-pro data/interim/libraries/sop/lotus_prepared.tsv.gz
+  Rscript inst/scripts/prepare_libraries_sop_lotus.R --fil-lib-sop-raw-ecm data/source/libraries/sop/lotus.csv.gz --fil-lib-sop-pre data/interim/libraries/sop/lotus_prepared.tsv.gz
 
 Usage:
-  prepare_libraries_sop_ecmdb.R [--fil-lib-sop-raw-ecm=<fil-lib-sop-raw-ecm>] [--fil-lib-sop-pro=<fil-lib-sop-pro>]
+  prepare_libraries_sop_ecmdb.R [--fil-lib-sop-raw-ecm=<fil-lib-sop-raw-ecm>] [--fil-lib-sop-pre=<fil-lib-sop-pre>]
 
 Arguments:
   fil-lib-sop-raw-lot        LOTUS raw structure organism pairs library. STRING
-  fil-lib-sop-pro            List of prepared structure organism pairs libraries. STRING
+  fil-lib-sop-pre            List of prepared structure organism pairs libraries. STRING
 
 Options:
   -h --help                  Shows this screen.

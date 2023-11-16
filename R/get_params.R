@@ -20,16 +20,25 @@ get_params <- function(step) {
     list.files(path = file.path(paths$inst$scripts$docopt)) |>
     stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
+  default_path <-
+    if (step == "prepare_params") {
+      file.path(paths$params$prepare_params)
+    } else {
+      if (step == "prepare_params_advanced") {
+        file.path(paths$params$prepare_params_advanced)
+      } else {
+        file.path(paths$params$default$path, paste0(step, ".yaml"))
+      }
+    }
+
+  # for advanced parameters to work
+  step <- step |>
+    gsub(pattern = "_advanced", replacement = "", fixed = TRUE)
+
   stopifnot("Your step does not exist." = step %in% steps)
 
   doc_path <-
     file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
-  default_path <-
-    if (step != "prepare_params") {
-      file.path(paths$params$default$path, paste0(step, ".yaml"))
-    } else {
-      file.path(paths$params$prepare_params)
-    }
 
   user_path <-
     file.path(paths$params$user$path, paste0(step, ".yaml"))

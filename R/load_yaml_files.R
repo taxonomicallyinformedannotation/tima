@@ -17,7 +17,8 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
       pattern = ".yaml",
       full.names = TRUE
     ),
-    parse_yaml_paths()$params$prepare_params
+    parse_yaml_paths()$params$prepare_params,
+    parse_yaml_paths()$params$prepare_params_advanced
   )
   ## -1 because of params.yaml
 
@@ -28,7 +29,8 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
         pattern = ".yaml",
         full.names = TRUE
       ),
-      parse_yaml_paths()$params$prepare_params
+      parse_yaml_paths()$params$prepare_params,
+      parse_yaml_paths()$params$prepare_params_advanced
     )
   }
 

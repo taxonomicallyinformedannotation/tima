@@ -1,0 +1,238 @@
+annotations:
+  candidates:
+    final: 3
+  ms1only: no
+  ms2approx: no
+  thresholds:
+    consistency: 0.0
+    ms1:
+      biological: 0.6
+      chemical: 0.6
+      condition: OR
+    ms2:
+      similarity: 0.2
+files:
+  pattern: example
+  annotations:
+    raw:
+      spectral: data/interim/annotations/example_isdb.tsv.gz
+      sirius: data/interim/annotations/example_sirius/
+    filtered: data/interim/annotations/example_annotations_filtered.tsv.gz
+    prepared:
+      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+      structural:
+      - data/interim/annotations/example_ms1_prepared.tsv.gz
+      - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+      - data/interim/annotations/example_sirius_prepared.tsv.gz
+    processed: example_results.tsv
+  features:
+    raw: data/source/features.tsv.gz
+    prepared: data/interim/features/example_features.tsv.gz
+  libraries:
+    adducts:
+      neg: data/interim/libraries/adducts/neg.tsv.gz
+      pos: data/interim/libraries/adducts/pos.tsv.gz
+      prepared: library
+    sop:
+      raw:
+        closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+        ecmdb: data/source/libraries/sop/ecmdb.json.zip
+        lotus: data/source/libraries/sop/lotus.csv.gz
+      prepared:
+      - data/interim/libraries/sop/lotus_prepared.tsv.gz
+      - data/interim/libraries/sop/closed_prepared.tsv.gz
+      merged:
+        keys: data/interim/libraries/sop/merged/keys.tsv.gz
+        organisms:
+          names: data/interim/libraries/sop/merged/organisms/names.tsv.gz
+          taxonomies:
+            ott: data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz
+        structures:
+          stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
+          metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+          names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+          taxonomies:
+            cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+            npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
+    spectral:
+      exp:
+        neg:
+        - data/interim/libraries/spectra/exp/massbank_neg.rds
+        - data/interim/libraries/spectra/exp/internal_neg.rds
+        pos:
+        - data/interim/libraries/spectra/exp/massbank_pos.rds
+        - data/interim/libraries/spectra/exp/internal_pos.rds
+        raw: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
+      is:
+        neg: data/interim/libraries/spectra/is/lotus_neg.rds
+        pos: data/interim/libraries/spectra/is/lotus_pos.rds
+        raw:
+        - data/source/libraries/spectra/is/lotus_neg.rds
+        - data/source/libraries/spectra/is/lotus_pos.rds
+    temporal:
+      exp: data/interim/libraries/rt/internal.tsv
+      is: data/interim/libraries/rt/predicted.tsv
+      prepared: data/interim/libraries/rt/prepared.tsv.gz
+  networks:
+    spectral:
+      edges:
+        raw: data/source/example_edges_manual.csv
+        prepared: data/interim/features/example_edges.tsv.gz
+      components:
+        raw: data/interim/features/example_components.tsv.gz
+        prepared: data/interim/features/example_components_prepared.tsv.gz
+  metadata:
+    raw: data/source/example_metadata.tsv
+    prepared: data/interim/taxa/example_taxed.tsv.gz
+  spectral:
+    raw: data/source/example_spectra.mgf
+gnps:
+  id: 41c6068e905d482db5698ad81d145d7c
+  workflow: fbmn
+ms:
+  adducts:
+    neg:
+    - '[1M-(H)3]3-'
+    - '[1M-(H)2]2-'
+    - '[1M-(H)1]1-'
+    - '[1M+(F)1]1-'
+    - '[1M+(Na)1-(H)2]1-'
+    - '[1M+(Cl)1]1-'
+    - '[1M+(K)1-(H)2]1-'
+    - '[1M+(Br)1]1-'
+    - '[2M-(H)1]1-'
+    - '[3M-(H)1]1-'
+    pos:
+    - '[1M+(H)3]3+'
+    - '[1M+(H)2(Na)1]3+'
+    - '[1M+(H)1(Na)2]3+'
+    - '[1M+(Na)3]3+'
+    - '[1M+(H)2]2+'
+    - '[1M+(H)1(Na)1]2+'
+    - '[1M+(Mg)1]2+'
+    - '[1M+(H)1(K)1]2+'
+    - '[1M+(Ca)1]2+'
+    - '[1M+(Na)2]2+'
+    - '[1M+(Fe)1]2+'
+    - '[1M+(H)1]1+'
+    - '[1M+(Na)1]1+'
+    - '[1M+(K)1]1+'
+    - '[1M+(Cu)1]1+'
+    - '[2M+(Mg)1]2+'
+    - '[2M+(Ca)1]2+'
+    - '[2M+(Fe)1]2+'
+    - '[2M+(H)1]1+'
+    - '[2M+(Na)1]1+'
+    - '[2M+(K)1]1+'
+  clusters:
+    neg:
+    - H2O
+    - CH2O2
+    - NaCl
+    - C2H4O2
+    - H2PO4
+    - C2HF3O2
+    pos:
+    - HN3
+    - H2O
+    - C2H3N
+    - NaCl
+  polarity: pos
+  thresholds:
+    ms1:
+      intensity: 1000000
+    ms2:
+      intensity: 5
+  tolerances:
+    mass:
+      ppm:
+        ms1: 10
+        ms2: 10
+      dalton:
+        ms1: 0.01
+        ms2: 0.01
+    rt:
+      minutes: 0.05
+names:
+  extension: yes
+  features: feature_id
+  filename: filename
+  inchikey: inchikey
+  mgf:
+    collision_energy: ~
+    compound_id: ~
+    exact_mass: EXACTMASS
+    inchi: INCHI
+    inchi_no_stereo: ~
+    inchikey: ~
+    inchikey_no_stereo: ~
+    molecular_formula: ~
+    name: ~
+    polarity: IONMODE
+    retention_time: ~
+    smiles: SMILES
+    smiles_no_stereo: ~
+    spectrum_id: SPECTRUMID
+    splash: ~
+    synonyms: ~
+    xlogp: ~
+  precursor: mz
+  rt: rt
+  smiles: smiles
+  source: CLUSTERID1
+  target: CLUSTERID2
+  taxon: ATTRIBUTE_species
+organisms:
+  candidates: 1
+  filter:
+    mode: no
+    level: phylum
+    value: Streptophyta
+  taxon: ~
+tools:
+  metadata: gnps
+  networks:
+    spectral:
+      components: gnps
+      edges: gnps
+  taxonomies:
+    biological: otl
+    chemical: npc
+units:
+  rt: minutes
+weights:
+  global:
+    biological: 0.5
+    chemical: 0.166
+    spectral: 0.333
+  biological:
+    domain: 0.1
+    kingdom: 0.2
+    phylum: 0.3
+    class: 0.4
+    order: 0.5
+    infraorder: 0.55
+    family: 0.6
+    subfamily: 0.65
+    tribe: 0.7
+    subtribe: 0.75
+    genus: 0.8
+    subgenus: 0.85
+    species: 0.9
+    subspecies: 0.95
+    variety: 1.0
+  chemical:
+    cla:
+      kingdom: 0.25
+      superclass: 0.5
+      class: 0.75
+      parent: 1.0
+    npc:
+      pathway: 0.333
+      superclass: 0.666
+      class: 1.0
+options:
+  compounds_names: no
+  force: no
+  summarise: yes
