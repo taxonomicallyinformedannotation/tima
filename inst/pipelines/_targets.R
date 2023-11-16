@@ -1053,7 +1053,7 @@ list(
           temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
           temp_is = par_pre_lib_rt$files$libraries$temporal$is,
           output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
-          output_sop = par_pre_lib_rt$files$libraries$sop$prepared,
+          output_sop = par_pre_lib_rt$files$libraries$sop$prepared$rt,
           col_ik = par_pre_lib_rt$names$mgf$inchikey,
           col_rt = par_pre_lib_rt$names$mgf$retention_time,
           col_sm = par_pre_lib_rt$names$mgf$smiles,
@@ -1141,7 +1141,7 @@ list(
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
                 input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
-                output = par_pre_lib_sop_clo$files$libraries$sop$prepared
+                output = par_pre_lib_sop_clo$files$libraries$sop$prepared$closed
               )
           }
         ),
@@ -1152,7 +1152,7 @@ list(
             lib_sop_ecm_pre <-
               prepare_libraries_sop_ecmdb(
                 input = lib_sop_ecm,
-                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared
+                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared$ecmdb
               )
           }
         ),
@@ -1168,7 +1168,7 @@ list(
                 } else {
                   paths_data_source_libraries_sop_lotus
                 },
-                output = par_pre_lib_sop_lot$files$libraries$sop$prepared
+                output = par_pre_lib_sop_lot$files$libraries$sop$prepared$lotus
               )
           }
         )
@@ -1536,7 +1536,7 @@ list(
       #       ann_spe_exp_gnp_pre <-
       #         prepare_annotations_gnps(
       #           input = gnps_annotations,
-      #           output = par_pre_ann_gnp$files$annotations$prepared$structural,
+      #           output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
       #           str_stereo = lib_mer_str_stereo,
       #           str_met = lib_mer_str_met,
       #           str_nam = lib_mer_str_nam,
@@ -1612,7 +1612,7 @@ list(
                 ann_spe_neg,
                 ann_spe_pos
               ),
-              output = par_pre_ann_spe$files$annotations$prepared$structural,
+              output = par_pre_ann_spe$files$annotations$prepared$structural$spectral,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
@@ -1631,7 +1631,7 @@ list(
         ann_sir_pre <-
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
-            output_ann = par_pre_ann_sir$files$annotations$prepared$structural,
+            output_ann = par_pre_ann_sir$files$annotations$prepared$structural$sirius,
             output_can = par_pre_ann_sir$files$annotations$prepared$canopus,
             output_for = par_pre_ann_sir$files$annotations$prepared$formula,
             str_stereo = lib_mer_str_stereo,
