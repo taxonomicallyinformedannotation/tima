@@ -18,8 +18,8 @@
 #'
 #' @examples NULL
 prepare_annotations_gnps <-
-  function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral,
-           output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural,
+  function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral$gnps,
+           output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural$gnps,
            str_stereo = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$stereo,
            str_met = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$metadata,
            str_nam = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$names,

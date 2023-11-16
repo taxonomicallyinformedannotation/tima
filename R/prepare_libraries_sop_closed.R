@@ -12,7 +12,7 @@
 #' @examples NULL
 prepare_libraries_sop_closed <-
   function(input = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
-           output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared) {
+           output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared$closed) {
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>

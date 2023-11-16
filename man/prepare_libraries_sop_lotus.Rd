@@ -6,7 +6,8 @@
 \usage{
 prepare_libraries_sop_lotus(
   input = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$raw$lotus,
-  output = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$prepared
+  output = get_params(step =
+    "prepare_libraries_sop_lotus")$files$libraries$sop$prepared$lotus
 )
 }
 \arguments{
