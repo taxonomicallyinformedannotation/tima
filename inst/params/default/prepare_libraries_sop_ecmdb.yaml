@@ -10,6 +10,7 @@ files:
         #' ECMDB structure organism pairs library. STRING
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
 
-      #' List of prepared structure organism pairs libraries. STRING
+      #' List of prepared structure organism pairs libraries.
       prepared:
-        - data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+        #' ECMDB prepared structure organism pairs library. STRING
+        ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz

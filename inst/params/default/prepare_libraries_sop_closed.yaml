@@ -10,6 +10,7 @@ files:
         #' Closed structure organism pairs library. STRING
         closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
 
-      #' List of prepared structure organism pairs libraries. STRING
+      #' List of prepared structure organism pairs libraries.
       prepared:
-        - data/interim/libraries/sop/closed_prepared.tsv.gz
+        #' Closed prepared structure organism pairs library. STRING
+        closed: data/interim/libraries/sop/closed_prepared.tsv.gz

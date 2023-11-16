@@ -16,9 +16,10 @@ files:
       #' List of prepared formula annotations. STRING
       formula: data/interim/annotations/example_formula_prepared.tsv.gz
 
-      #' List of prepared structural annotations. STRING
+      #' List of prepared structural annotations.
       structural:
-        - data/interim/annotations/example_sirius_prepared.tsv.gz
+        #' Prepared SIRIUS structural annotations. STRING
+        sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
 
   #' Libraries files.
   libraries:
