@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/weight_annotations.R
 
 Usage:
-  weight_annotations.R [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-thr-ms1-bio=<ann-thr-ms1-bio>] [--ann-thr-ms1-che=<ann-thr-ms1-che>] [--ann-thr-ms1-con=<ann-thr-ms1-con>] [--ann-thr-con=<ann-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pro=<fil-net-spe-edg-pro>] [--fil-tax-pro=<fil-tax-pro>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-11=<wei-che-11>] [--wei-che-12=<wei-che-12>] [--wei-che-13=<wei-che-13>]  [--wei-che-14=<wei-che-14>] [--wei-che-21=<wei-che-21>] [--wei-che-22=<wei-che-22>] [--wei-che-23=<wei-che-23>] [--compounds-names=<compounds-names>] [--summarise=<summarise>] [--force=<force>]
+  weight_annotations.R [--ann-can-fin=<ann-can-fin>] [--ann-ms1only=<ann-ms1only>] [--ann-thr-ms1-bio=<ann-thr-ms1-bio>] [--ann-thr-ms1-che=<ann-thr-ms1-che>] [--ann-thr-ms1-con=<ann-thr-ms1-con>] [--ann-thr-con=<ann-thr-con>] [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pro=<fil-ann-pro>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-net-spe-edg-pre=<fil-net-spe-edg-pre>] [--fil-met-pre=<fil-met-pre>] [--wei-glo-bio=<wei-glo-bio>] [--wei-glo-che=<wei-glo-che>] [--wei-glo-spe=<wei-glo-spe>] [--wei-bio-01=<wei-bio-01>] [--wei-bio-02=<wei-bio-02>] [--wei-bio-03=<wei-bio-03>] [--wei-bio-04=<wei-bio-04>] [--wei-bio-05=<wei-bio-05>] [--wei-bio-06=<wei-bio-06>] [--wei-bio-07=<wei-bio-07>] [--wei-bio-08=<wei-bio-08>] [--wei-bio-09=<wei-bio-09>] [--wei-bio-10=<wei-bio-10>] [--wei-bio-11=<wei-bio-11>] [--wei-bio-12=<wei-bio-12>] [--wei-bio-13=<wei-bio-13>] [--wei-bio-14=<wei-bio-14>] [--wei-bio-15=<wei-bio-15>] [--wei-che-11=<wei-che-11>] [--wei-che-12=<wei-che-12>] [--wei-che-13=<wei-che-13>]  [--wei-che-14=<wei-che-14>] [--wei-che-21=<wei-che-21>] [--wei-che-22=<wei-che-22>] [--wei-che-23=<wei-che-23>] [--compounds-names=<compounds-names>] [--summarise=<summarise>] [--force=<force>]
 
 Arguments:
   ann-can-fin                Number of final candidates. INTEGER
@@ -17,8 +17,8 @@ Arguments:
   fil-ann-pre-for            List of prepared formula annotations. STRING
   fil-ann-pro                Final results file. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
-  fil-net-spe-edg-pro        Prepared edges file. STRING
-  fil-tax-pro                Taxonomically informed features file. STRING
+  fil-net-spe-edg-pre        Prepared edges file. STRING
+  fil-met-pre                Taxonomically informed features file. STRING
 
   wei-glo-bio                Weight for the biological part. FLOAT
   wei-glo-che                Weight for the chemical part. FLOAT

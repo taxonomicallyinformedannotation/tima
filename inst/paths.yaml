@@ -147,6 +147,7 @@ params:
     weight:
       annotations: inst/params/default/weight_annotations.yaml
   prepare_params: inst/params/prepare_params.yaml
+  prepare_params_advanced: inst/params/prepare_params_advanced.yaml
   user:
     path: inst/params/user
     annotate:

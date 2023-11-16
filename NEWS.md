@@ -2,6 +2,7 @@
 
 # timaR 2.9.1
 
+* Expose all parameters (#107, #108)
 * Fix for Zenodo API
 
 # timaR 2.9.0

@@ -16,7 +16,7 @@ weight_annotations(
   components = get_params(step =
     "weight_annotations")$files$networks$spectral$components$prepared,
   edges = get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared,
-  taxa = get_params(step = "weight_annotations")$files$taxa$prepared,
+  taxa = get_params(step = "weight_annotations")$files$metadata$prepared,
   output = get_params(step = "weight_annotations")$files$annotations$processed,
   candidates_final = get_params(step = "weight_annotations")$annotations$candidates$final,
   weight_spectral = get_params(step = "weight_annotations")$weights$global$spectral,
