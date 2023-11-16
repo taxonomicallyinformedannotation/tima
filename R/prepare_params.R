@@ -430,7 +430,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$raw$lotus <-
         fil_lib_sop_raw_lot
       yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$prepared$lotus <-
-        fil_lib_sop_lot
+        fil_lib_sop_pre_lot
     },
     prepare_libraries_sop_merged = {
       yamls_params$prepare_libraries_sop_merged$files$libraries$sop$prepared <-
