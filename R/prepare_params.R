@@ -31,13 +31,18 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
   ann_thr_ms2_sim <- params_advanced$annotations$thresholds$ms2$similarity
   fil_pat <- params_advanced$files$pattern
-  # TODO add layers
   fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
+  fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
+  fil_ann_raw_spe_sir <- params_advanced$files$annotations$raw$spectral$sirius
+  fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
   fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
   fil_ann_pre_for <- params_advanced$files$annotations$prepared$formula
-  # TODO add layers
   fil_ann_pre_str <- params_advanced$files$annotations$prepared$structural
+  fil_ann_pre_str_gnp <- params_advanced$files$annotations$prepared$structural$gnps
+  fil_ann_pre_str_ms1 <- params_advanced$files$annotations$prepared$structural$ms1
+  fil_ann_pre_str_sir <- params_advanced$files$annotations$prepared$structural$sirius
+  fil_ann_pre_str_spe <- params_advanced$files$annotations$prepared$structural$spectral
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
   fil_fea_raw <- params_advanced$files$features$raw
@@ -48,8 +53,11 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
   fil_lib_sop_raw_lot <- params_advanced$files$libraries$sop$raw$lotus
-  # TODO add layers
   fil_lib_sop_pre <- params_advanced$files$libraries$sop$prepared
+  fil_lib_sop_pre_clo <- params_advanced$files$libraries$sop$prepared$closed
+  fil_lib_sop_pre_ecm <- params_advanced$files$libraries$sop$prepared$ecmdb
+  fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
+  fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
   # TODO Docopt
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
   fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
@@ -60,14 +68,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
   # TODO Docopt
-  # TODO add layers
   fil_lib_spe_exp_neg <- params_advanced$files$libraries$spectral$exp$neg
-  # TODO add layers
   fil_lib_spe_exp_pos <- params_advanced$files$libraries$spectral$exp$pos
   fil_lib_spe_exp_raw <- params_advanced$files$libraries$spectral$exp$raw
-  # TODO add layers
   fil_lib_spe_is_neg <- params_advanced$files$libraries$spectral$is$neg
-  # TODO add layers
   fil_lib_spe_is_pos <- params_advanced$files$libraries$spectral$is$pos
   fil_lib_spe_is_raw <- params_advanced$files$libraries$spectral$is$raw
   fil_lib_tem_exp <- params_advanced$files$libraries$temporal$exp
@@ -167,7 +171,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   metadata <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
   # gnps_id = params_small$gnps$id
-  # TODO GNPS example id to change
+  # TODO GNPS example id ?
   # gnps_workflow = params_small$gnps$workflow
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
@@ -288,10 +292,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         ms_tol_rt_min
     },
     prepare_annotations_gnps = {
-      yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
-        fil_ann_raw_spe
-      yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural <-
-        fil_ann_pre_str
+      yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
+        fil_ann_raw_spe_gnp
+      yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
+        fil_ann_pre_str_gnp
       yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$stereo <-
         fil_lib_sop_mer_str_ste
       yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$metadata <-
@@ -311,8 +315,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula <-
         fil_ann_pre_for
       # TODO add sirius layer
-      yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural <-
-        fil_ann_pre_str
+      yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural$sirius <-
+        fil_ann_pre_str_sir
       yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$stereo <-
         fil_lib_sop_mer_str_ste
       yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$metadata <-
@@ -325,10 +329,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_sop_mer_str_tax_npc
     },
     prepare_annotations_spectra = {
-      yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral <-
-        fil_ann_raw_spe
-      yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural <-
-        fil_ann_pre_str
+      yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral <-
+        fil_ann_raw_spe_spe
+      yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural$spectral <-
+        fil_ann_pre_str_spe
       yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$stereo <-
         fil_lib_sop_mer_str_ste
       yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$metadata <-
@@ -387,8 +391,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_spe_is_neg
       yamls_params$prepare_libraries_rt$files$libraries$spectral$is$pos <-
         fil_lib_spe_is_pos
-      yamls_params$prepare_libraries_rt$files$libraries$sop$prepared <-
-        fil_lib_sop_pre
+      yamls_params$prepare_libraries_rt$files$libraries$sop$prepared$rt <-
+        fil_lib_sop_pre_rt
       yamls_params$prepare_libraries_rt$files$libraries$temporal$exp <-
         fil_lib_tem_exp
       yamls_params$prepare_libraries_rt$files$libraries$temporal$is <-
@@ -413,23 +417,20 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     prepare_libraries_sop_closed = {
       yamls_params$prepare_libraries_sop_closed$files$libraries$sop$raw$closed <-
         fil_lib_sop_raw_clo
-      # TODO add closed layer
-      yamls_params$prepare_libraries_sop_closed$files$libraries$sop$prepared <-
-        fil_lib_sop_pre
+      yamls_params$prepare_libraries_sop_closed$files$libraries$sop$prepared$closed <-
+        fil_lib_sop_pre_clo
     },
     prepare_libraries_sop_ecmdb = {
       yamls_params$prepare_libraries_sop_ecmdb$files$libraries$sop$raw$ecmdb <-
         fil_lib_sop_raw_ecm
-      # TODO add ecmdb layer
-      yamls_params$prepare_libraries_sop_ecmdb$files$libraries$sop$prepared <-
-        fil_lib_sop_pre
+      yamls_params$prepare_libraries_sop_ecmdb$files$libraries$sop$prepared$ecmdb <-
+        fil_lib_sop_pre_ecm
     },
     prepare_libraries_sop_lotus = {
       yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$raw$lotus <-
         fil_lib_sop_raw_lot
-      # TODO add lotus layer
-      yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$prepared <-
-        fil_lib_sop_pre
+      yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$prepared$lotus <-
+        fil_lib_sop_lot
     },
     prepare_libraries_sop_merged = {
       yamls_params$prepare_libraries_sop_merged$files$libraries$sop$prepared <-
