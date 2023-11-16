@@ -14,7 +14,7 @@
 #' @examples NULL
 prepare_libraries_sop_lotus <-
   function(input = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$raw$lotus,
-           output = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$prepared) {
+           output = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$prepared$lotus) {
     if (file.exists(input)) {
       log_debug(x = "Loading and preparing LOTUS")
       lotus_prepared <- input |>

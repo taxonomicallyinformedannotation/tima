@@ -8,18 +8,18 @@ files:
       #' Experimental libraries
       exp:
         #' List of negative experimental spectral libraries. STRING
-        neg: []
+        neg: [ ]
 
         #' List of positive experimental spectral libraries. STRING
-        pos: []
+        pos: [ ]
 
       #' In silico libraries
       is:
         #' List of negative in silico spectral libraries. STRING
-        neg: []
+        neg: [ ]
 
         #' List of positive in silico spectral libraries. STRING
-        pos: []
+        pos: [ ]
 
     #' Structure organism pairs libraries.
     sop:
@@ -31,10 +31,10 @@ files:
     #' Temporal libraries. STRING
     temporal:
       #' List of experimental temporal libraries. STRING
-      exp: []
+      exp: [ ]
 
       #' List of in silico temporal libraries. STRING
-      is: []
+      is: [ ]
 
       #' List of prepared temporal libraries. STRING
       prepared:
