@@ -1036,6 +1036,217 @@ list(
   ),
   ## libraries
   list(
+    ## Spectra
+    list( ## In silico
+      list( ## Raw
+        list(
+          ## TODO ADD ISDB HMDB,
+          tar_target(
+            name = lib_spe_is_lot_pos,
+            format = "file",
+            command = {
+              lib_spe_is_lot_pos <-
+                # if (paths_test_mode == FALSE) {
+                get_file(
+                  url = paths_urls_examples_spectral_lib_pos,
+                  export = paths_data_source_libraries_spectra_is_lotus_pos |>
+                    gsub(
+                      pattern = "isdb_pos.mgf",
+                      replacement = "lotus_pos.rds"
+                    )
+                )
+              # get_last_version_from_zenodo(
+              #   doi = paths_urls_lotus_isdb_doi,
+              #   pattern = paths_urls_lotus_isdb_pattern_pos,
+              #   path = paths_data_source_libraries_spectra_is_lotus_pos
+              # )
+              # } else {
+              #   get_file(
+              #     url = paths_urls_examples_spectral_lib_pos,
+              #     export = paths_data_source_libraries_spectra_is_lotus_pos
+              #   )
+              # }
+            }
+            ## To always check if a newest version is available
+            ,
+            cue = tar_cue(mode = "always")
+            # cue = tar_cue(mode = "thorough")
+          ),
+          tar_target(
+            name = lib_spe_is_lot_neg,
+            format = "file",
+            command = {
+              lib_spe_is_lot_neg <-
+                # if (paths_test_mode == FALSE) {
+                get_file(
+                  url = paths_urls_examples_spectral_lib_neg,
+                  export = paths_data_source_libraries_spectra_is_lotus_neg |>
+                    gsub(
+                      pattern = "isdb_neg.mgf",
+                      replacement = "lotus_neg.rds"
+                    )
+                )
+              # get_last_version_from_zenodo(
+              #   doi = paths_urls_lotus_isdb_doi,
+              #   pattern = paths_urls_lotus_isdb_pattern_neg,
+              #   path = paths_data_source_libraries_spectra_is_lotus_neg
+              # )
+              # } else {
+              #   get_file(
+              #     url = paths_urls_examples_spectral_lib_neg,
+              #     export = paths_data_source_libraries_spectra_is_lotus_neg
+              #   )
+              # }
+            }
+            ## To always check if a newest version is available
+            ,
+            cue = tar_cue(mode = "always")
+            # cue = tar_cue(mode = "thorough")
+          )
+        )
+      ),
+      ## Prepared
+      list(
+        ## TODO ADD IS HMDB PREPARED,
+        tar_target(
+          name = lib_spe_is_lot_pre_pos,
+          format = "file",
+          command = {
+            lib_spe_is_lot_pre_pos <-
+              lib_spe_is_lot_pos
+          }
+        ),
+        tar_target(
+          name = lib_spe_is_lot_pre_neg,
+          format = "file",
+          command = {
+            lib_spe_is_lot_pre_neg <-
+              lib_spe_is_lot_neg
+          }
+        )
+      ),
+      ## Experimental
+      list(
+        ## RAW
+        list(
+          ### Internal
+          ## This does not work as it forces the file to exist.
+          ## So targets will not check if the input file changed automatically.
+          # tar_target(
+          #   name = lib_spe_exp_int_raw,
+          # .  format = "file",
+          #   command = {
+          #     lib_spe_exp_int_raw <-
+          #       par_pre_lib_spe$files$libraries$spectral$exp$raw
+          #   }
+          # ),
+          ### MassBank
+          tar_target(
+            name = lib_spe_exp_mb_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_raw <- get_massbank_spectra(
+                mb_file = paths_urls_massbank_file,
+                mb_url = paths_urls_massbank_url,
+                mb_version = paths_urls_massbank_version
+              )
+            }
+          )
+        ),
+        ## Prepared
+        list(
+          tar_target(
+            name = lib_spe_exp_int_pre,
+            format = "file",
+            command = {
+              lib_spe_exp_int_pre <-
+                prepare_libraries_spectra(
+                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
+                  output_pos = "data/interim/libraries/spectra/exp/internal_pos.rds",
+                  output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
+                  metad = "InternalLib",
+                  col_ce = NULL,
+                  col_ci = "FILENAME",
+                  col_em = "EXACTMASS",
+                  col_in = "INCHI",
+                  col_io = NULL,
+                  col_ik = NULL,
+                  col_il = NULL,
+                  col_mf = NULL,
+                  col_na = "NAME",
+                  col_po = "IONMODE",
+                  col_sm = "SMILES",
+                  col_sn = NULL,
+                  col_si = "SPECTRUMID",
+                  col_sp = NULL,
+                  col_sy = NULL,
+                  col_xl = NULL
+                )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_int_pre_pos,
+            format = "file",
+            command = {
+              lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_int_pre_neg,
+            format = "file",
+            command = {
+              lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mb_pre,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_pre <-
+                prepare_libraries_spectra(
+                  input = lib_spe_exp_mb_raw,
+                  output_pos = "data/interim/libraries/spectra/exp/massbank_pos.rds",
+                  output_neg = "data/interim/libraries/spectra/exp/massbank_neg.rds",
+                  metad = paste("MassBank",
+                    paths_urls_massbank_version,
+                    sep = " - "
+                  ),
+                  col_ce = "Collision_energy",
+                  col_ci = NULL,
+                  col_em = "ExactMass",
+                  col_in = "InChI",
+                  col_io = NULL,
+                  col_ik = "InChIKey",
+                  col_il = NULL,
+                  col_mf = "Formula",
+                  col_na = "Name",
+                  col_po = "Ion_mode",
+                  col_sm = "smiles",
+                  col_sn = NULL,
+                  col_si = "accession",
+                  col_sp = "Splash",
+                  col_sy = "Synon",
+                  col_xl = NULL
+                )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mb_pre_pos,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_pre_pos <- lib_spe_exp_mb_pre[[1]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mb_pre_neg,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
+            }
+          )
+        )
+      )
+    ),
     ## Retention times
     list(tar_target(
       name = lib_rt,
@@ -1043,12 +1254,12 @@ list(
       command = {
         lib_rt <- prepare_libraries_rt(
           mgf_exp = list(
-            par_pre_lib_rt$files$libraries$spectral$exp$neg,
-            par_pre_lib_rt$files$libraries$spectral$exp$pos
+            lib_spe_exp_int_pre_neg,
+            lib_spe_exp_int_pre_pos
           ),
           mgf_is = list(
-            par_pre_lib_rt$files$libraries$spectral$is$neg,
-            par_pre_lib_rt$files$libraries$spectral$is$pos
+            lib_spe_is_lot_pre_neg,
+            lib_spe_is_lot_pre_pos
           ),
           temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
           temp_is = par_pre_lib_rt$files$libraries$temporal$is,
@@ -1260,217 +1471,7 @@ list(
           masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
         )
       }
-    )),
-    ## Spectra
-    list( ## In silico
-      list( ## Raw
-        list(
-          ## TODO ADD ISDB HMDB,
-          tar_target(
-            name = lib_spe_is_lot_pos,
-            format = "file",
-            command = {
-              lib_spe_is_lot_pos <-
-                # if (paths_test_mode == FALSE) {
-                get_file(
-                  url = paths_urls_examples_spectral_lib_pos,
-                  export = paths_data_source_libraries_spectra_is_lotus_pos |>
-                    gsub(
-                      pattern = "isdb_pos.mgf",
-                      replacement = "lotus_pos.rds"
-                    )
-                )
-              # get_last_version_from_zenodo(
-              #   doi = paths_urls_lotus_isdb_doi,
-              #   pattern = paths_urls_lotus_isdb_pattern_pos,
-              #   path = paths_data_source_libraries_spectra_is_lotus_pos
-              # )
-              # } else {
-              #   get_file(
-              #     url = paths_urls_examples_spectral_lib_pos,
-              #     export = paths_data_source_libraries_spectra_is_lotus_pos
-              #   )
-              # }
-            }
-            ## To always check if a newest version is available
-            ,
-            cue = tar_cue(mode = "always")
-            # cue = tar_cue(mode = "thorough")
-          ),
-          tar_target(
-            name = lib_spe_is_lot_neg,
-            format = "file",
-            command = {
-              lib_spe_is_lot_neg <-
-                # if (paths_test_mode == FALSE) {
-                get_file(
-                  url = paths_urls_examples_spectral_lib_neg,
-                  export = paths_data_source_libraries_spectra_is_lotus_neg |>
-                    gsub(
-                      pattern = "isdb_neg.mgf",
-                      replacement = "lotus_neg.rds"
-                    )
-                )
-              # get_last_version_from_zenodo(
-              #   doi = paths_urls_lotus_isdb_doi,
-              #   pattern = paths_urls_lotus_isdb_pattern_neg,
-              #   path = paths_data_source_libraries_spectra_is_lotus_neg
-              # )
-              # } else {
-              #   get_file(
-              #     url = paths_urls_examples_spectral_lib_neg,
-              #     export = paths_data_source_libraries_spectra_is_lotus_neg
-              #   )
-              # }
-            }
-            ## To always check if a newest version is available
-            ,
-            cue = tar_cue(mode = "always")
-            # cue = tar_cue(mode = "thorough")
-          )
-        )
-      ),
-      ## Prepared
-      list(
-        ## TODO ADD IS HMDB PREPARED,
-        tar_target(
-          name = lib_spe_is_lot_pre_pos,
-          format = "file",
-          command = {
-            lib_spe_is_lot_pre_pos <-
-              lib_spe_is_lot_pos
-          }
-        ),
-        tar_target(
-          name = lib_spe_is_lot_pre_neg,
-          format = "file",
-          command = {
-            lib_spe_is_lot_pre_neg <-
-              lib_spe_is_lot_neg
-          }
-        )
-      ),
-      ## Experimental
-      list(
-        ## RAW
-        list(
-          ### Internal
-          ## This does not work as it forces the file to exist.
-          ## So targets will not check if the input file changed automatically.
-          # tar_target(
-          #   name = lib_spe_exp_int_raw,
-          # .  format = "file",
-          #   command = {
-          #     lib_spe_exp_int_raw <-
-          #       par_pre_lib_spe$files$libraries$spectral$exp$raw
-          #   }
-          # ),
-          ### MassBank
-          tar_target(
-            name = lib_spe_exp_mb_raw,
-            format = "file",
-            command = {
-              lib_spe_exp_mb_raw <- get_massbank_spectra(
-                mb_file = paths_urls_massbank_file,
-                mb_url = paths_urls_massbank_url,
-                mb_version = paths_urls_massbank_version
-              )
-            }
-          )
-        ),
-        ## Prepared
-        list(
-          tar_target(
-            name = lib_spe_exp_int_pre,
-            format = "file",
-            command = {
-              lib_spe_exp_int_pre <-
-                prepare_libraries_spectra(
-                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output_pos = "data/interim/libraries/spectra/exp/internal_pos.rds",
-                  output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
-                  metad = "InternalLib",
-                  col_ce = NULL,
-                  col_ci = "FILENAME",
-                  col_em = "EXACTMASS",
-                  col_in = "INCHI",
-                  col_io = NULL,
-                  col_ik = NULL,
-                  col_il = NULL,
-                  col_mf = NULL,
-                  col_na = "NAME",
-                  col_po = "IONMODE",
-                  col_sm = "SMILES",
-                  col_sn = NULL,
-                  col_si = "SPECTRUMID",
-                  col_sp = NULL,
-                  col_sy = NULL,
-                  col_xl = NULL
-                )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_int_pre_pos,
-            format = "file",
-            command = {
-              lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_int_pre_neg,
-            format = "file",
-            command = {
-              lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre,
-            format = "file",
-            command = {
-              lib_spe_exp_mb_pre <-
-                prepare_libraries_spectra(
-                  input = lib_spe_exp_mb_raw,
-                  output_pos = "data/interim/libraries/spectra/exp/massbank_pos.rds",
-                  output_neg = "data/interim/libraries/spectra/exp/massbank_neg.rds",
-                  metad = paste("MassBank",
-                    paths_urls_massbank_version,
-                    sep = " - "
-                  ),
-                  col_ce = "Collision_energy",
-                  col_ci = NULL,
-                  col_em = "ExactMass",
-                  col_in = "InChI",
-                  col_io = NULL,
-                  col_ik = "InChIKey",
-                  col_il = NULL,
-                  col_mf = "Formula",
-                  col_na = "Name",
-                  col_po = "Ion_mode",
-                  col_sm = "smiles",
-                  col_sn = NULL,
-                  col_si = "accession",
-                  col_sp = "Splash",
-                  col_sy = "Synon",
-                  col_xl = NULL
-                )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre_pos,
-            format = "file",
-            command = {
-              lib_spe_exp_mb_pre_pos <- lib_spe_exp_mb_pre[[1]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre_neg,
-            format = "file",
-            command = {
-              lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
-            }
-          )
-        )
-      )
+    )
     )
   ),
   ## Annotations
