@@ -604,4 +604,4 @@ options:
   force: no
 
   #' Summarise results to one row per feature. BOOLEAN
-  summarise: yes
+  summarise: no
