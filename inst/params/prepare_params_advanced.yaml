@@ -189,12 +189,12 @@ files:
     #' Temporal libraries. STRING
     temporal:
       #' List of experimental temporal libraries. STRING
-      exp:
-        - data/interim/libraries/rt/internal.tsv
+      exp: [ ]
+        # - data/interim/libraries/rt/internal.tsv
 
       #' List of in silico temporal libraries. STRING
-      is:
-        - data/interim/libraries/rt/predicted.tsv
+      is: [ ]
+        # - data/interim/libraries/rt/predicted.tsv
 
       #' List of prepared temporal libraries. STRING
       prepared:
