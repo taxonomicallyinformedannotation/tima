@@ -78,6 +78,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_tem_is <- params_advanced$files$libraries$temporal$is
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
   fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
+  fil_net_spe_edg_raw_ms1 <- params_advanced$files$networks$spectral$edges$raw$ms1
+  fil_net_spe_edg_raw_spe <- params_advanced$files$networks$spectral$edges$raw$spectral
   fil_net_spe_edg_pre <- params_advanced$files$networks$spectral$edges$prepared
   fil_net_spe_com_raw <- params_advanced$files$networks$spectral$components$raw
   fil_net_spe_com_pre <- params_advanced$files$networks$spectral$components$prepared
@@ -170,9 +172,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_fea_raw <- params_small$files$features$raw
   metadata <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
-  # gnps_id = params_small$gnps$id
-  # TODO GNPS example id ?
-  # gnps_workflow = params_small$gnps$workflow
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_sum <- params_small$options$summarise
@@ -202,8 +201,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_sop_mer_str_tax_cla
       yamls_params$annotate_masses$files$libraries$sop$merged$structures$taxonomies$npc <-
         fil_lib_sop_mer_str_tax_npc
-      yamls_params$annotate_masses$files$networks$spectral$edges$raw <-
-        fil_net_spe_edg_raw
+      yamls_params$annotate_masses$files$networks$spectral$edges$raw$ms1 <-
+        fil_net_spe_edg_raw_ms1
       yamls_params$annotate_masses$ms$adducts$neg <-
         ms_add_neg
       yamls_params$annotate_masses$ms$adducts$pos <-
@@ -264,8 +263,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     create_edges_spectra = {
       yamls_params$create_edges_spectra$annotations$thresholds$ms2$similarity <-
         ann_thr_ms2_sim
-      yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
-        fil_net_spe_edg_raw
+      yamls_params$create_edges_spectra$files$networks$spectral$edges$raw$spectral <-
+        fil_net_spe_edg_raw_spe
       yamls_params$create_edges_spectra$files$spectral$raw <-
         fil_spe_raw
       yamls_params$create_edges_spectra$ms$thresholds$ms2$intensity <-
@@ -351,8 +350,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_net_spe_com_pre
     },
     prepare_features_edges = {
-      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw <-
-        fil_net_spe_edg_raw
+      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 <-
+        fil_net_spe_edg_raw_ms1
+      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral <-
+        fil_net_spe_edg_raw_spe
       yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
         fil_net_spe_edg_pre
       yamls_params$prepare_features_edges$names$source <-
@@ -675,8 +676,11 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     prepare_features_edges = {
-      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw <-
-        yamls_params$prepare_features_edges$files$networks$spectral$edges$raw |>
+      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 <-
+        yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 |>
+        lapply(FUN = replace_id)
+      yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral <-
+        yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral |>
         lapply(FUN = replace_id)
       yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
         yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared |>
