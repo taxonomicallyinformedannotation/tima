@@ -1,6 +1,7 @@
 ---
 title: "1 Inputs: Getting everything you need"
 author: "Adriano Rutz"
+creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 opengraph:
@@ -9,6 +10,8 @@ opengraph:
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
+    mastodon:
+      author_name: "@adafede@mastodon.online"
 vignette: >
   %\VignetteIndexEntry{1 Inputs: Getting everything you need}
   %\VignetteEngine{knitr::rmarkdown}
