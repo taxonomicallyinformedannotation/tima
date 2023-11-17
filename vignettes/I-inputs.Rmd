@@ -79,7 +79,7 @@ targets::tar_visnetwork(
 ```
 
 See how your targets changed?
-The values you adapted in `inst/prepare_params.yaml` were automatically propagated to all sub-files in `inst/params/user`.
+The values you adapted in `inst/prepare_params.yaml` and/or `inst/prepare_params_advanced.yaml`  were automatically propagated to all sub-files in `inst/params/user`.
 
 And everything is stored in case you re-perform it, the beauty of `{targets}`!
 
