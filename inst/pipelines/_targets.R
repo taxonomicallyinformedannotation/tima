@@ -1723,7 +1723,7 @@ list(
       format = "file",
       command = {
         fea_edg_pre <- prepare_features_edges(
-          input = c(edg_spe, ann_ms1_pre_edg),
+          input = c("ms1" = ann_ms1_pre_edg, "spectral" = edg_spe),
           output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target
