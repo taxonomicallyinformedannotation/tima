@@ -25,7 +25,7 @@
 #' @examples NULL
 prepare_annotations_sirius <-
   function(input_directory = get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
-           output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural,
+           output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural$sirius,
            output_can = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$canopus,
            output_for = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$formula,
            str_stereo = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,

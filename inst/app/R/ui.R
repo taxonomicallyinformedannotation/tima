@@ -104,7 +104,7 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::fileInput(
-          inputId = "fil_tax_raw",
+          inputId = "fil_met_raw",
           label = "Metadata table (mandatory if no taxon name)",
           accept = c(
             ".csv",
@@ -144,22 +144,6 @@ ui <- shiny::fluidPage(
         title = "Annotations",
         shiny::h3("Annotations-related parameters"),
         shiny::sliderInput(
-          inputId = "ann_can_ini",
-          label = "Number of initial candidates",
-          min = 1,
-          max = 500,
-          value = 50,
-          step = 1,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Number of initial candidates to consider.",
-              "For 12 candidates, with 10, only the first 10 will be kept."
-            )
-          ),
-        shiny::sliderInput(
           inputId = "ann_can_fin",
           label = "Number of final candidates",
           min = 1,
@@ -186,17 +170,6 @@ ui <- shiny::fluidPage(
             content = c(
               "Option to erase MS2 results.",
               "Usually not needed, for benchmarking mainly."
-            )
-          ),
-        shiny::checkboxInput(
-          inputId = "ann_ms1_ann",
-          label = "Perform MS1 annotation",
-          value = TRUE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Options to complement previous results at the MS1 level."
             )
           ),
         shiny::sliderInput(
@@ -1246,38 +1219,38 @@ ui <- shiny::fluidPage(
               (one per candidate)."
             )
           )
+      ),
+      shiny::tabPanel(
+        title = "GNPS (optional)",
+        shiny::h3("GNPS parameters"),
+        shiny::textInput(
+          inputId = "gnps_id",
+          label = "GNPS job ID",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Your GNPS job ID.",
+              "If you provide one, all files will be taken from there.",
+              "You still need to provide a path for
+              where we will store the files,",
+              "in case your GNPS job gets deleted for you to find them back.",
+              "Annotations will also be downloaded."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "gnps_workflow",
+          label = "Workflow used within GNPS",
+          choices = c("classical", "fbmn"),
+          selected = "fbmn"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("We advise `fbmn`,
+                        but we also support `classical` jobs.")
+          )
       )
-      # shiny::tabPanel(
-      #   title = "GNPS (optional)",
-      #   shiny::h3("GNPS parameters"),
-      #   shiny::textInput(
-      #     inputId = "gnps_id",
-      #     label = "GNPS job ID",
-      #     value = NULL
-      #   ) |>
-      #     shinyhelper::helper(
-      #       type = "inline",
-      #       content = c(
-      #         "Your GNPS job ID.",
-      #         "If you provide one, all files will be taken from there.",
-      #         "You still need to provide a path for
-      #         where we will store the files,",
-      #         "in case your GNPS job gets deleted for you to find them back.",
-      #         "Annotations will also be downloaded."
-      #       )
-      #     ),
-      #   shiny::selectInput(
-      #     inputId = "gnps_workflow",
-      #     label = "Workflow used within GNPS",
-      #     choices = c("classical", "fbmn"),
-      #     selected = "fbmn"
-      #   ) |>
-      #     shinyhelper::helper(
-      #       type = "inline",
-      #       content = c("We advise `fbmn`,
-      #                   but we also support `classical` jobs.")
-      #     )
-      # )
     )
   )),
   shiny::fluidPage(

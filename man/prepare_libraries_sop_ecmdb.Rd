@@ -6,7 +6,8 @@
 \usage{
 prepare_libraries_sop_ecmdb(
   input = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$raw$ecmdb,
-  output = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared
+  output = get_params(step =
+    "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared$ecmdb
 )
 }
 \arguments{

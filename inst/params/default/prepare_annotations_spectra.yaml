@@ -5,15 +5,17 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' List of spectral matching results. STRING
+      #' List of spectral matching results.
       spectral:
-        - data/interim/annotations/example_spectral_matches.tsv.gz
+        #' Spectral spectral matching results. STRING
+        spectral: data/interim/annotations/example_spectral_matches.tsv.gz
 
     #' List of prepared annotations.
     prepared:
-      #' List of prepared structural annotations. STRING
+      #' List of prepared structural annotations.
       structural:
-        - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+        #' Prepared spectral structural annotations. STRING
+        spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
 
   #' Libraries files.
   libraries:

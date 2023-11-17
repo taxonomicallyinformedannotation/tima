@@ -1,6 +1,7 @@
 ---
 title: "2 Formatting all inputs"
 author: "Adriano Rutz"
+creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 opengraph:

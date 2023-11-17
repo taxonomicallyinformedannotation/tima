@@ -7,7 +7,7 @@
 annotate_masses(
   features = get_params(step = "annotate_masses")$files$features$prepared,
   output_annotations = get_params(step =
-    "annotate_masses")$files$annotations$prepared$structural,
+    "annotate_masses")$files$annotations$prepared$structural$ms1,
   output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
   name_source = get_params(step = "annotate_masses")$names$source,
   name_target = get_params(step = "annotate_masses")$names$target,

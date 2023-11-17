@@ -10,12 +10,12 @@ prepare_libraries_rt(
   temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp,
   temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is,
   output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
-  output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared,
+  output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared$rt,
   col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
   col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
   col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
   name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
-  name_rt = get_params(step = "prepare_libraries_rt")$names$rt,
+  name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
 )

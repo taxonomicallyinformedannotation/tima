@@ -412,11 +412,27 @@ list(
           }
         ),
         tar_target(
+          name = par_pre_par2,
+          format = "file",
+          command = {
+            par_pre_par2 <- paths$params$prepare_params_advanced
+          }
+        ),
+        tar_target(
           name = par_fin_par,
           command = {
             par_fin_par <- parse_yaml_params(
               def = par_pre_par,
               usr = par_pre_par
+            )
+          }
+        ),
+        tar_target(
+          name = par_fin_par2,
+          command = {
+            par_fin_par2 <- parse_yaml_params(
+              def = par_pre_par2,
+              usr = par_pre_par2
             )
           }
         )
@@ -429,15 +445,8 @@ list(
           command = {
             par_usr_ann_mas <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "annotate_masses"
               )
           }
@@ -448,15 +457,8 @@ list(
           command = {
             par_usr_ann_spe <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "annotate_spectra"
               )
           }
@@ -467,15 +469,8 @@ list(
           command = {
             par_usr_cre_com <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "create_components"
               )
           }
@@ -486,15 +481,8 @@ list(
           command = {
             par_usr_fil_ann <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "filter_annotations"
               )
           }
@@ -505,15 +493,8 @@ list(
           command = {
             par_usr_cre_edg_spe <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "create_edges_spectra"
               )
           }
@@ -524,15 +505,8 @@ list(
           command = {
             par_usr_pre_ann_gnp <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_annotations_gnps"
               )
           }
@@ -543,15 +517,8 @@ list(
           command = {
             par_usr_pre_ann_sir <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_annotations_sirius"
               )
           }
@@ -562,15 +529,8 @@ list(
           command = {
             par_usr_pre_ann_spe <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_annotations_spectra"
               )
           }
@@ -581,15 +541,8 @@ list(
           command = {
             par_usr_pre_fea_com <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_features_components"
               )
           }
@@ -600,15 +553,8 @@ list(
           command = {
             par_usr_pre_fea_edg <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_features_edges"
               )
           }
@@ -619,15 +565,8 @@ list(
           command = {
             par_usr_pre_fea_tab <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_features_tables"
               )
           }
@@ -638,15 +577,8 @@ list(
           command = {
             par_usr_pre_lib_add <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_adducts"
               )
           }
@@ -657,15 +589,8 @@ list(
           command = {
             par_usr_pre_lib_rt <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_rt"
               )
           }
@@ -676,15 +601,8 @@ list(
           command = {
             par_usr_pre_lib_sop_clo <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_closed"
               )
           }
@@ -695,34 +613,20 @@ list(
           command = {
             par_usr_pre_lib_sop_ecm <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_ecmdb"
               )
           }
         ),
         # tar_target(
         #   name = par_usr_pre_lib_sop_hmd,
-        # .  format = "file",
+        #   format = "file",
         #   command = {
         #     par_usr_pre_lib_sop_hmd <-
         #       prepare_params(
-        #         filename = par_fin_par$files$pattern,
-        #         features = par_fin_par$files$features$raw,
-        #         metadata = par_fin_par$files$metadata$raw,
-        #         spectra = par_fin_par$files$spectral$raw,
-        #         # gnps_job_id = par_fin_par$gnps$id,
-        #         # gnps_example_id = paths_gnps_example_id,
-        #         ms_mode = par_fin_par$ms$polarity,
-        #         taxon = par_fin_par$organisms$taxon,
-        # .        summarise = par_fin_par$options$summarise,
+        #         params_small = par_fin_par,
+        #         params_advanced = par_fin_par2,
         #         step = "prepare_libraries_sop_hmdb"
         #       )
         #   }
@@ -733,15 +637,8 @@ list(
           command = {
             par_usr_pre_lib_sop_lot <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_lotus"
               )
           }
@@ -752,15 +649,8 @@ list(
           command = {
             par_usr_pre_lib_sop_mer <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_merged"
               )
           }
@@ -771,15 +661,8 @@ list(
           command = {
             par_usr_pre_lib_spe <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_libraries_spectra"
               )
           }
@@ -790,15 +673,8 @@ list(
           command = {
             par_usr_pre_tax <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "prepare_taxa"
               )
           }
@@ -809,15 +685,8 @@ list(
           command = {
             par_usr_wei_ann <-
               prepare_params(
-                filename = par_fin_par$files$pattern,
-                features = par_fin_par$files$features$raw,
-                metadata = par_fin_par$files$metadata$raw,
-                spectra = par_fin_par$files$spectral$raw,
-                # gnps_job_id = par_fin_par$gnps$id,
-                # gnps_example_id = paths_gnps_example_id,
-                ms_mode = par_fin_par$ms$polarity,
-                taxon = par_fin_par$organisms$taxon,
-                summarise = par_fin_par$options$summarise,
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
                 step = "weight_annotations"
               )
           }
@@ -1050,7 +919,7 @@ list(
   #         filename = par_fin_par$files$pattern,
   #         workflow = par_fin_par$gnps$workflow,
   #         path_features = par_pre_fea_tab$files$features$raw,
-  #         path_metadata = par_pre_tax$files$taxa$raw,
+  #         path_metadata = par_pre_tax$files$metadata$raw,
   #         path_spectra = par_ann_spe$files$spectral$raw,
   #         path_source = paths_source,
   #         path_interim_a = paths_interim_a,
@@ -1152,246 +1021,21 @@ list(
       name = input_metadata,
       format = "file",
       command = {
-        input_metadata <- par_pre_tax$files$taxa$raw
+        input_metadata <- par_pre_tax$files$metadata$raw
         # input_metadata <-
         #   ifelse(
         #     test = !is.null(gnps_metadata),
         #     yes = ifelse(test = file.exists(gnps_metadata),
         #       yes = gnps_metadata,
-        #       no = par_pre_tax$files$taxa$raw
+        #       no = par_pre_tax$files$metadata$raw
         #     ),
-        #     no = par_pre_tax$files$taxa$raw
+        #     no = par_pre_tax$files$metadata$raw
         #   )
       }
     )
   ),
   ## libraries
   list(
-    ## Retention times
-    list(tar_target(
-      name = lib_rt,
-      format = "file",
-      command = {
-        lib_rt <- prepare_libraries_rt(
-          mgf_exp = list(
-            par_pre_lib_rt$files$libraries$spectral$exp$neg,
-            par_pre_lib_rt$files$libraries$spectral$exp$pos
-          ),
-          mgf_is = list(
-            par_pre_lib_rt$files$libraries$spectral$is$neg,
-            par_pre_lib_rt$files$libraries$spectral$is$pos
-          ),
-          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
-          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
-          output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
-          output_sop = par_pre_lib_rt$files$libraries$sop$prepared,
-          col_ik = par_pre_lib_rt$names$mgf$inchikey,
-          col_rt = par_pre_lib_rt$names$mgf$retention_time,
-          col_sm = par_pre_lib_rt$names$mgf$smiles,
-          name_inchikey = par_pre_lib_rt$names$inchikey,
-          name_rt = par_pre_lib_rt$names$rt,
-          name_smiles = par_pre_lib_rt$names$smiles,
-          unit_rt = par_pre_lib_rt$units$rt
-        )
-      }
-    )),
-    tar_target(
-      name = lib_rt_rts,
-      format = "file",
-      command = {
-        lib_rt_rts <- lib_rt[[1]]
-      }
-    ),
-    tar_target(
-      name = lib_rt_sop,
-      format = "file",
-      command = {
-        lib_rt_sop <- lib_rt[[2]]
-      }
-    ),
-    ## Structure organism pairs
-    list(
-      ## Raw
-      list(
-        ## This does not work as it forces the file to exist.
-        ## So targets will not check if the input file changed automatically.
-        # tar_target(
-        #   name = lib_sop_clo,
-        # .  format = "file",
-        #   command = {
-        #     lib_sop_clo <- paths$data$source$libraries$sop$closed
-        #   }
-        # ),
-        tar_target(
-          name = lib_sop_ecm,
-          format = "file",
-          command = {
-            ## Because ECMDB certificate is expired
-            lib_sop_ecm <- tryCatch(
-              expr = {
-                get_file(
-                  url = paths_urls_ecmdb_metabolites,
-                  export = paths_data_source_libraries_sop_ecmdb
-                )
-              },
-              error = function(e) {
-                fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb)
-              }
-            )
-          }
-        ),
-        ## TODO ADD  GET HMDB
-        tar_target(
-          name = lib_sop_lot,
-          format = "file",
-          command = {
-            lib_sop_lot <- tryCatch(
-              expr = {
-                get_last_version_from_zenodo(
-                  doi = paths_urls_lotus_doi,
-                  pattern = paths_urls_lotus_pattern,
-                  path = paths_data_source_libraries_sop_lotus
-                )
-              },
-              error = function(e) {
-                fake_lotus(export = paths_data_source_libraries_sop_lotus)
-              }
-            )
-          },
-          ## To always check if a newest version is available
-          cue = tar_cue(mode = "always")
-          # cue = tar_cue(mode = "thorough")
-        )
-      ),
-      ## Prepared
-      list(
-        tar_target(
-          name = lib_sop_clo_pre,
-          format = "file",
-          command = {
-            lib_sop_clo_pre <-
-              prepare_libraries_sop_closed(
-                input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
-                output = par_pre_lib_sop_clo$files$libraries$sop$prepared
-              )
-          }
-        ),
-        tar_target(
-          name = lib_sop_ecm_pre,
-          format = "file",
-          command = {
-            lib_sop_ecm_pre <-
-              prepare_libraries_sop_ecmdb(
-                input = lib_sop_ecm,
-                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared
-              )
-          }
-        ),
-        ## TODO ADD HMDB PREPARED
-        tar_target(
-          name = lib_sop_lot_pre,
-          format = "file",
-          command = {
-            lib_sop_lot_pre <-
-              prepare_libraries_sop_lotus(
-                input = if (paths_test_mode == FALSE) {
-                  lib_sop_lot
-                } else {
-                  paths_data_source_libraries_sop_lotus
-                },
-                output = par_pre_lib_sop_lot$files$libraries$sop$prepared
-              )
-          }
-        )
-      ),
-      ## Merged
-      list(
-        tar_target(
-          name = lib_sop_mer,
-          format = "file",
-          command = {
-            lib_sop_mer <- prepare_libraries_sop_merged(
-              files = c(
-                lib_sop_clo_pre,
-                lib_sop_ecm_pre,
-                ## TODO
-                # lib_sop_hmd_pre,
-                lib_sop_lot_pre,
-                lib_rt_sop
-              ),
-              filter = par_pre_lib_sop_mer$organisms$filter$mode,
-              level = par_pre_lib_sop_mer$organisms$filter$level,
-              value = par_pre_lib_sop_mer$organisms$filter$value,
-              output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
-              output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
-              output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,
-              output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
-              output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
-              output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
-              output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
-            )
-          }
-        ),
-        tar_target(
-          name = lib_mer_key,
-          format = "file", command = {
-            lib_mer_key <- lib_sop_mer[[1]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_org_tax_ott,
-          format = "file", command = {
-            lib_mer_org_tax_ott <- lib_sop_mer[[2]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_str_stereo,
-          format = "file", command = {
-            lib_mer_str_stereo <- lib_sop_mer[[3]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_str_met,
-          format = "file", command = {
-            lib_mer_str_met <- lib_sop_mer[[4]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_str_nam,
-          format = "file", command = {
-            lib_mer_str_nam <- lib_sop_mer[[5]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_str_tax_cla,
-          format = "file", command = {
-            lib_mer_str_tax_cla <- lib_sop_mer[[6]]
-          }
-        ),
-        tar_target(
-          name = lib_mer_str_tax_npc,
-          format = "file", command = {
-            lib_mer_str_tax_npc <- lib_sop_mer[[7]]
-          }
-        )
-      )
-    ),
-    ## Adducts
-    list(tar_target(
-      name = lib_add,
-      format = "file",
-      command = {
-        lib_add <- prepare_libraries_adducts(
-          str_met = lib_mer_str_met,
-          adducts_masses_list = dic_add,
-          adducts_output_path = paths_data_interim_libraries_adducts_path,
-          clusters_list = dic_clu,
-          output_name = par_pre_lib_add$files$libraries$adducts$prepared,
-          masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
-          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
-        )
-      }
-    )),
     ## Spectra
     list( ## In silico
       list( ## Raw
@@ -1602,7 +1246,232 @@ list(
           )
         )
       )
-    )
+    ),
+    ## Retention times
+    list(tar_target(
+      name = lib_rt,
+      format = "file",
+      command = {
+        lib_rt <- prepare_libraries_rt(
+          mgf_exp = list(
+            lib_spe_exp_int_pre_neg,
+            lib_spe_exp_int_pre_pos
+          ),
+          mgf_is = list(
+            lib_spe_is_lot_pre_neg,
+            lib_spe_is_lot_pre_pos
+          ),
+          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
+          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
+          output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
+          output_sop = par_pre_lib_rt$files$libraries$sop$prepared$rt,
+          col_ik = par_pre_lib_rt$names$mgf$inchikey,
+          col_rt = par_pre_lib_rt$names$mgf$retention_time,
+          col_sm = par_pre_lib_rt$names$mgf$smiles,
+          name_inchikey = par_pre_lib_rt$names$inchikey,
+          name_rt = par_pre_lib_rt$names$rt,
+          name_smiles = par_pre_lib_rt$names$smiles,
+          unit_rt = par_pre_lib_rt$units$rt
+        )
+      }
+    )),
+    tar_target(
+      name = lib_rt_rts,
+      format = "file",
+      command = {
+        lib_rt_rts <- lib_rt[[1]]
+      }
+    ),
+    tar_target(
+      name = lib_rt_sop,
+      format = "file",
+      command = {
+        lib_rt_sop <- lib_rt[[2]]
+      }
+    ),
+    ## Structure organism pairs
+    list(
+      ## Raw
+      list(
+        ## This does not work as it forces the file to exist.
+        ## So targets will not check if the input file changed automatically.
+        # tar_target(
+        #   name = lib_sop_clo,
+        # .  format = "file",
+        #   command = {
+        #     lib_sop_clo <- paths$data$source$libraries$sop$closed
+        #   }
+        # ),
+        tar_target(
+          name = lib_sop_ecm,
+          format = "file",
+          command = {
+            ## Because ECMDB certificate is expired
+            lib_sop_ecm <- tryCatch(
+              expr = {
+                get_file(
+                  url = paths_urls_ecmdb_metabolites,
+                  export = paths_data_source_libraries_sop_ecmdb
+                )
+              },
+              error = function(e) {
+                fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb)
+              }
+            )
+          }
+        ),
+        ## TODO ADD  GET HMDB
+        tar_target(
+          name = lib_sop_lot,
+          format = "file",
+          command = {
+            lib_sop_lot <- tryCatch(
+              expr = {
+                get_last_version_from_zenodo(
+                  doi = paths_urls_lotus_doi,
+                  pattern = paths_urls_lotus_pattern,
+                  path = paths_data_source_libraries_sop_lotus
+                )
+              },
+              error = function(e) {
+                fake_lotus(export = paths_data_source_libraries_sop_lotus)
+              }
+            )
+          },
+          ## To always check if a newest version is available
+          cue = tar_cue(mode = "always")
+          # cue = tar_cue(mode = "thorough")
+        )
+      ),
+      ## Prepared
+      list(
+        tar_target(
+          name = lib_sop_clo_pre,
+          format = "file",
+          command = {
+            lib_sop_clo_pre <-
+              prepare_libraries_sop_closed(
+                input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
+                output = par_pre_lib_sop_clo$files$libraries$sop$prepared$closed
+              )
+          }
+        ),
+        tar_target(
+          name = lib_sop_ecm_pre,
+          format = "file",
+          command = {
+            lib_sop_ecm_pre <-
+              prepare_libraries_sop_ecmdb(
+                input = lib_sop_ecm,
+                output = par_pre_lib_sop_ecm$files$libraries$sop$prepared$ecmdb
+              )
+          }
+        ),
+        ## TODO ADD HMDB PREPARED
+        tar_target(
+          name = lib_sop_lot_pre,
+          format = "file",
+          command = {
+            lib_sop_lot_pre <-
+              prepare_libraries_sop_lotus(
+                input = if (paths_test_mode == FALSE) {
+                  lib_sop_lot
+                } else {
+                  paths_data_source_libraries_sop_lotus
+                },
+                output = par_pre_lib_sop_lot$files$libraries$sop$prepared$lotus
+              )
+          }
+        )
+      ),
+      ## Merged
+      list(
+        tar_target(
+          name = lib_sop_mer,
+          format = "file",
+          command = {
+            lib_sop_mer <- prepare_libraries_sop_merged(
+              files = c(
+                lib_sop_clo_pre,
+                lib_sop_ecm_pre,
+                ## TODO
+                # lib_sop_hmd_pre,
+                lib_sop_lot_pre,
+                lib_rt_sop
+              ),
+              filter = par_pre_lib_sop_mer$organisms$filter$mode,
+              level = par_pre_lib_sop_mer$organisms$filter$level,
+              value = par_pre_lib_sop_mer$organisms$filter$value,
+              output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
+              output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
+              output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,
+              output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
+              output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
+              output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
+              output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
+            )
+          }
+        ),
+        tar_target(
+          name = lib_mer_key,
+          format = "file", command = {
+            lib_mer_key <- lib_sop_mer[[1]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_org_tax_ott,
+          format = "file", command = {
+            lib_mer_org_tax_ott <- lib_sop_mer[[2]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_stereo,
+          format = "file", command = {
+            lib_mer_str_stereo <- lib_sop_mer[[3]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_met,
+          format = "file", command = {
+            lib_mer_str_met <- lib_sop_mer[[4]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_nam,
+          format = "file", command = {
+            lib_mer_str_nam <- lib_sop_mer[[5]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_tax_cla,
+          format = "file", command = {
+            lib_mer_str_tax_cla <- lib_sop_mer[[6]]
+          }
+        ),
+        tar_target(
+          name = lib_mer_str_tax_npc,
+          format = "file", command = {
+            lib_mer_str_tax_npc <- lib_sop_mer[[7]]
+          }
+        )
+      )
+    ),
+    ## Adducts
+    list(tar_target(
+      name = lib_add,
+      format = "file",
+      command = {
+        lib_add <- prepare_libraries_adducts(
+          str_met = lib_mer_str_met,
+          adducts_masses_list = dic_add,
+          adducts_output_path = paths_data_interim_libraries_adducts_path,
+          clusters_list = dic_clu,
+          output_name = par_pre_lib_add$files$libraries$adducts$prepared,
+          masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
+          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
+        )
+      }
+    ))
   ),
   ## Annotations
   list(
@@ -1667,7 +1536,7 @@ list(
       #       ann_spe_exp_gnp_pre <-
       #         prepare_annotations_gnps(
       #           input = gnps_annotations,
-      #           output = par_pre_ann_gnp$files$annotations$prepared$structural,
+      #           output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
       #           str_stereo = lib_mer_str_stereo,
       #           str_met = lib_mer_str_met,
       #           str_nam = lib_mer_str_nam,
@@ -1743,7 +1612,7 @@ list(
                 ann_spe_neg,
                 ann_spe_pos
               ),
-              output = par_pre_ann_spe$files$annotations$prepared$structural,
+              output = par_pre_ann_spe$files$annotations$prepared$structural$spectral,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
               str_nam = lib_mer_str_nam,
@@ -1762,7 +1631,7 @@ list(
         ann_sir_pre <-
           prepare_annotations_sirius(
             input_directory = par_pre_ann_sir$files$annotations$raw$sirius,
-            output_ann = par_pre_ann_sir$files$annotations$prepared$structural,
+            output_ann = par_pre_ann_sir$files$annotations$prepared$structural$sirius,
             output_can = par_pre_ann_sir$files$annotations$prepared$canopus,
             output_for = par_pre_ann_sir$files$annotations$prepared$formula,
             str_stereo = lib_mer_str_stereo,
@@ -1854,7 +1723,7 @@ list(
       format = "file",
       command = {
         fea_edg_pre <- prepare_features_edges(
-          input = c(edg_spe, ann_ms1_pre_edg),
+          input = c("ms1" = ann_ms1_pre_edg, "spectral" = edg_spe),
           output = par_pre_fea_edg$files$networks$spectral$edges$prepared,
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target
@@ -1898,7 +1767,7 @@ list(
         metadata = input_metadata,
         top_k = par_pre_tax$organisms$candidates,
         org_tax_ott = lib_mer_org_tax_ott,
-        output = par_pre_tax$files$taxa$prepared,
+        output = par_pre_tax$files$metadata$prepared,
         taxon = par_pre_tax$organisms$taxon
       )
     }
