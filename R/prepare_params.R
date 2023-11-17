@@ -122,7 +122,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   names_mgf_sy <- params_advanced$names$mgf$synonyms
   names_mgf_xl <- params_advanced$names$mgf$xlogp
   names_precursor <- params_advanced$names$precursor
-  names_rt <- params_advanced$names$rt
+  names_rt_fea <- params_advanced$names$rt$features
+  names_rt_lib <- params_advanced$names$rt$library
   names_smiles <- params_advanced$names$smiles
   names_source <- params_advanced$names$source
   names_target <- params_advanced$names$target
@@ -157,12 +158,12 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   wei_bio_14 <- params_advanced$weights$biological$subspecies
   wei_bio_15 <- params_advanced$weights$biological$variety
   wei_che_11 <- params_advanced$weights$chemical$cla$kingdom
-  wei_che_12 <- params_advanced$weights$chemical$npc$pathway
-  wei_che_13 <- params_advanced$weights$chemical$cla$superclass
-  wei_che_14 <- params_advanced$weights$chemical$npc$superclass
-  wei_che_21 <- params_advanced$weights$chemical$cla$class
-  wei_che_22 <- params_advanced$weights$chemical$npc$class
-  wei_che_23 <- params_advanced$weights$chemical$cla$parent
+  wei_che_21 <- params_advanced$weights$chemical$npc$pathway
+  wei_che_12 <- params_advanced$weights$chemical$cla$superclass
+  wei_che_22 <- params_advanced$weights$chemical$npc$superclass
+  wei_che_13 <- params_advanced$weights$chemical$cla$class
+  wei_che_23 <- params_advanced$weights$chemical$npc$class
+  wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
   opt_for <- params_advanced$options$force
   opt_sum <- params_advanced$options$summarise
@@ -371,7 +372,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_features_tables$names$precursor <-
         names_precursor
       yamls_params$prepare_features_tables$names$rt <-
-        names_rt
+        names_rt_fea
     },
     prepare_libraries_adducts = {
       yamls_params$prepare_libraries_adducts$files$libraries$adducts$neg <-
@@ -409,7 +410,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_libraries_rt$names$mgf$smiles <-
         names_mgf_sm
       yamls_params$prepare_libraries_rt$names$rt <-
-        names_rt
+        names_rt_lib
       yamls_params$prepare_libraries_rt$names$smiles <-
         names_smiles
       yamls_params$prepare_libraries_rt$units$rt <-
