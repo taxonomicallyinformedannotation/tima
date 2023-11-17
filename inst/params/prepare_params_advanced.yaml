@@ -431,8 +431,13 @@ names:
   #' Name of "precursor m/z" variable in the input. STRING
   precursor: row m/z
 
-  #' Name of "retention time" variable in the input. STRING
-  rt: row retention time
+  #' Name of "retention time" variable.
+  rt: 
+    #' Name of "retention time" variable in the feature table. STRING
+    features: row retention time
+    
+    #' Name of "retention time" variable in the library. STRING
+    library: rt
 
   #' Name of "SMILES" variable in the input. STRING
   smiles: smiles
