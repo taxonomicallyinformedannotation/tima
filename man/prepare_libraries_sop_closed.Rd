@@ -7,7 +7,8 @@
 prepare_libraries_sop_closed(
   input = get_params(step =
     "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
-  output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared
+  output = get_params(step =
+    "prepare_libraries_sop_closed")$files$libraries$sop$prepared$closed
 )
 }
 \arguments{

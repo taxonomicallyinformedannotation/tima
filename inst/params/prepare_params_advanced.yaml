@@ -44,17 +44,19 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' List of spectral matching results. STRING
+      #' List of spectral matching results.
       spectral:
-        - data/interim/annotations/example_gnps.tsv
-        - data/interim/annotations/example_isdb.tsv.gz
+        # #' GNPS spectral matching results. STRING
+        # gnps: data/interim/annotations/example_gnps.tsv
+        
+        #' Spectral spectral matching results. STRING
+        spectral: data/interim/annotations/example_spectral_matches.tsv.gz
 
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius/
 
     #' List of filtered annotations. STRING
-    filtered:
-      - data/interim/annotations/example_annotations_filtered.tsv.gz
+    filtered: data/interim/annotations/example_annotations_filtered.tsv.gz
 
     #' List of prepared annotations.
     prepared:
@@ -64,12 +66,19 @@ files:
       #' List of prepared formula annotations. STRING
       formula: data/interim/annotations/example_formula_prepared.tsv.gz
 
-      #' List of prepared structural annotations. STRING
+      #' List of prepared structural annotations.
       structural:
-        - data/interim/annotations/example_ms1_prepared.tsv.gz
-        - data/interim/annotations/example_gnps_prepared.tsv.gz
-        - data/interim/annotations/example_spectral_matches_prepared.tsv.gz
-        - data/interim/annotations/example_sirius_prepared.tsv.gz
+        #' Prepared GNPS structural annotations. STRING
+        # gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
+
+        #' Prepared MS1 structural annotations. STRING
+        ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
+
+        #' Prepared SIRIUS structural annotations. STRING
+        sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
+
+        #' Prepared SPECTRAL structural annotations. STRING
+        spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
 
     #' Final results file. STRING
     processed: example_results.tsv
@@ -77,7 +86,7 @@ files:
   #' Features files.
   features:
     #' Raw features file. STRING
-    raw: data/source/features.tsv.gz
+    raw: data/source/example_features.csv
 
     #' Prepared features file. STRING
     prepared: data/interim/features/example_features.tsv.gz
@@ -108,10 +117,19 @@ files:
         #' Lotus raw structure organism pairs library. STRING
         lotus: data/source/libraries/sop/lotus.csv.gz
 
-      #' List of prepared structure organism pairs libraries. STRING
+      #' List of prepared structure organism pairs libraries.
       prepared:
-        - data/interim/libraries/sop/lotus_prepared.tsv.gz
-        - data/interim/libraries/sop/closed_prepared.tsv.gz
+        #' Closed prepared structure organism pairs library. STRING
+        closed: data/interim/libraries/sop/closed_prepared.tsv.gz
+
+        #' ECMDB prepared structure organism pairs library. STRING
+        ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+
+        #' Lotus prepared structure organism pairs library. STRING
+        lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
+
+        #' RT prepared structure organism pairs library. STRING
+        rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
       #' Merged structure organism pairs library.
       merged:
@@ -153,35 +171,39 @@ files:
       exp:
         #' List of negative experimental spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/exp/massbank_neg.rds
+          # - data/interim/libraries/spectra/exp/massbank_neg.rds
           - data/interim/libraries/spectra/exp/internal_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/exp/massbank_pos.rds
+          # - data/interim/libraries/spectra/exp/massbank_pos.rds
           - data/interim/libraries/spectra/exp/internal_pos.rds
+
+        #' List of raw experimental spectral libraries. STRING
+        raw: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
       #' In silico libraries
       is:
         #' List of negative in silico spectral libraries. STRING
-        neg:
-          - data/interim/libraries/spectra/is/lotus_neg.rds
+        neg: data/interim/libraries/spectra/is/lotus_neg.rds
 
         #' List of positive in silico spectral libraries. STRING
-        pos:
-          - data/interim/libraries/spectra/is/lotus_pos.rds
+        pos: data/interim/libraries/spectra/is/lotus_pos.rds
+
+        #' List of raw in silico spectral libraries. STRING
+        raw:
+          - data/source/libraries/spectra/is/lotus_neg.rds
+          - data/source/libraries/spectra/is/lotus_pos.rds
 
     #' Temporal libraries. STRING
     temporal:
-      #' Experimental libraries
-      exp:
-        #' List of experimental temporal libraries. STRING
-        - data/interim/libraries/rt/internal.tsv
+      #' List of experimental temporal libraries. STRING
+      exp: [ ]
+        # - data/interim/libraries/rt/internal.tsv
 
-      #' In silico libraries
-      is:
-        #' List of in silico temporal libraries. STRING
-        - data/interim/libraries/rt/predicted.tsv
+      #' List of in silico temporal libraries. STRING
+      is: [ ]
+        # - data/interim/libraries/rt/predicted.tsv
 
       #' List of prepared temporal libraries. STRING
       prepared:
@@ -193,8 +215,13 @@ files:
     spectral:
       #' Edges files.
       edges:
-        #' Raw edges file. STRING
-        raw: data/source/example_edges_manual.csv
+        #' Raw edges file.
+        raw:
+          #' Raw ms1 edges file. STRING
+          ms1: data/interim/features/example_edges_masses.tsv
+
+          #' Raw spectral edges file. STRING
+          spectral: data/interim/features/example_edges_spectra.tsv
 
         #' Prepared edges file. STRING
         prepared: data/interim/features/example_edges.tsv.gz
@@ -207,8 +234,8 @@ files:
         #' Prepared components file. STRING
         prepared: data/interim/features/example_components_prepared.tsv.gz
 
-  #' Taxa files.
-  taxa:
+  #' Metadata files.
+  metadata:
     #' OPTIONAL. If tool is "manual".
     #' Biological origin metadata file. STRING
     raw: data/source/example_metadata.tsv
@@ -275,24 +302,24 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      - "H2O" # (water)
-      - "CH2O2" # (formic)
-      - "NaCl" # (sodium chloride)
-      - "C2H4O2" # (acetic)
-      - "H2PO4" # (phosphoric)
-      - "C2HF3O2" # (tfa)
+      - H2O # (water)
+      - CH2O2 # (formic)
+      - NaCl # (sodium chloride)
+      - C2H4O2 # (acetic)
+      - H2PO4 # (phosphoric)
+      - C2HF3O2 # (tfa)
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - "HN3" # (ammonia)
-      - "H2O" # (water)
-      # - "CH4O" # (methanol)
-      - "C2H3N" # (acetonitrile)
-      # - "C2H7N" # (ethylamine)
-      # - "C2H6O" # (ethanol)
-      - "NaCl" # (sodium chloride)
-      # - "C3H8O" # (isopropanol)
-      # - "C2H6OS" # (dmso)
+      - HN3 # (ammonia)
+      - H2O # (water)
+      # - CH4O # (methanol)
+      - C2H3N # (acetonitrile)
+      # - C2H7N # (ethylamine)
+      # - C2H6O # (ethanol)
+      - NaCl # (sodium chloride)
+      # - C3H8O # (isopropanol)
+      # - C2H6OS # (dmso)
 
   #' Thresholds related parameters.
   thresholds:
@@ -340,7 +367,7 @@ names:
   extension: yes
 
   #' Name of "feature IDs" variable in the input. STRING
-  features: feature_id
+  features: row ID
 
   #' Name of "filename" variable in the input. STRING
   filename: filename
@@ -354,7 +381,7 @@ names:
     collision_energy: ~
 
     #' Name of "compound ID" in MGF. STRING
-    compound_id: ~
+    compound_id: SPECTRUMID
 
     #' Name of "exact mass" in MGF. STRING
     exact_mass: EXACTMASS
@@ -381,7 +408,7 @@ names:
     polarity: IONMODE
 
     #' Name of "retention time" in MGF. STRING
-    retention_time: ~
+    retention_time: RTINSECONDS
 
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
@@ -402,10 +429,15 @@ names:
     xlogp: ~
 
   #' Name of "precursor m/z" variable in the input. STRING
-  precursor: mz
+  precursor: row m/z
 
-  #' Name of "retention time" variable in the input. STRING
-  rt: rt
+  #' Name of "retention time" variable.
+  rt: 
+    #' Name of "retention time" variable in the feature table. STRING
+    features: row retention time
+    
+    #' Name of "retention time" variable in the library. STRING
+    library: rt
 
   #' Name of "SMILES" variable in the input. STRING
   smiles: smiles
@@ -572,4 +604,4 @@ options:
   force: no
 
   #' Summarise results to one row per feature. BOOLEAN
-  summarise: yes
+  summarise: no

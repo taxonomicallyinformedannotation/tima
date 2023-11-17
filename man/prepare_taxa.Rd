@@ -10,11 +10,11 @@ prepare_taxa(
   name_features = get_params(step = "prepare_taxa")$names$features,
   name_filename = get_params(step = "prepare_taxa")$names$filename,
   colname = get_params(step = "prepare_taxa")$names$taxon,
-  metadata = get_params(step = "prepare_taxa")$files$taxa$raw,
+  metadata = get_params(step = "prepare_taxa")$files$metadata$raw,
   top_k = get_params(step = "prepare_taxa")$organisms$candidates,
   org_tax_ott = get_params(step =
     "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output = get_params(step = "prepare_taxa")$files$taxa$prepared,
+  output = get_params(step = "prepare_taxa")$files$metadata$prepared,
   taxon = get_params(step = "prepare_taxa")$organisms$taxon
 )
 }

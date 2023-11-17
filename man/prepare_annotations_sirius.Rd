@@ -8,7 +8,7 @@ prepare_annotations_sirius(
   input_directory = get_params(step =
     "prepare_annotations_sirius")$files$annotations$raw$sirius,
   output_ann = get_params(step =
-    "prepare_annotations_sirius")$files$annotations$prepared$structural,
+    "prepare_annotations_sirius")$files$annotations$prepared$structural$sirius,
   output_can = get_params(step =
     "prepare_annotations_sirius")$files$annotations$prepared$canopus,
   output_for = get_params(step =

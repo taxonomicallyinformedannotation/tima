@@ -6,8 +6,8 @@ files:
     #' Raw features file. STRING
     raw: data/source/example_features.csv
 
-  #' Taxa files.
-  taxa:
+  #' Metadata files.
+  metadata:
     #' OPTIONAL. If not all features forced to a single taxon. (see below)
     #' Biological origin metadata file. STRING
     raw: data/source/example_metadata.tsv

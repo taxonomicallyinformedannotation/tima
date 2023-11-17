@@ -1,3 +1,4 @@
+---
 files:
   #' The pattern identifying your whole job. You can put whatever you want. STRING
   pattern: example

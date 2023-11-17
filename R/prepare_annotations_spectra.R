@@ -19,8 +19,8 @@
 #'
 #' @examples NULL
 prepare_annotations_spectra <-
-  function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral,
-           output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural,
+  function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral,
+           output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural$spectral,
            str_stereo = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$stereo,
            str_met = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$metadata,
            str_nam = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,

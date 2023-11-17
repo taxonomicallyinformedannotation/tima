@@ -29,9 +29,8 @@ prepare_features_edges <-
       colClasses = "character"
     )
 
-    ## TODO secure the order
-    edges_ms2 <- edges_tables[[1]]
-    edges_ms1 <- edges_tables[[2]]
+    edges_ms1 <- edges_tables[["ms1"]]
+    edges_ms2 <- edges_tables[["spectral"]]
     rm(edges_tables)
     features_entropy <- edges_ms2 |>
       tidytable::select(

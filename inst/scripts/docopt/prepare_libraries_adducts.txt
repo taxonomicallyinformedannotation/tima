@@ -1,13 +1,13 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_libraries_adducts.R --fil-lib-add-neg data/interim/libraries/adducts/neg.tsv.gz --fil-lib-add-pos data/interim/libraries/adducts/pos.tsv.gz --fil-lib-add-pro library
+  Rscript inst/scripts/prepare_libraries_adducts.R --fil-lib-add-neg data/interim/libraries/adducts/neg.tsv.gz --fil-lib-add-pos data/interim/libraries/adducts/pos.tsv.gz --fil-lib-add-pre library
 
 Usage:
-  prepare_libraries_adducts.R [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>]
+  prepare_libraries_adducts.R [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pre=<fil-lib-add-pre>]
 
 Arguments:
   fil-lib-add-neg            Negative adducts. STRING
   fil-lib-add-pos            Positive adducts. STRING
-  fil-lib-add-pro            Prepared adducts library. STRING
+  fil-lib-add-pre            Prepared adducts library. STRING
 
 Options:
   -h --help                  Shows this screen.

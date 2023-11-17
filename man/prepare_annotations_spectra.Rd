@@ -5,9 +5,10 @@
 \title{Prepare annotations MS2}
 \usage{
 prepare_annotations_spectra(
-  input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral,
+  input = get_params(step =
+    "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral,
   output = get_params(step =
-    "prepare_annotations_spectra")$files$annotations$prepared$structural,
+    "prepare_annotations_spectra")$files$annotations$prepared$structural$spectral,
   str_stereo = get_params(step =
     "prepare_annotations_spectra")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =

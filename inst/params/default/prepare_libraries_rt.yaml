@@ -8,32 +8,33 @@ files:
       #' Experimental libraries
       exp:
         #' List of negative experimental spectral libraries. STRING
-        neg: []
+        neg: [ ]
 
         #' List of positive experimental spectral libraries. STRING
-        pos: []
+        pos: [ ]
 
       #' In silico libraries
       is:
         #' List of negative in silico spectral libraries. STRING
-        neg: []
+        neg: [ ]
 
         #' List of positive in silico spectral libraries. STRING
-        pos: []
+        pos: [ ]
 
     #' Structure organism pairs libraries.
     sop:
-      #' List of prepared structure organism pairs libraries. STRING
+      #' List of prepared structure organism pairs libraries.
       prepared:
-        - data/interim/libraries/sop/rt_prepared.tsv.gz
+        #' RT prepared structure organism pairs libraries. STRING
+        rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
     #' Temporal libraries. STRING
     temporal:
       #' List of experimental temporal libraries. STRING
-      exp: []
+      exp: [ ]
 
       #' List of in silico temporal libraries. STRING
-      is: []
+      is: [ ]
 
       #' List of prepared temporal libraries. STRING
       prepared:
@@ -55,8 +56,10 @@ names:
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
 
-  #' Name of "retention time" variable in the input. STRING
-  rt: rt
+  #' Name of "retention time" variable.
+  rt: 
+    #' Name of "retention time" variable in the library. STRING
+    library: rt
 
   #' Name of "SMILES" variable in the input. STRING
   smiles: smiles

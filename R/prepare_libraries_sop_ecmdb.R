@@ -12,7 +12,7 @@
 #' @examples NULL
 prepare_libraries_sop_ecmdb <-
   function(input = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$raw$ecmdb,
-           output = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared) {
+           output = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared$ecmdb) {
     if (file.exists(input)) {
       log_debug(x = "Loading ECMDB resources")
 

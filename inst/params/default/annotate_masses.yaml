@@ -5,9 +5,10 @@ files:
   annotations:
     #' List of prepared annotations.
     prepared:
-      #' List of prepared structural annotations. STRING
+      #' List of prepared structural annotations.
       structural:
-        - data/interim/annotations/example_ms1_prepared.tsv.gz
+        #' Prepared MS1 structural annotations. STRING
+        ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
 
   #' Features files.
   features:
@@ -59,9 +60,10 @@ files:
     spectral:
       #' Edges files.
       edges:
-        #' Raw edges file. STRING
+        #' Raw edges file.
         raw:
-          - data/interim/features/example_edges_masses.tsv
+          #' Raw ms1 edges file. STRING
+          ms1: data/interim/features/example_edges_masses.tsv
 
 #' MS related parameters.
 ms:
@@ -108,24 +110,24 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      - "H2O" # (water)
-      - "CH2O2" # (formic)
-      - "NaCl" # (sodium chloride)
-      - "C2H4O2" # (acetic)
-      - "H2PO4" # (phosphoric)
-      - "C2HF3O2" # (tfa)
+      - H2O # (water)
+      - CH2O2 # (formic)
+      - NaCl # (sodium chloride)
+      - C2H4O2 # (acetic)
+      - H2PO4 # (phosphoric)
+      - C2HF3O2 # (tfa)
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - "HN3" # (ammonia)
-      - "H2O" # (water)
-      # - "CH4O" # (methanol)
-      - "C2H3N" # (acetonitrile)
-      # - "C2H7N" # (ethylamine)
-      # - "C2H6O" # (ethanol)
-      - "NaCl" # (sodium chloride)
-      # - "C3H8O" # (isopropanol)
-      # - "C2H6OS" # (dmso)
+      - HN3 # (ammonia)
+      - H2O # (water)
+      # - CH4O # (methanol)
+      - C2H3N # (acetonitrile)
+      # - C2H7N # (ethylamine)
+      # - C2H6O # (ethanol)
+      - NaCl # (sodium chloride)
+      # - C3H8O # (isopropanol)
+      # - C2H6OS # (dmso)
 
   #' Thresholds related parameters.
   thresholds:

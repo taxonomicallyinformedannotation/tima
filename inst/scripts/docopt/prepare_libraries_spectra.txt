@@ -1,13 +1,16 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_libraries_spectra.R --fil-lib-spe-raw data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf --fil-lib-spe-pos data/interim/libraries/spectra/exp/internal_pos.sqlite --ms-pol pos
+Rscript inst/scripts/prepare_libraries_spectra.R --fil-lib-spe-exp-raw data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf --fil-lib-spe-exp-pos data/interim/libraries/spectra/exp/internal_pos.sqlite --ms-pol pos
 
 Usage:
-  prepare_libraries_spectra.R [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-lib-spe-raw=<fil-lib-spe-raw>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>]
+  prepare_libraries_spectra.R [--fil-lib-spe-exp-neg=<fil-lib-spe-exp-neg>] [--fil-lib-spe-exp-pos=<fil-lib-spe-exp-pos>] [--fil-lib-spe-exp-raw=<fil-lib-spe-exp-raw>] [--fil-lib-spe-is-neg=<fil-lib-spe-is-neg>] [--fil-lib-spe-is-pos=<fil-lib-spe-is-pos>] [--fil-lib-spe-is-raw=<fil-lib-spe-is-raw>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>]
 
 Arguments:
-  fil-lib-spe-neg            List of negative spectral libraries. STRING
-  fil-lib-spe-pos            List of positive spectral libraries. STRING
-  fil-lib-spe-raw            List of raw spectral libraries. STRING
+  fil-lib-spe-exp-neg        List of experimental negative spectral libraries. STRING
+  fil-lib-spe-exp-pos        List of experimental positive spectral libraries. STRING
+  fil-lib-spe-exp-raw        List of experimental raw spectral libraries. STRING
+  fil-lib-spe-is-neg         List of in silico negative spectral libraries. STRING
+  fil-lib-spe-is-pos         List of in silico positive spectral libraries. STRING
+  fil-lib-spe-is-raw         List of in silico raw spectral libraries. STRING
 
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
 

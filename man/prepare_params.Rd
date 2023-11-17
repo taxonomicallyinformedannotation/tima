@@ -5,28 +5,15 @@
 \title{Prepare params}
 \usage{
 prepare_params(
-  filename = get_params(step = "prepare_params")$files$pattern,
-  features = get_params(step = "prepare_params")$files$features$raw,
-  metadata = get_params(step = "prepare_params")$files$metadata$raw,
-  spectra = get_params(step = "prepare_params")$files$spectral$raw,
-  ms_mode = get_params(step = "prepare_params")$ms$polarity,
-  taxon = get_params(step = "prepare_params")$organisms$taxon,
-  summarise = get_params(step = "prepare_params")$options$summarise,
+  params_small = get_params(step = "prepare_params"),
+  params_advanced = get_params(step = "prepare_params_advanced"),
   step = NA
 )
 }
 \arguments{
-\item{filename}{Name of the file}
+\item{params_small}{params_small}
 
-\item{features}{File containing the metadata}
-
-\item{spectra}{File containing the spectra}
-
-\item{ms_mode}{MS ionization mode. 'pos' or 'neg'}
-
-\item{taxon}{Name of a taxon you want to enforce}
-
-\item{summarise}{Summarise results to one row per feature. BOOLEAN}
+\item{params_advanced}{params_advanced}
 
 \item{step}{Step}
 }

@@ -9,10 +9,12 @@ files:
       exp:
         #' List of negative experimental spectral libraries. STRING
         neg:
+          # - data/interim/libraries/spectra/exp/massbank_neg.rds
           - data/interim/libraries/spectra/exp/internal_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
+          # - data/interim/libraries/spectra/exp/massbank_pos.rds
           - data/interim/libraries/spectra/exp/internal_pos.rds
 
         #' List of raw experimental spectral libraries. STRING
