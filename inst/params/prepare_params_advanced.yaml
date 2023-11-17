@@ -353,7 +353,7 @@ names:
   extension: yes
 
   #' Name of "feature IDs" variable in the input. STRING
-  features: feature_id
+  features: row ID
 
   #' Name of "filename" variable in the input. STRING
   filename: filename
@@ -415,10 +415,10 @@ names:
     xlogp: ~
 
   #' Name of "precursor m/z" variable in the input. STRING
-  precursor: mz
+  precursor: row m/z
 
   #' Name of "retention time" variable in the input. STRING
-  rt: rt
+  rt: row retention time
 
   #' Name of "SMILES" variable in the input. STRING
   smiles: smiles

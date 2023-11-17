@@ -20,9 +20,8 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
     parse_yaml_paths()$params$prepare_params,
     parse_yaml_paths()$params$prepare_params_advanced
   )
-  ## -1 because of params.yaml
 
-  if (length(list.files(parse_yaml_paths()$params$user$path)) >= length(list.files(parse_yaml_paths()$params$default$path)) - 1) {
+  if (length(list.files(parse_yaml_paths()$params$user$path)) >= length(list.files(parse_yaml_paths()$params$default$path))) {
     yaml_files <- c(
       list.files(
         path = file.path(parse_yaml_paths()$params$user),

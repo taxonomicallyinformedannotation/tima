@@ -430,7 +430,7 @@ list(
         tar_target(
           name = par_fin_par2,
           command = {
-            par_fin_par <- parse_yaml_params(
+            par_fin_par2 <- parse_yaml_params(
               def = par_pre_par2,
               usr = par_pre_par2
             )
