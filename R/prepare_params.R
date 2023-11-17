@@ -624,8 +624,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   log_debug(x = "Changing filenames")
   switch(step,
     annotate_masses = {
-      yamls_params$annotate_masses$files$annotations$prepared <-
-        yamls_params$annotate_masses$files$annotations$prepared |>
+      yamls_params$annotate_masses$files$annotations$prepared$structural <-
+        yamls_params$annotate_masses$files$annotations$prepared$structural |>
         lapply(FUN = replace_id)
       yamls_params$annotate_masses$files$features$prepared <-
         yamls_params$annotate_masses$files$features$prepared |>
@@ -635,8 +635,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     annotate_spectra = {
-      yamls_params$annotate_spectra$files$annotations$raw$spectral <-
-        yamls_params$annotate_spectra$files$annotations$raw$spectral |>
+      yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
+        yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral |>
         lapply(FUN = replace_id)
       # yamls_params$annotate_spectra$files$spectral$raw <-
       #   yamls_params$annotate_spectra$files$spectral$raw |>
@@ -682,28 +682,34 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared |>
         lapply(FUN = replace_id)
     },
-    # prepare_annotations_gnps = {
-    #   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
-    #     yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
-    #     lapply(FUN = replace_id)
-    #   yamls_params$prepare_annotations_gnps$files$annotations$prepared <-
-    #     yamls_params$prepare_annotations_gnps$files$annotations$prepared |>
-    #     lapply(FUN = replace_id)
-    # },
+    prepare_annotations_gnps = {
+      yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
+        yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
+        lapply(FUN = replace_id)
+      yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural <-
+        yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural |>
+        lapply(FUN = replace_id)
+    },
     prepare_annotations_sirius = {
       yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
         yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
         lapply(FUN = replace_id)
-      yamls_params$prepare_annotations_sirius$files$annotations$prepared <-
-        yamls_params$prepare_annotations_sirius$files$annotations$prepared |>
+      yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus <-
+        yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus |>
+        lapply(FUN = replace_id)
+      yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula <-
+        yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula |>
+        lapply(FUN = replace_id)
+      yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural <-
+        yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural |>
         lapply(FUN = replace_id)
     },
     prepare_annotations_spectra = {
-      yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral <-
-        yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral |>
+      yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral <-
+        yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral |>
         lapply(FUN = replace_id)
-      yamls_params$prepare_annotations_spectra$files$annotations$prepared <-
-        yamls_params$prepare_annotations_spectra$files$annotations$prepared |>
+      yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural <-
+        yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural |>
         lapply(FUN = replace_id)
     },
     prepare_taxa = {
@@ -718,8 +724,11 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     weight_annotations = {
-      yamls_params$weight_annotations$files$annotations$prepared <-
-        yamls_params$weight_annotations$files$annotations$prepared |>
+      yamls_params$weight_annotations$files$annotations$prepared$canopus <-
+        yamls_params$weight_annotations$files$annotations$prepared$canopus |>
+        lapply(FUN = replace_id)
+      yamls_params$weight_annotations$files$annotations$prepared$formula <-
+        yamls_params$weight_annotations$files$annotations$prepared$formula |>
         lapply(FUN = replace_id)
       # yamls_params$weight_annotations$files$annotations$processed <-
       #   yamls_params$weight_annotations$files$annotations$processed |>
