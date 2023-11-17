@@ -20,4 +20,4 @@ names:
   #' Name of "retention time" variable.
   rt: 
     #' Name of "retention time" variable in the feature table. STRING
-    features: rt
+    features: row retention time
