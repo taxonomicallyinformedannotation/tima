@@ -1471,8 +1471,7 @@ list(
           masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
         )
       }
-    )
-    )
+    ))
   ),
   ## Annotations
   list(
