@@ -10,8 +10,6 @@ opengraph:
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
-    mastodon:
-      author_name: "@adafede@mastodon.online"
 vignette: >
   %\VignetteIndexEntry{2 Formatting all inputs}
   %\VignetteEngine{knitr::rmarkdown}
