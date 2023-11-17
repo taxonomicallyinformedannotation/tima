@@ -48,6 +48,7 @@ files:
       spectral:
         # #' GNPS spectral matching results. STRING
         # gnps: data/interim/annotations/example_gnps.tsv
+        
         #' Spectral spectral matching results. STRING
         spectral: data/interim/annotations/example_spectral_matches.tsv.gz
 
@@ -69,10 +70,13 @@ files:
       structural:
         #' Prepared GNPS structural annotations. STRING
         # gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
+
         #' Prepared MS1 structural annotations. STRING
         ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
+
         #' Prepared SIRIUS structural annotations. STRING
         sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
+
         #' Prepared SPECTRAL structural annotations. STRING
         spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
 
@@ -106,8 +110,10 @@ files:
       raw:
         #' Closed structure organism pairs library. STRING
         closed: ../lotus-processor/data/processed/230106_closed_metadata.csv.gz
+
         #' ECMDB structure organism pairs library. STRING
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
+
         #' Lotus raw structure organism pairs library. STRING
         lotus: data/source/libraries/sop/lotus.csv.gz
 
@@ -115,10 +121,13 @@ files:
       prepared:
         #' Closed prepared structure organism pairs library. STRING
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
+
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+
         #' Lotus prepared structure organism pairs library. STRING
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
+
         #' RT prepared structure organism pairs library. STRING
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
