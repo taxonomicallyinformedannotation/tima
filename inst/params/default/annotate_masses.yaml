@@ -60,9 +60,10 @@ files:
     spectral:
       #' Edges files.
       edges:
-        #' Raw edges file. STRING
+        #' Raw edges file.
         raw:
-          - data/interim/features/example_edges_masses.tsv
+          #' Raw ms1 edges file. STRING
+          ms1: data/interim/features/example_edges_masses.tsv
 
 #' MS related parameters.
 ms:

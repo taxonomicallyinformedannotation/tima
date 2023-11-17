@@ -1219,38 +1219,38 @@ ui <- shiny::fluidPage(
               (one per candidate)."
             )
           )
+      ),
+      shiny::tabPanel(
+        title = "GNPS (optional)",
+        shiny::h3("GNPS parameters"),
+        shiny::textInput(
+          inputId = "gnps_id",
+          label = "GNPS job ID",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Your GNPS job ID.",
+              "If you provide one, all files will be taken from there.",
+              "You still need to provide a path for
+              where we will store the files,",
+              "in case your GNPS job gets deleted for you to find them back.",
+              "Annotations will also be downloaded."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "gnps_workflow",
+          label = "Workflow used within GNPS",
+          choices = c("classical", "fbmn"),
+          selected = "fbmn"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("We advise `fbmn`,
+                        but we also support `classical` jobs.")
+          )
       )
-      # shiny::tabPanel(
-      #   title = "GNPS (optional)",
-      #   shiny::h3("GNPS parameters"),
-      #   shiny::textInput(
-      #     inputId = "gnps_id",
-      #     label = "GNPS job ID",
-      #     value = NULL
-      #   ) |>
-      #     shinyhelper::helper(
-      #       type = "inline",
-      #       content = c(
-      #         "Your GNPS job ID.",
-      #         "If you provide one, all files will be taken from there.",
-      #         "You still need to provide a path for
-      #         where we will store the files,",
-      #         "in case your GNPS job gets deleted for you to find them back.",
-      #         "Annotations will also be downloaded."
-      #       )
-      #     ),
-      #   shiny::selectInput(
-      #     inputId = "gnps_workflow",
-      #     label = "Workflow used within GNPS",
-      #     choices = c("classical", "fbmn"),
-      #     selected = "fbmn"
-      #   ) |>
-      #     shinyhelper::helper(
-      #       type = "inline",
-      #       content = c("We advise `fbmn`,
-      #                   but we also support `classical` jobs.")
-      #     )
-      # )
     )
   )),
   shiny::fluidPage(

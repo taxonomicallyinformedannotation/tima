@@ -43,11 +43,11 @@ save_input <- function(input) {
   }
 
   filename <- shiny::isolate(input$fil_pat)
-  # gnps_job_id <- shiny::isolate(input$gnps_id)
-  # if (gnps_job_id == "") {
-  #   gnps_job_id <- NULL
-  # }
-  # gnps_workflow <- shiny::isolate(input$gnps_workflow)
+  gnps_job_id <- shiny::isolate(input$gnps_id)
+  if (gnps_job_id == "") {
+    gnps_job_id <- NULL
+  }
+  gnps_workflow <- shiny::isolate(input$gnps_workflow)
   org_tax <- shiny::isolate(input$org_tax)
   if (org_tax == "") {
     org_tax <- NULL

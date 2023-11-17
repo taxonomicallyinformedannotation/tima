@@ -215,8 +215,13 @@ files:
     spectral:
       #' Edges files.
       edges:
-        #' Raw edges file. STRING
-        raw: data/source/example_edges_manual.csv
+        #' Raw edges file.
+        raw:
+          #' Raw ms1 edges file. STRING
+          ms1: data/interim/features/example_edges_masses.tsv
+
+          #' Raw spectral edges file. STRING
+          spectral: data/interim/features/example_edges_spectra.tsv
 
         #' Prepared edges file. STRING
         prepared: data/interim/features/example_edges.tsv.gz
