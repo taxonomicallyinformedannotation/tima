@@ -8,7 +8,7 @@ prepare_features_tables(
   features = get_params(step = "prepare_features_tables")$files$features$raw,
   output = get_params(step = "prepare_features_tables")$files$features$prepared,
   name_features = get_params(step = "prepare_features_tables")$names$features,
-  name_rt = get_params(step = "prepare_features_tables")$names$rt,
+  name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
   name_mz = get_params(step = "prepare_features_tables")$names$precursor
 )
 }

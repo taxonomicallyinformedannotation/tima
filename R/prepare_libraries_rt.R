@@ -33,7 +33,7 @@ prepare_libraries_rt <-
            col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
            col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
            name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
-           name_rt = get_params(step = "prepare_libraries_rt")$names$rt,
+           name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
            name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
            unit_rt = get_params(step = "prepare_libraries_rt")$units$rt) {
     ## default transforms from `Spectra`
