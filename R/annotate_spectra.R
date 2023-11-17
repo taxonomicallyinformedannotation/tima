@@ -26,9 +26,8 @@
 annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files$spectral$raw,
                              library = get_params(step = "annotate_spectra")$files$libraries$spectral$exp,
                              polarity = get_params(step = "annotate_spectra")$ms$polarity,
-                             output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
-                             threshold =
-                               get_params(step = "annotate_spectra")$annotations$thresholds$ms2$similarity,
+                             output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral,
+                             threshold = get_params(step = "annotate_spectra")$annotations$thresholds$ms2$similarity,
                              ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
                              dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
                              qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
