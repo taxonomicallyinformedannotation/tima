@@ -367,7 +367,7 @@ names:
     collision_energy: ~
 
     #' Name of "compound ID" in MGF. STRING
-    compound_id: ~
+    compound_id: SPECTRUMID
 
     #' Name of "exact mass" in MGF. STRING
     exact_mass: EXACTMASS
@@ -394,7 +394,7 @@ names:
     polarity: IONMODE
 
     #' Name of "retention time" in MGF. STRING
-    retention_time: ~
+    retention_time: RTINSECONDS
 
     #' Name of "SMILES" in MGF. STRING
     smiles: SMILES
