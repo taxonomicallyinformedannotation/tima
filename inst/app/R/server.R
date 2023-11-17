@@ -96,7 +96,7 @@ save_input <- function(input) {
   yaml_advanced$annotations$thresholds$ms2$similarity <-
     shiny::isolate(input$ann_thr_ms2_sim)
   yaml_advanced$files$pattern <-
-    shiny::isolate(input$fil_pat)
+    fil_pat
   # TODO
   # yaml_advanced$files$annotations$raw$spectral <-
   #   shiny::isolate(input$todo)
@@ -127,7 +127,7 @@ save_input <- function(input) {
   # yaml_advanced$files$annotations$processed <-
   #   shiny::isolate(input$todo)
   yaml_advanced$files$features$raw <-
-    shiny::isolate(input$fil_fea_raw)
+    fil_fea_raw
   # TODO
   # yaml_advanced$files$features$prepared <-
   #   shiny::isolate(input$fil_fea_pre)
@@ -201,14 +201,14 @@ save_input <- function(input) {
   # yaml_advanced$files$networks$spectral$components$prepared <-
   #   shiny::isolate(input$todo)
   yaml_advanced$files$metadata$raw <-
-    shiny::isolate(input$fil_met_raw)
+    fil_met_raw
   # TODO
   # yaml_advanced$files$metadata$prepared <-
   #   shiny::isolate(input$fil_met_pre)
   yaml_advanced$files$spectral$raw <-
-    shiny::isolate(input$fil_spe_raw)
+    fil_spe_raw
   yaml_advanced$gnps$id <-
-    shiny::isolate(input$gnps_id)
+    gnps_job_id
   yaml_advanced$gnps$workflow <-
     shiny::isolate(input$gnps_workflow)
   yaml_advanced$ms$adducts$neg <-
@@ -303,7 +303,7 @@ save_input <- function(input) {
   yaml_advanced$organisms$filter$value <-
     shiny::isolate(input$org_fil_val)
   yaml_advanced$organisms$taxon <-
-    shiny::isolate(input$org_tax)
+    org_tax
   # TODO
   # yaml_advanced$tools$metadata <-
   #   shiny::isolate(input$too_x)
@@ -374,10 +374,6 @@ save_input <- function(input) {
     shiny::isolate(input$force)
   yaml_advanced$options$summarise <-
     shiny::isolate(input$summarise)
-  yaml::write_yaml(
-    x = yaml_advanced,
-    file = "inst/params/prepare_params_advanced.yaml"
-  )
 
   if (!is.null(prefil_met_raw)) {
     yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
@@ -387,6 +383,10 @@ save_input <- function(input) {
       file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
   }
 
+  yaml::write_yaml(
+    x = yaml_advanced,
+    file = "inst/params/prepare_params_advanced.yaml"
+  )
 
   setwd("inst/app/")
 }
