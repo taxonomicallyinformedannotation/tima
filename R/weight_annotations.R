@@ -290,9 +290,14 @@ weight_annotations <- function(
     output
   )
   export_params(
-    parameters = get_params(step = "weight_annotations"),
+    parameters = get_params(step = "prepare_params"),
     directory = dir_time,
-    step = "weight_annotations"
+    step = "prepare_params"
+  )
+  export_params(
+    parameters = get_params(step = "prepare_params_advanced"),
+    directory = dir_time,
+    step = "prepare_params_advanced"
   )
   export_output(
     x = results,
