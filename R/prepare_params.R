@@ -229,13 +229,13 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$annotate_masses$options$force <-
         opt_for
     },
-    annotate_masses = {
+    annotate_spectra = {
       yamls_params$annotate_spectra$annotations$ms2approx <-
         ann_ms2_app
       yamls_params$annotate_spectra$annotations$thresholds$ms2$similarity <-
         ann_thr_ms2_sim
-      yamls_params$annotate_spectra$files$annotations$raw$spectral <-
-        fil_ann_raw_spe
+      yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
+        fil_ann_raw_spe_spe
       yamls_params$annotate_spectra$files$libraries$spectral$exp$neg <-
         fil_lib_spe_exp_neg
       yamls_params$annotate_spectra$files$libraries$spectral$exp$pos <-
