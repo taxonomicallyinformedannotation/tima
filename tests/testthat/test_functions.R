@@ -40,7 +40,7 @@ testthat::test_that("Test functions", {
   prepare_params(step = "weight_annotations")
 
   ## With empty GNPS ID
-  # prepare_params(gnps_job_id = "")
+  prepare_params(gnps_job_id = "")
   ## When previous params exist
   prepare_params()
 
@@ -285,6 +285,19 @@ testthat::test_that("Test functions", {
   # prepare_mona()
 
   ### Retention time
+  #### When no RT
+  prepare_libraries_rt(
+    mgf_exp = list(
+      "data/source/libraries/spectra/is/isdb_neg.mgf",
+      "data/source/libraries/spectra/is/isdb_pos.mgf"
+    ),
+    mgf_is = list(
+      "data/source/libraries/spectra/is/isdb_neg.mgf",
+      "data/source/libraries/spectra/is/isdb_pos.mgf"
+    ),
+    temp_exp = paths$data$source$libraries$rt$example_mini,
+    temp_is = paths$data$source$libraries$rt$example_mini
+  )
   prepare_libraries_rt(
     mgf_exp = list(
       "data/interim/libraries/spectra/exp/internal_neg.rds",
