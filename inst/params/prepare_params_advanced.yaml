@@ -51,8 +51,8 @@ files:
     raw:
       #' List of spectral matching results.
       spectral:
-        # #' GNPS spectral matching results. STRING
-        # gnps: data/interim/annotations/example_gnps.tsv
+        #' GNPS spectral matching results. STRING
+        gnps: data/interim/annotations/example_gnps.tsv
         
         #' Spectral spectral matching results. STRING
         spectral: data/interim/annotations/example_spectral_matches.tsv.gz
@@ -74,7 +74,7 @@ files:
       #' List of prepared structural annotations.
       structural:
         #' Prepared GNPS structural annotations. STRING
-        # gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
+        gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
 
         #' Prepared MS1 structural annotations. STRING
         ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
