@@ -18,6 +18,27 @@ testthat::test_that("Test functions", {
   prepare_params(step = "weight_annotations")
   ## For all steps
   prepare_params()
+  prepare_params(step = "annotate_masses")
+  prepare_params(step = "annotate_spectra")
+  prepare_params(step = "create_components")
+  prepare_params(step = "create_edges_spectra")
+  prepare_params(step = "filter_annotations")
+  prepare_params(step = "prepare_annotations_gnps")
+  prepare_params(step = "prepare_annotations_sirius")
+  prepare_params(step = "prepare_annotations_spectra")
+  prepare_params(step = "prepare_features_components")
+  prepare_params(step = "prepare_features_edges")
+  prepare_params(step = "prepare_features_tables")
+  prepare_params(step = "prepare_libraries_adducts")
+  prepare_params(step = "prepare_libraries_rt")
+  prepare_params(step = "prepare_libraries_sop_closed")
+  prepare_params(step = "prepare_libraries_sop_ecmdb")
+  prepare_params(step = "prepare_libraries_sop_lotus")
+  prepare_params(step = "prepare_libraries_sop_merged")
+  prepare_params(step = "prepare_libraries_spectra")
+  prepare_params(step = "prepare_taxa")
+  prepare_params(step = "weight_annotations")
+
   ## With empty GNPS ID
   # prepare_params(gnps_job_id = "")
   ## When previous params exist
