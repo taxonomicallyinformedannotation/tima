@@ -203,7 +203,7 @@ files:
       #' List of experimental temporal libraries.
       exp: 
         #' List of experimental temporal libraries (CSV). STRING
-        csv: [ ]
+        csv: ~
 
         #' List of experimental temporal libraries (MGF).
         mgf:
@@ -216,7 +216,7 @@ files:
       #' List of in silico temporal libraries. STRING
       is:
         #' List of in silico temporal libraries (CSV). STRING
-        csv: [ ]
+        csv: ~
 
         #' List of in silico temporal libraries (MGF).
         mgf:
@@ -527,7 +527,7 @@ tools:
 #' Units of the different variables in the input files.
 units:
   #' Unit of the "retention time" variable in the input files. STRING
-  rt: minutes
+  rt: seconds
 
 #' Weights to apply to each part of the final score.
 weights:
