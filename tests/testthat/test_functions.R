@@ -284,12 +284,8 @@ testthat::test_that("Test functions", {
 
   ### Retention time
   prepare_libraries_rt(
-    mgf_exp = list(
-      "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "data/interim/libraries/spectra/exp/internal_pos.rds"
-    ),
-    temp_exp = paths$data$source$libraries$rt$example_mini,
-    temp_is = paths$data$source$libraries$rt$example_mini
+    mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+    temp_exp = paths$data$source$libraries$rt$example_mini
   )
   ## Check wrong SMILES
   tidytable::tidytable(
