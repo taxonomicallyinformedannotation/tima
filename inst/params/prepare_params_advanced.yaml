@@ -53,7 +53,7 @@ files:
       spectral:
         #' GNPS spectral matching results. STRING
         gnps: data/interim/annotations/example_gnps.tsv
-        
+
         #' Spectral spectral matching results. STRING
         spectral: data/interim/annotations/example_spectral_matches.tsv.gz
 
@@ -201,7 +201,7 @@ files:
     #' Temporal libraries. STRING
     temporal:
       #' List of experimental temporal libraries.
-      exp: 
+      exp:
         #' List of experimental temporal libraries (CSV). STRING
         csv: ~
 
@@ -453,10 +453,10 @@ names:
   precursor: row m/z
 
   #' Name of "retention time" variable.
-  rt: 
+  rt:
     #' Name of "retention time" variable in the feature table. STRING
     features: row retention time
-    
+
     #' Name of "retention time" variable in the library. STRING
     library: rt
 
