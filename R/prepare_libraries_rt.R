@@ -99,7 +99,8 @@ prepare_libraries_rt <-
             rt = col_rt,
             inchikey = col_ik,
             smiles = col_sm
-          )))
+          ))) |>
+          tidytable::filter(!is.na(rt))
         return(rts)
       }
 
@@ -115,7 +116,8 @@ prepare_libraries_rt <-
               inchikey = name_inchikey,
               smiles = name_smiles
             )
-          ))
+          )) |>
+          tidytable::filter(!is.na(rt))
         return(rts)
       }
 
@@ -135,7 +137,7 @@ prepare_libraries_rt <-
             inchikey = NA_character_,
             smiles = NA_character_
           )) |>
-          tidytable::filter(!is.na(as.numeric(rt))) |>
+          tidytable::filter(!is.na(rt)) |>
           tidytable::filter(!is.na(smiles)) |>
           tidytable::distinct()
         return(df_polished)
