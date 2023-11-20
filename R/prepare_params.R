@@ -74,8 +74,12 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_spe_is_neg <- params_advanced$files$libraries$spectral$is$neg
   fil_lib_spe_is_pos <- params_advanced$files$libraries$spectral$is$pos
   fil_lib_spe_is_raw <- params_advanced$files$libraries$spectral$is$raw
-  fil_lib_tem_exp <- params_advanced$files$libraries$temporal$exp
-  fil_lib_tem_is <- params_advanced$files$libraries$temporal$is
+  fil_lib_tem_exp_csv <- params_advanced$files$libraries$temporal$exp$csv
+  fil_lib_tem_exp_mgf_neg <- params_advanced$files$libraries$temporal$exp$mgf$neg
+  fil_lib_tem_exp_mgf_pos <- params_advanced$files$libraries$temporal$exp$mgf$pos
+  fil_lib_tem_is_csv <- params_advanced$files$libraries$temporal$is$csv
+  fil_lib_tem_is_mgf_neg <- params_advanced$files$libraries$temporal$is$mgf$neg
+  fil_lib_tem_is_mgf_pos <- params_advanced$files$libraries$temporal$is$mgf$pos
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
   fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
   fil_net_spe_edg_raw_ms1 <- params_advanced$files$networks$spectral$edges$raw$ms1
@@ -385,20 +389,20 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_sop_mer_str_met
     },
     prepare_libraries_rt = {
-      yamls_params$prepare_libraries_rt$files$libraries$spectral$exp$neg <-
-        fil_lib_spe_exp_neg
-      yamls_params$prepare_libraries_rt$files$libraries$spectral$exp$pos <-
-        fil_lib_spe_exp_pos
-      yamls_params$prepare_libraries_rt$files$libraries$spectral$is$neg <-
-        fil_lib_spe_is_neg
-      yamls_params$prepare_libraries_rt$files$libraries$spectral$is$pos <-
-        fil_lib_spe_is_pos
       yamls_params$prepare_libraries_rt$files$libraries$sop$prepared$rt <-
         fil_lib_sop_pre_rt
-      yamls_params$prepare_libraries_rt$files$libraries$temporal$exp <-
-        fil_lib_tem_exp
-      yamls_params$prepare_libraries_rt$files$libraries$temporal$is <-
-        fil_lib_tem_is
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$exp$csv <-
+        fil_lib_tem_exp_csv
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$exp$mgf$neg <-
+        fil_lib_tem_exp_mgf_neg
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$exp$mgf$pos <-
+        fil_lib_tem_exp_mgf_pos
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$is$csv <-
+        fil_lib_tem_is_csv
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$is$mgf$neg <-
+        fil_lib_tem_is_mgf_neg
+      yamls_params$prepare_libraries_rt$files$libraries$temporal$is$mgf$pos <-
+        fil_lib_tem_is_mgf_pos
       yamls_params$prepare_libraries_rt$files$libraries$temporal$prepared <-
         fil_lib_tem_pre
       yamls_params$prepare_libraries_rt$names$inchikey <-
