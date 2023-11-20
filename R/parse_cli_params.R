@@ -37,9 +37,13 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$ann_ms2_app)) {
       parameters$annotations$ms2approx <- as.logical(arguments$ann_ms2_app)
     }
-    if (!is.null(arguments$ann_thr_ms2_sim)) {
+    if (!is.null(arguments$ann_thr_ms2_sim_ann)) {
       parameters$annotations$thresholds$ms2$similarity <-
-        as.numeric(arguments$ann_thr_ms2_sim)
+        as.numeric(arguments$ann_thr_ms2_sim_ann)
+    }
+    if (!is.null(arguments$ann_thr_ms2_sim_edg)) {
+      parameters$annotations$thresholds$ms2$similarity$edges <-
+        as.numeric(arguments$ann_thr_ms2_sim_edg)
     }
     if (!is.null(arguments$fil_pat)) {
       parameters$files$pattern <- as.character(arguments$fil_pat)
