@@ -1269,7 +1269,7 @@ list(
           col_rt = par_pre_lib_rt$names$mgf$retention_time,
           col_sm = par_pre_lib_rt$names$mgf$smiles,
           name_inchikey = par_pre_lib_rt$names$inchikey,
-          name_rt = par_pre_lib_rt$names$rt,
+          name_rt = par_pre_lib_rt$names$rt$library,
           name_smiles = par_pre_lib_rt$names$smiles,
           unit_rt = par_pre_lib_rt$units$rt
         )
@@ -1748,7 +1748,7 @@ list(
           features = input_features,
           output = par_pre_fea_tab$files$features$prepared,
           name_features = par_pre_fea_tab$names$features,
-          name_rt = par_pre_fea_tab$names$rt,
+          name_rt = par_pre_fea_tab$names$rt$features,
           name_mz = par_pre_fea_tab$names$precursor
         )
       }
