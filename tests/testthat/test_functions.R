@@ -368,8 +368,8 @@ testthat::test_that("Test functions", {
   ### Negative
   annotate_spectra(
     library = list(
-      "data/interim/libraries/spectra/exp/internal_neg.rds",
-      "data/interim/libraries/spectra/exp/internal_pos.rds"
+      neg = paths$data$source$libraries$spectra$exp$with_rt,
+      pos = paths$data$source$libraries$spectra$exp$with_rt
     ),
     ## shallow tolerance to speed up tests
     ppm = 1,
@@ -382,7 +382,7 @@ testthat::test_that("Test functions", {
   )
   ### Approx
   annotate_spectra(
-    library = list("data/interim/libraries/spectra/exp/internal_pos.rds"),
+    library = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
