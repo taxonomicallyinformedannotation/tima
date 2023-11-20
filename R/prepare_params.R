@@ -371,7 +371,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         names_features
       yamls_params$prepare_features_tables$names$precursor <-
         names_precursor
-      yamls_params$prepare_features_tables$names$rt <-
+      yamls_params$prepare_features_tables$names$rt$features <-
         names_rt_fea
     },
     prepare_libraries_adducts = {
@@ -409,7 +409,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         names_mgf_rt
       yamls_params$prepare_libraries_rt$names$mgf$smiles <-
         names_mgf_sm
-      yamls_params$prepare_libraries_rt$names$rt <-
+      yamls_params$prepare_libraries_rt$names$rt$library <-
         names_rt_lib
       yamls_params$prepare_libraries_rt$names$smiles <-
         names_smiles
