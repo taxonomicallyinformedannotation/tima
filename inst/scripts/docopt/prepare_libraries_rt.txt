@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_libraries_rt.R --fil-lib-spe-neg data/interim/libraries/spectra/exp/internal_neg.sqlite --fil-lib-spe-pos data/interim/libraries/spectra/exp/internal_pos.sqlite --fil-lib-tem-exp data/source/libraries/rt/internal.tsv --fil-lib-tem-is data/source/libraries/rt/predicted.tsv --fil-lib-tem-pre data/interim/libraries/rt/prepared.tsv.gz
 
 Usage:
-  prepare_libraries_rt.R [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-lib-tem-exp=<fil-lib-tem-exp>] [--fil-lib-tem-is=<fil-lib-tem-is>] [--fil-lib-tem-exp=<fil-lib-tem-exp>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--names-inchikey=<names-inchikey>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-rt=<names-mgf-rt>] [--names-mgf-sm=<names-mgf-sm>] [--names-rt=<names-rt>] [--names-smiles=<names-smiles>] [--units-rt=<units-rt>]
+  prepare_libraries_rt.R [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-lib-tem-exp=<fil-lib-tem-exp>] [--fil-lib-tem-is=<fil-lib-tem-is>] [--fil-lib-tem-exp=<fil-lib-tem-exp>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--names-inchikey=<names-inchikey>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-rt=<names-mgf-rt>] [--names-mgf-sm=<names-mgf-sm>] [--names-rt-lib=<names-rt-lib>] [--names-smiles=<names-smiles>] [--units-rt=<units-rt>]
 
 Arguments:
   fil-lib-spe-neg            List of negative spectral libraries. STRING
@@ -15,7 +15,7 @@ Arguments:
   names-mgf-ik               Name of "InChIKey" in MGF. STRING
   names-mgf-rt               Name of "retention time" in MGF. STRING
   names-mgf-sm               Name of "SMILES" in MGF. STRING
-  names-rt                   Name of "retention time" variable in the input. STRING
+  names-rt-lib               Name of "retention time" variable (lib) in the input. STRING
   names-smiles               Name of "SMILES" variable in the input. STRING
 
   units-rt                   Unit of the "retention time" variable in the input. Must be "seconds" or "minutes". STRING

@@ -2,7 +2,7 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_libraries_spectra.R --fil-lib-spe-exp-raw data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf --fil-lib-spe-exp-pos data/interim/libraries/spectra/exp/internal_pos.sqlite --ms-pol pos
 
 Usage:
-  prepare_libraries_spectra.R [--fil-lib-spe-exp-neg=<fil-lib-spe-exp-neg>] [--fil-lib-spe-exp-pos=<fil-lib-spe-exp-pos>] [--fil-lib-spe-exp-raw=<fil-lib-spe-exp-raw>] [--fil-lib-spe-is-neg=<fil-lib-spe-is-neg>] [--fil-lib-spe-is-pos=<fil-lib-spe-is-pos>] [--fil-lib-spe-is-raw=<fil-lib-spe-is-raw>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>]
+  prepare_libraries_spectra.R [--fil-lib-spe-exp-neg=<fil-lib-spe-exp-neg>] [--fil-lib-spe-exp-pos=<fil-lib-spe-exp-pos>] [--fil-lib-spe-exp-raw=<fil-lib-spe-exp-raw>] [--fil-lib-spe-is-neg=<fil-lib-spe-is-neg>] [--fil-lib-spe-is-pos=<fil-lib-spe-is-pos>] [--fil-lib-spe-is-raw=<fil-lib-spe-is-raw>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>] [--names-precursor=<names-precursor>] [--names-rt-lib=<names-rt-lib>] [--names-source=<names-source>] [--names-target=<names-target>] [--names-taxon=<names-taxon>]
 
 Arguments:
   fil-lib-spe-exp-neg        List of experimental negative spectral libraries. STRING
@@ -31,7 +31,7 @@ Arguments:
   names-mgf-sy               Name of "synonyms" in MGF. STRING
   names-mgf-xl               Name of "xlogp" in MGF. STRING
   names-precursor            Name of "precursor m/z" variable in the input. STRING
-  names-rt                   Name of "retention time" variable in the input. STRING
+  names-rt-lib               Name of "retention time" variable (lib) in the input. STRING
   names-source               Name of "source IDs" variable in the input. STRING
   names-target               Name of "target IDs" variable in the input. STRING
   names-taxon                Name of the "taxon name" variable in the input. STRING

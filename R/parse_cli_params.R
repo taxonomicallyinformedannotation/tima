@@ -262,8 +262,11 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$names_precursor)) {
       parameters$names$precursor <- as.character(arguments$names_precursor)
     }
-    if (!is.null(arguments$names_rt)) {
-      parameters$names$rt <- as.character(arguments$names_rt)
+    if (!is.null(arguments$names_rt_fea)) {
+      parameters$names$rt$features <- as.character(arguments$names_rt_fea)
+    }
+    if (!is.null(arguments$names_rt_lib)) {
+      parameters$names$rt$library <- as.character(arguments$names_rt_lib)
     }
     if (!is.null(arguments$names_smiles)) {
       parameters$names$smiles <- as.character(arguments$names_smiles)
