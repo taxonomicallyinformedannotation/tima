@@ -1,8 +1,8 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_libraries_rt.R --fil-lib-tem-exp-csv data/source/libraries/rt/internal.tsv fil-lib-tem-is-csv data/source/libraries/rt/predicted.tsv --fil-lib-tem-pre data/interim/libraries/rt/prepared.tsv.gz
+Rscript inst/scripts/prepare_libraries_rt.R --fil-lib-tem-exp-csv data/source/libraries/rt/internal.tsv --fil-lib-tem-is-csv data/source/libraries/rt/predicted.tsv --fil-lib-tem-pre data/interim/libraries/rt/prepared.tsv.gz
 
 Usage:
-  prepare_libraries_rt.R [fil-lib-tem-exp-csv=<fil-lib-tem-exp-csv>] [--fil-lib-tem-exp-mgf-neg=<fil-lib-tem-exp-mgf-neg>] [--fil-lib-tem-exp-mgf-pos=<fil-lib-tem-exp-mgf-pos>] [--fil-lib-tem-is-csv=<fil-lib-tem-is-csv>] [--fil-lib-tem-is-mgf-neg=<fil-lib-tem-is-mgf-neg>] [--fil-lib-tem-is-mgf-pos=<fil-lib-tem-is-mgf-pos>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--names-inchikey=<names-inchikey>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-rt=<names-mgf-rt>] [--names-mgf-sm=<names-mgf-sm>] [--names-rt-lib=<names-rt-lib>] [--names-smiles=<names-smiles>] [--units-rt=<units-rt>]
+  prepare_libraries_rt.R [--fil-lib-tem-exp-csv=<fil-lib-tem-exp-csv>] [--fil-lib-tem-exp-mgf-neg=<fil-lib-tem-exp-mgf-neg>] [--fil-lib-tem-exp-mgf-pos=<fil-lib-tem-exp-mgf-pos>] [--fil-lib-tem-is-csv=<fil-lib-tem-is-csv>] [--fil-lib-tem-is-mgf-neg=<fil-lib-tem-is-mgf-neg>] [--fil-lib-tem-is-mgf-pos=<fil-lib-tem-is-mgf-pos>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--names-inchikey=<names-inchikey>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-rt=<names-mgf-rt>] [--names-mgf-sm=<names-mgf-sm>] [--names-rt-lib=<names-rt-lib>] [--names-smiles=<names-smiles>] [--units-rt=<units-rt>]
 
 Arguments:
   fil-lib-tem-exp-csv        List of experimental temporal libraries (CSV). STRING
