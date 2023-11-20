@@ -1261,8 +1261,8 @@ list(
             lib_spe_is_lot_pre_neg,
             lib_spe_is_lot_pre_pos
           ),
-          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp,
-          temp_is = par_pre_lib_rt$files$libraries$temporal$is,
+          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp$csv,
+          temp_is = par_pre_lib_rt$files$libraries$temporal$is$csv,
           output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
           output_sop = par_pre_lib_rt$files$libraries$sop$prepared$rt,
           col_ik = par_pre_lib_rt$names$mgf$inchikey,
