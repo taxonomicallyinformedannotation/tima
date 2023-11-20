@@ -99,8 +99,7 @@ prepare_libraries_rt <-
             rt = col_rt,
             inchikey = col_ik,
             smiles = col_sm
-          ))) |>
-          tidytable::filter(!is.na(rt))
+          )))
         return(rts)
       }
 
@@ -116,8 +115,7 @@ prepare_libraries_rt <-
               inchikey = name_inchikey,
               smiles = name_smiles
             )
-          )) |>
-          tidytable::filter(!is.na(rt))
+          ))
         return(rts)
       }
 
