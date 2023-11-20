@@ -130,7 +130,7 @@ prepare_libraries_rt <-
           tidytable::mutate(type = type) |>
           tidytable::rowwise() |>
           tidytable::mutate(rt = ifelse(unit == "seconds",
-            yes = rt / 60,
+            yes = as.numeric(rt) / 60,
             no = rt
           )) |>
           tidytable::bind_rows(data.frame(
