@@ -5,10 +5,10 @@
 \title{Prepare libraries of retention times}
 \usage{
 prepare_libraries_rt(
-  mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$exp,
-  mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$spectral$is,
-  temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp,
-  temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is,
+  mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp$mgf,
+  mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is$mgf,
+  temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp$csv,
+  temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is$csv,
   output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
   output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared$rt,
   col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,

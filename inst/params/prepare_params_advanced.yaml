@@ -176,13 +176,11 @@ files:
       exp:
         #' List of negative experimental spectral libraries. STRING
         neg:
-          # - data/interim/libraries/spectra/exp/massbank_neg.rds
-          - data/interim/libraries/spectra/exp/internal_neg.rds
+          - data/interim/libraries/spectra/exp/massbank_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
-          # - data/interim/libraries/spectra/exp/massbank_pos.rds
-          - data/interim/libraries/spectra/exp/internal_pos.rds
+          - data/interim/libraries/spectra/exp/massbank_pos.rds
 
         #' List of raw experimental spectral libraries. STRING
         raw: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
@@ -202,13 +200,31 @@ files:
 
     #' Temporal libraries. STRING
     temporal:
-      #' List of experimental temporal libraries. STRING
-      exp: [ ]
-        # - data/interim/libraries/rt/internal.tsv
+      #' List of experimental temporal libraries.
+      exp: 
+        #' List of experimental temporal libraries (CSV). STRING
+        csv: [ ]
+
+        #' List of experimental temporal libraries (MGF).
+        mgf:
+          #' List of negative experimental temporal libraries (MGF). STRING
+          neg: [ ]
+
+          #' List of positive experimental temporal libraries (MGF). STRING
+          pos: [ ]
 
       #' List of in silico temporal libraries. STRING
       is: [ ]
-        # - data/interim/libraries/rt/predicted.tsv
+        #' List of in silico temporal libraries (CSV). STRING
+        csv: [ ]
+
+        #' List of in silico temporal libraries (MGF).
+        mgf:
+          #' List of negative in silico temporal libraries (MGF). STRING
+          neg: [ ]
+
+          #' List of positive in silico temporal libraries (MGF). STRING
+          pos: [ ]
 
       #' List of prepared temporal libraries. STRING
       prepared:
