@@ -422,7 +422,7 @@ names:
     smiles_no_stereo: ~
 
     #' Name of "spectrum ID" in MGF. STRING
-    spectrum_id: SPECTRUMID
+    spectrum_id: ~
 
     #' Name of "SPLASH" in MGF. STRING
     splash: ~
