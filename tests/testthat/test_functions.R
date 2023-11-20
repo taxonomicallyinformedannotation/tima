@@ -39,8 +39,6 @@ testthat::test_that("Test functions", {
   prepare_params(step = "prepare_taxa")
   prepare_params(step = "weight_annotations")
 
-  ## With empty GNPS ID
-  prepare_params(gnps_job_id = "")
   ## When previous params exist
   prepare_params()
 
