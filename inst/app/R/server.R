@@ -93,8 +93,10 @@ save_input <- function(input) {
     shiny::isolate(input$ann_thr_ms1_che)
   yaml_advanced$annotations$thresholds$ms1$condition <-
     shiny::isolate(input$ann_thr_ms1_con)
-  yaml_advanced$annotations$thresholds$ms2$similarity <-
+  yaml_advanced$annotations$thresholds$ms2$similarity$annotation <-
     shiny::isolate(input$ann_thr_ms2_sim)
+  yaml_advanced$annotations$thresholds$ms2$similarity$edges <-
+    shiny::isolate(input$edg_thr_ms2_sim)
   yaml_advanced$files$pattern <-
     fil_pat
   # TODO
