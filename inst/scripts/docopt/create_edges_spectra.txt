@@ -1,11 +1,11 @@
 You can use this script with the following example:
-  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ann-thr-ms2-sim 0.7 --ms-thr-ms2-int 5
+  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edges_spectra.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ann-thr-ms2-sim-edg 0.7 --ms-thr-ms2-int 5
 
 Usage:
-  create_edges_spectra.R [--ann-thr-ms2-sim=<ann-thr-ms2-sim>] [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
+  create_edges_spectra.R [--ann-thr-ms2-sim-edg=<ann-thr-ms2-sim-edg>] [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
 
 Arguments:
-  ann-thr-ms2-sim            Similarity threhsold. FLOAT
+  ann-thr-ms2-sim-edg        Similarity threhsold for edges. FLOAT
 
   fil-net-spe-edg-raw        Raw edges file. STRING
   fil-spe-raw                Raw spectral file. STRING

@@ -8,8 +8,10 @@ annotations:
   thresholds:
     #' MS2 annotation related parameters.
     ms2:
-      #' For similarity. FLOAT
-      similarity: 0.0
+      #' For similarity.
+      similarity:
+        #' For annotation. FLOAT
+        annotation: 0.0
 
 #' Files.
 files:

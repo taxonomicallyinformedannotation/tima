@@ -1568,7 +1568,7 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
@@ -1595,7 +1595,7 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity,
+              threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
@@ -1673,7 +1673,7 @@ list(
           output = par_cre_edg_spe$files$networks$spectral$edges$raw,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
-          threshold = par_cre_edg_spe$annotations$thresholds$ms2$similarity,
+          threshold = par_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
@@ -2304,7 +2304,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0
@@ -2320,7 +2320,7 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity,
+          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0
@@ -2440,7 +2440,7 @@ list(
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
           threshold =
-            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity,
+            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity$annotation,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2461,7 +2461,7 @@ list(
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
           threshold =
-            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity,
+            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity$annotation,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
