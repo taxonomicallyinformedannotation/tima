@@ -3,24 +3,6 @@
 files:
   #' Libraries files.
   libraries:
-    #' Spectral libraries. STRING
-    spectral:
-      #' Experimental libraries
-      exp:
-        #' List of negative experimental spectral libraries. STRING
-        neg: [ ]
-
-        #' List of positive experimental spectral libraries. STRING
-        pos: [ ]
-
-      #' In silico libraries
-      is:
-        #' List of negative in silico spectral libraries. STRING
-        neg: [ ]
-
-        #' List of positive in silico spectral libraries. STRING
-        pos: [ ]
-
     #' Structure organism pairs libraries.
     sop:
       #' List of prepared structure organism pairs libraries.
@@ -30,11 +12,31 @@ files:
 
     #' Temporal libraries. STRING
     temporal:
-      #' List of experimental temporal libraries. STRING
-      exp: [ ]
+      #' List of experimental temporal libraries.
+      exp:
+        #' List of experimental temporal libraries (CSV). STRING
+        csv: [ ]
 
-      #' List of in silico temporal libraries. STRING
-      is: [ ]
+        #' List of experimental temporal libraries (MGF).
+        mgf:
+          #' List of negative experimental temporal libraries (MGF). STRING
+          neg: [ ]
+
+          #' List of positive experimental temporal libraries (MGF). STRING
+          pos: [ ]
+
+      #' List of in silico temporal libraries.
+      is:
+        #' List of in silico temporal libraries (CSV). STRING
+        csv: [ ]
+
+        #' List of in silico temporal libraries (MGF).
+        mgf:
+          #' List of negative in silico temporal libraries (MGF). STRING
+          neg: [ ]
+
+          #' List of positive in silico temporal libraries (MGF). STRING
+          pos: [ ]
 
       #' List of prepared temporal libraries. STRING
       prepared:

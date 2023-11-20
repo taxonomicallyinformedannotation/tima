@@ -120,6 +120,34 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$files$libraries$spectral$is$raw <-
         as.character(arguments$fil_lib_spe_is_raw)
     }
+    if (!is.null(arguments$fil_lib_tem_exp_csv)) {
+      parameters$files$libraries$temporal$exp$csv <-
+        as.character(arguments$fil_lib_tem_exp_csv)
+    }
+    if (!is.null(arguments$fil_lib_tem_exp_mgf_neg)) {
+      parameters$files$libraries$temporal$exp$mgf$neg <-
+        as.character(arguments$fil_lib_tem_exp_mgf_neg)
+    }
+    if (!is.null(arguments$fil_lib_tem_exp_mgf_pos)) {
+      parameters$files$libraries$temporal$exp$mgf$pos <-
+        as.character(arguments$fil_lib_tem_exp_mgf_pos)
+    }
+    if (!is.null(arguments$fil_lib_tem_is_csv)) {
+      parameters$files$libraries$temporal$is$csv <-
+        as.character(arguments$fil_lib_tem_is_csv)
+    }
+    if (!is.null(arguments$fil_lib_tem_is_mgf_neg)) {
+      parameters$files$libraries$temporal$is$mgf$neg <-
+        as.character(arguments$fil_lib_tem_is_mgf_neg)
+    }
+    if (!is.null(arguments$fil_lib_tem_is_mgf_pos)) {
+      parameters$files$libraries$temporal$is$mgf$pos <-
+        as.character(arguments$fil_lib_tem_is_mgf_pos)
+    }
+    if (!is.null(arguments$fil_lib_tem_pre)) {
+      parameters$files$libraries$temporal$prepared <-
+        as.character(arguments$fil_lib_tem_pre)
+    }
     if (!is.null(arguments$fil_net_spe_edg_raw)) {
       parameters$files$networks$spectral$edges$raw <-
         as.character(arguments$fil_net_spe_edg_raw)
