@@ -1,10 +1,8 @@
-options(shiny.host = "0.0.0.0")
 options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 # save the results to a file
 save_input <- function(input) {
-  setwd("../../")
   paths_data_source <- timaR::parse_yaml_paths()$data$source$path
   ## safety
   timaR::create_dir(paths_data_source)
