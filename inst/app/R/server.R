@@ -651,7 +651,6 @@ server <- function(input, output, session) {
           garbage_collection = TRUE,
           reporter = "verbose_positives"
         )
-        setwd("inst/app")
       }, finally = {
         shiny::stopApp()
       })
