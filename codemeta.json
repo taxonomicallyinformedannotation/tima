@@ -348,7 +348,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
-      "version": ">= 0.3.1",
+      "version": ">= 0.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -431,7 +431,7 @@
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
-      "version": ">= 1.8.1",
+      "version": ">= 1.8.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3024.285KB",
+  "fileSize": "3026.896KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
