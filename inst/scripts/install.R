@@ -12,23 +12,6 @@ if (Sys.info()[["sysname"]] == "Windows") {
   )
 }
 if (!requireNamespace("pak", quietly = TRUE)) {
-  lib <- Sys.getenv("R_LIBS_SITE")
-  if (lib == "") {
-    lib <- file.path(dirname(.Library), "site-library")
-    cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
-    cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
-
-    message("Setting R_LIBS_SITE to ", lib)
-  } else {
-    message("R_LIBS_SITE is already set to ", lib)
-    cat(
-      sprintf(
-        "R_LIB_FOR_PAK=%s\n",
-        strsplit(lib, .Platform$path.sep)[[1]][[1]]
-      ),
-      append = TRUE
-    )
-  }
   install.packages(
     "pak",
     repos = sprintf(
@@ -39,16 +22,35 @@ if (!requireNamespace("pak", quietly = TRUE)) {
     )
   )
 }
+lib <- Sys.getenv("R_LIBS_SITE")
+if (lib == "") {
+  lib <- file.path(dirname(.Library), "site-library")
+  cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
+  cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
+
+  message("Setting R_LIBS_SITE to ", lib)
+} else {
+  message("R_LIBS_SITE is already set to ", lib)
+  cat(
+    sprintf(
+      "R_LIB_FOR_PAK=%s\n",
+      strsplit(lib, .Platform$path.sep)[[1]][[1]]
+    ),
+    append = TRUE
+  )
+}
 pak::pak_update()
-pak::lockfile_create()
-pak::lockfile_install()
+pak::lockfile_create(lib = lib)
+pak::lockfile_install(lib = lib)
 unlink(x = "pkg.lock")
 pak::pak(
   ask = FALSE,
-  upgrade = FALSE
+  upgrade = FALSE,
+  lib = lib
 )
 pak::pkg_install(
   pkg = desc::desc_get_urls()[[1]],
   ask = FALSE,
-  upgrade = FALSE
+  upgrade = FALSE,
+  lib = lib
 )
