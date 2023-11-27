@@ -22,8 +22,8 @@ if (!requireNamespace("pak", quietly = TRUE)) {
     )
   )
 }
-lib <- Sys.getenv("R_LIBS_SITE")
-if (lib == "") {
+lib <- .Library.site
+if (length(lib) == 0) {
   lib <- file.path(dirname(.Library), "site-library")
   cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
   cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
