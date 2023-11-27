@@ -28,6 +28,7 @@ dir.create(lib, showWarnings = FALSE, recursive = TRUE)
 if (!requireNamespace("pak", quietly = TRUE)) {
   install.packages(
     "pak",
+    lib = lib,
     repos = sprintf(
       "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
       .Platform$pkgType,
