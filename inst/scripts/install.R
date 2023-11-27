@@ -1,7 +1,3 @@
-## Simple install helper
-options(repos = c(CRAN = "https://cloud.r-project.org"))
-###
-## Probably not necessary anymore, letting for safety for now
 if (Sys.info()[["sysname"]] == "Windows") {
   if (!requireNamespace("installr", quietly = TRUE)) {
     install.packages("installr")
@@ -11,18 +7,7 @@ if (Sys.info()[["sysname"]] == "Windows") {
     GUI = FALSE
   )
 }
-if (!requireNamespace("pak", quietly = TRUE)) {
-  install.packages(
-    "pak",
-    repos = sprintf(
-      "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
-      .Platform$pkgType,
-      R.Version()$os,
-      R.Version()$arch
-    )
-  )
-}
-lib <- .Library.site
+lib <- Sys.getenv("R_LIBS_SITE")
 if (length(lib) == 0) {
   lib <- file.path(dirname(.Library), "site-library")
   cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
@@ -37,6 +22,17 @@ if (length(lib) == 0) {
       strsplit(lib, .Platform$path.sep)[[1]][[1]]
     ),
     append = TRUE
+  )
+}
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages(
+    "pak",
+    repos = sprintf(
+      "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+      .Platform$pkgType,
+      R.Version()$os,
+      R.Version()$arch
+    )
   )
 }
 pak::pak_update()
