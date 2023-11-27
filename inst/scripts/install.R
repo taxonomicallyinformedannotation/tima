@@ -1,3 +1,5 @@
+## Simple install helper
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 if (Sys.info()[["sysname"]] == "Windows") {
   if (!requireNamespace("installr", quietly = TRUE)) {
     install.packages("installr")
