@@ -24,6 +24,7 @@ if (length(lib) == 0) {
     append = TRUE
   )
 }
+dir.create(lib, showWarnings = FALSE, recursive = TRUE)
 if (!requireNamespace("pak", quietly = TRUE)) {
   install.packages(
     "pak",
