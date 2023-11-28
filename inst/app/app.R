@@ -1,10 +1,1997 @@
 library(shiny)
 library(timaR)
 
-source(file = "R/ui.R")
-source(file = "R/server.R")
+if(getwd() |> endsWith(suffix = "tima-r")) {
+  log_debug("Correct working directory")
+} else{
+  setwd("../..")
+  log_debug(getwd())
+}
 
 options(shiny.port = 3838)
+options(shiny.maxRequestSize = 1000 * 1024^2)
+
+#' @title Label mandatory
+#'
+#' @description This function adds an asterisk to mandatory inputs
+#'
+#' @param label Label
+#'
+#' @return NULL
+#'
+#' @export
+#'
+#' @examples NULL
+label_mandatory <- function(label) {
+  shiny::tagList(
+    label,
+    shiny::span("*", class = "mandatory_star")
+  )
+}
+
+app_css <-
+  ".mandatory_star { color: red; }
+     .shiny-input-container { margin-top: 25px; }
+     #submit_msg { margin-left: 15px; }
+     #error { color: red; }
+     body { background: #fcfcfc; }
+     #header { margin: -20px -15px 0; padding: 15px 15px 10px; }
+    "
+
+ui <- shiny::fluidPage(
+  shinyjs::useShinyjs(),
+  shinyjs::inlineCSS(rules = app_css),
+  title = "Taxonomically Informed Metabolite Annotation",
+  shiny::div(
+    id = "header",
+    shiny::h1("Taxonomically Informed Metabolite Annotation"),
+    shiny::h4(
+      "This app helps performing TIMA as described in the",
+      shiny::a(
+        href = "https://taxonomicallyinformedannotation.github.io/tima-r/",
+        "following documentation"
+      )
+    ),
+    shiny::strong(
+      shiny::span("Created by "),
+      shiny::a("Adriano Rutz", href = "https://adafede.github.io/"),
+      shiny::HTML("&bull;"),
+      shiny::a("Main publication",
+               href = "https://doi.org/10.3389/fpls.2019.01329"
+      ),
+      shiny::HTML("&bull;"),
+      shiny::span("Code"),
+      shiny::a(
+        "on GitHub",
+        href = "https://github.com/taxonomicallyinformedannotation/tima-r/"
+      )
+    )
+  ),
+  shiny::fluidPage(shiny::div(
+    id = "params",
+    shiny::navlistPanel(
+      widths = c(4, 5),
+      "Parameters",
+      shiny::tabPanel(
+        title = "Files",
+        shiny::h3("Required files"),
+        shiny::h5("They SHOULD be located in `data/source`"),
+        shiny::div(
+          shiny::fileInput(
+            inputId = "fil_spe_raw",
+            label = label_mandatory("MGF file"),
+            accept = ".mgf"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "The MGF file containing your spectra.",
+              "Should be located in `data/source`.",
+              "Reason therefore is to find it in the future."
+              # "If you have a GNPS job ID, the spectra will be stored there."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "fil_fea_raw",
+          label = label_mandatory("Features table"),
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "The csv or tsv file containing your features",
+              "Should be located in `data/source`.",
+              "Reason therefore is to find it in the future."
+              # "If you have a GNPS job ID, the spectra will be stored there."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "fil_met_raw",
+          label = "Metadata table (mandatory if no taxon name)",
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "The csv or tsv file containing the metadata of your experiment.",
+              "Should be located in `data/source`.",
+              "Reason therefore is to find it in the future.",
+              # "If you have a GNPS job ID, the spectra will be stored there.",
+              "Do not forget to change the `name` in the corresponding tab."
+            )
+          ),
+        shiny::textInput(
+          inputId = "fil_pat",
+          label = label_mandatory("Pattern to identify your job locally"),
+          value = "example"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of your job.",
+              "All intermediate steps will use this pattern.",
+              "For example, the corresponding SIRIUS results will be named:",
+              "`YOUR_PATTERN_sirius`."
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "Annotations",
+        shiny::h3("Annotations-related parameters"),
+        shiny::sliderInput(
+          inputId = "ann_can_fin",
+          label = "Number of final candidates",
+          min = 1,
+          max = 500,
+          value = 3,
+          step = 1,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Number of final candidates to consider.",
+              "For 12 candidates, with 10, only the first 10 will be kept.",
+              "This can end to more than n candidates, if some are ex aequo."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "ann_ms1only",
+          label = "Erase MS2 results and keep MS1 only",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Option to erase MS2 results.",
+              "Usually not needed, for benchmarking mainly."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ann_thr_con",
+          label = "Minimal consistency score (chemical) to consider a class",
+          min = 0,
+          max = 1,
+          value = 0.0,
+          step = 0.05,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimal consistency score (chemical) to consider a class.",
+              "Everything below will be considered as not consistent."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ann_thr_ms1_bio",
+          label = "Minimal biological score to keep MS1 only annotation",
+          min = 0,
+          max = 1,
+          value = 0.6,
+          step = 0.05,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimal biological score to keep an MS1 candaidate.",
+              "Everything below will be discarded (see below).",
+              "Check the sub-scores and weights in the `weights` panel."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ann_thr_ms1_che",
+          label = "Minimal chemical score to keep MS1 only annotation",
+          min = 0,
+          max = 1,
+          value = 0.6,
+          step = 0.1,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimal chemical score to keep an MS1 candaidate.",
+              "Everything below will be discarded (see below).",
+              "Check the sub-scores and weights in the `weights` panel."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "ann_thr_ms1_con",
+          label = "Condition to be used to retain candidates",
+          choices = c("AND", "OR"),
+          selected = "OR"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If an MS1 candidate has a bio score of 1, a chem score of 0.25",
+              "the above thresholds set at 0.5 and 0.5 respectively",
+              "keeps it if the condition is `OR` but discard it if `AND`."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "ann_ms2_app",
+          label = "Perform matching without precursor? (can be very long)",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Corresponds to variable dereplication.",
+              "Then, precurors masses are disregarded during matching.",
+              "Allows to find (incorrect) analogs.",
+              "Takes a lot of time."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ann_thr_ms2_sim",
+          label = "Minimal similarity score (annotation)",
+          min = 0,
+          max = 1,
+          step = 0.05,
+          value = 0.0,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimum similarity score between spectra.",
+              "To keep MS2 annotation."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "edg_thr_ms2_sim",
+          label = "Minimal similarity score (edges)",
+          min = 0.5,
+          max = 1,
+          step = 0.05,
+          value = 0.7,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Minimum similarity score between spectra.",
+              "To keep MS2 similarity edge."
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "MS",
+        shiny::h3("MS-related parameters"),
+        shiny::selectInput(
+          inputId = "ms_pol",
+          label = "Polarity used",
+          choices = c("pos", "neg"),
+          selected = "pos"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Polarity of the MS experiment.")
+          ),
+        shiny::sliderInput(
+          inputId = "ms_thr_ms1_int",
+          label = "Intensity threshold for MS1",
+          min = 0,
+          max = 1E6,
+          value = 1E5,
+          step = 1E4,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "MS1 intensity threshold.",
+              "Features below this threshold will not be annotated."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ms_thr_ms2_int",
+          label = "Intensity threshold for MS2",
+          min = 0,
+          max = 1E4,
+          value = 5,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "MS2 intensity threshold.",
+              "Fragments below this threshold will be removed from spectra."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_mas_ppm_ms1",
+          label = "Relative mass tolerance for MS1 in ppm",
+          min = 0.1,
+          max = 20,
+          value = 10,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Mass tolerance (in ppm) used for MS1 annotation.")
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_mas_dal_ms1",
+          label = "Absolute mass tolerance for MS1 in Dalton",
+          min = 0.005,
+          max = 0.02,
+          value = 0.01,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Mass tolerance (in Da) used for MS1 annotation.")
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_mas_ppm_ms2",
+          label = "Relative mass tolerance for MS2 in ppm",
+          min = 0.1,
+          max = 20,
+          value = 10,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Mass tolerance (in ppm) used for MS2 annotation.")
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_mas_dal_ms2",
+          label = "Absolute mass tolerance for MS2 in Dalton",
+          min = 0.005,
+          max = 0.02,
+          value = 0.01,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("Mass tolerance (in Da) used for MS2 annotation.")
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_rt_min",
+          label = "Retention time tolerance in minutes",
+          min = 0.01,
+          max = 0.20,
+          value = 0.05,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Retention time tolerance (minutes) used for adducts attribution",
+              "and annotation if an experimental library is provided.",
+              "If no experimental library is given, does not impact results."
+            )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_add_pos",
+          label = "List of adducts to be used in positive",
+          choices = list(
+            "[1M+(H)3]3+",
+            "[1M+(H)2(Na)1]3+",
+            "[1M+(H)1(Na)2]3+",
+            "[1M+(Na)3]3+",
+            "[1M+(H)2]2+",
+            "[1M+(H)1(Na)1]2+",
+            "[1M+(Mg)1]2+",
+            "[1M+(H)1(K)1]2+",
+            "[1M+(Ca)1]2+",
+            "[1M+(Na)2]2+",
+            "[1M+(Fe)1]2+",
+            "[1M+(H)1]1+",
+            "[1M+(Na)1]1+",
+            "[1M+(K)1]1+",
+            "[1M+(Cu)1]1+",
+            "[2M+(Mg)1]2+",
+            "[2M+(Ca)1]2+",
+            "[2M+(Fe)1]2+",
+            "[2M+(H)1]1+",
+            "[2M+(Na)1]1+",
+            "[2M+(K)1]1+"
+          ),
+          selected = list(
+            "[1M+(H)2]2+",
+            "[1M+(H)1]1+",
+            "[1M+(Na)1]1+",
+            "[2M+(H)1]1+"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important adduct everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_add_neg",
+          label = "List of adducts to be used in negative",
+          choices = list(
+            "[1M-(H)3]3-",
+            "[1M-(H)2]2-",
+            "[1M-(H)1]1-",
+            "[1M+(F)1]1-",
+            "[1M+(Na)1-(H)2]1-",
+            "[1M+(Cl)1]1-",
+            "[1M+(K)1-(H)2]1-",
+            "[1M+(Br)1]1-",
+            "[2M-(H)1]1-",
+            "[3M-(H)1]1-"
+          ),
+          selected = list(
+            "[1M-(H)2]2-",
+            "[1M-(H)1]1-",
+            "[2M-(H)1]1-"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important adduct everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_clu_pos",
+          label = "List of clusters to be used in positive",
+          choices = list(
+            "HN3", # (ammonia)
+            "H2O", # (water)
+            # "CH4O", # (methanol)
+            "C2H3N", # (acetonitrile)
+            # "C2H7N", # (ethylamine)
+            # "C2H6O", # (ethanol)
+            "NaCl" # (sodium chloride)
+            # "C3H8O", # (isopropanol)
+            # "C2H6OS" # (dmso)
+          ),
+          selected = list(
+            "HN3", # (ammonia)
+            "H2O", # (water)
+            # "CH4O", # (methanol)
+            "C2H3N" # (acetonitrile)
+            # "C2H7N", # (ethylamine)
+            # "C2H6O", # (ethanol)
+            # "NaCl", # (sodium chloride)
+            # "C3H8O", # (isopropanol)
+            # "C2H6OS" # (dmso)
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important cluster everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_clu_neg",
+          label = "List of clusters to be used in negative",
+          choices = list(
+            "H2O", # (water)
+            "CH2O2", # (formic)
+            "NaCl", # (sodium chloride)
+            "C2H4O2", # (acetic)
+            "H2PO4", # (phosphoric)
+            "C2HF3O2" # (tfa)
+          ),
+          selected = list(
+            "H2O", # (water)
+            "CH2O2", # (formic)
+            # "NaCl", # (sodium chloride)
+            # "C2H4O2", # (acetic)
+            "H2PO4" # (phosphoric)
+            # "C2HF3O2" # (tfa)
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important cluster everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "Organisms",
+        shiny::h3("Organisms-related parameters"),
+        shiny::textInput(
+          inputId = "org_tax",
+          label = "OPTIONAL. Force all features to be attributed to a taxon
+          (e.g. Gentiana lutea)",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "You have to input the scientific name of your taxon.",
+              "Will be used for the weighting of your annotations",
+              "Example: Gentiana lutea",
+              "All features will be attributed to this source.",
+              "For finer attribution,
+              you need to provide a metadata file in the `Files` panel."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "org_can",
+          label = "Number of organisms to keep per feature",
+          min = 1,
+          max = 5,
+          value = 1,
+          step = 1,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Only has impact if you provided a metadata file in the
+              `Files` panel.",
+              "In this case,
+              it will take the intensity matrix of your features",
+              "and attribute the n organisms where the highest intensity",
+              "was observed as source to your features.",
+              "Useful when your experiment contains
+              different biological sources.",
+              "As the organisms where the measured intensity
+              is the highest are also the ones",
+              "with higher likelihood of the
+              corresponding compounds being isolated,",
+              "the number of organisms can be kept low."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "org_fil_mod",
+          label = "Filter library to restrict it to a
+          portion of organisms only",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If you want, you can restrict your
+              structure-organism pairs library",
+              "to given taxa only.",
+              "We do not advise doing so, but you are free to."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "org_fil_lev",
+          label = "Level at which the library will be filtered",
+          choices = c(
+            "domain",
+            "phylum",
+            "class",
+            "order",
+            "family",
+            "tribe",
+            "genus",
+            "species",
+            "varietas"
+          ),
+          selected = "phylum"
+        ),
+        shiny::textInput(
+          inputId = "org_fil_val",
+          label = "Value to be applied for filtering",
+          value = "Streptophyta"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "You can also provide multiple values.",
+              "Example, if you want to get a bitter library:",
+              "`Simaroubaceae|Gentianaceae`"
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "Names",
+        shiny::h3("Variable names parameters"),
+        shiny::textInput(
+          inputId = "names_features",
+          label = "Name of \"feature IDs\" variable in the input",
+          value = "row ID"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `feature id` column in your features file.",
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'slaw_id'"
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_filename",
+          label = "Name of \"filename\" variable in the input",
+          value = "filename"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `file name` column in your metadata file.",
+              "The default is filename.",
+              "If using Sequencer, please input 'Sample Name'"
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "names_extension",
+          label = "The file(s) extension is present in the sample name",
+          value = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Uncheck the box if you removed the files extensions",
+              "of your file in the features file",
+              "The default corresponds to the default in MZmine."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_precursor",
+          label = "Name of \"precursor m/z\" variable in the input",
+          value = "row m/z"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `precursor m/z` column in your features file.",
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'mz'"
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_rt",
+          label = "Name of \"retention time\" variable in the feature table",
+          value = "row retention time"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `retention time` column in your features file.",
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'rt'",
+              "Assumed to be in minutes."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_rt_2",
+          label = "Name of \"retention time\" variable in the rt library",
+          value = "rt"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `retention time` column in your rt library file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_source",
+          label = "Name of \"source IDs\" variable in the input",
+          value = "CLUSTERID1"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `source id` column in your edges file.",
+              "The default corresponds to the default in GNPS."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_target",
+          label = "Name of \"target IDs\" variable in the input",
+          value = "CLUSTERID2"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `target id` column in your edges file.",
+              "The default corresponds to the default in GNPS."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_taxon",
+          label = "Name of \"taxon name\" variable in the input",
+          value = "ATTRIBUTE_species"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `taxon name` column in your edges file.",
+              "The default corresponds to the default in GNPS."
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "Weights",
+        shiny::h3("Weights-related parameters"),
+        shiny::sliderInput(
+          inputId = "wei_glo_bio",
+          label = "Weight for the biological part",
+          min = 0,
+          max = 1,
+          value = 0.500,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Weight attributed to the biological score.",
+              "Depends on the organism you are studying,
+              and how specialized its metabolome is.",
+              "Also depends if you favor novelty over previous knowledge.",
+              "We advise this value to be high."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_glo_che",
+          label = "Weight for the chemical part",
+          min = 0,
+          max = 1,
+          value = 0.166,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Weight attributed to the chemical score.",
+              "We advise this value to be low.",
+              "Current chemical taxonomies do not perform well."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_glo_spe",
+          label = "Weight for the spectral part",
+          min = 0,
+          max = 1,
+          value = 0.333,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Weight attributed to the spectral score.",
+              "Depends on the quality of your spectra.",
+              "We advise this value to be medium to high."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_01",
+          label = "Score for a biological domain match",
+          min = 0,
+          max = 1,
+          value = 0.100,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `domain` match.",
+              "We advise this value to be the lowest."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_02",
+          label = "Score for a biological kingdom match",
+          min = 0,
+          max = 1,
+          value = 0.200,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `kingdom` match.",
+              "We advise this value to be higher than the one of `domain`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_03",
+          label = "Score for a biological phylum match",
+          min = 0,
+          max = 1,
+          value = 0.300,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `phylum` match.",
+              "We advise this value to be higher than the one of `kingdom`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_04",
+          label = "Score for a biological class match",
+          min = 0,
+          max = 1,
+          value = 0.400,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `class` match.",
+              "We advise this value to be higher than the one of `phylum`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_05",
+          label = "Score for a biological order match",
+          min = 0,
+          max = 1,
+          value = 0.500,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `order` match.",
+              "We advise this value to be higher than the one of `class`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_06",
+          label = "Score for a biological infraorder match",
+          min = 0,
+          max = 1,
+          value = 0.550,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `infraorder` match.",
+              "We advise this value to be higher than the one of `order`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_07",
+          label = "Score for a biological family match",
+          min = 0,
+          max = 1,
+          value = 0.600,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `family` match.",
+              "We advise this value to be higher than the one of `infraorder`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_08",
+          label = "Score for a biological subfamily match",
+          min = 0,
+          max = 1,
+          value = 0.650,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `subfamily` match.",
+              "We advise this value to be higher than the one of `family`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_09",
+          label = "Score for a biological tribe match",
+          min = 0,
+          max = 1,
+          value = 0.700,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `tribe` match.",
+              "We advise this value to be higher than the one of `subfamily`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_10",
+          label = "Score for a biological subtribe match",
+          min = 0,
+          max = 1,
+          value = 0.750,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `subtribe` match.",
+              "We advise this value to be higher than the one of `tribe`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_11",
+          label = "Score for a biological genus match",
+          min = 0,
+          max = 1,
+          value = 0.800,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `genus` match.",
+              "We advise this value to be higher than the one of `subtribe`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_12",
+          label = "Score for a biological subgenus match",
+          min = 0,
+          max = 1,
+          value = 0.850,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `subgenus` match.",
+              "We advise this value to be higher than the one of `genus`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_13",
+          label = "Score for a biological species match",
+          min = 0,
+          max = 1,
+          value = 0.900,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `species` match.",
+              "We advise this value to be higher than the one of `subgenus`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_14",
+          label = "Score for a biological subspecies match",
+          min = 0,
+          max = 1,
+          value = 0.950,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `subspecies` match.",
+              "We advise this value to be higher than the one of `species`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_bio_15",
+          label = "Score for a biological variety match",
+          min = 0,
+          max = 1,
+          value = 1.000,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `variety` match.",
+              "We advise this value to be higher than the one of `subspecies`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_11",
+          label = "Score for a (classyfire) chemical kingdom match",
+          min = 0,
+          max = 1,
+          value = 0.250,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `kingdom (classyfire)` match.",
+              "We advise this value to be the lowest."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_12",
+          label = "Score for a (classyfire) chemical superclass match",
+          min = 0,
+          max = 1,
+          value = 0.500,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `superclass (classyfire)` match.",
+              "We advise this value to be higher
+              than the one of `kingdom (classyfire)`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_13",
+          label = "Score for a (classyfire) chemical class match",
+          min = 0,
+          max = 1,
+          value = 0.750,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `class (classyfire)` match.",
+              "We advise this value to be higher
+              than the one of `superclass (classyfire)`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_14",
+          label = "Score for a (classyfire) chemical parent match",
+          min = 0,
+          max = 1,
+          value = 1.000,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `parent (classyfire)` match.",
+              "We advise this value to be higher
+              than the one of `class (classyfire)`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_21",
+          label = "Score for a (NPC) chemical pathway match",
+          min = 0,
+          max = 1,
+          value = 0.333,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `pathway (npclassifier)` match.",
+              "We advise this value to be the lowest."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_22",
+          label = "Score for a (NPC) chemical superclass match",
+          min = 0,
+          max = 1,
+          value = 0.666,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `superclass (npclassifier)` match.",
+              "We advise this value to be higher
+              than the one of `pathway (npclassifier)`."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "wei_che_23",
+          label = "Score for a (NPC) chemical class match",
+          min = 0,
+          max = 1,
+          value = 1.000,
+          step = 0.001,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Score for a `class (npclassifier)` match.",
+              "We advise this value to be higher
+              than the one of `superclass (npclassifier)`."
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "Options",
+        shiny::h3("Options parameters"),
+        shiny::checkboxInput(
+          inputId = "compounds_names",
+          label = "Compound names",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If ticked, compounds names will be reported.",
+              "This will require much more memory,
+              as they are the longest strings."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "force",
+          label = "Do not use it!",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Really, do not use it.",
+              "Corresponds to a `--force` parameter,
+              allowing for crazy things that can crash.",
+              "Really, do not use it."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "summarise",
+          label = "Summarise results to one row per feature",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If checked, the output will be a Cytoscape-ready table,",
+              "with multiple candidates per line, separated by pipes (|).",
+              "If unchecked, will output multiple lines per features
+              (one per candidate)."
+            )
+          )
+      ),
+      shiny::tabPanel(
+        title = "GNPS (optional)",
+        shiny::h3("GNPS parameters"),
+        shiny::textInput(
+          inputId = "gnps_id",
+          label = "GNPS job ID",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Your GNPS job ID.",
+              "If you provide one, all files will be taken from there.",
+              "You still need to provide a path for
+              where we will store the files,",
+              "in case your GNPS job gets deleted for you to find them back.",
+              "Annotations will also be downloaded."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "gnps_workflow",
+          label = "Workflow used within GNPS",
+          choices = c("classical", "fbmn"),
+          selected = "fbmn"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c("We advise `fbmn`,
+                        but we also support `classical` jobs.")
+          )
+      )
+    )
+  )),
+  shiny::fluidPage(
+    shiny::div(
+      id = "form",
+      shiny::actionButton(
+        inputId = "save",
+        label = "Save parameters",
+        class = "btn-primary"
+      ),
+      shinyjs::hidden(
+        shiny::span(id = "save_msg", "Saving parameters..."),
+        shiny::div(
+          id = "error",
+          shiny::div(
+            shiny::br(),
+            shiny::tags$b("Error: "),
+            shiny::span(id = "error_msg")
+          )
+        )
+      ),
+      shiny::actionButton(
+        inputId = "launch",
+        label = "Launch job",
+        class = "btn-primary"
+      ),
+    ),
+    shinyjs::hidden(shiny::div(
+      id = "thankyou_msg",
+      shiny::h3("Thanks, your parameters were saved successfully!")
+    )),
+    shinyjs::hidden(shiny::div(
+      id = "job_msg",
+      shiny::h3("Job is running!")
+    )),
+    shinyjs::hidden(shiny::div(
+      targets::tar_watch_ui(
+        id = "tar_watch",
+        label = "Live Show",
+        targets_only = TRUE,
+        degree_from = 8,
+        level_separation = 300,
+        display = "graph",
+        displays = c("summary", "progress", "graph")
+      )
+    ))
+  )
+)
+
+# save the results to a file
+save_input <- function(input) {
+  log_debug("Test")
+  log_debug(getwd())
+  paths_data_source <- parse_yaml_paths()$data$source$path
+  log_debug("Test")
+  ## safety
+  timaR::create_dir(paths_data_source)
+  log_debug("Test")
+  
+  
+  list <- timaR::load_yaml_files()
+  log_debug("Test")
+  
+  yamls_params <- list$yamls_params
+  yaml_files <- list$yaml_files
+  yaml_names <- list$yaml_names
+  log_debug("Test")
+  
+  ## This allows to keep files correctly placed in `data/source` clean
+  prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
+  prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
+  prefil_met_raw <- shiny::isolate(input$fil_met_raw)
+  prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
+  prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
+  if (!is.null(prefil_met_raw)) {
+    prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
+  }
+  if (file.exists(prefil_fea_raw_1)) {
+    fil_fea_raw <- prefil_fea_raw_1
+  } else {
+    fil_fea_raw <- prefil_fea_raw[[4]]
+  }
+  if (file.exists(prefil_spe_raw_1)) {
+    fil_spe_raw <- prefil_spe_raw_1
+  } else {
+    fil_spe_raw <- prefil_spe_raw[[4]]
+  }
+  if (!is.null(prefil_met_raw)) {
+    if (file.exists(prefil_met_raw_1)) {
+      fil_met_raw <- prefil_met_raw_1
+    } else {
+      fil_met_raw <- prefil_met_raw[[4]]
+    }
+  }
+  
+  fil_pat <- shiny::isolate(input$fil_pat)
+  
+  gnps_job_id <- shiny::isolate(input$gnps_id)
+  if (gnps_job_id == "") {
+    gnps_job_id <- NULL
+  }
+  gnps_workflow <- shiny::isolate(input$gnps_workflow)
+  
+  org_tax <- shiny::isolate(input$org_tax)
+  if (org_tax == "") {
+    org_tax <- NULL
+  }
+  
+  timaR::log_debug(x = "Changing parameters ...")
+  timaR::log_debug(x = "... Small")
+  yaml_small <- yamls_params[["inst/params/prepare_params"]]
+  yaml_small$files$pattern <-
+    fil_pat
+  yaml_small$files$features$raw <-
+    fil_fea_raw
+  yaml_small$files$metadata$raw <-
+    fil_met_raw
+  yaml_small$files$spectral$raw <-
+    fil_spe_raw
+  yaml_small$ms$polarity <-
+    shiny::isolate(input$ms_pol)
+  yaml_small$organisms$taxon <-
+    org_tax
+  yaml_small$options$summarise <-
+    shiny::isolate(input$summarise)
+  timaR::create_dir("inst/params")
+  yaml::write_yaml(
+    x = yaml_small,
+    file = "inst/params/prepare_params.yaml"
+  )
+  
+  timaR::log_debug(x = "... Advanced")
+  yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
+  yaml_advanced$annotations$candidates$final <-
+    shiny::isolate(input$ann_can_fin)
+  yaml_advanced$annotations$ms1only <-
+    shiny::isolate(input$ann_ms1only)
+  yaml_advanced$annotations$ms2approx <-
+    shiny::isolate(input$ann_ms2_app)
+  yaml_advanced$annotations$thresholds$consistency <-
+    shiny::isolate(input$ann_thr_con)
+  yaml_advanced$annotations$thresholds$ms1$biological <-
+    shiny::isolate(input$ann_thr_ms1_bio)
+  yaml_advanced$annotations$thresholds$ms1$chemical <-
+    shiny::isolate(input$ann_thr_ms1_che)
+  yaml_advanced$annotations$thresholds$ms1$condition <-
+    shiny::isolate(input$ann_thr_ms1_con)
+  yaml_advanced$annotations$thresholds$ms2$similarity$annotation <-
+    shiny::isolate(input$ann_thr_ms2_sim)
+  yaml_advanced$annotations$thresholds$ms2$similarity$edges <-
+    shiny::isolate(input$edg_thr_ms2_sim)
+  yaml_advanced$files$pattern <-
+    fil_pat
+  # TODO
+  # yaml_advanced$files$annotations$raw$spectral <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$raw$spectral$gnps <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$raw$spectral$sirius <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$raw$spectral$spectral <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$raw$sirius <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$canopus <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$formula <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$structural <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$structural$gnps <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$structural$ms1 <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$structural$sirius <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$prepared$structural$spectral <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$filtered <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$annotations$processed <-
+  #   shiny::isolate(input$todo)
+  yaml_advanced$files$features$raw <-
+    fil_fea_raw
+  # TODO
+  # yaml_advanced$files$features$prepared <-
+  #   shiny::isolate(input$fil_fea_pre)
+  # TODO
+  # yaml_advanced$files$libraries$adducts$neg <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$adducts$pos <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$adducts$prepared <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$raw$closed <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$raw$ecmdb <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$raw$lotus <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$closed <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$ecmdb <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$lotus <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$rt <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$keys <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$organisms$names <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$organisms$taxonomies$ott <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$stereo <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$metadata <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$names <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$cla <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$exp$neg <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$exp$pos <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$exp$raw <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$is$neg <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$is$pos <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$spectral$is$raw <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$exp <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$is <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$prepared <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$edges$raw <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$edges$raw$spectral <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$edges$prepared <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$components$raw <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$networks$spectral$components$prepared <-
+  #   shiny::isolate(input$todo)
+  yaml_advanced$files$metadata$raw <-
+    fil_met_raw
+  # TODO
+  # yaml_advanced$files$metadata$prepared <-
+  #   shiny::isolate(input$fil_met_pre)
+  yaml_advanced$files$spectral$raw <-
+    fil_spe_raw
+  yaml_advanced$gnps$id <-
+    gnps_job_id
+  yaml_advanced$gnps$workflow <-
+    shiny::isolate(input$gnps_workflow)
+  yaml_advanced$ms$adducts$neg <-
+    shiny::isolate(input$ms_add_neg)
+  yaml_advanced$ms$adducts$pos <-
+    shiny::isolate(input$ms_add_pos)
+  yaml_advanced$ms$clusters$neg <-
+    shiny::isolate(input$ms_clu_neg)
+  yaml_advanced$ms$clusters$pos <-
+    shiny::isolate(input$ms_clu_pos)
+  yaml_advanced$ms$polarity <-
+    shiny::isolate(input$ms_pol)
+  yaml_advanced$ms$thresholds$ms1$intensity <-
+    shiny::isolate(input$ms_thr_ms1_int)
+  yaml_advanced$ms$thresholds$ms2$intensity <-
+    shiny::isolate(input$ms_thr_ms2_int)
+  yaml_advanced$ms$tolerances$mass$ppm$ms1 <-
+    shiny::isolate(input$ms_tol_mas_ppm_ms1)
+  yaml_advanced$ms$tolerances$mass$ppm$ms2 <-
+    shiny::isolate(input$ms_tol_mas_ppm_ms2)
+  yaml_advanced$ms$tolerances$mass$dalton$ms1 <-
+    shiny::isolate(input$ms_tol_mas_dal_ms1)
+  yaml_advanced$ms$tolerances$mass$dalton$ms2 <-
+    shiny::isolate(input$ms_tol_mas_dal_ms2)
+  yaml_advanced$ms$tolerances$rt$minutes <-
+    shiny::isolate(input$ms_tol_rt_min)
+  yaml_advanced$names$extension <-
+    shiny::isolate(input$names_extension)
+  yaml_advanced$names$features <-
+    shiny::isolate(input$names_features)
+  yaml_advanced$names$filename <-
+    shiny::isolate(input$names_filename)
+  # TODO
+  # yaml_advanced$names$inchikey <-
+  #   shiny::isolate(input$names_inchikey)
+  # TODO
+  # yaml_advanced$names$mgf$collision_energy <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$compound_id <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$exact_mass <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$inchi <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$inchi_no_stereo <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$inchikey <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$inchikey_no_stereo <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$molecular_formula <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$name <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$polarity <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$retention_time <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$smiles <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$smiles_no_stereo <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$spectrum_id <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$splash <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$synonyms <-
+  #   shiny::isolate(input$names_mgf_x)
+  # yaml_advanced$names$mgf$xlogp <-
+  #   shiny::isolate(input$names_mgf_x)
+  yaml_advanced$names$precursor <-
+    shiny::isolate(input$names_precursor)
+  yaml_advanced$names$rt$features <-
+    shiny::isolate(input$names_rt)
+  yaml_advanced$names$rt$library <-
+    shiny::isolate(input$names_rt_2)
+  # TODO
+  # yaml_advanced$names$smiles <-
+  #   shiny::isolate(input$names_smiles)
+  yaml_advanced$names$source <-
+    shiny::isolate(input$names_source)
+  yaml_advanced$names$target <-
+    shiny::isolate(input$names_target)
+  yaml_advanced$names$taxon <-
+    shiny::isolate(input$names_taxon)
+  yaml_advanced$organisms$candidates <-
+    shiny::isolate(input$org_can)
+  yaml_advanced$organisms$filter$mode <-
+    shiny::isolate(input$org_fil_mod)
+  yaml_advanced$organisms$filter$level <-
+    shiny::isolate(input$org_fil_lev)
+  yaml_advanced$organisms$filter$value <-
+    shiny::isolate(input$org_fil_val)
+  yaml_advanced$organisms$taxon <-
+    org_tax
+  # TODO
+  # yaml_advanced$tools$metadata <-
+  #   shiny::isolate(input$too_x)
+  # yaml_advanced$tools$networks$spectral$components <-
+  #   shiny::isolate(input$too_x)
+  # yaml_advanced$tools$networks$spectral$edges <-
+  #   shiny::isolate(input$too_x)
+  # yaml_advanced$tools$taxonomies$biological <-
+  #   shiny::isolate(input$too_x)
+  # yaml_advanced$tools$taxonomies$chemical <-
+  #   shiny::isolate(input$too_x)
+  # TODO
+  # yaml_advanced$units$rt <-
+  #   shiny::isolate(input$uni_rt)
+  yaml_advanced$weights$global$biological <-
+    shiny::isolate(input$wei_glo_bio)
+  yaml_advanced$weights$global$chemical <-
+    shiny::isolate(input$wei_glo_che)
+  yaml_advanced$weights$global$spectral <-
+    shiny::isolate(input$wei_glo_spe)
+  yaml_advanced$weights$biological$domain <-
+    shiny::isolate(input$wei_bio_01)
+  yaml_advanced$weights$biological$kingdom <-
+    shiny::isolate(input$wei_bio_02)
+  yaml_advanced$weights$biological$phylum <-
+    shiny::isolate(input$wei_bio_03)
+  yaml_advanced$weights$biological$class <-
+    shiny::isolate(input$wei_bio_04)
+  yaml_advanced$weights$biological$order <-
+    shiny::isolate(input$wei_bio_05)
+  yaml_advanced$weights$biological$infraorder <-
+    shiny::isolate(input$wei_bio_06)
+  yaml_advanced$weights$biological$family <-
+    shiny::isolate(input$wei_bio_07)
+  yaml_advanced$weights$biological$subfamily <-
+    shiny::isolate(input$wei_bio_08)
+  yaml_advanced$weights$biological$tribe <-
+    shiny::isolate(input$wei_bio_09)
+  yaml_advanced$weights$biological$subtribe <-
+    shiny::isolate(input$wei_bio_10)
+  yaml_advanced$weights$biological$genus <-
+    shiny::isolate(input$wei_bio_11)
+  yaml_advanced$weights$biological$subgenus <-
+    shiny::isolate(input$wei_bio_12)
+  yaml_advanced$weights$biological$species <-
+    shiny::isolate(input$wei_bio_13)
+  yaml_advanced$weights$biological$subspecies <-
+    shiny::isolate(input$wei_bio_14)
+  yaml_advanced$weights$biological$variety <-
+    shiny::isolate(input$wei_bio_15)
+  yaml_advanced$weights$chemical$cla$kingdom <-
+    shiny::isolate(input$wei_che_11)
+  yaml_advanced$weights$chemical$npc$pathway <-
+    shiny::isolate(input$wei_che_21)
+  yaml_advanced$weights$chemical$cla$superclass <-
+    shiny::isolate(input$wei_che_12)
+  yaml_advanced$weights$chemical$npc$superclass <-
+    shiny::isolate(input$wei_che_22)
+  yaml_advanced$weights$chemical$cla$class <-
+    shiny::isolate(input$wei_che_13)
+  yaml_advanced$weights$chemical$npc$class <-
+    shiny::isolate(input$wei_che_23)
+  yaml_advanced$weights$chemical$cla$parent <-
+    shiny::isolate(input$wei_che_14)
+  yaml_advanced$options$compounds_names <-
+    shiny::isolate(input$compounds_names)
+  yaml_advanced$options$force <-
+    shiny::isolate(input$force)
+  yaml_advanced$options$summarise <-
+    shiny::isolate(input$summarise)
+  
+  if (!is.null(prefil_met_raw)) {
+    yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
+  }
+  if (!is.null(gnps_job_id)) {
+    yamls_params$prepare_taxa$files$metadata$raw <-
+      file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
+  }
+  
+  yaml::write_yaml(
+    x = yaml_advanced,
+    file = "inst/params/prepare_params_advanced.yaml"
+  )
+  
+}
+
+server <- function(input, output, session) {
+  ## Set working directory
+  if(getwd() |> endsWith(suffix = "tima-r")) {
+    log_debug("Correct working directory")
+  } else{
+    setwd("../..")
+    log_debug(getwd())
+  }
+  ## Observe helpers
+  shinyhelper::observe_helpers()
+  
+  ## Mandatory fields
+  fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
+  
+  ## Enable the Submit button when all mandatory fields are filled out
+  shiny::observe(x = {
+    mandatory_filled <-
+      vapply(
+        X = fields_mandatory,
+        FUN = function(x) {
+          ## TODO improve
+          suppressWarnings(any(
+            !is.null(input[[x]]),
+            input[[x]] != ""
+          ))
+        },
+        FUN.VALUE = logical(1)
+      )
+    mandatory_filled <- all(mandatory_filled)
+    
+    shinyjs::toggleState(id = "save", condition = mandatory_filled)
+    shinyjs::toggleState(id = "launch", condition = input$save >= 1)
+  })
+  
+  ## Special check for taxon name
+  iv <- shinyvalidate::InputValidator$new()
+  iv$add_rule("org_tax", function(taxon) {
+    if (!grepl(pattern = "^[[:upper:]]", x = taxon)) {
+      "Please provide your taxon name with capital letter"
+    }
+  })
+  iv$add_rule("org_tax", function(taxon) {
+    if (is.na(rotl::tnrs_match_names(
+      names = taxon,
+      do_approximate_matching = FALSE
+    )$ott_id)) {
+      "Taxon not found in Open Tree of Life"
+    }
+  })
+  iv$enable()
+  
+  ## When the Save button is clicked, save the response
+  shiny::observeEvent(
+    eventExpr = input$save,
+    handlerExpr = {
+      ## User-experience stuff
+      shinyjs::show("save_msg")
+      shinyjs::enable("launch")
+      shinyjs::hide("error")
+      
+      ## Save the data (show an error message in case of error)
+      tryCatch(
+        expr = {
+          save_input(input = input)
+          shinyjs::show("thankyou_msg")
+        },
+        error = function(err) {
+          shinyjs::html("error_msg", err$message)
+          shinyjs::show(
+            id = "error",
+            anim = TRUE,
+            animType = "fade"
+          )
+        },
+        finally = {
+          shinyjs::enable("save")
+          shinyjs::enable("launch")
+          shinyjs::hide("save_msg")
+          shinyjs::hide("error")
+        }
+      )
+    }
+  )
+  
+  shiny::observeEvent(
+    eventExpr = input$launch,
+    handlerExpr = {
+      shinyjs::show("job_msg")
+      shinyjs::hide("error")
+      shinyjs::hide("params")
+      shinyjs::hide("form")
+      shinyjs::show("tar_watch")
+      tryCatch(expr = {
+        targets::tar_watch_server(id = "tar_watch")
+        targets::tar_watch(
+          port = 3839,
+          display = "graph",
+          displays = c("summary", "graph"),
+          degree_from = 10,
+          outdated = TRUE,
+          targets_only = TRUE,
+          supervise = TRUE,
+          verbose = TRUE,
+          exclude = c(
+            "yaml_paths",
+            "benchmark_ann_fil_ms1_neg",
+            "benchmark_ann_fil_ms1_pos",
+            "benchmark_ann_fil_spe_neg",
+            "benchmark_ann_fil_spe_pos",
+            "benchmark_ann_fil_spe_ms1_neg",
+            "benchmark_ann_fil_spe_ms1_pos",
+            "benchmark_ann_ms1_neg",
+            "benchmark_ann_ms2_pos",
+            "benchmark_ann_ms1_pre_neg",
+            "benchmark_ann_ms1_pre_pos",
+            "benchmark_ann_pre_ms1_ms2_b_c_neg",
+            "benchmark_ann_pre_ms1_ms2_b_c_pos",
+            "benchmark_ann_pre_ms1_ms2_b_neg",
+            "benchmark_ann_pre_ms1_ms2_b_pos",
+            "benchmark_ann_pre_ms2_b_c_neg",
+            "benchmark_ann_pre_ms2_b_c_pos",
+            "benchmark_ann_pre_ms2_b_neg",
+            "benchmark_ann_pre_ms2_b_pos",
+            "benchmark_ann_sir_pre",
+            "benchmark_ann_sir_pre_can",
+            "benchmark_ann_sir_pre_for",
+            "benchmark_ann_sir_pre_str",
+            "benchmark_ann_spe_neg",
+            "benchmark_ann_spe_pos",
+            "benchmark_ann_spe_pre_neg",
+            "benchmark_ann_spe_pre_pos",
+            "benchmark_com_neg",
+            "benchmark_com_pos",
+            "benchmark_com_pre_neg",
+            "benchmark_com_pre_pos",
+            "benchmark_converted",
+            "benchmark_copy",
+            "benchmark_def_ann_mas",
+            "benchmark_def_ann_spe",
+            "benchmark_def_cre_edg_com",
+            "benchmark_def_cre_edg_spe",
+            "benchmark_def_fil_ann",
+            "benchmark_def_pre_ann_sir",
+            "benchmark_def_pre_ann_spe",
+            "benchmark_def_pre_fea_com",
+            "benchmark_def_pre_fea_edg",
+            "benchmark_def_wei_ann",
+            "benchmark_edg_pre_neg",
+            "benchmark_edg_pre_pos",
+            "benchmark_edg_spe_neg",
+            "benchmark_edg_spe_pos",
+            "benchmark_file",
+            "benchmark_files_neg",
+            "benchmark_files_pos",
+            "benchmark_path_copy",
+            "benchmark_path_export",
+            "benchmark_path_mgf_neg",
+            "benchmark_path_mgf_pos",
+            "benchmark_path_url",
+            "benchmark_prepared",
+            "benchmark_pre_meta_neg",
+            "benchmark_pre_meta_pos",
+            "benchmark_pre_mgf_neg",
+            "benchmark_pre_mgf_pos",
+            "benchmark_taxed_neg",
+            "benchmark_taxed_pos",
+            "benchmark_wei_par",
+            "paths",
+            "paths_data_interim_libraries_adducts_path",
+            "paths_data_source_benchmark_copy",
+            "paths_data_source_benchmark_mgf_neg",
+            "paths_data_source_benchmark_mgf_pos",
+            "paths_data_source_benchmark_set",
+            "paths_data_source_libraries_sop_ecmdb",
+            "paths_data_source_libraries_sop_lotus",
+            "paths_data_source_libraries_spectra_is_lotus_pos",
+            "paths_data_source_libraries_spectra_is_lotus_neg",
+            "paths_data_source_spectra",
+            # "paths_gnps_example_id",
+            "paths_interim_a",
+            "paths_interim_f",
+            "paths_source",
+            "paths_test_mode",
+            "paths_urls_benchmarking_set",
+            "paths_urls_ecmdb_metabolites",
+            "paths_urls_lotus_doi",
+            "paths_urls_lotus_pattern",
+            "paths_urls_massbank_file",
+            "paths_urls_massbank_url",
+            "paths_urls_massbank_version",
+            "paths_urls_examples_spectra_mini",
+            "paths_urls_examples_spectral_lib_pos",
+            "paths_urls_examples_spectral_lib_neg",
+            "par_def_ann_mas",
+            "par_def_ann_spe",
+            "par_def_cre_com",
+            "par_def_cre_edg_spe",
+            "par_def_fil_ann",
+            "par_def_pre_ann_gnp",
+            "par_def_pre_ann_sir",
+            "par_def_pre_ann_spe",
+            "par_def_pre_fea_com",
+            "par_def_pre_fea_edg",
+            "par_def_pre_fea_tab",
+            "par_def_pre_lib_add",
+            "par_def_pre_lib_rt",
+            "par_def_pre_lib_sop_clo",
+            "par_def_pre_lib_sop_ecm",
+            "par_def_pre_lib_sop_lot",
+            "par_def_pre_lib_sop_mer",
+            "par_def_pre_lib_spe",
+            "par_def_pre_tax",
+            "par_def_wei_ann",
+            "par_fin_par",
+            "par_fin_par2",
+            "par_pre_par",
+            "par_pre_par2",
+            "par_usr_ann_mas",
+            "par_usr_ann_spe",
+            "par_usr_cre_com",
+            "par_usr_cre_edg_spe",
+            "par_usr_fil_ann",
+            "par_usr_pre_ann_gnp",
+            "par_usr_pre_ann_sir",
+            "par_usr_pre_ann_spe",
+            "par_usr_pre_fea_com",
+            "par_usr_pre_fea_edg",
+            "par_usr_pre_fea_tab",
+            "par_usr_pre_lib_add",
+            "par_usr_pre_lib_rt",
+            "par_usr_pre_lib_sop_clo",
+            "par_usr_pre_lib_sop_ecm",
+            "par_usr_pre_lib_sop_lot",
+            "par_usr_pre_lib_sop_mer",
+            "par_usr_pre_lib_spe",
+            "par_usr_pre_tax",
+            "par_usr_wei_ann",
+            "par_ann_mas",
+            "par_ann_spe",
+            "par_cre_com",
+            "par_cre_edg_spe",
+            "par_fil_ann",
+            "par_pre_ann_gnp",
+            "par_pre_ann_sir",
+            "par_pre_ann_spe",
+            "par_pre_fea_com",
+            "par_pre_fea_edg",
+            "par_pre_fea_tab",
+            "par_pre_lib_add",
+            "par_pre_lib_rt",
+            "par_pre_lib_sop_clo",
+            "par_pre_lib_sop_ecm",
+            "par_pre_lib_sop_lot",
+            "par_pre_lib_sop_mer",
+            "par_pre_lib_spe",
+            "par_pre_tax",
+            "par_wei_ann",
+            ".Random.seed"
+          )
+        )
+        targets::tar_make(
+          names = targets::matches("^ann_pre$"),
+          garbage_collection = TRUE,
+          reporter = "verbose_positives"
+        )
+      }, finally = {
+        shiny::stopApp()
+      })
+      process <-
+        shiny::reactiveValues(status = targets::tar_active())
+      shiny::observe({
+        shiny::invalidateLater(millis = 5000)
+        process$status <- targets::tar_active()
+      })
+      
+      shiny::observeEvent(
+        eventExpr = process$status,
+        handlerExpr = {
+          message("Job finished")
+          shiny::stopApp()
+        }
+      )
+    }
+  )
+}
 
 shinyApp(
   ui = ui,
