@@ -664,6 +664,26 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         yamls_params$create_components$files$networks$spectral$components$raw |>
         lapply(FUN = replace_id)
     },
+    filter_annotations = {
+      yamls_params$filter_annotations$files$annotations$filtered <-
+        yamls_params$filter_annotations$files$annotations$filtered |>
+        lapply(FUN = replace_id)
+      yamls_params$filter_annotations$files$annotations$prepared$structural$gnps <-
+        yamls_params$filter_annotations$files$annotations$prepared$structural$gnps |>
+        lapply(FUN = replace_id)
+      yamls_params$filter_annotations$files$annotations$prepared$structural$ms1 <-
+        yamls_params$filter_annotations$files$annotations$prepared$structural$ms1 |>
+        lapply(FUN = replace_id)
+      yamls_params$filter_annotations$files$annotations$prepared$structural$sirius <-
+        yamls_params$filter_annotations$files$annotations$prepared$structural$sirius |>
+        lapply(FUN = replace_id)
+      yamls_params$filter_annotations$files$annotations$prepared$structural$spectral <-
+        yamls_params$filter_annotations$files$annotations$prepared$structural$spectral |>
+        lapply(FUN = replace_id)
+      yamls_params$filter_annotations$files$features$prepared <-
+        yamls_params$filter_annotations$files$features$prepared |>
+        lapply(FUN = replace_id)
+    },
     prepare_features_tables = {
       # yamls_params$prepare_features_tables$files$features$raw <-
       #   yamls_params$prepare_features_tables$files$features$raw |>
@@ -733,15 +753,18 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     weight_annotations = {
+      yamls_params$weight_annotations$files$annotations$filtered <-
+        yamls_params$weight_annotations$files$annotations$filtered |>
+        lapply(FUN = replace_id)
       yamls_params$weight_annotations$files$annotations$prepared$canopus <-
         yamls_params$weight_annotations$files$annotations$prepared$canopus |>
         lapply(FUN = replace_id)
       yamls_params$weight_annotations$files$annotations$prepared$formula <-
         yamls_params$weight_annotations$files$annotations$prepared$formula |>
         lapply(FUN = replace_id)
-      # yamls_params$weight_annotations$files$annotations$processed <-
-      #   yamls_params$weight_annotations$files$annotations$processed |>
-      #   lapply(FUN = replace_id)
+      yamls_params$weight_annotations$files$annotations$processed <-
+        yamls_params$weight_annotations$files$annotations$processed |>
+        lapply(FUN = replace_id)
       yamls_params$weight_annotations$files$features$prepared <-
         yamls_params$weight_annotations$files$features$prepared |>
         lapply(FUN = replace_id)
