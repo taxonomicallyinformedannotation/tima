@@ -1,9 +1,9 @@
 library(shiny)
 library(timaR)
 
-if(getwd() |> endsWith(suffix = "tima-r")) {
+if (getwd() |> endsWith(suffix = "tima-r")) {
   log_debug("Correct working directory")
-} else{
+} else {
   setwd("../..")
   log_debug(getwd())
 }
@@ -57,7 +57,7 @@ ui <- shiny::fluidPage(
       shiny::a("Adriano Rutz", href = "https://adafede.github.io/"),
       shiny::HTML("&bull;"),
       shiny::a("Main publication",
-               href = "https://doi.org/10.3389/fpls.2019.01329"
+        href = "https://doi.org/10.3389/fpls.2019.01329"
       ),
       shiny::HTML("&bull;"),
       shiny::span("Code"),
@@ -1312,23 +1312,17 @@ ui <- shiny::fluidPage(
 
 # save the results to a file
 save_input <- function(input) {
-  log_debug("Test")
   log_debug(getwd())
   paths_data_source <- parse_yaml_paths()$data$source$path
-  log_debug("Test")
   ## safety
   timaR::create_dir(paths_data_source)
-  log_debug("Test")
-  
-  
+
   list <- timaR::load_yaml_files()
-  log_debug("Test")
-  
+
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
   yaml_names <- list$yaml_names
-  log_debug("Test")
-  
+
   ## This allows to keep files correctly placed in `data/source` clean
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
@@ -1355,20 +1349,23 @@ save_input <- function(input) {
       fil_met_raw <- prefil_met_raw[[4]]
     }
   }
-  
+  if (!exists("fil_met_raw")) {
+    fil_met_raw <- NULL
+  }
+
   fil_pat <- shiny::isolate(input$fil_pat)
-  
+
   gnps_job_id <- shiny::isolate(input$gnps_id)
   if (gnps_job_id == "") {
     gnps_job_id <- NULL
   }
   gnps_workflow <- shiny::isolate(input$gnps_workflow)
-  
+
   org_tax <- shiny::isolate(input$org_tax)
   if (org_tax == "") {
     org_tax <- NULL
   }
-  
+
   timaR::log_debug(x = "Changing parameters ...")
   timaR::log_debug(x = "... Small")
   yaml_small <- yamls_params[["inst/params/prepare_params"]]
@@ -1391,7 +1388,7 @@ save_input <- function(input) {
     x = yaml_small,
     file = "inst/params/prepare_params.yaml"
   )
-  
+
   timaR::log_debug(x = "... Advanced")
   yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
@@ -1691,7 +1688,7 @@ save_input <- function(input) {
     shiny::isolate(input$force)
   yaml_advanced$options$summarise <-
     shiny::isolate(input$summarise)
-  
+
   if (!is.null(prefil_met_raw)) {
     yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
   }
@@ -1699,28 +1696,27 @@ save_input <- function(input) {
     yamls_params$prepare_taxa$files$metadata$raw <-
       file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
   }
-  
+
   yaml::write_yaml(
     x = yaml_advanced,
     file = "inst/params/prepare_params_advanced.yaml"
   )
-  
 }
 
 server <- function(input, output, session) {
   ## Set working directory
-  if(getwd() |> endsWith(suffix = "tima-r")) {
+  if (getwd() |> endsWith(suffix = "tima-r")) {
     log_debug("Correct working directory")
-  } else{
+  } else {
     setwd("../..")
     log_debug(getwd())
   }
   ## Observe helpers
   shinyhelper::observe_helpers()
-  
+
   ## Mandatory fields
   fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
-  
+
   ## Enable the Submit button when all mandatory fields are filled out
   shiny::observe(x = {
     mandatory_filled <-
@@ -1736,11 +1732,11 @@ server <- function(input, output, session) {
         FUN.VALUE = logical(1)
       )
     mandatory_filled <- all(mandatory_filled)
-    
+
     shinyjs::toggleState(id = "save", condition = mandatory_filled)
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
   })
-  
+
   ## Special check for taxon name
   iv <- shinyvalidate::InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
@@ -1757,7 +1753,7 @@ server <- function(input, output, session) {
     }
   })
   iv$enable()
-  
+
   ## When the Save button is clicked, save the response
   shiny::observeEvent(
     eventExpr = input$save,
@@ -1766,7 +1762,7 @@ server <- function(input, output, session) {
       shinyjs::show("save_msg")
       shinyjs::enable("launch")
       shinyjs::hide("error")
-      
+
       ## Save the data (show an error message in case of error)
       tryCatch(
         expr = {
@@ -1790,7 +1786,7 @@ server <- function(input, output, session) {
       )
     }
   )
-  
+
   shiny::observeEvent(
     eventExpr = input$launch,
     handlerExpr = {
@@ -1981,7 +1977,7 @@ server <- function(input, output, session) {
         shiny::invalidateLater(millis = 5000)
         process$status <- targets::tar_active()
       })
-      
+
       shiny::observeEvent(
         eventExpr = process$status,
         handlerExpr = {
