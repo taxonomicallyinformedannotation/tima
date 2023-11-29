@@ -41,9 +41,9 @@ create_edges_spectra <- function(
   if (length(spectra) > 0) {
     spectra <- spectra |>
       sanitize_spectra(cutoff = qutoff) |>
-      Spectra::addProcessing(remove_above_precursor(),
-        spectraVariables = c("precursorMz")
-      ) |>
+      # Spectra::addProcessing(remove_above_precursor(),
+      #   spectraVariables = c("precursorMz")
+      # ) |>
       Spectra::addProcessing(normalize_peaks()) |>
       Spectra::applyProcessing()
 
