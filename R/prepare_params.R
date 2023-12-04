@@ -180,7 +180,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_sum <- params_small$options$summarise
-  
+
   if (!is.null(org_tax)) {
     if (org_tax == "") {
       org_tax <- NULL
