@@ -2,10 +2,10 @@ library(shiny)
 library(timaR)
 
 if (getwd() |> endsWith(suffix = "tima-r")) {
-  log_debug("Correct working directory")
+  # log_debug("Correct working directory")
 } else {
   setwd("../..")
-  log_debug(getwd())
+  # log_debug(getwd())
 }
 
 options(shiny.port = 3838)
@@ -1312,7 +1312,7 @@ ui <- shiny::fluidPage(
 
 # save the results to a file
 save_input <- function(input) {
-  log_debug(getwd())
+  # log_debug(getwd())
   paths_data_source <- parse_yaml_paths()$data$source$path
   ## safety
   timaR::create_dir(paths_data_source)
@@ -1706,10 +1706,10 @@ save_input <- function(input) {
 server <- function(input, output, session) {
   ## Set working directory
   if (getwd() |> endsWith(suffix = "tima-r")) {
-    log_debug("Correct working directory")
+    # log_debug("Correct working directory")
   } else {
     setwd("../..")
-    log_debug(getwd())
+    # log_debug(getwd())
   }
   ## Observe helpers
   shinyhelper::observe_helpers()
@@ -1988,7 +1988,8 @@ server <- function(input, output, session) {
     }
   )
 }
-
+url <- "http://localhost:3838/"
+log_debug("Please, go to:", url)
 shinyApp(
   ui = ui,
   server = server
