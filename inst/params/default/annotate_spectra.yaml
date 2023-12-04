@@ -19,9 +19,10 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' List of spectral matching results. STRING
+      #' List of spectral matching results.
       spectral:
-        - data/interim/annotations/example_spectral_matches.tsv.gz
+        #' Spectral spectral matching results. STRING
+        spectral: data/interim/annotations/example_spectral_matches.tsv.gz
 
   #' Libraries files.
   libraries:
