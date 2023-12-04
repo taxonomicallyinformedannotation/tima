@@ -175,11 +175,20 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   log_debug(x = "Small params")
   fil_pat <- params_small$files$pattern
   fil_fea_raw <- params_small$files$features$raw
-  metadata <- params_small$files$metadata$raw
+  fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_sum <- params_small$options$summarise
+  
+  if (!is.null(org_tax)) {
+    if (org_tax == "") {
+      org_tax <- NULL
+    }
+  }
+  if (!is.null(org_tax)) {
+    fil_met_raw <- NULL
+  }
 
   log_debug(x = "Changing params")
   switch(step,

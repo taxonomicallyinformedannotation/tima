@@ -257,8 +257,9 @@ files:
 
   #' Metadata files.
   metadata:
-    #' OPTIONAL. If tool is "manual".
-    #' Biological origin metadata file. STRING
+    #' The path to the file containing your metadata.
+    #' Must be formatted accordingly.
+    #' If your experiment contains a single taxon, you can provide it below instead. STRING
     raw: data/source/example_metadata.tsv
 
     #' Taxonomically informed features file. STRING
@@ -492,7 +493,9 @@ organisms:
     # Example: "Simaroubaceae|Gentianaceae". STRING
     value: Streptophyta
 
-  #' OPTIONAL. Force all features to be attributed to given taxon.
+  #' OPTIONAL. If your experiment contains a single taxon, its scientific name.
+  #' Else, you will need to provide a metadata file above.
+  #' If you provide both, this one will have priority.
   #' Example: "Homo sapiens". STRING
   taxon: ~
 
