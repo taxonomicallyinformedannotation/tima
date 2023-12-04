@@ -258,4 +258,4 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/IV-processing.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/III-processing.html).
