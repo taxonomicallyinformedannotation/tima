@@ -19,8 +19,10 @@ ms:
   #' The polarity used. Must be either "pos" or "neg". STRING
   polarity: pos
 organisms:
-  #' If your experiment contains a single taxon, its scientific name.
-  #' Else, you will need to provide a metadata file above. STRING
+  #' OPTIONAL. If your experiment contains a single taxon, its scientific name.
+  #' Else, you will need to provide a metadata file above.
+  #' If you provide both, this one will have priority.
+  #' Example: "Homo sapiens". STRING
   taxon: ~
 options:
   #' Do you want to summarize all candidates per feature to a single row? BOOLEAN
