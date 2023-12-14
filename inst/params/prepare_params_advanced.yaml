@@ -245,15 +245,15 @@ files:
           spectral: data/interim/features/example_edges_spectra.tsv
 
         #' Prepared edges file. STRING
-        prepared: data/interim/features/example_edges.tsv.gz
+        prepared: data/interim/features/example_edges.tsv
 
       #' Components files.
       components:
         #' Raw components file. STRING
-        raw: data/interim/features/example_components.tsv.gz
+        raw: data/interim/features/example_components.tsv
 
         #' Prepared components file. STRING
-        prepared: data/interim/features/example_components_prepared.tsv.gz
+        prepared: data/interim/features/example_components_prepared.tsv
 
   #' Metadata files.
   metadata:
