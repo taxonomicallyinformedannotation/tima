@@ -2,6 +2,7 @@
 
 # timaR 2.9.1
 
+* Add [Waystation](https://caltechlibrary.github.io/waystation/) action
 * Expose all parameters (#107, #108)
 * Fix for Zenodo API
 
