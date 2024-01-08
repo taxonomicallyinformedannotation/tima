@@ -26,7 +26,7 @@ export_spectra <- function(file,
   #     pattern = ".*\\.",
   #     replacement = "",
   #     x = file,
-  #.    perl = TRUE
+  #     perl = TRUE
   #   ),
   #   "mgf" = {
   #     Spectra::Spectra(object = spectra) |>

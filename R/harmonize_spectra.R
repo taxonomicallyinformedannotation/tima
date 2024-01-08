@@ -151,8 +151,7 @@ harmonize_spectra <- function(spectra,
       grepl(
         pattern = mode,
         x = !!as.name(col_po),
-        fixed = TRUE,
-        ignore.case = TRUE
+        fixed = TRUE
       ) | grepl(
         pattern = if (mode == "pos") {
           1
@@ -160,8 +159,7 @@ harmonize_spectra <- function(spectra,
           0
         },
         x = !!as.name(col_po),
-        fixed = TRUE,
-        ignore.case = TRUE
+        fixed = TRUE
       )
     ) |>
     tidytable::select(
