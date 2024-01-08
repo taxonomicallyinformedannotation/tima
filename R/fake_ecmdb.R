@@ -12,8 +12,8 @@
 fake_ecmdb <- function(export) {
   log_debug("External error. Returning empty file instead.")
   fake_export <- export |>
-    gsub(pattern = ".*/", replacement = "") |>
-    gsub(pattern = ".zip", replacement = "")
+    gsub(pattern = ".*/", replacement = "", perl = TRUE) |>
+    gsub(pattern = ".zip", replacement = "", fixed = TRUE)
   paste0(
     "[{",
     "\"name\":null,",

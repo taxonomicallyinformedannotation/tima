@@ -42,7 +42,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   ## Not checking for ppm and Da limits, everyone is free.
 
   if (length(library) > 1) {
-    library <- library[grepl(polarity, library)]
+    library <- library[grepl(polarity, library, fixed = TRUE)]
   }
 
   log_debug("Loading spectra...")
@@ -313,7 +313,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
             yes = target_inchikey |>
               gsub(
                 pattern = "-.*",
-                replacement = ""
+                replacement = "",
+                perl = TRUE
               ),
             no = target_inchikey_no_stereo
           ),

@@ -74,7 +74,7 @@ standardize_mol <- function(mol) {
       rinchi::get.inchi()
     inchikey_no_stereo <- mol |>
       rinchi::get.inchi.key() |>
-      gsub(pattern = "-.*", replacement = "")
+      gsub(pattern = "-.*", replacement = "", perl = TRUE)
 
     return(list(
       smiles_no_stereo = ifelse(

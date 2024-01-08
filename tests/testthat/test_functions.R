@@ -69,9 +69,9 @@ testthat::test_that("Test functions", {
   )
   get_file(
     url = paths$urls$examples$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv"),
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE),
     export = paths$data$source$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE)
   )
   ## Other GNPS job id (without metadata)
   get_gnps_tables(
@@ -116,7 +116,8 @@ testthat::test_that("Test functions", {
     export = paths$data$source$spectra |>
       gsub(
         pattern = "example_spectra",
-        replacement = "example_spectra_ms1"
+        replacement = "example_spectra_ms1",
+        fixed = TRUE
       )
   )
 
@@ -189,7 +190,11 @@ testthat::test_that("Test functions", {
   # get_file(
   #   url = paths$urls$examples$spectral_lib$pos,
   #   export = paths$data$source$libraries$spectra$is$lotus$pos |>
-  #     gsub(pattern = "isdb_pos.mgf", replacement = "lotus_pos.rds")
+  #     gsub(
+  #       pattern = "isdb_pos.mgf",
+  #       replacement = "lotus_pos.rds",
+  #       fixed = TRUE
+  #     )
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$pos,
@@ -198,7 +203,11 @@ testthat::test_that("Test functions", {
   # get_file(
   #   url = paths$urls$examples$spectral_lib$neg,
   #   export = paths$data$source$libraries$spectra$is$lotus$neg |>
-  #     gsub(pattern = "isdb_neg.mgf", replacement = "lotus_neg.rds")
+  #     gsub(
+  #       pattern = "isdb_neg.mgf",
+  #       replacement = "lotus_neg.rds",
+  #       fixed = TRUE
+  #     )
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$neg,
@@ -237,7 +246,7 @@ testthat::test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
+        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf", fixed = TRUE),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -248,7 +257,7 @@ testthat::test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf"),
+        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf", fixed = TRUE),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -259,7 +268,7 @@ testthat::test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
-        gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf"),
+        gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf", fixed = TRUE),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -439,7 +448,7 @@ testthat::test_that("Test functions", {
   ## Testing for unrecognized taxa
   prepare_taxa(
     metadata = paths$data$source$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv")
+      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE)
   )
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()

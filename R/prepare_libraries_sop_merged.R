@@ -161,9 +161,11 @@ prepare_libraries_sop_merged <-
         tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
-            x = colnames(table_keys)
+            x = colnames(table_keys),
+            perl = TRUE
           )]),
-          pattern = value
+          pattern = value,
+          perl = TRUE
         )) |>
         tidytable::select(
           structure_inchikey,

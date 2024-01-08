@@ -19,11 +19,13 @@ prepare_libraries_sop_ecmdb <-
       file <- gsub(
         pattern = ".zip",
         replacement = "",
-        x = input
+        x = input,
+        fixed = TRUE
       ) |>
         gsub(
           pattern = ".*/",
-          replacement = ""
+          replacement = "",
+          perl = TRUE
         )
 
       ## Get rid of the annoying incomplete final line warning

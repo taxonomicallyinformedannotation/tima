@@ -5,6 +5,7 @@
 * Add [Waystation](https://caltechlibrary.github.io/waystation/) action
 * Expose all parameters (#107, #108)
 * Fix for Zenodo API
+* Optimize grep/gsub by adding `perl=TRUE` or `fixed=TRUE`
 
 # timaR 2.9.0
 

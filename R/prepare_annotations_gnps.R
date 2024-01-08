@@ -66,8 +66,8 @@ prepare_annotations_gnps <-
           candidate_structure_smiles_no_stereo = NA,
           candidate_structure_molecular_formula = candidate_structure_inchi |>
             ## really dirty
-            gsub(pattern = ".*\\/C", replacement = "C") |>
-            gsub(pattern = "\\/.*", replacement = ""),
+            gsub(pattern = ".*\\/C", replacement = "C", perl = TRUE) |>
+            gsub(pattern = "\\/.*", replacement = "", perl = TRUE),
           candidate_structure_xlogp = NA,
           ## Only partially present
           candidate_structure_tax_cla_chemontid = NA,

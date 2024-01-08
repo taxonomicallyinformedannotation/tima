@@ -1740,7 +1740,7 @@ server <- function(input, output, session) {
   ## Special check for taxon name
   iv <- shinyvalidate::InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
-    if (!grepl(pattern = "^[[:upper:]]", x = taxon)) {
+    if (!grepl(pattern = "^[[:upper:]]", x = taxon, perl = TRUE)) {
       "Please provide your taxon name with capital letter"
     }
   })

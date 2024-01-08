@@ -38,7 +38,8 @@ get_last_version_from_zenodo <-
       gsub(
         pattern = ".*/",
         replacement = "",
-        x = record_new$url
+        x = record_new$url,
+        perl = TRUE
       )
     ))
 
@@ -49,7 +50,7 @@ get_last_version_from_zenodo <-
     filenames <- content$files$key
 
     ## Select the file URL and name matching the given pattern
-    indices <- grepl(pattern = pattern, x = filenames)
+    indices <- grepl(pattern = pattern, x = filenames, fixed = TRUE)
     fileurl <- fileurls[indices]
     filename <- filenames[indices]
     ## Fix with new Zenodo (weird)
