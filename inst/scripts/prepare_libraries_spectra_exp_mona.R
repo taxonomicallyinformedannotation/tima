@@ -65,7 +65,10 @@ prepare_mona <-
       )) |>
       tidytable::filter(!is.na(smiles) | !is.na(inchi)) |>
       ## COMMENT (AR): FILTERING INVALID InChIs
-      tidytable::filter(grepl(pattern = "InChI=1S/", x = inchi)) |>
+      tidytable::filter(grepl(
+        pattern = "InChI=1S/",
+        x = inchi,
+        fixed = TRUE)) |>
       tidytable::filter(!grepl(
         pattern = ".",
         x = inchi,
@@ -91,33 +94,33 @@ prepare_mona <-
     log_debug("Cleaning charges")
     spctra_enhanced_1 <- spctra_enhanced |>
       tidytable::filter(
-        grepl(pattern = "]\\+\\+", x = precursor_type) |
-          grepl(pattern = "]2\\+", x = precursor_type)
+        grepl(pattern = "]\\+\\+", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "]2\\+", x = precursor_type, perl = TRUE)
       ) |>
       tidytable::mutate(precursorCharge = 2L)
     spctra_enhanced_2 <- spctra_enhanced |>
       tidytable::filter(
-        grepl(pattern = "]\\+$", x = precursor_type) |
-          grepl(pattern = "]1\\+", x = precursor_type) |
-          grepl(pattern = "M\\+H$", x = precursor_type) |
-          grepl(pattern = "M\\+K$", x = precursor_type) |
-          grepl(pattern = "M\\+Na$", x = precursor_type) |
-          grepl(pattern = "M\\+NH4$", x = precursor_type) |
-          grepl(pattern = "M\\+$", x = precursor_type)
+        grepl(pattern = "]\\+$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "]1\\+", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+H$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+K$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+Na$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+NH4$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+$", x = precursor_type, perl = TRUE)
       ) |>
       tidytable::mutate(precursorCharge = 1L)
     spctra_enhanced_3 <- spctra_enhanced |>
       tidytable::filter(
-        grepl(pattern = "]\\-\\-", x = precursor_type) |
-          grepl(pattern = "]2\\-", x = precursor_type)
+        grepl(pattern = "]\\-\\-", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "]2\\-", x = precursor_type, perl = TRUE)
       ) |>
       tidytable::mutate(precursorCharge = -2L)
     spctra_enhanced_4 <- spctra_enhanced |>
       tidytable::filter(
-        grepl(pattern = "]\\-$", x = precursor_type) |
-          grepl(pattern = "]1\\-", x = precursor_type) |
-          grepl(pattern = "M\\-H$", x = precursor_type) |
-          grepl(pattern = "M\\+Cl$", x = precursor_type)
+        grepl(pattern = "]\\-$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "]1\\-", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\-H$", x = precursor_type, perl = TRUE) |
+          grepl(pattern = "M\\+Cl$", x = precursor_type, perl = TRUE)
       ) |>
       tidytable::mutate(precursorCharge = -1L)
 

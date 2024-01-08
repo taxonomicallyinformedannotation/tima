@@ -187,13 +187,15 @@ clean_chemo <-
         tidytable::reframe(tidytable::across(
           .cols = colnames(df3)[grepl(
             pattern = "^candidate|^rank|^score",
-            x = colnames(df3)
+            x = colnames(df3),
+            perl = TRUE
           )],
           .fns = function(x) {
             gsub(
               pattern = "\\bNA\\b",
               replacement = "",
-              x = paste(x, collapse = "|")
+              x = paste(x, collapse = "|"),
+              perl = TRUE
             )
           }
         )) |>

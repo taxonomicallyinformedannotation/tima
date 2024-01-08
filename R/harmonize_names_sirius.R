@@ -16,7 +16,8 @@ harmonize_names_sirius <- function(x) {
   harmonized_name <- gsub(
     pattern = ".*_",
     replacement = "",
-    x = x
+    x = x,
+    perl = TRUE
   )
 
   return(harmonized_name)

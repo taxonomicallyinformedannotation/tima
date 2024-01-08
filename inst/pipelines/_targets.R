@@ -1052,7 +1052,8 @@ list(
                   export = paths_data_source_libraries_spectra_is_lotus_pos |>
                     gsub(
                       pattern = "isdb_pos.mgf",
-                      replacement = "lotus_pos.rds"
+                      replacement = "lotus_pos.rds", 
+                      fixed = TRUE
                     )
                 )
               # get_last_version_from_zenodo(
@@ -1083,7 +1084,8 @@ list(
                   export = paths_data_source_libraries_spectra_is_lotus_neg |>
                     gsub(
                       pattern = "isdb_neg.mgf",
-                      replacement = "lotus_neg.rds"
+                      replacement = "lotus_neg.rds", 
+                      fixed = TRUE
                     )
                 )
               # get_last_version_from_zenodo(
@@ -2029,7 +2031,8 @@ list(
           tidytable::mutate(inchikey_no_stereo = gsub(
             pattern = "-.*",
             replacement = "",
-            x = inchikey
+            x = inchikey, 
+            perl = TRUE
           )) |>
           tidytable::distinct(inchikey_no_stereo, adduct, .keep_all = TRUE) |>
           tidytable::mutate(mz = precursorMz) |>
@@ -2066,7 +2069,8 @@ list(
             tidytable::mutate(short_ik = gsub(
               pattern = "-.*",
               replacement = "",
-              inchikey
+              inchikey, 
+              perl = TRUE
             )) |>
             tidytable::mutate(
               rtime = tidytable::cur_group_id(),
@@ -2121,7 +2125,8 @@ list(
             tidytable::mutate(inchikey_no_stereo = gsub(
               pattern = "-.*",
               replacement = "",
-              x = inchikey
+              x = inchikey, 
+              perl = TRUE
             )) |>
             data.frame()
           return(df)

@@ -790,7 +790,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   )
 
   yaml_export <- list$yaml_files |>
-    gsub(pattern = "default", replacement = "user")
+    gsub(pattern = "default", replacement = "user", fixed = TRUE)
   names(yaml_export) <- list$yaml_names
 
   if (!is.na(step)) {
@@ -798,11 +798,16 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     yamls_params <-
       yamls_params[grepl(
         pattern = paste0(step[[1]], "$"),
-        x = names(yamls_params)
+        x = names(yamls_params),
+        perl = TRUE
       )]
     ## The dot is for steps having similar names separated by underscores
     yaml_export <-
-      yaml_export[grepl(pattern = paste0(step[[1]], "\\."), x = yaml_export)]
+      yaml_export[grepl(
+        pattern = paste0(step[[1]], "\\."), 
+        x = yaml_export,
+        perl = TRUE
+        )]
   }
 
   log_debug(x = "Exporting params ...")

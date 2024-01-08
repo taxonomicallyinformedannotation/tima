@@ -38,7 +38,8 @@ prepare_libraries_sop_hmdb <- function(
     gsub(
       pattern = ".zip",
       replacement = ".xml",
-      x = input
+      x = input,
+      fixed = TRUE
     )
 
   log_debug("Loading HMDB (takes waaaaayyyy tooooo long)")
@@ -53,7 +54,8 @@ prepare_libraries_sop_hmdb <- function(
         namespaces = c(ns = "https://www.hmdb.ca" |>
           gsub(
             pattern = "https",
-            replacement = "http"
+            replacement = "http",
+            fixed = TRUE
           )),
         fun = XML::xmlValue
       ) |>

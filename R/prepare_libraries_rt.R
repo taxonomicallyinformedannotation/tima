@@ -281,7 +281,8 @@ prepare_libraries_rt <-
       tidytable::mutate(candidate_structure_inchikey_no_stereo = gsub(
         pattern = "-.*",
         replacement = "",
-        x = structure_inchikey
+        x = structure_inchikey,
+        perl = TRUE
       )) |>
       ## TODO REMINDER FOR NOW
       tidytable::distinct(
