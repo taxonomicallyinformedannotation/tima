@@ -6,6 +6,7 @@
 * Expose all parameters (#107, #108)
 * Fix for Zenodo API
 * Optimize grep/gsub by adding `perl=TRUE` or `fixed=TRUE`
+* Update to Massbank version `2023.11`
 
 # timaR 2.9.0
 
