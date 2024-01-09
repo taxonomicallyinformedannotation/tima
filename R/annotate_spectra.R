@@ -39,7 +39,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     "Library file(s) do(es) not exist" = all(BiocParallel::bplapply(
       X = library,
       FUN = file.exists,
-      BPPARAM = MulticoreParam()
+      BPPARAM = BiocParallel::MulticoreParam()
     ) |> unlist())
   )
 
@@ -76,7 +76,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
-      BiocParallel::bplapply(FUN = import_spectra, BPPARAM = MulticoreParam()) |>
+      BiocParallel::bplapply(FUN = import_spectra, BPPARAM = BiocParallel::MulticoreParam()) |>
       Spectra::concatenateSpectra() |>
       sanitize_spectra() |>
       Spectra::addProcessing(remove_above_precursor(),
@@ -146,7 +146,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     lib_id <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[BiocParallel::bplapply(X = lib_spectra, FUN = length, BPPARAM = MulticoreParam()) != 0]
+    safety <- lib_spectra[BiocParallel::bplapply(
+      X = lib_spectra,
+      FUN = length,
+      BPPARAM = BiocParallel::MulticoreParam()) != 0]
     if (length(safety) != 0) {
       calculate_entropy_score <-
         function(spectra,
@@ -214,7 +217,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                       "candidate_count_similarity_peaks_matched" = matched
                     )
                   },
-                  BPPARAM = MulticoreParam()
+                  BPPARAM = BiocParallel::MulticoreParam()
                 )
 
               return(inner_list)
