@@ -68,7 +68,8 @@ prepare_mona <-
       tidytable::filter(grepl(
         pattern = "InChI=1S/",
         x = inchi,
-        fixed = TRUE)) |>
+        fixed = TRUE
+      )) |>
       tidytable::filter(!grepl(
         pattern = ".",
         x = inchi,
