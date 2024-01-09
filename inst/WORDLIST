@@ -21,6 +21,7 @@ InChIKey
 Lifecycle
 MatchForwardReverseParam
 MassBank
+Massbank
 MGF
 MegaLinter
 MsCoreUtils
@@ -42,6 +43,7 @@ Summarise
 TIMA
 Taxize
 Taxonomically
+Waystation
 YAML
 Zenodo
 adduct
@@ -60,6 +62,7 @@ fastverse
 fbmn
 github
 gnps
+gsub
 https
 ilico
 inbo
