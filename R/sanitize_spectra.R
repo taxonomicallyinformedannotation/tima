@@ -24,7 +24,7 @@ sanitize_spectra <-
     ## Not needed anymore (fixed in Spectra 1.10.3)
     ## see https://github.com/rformassspectrometry/Spectra/issues/302
     # spectra@backend@peaksData <- spectra@backend@peaksData |>
-    # BiocParallel::bplapply(FUN = Spectra:::.peaks_remove_fft_artifact, BPPARAM=BiocParallel::MulticoreParam())
+    # lapply(FUN = Spectra:::.peaks_remove_fft_artifact)
 
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
@@ -42,10 +42,9 @@ sanitize_spectra <-
     #   ) |>
     #   Spectra::applyProcessing()
 
-    spectra <- spectra[BiocParallel::bplapply(
+    spectra <- spectra[lapply(
       X = spectra@backend@peaksData,
-      FUN = length,
-      BPPARAM = BiocParallel::MulticoreParam()
+      FUN = length
     ) >= fragments * 2]
 
     return(spectra)

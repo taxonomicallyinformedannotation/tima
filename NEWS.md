@@ -7,7 +7,6 @@
 * Fix for Zenodo API
 * Optimize grep/gsub by adding `perl=TRUE` or `fixed=TRUE`
 * Update to Massbank version `2023.11`
-* Use `bplapply` instead of `lapply`
 
 # timaR 2.9.0
 

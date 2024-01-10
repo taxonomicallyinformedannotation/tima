@@ -36,10 +36,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
   stopifnot(
-    "Library file(s) do(es) not exist" = all(BiocParallel::bplapply(
+    "Library file(s) do(es) not exist" = all(lapply(
       X = library,
       FUN = file.exists,
-      BPPARAM = BiocParallel::MulticoreParam()
     ) |> unlist())
   )
 
@@ -76,7 +75,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
-      BiocParallel::bplapply(FUN = import_spectra, BPPARAM = BiocParallel::MulticoreParam()) |>
+      lapply(FUN = import_spectra) |>
       Spectra::concatenateSpectra() |>
       sanitize_spectra() |>
       Spectra::addProcessing(remove_above_precursor(),
@@ -146,10 +145,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     lib_id <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[BiocParallel::bplapply(
+    safety <- lib_spectra[lapply(
       X = lib_spectra,
-      FUN = length,
-      BPPARAM = BiocParallel::MulticoreParam()) != 0]
+      FUN = length
+    ) != 0]
     if (length(safety) != 0) {
       calculate_entropy_score <-
         function(spectra,
@@ -171,7 +170,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               spectral_lib <- lib_spectra[indices]
 
               inner_list <-
-                BiocParallel::bplapply(
+                lapply(
                   X = seq_along(spectral_lib),
                   FUN = function(index,
                                  sp = spectrum,
@@ -216,8 +215,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                       "candidate_score_similarity" = as.numeric(score),
                       "candidate_count_similarity_peaks_matched" = matched
                     )
-                  },
-                  BPPARAM = BiocParallel::MulticoreParam()
+                  }
                 )
 
               return(inner_list)
