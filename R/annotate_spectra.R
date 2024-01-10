@@ -38,7 +38,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot(
     "Library file(s) do(es) not exist" = all(lapply(
       X = library,
-      FUN = file.exists,
+      FUN = file.exists
     ) |> unlist())
   )
 
