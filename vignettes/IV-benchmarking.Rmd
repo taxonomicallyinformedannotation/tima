@@ -1,5 +1,5 @@
 ---
-title: "4 Actual Performance"
+title: "4 Benchmarking Performance"
 author: "Adriano Rutz"
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
@@ -11,7 +11,7 @@ opengraph:
     twitter:
       creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{4 Actual Performance}
+  %\VignetteIndexEntry{4 Benchmarking Performance}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 resource_files:

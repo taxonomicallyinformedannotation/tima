@@ -86,7 +86,7 @@ git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
 cd tima-r
 ```
 
-We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-inputs.html).
+We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-gathering.html).
 
 ### tl;dr
 
