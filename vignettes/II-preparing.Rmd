@@ -1,5 +1,5 @@
 ---
-title: "2 Formatting all inputs"
+title: "2 Preparing inputs"
 author: "Adriano Rutz"
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
@@ -11,7 +11,7 @@ opengraph:
     twitter:
       creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{2 Formatting all inputs}
+  %\VignetteIndexEntry{2 Preparing inputs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

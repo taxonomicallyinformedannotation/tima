@@ -1,5 +1,5 @@
 ---
-title: "1 Inputs: Getting everything you need"
+title: "1 Gathering everything you need"
 author: "Adriano Rutz"
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
@@ -11,7 +11,7 @@ opengraph:
     twitter:
       creator: "@adafede"
 vignette: >
-  %\VignetteIndexEntry{1 Inputs: Getting everything you need}
+  %\VignetteIndexEntry{1 Gathering everything you need}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -141,6 +141,18 @@ source(file = "inst/scripts/get_example_metadata.R")
 source(file = "inst/scripts/get_example_spectra.R")
 ```
 
+```{r input, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+targets::tar_visnetwork(
+  names = starts_with("input"),
+  exclude = c(
+    contains("benchmark"),
+    contains("par_"),
+    contains("paths")
+  ),
+  targets_only = TRUE,
+  degree_from = 8
+)
+```
 
 ### Libraries
 
@@ -258,19 +270,6 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 **M**etabolite
 **A**nnotation in mind,
 we provide it here as a starting point for your structure-organism pairs library.
-
-```{r input, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(
-  names = starts_with("input"),
-  exclude = c(
-    contains("benchmark"),
-    contains("par_"),
-    contains("paths")
-  ),
-  targets_only = TRUE,
-  degree_from = 8
-)
-```
 
 You can easily get it by running:
 
@@ -430,4 +429,4 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-formatting.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-preparing.html).
