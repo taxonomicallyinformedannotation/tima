@@ -16,7 +16,6 @@ Depends:
     R (>= 4.3.0)
 Imports:
     bs4Dash (>= 2.3.0),
-    BiocParallel (>= 1.36.0),
     crayon (>= 1.5.2),
     desc (>= 1.4.3),
     docopt (>= 0.7.1),
