@@ -3,6 +3,7 @@
 # timaR 2.9.1
 
 * Add [Waystation](https://caltechlibrary.github.io/waystation/) action
+* Add structures from spectral libraries to SOP library (#113)
 * Expose all parameters (#107, #108)
 * Fix for Zenodo API
 * Optimize grep/gsub by adding `perl=TRUE` or `fixed=TRUE`
