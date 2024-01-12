@@ -1166,6 +1166,7 @@ list(
                   input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
                   output_pos = "data/interim/libraries/spectra/exp/internal_pos.rds",
                   output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
+                  output_sop = "data/interim/libraries/sop/spectral_int_prepared.tsv.gz",
                   metad = "InternalLib",
                   col_ce = NULL,
                   col_ci = "FILENAME",
@@ -1201,6 +1202,13 @@ list(
             }
           ),
           tar_target(
+            name = lib_spe_exp_int_pre_sop,
+            format = "file",
+            command = {
+              lib_spe_exp_int_pre_sop <- lib_spe_exp_int_pre[[3]]
+            }
+          ),
+          tar_target(
             name = lib_spe_exp_mb_pre,
             format = "file",
             command = {
@@ -1209,6 +1217,7 @@ list(
                   input = lib_spe_exp_mb_raw,
                   output_pos = "data/interim/libraries/spectra/exp/massbank_pos.rds",
                   output_neg = "data/interim/libraries/spectra/exp/massbank_neg.rds",
+                  output_sop = "data/interim/libraries/sop/spectral_mb_prepared.tsv.gz",
                   metad = paste("MassBank",
                     paths_urls_massbank_version,
                     sep = " - "
@@ -1407,6 +1416,7 @@ list(
                 # lib_sop_hmd_pre,
                 lib_sop_lot_pre,
                 lib_rt_sop,
+                lib_spe_exp_int_pre_sop,
                 lib_spe_exp_mb_pre_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
