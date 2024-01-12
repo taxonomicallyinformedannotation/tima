@@ -3,6 +3,12 @@
 files:
   #' Libraries files.
   libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' List of prepared structure organism pairs libraries.
+      prepared:
+        #' Spectral prepared structure organism pairs library. STRING
+        spectral: data/interim/libraries/sop/spectral_prepared.tsv.gz
     #' Spectral libraries. STRING
     spectral:
       #' Experimental libraries

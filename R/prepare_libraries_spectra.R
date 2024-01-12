@@ -12,6 +12,7 @@
 #' @param input File containing spectra
 #' @param output_neg Negative output file
 #' @param output_pos Positive output file
+#' @param output_sop SOP output file
 #' @param polarity MS polarity
 #' @param metad Metadata to identify the library
 #' @param col_ce Name of the collision energy in mgf
@@ -40,6 +41,7 @@ prepare_libraries_spectra <-
   function(input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$raw,
            output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$neg,
            output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
+           output_sop = get_params(step = "prepare_libraries_spectra")$files$libraries$sop$prepared$spectral,
            metad = "myLib",
            col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
            col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
@@ -108,7 +110,27 @@ prepare_libraries_spectra <-
         )
         spectra_harmonized_neg <- spectra_harmonized_pos
       }
+      log_debug("Extracting structures for the SOP library.")
+      sop <- spectra_harmonized_pos |>
+        tidytable::bind_rows(spectra_harmonized_neg) |>
+        tidytable::distinct(
+          structure_inchikey = inchikey,
+          structure_smiles = smiles,
+          structure_smiles_no_stereo = smiles_no_stereo
+        ) |>
+        tidytable::mutate(
+          structure_inchikey_no_stereo = stringi::stri_sub(
+            str = structure_inchikey,
+            from = 1,
+            to = 14
+          ),
+          organism_name = "experimental"
+        )
       log_debug("Exporting")
+      export_output(
+        sop,
+        file = output_sop
+      )
       export_spectra_2(
         file = output_pos,
         spectra = spectra_harmonized_pos,
@@ -130,6 +152,7 @@ prepare_libraries_spectra <-
 
     return(c(
       "pos" = output_pos,
-      "neg" = output_neg
+      "neg" = output_neg,
+      "sop" = output_sop
     ))
   }

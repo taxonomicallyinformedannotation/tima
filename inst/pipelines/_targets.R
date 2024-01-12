@@ -1052,7 +1052,7 @@ list(
                   export = paths_data_source_libraries_spectra_is_lotus_pos |>
                     gsub(
                       pattern = "isdb_pos.mgf",
-                      replacement = "lotus_pos.rds", 
+                      replacement = "lotus_pos.rds",
                       fixed = TRUE
                     )
                 )
@@ -1084,7 +1084,7 @@ list(
                   export = paths_data_source_libraries_spectra_is_lotus_neg |>
                     gsub(
                       pattern = "isdb_neg.mgf",
-                      replacement = "lotus_neg.rds", 
+                      replacement = "lotus_neg.rds",
                       fixed = TRUE
                     )
                 )
@@ -1245,6 +1245,13 @@ list(
             command = {
               lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
             }
+          ),
+          tar_target(
+            name = lib_spe_exp_mb_pre_sop,
+            format = "file",
+            command = {
+              lib_spe_exp_mb_pre_sop <- lib_spe_exp_mb_pre[[3]]
+            }
           )
         )
       )
@@ -1399,7 +1406,8 @@ list(
                 ## TODO
                 # lib_sop_hmd_pre,
                 lib_sop_lot_pre,
-                lib_rt_sop
+                lib_rt_sop,
+                lib_spe_exp_mb_pre_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
               level = par_pre_lib_sop_mer$organisms$filter$level,
