@@ -36,7 +36,7 @@ Imports:
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
     shinyvalidate (>= 0.1.3),
-    shinyWidgets (>= 0.8.0),
+    shinyWidgets (>= 0.8.1),
     Spectra (>= 1.12.0),
     stats,
     stringi (>= 1.8.3),
@@ -58,7 +58,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Collate:
     'round_reals.R'
     'dist_groups.R'
