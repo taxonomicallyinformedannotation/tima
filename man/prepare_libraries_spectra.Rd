@@ -10,6 +10,8 @@ prepare_libraries_spectra(
     "prepare_libraries_spectra")$files$libraries$spectral$exp$neg,
   output_pos = get_params(step =
     "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
+  output_sop = get_params(step =
+    "prepare_libraries_spectra")$files$libraries$sop$prepared$spectral,
   metad = "myLib",
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
@@ -35,6 +37,8 @@ prepare_libraries_spectra(
 \item{output_neg}{Negative output file}
 
 \item{output_pos}{Positive output file}
+
+\item{output_sop}{SOP output file}
 
 \item{metad}{Metadata to identify the library}
 

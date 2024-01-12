@@ -136,6 +136,9 @@ files:
         #' RT prepared structure organism pairs library. STRING
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
+        #' Spectral prepared structure organism pairs library. STRING
+        spectral: data/interim/libraries/sop/spectral_prepared.tsv.gz
+
       #' Merged structure organism pairs library.
       merged:
         #' Merged structure organism pairs library keys. STRING
