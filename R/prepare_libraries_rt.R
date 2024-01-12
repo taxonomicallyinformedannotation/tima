@@ -270,10 +270,17 @@ prepare_libraries_rt <-
     sop <- df_rts |>
       tidytable::select(
         structure_smiles,
-        structure_inchikey,
-        organism_name = type
+        structure_inchikey
       ) |>
-      tidytable::distinct()
+      tidytable::distinct() |>
+      tidytable::mutate(
+        structure_inchikey_no_stereo = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1,
+          to = 14
+        ),
+        organism_name = NA_character_
+      )
 
     rts <- df_rts |>
       tidytable::select(-structure_smiles) |>
@@ -297,6 +304,7 @@ prepare_libraries_rt <-
       sop <- tidytable::tidytable(
         structure_smiles = NA_character_,
         structure_inchikey = NA_character_,
+        structure_inchikey_no_stereo = NA_character_,
         organism_name = NA_character_
       )
     }
