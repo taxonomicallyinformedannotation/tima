@@ -124,7 +124,7 @@ prepare_libraries_spectra <-
             from = 1,
             to = 14
           ),
-          organism_name = "experimental"
+          organism_name = NA_character_
         )
       log_debug("Exporting")
       export_output(
