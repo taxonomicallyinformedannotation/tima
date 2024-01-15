@@ -2,7 +2,9 @@
 #'
 #' @description This function prepares the LOTUS structure-organism pairs
 #'
+#' @include fake_sop_columns.R
 #' @include round_reals.R
+#' @include select_sop_columns.R
 #'
 #' @param input Input file
 #' @param output Output file
