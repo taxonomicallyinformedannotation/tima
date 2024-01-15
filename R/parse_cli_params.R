@@ -88,6 +88,14 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$files$libraries$sop$raw$closed <-
         as.character(arguments$fil_lib_sop_raw_clo)
     }
+    if (!is.null(arguments$fil_lib_sop_raw_ecm)) {
+      parameters$files$libraries$sop$raw$ecmdb <-
+        as.character(arguments$fil_lib_sop_raw_ecm)
+    }
+    if (!is.null(arguments$fil_lib_sop_raw_hmd)) {
+      parameters$files$libraries$sop$raw$hmdb <-
+        as.character(arguments$fil_lib_sop_raw_hmd)
+    }
     if (!is.null(arguments$fil_lib_sop_raw_lot)) {
       parameters$files$libraries$sop$raw$lotus <-
         as.character(arguments$fil_lib_sop_raw_lot)

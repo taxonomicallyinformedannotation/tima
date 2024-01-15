@@ -208,6 +208,7 @@ urls:
     metabolites: https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip
     spectra:
       predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
+    structures: https://hmdb.ca/system/downloads/current/structures.zip
   lotus:
     doi: 10.5281/zenodo.5794106
     pattern: frozen_metadata.csv.gz

@@ -119,6 +119,9 @@ files:
         #' ECMDB structure organism pairs library. STRING
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
 
+        #' HMDB structure organism pairs library. STRING
+        hmdb: data/source/libraries/sop/hmdb/structures.zip
+
         #' Lotus raw structure organism pairs library. STRING
         lotus: data/source/libraries/sop/lotus.csv.gz
 
@@ -129,6 +132,9 @@ files:
 
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+
+        #' HMDB prepared structure organism pairs library. STRING
+        hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
 
         #' Lotus prepared structure organism pairs library. STRING
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
