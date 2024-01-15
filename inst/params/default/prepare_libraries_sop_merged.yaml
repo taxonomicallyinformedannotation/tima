@@ -11,6 +11,8 @@ files:
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+        #' HMDB prepared structure organism pairs library. STRING
+        hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         #' Lotus prepared structure organism pairs library. STRING
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
         #' RT prepared structure organism pairs library. STRING

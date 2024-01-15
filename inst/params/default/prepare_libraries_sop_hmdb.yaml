@@ -1,0 +1,16 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' Raw structure organism pairs libraries.
+      raw:
+        #' HMDB structure organism pairs library. STRING
+        hmdb: data/source/libraries/sop/hmdb/structures.zip
+
+      #' List of prepared structure organism pairs libraries.
+      prepared:
+        #' HMDB prepared structure organism pairs library. STRING
+        hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz

@@ -33,6 +33,7 @@ testthat::test_that("Test functions", {
   prepare_params(step = "prepare_libraries_rt")
   prepare_params(step = "prepare_libraries_sop_closed")
   prepare_params(step = "prepare_libraries_sop_ecmdb")
+  prepare_params(step = "prepare_libraries_sop_hmdb")
   prepare_params(step = "prepare_libraries_sop_lotus")
   prepare_params(step = "prepare_libraries_sop_merged")
   prepare_params(step = "prepare_libraries_spectra")
@@ -153,7 +154,18 @@ testthat::test_that("Test functions", {
   )
 
   #### HMDB
-  # get_hmdb()
+  fake_hmdb(export = "fakeHMDB.zip")
+  tryCatch(
+    expr = {
+      get_file(
+        url = paths$urls$hmdb$structures,
+        export = paths$data$source$libraries$sop$hmdb
+      )
+    },
+    error = function(e) {
+      fake_hmdb(export = paths$data$source$libraries$sop$hmdb)
+    }
+  )
 
   #### LOTUS
   ## try exception because of external resource
@@ -322,7 +334,8 @@ testthat::test_that("Test functions", {
   prepare_libraries_sop_ecmdb()
 
   #### HMDB
-  # prepare_libraries_sop_hmdb()
+  prepare_libraries_sop_hmdb(input = "randomNonExistingFile")
+  prepare_libraries_sop_hmdb()
 
   #### LOTUS
   ## If LOTUS download failed
@@ -517,6 +530,7 @@ testthat::test_that("Test functions", {
   arguments$fil_lib_add_pre <- "x"
   arguments$fil_lib_sop_raw_clo <- "x"
   arguments$fil_lib_sop_raw_ecm <- "x"
+  arguments$fil_lib_sop_raw_hmd <- "x"
   arguments$fil_lib_sop_raw_lot <- "x"
   arguments$fil_lib_sop_pre <- "x"
   arguments$fil_lib_spe_exp_neg <- "x"

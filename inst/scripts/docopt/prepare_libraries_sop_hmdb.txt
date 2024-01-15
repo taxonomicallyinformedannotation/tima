@@ -1,0 +1,13 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_libraries_sop_hmdb.R --fil-lib-sop-raw-hmd data/source/libraries/sop/hmdb/structures.zip --fil-lib-sop-pre data/interim/libraries/sop/hmdb_prepared.tsv.gz
+
+Usage:
+  prepare_libraries_sop_hmdb.R [--fil-lib-sop-raw-hmd=<fil-lib-sop-raw-hmd>] [--fil-lib-sop-pre=<fil-lib-sop-pre>]
+
+Arguments:
+  fil-lib-sop-raw-hmd        HMDB raw structure organism pairs library. STRING
+  fil-lib-sop-pre            List of prepared structure organism pairs libraries. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

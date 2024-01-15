@@ -310,9 +310,7 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
 #### ECMDB
 
-If you want, you can also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
-
-To do so, you need to:
+If you want, you can also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/) :
 
 ```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
@@ -333,16 +331,10 @@ targets::tar_visnetwork(
 
 ##### HMDB
 
-You can do the same with the ones coming from HMDB (not running by default as quite long):
+You can do the same with the ones coming from [HMDB](https://hmdb.ca/) :
 
-```{r get-hmdb, eval=FALSE, include=TRUE}
-source(file = "inst/scripts/get_hmdb.R")
-```
-
-As previously, you then need to prepare the library:
-
-```{r prepare-hmdb, eval=FALSE, include=TRUE}
-source(file = "inst/scripts/prepare_hmdb.R")
+```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE}
+source(file = "inst/scripts/prepare_libraries_sop_hmdb.R")
 ```
 
 For these first steps, you do not need to change any parameters as they are implemented *by default*.

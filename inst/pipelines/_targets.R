@@ -117,6 +117,19 @@ list(
         }
       ),
       tar_target(
+        name = paths_urls_hmdb_structures,
+        command = {
+          paths_urls_hmdb_structures <- paths$urls$hmdb$structures
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_sop_hmdb,
+        command = {
+          paths_data_source_libraries_sop_hmdb <-
+            paths$data$source$libraries$sop$hmdb
+        }
+      ),
+      tar_target(
         name = paths_urls_lotus_doi,
         command = {
           paths_urls_lotus_doi <- paths$urls$lotus$doi
@@ -354,14 +367,14 @@ list(
             paths$params$default$prepare$libraries$sop$ecmdb
         }
       ),
-      # tar_target(
-      #   name = par_def_pre_lib_sop_hmd,
-      # .  format = "file",
-      #   command = {
-      #     par_def_pre_lib_sop_hmd <-
-      #       paths$params$default$prepare$libraries$sop$hmdb
-      #   }
-      # ),
+      tar_target(
+        name = par_def_pre_lib_sop_hmd,
+        format = "file",
+        command = {
+          par_def_pre_lib_sop_hmd <-
+            paths$params$default$prepare$libraries$sop$hmdb
+        }
+      ),
       tar_target(
         name = par_def_pre_lib_sop_lot,
         format = "file",
@@ -619,18 +632,18 @@ list(
               )
           }
         ),
-        # tar_target(
-        #   name = par_usr_pre_lib_sop_hmd,
-        #   format = "file",
-        #   command = {
-        #     par_usr_pre_lib_sop_hmd <-
-        #       prepare_params(
-        #         params_small = par_fin_par,
-        #         params_advanced = par_fin_par2,
-        #         step = "prepare_libraries_sop_hmdb"
-        #       )
-        #   }
-        # ),
+        tar_target(
+          name = par_usr_pre_lib_sop_hmd,
+          format = "file",
+          command = {
+            par_usr_pre_lib_sop_hmd <-
+              prepare_params(
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
+                step = "prepare_libraries_sop_hmdb"
+              )
+          }
+        ),
         tar_target(
           name = par_usr_pre_lib_sop_lot,
           format = "file",
@@ -845,16 +858,16 @@ list(
             )
         }
       ),
-      # tar_target(
-      #   name = par_pre_lib_sop_hmd,
-      #   command = {
-      #     par_pre_lib_sop_hmd <-
-      #       parse_yaml_params(
-      #         def = par_def_pre_lib_sop_hmd,
-      #         usr = par_usr_pre_lib_sop_hmd[1]
-      #       )
-      #   }
-      # ),
+      tar_target(
+        name = par_pre_lib_sop_hmd,
+        command = {
+          par_pre_lib_sop_hmd <-
+            parse_yaml_params(
+              def = par_def_pre_lib_sop_hmd,
+              usr = par_usr_pre_lib_sop_hmd[1]
+            )
+        }
+      ),
       tar_target(
         name = par_pre_lib_sop_lot,
         command = {
@@ -1315,7 +1328,7 @@ list(
         ## So targets will not check if the input file changed automatically.
         # tar_target(
         #   name = lib_sop_clo,
-        # .  format = "file",
+        #   format = "file",
         #   command = {
         #     lib_sop_clo <- paths$data$source$libraries$sop$closed
         #   }
@@ -1334,6 +1347,23 @@ list(
               },
               error = function(e) {
                 fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb)
+              }
+            )
+          }
+        ),
+        tar_target(
+          name = lib_sop_hmd,
+          format = "file",
+          command = {
+            lib_sop_hmd <- tryCatch(
+              expr = {
+                get_file(
+                  url = paths_urls_hmdb_structures,
+                  export = paths_data_source_libraries_sop_hmdb
+                )
+              },
+              error = function(e) {
+                fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
               }
             )
           }
@@ -1385,7 +1415,17 @@ list(
               )
           }
         ),
-        ## TODO ADD HMDB PREPARED
+        tar_target(
+          name = lib_sop_hmd_pre,
+          format = "file",
+          command = {
+            lib_sop_hmd_pre <-
+              prepare_libraries_sop_hmdb(
+                input = lib_sop_hmd,
+                output = par_pre_lib_sop_hmd$files$libraries$sop$prepared$hmdb
+              )
+          }
+        ),
         tar_target(
           name = lib_sop_lot_pre,
           format = "file",
@@ -1412,8 +1452,7 @@ list(
               files = c(
                 lib_sop_clo_pre,
                 lib_sop_ecm_pre,
-                ## TODO
-                # lib_sop_hmd_pre,
+                lib_sop_hmd_pre,
                 lib_sop_lot_pre,
                 lib_rt_sop,
                 lib_spe_exp_int_pre_sop,
@@ -2049,7 +2088,7 @@ list(
           tidytable::mutate(inchikey_no_stereo = gsub(
             pattern = "-.*",
             replacement = "",
-            x = inchikey, 
+            x = inchikey,
             perl = TRUE
           )) |>
           tidytable::distinct(inchikey_no_stereo, adduct, .keep_all = TRUE) |>
@@ -2087,7 +2126,7 @@ list(
             tidytable::mutate(short_ik = gsub(
               pattern = "-.*",
               replacement = "",
-              inchikey, 
+              inchikey,
               perl = TRUE
             )) |>
             tidytable::mutate(
@@ -2143,7 +2182,7 @@ list(
             tidytable::mutate(inchikey_no_stereo = gsub(
               pattern = "-.*",
               replacement = "",
-              x = inchikey, 
+              x = inchikey,
               perl = TRUE
             )) |>
             data.frame()
