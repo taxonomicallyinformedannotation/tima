@@ -1,6 +1,8 @@
 #' @title Prepare libraries of structure organism pairs CLOSED
 #'
+#' @include fake_sop_columns.R
 #' @include round_reals.R
+#' @include select_sop_columns.R
 #'
 #' @param input Input file
 #' @param output Output file
