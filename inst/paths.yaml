@@ -81,7 +81,7 @@ data:
         path: data/source/libraries/sop
         closed: ../lotus-processor/data/processed/230224_closed_metadata.csv.gz
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
-        hmdb: data/source/libraries/sop/hmdb_metabolites.zip
+        hmdb: data/source/libraries/sop/hmdb/structures.zip
         lotus: data/source/libraries/sop/lotus.csv.gz
       spectra:
         path: data/source/libraries/spectra
