@@ -111,21 +111,29 @@ targets::tar_visnetwork(
 
 #### Sirius
 
-As SIRIUS jobs are long to perform, we provide an already computed SIRIUS Workspace.
-It has been generated on the same MGF as the  <!-- GNPS and --> ISDB job with the following command:
+As SIRIUS jobs are long to perform, we provide an example SIRIUS (version 5.8.5) workspace.
+It has been generated on the 20 first lines of the example MGF with the following command:
 
 ```{bash eval=FALSE, include=TRUE}
-config --IsotopeSettings.filter true --FormulaSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC --Timeout.secondsPerTree 0 --FormulaSettings.enforced HCNOP --Timeout.secondsPerInstance 0 --AdductSettings.detectable [[M + H3N + H]+, [M - H2O + H]+, [M + K]+, [M - H4O2 + H]+, [M + H]+, [M + Na]+] --UseHeuristic.mzToUseHeuristicOnly 650 --AlgorithmProfile orbitrap --IsotopeMs2Settings IGNORE --MS2MassDeviation.allowedMassDeviation 5.0ppm --NumberOfCandidatesPerIon 1 --UseHeuristic.mzToUseHeuristic 300 --FormulaSettings.detectable B,Cl,Br,Se,S --NumberOfCandidates 10 --ZodiacNumberOfConsideredCandidatesAt300Mz 10 --ZodiacRunInTwoSteps true --ZodiacEdgeFilterThresholds.minLocalConnections 10 --ZodiacEdgeFilterThresholds.thresholdFilter 0.95 --ZodiacEpochs.burnInPeriod 2000 --ZodiacEpochs.numberOfMarkovChains 10 --ZodiacNumberOfConsideredCandidatesAt800Mz 50 --ZodiacEpochs.iterations 20000 --AdductSettings.enforced , --AdductSettings.fallback [[M + K]+, [M + H]+, [M + Na]+] --FormulaResultThreshold true --InjectElGordoCompounds true --StructureSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC --RecomputeResults false formula zodiac fingerprint structure canopus
+sirius \
+--input data/source/example_spectra.mgf \
+--output data/interim/annotation/example_sirius \
+config \
+--AlgorithmProfile orbitrap \
+--FormulaSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC \
+--RecomputeResults false \
+--StructureSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC \
+--Timeout.secondsPerTree 10 \
+--Timeout.secondsPerInstance 10 \
+formula \
+zodiac \
+fingerprint \
+structure \
+canopus \
+W
 ```
 
 These parameters were not optimized and were only used to give an example output.
-
-Then, the summaries have been generated using:
-
-```{bash eval=FALSE, include=TRUE}
-sirius -i inst/extdata/interim/annotations/sirius_example/ write-summaries -c --digits 3
-```
-
 You can get the example running:
 
 ```{r get-sirius, results="hide", message=FALSE, warning=FALSE}

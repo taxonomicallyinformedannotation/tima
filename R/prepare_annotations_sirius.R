@@ -34,20 +34,6 @@ prepare_annotations_sirius <-
            str_tax_cla = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (file.exists(input_directory)) {
-      stopifnot("Your npc summary file must be named
-                'canopus_compound_summary.tsv" = file.exists(file.path(input_directory, "canopus_compound_summary.tsv")))
-      stopifnot(
-        "You must generate the summaries before submission. \n
-              Please do
-        `sirius -i $WORKSPACE write-summaries -o $WORKSPACE_SUMMARIES.zip
-        -c --digits 3" = length(
-          list.files(
-            path = input_directory,
-            pattern = "structure_candidates.tsv",
-            recursive = TRUE
-          )
-        ) != 0
-      )
       log_debug("Loading and formatting SIRIUS results")
       canopus <-
         tidytable::fread(
@@ -69,29 +55,11 @@ prepare_annotations_sirius <-
           colClasses = "character"
         )
 
-      formula_adducts <-
+      compound <-
         tidytable::fread(
           file = file.path(
             input_directory,
-            "formula_identifications_adducts.tsv"
-          ),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
-
-      # compound <-
-      #   tidytable::fread(file = file.path(
-      #     input_directory,
-      #     "compound_identifications.tsv"
-      #   ),
-      #         na.strings = c("","NA")),
-      #     colClasses = "character"
-
-      compound_adducts <-
-        tidytable::fread(
-          file = file.path(
-            input_directory,
-            "compound_identifications_adducts.tsv"
+            "compound_identifications.tsv"
           ),
           na.strings = c("", "NA"),
           colClasses = "character"
@@ -155,28 +123,19 @@ prepare_annotations_sirius <-
         select_sirius_columns()
       rm(compound_summary_ready)
 
-      compound_adducts_prepared <- compound_adducts |>
+      compound_prepared_2 <- compound |>
         tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
         select_sirius_columns()
-      rm(compound_adducts)
+      rm(compound)
 
-      formula_prepared <- formula |>
+      formulas_prepared <- formula |>
         select_sirius_columns_2()
       rm(formula)
 
-      formula_adducts_prepared <- formula_adducts |>
-        select_sirius_columns_2()
-      rm(formula_adducts)
-
       compounds_prepared <-
-        tidytable::bind_rows(compound_prepared, compound_adducts_prepared) |>
+        tidytable::bind_rows(compound_prepared, compound_prepared_2) |>
         tidytable::distinct()
-      rm(compound_prepared, compound_adducts_prepared)
-
-      formulas_prepared <-
-        tidytable::bind_rows(formula_prepared, formula_adducts_prepared) |>
-        tidytable::distinct()
-      rm(formula_prepared, formula_adducts_prepared)
+      rm(compound_prepared, compound_prepared_2)
 
       table <- compounds_prepared |>
         tidytable::left_join(formulas_prepared) |>
