@@ -9,6 +9,7 @@
 * HMDB structures support
 * Optimize grep/gsub by adding `perl=TRUE` or `fixed=TRUE`
 * Update to Massbank version `2023.11`
+* Update SIRIUS preparation (#74, #115)
 
 # timaR 2.9.0
 

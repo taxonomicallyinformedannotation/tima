@@ -134,7 +134,8 @@ W
 ```
 
 These parameters were not optimized and were only used to give an example output.
-You can get the example running:
+If you are using the cli, do not forget the `W` to generate the summaries, or if you use the gui, generate them by clicking the corresponding icon.
+You can get an example running:
 
 ```{r get-sirius, results="hide", message=FALSE, warning=FALSE}
 source(file = "inst/scripts/get_example_sirius.R")
