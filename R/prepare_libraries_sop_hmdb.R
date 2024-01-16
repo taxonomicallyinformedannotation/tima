@@ -128,4 +128,5 @@ prepare_libraries_sop_hmdb <-
     }
     log_debug(x = "Exporting ...")
     export_output(x = hmdb_prepared, file = output)
+    return(output)
   }

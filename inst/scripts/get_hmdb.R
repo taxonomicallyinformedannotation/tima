@@ -18,7 +18,7 @@ log_debug("Contributors: ...")
 ## (see https://twitter.com/Adafede/status/1592543895094788096)
 log_debug("Downloading HMDB (might be long)")
 get_file(
-  url = paths$urls$hmdb$metabolites,
+  url = paths$urls$hmdb$structures,
   export = paths$data$source$libraries$sop$hmdb
 )
 
