@@ -441,6 +441,12 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_libraries_sop_ecmdb$files$libraries$sop$prepared$ecmdb <-
         fil_lib_sop_pre_ecm
     },
+    prepare_libraries_sop_hmdb = {
+      yamls_params$prepare_libraries_sop_hmdb$files$libraries$sop$raw$hmdb <-
+        fil_lib_sop_raw_hmd
+      yamls_params$prepare_libraries_sop_hmdb$files$libraries$sop$prepared$hmdb <-
+        fil_lib_sop_pre_hmd
+    },
     prepare_libraries_sop_lotus = {
       yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$raw$lotus <-
         fil_lib_sop_raw_lot
