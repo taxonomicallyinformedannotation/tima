@@ -52,10 +52,12 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_add_pre <- params_advanced$files$libraries$adducts$prepared
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
+  fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
   fil_lib_sop_raw_lot <- params_advanced$files$libraries$sop$raw$lotus
   fil_lib_sop_pre <- params_advanced$files$libraries$sop$prepared
   fil_lib_sop_pre_clo <- params_advanced$files$libraries$sop$prepared$closed
   fil_lib_sop_pre_ecm <- params_advanced$files$libraries$sop$prepared$ecmdb
+  fil_lib_sop_pre_hmd <- params_advanced$files$libraries$sop$prepared$hmdb
   fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
   fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
   # TODO Docopt
