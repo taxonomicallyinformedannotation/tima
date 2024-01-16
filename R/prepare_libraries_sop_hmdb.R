@@ -23,14 +23,15 @@ prepare_libraries_sop_hmdb <-
         zipfile = input,
         exdir = dirname(input)
       )
+      hmdb_structures <- input |>
+        gsub(
+          pattern = ".zip",
+          replacement = ".sdf",
+          fixed = TRUE
+        )
       log_debug(x = "Loading HMDB...")
       sdf_data <- readLines(
-        con = input |>
-          gsub(
-            pattern = ".zip",
-            replacement = ".sdf",
-            fixed = TRUE
-          ),
+        con = hmdb_structures,
         warn = FALSE
       )
 
