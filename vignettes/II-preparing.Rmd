@@ -141,6 +141,7 @@ You can get an example running:
 source(file = "inst/scripts/get_example_sirius.R")
 ```
 
+The sirius workspace should have `yourPattern_sirius` as name (else it will not be found).
 Then prepare it:
 
 ```{r prepare-sirius, results="hide", message=FALSE, warning=FALSE}
