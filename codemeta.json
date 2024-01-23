@@ -127,7 +127,7 @@
       "@type": "SoftwareApplication",
       "identifier": "bs4Dash",
       "name": "bs4Dash",
-      "version": ">= 2.3.0",
+      "version": ">= 2.3.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -205,7 +205,7 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
-      "version": ">= 0.10.0",
+      "version": ">= 0.10.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2850.035KB",
+  "fileSize": "2834.202KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

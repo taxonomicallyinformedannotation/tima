@@ -1,13 +1,6 @@
 library(shiny)
 library(timaR)
 
-if (getwd() |> endsWith(suffix = "tima-r")) {
-  # log_debug("Correct working directory")
-} else {
-  setwd("../..")
-  # log_debug(getwd())
-}
-
 options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
@@ -1312,10 +1305,9 @@ ui <- shiny::fluidPage(
 
 # save the results to a file
 save_input <- function(input) {
-  # log_debug(getwd())
   paths_data_source <- parse_yaml_paths()$data$source$path
   ## safety
-  timaR::create_dir(paths_data_source)
+  create_dir(paths_data_source)
 
   list <- timaR::load_yaml_files()
 
@@ -1366,8 +1358,8 @@ save_input <- function(input) {
     org_tax <- NULL
   }
 
-  timaR::log_debug(x = "Changing parameters ...")
-  timaR::log_debug(x = "... Small")
+  log_debug(x = "Changing parameters ...")
+  log_debug(x = "... Small")
   yaml_small <- yamls_params[["inst/params/prepare_params"]]
   yaml_small$files$pattern <-
     fil_pat
@@ -1383,13 +1375,13 @@ save_input <- function(input) {
     org_tax
   yaml_small$options$summarise <-
     shiny::isolate(input$summarise)
-  timaR::create_dir("inst/params")
+  create_dir("inst/params")
   yaml::write_yaml(
     x = yaml_small,
     file = "inst/params/prepare_params.yaml"
   )
 
-  timaR::log_debug(x = "... Advanced")
+  log_debug(x = "... Advanced")
   yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
@@ -1704,13 +1696,6 @@ save_input <- function(input) {
 }
 
 server <- function(input, output, session) {
-  ## Set working directory
-  if (getwd() |> endsWith(suffix = "tima-r")) {
-    # log_debug("Correct working directory")
-  } else {
-    setwd("../..")
-    # log_debug(getwd())
-  }
   ## Observe helpers
   shinyhelper::observe_helpers()
 
@@ -1997,5 +1982,14 @@ url <- "http://localhost:3838/"
 log_debug("Please, go to:", url)
 shinyApp(
   ui = ui,
-  server = server
+  server = server,
+  onStart = function() {
+    if (getwd() |>
+      endsWith(suffix = "tima-r")) {
+      message(getwd())
+    } else {
+      setwd("../..")
+      message(getwd())
+    }
+  }
 )
