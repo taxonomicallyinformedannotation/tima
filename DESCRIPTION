@@ -15,7 +15,7 @@ BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.3.0)
 Imports:
-    bs4Dash (>= 2.3.0),
+    bs4Dash (>= 2.3.3),
     crayon (>= 1.5.2),
     desc (>= 1.4.3),
     docopt (>= 0.7.1),
@@ -58,7 +58,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.1
 Collate:
     'round_reals.R'
     'dist_groups.R'
