@@ -23,7 +23,7 @@ Imports:
     DT (>= 0.31),
     gt (>= 0.10.1),
     httr2 (>= 1.0.0),
-    igraph (>= 1.6.0),
+    igraph (>= 2.0.1),
     jsonlite (>= 1.8.8),
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
