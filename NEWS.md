@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.9.2
+
+* Remove completely empty columns from final output to avoid confusion (#120)
+
 # timaR 2.9.1
 
 * Add [Waystation](https://caltechlibrary.github.io/waystation/) action
