@@ -277,7 +277,8 @@ weight_annotations <- function(
     clean_bio() |>
     weight_chemo() |>
     decorate_chemo() |>
-    clean_chemo()
+    clean_chemo() |>
+    tidytable::select(tidytable::where(~ any(!is.na(.))))
 
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
