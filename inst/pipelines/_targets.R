@@ -1360,7 +1360,10 @@ list(
                 get_file(
                   url = paths_urls_hmdb_structures,
                   export = paths_data_source_libraries_sop_hmdb
-                )
+                ) |>
+                  ## Additional check to see if the file was
+                  ## correctly downloaded (See #118)
+                  file.exists()
               },
               error = function(e) {
                 fake_hmdb(export = paths_data_source_libraries_sop_hmdb)

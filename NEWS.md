@@ -2,6 +2,7 @@
 
 # timaR 2.9.2
 
+* Better handling of partial downloads (#118)
 * Remove completely empty columns from final output to avoid confusion (#120)
 
 # timaR 2.9.1
