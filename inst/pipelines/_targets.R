@@ -1364,6 +1364,7 @@ list(
                   ## Additional check to see if the file was
                   ## correctly downloaded (See #118)
                   file.exists()
+                paths_data_source_libraries_sop_hmdb
               },
               error = function(e) {
                 fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
