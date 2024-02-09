@@ -1,7 +1,7 @@
 library(shiny)
 library(timaR)
 
-options(shiny.port = 3838)
+options(shiny.host = "0.0.0.0")
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 #' @title Label mandatory
@@ -1986,10 +1986,10 @@ shinyApp(
   onStart = function() {
     if (getwd() |>
       endsWith(suffix = "tima-r")) {
-      message(getwd())
+      # message(getwd())
     } else {
       setwd("../..")
-      message(getwd())
+      # message(getwd())
     }
   }
 )
