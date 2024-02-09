@@ -2,6 +2,7 @@ library(shiny)
 library(timaR)
 
 options(shiny.host = "0.0.0.0")
+options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
 #' @title Label mandatory
@@ -1979,7 +1980,7 @@ server <- function(input, output, session) {
   )
 }
 url <- "http://localhost:3838/"
-log_debug("Please, go to:", url)
+log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
 shinyApp(
   ui = ui,
   server = server,
