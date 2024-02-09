@@ -1,7 +1,12 @@
 library(shiny)
 library(timaR)
 
-options(shiny.host = "0.0.0.0")
+# Check if runs in Docker environment or not
+if (file.exists("/.dockerenv")) {
+  options(shiny.host = "127.0.0.1")
+} else {
+  options(shiny.host = "0.0.0.0")
+}
 options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
 
@@ -1979,7 +1984,7 @@ server <- function(input, output, session) {
     }
   )
 }
-url <- "http://localhost:3838/"
+url <- "<http://localhost:3838/>"
 log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
 shinyApp(
   ui = ui,
