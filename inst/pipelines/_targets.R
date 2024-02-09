@@ -1360,11 +1360,13 @@ list(
                 get_file(
                   url = paths_urls_hmdb_structures,
                   export = paths_data_source_libraries_sop_hmdb
-                ) |>
-                  ## Additional check to see if the file was
-                  ## correctly downloaded (See #118)
-                  file.exists()
-                paths_data_source_libraries_sop_hmdb
+                )
+              },
+              warning = function(w) {
+                ## See #118
+                log_debug("HMDB download failed partially, returning empty file instead")
+                unlink(paths_data_source_libraries_sop_hmdb)
+                fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
               },
               error = function(e) {
                 fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
