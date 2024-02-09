@@ -1984,7 +1984,7 @@ server <- function(input, output, session) {
     }
   )
 }
-url <- "<http://localhost:3838/>"
+url <- "<http://127.0.0.1:3838>"
 log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
 shinyApp(
   ui = ui,
