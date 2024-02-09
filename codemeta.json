@@ -457,7 +457,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
-      "version": ">= 0.10.2",
+      "version": ">= 0.11.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2847.105KB",
+  "fileSize": "3648.819KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

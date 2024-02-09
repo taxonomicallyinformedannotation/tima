@@ -41,7 +41,7 @@ Imports:
     stats,
     stringi (>= 1.8.3),
     targets (>= 1.4.1),
-    tidytable (>= 0.10.2),
+    tidytable (>= 0.11.0),
     tidyfst (>= 1.7.7),
     utils,
     visNetwork (>= 2.1.2),
