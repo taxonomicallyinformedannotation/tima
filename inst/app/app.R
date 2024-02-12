@@ -3,9 +3,9 @@ library(timaR)
 
 # Check if runs in Docker environment or not
 if (file.exists("/.dockerenv")) {
-  options(shiny.host = "127.0.0.1")
-} else {
   options(shiny.host = "0.0.0.0")
+} else {
+  options(shiny.host = "127.0.0.1")
 }
 options(shiny.port = 3838)
 options(shiny.maxRequestSize = 1000 * 1024^2)
@@ -1315,7 +1315,7 @@ save_input <- function(input) {
   ## safety
   create_dir(paths_data_source)
 
-  list <- timaR::load_yaml_files()
+  list <- load_yaml_files()
 
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
@@ -1384,7 +1384,7 @@ save_input <- function(input) {
   create_dir("inst/params")
   yaml::write_yaml(
     x = yaml_small,
-    file = "inst/params/prepare_params.yaml"
+    file = parse_yaml_paths()$params$prepare_params
   )
 
   log_debug(x = "... Advanced")
@@ -1697,7 +1697,7 @@ save_input <- function(input) {
 
   yaml::write_yaml(
     x = yaml_advanced,
-    file = "inst/params/prepare_params_advanced.yaml"
+    file = parse_yaml_paths()$params$prepare_params_advanced
   )
 }
 
@@ -1789,6 +1789,7 @@ server <- function(input, output, session) {
       tryCatch(expr = {
         targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
+          host = "127.0.0.1",
           port = 3839,
           display = "graph",
           displays = c("summary", "graph"),
