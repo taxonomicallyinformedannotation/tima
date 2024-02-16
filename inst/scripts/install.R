@@ -45,8 +45,19 @@ pak::pak(
   ask = FALSE,
   upgrade = FALSE
 )
-pak::pkg_install(
-  pkg = desc::desc_get_urls()[[1]],
-  ask = FALSE,
-  upgrade = FALSE
+tryCatch(
+  expr = {
+    pak::pkg_install(
+      pkg = desc::desc_get_urls()[[1]],
+      ask = FALSE,
+      upgrade = FALSE
+    )
+  },
+  error = function(e) {
+    pak::pkg_install(
+      pkg = ".",
+      ask = FALSE,
+      upgrade = FALSE
+    )
+  }
 )
