@@ -48,9 +48,17 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$fil_pat)) {
       parameters$files$pattern <- as.character(arguments$fil_pat)
     }
-    if (!is.null(arguments$fil_ann_raw_spe)) {
-      parameters$files$annotations$raw$spectral <-
-        as.character(arguments$fil_ann_raw_spe)
+    # if (!is.null(arguments$fil_ann_raw_spe)) {
+    #   parameters$files$annotations$raw$spectral <-
+    #     as.character(arguments$fil_ann_raw_spe)
+    # }
+    if (!is.null(arguments$fil_ann_raw_spe_gnp)) {
+      parameters$files$annotations$raw$spectral$gnps <-
+        as.character(arguments$fil_ann_raw_spe_gnp)
+    }
+    if (!is.null(arguments$fil_ann_raw_spe_spe)) {
+      parameters$files$annotations$raw$spectral$spectral <-
+        as.character(arguments$fil_ann_raw_spe_spe)
     }
     if (!is.null(arguments$fil_ann_raw_sir)) {
       parameters$files$annotations$raw$sirius <-
