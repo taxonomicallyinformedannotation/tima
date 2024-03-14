@@ -101,6 +101,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     if (is.null(query_ids)) {
       query_ids <- spectra@backend@spectraData$spectrum_id
     }
+    if (is.null(query_ids)) {
+      query_ids <- spectra@backend@spectraData$SLAW_ID
+    }
 
     if (approx == FALSE) {
       log_debug("Reducing library size...")
