@@ -1630,7 +1630,7 @@ list(
               output = gsub(
                 pattern = ".tsv.gz",
                 replacement = "_pos.tsv.gz",
-                x = par_ann_spe$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral$spectral,
                 fixed = TRUE
               ),
               threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
@@ -1657,7 +1657,7 @@ list(
               output = gsub(
                 pattern = ".tsv.gz",
                 replacement = "_neg.tsv.gz",
-                x = par_ann_spe$files$annotations$raw$spectral,
+                x = par_ann_spe$files$annotations$raw$spectral$spectral,
                 fixed = TRUE
               ),
               threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
