@@ -1593,24 +1593,24 @@ list(
     ## Spectral
     list(
       # ## GNPS
-      # list(
-      #   tar_target(
-      #     name = ann_spe_exp_gnp_pre,
-      #     format = "file",
-      #     command = {
-      #       ann_spe_exp_gnp_pre <-
-      #         prepare_annotations_gnps(
-      #           input = gnps_annotations,
-      #           output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
-      #           str_stereo = lib_mer_str_stereo,
-      #           str_met = lib_mer_str_met,
-      #           str_nam = lib_mer_str_nam,
-      #           str_tax_cla = lib_mer_str_tax_cla,
-      #           str_tax_npc = lib_mer_str_tax_npc
-      #         )
-      #     }
-      #   )
-      # ),
+      list(
+        tar_target(
+          name = ann_spe_exp_gnp_pre,
+          format = "file",
+          command = {
+            ann_spe_exp_gnp_pre <-
+              prepare_annotations_gnps(
+                input = gnps_annotations,
+                output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
+                str_stereo = lib_mer_str_stereo,
+                str_met = lib_mer_str_met,
+                str_nam = lib_mer_str_nam,
+                str_tax_cla = lib_mer_str_tax_cla,
+                str_tax_npc = lib_mer_str_tax_npc
+              )
+          }
+        )
+      ),
       ## Classic
       list(
         ## TODO improve polarity handling, suboptimal
@@ -1843,7 +1843,7 @@ list(
     command = {
       ann_fil <- filter_annotations(
         annotations = c(
-          # ann_spe_exp_gnp_pre,
+          ann_spe_exp_gnp_pre,
           ann_spe_pre,
           ann_sir_pre_str,
           ann_ms1_pre_ann

@@ -729,11 +729,11 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     prepare_annotations_gnps = {
-      yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral <-
-        yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral |>
+      yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
+        yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps |>
         lapply(FUN = replace_id)
-      yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural <-
-        yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural |>
+      yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
+        yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps |>
         lapply(FUN = replace_id)
     },
     prepare_annotations_sirius = {
