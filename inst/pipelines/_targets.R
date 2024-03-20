@@ -962,6 +962,7 @@ list(
   #         gnps_spectra <- gnps_tables[[3]]
   #       }
   #     ),
+  #     # TODO think to change this also if uncommenting
   #     tar_target(
   #       name = gnps_annotations,
   #       format = "file",
@@ -1600,7 +1601,8 @@ list(
           command = {
             ann_spe_exp_gnp_pre <-
               prepare_annotations_gnps(
-                input = gnps_annotations,
+                # input = gnps_annotations,
+                input = par_pre_ann_gnp$files$annotations$raw$spectral$gnps,
                 output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
                 str_stereo = lib_mer_str_stereo,
                 str_met = lib_mer_str_met,
