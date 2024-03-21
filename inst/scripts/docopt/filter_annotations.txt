@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/filter_annotations.R
 
 Usage:
-  filter_annotations.R [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-fea-pre=<fil-fea-prer>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--ms-tol-rt-min=<ms-tol-rt-min>]
+  filter_annotations.R [--fil-ann-fil=<fil-ann-fil>] [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-fea-pre=<fil-fea-prer>] [--fil-lib-tem-pre=<fil-lib-tem-pre>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--nit-rul=<nit-rul>]
 
 Arguments:  
   fil-ann-fil                Filtered annotation file. STRING
@@ -11,6 +11,8 @@ Arguments:
   fil-lib-tem-pre            List of prepared temporal libraries. STRING
   
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
+
+  nit-rul                    Use Nitrogen rule. BOOLEAN
 
 Options:
   -h --help                  Shows this screen.

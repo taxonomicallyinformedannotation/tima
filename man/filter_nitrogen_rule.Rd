@@ -4,12 +4,14 @@
 \alias{filter_nitrogen_rule}
 \title{Filter nitrogen rule}
 \usage{
-filter_nitrogen_rule(df_annotated_final, features_table)
+filter_nitrogen_rule(df_annotated_final, features_table, filter_nitro)
 }
 \arguments{
 \item{df_annotated_final}{Table containing your MS1 annotations}
 
 \item{features_table}{Feature table containing your mzs}
+
+\item{filter_nitro}{Filter according to Nitrogen rule. Boolean}
 }
 \value{
 A table containing filtered MS1 annotations

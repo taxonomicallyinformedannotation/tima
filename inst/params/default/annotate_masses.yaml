@@ -130,13 +130,6 @@ ms:
       # - C3H8O # (isopropanol)
       # - C2H6OS # (dmso)
 
-  #' Thresholds related parameters.
-  thresholds:
-    #' MS1 related parameters.
-    ms1:
-      #' Intensity threshold for MS1. INTEGER
-      intensity: 1000000
-
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos
 
@@ -159,6 +152,13 @@ ms:
       #' Retention time tolerance in minutes. FLOAT
       minutes: 0.05
 
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS1 related parameters.
+    ms1:
+      #' Intensity threshold for MS1. INTEGER
+      intensity: 1000000
+
 #' Names of the different variables in the input files.
 names:
   #' Name of "source IDs" variable in the input. STRING
@@ -171,3 +171,6 @@ names:
 options:
   #' Do not use it. BOOLEAN
   force: no
+
+  #' Nitrogen rule. BOOLEAN
+  nitrogen_rule: yes

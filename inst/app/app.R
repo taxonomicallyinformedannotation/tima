@@ -1202,6 +1202,18 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::checkboxInput(
+          inputId = "nitrogen_rule",
+          label = "Nitrogen rule",
+          value = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If ticked, apply Nitrogen rule.",
+              "This assumes no radical fragmentation."
+            )
+          ),
+        shiny::checkboxInput(
           inputId = "force",
           label = "Do not use it!",
           value = FALSE
@@ -1683,6 +1695,8 @@ save_input <- function(input) {
     shiny::isolate(input$wei_che_14)
   yaml_advanced$options$compounds_names <-
     shiny::isolate(input$compounds_names)
+  yaml_advanced$options$nitrogen_rule <-
+    shiny::isolate(input$nitrogen_rule)
   yaml_advanced$options$force <-
     shiny::isolate(input$force)
   yaml_advanced$options$summarise <-

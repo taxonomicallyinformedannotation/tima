@@ -1550,6 +1550,7 @@ list(
           ann_ms1_pre <-
             annotate_masses(
               features = fea_pre,
+              filter_nitro = par_ann_mas$options$nitrogen_rule,
               library = lib_mer_key,
               output_annotations = par_ann_mas$files$annotations$prepared$structural,
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
@@ -1851,6 +1852,7 @@ list(
           ann_ms1_pre_ann
         ),
         features = fea_pre,
+        filter_nitro = par_fil_ann$options$nitrogen_rule,
         rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
         tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
