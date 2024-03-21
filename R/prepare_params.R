@@ -172,6 +172,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
   opt_for <- params_advanced$options$force
+  opt_nit_rul <- params_advanced$options$nitrogen_rule
   opt_sum <- params_advanced$options$summarise
 
   log_debug(x = "Small params")
@@ -243,6 +244,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         names_target
       yamls_params$annotate_masses$options$force <-
         opt_for
+      yamls_params$annotate_masses$options$nitrogen_rule <-
+        opt_nit_rul
     },
     annotate_spectra = {
       yamls_params$annotate_spectra$annotations$ms2approx <-
@@ -305,6 +308,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_tem_pre
       yamls_params$filter_annotations$ms$tolerances$rt$minutes <-
         ms_tol_rt_min
+      yamls_params$filter_annotations$options$nitrogen_rule <-
+        opt_nit_rul
     },
     prepare_annotations_gnps = {
       yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-

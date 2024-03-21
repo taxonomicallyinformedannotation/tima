@@ -4,6 +4,7 @@
 #'
 #' @param df_annotated_final Table containing your MS1 annotations
 #' @param features_table Feature table containing your mzs
+#' @param filter_nitro Filter according to Nitrogen rule. Boolean
 #'
 #' @return A table containing filtered MS1 annotations
 #'
@@ -11,7 +12,7 @@
 #'
 #' @examples NULL
 filter_nitrogen_rule <-
-  function(df_annotated_final, features_table) {
+  function(df_annotated_final, features_table, filter_nitro) {
     count_n <- function(vec) {
       return(vec |>
         stringi::stri_count(regex = "N(?![a-z])"))
@@ -52,14 +53,19 @@ filter_nitrogen_rule <-
       "non-sensical adducts"
     )
 
-    df_3 <- df_2 |>
-      tidytable::filter(mz |> as.integer() %% 2 == n |> as.integer() %% 2 |
-        n == 0 | is.na(n)) |>
-      tidytable::select(colnames(df_annotated_final))
-    log_debug(
-      "Removed other",
-      nrow(df_2) - nrow(df_3),
-      "adducts based on Nitrogen rule"
-    )
+    if (filter_nitro == TRUE) {
+      df_3 <- df_2 |>
+        tidytable::filter(mz |> as.integer() %% 2 == n |> as.integer() %% 2 |
+          n == 0 | is.na(n))
+      log_debug(
+        "Removed other",
+        nrow(df_2) - nrow(df_3),
+        "adducts based on Nitrogen rule"
+      )
+    } else {
+      df_3 <- df_2
+      log_debug("Skipping Nitrogen rule")
+    }
+
     return(df_3)
   }

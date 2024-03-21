@@ -41,3 +41,8 @@ ms:
     rt:
       #' Retention time tolerance in minutes. FLOAT
       minutes: 0.05
+
+#' Options.
+options:
+  #' Nitrogen rule. BOOLEAN
+  nitrogen_rule: yes

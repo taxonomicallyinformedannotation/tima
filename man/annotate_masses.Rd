@@ -6,6 +6,7 @@
 \usage{
 annotate_masses(
   features = get_params(step = "annotate_masses")$files$features$prepared,
+  filter_nitro = get_params(step = "annotate_masses")$options$nitrogen_rule,
   output_annotations = get_params(step =
     "annotate_masses")$files$annotations$prepared$structural$ms1,
   output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
@@ -38,6 +39,8 @@ annotate_masses(
 }
 \arguments{
 \item{features}{Table containing your previous annotation to complement}
+
+\item{filter_nitro}{Filter according to Nitrogen rule. Boolean}
 
 \item{output_annotations}{Output for mass based structural annotations}
 

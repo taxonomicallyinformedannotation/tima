@@ -8,6 +8,7 @@
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
+#' @param filter_nitro Filter according to Nitrogen rule. Boolean
 #' @param output_annotations Output for mass based structural annotations
 #' @param output_edges Output for mass based edges
 #' @param name_source Name of the source features column
@@ -38,6 +39,7 @@
 #' @examples NULL
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
+           filter_nitro = get_params(step = "annotate_masses")$options$nitrogen_rule,
            output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,
            output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
            name_source = get_params(step = "annotate_masses")$names$source,
@@ -724,7 +726,7 @@ annotate_masses <-
     rm(df_annotated_1, df_annotated_2, df_str_unique)
 
     df_annotated_filtered <- df_annotated_final |>
-      filter_nitrogen_rule(features_table = features_table)
+      filter_nitrogen_rule(features_table = features_table, filter_nitro = filter_nitro)
 
     rm(df_annotated_final)
 

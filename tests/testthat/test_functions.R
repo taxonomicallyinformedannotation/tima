@@ -373,6 +373,7 @@ testthat::test_that("Test functions", {
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
+    filter_nitro = FALSE,
     ## shallow tolerance to speed up tests
     tolerance_ppm = 1,
     tolerance_rt = 0.01,

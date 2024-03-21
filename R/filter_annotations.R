@@ -6,6 +6,7 @@
 #'
 #' @param annotations Prepared annotations file
 #' @param features Prepared features file
+#' @param filter_nitro Filter according to Nitrogen rule. Boolean
 #' @param rts Prepared retention time library
 #' @param output Output file
 #' @param tolerance_rt Tolerance to filter retention time
@@ -18,6 +19,7 @@
 filter_annotations <-
   function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
            features = get_params(step = "filter_annotations")$files$features$prepared,
+           filter_nitro = get_params(step = "filter_annotations")$options$nitrogen_rule,
            rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
            output = get_params(step = "filter_annotations")$files$annotations$filtered,
            tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes) {
@@ -95,7 +97,7 @@ filter_annotations <-
     )
 
     features_annotated_table_3 <- features_annotated_table_2 |>
-      filter_nitrogen_rule(features_table = features_table)
+      filter_nitrogen_rule(features_table = features_table, filter_nitro = filter_nitro)
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
