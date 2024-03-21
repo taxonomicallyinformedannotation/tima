@@ -520,6 +520,8 @@ testthat::test_that("Test functions", {
   arguments$ann_thr_ms2_sim_edg <- "x"
   arguments$fil_pat <- "x"
   arguments$fil_ann_raw_spe <- "x"
+  arguments$fil_ann_raw_spe_gnp <- "x"
+  arguments$fil_ann_raw_spe_spe <- "x"
   arguments$fil_ann_raw_sir <- "x"
   arguments$fil_ann_pre_can <- "x"
   arguments$fil_ann_pre_for <- "x"
@@ -592,6 +594,8 @@ testthat::test_that("Test functions", {
   arguments$names_mgf_xl <- "x"
   arguments$names_precursor <- "x"
   arguments$names_rt <- "x"
+  arguments$names_rt_fea <- "x"
+  arguments$names_rt_lib <- "x"
   arguments$names_smiles <- "x"
   arguments$names_source <- "x"
   arguments$names_target <- "x"
@@ -634,6 +638,7 @@ testthat::test_that("Test functions", {
   arguments$wei_che_23 <- "x"
   arguments$compounds_names <- "x"
   arguments$force <- "x"
+  arguments$nit_rul <- "x"
   arguments$summarise <- "x"
 
   parse_cli_params(
