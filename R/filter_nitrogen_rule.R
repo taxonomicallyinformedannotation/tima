@@ -1,0 +1,65 @@
+#' @title Filter nitrogen rule
+#'
+#' @description This function filters annotations according to nitrogen rule
+#'
+#' @param df_annotated_final Table containing your MS1 annotations
+#' @param features_table Feature table containing your mzs
+#'
+#' @return A table containing filtered MS1 annotations
+#'
+#' @export
+#'
+#' @examples NULL
+filter_nitrogen_rule <-
+  function(df_annotated_final, features_table) {
+    count_n <- function(vec) {
+      return(vec |>
+        stringi::stri_count(regex = "N(?![a-z])"))
+    }
+    multiply_n <- function(vec) {
+      return(
+        vec |>
+          stringi::stri_extract_all_regex(pattern = "N[0-9]") |>
+          as.character() |>
+          stringi::stri_replace_all_fixed(pattern = "N", replacement = "") |>
+          tidytable::replace_na("1") |>
+          as.numeric()
+      )
+    }
+    count_nitrogens <- function(vec) {
+      return(count_n(vec) * multiply_n(vec))
+    }
+
+    df_1 <- df_annotated_final |>
+      tidytable::left_join(features_table) |>
+      tidytable::separate_wider_delim(candidate_library,
+        delim = " - ",
+        cols_remove = FALSE
+      )
+
+    formula_n <-
+      count_nitrogens(df_1$candidate_structure_molecular_formula)
+    adduct_n <- count_nitrogens(df_1$candidate_library1)
+    loss_n <- count_nitrogens(df_1$candidate_library2 |>
+      gsub(pattern = "\\(.*", replacement = ""))
+    df_1$n <- formula_n + adduct_n - loss_n
+
+    df_2 <- df_1 |>
+      tidytable::filter(n >= 0 | is.na(n))
+    log_debug(
+      "Removed",
+      nrow(df_1) - nrow(df_2),
+      "non-sensical adducts"
+    )
+
+    df_3 <- df_2 |>
+      tidytable::filter(mz |> as.integer() %% 2 == n |> as.integer() %% 2 |
+        n == 0 | is.na(n)) |>
+      tidytable::select(colnames(df_annotated_final))
+    log_debug(
+      "Removed other",
+      nrow(df_2) - nrow(df_3),
+      "adducts based on Nitrogen rule"
+    )
+    return(df_3)
+  }

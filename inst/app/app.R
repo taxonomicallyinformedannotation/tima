@@ -416,6 +416,7 @@ ui <- shiny::fluidPage(
             "[1M+(Na)2]2+",
             "[1M+(Fe)1]2+",
             "[1M+(H)1]1+",
+            "[1M+(H)4(N)1]1+",
             "[1M+(Na)1]1+",
             "[1M+(K)1]1+",
             "[1M+(Cu)1]1+",
@@ -423,12 +424,14 @@ ui <- shiny::fluidPage(
             "[2M+(Ca)1]2+",
             "[2M+(Fe)1]2+",
             "[2M+(H)1]1+",
+            "[2M+(H)4(N)1]1+",
             "[2M+(Na)1]1+",
             "[2M+(K)1]1+"
           ),
           selected = list(
             "[1M+(H)2]2+",
             "[1M+(H)1]1+",
+            "[1M+(H)4(N)1]1+",
             "[1M+(Na)1]1+",
             "[2M+(H)1]1+"
           )
@@ -488,7 +491,6 @@ ui <- shiny::fluidPage(
           inputId = "ms_clu_pos",
           label = "List of clusters to be used in positive",
           choices = list(
-            "HN3", # (ammonia)
             "H2O", # (water)
             # "CH4O", # (methanol)
             "C2H3N", # (acetonitrile)
@@ -499,7 +501,6 @@ ui <- shiny::fluidPage(
             # "C2H6OS" # (dmso)
           ),
           selected = list(
-            "HN3", # (ammonia)
             "H2O", # (water)
             # "CH4O", # (methanol)
             "C2H3N" # (acetonitrile)

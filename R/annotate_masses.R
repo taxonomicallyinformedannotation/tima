@@ -4,6 +4,7 @@
 #'
 #' @include decorate_masses.R
 #' @include dist_groups.R
+#' @include filter_nitrogen_rule.R
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
@@ -267,7 +268,6 @@ annotate_masses <-
       df_fea_min[, "rt"] <- df_fea_min[, "feature_id"] |>
         as.numeric()
     }
-    rm(features_table)
 
     log_debug("calculating rt tolerance ... \n")
     df_rt_tol <- df_fea_min |>
@@ -517,16 +517,16 @@ annotate_masses <-
 
     ## TODO This will then be externalized somehow
     forbidden_adducts <- c(
-      "[1M-(H)1]1- + (HN3)1 - H3N (ammonia)",
       "[1M-(H)1]1- + (H2O)1 - H2O (water)",
       "[1M-(H)1]1- + (H2PO4)1 - H3O4P (phosphoric)",
       "[1M-(H)1]1- + (C2H7N)1 - H3N (ammonia)",
       "[1M-(H)1]1- + (C2H3N)1 - H3N (ammonia)",
-      "[1M+(H)1]1+ + (HN3)1 - H3N (ammonia)",
+      "[1M+(H)4(N)1]1+ - H3N (ammonia)",
       "[1M+(H)1]1+ + (H2O)1 - H2O (water)",
       "[1M+(H)1]1+ + (H2PO4)1 - H3O4P (phosphoric)",
       "[1M+(H)1]1+ + (C2H7N)1 - H3N (ammonia)",
-      "[1M+(H)1]1+ + (C2H3N)1 - H3N (ammonia)"
+      "[1M+(H)1]1+ + (C2H3N)1 - H3N (ammonia)",
+      "[2M+(H)4(N)1]1+ - H3N (ammonia)"
     )
 
     log_debug("joining exact masses with single charge adducts \n")
@@ -720,11 +720,17 @@ annotate_masses <-
         candidate_library = library
       ) |>
       tidytable::distinct()
+
     rm(df_annotated_1, df_annotated_2, df_str_unique)
+
+    df_annotated_filtered <- df_annotated_final |>
+      filter_nitrogen_rule(features_table = features_table)
+
+    rm(df_annotated_final)
 
     log_debug("adding chemical classification")
     df_final <- tidytable::left_join(
-      df_annotated_final,
+      df_annotated_filtered,
       structure_organism_pairs_table |>
         tidytable::distinct(
           candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
@@ -748,7 +754,7 @@ annotate_masses <-
           }
         )
       )
-    rm(df_annotated_final, structure_organism_pairs_table)
+    rm(structure_organism_pairs_table)
 
     df_final |>
       decorate_masses()
