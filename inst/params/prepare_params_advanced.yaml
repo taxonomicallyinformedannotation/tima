@@ -319,6 +319,7 @@ ms:
       - "[1M+(Na)2]2+"
       - "[1M+(Fe)1]2+"
       - "[1M+(H)1]1+"
+      - "[1M+(H)4(N)1]1+"
       - "[1M+(Na)1]1+"
       - "[1M+(K)1]1+"
       - "[1M+(Cu)1]1+"
@@ -326,6 +327,7 @@ ms:
       - "[2M+(Ca)1]2+"
       - "[2M+(Fe)1]2+"
       - "[2M+(H)1]1+"
+      - "[2M+(H)4(N)1]1+"
       - "[2M+(Na)1]1+"
       - "[2M+(K)1]1+"
 
@@ -342,7 +344,6 @@ ms:
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - HN3 # (ammonia)
       - H2O # (water)
       # - CH4O # (methanol)
       - C2H3N # (acetonitrile)

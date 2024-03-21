@@ -400,7 +400,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
-      "version": ">= 0.8.2",
+      "version": ">= 0.8.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3014.458KB",
+  "fileSize": "2849.429KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

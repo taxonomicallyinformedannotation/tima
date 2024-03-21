@@ -2,6 +2,7 @@
 
 # timaR 2.9.2
 
+* Add Nitrogen rule to filter out some annotations
 * Better handling of partial downloads (#118)
 * Dependencies update (mainly `targets 1.5.1`, will invalidate previous targets)
 * Fix some port issues in Shiny (#122)

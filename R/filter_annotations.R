@@ -2,6 +2,8 @@
 #'
 #' @description This function filters initial annotations.
 #'
+#' @include filter_nitrogen_rule.R
+#'
 #' @param annotations Prepared annotations file
 #' @param features Prepared features file
 #' @param rts Prepared retention time library
@@ -92,9 +94,12 @@ filter_annotations <-
       "Candidates were removed based on retention time."
     )
 
+    features_annotated_table_3 <- features_annotated_table_2 |>
+      filter_nitrogen_rule(features_table = features_table)
+
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
-      tidytable::left_join(features_annotated_table_2)
+      tidytable::left_join(features_annotated_table_3)
 
     rm(
       features_table,
