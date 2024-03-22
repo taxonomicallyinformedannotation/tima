@@ -17,7 +17,10 @@ testthat::test_that("Test functions", {
   ## Prepare config for a single step only
   prepare_params(step = "weight_annotations")
   ## For all steps
-  prepare_params()
+  params$organisms$taxon <- ""
+  prepare_params(params_small = params)
+  params$organisms$taxon <- "Gentiana lutea"
+  prepare_params(params_small = params)
   prepare_params(step = "annotate_masses")
   prepare_params(step = "annotate_spectra")
   prepare_params(step = "create_components")
@@ -292,6 +295,8 @@ testthat::test_that("Test functions", {
     output_neg = "data/interim/libraries/spectra/exp/nope_neg.rds",
   )
   #### Classical
+  prepare_libraries_spectra()
+  #### Again
   prepare_libraries_spectra()
 
   ## for msp reading test
@@ -640,6 +645,11 @@ testthat::test_that("Test functions", {
   arguments$force <- "x"
   arguments$nit_rul <- "x"
   arguments$summarise <- "x"
+
+  # Useless
+  keep_peaks(x = 0, prop = 0)
+  normalize_peaks()
+  remove_above_precursor()
 
   parse_cli_params(
     arguments = arguments,
