@@ -187,10 +187,9 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   if (!is.null(org_tax)) {
     if (org_tax == "") {
       org_tax <- NULL
+    } else {
+      fil_met_raw <- NULL
     }
-  }
-  if (!is.null(org_tax)) {
-    fil_met_raw <- NULL
   }
 
   log_debug(x = "Changing params")
