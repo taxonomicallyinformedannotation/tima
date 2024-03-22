@@ -20,7 +20,7 @@ filter_nitrogen_rule <-
     multiply_n <- function(vec, element) {
       return(
         vec |>
-          stringi::stri_extract_all_regex(pattern = paste0(element, "[0-9]")) |>
+          stringi::stri_extract_all_regex(pattern = paste0(element, "[0-9]{1,3}")) |>
           as.character() |>
           stringi::stri_replace_all_fixed(pattern = element, replacement = "") |>
           tidytable::replace_na("1") |>
