@@ -13,22 +13,22 @@
 #' @examples NULL
 filter_nitrogen_rule <-
   function(df_annotated_final, features_table, filter_nitro) {
-    count_n <- function(vec) {
+    count_n <- function(vec, element) {
       return(vec |>
-        stringi::stri_count(regex = "N(?![a-z])"))
+        stringi::stri_count(regex = paste0(element, "(?![a-z])")))
     }
-    multiply_n <- function(vec) {
+    multiply_n <- function(vec, element) {
       return(
         vec |>
-          stringi::stri_extract_all_regex(pattern = "N[0-9]") |>
+          stringi::stri_extract_all_regex(pattern = paste0(element, "[0-9]")) |>
           as.character() |>
-          stringi::stri_replace_all_fixed(pattern = "N", replacement = "") |>
+          stringi::stri_replace_all_fixed(pattern = element, replacement = "") |>
           tidytable::replace_na("1") |>
           as.numeric()
       )
     }
-    count_nitrogens <- function(vec) {
-      return(count_n(vec) * multiply_n(vec))
+    count_element <- function(vec, elem) {
+      return(count_n(vec, elem) * multiply_n(vec, elem))
     }
 
     df_1 <- df_annotated_final |>
@@ -38,15 +38,29 @@ filter_nitrogen_rule <-
         cols_remove = FALSE
       )
 
-    formula_n <-
-      count_nitrogens(df_1$candidate_structure_molecular_formula)
-    adduct_n <- count_nitrogens(df_1$candidate_library1)
-    loss_n <- count_nitrogens(df_1$candidate_library2 |>
-      gsub(pattern = "\\(.*", replacement = ""))
+    formula_n <- df_1$candidate_structure_molecular_formula |>
+      count_element("N")
+    adduct_n <- df_1$candidate_library1 |>
+      count_element("N")
+    loss_n <- df_1$candidate_library2 |>
+      gsub(pattern = "\\(.*", replacement = "") |>
+      count_element("N")
     df_1$n <- formula_n + adduct_n - loss_n
 
+    formula_o <- df_1$candidate_structure_molecular_formula |>
+      count_element("O")
+    adduct_o <- df_1$candidate_library1 |>
+      count_element("O")
+    loss_o <- df_1$candidate_library2 |>
+      gsub(pattern = "\\(.*", replacement = "") |>
+      count_element("O")
+    df_1$o <- formula_o + adduct_o - loss_o
+
+    # TODO this could be extended
+
     df_2 <- df_1 |>
-      tidytable::filter(n >= 0 | is.na(n))
+      tidytable::filter(n >= 0 | is.na(n)) |>
+      tidytable::filter(o >= 0 | is.na(o))
     log_debug(
       "Removed",
       nrow(df_1) - nrow(df_2),
