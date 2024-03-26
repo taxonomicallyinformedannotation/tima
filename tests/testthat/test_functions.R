@@ -432,8 +432,8 @@ testthat::test_that("Test functions", {
   )
 
   ### GNPS results
-  prepare_annotations_gnps(input = "fileDoesNotExist")
-  prepare_annotations_gnps(input = NULL)
+  prepare_annotations_gnps(input = "fileDoesNotExist", output = "notWanted.tsv.gz")
+  prepare_annotations_gnps(input = NULL, output = "notWanted_2.tsv.gz")
   prepare_annotations_gnps()
   prepare_annotations_gnps()
 
