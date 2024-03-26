@@ -82,6 +82,8 @@ filter_nitrogen_rule <-
       df_3 <- df_2
       log_debug("Skipping Nitrogen rule")
     }
+    df_3 <- df_3 |>
+      tidytable::select(colnames(df_annotated_final))
 
     return(df_3)
   }

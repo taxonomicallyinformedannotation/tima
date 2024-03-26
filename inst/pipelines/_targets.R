@@ -1552,7 +1552,7 @@ list(
               features = fea_pre,
               filter_nitro = par_ann_mas$options$nitrogen_rule,
               library = lib_mer_key,
-              output_annotations = par_ann_mas$files$annotations$prepared$structural,
+              output_annotations = par_ann_mas$files$annotations$prepared$structural$ms1,
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
               name_source = par_ann_mas$names$source,
               name_target = par_ann_mas$names$target,
