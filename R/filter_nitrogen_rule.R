@@ -30,6 +30,16 @@ filter_nitrogen_rule <-
     count_element <- function(vec, elem) {
       return(count_n(vec, elem) * multiply_n(vec, elem))
     }
+    add_element_count <- function(df, element) {
+      formula <- df$candidate_structure_molecular_formula |>
+        count_element(element)
+      adduct <- df$candidate_library1 |>
+        count_element(element)
+      loss <- df$candidate_library2 |>
+        gsub(pattern = "\\(.*", replacement = "") |>
+        count_element(element)
+      return(formula + adduct - loss)
+    }
 
     df_1 <- df_annotated_final |>
       tidytable::left_join(features_table) |>
@@ -38,29 +48,22 @@ filter_nitrogen_rule <-
         cols_remove = FALSE
       )
 
-    formula_n <- df_1$candidate_structure_molecular_formula |>
-      count_element("N")
-    adduct_n <- df_1$candidate_library1 |>
-      count_element("N")
-    loss_n <- df_1$candidate_library2 |>
-      gsub(pattern = "\\(.*", replacement = "") |>
-      count_element("N")
-    df_1$n <- formula_n + adduct_n - loss_n
-
-    formula_o <- df_1$candidate_structure_molecular_formula |>
-      count_element("O")
-    adduct_o <- df_1$candidate_library1 |>
-      count_element("O")
-    loss_o <- df_1$candidate_library2 |>
-      gsub(pattern = "\\(.*", replacement = "") |>
-      count_element("O")
-    df_1$o <- formula_o + adduct_o - loss_o
-
-    # TODO this could be extended
+    df_1$C <- add_element_count(df_1, element = "C")
+    df_1$H <- add_element_count(df_1, element = "H")
+    df_1$N <- add_element_count(df_1, element = "N")
+    df_1$O <- add_element_count(df_1, element = "O")
+    df_1$P <- add_element_count(df_1, element = "P")
+    df_1$S <- add_element_count(df_1, element = "S")
 
     df_2 <- df_1 |>
-      tidytable::filter(n >= 0 | is.na(n)) |>
-      tidytable::filter(o >= 0 | is.na(o))
+      tidytable::filter(C >= 0 | is.na(C)) |>
+      tidytable::filter(H >= 0 | is.na(H)) |>
+      tidytable::filter(N >= 0 | is.na(N)) |>
+      tidytable::filter(O >= 0 | is.na(O)) |>
+      tidytable::filter(P >= 0 | is.na(P)) |>
+      tidytable::filter(S >= 0 | is.na(S)) |>
+      tidytable::select(-C, -H, -N, -O, -P, -S)
+
     log_debug(
       "Removed",
       nrow(df_1) - nrow(df_2),
