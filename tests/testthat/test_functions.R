@@ -435,6 +435,7 @@ testthat::test_that("Test functions", {
   prepare_annotations_gnps(input = "fileDoesNotExist")
   prepare_annotations_gnps(input = NULL)
   prepare_annotations_gnps()
+  prepare_annotations_gnps()
 
   ### SIRIUS results
   ## To do as if there was no input
