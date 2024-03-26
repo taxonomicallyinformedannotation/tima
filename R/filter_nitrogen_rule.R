@@ -48,21 +48,20 @@ filter_nitrogen_rule <-
         cols_remove = FALSE
       )
 
-    df_1$C <- add_element_count(df_1, element = "C")
-    df_1$H <- add_element_count(df_1, element = "H")
-    df_1$N <- add_element_count(df_1, element = "N")
-    df_1$O <- add_element_count(df_1, element = "O")
-    df_1$P <- add_element_count(df_1, element = "P")
-    df_1$S <- add_element_count(df_1, element = "S")
+    df_1$c <- add_element_count(df_1, element = "C")
+    df_1$h <- add_element_count(df_1, element = "H")
+    df_1$n <- add_element_count(df_1, element = "N")
+    df_1$o <- add_element_count(df_1, element = "O")
+    df_1$p <- add_element_count(df_1, element = "P")
+    df_1$s <- add_element_count(df_1, element = "S")
 
     df_2 <- df_1 |>
-      tidytable::filter(C >= 0 | is.na(C)) |>
-      tidytable::filter(H >= 0 | is.na(H)) |>
-      tidytable::filter(N >= 0 | is.na(N)) |>
-      tidytable::filter(O >= 0 | is.na(O)) |>
-      tidytable::filter(P >= 0 | is.na(P)) |>
-      tidytable::filter(S >= 0 | is.na(S)) |>
-      tidytable::select(-C, -H, -N, -O, -P, -S)
+      tidytable::filter(c >= 0 | is.na(c)) |>
+      tidytable::filter(h >= 0 | is.na(h)) |>
+      tidytable::filter(n >= 0 | is.na(n)) |>
+      tidytable::filter(o >= 0 | is.na(o)) |>
+      tidytable::filter(p >= 0 | is.na(p)) |>
+      tidytable::filter(s >= 0 | is.na(s))
 
     log_debug(
       "Removed",
