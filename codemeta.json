@@ -218,7 +218,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.0.0",
+      "version": ">= 1.0.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -335,7 +335,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
-      "version": ">= 1.8.0",
+      "version": ">= 1.8.1.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2841.482KB",
+  "fileSize": "2841.453KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
