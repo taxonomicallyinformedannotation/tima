@@ -31,7 +31,7 @@ Imports:
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
     rotl (>= 3.1.0),
-    shiny (<= 1.8.0),
+    shiny (>= 1.8.1.1),
     shinybusy (>= 0.3.3),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
