@@ -1300,25 +1300,18 @@ ui <- shiny::fluidPage(
         class = "btn-primary"
       ),
     ),
-    shinyjs::hidden(shiny::div(
-      id = "thankyou_msg",
-      shiny::h3("Thanks, your parameters were saved successfully!")
-    )),
-    shinyjs::hidden(shiny::div(
-      id = "job_msg",
-      shiny::h3("Job is running!")
-    )),
-    shinyjs::hidden(shiny::div(
-      targets::tar_watch_ui(
-        id = "tar_watch",
-        label = "Live Show",
-        targets_only = TRUE,
-        degree_from = 8,
-        level_separation = 300,
-        display = "graph",
-        displays = c("summary", "progress", "graph")
+    shinyjs::hidden(
+      shiny::div(
+        id = "thankyou_msg",
+        shiny::h3("Thanks, your parameters were saved successfully!")
       )
-    ))
+    ),
+    shinyjs::hidden(
+      shiny::div(
+        id = "job_msg",
+        shiny::h3("Job is running!")
+      )
+    )
   )
 )
 
@@ -1370,7 +1363,6 @@ save_input <- function(input) {
   if (gnps_job_id == "") {
     gnps_job_id <- NULL
   }
-  gnps_workflow <- shiny::isolate(input$gnps_workflow)
 
   org_tax <- shiny::isolate(input$org_tax)
   if (org_tax == "") {
@@ -1797,19 +1789,19 @@ server <- function(input, output, session) {
     eventExpr = input$launch,
     handlerExpr = {
       shinyjs::show("job_msg")
+      shinyjs::hide("thankyou_msg")
       shinyjs::hide("error")
       shinyjs::hide("params")
       shinyjs::hide("form")
-      shinyjs::show("tar_watch")
       tryCatch(expr = {
-        targets::tar_watch_server(id = "tar_watch")
         targets::tar_watch(
           host = "127.0.0.1",
           port = 3839,
           display = "graph",
           displays = c("summary", "graph"),
-          degree_from = 10,
-          outdated = TRUE,
+          level_separation = 300,
+          degree_from = 8,
+          outdated = FALSE,
           targets_only = TRUE,
           supervise = TRUE,
           verbose = TRUE,
