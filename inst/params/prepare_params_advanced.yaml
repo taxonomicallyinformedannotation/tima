@@ -20,14 +20,14 @@ annotations:
     #' MS1 annotation related parameters.
     ms1:
       #' Minimal biological score to keep MS1 only annotation. FLOAT
-      biological: 0.6
+      biological: 0.3
 
       #' Minimal chemical score to keep MS1 only annotation. FLOAT
-      chemical: 0.6
+      chemical: 0.3
 
       #' Condition to be used to retain candidates.
       #' Must be "OR" or "AND".
-      #' Example: Minimum 0.5 biological AND 0.666 chemical. STRING
+      #' Example: Minimum 0.3 biological AND 0.3 chemical. STRING
       condition: OR
 
     #' MS2 annotation related parameters.
