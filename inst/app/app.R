@@ -202,7 +202,7 @@ ui <- shiny::fluidPage(
           label = "Minimal biological score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.6,
+          value = 0.3,
           step = 0.05,
           ticks = FALSE
         ) |>
@@ -219,7 +219,7 @@ ui <- shiny::fluidPage(
           label = "Minimal chemical score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.6,
+          value = 0.3,
           step = 0.1,
           ticks = FALSE
         ) |>
@@ -241,7 +241,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "If an MS1 candidate has a bio score of 1, a chem score of 0.25",
-              "the above thresholds set at 0.5 and 0.5 respectively",
+              "the above thresholds set at 0.3 and 0.3 respectively",
               "keeps it if the condition is `OR` but discard it if `AND`."
             )
           ),
