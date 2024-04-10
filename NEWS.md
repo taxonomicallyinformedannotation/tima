@@ -4,6 +4,7 @@
 
 * Allow for SIRIUS jobs containing only summaries
 * Allow for underscores in job pattern
+* Change some default values (less stringent)
 * Dependencies update
 * Remove further some inconsistent MS1 annotations
 
