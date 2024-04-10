@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_annotations_gnps.R --fil-ann-raw-spe-gnp data/interim/annotations/example_gnps.tsv --fil-ann-pre-str data/interim/annotations/example_gnps_prepared.tsv.gz
+  Rscript inst/scripts/prepare_annotations_gnps.R --fil-ann-raw-spe-gnp data/interim/annotations/example_gnps.tsv --fil-ann-pre-str data/interim/annotations/example_gnpsPrepared.tsv.gz
 
 Usage:
   prepare_annotations_gnps.R [--=fil-ann-pre-str<fil-ann-pre-str>] [--gnps-id=<gnps-id>] [--gnps-workflow=<gnps-workflow>]

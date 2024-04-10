@@ -1,5 +1,5 @@
 You can use this script with the following example:
-Rscript inst/scripts/prepare_annotations_spectra.R --fil-ann-raw-spe-spe data/interim/annotations/example_isdb.tsv.gz --fil-ann-pre-str data/interim/annotations/example_isdb_prepared.tsv.gz
+Rscript inst/scripts/prepare_annotations_spectra.R --fil-ann-raw-spe-spe data/interim/annotations/example_isdb.tsv.gz --fil-ann-pre-str data/interim/annotations/example_isdbPrepared.tsv.gz
 
 Usage:
   prepare_annotations_spectra.R [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-ann-pre-str=<fil-ann-pre-str>]
