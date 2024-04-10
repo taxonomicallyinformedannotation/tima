@@ -192,6 +192,7 @@ prepare_annotations_sirius <-
         model$features_columns,
         model$features_calculated_columns
       ))) |>
+      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
     table_for <- table |>
@@ -199,6 +200,7 @@ prepare_annotations_sirius <-
         model$features_columns,
         model$candidates_sirius_for_columns
       ))) |>
+      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
     table_str <- table |>
@@ -208,6 +210,7 @@ prepare_annotations_sirius <-
         model$candidates_spectra_columns,
         model$candidates_sirius_str_columns
       ))) |>
+      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
     rm(table)
 
