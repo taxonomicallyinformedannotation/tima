@@ -8,14 +8,14 @@ files:
       #' List of spectral matching results.
       spectral:
         #' Spectral spectral matching results. STRING
-        spectral: data/interim/annotations/example_spectral_matches.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
     #' List of prepared annotations.
     prepared:
       #' List of prepared structural annotations.
       structural:
         #' Prepared spectral structural annotations. STRING
-        spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatchesPrepared.tsv.gz
 
   #' Libraries files.
   libraries:

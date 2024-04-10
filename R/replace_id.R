@@ -51,8 +51,8 @@ replace_id <-
 
     old <- file |>
       stringi::stri_replace_all_regex(
-        pattern = "_.*",
-        replacement = "",
+        pattern = "([^_])(_.*)",
+        replacement = "$1",
         vectorize_all = FALSE
       )
 
