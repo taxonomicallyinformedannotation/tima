@@ -202,7 +202,7 @@ ui <- shiny::fluidPage(
           label = "Minimal biological score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.3,
+          value = 0.0,
           step = 0.05,
           ticks = FALSE
         ) |>
@@ -219,7 +219,7 @@ ui <- shiny::fluidPage(
           label = "Minimal chemical score to keep MS1 only annotation",
           min = 0,
           max = 1,
-          value = 0.3,
+          value = 0.0,
           step = 0.1,
           ticks = FALSE
         ) |>
