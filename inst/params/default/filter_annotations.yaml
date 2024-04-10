@@ -5,20 +5,20 @@ files:
   annotations:
     #' List of filtered annotations. STRING
     filtered:
-      - data/interim/annotations/example_annotations_filtered.tsv.gz
+      - data/interim/annotations/example_annotationsFiltered.tsv.gz
 
     #' List of prepared annotations.
     prepared:
       #' List of prepared structural annotations.
       structural:
         #' Prepared GNPS structural annotations. STRING
-        # gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
+        gnps: data/interim/annotations/example_gnpsPrepared.tsv.gz
         #' Prepared MS1 structural annotations. STRING
-        ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
+        ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
         #' Prepared SIRIUS structural annotations. STRING
-        sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
+        sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
         #' Prepared SPECTRAL structural annotations. STRING
-        spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatchesPrepared.tsv.gz
 
   #' Features files.
   features:

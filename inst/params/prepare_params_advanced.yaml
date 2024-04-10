@@ -55,35 +55,35 @@ files:
         gnps: data/interim/annotations/example_gnps.tsv
 
         #' Spectral spectral matching results. STRING
-        spectral: data/interim/annotations/example_spectral_matches.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
       #' Directory containing the sirius results. STRING
       sirius: data/interim/annotations/example_sirius
 
     #' List of filtered annotations. STRING
-    filtered: data/interim/annotations/example_annotations_filtered.tsv.gz
+    filtered: data/interim/annotations/example_annotationsFiltered.tsv.gz
 
     #' List of prepared annotations.
     prepared:
       #' List of prepared canopus annotations. STRING
-      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+      canopus: data/interim/annotations/example_canopusPrepared.tsv.gz
 
       #' List of prepared formula annotations. STRING
-      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+      formula: data/interim/annotations/example_formulaPrepared.tsv.gz
 
       #' List of prepared structural annotations.
       structural:
         #' Prepared GNPS structural annotations. STRING
-        gnps: data/interim/annotations/example_gnps_prepared.tsv.gz
+        gnps: data/interim/annotations/example_gnpsPrepared.tsv.gz
 
         #' Prepared MS1 structural annotations. STRING
-        ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
+        ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
 
         #' Prepared SIRIUS structural annotations. STRING
-        sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
+        sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
 
         #' Prepared SPECTRAL structural annotations. STRING
-        spectral: data/interim/annotations/example_spectral_matches_prepared.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatchesPrepared.tsv.gz
 
     #' Final results file. STRING
     processed: example_results.tsv
@@ -248,10 +248,10 @@ files:
         #' Raw edges file.
         raw:
           #' Raw ms1 edges file. STRING
-          ms1: data/interim/features/example_edges_masses.tsv
+          ms1: data/interim/features/example_edgesMasses.tsv
 
           #' Raw spectral edges file. STRING
-          spectral: data/interim/features/example_edges_spectra.tsv
+          spectral: data/interim/features/example_edgesSpectra.tsv
 
         #' Prepared edges file. STRING
         prepared: data/interim/features/example_edges.tsv
@@ -262,7 +262,7 @@ files:
         raw: data/interim/features/example_components.tsv
 
         #' Prepared components file. STRING
-        prepared: data/interim/features/example_components_prepared.tsv
+        prepared: data/interim/features/example_componentsPrepared.tsv
 
   #' Metadata files.
   metadata:

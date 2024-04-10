@@ -36,15 +36,15 @@ files:
   annotations:
     #' List of filtered annotations. STRING
     filtered:
-      - data/interim/annotations/example_annotations_filtered.tsv.gz
+      - data/interim/annotations/example_annotationsFiltered.tsv.gz
 
     #' List of prepared annotations.
     prepared:
       #' List of prepared canopus annotations. STRING
-      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+      canopus: data/interim/annotations/example_canopusPrepared.tsv.gz
 
       #' List of prepared formula annotations. STRING
-      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+      formula: data/interim/annotations/example_formulaPrepared.tsv.gz
 
     #' Final results file. STRING
     processed: annotations.tsv
@@ -77,7 +77,7 @@ files:
       #' Components files.
       components:
         #' Prepared edges file. STRING
-        prepared: data/interim/features/example_components_prepared.tsv
+        prepared: data/interim/features/example_componentsPrepared.tsv
 
       #' Edges files.
       edges:

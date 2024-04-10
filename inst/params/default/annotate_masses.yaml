@@ -8,7 +8,7 @@ files:
       #' List of prepared structural annotations.
       structural:
         #' Prepared MS1 structural annotations. STRING
-        ms1: data/interim/annotations/example_ms1_prepared.tsv.gz
+        ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
 
   #' Features files.
   features:
@@ -63,7 +63,7 @@ files:
         #' Raw edges file.
         raw:
           #' Raw ms1 edges file. STRING
-          ms1: data/interim/features/example_edges_masses.tsv
+          ms1: data/interim/features/example_edgesMasses.tsv
 
 #' MS related parameters.
 ms:

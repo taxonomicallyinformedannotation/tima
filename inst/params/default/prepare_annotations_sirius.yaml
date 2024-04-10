@@ -11,15 +11,15 @@ files:
     #' List of prepared annotations.
     prepared:
       #' List of prepared canopus annotations. STRING
-      canopus: data/interim/annotations/example_canopus_prepared.tsv.gz
+      canopus: data/interim/annotations/example_canopusPrepared.tsv.gz
 
       #' List of prepared formula annotations. STRING
-      formula: data/interim/annotations/example_formula_prepared.tsv.gz
+      formula: data/interim/annotations/example_formulaPrepared.tsv.gz
 
       #' List of prepared structural annotations.
       structural:
         #' Prepared SIRIUS structural annotations. STRING
-        sirius: data/interim/annotations/example_sirius_prepared.tsv.gz
+        sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
 
   #' Libraries files.
   libraries:

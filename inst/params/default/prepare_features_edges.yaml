@@ -10,10 +10,10 @@ files:
         #' Raw edges file.
         raw:
           #' Raw ms1 edges file. STRING
-          ms1: data/interim/features/example_edges_masses.tsv
+          ms1: data/interim/features/example_edgesMasses.tsv
 
           #' Raw spectral edges file. STRING
-          spectral: data/interim/features/example_edges_spectra.tsv
+          spectral: data/interim/features/example_edgesSpectra.tsv
 
         #' Prepared edges file. STRING
         prepared: data/interim/features/example_edges.tsv
