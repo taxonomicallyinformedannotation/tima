@@ -88,8 +88,13 @@ prepare_annotations_sirius <-
       compound_summary <-
         compound_summary[lapply(compound_summary, nrow) > 0]
 
-      compound_summary_ready <- compound_summary |>
-        tidytable::bind_rows(.id = "feature_id")
+      # Allow for summaries only
+      if (length(compound_summary) != 0) {
+        compound_summary_ready <- compound_summary |>
+          tidytable::bind_rows(.id = "feature_id")
+      } else {
+        compound_summary_ready <- tidytable::tidytable()
+      }
       rm(compound_summary)
 
       canopus_prepared <- canopus |>
