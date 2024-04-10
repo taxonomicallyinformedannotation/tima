@@ -145,7 +145,7 @@ ui <- shiny::fluidPage(
               "Name of your job.",
               "All intermediate steps will use this pattern.",
               "For example, the corresponding SIRIUS results will be named:",
-              "`YOUR_PATTERN_sirius`."
+              "`yourPattern_sirius`."
             )
           )
       ),
@@ -1214,20 +1214,6 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::checkboxInput(
-          inputId = "force",
-          label = "Do not use it!",
-          value = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Really, do not use it.",
-              "Corresponds to a `--force` parameter,
-              allowing for crazy things that can crash.",
-              "Really, do not use it."
-            )
-          ),
-        shiny::checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
           value = FALSE
@@ -1239,6 +1225,20 @@ ui <- shiny::fluidPage(
               "with multiple candidates per line, separated by pipes (|).",
               "If unchecked, will output multiple lines per features
               (one per candidate)."
+            )
+          ),
+        shiny::checkboxInput(
+          inputId = "force",
+          label = "Do not use it!",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Really, do not use it.",
+              "Corresponds to a `--force` parameter,
+              allowing for crazy things that can crash.",
+              "Really, do not use it."
             )
           )
       ),
@@ -1414,40 +1414,32 @@ save_input <- function(input) {
     shiny::isolate(input$edg_thr_ms2_sim)
   yaml_advanced$files$pattern <-
     fil_pat
-  # TODO
-  # yaml_advanced$files$annotations$raw$spectral <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$raw$spectral$gnps <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$raw$spectral$sirius <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$raw$spectral$spectral <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$raw$sirius <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$canopus <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$formula <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$structural <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$structural$gnps <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$structural$ms1 <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$structural$sirius <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$prepared$structural$spectral <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$annotations$filtered <-
-  #   shiny::isolate(input$todo)
+  yaml_advanced$files$annotations$raw$spectral$gnps <-
+    yaml_advanced$files$annotations$raw$spectral$gnps |> replace_id()
+  yaml_advanced$files$annotations$raw$spectral$spectral <-
+    yaml_advanced$files$annotations$raw$spectral$spectral |> replace_id()
+  yaml_advanced$files$annotations$raw$sirius <-
+    yaml_advanced$files$annotations$raw$sirius |> replace_id()
+  yaml_advanced$files$annotations$prepared$canopus <-
+    yaml_advanced$files$annotations$prepared$canopus |> replace_id()
+  yaml_advanced$files$annotations$prepared$formula <-
+    yaml_advanced$files$annotations$prepared$formula |> replace_id()
+  yaml_advanced$files$annotations$prepared$structural$gnps <-
+    yaml_advanced$files$annotations$prepared$structural$gnps |> replace_id()
+  yaml_advanced$files$annotations$prepared$structural$ms1 <-
+    yaml_advanced$files$annotations$prepared$structural$ms1 |> replace_id()
+  yaml_advanced$files$annotations$prepared$structural$sirius <-
+    yaml_advanced$files$annotations$prepared$structural$sirius |> replace_id()
+  yaml_advanced$files$annotations$prepared$structural$spectral <-
+    yaml_advanced$files$annotations$prepared$structural$spectral |> replace_id()
+  yaml_advanced$files$annotations$filtered <-
+    yaml_advanced$files$annotations$filtered |> replace_id()
   # yaml_advanced$files$annotations$processed <-
-  #   shiny::isolate(input$todo)
+  #   yaml_advanced$files$annotations$processed |> replace_id()
   yaml_advanced$files$features$raw <-
     fil_fea_raw
-  # TODO
-  # yaml_advanced$files$features$prepared <-
-  #   shiny::isolate(input$fil_fea_pre)
+  yaml_advanced$files$features$prepared <-
+    yaml_advanced$files$features$prepared |> replace_id()
   # TODO
   # yaml_advanced$files$libraries$adducts$neg <-
   #   shiny::isolate(input$todo)
@@ -1459,17 +1451,21 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$raw$ecmdb <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$sop$raw$lotus <-
+  # yaml_advanced$files$libraries$sop$raw$hmdb <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$sop$prepared <-
+  # yaml_advanced$files$libraries$sop$raw$lotus <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$prepared$closed <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$prepared$ecmdb <-
   #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$hmdb <-
+  #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$prepared$lotus <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$prepared$rt <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$prepared$spectral <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$keys <-
   #   shiny::isolate(input$todo)
@@ -1499,29 +1495,34 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$spectral$is$raw <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp <-
+  # yaml_advanced$files$libraries$temporal$exp$csv <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is <-
+  # yaml_advanced$files$libraries$temporal$exp$mgf$pos <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$exp$mgf$neg <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$is$csv <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$is$mgf$pos <-
+  #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$temporal$is$mgf$neg <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$temporal$prepared <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$edges$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$edges$raw$spectral <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$edges$prepared <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$components$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$networks$spectral$components$prepared <-
-  #   shiny::isolate(input$todo)
+  yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
+    yaml_advanced$files$networks$spectral$edges$raw$ms1 |> replace_id()
+  yaml_advanced$files$networks$spectral$edges$raw$spectral <-
+    yaml_advanced$files$networks$spectral$edges$raw$spectral |> replace_id()
+  yaml_advanced$files$networks$spectral$edges$prepared <-
+    yaml_advanced$files$networks$spectral$edges$prepared |> replace_id()
+  yaml_advanced$files$networks$spectral$components$raw <-
+    yaml_advanced$files$networks$spectral$components$raw |> replace_id()
+  yaml_advanced$files$networks$spectral$components$prepared <-
+    yaml_advanced$files$networks$spectral$components$prepared |> replace_id()
   yaml_advanced$files$metadata$raw <-
     fil_met_raw
-  # TODO
-  # yaml_advanced$files$metadata$prepared <-
-  #   shiny::isolate(input$fil_met_pre)
+  yaml_advanced$files$metadata$prepared <-
+    yaml_advanced$files$metadata$prepared |> replace_id()
   yaml_advanced$files$spectral$raw <-
     fil_spe_raw
   yaml_advanced$gnps$id <-
