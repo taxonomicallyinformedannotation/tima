@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-can data/interim/annotations/example_canopus_prepared.tsv.gz --fil-ann-pre-for data/interim/annotations/example_formula_prepared.tsv.gz --fil-ann-pre-str data/interim/annotations/example_sirius_prepared.tsv.gz
+  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-can data/interim/annotations/example_canopusPrepared.tsv.gz --fil-ann-pre-for data/interim/annotations/example_formulaPrepared.tsv.gz --fil-ann-pre-str data/interim/annotations/example_siriusPrepared.tsv.gz
 
 Usage:
   prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pre-str=<fil-ann-pre-str>]
