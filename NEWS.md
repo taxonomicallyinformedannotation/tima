@@ -1,5 +1,12 @@
 # timaR
 
+# timaR 2.9.3
+
+* Allow for SIRIUS jobs containing only summaries
+* Allow for underscores in job pattern
+* Dependencies update
+* Remove further some inconsistent MS1 annotations
+
 # timaR 2.9.2
 
 * Add Nitrogen rule to filter out some annotations
