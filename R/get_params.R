@@ -22,29 +22,14 @@ get_params <- function(step) {
 
   default_path <-
     if (step == "prepare_params") {
-      if (file.exists(paths$params$prepare_params)) {
-        paths$params$prepare_params
-      } else{
-        paths$params$prepare_params |>
-          gsub(pattern = "inst/", replacement = "")
-      }
+      file.path(paths$params$prepare_params)
     } else {
       if (step == "prepare_params_advanced") {
-        if (file.exists(paths$params$prepare_params)) {
-          paths$params$prepare_params_advanced
-        } else {
-          paths$params$prepare_params_advanced |>
-            gsub(pattern = "inst/", replacement = "")
-        }
+        file.path(paths$params$prepare_params_advanced)
       } else {
-        if (file.exists(file.path(paths$params$default$path, paste0(step, ".yaml")))) {
-          file.path(paths$params$default$path, paste0(step, ".yaml"))
-        } else {
-          file.path(paths$params$default$path, paste0(step, ".yaml")) |>
-            gsub(pattern = "inst/", replacement = "")
-        }
+        file.path(paths$params$default$path, paste0(step, ".yaml"))
       }
-      }
+    }
 
   # for advanced parameters to work
   step <- step |>
