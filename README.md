@@ -1,4 +1,4 @@
-# Taxonomically Informed Metabolite Annotation <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/logo.svg' align="right" height="108" />
+# Taxonomically Informed Metabolite Annotation <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/logo.svg' alt='TIMA logo' align="right" height="108" />
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r?branch=main)
