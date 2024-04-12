@@ -4,6 +4,7 @@
 
 * Allow for SIRIUS jobs containing only summaries
 * Allow for underscores in job pattern
+* Change the Docker ARM image to darwin platform
 * Change some default values (less stringent)
 * Dependencies update
 * Migrate app testing to `shinytest2`
