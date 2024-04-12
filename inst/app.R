@@ -2003,7 +2003,7 @@ shinyApp(
       endsWith(suffix = "tima-r")) {
       # message(getwd())
     } else {
-      setwd("../..")
+      setwd("..")
       # message(getwd())
     }
   }

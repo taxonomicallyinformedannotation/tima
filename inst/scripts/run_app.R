@@ -12,7 +12,7 @@ if (file.exists("/.dockerenv")) {
 }
 
 shiny::runApp(
-  appDir = "inst/app",
+  appDir = "inst",
   port = 3838,
   host = h,
   launch.browser = b
