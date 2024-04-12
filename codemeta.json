@@ -81,15 +81,15 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shinytest",
-      "name": "shinytest",
+      "identifier": "shinytest2",
+      "name": "shinytest2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=shinytest"
+      "sameAs": "https://CRAN.R-project.org/package=shinytest2"
     },
     {
       "@type": "SoftwareApplication",
@@ -513,7 +513,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2782.068KB",
+  "fileSize": "4423.534KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
