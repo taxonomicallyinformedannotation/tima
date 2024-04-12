@@ -6,4 +6,4 @@ library(timaR)
 testthat::test_check(package = "timaR")
 
 ## Test the app
-shinytest2::test_app(filter = "shinytest2")
+shinytest2::test_app(app_dir = "../inst/app/", filter = "shinytest2")
