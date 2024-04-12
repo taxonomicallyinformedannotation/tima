@@ -30,6 +30,7 @@ Imports:
     msentropy (>= 0.1.4),
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
+    R.utils,
     rotl (>= 3.1.0),
     shiny (>= 1.8.1.1),
     shinybusy (>= 0.3.3),
@@ -48,11 +49,7 @@ Imports:
     yaml (>= 2.3.8)
 Suggests: 
     BiocManager,
-    knitr,
-    R.utils,
-    shinytest2,
-    spelling,
-    testthat
+    knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
