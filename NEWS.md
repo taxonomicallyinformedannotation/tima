@@ -8,6 +8,7 @@
 * Dependencies update
 * Migrate app testing to `shinytest2`
 * Remove further some inconsistent MS1 annotations
+* Remove DOcker ARM image because of Chrome dependency
 
 # timaR 2.9.2
 
