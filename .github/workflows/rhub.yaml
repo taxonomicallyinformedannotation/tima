@@ -15,7 +15,16 @@ run-name: "${{ github.event.inputs.id }}: ${{ github.event.inputs.name || format
 on:
   workflow_dispatch:
     inputs:
-      config: "linux,windows,macos"
+      config:
+        description: "A comma separated list of R-hub platforms to use."
+        type: string
+        default: "linux,windows,macos"
+      name:
+        description: "Run name. You can leave this empty now."
+        type: string
+      id:
+        description: "Unique ID. You can leave this empty now."
+        type: string
 
 jobs:
 
