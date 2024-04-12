@@ -6,6 +6,7 @@
 * Allow for underscores in job pattern
 * Change some default values (less stringent)
 * Dependencies update
+* Migrate app testing to `shinytest2`
 * Remove further some inconsistent MS1 annotations
 
 # timaR 2.9.2
