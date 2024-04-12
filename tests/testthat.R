@@ -1,4 +1,4 @@
-library(shinytest)
+library(shinytest2)
 library(testthat)
 library(timaR)
 
@@ -6,15 +6,4 @@ library(timaR)
 testthat::test_check(package = "timaR")
 
 ## Test the app
-setwd("../../")
-system(
-  command =
-    "
-    mkdir inst/app/tests/shinytest/inst/
-    cp -R inst/ inst/app/tests/shinytest/inst/
-    "
-)
-shinytest::installDependencies()
-shinytest::testApp(appDir = dirname(list.files(
-  pattern = "^app.R$", recursive = TRUE
-)))
+shinytest2::test_app(filter = "shinytest2")

@@ -50,7 +50,7 @@ Suggests:
     BiocManager,
     knitr,
     R.utils,
-    shinytest,
+    shinytest2,
     spelling,
     testthat
 Config/testthat/edition: 3

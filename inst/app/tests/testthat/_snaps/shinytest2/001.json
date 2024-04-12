@@ -1,13 +1,11 @@
 {
   "input": {
     "ann_can_fin": 3,
-    "ann_can_ini": 50,
-    "ann_ms1_ann": true,
     "ann_ms1only": false,
     "ann_ms2_app": false,
     "ann_thr_con": 0,
-    "ann_thr_ms1_bio": 0.6,
-    "ann_thr_ms1_che": 0.6,
+    "ann_thr_ms1_bio": 0,
+    "ann_thr_ms1_che": 0,
     "ann_thr_ms1_con": "OR",
     "ann_thr_ms2_sim": 0,
     "compounds_names": false,
@@ -26,6 +24,7 @@
         "0.csv"
       ]
     },
+    "fil_met_raw": null,
     "fil_pat": "example",
     "fil_spe_raw": {
       "name": [
@@ -41,7 +40,6 @@
         "0.mgf"
       ]
     },
-    "fil_tax_raw": null,
     "force": false,
     "gnps_id": "",
     "gnps_workflow": "fbmn",
@@ -54,8 +52,18 @@
     "ms_add_pos": [
       "[1M+(H)2]2+",
       "[1M+(H)1]1+",
+      "[1M+(H)4(N)1]1+",
       "[1M+(Na)1]1+",
       "[2M+(H)1]1+"
+    ],
+    "ms_clu_neg": [
+      "H2O",
+      "CH2O2",
+      "H2PO4"
+    ],
+    "ms_clu_pos": [
+      "H2O",
+      "C2H3N"
     ],
     "ms_pol": "pos",
     "ms_thr_ms1_int": 100000,
@@ -74,6 +82,7 @@
     "names_source": "CLUSTERID1",
     "names_target": "CLUSTERID2",
     "names_taxon": "ATTRIBUTE_species",
+    "nitrogen_rule": true,
     "org_can": 1,
     "org_fil_lev": "phylum",
     "org_fil_mod": false,
@@ -81,15 +90,6 @@
     "org_tax": "",
     "save": 1,
     "summarise": false,
-    "tar_watch-degree_from": 8,
-    "tar_watch-degree_to": 1,
-    "tar_watch-label_tar_visnetwork": null,
-    "tar_watch-level_separation": 300,
-    "tar_watch-outdated": false,
-    "tar_watch-refresh": 0,
-    "tar_watch-seconds": 10,
-    "tar_watch-targets_only": true,
-    "tar_watch-watch": true,
     "wei_bio_01": 0.1,
     "wei_bio_02": 0.2,
     "wei_bio_03": 0.3,
