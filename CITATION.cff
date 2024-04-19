@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "Please cite the following works when using this software: <https://doi.org/10.3389/fpls.2019.01329> and <https://doi.org/10.5281/zenodo.5797920>"
+message: "Please cite the following works when using this software: https://doi.org/10.3389/fpls.2019.01329 and https://doi.org/10.5281/zenodo.5797920"
 authors:
   - family-names: Rutz
     given-names: Adriano
