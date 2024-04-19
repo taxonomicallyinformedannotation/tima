@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.9.4
+
+* Dependencies update
+
 # timaR 2.9.3
 
 * Allow for SIRIUS jobs containing only summaries
