@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima-r",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.3 (2024-02-29)",
+  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
   "author": [
     {
       "@type": "Person",
@@ -478,7 +478,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3631.962KB",
+  "fileSize": "3630.893KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
