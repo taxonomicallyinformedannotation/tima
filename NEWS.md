@@ -3,6 +3,7 @@
 # timaR 2.9.4
 
 * Dependencies update
+* Update R and Bioconductor versions
 
 # timaR 2.9.3
 

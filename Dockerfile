@@ -1,5 +1,5 @@
 # Image
-FROM bioconductor/bioconductor_docker:3.18-R-4.3.2
+FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
 
 # Define workdir and user
 WORKDIR /tima
