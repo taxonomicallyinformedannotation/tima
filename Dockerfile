@@ -10,10 +10,10 @@ RUN groupadd -r tima && useradd -r -g tima tima-user
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 COPY DESCRIPTION ./DESCRIPTION
 COPY R ./R
+COPY _targets.yaml ./_targets.yaml
 COPY inst/scripts/install.R ./inst/scripts/install.R
 RUN Rscript ./inst/scripts/install.R
 COPY inst ./inst
-COPY _targets.yaml ./_targets.yaml
 COPY docker-compose.yml ./docker-compose.yml
 
 # For Shiny
