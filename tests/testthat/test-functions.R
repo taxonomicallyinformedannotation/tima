@@ -325,7 +325,7 @@ test_that("Test functions", {
   prepare_libraries_rt(
     temp_exp = "data/source/libraries/rt/example_bad.tsv"
   )
-  testthat::expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
+  expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
 
   ### SOP
   #### Closed
@@ -658,5 +658,5 @@ test_that("Test functions", {
     parameters = params
   )
 
-  testthat::succeed()
+  succeed()
 })
