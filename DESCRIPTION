@@ -21,6 +21,7 @@ Imports:
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
     DT (>= 0.33),
+    fs (>= 1.6.4),
     gt (>= 0.10.1),
     httr2 (>= 1.0.1),
     igraph (>= 2.0.3),
@@ -40,7 +41,7 @@ Imports:
     shinyWidgets (>= 0.8.6),
     Spectra (>= 1.14.0),
     stats,
-    stringi (>= 1.8.3),
+    stringi (>= 1.8.4),
     targets (>= 1.7.0),
     tidytable (>= 0.11.0),
     tidyfst (>= 1.7.8),
@@ -105,6 +106,7 @@ Collate:
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
+    'install_latest_version.R'
     'load_yaml_files.R'
     'log_debug.R'
     'log_pipe.R'

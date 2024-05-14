@@ -2,6 +2,8 @@
 
 # timaR 2.9.4
 
+* Automated update
+* New working directory at `$HOME/.tima`
 * Dependencies update
 * Update R and Bioconductor versions
 

@@ -34,14 +34,23 @@ load_yaml_files <- function(paths = parse_yaml_paths()) {
   }
 
   yaml_names <- yaml_files |>
-    gsub(pattern = "inst/params/default/", replacement = "", fixed = TRUE) |>
-    gsub(pattern = "inst/params/user/", replacement = "", fixed = TRUE) |>
-    gsub(pattern = ".yaml", replacement = "", fixed = TRUE)
+    gsub(
+      pattern = "inst/params/default/",
+      replacement = "",
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = "inst/params/user/",
+      replacement = "",
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = ".yaml",
+      replacement = "",
+      fixed = TRUE
+    )
 
-  yamls_default <- lapply(
-    X = yaml_files,
-    FUN = yaml::read_yaml
-  )
+  yamls_default <- lapply(X = yaml_files, FUN = yaml::read_yaml)
 
   names(yamls_default) <- yaml_names
 
