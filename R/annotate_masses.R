@@ -38,84 +38,39 @@
 #'
 #' @examples NULL
 annotate_masses <-
-  function(features = get_params(
-             step = "annotate_masses"
-           )$files$features$prepared,
-           filter_nitro = get_params(
-             step = "annotate_masses"
-           )$options$nitrogen_rule,
-           output_annotations = get_params(
-             step = "annotate_masses"
-           )$files$annotations$prepared$structural$ms1,
-           output_edges = get_params(
-             step = "annotate_masses"
-           )$files$networks$spectral$edges$raw,
-           name_source = get_params(
-             step = "annotate_masses"
-           )$names$source,
-           name_target = get_params(
-             step = "annotate_masses"
-           )$names$target,
-           library = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$keys,
-           str_stereo = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$structures$stereo,
-           str_met = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$structures$metadata,
-           str_nam = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$structures$names,
-           str_tax_cla = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc = get_params(
-             step = "annotate_masses"
-           )$files$libraries$sop$merged$structures$taxonomies$npc,
-           name = get_params(
-             step = "annotate_masses"
-           )$files$libraries$adducts$prepared,
-           adducts_list = get_params(
-             step = "annotate_masses"
-           )$ms$adducts,
-           adducts_neg = get_params(
-             step = "annotate_masses"
-           )$files$libraries$adducts$neg,
-           adducts_pos = get_params(
-             step = "annotate_masses"
-           )$files$libraries$adducts$pos,
-           adducts_masses_list = system.file(
-             "extdata",
+  function(features = get_params(step = "annotate_masses")$files$features$prepared,
+           filter_nitro = get_params(step = "annotate_masses")$options$nitrogen_rule,
+           output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,
+           output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
+           name_source = get_params(step = "annotate_masses")$names$source,
+           name_target = get_params(step = "annotate_masses")$names$target,
+           library = get_params(step = "annotate_masses")$files$libraries$sop$merged$keys,
+           str_stereo = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$stereo,
+           str_met = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$metadata,
+           str_nam = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$names,
+           str_tax_cla = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
+           str_tax_npc = get_params(step = "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
+           name = get_params(step = "annotate_masses")$files$libraries$adducts$prepared,
+           adducts_list = get_params(step = "annotate_masses")$ms$adducts,
+           adducts_neg = get_params(step = "annotate_masses")$files$libraries$adducts$neg,
+           adducts_pos = get_params(step = "annotate_masses")$files$libraries$adducts$pos,
+           adducts_masses_list = system.file("extdata",
              "adducts.tsv",
              package = "timaR"
            ),
-           clusters_neg = get_params(
-             step = "annotate_masses"
-           )$ms$clusters$neg,
-           clusters_pos = get_params(
-             step = "annotate_masses"
-           )$ms$clusters$pos,
-           clusters_list = system.file(
-             "extdata",
+           clusters_neg = get_params(step = "annotate_masses")$ms$clusters$neg,
+           clusters_pos = get_params(step = "annotate_masses")$ms$clusters$pos,
+           clusters_list = system.file("extdata",
              "clusters.tsv",
              package = "timaR"
            ),
-           neutral_losses_list = system.file(
-             "extdata",
+           neutral_losses_list = system.file("extdata",
              "neutral_losses.tsv",
              package = "timaR"
            ),
-           ms_mode = get_params(
-             step = "annotate_masses"
-           )$ms$polarity,
-           tolerance_ppm = get_params(
-             step = "annotate_masses"
-           )$ms$tolerances$mass$ppm$ms1,
-           tolerance_rt = get_params(
-             step = "annotate_masses"
-           )$ms$tolerances$rt$minutes) {
+           ms_mode = get_params(step = "annotate_masses")$ms$polarity,
+           tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
+           tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
     # TODO not using MS1 threshold
     stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
     stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
