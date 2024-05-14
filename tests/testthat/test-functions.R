@@ -2,16 +2,8 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that("Test functions", {
-  setwd("../../")
-  system(
-    command =
-      "
-    mkdir inst
-    cp -R params inst/params
-    cp -R scripts inst/scripts ## because of docopt steps
-    cp paths.yaml inst/paths.yaml
-    "
-  )
+  install_latest_version()
+  setwd(fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
