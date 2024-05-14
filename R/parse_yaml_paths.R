@@ -10,7 +10,10 @@
 #' @export
 #'
 #' @examples NULL
-parse_yaml_paths <- function(file = "inst/paths.yaml") {
+parse_yaml_paths <- function(file = system.file("extdata",
+                               "paths.yaml",
+                               package = "timaR"
+                             )) {
   ## Read the YAML file containing the paths
   suppressWarnings(
     paths <- yaml::read_yaml(

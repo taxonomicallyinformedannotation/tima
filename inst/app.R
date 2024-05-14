@@ -2,7 +2,8 @@ library(shiny)
 library(timaR)
 
 # Check if runs in Docker environment or not
-if (file.exists("/.dockerenv")) {
+i_am_a_whale <- file.exists("/.dockerenv")
+if (i_am_a_whale) {
   options(shiny.host = "0.0.0.0")
 } else {
   options(shiny.host = "127.0.0.1")
@@ -1336,23 +1337,21 @@ save_input <- function(input) {
   if (!is.null(prefil_met_raw)) {
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
   }
-  if (file.exists(prefil_fea_raw_1)) {
-    fil_fea_raw <- prefil_fea_raw_1
-  } else {
-    fil_fea_raw <- prefil_fea_raw[[4]]
+  if (!file.exists(prefil_fea_raw_1)) {
+    fs::file_copy(path = prefil_fea_raw[[4]], new_path = file.path(prefil_fea_raw_1), overwrite = TRUE)
   }
-  if (file.exists(prefil_spe_raw_1)) {
-    fil_spe_raw <- prefil_spe_raw_1
-  } else {
-    fil_spe_raw <- prefil_spe_raw[[4]]
+  if (!file.exists(prefil_spe_raw_1)) {
+    fs::file_copy(path = prefil_spe_raw[[4]], new_path = file.path(prefil_spe_raw_1), overwrite = TRUE)
   }
   if (!is.null(prefil_met_raw)) {
-    if (file.exists(prefil_met_raw_1)) {
-      fil_met_raw <- prefil_met_raw_1
-    } else {
-      fil_met_raw <- prefil_met_raw[[4]]
+    if (!file.exists(prefil_met_raw_1)) {
+      fs::file_copy(path = prefil_met_raw[[4]], new_path = file.path(prefil_met_raw_1), overwrite = TRUE)
     }
   }
+  fil_fea_raw <- prefil_fea_raw_1
+  fil_spe_raw <- prefil_spe_raw_1
+  fil_met_raw <- prefil_met_raw_1
+
   if (!exists("fil_met_raw")) {
     fil_met_raw <- NULL
   }
@@ -1999,12 +1998,14 @@ shinyApp(
   ui = ui,
   server = server,
   onStart = function() {
-    if (getwd() |>
-      endsWith(suffix = "tima-r")) {
-      # message(getwd())
+    if (i_am_a_whale) {
+      message("I\'m inside matrix ;(")
+      setwd(dir = "..")
     } else {
-      setwd("..")
-      # message(getwd())
+      cache <- fs::path_home(".tima")
+      fs::dir_create(cache)
+      message("Working in ", cache)
+      setwd(dir = cache)
     }
   }
 )
