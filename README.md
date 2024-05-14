@@ -17,7 +17,7 @@ The workflow is illustrated below.
 
 This repository contains everything needed to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
 
-It is provided with an example from well-known pharmacopoeia plants.
+## Requirements
 
 Here is what you *minimally* need:
 
@@ -32,8 +32,11 @@ Optionally, you may want to add:
 
 ## Installation
 
+### R
 R (>= 4.4.0) is required.
 Please install it on your machine using the official binaries (<https://cran.r-project.org/>).
+
+### TIMA-R
 
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
