@@ -4,7 +4,9 @@
 \alias{parse_yaml_paths}
 \title{Parse YAML paths}
 \usage{
-parse_yaml_paths(file = "inst/paths.yaml")
+parse_yaml_paths(
+  file = system.file("extdata", "paths.yaml", package = "timaR")
+)
 }
 \arguments{
 \item{file}{The file name of the YAML file containing the paths

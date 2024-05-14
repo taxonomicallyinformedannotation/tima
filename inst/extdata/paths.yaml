@@ -44,8 +44,8 @@ data:
         exp:
           path: data/interim/libraries/spectra/exp
           mona:
-          pos: data/interim/libraries/spectra/exp/mona_pos.rds
-          neg: data/interim/libraries/spectra/exp/mona_neg.rds
+            pos: data/interim/libraries/spectra/exp/mona_pos.rds
+            neg: data/interim/libraries/spectra/exp/mona_neg.rds
         is:
           path: data/interim/libraries/spectra/is
           hmdb:
@@ -67,11 +67,11 @@ data:
     spectra: data/source/example_spectra.mgf
     benchmark:
       path: data/source/benchmark
-      copy: data/interim/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2_copy.msp
+      cleaned: data/interim/benchmark/cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf
       mgf:
         neg: data/interim/benchmark/benchmark_neg.mgf
         pos: data/interim/benchmark/benchmark_pos.mgf
-      set: data/source/benchmark/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp
+      zip: data/source/benchmark/cleaned_libraries_matchms.zip
     libraries:
       path: data/source/libraries
       rt:
@@ -185,7 +185,7 @@ tests:
   mode: no
   path: tests
 urls:
-  benchmarking_set: https://zenodo.org/record/5186176/files/ALL_GNPS_210125_matchms_pubchem_cleaned_v2.msp?download=1
+  benchmarking_set: https://zenodo.org/records/10160791/files/cleaned_libraries_matchms.zip?download=1
   examples:
     features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv
     lib_mini:

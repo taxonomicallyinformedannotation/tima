@@ -33,6 +33,9 @@ Optionally, you may want to add:
 
 ## Installation
 
+R (>= 4.4.0) is required.
+Please install it on your machine using the official binaries (<https://cran.r-project.org/>).
+
 As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
 
 ```bash

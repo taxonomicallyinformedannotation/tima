@@ -34,7 +34,7 @@ list(
         name = yaml_paths,
         format = "file",
         command = {
-          yaml_paths <- "inst/paths.yaml"
+          yaml_paths <- system.file("extdata", "paths.yaml", package = "timaR")
         }
       ),
       tar_target(
