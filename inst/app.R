@@ -1999,11 +1999,12 @@ shinyApp(
   server = server,
   onStart = function() {
     if (i_am_a_whale) {
-      system('echo "I\'m inside matrix ;("')
-      setwd("..")
+      message("I\'m inside matrix ;(")
+      setwd(dir = "..")
     } else {
-      system('echo "Working in .tima"')
-      setwd(fs::path_home(".tima"))
+      cache <- fs::path_home(".tima")
+      message("Working in ", cache)
+      setwd(dir = cache)
     }
   }
 )
