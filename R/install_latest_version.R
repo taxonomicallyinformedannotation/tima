@@ -73,10 +73,23 @@ install_latest_version <- function() {
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
   message("Copying default architecture ...")
-  fs::dir_copy(
-    path = "./inst",
-    new_path = file.path(cache, "inst"),
-    overwrite = TRUE
+  tryCatch(
+    expr = {
+      fs::dir_copy(
+        path = "./inst",
+        new_path = file.path(cache, "inst"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      if (file.exists("app.R")) {
+        fs::dir_copy(
+          path = ".",
+          new_path = file.path(cache, "inst"),
+          overwrite = TRUE
+        )
+      }
+    }
   )
   tryCatch(
     expr = {
