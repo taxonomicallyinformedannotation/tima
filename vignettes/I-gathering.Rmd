@@ -308,7 +308,7 @@ As you can see, the target seems outdated.
 In reality, we force it to search if a new version of LOTUS exists each time.
 If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
-#### ECMDB
+##### ECMDB
 
 If you want, you can also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/) :
 
