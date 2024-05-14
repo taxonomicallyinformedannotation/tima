@@ -10,7 +10,7 @@
 #'
 #' @examples NULL
 fake_lotus <- function(export) {
-  log_debug("External error. Returning empty file instead.")
+  log_debug("External failure. Returning empty file instead.")
   tidytable::tidytable() |>
     tidytable::mutate(
       structure_wikidata = NA,
