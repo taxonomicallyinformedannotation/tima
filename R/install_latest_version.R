@@ -51,10 +51,21 @@ install_latest_version <- function() {
       )
     },
     error = function(e) {
-      pak::pkg_install(
-        pkg = desc::desc_get_urls()[[1]],
-        ask = FALSE,
-        upgrade = FALSE
+      tryCatch(
+        expr = {
+          pak::pkg_install(
+            pkg = desc::desc_get_urls()[[1]],
+            ask = FALSE,
+            upgrade = FALSE
+          )
+        },
+        error = function(e) {
+          pak::pkg_install(
+            pkg = "taxonomicallyinformedannotation/tima-r",
+            ask = FALSE,
+            upgrade = FALSE
+          )
+        }
       )
     }
   )
@@ -67,14 +78,34 @@ install_latest_version <- function() {
     new_path = file.path(cache, "inst"),
     overwrite = TRUE
   )
-  fs::file_copy(
-    path = "./_targets.yaml",
-    new_path = file.path(cache, "_targets.yaml"),
-    overwrite = TRUE
+  tryCatch(
+    expr = {
+      fs::file_copy(
+        path = "./_targets.yaml",
+        new_path = file.path(cache, "_targets.yaml"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      timaR::get_file(
+        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
+        export = file.path(cache, "_targets.yaml")
+      )
+    }
   )
-  fs::file_copy(
-    path = "./DESCRIPTION",
-    new_path = file.path(cache, "DESCRIPTION"),
-    overwrite = TRUE
+  tryCatch(
+    expr = {
+      fs::file_copy(
+        path = "./DESCRIPTION",
+        new_path = file.path(cache, "DESCRIPTION"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      timaR::get_file(
+        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
+        export = file.path(cache, "DESCRIPTION")
+      )
+    }
   )
 }
