@@ -1347,7 +1347,9 @@ list(
                 )
               },
               error = function(e) {
-                fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb)
+                return(fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb))
+              }, finally = {
+                return(paths_data_source_libraries_sop_ecmdb)
               }
             )
           }
@@ -1367,10 +1369,12 @@ list(
                 ## See #118
                 log_debug("HMDB download failed partially, returning empty file instead")
                 unlink(paths_data_source_libraries_sop_hmdb)
-                fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
+                return(fake_hmdb(export = paths_data_source_libraries_sop_hmdb))
               },
               error = function(e) {
-                fake_hmdb(export = paths_data_source_libraries_sop_hmdb)
+                return(fake_hmdb(export = paths_data_source_libraries_sop_hmdb))
+              }, finally = {
+                return(paths_data_source_libraries_sop_hmdb)
               }
             )
           }
@@ -1389,7 +1393,9 @@ list(
                 )
               },
               error = function(e) {
-                fake_lotus(export = paths_data_source_libraries_sop_lotus)
+                return(fake_lotus(export = paths_data_source_libraries_sop_lotus))
+              }, finally = {
+                return(paths_data_source_libraries_sop_lotus)
               }
             )
           },
