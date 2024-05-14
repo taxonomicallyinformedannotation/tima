@@ -19,7 +19,7 @@ fake_hmdb <- function(export) {
     ) |>
     gsub(
       pattern = ".zip",
-      replacement = "",
+      replacement = ".sdf",
       fixed = TRUE
     )
   paste0(
