@@ -82,9 +82,10 @@ install_latest_version <- function() {
       )
     },
     error = function(e) {
-      if (file.exists("app.R")) {
+      if (file.exists("./../../app.R")) {
+        message("I'm in test dir")
         fs::dir_copy(
-          path = ".",
+          path = "./../../",
           new_path = file.path(cache, "inst"),
           overwrite = TRUE
         )
