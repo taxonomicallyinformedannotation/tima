@@ -29,8 +29,8 @@
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param name Name of the adducts library
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
-#' @param tolerance_ppm Tolerance to perform annotation. Should be ≤ 10 ppm
-#' @param tolerance_rt Tolerance to group adducts. Should be ≤ 0.1min
+#' @param tolerance_ppm Tolerance to perform annotation. Should be <= 10 ppm
+#' @param tolerance_rt Tolerance to group adducts. Should be <= 0.1min
 #'
 #' @return A table containing MS1 annotations based on exact mass
 #'
@@ -72,8 +72,8 @@ annotate_masses <-
            tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
            tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
     # TODO not using MS1 threshold
-    stopifnot("Your ppm tolerance must be ≤ 20" = tolerance_ppm <= 20)
-    stopifnot("Your rt tolerance must be ≤ 0.05" = tolerance_rt <= 0.05)
+    stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
+    stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
 
     features_table <- tidytable::fread(
       file = features,
