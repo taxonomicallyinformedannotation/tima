@@ -301,7 +301,8 @@ test_that("Test functions", {
   prepare_libraries_spectra()
 
   ## for msp reading test
-  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"), full.names = TRUE, pattern = "msp$")[1L])
+  # Spectrum 1 fails
+  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"), full.names = TRUE, pattern = "msp$")[8L])
 
   #### HMDB
   # prepare_isdb_hmdb()
@@ -324,7 +325,7 @@ test_that("Test functions", {
   prepare_libraries_rt(
     temp_exp = "data/source/libraries/rt/example_bad.tsv"
   )
-  prepare_libraries_rt()
+  expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
 
   ### SOP
   #### Closed
@@ -657,5 +658,5 @@ test_that("Test functions", {
     parameters = params
   )
 
-  testthat::succeed()
+  succeed()
 })

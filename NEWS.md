@@ -1,5 +1,12 @@
 # timaR
 
+# timaR 2.9.4
+
+* Automated update
+* New working directory at `$HOME/.tima`
+* Dependencies update
+* Update R and Bioconductor versions
+
 # timaR 2.9.3
 
 * Allow for SIRIUS jobs containing only summaries

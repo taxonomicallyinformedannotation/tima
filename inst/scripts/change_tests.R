@@ -1,6 +1,9 @@
-paths <- yaml::read_yaml(file = "inst/paths.yaml")
+paths <- yaml::read_yaml(file = system.file("extdata", "paths.yaml", package = "timaR"))
 
 paths$tests$mode <- "yes"
 paths$urls$examples$spectra <- paths$urls$examples$spectra_mini
 
-yaml::write_yaml(x = paths, file = "inst/paths.yaml")
+yaml::write_yaml(
+  x = paths,
+  file = system.file("extdata", "paths.yaml", package = "timaR")
+)

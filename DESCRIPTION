@@ -1,6 +1,6 @@
 Package: timaR
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.9.3
+Version: 2.9.4
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -13,7 +13,7 @@ License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima-r, https://taxonomicallyinformedannotation.github.io/tima-r/
 BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
-    R (>= 4.3.0)
+    R (>= 4.4.0)
 Imports:
     bs4Dash (>= 2.3.3),
     crayon (>= 1.5.2),
@@ -21,35 +21,41 @@ Imports:
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
     DT (>= 0.33),
+    fs (>= 1.6.4),
     gt (>= 0.10.1),
     httr2 (>= 1.0.1),
     igraph (>= 2.0.3),
+    installr (>= 0.23.4),
     jsonlite (>= 1.8.8),
-    MsBackendMgf (>= 1.10.0),
-    MsBackendMsp (>= 1.6.0),
+    MsBackendMgf (>= 1.12.0),
+    MsBackendMsp (>= 1.8.0),
     msentropy (>= 0.1.4),
+    pak (>= 0.7.2),
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
-    R.utils,
+    R.utils (>= 2.12.3),
     rotl (>= 3.1.0),
     shiny (>= 1.8.1.1),
     shinybusy (>= 0.3.3),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
     shinyvalidate (>= 0.1.3),
-    shinyWidgets (>= 0.8.4),
-    Spectra (>= 1.12.0),
+    shinyWidgets (>= 0.8.6),
+    Spectra (>= 1.14.0),
     stats,
-    stringi (>= 1.8.3),
-    targets (>= 1.6.0),
+    stringi (>= 1.8.4),
+    targets (>= 1.7.0),
     tidytable (>= 0.11.0),
-    tidyfst (>= 1.7.7),
+    tidyfst (>= 1.7.8),
     utils,
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.8)
 Suggests: 
     BiocManager,
-    knitr
+    knitr,
+    testthat,
+    shinytest2,
+    spelling
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
@@ -105,6 +111,7 @@ Collate:
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
+    'install_latest_version.R'
     'load_yaml_files.R'
     'log_debug.R'
     'log_pipe.R'

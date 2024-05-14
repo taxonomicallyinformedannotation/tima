@@ -82,9 +82,9 @@ annotate_masses(
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
-\item{tolerance_ppm}{Tolerance to perform annotation. Should be ≤ 10 ppm}
+\item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 10 ppm}
 
-\item{tolerance_rt}{Tolerance to group adducts. Should be ≤ 0.1min}
+\item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.1min}
 }
 \value{
 A table containing MS1 annotations based on exact mass
