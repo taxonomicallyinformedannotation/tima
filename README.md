@@ -21,15 +21,14 @@ It is provided with an example from well-known pharmacopoeia plants.
 
 Here is what you *minimally* need:
 
-- A feature list with *or without* candidate annotations, if you are using GNPS, it can be your GNPS job ID.
-- The source organism of the extract you are annotating, if you are associating metadata within GNPS, it can be your
-  GNPS job ID.
-- An edge list, if you are using GNPS, it can be your GNPS job ID.
+- A feature list (.csv) (see [example features](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
+- A spectral file corresponding to the feature list (.mgf) (see [example spectra](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
+- The biological source(s) of the sample(s) you are annotating (.csv) (see [example metadata](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv)) (File is optional if only a single organism)
 
 Optionally, you may want to add:
 
 - An in-house structure-organism pairs library (we provide **[LOTUS](https://lotusnprod.github.io/lotus-manuscript/)** as starting point for each user)
-- Your own manual or automated annotations (we currently support annotations coming from ISDB and SIRIUS (with some limitations))
+- Your own manual or automated annotations (we currently support annotations coming from SIRIUS (with some limitations))
 
 ## Installation
 
@@ -50,7 +49,7 @@ To avoid such issues, we offer a containerized version (see [Docker](#docker)).
 
 Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
 
-In case you do not have your data ready, you can obtain some example data (set of 8,000 spectra) using:
+In case you do not have your data ready, you can obtain some example data (set of 7,000+ spectra) using:
 
 ```bash
 Rscript inst/scripts/get_example_spectra.R
