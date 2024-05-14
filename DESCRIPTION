@@ -52,7 +52,10 @@ Imports:
     yaml (>= 2.3.8)
 Suggests: 
     BiocManager,
-    knitr
+    knitr,
+    testthat,
+    shinytest2,
+    spelling
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
