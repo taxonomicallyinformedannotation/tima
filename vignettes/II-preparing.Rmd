@@ -28,12 +28,12 @@ This vignette describes the main steps of the annotation process.
 
 ## Structural annotations of your features
 
-For the moment, we support annotations coming from 3 different annotation tools:
+For the moment, we support 3 different types of annotations:
 
 <!-- * [GNPS](https://gnps.ucsd.edu) -->
-* MS^1^ exact mass-based library search
+* Internal MS^1^ exact mass-based library search
+* Internal MS^2^ library search (experimental and in silico)
 * [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
-* Formatted results of **ISDB** annotation.
 
 ### MS^1^-based
 
