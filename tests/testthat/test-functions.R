@@ -325,7 +325,7 @@ test_that("Test functions", {
   prepare_libraries_rt(
     temp_exp = "data/source/libraries/rt/example_bad.tsv"
   )
-  prepare_libraries_rt()
+  testthat::expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
 
   ### SOP
   #### Closed
