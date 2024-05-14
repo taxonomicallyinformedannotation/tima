@@ -2003,6 +2003,7 @@ shinyApp(
       setwd(dir = "..")
     } else {
       cache <- fs::path_home(".tima")
+      fs::dir_create(cache)
       message("Working in ", cache)
       setwd(dir = cache)
     }
