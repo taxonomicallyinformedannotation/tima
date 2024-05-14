@@ -1,6 +1,6 @@
 # Check if runs in Docker environment or not
 if (file.exists("/.dockerenv")) {
-  system('echo "I\'m inside matrix ;("')
+  system('echo "I\'m inside the matrix ;("')
   b <- FALSE
   h <- "0.0.0.0"
 } else {
@@ -14,7 +14,7 @@ if (file.exists("/.dockerenv")) {
       install_latest_version()
     }
   )
-  system('echo "I\'m living in real world!"')
+  system('echo "I\'m living in the real world!"')
   b <- TRUE
   h <- "127.0.0.1"
 }
