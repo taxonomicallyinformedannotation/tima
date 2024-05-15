@@ -7,19 +7,6 @@
 <filter id="filter-color-to-alpha" x="0%" y="0%" width="100%" height="100%">
 <feColorMatrix color-interpolation-filters="sRGB" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.2126 0.7152 0.0722 0 0"/>
 </filter>
-<filter id="filter-remove-color-and-invert-alpha" x="0%" y="0%" width="100%" height="100%">
-<feColorMatrix color-interpolation-filters="sRGB" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1 1"/>
-</filter>
-<filter id="filter-0" x="0%" y="0%" width="100%" height="100%">
-<feImage xlink:href="#compositing-group-1" result="source" x="0" y="0" width="1610.474165" height="721.1646"/>
-<feImage xlink:href="#compositing-group-2" result="destination" x="0" y="0" width="1610.474165" height="721.1646"/>
-<feBlend in="source" in2="destination" mode="multiply" color-interpolation-filters="sRGB"/>
-</filter>
-<filter id="filter-1" x="0%" y="0%" width="100%" height="100%">
-<feImage xlink:href="#compositing-group-3" result="source" x="0" y="0" width="1610.474165" height="721.1646"/>
-<feImage xlink:href="#compositing-group-4" result="destination" x="0" y="0" width="1610.474165" height="721.1646"/>
-<feComposite in="source" in2="destination" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" color-interpolation-filters="sRGB"/>
-</filter>
 <g>
 <g id="glyph-0-0">
 <path d="M 0.28125 -25.703125 L 21.09375 -25.703125 L 21.09375 -21.8125 L 12.921875 -21.8125 L 12.921875 0 L 8.421875 0 L 8.421875 -21.8125 L 0.28125 -21.8125 Z M 0.28125 -25.703125 "/>
@@ -594,32 +581,10 @@
 <use xlink:href="#glyph-4-36" x="74.469704" y="22.207"/>
 </g>
 </g>
-<g id="compositing-group-0" transform="translate(134.20618, 60.09705)">
-<rect x="-134.20618" y="-60.09705" width="1610.474165" height="721.1646" fill="rgb(0%, 0%, 0%)" fill-opacity="0"/>
 <clipPath id="clip-25">
-<path clip-rule="nonzero" d="M 633.289062 272 L 891.042969 272 L 891.042969 286 L 633.289062 286 Z M 633.289062 272 "/>
+<path clip-rule="nonzero" d="M 596.601562 255.347656 L 908.269531 255.347656 L 908.269531 303.566406 L 596.601562 303.566406 Z M 596.601562 255.347656 "/>
 </clipPath>
-<g clip-path="url(#clip-25)">
-<rect x="-134.20618" y="-60.09705" width="1610.474165" height="721.1646" fill="rgb(100%, 100%, 100%)" fill-opacity="1"/>
-</g>
-</g>
-<mask id="mask-14">
-<use xlink:href="#compositing-group-0"/>
-</mask>
-<mask id="mask-15">
-<use xlink:href="#compositing-group-0" filter="url(#filter-remove-color-and-invert-alpha)"/>
-</mask>
-<mask id="mask-16">
-<g transform="translate(134.20618, 60.09705)">
-<path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" d="M 633.289062 279.035156 C 633.289062 275.773438 634.921875 272.511719 636.550781 272.511719 L 887.78125 272.511719 C 889.414062 272.511719 891.042969 275.773438 891.042969 279.035156 C 891.042969 282.296875 889.414062 285.558594 887.78125 285.558594 L 636.550781 285.558594 C 634.921875 285.558594 633.289062 282.296875 633.289062 279.035156 "/>
-</g>
-</mask>
-<g id="compositing-group-1" mask="url(#mask-16)">
-<g transform="translate(134.20618, 60.09705)">
-<rect x="-134.20618" y="-60.09705" width="1610.474165" height="721.1646" fill="rgb(98.431396%, 36.077881%, 53.726196%)" fill-opacity="1"/>
-</g>
-</g>
-<g id="compositing-group-2" transform="translate(134.20618, 60.09705)">
+</defs>
 <g clip-path="url(#clip-0)">
 <rect x="-134.20618" y="-60.09705" width="1610.474165" height="721.1646" fill="rgb(98.823547%, 98.823547%, 98.823547%)" fill-opacity="1"/>
 <rect x="-134.20618" y="-60.09705" width="1610.474165" height="721.1646" fill="rgb(98.823547%, 98.823547%, 98.823547%)" fill-opacity="1"/>
@@ -1147,15 +1112,7 @@
 <g fill="rgb(3.921509%, 22.744751%, 52.941895%)" fill-opacity="1">
 <use xlink:href="#glyph-7-0" x="1310.789804" y="329.207"/>
 </g>
-</g>
-<g id="compositing-group-3" filter="url(#filter-0)" mask="url(#mask-14)">
-<rect x="0" y="0" width="1610.474165" height="721.1646" fill="rgb(0%, 0%, 0%)" fill-opacity="1"/>
-</g>
-<g id="compositing-group-4" mask="url(#mask-15)">
-<use xlink:href="#compositing-group-2"/>
-</g>
-</defs>
-<g filter="url(#filter-1)" transform="translate(-134.20618, -60.09705)">
-<rect x="0" y="0" width="1610.474165" height="721.1646" fill="rgb(0%, 0%, 0%)" fill-opacity="1"/>
+<g clip-path="url(#clip-25)">
+<path fill="none" stroke-width="3.852041" stroke-linecap="square" stroke-linejoin="miter" stroke="rgb(100%, 14.901733%, 0%)" stroke-opacity="1" stroke-miterlimit="10" d="M 912.037946 778.749979 C 912.037946 790.449202 843.577009 799.933581 759.12779 799.933581 C 674.678571 799.933581 606.22154 790.449202 606.22154 778.749979 C 606.22154 767.050755 674.678571 757.566376 759.12779 757.566376 C 843.577009 757.566376 912.037946 767.050755 912.037946 778.749979 Z M 912.037946 778.749979 " transform="matrix(1, 0, 0, -1, -6.694196, 1058.206687)"/>
 </g>
 </svg>
