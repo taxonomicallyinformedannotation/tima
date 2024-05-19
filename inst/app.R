@@ -1347,14 +1347,12 @@ save_input <- function(input) {
     if (!file.exists(prefil_met_raw_1)) {
       fs::file_copy(path = prefil_met_raw[[4]], new_path = file.path(prefil_met_raw_1), overwrite = TRUE)
     }
+  } else {
+    prefil_met_raw_1 <- NULL
   }
   fil_fea_raw <- prefil_fea_raw_1
   fil_spe_raw <- prefil_spe_raw_1
   fil_met_raw <- prefil_met_raw_1
-
-  if (!exists("fil_met_raw")) {
-    fil_met_raw <- NULL
-  }
 
   fil_pat <- shiny::isolate(input$fil_pat)
 
