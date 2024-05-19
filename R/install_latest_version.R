@@ -62,11 +62,18 @@ install_latest_version <- function() {
           )
         },
         error = function(e) {
-          message("Installing remote version")
-          pak::pkg_install(
-            pkg = "taxonomicallyinformedannotation/tima-r",
-            ask = FALSE,
-            upgrade = FALSE
+          tryCatch(
+            expr = {
+              message("Installing remote version")
+              pak::pkg_install(
+                pkg = "taxonomicallyinformedannotation/tima-r",
+                ask = FALSE,
+                upgrade = FALSE
+              )
+            },
+            error = function(e) {
+              message("Install failed")
+            }
           )
         }
       )
