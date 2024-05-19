@@ -41,7 +41,7 @@ Imports:
     shinyjs (>= 2.1.0),
     shinyvalidate (>= 0.1.3),
     shinyWidgets (>= 0.8.6),
-    Spectra (>= 1.14.0),
+    Spectra (>= 1.14.1),
     stats,
     stringi (>= 1.8.4),
     targets (>= 1.7.0),
