@@ -44,6 +44,7 @@ install_latest_version <- function() {
   pak::pak(ask = FALSE, upgrade = TRUE)
   tryCatch(
     expr = {
+      message("Installing local version")
       pak::pkg_install(
         pkg = ".",
         ask = FALSE,
@@ -53,6 +54,7 @@ install_latest_version <- function() {
     error = function(e) {
       tryCatch(
         expr = {
+          message("Installing local version 2")
           pak::pkg_install(
             pkg = desc::desc_get_urls()[[1]],
             ask = FALSE,
@@ -60,6 +62,7 @@ install_latest_version <- function() {
           )
         },
         error = function(e) {
+          message("Installing remote version")
           pak::pkg_install(
             pkg = "taxonomicallyinformedannotation/tima-r",
             ask = FALSE,
@@ -94,6 +97,7 @@ install_latest_version <- function() {
   )
   tryCatch(
     expr = {
+      message("Installing local targets")
       fs::file_copy(
         path = "./_targets.yaml",
         new_path = file.path(cache, "_targets.yaml"),
@@ -101,6 +105,7 @@ install_latest_version <- function() {
       )
     },
     error = function(e) {
+      message("Installing remote targets")
       timaR::get_file(
         url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
         export = file.path(cache, "_targets.yaml")
@@ -109,6 +114,7 @@ install_latest_version <- function() {
   )
   tryCatch(
     expr = {
+      message("Getting local DESCRIPTION")
       fs::file_copy(
         path = "./DESCRIPTION",
         new_path = file.path(cache, "DESCRIPTION"),
@@ -116,6 +122,7 @@ install_latest_version <- function() {
       )
     },
     error = function(e) {
+      message("Getting remote DESCRIPTION")
       timaR::get_file(
         url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
         export = file.path(cache, "DESCRIPTION")
