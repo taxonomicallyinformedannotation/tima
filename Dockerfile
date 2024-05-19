@@ -27,7 +27,7 @@ EXPOSE 3838
 EXPOSE 3839
 
 # Change the ownership of the app files to the user
-RUN chown -R tima-user:tima / # && chmod -R u+rwx /
+RUN chown -R tima-user:tima ./
 
 # Define user and working directory
 USER tima-user
