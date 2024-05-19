@@ -9,13 +9,17 @@ RUN groupadd -r tima && useradd -r -g tima tima-user
 # To force bioconductor to install from source
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 
+# Create the directory for the package cache and set appropriate permissions
+RUN mkdir -p /home/tima-user/.cache/R/pkgcache/pkg && \
+    chown -R tima-user:tima /home/tima-user/.cache
+
 # Copy necessary files for dependency installation
 COPY DESCRIPTION ./DESCRIPTION
 COPY R ./R
 COPY _targets.yaml ./_targets.yaml
 COPY inst/scripts/install.R ./inst/scripts/install.R
 
-# Run R script to install dependencies
+# Run R script to install dependencies as root user
 RUN Rscript ./inst/scripts/install.R
 
 # Copy remaining files
@@ -27,7 +31,7 @@ EXPOSE 3838
 EXPOSE 3839
 
 # Change the ownership of the app files to the user
-RUN chown -R tima-user:tima ./
+RUN chown -R tima-user:tima /tima
 
 # Define user and working directory
 USER tima-user
