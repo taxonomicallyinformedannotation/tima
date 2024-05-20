@@ -22,6 +22,7 @@ services:
     volumes:
       - "./data:/tima/data"
       - "./inst:/tima/inst"
+      - "~/.tima:/.tima"
     command: Rscript inst/scripts/tima_full.R
 
   tima-gui:
@@ -49,6 +50,7 @@ services:
     volumes:
       - "./data:/tima/data"
       - "./inst:/tima/inst"
+      - "~/.tima:/.tima"
     command: Rscript inst/scripts/run_app.R
 
 networks:
