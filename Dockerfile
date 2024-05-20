@@ -1,41 +1,39 @@
 # Use the specified Bioconductor Docker image
 FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
 
-# Define workdir and user
-WORKDIR /tima
-RUN groupadd -r tima && useradd -r -g tima tima-user
+# Update apt and install necessary system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install R dependencies
-# To force bioconductor to install from source
+# To force Bioconductor to install from source
 ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 
-# Create the directory for the package cache and set appropriate permissions
-RUN mkdir -p /home/tima-user/.cache/R/pkgcache/pkg && \
-    chown -R tima-user:tima /home/tima-user/.cache
+# Add a non-root user and create the R library directory
+RUN useradd -m tima-user && \
+    mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
+    chown -R tima-user:tima-user /home/tima-user
+
+# Set the R library path to the new directory
+ENV R_LIBS_USER=/home/tima-user/Library/Frameworks/R.framework/Resources/site-library
+
+# Switch to the non-root user
+USER tima-user
+WORKDIR /home/tima-user
 
 # Copy necessary files for dependency installation
-COPY DESCRIPTION ./DESCRIPTION
-COPY R ./R
-COPY _targets.yaml ./_targets.yaml
-COPY inst/scripts/install.R ./inst/scripts/install.R
+COPY --chown=tima-user:tima-user _targets.yaml ./_targets.yaml
+COPY --chown=tima-user:tima-user DESCRIPTION ./DESCRIPTION
+COPY --chown=tima-user:tima-user docker-compose.yml ./docker-compose.yml
+COPY --chown=tima-user:tima-user inst ./inst
+COPY --chown=tima-user:tima-user R ./R
 
-# Run R script to install dependencies as root user
+# Run R script to install dependencies
 RUN Rscript ./inst/scripts/install.R
 
-# Copy remaining files
-COPY inst ./inst
-COPY docker-compose.yml ./docker-compose.yml
-
-# For Shiny (assuming ports 3838 and 3839 are used)
+# Expose the necessary ports for Shiny
 EXPOSE 3838
 EXPOSE 3839
-
-# Change the ownership of the app files to the user
-RUN chown -R tima-user:tima /tima
-
-# Define user and working directory
-USER tima-user
-WORKDIR /tima
 
 # Disable healthcheck (if you really want to disable it)
 HEALTHCHECK NONE
