@@ -121,11 +121,7 @@ prepare_libraries_sop_hmdb <-
         log_debug("Something went wrong, see original error message:")
         log_debug(cond)
         hmdb_prepared <- fake_sop_columns()
-      }, warning = function(cond) {
-        log_debug("Something generated a warning:")
-        log_debug(cond)
-        hmdb_prepared
-      }, finally = hmdb_prepared)
+      })
     } else {
       log_debug("Sorry, HMDB not found, returning an empty file instead")
       hmdb_prepared <- fake_sop_columns()
