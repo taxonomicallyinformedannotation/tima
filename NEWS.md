@@ -3,6 +3,7 @@
 # timaR 2.9.4
 
 * Automated update
+* Add some details for SIRIUS
 * Improved documentation
 * New working directory at `$HOME/.tima`
 * Dependencies update
