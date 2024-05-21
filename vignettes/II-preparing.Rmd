@@ -107,7 +107,7 @@ You can get an example running:
 source(file = "inst/scripts/get_example_sirius.R")
 ```
 
-The sirius workspace should have `yourPattern_sirius` as name (else it will not be found).
+The sirius workspace should have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found).
 
 ```{r prepare-sirius, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 source(file = "inst/scripts/prepare_annotations_sirius.R")
