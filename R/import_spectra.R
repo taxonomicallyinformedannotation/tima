@@ -23,15 +23,12 @@ import_spectra <- function(file) {
     "mgf" = {
       MsBackendMgf::readMgf(f = file) |>
         Spectra::Spectra() |>
-        Spectra::filterMsLevel(2)
-      ## TODO change it as soon as
-      ## https://github.com/RforMassSpectrometry/MsBackendSql
-      ## will be available
+        cleanup_spectra()
     },
     "msp" = {
       MsBackendMsp::readMsp(f = file) |>
         Spectra::Spectra() |>
-        Spectra::filterMsLevel(2)
+        cleanup_spectra()
     },
     # "sqlite" = {
     #   CompoundDb::CompDb(x = file) |>
@@ -41,7 +38,8 @@ import_spectra <- function(file) {
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
-        Spectra::Spectra()
+        Spectra::Spectra() |>
+        cleanup_spectra()
     }
   )
 }
