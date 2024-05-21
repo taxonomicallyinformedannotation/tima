@@ -38,7 +38,7 @@ create_edges_spectra <- function(
   log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra()
-  if (length(spectra) > 0) {
+  if (length(spectra) > 1) {
     spectra <- spectra |>
       sanitize_spectra(cutoff = qutoff) |>
       # Spectra::addProcessing(remove_above_precursor(),
