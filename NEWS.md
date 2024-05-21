@@ -4,6 +4,7 @@
 
 * Automated update
 * Add some details for SIRIUS
+* Handle cases when same (feature_id, mslevel) pairs are present within an MGF (#133)
 * Improved documentation
 * New working directory at `$HOME/.tima`
 * Dependencies update
