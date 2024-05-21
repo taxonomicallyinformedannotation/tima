@@ -3,7 +3,8 @@
 # timaR 2.9.4
 
 * Automated update
-* Add some details for SIRIUS
+* Add some details for SIRIUS (#132)
+* Docker updates (#131)
 * Handle cases when same (feature_id, mslevel) pairs are present within an MGF (#133)
 * Improved documentation
 * New working directory at `$HOME/.tima`
