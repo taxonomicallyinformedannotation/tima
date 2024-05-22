@@ -1373,6 +1373,8 @@ save_input <- function(input) {
   }
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
+      ## safety
+      create_dir(parse_yaml_paths()$data$interim$path)
       fs::file_copy(path = prefil_sir_raw[[4]], new_path = file.path(prefil_sir_raw_1), overwrite = TRUE)
     }
   } else {
