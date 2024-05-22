@@ -3,7 +3,7 @@
 # timaR 2.9.4
 
 * Automated update
-* Add some details for SIRIUS (#132)
+* Add some details for SIRIUS, add manual workspace addition (#132)
 * Docker updates (#131)
 * Handle cases when same (feature_id, mslevel) pairs are present within an MGF (#133)
 * Improved documentation

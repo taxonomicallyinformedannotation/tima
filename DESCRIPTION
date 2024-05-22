@@ -120,6 +120,7 @@ Collate:
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
     'select_sirius_columns.R'
+    'read_from_sirius_zip.R'
     'prepare_annotations_sirius.R'
     'prepare_annotations_spectra.R'
     'prepare_features_components.R'

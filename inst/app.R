@@ -135,6 +135,21 @@ ui <- shiny::fluidPage(
               "Do not forget to change the `name` in the corresponding tab."
             )
           ),
+        shiny::fileInput(
+          inputId = "fil_ann_raw_sir",
+          label = "SIRIUS project space (optional)",
+          accept = c(
+            ".zip"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "The compressed directory containing the SIRIUS project space.",
+              "Should be located in `data/interim`.",
+              "Reason therefore is to find it in the future."
+            )
+          ),
         shiny::textInput(
           inputId = "fil_pat",
           label = label_mandatory("Pattern to identify your job locally"),
@@ -1332,11 +1347,17 @@ save_input <- function(input) {
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
   prefil_met_raw <- shiny::isolate(input$fil_met_raw)
+  prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
+
   prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
   if (!is.null(prefil_met_raw)) {
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
   }
+  if (!is.null(prefil_sir_raw)) {
+    prefil_sir_raw_1 <- file.path(paths_data_source, prefil_sir_raw[[1]])
+  }
+
   if (!file.exists(prefil_fea_raw_1)) {
     fs::file_copy(path = prefil_fea_raw[[4]], new_path = file.path(prefil_fea_raw_1), overwrite = TRUE)
   }
@@ -1350,9 +1371,18 @@ save_input <- function(input) {
   } else {
     prefil_met_raw_1 <- NULL
   }
+  if (!is.null(prefil_sir_raw)) {
+    if (!file.exists(prefil_sir_raw_1)) {
+      fs::file_copy(path = prefil_sir_raw[[4]], new_path = file.path(prefil_sir_raw_1), overwrite = TRUE)
+    }
+  } else {
+    prefil_sir_raw_1 <- NULL
+  }
+
   fil_fea_raw <- prefil_fea_raw_1
   fil_spe_raw <- prefil_spe_raw_1
   fil_met_raw <- prefil_met_raw_1
+  fil_sir_raw <- prefil_sir_raw_1
 
   fil_pat <- shiny::isolate(input$fil_pat)
 
@@ -1375,6 +1405,8 @@ save_input <- function(input) {
     fil_fea_raw
   yaml_small$files$metadata$raw <-
     fil_met_raw
+  yaml_small$files$anotations$raw$sirius <-
+    fil_sir_raw
   yaml_small$files$spectral$raw <-
     fil_spe_raw
   yaml_small$ms$polarity <-
@@ -1415,8 +1447,9 @@ save_input <- function(input) {
     yaml_advanced$files$annotations$raw$spectral$gnps |> replace_id()
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |> replace_id()
-  yaml_advanced$files$annotations$raw$sirius <-
-    yaml_advanced$files$annotations$raw$sirius |> replace_id()
+  # yaml_advanced$files$annotations$raw$sirius <-
+  #   yaml_advanced$files$annotations$raw$sirius |> replace_id()
+  yaml_advanced$files$annotations$raw$sirius <- fil_sir_raw
   yaml_advanced$files$annotations$prepared$canopus <-
     yaml_advanced$files$annotations$prepared$canopus |> replace_id()
   yaml_advanced$files$annotations$prepared$formula <-

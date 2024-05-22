@@ -5,8 +5,8 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' Directory containing the sirius results. STRING
-      sirius: data/interim/annotations/example_sirius
+      #' Directory containing the sirius annotations. STRING
+      sirius: data/interim/annotations/example_sirius.zip
 
     #' List of prepared annotations.
     prepared:

@@ -15,6 +15,11 @@ files:
     #' The path to the file containing your features' spectra.
     #' Can contain MS1 and/or MS2 spectra. STRING
     raw: data/source/example_spectra.mgf
+  #' Annotations files.
+  annotations:
+    raw:
+      #' Directory containing the sirius annotations. STRING
+      sirius: data/interim/annotations/example_sirius.zip
 ms:
   #' The polarity used. Must be either "pos" or "neg". STRING
   polarity: pos

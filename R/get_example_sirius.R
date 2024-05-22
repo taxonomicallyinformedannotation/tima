@@ -19,9 +19,4 @@ get_example_sirius <-
       url = url,
       export = export
     )
-    message("Unzipping")
-    utils::unzip(
-      zipfile = export,
-      exdir = dirname(export)
-    )
   }
