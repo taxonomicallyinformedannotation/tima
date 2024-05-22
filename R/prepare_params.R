@@ -173,6 +173,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   opt_cpd_nam <- params_advanced$options$compounds_names
   opt_for <- params_advanced$options$force
   opt_nit_rul <- params_advanced$options$nitrogen_rule
+  opt_rem_tie <- params_advanced$options$remove_ties
   opt_sum <- params_advanced$options$summarise
 
   log_debug(x = "Small params")
@@ -643,6 +644,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         opt_cpd_nam
       yamls_params$weight_annotations$options$force <-
         opt_for
+      yamls_params$weight_annotations$options$remove_ties <-
+        opt_rem_tie
       yamls_params$weight_annotations$options$summarise <-
         opt_sum
     }

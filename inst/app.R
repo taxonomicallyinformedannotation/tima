@@ -1230,6 +1230,18 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::checkboxInput(
+          inputId = "remove_ties",
+          label = "Remove ties",
+          value = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "If checked, only one of the candidates with the exact same score will be kept randomly.",
+              "Not adivsed, but here for convenience."
+            )
+          ),
+        shiny::checkboxInput(
           inputId = "summarise",
           label = "Summarise results to one row per feature",
           value = FALSE
@@ -1727,6 +1739,8 @@ save_input <- function(input) {
     shiny::isolate(input$nitrogen_rule)
   yaml_advanced$options$force <-
     shiny::isolate(input$force)
+  yaml_advanced$options$remove_ties <-
+    shiny::isolate(input$remove_ties)
   yaml_advanced$options$summarise <-
     shiny::isolate(input$summarise)
 

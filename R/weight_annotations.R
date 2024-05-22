@@ -74,9 +74,10 @@
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
-#' @param ms1_only Boolean. Keep only MS1 annotations
+#' @param ms1_only Keep only MS1 annotations. BOOLEAN
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
-#' @param summarise Boolean. Summarize results (1 row per feature)
+#' @param remove_ties Remove ties. BOOLEAN
+#' @param summarise Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
 #'
 #' @return NULL
@@ -129,6 +130,7 @@ weight_annotations <- function(
     minimal_ms1_condition = get_params(step = "weight_annotations")$annotations$thresholds$ms1$condition,
     ms1_only = get_params(step = "weight_annotations")$annotations$ms1only,
     compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
+    remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
     summarise = get_params(step = "weight_annotations")$options$summarise,
     pattern = get_params(step = "weight_annotations")$files$pattern,
     force = get_params(step = "weight_annotations")$options$force) {

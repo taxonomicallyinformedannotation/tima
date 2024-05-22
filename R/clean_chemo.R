@@ -16,6 +16,7 @@
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
+#' @param remove_ties Remove ties. BOOLEAN
 #' @param summarise Boolean. summarise results (1 row per feature)
 #'
 #' @return A table containing the chemically weighted annotation
@@ -50,6 +51,9 @@ clean_chemo <-
              envir = parent.frame()
            ),
            minimal_ms1_condition = get("minimal_ms1_condition",
+             envir = parent.frame()
+           ),
+           remove_ties = get("remove_ties",
              envir = parent.frame()
            ),
            summarise = get("summarise",
@@ -175,8 +179,15 @@ clean_chemo <-
         model$rank_columns,
         model$score_columns
       ))) |>
-      tidytable::arrange(rank_final)
+      tidytable::arrange(rank_final) |>
+      tidytable::ungroup()
     rm(df1)
+
+    if (remove_ties == TRUE) {
+      log_debug("Removing ties ...")
+      df3 <- df3 |>
+        tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
+    }
 
     if (summarise == TRUE) {
       log_debug("Collecting garbage ...")

@@ -184,5 +184,8 @@ options:
   #' Do not use it. BOOLEAN
   force: no
 
+  #' Remove ties. BOOLEAN
+  remove_ties: no
+
   #' Summarise results to one row per feature. BOOLEAN
   summarise: no
