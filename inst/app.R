@@ -1334,6 +1334,7 @@ ui <- shiny::fluidPage(
 # save the results to a file
 save_input <- function(input) {
   paths_data_source <- parse_yaml_paths()$data$source$path
+  paths_data_interim <- parse_yaml_paths()$data$interim$path
   ## safety
   create_dir(paths_data_source)
 
@@ -1355,7 +1356,7 @@ save_input <- function(input) {
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
   }
   if (!is.null(prefil_sir_raw)) {
-    prefil_sir_raw_1 <- file.path(paths_data_source, prefil_sir_raw[[1]])
+    prefil_sir_raw_1 <- file.path(paths_data_interim, prefil_sir_raw[[1]])
   }
 
   if (!file.exists(prefil_fea_raw_1)) {
@@ -1374,7 +1375,7 @@ save_input <- function(input) {
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
-      create_dir(parse_yaml_paths()$data$interim$path)
+      create_dir(paths_data_interim)
       fs::file_copy(path = prefil_sir_raw[[4]], new_path = file.path(prefil_sir_raw_1), overwrite = TRUE)
     }
   } else {
