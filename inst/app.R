@@ -1407,7 +1407,7 @@ save_input <- function(input) {
     fil_fea_raw
   yaml_small$files$metadata$raw <-
     fil_met_raw
-  yaml_small$files$anotations$raw$sirius <-
+  yaml_small$files$annotations$raw$sirius <-
     fil_sir_raw
   yaml_small$files$spectral$raw <-
     fil_spe_raw
