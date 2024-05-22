@@ -10,6 +10,7 @@
     "ann_thr_ms2_sim": 0,
     "compounds_names": false,
     "edg_thr_ms2_sim": 0.7,
+    "fil_ann_raw_sir": null,
     "fil_fea_raw": {
       "name": [
         "example_features.csv"
@@ -26,7 +27,6 @@
     },
     "fil_met_raw": null,
     "fil_pat": "example",
-    "fil_sir_raw": null,
     "fil_spe_raw": {
       "name": [
         "example_spectra.mgf"
