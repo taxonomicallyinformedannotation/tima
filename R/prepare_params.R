@@ -180,6 +180,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
+  fil_ann_raw_spe_sir <- params_small$files$annotations$raw$spectral$sirius
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_sum <- params_small$options$summarise
@@ -333,7 +334,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_ann_pre_can
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula <-
         fil_ann_pre_for
-      # TODO add sirius layer
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural$sirius <-
         fil_ann_pre_str_sir
       yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$stereo <-
@@ -741,9 +741,9 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         lapply(FUN = replace_id)
     },
     prepare_annotations_sirius = {
-      yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
-        yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
-        lapply(FUN = replace_id)
+      # yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
+      #   yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
+      #   lapply(FUN = replace_id)
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus <-
         yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus |>
         lapply(FUN = replace_id)
