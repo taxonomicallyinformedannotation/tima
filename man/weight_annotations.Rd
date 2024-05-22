@@ -76,6 +76,7 @@ weight_annotations(
     "weight_annotations")$annotations$thresholds$ms1$condition,
   ms1_only = get_params(step = "weight_annotations")$annotations$ms1only,
   compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
+  remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
   summarise = get_params(step = "weight_annotations")$options$summarise,
   pattern = get_params(step = "weight_annotations")$files$pattern,
   force = get_params(step = "weight_annotations")$options$force
@@ -184,11 +185,13 @@ match (should be lower than \verb{NPC class})}
 
 \item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
 
-\item{ms1_only}{Boolean. Keep only MS1 annotations}
+\item{ms1_only}{Keep only MS1 annotations. BOOLEAN}
 
 \item{compounds_names}{Report compounds names. Can be very large. BOOLEAN}
 
-\item{summarise}{Boolean. Summarize results (1 row per feature)}
+\item{remove_ties}{Remove ties. BOOLEAN}
+
+\item{summarise}{Summarize results (1 row per feature). BOOLEAN}
 
 \item{pattern}{Pattern to identify your job. STRING}
 

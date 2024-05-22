@@ -1915,6 +1915,7 @@ list(
           par_wei_ann$annotations$thresholds$ms1$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         compounds_names = par_wei_ann$options$compounds_names,
+        remove_ties = par_wei_ann$options$remove_ties,
         summarise = par_wei_ann$options$summarise,
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force
@@ -2812,6 +2813,7 @@ list(
           minimal_ms1_condition =
             benchmark_def_wei_ann$annotations$thresholds$ms1$condition,
           compounds_names = benchmark_def_wei_ann$options$compounds_names,
+          remove_ties = benchmark_def_wei_ann$options$remove_ties,
           summarise = benchmark_def_wei_ann$options$summarise,
           pattern = benchmark_def_wei_ann$files$pattern,
           force = benchmark_def_wei_ann$options$force

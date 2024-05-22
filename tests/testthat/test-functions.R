@@ -499,6 +499,7 @@ test_that("Test functions", {
   ### Only MS1
   weight_annotations(
     ms1_only = TRUE,
+    remove_ties = TRUE,
     summarise = TRUE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
@@ -638,6 +639,7 @@ test_that("Test functions", {
   arguments$compounds_names <- "x"
   arguments$force <- "x"
   arguments$nit_rul <- "x"
+  arguments$remove_ties <- "x"
   arguments$summarise <- "x"
 
   # Useless
