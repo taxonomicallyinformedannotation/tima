@@ -49,16 +49,16 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' List of spectral matching results.
+      #' List of spectral matching annotations.
       spectral:
-        #' GNPS spectral matching results. STRING
+        #' GNPS spectral matching annotations. STRING
         gnps: data/interim/annotations/example_gnps.tsv
 
-        #' Spectral spectral matching results. STRING
+        #' Spectral spectral matching annotations. STRING
         spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
-      #' Directory containing the sirius results. STRING
-      sirius: data/interim/annotations/example_sirius
+      #' Directory containing the sirius annotations. STRING
+      sirius: data/interim/annotations/example_sirius.zip
 
     #' List of filtered annotations. STRING
     filtered: data/interim/annotations/example_annotationsFiltered.tsv.gz

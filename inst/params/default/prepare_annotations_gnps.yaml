@@ -5,9 +5,9 @@ files:
   annotations:
     #' Raw annotations files.
     raw:
-      #' List of spectral matching results.
+      #' List of spectral matching annotations.
       spectral:
-        #' GNPS spectral matching results. STRING
+        #' GNPS spectral matching annotations. STRING
         gnps: data/interim/annotations/example_gnps.tsv
 
     #' List of prepared annotations.

@@ -5,6 +5,7 @@
 #' @include columns_model.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
+#' @include read_from_sirius_zip.R
 #' @include select_annotations_columns.R
 #' @include select_sirius_columns.R
 #'
@@ -35,53 +36,39 @@ prepare_annotations_sirius <-
            str_tax_npc = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (file.exists(input_directory)) {
       log_debug("Loading and formatting SIRIUS results")
-      canopus <-
-        tidytable::fread(
-          file = file.path(
-            input_directory,
-            "canopus_compound_summary.tsv"
-          ),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+      canopus <- input_directory |>
+        read_from_sirius_zip(file = "canopus_compound_summary.tsv")
 
-      formula <-
-        tidytable::fread(
-          file = file.path(
-            input_directory,
-            "formula_identifications.tsv"
-          ),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+      formula <- input_directory |>
+        read_from_sirius_zip(file = "formula_identifications.tsv")
 
-      compound <-
-        tidytable::fread(
-          file = file.path(
-            input_directory,
-            "compound_identifications.tsv"
-          ),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+      compound <- input_directory |>
+        read_from_sirius_zip(file = "compound_identifications.tsv")
+
+      list <- unzip(input_directory, list = TRUE)
+      summary_files <- list$Name[list$Name |>
+        grepl(
+          pattern = "structure_candidates.tsv", fixed =
+            TRUE
+        )] |>
+        gsub(
+          pattern = basename(input_directory) |>
+            gsub(
+              pattern = ".zip",
+              replacement = "",
+              fixed = TRUE
+            ),
+          replacement = ""
+        ) |>
+        gsub(pattern = "^/", replacement = "")
 
       compound_summary <- lapply(
-        X = list.files(
-          path = input_directory,
-          pattern = "structure_candidates.tsv",
-          full.names = TRUE,
-          recursive = TRUE
-        ),
-        FUN = tidytable::fread,
-        na.strings = c("", "NA"),
-        colClasses = "character"
+        X = summary_files,
+        FUN = read_from_sirius_zip,
+        sirius_zip = input_directory
       )
 
-      names(compound_summary) <- list.files(
-        path = input_directory,
-        pattern = "structure_candidates.tsv",
-        recursive = TRUE
-      ) |>
+      names(compound_summary) <- summary_files |>
         pre_harmonize_names_sirius() |>
         harmonize_names_sirius()
 
