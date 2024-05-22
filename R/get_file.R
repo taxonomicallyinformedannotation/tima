@@ -37,10 +37,24 @@ get_file <-
     if (!file.exists(export)) {
       options(timeout = limit)
       create_dir(export = export)
-      utils::download.file(
-        url = url,
-        destfile = export
-      )
+      tryCatch(expr = {
+        utils::download.file(
+          url = url,
+          destfile = export
+        )
+      }, error = tryCatch(expr = {
+        message("Something seems wrong...retrying...")
+        utils::download.file(
+          url = url,
+          destfile = export
+        )
+      }, error = {
+        message("Something seems wrong...retrying again... (and then failing)")
+        utils::download.file(
+          url = url,
+          destfile = export
+        )
+      }))
     } else {
       message("File already exists. Skipping.")
     }
