@@ -89,6 +89,7 @@
     "org_fil_mod": false,
     "org_fil_val": "Streptophyta",
     "org_tax": "",
+    "remove_ties": false,
     "save": 1,
     "summarise": false,
     "wei_bio_01": 0.1,
