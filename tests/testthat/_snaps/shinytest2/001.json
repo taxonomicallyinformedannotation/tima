@@ -26,6 +26,7 @@
     },
     "fil_met_raw": null,
     "fil_pat": "example",
+    "fil_sir_raw": null,
     "fil_spe_raw": {
       "name": [
         "example_spectra.mgf"
