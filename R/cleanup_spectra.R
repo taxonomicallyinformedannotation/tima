@@ -10,6 +10,8 @@
 #'
 #' @examples NULL
 cleanup_spectra <- function(spectra) {
+  spectra <- spectra |>
+    Spectra::reduceSpectra()
   if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
     spectra <- spectra[spectra$MSLEVEL == 2]
   }
