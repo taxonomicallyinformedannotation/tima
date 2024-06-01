@@ -11,7 +11,8 @@
 #' @examples NULL
 cleanup_spectra <- function(spectra) {
   spectra <- spectra |>
-    Spectra::reduceSpectra()
+    Spectra::reduceSpectra() |>
+    Spectra::applyProcessing()
   if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
     spectra <- spectra[spectra$MSLEVEL == 2]
   }
