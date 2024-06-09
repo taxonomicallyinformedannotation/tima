@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.9.5
+
+* SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)
+
 # timaR 2.9.4
 
 * Automated update

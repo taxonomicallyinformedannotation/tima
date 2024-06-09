@@ -48,6 +48,11 @@ files:
 
 #' Tools used for each step.
 tools:
+  #' Sirius.
+  sirius:
+    #' Sirius version.
+    #' Currently only 5 or 6 supported. INTEGER
+    version: 6
   #' Taxonomies related parameters.
   taxonomies:
     #' Chemical taxonomy used for matching.

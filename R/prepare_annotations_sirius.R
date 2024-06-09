@@ -13,6 +13,7 @@
 #' @param output_ann Output where to save prepared annotation results
 #' @param output_can Output where to save prepared canopus results
 #' @param output_for Output where to save prepared formula results
+#' @param sirius_version Sirius version
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
 #' @param str_nam File containing structures names
@@ -29,23 +30,64 @@ prepare_annotations_sirius <-
            output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural$sirius,
            output_can = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$canopus,
            output_for = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$formula,
+           sirius_version = get_params(step = "prepare_annotations_sirius")$tools$sirius$version,
            str_stereo = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,
            str_met = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$metadata,
            str_nam = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$names,
            str_tax_cla = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
     if (file.exists(input_directory)) {
+      log_debug("Loading parameters for SIRIUS", sirius_version)
+      sirius_version <- as.character(sirius_version)
+      canopus_filename <- switch(sirius_version,
+        "5" = "canopus_compound_summary.tsv",
+        "6" = "canopus_structure_summary.tsv"
+      )
+      formulas_filename <- switch(sirius_version,
+        "5" = "formula_identifications.tsv",
+        "6" = "formula_identifications.tsv"
+      )
+      structures_filename <- switch(sirius_version,
+        "5" = "compound_identifications.tsv",
+        "6" = "structure_identifications.tsv"
+      )
+      denovo_filename <- switch(sirius_version,
+        "5" = NULL,
+        "6" = "denovo_structure_identifications.tsv"
+      )
+      spectral_filename <- switch(sirius_version,
+        "5" = NULL,
+        "6" = "spectral_matches.tsv"
+      )
+
       log_debug("Loading and formatting SIRIUS results")
       canopus <- input_directory |>
-        read_from_sirius_zip(file = "canopus_compound_summary.tsv")
+        read_from_sirius_zip(file = canopus_filename)
 
-      formula <- input_directory |>
-        read_from_sirius_zip(file = "formula_identifications.tsv")
+      formulas <- input_directory |>
+        read_from_sirius_zip(file = formulas_filename)
 
-      compound <- input_directory |>
-        read_from_sirius_zip(file = "compound_identifications.tsv")
+      structures <- input_directory |>
+        read_from_sirius_zip(file = structures_filename)
 
-      list <- unzip(input_directory, list = TRUE)
+      denovo <- input_directory |>
+        read_from_sirius_zip(file = denovo_filename)
+
+      # TODO
+      spectral <- input_directory |>
+        read_from_sirius_zip(file = spectral_filename)
+
+      # dirty to support old zip
+      list <- tryCatch(
+        expr = {
+          unzip(input_directory, list = TRUE)
+        },
+        error = function(err) {
+          list <- list()
+          list$Name <- list.files(input_directory)
+          return(list)
+        }
+      )
       summary_files <- list$Name[list$Name |>
         grepl(
           pattern = "structure_candidates.tsv", fixed =
@@ -62,83 +104,65 @@ prepare_annotations_sirius <-
         ) |>
         gsub(pattern = "^/", replacement = "")
 
-      compound_summary <- lapply(
+      structures_summary <- lapply(
         X = summary_files,
         FUN = read_from_sirius_zip,
         sirius_zip = input_directory
       )
 
-      names(compound_summary) <- summary_files |>
+      names(structures_summary) <- summary_files |>
         pre_harmonize_names_sirius() |>
         harmonize_names_sirius()
 
-      compound_summary <-
-        compound_summary[lapply(compound_summary, nrow) > 0]
+      structures_summary <-
+        structures_summary[lapply(structures_summary, nrow) > 0]
 
       # Allow for summaries only
-      if (length(compound_summary) != 0) {
-        compound_summary_ready <- compound_summary |>
+      if (length(structures_summary) != 0) {
+        structures_summary_ready <- structures_summary |>
           tidytable::bind_rows(.id = "feature_id")
       } else {
-        compound_summary_ready <- tidytable::tidytable()
+        structures_summary_ready <- tidytable::tidytable()
       }
-      rm(compound_summary)
+      rm(structures_summary)
 
       canopus_prepared <- canopus |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
-        tidytable::select(tidytable::any_of(
-          c(
-            "feature_id",
-            "candidate_structure_molecular_formula" = "molecularFormula",
-            "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
-            "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
-            "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
-            "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
-            "feature_pred_tax_npc_03cla_val" = "NPC#class",
-            "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
-            "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
-            "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
-            "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
-            "feature_pred_tax_cla_02sup_score" =
-              "ClassyFire#superclass probability",
-            "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
-            "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
-            "feature_pred_tax_cla_04dirpar_val" =
-              "ClassyFire#most specific class",
-            "feature_pred_tax_cla_04dirpar_score" =
-              "ClassyFire#most specific class Probability"
-          )
-        ))
+        select_sirius_columns_canopus(sirius_version = sirius_version)
+
       rm(canopus)
 
-      compound_prepared <- compound_summary_ready |>
-        select_sirius_columns()
-      rm(compound_summary_ready)
+      formulas_prepared <- formulas |>
+        select_sirius_columns_formulas(sirius_version = sirius_version)
+      rm(formulas)
 
-      compound_prepared_2 <- compound |>
-        tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
-        select_sirius_columns()
-      rm(compound)
+      structures_prepared <- structures_summary_ready |>
+        select_sirius_columns_structures(sirius_version = sirius_version)
+      rm(structures_summary_ready)
 
-      formulas_prepared <- formula |>
-        select_sirius_columns_2()
-      rm(formula)
+      structures_prepared_2 <- structures |>
+        tidytable::mutate(feature_id = switch(sirius_version,
+          "5" = harmonize_names_sirius(id),
+          "6" = mappingFeatureId
+        )) |>
+        select_sirius_columns_structures(sirius_version = sirius_version)
+      rm(structures)
 
-      compounds_prepared <-
-        tidytable::bind_rows(compound_prepared, compound_prepared_2) |>
+      structures_prepared <-
+        tidytable::bind_rows(structures_prepared, structures_prepared_2) |>
         tidytable::distinct()
-      rm(compound_prepared, compound_prepared_2)
+      rm(structures_prepared, structures_prepared_2)
 
-      table <- compounds_prepared |>
+      table <- structures_prepared |>
         tidytable::left_join(formulas_prepared) |>
         tidytable::left_join(canopus_prepared) |>
+        # TODO add de novo and spectral
         tidytable::distinct() |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA,
           candidate_structure_tax_cla_01kin = NA
         ) |>
         select_annotations_columns()
-      rm(compounds_prepared, formulas_prepared, canopus_prepared)
+      rm(structures_prepared, formulas_prepared, canopus_prepared)
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")

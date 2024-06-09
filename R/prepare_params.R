@@ -142,6 +142,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   too_met <- params_advanced$tools$metadata
   too_net_spe_com <- params_advanced$tools$networks$spectral$components
   too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
+  too_sir_ver <- params_advanced$tools$sirius$version
   too_tax_bio <- params_advanced$tools$taxonomies$biological
   too_tax_che <- params_advanced$tools$taxonomies$chemical
   units_rt <- params_advanced$units$rt
@@ -347,6 +348,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_sop_mer_str_tax_cla
       yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$taxonomies$npc <-
         fil_lib_sop_mer_str_tax_npc
+      yamls_params$prepare_annotations_sirius$tools$sirius$version <-
+        too_sir_ver
     },
     prepare_annotations_spectra = {
       yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral <-
