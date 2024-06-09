@@ -92,6 +92,7 @@
     "remove_ties": false,
     "save": 1,
     "summarise": false,
+    "too_sir_ver": "6",
     "wei_bio_01": 0.1,
     "wei_bio_02": 0.2,
     "wei_bio_03": 0.3,
