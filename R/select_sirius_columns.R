@@ -1,57 +1,67 @@
-#' @title Select sirius columns
+#' @title Select sirius columns (canopus)
 #'
-#' @description This function selects sirius columns
+#' @description This function selects sirius columns (canopus)
 #'
 #' @param df Dataframe
+#' @param sirius_version Sirius version
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-select_sirius_columns <- function(df) {
+select_sirius_columns_canopus <- function(df, sirius_version) {
   df <- df |>
-    tidytable::select(tidytable::any_of(c(
-      "feature_id",
-      "candidate_structure_name" = "name",
-      "candidate_structure_smiles_no_stereo" = "smiles",
-      "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
-      "candidate_structure_molecular_formula" = "molecularFormula",
-      "candidate_structure_xlogp" = "xlogp",
-      "candidate_score_sirius_confidence" = "ConfidenceScore",
-      "candidate_score_sirius_csi" = "CSI:FingerIDScore"
-    ))) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      candidate_library = "SIRIUS",
-      candidate_structure_tax_npc_01pat = NA_character_,
-      candidate_structure_tax_npc_02sup = NA_character_,
-      candidate_structure_tax_npc_03cla = NA_character_,
-      candidate_structure_tax_cla_chemontid = NA_character_,
-      candidate_structure_tax_cla_01kin = NA_character_,
-      candidate_structure_tax_cla_02sup = NA_character_,
-      candidate_structure_tax_cla_03cla = NA_character_,
-      candidate_structure_tax_cla_04dirpar = NA_character_
-    )
+    tidytable::mutate(feature_id = switch(sirius_version,
+      "5" = harmonize_names_sirius(id),
+      "6" = mappingFeatureId
+    )) |>
+    tidytable::select(tidytable::any_of(
+      c(
+        "feature_id",
+        "candidate_structure_molecular_formula" = "molecularFormula",
+        "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
+        "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
+        "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
+        "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
+        "feature_pred_tax_npc_03cla_val" = "NPC#class",
+        "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
+        "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
+        "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
+        "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
+        "feature_pred_tax_cla_02sup_score" =
+          "ClassyFire#superclass probability",
+        "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
+        "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
+        "feature_pred_tax_cla_04dirpar_val" =
+          "ClassyFire#most specific class",
+        "feature_pred_tax_cla_04dirpar_score" =
+          "ClassyFire#most specific class Probability"
+      )
+    ))
   return(df)
 }
 
-#' @title Select sirius columns 2
+#' @title Select sirius columns (formulas)
 #'
-#' @description This function selects sirius columns (2)
+#' @description This function selects sirius columns (formulas)
 #'
 #' @include harmonize_names_sirius.R
 #'
 #' @param df Dataframe
+#' @param sirius_version Sirius version
 #'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-select_sirius_columns_2 <- function(df) {
+select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
-    tidytable::mutate(feature_id = harmonize_names_sirius(id)) |>
+    tidytable::mutate(feature_id = switch(sirius_version,
+      "5" = harmonize_names_sirius(id),
+      "6" = mappingFeatureId
+    )) |>
     tidytable::mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
         as.numeric(`massErrorPrecursor(ppm)`) *
@@ -73,5 +83,48 @@ select_sirius_columns_2 <- function(df) {
       "candidate_score_sirius_intensity" = "explainedIntensity",
       "candidate_count_sirius_peaks_explained" = "numExplainedPeaks"
     )))
+  return(df)
+}
+
+#' @title Select sirius columns (structures)
+#'
+#' @description This function selects sirius columns (structures)
+#'
+#' @param df Dataframe
+#' @param sirius_version Sirius version
+#'
+#' @return NULL
+#'
+#' @export
+#'
+#' @examples NULL
+select_sirius_columns_structures <- function(df, sirius_version) {
+  df <- df |>
+    tidytable::select(tidytable::any_of(c(
+      "feature_id",
+      "candidate_structure_name" = "name",
+      "candidate_structure_smiles_no_stereo" = "smiles",
+      "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
+      "candidate_structure_molecular_formula" = "molecularFormula",
+      "candidate_structure_xlogp" = "xlogp",
+      # TODO DOC
+      "candidate_score_sirius_confidence" = switch(sirius_version,
+        "5" = "ConfidenceScore",
+        "6" = "ConfidenceScoreApproximate"
+      ),
+      "candidate_score_sirius_csi" = "CSI:FingerIDScore"
+    ))) |>
+    tidytable::distinct() |>
+    tidytable::mutate(
+      candidate_library = "SIRIUS",
+      candidate_structure_tax_npc_01pat = NA_character_,
+      candidate_structure_tax_npc_02sup = NA_character_,
+      candidate_structure_tax_npc_03cla = NA_character_,
+      candidate_structure_tax_cla_chemontid = NA_character_,
+      candidate_structure_tax_cla_01kin = NA_character_,
+      candidate_structure_tax_cla_02sup = NA_character_,
+      candidate_structure_tax_cla_03cla = NA_character_,
+      candidate_structure_tax_cla_04dirpar = NA_character_
+    )
   return(df)
 }

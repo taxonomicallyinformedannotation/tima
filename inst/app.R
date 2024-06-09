@@ -150,6 +150,19 @@ ui <- shiny::fluidPage(
               "Reason therefore is to find it in the future."
             )
           ),
+        shiny::selectInput(
+          inputId = "too_sir_ver",
+          label = "SIRIUS version",
+          choices = c(5, 6),
+          selected = 6
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "The SIRIUS version used.",
+              "We highly recommend 6, the default."
+            )
+          ),
         shiny::textInput(
           inputId = "fil_pat",
           label = label_mandatory("Pattern to identify your job locally"),
@@ -1676,6 +1689,8 @@ save_input <- function(input) {
   #   shiny::isolate(input$too_x)
   # yaml_advanced$tools$networks$spectral$edges <-
   #   shiny::isolate(input$too_x)
+  yaml_advanced$tools$sirius$version <-
+    shiny::isolate(input$too_sir_ver)
   # yaml_advanced$tools$taxonomies$biological <-
   #   shiny::isolate(input$too_x)
   # yaml_advanced$tools$taxonomies$chemical <-

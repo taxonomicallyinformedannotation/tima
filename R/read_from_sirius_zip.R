@@ -12,24 +12,25 @@
 #'
 #' @examples NULL
 read_from_sirius_zip <- function(sirius_zip, file) {
-  temp <- tempdir()
-  sirius_dir <- file.path(
-    temp,
-    basename(sirius_zip) |> gsub(
+  sirius_no_zip <- sirius_zip |>
+    gsub(
       pattern = ".zip",
       replacement = "",
       fixed = TRUE
     )
-  )
-  if (!file.exists(sirius_dir)) {
-    unzip(sirius_zip, exdir = temp)
+  if (sirius_zip != sirius_no_zip) {
+    temp <- tempdir()
+    sirius_dir <- file.path(temp, sirius_no_zip |>
+      basename())
+    if (!file.exists(sirius_dir)) {
+      unzip(sirius_zip, exdir = temp)
+    }
+  } else {
+    sirius_dir <- sirius_no_zip
   }
 
   tidytable::fread(
-    file = file.path(
-      sirius_dir,
-      file
-    ),
+    file = file.path(sirius_dir, file),
     na.strings = c("", "NA"),
     colClasses = "character"
   )

@@ -527,6 +527,12 @@ tools:
       #' Currently "gnps" or "manual" supported. STRING
       edges: gnps
 
+  #' Sirius.
+  sirius:
+    #' Sirius version.
+    #' Currently only 5 or 6 supported. INTEGER
+    version: 6
+
   #' Taxonomies related parameters.
   taxonomies:
     #' Biological taxonomy used for matching.

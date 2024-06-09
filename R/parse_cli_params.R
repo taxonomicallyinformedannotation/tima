@@ -350,6 +350,9 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$tools$networks$spectral$edges <-
         as.character(arguments$too_net_spe_edg)
     }
+    if (!is.null(arguments$too_sir_ver)) {
+      parameters$tools$sirius$version <- as.integer(arguments$too_sir_ver)
+    }
     if (!is.null(arguments$too_tax_bio)) {
       parameters$tools$taxonomies$biological <- as.character(arguments$too_tax_bio)
     }

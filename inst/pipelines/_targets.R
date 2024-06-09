@@ -1708,6 +1708,7 @@ list(
             output_ann = par_pre_ann_sir$files$annotations$prepared$structural$sirius,
             output_can = par_pre_ann_sir$files$annotations$prepared$canopus,
             output_for = par_pre_ann_sir$files$annotations$prepared$formula,
+            sirius_version = par_pre_ann_sir$tools$sirius$version,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_nam = lib_mer_str_nam,

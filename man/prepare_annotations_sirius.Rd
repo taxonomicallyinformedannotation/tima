@@ -13,6 +13,7 @@ prepare_annotations_sirius(
     "prepare_annotations_sirius")$files$annotations$prepared$canopus,
   output_for = get_params(step =
     "prepare_annotations_sirius")$files$annotations$prepared$formula,
+  sirius_version = get_params(step = "prepare_annotations_sirius")$tools$sirius$version,
   str_stereo = get_params(step =
     "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =
@@ -33,6 +34,8 @@ prepare_annotations_sirius(
 \item{output_can}{Output where to save prepared canopus results}
 
 \item{output_for}{Output where to save prepared formula results}
+
+\item{sirius_version}{Sirius version}
 
 \item{str_stereo}{File containing structures stereo}
 
