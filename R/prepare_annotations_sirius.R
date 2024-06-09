@@ -77,7 +77,7 @@ prepare_annotations_sirius <-
       }
 
       # TODO
-      if (!is.null(spectral)) {
+      if (!is.null(spectral_filename)) {
         spectral <- input_directory |>
           read_from_sirius_zip(file = spectral_filename)
       }
