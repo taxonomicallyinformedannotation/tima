@@ -70,12 +70,17 @@ prepare_annotations_sirius <-
       structures <- input_directory |>
         read_from_sirius_zip(file = structures_filename)
 
-      denovo <- input_directory |>
-        read_from_sirius_zip(file = denovo_filename)
+      # TODO
+      if (!is.null(denovo_filename)) {
+        denovo <- input_directory |>
+          read_from_sirius_zip(file = denovo_filename)
+      }
 
       # TODO
-      spectral <- input_directory |>
-        read_from_sirius_zip(file = spectral_filename)
+      if (!is.null(spectral)) {
+        spectral <- input_directory |>
+          read_from_sirius_zip(file = spectral_filename)
+      }
 
       # dirty to support old zip
       list <- tryCatch(
