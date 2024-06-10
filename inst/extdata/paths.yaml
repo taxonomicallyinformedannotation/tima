@@ -6,7 +6,9 @@ data:
     path: data/interim
     annotations:
       path: data/interim/annotations
-      example_sirius: data/interim/annotations/example_sirius.zip
+      example_sirius:
+        v5: data/interim/annotations/example_sirius_5.zip
+        v6: data/interim/annotations/example_sirius_6.zip
     features:
       path: data/interim/features
     libraries:
@@ -191,7 +193,9 @@ urls:
     lib_mini:
       rt: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_lib_mini_rt.tsv
     metadata: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv
-    sirius: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius.zip
+    sirius:
+      v5: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_5.zip
+      v6: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_6.zip
     spectra: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf
     spectra_ms1: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_ms1.mgf

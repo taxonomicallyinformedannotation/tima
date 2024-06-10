@@ -6,7 +6,7 @@ files:
     #' Raw annotations files.
     raw:
       #' Directory containing the sirius annotations. STRING
-      sirius: data/interim/annotations/example_sirius.zip
+      sirius: data/interim/annotations/example_sirius
 
     #' List of prepared annotations.
     prepared:
@@ -52,7 +52,7 @@ tools:
   sirius:
     #' Sirius version.
     #' Currently only 5 or 6 supported. INTEGER
-    version: 5
+    version: 6
   #' Taxonomies related parameters.
   taxonomies:
     #' Chemical taxonomy used for matching.

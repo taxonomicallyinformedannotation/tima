@@ -15,8 +15,11 @@
 get_example_sirius <-
   function(url = parse_yaml_paths()$urls$examples$sirius,
            export = parse_yaml_paths()$data$interim$annotations$example_sirius) {
-    get_file(
-      url = url,
-      export = export
+    get_file(url = url$v5, export = export$v5)
+    get_file(url = url$v6, export = export$v6)
+    unzip(
+      zipfile = export$v6,
+      exdir = dirname(export$v6),
+      overwrite = TRUE
     )
   }
