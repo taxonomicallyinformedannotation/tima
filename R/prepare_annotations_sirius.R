@@ -45,19 +45,19 @@ prepare_annotations_sirius <-
       )
       formulas_filename <- switch(sirius_version,
         "5" = "formula_identifications.tsv",
-        "6" = "formula_identifications.tsv"
+        "6" = "formula_identifications_all.tsv"
       )
       structures_filename <- switch(sirius_version,
         "5" = "compound_identifications.tsv",
-        "6" = "structure_identifications.tsv"
+        "6" = "structure_identifications_all.tsv"
       )
       denovo_filename <- switch(sirius_version,
         "5" = NULL,
-        "6" = "denovo_structure_identifications.tsv"
+        "6" = "denovo_structure_identifications_all.tsv"
       )
       spectral_filename <- switch(sirius_version,
         "5" = NULL,
-        "6" = "spectral_matches.tsv"
+        "6" = "spectral_matches_all.tsv"
       )
 
       log_debug("Loading and formatting SIRIUS results")
