@@ -74,6 +74,9 @@ prepare_annotations_sirius <-
       if (!is.null(denovo_filename)) {
         denovo <- input_directory |>
           read_from_sirius_zip(file = denovo_filename)
+      } else {
+        denovo <- tidytable::tidytable() |>
+          tidytable::mutate(mappingFeatureId = NA)
       }
 
       # TODO
@@ -155,11 +158,16 @@ prepare_annotations_sirius <-
       structures_prepared <-
         tidytable::bind_rows(structures_prepared, structures_prepared_2) |>
         tidytable::distinct()
-      rm(structures_prepared, structures_prepared_2)
+      rm(structures_prepared_2)
+
+      denovo_prepared <- denovo |>
+        tidytable::mutate(feature_id = mappingFeatureId) |>
+        select_sirius_columns_structures(sirius_version = sirius_version)
 
       table <- structures_prepared |>
         tidytable::left_join(formulas_prepared) |>
         tidytable::left_join(canopus_prepared) |>
+        tidytable::left_join(denovo_prepared) |>
         # TODO add de novo and spectral
         tidytable::distinct() |>
         tidytable::mutate(
@@ -192,7 +200,8 @@ prepare_annotations_sirius <-
           candidate_score_sirius_tree = NA,
           candidate_score_sirius_zodiac = NA,
           candidate_score_sirius_confidence = NA,
-          candidate_score_sirius_csi = NA
+          candidate_score_sirius_csi = NA,
+          candidate_score_sirius_msnovelist = NA
         ) |>
         tidytable::select(
           -candidate_structure_error_rt,

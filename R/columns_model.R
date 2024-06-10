@@ -47,7 +47,8 @@ columns_model <- function() {
   candidates_sirius_str_columns <-
     c(
       "candidate_score_sirius_confidence",
-      "candidate_score_sirius_csi"
+      "candidate_score_sirius_csi",
+      "candidate_score_sirius_msnovelist"
     )
 
   candidates_spectra_columns <- c(
