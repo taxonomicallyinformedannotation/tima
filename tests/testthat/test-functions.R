@@ -132,7 +132,6 @@ test_that("Test functions", {
   #### SIRIUS
   ## mini version for tests
   get_example_sirius()
-  ## TODO get sirius 6 example
 
   ### Libraries
   #### ECMDB
@@ -438,9 +437,11 @@ test_that("Test functions", {
   prepare_annotations_sirius(
     input_directory =
       get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
+  )
+  prepare_annotations_sirius(
+    input_directory = "data/interim/annotations/example_sirius.zip",
     sirius_version = 5
   )
-  ## TODO check 6
 
   ### ISDB results
   prepare_annotations_spectra()

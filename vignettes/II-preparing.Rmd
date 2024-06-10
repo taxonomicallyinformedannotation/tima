@@ -77,30 +77,53 @@ source(file = "inst/scripts/prepare_annotations_gnps.R")
 
 #### Sirius
 
-As SIRIUS jobs are long to perform, we provide an example SIRIUS (version 5.8.5) workspace.
-It has been generated on the 20 first lines of the example MGF with the following command:
+As SIRIUS jobs are long to perform, we provide example SIRIUS workspaces (both SIRIUS 5 and 6).
+Note that spectral matches from SIRIUS are not supported for now.
+They have been generated on the 20 first lines of the example MGF with the following command:
 
 ```{bash eval=FALSE, include=TRUE}
+# this is run on SIRIUS 6
 sirius \
---input data/source/example_spectra.mgf \
---output data/interim/annotation/example_sirius \
+--noCite \
+--input=data/source/example_spectra_mini.mgf \
+--output=data/interim/annotations/example_sirius.sirius/ \
+--maxmz=800 \
+config \
+--AlgorithmProfile=orbitrap \
+--StructureSearchDB=BIO \
+--Timeout.secondsPerTree=10 \
+--Timeout.secondsPerInstance=10 \
+formulas \
+zodiac \
+fingerprints \
+classes \
+structures \
+denovo-structures \
+summaries \
+--full-summary
+
+# this is run on SIRIUS 5
+sirius \
+--noCite \
+--input data/source/example_spectra_mini.mgf \
+--output data/interim/annotations/example_sirius/ \
+--maxmz 800 \
 config \
 --AlgorithmProfile orbitrap \
---FormulaSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC \
---RecomputeResults false \
---StructureSearchDB BIO,COCONUT,GNPS,KNAPSACK,UNDP,PLANTCYC \
+--StructureSearchDB BIO \
 --Timeout.secondsPerTree 10 \
 --Timeout.secondsPerInstance 10 \
 formula \
 zodiac \
 fingerprint \
 structure \
-canopus \
-W
+compound-classes \
+write-summaries \
+--full-summary
 ```
 
 These parameters were not optimized and were only used to give an example output.
-If you are using the cli, do not forget the `W` to generate the summaries, or if you use the gui, generate them by clicking the corresponding icon.
+If you are using the cli, do not forget to generate the summaries with the `--full-summary` option, or if you use the gui, generate them by clicking the corresponding icon.
 You can get an example running:
 
 ```{r get-sirius, results="hide", message=FALSE, warning=FALSE}

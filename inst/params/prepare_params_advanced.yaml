@@ -58,7 +58,7 @@ files:
         spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
       #' Directory containing the sirius annotations. STRING
-      sirius: data/interim/annotations/example_sirius.zip
+      sirius: data/interim/annotations/example_sirius
 
     #' List of filtered annotations. STRING
     filtered: data/interim/annotations/example_annotationsFiltered.tsv.gz
@@ -531,7 +531,7 @@ tools:
   sirius:
     #' Sirius version.
     #' Currently only 5 or 6 supported. INTEGER
-    version: 5
+    version: 6
 
   #' Taxonomies related parameters.
   taxonomies:
