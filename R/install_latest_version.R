@@ -45,7 +45,7 @@ install_latest_version <- function() {
   }
   local_sha <- pak::pkg_status("timaR")$remotesha
   remote_sha <- gh::gh("GET /repos/taxonomicallyinformedannotation/tima-r/commits")[[1]]$sha
-  if (is.null(local_sha) || local_sha != remote_sha) {
+  if (is.null(local_sha) || (local_sha != remote_sha)) {
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     tryCatch(
