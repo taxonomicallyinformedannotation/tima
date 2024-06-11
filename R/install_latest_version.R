@@ -47,106 +47,114 @@ install_latest_version <- function() {
     local_version <- pak::pkg_status("timaR")$version
   }
   # TODO not ideal
-  remote_version <- readLines("https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION")[[3]] |>
-    gsub(pattern = "Version: ", replacement = "", fixed = TRUE)
-  if (local_version != remote_version) {
-    pak::pak_update()
-    pak::pak(ask = FALSE, upgrade = TRUE)
-    tryCatch(
-      expr = {
-        message("Installing local version")
-        pak::pkg_install(
-          pkg = ".",
-          ask = FALSE,
-          upgrade = FALSE
-        )
-      },
-      error = function(e) {
-        tryCatch(
-          expr = {
-            message("Installing local version 2")
-            pak::pkg_install(
-              pkg = desc::desc_get_urls()[[1]],
-              ask = FALSE,
-              upgrade = FALSE
-            )
-          },
-          error = function(e) {
-            tryCatch(
-              expr = {
-                message("Installing remote version")
-                pak::pkg_install(
-                  pkg = "taxonomicallyinformedannotation/tima-r",
-                  ask = FALSE,
-                  upgrade = FALSE
-                )
-              },
-              error = function(e) {
-                message("Install failed")
-              }
-            )
-          }
-        )
-      }
+  remote_version <- readLines(
+    "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION"
+  )[[3]] |>
+    gsub(
+      pattern = "Version: ",
+      replacement = "",
+      fixed = TRUE
     )
-    cache <- fs::path_home(".tima")
-    message("Creating cache at ", cache)
-    fs::dir_create(path = cache)
-    message("Copying default architecture ...")
-    tryCatch(
-      expr = {
+  if (local_version == remote_version) {
+    message("You already have the latest version, skipping")
+    stop_quietly <- function() {
+      opt <- options(show.error.messages = FALSE)
+      on.exit(options(opt))
+      stop()
+    }
+    stop_quietly()
+  }
+  pak::pak_update()
+  pak::pak(ask = FALSE, upgrade = TRUE)
+  tryCatch(
+    expr = {
+      message("Installing local version")
+      pak::pkg_install(
+        pkg = ".",
+        ask = FALSE,
+        upgrade = FALSE
+      )
+    },
+    error = function(e) {
+      tryCatch(
+        expr = {
+          message("Installing local version 2")
+          pak::pkg_install(
+            pkg = desc::desc_get_urls()[[1]],
+            ask = FALSE,
+            upgrade = FALSE
+          )
+        },
+        error = function(e) {
+          tryCatch(
+            expr = {
+              message("Installing remote version")
+              pak::pkg_install(
+                pkg = "taxonomicallyinformedannotation/tima-r",
+                ask = FALSE,
+                upgrade = FALSE
+              )
+            },
+            error = function(e) {
+              message("Install failed")
+            }
+          )
+        }
+      )
+    }
+  )
+  cache <- fs::path_home(".tima")
+  message("Creating cache at ", cache)
+  fs::dir_create(path = cache)
+  message("Copying default architecture ...")
+  tryCatch(
+    expr = {
+      fs::dir_copy(
+        path = "./inst",
+        new_path = file.path(cache, "inst"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      if (file.exists("./../../app.R")) {
+        message("I'm in test dir")
         fs::dir_copy(
-          path = "./inst",
+          path = "./../../",
           new_path = file.path(cache, "inst"),
           overwrite = TRUE
         )
-      },
-      error = function(e) {
-        if (file.exists("./../../app.R")) {
-          message("I'm in test dir")
-          fs::dir_copy(
-            path = "./../../",
-            new_path = file.path(cache, "inst"),
-            overwrite = TRUE
-          )
-        }
       }
-    )
-    tryCatch(
-      expr = {
-        message("Installing local targets")
-        fs::file_copy(
-          path = "./_targets.yaml",
-          new_path = file.path(cache, "_targets.yaml"),
-          overwrite = TRUE
-        )
-      },
-      error = function(e) {
-        message("Installing remote targets")
-        timaR::get_file(
-          url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
-          export = file.path(cache, "_targets.yaml")
-        )
-      }
-    )
-    tryCatch(
-      expr = {
-        message("Getting local DESCRIPTION")
-        fs::file_copy(
-          path = "./DESCRIPTION",
-          new_path = file.path(cache, "DESCRIPTION"),
-          overwrite = TRUE
-        )
-      },
-      error = function(e) {
-        message("Getting remote DESCRIPTION")
-        timaR::get_file(
-          url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
-          export = file.path(cache, "DESCRIPTION")
-        )
-      }
-    )
-  } else {
-    message("You already have the latest version, skipping")
-  }
+    }
+  )
+  tryCatch(
+    expr = {
+      message("Installing local targets")
+      fs::file_copy(
+        path = "./_targets.yaml",
+        new_path = file.path(cache, "_targets.yaml"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      message("Installing remote targets")
+      timaR::get_file(
+        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
+        export = file.path(cache, "_targets.yaml")
+      )
+    }
+  )
+  tryCatch(
+    expr = {
+      message("Getting local DESCRIPTION")
+      fs::file_copy(
+        path = "./DESCRIPTION",
+        new_path = file.path(cache, "DESCRIPTION"),
+        overwrite = TRUE
+      )
+    },
+    error = function(e) {
+      message("Getting remote DESCRIPTION")
+      timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION", export = file.path(cache, "DESCRIPTION"))
+    }
+  )
 }
