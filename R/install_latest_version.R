@@ -40,16 +40,16 @@ install_latest_version <- function() {
       )
     )
   }
-  if (!requireNamespace(c("gh"), quietly = TRUE)) {
-    install.packages(c("gh"))
-  }
-  local_sha <- pak::pkg_status("timaR")$remotesha
-  if (is.na(local_sha)) {
+  if (!requireNamespace(c("timaR"), quietly = TRUE)) {
     message("Installing for the first time...")
-    local_sha <- "myFirstInstallTrickToWork"
+    local_version <- "myFirstInstallTrickToWork"
+  } else {
+    local_version <- pak::pkg_status("timaR")$version
   }
-  remote_sha <- gh::gh("GET /repos/taxonomicallyinformedannotation/tima-r/commits")[[1]]$sha
-  if (local_sha != remote_sha) {
+  # TODO not ideal
+  remote_version <- readLines("https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION")[[3]] |>
+    gsub(pattern = "Version: ", replacement = "", fixed = TRUE)
+  if (local_version != remote_version) {
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     tryCatch(
