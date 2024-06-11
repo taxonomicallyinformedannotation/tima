@@ -2,6 +2,9 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that("Test functions", {
+  if (requireNamespace("pak", quietly = TRUE)) {
+    remove.packages("pak")
+  }
   install_latest_version()
   setwd(fs::path_home(".tima"))
   ## Prepare parameters
