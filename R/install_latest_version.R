@@ -44,7 +44,7 @@ install_latest_version <- function() {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    local_version <- pak::pkg_status("timaR")$version
+    local_version <- pak::pkg_status("timaR")$version[1]
   }
   # TODO not ideal
   remote_version <- readLines(
