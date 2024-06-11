@@ -44,11 +44,11 @@ prepare_annotations_sirius <-
         "6" = "canopus_structure_summary.tsv"
       )
       formulas_filename <- switch(sirius_version,
-        "5" = "formula_identifications.tsv",
+        "5" = "formula_identifications_all.tsv",
         "6" = "formula_identifications_all.tsv"
       )
       structures_filename <- switch(sirius_version,
-        "5" = "compound_identifications.tsv",
+        "5" = "compound_identifications_all.tsv",
         "6" = "structure_identifications_all.tsv"
       )
       denovo_filename <- switch(sirius_version,
