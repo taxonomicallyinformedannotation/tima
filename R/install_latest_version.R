@@ -9,6 +9,37 @@
 #' @examples NULL
 install_latest_version <- function() {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
+  if (Sys.info()[["sysname"]] == "Windows") {
+    if (!requireNamespace("installr", quietly = TRUE)) {
+      install.packages("installr")
+    }
+    installr::install.rtools(check_r_update = FALSE, GUI = FALSE)
+  }
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    lib <- Sys.getenv("R_LIBS_SITE")
+    if (lib == "") {
+      lib <- file.path(dirname(.Library), "site-library")
+      cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
+      cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
+
+      message("Setting R_LIBS_SITE to ", lib)
+    } else {
+      message("R_LIBS_SITE is already set to ", lib)
+      cat(sprintf(
+        "R_LIB_FOR_PAK=%s\n",
+        strsplit(lib, .Platform$path.sep)[[1]][[1]]
+      ), append = TRUE)
+    }
+    install.packages(
+      "pak",
+      repos = sprintf(
+        "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+        .Platform$pkgType,
+        R.Version()$os,
+        R.Version()$arch
+      )
+    )
+  }
   if (!requireNamespace(c("httr2", "jsonlite", "tidytable"), quietly = TRUE)) {
     install.packages(c("httr2", "jsonlite", "tidytable"))
   }
@@ -20,37 +51,6 @@ install_latest_version <- function() {
     jsonlite::fromJSON() |>
     tidytable::pull(sha)
   if (pak::pkg_status("timaR")$remotesha != shas[1]) {
-    if (Sys.info()[["sysname"]] == "Windows") {
-      if (!requireNamespace("installr", quietly = TRUE)) {
-        install.packages("installr")
-      }
-      installr::install.rtools(check_r_update = FALSE, GUI = FALSE)
-    }
-    if (!requireNamespace("pak", quietly = TRUE)) {
-      lib <- Sys.getenv("R_LIBS_SITE")
-      if (lib == "") {
-        lib <- file.path(dirname(.Library), "site-library")
-        cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
-        cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
-
-        message("Setting R_LIBS_SITE to ", lib)
-      } else {
-        message("R_LIBS_SITE is already set to ", lib)
-        cat(sprintf(
-          "R_LIB_FOR_PAK=%s\n",
-          strsplit(lib, .Platform$path.sep)[[1]][[1]]
-        ), append = TRUE)
-      }
-      install.packages(
-        "pak",
-        repos = sprintf(
-          "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
-          .Platform$pkgType,
-          R.Version()$os,
-          R.Version()$arch
-        )
-      )
-    }
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     tryCatch(
