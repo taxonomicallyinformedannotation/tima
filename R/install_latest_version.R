@@ -55,6 +55,8 @@ install_latest_version <- function() {
       replacement = "",
       fixed = TRUE
     )
+  message("Local version is ", local_version)
+  message("Last version is ", remote_version)
   if (local_version == remote_version) {
     message("You already have the latest version, skipping")
     stop_quietly <- function() {
