@@ -53,9 +53,11 @@ install_latest_version <- function() {
     tryCatch(
       expr = {
         message("Installing local version")
-        pak::pkg_install(pkg = ".",
-                         ask = FALSE,
-                         upgrade = FALSE)
+        pak::pkg_install(
+          pkg = ".",
+          ask = FALSE,
+          upgrade = FALSE
+        )
       },
       error = function(e) {
         tryCatch(
@@ -71,9 +73,11 @@ install_latest_version <- function() {
             tryCatch(
               expr = {
                 message("Installing remote version")
-                pak::pkg_install(pkg = "taxonomicallyinformedannotation/tima-r",
-                                 ask = FALSE,
-                                 upgrade = FALSE)
+                pak::pkg_install(
+                  pkg = "taxonomicallyinformedannotation/tima-r",
+                  ask = FALSE,
+                  upgrade = FALSE
+                )
               },
               error = function(e) {
                 message("Install failed")
@@ -117,8 +121,10 @@ install_latest_version <- function() {
       },
       error = function(e) {
         message("Installing remote targets")
-        timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
-                        export = file.path(cache, "_targets.yaml"))
+        timaR::get_file(
+          url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
+          export = file.path(cache, "_targets.yaml")
+        )
       }
     )
     tryCatch(
@@ -132,11 +138,13 @@ install_latest_version <- function() {
       },
       error = function(e) {
         message("Getting remote DESCRIPTION")
-        timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
-                        export = file.path(cache, "DESCRIPTION"))
+        timaR::get_file(
+          url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
+          export = file.path(cache, "DESCRIPTION")
+        )
       }
     )
-  } else{
+  } else {
     message("You already have the latest version, skipping")
   }
 }
