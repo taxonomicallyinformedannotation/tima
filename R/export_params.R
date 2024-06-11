@@ -41,8 +41,8 @@ export_params <-
         paste0(
           format(Sys.time(), "%y%m%d_%H%M%OS"),
           "_",
-          desc::desc_get_field("Package"),
-          desc::desc_get_version(),
+          pak::pkg_status("timaR")$package,
+          pak::pkg_status("timaR")$version,
           "_",
           step,
           ".yaml"
