@@ -2,6 +2,7 @@
 
 # timaR 2.9.5
 
+* Do not re-package if already the latest version
 * SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)
 
 # timaR 2.9.4
