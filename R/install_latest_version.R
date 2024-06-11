@@ -44,7 +44,7 @@ install_latest_version <- function() {
     install.packages(c("gh"))
   }
   local_sha <- pak::pkg_status("timaR")$remotesha
-  if (is.null(local_sha)) {
+  if (is.na(local_sha)) {
     message("Installing for the first time...")
     local_sha <- "myFirstInstallTrickToWork"
   }
