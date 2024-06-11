@@ -8,6 +8,7 @@
 #'
 #' @examples NULL
 install_latest_version <- function() {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (!requireNamespace(c("httr2", "jsonlite", "tidytable"), quietly = TRUE)) {
     install.packages(c("httr2", "jsonlite", "tidytable"))
   }
@@ -19,7 +20,6 @@ install_latest_version <- function() {
     jsonlite::fromJSON() |>
     tidytable::pull(sha)
   if (pak::pkg_status("timaR")$remotesha != shas[1]) {
-    options(repos = c(CRAN = "https://cloud.r-project.org"))
     if (Sys.info()[["sysname"]] == "Windows") {
       if (!requireNamespace("installr", quietly = TRUE)) {
         install.packages("installr")
