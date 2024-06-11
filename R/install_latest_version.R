@@ -40,17 +40,12 @@ install_latest_version <- function() {
       )
     )
   }
-  if (!requireNamespace(c("httr2", "jsonlite", "tidytable"), quietly = TRUE)) {
-    install.packages(c("httr2", "jsonlite", "tidytable"))
+  if (!requireNamespace(c("gh"), quietly = TRUE)) {
+    install.packages(c("gh"))
   }
-  shas <- "https://api.github.com/repos/taxonomicallyinformedannotation/tima-r/commits" |>
-    httr2::request() |>
-    httr2::req_method("GET") |>
-    httr2::req_perform() |>
-    tidytable::pull(url) |>
-    jsonlite::fromJSON() |>
-    tidytable::pull(sha)
-  if (pak::pkg_status("timaR")$remotesha != shas[1]) {
+  local_sha <- pak::pkg_status("timaR")$remotesha
+  remote_sha <- gh::gh("GET /repos/taxonomicallyinformedannotation/tima-r/commits")[[1]]$sha
+  if (local_sha != remote_sha) {
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     tryCatch(
