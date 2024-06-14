@@ -2,12 +2,14 @@
 #'
 #' @description This function installs the latest version
 #'
+#' @param test Flag for test
+#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function() {
+install_latest_version <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     if (!requireNamespace("installr", quietly = TRUE)) {
@@ -73,10 +75,10 @@ install_latest_version <- function() {
           ask = FALSE,
           upgrade = FALSE
         )
-        TRUE
+        return(test == FALSE)
       },
       error = function(e) {
-        FALSE
+        return(FALSE)
       }
     )
     # If local version installation fails, try the URL from DESCRIPTION file
@@ -89,10 +91,10 @@ install_latest_version <- function() {
             ask = FALSE,
             upgrade = FALSE
           )
-          TRUE
+          return(test == FALSE)
         },
         error = function(e) {
-          FALSE
+          return(FALSE)
         }
       )
     }
@@ -106,11 +108,11 @@ install_latest_version <- function() {
             ask = FALSE,
             upgrade = FALSE
           )
-          TRUE
+          return(test == FALSE)
         },
         error = function(e) {
           message("Install failed")
-          FALSE
+          return(FALSE)
         }
       )
     }
