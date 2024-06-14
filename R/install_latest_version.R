@@ -47,50 +47,77 @@ install_latest_version <- function() {
     local_version <- pak::pkg_status("timaR")$version[1]
   }
   # TODO not ideal
-  remote_version <- readLines("https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION")[[3]] |>
-    gsub(pattern = "Version: ", replacement = "", fixed = TRUE)
+  remote_version <- readLines(
+    "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION"
+  )[[3]] |>
+    gsub(
+      pattern = "Version: ",
+      replacement = "",
+      fixed = TRUE
+    )
   if (local_version == remote_version) {
-    message("You already have the latest version (", local_version, ") skipping")
+    message(
+      "You already have the latest version (",
+      local_version,
+      ") skipping"
+    )
   } else {
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
-    tryCatch(
-      expr = {
+    # Try installing the local version first
+    success <- tryCatch(
+      {
         message("Installing local version")
         pak::pkg_install(
           pkg = ".",
           ask = FALSE,
           upgrade = FALSE
         )
+        TRUE
       },
       error = function(e) {
-        tryCatch(
-          expr = {
-            message("Installing local version 2")
-            pak::pkg_install(
-              pkg = desc::desc_get_urls()[[1]],
-              ask = FALSE,
-              upgrade = FALSE
-            )
-          },
-          error = function(e) {
-            tryCatch(
-              expr = {
-                message("Installing remote version")
-                pak::pkg_install(
-                  pkg = "taxonomicallyinformedannotation/tima-r",
-                  ask = FALSE,
-                  upgrade = FALSE
-                )
-              },
-              error = function(e) {
-                message("Install failed")
-              }
-            )
-          }
-        )
+        FALSE
       }
     )
+    # If local version installation fails, try the URL from DESCRIPTION file
+    if (!success) {
+      success <- tryCatch(
+        {
+          message("Installing local version from URL")
+          pak::pkg_install(
+            pkg = desc::desc_get_urls()[[1]],
+            ask = FALSE,
+            upgrade = FALSE
+          )
+          TRUE
+        },
+        error = function(e) {
+          FALSE
+        }
+      )
+    }
+    # If URL installation fails, try installing the remote version from GitHub
+    if (!success) {
+      success <- tryCatch(
+        {
+          message("Installing remote version")
+          pak::pkg_install(
+            pkg = "taxonomicallyinformedannotation/tima-r",
+            ask = FALSE,
+            upgrade = FALSE
+          )
+          TRUE
+        },
+        error = function(e) {
+          message("Install failed")
+          FALSE
+        }
+      )
+    }
+    # Final message if all attempts fail
+    if (!success) {
+      message("All installation attempts failed")
+    }
   }
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
@@ -143,10 +170,7 @@ install_latest_version <- function() {
     },
     error = function(e) {
       message("Getting remote DESCRIPTION")
-      timaR::get_file(
-        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION",
-        export = file.path(cache, "DESCRIPTION")
-      )
+      timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION", export = file.path(cache, "DESCRIPTION"))
     }
   )
 }
