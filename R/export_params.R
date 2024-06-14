@@ -33,7 +33,7 @@ export_params <-
 
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", crayon::green(directory))
-    tima_version <- pak::pkg_status("timaR")$version
+    tima_version <- pak::pkg_status("timaR")$version[1]
 
     yaml::write_yaml(
       x = parameters,
