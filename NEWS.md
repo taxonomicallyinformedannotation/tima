@@ -202,7 +202,7 @@
 
 * Minor fixes
 * Additional benchmark
-  figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution)
+  figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution))
 
 # timaR 2.2.1
 
