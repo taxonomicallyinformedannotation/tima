@@ -4,6 +4,7 @@
 
 * Do not re-package if already the latest version
 * SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)
+* Update to Massbank version `2024.06`
 
 # timaR 2.9.4
 
