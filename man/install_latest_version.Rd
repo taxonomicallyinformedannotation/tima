@@ -4,7 +4,10 @@
 \alias{install_latest_version}
 \title{Install latest version}
 \usage{
-install_latest_version()
+install_latest_version(test = FALSE)
+}
+\arguments{
+\item{test}{Flag for test}
 }
 \description{
 This function installs the latest version
