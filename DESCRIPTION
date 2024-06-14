@@ -46,7 +46,7 @@ Imports:
     stringi (>= 1.8.4),
     targets (>= 1.7.0),
     tidytable (>= 0.11.0),
-    tidyfst (>= 1.7.8),
+    tidyfst (>= 1.7.9),
     utils,
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.8)
