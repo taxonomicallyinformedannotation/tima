@@ -21,9 +21,7 @@
 #'   export = "data/source/example_metadata.tsv"
 #' )
 get_file <-
-  function(url,
-           export,
-           limit = 3600) {
+  function(url, export, limit = 3600) {
     # ## Use default system data directory
     # export <- file.path(
     #   rappdirs::user_data_dir(
@@ -37,24 +35,26 @@ get_file <-
     if (!file.exists(export)) {
       options(timeout = limit)
       create_dir(export = export)
-      tryCatch(expr = {
-        utils::download.file(
-          url = url,
-          destfile = export
-        )
-      }, error = tryCatch(expr = {
-        message("Something seems wrong...retrying...")
-        utils::download.file(
-          url = url,
-          destfile = export
-        )
-      }, error = {
-        message("Something seems wrong...retrying again... (and then failing)")
-        utils::download.file(
-          url = url,
-          destfile = export
-        )
-      }))
+
+      download_with_retry <- function(url, destfile, attempts = 3) {
+        for (i in 1:attempts) {
+          tryCatch(
+            {
+              utils::download.file(url = url, destfile = destfile)
+              if (file.exists(destfile)) {
+                return(TRUE)
+              }
+            },
+            error = function(e) {
+              message("Something seems wrong...retrying... attempt ", i)
+            }
+          )
+        }
+        return(FALSE)
+      }
+      if (!download_with_retry(url = url, destfile = export)) {
+        message("Failed to download the file after multiple attempts.")
+      }
     } else {
       message("File already exists. Skipping.")
     }
