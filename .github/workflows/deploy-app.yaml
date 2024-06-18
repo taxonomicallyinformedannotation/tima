@@ -21,12 +21,8 @@
 name: Deploy app
 
 on:
-  workflow_call:
-    inputs:
-      cache-version:
-        type: string
-        default: "1"
-        required: false
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
