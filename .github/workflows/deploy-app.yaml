@@ -38,7 +38,7 @@ jobs:
         with:
           packages: |
             renv
-            posit-dev/shinylive
+            shinylive
             sessioninfo
           cache-version: ${{ github.event.inputs.cache-version }}
 
