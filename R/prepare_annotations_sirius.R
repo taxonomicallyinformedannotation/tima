@@ -36,6 +36,9 @@ prepare_annotations_sirius <-
            str_nam = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$names,
            str_tax_cla = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
+    if (is.null(input_directory)) {
+      input_directory <- "Th1sd1rw0nt3x1st"
+    }
     if (file.exists(input_directory)) {
       log_debug("Loading parameters for SIRIUS", sirius_version)
       sirius_version <- as.character(sirius_version)
@@ -213,44 +216,48 @@ prepare_annotations_sirius <-
     model <- columns_model()
 
     table_can <- table |>
-      tidytable::select(tidytable::any_of(c(
-        model$features_columns,
-        model$features_calculated_columns
-      ))) |>
+      tidytable::select(tidytable::any_of(
+        c(model$features_columns, model$features_calculated_columns)
+      )) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
     table_for <- table |>
-      tidytable::select(tidytable::any_of(c(
-        model$features_columns,
-        model$candidates_sirius_for_columns
-      ))) |>
+      tidytable::select(tidytable::any_of(
+        c(
+          model$features_columns,
+          model$candidates_sirius_for_columns
+        )
+      )) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
     table_str <- table |>
-      tidytable::select(tidytable::any_of(c(
-        model$features_columns,
-        model$candidates_structures_columns,
-        model$candidates_spectra_columns,
-        model$candidates_sirius_str_columns
-      ))) |>
+      tidytable::select(tidytable::any_of(
+        c(
+          model$features_columns,
+          model$candidates_structures_columns,
+          model$candidates_spectra_columns,
+          model$candidates_sirius_str_columns
+        )
+      )) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
     rm(table)
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_annotations_sirius"), step = "prepare_annotations_sirius")
+    export_params(
+      parameters = get_params(step = "prepare_annotations_sirius"),
+      step = "prepare_annotations_sirius"
+    )
     export_output(x = table_can, file = output_can)
     export_output(x = table_for, file = output_for)
     export_output(x = table_str, file = output_ann[[1]])
 
     rm(table_can, table_for, table_str)
-    return(
-      c(
-        "canopus" = output_can,
-        "formula" = output_for,
-        "structural" = output_ann[[1]]
-      )
-    )
+    return(c(
+      "canopus" = output_can,
+      "formula" = output_for,
+      "structural" = output_ann[[1]]
+    ))
   }
