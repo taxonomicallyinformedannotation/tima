@@ -38,8 +38,7 @@ jobs:
             renv
             shinylive
             sessioninfo
-          cache-version: ${{ github.event.inputs.cache-version }}
-
+            
       - name: Install package
         run: |
           Rscript inst/scripts/install.R
