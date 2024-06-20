@@ -432,7 +432,7 @@ test_that("Test functions", {
   prepare_annotations_gnps()
 
   ### SIRIUS results
-  ## To do as if there was no input
+  prepare_annotations_sirius(input_directory = NULL)
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   ## When there is an input
   prepare_annotations_sirius(
