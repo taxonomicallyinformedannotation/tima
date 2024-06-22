@@ -16,7 +16,7 @@ Depends:
     R (>= 4.4.0)
 Imports:
     bs4Dash (>= 2.3.3),
-    crayon (>= 1.5.2),
+    crayon (>= 1.5.3),
     desc (>= 1.4.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
@@ -44,7 +44,7 @@ Imports:
     Spectra (>= 1.14.1),
     stats,
     stringi (>= 1.8.4),
-    targets (>= 1.7.0),
+    targets (>= 1.7.1),
     tidytable (>= 0.11.0),
     tidyfst (>= 1.7.9),
     utils,
