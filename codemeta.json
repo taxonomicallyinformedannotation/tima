@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
+  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
   "author": [
     {
       "@type": "Person",
@@ -128,7 +128,7 @@
       "@type": "SoftwareApplication",
       "identifier": "crayon",
       "name": "crayon",
-      "version": ">= 1.5.2",
+      "version": ">= 1.5.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -484,7 +484,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.7.0",
+      "version": ">= 1.7.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -553,7 +553,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4581.344KB",
+  "fileSize": "4413.45KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
