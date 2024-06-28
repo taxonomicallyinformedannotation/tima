@@ -8,6 +8,7 @@ harmonize_spectra(
   spectra,
   metad = get("metad", envir = parent.frame()),
   mode,
+  col_ad = get("col_ad", envir = parent.frame()),
   col_ce = get("col_ce", envir = parent.frame()),
   col_ci = get("col_ci", envir = parent.frame()),
   col_em = get("col_em", envir = parent.frame()),
@@ -32,6 +33,8 @@ harmonize_spectra(
 \item{metad}{Metadata to identify the library}
 
 \item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
+
+\item{col_ad}{Name of the adduct in mgf}
 
 \item{col_ce}{Name of the collision energy in mgf}
 

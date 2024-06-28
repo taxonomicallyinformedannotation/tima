@@ -18,6 +18,7 @@ fake_annotations_columns <- function() {
     candidate_structure_molecular_formula = NA,
     candidate_structure_exact_mass = NA,
     candidate_structure_xlogp = NA,
+    candidate_adduct = NA,
     candidate_library = NA,
     candidate_score_similarity = NA,
     candidate_count_similarity_peaks_matched = NA,

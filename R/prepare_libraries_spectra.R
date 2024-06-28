@@ -15,6 +15,7 @@
 #' @param output_sop SOP output file
 #' @param polarity MS polarity
 #' @param metad Metadata to identify the library
+#' @param col_ad Name of the adduct in mgf
 #' @param col_ce Name of the collision energy in mgf
 #' @param col_ci Name of the compound id in mgf
 #' @param col_em Name of the exact mass in mgf
@@ -43,6 +44,7 @@ prepare_libraries_spectra <-
            output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
            output_sop = get_params(step = "prepare_libraries_spectra")$files$libraries$sop$prepared$spectral,
            metad = "myLib",
+           col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
            col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
            col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
            col_em = get_params(step = "prepare_libraries_spectra")$names$mgf$exact_mass,
@@ -86,6 +88,7 @@ prepare_libraries_spectra <-
         log_debug("Your input file does not exist, returning empty lib instead.")
         spectra_harmonized_pos <- tidytable::tidytable(
           "compound_id" = "fake_compound",
+          "adduct" = NA_character_,
           "collision_energy" = NA_character_,
           "exactmass" = NA_real_,
           "formula" = NA_character_,

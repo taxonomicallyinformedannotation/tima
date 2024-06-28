@@ -1182,6 +1182,7 @@ list(
                   output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
                   output_sop = "data/interim/libraries/sop/spectral_int_prepared.tsv.gz",
                   metad = "InternalLib",
+                  col_ad = NULL,
                   col_ce = NULL,
                   col_ci = "FILENAME",
                   col_em = "EXACTMASS",
@@ -1236,6 +1237,7 @@ list(
                     paths_urls_massbank_version,
                     sep = " - "
                   ),
+                  col_ad = "Precursor_type",
                   col_ce = "Collision_energy",
                   col_ci = NULL,
                   col_em = "ExactMass",

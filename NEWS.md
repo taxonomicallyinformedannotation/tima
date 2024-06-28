@@ -1,5 +1,9 @@
 # timaR
 
+# timaR 2.9.6
+
+* Fix library/adducts confusion (#123)
+
 # timaR 2.9.5
 
 * Do not re-package if already the latest version
