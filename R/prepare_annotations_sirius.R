@@ -178,7 +178,7 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_01kin = NA
         ) |>
         select_annotations_columns()
-      rm(structures_prepared, formulas_prepared, canopus_prepared)
+      rm(structures_prepared, formulas_prepared, canopus_prepared, denovo_prepared)
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")

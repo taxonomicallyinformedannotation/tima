@@ -53,6 +53,7 @@ columns_model <- function() {
 
   candidates_spectra_columns <- c(
     "candidate_library",
+    "candidate_adduct",
     "candidate_count_similarity_peaks_matched",
     "candidate_score_similarity"
   )
@@ -101,8 +102,7 @@ columns_model <- function() {
       "features_calculated_columns" = features_calculated_columns,
       "candidates_calculated_columns" = candidates_calculated_columns,
       "candidates_sirius_for_columns" = candidates_sirius_for_columns,
-      "candidates_sirius_str_columns" =
-        candidates_sirius_str_columns,
+      "candidates_sirius_str_columns" = candidates_sirius_str_columns,
       "candidates_spectra_columns" = candidates_spectra_columns,
       "candidates_structures_columns" = candidates_structures_columns,
       "components_columns" = components_columns,

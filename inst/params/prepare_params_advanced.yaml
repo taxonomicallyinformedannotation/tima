@@ -409,6 +409,9 @@ names:
 
   #' Name of fields present in the MGF.
   mgf:
+    #' Name of "adduct" in MGF. STRING
+    adduct: ~
+
     #' Name of "collision energy" in MGF. STRING
     collision_energy: ~
 

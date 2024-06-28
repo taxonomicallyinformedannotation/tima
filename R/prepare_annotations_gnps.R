@@ -45,6 +45,7 @@ prepare_annotations_gnps <-
         ) |>
         tidytable::select(tidytable::any_of(c(
           "feature_id" = "#Scan#",
+          "candidate_adduct" = "Adduct",
           "candidate_structure_error_mz" = "MassDiff",
           "candidate_library" = "LibraryName",
           "candidate_structure_name" = "Compound_Name",

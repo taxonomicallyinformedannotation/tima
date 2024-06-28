@@ -60,6 +60,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   df_empty <- data.frame(
     feature_id = NA,
     candidate_spectrum_entropy = NA,
+    candidate_adduct = NA,
     candidate_library = NA,
     candidate_structure_error_mz = NA,
     candidate_structure_name = NA,
@@ -260,6 +261,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         tidytable::as_tidytable()
       rm(spectra)
 
+      lib_adduct <- spectral_library@backend@spectraData$adduct
+      if (is.null(lib_adduct)) {
+        lib_adduct <- rep(NA_character_, length(spectral_library))
+      }
       lib_inchikey <- spectral_library@backend@spectraData$inchikey
       if (is.null(lib_inchikey)) {
         lib_inchikey <- rep(NA_character_, length(spectral_library))
@@ -301,6 +306,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
       df_meta <- tidytable::tidytable(
         "target_id" = lib_id,
+        "target_adduct" = lib_adduct,
         "target_inchikey" = lib_inchikey,
         "target_inchikey_no_stereo" = lib_inchikey2D,
         "target_smiles" = lib_smiles,
@@ -338,6 +344,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         tidytable::select(tidytable::any_of(
           c(
             "feature_id",
+            "candidate_adduct" = "target_adduct",
             "candidate_library" = "target_library",
             "candidate_structure_error_mz",
             "candidate_structure_name" = "target_name",

@@ -19,6 +19,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
     tidytable::select(tidytable::any_of(
       c(
         "feature_id",
+        "candidate_adduct" = "adduct",
         "candidate_structure_molecular_formula" = "molecularFormula",
         "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
         "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
@@ -73,6 +74,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
     ) |>
     tidytable::select(tidytable::any_of(c(
       "feature_id",
+      "candidate_adduct" = "adduct",
       "candidate_structure_molecular_formula" = "molecularFormula",
       "candidate_structure_exact_mass",
       "candidate_structure_error_mz",
@@ -102,6 +104,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
   df <- df |>
     tidytable::select(tidytable::any_of(c(
       "feature_id",
+      "candidate_adduct" = "adduct",
       "candidate_structure_name" = "name",
       "candidate_structure_smiles_no_stereo" = "smiles",
       "candidate_structure_inchikey_no_stereo" = "InChIkey2D",

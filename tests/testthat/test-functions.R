@@ -232,6 +232,7 @@ test_that("Test functions", {
   ### Spectra
   #### LOTUS
   col_args <- list(
+    col_ad = NULL,
     col_ce = NULL,
     col_ci = "FILENAME",
     col_em = "EXACTMASS",
@@ -579,6 +580,7 @@ test_that("Test functions", {
   arguments$names_features <- "x"
   arguments$names_filename <- "x"
   arguments$names_inchikey <- "x"
+  arguments$names_mgf_ad <- "x"
   arguments$names_mgf_ce <- "x"
   arguments$names_mgf_ci <- "x"
   arguments$names_mgf_em <- "x"

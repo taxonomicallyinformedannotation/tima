@@ -5,6 +5,7 @@
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
+#' @param col_ad Name of the adduct in mgf
 #' @param col_ce Name of the collision energy in mgf
 #' @param col_ci Name of the compound id in mgf
 #' @param col_em Name of the exact mass in mgf
@@ -33,6 +34,10 @@ harmonize_spectra <- function(spectra,
                                 envir = parent.frame()
                               ),
                               mode,
+                              col_ad = get(
+                                "col_ad",
+                                envir = parent.frame()
+                              ),
                               col_ce = get(
                                 "col_ce",
                                 envir = parent.frame()
@@ -98,6 +103,7 @@ harmonize_spectra <- function(spectra,
                                 envir = parent.frame()
                               )) {
   columns <- c(
+    "adduct",
     "collision_energy",
     "compound_id",
     "exactmass",
@@ -116,6 +122,7 @@ harmonize_spectra <- function(spectra,
   )
   columns_full <-
     c(
+      "adduct" = col_ad,
       "collision_energy" = col_ce,
       "compound_id" = col_ci,
       "exactmass" = col_em,
@@ -175,6 +182,7 @@ harmonize_spectra <- function(spectra,
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(spectra_missing) |>
     tidytable::select(
+      adduct,
       collision_energy,
       compound_id,
       exactmass,

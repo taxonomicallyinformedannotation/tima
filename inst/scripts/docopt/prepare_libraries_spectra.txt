@@ -14,6 +14,7 @@ Arguments:
 
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
 
+  names-mgf-ad               Name of "adduct" in MGF. STRING
   names-mgf-ce               Name of "collision energy" in MGF. STRING
   names-mgf-ci               Name of "compound ID" in MGF. STRING
   names-mgf-em               Name of "exact mass" in MGF. STRING

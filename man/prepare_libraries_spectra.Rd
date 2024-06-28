@@ -13,6 +13,7 @@ prepare_libraries_spectra(
   output_sop = get_params(step =
     "prepare_libraries_spectra")$files$libraries$sop$prepared$spectral,
   metad = "myLib",
+  col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
   col_em = get_params(step = "prepare_libraries_spectra")$names$mgf$exact_mass,
@@ -41,6 +42,8 @@ prepare_libraries_spectra(
 \item{output_sop}{SOP output file}
 
 \item{metad}{Metadata to identify the library}
+
+\item{col_ad}{Name of the adduct in mgf}
 
 \item{col_ce}{Name of the collision energy in mgf}
 

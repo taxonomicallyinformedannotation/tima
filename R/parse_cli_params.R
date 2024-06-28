@@ -247,6 +247,9 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$names_inchikey)) {
       parameters$names$inchikey <- as.character(arguments$names_inchikey)
     }
+    if (!is.null(arguments$names_mgf_ad)) {
+      parameters$names$mgf$adduct <- as.character(arguments$names_mgf_ad)
+    }
     if (!is.null(arguments$names_mgf_ce)) {
       parameters$names$mgf$collision_energy <- as.character(arguments$names_mgf_ce)
     }

@@ -756,7 +756,9 @@ annotate_masses <-
             tidytable::na_if(x, "")
           }
         )
-      )
+      ) |>
+      tidytable::mutate(candidate_adduct = candidate_library) |>
+      tidytable::mutate(candidate_library = "TIMA MS1")
     rm(structure_organism_pairs_table)
 
     df_final |>
