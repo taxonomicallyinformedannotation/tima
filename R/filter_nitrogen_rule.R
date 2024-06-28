@@ -48,6 +48,12 @@ filter_nitrogen_rule <-
         cols_remove = FALSE
       )
 
+    if (!"candidate_library" %in% colnames(df_1)) {
+      # Fix that actually should not be needed
+      df_1 <- df_1 |>
+        tidytable::mutate(candidate_library = NA_character_)
+    }
+
     df_1$c <- add_element_count(df_1, element = "C")
     df_1$h <- add_element_count(df_1, element = "H")
     df_1$n <- add_element_count(df_1, element = "N")
