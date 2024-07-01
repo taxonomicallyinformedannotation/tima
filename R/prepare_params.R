@@ -110,6 +110,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   names_features <- params_advanced$names$features
   names_filename <- params_advanced$names$filename
   names_inchikey <- params_advanced$names$inchikey
+  names_mgf_ad <- params_advanced$names$mgf$adduct
   names_mgf_ce <- params_advanced$names$mgf$collision_energy
   names_mgf_ci <- params_advanced$names$mgf$compound_id
   names_mgf_em <- params_advanced$names$mgf$exact_mass
@@ -503,6 +504,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_spe_is_pos
       yamls_params$prepare_libraries_spectra$files$libraries$spectral$is$raw <-
         fil_lib_spe_is_raw
+      yamls_params$prepare_libraries_spectra$names$mgf$adduct <-
+        names_mgf_ad
       yamls_params$prepare_libraries_spectra$names$mgf$collision_energy <-
         names_mgf_ce
       yamls_params$prepare_libraries_spectra$names$mgf$compound_id <-
