@@ -1623,6 +1623,8 @@ save_input <- function(input) {
   # yaml_advanced$names$inchikey <-
   #   shiny::isolate(input$names_inchikey)
   # TODO
+  # yaml_advanced$names$mgf$adduct <-
+  #   shiny::isolate(input$names_mgf_x)
   # yaml_advanced$names$mgf$collision_energy <-
   #   shiny::isolate(input$names_mgf_x)
   # yaml_advanced$names$mgf$compound_id <-
