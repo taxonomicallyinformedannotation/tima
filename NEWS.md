@@ -3,6 +3,7 @@
 # timaR 2.9.6
 
 * Fix library/adducts confusion (#123)
+* Fix some incorrect adduct differences annotations
 
 # timaR 2.9.5
 

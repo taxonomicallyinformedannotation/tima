@@ -301,18 +301,10 @@ annotate_masses <-
       ) |>
       tidytable::filter(feature_id != feature_id_dest) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
-      tidytable::filter(mz >= mz_dest) |>
+      tidytable::filter(mz_dest >= mz) |>
       tidytable::mutate(
-        delta_min = ifelse(
-          test = mz >= mz_dest,
-          yes = abs(mz - (1E-6 * tolerance_ppm * mz) - mz_dest),
-          no = abs(mz + (1E-6 * tolerance_ppm * mz) - mz_dest)
-        ),
-        delta_max = ifelse(
-          test = mz >= mz_dest,
-          yes = abs(mz + (1E-6 * tolerance_ppm * mz) - mz_dest),
-          no = abs(mz - (1E-6 * tolerance_ppm * mz) - mz_dest)
-        )
+        delta_min = (mz_dest - (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz),
+        delta_max = (mz_dest + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz)
       )
     rm(df_rt_tol)
 
@@ -343,6 +335,13 @@ annotate_masses <-
       dist_groups(
         d = stats::dist(add_clu_table$adduct_mass),
         g = add_clu_table$adduct
+      ) |>
+      tidytable::mutate(
+        Group1 = Label |>
+          gsub(pattern = "Between ", replacement = "", fixed = TRUE) |>
+          gsub(pattern = " and .*", replacement = ""),
+        Group2 = Label |>
+          gsub(pattern = ".* and ", replacement = "")
       ) |>
       tidytable::select(-Item1, -Item2, -Label) |>
       ## remove redundancy among clusters
