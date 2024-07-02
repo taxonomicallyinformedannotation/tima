@@ -11,7 +11,6 @@
 #' @examples NULL
 install_latest_version <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
-  options("install.lock"=FALSE)
   if (Sys.info()[["sysname"]] == "Windows") {
     if (!requireNamespace("installr", quietly = TRUE)) {
       install.packages("installr")
@@ -21,14 +20,16 @@ install_latest_version <- function(test = FALSE) {
   if (!requireNamespace("pak", quietly = TRUE)) {
     install.packages("pak")
   }
-  if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-  }
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = remotes::system_requirements(os = "ubuntu", os_release = "22.04"))
     system(command = "sudo apt install libcurl4-openssl-dev")
   }
-  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", )
+  unlink(x = list.files(
+    path = file.path(.libPaths()[1], "_cache"),
+    pattern = "*.lock",
+    full.names = TRUE
+  ))
+  pak::pak("taxonomicallyinformedannotation/tima-r")
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
