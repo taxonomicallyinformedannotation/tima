@@ -46,16 +46,16 @@
     "gnps_workflow": "fbmn",
     "launch": 0,
     "ms_add_neg": [
-      "[1M-(H)2]2-",
-      "[1M-(H)1]1-",
-      "[2M-(H)1]1-"
+      "[M-H2]2-",
+      "[M-H]-",
+      "[2M-H]-"
     ],
     "ms_add_pos": [
-      "[1M+(H)2]2+",
-      "[1M+(H)1]1+",
-      "[1M+(H)4(N)1]1+",
-      "[1M+(Na)1]1+",
-      "[2M+(H)1]1+"
+      "[M+H2]2+",
+      "[M+H]+",
+      "[M+H4N]+",
+      "[M+Na]+",
+      "[2M+H]+"
     ],
     "ms_clu_neg": [
       "H2O",
@@ -74,6 +74,7 @@
     "ms_tol_mas_ppm_ms1": 10,
     "ms_tol_mas_ppm_ms2": 10,
     "ms_tol_rt_min": 0.05,
+    "names_adduct": "best ion",
     "names_extension": true,
     "names_features": "row ID",
     "names_filename": "filename",

@@ -440,9 +440,9 @@ annotate_masses <-
     # TODO dictionary of adducts (example 2H2O in mzmine)
 
     df_addlossed_min <- df_addlossed |>
-      tidytable::distinct(mz_1, label) |>
       tidytable::rowwise() |>
-      tidytable::mutate(mass = calculate_mass_from_adduct(adduct_string = label, mass = mz_1))
+      tidytable::mutate(mass = calculate_mass_from_adduct(adduct_string = label, mass = mz_1)) |>
+      tidytable::ungroup()
 
     ## Safety
     df_addlossed_min_1 <- df_addlossed_min |>
@@ -453,8 +453,11 @@ annotate_masses <-
 
     if (nrow(df_addlossed_min_2) != 0) {
       message("Some adducts were unproperly detected, defaulting to (de)protonated")
-      # TODO
-      df_addlossed_min_2
+      df_addlossed_min_2 <- df_addlossed_min_2 |>
+        tidytable::mutate(label = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")) |>
+        tidytable::rowwise() |>
+        tidytable::mutate(mass = calculate_mass_from_adduct(adduct_string = label, mass = mz_1)) |>
+        tidytable::ungroup()
     }
 
     df_addlossed_rdy <- df_addlossed_min_1 |>
@@ -463,7 +466,7 @@ annotate_masses <-
     # TODO if same, say unrecognized and switch to M+H or M-H by default
 
     log_debug("joining within given mz tol to exact mass library \n")
-    df_addlossed_em <- df_addlossed |>
+    df_addlossed_em <- df_addlossed_rdy |>
       dplyr::inner_join(df_add_em,
         by = dplyr::join_by(
           mz_1 >= value_min,
