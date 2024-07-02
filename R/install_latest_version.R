@@ -2,14 +2,12 @@
 #'
 #' @description This function installs the latest version
 #'
-#' @param test Flag for test
-#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function(test = FALSE) {
+install_latest_version <- function() {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     if (!requireNamespace("installr", quietly = TRUE)) {
@@ -20,18 +18,10 @@ install_latest_version <- function(test = FALSE) {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev")
   }
-  if (!requireNamespace("pak", quietly = TRUE)) {
-    install.packages("pak")
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
   }
-  unlink(x = list.files(
-    path = file.path(.libPaths()[1], "_cache"),
-    pattern = "*.lock",
-    full.names = TRUE
-  ))
-  pak::pkg_install(
-    pkg = "taxonomicallyinformedannotation/tima-r",
-    ask = FALSE,
-  )
+  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r")
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
