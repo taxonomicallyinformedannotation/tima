@@ -454,7 +454,10 @@ annotate_masses <-
     if (nrow(df_addlossed_min_2) != 0) {
       message("Some adducts were unproperly detected, defaulting to (de)protonated")
       df_addlossed_min_2 <- df_addlossed_min_2 |>
-        tidytable::mutate(label = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")) |>
+        tidytable::mutate(label = switch(ms_mode,
+          "pos" = "[M+H]+",
+          "neg" = "[M-H]-"
+        )) |>
         tidytable::rowwise() |>
         tidytable::mutate(mass = calculate_mass_from_adduct(adduct_string = label, mass = mz_1)) |>
         tidytable::ungroup()
