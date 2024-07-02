@@ -17,12 +17,11 @@ install_latest_version <- function(test = FALSE) {
     }
     installr::install.rtools(check_r_update = FALSE, GUI = FALSE)
   }
+  if (Sys.info()[["sysname"]] == "Linux") {
+    system(command = "sudo apt install libcurl4-openssl-dev")
+  }
   if (!requireNamespace("pak", quietly = TRUE)) {
     install.packages("pak")
-  }
-  if (Sys.info()[["sysname"]] == "Linux") {
-    system(command = remotes::system_requirements(os = "ubuntu", os_release = "22.04"))
-    system(command = "sudo apt install libcurl4-openssl-dev")
   }
   unlink(x = list.files(
     path = file.path(.libPaths()[1], "_cache"),
