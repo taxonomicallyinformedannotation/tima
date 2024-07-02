@@ -21,19 +21,30 @@ install_latest_version <- function() {
   if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
   }
-  lib <- Sys.getenv("R_LIBS_SITE")
-  if (lib == "") {
-    lib <- file.path(dirname(.Library), "site-library")
-    cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
-    cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    lib <- Sys.getenv("R_LIBS_SITE")
+    if (lib == "") {
+      lib <- file.path(dirname(.Library), "site-library")
+      cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
+      cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
 
-    message("Setting R_LIBS_SITE to ", lib)
-  } else {
-    message("R_LIBS_SITE is already set to ", lib)
-    cat(sprintf(
-      "R_LIB_FOR_PAK=%s\n",
-      strsplit(lib, .Platform$path.sep)[[1]][[1]]
-    ), append = TRUE)
+      message("Setting R_LIBS_SITE to ", lib)
+    } else {
+      message("R_LIBS_SITE is already set to ", lib)
+      cat(sprintf(
+        "R_LIB_FOR_PAK=%s\n",
+        strsplit(lib, .Platform$path.sep)[[1]][[1]]
+      ), append = TRUE)
+    }
+    install.packages(
+      "pak",
+      repos = sprintf(
+        "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+        .Platform$pkgType,
+        R.Version()$os,
+        R.Version()$arch
+      )
+    )
   }
   ref <- ifelse(
     test = Sys.getenv("BRANCH_NAME") != "",
