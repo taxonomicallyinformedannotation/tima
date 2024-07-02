@@ -11,6 +11,7 @@
 #' @examples NULL
 install_latest_version <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
+  options("install.lock"=FALSE)
   if (Sys.info()[["sysname"]] == "Windows") {
     if (!requireNamespace("installr", quietly = TRUE)) {
       install.packages("installr")
