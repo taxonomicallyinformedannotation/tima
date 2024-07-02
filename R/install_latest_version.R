@@ -23,7 +23,10 @@ install_latest_version <- function(test = FALSE) {
   if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
   }
-  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r")
+  if (Sys.info()[["sysname"]] == "Linux") {
+    system(command = remotes::system_requirements(os = "ubuntu", os_release = "22.04"))
+  }
+  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", )
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
