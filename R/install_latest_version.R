@@ -25,6 +25,7 @@ install_latest_version <- function(test = FALSE) {
   }
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = remotes::system_requirements(os = "ubuntu", os_release = "22.04"))
+    system(command = "sudo apt install libcurl4-openssl-dev")
   }
   remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", )
   cache <- fs::path_home(".tima")
