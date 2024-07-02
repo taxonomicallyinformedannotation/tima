@@ -18,7 +18,7 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
