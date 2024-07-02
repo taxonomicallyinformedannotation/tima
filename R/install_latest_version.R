@@ -21,7 +21,14 @@ install_latest_version <- function() {
   if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
   }
-  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r")
+  ref <- ifelse(
+    test = Sys.getenv("BRANCH_NAME") != "",
+    yes = Sys.getenv("BRANCH_NAME"),
+    no = "HEAD"
+  )
+  message("ref is ", ref)
+  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r",
+                          ref = ref)
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
