@@ -24,11 +24,10 @@ install_latest_version <- function() {
   ref <- ifelse(
     test = Sys.getenv("BRANCH_NAME") != "",
     yes = Sys.getenv("BRANCH_NAME"),
-    no = "HEAD"
+    no = "main"
   )
   message("ref is ", ref)
-  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r",
-                          ref = ref)
+  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", ref = ref)
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
@@ -64,7 +63,11 @@ install_latest_version <- function() {
     error = function(e) {
       message("Installing remote targets")
       timaR::get_file(
-        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
+        url = paste0(
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          ref,
+          "/_targets.yaml"
+        ),
         export = file.path(cache, "_targets.yaml")
       )
     }
@@ -80,7 +83,14 @@ install_latest_version <- function() {
     },
     error = function(e) {
       message("Getting remote DESCRIPTION")
-      timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION", export = file.path(cache, "DESCRIPTION"))
+      timaR::get_file(
+        url = paste0(
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          ref,
+          "/DESCRIPTION"
+        ),
+        export = file.path(cache, "DESCRIPTION")
+      )
     }
   )
 }
