@@ -10,10 +10,7 @@
 install_latest_version <- function() {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
-    if (!requireNamespace("installr", quietly = TRUE)) {
-      install.packages("installr")
-    }
-    installr::install.rtools(check_r_update = FALSE, GUI = FALSE)
+    message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev")
@@ -49,6 +46,7 @@ install_latest_version <- function() {
     no = "main"
   )
   message("ref is ", ref)
+  pak::pak_update()
   pak::pak(
     pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
     ask = FALSE
