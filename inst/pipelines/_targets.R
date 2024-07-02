@@ -336,14 +336,6 @@ list(
         }
       ),
       tar_target(
-        name = par_def_pre_lib_add,
-        format = "file",
-        command = {
-          par_def_pre_lib_add <-
-            paths$params$default$prepare$libraries$adducts
-        }
-      ),
-      tar_target(
         name = par_def_pre_lib_rt,
         format = "file",
         command = {
@@ -585,18 +577,6 @@ list(
           }
         ),
         tar_target(
-          name = par_usr_pre_lib_add,
-          format = "file",
-          command = {
-            par_usr_pre_lib_add <-
-              prepare_params(
-                params_small = par_fin_par,
-                params_advanced = par_fin_par2,
-                step = "prepare_libraries_adducts"
-              )
-          }
-        ),
-        tar_target(
           name = par_usr_pre_lib_rt,
           format = "file",
           command = {
@@ -815,16 +795,6 @@ list(
             parse_yaml_params(
               def = par_def_pre_fea_tab,
               usr = par_usr_pre_fea_tab[1]
-            )
-        }
-      ),
-      tar_target(
-        name = par_pre_lib_add,
-        command = {
-          par_pre_lib_add <-
-            parse_yaml_params(
-              def = par_def_pre_lib_add,
-              usr = par_usr_pre_lib_add[1]
             )
         }
       ),
@@ -1529,23 +1499,7 @@ list(
           }
         )
       )
-    ),
-    ## Adducts
-    list(tar_target(
-      name = lib_add,
-      format = "file",
-      command = {
-        lib_add <- prepare_libraries_adducts(
-          str_met = lib_mer_str_met,
-          adducts_masses_list = dic_add,
-          adducts_output_path = paths_data_interim_libraries_adducts_path,
-          clusters_list = dic_clu,
-          output_name = par_pre_lib_add$files$libraries$adducts$prepared,
-          masses_pos_output_path = par_pre_lib_add$files$libraries$adducts$pos,
-          masses_neg_output_path = par_pre_lib_add$files$libraries$adducts$neg
-        )
-      }
-    ))
+    )
   ),
   ## Annotations
   list(
@@ -1569,10 +1523,7 @@ list(
               str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc,
-              name = lib_add[par_ann_mas$ms$polarity],
               adducts_list = par_ann_mas$ms$adducts,
-              adducts_neg = par_ann_mas$files$libraries$adducts$neg,
-              adducts_pos = par_ann_mas$files$libraries$adducts$pos,
               adducts_masses_list = dic_add,
               clusters_neg = par_ann_mas$ms$clusters$neg,
               clusters_pos = par_ann_mas$ms$clusters$pos,
@@ -2321,10 +2272,7 @@ list(
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
-            name = lib_add["pos"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
-            adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
-            adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
             clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
             clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
@@ -2353,10 +2301,7 @@ list(
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
-            name = lib_add["neg"],
             adducts_list = benchmark_def_ann_mas$ms$adducts,
-            adducts_neg = benchmark_def_ann_mas$files$libraries$adducts$neg,
-            adducts_pos = benchmark_def_ann_mas$files$libraries$adducts$pos,
             adducts_masses_list = dic_add,
             clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
             clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,

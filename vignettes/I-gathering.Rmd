@@ -232,28 +232,4 @@ targets::tar_visnetwork(
 )
 ```
 
-#### Adducts
-
-The next library you need is an adducts library!
-As a main limitation of current annotation tools is adducts detection and coverage, an adducts library can also be generated in order to perform MS^1^ annotation later on.
-
-```{r adducts-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-targets::tar_visnetwork(
-  names = starts_with("lib_add"),
-  exclude = c(
-    contains("benchmark"),
-    contains("par_"),
-    contains("paths")
-  ),
-  targets_only = TRUE,
-  degree_from = 8
-)
-```
-
-As you can see, it depends on the previously built library.
-
-```{r adducts-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_adducts.R")
-```
-
 We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/II-preparing.html).

@@ -17,17 +17,6 @@ files:
 
   #' Libraries files.
   libraries:
-    #' Adducts libraries.
-    adducts:
-      #' Negative adducts. STRING
-      neg: data/interim/libraries/adducts/neg.tsv.gz
-
-      #' Positive adducts. STRING
-      pos: data/interim/libraries/adducts/pos.tsv.gz
-
-      #' Prepared adducts library. STRING
-      prepared: library
-
     #' Structure organism pairs libraries.
     sop:
       #' Merged structure organism pairs library.
@@ -71,42 +60,42 @@ ms:
   adducts:
     #' List of adducts to be used in negative. STRING
     neg:
-      - "[1M-(H)3]3-"
-      - "[1M-(H)2]2-"
-      - "[1M-(H)1]1-"
-      - "[1M+(F)1]1-"
-      - "[1M+(Na)1-(H)2]1-"
-      - "[1M+(Cl)1]1-"
-      - "[1M+(K)1-(H)2]1-"
-      - "[1M+(Br)1]1-"
-      - "[2M-(H)1]1-"
-      - "[3M-(H)1]1-"
+      - "[M-H3]3-"
+      - "[M-H2]2-"
+      - "[M-H]-"
+      - "[M+F]-"
+      - "[M+Na-H2]-"
+      - "[M+Cl]-"
+      - "[M+K-H2]-"
+      - "[M+Br]-"
+      - "[2M-H]-"
+      - "[3M-H]-"
 
     #' List of adducts to be used in positive. STRING
     pos:
-      - "[1M+(H)3]3+"
-      - "[1M+(H)2(Na)1]3+"
-      - "[1M+(H)1(Na)2]3+"
-      - "[1M+(Na)3]3+"
-      - "[1M+(H)2]2+"
-      - "[1M+(H)1(Na)1]2+"
-      - "[1M+(Mg)1]2+"
-      - "[1M+(H)1(K)1]2+"
-      - "[1M+(Ca)1]2+"
-      - "[1M+(Na)2]2+"
-      - "[1M+(Fe)1]2+"
-      - "[1M+(H)1]1+"
-      - "[1M+(H)4(N)1]1+"
-      - "[1M+(Na)1]1+"
-      - "[1M+(K)1]1+"
-      - "[1M+(Cu)1]1+"
-      - "[2M+(Mg)1]2+"
-      - "[2M+(Ca)1]2+"
-      - "[2M+(Fe)1]2+"
-      - "[2M+(H)1]1+"
-      - "[2M+(H)4(N)1]1+"
-      - "[2M+(Na)1]1+"
-      - "[2M+(K)1]1+"
+      - "[M+H3]3+"
+      - "[M+H2Na]3+"
+      - "[M+HNa2]3+"
+      - "[M+Na3]3+"
+      - "[M+H2]2+"
+      - "[M+HNa]2+"
+      - "[M+Mg]2+"
+      - "[M+HK]2+"
+      - "[M+Ca]2+"
+      - "[M+Na2]2+"
+      - "[M+Fe]2+"
+      - "[M+H]+"
+      - "[M+H4N]+"
+      - "[M+Na]+"
+      - "[M+K]+"
+      - "[M+Cu]+"
+      - "[2M+Mg]2+"
+      - "[2M+Ca]2+"
+      - "[2M+Fe]2+"
+      - "[2M+H]+"
+      - "[2M+H4N]+"
+      - "[2M+Na]+"
+      - "[2M+K]+"
 
   #' List of clusters to be used.
   clusters:

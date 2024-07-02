@@ -23,10 +23,7 @@ annotate_masses(
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
-  name = get_params(step = "annotate_masses")$files$libraries$adducts$prepared,
   adducts_list = get_params(step = "annotate_masses")$ms$adducts,
-  adducts_neg = get_params(step = "annotate_masses")$files$libraries$adducts$neg,
-  adducts_pos = get_params(step = "annotate_masses")$files$libraries$adducts$pos,
   adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
   clusters_neg = get_params(step = "annotate_masses")$ms$clusters$neg,
   clusters_pos = get_params(step = "annotate_masses")$ms$clusters$pos,
@@ -62,13 +59,7 @@ annotate_masses(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 
-\item{name}{Name of the adducts library}
-
 \item{adducts_list}{List of adducts to be used}
-
-\item{adducts_neg}{Negative adducts to be used}
-
-\item{adducts_pos}{Positive adducts to be used}
 
 \item{adducts_masses_list}{Adducts masses}
 

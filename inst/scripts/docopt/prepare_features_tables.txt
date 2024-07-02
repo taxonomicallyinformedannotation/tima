@@ -1,5 +1,5 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_features_tables.R --fil-fea-raw data/source/example_features.csv --fil-fea-pre data/interim/features/example_features.tsv.gz --names-features 'row ID' --names-precursor 'row m/z' --names-rt 'row retention time'
+  Rscript inst/scripts/prepare_features_tables.R --fil-fea-raw data/source/example_features.csv --fil-fea-pre data/interim/features/example_features.tsv.gz --names-adduct 'best ion' --names-features 'row ID' --names-precursor 'row m/z' --names-rt 'row retention time'
 
 Usage:
   prepare_features_tables.R [--fil-fea-raw=<fil-fea-raw>] [--fil-fea-pre=<fil-fea-pre>] [--names-features=<names-features>] [--names-precursor=<names-precursor>] [--names-rt-fea=<names-rt-fea>]
@@ -8,6 +8,7 @@ Arguments:
   fil-fea-raw                Raw features file. STRING
   fil-fea-pre                Prepared features file. STRING
 
+  names-adduct               Name of "adduct" variable in the input. STRING
   names-features             Name of "feature IDs" variable in the input. STRING
   names-precursor            Name of "precursor m/z" variable in the input. STRING
   names-rt-fea               Name of "retention time" variable (fea) in the input. STRING
