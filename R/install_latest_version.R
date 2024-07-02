@@ -20,10 +20,7 @@ install_latest_version <- function(test = FALSE) {
   if (!requireNamespace("pak", quietly = TRUE)) {
     install.packages("pak")
   }
-  if (!requireNamespace("devtools", quietly = TRUE)) {
-    install.packages("devtools")
-  }
-  devtools::install_github(repo = "taxonomicallyinformedannotation/tima-r")
+  pak::pkg_install("taxonomicallyinformedannotation/tima-r")
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
