@@ -35,7 +35,6 @@ Imports:
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
     R.utils (>= 2.12.3),
-    remotes (>= 2.5.0),
     rotl (>= 3.1.0),
     shiny (>= 1.8.1.1),
     shinybusy (>= 0.3.3),
@@ -55,6 +54,7 @@ Imports:
 Suggests: 
     BiocManager,
     knitr,
+    pak,
     testthat,
     shinytest2,
     spelling

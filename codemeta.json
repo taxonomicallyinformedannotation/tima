@@ -69,6 +69,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "pak",
+      "name": "pak",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=pak"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
       "provider": {
@@ -373,19 +385,6 @@
     },
     "22": {
       "@type": "SoftwareApplication",
-      "identifier": "remotes",
-      "name": "remotes",
-      "version": ">= 2.5.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=remotes"
-    },
-    "23": {
-      "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
       "version": ">= 3.1.0",
@@ -397,7 +396,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "24": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -410,7 +409,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "25": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
@@ -423,7 +422,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinybusy"
     },
-    "26": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "shinyhelper",
       "name": "shinyhelper",
@@ -436,7 +435,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyhelper"
     },
-    "27": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "shinyjs",
       "name": "shinyjs",
@@ -449,7 +448,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyjs"
     },
-    "28": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "shinyvalidate",
       "name": "shinyvalidate",
@@ -462,7 +461,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
     },
-    "29": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
@@ -475,7 +474,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "30": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -488,12 +487,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "31": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "32": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -506,7 +505,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "33": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -519,7 +518,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "34": {
+    "33": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -532,7 +531,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "35": {
+    "34": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -545,12 +544,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "36": {
+    "35": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "37": {
+    "36": {
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
@@ -563,7 +562,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     },
-    "38": {
+    "37": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -579,7 +578,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "NAKB",
+  "fileSize": "4376.681KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
