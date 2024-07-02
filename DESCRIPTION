@@ -79,7 +79,6 @@ Collate:
     'clean_chemo.R'
     'cleanup_spectra.R'
     'complement_metadata_structures.R'
-    'create_adducts.R'
     'create_components.R'
     'create_dir.R'
     'create_edges.R'
