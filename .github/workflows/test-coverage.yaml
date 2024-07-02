@@ -20,7 +20,7 @@ jobs:
   test-coverage:
     runs-on: macos-latest
     env:
-      GITHUB_PAT: ${{ secrets.PAT_GITHUB }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
