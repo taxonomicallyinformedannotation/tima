@@ -88,10 +88,6 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$fil_fea_pre)) {
       parameters$files$features$prepared <- as.character(arguments$fil_fea_pre)
     }
-    if (!is.null(arguments$fil_lib_add_pre)) {
-      parameters$files$libraries$adducts$prepared <-
-        as.character(arguments$fil_lib_add_pre)
-    }
     if (!is.null(arguments$fil_lib_sop_raw_clo)) {
       parameters$files$libraries$sop$raw$closed <-
         as.character(arguments$fil_lib_sop_raw_clo)
@@ -234,6 +230,9 @@ parse_cli_params <- function(arguments, parameters) {
     }
     if (!is.null(arguments$ms_tol_rt_min)) {
       parameters$ms$tolerances$rt$minutes <- as.numeric(arguments$ms_tol_rt_min)
+    }
+    if (!is.null(arguments$names_adduct)) {
+      parameters$names$adduct <- as.character(arguments$names_adduct)
     }
     if (!is.null(arguments$names_extension)) {
       parameters$names$extension <- as.logical(arguments$names_extension)

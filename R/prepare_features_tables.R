@@ -4,6 +4,7 @@
 #'
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
+#' @param name_adduct Name of the adduct column in the features data
 #' @param name_features Name of the features column in the features data
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
@@ -16,6 +17,7 @@
 prepare_features_tables <-
   function(features = get_params(step = "prepare_features_tables")$files$features$raw,
            output = get_params(step = "prepare_features_tables")$files$features$prepared,
+           name_adduct = get_params(step = "prepare_features_tables")$names$adduct,
            name_features = get_params(step = "prepare_features_tables")$names$features,
            name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
            name_mz = get_params(step = "prepare_features_tables")$names$precursor) {
@@ -30,7 +32,8 @@ prepare_features_tables <-
       tidytable::select(tidytable::any_of(c(
         feature_id = name_features,
         rt = name_rt,
-        mz = name_mz
+        mz = name_mz,
+        adduct = name_adduct
       )))
 
     log_debug(x = "Exporting ...")

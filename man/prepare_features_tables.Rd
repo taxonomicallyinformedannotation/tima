@@ -7,6 +7,7 @@
 prepare_features_tables(
   features = get_params(step = "prepare_features_tables")$files$features$raw,
   output = get_params(step = "prepare_features_tables")$files$features$prepared,
+  name_adduct = get_params(step = "prepare_features_tables")$names$adduct,
   name_features = get_params(step = "prepare_features_tables")$names$features,
   name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
   name_mz = get_params(step = "prepare_features_tables")$names$precursor
@@ -16,6 +17,8 @@ prepare_features_tables(
 \item{features}{Path to the file containing the features data}
 
 \item{output}{Path to the file to export the merged data to}
+
+\item{name_adduct}{Name of the adduct column in the features data}
 
 \item{name_features}{Name of the features column in the features data}
 

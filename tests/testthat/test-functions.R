@@ -26,7 +26,6 @@ test_that("Test functions", {
   prepare_params(step = "prepare_features_components")
   prepare_params(step = "prepare_features_edges")
   prepare_params(step = "prepare_features_tables")
-  prepare_params(step = "prepare_libraries_adducts")
   prepare_params(step = "prepare_libraries_rt")
   prepare_params(step = "prepare_libraries_sop_closed")
   prepare_params(step = "prepare_libraries_sop_ecmdb")
@@ -352,9 +351,6 @@ test_that("Test functions", {
   )
   prepare_libraries_sop_merged()
 
-  ### Adducts
-  prepare_libraries_adducts()
-
   ### Features
   #### if no RT
   tidytable::tidytable(
@@ -371,6 +367,15 @@ test_that("Test functions", {
   prepare_features_tables()
 
   ## Performing MS1 annotation
+  ## TODO improve this
+  calculate_mass_from_adduct(adduct_string = "[2M1-2H2O+NaCl+H]2+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+Na]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+H]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mass = 123.456)
+
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
@@ -536,7 +541,6 @@ test_that("Test functions", {
   arguments$fil_ann_pro <- "x"
   arguments$fil_fea_raw <- "x"
   arguments$fil_fea_pre <- "x"
-  arguments$fil_lib_add_pre <- "x"
   arguments$fil_lib_sop_raw_clo <- "x"
   arguments$fil_lib_sop_raw_ecm <- "x"
   arguments$fil_lib_sop_raw_hmd <- "x"
@@ -576,6 +580,7 @@ test_that("Test functions", {
   arguments$ms_tol_mas_dal_ms1 <- "x"
   arguments$ms_tol_mas_dal_ms2 <- "x"
   arguments$ms_tol_rt_min <- "x"
+  arguments$names_adduct <- "x"
   arguments$names_extension <- "x"
   arguments$names_features <- "x"
   arguments$names_filename <- "x"

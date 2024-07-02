@@ -132,7 +132,6 @@ params:
         edges: inst/params/default/prepare_features_edges.yaml
         tables: inst/params/default/prepare_features_tables.yaml
       libraries:
-        adducts: inst/params/default/prepare_libraries_adducts.yaml
         rt: inst/params/default/prepare_libraries_rt.yaml
         sop:
           closed: inst/params/default/prepare_libraries_sop_closed.yaml
@@ -167,7 +166,6 @@ params:
         edges: inst/params/user/prepare_features_edges.yaml
         tables: inst/params/user/prepare_features_tables.yaml
       libraries:
-        adducts: inst/params/user/prepare_libraries_adducts.yaml
         rt: inst/params/user/prepare_libraries_rt.yaml
         sop:
           closed: inst/params/user/prepare_libraries_sop_closed.yaml
