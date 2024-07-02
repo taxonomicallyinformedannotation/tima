@@ -18,9 +18,6 @@ install_latest_version <- function() {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev")
   }
-  if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-  }
   if (!requireNamespace("pak", quietly = TRUE)) {
     lib <- Sys.getenv("R_LIBS_SITE")
     if (lib == "") {
@@ -52,7 +49,10 @@ install_latest_version <- function() {
     no = "main"
   )
   message("ref is ", ref)
-  remotes::install_github(repo = "taxonomicallyinformedannotation/tima-r", ref = ref)
+  pak::pak(
+    pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+    ask = FALSE
+  )
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
