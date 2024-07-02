@@ -28,7 +28,10 @@ install_latest_version <- function(test = FALSE) {
     pattern = "*.lock",
     full.names = TRUE
   ))
-  pak::pak("taxonomicallyinformedannotation/tima-r")
+  pak::pkg_install(
+    pkg = "taxonomicallyinformedannotation/tima-r",
+    ask = FALSE,
+  )
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
