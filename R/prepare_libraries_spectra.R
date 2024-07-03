@@ -159,3 +159,6 @@ prepare_libraries_spectra <-
       "sop" = output_sop
     ))
   }
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE
