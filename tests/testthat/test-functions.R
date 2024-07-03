@@ -2,7 +2,8 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
-  install_latest_version(test = TRUE)
+  install_latest_version()
+  setwd(fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
@@ -662,6 +663,3 @@ test_that(desc = "Test functions", code = {
 
   succeed()
 })
-
-## See https://github.com/markfairbanks/tidytable/issues/269
-.datatable.aware <- TRUE
