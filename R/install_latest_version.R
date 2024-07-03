@@ -62,7 +62,7 @@ install_latest_version <- function() {
         url = paste0(
           "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
           ref,
-          "/inst/pipelines/_targets.yaml"
+          "/_targets.yaml"
         ),
         export = file.path(cache, "_targets.yaml")
       )
