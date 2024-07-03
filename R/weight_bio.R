@@ -433,7 +433,7 @@ weight_bio <-
       ) |>
       tidytable::left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
-      ## TODO suboptimal
+      ## ISSUE see #146
       tidytable::mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
       tidytable::mutate(interim_2 = ifelse(test = interim > 1,
         yes = 1,

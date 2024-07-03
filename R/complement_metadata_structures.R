@@ -303,7 +303,8 @@ complement_metadata_structures <- function(
     )
   rm(met_i, met_s, nam_i, nam_s, stereo_i, stereo_s, tax_cla, tax_npc)
 
-  ## TODO if (quickmode == FALSE){...}
+  ## ISSUE see #19
+  # if (quickmode == FALSE){...}
 
   return(table_final)
 }

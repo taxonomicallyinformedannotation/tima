@@ -110,7 +110,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
       "candidate_structure_molecular_formula" = "molecularFormula",
       "candidate_structure_xlogp" = "xlogp",
-      # TODO DOC
+      # ISSUE see #147
       "candidate_score_sirius_confidence" = switch(sirius_version,
         "5" = "ConfidenceScore",
         "6" = "ConfidenceScoreApproximate"
