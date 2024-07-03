@@ -422,7 +422,7 @@ annotate_masses <-
       tidytable::mutate(
         mz_1 = ifelse(
           test = !is.na(loss),
-          yes = mz + mass,
+          yes = mz - mass,
           no = mz
         ),
         label = ifelse(
