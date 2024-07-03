@@ -4,10 +4,7 @@
 \alias{load_yaml_files}
 \title{Load yaml files}
 \usage{
-load_yaml_files(paths = parse_yaml_paths())
-}
-\arguments{
-\item{paths}{Paths}
+load_yaml_files()
 }
 \description{
 This function load yaml files
