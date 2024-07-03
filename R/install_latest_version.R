@@ -15,18 +15,115 @@ install_latest_version <- function() {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  if (!requireNamespace("pak")) {
-    install.packages("pak")
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    lib <- Sys.getenv("R_LIBS_SITE")
+    if (lib == "") {
+      lib <- file.path(dirname(.Library), "site-library")
+      cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
+      cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
+
+      message("Setting R_LIBS_SITE to ", lib)
+    } else {
+      message("R_LIBS_SITE is already set to ", lib)
+      cat(sprintf(
+        "R_LIB_FOR_PAK=%s\n",
+        strsplit(lib, .Platform$path.sep)[[1]][[1]]
+      ), append = TRUE)
+    }
+    install.packages(
+      "pak",
+      repos = sprintf(
+        "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+        .Platform$pkgType,
+        R.Version()$os,
+        R.Version()$arch
+      )
+    )
   }
   ref <- ifelse(
     test = Sys.getenv("BRANCH_NAME") != "",
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  pak::pak_cleanup(force = TRUE)
-  pak::pak_update()
-  pak::pak(ask = FALSE, upgrade = TRUE)
-  pak::pkg_install(pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref), ask = FALSE, upgrade = TRUE)
+  if (!requireNamespace(c("timaR"), quietly = TRUE)) {
+    message("Installing for the first time...")
+    local_version <- "myFirstInstallTrickToWork"
+  } else {
+    local_version <- pak::pkg_status("timaR")$version[1]
+  }
+  # TODO not ideal
+  remote_version <- readLines(
+    paste0("https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",ref,"/DESCRIPTION"
+  )[[3]] |>
+    gsub(
+      pattern = "Version: ",
+      replacement = "",
+      fixed = TRUE
+    )
+  if ((local_version == remote_version)) {
+    message(
+      "You already have the latest version (",
+      local_version,
+      ") skipping"
+    )
+  } else {
+    pak::pak_update()
+    pak::pak(ask = FALSE, upgrade = TRUE)
+    # Try installing the local version first
+    success <- tryCatch(
+      {
+        message("Installing local version")
+        pak::pkg_install(
+          pkg = ".",
+          ask = FALSE,
+          upgrade = FALSE
+        )
+        TRUE
+      },
+      error = function(e) {
+        FALSE
+      }
+    )
+    # If local version installation fails, try the URL from DESCRIPTION file
+    if (!success) {
+      success <- tryCatch(
+        {
+          message("Installing local version from URL")
+          pak::pkg_install(
+            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+            ask = FALSE,
+            upgrade = FALSE
+          )
+          TRUE
+        },
+        error = function(e) {
+          FALSE
+        }
+      )
+    }
+    # If URL installation fails, try installing the remote version from GitHub
+    if (!success) {
+      success <- tryCatch(
+        {
+          message("Installing remote version")
+          pak::pkg_install(
+            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+            ask = FALSE,
+            upgrade = FALSE
+          )
+          TRUE
+        },
+        error = function(e) {
+          message("Install failed")
+          FALSE
+        }
+      )
+    }
+    # Final message if all attempts fail
+    if (!success) {
+      message("All installation attempts failed")
+    }
+  }
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
