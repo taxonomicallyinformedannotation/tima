@@ -15,7 +15,7 @@ parse_yaml_paths <- function(file = system.file("extdata",
                                package = "timaR"
                              )) {
   ## Read the YAML file containing the paths
-  yaml::read_yaml(
+  paths <- yaml::read_yaml(
       file = file
     )
 
