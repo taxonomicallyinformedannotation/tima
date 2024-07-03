@@ -17,7 +17,7 @@
 get_params <- function(step) {
   paths <- parse_yaml_paths()
   steps <-
-    list.files(path = file.path(paths$inst$scripts$docopt)) |>
+    list.files(path = system.file("scripts/docopt/", package = "timaR")) |>
     stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   default_path <-
