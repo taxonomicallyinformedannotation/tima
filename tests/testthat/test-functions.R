@@ -3,7 +3,6 @@ library(testthat)
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
   install_latest_version(test = TRUE)
-  setwd(fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
