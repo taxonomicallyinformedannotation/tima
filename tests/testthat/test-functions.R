@@ -2,12 +2,8 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
-  if ("pak" %in% installed.packages()) {
-    remove.packages("pak")
-  }
-  if ("timaR" %in% installed.packages()) {
-    remove.packages("timaR")
-  }
+  try(remove.packages("pak"))
+  try(remove.packages("timaR"))
   install_latest_version()
   # When already present
   install_latest_version()
