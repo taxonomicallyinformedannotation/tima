@@ -87,7 +87,7 @@ create_edges_spectra <- function(
         tidytable::everything()
       )
 
-    ## TODO find a way to have consistency in spectrum IDs
+    ## ISSUE see #148 find a way to have consistency in spectrum IDs
     idz <- spectra@backend@spectraData$acquisitionNum
     rm(spectra)
     edges <- edges |>

@@ -138,17 +138,11 @@ prepare_libraries_sop_merged <-
     table_structures_taxonomy_cla <- tables$str_tax_cla
     table_structures_taxonomy_npc <- tables$str_tax_npc
 
-    log_debug(x = "Completing structures metadata")
-    log_debug(x = "TODO")
-
-    log_debug(x = "Completing structures names")
-    log_debug(x = "TODO")
-
-    log_debug(x = "Completing structures taxonomy (classyfire)")
-    log_debug(x = "TODO")
-
-    log_debug(x = "Completing structures taxonomy (NPC)")
-    log_debug(x = "TODO")
+    ## ISSUE see #19
+    # log_debug(x = "Completing structures metadata")
+    # log_debug(x = "Completing structures names")
+    # log_debug(x = "Completing structures taxonomy (classyfire)")
+    # log_debug(x = "Completing structures taxonomy (NPC)")
 
     ## If filter is TRUE,
     ## filter the library based on the specified level and value

@@ -72,7 +72,7 @@ prepare_libraries_sop_hmdb <-
               from = 1,
               to = 14
             ),
-            ## TODO compute it
+            ## ISSUE see #19
             structure_smiles_2D = NA_character_,
             structure_exact_mass = NA_real_
           ) |>

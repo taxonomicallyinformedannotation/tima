@@ -57,7 +57,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_pre_hmd <- params_advanced$files$libraries$sop$prepared$hmdb
   fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
   fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
-  # TODO Docopt
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
   fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
   fil_lib_sop_mer_org_tax_ott <- params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
@@ -66,7 +65,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_mer_str_nam <- params_advanced$files$libraries$sop$merged$structures$names
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
-  # TODO Docopt
   fil_lib_spe_exp_neg <- params_advanced$files$libraries$spectral$exp$neg
   fil_lib_spe_exp_pos <- params_advanced$files$libraries$spectral$exp$pos
   fil_lib_spe_exp_raw <- params_advanced$files$libraries$spectral$exp$raw
@@ -472,7 +470,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         org_fil_val
     },
     prepare_libraries_spectra = {
-      # TODO see layers
       yamls_params$prepare_libraries_spectra$files$libraries$spectral$exp$neg <-
         fil_lib_spe_exp_neg
       yamls_params$prepare_libraries_spectra$files$libraries$spectral$exp$pos <-
