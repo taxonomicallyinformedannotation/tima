@@ -50,6 +50,7 @@ Imports:
     tidyfst (>= 1.7.9),
     utils,
     visNetwork (>= 2.1.2),
+    withr (>= 3.0.0),
     yaml (>= 2.3.8)
 Suggests: 
     BiocManager,

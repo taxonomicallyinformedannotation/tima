@@ -2070,18 +2070,18 @@ server <- function(input, output, session) {
 }
 url <- "<http://127.0.0.1:3838>"
 log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
-shinyApp(
-  ui = ui,
-  server = server,
-  onStart = function() {
-    if (i_am_a_whale) {
-      message("I\'m inside the matrix ;(")
-      setwd(dir = "..")
-    } else {
-      cache <- fs::path_home(".tima")
-      fs::dir_create(cache)
-      message("Working in ", cache)
-      setwd(dir = cache)
-    }
-  }
-)
+dir <- if (i_am_a_whale) {
+  message("I\'m inside the matrix ;(")
+  ".."
+} else {
+  cache <- fs::path_home(".tima")
+  fs::dir_create(cache)
+  message("Working in ", cache)
+  cache
+}
+withr::with_dir(new = dir, code = {
+  shinyApp(
+    ui = ui,
+    server = server
+  )
+})

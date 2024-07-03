@@ -564,6 +564,19 @@
     },
     "37": {
       "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
+    },
+    "38": {
+      "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
       "version": ">= 2.3.8",
@@ -578,7 +591,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4376.027KB",
+  "fileSize": "4377.449KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
