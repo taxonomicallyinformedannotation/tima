@@ -23,7 +23,10 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  pak::pak(paste0("taxonomicallyinformedannotation/tima-r@", ref), ask = FALSE)
+  pak::pak_cleanup(force = TRUE)
+  pak::pak_update()
+  pak::pak(ask = FALSE, upgrade = TRUE)
+  pak::pkg_install(pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref), ask = FALSE, upgrade = TRUE)
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
