@@ -665,3 +665,6 @@ test_that(desc = "Test functions", code = {
 
   succeed()
 })
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE

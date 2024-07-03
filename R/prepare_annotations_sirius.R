@@ -261,3 +261,6 @@ prepare_annotations_sirius <-
       "structural" = output_ann[[1]]
     ))
   }
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE
