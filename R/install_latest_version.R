@@ -2,20 +2,18 @@
 #'
 #' @description This function installs the latest version
 #'
-#' @param test Flag for test
-#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function(test = FALSE) {
+install_latest_version <- function() {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
-    if (!requireNamespace("installr", quietly = TRUE)) {
-      install.packages("installr")
-    }
-    installr::install.rtools(check_r_update = FALSE, GUI = FALSE)
+    message("You should install RTools if not already done")
+  }
+  if (Sys.info()[["sysname"]] == "Linux") {
+    system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
   if (!requireNamespace("pak", quietly = TRUE)) {
     lib <- Sys.getenv("R_LIBS_SITE")
@@ -42,6 +40,11 @@ install_latest_version <- function(test = FALSE) {
       )
     )
   }
+  ref <- ifelse(
+    test = Sys.getenv("BRANCH_NAME") != "",
+    yes = Sys.getenv("BRANCH_NAME"),
+    no = "main"
+  )
   if (!requireNamespace(c("timaR"), quietly = TRUE)) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
@@ -50,14 +53,18 @@ install_latest_version <- function(test = FALSE) {
   }
   # TODO not ideal
   remote_version <- readLines(
-    "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION"
+    paste0(
+      "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+      ref,
+      "/DESCRIPTION"
+    )
   )[[3]] |>
     gsub(
       pattern = "Version: ",
       replacement = "",
       fixed = TRUE
     )
-  if ((local_version == remote_version) && (test == FALSE)) {
+  if (local_version == remote_version) {
     message(
       "You already have the latest version (",
       local_version,
@@ -75,10 +82,10 @@ install_latest_version <- function(test = FALSE) {
           ask = FALSE,
           upgrade = FALSE
         )
-        return(test == FALSE)
+        TRUE
       },
       error = function(e) {
-        return(FALSE)
+        FALSE
       }
     )
     # If local version installation fails, try the URL from DESCRIPTION file
@@ -87,14 +94,14 @@ install_latest_version <- function(test = FALSE) {
         {
           message("Installing local version from URL")
           pak::pkg_install(
-            pkg = desc::desc_get_urls()[[1]],
+            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
             ask = FALSE,
             upgrade = FALSE
           )
-          return(test == FALSE)
+          TRUE
         },
         error = function(e) {
-          return(FALSE)
+          FALSE
         }
       )
     }
@@ -104,15 +111,15 @@ install_latest_version <- function(test = FALSE) {
         {
           message("Installing remote version")
           pak::pkg_install(
-            pkg = "taxonomicallyinformedannotation/tima-r",
+            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
             ask = FALSE,
             upgrade = FALSE
           )
-          return(test == FALSE)
+          TRUE
         },
         error = function(e) {
           message("Install failed")
-          return(FALSE)
+          FALSE
         }
       )
     }
@@ -156,7 +163,11 @@ install_latest_version <- function(test = FALSE) {
     error = function(e) {
       message("Installing remote targets")
       timaR::get_file(
-        url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/_targets.yaml",
+        url = paste0(
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          ref,
+          "/_targets.yaml"
+        ),
         export = file.path(cache, "_targets.yaml")
       )
     }
@@ -172,7 +183,14 @@ install_latest_version <- function(test = FALSE) {
     },
     error = function(e) {
       message("Getting remote DESCRIPTION")
-      timaR::get_file(url = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/DESCRIPTION", export = file.path(cache, "DESCRIPTION"))
+      timaR::get_file(
+        url = paste0(
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          ref,
+          "/DESCRIPTION"
+        ),
+        export = file.path(cache, "DESCRIPTION")
+      )
     }
   )
 }

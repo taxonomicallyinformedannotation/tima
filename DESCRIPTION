@@ -27,6 +27,7 @@ Imports:
     igraph (>= 2.0.3),
     installr (>= 0.23.4),
     jsonlite (>= 1.8.8),
+    MetaboCoreUtils (>= 1.12.0),
     MsBackendMgf (>= 1.12.0),
     MsBackendMsp (>= 1.8.0),
     msentropy (>= 0.1.4),
@@ -49,10 +50,12 @@ Imports:
     tidyfst (>= 1.7.9),
     utils,
     visNetwork (>= 2.1.2),
+    withr (>= 3.0.0),
     yaml (>= 2.3.8)
 Suggests: 
     BiocManager,
     knitr,
+    pak,
     testthat,
     shinytest2,
     spelling
@@ -71,13 +74,14 @@ Collate:
     'import_spectra.R'
     'annotate_spectra.R'
     'calculate_entropy.R'
+    'parse_adduct.R'
+    'calculate_mass_from_adduct.R'
     'clean_bio.R'
     'columns_model.R'
     'clean_collapse.R'
     'clean_chemo.R'
     'cleanup_spectra.R'
     'complement_metadata_structures.R'
-    'create_adducts.R'
     'create_components.R'
     'create_dir.R'
     'create_edges.R'
@@ -126,7 +130,6 @@ Collate:
     'prepare_features_components.R'
     'prepare_features_edges.R'
     'prepare_features_tables.R'
-    'prepare_libraries_adducts.R'
     'prepare_libraries_rt.R'
     'select_sop_columns.R'
     'prepare_libraries_sop_closed.R'
