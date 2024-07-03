@@ -58,12 +58,12 @@ install_latest_version <- function() {
     error = function(err) {
       if (Sys.getenv("RSTUDIO") == 1) {
         if (!requireNamespace("rstudioapi", quietly = TRUE)) {
-          install.packages(rstudioapi)
+          install.packages("rstudioapi")
         }
         rstudioapi::restartSession()
       } else {
         if (!requireNamespace("startup", quietly = TRUE)) {
-          install.packages(startup)
+          install.packages("startup")
         }
         startup::restart()
       }
