@@ -16,7 +16,7 @@ parse_yaml_params <- function(def = get("default_path",
                               usr = get("user_path",
                                 envir = parent.frame()
                               )) {
-  ## Read the default YAML fil
+  ## Read the default YAML file
   params <- yaml::read_yaml(file = def)
 
   ## If a user-specified YAML file exists,
