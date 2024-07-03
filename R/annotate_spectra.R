@@ -97,7 +97,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
-    ## TODO find a way to have consistency in spectrum IDs
+    ## ISSUE see #148 find a way to have consistency in spectrum IDs
     query_ids <- spectra@backend@spectraData$acquisitionNum
     if (is.null(query_ids)) {
       query_ids <- spectra@backend@spectraData$spectrum_id

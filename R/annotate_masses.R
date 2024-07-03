@@ -437,7 +437,7 @@ annotate_masses <-
       )
     rm(df_adducted, df_nl_min)
 
-    # TODO dictionary of adducts (example 2H2O in mzmine)
+    # ISSUE see #141 dictionary of adducts (example 2H2O in mzmine)
 
     df_addlossed_min <- df_addlossed |>
       tidytable::rowwise() |>
@@ -465,8 +465,6 @@ annotate_masses <-
 
     df_addlossed_rdy <- df_addlossed_min_1 |>
       tidytable::bind_rows(df_addlossed_min_2)
-
-    # TODO if same, say unrecognized and switch to M+H or M-H by default
 
     log_debug("joining within given mz tol to exact mass library \n")
     df_addlossed_em <- df_addlossed_rdy |>
@@ -520,7 +518,7 @@ annotate_masses <-
         )
       )
 
-    ## TODO This will then be externalized somehow
+    ## TODO This should be externalized somehow
     forbidden_adducts <- c(
       "[M-H2O (water)+H2O-H]-",
       "[M-H3O4P (phosphoric)+H3O4P-H]-",

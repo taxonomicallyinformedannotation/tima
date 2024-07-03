@@ -153,7 +153,7 @@ prepare_libraries_rt <-
         "We would recommend you adding them but will try completing.",
         "We will query them on the fly, this might take some time."
       )
-      ## TODO change with a small dependency
+      ## ISSUE see #19
       smiles <- unique(df_missing$smiles)
 
       get_inchikey <- function(smiles, toolkit = "rdkit") {
