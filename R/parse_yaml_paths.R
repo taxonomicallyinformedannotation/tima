@@ -16,8 +16,8 @@ parse_yaml_paths <- function(file = system.file("extdata",
                              )) {
   ## Read the YAML file containing the paths
   paths <- yaml::read_yaml(
-      file = file
-    )
+    file = file
+  )
 
   ## Set the working directory to the base directory specified in the YAML file
   setwd(paths$base_dir)
