@@ -15,15 +15,15 @@ install_latest_version <- function() {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  if (!requireNamespace("devtools")) {
-    install.packages("devtools")
+  if (!requireNamespace("pak")) {
+    install.packages("pak")
   }
   ref <- ifelse(
     test = Sys.getenv("BRANCH_NAME") != "",
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  devtools::install_github(repo = paste0("taxonomicallyinformedannotation/tima-r@", ref))
+  pak::pak(paste0("taxonomicallyinformedannotation/tima-r@", ref), ask = FALSE)
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
