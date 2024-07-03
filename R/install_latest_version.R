@@ -53,14 +53,18 @@ install_latest_version <- function() {
   }
   # TODO not ideal
   remote_version <- readLines(
-    paste0("https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",ref,"/DESCRIPTION"
+    paste0(
+      "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+      ref,
+      "/DESCRIPTION"
+    )
   )[[3]] |>
     gsub(
       pattern = "Version: ",
       replacement = "",
       fixed = TRUE
     )
-  if ((local_version == remote_version)) {
+  if (local_version == remote_version) {
     message(
       "You already have the latest version (",
       local_version,
