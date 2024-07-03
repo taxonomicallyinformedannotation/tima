@@ -6,8 +6,6 @@ test_that(desc = "Test functions", code = {
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
-  ## Prepare config for a single step only
-  prepare_params(step = "weight_annotations")
   ## For all steps
   params$organisms$taxon <- ""
   prepare_params(params_small = params)

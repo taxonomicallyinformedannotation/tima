@@ -10,20 +10,6 @@
 #' @export
 #'
 #' @examples NULL
-parse_yaml_paths <- function(file = system.file("extdata",
-                               "paths.yaml",
-                               package = "timaR"
-                             )) {
-  ## Read the YAML file containing the paths
-  suppressWarnings(
-    paths <- yaml::read_yaml(
-      file = file
-    )
-  )
-
-  ## Set the working directory to the base directory specified in the YAML file
-  setwd(paths$base_dir)
-
-  ## Return the list of paths
-  return(paths)
+parse_yaml_paths <- function(file = system.file("extdata", "paths.yaml", package = "timaR")) {
+  return(suppressWarnings(yaml::read_yaml(file = file)))
 }
