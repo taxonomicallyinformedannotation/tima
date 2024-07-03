@@ -383,7 +383,7 @@ test_that(desc = "Test functions", code = {
   prepare_features_tables()
 
   ## Performing MS1 annotation
-  ## TODO improve this
+  ## TODO check values later on
   calculate_mass_from_adduct(adduct_string = "[2M1-2H2O+NaCl+H]2+", mass = 123.456)
   calculate_mass_from_adduct(adduct_string = "[M+Na]+", mass = 123.456)
   calculate_mass_from_adduct(adduct_string = "[M+H]+", mass = 123.456)

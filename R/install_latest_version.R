@@ -51,7 +51,6 @@ install_latest_version <- function() {
   } else {
     local_version <- pak::pkg_status("timaR")$version[1]
   }
-  # TODO not ideal
   remote_version <- readLines(
     paste0(
       "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",

@@ -46,7 +46,7 @@ prepare_libraries_sop_ecmdb <-
             from = 1,
             to = 14
           ),
-          ## TODO compute it
+          ## ISSUE see #19
           structure_smiles_2D = NA_character_
         ) |>
         tidytable::rename(

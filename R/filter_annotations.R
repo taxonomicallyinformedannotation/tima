@@ -80,7 +80,7 @@ filter_annotations <-
         tidytable::distinct(-candidate_structure_error_rt, -rt_target,
           .keep_all = TRUE
         ) |>
-        ## TODO adapt for types and improve the * 3
+        ## ISSUE see #149 adapt for types and improve the * 3
         tidytable::filter(abs(candidate_structure_error_rt) <= abs(tolerance_rt * 3) | is.na(candidate_structure_error_rt)) |>
         tidytable::select(-rt_target, -type)
     } else {

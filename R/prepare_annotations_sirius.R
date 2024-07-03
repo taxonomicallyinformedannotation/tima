@@ -171,7 +171,7 @@ prepare_annotations_sirius <-
         tidytable::left_join(formulas_prepared) |>
         tidytable::left_join(canopus_prepared) |>
         tidytable::left_join(denovo_prepared) |>
-        # TODO add de novo and spectral
+        # TODO add spectral
         tidytable::distinct() |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA,
