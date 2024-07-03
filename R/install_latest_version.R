@@ -2,12 +2,14 @@
 #'
 #' @description This function installs the latest version
 #'
+#' @param test Flag for test
+#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function() {
+install_latest_version <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
@@ -55,17 +57,19 @@ install_latest_version <- function() {
         ask = FALSE
       )
     },
-    error = function(err) {
-      if (Sys.getenv("RSTUDIO") == 1) {
-        if (!requireNamespace("rstudioapi", quietly = TRUE)) {
-          install.packages("rstudioapi")
+    error = function(e) {
+      if (test == FALSE) {
+        if (Sys.getenv("RSTUDIO") == 1) {
+          if (!requireNamespace("rstudioapi", quietly = TRUE)) {
+            install.packages("rstudioapi")
+          }
+          rstudioapi::restartSession()
+        } else {
+          if (!requireNamespace("startup", quietly = TRUE)) {
+            install.packages("startup")
+          }
+          startup::restart()
         }
-        rstudioapi::restartSession()
-      } else {
-        if (!requireNamespace("startup", quietly = TRUE)) {
-          install.packages("startup")
-        }
-        startup::restart()
       }
     }
   )

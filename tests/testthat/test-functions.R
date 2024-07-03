@@ -2,7 +2,7 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that("Test functions", {
-  install_latest_version()
+  install_latest_version(test = TRUE)
   setwd(fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
