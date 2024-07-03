@@ -13,7 +13,7 @@ install_latest_version <- function() {
     message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
-    system(command = "sudo apt install libcurl4-openssl-dev")
+    system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
   if (!requireNamespace("devtools")) {
     install.packages("devtools")
