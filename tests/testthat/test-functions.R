@@ -37,14 +37,18 @@ test_that(desc = "Test functions", code = {
   prepare_params()
 
   ## replace id
-  replace_id(x = "example/123456_features.tsv",
-             user_gnps = "",
-             user_filename = "Foo")
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = "",
+    user_filename = "Foo"
+  )
 
   ## Get all files
   ### Features table
-  get_file(url = paths$urls$examples$features,
-           export = paths$data$source$features)
+  get_file(
+    url = paths$urls$examples$features,
+    export = paths$data$source$features
+  )
   get_gnps_tables(
     filename = "example",
     path_features = paths$data$source$features,
@@ -53,8 +57,10 @@ test_that(desc = "Test functions", code = {
     gnps_job_id = params$gnps$id
   )
   ### Metadata table
-  get_file(url = paths$urls$examples$metadata,
-           export = paths$data$source$metadata)
+  get_file(
+    url = paths$urls$examples$metadata,
+    export = paths$data$source$metadata
+  )
   get_file(
     url = paths$urls$examples$metadata |>
       gsub(
@@ -294,9 +300,11 @@ test_that(desc = "Test functions", code = {
     )
   )
   #### If does not exist
-  prepare_libraries_spectra(input = "doesNotExists.txt",
-                            output_pos = "data/interim/libraries/spectra/exp/nope_pos.rds",
-                            output_neg = "data/interim/libraries/spectra/exp/nope_neg.rds",)
+  prepare_libraries_spectra(
+    input = "doesNotExists.txt",
+    output_pos = "data/interim/libraries/spectra/exp/nope_pos.rds",
+    output_neg = "data/interim/libraries/spectra/exp/nope_neg.rds",
+  )
   #### Classical
   prepare_libraries_spectra()
   #### Again
@@ -322,9 +330,11 @@ test_that(desc = "Test functions", code = {
     temp_exp = paths$data$source$libraries$rt$example_mini
   )
   ## Check wrong SMILES
-  tidytable::tidytable("rt" = 0.1,
-                       "smiles" = "wrongSMILES",
-                       "inchikey" = NA) |>
+  tidytable::tidytable(
+    "rt" = 0.1,
+    "smiles" = "wrongSMILES",
+    "inchikey" = NA
+  ) |>
     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
   prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv")
   expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
@@ -424,13 +434,16 @@ test_that(desc = "Test functions", code = {
   )
 
   ## Create MS2 based edges
-  create_edges_spectra(## shallow tolerance to speed up tests
-    ppm = 1, dalton = 0.001)
+  create_edges_spectra( ## shallow tolerance to speed up tests
+    ppm = 1, dalton = 0.001
+  )
   ## if MS1 only
-  create_edges_spectra(input = "data/source/example_spectra_ms1.mgf",
-                       ## shallow tolerance to speed up tests
-                       ppm = 1,
-                       dalton = 0.001)
+  create_edges_spectra(
+    input = "data/source/example_spectra_ms1.mgf",
+    ## shallow tolerance to speed up tests
+    ppm = 1,
+    dalton = 0.001
+  )
 
   ### GNPS results
   prepare_annotations_gnps(input = "fileDoesNotExist")
