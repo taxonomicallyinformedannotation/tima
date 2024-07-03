@@ -2,14 +2,12 @@
 #'
 #' @description This function load yaml files
 #'
-#' @param paths Paths
-#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-load_yaml_files <- function(paths = parse_yaml_paths()) {
+load_yaml_files <- function() {
   log_debug(x = "Loading default params")
   yaml_files <- c(
     list.files(

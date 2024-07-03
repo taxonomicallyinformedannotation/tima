@@ -11,5 +11,5 @@
 #'
 #' @examples NULL
 parse_yaml_paths <- function(file = system.file("extdata", "paths.yaml", package = "timaR")) {
-  return(suppressWarnings(yaml::read_yaml(file = file)))
+  return(yaml::read_yaml(file = file))
 }
