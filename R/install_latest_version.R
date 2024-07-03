@@ -48,6 +48,7 @@ install_latest_version <- function(test = FALSE) {
     no = "main"
   )
   message("ref is ", ref)
+  pak::pak_cleanup(force = TRUE)
   pak::pak_update()
   # Fails sometimes
   tryCatch(
@@ -112,7 +113,7 @@ install_latest_version <- function(test = FALSE) {
         url = paste0(
           "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
           ref,
-          "/_targets.yaml"
+          "/inst/pipelines/_targets.yaml"
         ),
         export = file.path(cache, "_targets.yaml")
       )
