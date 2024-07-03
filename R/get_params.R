@@ -17,17 +17,17 @@
 get_params <- function(step) {
   paths <- parse_yaml_paths()
   steps <-
-    list.files(path = system.file("scripts/docopt/", package = "timaR")) |>
+    list.files(path = file.path(paths$inst$scripts$docopt)) |>
     stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   default_path <-
     if (step == "prepare_params") {
-      system.file("params/prepare_params.yaml", package = "timaR")
+      file.path(paths$params$prepare_params)
     } else {
       if (step == "prepare_params_advanced") {
-        system.file("params/prepare_params_advanced.yaml", package = "timaR")
+        file.path(paths$params$prepare_params_advanced)
       } else {
-        file.path(system.file("params/default/", package = "timaR"), paste0(step, ".yaml"))
+        file.path(paths$params$default$path, paste0(step, ".yaml"))
       }
     }
 
@@ -38,10 +38,10 @@ get_params <- function(step) {
   stopifnot("Your step does not exist." = step %in% steps)
 
   doc_path <-
-    file.path(system.file("scripts/docopt/", package = "timaR"), paste0(step, ".txt"))
+    file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
 
   user_path <-
-    file.path(system.file("params/user/", package = "timaR"), paste0(step, ".yaml"))
+    file.path(paths$params$user$path, paste0(step, ".yaml"))
 
   doc <- readChar(
     con = doc_path,
