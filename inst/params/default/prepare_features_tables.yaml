@@ -11,6 +11,9 @@ files:
 
 #' Names of the different variables in the input files.
 names:
+  #' Name of "adduct" variable in the feature table. STRING
+  adduct: best ion
+  
   #' Name of "feature IDs" variable in the input. STRING
   features: row ID
 

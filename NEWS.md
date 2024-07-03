@@ -2,8 +2,10 @@
 
 # timaR 2.9.6
 
+* Attempt to simplify installation
 * Fix library/adducts confusion (#123)
 * Fix some incorrect adduct differences annotations
+* Refactored adducts / neutral losses / dimers annotation to allow for more flexibility (#141, #144)
 
 # timaR 2.9.5
 

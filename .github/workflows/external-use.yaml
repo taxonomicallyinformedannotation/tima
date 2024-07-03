@@ -18,6 +18,8 @@ jobs:
   tima-test:
     name: tima-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         os:

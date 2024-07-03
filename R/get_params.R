@@ -22,12 +22,27 @@ get_params <- function(step) {
 
   default_path <-
     if (step == "prepare_params") {
-      file.path(paths$params$prepare_params)
+      path_1 <- file.path(paths$params$prepare_params)
+      if (file.exists(path_1)) {
+        path_1
+      } else {
+        path_1 |> gsub(pattern = "inst/", replacement = "")
+      }
     } else {
       if (step == "prepare_params_advanced") {
-        file.path(paths$params$prepare_params_advanced)
+        path_2 <- file.path(paths$params$prepare_params_advanced)
+        if (file.exists(path_2)) {
+          path_2
+        } else {
+          path_2 |> gsub(pattern = "inst/", replacement = "")
+        }
       } else {
-        file.path(paths$params$default$path, paste0(step, ".yaml"))
+        path_3 <- file.path(paths$params$default$path, paste0(step, ".yaml"))
+        if (file.exists(path_3)) {
+          path_3
+        } else {
+          path_3 |> gsub(pattern = "inst/", replacement = "")
+        }
       }
     }
 

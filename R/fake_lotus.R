@@ -56,3 +56,6 @@ fake_lotus <- function(export) {
     tidytable::fwrite(export)
   return(export)
 }
+
+## See https://github.com/markfairbanks/tidytable/issues/269
+.datatable.aware <- TRUE

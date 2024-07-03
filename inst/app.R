@@ -433,36 +433,36 @@ ui <- shiny::fluidPage(
           inputId = "ms_add_pos",
           label = "List of adducts to be used in positive",
           choices = list(
-            "[1M+(H)3]3+",
-            "[1M+(H)2(Na)1]3+",
-            "[1M+(H)1(Na)2]3+",
-            "[1M+(Na)3]3+",
-            "[1M+(H)2]2+",
-            "[1M+(H)1(Na)1]2+",
-            "[1M+(Mg)1]2+",
-            "[1M+(H)1(K)1]2+",
-            "[1M+(Ca)1]2+",
-            "[1M+(Na)2]2+",
-            "[1M+(Fe)1]2+",
-            "[1M+(H)1]1+",
-            "[1M+(H)4(N)1]1+",
-            "[1M+(Na)1]1+",
-            "[1M+(K)1]1+",
-            "[1M+(Cu)1]1+",
-            "[2M+(Mg)1]2+",
-            "[2M+(Ca)1]2+",
-            "[2M+(Fe)1]2+",
-            "[2M+(H)1]1+",
-            "[2M+(H)4(N)1]1+",
-            "[2M+(Na)1]1+",
-            "[2M+(K)1]1+"
+            "[M+H3]3+",
+            "[M+H2Na]3+",
+            "[M+HNa2]3+",
+            "[M+Na3]3+",
+            "[M+H2]2+",
+            "[M+HNa]2+",
+            "[M+Mg]2+",
+            "[M+HK]2+",
+            "[M+Ca]2+",
+            "[M+Na2]2+",
+            "[M+Fe]2+",
+            "[M+H]+",
+            "[M+H4N]+",
+            "[M+Na]+",
+            "[M+K]+",
+            "[M+Cu]+",
+            "[2M+Mg]2+",
+            "[2M+Ca]2+",
+            "[2M+Fe]2+",
+            "[2M+H]+",
+            "[2M+H4N]+",
+            "[2M+Na]+",
+            "[2M+K]+"
           ),
           selected = list(
-            "[1M+(H)2]2+",
-            "[1M+(H)1]1+",
-            "[1M+(H)4(N)1]1+",
-            "[1M+(Na)1]1+",
-            "[2M+(H)1]1+"
+            "[M+H2]2+",
+            "[M+H]+",
+            "[M+H4N]+",
+            "[M+Na]+",
+            "[2M+H]+"
           )
         ) |>
           shinyhelper::helper(
@@ -484,21 +484,21 @@ ui <- shiny::fluidPage(
           inputId = "ms_add_neg",
           label = "List of adducts to be used in negative",
           choices = list(
-            "[1M-(H)3]3-",
-            "[1M-(H)2]2-",
-            "[1M-(H)1]1-",
-            "[1M+(F)1]1-",
-            "[1M+(Na)1-(H)2]1-",
-            "[1M+(Cl)1]1-",
-            "[1M+(K)1-(H)2]1-",
-            "[1M+(Br)1]1-",
-            "[2M-(H)1]1-",
-            "[3M-(H)1]1-"
+            "[M-H3]3-",
+            "[M-H2]2-",
+            "[M-H]-",
+            "[M+F]-",
+            "[M+Na-H2]-",
+            "[M+Cl]-",
+            "[M+K-H2]-",
+            "[M+Br]-",
+            "[2M-H]-",
+            "[3M-H]-"
           ),
           selected = list(
-            "[1M-(H)2]2-",
-            "[1M-(H)1]1-",
-            "[2M-(H)1]1-"
+            "[M-H2]2-",
+            "[M-H]-",
+            "[2M-H]-"
           )
         ) |>
           shinyhelper::helper(
@@ -686,6 +686,19 @@ ui <- shiny::fluidPage(
       shiny::tabPanel(
         title = "Names",
         shiny::h3("Variable names parameters"),
+        shiny::textInput(
+          inputId = "names_adduct",
+          label = "Name of \"adduct\" variable in the input",
+          value = "best ion"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `adduct` column in your features file.",
+              "The default corresponds to the default in MZmine.",
+              "If using SLAW, please input 'annotation'"
+            )
+          ),
         shiny::textInput(
           inputId = "names_features",
           label = "Name of \"feature IDs\" variable in the input",
@@ -1501,12 +1514,6 @@ save_input <- function(input) {
   yaml_advanced$files$features$prepared <-
     yaml_advanced$files$features$prepared |> replace_id()
   # TODO
-  # yaml_advanced$files$libraries$adducts$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$adducts$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$adducts$prepared <-
-  #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$raw$closed <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$raw$ecmdb <-
@@ -1613,6 +1620,8 @@ save_input <- function(input) {
     shiny::isolate(input$ms_tol_mas_dal_ms2)
   yaml_advanced$ms$tolerances$rt$minutes <-
     shiny::isolate(input$ms_tol_rt_min)
+  yaml_advanced$names$adduct <-
+    shiny::isolate(input$names_adduct)
   yaml_advanced$names$extension <-
     shiny::isolate(input$names_extension)
   yaml_advanced$names$features <-
@@ -1623,6 +1632,8 @@ save_input <- function(input) {
   # yaml_advanced$names$inchikey <-
   #   shiny::isolate(input$names_inchikey)
   # TODO
+  # yaml_advanced$names$mgf$adduct <-
+  #   shiny::isolate(input$names_mgf_x)
   # yaml_advanced$names$mgf$collision_energy <-
   #   shiny::isolate(input$names_mgf_x)
   # yaml_advanced$names$mgf$compound_id <-
@@ -2059,18 +2070,18 @@ server <- function(input, output, session) {
 }
 url <- "<http://127.0.0.1:3838>"
 log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
-shinyApp(
-  ui = ui,
-  server = server,
-  onStart = function() {
-    if (i_am_a_whale) {
-      message("I\'m inside the matrix ;(")
-      setwd(dir = "..")
-    } else {
-      cache <- fs::path_home(".tima")
-      fs::dir_create(cache)
-      message("Working in ", cache)
-      setwd(dir = cache)
-    }
-  }
-)
+dir <- if (i_am_a_whale) {
+  message("I\'m inside the matrix ;(")
+  ".."
+} else {
+  cache <- fs::path_home(".tima")
+  fs::dir_create(cache)
+  message("Working in ", cache)
+  cache
+}
+withr::with_dir(new = dir, code = {
+  shinyApp(
+    ui = ui,
+    server = server
+  )
+})

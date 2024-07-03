@@ -1,15 +1,12 @@
 library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
-test_that("Test functions", {
-  install_latest_version(test = TRUE)
+test_that(desc = "Test functions", code = {
   install_latest_version()
-  setwd(fs::path_home(".tima"))
+  withr::local_dir(new = fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
-  ## Prepare config for a single step only
-  prepare_params(step = "weight_annotations")
   ## For all steps
   params$organisms$taxon <- ""
   prepare_params(params_small = params)
@@ -26,7 +23,6 @@ test_that("Test functions", {
   prepare_params(step = "prepare_features_components")
   prepare_params(step = "prepare_features_edges")
   prepare_params(step = "prepare_features_tables")
-  prepare_params(step = "prepare_libraries_adducts")
   prepare_params(step = "prepare_libraries_rt")
   prepare_params(step = "prepare_libraries_sop_closed")
   prepare_params(step = "prepare_libraries_sop_ecmdb")
@@ -67,9 +63,17 @@ test_that("Test functions", {
   )
   get_file(
     url = paths$urls$examples$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE),
+      gsub(
+        pattern = ".tsv",
+        replacement = "_unrecognized.tsv",
+        fixed = TRUE
+      ),
     export = paths$data$source$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE)
+      gsub(
+        pattern = ".tsv",
+        replacement = "_unrecognized.tsv",
+        fixed = TRUE
+      )
   )
   ## Other GNPS job id (without metadata)
   get_gnps_tables(
@@ -256,7 +260,11 @@ test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf", fixed = TRUE),
+        gsub(
+          pattern = "lotus_pos.rds",
+          replacement = "isdb_pos.mgf",
+          fixed = TRUE
+        ),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -267,7 +275,11 @@ test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(pattern = "lotus_pos.rds", replacement = "isdb_pos.mgf", fixed = TRUE),
+        gsub(
+          pattern = "lotus_pos.rds",
+          replacement = "isdb_pos.mgf",
+          fixed = TRUE
+        ),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -278,7 +290,11 @@ test_that("Test functions", {
     args = c(
       col_args,
       input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
-        gsub(pattern = "lotus_neg.rds", replacement = "isdb_neg.mgf", fixed = TRUE),
+        gsub(
+          pattern = "lotus_neg.rds",
+          replacement = "isdb_neg.mgf",
+          fixed = TRUE
+        ),
       output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
       output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
     )
@@ -296,7 +312,11 @@ test_that("Test functions", {
 
   ## for msp reading test
   # Spectrum 1 fails
-  import_spectra(dir(system.file("extdata", package = "MsBackendMsp"), full.names = TRUE, pattern = "msp$")[8L])
+  import_spectra(dir(
+    system.file("extdata", package = "MsBackendMsp"),
+    full.names = TRUE,
+    pattern = "msp$"
+  )[8L])
 
   #### HMDB
   # prepare_isdb_hmdb()
@@ -316,9 +336,7 @@ test_that("Test functions", {
     "inchikey" = NA
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
-  prepare_libraries_rt(
-    temp_exp = "data/source/libraries/rt/example_bad.tsv"
-  )
+  prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv")
   expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
 
   ### SOP
@@ -352,9 +370,6 @@ test_that("Test functions", {
   )
   prepare_libraries_sop_merged()
 
-  ### Adducts
-  prepare_libraries_adducts()
-
   ### Features
   #### if no RT
   tidytable::tidytable(
@@ -363,14 +378,20 @@ test_that("Test functions", {
     "sample.mzML Peak area" = 98765.43
   ) |>
     tidytable::fwrite("data/source/example_features_no_rt.csv")
-  prepare_features_tables(
-    features = "data/source/example_features_no_rt.csv",
-    output = "data/interim/features/example_features_no_rt.tsv.gz"
-  )
+  prepare_features_tables(features = "data/source/example_features_no_rt.csv", output = "data/interim/features/example_features_no_rt.tsv.gz")
   #### classical
   prepare_features_tables()
 
   ## Performing MS1 annotation
+  ## TODO improve this
+  calculate_mass_from_adduct(adduct_string = "[2M1-2H2O+NaCl+H]2+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+Na]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+H]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M+]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M]+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mass = 123.456)
+  calculate_mass_from_adduct(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mass = 123.456)
+
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
@@ -401,9 +422,7 @@ test_that("Test functions", {
     polarity = "neg"
   )
   ### Empty
-  annotate_spectra(
-    library = list("data/interim/libraries/spectra/exp/nope_pos.rds")
-  )
+  annotate_spectra(library = list("data/interim/libraries/spectra/exp/nope_pos.rds"))
   ### Approx
   annotate_spectra(
     library = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
@@ -416,8 +435,7 @@ test_that("Test functions", {
 
   ## Create MS2 based edges
   create_edges_spectra( ## shallow tolerance to speed up tests
-    ppm = 1,
-    dalton = 0.001
+    ppm = 1, dalton = 0.001
   )
   ## if MS1 only
   create_edges_spectra(
@@ -440,10 +458,7 @@ test_that("Test functions", {
     input_directory =
       get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
   )
-  prepare_annotations_sirius(
-    input_directory = "data/interim/annotations/example_sirius.zip",
-    sirius_version = 5
-  )
+  prepare_annotations_sirius(input_directory = "data/interim/annotations/example_sirius.zip", sirius_version = 5)
 
   ### ISDB results
   prepare_annotations_spectra()
@@ -467,7 +482,11 @@ test_that("Test functions", {
   ## Testing for unrecognized taxa
   prepare_taxa(
     metadata = paths$data$source$metadata |>
-      gsub(pattern = ".tsv", replacement = "_unrecognized.tsv", fixed = TRUE)
+      gsub(
+        pattern = ".tsv",
+        replacement = "_unrecognized.tsv",
+        fixed = TRUE
+      )
   )
   ## Attributing based on intensity (multiple source organisms)
   prepare_taxa()
@@ -476,10 +495,7 @@ test_that("Test functions", {
   wrong_taxon_df <- data.frame("organism" = "Gentiano luteo")
   get_organism_taxonomy_ott(df = fake_taxon_df)
   get_organism_taxonomy_ott(df = wrong_taxon_df)
-  get_organism_taxonomy_ott(
-    df = fake_taxon_df,
-    url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
-  )
+  get_organism_taxonomy_ott(df = fake_taxon_df, url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown")
   ## Stupid tests for benchmark
   data.frame(feature_id = 1, organism_name = "Gentiana lutea") |>
     export_output("data/interim/benchmark/bench_test_in.tsv.gz")
@@ -498,10 +514,7 @@ test_that("Test functions", {
 
   ## Perform TIMA
   ### Normal
-  weight_annotations(
-    candidates_final = 1,
-    minimal_ms1_bio = 0.8
-  )
+  weight_annotations(candidates_final = 1, minimal_ms1_bio = 0.8)
   ### Only MS1
   weight_annotations(
     ms1_only = TRUE,
@@ -536,7 +549,6 @@ test_that("Test functions", {
   arguments$fil_ann_pro <- "x"
   arguments$fil_fea_raw <- "x"
   arguments$fil_fea_pre <- "x"
-  arguments$fil_lib_add_pre <- "x"
   arguments$fil_lib_sop_raw_clo <- "x"
   arguments$fil_lib_sop_raw_ecm <- "x"
   arguments$fil_lib_sop_raw_hmd <- "x"
@@ -576,6 +588,7 @@ test_that("Test functions", {
   arguments$ms_tol_mas_dal_ms1 <- "x"
   arguments$ms_tol_mas_dal_ms2 <- "x"
   arguments$ms_tol_rt_min <- "x"
+  arguments$names_adduct <- "x"
   arguments$names_extension <- "x"
   arguments$names_features <- "x"
   arguments$names_filename <- "x"
@@ -654,10 +667,7 @@ test_that("Test functions", {
   normalize_peaks()
   remove_above_precursor()
 
-  parse_cli_params(
-    arguments = arguments,
-    parameters = params
-  )
+  parse_cli_params(arguments = arguments, parameters = params)
 
   succeed()
 })

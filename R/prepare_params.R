@@ -47,9 +47,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_ann_pro <- params_advanced$files$annotations$processed
   fil_fea_raw <- params_advanced$files$features$raw
   fil_fea_pre <- params_advanced$files$features$prepared
-  fil_lib_add_neg <- params_advanced$files$libraries$adducts$neg
-  fil_lib_add_pos <- params_advanced$files$libraries$adducts$pos
-  fil_lib_add_pre <- params_advanced$files$libraries$adducts$prepared
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
   fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
@@ -110,6 +107,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   names_features <- params_advanced$names$features
   names_filename <- params_advanced$names$filename
   names_inchikey <- params_advanced$names$inchikey
+  names_mgf_ad <- params_advanced$names$mgf$adduct
   names_mgf_ce <- params_advanced$names$mgf$collision_energy
   names_mgf_ci <- params_advanced$names$mgf$compound_id
   names_mgf_em <- params_advanced$names$mgf$exact_mass
@@ -202,12 +200,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_ann_pre_str
       yamls_params$annotate_masses$files$features$prepared <-
         fil_fea_pre
-      yamls_params$annotate_masses$files$libraries$adducts$neg <-
-        fil_lib_add_neg
-      yamls_params$annotate_masses$files$libraries$adducts$pos <-
-        fil_lib_add_pos
-      yamls_params$annotate_masses$files$libraries$adducts$prepared <-
-        fil_lib_add_pre
       yamls_params$annotate_masses$files$libraries$sop$merged$keys <-
         fil_lib_sop_mer_key
       yamls_params$annotate_masses$files$libraries$sop$merged$structures$stereo <-
@@ -397,16 +389,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_features_tables$names$rt$features <-
         names_rt_fea
     },
-    prepare_libraries_adducts = {
-      yamls_params$prepare_libraries_adducts$files$libraries$adducts$neg <-
-        fil_lib_add_neg
-      yamls_params$prepare_libraries_adducts$files$libraries$adducts$pos <-
-        fil_lib_add_pos
-      yamls_params$prepare_libraries_adducts$files$libraries$adducts$prepared <-
-        fil_lib_add_pre
-      yamls_params$prepare_libraries_adducts$files$libraries$sop$merged$structures$metadata <-
-        fil_lib_sop_mer_str_met
-    },
     prepare_libraries_rt = {
       yamls_params$prepare_libraries_rt$files$libraries$sop$prepared$rt <-
         fil_lib_sop_pre_rt
@@ -503,6 +485,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_spe_is_pos
       yamls_params$prepare_libraries_spectra$files$libraries$spectral$is$raw <-
         fil_lib_spe_is_raw
+      yamls_params$prepare_libraries_spectra$names$mgf$adduct <-
+        names_mgf_ad
       yamls_params$prepare_libraries_spectra$names$mgf$collision_energy <-
         names_mgf_ce
       yamls_params$prepare_libraries_spectra$names$mgf$compound_id <-
