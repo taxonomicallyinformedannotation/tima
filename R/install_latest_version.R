@@ -47,10 +47,29 @@ install_latest_version <- function() {
   )
   message("ref is ", ref)
   pak::pak_update()
-  pak::pak(
-    pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
-    ask = FALSE
+  # Fails sometimes
+  tryCatch(
+    expr = {
+      pak::pak(
+        pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+        ask = FALSE
+      )
+    },
+    error = function(err) {
+      if (Sys.getenv("RSTUDIO") == 1) {
+        if (!requireNamespace("rstudioapi", quietly = TRUE)) {
+          install.packages(rstudioapi)
+        }
+        rstudioapi::restartSession()
+      } else {
+        if (!requireNamespace("startup", quietly = TRUE)) {
+          install.packages(startup)
+        }
+        startup::restart()
+      }
+    }
   )
+
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
