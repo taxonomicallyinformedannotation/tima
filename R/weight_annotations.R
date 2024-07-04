@@ -204,6 +204,15 @@ weight_annotations <- function(
   ) |>
     tidytable::bind_rows()
 
+  log_debug(
+    x = "Got",
+    annotation_table |>
+      tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
+      tidytable::distinct(feature_id, candidate_library, candidate_structure_inchikey_no_stereo) |>
+      tidytable::group_by(candidate_library) |>
+      tidytable::count(), "initial annotations"
+  )
+
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
 

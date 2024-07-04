@@ -589,6 +589,131 @@ ui <- shiny::fluidPage(
                 )
               )
             )
+          ),
+        shiny::checkboxGroupInput(
+          inputId = "ms_neu",
+          label = "List of neutral losses to be used",
+          choices = list(
+            "HN",
+            "CH3",
+            "O",
+            "H3N (ammonia)",
+            "H2O (water)",
+            "CHN",
+            "CO",
+            "C2H4 (2xCH2)",
+            "C2H5 (CH2-CH3)",
+            "CH2O",
+            "H5ON (H2O-H3N)",
+            "H4O2 (2xH2O)",
+            "C2H2O",
+            "CHON",
+            "CO2",
+            "CHO2",
+            "H6O3 (3xH2O)",
+            "C2O2 (2xCO)",
+            "CH6O3 (combination)",
+            "H8O4 (4xH2O)",
+            "C2H2O3 (CH2O-CO2)",
+            "C3H6O2 (CH3-CH2-COOH)",
+            "C3O3 (3xCO)",
+            "C4H9NO (combination)",
+            "C2O4 (2xCO2)",
+            "C3H4O3 (pyruvic)",
+            "C4H8O2 (butyric)",
+            "C3H7NO2 (alanine)",
+            "C3H6O3 (sugar)",
+            "H2O4S (sulfuric)",
+            "H3O4P (phosphoric)",
+            "C5H10O2 (valeric)",
+            "C3H4O4 (malonic)",
+            "C2H2O5 (CO2-CO2-H2O)",
+            "C3H8O4 (combination)",
+            "C5H9NO2 (proline)",
+            "C4O4H6 (CO2-CO2-CH3-CH3)",
+            "C4H8O4 (sugar)",
+            "C2H4O6 (CO2-CO2-H2O-H2O)",
+            "C6H6O3 (HRF)",
+            "C5H8O4 (pentose-H2O)",
+            "C8H8O2 (RDA-1)",
+            "C6H8O4 (HRF)",
+            "C9H6O2 (coumaroyl)",
+            "C6H10O4 (methylpentose/desoxyhexose-H2O)",
+            "C9H8O2 (cinnamoyl)",
+            "C7H4O4 (galloyl)",
+            "C8H8O3 (RDA-2)",
+            "C9H6O3 (caffeoyl)",
+            "C6H10O5 (hexose-H2O)",
+            "C8H8O4 (RDA-3)",
+            "C8H10O4 (RDA-2-H2O)",
+            "C6H8O6 (glucuronic-H2O)",
+            "C10H8O3 (feruloyl)",
+            "C6H13NO5 (hexose-H2N)",
+            "C6H12O6 (hexose)",
+            "C7H12O6 (quinoyl)",
+            "C6H15NO6 (hexose-H2N-H2O)",
+            "C6H14O7 (hexose-H2O)",
+            "C8H12O6 (acetylhexose-H2O)",
+            "C11H10O4 (sinapoyl)",
+            "C16H30O (pamitoyl)",
+            "C9H12O8 (malonylhexose)",
+            "C13H14O6 (benzoylhexose)",
+            "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
+            "C15H16O7 (coumaroylhexose)",
+            "C13H14O9 (galloylhexose)",
+            "C15H16O8 (caffeoylhexose)",
+            "C12H20O10 (2xhexose-H2O)",
+            "C16H18O8 (feruloylhexose)",
+            "C17H20O9 (sinapoylhexose)",
+            "C18H30O15 (3xhexose-H2O)"
+          ),
+          selected = list(
+            "O",
+            "H3N (ammonia)",
+            "H2O (water)",
+            "CO",
+            "C2H5 (CH2-CH3)",
+            "H4O2 (2xH2O)",
+            "CO2",
+            "CHO2",
+            "H6O3 (3xH2O)",
+            "C2O2 (2xCO)",
+            "CH6O3 (combination)",
+            "H8O4 (4xH2O)",
+            "C3H6O3 (sugar)",
+            "H2O4S (sulfuric)",
+            "H3O4P (phosphoric)",
+            "C4H8O4 (sugar)",
+            "C6H6O3 (HRF)",
+            "C5H8O4 (pentose-H2O)",
+            "C8H8O2 (RDA-1)",
+            "C6H8O4 (HRF)",
+            "C6H10O4 (methylpentose/desoxyhexose-H2O)",
+            "C8H8O3 (RDA-2)",
+            "C6H10O5 (hexose-H2O)",
+            "C8H8O4 (RDA-3)",
+            "C8H10O4 (RDA-2-H2O)",
+            "C6H12O6 (hexose)",
+            "C11H10O4 (sinapoyl)",
+            "C16H30O (pamitoyl)",
+            "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
+            "C12H20O10 (2xhexose-H2O)"
+          )
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Choose wisely.",
+              "If a very important neutral loss everyone should have is missing,",
+              "please open an issue at:",
+              as.character(
+                shiny::tags$a(
+                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  href =
+                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                )
+              )
+            )
           )
       ),
       shiny::tabPanel(
@@ -1604,6 +1729,8 @@ save_input <- function(input) {
     shiny::isolate(input$ms_clu_neg)
   yaml_advanced$ms$clusters$pos <-
     shiny::isolate(input$ms_clu_pos)
+  yaml_advanced$ms$neutral_losses <-
+    shiny::isolate(input$ms_neu)
   yaml_advanced$ms$polarity <-
     shiny::isolate(input$ms_pol)
   yaml_advanced$ms$thresholds$ms1$intensity <-
@@ -1984,7 +2111,6 @@ server <- function(input, output, session) {
             "par_def_pre_fea_com",
             "par_def_pre_fea_edg",
             "par_def_pre_fea_tab",
-            "par_def_pre_lib_add",
             "par_def_pre_lib_rt",
             "par_def_pre_lib_sop_clo",
             "par_def_pre_lib_sop_ecm",
@@ -2009,7 +2135,6 @@ server <- function(input, output, session) {
             "par_usr_pre_fea_com",
             "par_usr_pre_fea_edg",
             "par_usr_pre_fea_tab",
-            "par_usr_pre_lib_add",
             "par_usr_pre_lib_rt",
             "par_usr_pre_lib_sop_clo",
             "par_usr_pre_lib_sop_ecm",
@@ -2030,7 +2155,6 @@ server <- function(input, output, session) {
             "par_pre_fea_com",
             "par_pre_fea_edg",
             "par_pre_fea_tab",
-            "par_pre_lib_add",
             "par_pre_lib_rt",
             "par_pre_lib_sop_clo",
             "par_pre_lib_sop_ecm",

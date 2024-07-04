@@ -24,11 +24,8 @@ annotate_masses(
   str_tax_npc = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
   adducts_list = get_params(step = "annotate_masses")$ms$adducts,
-  adducts_masses_list = system.file("extdata", "adducts.tsv", package = "timaR"),
-  clusters_neg = get_params(step = "annotate_masses")$ms$clusters$neg,
-  clusters_pos = get_params(step = "annotate_masses")$ms$clusters$pos,
-  clusters_list = system.file("extdata", "clusters.tsv", package = "timaR"),
-  neutral_losses_list = system.file("extdata", "neutral_losses.tsv", package = "timaR"),
+  clusters_list = get_params(step = "annotate_masses")$ms$clusters,
+  neutral_losses_list = get_params(step = "annotate_masses")$ms$neutral_losses,
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
   tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes
@@ -61,12 +58,6 @@ annotate_masses(
 
 \item{adducts_list}{List of adducts to be used}
 
-\item{adducts_masses_list}{Adducts masses}
-
-\item{clusters_neg}{Negative clusters to be used}
-
-\item{clusters_pos}{Positive clusters to be used}
-
 \item{clusters_list}{List of clusters to be used}
 
 \item{neutral_losses_list}{List of neutral losses to be used}
@@ -76,6 +67,12 @@ annotate_masses(
 \item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 10 ppm}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.1min}
+
+\item{adducts_masses_list}{Adducts masses}
+
+\item{clusters_neg}{Negative clusters to be used}
+
+\item{clusters_pos}{Positive clusters to be used}
 }
 \value{
 A table containing MS1 annotations based on exact mass
