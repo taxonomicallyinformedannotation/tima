@@ -324,23 +324,98 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      - H2O # (water)
-      - CH2O2 # (formic)
-      - NaCl # (sodium chloride)
-      - C2H4O2 # (acetic)
-      - H2PO4 # (phosphoric)
-      - C2HF3O2 # (tfa)
+      - "H2O" # (water)
+      - "CH2O2" # (formic)
+      - "NaCl" # (sodium chloride)
+      - "C2H4O2" # (acetic)
+      - "H2PO4" # (phosphoric)
+      - "C2HF3O2" # (tfa)
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - H2O # (water)
+      - "H2O" # (water)
       # - CH4O # (methanol)
-      - C2H3N # (acetonitrile)
+      - "C2H3N" # (acetonitrile)
       # - C2H7N # (ethylamine)
       # - C2H6O # (ethanol)
-      - NaCl # (sodium chloride)
+      - "NaCl" # (sodium chloride)
       # - C3H8O # (isopropanol)
       # - C2H6OS # (dmso)
+
+  #' List of neutral losses to be used. STRING
+  neutral_losses:
+    - "HN"
+    - "CH3"
+    - "O"
+    - "H3N (ammonia)"
+    - "H2O (water)"
+    - "CHN"
+    - "CO"
+    - "C2H4 (2xCH2)"
+    - "C2H5 (CH2-CH3)"
+    - "CH2O"
+    - "H5ON (H2O-H3N)"
+    - "H4O2 (2xH2O)"
+    - "C2H2O"
+    - "CHON"
+    - "CO2"
+    - "CHO2"
+    - "H6O3 (3xH2O)"
+    - "C2O2 (2xCO)"
+    - "CH6O3 (combination)"
+    - "H8O4 (4xH2O)"
+    - "C2H2O3 (CH2O-CO2)"
+    - "C3H6O2 (CH3-CH2-COOH)"
+    - "C3O3 (3xCO)"
+    - "C4H9NO (combination)"
+    - "C2O4 (2xCO2)"
+    - "C3H4O3 (pyruvic)"
+    - "C4H8O2 (butyric)"
+    - "C3H7NO2 (alanine)"
+    - "C3H6O3 (sugar)"
+    - "H2O4S (sulfuric)"
+    - "H3O4P (phosphoric)"
+    - "C5H10O2 (valeric)"
+    - "C3H4O4 (malonic)"
+    - "C2H2O5 (CO2-CO2-H2O)"
+    - "C3H8O4 (combination)"
+    - "C5H9NO2 (proline)"
+    - "C4O4H6 (CO2-CO2-CH3-CH3)"
+    - "C4H8O4 (sugar)"
+    - "C2H4O6 (CO2-CO2-H2O-H2O)"
+    - "C6H6O3 (HRF)"
+    - "C5H8O4 (pentose-H2O)"
+    - "C8H8O2 (RDA-1)"
+    - "C6H8O4 (HRF)"
+    - "C9H6O2 (coumaroyl)"
+    - "C6H10O4 (methylpentose/desoxyhexose-H2O)"
+    - "C9H8O2 (cinnamoyl)"
+    - "C7H4O4 (galloyl)"
+    - "C8H8O3 (RDA-2)"
+    - "C9H6O3 (caffeoyl)"
+    - "C6H10O5 (hexose-H2O)"
+    - "C8H8O4 (RDA-3)"
+    - "C8H10O4 (RDA-2-H2O)"
+    - "C6H8O6 (glucuronic-H2O)"
+    - "C10H8O3 (feruloyl)"
+    - "C6H13NO5 (hexose-H2N)"
+    - "C6H12O6 (hexose)"
+    - "C7H12O6 (quinoyl)"
+    - "C6H15NO6 (hexose-H2N-H2O)"
+    - "C6H14O7 (hexose-H2O)"
+    - "C8H12O6 (acetylhexose-H2O)"
+    - "C11H10O4 (sinapoyl)"
+    - "C16H30O (pamitoyl)"
+    - "C9H12O8 (malonylhexose)"
+    - "C13H14O6 (benzoylhexose)"
+    - "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)"
+    - "C15H16O7 (coumaroylhexose)"
+    - "C13H14O9 (galloylhexose)"
+    - "C15H16O8 (caffeoylhexose)"
+    - "C12H20O10 (2xhexose-H2O)"
+    - "C16H18O8 (feruloylhexose)"
+    - "C17H20O9 (sinapoylhexose)"
+    - "C18H30O15 (3xhexose-H2O)"
 
   #' Thresholds related parameters.
   thresholds:

@@ -45,11 +45,13 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!requireNamespace(c("timaR"), quietly = TRUE)) {
+  if (!"timaR" %in% installed.packages()) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    local_version <- pak::pkg_status("timaR")$version[1]
+    status <- pak::pkg_status("timaR")
+    local_version <- status$version[1]
+    local_sha <- status$remotesha[1]
   }
   remote_version <- readLines(
     paste0(
@@ -70,6 +72,7 @@ install_latest_version <- function() {
       ") skipping"
     )
   } else {
+    pak::pak_cleanup(force = TRUE)
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     # Try installing the local version first
@@ -91,9 +94,9 @@ install_latest_version <- function() {
     if (!success) {
       success <- tryCatch(
         {
-          message("Installing local version from URL")
+          message("Installing remote version")
           pak::pkg_install(
-            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+            pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
             ask = FALSE,
             upgrade = FALSE
           )
@@ -108,9 +111,9 @@ install_latest_version <- function() {
     if (!success) {
       success <- tryCatch(
         {
-          message("Installing remote version")
+          message("Retrying remote version")
           pak::pkg_install(
-            pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+            pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
             ask = FALSE,
             upgrade = FALSE
           )

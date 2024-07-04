@@ -203,6 +203,9 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$ms_clu_pos)) {
       parameters$ms$clusters$pos <- as.character(arguments$ms_clu_pos)
     }
+    if (!is.null(arguments$ms_neu)) {
+      parameters$ms$neutral_losses <- as.character(arguments$ms_neu)
+    }
     if (!is.null(arguments$ms_pol)) {
       parameters$ms$polarity <- as.character(arguments$ms_pol)
     }

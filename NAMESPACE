@@ -3,7 +3,7 @@
 export(annotate_masses)
 export(annotate_spectra)
 export(calculate_entropy)
-export(calculate_mass_from_adduct)
+export(calculate_mass_of_m)
 export(clean_bio)
 export(clean_chemo)
 export(clean_collapse)
