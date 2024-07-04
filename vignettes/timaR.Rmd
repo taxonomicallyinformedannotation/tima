@@ -59,7 +59,6 @@ targets::tar_visnetwork(
   names = starts_with("ann"),
   exclude = c(
     contains("benchmark"),
-    contains("dic"),
     contains("par_"),
     contains("gnps"),
     contains("input"),

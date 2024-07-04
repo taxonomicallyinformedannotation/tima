@@ -75,7 +75,7 @@ Collate:
     'annotate_spectra.R'
     'calculate_entropy.R'
     'parse_adduct.R'
-    'calculate_mass_from_adduct.R'
+    'calculate_mass_of_m.R'
     'clean_bio.R'
     'columns_model.R'
     'clean_collapse.R'

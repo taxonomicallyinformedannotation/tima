@@ -218,36 +218,6 @@ list(
             paths$data$source$benchmark$mgf$pos
         }
       )
-    ),
-    ## Dictionaries
-    list(
-      tar_target(
-        name = dic_add,
-        format = "file",
-        command = {
-          dic_add <- system.file("extdata", "adducts.tsv", package = "timaR")
-        }
-      ),
-      tar_target(
-        name = dic_clu,
-        format = "file",
-        command = {
-          dic_clu <- system.file("extdata",
-            "clusters.tsv",
-            package = "timaR"
-          )
-        }
-      ),
-      tar_target(
-        name = dic_neu_los,
-        format = "file",
-        command = {
-          dic_neu_los <- system.file("extdata",
-            "neutral_losses.tsv",
-            package = "timaR"
-          )
-        }
-      )
     )
   ),
   ## Params
@@ -1524,11 +1494,8 @@ list(
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc,
               adducts_list = par_ann_mas$ms$adducts,
-              adducts_masses_list = dic_add,
-              clusters_neg = par_ann_mas$ms$clusters$neg,
-              clusters_pos = par_ann_mas$ms$clusters$pos,
-              clusters_list = dic_clu,
-              neutral_losses_list = dic_neu_los,
+              clusters_list = par_ann_mas$ms$clusters,
+              neutral_losses_list = par_ann_mas$ms$neutral_losses,
               ms_mode = par_ann_mas$ms$polarity,
               tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
               tolerance_rt = par_ann_mas$ms$tolerances$rt$minutes
@@ -2272,12 +2239,9 @@ list(
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
-            adducts_list = benchmark_def_ann_mas$ms$adducts,
-            adducts_masses_list = dic_add,
-            clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
-            clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
-            clusters_list = dic_clu,
-            neutral_losses_list = dic_neu_los,
+            adducts_list = par_ann_mas$ms$adducts,
+            clusters_list = par_ann_mas$ms$clusters,
+            neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = "pos",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
             tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
@@ -2301,12 +2265,9 @@ list(
             str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
-            adducts_list = benchmark_def_ann_mas$ms$adducts,
-            adducts_masses_list = dic_add,
-            clusters_neg = benchmark_def_ann_mas$ms$clusters$neg,
-            clusters_pos = benchmark_def_ann_mas$ms$clusters$pos,
-            clusters_list = dic_clu,
-            neutral_losses_list = dic_neu_los,
+            adducts_list = par_ann_mas$ms$adducts,
+            clusters_list = par_ann_mas$ms$clusters,
+            neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = "neg",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
             tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
