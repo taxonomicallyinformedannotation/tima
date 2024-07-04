@@ -179,7 +179,7 @@ annotate_masses <-
       tidytable::tidytable() |>
       tidytable::rename(cluster = 1)
 
-    log_debug("forming adducts  and clusters \n")
+    log_debug("forming adducts and clusters \n")
     add_clu_table <- adducts_table |>
       tidytable::mutate(join = "x") |>
       tidytable::left_join(clusters_table |>
@@ -213,6 +213,8 @@ annotate_masses <-
       tidytable::mutate_rowwise(adduct_mass = -1 * calculate_mass_of_m(adduct_string = adduct, mz = 0))
 
     rm(clusters_table)
+
+    # TODO add safety if no monocharged?
 
     log_debug("calculating delta mz for single charge adducts and clusters \n")
     differences <-
@@ -421,6 +423,8 @@ annotate_masses <-
       tidytable::filter(!adduct %in% add_clu_table$adduct) |>
       tidytable::mutate(join = "x")
     rm(adducts_table, add_clu_table)
+
+    # TODO add safety if no multicharged
 
     df_multi <- df_fea_min |>
       tidytable::select(-adduct) |>
