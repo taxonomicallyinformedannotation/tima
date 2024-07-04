@@ -45,12 +45,14 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
+  pak::pak(ask = FALSE, upgrade = FALSE)
+
   # First attempt
   success <- tryCatch(
     {
       message("Installing ", ref, " version from repository")
       pak::pkg_install(
-        pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+        pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
         ask = FALSE,
         upgrade = FALSE
       )
@@ -70,7 +72,7 @@ install_latest_version <- function() {
         pak::pak_update()
         pak::pak(ask = FALSE, upgrade = TRUE)
         pak::pkg_install(
-          pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+          pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
           ask = FALSE,
           upgrade = FALSE
         )
@@ -86,19 +88,19 @@ install_latest_version <- function() {
   if (!success) {
     success <- tryCatch(
       {
-        message("Retrying again...")
+        message("Retrying one last time")
         pak::pak_cleanup(force = TRUE)
         pak::pak_update()
         pak::pak(ask = FALSE, upgrade = TRUE)
         pak::pkg_install(
-          pkg = paste0("taxonomicallyinformedannotation/tima-r@", ref),
+          pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
           ask = FALSE,
           upgrade = FALSE
         )
         TRUE
       },
       error = function(e) {
-        message("Last fail")
+        message("Failed.")
         FALSE
       }
     )
