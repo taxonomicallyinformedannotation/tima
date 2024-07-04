@@ -387,13 +387,13 @@ test_that(desc = "Test functions", code = {
 
   ## Performing MS1 annotation
   ## TODO check values later on
-  calculate_mass_from_adduct(adduct_string = "[2M1-2H2O+NaCl+H]2+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[M+Na]+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[M+H]+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[M+]+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[M]+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mass = 123.456)
-  calculate_mass_from_adduct(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mass = 123.456)
+  calculate_mass_of_m(adduct_string = "[2M1-2H2O+NaCl+H]2+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M+Na]+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M+H]+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M+]+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M]+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mz = 123.456)
 
   ### Negative and no RT
   annotate_masses(
@@ -583,6 +583,7 @@ test_that(desc = "Test functions", code = {
   arguments$ms_add_pos <- "x"
   arguments$ms_clu_neg <- "x"
   arguments$ms_clu_pos <- "x"
+  arguments$ms_neu <- "x"
   arguments$ms_pol <- "x"
   arguments$ms_thr_ms1_int <- "x"
   arguments$ms_thr_ms2_int <- "x"

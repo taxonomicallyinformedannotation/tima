@@ -93,6 +93,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ms_add_pos <- params_advanced$ms$adducts$pos
   ms_clu_neg <- params_advanced$ms$clusters$neg
   ms_clu_pos <- params_advanced$ms$clusters$pos
+  ms_neu <- params_advanced$ms$neutral_losses
   ms_pol <- params_advanced$ms$polarity
   ms_thr_ms1_int <- params_advanced$ms$thresholds$ms1$intensity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
@@ -220,6 +221,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         ms_clu_neg
       yamls_params$annotate_masses$ms$clusters$pos <-
         ms_clu_pos
+      yamls_params$annotate_masses$ms$neutral_losses <-
+        ms_neu
       yamls_params$annotate_masses$ms$thresholds$ms1$intensity <-
         ms_thr_ms1_int
       yamls_params$annotate_masses$ms$polarity <-

@@ -36,16 +36,7 @@ prepare_isdb_hmdb <-
     source(file = "inst/scripts/standardize.R")
 
     log_debug("Loading proton mass")
-    proton <-
-      readr::read_tsv(
-        file = system.file(
-          "extdata",
-          "adducts.tsv",
-          package = "timaR"
-        )
-      ) |>
-      tidytable::filter(adduct == "H (proton)") |>
-      tidytable::pull("mass")
+    proton <- MetaboCoreUtils::calculateMass("H") - 5.485799E-4
 
     log_debug("Loading metadata")
     df_meta <- readr::read_tsv(file = metadata)
