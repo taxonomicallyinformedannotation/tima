@@ -45,7 +45,7 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!requireNamespace(c("timaR"), quietly = TRUE)) {
+  if (!"timaR" %in% installed.packages()) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
@@ -70,6 +70,7 @@ install_latest_version <- function() {
       ") skipping"
     )
   } else {
+    pak::pak_cleanup(force = TRUE)
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
     # Try installing the local version first
