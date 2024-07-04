@@ -2,6 +2,9 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
+  try(remove.packages("pak"))
+  install_latest_version()
+  # When already present
   install_latest_version()
   withr::local_dir(new = fs::path_home(".tima"))
   ## Prepare parameters
