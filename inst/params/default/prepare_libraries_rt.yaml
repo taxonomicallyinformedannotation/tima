@@ -15,7 +15,7 @@ files:
       #' List of experimental temporal libraries.
       exp:
         #' List of experimental temporal libraries (CSV). STRING
-        csv: ~
+        csv: [ ]
 
         #' List of experimental temporal libraries (MGF).
         mgf:
@@ -28,7 +28,7 @@ files:
       #' List of in silico temporal libraries.
       is:
         #' List of in silico temporal libraries (CSV). STRING
-        csv: ~
+        csv: [ ]
 
         #' List of in silico temporal libraries (MGF).
         mgf:
