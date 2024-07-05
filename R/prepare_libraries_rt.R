@@ -69,6 +69,24 @@ prepare_libraries_rt <-
         !is.null(x)
       }) |>
       unlist()]
+    mgf_exp <- mgf_exp |>
+      lapply(
+        FUN = full_or_null
+      )
+    temp_exp <- temp_exp[temp_exp |>
+      lapply(FUN = function(x) {
+        !is.null(x)
+      }) |>
+      unlist()]
+    mgf_is <- mgf_is |>
+      lapply(
+        FUN = full_or_null
+      )
+    temp_is <- temp_is[temp_is |>
+      lapply(FUN = function(x) {
+        !is.null(x)
+      }) |>
+      unlist()]
     if (length(mgf_exp) == 0) {
       mgf_exp <- NULL
     }
@@ -300,7 +318,7 @@ prepare_libraries_rt <-
     rm(df_rts)
 
     if (nrow(rts) == 0) {
-      log_debug("No retention time library found, returning empty table.")
+      log_debug("No retention time library found, returning empty organism table.")
       sop <- tidytable::tidytable(
         structure_smiles = NA_character_,
         structure_inchikey = NA_character_,
@@ -310,7 +328,7 @@ prepare_libraries_rt <-
     }
 
     if (nrow(rts) == 0) {
-      log_debug("No retention time library found, returning empty tables")
+      log_debug("No retention time library found, returning empty retention time table.")
       rts <- tidytable::tidytable(
         rt = NA_real_,
         candidate_structure_inchikey_no_stereo = NA_character_,
