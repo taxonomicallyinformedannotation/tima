@@ -29,7 +29,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ann_thr_ms1_bio <- params_advanced$annotations$thresholds$ms1$biological
   ann_thr_ms1_che <- params_advanced$annotations$thresholds$ms1$chemical
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
-  ann_thr_ms2_sim <- params_advanced$annotations$thresholds$ms2$similarity
+  ann_thr_ms2_sim_ann <- params_advanced$annotations$thresholds$ms2$similarity$annotation
+  ann_thr_ms2_sim_edg <- params_advanced$annotations$thresholds$ms2$similarity$edges
   fil_pat <- params_advanced$files$pattern
   fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
@@ -245,8 +246,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     annotate_spectra = {
       yamls_params$annotate_spectra$annotations$ms2approx <-
         ann_ms2_app
-      yamls_params$annotate_spectra$annotations$thresholds$ms2$similarity <-
-        ann_thr_ms2_sim
+      yamls_params$annotate_spectra$annotations$thresholds$ms2$similarity$annotation <-
+        ann_thr_ms2_sim_ann
       yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
         fil_ann_raw_spe_spe
       yamls_params$annotate_spectra$files$libraries$spectral$exp$neg <-
@@ -275,8 +276,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_net_spe_com_raw
     },
     create_edges_spectra = {
-      yamls_params$create_edges_spectra$annotations$thresholds$ms2$similarity <-
-        ann_thr_ms2_sim
+      yamls_params$create_edges_spectra$annotations$thresholds$ms2$similarity$edges <-
+        ann_thr_ms2_sim_edg
       yamls_params$create_edges_spectra$files$networks$spectral$edges$raw$spectral <-
         fil_net_spe_edg_raw_spe
       yamls_params$create_edges_spectra$files$spectral$raw <-
