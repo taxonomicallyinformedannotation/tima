@@ -579,7 +579,7 @@
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
-      "version": ">= 2.3.8",
+      "version": ">= 2.3.9",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -591,7 +591,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4381.322KB",
+  "fileSize": "4385.555KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

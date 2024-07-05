@@ -51,7 +51,7 @@ Imports:
     utils,
     visNetwork (>= 2.1.2),
     withr (>= 3.0.0),
-    yaml (>= 2.3.8)
+    yaml (>= 2.3.9)
 Suggests: 
     BiocManager,
     knitr,
