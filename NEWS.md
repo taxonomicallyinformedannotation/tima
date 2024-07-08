@@ -2,6 +2,7 @@
 
 # timaR 2.9.6
 
+* Adding light-switch thanks to `pkgdown 2.1.0`.
 * Attempt to simplify installation
 * Fix library/adducts confusion (#123)
 * Fix some incorrect adduct differences annotations

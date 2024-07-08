@@ -123,6 +123,41 @@ annotate_masses <-
     if (!"adduct" %in% colnames(features_table)) {
       log_debug("No previously attributed adducts detected")
       features_table$adduct <- NA_character_
+    } else {
+      log_debug(
+        "Already",
+        nrow(features_table |> tidytable::filter(!is.na(adduct))),
+        "adducts previously detected"
+      )
+      # TODO this should be externalized
+      adducts_translations <-
+        c(
+          "-2H2O" = "-H4O2 (2xH2O)", # mzmine
+          "-3H2O" = "-H6O3 (3xH2O)", # mzmine
+          "-4H2O" = "-H8O4 (4xH2O)", # mzmine
+          "-5H2O" = "-H10O5 (5xH2O)", # mzmine
+          "-NH3" = "+H3N", # mzmine
+          "+2H" = "+H2", # mzmine
+          "+2Na" = "+Na2", # mzmine
+          "+Acetate" = "C2H3O2", # mzmine
+          "+ACN" = "+C2H3N", # mzmine
+          "+FA" = "CHO2", # mzmine
+          "+HAc" = "C2H4O2", # mzmine
+          "+HFA" = "CH2O2", # mzmine
+          "+IsoProp" = "+C3H8O", # mzmine
+          "+MeOH" = "+CH4O", # mzmine
+          "+NH4" = "+H4N" # mzmine
+        )
+      log_debug("Trying to harmonize adducts definitions...")
+      features_table <- features_table |>
+        tidytable::mutate(
+          adduct = stringi::stri_replace_all_fixed(
+            str = adduct,
+            pattern = names(adducts_translations),
+            replacement = adducts_translations,
+            vectorize_all = FALSE
+          )
+        )
     }
 
     df_fea_min <- features_table |>
@@ -470,7 +505,8 @@ annotate_masses <-
       ) |>
       tidytable::select(structure_molecular_formula,
         library = library_name,
-        tidytable::everything(), -exact_mass,
+        tidytable::everything(),
+        -exact_mass,
       ) |>
       tidytable::filter(!(library %in% forbidden_adducts)) |>
       tidytable::mutate(library = as.character(library)) |>
@@ -536,14 +572,16 @@ annotate_masses <-
       df_add |>
         tidytable::mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct(),
       df_nl |>
         tidytable::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         tidytable::distinct()
