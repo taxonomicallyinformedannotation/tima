@@ -8,13 +8,14 @@ figure:
 
 template:
   bootstrap: 5
-  params:
-    google_site_verification: Bt77rpBuC_R-0p62TWtA_ba5rvx-PuSEMv4LHg1UsOo
+  light-switch: true
   opengraph:
     image:
       src: man/figures/logo.svg
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
+  params:
+    google_site_verification: Bt77rpBuC_R-0p62TWtA_ba5rvx-PuSEMv4LHg1UsOo
 
 url: https://taxonomicallyinformedannotation.github.io/tima-r
