@@ -132,13 +132,18 @@ annotate_masses <-
       # TODO this should be externalized
       adducts_translations <-
         c(
+          "-2H" = "-H2", # cliqueMS
+          "-3H" = "-H3", # cliqueMS
           "-2H2O" = "-H4O2 (2xH2O)", # mzmine
           "-3H2O" = "-H6O3 (3xH2O)", # mzmine
           "-4H2O" = "-H8O4 (4xH2O)", # mzmine
           "-5H2O" = "-H10O5 (5xH2O)", # mzmine
           "-NH3" = "+H3N", # mzmine
           "+2H" = "+H2", # mzmine
+          "+2K" = "+K2", # cliqueMS
           "+2Na" = "+Na2", # mzmine
+          "+3K" = "+K3", # cliqueMS
+          "+3Na" = "+Na3", # cliqueMS
           "+Acetate" = "C2H3O2", # mzmine
           "+ACN" = "+C2H3N", # mzmine
           "+FA" = "CHO2", # mzmine
