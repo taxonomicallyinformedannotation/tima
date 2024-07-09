@@ -417,20 +417,15 @@ ms:
     - "C17H20O9 (sinapoylhexose)"
     - "C18H30O15 (3xhexose-H2O)"
 
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
   #' Thresholds related parameters.
   thresholds:
-    #' MS1 related parameters.
-    ms1:
-      #' Intensity threshold for MS1. INTEGER
-      intensity: 1000000
-
     #' MS2 related parameters.
     ms2:
       #' Intensity threshold for MS2. INTEGER
       intensity: 5
-
-  #' Polarity used. Must be "pos" or "neg". STRING
-  polarity: pos
 
   #' Tolerances.
   tolerances:

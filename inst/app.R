@@ -335,22 +335,6 @@ ui <- shiny::fluidPage(
             content = c("Polarity of the MS experiment.")
           ),
         shiny::sliderInput(
-          inputId = "ms_thr_ms1_int",
-          label = "Intensity threshold for MS1",
-          min = 0,
-          max = 1E6,
-          value = 1E5,
-          step = 1E4,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "MS1 intensity threshold.",
-              "Features below this threshold will not be annotated."
-            )
-          ),
-        shiny::sliderInput(
           inputId = "ms_thr_ms2_int",
           label = "Intensity threshold for MS2",
           min = 0,
@@ -1733,8 +1717,6 @@ save_input <- function(input) {
     shiny::isolate(input$ms_neu)
   yaml_advanced$ms$polarity <-
     shiny::isolate(input$ms_pol)
-  yaml_advanced$ms$thresholds$ms1$intensity <-
-    shiny::isolate(input$ms_thr_ms1_int)
   yaml_advanced$ms$thresholds$ms2$intensity <-
     shiny::isolate(input$ms_thr_ms2_int)
   yaml_advanced$ms$tolerances$mass$ppm$ms1 <-
