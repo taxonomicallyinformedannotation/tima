@@ -1,5 +1,10 @@
 # timaR
 
+# timaR 2.9.7
+
+* Adding possibility to add internal libraries through the GUI (#159)
+* Expose more parameters to the GUI (#159)
+
 # timaR 2.9.6
 
 * Adding light-switch thanks to `pkgdown 2.1.0`.
