@@ -53,7 +53,6 @@ annotate_masses <-
            ms_mode = get_params(step = "annotate_masses")$ms$polarity,
            tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
            tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
-    # TODO not using MS1 threshold
     stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
     stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
 
@@ -72,7 +71,6 @@ annotate_masses <-
       clusters <- clusters_list$neg
     }
 
-    ## slim it
     structure_organism_pairs_table <-
       tidytable::fread(
         file = library,

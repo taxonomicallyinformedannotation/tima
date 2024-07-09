@@ -216,13 +216,6 @@ ms:
       #' Retention time tolerance in minutes. FLOAT
       minutes: 0.05
 
-  #' Thresholds related parameters.
-  thresholds:
-    #' MS1 related parameters.
-    ms1:
-      #' Intensity threshold for MS1. INTEGER
-      intensity: 1000000
-
 #' Names of the different variables in the input files.
 names:
   #' Name of "source IDs" variable in the input. STRING

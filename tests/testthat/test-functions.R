@@ -585,7 +585,6 @@ test_that(desc = "Test functions", code = {
   arguments$ms_clu_pos <- "x"
   arguments$ms_neu <- "x"
   arguments$ms_pol <- "x"
-  arguments$ms_thr_ms1_int <- "x"
   arguments$ms_thr_ms2_int <- "x"
   arguments$ms_tol_mas_ppm_ms1 <- "x"
   arguments$ms_tol_mas_ppm_ms2 <- "x"

@@ -209,9 +209,6 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$ms_pol)) {
       parameters$ms$polarity <- as.character(arguments$ms_pol)
     }
-    if (!is.null(arguments$ms_thr_ms1_int)) {
-      parameters$ms$thresholds$ms1$intensity <- as.numeric(arguments$ms_thr_ms1_int)
-    }
     if (!is.null(arguments$ms_thr_ms2_int)) {
       parameters$ms$thresholds$ms2$intensity <- as.numeric(arguments$ms_thr_ms2_int)
     }
