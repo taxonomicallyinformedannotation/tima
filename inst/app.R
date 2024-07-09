@@ -797,7 +797,7 @@ ui <- shiny::fluidPage(
         shiny::h3("Variable names parameters"),
         shiny::textInput(
           inputId = "names_adduct",
-          label = "Name of \"adduct\" variable in the input",
+          label = "Name of `adduct` variable in the input",
           value = "best ion"
         ) |>
           shinyhelper::helper(
@@ -810,7 +810,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_features",
-          label = "Name of \"feature IDs\" variable in the input",
+          label = "Name of `feature IDs` variable in the input",
           value = "row ID"
         ) |>
           shinyhelper::helper(
@@ -823,7 +823,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_filename",
-          label = "Name of \"filename\" variable in the input",
+          label = "Name of `filename` variable in the input",
           value = "filename"
         ) |>
           shinyhelper::helper(
@@ -848,8 +848,19 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::textInput(
+          inputId = "names_inchikey",
+          label = "Name of `inchikey` variable in the input",
+          value = "inchikey"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `inchikey` column in your file."
+            )
+          ),
+        shiny::textInput(
           inputId = "names_precursor",
-          label = "Name of \"precursor m/z\" variable in the input",
+          label = "Name of `precursor m/z` variable in the input",
           value = "row m/z"
         ) |>
           shinyhelper::helper(
@@ -862,7 +873,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_rt",
-          label = "Name of \"retention time\" variable in the feature table",
+          label = "Name of `retention time` variable in the feature table",
           value = "row retention time"
         ) |>
           shinyhelper::helper(
@@ -876,7 +887,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_rt_2",
-          label = "Name of \"retention time\" variable in the rt library",
+          label = "Name of `retention time` variable in the rt library",
           value = "rt"
         ) |>
           shinyhelper::helper(
@@ -886,8 +897,19 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::textInput(
+          inputId = "names_smiles",
+          label = "Name of `SMILES` variable in the input",
+          value = "smiles"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `SMILES` column in your file."
+            )
+          ),
+        shiny::textInput(
           inputId = "names_source",
-          label = "Name of \"source IDs\" variable in the input",
+          label = "Name of `source IDs` variable in the input",
           value = "CLUSTERID1"
         ) |>
           shinyhelper::helper(
@@ -899,7 +921,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_target",
-          label = "Name of \"target IDs\" variable in the input",
+          label = "Name of `target IDs` variable in the input",
           value = "CLUSTERID2"
         ) |>
           shinyhelper::helper(
@@ -911,7 +933,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_taxon",
-          label = "Name of \"taxon name\" variable in the input",
+          label = "Name of `taxon name` variable in the input",
           value = "ATTRIBUTE_species"
         ) |>
           shinyhelper::helper(
@@ -1406,6 +1428,99 @@ ui <- shiny::fluidPage(
           )
       ),
       shiny::tabPanel(
+        title = "Libraries (optional)",
+        shiny::h3("Additional personal libraries"),
+        shiny::h4("Temporal (retention time)"),
+        shiny::fileInput(
+          inputId = "lib_tmp_exp_csv",
+          label = "Experimental (CSV)",
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "A TSV of retention times.",
+              "The default column names are `rt`, `smiles`, `inchikey`.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "lib_tmp_is_csv",
+          label = "In silico (CSV)",
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "A TSV of retention times.",
+              "The default column names are `rt`, `smiles`, `inchikey`.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::h4("Spectral"),
+        shiny::fileInput(
+          inputId = "lib_spe_exp_mgf",
+          label = "Experimental (MGF)",
+          accept = c(
+            ".mgf"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "An MGF containing reference spectra.",
+              "If it contains retention times, they will also be used.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "lib_spe_is_mgf",
+          label = "In silico (MGF)",
+          accept = c(
+            ".mgf"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "An MGF containing reference spectra.",
+              "If it contains retention times, they will also be used.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "uni_rt",
+          label = "Retention time unit",
+          choices = c("seconds", "minutes"),
+          selected = "seconds"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Unit of the retention time.",
+              "Must be `seconds` or `minutes`."
+            )
+          ),
+      ),
+      shiny::tabPanel(
         title = "GNPS (optional)",
         shiny::h3("GNPS parameters"),
         shiny::textInput(
@@ -1659,30 +1774,17 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$csv <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$mgf$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$mgf$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$csv <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$mgf$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$mgf$neg <-
-  #   shiny::isolate(input$todo)
+  yaml_advanced$files$libraries$spectral$exp$raw <-
+    shiny::isolate(input$lib_spe_exp_mgf)
+  yaml_advanced$files$libraries$spectral$is$raw <-
+    shiny::isolate(input$lib_spe_is_mgf)
+  yaml_advanced$files$libraries$temporal$exp$csv <-
+    shiny::isolate(input$lib_tmp_exp_csv)
+  yaml_advanced$files$libraries$temporal$is$csv <-
+    shiny::isolate(input$lib_tmp_is_csv)
+  # TODO
+  # other relative paths, not necessary
+  # TODO
   # yaml_advanced$files$libraries$temporal$prepared <-
   #   shiny::isolate(input$todo)
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
@@ -1737,9 +1839,8 @@ save_input <- function(input) {
     shiny::isolate(input$names_features)
   yaml_advanced$names$filename <-
     shiny::isolate(input$names_filename)
-  # TODO
-  # yaml_advanced$names$inchikey <-
-  #   shiny::isolate(input$names_inchikey)
+  yaml_advanced$names$inchikey <-
+    shiny::isolate(input$names_inchikey)
   # TODO
   # yaml_advanced$names$mgf$adduct <-
   #   shiny::isolate(input$names_mgf_x)
@@ -1783,9 +1884,8 @@ save_input <- function(input) {
     shiny::isolate(input$names_rt)
   yaml_advanced$names$rt$library <-
     shiny::isolate(input$names_rt_2)
-  # TODO
-  # yaml_advanced$names$smiles <-
-  #   shiny::isolate(input$names_smiles)
+  yaml_advanced$names$smiles <-
+    shiny::isolate(input$names_smiles)
   yaml_advanced$names$source <-
     shiny::isolate(input$names_source)
   yaml_advanced$names$target <-
@@ -1811,13 +1911,13 @@ save_input <- function(input) {
   #   shiny::isolate(input$too_x)
   yaml_advanced$tools$sirius$version <-
     shiny::isolate(input$too_sir_ver)
+  # TODO
   # yaml_advanced$tools$taxonomies$biological <-
   #   shiny::isolate(input$too_x)
   # yaml_advanced$tools$taxonomies$chemical <-
   #   shiny::isolate(input$too_x)
-  # TODO
-  # yaml_advanced$units$rt <-
-  #   shiny::isolate(input$uni_rt)
+  yaml_advanced$units$rt <-
+    shiny::isolate(input$uni_rt)
   yaml_advanced$weights$global$biological <-
     shiny::isolate(input$wei_glo_bio)
   yaml_advanced$weights$global$chemical <-
@@ -2181,7 +2281,7 @@ shinyApp(
   server = server,
   onStart = function() {
     if (i_am_a_whale) {
-      message("I\'m inside the matrix ;(")
+      message("I'm inside the matrix ;(")
       setwd(dir = "..")
     } else {
       cache <- fs::path_home(".tima")
