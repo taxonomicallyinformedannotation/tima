@@ -502,7 +502,7 @@ test_that(desc = "Test functions", code = {
   ## Stupid tests for benchmark
   data.frame(feature_id = 1, organism_name = "Gentiana lutea") |>
     export_output("data/interim/benchmark/bench_test_in.tsv.gz")
-  taxize_spectra_benchmark(
+  benchmark_taxize_spectra(
     input = "data/interim/benchmark/bench_test_in.tsv.gz",
     keys = paths$data$interim$libraries$sop$merged$keys,
     org_tax_ott =

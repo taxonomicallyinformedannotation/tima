@@ -2166,7 +2166,7 @@ list(
       format = "file",
       command = {
         benchmark_taxed_pos <- benchmark_pre_meta_pos |>
-          taxize_spectra_benchmark(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_pos.tsv.gz"
@@ -2178,7 +2178,7 @@ list(
       format = "file",
       command = {
         benchmark_taxed_neg <- benchmark_pre_meta_neg |>
-          taxize_spectra_benchmark(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_neg.tsv.gz"

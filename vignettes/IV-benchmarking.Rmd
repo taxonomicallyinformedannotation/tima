@@ -34,7 +34,7 @@ This vignette simply shows the actual performance of TIMA.
 
 The benchmarking dataset was built using [https://zenodo.org/record/5186176](https://zenodo.org/record/5186176).
 
-It contained positive and negative MS^2^ spectra of multiple ion species ([M+H]^+^, [M+Na]^+^, [M+NH4]^+^, ...) coming from different mass spectrometers.
+It contained positive and negative MS^2^ spectra of multiple ion species ([M+H]^+^, [M+Na]^+^, [M+H~4~N]^+^, ...) coming from different mass spectrometers.
 
 In positive mode,
 It was filtered to 22,251 spectra, representing 12,482 structures without stereo.
