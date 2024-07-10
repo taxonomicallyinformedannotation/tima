@@ -1852,13 +1852,13 @@ list(
       }
     ),
     tar_target(
-      name = benchmark_path_export,
+      name = benchmark_path_zip,
       command = {
         benchmark_path_zip <- paths_data_source_benchmark_zip
       }
     ),
     tar_target(
-      name = benchmark_path_export,
+      name = benchmark_path_file,
       command = {
         benchmark_path_file <- paths_data_source_benchmark_cleaned
       }
