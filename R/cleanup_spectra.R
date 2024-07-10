@@ -21,5 +21,7 @@ cleanup_spectra <- function(spectra) {
     spectra <- spectra |>
       Spectra::combineSpectra(f = spectra$FEATURE_ID)
   }
+  spectra <- spectra |>
+    Spectra::filterEmptySpectra()
   return(spectra)
 }
