@@ -2301,7 +2301,7 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = c(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
+          input = list("spectral" = benchmark_edg_spe_pos, "ms1" = benchmark_ann_ms1_pre_pos[[2]]),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2313,7 +2313,7 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = c(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
+          input = list("spectral" = benchmark_edg_spe_neg, "ms1" = benchmark_ann_ms1_pre_neg[[2]]),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
