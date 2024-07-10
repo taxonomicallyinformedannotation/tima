@@ -1864,12 +1864,6 @@ list(
       }
     ),
     tar_target(
-      name = benchmark_path_copy,
-      command = {
-        benchmark_path_copy <- paths_data_source_benchmark_copy
-      }
-    ),
-    tar_target(
       name = benchmark_path_mgf_neg,
       command = {
         benchmark_path_mgf_neg <- paths_data_source_benchmark_mgf_neg
@@ -1889,7 +1883,7 @@ list(
           url = benchmark_path_url,
           export = benchmark_path_zip
         )
-        return(benchmark_path_export)
+        return(benchmark_path_zip)
       }
     ),
     tar_target(
