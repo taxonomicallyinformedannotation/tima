@@ -4,11 +4,10 @@
 #'
 #' @include decorate_masses.R
 #' @include dist_groups.R
-#' @include filter_nitrogen_rule.R
+#' @include harmonize_adducts.R
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
-#' @param filter_nitro Filter according to Nitrogen rule. Boolean
 #' @param output_annotations Output for mass based structural annotations
 #' @param output_edges Output for mass based edges
 #' @param name_source Name of the source features column
@@ -36,7 +35,6 @@
 #' @examples NULL
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
-           filter_nitro = get_params(step = "annotate_masses")$options$nitrogen_rule,
            output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,
            output_edges = get_params(step = "annotate_masses")$files$networks$spectral$edges$raw,
            name_source = get_params(step = "annotate_masses")$names$source,
@@ -154,16 +152,8 @@ annotate_masses <-
           "+NH4" = "+H4N", # mzmine
           "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
         )
-      log_debug("Trying to harmonize adducts definitions...")
       features_table <- features_table |>
-        tidytable::mutate(
-          adduct = stringi::stri_replace_all_fixed(
-            str = adduct,
-            pattern = names(adducts_translations),
-            replacement = adducts_translations,
-            vectorize_all = FALSE
-          )
-        )
+        harmonize_adducts()
     }
 
     df_fea_min <- features_table |>
@@ -211,7 +201,7 @@ annotate_masses <-
         delta_max = (mz_dest + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz)
       )
 
-    rm(df_rt_tol)
+    rm(df_rt_tol, features_table)
 
     adducts_table <- adducts |>
       tidytable::tidytable() |>
@@ -373,8 +363,6 @@ annotate_masses <-
       ))
     rm(df_adducted, df_nl_min)
 
-    # ISSUE see #141 dictionary of adducts (example 2H2O in mzmine)
-
     df_addlossed_min <- df_addlossed |>
       tidytable::mutate_rowwise(mass = calculate_mass_of_m(adduct_string = adduct, mz = mz))
 
@@ -481,7 +469,6 @@ annotate_masses <-
       tidytable::distinct()
     rm(adducts_table_multi)
 
-
     log_debug("joining within given rt tolerance \n")
     df_multi_nl <- df_multi |>
       dplyr::inner_join(
@@ -538,14 +525,9 @@ annotate_masses <-
 
     rm(df_annotated_1, df_annotated_2, df_str_unique)
 
-    df_annotated_filtered <- df_annotated_final |>
-      filter_nitrogen_rule(features_table = features_table, filter_nitro = filter_nitro)
-
-    rm(df_annotated_final, features_table)
-
     log_debug("adding chemical classification")
     df_final <- tidytable::left_join(
-      df_annotated_filtered,
+      df_annotated_final,
       structure_organism_pairs_table |>
         tidytable::distinct(
           candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
@@ -569,7 +551,7 @@ annotate_masses <-
       )) |>
       tidytable::mutate(candidate_adduct = candidate_library) |>
       tidytable::mutate(candidate_library = "TIMA MS1")
-    rm(structure_organism_pairs_table, df_annotated_filtered)
+    rm(structure_organism_pairs_table, df_annotated_final)
 
     df_final |>
       decorate_masses()

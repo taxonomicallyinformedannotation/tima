@@ -394,11 +394,11 @@ test_that(desc = "Test functions", code = {
   calculate_mass_of_m(adduct_string = "[M]+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mz = 123.456)
-
+  calculate_mass_of_m(adduct_string = "[M+CH3COO]-/[M-CH3]-", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M+K-2H]-", mz = 123.456)
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
-    filter_nitro = FALSE,
     ## shallow tolerance to speed up tests
     tolerance_ppm = 1,
     tolerance_rt = 0.01,

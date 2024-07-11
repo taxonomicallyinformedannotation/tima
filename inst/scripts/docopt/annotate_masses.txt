@@ -23,7 +23,6 @@ Arguments:
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
 
   force                      Do not use it. BOOLEAN
-  nit-rul                    Use Nitrogen rule. BOOLEAN
 
 Options:
   -h --help                  Shows this screen.

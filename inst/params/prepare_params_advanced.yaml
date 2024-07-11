@@ -711,9 +711,6 @@ options:
   #' Do not use it. BOOLEAN
   force: no
 
-  #' Nitrogen rule. BOOLEAN
-  nitrogen_rule: yes
-
   #' Remove ties. BOOLEAN
   remove_ties: no
 
