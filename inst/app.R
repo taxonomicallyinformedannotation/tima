@@ -335,22 +335,6 @@ ui <- shiny::fluidPage(
             content = c("Polarity of the MS experiment.")
           ),
         shiny::sliderInput(
-          inputId = "ms_thr_ms1_int",
-          label = "Intensity threshold for MS1",
-          min = 0,
-          max = 1E6,
-          value = 1E5,
-          step = 1E4,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "MS1 intensity threshold.",
-              "Features below this threshold will not be annotated."
-            )
-          ),
-        shiny::sliderInput(
           inputId = "ms_thr_ms2_int",
           label = "Intensity threshold for MS2",
           min = 0,
@@ -813,7 +797,7 @@ ui <- shiny::fluidPage(
         shiny::h3("Variable names parameters"),
         shiny::textInput(
           inputId = "names_adduct",
-          label = "Name of \"adduct\" variable in the input",
+          label = "Name of `adduct` variable in the input",
           value = "best ion"
         ) |>
           shinyhelper::helper(
@@ -826,7 +810,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_features",
-          label = "Name of \"feature IDs\" variable in the input",
+          label = "Name of `feature IDs` variable in the input",
           value = "row ID"
         ) |>
           shinyhelper::helper(
@@ -839,7 +823,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_filename",
-          label = "Name of \"filename\" variable in the input",
+          label = "Name of `filename` variable in the input",
           value = "filename"
         ) |>
           shinyhelper::helper(
@@ -864,8 +848,19 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::textInput(
+          inputId = "names_inchikey",
+          label = "Name of `inchikey` variable in the input",
+          value = "inchikey"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `inchikey` column in your file."
+            )
+          ),
+        shiny::textInput(
           inputId = "names_precursor",
-          label = "Name of \"precursor m/z\" variable in the input",
+          label = "Name of `precursor m/z` variable in the input",
           value = "row m/z"
         ) |>
           shinyhelper::helper(
@@ -878,7 +873,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_rt",
-          label = "Name of \"retention time\" variable in the feature table",
+          label = "Name of `retention time` variable in the feature table",
           value = "row retention time"
         ) |>
           shinyhelper::helper(
@@ -892,7 +887,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_rt_2",
-          label = "Name of \"retention time\" variable in the rt library",
+          label = "Name of `retention time` variable in the rt library",
           value = "rt"
         ) |>
           shinyhelper::helper(
@@ -902,8 +897,19 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::textInput(
+          inputId = "names_smiles",
+          label = "Name of `SMILES` variable in the input",
+          value = "smiles"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `SMILES` column in your file."
+            )
+          ),
+        shiny::textInput(
           inputId = "names_source",
-          label = "Name of \"source IDs\" variable in the input",
+          label = "Name of `source IDs` variable in the input",
           value = "CLUSTERID1"
         ) |>
           shinyhelper::helper(
@@ -915,7 +921,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_target",
-          label = "Name of \"target IDs\" variable in the input",
+          label = "Name of `target IDs` variable in the input",
           value = "CLUSTERID2"
         ) |>
           shinyhelper::helper(
@@ -927,7 +933,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_taxon",
-          label = "Name of \"taxon name\" variable in the input",
+          label = "Name of `taxon name` variable in the input",
           value = "ATTRIBUTE_species"
         ) |>
           shinyhelper::helper(
@@ -935,6 +941,205 @@ ui <- shiny::fluidPage(
             content = c(
               "Name of the `taxon name` column in your edges file.",
               "The default corresponds to the default in GNPS."
+            )
+          ),
+        shiny::h3("MGF names parameters"),
+        shiny::textInput(
+          inputId = "names_mgf_ad",
+          label = "Name of `adduct` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `adduct` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_ce",
+          label = "Name of `collision energy` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `collision energy` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_ci",
+          label = "Name of `compound id` variable in the MGF",
+          value = "SPECTRUMID"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `compound id` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_em",
+          label = "Name of `exact mass` variable in the MGF",
+          value = "EXACTMASS"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `exact mass` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_in",
+          label = "Name of `InChI` variable in the MGF",
+          value = "INCHI"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `InChI` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_io",
+          label = "Name of `InChI no stereo` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `InChI no stereo` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_ik",
+          label = "Name of `InChIKey` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `InChIKey` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_il",
+          label = "Name of `InChIKey no stereo` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `InChIKey no stereo` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_mf",
+          label = "Name of `molecular formula` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `molecular formula` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_na",
+          label = "Name of `name` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `name` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_po",
+          label = "Name of `polarity` variable in the MGF",
+          value = "IONMODE"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `polarity` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_rt",
+          label = "Name of `retention time` variable in the MGF",
+          value = "RTINSECONDS"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `retention time` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_sm",
+          label = "Name of `SMILES` variable in the MGF",
+          value = "SMILES"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `SMILES` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_sn",
+          label = "Name of `SMILES no stereo` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `SMILES no stereo` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_si",
+          label = "Name of `spectrum ID` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `spectrum ID` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_sp",
+          label = "Name of `SPLASH` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `SPLASH` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_sy",
+          label = "Name of `synonyms` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `synonyms` column in your MGF file."
+            )
+          ),
+        shiny::textInput(
+          inputId = "names_mgf_xl",
+          label = "Name of `xlogP` variable in the MGF",
+          value = NULL
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Name of the `xlogP` column in your MGF file."
             )
           )
       ),
@@ -1369,18 +1574,6 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::checkboxInput(
-          inputId = "nitrogen_rule",
-          label = "Nitrogen rule",
-          value = TRUE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "If ticked, apply Nitrogen rule.",
-              "This assumes no radical fragmentation."
-            )
-          ),
-        shiny::checkboxInput(
           inputId = "remove_ties",
           label = "Remove ties",
           value = FALSE
@@ -1420,6 +1613,101 @@ ui <- shiny::fluidPage(
               "Really, do not use it."
             )
           )
+      ),
+      shiny::tabPanel(
+        title = "Libraries (optional)",
+        shiny::h3("Additional personal libraries"),
+        shiny::h4("Temporal (retention time)"),
+        shiny::fileInput(
+          inputId = "lib_tmp_exp_csv",
+          label = "Experimental (CSV)",
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "A TSV of retention times.",
+              "The default column names are `rt`, `smiles`, `inchikey`.",
+              "Do not forget to adapt MGF names parameters if needed.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "lib_tmp_is_csv",
+          label = "In silico (CSV)",
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "A TSV of retention times.",
+              "The default column names are `rt`, `smiles`, `inchikey`.",
+              "Do not forget to adapt MGF names parameters if needed.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::h4("Spectral"),
+        shiny::fileInput(
+          inputId = "lib_spe_exp_mgf",
+          label = "Experimental (MGF)",
+          accept = c(
+            ".mgf"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "An MGF containing reference spectra.",
+              "If it contains retention times, they will also be used.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::fileInput(
+          inputId = "lib_spe_is_mgf",
+          label = "In silico (MGF)",
+          accept = c(
+            ".mgf"
+          ),
+          multiple = TRUE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "An MGF containing reference spectra.",
+              "If it contains retention times, they will also be used.",
+              "Do not forget to fill down seconds or minutes below."
+            )
+          ),
+        shiny::selectInput(
+          inputId = "uni_rt",
+          label = "Retention time unit",
+          choices = c("seconds", "minutes"),
+          selected = "seconds"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Unit of the retention time.",
+              "Must be `seconds` or `minutes`."
+            )
+          ),
       ),
       shiny::tabPanel(
         title = "GNPS (optional)",
@@ -1675,30 +1963,17 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
   #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$exp$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$spectral$is$raw <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$csv <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$mgf$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$exp$mgf$neg <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$csv <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$mgf$pos <-
-  #   shiny::isolate(input$todo)
-  # yaml_advanced$files$libraries$temporal$is$mgf$neg <-
-  #   shiny::isolate(input$todo)
+  yaml_advanced$files$libraries$spectral$exp$raw <-
+    shiny::isolate(input$lib_spe_exp_mgf)
+  yaml_advanced$files$libraries$spectral$is$raw <-
+    shiny::isolate(input$lib_spe_is_mgf)
+  yaml_advanced$files$libraries$temporal$exp$csv <-
+    shiny::isolate(input$lib_tmp_exp_csv)
+  yaml_advanced$files$libraries$temporal$is$csv <-
+    shiny::isolate(input$lib_tmp_is_csv)
+  # TODO
+  # other relative paths, not necessary
+  # TODO
   # yaml_advanced$files$libraries$temporal$prepared <-
   #   shiny::isolate(input$todo)
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
@@ -1733,8 +2008,6 @@ save_input <- function(input) {
     shiny::isolate(input$ms_neu)
   yaml_advanced$ms$polarity <-
     shiny::isolate(input$ms_pol)
-  yaml_advanced$ms$thresholds$ms1$intensity <-
-    shiny::isolate(input$ms_thr_ms1_int)
   yaml_advanced$ms$thresholds$ms2$intensity <-
     shiny::isolate(input$ms_thr_ms2_int)
   yaml_advanced$ms$tolerances$mass$ppm$ms1 <-
@@ -1755,55 +2028,52 @@ save_input <- function(input) {
     shiny::isolate(input$names_features)
   yaml_advanced$names$filename <-
     shiny::isolate(input$names_filename)
-  # TODO
-  # yaml_advanced$names$inchikey <-
-  #   shiny::isolate(input$names_inchikey)
-  # TODO
-  # yaml_advanced$names$mgf$adduct <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$collision_energy <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$compound_id <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$exact_mass <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$inchi <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$inchi_no_stereo <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$inchikey <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$inchikey_no_stereo <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$molecular_formula <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$name <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$polarity <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$retention_time <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$smiles <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$smiles_no_stereo <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$spectrum_id <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$splash <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$synonyms <-
-  #   shiny::isolate(input$names_mgf_x)
-  # yaml_advanced$names$mgf$xlogp <-
-  #   shiny::isolate(input$names_mgf_x)
+  yaml_advanced$names$inchikey <-
+    shiny::isolate(input$names_inchikey)
+  yaml_advanced$names$mgf$adduct <-
+    shiny::isolate(input$names_mgf_ad)
+  yaml_advanced$names$mgf$collision_energy <-
+    shiny::isolate(input$names_mgf_ce)
+  yaml_advanced$names$mgf$compound_id <-
+    shiny::isolate(input$names_mgf_ci)
+  yaml_advanced$names$mgf$exact_mass <-
+    shiny::isolate(input$names_mgf_em)
+  yaml_advanced$names$mgf$inchi <-
+    shiny::isolate(input$names_mgf_in)
+  yaml_advanced$names$mgf$inchi_no_stereo <-
+    shiny::isolate(input$names_mgf_io)
+  yaml_advanced$names$mgf$inchikey <-
+    shiny::isolate(input$names_mgf_ik)
+  yaml_advanced$names$mgf$inchikey_no_stereo <-
+    shiny::isolate(input$names_mgf_il)
+  yaml_advanced$names$mgf$molecular_formula <-
+    shiny::isolate(input$names_mgf_mf)
+  yaml_advanced$names$mgf$name <-
+    shiny::isolate(input$names_mgf_na)
+  yaml_advanced$names$mgf$polarity <-
+    shiny::isolate(input$names_mgf_po)
+  yaml_advanced$names$mgf$retention_time <-
+    shiny::isolate(input$names_mgf_rt)
+  yaml_advanced$names$mgf$smiles <-
+    shiny::isolate(input$names_mgf_sm)
+  yaml_advanced$names$mgf$smiles_no_stereo <-
+    shiny::isolate(input$names_mgf_sn)
+  yaml_advanced$names$mgf$spectrum_id <-
+    shiny::isolate(input$names_mgf_si)
+  yaml_advanced$names$mgf$splash <-
+    shiny::isolate(input$names_mgf_sp)
+  yaml_advanced$names$mgf$synonyms <-
+    shiny::isolate(input$names_mgf_sy)
+  yaml_advanced$names$mgf$xlogp <-
+    shiny::isolate(input$names_mgf_xl)
   yaml_advanced$names$precursor <-
     shiny::isolate(input$names_precursor)
   yaml_advanced$names$rt$features <-
     shiny::isolate(input$names_rt)
   yaml_advanced$names$rt$library <-
     shiny::isolate(input$names_rt_2)
-  # TODO
-  # yaml_advanced$names$smiles <-
-  #   shiny::isolate(input$names_smiles)
+  yaml_advanced$names$smiles <-
+    shiny::isolate(input$names_smiles)
   yaml_advanced$names$source <-
     shiny::isolate(input$names_source)
   yaml_advanced$names$target <-
@@ -1829,13 +2099,13 @@ save_input <- function(input) {
   #   shiny::isolate(input$too_x)
   yaml_advanced$tools$sirius$version <-
     shiny::isolate(input$too_sir_ver)
+  # TODO
   # yaml_advanced$tools$taxonomies$biological <-
   #   shiny::isolate(input$too_x)
   # yaml_advanced$tools$taxonomies$chemical <-
   #   shiny::isolate(input$too_x)
-  # TODO
-  # yaml_advanced$units$rt <-
-  #   shiny::isolate(input$uni_rt)
+  yaml_advanced$units$rt <-
+    shiny::isolate(input$uni_rt)
   yaml_advanced$weights$global$biological <-
     shiny::isolate(input$wei_glo_bio)
   yaml_advanced$weights$global$chemical <-
@@ -1888,8 +2158,6 @@ save_input <- function(input) {
     shiny::isolate(input$wei_che_14)
   yaml_advanced$options$compounds_names <-
     shiny::isolate(input$compounds_names)
-  yaml_advanced$options$nitrogen_rule <-
-    shiny::isolate(input$nitrogen_rule)
   yaml_advanced$options$force <-
     shiny::isolate(input$force)
   yaml_advanced$options$remove_ties <-
@@ -2199,7 +2467,7 @@ shinyApp(
   server = server,
   onStart = function() {
     if (i_am_a_whale) {
-      message("I\'m inside the matrix ;(")
+      message("I'm inside the matrix ;(")
       setwd(dir = "..")
     } else {
       cache <- fs::path_home(".tima")

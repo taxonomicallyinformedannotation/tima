@@ -394,11 +394,11 @@ test_that(desc = "Test functions", code = {
   calculate_mass_of_m(adduct_string = "[M]+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mz = 123.456)
-
+  calculate_mass_of_m(adduct_string = "[M+CH3COO]-/[M-CH3]-", mz = 123.456)
+  calculate_mass_of_m(adduct_string = "[M+K-2H]-", mz = 123.456)
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
-    filter_nitro = FALSE,
     ## shallow tolerance to speed up tests
     tolerance_ppm = 1,
     tolerance_rt = 0.01,
@@ -502,7 +502,7 @@ test_that(desc = "Test functions", code = {
   ## Stupid tests for benchmark
   data.frame(feature_id = 1, organism_name = "Gentiana lutea") |>
     export_output("data/interim/benchmark/bench_test_in.tsv.gz")
-  taxize_spectra_benchmark(
+  benchmark_taxize_spectra(
     input = "data/interim/benchmark/bench_test_in.tsv.gz",
     keys = paths$data$interim$libraries$sop$merged$keys,
     org_tax_ott =
@@ -585,7 +585,6 @@ test_that(desc = "Test functions", code = {
   arguments$ms_clu_pos <- "x"
   arguments$ms_neu <- "x"
   arguments$ms_pol <- "x"
-  arguments$ms_thr_ms1_int <- "x"
   arguments$ms_thr_ms2_int <- "x"
   arguments$ms_tol_mas_ppm_ms1 <- "x"
   arguments$ms_tol_mas_ppm_ms2 <- "x"

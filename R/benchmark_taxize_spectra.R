@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples NULL
-taxize_spectra_benchmark <-
+benchmark_taxize_spectra <-
   function(input,
            keys,
            org_tax_ott,

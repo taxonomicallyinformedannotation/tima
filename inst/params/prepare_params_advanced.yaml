@@ -174,22 +174,25 @@ files:
       exp:
         #' List of negative experimental spectral libraries. STRING
         neg:
-          - data/interim/libraries/spectra/exp/massbank_neg.rds
+          - data/interim/libraries/spectra/exp/spectra_exp_neg.rds
 
         #' List of positive experimental spectral libraries. STRING
         pos:
-          - data/interim/libraries/spectra/exp/massbank_pos.rds
+          - data/interim/libraries/spectra/exp/spectra_exp_pos.rds
 
         #' List of raw experimental spectral libraries. STRING
-        raw: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
+        raw: 
+          - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
       #' In silico libraries
       is:
         #' List of negative in silico spectral libraries. STRING
-        neg: data/interim/libraries/spectra/is/lotus_neg.rds
+        neg: 
+          - data/interim/libraries/spectra/is/lotus_neg.rds
 
         #' List of positive in silico spectral libraries. STRING
-        pos: data/interim/libraries/spectra/is/lotus_pos.rds
+        pos: 
+          - data/interim/libraries/spectra/is/lotus_pos.rds
 
         #' List of raw in silico spectral libraries. STRING
         raw:
@@ -417,20 +420,15 @@ ms:
     - "C17H20O9 (sinapoylhexose)"
     - "C18H30O15 (3xhexose-H2O)"
 
+  #' Polarity used. Must be "pos" or "neg". STRING
+  polarity: pos
+
   #' Thresholds related parameters.
   thresholds:
-    #' MS1 related parameters.
-    ms1:
-      #' Intensity threshold for MS1. INTEGER
-      intensity: 1000000
-
     #' MS2 related parameters.
     ms2:
       #' Intensity threshold for MS2. INTEGER
       intensity: 5
-
-  #' Polarity used. Must be "pos" or "neg". STRING
-  polarity: pos
 
   #' Tolerances.
   tolerances:
@@ -712,9 +710,6 @@ options:
 
   #' Do not use it. BOOLEAN
   force: no
-
-  #' Nitrogen rule. BOOLEAN
-  nitrogen_rule: yes
 
   #' Remove ties. BOOLEAN
   remove_ties: no

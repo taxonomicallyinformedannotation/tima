@@ -96,7 +96,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ms_clu_pos <- params_advanced$ms$clusters$pos
   ms_neu <- params_advanced$ms$neutral_losses
   ms_pol <- params_advanced$ms$polarity
-  ms_thr_ms1_int <- params_advanced$ms$thresholds$ms1$intensity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
   ms_tol_mas_ppm_ms1 <- params_advanced$ms$tolerances$mass$ppm$ms1
   ms_tol_mas_ppm_ms2 <- params_advanced$ms$tolerances$mass$ppm$ms2
@@ -171,7 +170,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
   opt_for <- params_advanced$options$force
-  opt_nit_rul <- params_advanced$options$nitrogen_rule
   opt_rem_tie <- params_advanced$options$remove_ties
   opt_sum <- params_advanced$options$summarise
 
@@ -224,8 +222,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         ms_clu_pos
       yamls_params$annotate_masses$ms$neutral_losses <-
         ms_neu
-      yamls_params$annotate_masses$ms$thresholds$ms1$intensity <-
-        ms_thr_ms1_int
       yamls_params$annotate_masses$ms$polarity <-
         ms_pol
       yamls_params$annotate_masses$ms$tolerances$mass$ppm$ms1 <-
@@ -240,8 +236,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         names_target
       yamls_params$annotate_masses$options$force <-
         opt_for
-      yamls_params$annotate_masses$options$nitrogen_rule <-
-        opt_nit_rul
     },
     annotate_spectra = {
       yamls_params$annotate_spectra$annotations$ms2approx <-
@@ -304,8 +298,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_lib_tem_pre
       yamls_params$filter_annotations$ms$tolerances$rt$minutes <-
         ms_tol_rt_min
-      yamls_params$filter_annotations$options$nitrogen_rule <-
-        opt_nit_rul
     },
     prepare_annotations_gnps = {
       yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
