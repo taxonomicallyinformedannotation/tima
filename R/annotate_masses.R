@@ -142,11 +142,13 @@ annotate_masses <-
           "+2Na" = "+Na2", # mzmine
           "+3K" = "+K3", # cliqueMS
           "+3Na" = "+Na3", # cliqueMS
-          "+Acetate" = "C2H3O2", # mzmine
+          "+Acetate" = "+C2H3O2", # mzmine
           "+ACN" = "+C2H3N", # mzmine
-          "+FA" = "CHO2", # mzmine
-          "+HAc" = "C2H4O2", # mzmine
-          "+HFA" = "CH2O2", # mzmine
+          "+CH3COO" = "+C2H3O2", # GNPS
+          "+FA" = "+CHO2", # mzmine
+          "+HAc" = "+C2H4O2", # mzmine
+          "+Hac" = "+C2H4O2", # GNPS
+          "+HFA" = "+CH2O2", # mzmine
           "+IsoProp" = "+C3H8O", # mzmine
           "+MeOH" = "+CH4O", # mzmine
           "+NH4" = "+H4N" # mzmine
