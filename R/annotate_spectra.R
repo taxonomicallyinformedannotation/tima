@@ -5,6 +5,7 @@
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
 #'
+#' @include harmonize_adducts.R
 #' @include import_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
@@ -318,6 +319,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         "target_xlogp" = lib_xlogp,
         "target_precursorMz" = lib_precursors
       )
+      df_meta <- df_meta |>
+        harmonize_adducts(adducts_colname = "target_adduct")
       rm(lib_precursors)
       df_final <- df_final |>
         tidytable::left_join(df_meta) |>

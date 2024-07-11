@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/annotate_masses.R
 
 Usage:
-  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-clu-neg=<ms-clu-neg>] [--ms-clu-pos=<ms-clu-pos>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-thr-ms1-int=<ms-thr-ms1-int>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--force=<force>] [--nit-rul=<nit-rul>]
+  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>] [--ms-clu-neg=<ms-clu-neg>] [--ms-clu-pos=<ms-clu-pos>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--force=<force>] [--nit-rul=<nit-rul>]
 
 Arguments:
   fil-ann-pre-str            List of prepared structural annotations. STRING
@@ -18,13 +18,11 @@ Arguments:
   ms-clu-pos                 List of clusters to be used in positive. STRING
   ms-neu                     List of neutral losses to be used. STRING
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
-  ms-thr-ms1-int             Intensity threshold for MS1. INTEGER
   ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT
   ms-tol-mas-dal-ms1         Absolute mass tolerance for MS1 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
 
   force                      Do not use it. BOOLEAN
-  nit-rul                    Use Nitrogen rule. BOOLEAN
 
 Options:
   -h --help                  Shows this screen.

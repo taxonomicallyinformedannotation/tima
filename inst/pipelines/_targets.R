@@ -191,17 +191,17 @@ list(
         }
       ),
       tar_target(
-        name = paths_data_source_benchmark_set,
+        name = paths_data_source_benchmark_zip,
         command = {
-          paths_data_source_benchmark_set <-
-            paths$data$source$benchmark$set
+          paths_data_source_benchmark_zip <-
+            paths$data$source$benchmark$zip
         }
       ),
       tar_target(
-        name = paths_data_source_benchmark_copy,
+        name = paths_data_source_benchmark_cleaned,
         command = {
-          paths_data_source_benchmark_copy <-
-            paths$data$source$benchmark$copy
+          paths_data_source_benchmark_cleaned <-
+            paths$data$source$benchmark$cleaned
         }
       ),
       tar_target(
@@ -1482,7 +1482,6 @@ list(
           ann_ms1_pre <-
             annotate_masses(
               features = fea_pre,
-              filter_nitro = par_ann_mas$options$nitrogen_rule,
               library = lib_mer_key,
               output_annotations = par_ann_mas$files$annotations$prepared$structural$ms1,
               output_edges = par_ann_mas$files$networks$spectral$edges$raw,
@@ -1779,7 +1778,6 @@ list(
           ann_ms1_pre_ann
         ),
         features = fea_pre,
-        filter_nitro = par_fil_ann$options$nitrogen_rule,
         rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
         tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
@@ -1852,15 +1850,15 @@ list(
       }
     ),
     tar_target(
-      name = benchmark_path_export,
+      name = benchmark_path_zip,
       command = {
-        benchmark_path_export <- paths_data_source_benchmark_set
+        benchmark_path_zip <- paths_data_source_benchmark_zip
       }
     ),
     tar_target(
-      name = benchmark_path_copy,
+      name = benchmark_path_file,
       command = {
-        benchmark_path_copy <- paths_data_source_benchmark_copy
+        benchmark_path_file <- paths_data_source_benchmark_cleaned
       }
     ),
     tar_target(
@@ -1876,63 +1874,37 @@ list(
       }
     ),
     tar_target(
-      name = benchmark_file,
+      name = benchmark_zip,
       format = "file",
       command = {
-        benchmark_file <- get_file(
+        benchmark_zip <- get_file(
           url = benchmark_path_url,
-          export = benchmark_path_export
+          export = benchmark_path_zip
         )
-        return(benchmark_path_export)
+        return(benchmark_path_zip)
       }
     ),
     tar_target(
-      name = benchmark_copy,
+      name = benchmark_file,
       format = "file",
       command = {
-        con <- file(benchmark_file, "r")
-        text <- readLines(con)
-        close(con)
-        ## reduce size
-        text_corrected <- text |>
-          gsub(
-            pattern =
-              "(\\()([0-9]{1,9}.[0-9]{1,9})(, None\\))",
-            replacement = "\\2"
-          )
-
-        patterns_to_remove <- c(
-          "FILENAME:",
-          "SEQ:",
-          "IONMODE:",
-          "ORGANISM:",
-          "PI:",
-          "DATACOLLECTOR:",
-          "INCHIAUX:",
-          "PUBMED:",
-          "SUBMITUSER:",
-          "LIBRARYQUALITY:",
-          "PARENT_MASS:"
-        )
-
-        text_corrected_2 <- text_corrected[!grepl(
-          pattern = paste(patterns_to_remove, collapse = "|"),
-          x = text_corrected
-        )]
-
-        text_corrected_2 |>
-          writeLines(con = benchmark_path_copy)
-        return(benchmark_path_copy)
+        unzip(zipfile = benchmark_zip)
+        dir.create(dirname(benchmark_path_file), recursive = TRUE)
+        file.copy(from = "cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf", to = benchmark_path_file)
+        unlink("cleaned_libraries_matchms", recursive = TRUE)
+        return(benchmark_path_file)
       }
     ),
     tar_target(
       name = benchmark_converted,
       format = "file",
       command = {
-        sp <- benchmark_copy |>
-          Spectra::Spectra(source = MsBackendMsp::MsBackendMsp()) |>
-          Spectra::setBackend(Spectra::MsBackendMemory())
+        sp <- benchmark_file |>
+          import_spectra()
         sp |>
+          Spectra::filterEmptySpectra() |>
+          extract_spectra() |>
+          data.frame() |>
           saveRDS(file = "data/interim/benchmark/benchmark_spectra.rds")
         return("data/interim/benchmark/benchmark_spectra.rds")
       }
@@ -1942,7 +1914,7 @@ list(
       format = "file",
       command = {
         sp <- benchmark_converted |>
-          readRDS() |>
+          import_spectra() |>
           sanitize_spectra(
             cutoff = 0,
             ratio = 10000,
@@ -1964,17 +1936,16 @@ list(
         log_debug("Cleaned")
         df_meta <- tidytable::tidytable(
           adduct = sp_clean$ADDUCT,
-          inchikey = sp_clean$inchikey,
-          instrument = sp_clean$SOURCE_INSTRUMENT,
+          inchikey = sp_clean$INCHIKEY,
+          instrument = sp_clean$INSTRUMENT_TYPE,
           fragments = lapply(sp_clean@backend@peaksData, length) |>
             as.character() |>
             as.numeric() / 2,
           precursorMz = sp_clean$precursorMz,
-          pepmass = sp_clean$PEPMASS,
-          smiles = sp_clean$smiles,
-          ccmslib = sp_clean$SPECTRUMID,
+          smiles = sp_clean$SMILES,
+          ccmslib = sp_clean$SPECTRUM_ID,
           charge = sp_clean$precursorCharge,
-          name = sp_clean$name
+          name = sp_clean$COMPOUND_NAME
         ) |>
           tidytable::mutate(
             tidytable::across(
@@ -2052,9 +2023,9 @@ list(
           ))
 
         sp_pos <-
-          sp_clean[sp_clean$SPECTRUMID %in% df_clean_pos$ccmslib]
+          sp_clean[sp_clean$SPECTRUM_ID %in% df_clean_pos$ccmslib]
         sp_neg <-
-          sp_clean[sp_clean$SPECTRUMID %in% df_clean_neg$ccmslib]
+          sp_clean[sp_clean$SPECTRUM_ID %in% df_clean_neg$ccmslib]
 
         extract_benchmark_spectra <- function(x, mode) {
           df <- x |>
@@ -2064,7 +2035,7 @@ list(
             tidytable::mutate(short_ik = gsub(
               pattern = "-.*",
               replacement = "",
-              inchikey,
+              INCHIKEY,
               perl = TRUE
             )) |>
             tidytable::mutate(
@@ -2077,19 +2048,18 @@ list(
               no = as.integer(-1)
             )) |>
             tidytable::select(
-              SCANS,
               acquisitionNum,
               precursorCharge,
               precursorMz,
-              MSLEVEL,
+              MS_LEVEL,
               rtime,
-              name,
-              smiles,
-              inchi,
-              inchikey,
+              name = COMPOUND_NAME,
+              smiles = SMILES,
+              inchi = INCHI,
+              inchikey = INCHIKEY,
               adduct = ADDUCT,
-              instrument = SOURCE_INSTRUMENT,
-              ccmslib = SPECTRUMID,
+              instrument = INSTRUMENT_TYPE,
+              ccmslib = SPECTRUM_ID,
               spectrum_id = acquisitionNum,
               mz,
               intensity
@@ -2194,7 +2164,7 @@ list(
       format = "file",
       command = {
         benchmark_taxed_pos <- benchmark_pre_meta_pos |>
-          taxize_spectra_benchmark(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_pos.tsv.gz"
@@ -2206,7 +2176,7 @@ list(
       format = "file",
       command = {
         benchmark_taxed_neg <- benchmark_pre_meta_neg |>
-          taxize_spectra_benchmark(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_neg.tsv.gz"
@@ -2329,7 +2299,7 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = c(benchmark_edg_spe_pos, benchmark_ann_ms1_pre_pos[[2]]),
+          input = list("spectral" = benchmark_edg_spe_pos, "ms1" = benchmark_ann_ms1_pre_pos[[2]]),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2341,7 +2311,7 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = c(benchmark_edg_spe_neg, benchmark_ann_ms1_pre_neg[[2]]),
+          input = list("spectral" = benchmark_edg_spe_neg, "ms1" = benchmark_ann_ms1_pre_neg[[2]]),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target

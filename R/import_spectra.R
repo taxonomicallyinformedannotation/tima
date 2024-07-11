@@ -21,7 +21,7 @@ import_spectra <- function(file) {
   switch(
     EXPR = file_ext,
     "mgf" = {
-      MsBackendMgf::readMgf(f = file) |>
+      MsBackendMgf::readMgfSplit(f = file) |>
         Spectra::Spectra() |>
         cleanup_spectra()
     },
