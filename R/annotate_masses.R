@@ -151,7 +151,8 @@ annotate_masses <-
           "+HFA" = "+CH2O2", # mzmine
           "+IsoProp" = "+C3H8O", # mzmine
           "+MeOH" = "+CH4O", # mzmine
-          "+NH4" = "+H4N" # mzmine
+          "+NH4" = "+H4N", # mzmine
+          "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
         )
       log_debug("Trying to harmonize adducts definitions...")
       features_table <- features_table |>
