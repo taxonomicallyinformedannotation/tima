@@ -67,7 +67,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Collate:
     'round_reals.R'
-    'filter_nitrogen_rule.R'
+    'harmonize_adducts.R'
     'dist_groups.R'
     'decorate_masses.R'
     'annotate_masses.R'

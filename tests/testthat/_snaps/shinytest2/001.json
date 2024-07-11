@@ -139,7 +139,6 @@
     "names_source": "CLUSTERID1",
     "names_target": "CLUSTERID2",
     "names_taxon": "ATTRIBUTE_species",
-    "nitrogen_rule": true,
     "org_can": 1,
     "org_fil_lev": "phylum",
     "org_fil_mod": false,

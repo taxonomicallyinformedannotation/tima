@@ -445,9 +445,6 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$force)) {
       parameters$options$force <- as.logical(arguments$force)
     }
-    if (!is.null(arguments$nit_rul)) {
-      parameters$options$nitrogen_rule <- as.logical(arguments$nit_rul)
-    }
     if (!is.null(arguments$remove_ties)) {
       parameters$options$remove_ties <- as.logical(arguments$remove_ties)
     }

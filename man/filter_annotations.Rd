@@ -8,7 +8,6 @@ filter_annotations(
   annotations = get_params(step =
     "filter_annotations")$files$annotations$prepared$structural,
   features = get_params(step = "filter_annotations")$files$features$prepared,
-  filter_nitro = get_params(step = "filter_annotations")$options$nitrogen_rule,
   rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
   output = get_params(step = "filter_annotations")$files$annotations$filtered,
   tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes
@@ -18,8 +17,6 @@ filter_annotations(
 \item{annotations}{Prepared annotations file}
 
 \item{features}{Prepared features file}
-
-\item{filter_nitro}{Filter according to Nitrogen rule. Boolean}
 
 \item{rts}{Prepared retention time library}
 
