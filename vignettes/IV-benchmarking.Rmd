@@ -44,7 +44,7 @@ In negative mode,
 It was filtered to 12,060 spectra, representing 9,112 structures without stereo.
 Of those, only 6,282 spectra (52.1%) corresponded to structures present in the library we used to annotate.
 
-## Best 500 candidates
+## Best 100 candidates
 ### Positive
 ```{r, echo=FALSE}
 knitr::include_graphics("benchmark_full_pos.svg")
