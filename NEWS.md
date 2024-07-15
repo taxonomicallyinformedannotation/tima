@@ -3,6 +3,7 @@
 # timaR 2.9.7
 
 * Adding possibility to add internal libraries through the GUI (#159)
+* Adding number of peaks in spectrum
 * Expose more parameters to the GUI (#159)
 * Fix adducts and remove nitrogen rule
 * Updated benchmarking steps
