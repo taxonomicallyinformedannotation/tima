@@ -207,8 +207,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                     matched <- sum(
                       abs(
                         outer(
-                          X = spectra[[sp]],
-                          Y = lib[[index]],
+                          X = spectra[[sp]][, 1],
+                          Y = lib[[index]][, 1],
                           FUN = "-"
                         )
                       ) <= dalton
