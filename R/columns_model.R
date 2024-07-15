@@ -16,6 +16,7 @@ columns_model <- function() {
 
   features_calculated_columns <- c(
     "feature_spectrum_entropy",
+    "feature_spectrum_peaks",
     "feature_pred_tax_cla_01kin_val",
     "feature_pred_tax_cla_01kin_score",
     "feature_pred_tax_cla_02sup_val",

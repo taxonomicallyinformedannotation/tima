@@ -255,7 +255,8 @@ weight_annotations <- function(
       edges_table |>
         tidytable::distinct(
           feature_id = feature_source,
-          feature_spectrum_entropy
+          feature_spectrum_entropy,
+          feature_spectrum_peaks
         )
     )
 

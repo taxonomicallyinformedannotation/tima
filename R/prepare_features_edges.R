@@ -37,7 +37,8 @@ prepare_features_edges <-
         tidytable::all_of(c(
           name_source
         )),
-        feature_spectrum_entropy
+        feature_spectrum_entropy,
+        feature_spectrum_peaks
       ) |>
       tidytable::distinct()
 
