@@ -6,9 +6,11 @@
 # Load packages required to define the pipeline:
 library(targets)
 pkgload::load_all()
+
 # Set target options:
 tar_option_set(
-  packages = "timaR",
+  packages = c("timaR"),
+  imports = c("timaR"),
   memory = "transient",
   garbage_collection = TRUE,
   resources = tar_resources(
