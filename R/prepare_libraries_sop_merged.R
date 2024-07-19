@@ -6,6 +6,8 @@
 #' @details It can be restricted to specific taxa to have
 #'    more biologically meaningful annotation.
 #'
+#' @importFrom tidytable across anti_join as_tidytable bind_rows distinct filter fread left_join mutate select where
+#'
 #' @include get_organism_taxonomy_ott.R
 #' @include split_tables_sop.R
 #'
@@ -78,13 +80,13 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Loading and concatenating prepared libraries")
     libraries <- files |>
       lapply(
-        FUN = tidytable::fread,
+        FUN = fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       )
 
     tables <- libraries |>
-      tidytable::bind_rows() |>
+      bind_rows() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -96,8 +98,8 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Completing organisms taxonomy")
     table_org_tax_ott_2 <- table_keys |>
-      tidytable::anti_join(table_org_tax_ott) |>
-      tidytable::distinct(organism = organism_name) |>
+      anti_join(table_org_tax_ott) |>
+      distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_org_tax_ott_2) != 0) {
@@ -107,24 +109,24 @@ prepare_libraries_sop_merged <-
 
       table_org_tax_ott <-
         table_org_tax_ott |>
-        tidytable::bind_rows(
+        bind_rows(
           table_org_tax_ott_full |>
-            tidytable::as_tidytable() |>
-            tidytable::mutate(
-              tidytable::across(
-                .cols = tidytable::where(is.numeric),
+            as_tidytable() |>
+            mutate(
+              across(
+                .cols = where(is.numeric),
                 .fns = as.character
               )
             ) |>
-            tidytable::mutate(
-              tidytable::across(
-                .cols = tidytable::where(is.list),
+            mutate(
+              across(
+                .cols = where(is.list),
                 .fns = as.character
               )
             ) |>
-            tidytable::mutate(
-              tidytable::across(
-                .cols = tidytable::where(is.logical),
+            mutate(
+              across(
+                .cols = where(is.logical),
                 .fns = as.character
               )
             )
@@ -149,10 +151,10 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        tidytable::left_join(table_org_tax_ott)
+        left_join(table_org_tax_ott)
 
       table_keys <- table_keys |>
-        tidytable::filter(grepl(
+        filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys),
@@ -161,13 +163,13 @@ prepare_libraries_sop_merged <-
           pattern = value,
           perl = TRUE
         )) |>
-        tidytable::select(
+        select(
           structure_inchikey,
           structure_smiles,
           organism_name,
           reference_doi
         ) |>
-        tidytable::distinct()
+        distinct()
 
       stopifnot("Your filter led to no entries,
         try to change it." = nrow(table_keys) != 0)

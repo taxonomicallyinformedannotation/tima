@@ -2,6 +2,8 @@
 #'
 #' @description This function selects annotations columns
 #'
+#' @importFrom tidytable across any_of mutate na_if select where
+#'
 #' @include columns_model.R
 #' @include complement_metadata_structures.R
 #' @include round_reals.R
@@ -27,7 +29,7 @@ select_annotations_columns <- function(
     str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
   model <- columns_model()
   df <- df |>
-    tidytable::select(tidytable::any_of(c(
+    select(any_of(c(
       "feature_id",
       model$features_calculated_columns,
       model$candidates_calculated_columns,
@@ -36,34 +38,34 @@ select_annotations_columns <- function(
       model$candidates_spectra_columns,
       model$candidates_structures_columns
     ))) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::na_if(x, "N/A")
+          na_if(x, "N/A")
         }
       )
     ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::na_if(x, "null")
+          na_if(x, "null")
         }
       )
     ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::na_if(x, "")
+          na_if(x, "")
         }
       )
     ) |>
     round_reals() |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.numeric),
+    mutate(
+      across(
+        .cols = where(is.numeric),
         .fns = as.character
       )
     ) |>

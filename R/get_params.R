@@ -3,6 +3,9 @@
 #' @description This function gets the parameters for the job.
 #'    Combination of cli and yaml parameters
 #'
+#' @importFrom docopt docopt
+#' @importFrom stringi stri_replace_all_fixed
+#'
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #' @include parse_yaml_paths.R
@@ -18,7 +21,7 @@ get_params <- function(step) {
   paths <- parse_yaml_paths()
   steps <-
     list.files(path = file.path(paths$inst$scripts$docopt)) |>
-    stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
+    stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   default_path <-
     if (step == "prepare_params") {
@@ -66,7 +69,7 @@ get_params <- function(step) {
   params <- parse_yaml_params(def = default_path, usr = user_path)
 
   params <- parse_cli_params(
-    arguments = docopt::docopt(doc = doc, version = paths$version),
+    arguments = docopt(doc = doc, version = paths$version),
     parameters = params
   )
 

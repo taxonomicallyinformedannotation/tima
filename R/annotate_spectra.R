@@ -5,6 +5,12 @@
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
 #'
+#' @importFrom dplyr join_by
+#' @importFrom msentropy calculate_entropy_similarity calculate_spectral_entropy
+#' @importFrom pbapply pblapply
+#' @importFrom Spectra addProcessing applyProcessing concatenateSpectra filterIntensity filterPrecursorCharge
+#' @importFrom tidytable any_of arrange as_tidytable bind_rows coalesce desc distinct filter left_join mutate select tidytable
+#'
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
 #'
@@ -52,7 +58,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra() |>
-    Spectra::filterPrecursorCharge(z = if (polarity == "pos") {
+    filterPrecursorCharge(z = if (polarity == "pos") {
       c(1, 2, 3)
     } else {
       c(-1, -2, -3)
@@ -78,23 +84,23 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
       lapply(FUN = import_spectra) |>
-      Spectra::concatenateSpectra() |>
+      concatenateSpectra() |>
       sanitize_spectra() |>
-      Spectra::addProcessing(remove_above_precursor(),
+      addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
-      Spectra::addProcessing(normalize_peaks()) |>
-      Spectra::applyProcessing()
+      addProcessing(normalize_peaks()) |>
+      applyProcessing()
 
     log_debug("Applying initial intensity filter to query spectra")
     spectra <- spectra |>
       sanitize_spectra() |>
-      Spectra::filterIntensity(intensity = c(qutoff, Inf)) |>
-      Spectra::addProcessing(remove_above_precursor(),
+      filterIntensity(intensity = c(qutoff, Inf)) |>
+      addProcessing(remove_above_precursor(),
         spectraVariables = c("precursorMz")
       ) |>
-      Spectra::addProcessing(normalize_peaks()) |>
-      Spectra::applyProcessing()
+      addProcessing(normalize_peaks()) |>
+      applyProcessing()
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
@@ -125,14 +131,14 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       )
 
       df_3 <- dplyr::inner_join(
-        tidytable::tidytable(minimal, maximal, lib_precursors),
-        tidytable::tidytable(val = unique(query_precursors)),
-        by = dplyr::join_by(
+        tidytable(minimal, maximal, lib_precursors),
+        tidytable(val = unique(query_precursors)),
+        by = join_by(
           minimal < val,
           maximal > val
         )
       ) |>
-        tidytable::distinct(minimal, .keep_all = TRUE)
+        distinct(minimal, .keep_all = TRUE)
 
       spectral_library <-
         spectral_library[lib_precursors %in% df_3$lib_precursors]
@@ -186,7 +192,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                                  lib = spectral_lib,
                                  dalton = daz,
                                  ppm = ppmz) {
-                    score <- msentropy::calculate_entropy_similarity(
+                    score <- calculate_entropy_similarity(
                       peaks_a = spectra[[sp]],
                       peaks_b = lib[[index]],
                       min_mz = 0,
@@ -199,9 +205,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                     )
                     ## more efficient to do it when creating edges
                     # entropy_query <- spectra[[sp]] |>
-                    #   msentropy::calculate_spectral_entropy()
+                    #   calculate_spectral_entropy()
                     entropy_target <- lib[[index]] |>
-                      msentropy::calculate_spectral_entropy()
+                      calculate_spectral_entropy()
 
                     ## number of matched peaks (only Da for now)
                     matched <- sum(
@@ -214,7 +220,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                       ) <= dalton
                     )
 
-                    tidytable::tidytable(
+                    tidytable(
                       "feature_id" = query_ids[[spectrum]],
                       # "feature_spectrum_entropy" = entropy_query,
                       "precursorMz" = precursor,
@@ -231,7 +237,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
           log_debug("Performing spectral comparison")
           outer_list <-
-            pbapply::pblapply(
+            pblapply(
               X = seq_along(spectra),
               FUN = function(spectrum, qp = query_precursors) {
                 precursor <- qp[spectrum]
@@ -247,7 +253,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                 )
               }
             ) |>
-            tidytable::bind_rows()
+            bind_rows()
 
           return(outer_list)
         }
@@ -259,7 +265,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
           dalton = dalton,
           ppm = ppm
         ) |>
-        tidytable::as_tidytable()
+        as_tidytable()
       rm(spectra)
 
       lib_adduct <- spectral_library@backend@spectraData$adduct
@@ -305,7 +311,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       }
       rm(spectral_library)
 
-      df_meta <- tidytable::tidytable(
+      df_meta <- tidytable(
         "target_id" = lib_id,
         "target_adduct" = lib_adduct,
         "target_inchikey" = lib_inchikey,
@@ -323,11 +329,11 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         harmonize_adducts(adducts_colname = "target_adduct")
       rm(lib_precursors)
       df_final <- df_final |>
-        tidytable::left_join(df_meta) |>
-        tidytable::select(-target_id)
+        left_join(df_meta) |>
+        select(-target_id)
 
       df_final <- df_final |>
-        tidytable::mutate(
+        mutate(
           candidate_structure_error_mz = target_precursorMz - precursorMz,
           candidate_structure_inchikey_no_stereo = ifelse(
             test = is.na(target_inchikey_no_stereo),
@@ -339,12 +345,12 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               ),
             no = target_inchikey_no_stereo
           ),
-          candidate_structure_smiles_no_stereo = tidytable::coalesce(
+          candidate_structure_smiles_no_stereo = coalesce(
             target_smiles_no_stereo,
             target_smiles
           )
         ) |>
-        tidytable::select(tidytable::any_of(
+        select(any_of(
           c(
             "feature_id",
             "candidate_adduct" = "target_adduct",
@@ -367,10 +373,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
       log_debug("Filtering results above threshold only...")
       df_final <- df_final |>
-        tidytable::filter(candidate_score_similarity >= threshold) |>
-        tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+        filter(candidate_score_similarity >= threshold) |>
+        arrange(desc(candidate_score_similarity)) |>
         ## keep only the best result (per library for now)
-        tidytable::distinct(
+        distinct(
           feature_id,
           candidate_library,
           candidate_structure_inchikey_no_stereo,
@@ -381,13 +387,14 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         nrow(
           df_final |>
             ## else doesn't work if some are empty
-            tidytable::distinct(
+            distinct(
               candidate_structure_inchikey_no_stereo,
               candidate_structure_smiles_no_stereo
             )
         ),
         "Candidates were annotated on",
-        nrow(df_final |> tidytable::distinct(feature_id)),
+        nrow(df_final |>
+          distinct(feature_id)),
         "features, with at least",
         threshold,
         "similarity score."

@@ -1,5 +1,7 @@
 #' @title Round reals
 #'
+#' @importFrom tidytable across contains mutate
+#'
 #' @param df Dataframe to use
 #' @param dig Number of digits
 #'
@@ -11,10 +13,10 @@
 round_reals <- function(df, dig = 5) {
   df |>
     ## Round to 5 digits to avoid small discrepancies
-    tidytable::mutate(tidytable::across(
+    mutate(across(
       .cols = c(
-        tidytable::contains("structure_exact_mass"),
-        tidytable::contains("structure_xlogp")
+        contains("structure_exact_mass"),
+        contains("structure_xlogp")
       ),
       .fns = \(x) round(as.numeric(x), digits = dig)
     ))

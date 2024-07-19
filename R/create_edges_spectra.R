@@ -3,6 +3,12 @@
 #' @description This function create edges
 #'    based on fragmentation spectra similarity
 #'
+#' @importFrom msentropy calculate_spectral_entropy
+#' @importFrom pbapply pblapply
+#' @importFrom Spectra addProcessing applyProcessing
+#' @importFrom tidyfst rn_col
+#' @importFrom tidytable any_of bind_rows coalesce distinct everything filter full_join mutate select tidytable
+#'
 #' @include create_edges.R
 #' @include import_spectra.R
 #' @include normalize_peaks.R
@@ -41,11 +47,11 @@ create_edges_spectra <- function(
   if (length(spectra) > 1) {
     spectra <- spectra |>
       sanitize_spectra(cutoff = qutoff) |>
-      # Spectra::addProcessing(remove_above_precursor(),
+      # addProcessing(remove_above_precursor(),
       #   spectraVariables = c("precursorMz")
       # ) |>
-      Spectra::addProcessing(normalize_peaks()) |>
-      Spectra::applyProcessing()
+      addProcessing(normalize_peaks()) |>
+      applyProcessing()
 
     log_debug("Performing spectral comparison")
     log_debug(
@@ -58,7 +64,7 @@ create_edges_spectra <- function(
     fragz <- spectra@backend@peaksData
 
     edges <-
-      pbapply::pblapply(
+      pblapply(
         X = 1:(nspecz - 1),
         FUN = create_edges,
         frags = fragz,
@@ -68,18 +74,18 @@ create_edges_spectra <- function(
         ppm_tolerance = ppm,
         threshold = threshold
       ) |>
-      tidytable::bind_rows()
+      bind_rows()
     rm(precz)
 
     log_debug("Calculating features' entropy")
-    entropy <- pbapply::pblapply(
+    entropy <- pblapply(
       X = seq_along(1:nspecz),
       FUN = function(x, peaks = fragz) {
-        return(peaks[[x]] |> msentropy::calculate_spectral_entropy())
+        return(peaks[[x]] |> calculate_spectral_entropy())
       }
     )
     log_debug("Calculating features' number of peaks")
-    npeaks <- pbapply::pblapply(
+    npeaks <- pblapply(
       X = seq_along(1:nspecz),
       FUN = function(x, peaks = fragz) {
         return(peaks[[x]] |> length())
@@ -88,31 +94,31 @@ create_edges_spectra <- function(
     rm(nspecz, fragz)
 
     edges <- edges |>
-      tidytable::select(
+      select(
         !!as.name(name_source) := "feature_id",
         !!as.name(name_target) := "target_id",
-        tidytable::everything()
+        everything()
       )
 
     ## ISSUE see #148 find a way to have consistency in spectrum IDs
     idz <- spectra@backend@spectraData$acquisitionNum
     rm(spectra)
     edges <- edges |>
-      tidytable::mutate(
+      mutate(
         name_source = idz[name_source],
         name_target = idz[name_target]
       )
-    entropy_df <- tidytable::tidytable(entropy) |>
-      tidyfst::rn_col(var = name_source) |>
-      tidytable::mutate(
+    entropy_df <- tidytable(entropy) |>
+      rn_col(var = name_source) |>
+      mutate(
         name_source = idz[name_source],
         feature_spectrum_entropy = as.character(entropy),
         feature_spectrum_peaks = as.character(npeaks)
       ) |>
-      tidytable::mutate(
+      mutate(
         !!as.name(name_source) := as.integer(!!as.name(name_source))
       ) |>
-      tidytable::distinct(
+      distinct(
         !!as.name(name_source),
         feature_spectrum_entropy,
         feature_spectrum_peaks
@@ -120,7 +126,7 @@ create_edges_spectra <- function(
     rm(entropy, npeaks, idz)
 
     edges <- edges |>
-      tidytable::select(tidytable::any_of(
+      select(any_of(
         c(
           name_source,
           name_target,
@@ -130,14 +136,14 @@ create_edges_spectra <- function(
       ))
 
     edges <- edges |>
-      tidytable::filter(
+      filter(
         candidate_score_similarity >= threshold
       )
 
     edges <- edges |>
-      tidytable::full_join(entropy_df) |>
-      tidytable::mutate(
-        !!as.name(name_target) := tidytable::coalesce(
+      full_join(entropy_df) |>
+      mutate(
+        !!as.name(name_target) := coalesce(
           !!as.name(name_target),
           !!as.name(name_source)
         )
@@ -145,7 +151,7 @@ create_edges_spectra <- function(
     rm(entropy_df)
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")
-    edges <- tidytable::tidytable(
+    edges <- tidytable(
       !!as.name(name_source) := NA,
       "feature_spectrum_entropy" = NA,
       "feature_spectrum_peaks" = NA,

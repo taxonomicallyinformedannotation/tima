@@ -3,6 +3,8 @@
 #' @description This function replaces the default ID
 #'    in the example by a user-specified one
 #'
+#' @importFrom stringi stri_replace_all_regex
+#'
 #' @param x a character string containing the default ID
 #' @param user_filename a user-specified value for a file name job ID
 #' @param user_gnps a user-specified value for a GNPS job ID
@@ -36,28 +38,28 @@ replace_id <-
     }
 
     path <- x |>
-      stringi::stri_replace_all_regex(
+      stri_replace_all_regex(
         pattern = "/[^/]*$",
         replacement = "",
         vectorize_all = FALSE
       )
 
     file <- x |>
-      stringi::stri_replace_all_regex(
+      stri_replace_all_regex(
         pattern = ".*/",
         replacement = "",
         vectorize_all = FALSE
       )
 
     old <- file |>
-      stringi::stri_replace_all_regex(
+      stri_replace_all_regex(
         pattern = "(.*)(_)(.*)",
         replacement = "$1",
         vectorize_all = FALSE
       )
 
     new <- file |>
-      stringi::stri_replace_all_regex(
+      stri_replace_all_regex(
         pattern = old,
         replacement = ifelse(
           test = !is.null(user_gnps),

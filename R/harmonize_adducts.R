@@ -2,6 +2,8 @@
 #'
 #' @description This function annotates masses
 #'
+#' @importFrom stringi stri_replace_all_fixed
+#'
 #' @param df Dataframe
 #' @param adducts_colname Adducts colname
 #'
@@ -63,7 +65,7 @@ harmonize_adducts <- function(df, adducts_colname = "adduct") {
       # weird MassBank
     )
   log_debug("Trying to harmonize adducts definitions...")
-  df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
+  df[[adducts_colname]] <- stri_replace_all_fixed(
     str = df[[adducts_colname]],
     pattern = names(adducts_translations),
     replacement = adducts_translations,

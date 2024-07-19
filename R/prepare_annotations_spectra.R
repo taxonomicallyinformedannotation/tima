@@ -3,6 +3,8 @@
 #' @description This function prepares the spectral matches
 #'    obtained previously to make them compatible
 #'
+#' @importFrom tidytable bind_rows distinct filter fread mutate select
+#'
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file
@@ -33,13 +35,13 @@ prepare_annotations_spectra <-
     table <-
       lapply(
         X = input,
-        FUN = tidytable::fread,
+        FUN = fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::bind_rows() |>
-      tidytable::filter(!is.na(feature_id)) |>
-      tidytable::distinct(
+      bind_rows() |>
+      filter(!is.na(feature_id)) |>
+      distinct(
         feature_id,
         candidate_adduct,
         candidate_library,
@@ -55,7 +57,7 @@ prepare_annotations_spectra <-
         candidate_count_similarity_peaks_matched
       ) |>
       ## Add new columns
-      tidytable::mutate(
+      mutate(
         candidate_structure_exact_mass = as.numeric(candidate_structure_exact_mass),
         candidate_structure_tax_npc_01pat = NA_character_,
         candidate_structure_tax_npc_02sup = NA_character_,

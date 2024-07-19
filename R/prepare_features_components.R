@@ -3,6 +3,8 @@
 #' @description This function prepares the components
 #'    (clusters in molecular network) for further use
 #'
+#' @importFrom tidytable bind_rows distinct fread select
+#'
 #' @param input Input file
 #' @param output Output file
 #'
@@ -22,16 +24,16 @@ prepare_features_components <-
     log_debug(x = "... components table")
     table <- lapply(
       X = input,
-      FUN = tidytable::fread,
+      FUN = fread,
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>
-      tidytable::bind_rows() |>
-      tidytable::select(
+      bind_rows() |>
+      select(
         feature_id = `cluster index`,
         component_id = componentindex
       ) |>
-      tidytable::distinct()
+      distinct()
 
     log_debug(x = "Exporting ...")
     export_params(parameters = get_params(step = "prepare_features_components"), step = "prepare_features_components")

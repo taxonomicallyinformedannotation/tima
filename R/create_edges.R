@@ -3,6 +3,8 @@
 #' @description This function applies similarity calculation to a list of
 #'        spectra to create edges
 #'
+#' @importFrom tidytable bind_rows
+#'
 #' @include calculate_entropy.R
 #'
 #' @param index Indices
@@ -39,7 +41,7 @@ create_edges <- function(index,
         )
       }
     ) |>
-    tidytable::bind_rows()
+    bind_rows()
 
   return(inner_list)
 }

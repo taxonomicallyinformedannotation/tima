@@ -2,6 +2,8 @@
 #'
 #' @description This function parses YAML parameters
 #'
+#' @importFrom yaml read_yaml
+#'
 #' @param def Default path
 #' @param usr User path
 #'
@@ -17,12 +19,12 @@ parse_yaml_params <- function(def = get("default_path",
                                 envir = parent.frame()
                               )) {
   ## Read the default YAML file
-  params <- yaml::read_yaml(file = def)
+  params <- read_yaml(file = def)
 
   ## If a user-specified YAML file exists,
   ## read it and overwrite the default values with the user-specified ones
   if (file.exists(usr)) {
-    params <- yaml::read_yaml(file = usr)
+    params <- read_yaml(file = usr)
   }
 
   ## Return the final list of parameters

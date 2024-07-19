@@ -2,6 +2,9 @@
 #'
 #' @description This function installs the latest version
 #'
+#' @importFrom fs dir_copy dir_create file_copy path_home
+#' @importFrom pak pak_cleanup pak_update pak pkg_install pkg_status
+#'
 #' @return NULL
 #'
 #' @export
@@ -49,7 +52,7 @@ install_latest_version <- function() {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    status <- pak::pkg_status("timaR")
+    status <- pkg_status("timaR")
     local_version <- status$version[1]
     local_sha <- status$remotesha[1]
   }
@@ -72,14 +75,14 @@ install_latest_version <- function() {
       ") skipping"
     )
   } else {
-    pak::pak_cleanup(force = TRUE)
-    pak::pak_update()
-    pak::pak(ask = FALSE, upgrade = TRUE)
+    pak_cleanup(force = TRUE)
+    pak_update()
+    pak(ask = FALSE, upgrade = TRUE)
     # Try installing the local version first
     success <- tryCatch(
       {
         message("Installing local version")
-        pak::pkg_install(
+        pkg_install(
           pkg = ".",
           ask = FALSE,
           upgrade = FALSE
@@ -95,7 +98,7 @@ install_latest_version <- function() {
       success <- tryCatch(
         {
           message("Installing remote version")
-          pak::pkg_install(
+          pkg_install(
             pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
             ask = FALSE,
             upgrade = FALSE
@@ -112,7 +115,7 @@ install_latest_version <- function() {
       success <- tryCatch(
         {
           message("Retrying remote version")
-          pak::pkg_install(
+          pkg_install(
             pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
             ask = FALSE,
             upgrade = FALSE
@@ -130,13 +133,13 @@ install_latest_version <- function() {
       message("All installation attempts failed")
     }
   }
-  cache <- fs::path_home(".tima")
+  cache <- path_home(".tima")
   message("Creating cache at ", cache)
-  fs::dir_create(path = cache)
+  dir_create(path = cache)
   message("Copying default architecture ...")
   tryCatch(
     expr = {
-      fs::dir_copy(
+      dir_copy(
         path = "./inst",
         new_path = file.path(cache, "inst"),
         overwrite = TRUE
@@ -145,7 +148,7 @@ install_latest_version <- function() {
     error = function(e) {
       if (file.exists("./../../app.R")) {
         message("I'm in test dir")
-        fs::dir_copy(
+        dir_copy(
           path = "./../../",
           new_path = file.path(cache, "inst"),
           overwrite = TRUE
@@ -156,7 +159,7 @@ install_latest_version <- function() {
   tryCatch(
     expr = {
       message("Installing local targets")
-      fs::file_copy(
+      file_copy(
         path = "./_targets.yaml",
         new_path = file.path(cache, "_targets.yaml"),
         overwrite = TRUE
@@ -177,7 +180,7 @@ install_latest_version <- function() {
   tryCatch(
     expr = {
       message("Getting local DESCRIPTION")
-      fs::file_copy(
+      file_copy(
         path = "./DESCRIPTION",
         new_path = file.path(cache, "DESCRIPTION"),
         overwrite = TRUE

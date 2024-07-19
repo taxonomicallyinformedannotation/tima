@@ -2,6 +2,8 @@
 #'
 #' @description This function prepares GNPS obtained annotations
 #'
+#' @importFrom tidytable any_of bind_rows fread mutate select
+#'
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file
@@ -33,17 +35,17 @@ prepare_annotations_gnps <-
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(
         X = input,
-        FUN = tidytable::fread,
+        FUN = fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-        tidytable::bind_rows() |>
-        tidytable::mutate(
+        bind_rows() |>
+        mutate(
           candidate_structure_error_mz = as.numeric(MZErrorPPM) *
             1E-6 *
             as.numeric(Precursor_MZ)
         ) |>
-        tidytable::select(tidytable::any_of(c(
+        select(any_of(c(
           "feature_id" = "#Scan#",
           "candidate_adduct" = "Adduct",
           "candidate_structure_error_mz" = "MassDiff",
@@ -63,7 +65,7 @@ prepare_annotations_gnps <-
           "candidate_structure_tax_cla_03cla" = "class",
           "candidate_structure_tax_cla_04dirpar" = "subclass"
         ))) |>
-        tidytable::mutate(
+        mutate(
           candidate_structure_smiles_no_stereo = NA,
           candidate_structure_molecular_formula = candidate_structure_inchi |>
             ## really dirty

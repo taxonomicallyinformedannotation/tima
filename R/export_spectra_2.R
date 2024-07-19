@@ -2,6 +2,8 @@
 #'
 #' @description This function export spectra.
 #'
+#' @importFrom tidytable filter
+#'
 #' @include export_spectra.R
 #'
 #' @param file File where spectra will be exported. Can be '.mgf' or '.sqlite'
@@ -16,7 +18,8 @@
 export_spectra_2 <- function(file,
                              spectra,
                              meta) {
-  if (nrow(spectra |> tidytable::filter(!is.na(compound_id))) != 0) {
+  if (nrow(spectra |>
+    filter(!is.na(compound_id))) != 0) {
     log_debug("Exporting")
     create_dir(export = file)
     spectra |>

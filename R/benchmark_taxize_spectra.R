@@ -4,6 +4,9 @@
 #'
 #' @details Because they are still quite dirty
 #'
+#' @importFrom tidytable bind_rows distinct filter fread left_join mutate select slice_sample
+#' @importFrom stringi stri_sub
+#'
 #' @param input Initial features
 #' @param keys SOP keys
 #' @param org_tax_ott Taxonomy
@@ -20,44 +23,44 @@ benchmark_taxize_spectra <-
            org_tax_ott,
            output) {
     features <- input |>
-      tidytable::fread(
+      fread(
         na.strings = c("", "NA"),
         colClasses = "character"
       )
     sop <- keys |>
-      tidytable::fread(
+      fread(
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::mutate(inchikey_no_stereo = stringi::stri_sub(
+      mutate(inchikey_no_stereo = stri_sub(
         str = structure_inchikey,
         from = 1,
         to = 14
       ))
     taxo <- org_tax_ott |>
-      tidytable::fread(
+      fread(
         na.strings = c("", "NA"),
         colClasses = "character"
       )
 
     features_pretaxed <- features |>
-      tidytable::left_join(sop |>
-        tidytable::distinct(
+      left_join(sop |>
+        distinct(
           organism_name,
           inchikey_no_stereo
         ))
     rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>
-      tidytable::filter(!is.na(organism_name)) |>
-      tidytable::slice_sample(n = 1, .by = feature_id) |>
-      tidytable::bind_rows(features_pretaxed |> tidytable::filter(is.na(organism_name)))
+      filter(!is.na(organism_name)) |>
+      slice_sample(n = 1, .by = feature_id) |>
+      bind_rows(features_pretaxed |> filter(is.na(organism_name)))
     rm(features_pretaxed)
 
     features_taxed <- features_sampled |>
-      tidytable::left_join(taxo |>
-        tidytable::distinct(organism_name, .keep_all = TRUE)) |>
-      tidytable::select(
+      left_join(taxo |>
+        distinct(organism_name, .keep_all = TRUE)) |>
+      select(
         feature_id,
         sample_organism_01_domain = organism_taxonomy_01domain,
         sample_organism_02_kingdom = organism_taxonomy_02kingdom,

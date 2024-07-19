@@ -3,6 +3,12 @@
 #' @description This function prepares retention times libraries
 #'    to be used for later
 #'
+#' @importFrom jsonlite fromJSON
+#' @importFrom pbapply pblapply
+#' @importFrom stringi stri_sub
+#' @importFrom tidytable across any_of as_tidytable bind_rows distinct filter left_join na_if mutate rowwise select tidytable where
+#' @importFrom utils URLencode
+#'
 #' @param mgf_exp MGF containing experimental retention times
 #' @param mgf_is MGF containing in silico predicted retention times
 #' @param temp_exp File containing experimental retention times
@@ -110,10 +116,10 @@ prepare_libraries_rt <-
           lapply(function(x) {
             x@backend@spectraData |>
               data.frame() |>
-              tidytable::as_tidytable()
+              as_tidytable()
           }) |>
-          tidytable::bind_rows() |>
-          tidytable::select(tidytable::any_of(c(
+          bind_rows() |>
+          select(any_of(c(
             rt = col_rt,
             inchikey = col_ik,
             smiles = col_sm
@@ -125,9 +131,9 @@ prepare_libraries_rt <-
       function(tab) {
         log_debug("Importing file ...")
         rts <- tab |>
-          lapply(FUN = tidytable::fread) |>
-          tidytable::bind_rows() |>
-          tidytable::select(tidytable::any_of(
+          lapply(FUN = fread) |>
+          bind_rows() |>
+          select(any_of(
             c(
               rt = name_rt,
               inchikey = name_inchikey,
@@ -143,27 +149,27 @@ prepare_libraries_rt <-
                unit = unit_rt) {
         df_polished <- df |>
           data.frame() |>
-          tidytable::mutate(type = type) |>
-          tidytable::rowwise() |>
-          tidytable::mutate(rt = ifelse(unit == "seconds",
+          mutate(type = type) |>
+          rowwise() |>
+          mutate(rt = ifelse(unit == "seconds",
             yes = as.numeric(rt) / 60,
             no = rt
           )) |>
-          tidytable::bind_rows(data.frame(
+          bind_rows(data.frame(
             inchikey = NA_character_,
             smiles = NA_character_
           )) |>
-          tidytable::filter(!is.na(rt)) |>
-          tidytable::filter(!is.na(smiles)) |>
-          tidytable::distinct()
+          filter(!is.na(rt)) |>
+          filter(!is.na(smiles)) |>
+          distinct()
         return(df_polished)
       }
 
     complete_df <- function(df) {
       df_full <- df |>
-        tidytable::filter(!is.na(inchikey))
+        filter(!is.na(inchikey))
       df_missing <- df |>
-        tidytable::filter(is.na(inchikey))
+        filter(is.na(inchikey))
       log_debug(
         "There are",
         nrow(df_missing),
@@ -177,54 +183,54 @@ prepare_libraries_rt <-
       get_inchikey <- function(smiles, toolkit = "rdkit") {
         url <- paste0(
           "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
-          utils::URLencode(smiles),
+          URLencode(smiles),
           "&toolkit=",
           toolkit
         )
         tryCatch(
-          expr = jsonlite::fromJSON(txt = url),
+          expr = fromJSON(txt = url),
           error = function(e) {
             return(NA_character_)
           }
         )
       }
 
-      inchikey <- pbapply::pblapply(
+      inchikey <- pblapply(
         X = smiles,
         FUN = get_inchikey
       ) |>
         as.character()
       df_missing <- df_missing |>
-        tidytable::select(-inchikey) |>
-        tidytable::left_join(tidytable::tidytable(
+        select(-inchikey) |>
+        left_join(tidytable(
           smiles,
           inchikey
         ))
       rm(smiles)
 
       df_completed <- df_full |>
-        tidytable::bind_rows(df_missing) |>
-        tidytable::mutate(
-          tidytable::across(
-            .cols = tidytable::where(is.character),
+        bind_rows(df_missing) |>
+        mutate(
+          across(
+            .cols = where(is.character),
             .fns = function(x) {
-              tidytable::na_if(x, "NA")
+              na_if(x, "NA")
             }
           )
         )
       rm(df_full, df_missing)
       df_completed <- df_completed |>
-        tidytable::select(
+        select(
           rt,
           structure_smiles = smiles,
           structure_inchikey = inchikey,
           type
         ) |>
-        tidytable::distinct()
+        distinct()
       log_debug(
         "There were still",
         nrow(df_completed |>
-          tidytable::filter(is.na(
+          filter(is.na(
             structure_inchikey
           ))),
         "entries for which no InChIKey could not be found in the end."
@@ -232,7 +238,7 @@ prepare_libraries_rt <-
       return(df_completed)
     }
 
-    empty_df <- tidytable::tidytable(
+    empty_df <- tidytable(
       rt = NA_real_,
       structure_smiles = NA_character_,
       structure_inchikey = NA_character_,
@@ -275,24 +281,24 @@ prepare_libraries_rt <-
       rts_is_2 <- empty_df
     }
 
-    df_rts <- tidytable::bind_rows(
+    df_rts <- bind_rows(
       rts_exp_1,
       rts_exp_2,
       rts_is_1,
       rts_is_2
     ) |>
-      tidytable::filter(!is.na(as.numeric(rt))) |>
-      tidytable::filter(!is.na((structure_inchikey)))
+      filter(!is.na(as.numeric(rt))) |>
+      filter(!is.na((structure_inchikey)))
     rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
     sop <- df_rts |>
-      tidytable::select(
+      select(
         structure_smiles,
         structure_inchikey
       ) |>
-      tidytable::distinct() |>
-      tidytable::mutate(
-        structure_inchikey_no_stereo = stringi::stri_sub(
+      distinct() |>
+      mutate(
+        structure_inchikey_no_stereo = stri_sub(
           str = structure_inchikey,
           from = 1,
           to = 14
@@ -301,16 +307,16 @@ prepare_libraries_rt <-
       )
 
     rts <- df_rts |>
-      tidytable::select(-structure_smiles) |>
-      tidytable::distinct() |>
-      tidytable::mutate(candidate_structure_inchikey_no_stereo = gsub(
+      select(-structure_smiles) |>
+      distinct() |>
+      mutate(candidate_structure_inchikey_no_stereo = gsub(
         pattern = "-.*",
         replacement = "",
         x = structure_inchikey,
         perl = TRUE
       )) |>
       ## TODO REMINDER FOR NOW
-      tidytable::distinct(
+      distinct(
         rt,
         candidate_structure_inchikey_no_stereo,
         type
@@ -319,7 +325,7 @@ prepare_libraries_rt <-
 
     if (nrow(rts) == 0) {
       log_debug("No retention time library found, returning empty organism table.")
-      sop <- tidytable::tidytable(
+      sop <- tidytable(
         structure_smiles = NA_character_,
         structure_inchikey = NA_character_,
         structure_inchikey_no_stereo = NA_character_,
@@ -329,7 +335,7 @@ prepare_libraries_rt <-
 
     if (nrow(rts) == 0) {
       log_debug("No retention time library found, returning empty retention time table.")
-      rts <- tidytable::tidytable(
+      rts <- tidytable(
         rt = NA_real_,
         candidate_structure_inchikey_no_stereo = NA_character_,
         type = NA_character_

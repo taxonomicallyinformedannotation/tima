@@ -2,6 +2,8 @@
 #'
 #' @description This function prepares features
 #'
+#' @importFrom tidytable any_of fread select
+#'
 #' @param features Path to the file containing the features data
 #' @param output Path to the file to export the merged data to
 #' @param name_adduct Name of the adduct column in the features data
@@ -25,11 +27,11 @@ prepare_features_tables <-
 
     log_debug("Preparing features table")
     features_prepared <- features |>
-      tidytable::fread(
+      fread(
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::select(tidytable::any_of(c(
+      select(any_of(c(
         feature_id = name_features,
         rt = name_rt,
         mz = name_mz,

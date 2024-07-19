@@ -2,6 +2,9 @@
 #'
 #' @description This function gets GNPS tables from corresponding job ID.
 #'
+#' @importFrom httr2 req_error req_method req_perform resp_status_desc request
+#' @importFrom stringi stri_length
+#'
 #' @include get_file.R
 #'
 #' @param gnps_job_id GNPS job ID
@@ -40,7 +43,7 @@ get_gnps_tables <-
     if (!is.null(gnps_job_id)) {
       stopifnot(
         "Your GNPS job ID is invalid" =
-          stringi::stri_length(str = gnps_job_id) == 32
+          stri_length(str = gnps_job_id) == 32
       )
       stopifnot(
         "Your workflow is not supported,
@@ -90,15 +93,15 @@ get_gnps_tables <-
 
         log_debug("Checking response...")
         if (url |>
-          httr2::request() |>
-          httr2::req_method("GET") |>
-          httr2::req_error(
+          request() |>
+          req_method("GET") |>
+          req_error(
             is_error = function(resp) {
               return(FALSE)
             }
           ) |>
-          httr2::req_perform() |>
-          httr2::resp_status_desc() == "OK") {
+          req_perform() |>
+          resp_status_desc() == "OK") {
           log_debug("Status OK!")
           get_file(
             url = url,

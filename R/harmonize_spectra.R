@@ -2,6 +2,8 @@
 #'
 #' @description This function harmonizes spectra headers
 #'
+#' @importFrom tidytable any_of as_tidytable filter full_join mutate pivot_wider row_number select
+#'
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
@@ -146,15 +148,15 @@ harmonize_spectra <- function(spectra,
 
   spectra_missing <- columns_missing |>
     data.frame() |>
-    tidytable::as_tidytable() |>
-    tidytable::mutate(value = NA_character_) |>
-    tidytable::pivot_wider(names_from = columns_missing) |>
-    tidytable::mutate(join = "x")
+    as_tidytable() |>
+    mutate(value = NA_character_) |>
+    pivot_wider(names_from = columns_missing) |>
+    mutate(join = "x")
 
   spectra_filtered <- spectra |>
     data.frame() |>
-    tidytable::as_tidytable() |>
-    tidytable::filter(
+    as_tidytable() |>
+    filter(
       grepl(
         pattern = mode,
         x = !!as.name(col_po),
@@ -169,19 +171,19 @@ harmonize_spectra <- function(spectra,
         ignore.case = TRUE
       )
     ) |>
-    tidytable::select(
-      tidytable::any_of(c(columns_full)),
+    select(
+      any_of(c(columns_full)),
       precursorCharge,
       precursorMz,
       rtime,
       mz,
       intensity
     ) |>
-    tidytable::mutate(join = "x")
+    mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
-    tidytable::full_join(spectra_missing) |>
-    tidytable::select(
+    full_join(spectra_missing) |>
+    select(
       adduct,
       collision_energy,
       compound_id,
@@ -204,12 +206,12 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    tidytable::mutate(
+    mutate(
       library = metad,
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
-        yes = tidytable::row_number(),
+        yes = row_number(),
         no = as.numeric(spectrum_id)
       ),
       compound_id = ifelse(

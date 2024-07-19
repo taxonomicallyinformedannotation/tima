@@ -3,6 +3,10 @@
 #' @description This function writes the parameters
 #'    to a YAML file in the specified directory.
 #'
+#' @importFrom crayon green
+#' @importFrom pak pkg_status
+#' @importFrom yaml write_yaml
+#'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved
 #' @param step step identifier to be included in the YAML file name
@@ -32,10 +36,10 @@ export_params <-
     create_dir(export = directory)
 
     ## Log the path to the used parameters
-    log_debug(x = "... path to used parameters is", crayon::green(directory))
-    tima_version <- pak::pkg_status("timaR")$version[1]
+    log_debug(x = "... path to used parameters is", green(directory))
+    tima_version <- pkg_status("timaR")$version[1]
 
-    yaml::write_yaml(
+    write_yaml(
       x = parameters,
       file = file.path(
         directory,

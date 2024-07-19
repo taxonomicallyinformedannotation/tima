@@ -2,6 +2,13 @@
 #'
 #' @description This function imports spectra from a file (.mgf or .sqlite)
 #'
+#' @importFrom MsBackendMgf readMgfSplit
+#' @importFrom MsBackendMsp readMsp
+#' @importFrom Spectra Spectra
+#' @importFrom stringi stri_replace_all_regex
+#'
+#' @include cleanup_spectra.R
+#'
 #' @param file File path of the spectrum file to be imported
 #'
 #' @return Spectra object containing the imported spectra
@@ -11,7 +18,7 @@
 #' @examples NULL
 import_spectra <- function(file) {
   file_ext <-
-    stringi::stri_replace_all_regex(
+    stri_replace_all_regex(
       str = file,
       pattern = ".*\\.",
       replacement = "",
@@ -21,24 +28,24 @@ import_spectra <- function(file) {
   switch(
     EXPR = file_ext,
     "mgf" = {
-      MsBackendMgf::readMgfSplit(f = file) |>
-        Spectra::Spectra() |>
+      readMgfSplit(f = file) |>
+        Spectra() |>
         cleanup_spectra()
     },
     "msp" = {
-      MsBackendMsp::readMsp(f = file) |>
-        Spectra::Spectra() |>
+      readMsp(f = file) |>
+        Spectra() |>
         cleanup_spectra()
     },
     # "sqlite" = {
-    #   CompoundDb::CompDb(x = file) |>
-    #     CompoundDb::Spectra() |>
-    #     Spectra::setBackend(Spectra::MsBackendMemory())
+    #   CompDb(x = file) |>
+    #     Spectra() |>
+    #     setBackend(MsBackendMemory())
     # },
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
-        Spectra::Spectra() |>
+        Spectra() |>
         cleanup_spectra()
     }
   )

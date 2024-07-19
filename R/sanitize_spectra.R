@@ -2,6 +2,8 @@
 #'
 #' @description This function sanitizes spectra
 #'
+#' @importFrom Spectra applyProcessing dropNaSpectraVariables filterFourierTransformArtefacts filterIntensity
+#'
 #' @include keep_peaks.R
 #'
 #' @param spectra Spectra object
@@ -27,20 +29,20 @@ sanitize_spectra <-
     # lapply(FUN = Spectra:::.peaks_remove_fft_artifact)
 
     spectra <- spectra |>
-      Spectra::dropNaSpectraVariables() |>
-      Spectra::filterFourierTransformArtefacts() |> # fixed in Spectra 1.10.3
-      Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
-      Spectra::filterIntensity(intensity = keep_peaks, prop = ratio) |>
-      Spectra::applyProcessing()
+      dropNaSpectraVariables() |>
+      filterFourierTransformArtefacts() |> # fixed in Spectra 1.10.3
+      filterIntensity(intensity = c(cutoff, Inf)) |>
+      filterIntensity(intensity = keep_peaks, prop = ratio) |>
+      applyProcessing()
 
     # spectra <- spectra |>
-    #   Spectra::filterIntensity(
+    #   filterIntensity(
     #     intensity = function(x) {
     #       ## eventually go to 25%
-    #       x <- x > stats::quantile(x)[1]
+    #       x <- x > quantile(x)[1]
     #     }
     #   ) |>
-    #   Spectra::applyProcessing()
+    #   applyProcessing()
 
     spectra <- spectra[lapply(
       X = spectra@backend@peaksData,

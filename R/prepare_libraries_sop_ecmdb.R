@@ -1,5 +1,9 @@
 #' @title Prepare libraries of structure organism pairs ECMDB
 #'
+#' @importFrom jsonlite stream_in
+#' @importFrom stringi stri_sub
+#' @importFrom tidytable as_tidytable distinct mutate rename
+#'
 #' @include fake_sop_columns.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
@@ -31,17 +35,17 @@ prepare_libraries_sop_ecmdb <-
         )
 
       ## Get rid of the annoying incomplete final line warning
-      ecmdb <- jsonlite::stream_in(con = unz(
+      ecmdb <- stream_in(con = unz(
         description = input,
         filename = file
       )) |>
         data.frame() |>
-        tidytable::as_tidytable()
+        as_tidytable()
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
-        tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
+        mutate(
+          structure_inchikey_2D = stri_sub(
             str = moldb_inchikey,
             from = 1,
             to = 14
@@ -49,7 +53,7 @@ prepare_libraries_sop_ecmdb <-
           ## ISSUE see #19
           structure_smiles_2D = NA_character_
         ) |>
-        tidytable::rename(
+        rename(
           structure_name = name,
           structure_inchikey = moldb_inchikey,
           structure_smiles = moldb_smiles,
@@ -57,7 +61,7 @@ prepare_libraries_sop_ecmdb <-
           structure_exact_mass = moldb_mono_mass,
           structure_xlogp = moldb_logp
         ) |>
-        tidytable::mutate(
+        mutate(
           structure_taxonomy_npclassifier_01pathway = NA_character_,
           structure_taxonomy_npclassifier_02superclass = NA_character_,
           structure_taxonomy_npclassifier_03class = NA_character_,
@@ -67,7 +71,7 @@ prepare_libraries_sop_ecmdb <-
           structure_taxonomy_classyfire_03class = NA_character_,
           structure_taxonomy_classyfire_04directparent = NA_character_
         ) |>
-        tidytable::mutate(
+        mutate(
           organism_name = "Escherichia coli",
           organism_taxonomy_ottid = 474506,
           organism_taxonomy_01domain = "Bacteria",
@@ -81,10 +85,10 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_09species = "Escherichia coli",
           organism_taxonomy_10varietas = NA_character_
         ) |>
-        tidytable::mutate(reference_doi = NA) |>
+        mutate(reference_doi = NA) |>
         select_sop_columns() |>
         round_reals() |>
-        tidytable::distinct()
+        distinct()
       rm(ecmdb)
     } else {
       log_debug("Sorry, ECMDB not found, returning an empty file instead")

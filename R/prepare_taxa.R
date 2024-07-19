@@ -9,6 +9,10 @@
 #'    or attribute them to multiple ones,
 #'    according to their relative intensities among the samples.
 #'
+#' @importFrom stringi stri_replace_all_fixed
+#' @importFrom tidyfst col_rn rn_col
+#' @importFrom tidytable across all_of arrange bind_rows distinct everything filter fread group_by left_join matches mutate pivot_longer rename replace_na select separate_rows where
+#'
 #' @include clean_collapse.R
 #' @include get_organism_taxonomy_ott.R
 #'
@@ -57,7 +61,7 @@ prepare_taxa <-
     )
 
     log_debug(x = "Loading feature table")
-    feature_table_0 <- tidytable::fread(
+    feature_table_0 <- fread(
       file = input,
       na.strings = c("", "NA"),
       colClasses = "character"
@@ -65,7 +69,7 @@ prepare_taxa <-
 
     if (is.null(taxon)) {
       log_debug(x = "Loading metadata table")
-      metadata_table <- tidytable::fread(
+      metadata_table <- fread(
         file = metadata,
         na.strings = c("", "NA"),
         colClasses = "character"
@@ -77,33 +81,33 @@ prepare_taxa <-
               in columns (MZmine format)")
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
-      tidytable::select(
-        tidytable::all_of(c(name_features)),
-        tidytable::matches(" Peak area"),
-        tidytable::matches("quant_"),
+      select(
+        all_of(c(name_features)),
+        matches(" Peak area"),
+        matches("quant_"),
       ) |>
-      tidytable::select(-tidytable::matches("quant_peaktable")) |>
-      tidyfst::col_rn(var = name_features)
+      select(-matches("quant_peaktable")) |>
+      col_rn(var = name_features)
     colnames(feature_table) <- colnames(feature_table) |>
-      stringi::stri_replace_all_fixed(
+      stri_replace_all_fixed(
         pattern = " Peak area",
         replacement = "",
         vectorize_all = FALSE
       )
     colnames(feature_table) <- colnames(feature_table) |>
-      stringi::stri_replace_all_fixed(
+      stri_replace_all_fixed(
         pattern = "quant_",
         replacement = "",
         vectorize_all = FALSE
       )
     log_debug(x = "... filtering top K intensities per feature")
     top_n <- feature_table |>
-      tidyfst::rn_col() |>
-      tidytable::pivot_longer(cols = seq_len(ncol(feature_table)) + 1) |>
-      tidytable::filter(value != 0) |>
-      tidytable::mutate(rank = rank(-as.numeric(value)), .by = c(rowname)) |>
-      tidytable::filter(rank <= top_k) |>
-      tidytable::arrange(rowname, rank)
+      rn_col() |>
+      pivot_longer(cols = seq_len(ncol(feature_table)) + 1) |>
+      filter(value != 0) |>
+      mutate(rank = rank(-as.numeric(value)), .by = c(rowname)) |>
+      filter(rank <= top_k) |>
+      arrange(rowname, rank)
     rm(feature_table)
 
     if (!is.null(taxon)) {
@@ -114,17 +118,17 @@ prepare_taxa <-
 
     log_debug(x = "Preparing organisms names")
     organism_table <- metadata_table |>
-      tidytable::filter(!is.na(!!as.name(colname))) |>
-      tidytable::distinct(!!as.name(colname)) |>
-      tidytable::select(organism = !!as.name(colname)) |>
-      tidytable::separate_rows(organism,
+      filter(!is.na(!!as.name(colname))) |>
+      distinct(!!as.name(colname)) |>
+      select(organism = !!as.name(colname)) |>
+      separate_rows(organism,
         sep = "\\|",
       )
 
     log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
     organism_table_filled <- organism_table |>
-      tidytable::left_join(
-        tidytable::fread(org_tax_ott,
+      left_join(
+        fread(org_tax_ott,
           na.strings = c("", "NA"),
           colClasses = "character"
         ),
@@ -134,7 +138,7 @@ prepare_taxa <-
 
     log_debug(x = "Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
-      tidytable::filter(is.na(organism_taxonomy_ottid))
+      filter(is.na(organism_taxonomy_ottid))
 
     if (nrow(organism_table_missing) != 0) {
       biological_metadata_1 <- organism_table_missing |>
@@ -142,14 +146,14 @@ prepare_taxa <-
 
       log_debug(x = "Joining all results")
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
-        tidytable::rename(organism_name = organism) |>
-        tidytable::bind_rows(biological_metadata_1)
+        filter(!is.na(organism_taxonomy_ottid)) |>
+        rename(organism_name = organism) |>
+        bind_rows(biological_metadata_1)
       rm(biological_metadata_1)
     } else {
       biological_metadata <- organism_table_filled |>
-        tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
-        tidytable::rename(organism_name = organism)
+        filter(!is.na(organism_taxonomy_ottid)) |>
+        rename(organism_name = organism)
     }
     rm(organism_table_filled, organism_table_missing)
 
@@ -157,16 +161,16 @@ prepare_taxa <-
       if (extension == FALSE) {
         log_debug("Removing filename extensions")
         metadata_table <- metadata_table |>
-          tidytable::mutate(
-            filename = stringi::stri_replace_all_fixed(
+          mutate(
+            filename = stri_replace_all_fixed(
               str = filename,
               pattern = ".mzML",
               replacement = "",
               vectorize_all = FALSE
             )
           ) |>
-          tidytable::mutate(
-            filename = stringi::stri_replace_all_fixed(
+          mutate(
+            filename = stri_replace_all_fixed(
               str = filename,
               pattern = ".mzxML",
               replacement = "",
@@ -179,33 +183,33 @@ prepare_taxa <-
     if (!is.null(taxon)) {
       metadata_table_joined <- cbind(
         feature_table_0 |>
-          tidytable::mutate(feature_id = !!as.name(name_features)),
+          mutate(feature_id = !!as.name(name_features)),
         biological_metadata |>
-          tidytable::select(organismOriginal = organism_name)
+          select(organismOriginal = organism_name)
       )
     } else {
       metadata_table_joined <-
-        tidytable::left_join(top_n,
+        left_join(top_n,
           metadata_table,
           by = c("name" = name_filename)
         ) |>
-        tidytable::select(
+        select(
           feature_id := rowname,
-          organismOriginal = tidytable::all_of(colname),
-          tidytable::everything()
+          organismOriginal = all_of(colname),
+          everything()
         )
     }
     rm(feature_table_0, metadata_table)
 
     log_debug(x = "Joining with cleaned taxonomy table")
     taxed_features_table <-
-      tidytable::left_join(
+      left_join(
         metadata_table_joined,
         biological_metadata,
         by = c("organismOriginal" = "organism_name")
       ) |>
-      tidytable::distinct() |>
-      tidytable::select(
+      distinct() |>
+      select(
         feature_id,
         sample_organism_01_domain = organism_taxonomy_01domain,
         sample_organism_02_kingdom = organism_taxonomy_02kingdom,
@@ -218,13 +222,13 @@ prepare_taxa <-
         sample_organism_09_species = organism_taxonomy_09species,
         sample_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::everything(),
+      mutate(
+        across(
+          .cols = everything(),
           .fns = as.character
         )
       ) |>
-      tidytable::group_by(feature_id) |>
+      group_by(feature_id) |>
       clean_collapse(
         cols = c(
           "sample_organism_01_domain",
@@ -239,11 +243,11 @@ prepare_taxa <-
           "sample_organism_10_varietas"
         )
       ) |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::where(is.character),
+      mutate(
+        across(
+          .cols = where(is.character),
           .fns = function(x) {
-            tidytable::replace_na(x, "ND")
+            replace_na(x, "ND")
           }
         )
       )

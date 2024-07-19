@@ -3,6 +3,9 @@
 #' @description This function cleans the results
 #'    obtained after biological weighting
 #'
+#' @importFrom tidytable across add_count anti_join arrange bind_rows coalesce contains distinct everything filter group_by left_join mutate n_distinct right_join select ungroup where
+#' @importFrom stats setNames
+#'
 #' @param annot_table_wei_bio Table containing your
 #'    biologically weighted annotation
 #' @param edges_table Table containing the edges between features
@@ -27,7 +30,7 @@ clean_bio <-
              envir = parent.frame()
            )) {
     df <- annot_table_wei_bio |>
-      tidytable::distinct(
+      distinct(
         feature_id,
         candidate_structure_inchikey_no_stereo,
         candidate_structure_tax_cla_01kin,
@@ -44,15 +47,15 @@ clean_bio <-
     log_debug("calculating chemical consistency
               features with at least 2 neighbors ... \n")
     df3 <-
-      tidytable::right_join(
+      right_join(
         edges_table |>
-          tidytable::group_by(feature_source) |>
-          tidytable::add_count() |>
-          tidytable::ungroup() |>
-          tidytable::filter(n >= 2) |>
-          tidytable::select(-n),
+          group_by(feature_source) |>
+          add_count() |>
+          ungroup() |>
+          filter(n >= 2) |>
+          select(-n),
         df |>
-          tidytable::distinct(
+          distinct(
             feature_id,
             candidate_structure_tax_cla_01kin,
             candidate_structure_tax_npc_01pat,
@@ -63,9 +66,9 @@ clean_bio <-
             candidate_structure_tax_cla_04dirpar,
             score_pondered_bio
           ),
-        by = stats::setNames("feature_id", "feature_target")
+        by = setNames("feature_id", "feature_target")
       ) |>
-      tidytable::filter(!is.na(feature_source))
+      filter(!is.na(feature_source))
 
     log_debug("... among all edges ... \n")
     clean_per_level_bio <-
@@ -75,29 +78,29 @@ clean_bio <-
                feature_score_name,
                feature_val_name) {
         freq <- df |>
-          tidytable::distinct(
+          distinct(
             feature_source,
             feature_target,
             !!as.name(candidates),
             score_pondered_bio
           ) |>
-          tidytable::mutate(
-            count = tidytable::n_distinct(feature_target),
+          mutate(
+            count = n_distinct(feature_target),
             .by = c(
               feature_source,
               !!as.name(candidates)
             )
           ) |>
-          tidytable::mutate(
+          mutate(
             !!as.name(consistency_name) := count /
-              tidytable::n_distinct(feature_target),
+              n_distinct(feature_target),
             .by = c(feature_source)
           ) |>
-          tidytable::distinct(feature_source,
+          distinct(feature_source,
             !!as.name(candidates),
             .keep_all = TRUE
           ) |>
-          tidytable::mutate(
+          mutate(
             !!as.name(feature_score_name) :=
               !!as.name(consistency_name) * score_pondered_bio,
             .by = c(
@@ -105,15 +108,15 @@ clean_bio <-
               !!as.name(candidates)
             )
           ) |>
-          tidytable::arrange(-!!as.name(feature_score_name)) |>
-          tidytable::distinct(feature_source, .keep_all = TRUE) |>
-          tidytable::select(
+          arrange(-!!as.name(feature_score_name)) |>
+          distinct(feature_source, .keep_all = TRUE) |>
+          select(
             feature_source,
             !!as.name(feature_val_name) := !!as.name(candidates),
             !!as.name(consistency_name),
             !!as.name(feature_score_name)
           ) |>
-          tidytable::mutate(
+          mutate(
             !!as.name(feature_val_name) := ifelse(
               test = !!as.name(feature_score_name) >= minimal_consistency,
               yes = !!as.name(feature_val_name),
@@ -181,154 +184,154 @@ clean_bio <-
 
     log_debug("splitting already computed predictions \n")
     df1 <- df |>
-      tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
+      filter(!is.na(feature_pred_tax_cla_02sup_val))
 
     df1b <- df1 |>
-      tidytable::select(-tidytable::contains("feature_pred_tax"))
+      select(-contains("feature_pred_tax"))
 
     df2 <- df |>
-      tidytable::select(-tidytable::contains("feature_pred_tax")) |>
-      tidytable::anti_join(df1) |>
-      tidytable::bind_rows(df1b)
+      select(-contains("feature_pred_tax")) |>
+      anti_join(df1) |>
+      bind_rows(df1b)
 
     log_debug("joining all except -1 together \n")
     annot_table_wei_bio_preclean <-
-      tidytable::left_join(df2,
+      left_join(df2,
         freq_cla_kin,
-        by = stats::setNames(
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_npc_pat,
-        by = stats::setNames(
+      left_join(freq_npc_pat,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_cla_sup,
-        by = stats::setNames(
+      left_join(freq_cla_sup,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_npc_sup,
-        by = stats::setNames(
+      left_join(freq_npc_sup,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_cla_cla,
-        by = stats::setNames(
+      left_join(freq_cla_cla,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_npc_cla,
-        by = stats::setNames(
+      left_join(freq_npc_cla,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::left_join(freq_cla_par,
-        by = stats::setNames(
+      left_join(freq_cla_par,
+        by = setNames(
           "feature_source",
           "feature_id"
         )
       ) |>
-      tidytable::select(
+      select(
         feature_id,
-        tidytable::everything()
+        everything()
       ) |>
       ## In case there are no consensus at all because no network
-      tidytable::mutate(tidytable::across(
-        .cols = tidytable::where(is.logical),
+      mutate(across(
+        .cols = where(is.logical),
         .fns = as.character
       )) |>
       log_pipe("adding dummy consistency for features
               with less than 2 neighbors \n") |>
-      tidytable::mutate(
-        feature_pred_tax_cla_01kin_val = tidytable::coalesce(
+      mutate(
+        feature_pred_tax_cla_01kin_val = coalesce(
           feature_pred_tax_cla_01kin_val,
           "dummy"
         ),
-        consistency_structure_cla_kin = tidytable::coalesce(
+        consistency_structure_cla_kin = coalesce(
           consistency_structure_cla_kin,
           1
         ),
-        feature_pred_tax_cla_01kin_score = tidytable::coalesce(
+        feature_pred_tax_cla_01kin_score = coalesce(
           feature_pred_tax_cla_01kin_score,
           0
         ),
-        feature_pred_tax_npc_01pat_val = tidytable::coalesce(
+        feature_pred_tax_npc_01pat_val = coalesce(
           feature_pred_tax_npc_01pat_val,
           "dummy"
         ),
-        consistency_structure_npc_pat = tidytable::coalesce(
+        consistency_structure_npc_pat = coalesce(
           consistency_structure_npc_pat,
           1
         ),
-        feature_pred_tax_npc_01pat_score = tidytable::coalesce(
+        feature_pred_tax_npc_01pat_score = coalesce(
           feature_pred_tax_npc_01pat_score,
           0
         ),
-        feature_pred_tax_cla_02sup_val = tidytable::coalesce(
+        feature_pred_tax_cla_02sup_val = coalesce(
           feature_pred_tax_cla_02sup_val,
           "dummy"
         ),
-        consistency_structure_cla_sup = tidytable::coalesce(
+        consistency_structure_cla_sup = coalesce(
           consistency_structure_cla_sup,
           1
         ),
-        feature_pred_tax_cla_02sup_score = tidytable::coalesce(
+        feature_pred_tax_cla_02sup_score = coalesce(
           feature_pred_tax_cla_02sup_score,
           0
         ),
-        feature_pred_tax_npc_02sup_val = tidytable::coalesce(
+        feature_pred_tax_npc_02sup_val = coalesce(
           feature_pred_tax_npc_02sup_val,
           "dummy"
         ),
-        consistency_structure_npc_sup = tidytable::coalesce(
+        consistency_structure_npc_sup = coalesce(
           consistency_structure_npc_sup,
           1
         ),
-        feature_pred_tax_npc_02sup_score = tidytable::coalesce(
+        feature_pred_tax_npc_02sup_score = coalesce(
           feature_pred_tax_npc_02sup_score,
           0
         ),
-        feature_pred_tax_cla_03cla_val = tidytable::coalesce(
+        feature_pred_tax_cla_03cla_val = coalesce(
           feature_pred_tax_cla_03cla_val,
           "dummy"
         ),
-        consistency_structure_cla_cla = tidytable::coalesce(
+        consistency_structure_cla_cla = coalesce(
           consistency_structure_cla_cla,
           1
         ),
-        feature_pred_tax_cla_03cla_score = tidytable::coalesce(
+        feature_pred_tax_cla_03cla_score = coalesce(
           feature_pred_tax_cla_03cla_score,
           0
         ),
-        feature_pred_tax_npc_03cla_val = tidytable::coalesce(
+        feature_pred_tax_npc_03cla_val = coalesce(
           feature_pred_tax_npc_03cla_val,
           "dummy"
         ),
-        consistency_structure_npc_cla = tidytable::coalesce(
+        consistency_structure_npc_cla = coalesce(
           consistency_structure_npc_cla,
           1
         ),
-        feature_pred_tax_npc_03cla_score = tidytable::coalesce(
+        feature_pred_tax_npc_03cla_score = coalesce(
           feature_pred_tax_npc_03cla_score,
           0
         ),
-        feature_pred_tax_cla_04dirpar_val = tidytable::coalesce(
+        feature_pred_tax_cla_04dirpar_val = coalesce(
           feature_pred_tax_cla_04dirpar_val,
           "dummy"
         ),
-        consistency_structure_cla_par = tidytable::coalesce(
+        consistency_structure_cla_par = coalesce(
           consistency_structure_cla_par,
           1
         ),
-        feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(
+        feature_pred_tax_cla_04dirpar_score = coalesce(
           feature_pred_tax_cla_04dirpar_score,
           0
         )
@@ -336,8 +339,8 @@ clean_bio <-
 
     log_debug("adding already computed predictions back \n")
     annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-      tidytable::anti_join(df1b) |>
-      tidytable::bind_rows(df1)
+      anti_join(df1b) |>
+      bind_rows(df1)
 
     rm(
       annot_table_wei_bio,

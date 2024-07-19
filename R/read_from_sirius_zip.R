@@ -2,6 +2,7 @@
 #'
 #' @description This function reads files from Sirius compressed workspace
 #'
+#' @importFrom tidytable fread
 #'
 #' @param sirius_zip Compressed directory containing the Sirius results
 #' @param file File to be read
@@ -29,7 +30,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     sirius_dir <- sirius_no_zip
   }
 
-  tidytable::fread(
+  fread(
     file = file.path(sirius_dir, file),
     na.strings = c("", "NA"),
     colClasses = "character"

@@ -2,6 +2,8 @@
 #'
 #' @description This function selects sop columns
 #'
+#' @importFrom tidytable select
+#'
 #' @param df Dataframe
 #'
 #' @return NULL
@@ -11,7 +13,7 @@
 #' @examples NULL
 select_sop_columns <- function(df) {
   df <- df |>
-    tidytable::select(
+    select(
       structure_name,
       structure_inchikey,
       structure_smiles,

@@ -2,6 +2,8 @@
 #'
 #' @description This function collapses a grouped dataframe and trims it
 #'
+#' @importFrom tidytable across everything mutate na_if reframe ungroup where
+#'
 #' @param grouped_df Grouped dataframe
 #' @param cols Column(s) to apply collapse to
 #'
@@ -12,34 +14,34 @@
 #' @examples NULL
 clean_collapse <- function(grouped_df, cols = NA) {
   clean_collapse_df <- grouped_df |>
-    tidytable::reframe(tidytable::across(
+    reframe(across(
       .cols = ifelse(
         test = is.na(cols),
-        yes = tidytable::everything(),
+        yes = everything(),
         no = cols
       ),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
     )) |>
-    tidytable::ungroup() |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.list),
+    ungroup() |>
+    mutate(
+      across(
+        .cols = where(is.list),
         .fns = as.character
       )
     ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = trimws
       )
     ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::na_if(x, "")
+          na_if(x, "")
         }
       )
     )
