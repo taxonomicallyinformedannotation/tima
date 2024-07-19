@@ -9,6 +9,8 @@
 #' @importFrom tidytable across any_of as_tidytable bind_rows distinct filter left_join na_if mutate rowwise select tidytable where
 #' @importFrom utils URLencode
 #'
+#' @include get_params.R
+#'
 #' @param mgf_exp MGF containing experimental retention times
 #' @param mgf_is MGF containing in silico predicted retention times
 #' @param temp_exp File containing experimental retention times

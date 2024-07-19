@@ -14,6 +14,7 @@
 #' @importFrom tidytable across all_of arrange bind_rows distinct everything filter fread group_by left_join matches mutate pivot_longer rename replace_na select separate_rows where
 #'
 #' @include clean_collapse.R
+#' @include get_params.R
 #' @include get_organism_taxonomy_ott.R
 #'
 #' @param input File containing your features intensities

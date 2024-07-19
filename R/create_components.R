@@ -6,6 +6,8 @@
 #' @importFrom tidyfst rn_col
 #' @importFrom tidytable across arrange bind_rows distinct fread mutate select unnest where
 #'
+#' @include get_params.R
+#'
 #' @param input Input file(s) containing edges
 #' @param output Output file.
 #'

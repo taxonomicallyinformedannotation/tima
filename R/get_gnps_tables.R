@@ -5,7 +5,7 @@
 #' @importFrom httr2 req_error req_method req_perform resp_status_desc request
 #' @importFrom stringi stri_length
 #'
-#' @include get_file.R
+#' @include parse_yaml_paths.R get_file.R
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example

@@ -5,6 +5,8 @@
 #' @importFrom crayon green
 #' @importFrom tidytable arrange bind_rows distinct filter fread left_join mutate rename select
 #'
+#' @include get_params.R
+#'
 #' @param annotations Prepared annotations file
 #' @param features Prepared features file
 #' @param rts Prepared retention time library

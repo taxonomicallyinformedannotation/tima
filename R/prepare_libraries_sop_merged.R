@@ -9,6 +9,7 @@
 #' @importFrom tidytable across anti_join as_tidytable bind_rows distinct filter fread left_join mutate select where
 #'
 #' @include get_organism_taxonomy_ott.R
+#' @include get_params.R
 #' @include split_tables_sop.R
 #'
 #' @param files List of libraries to be merged

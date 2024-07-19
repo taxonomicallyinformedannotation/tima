@@ -9,6 +9,8 @@
 #' @include columns_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
+#' @include get_params.R
+#' @include parse_yaml_paths.R
 #' @include weight_bio.R
 #' @include weight_chemo.R
 #'

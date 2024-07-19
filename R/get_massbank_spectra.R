@@ -2,6 +2,8 @@
 #'
 #' @description This function gets MassBank spectra
 #'
+#' @include parse_yaml_paths.R
+#'
 #' @param output_dir Output where to store the spectra
 #' @param mb_file MassBank file
 #' @param mb_url MassBank URL
