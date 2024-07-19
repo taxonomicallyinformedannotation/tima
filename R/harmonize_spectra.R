@@ -151,7 +151,7 @@ harmonize_spectra <- function(spectra,
     as_tidytable() |>
     bind_cols(tidytable(value = NA_character_)) |>
     pivot_wider(names_from = columns_missing) |>
-    mutate(join = "x")
+    bind_cols(tidytable(join = "x"))
 
   spectra_filtered <- spectra |>
     data.frame() |>
@@ -179,7 +179,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    mutate(join = "x")
+    bind_cols(tidytable(join = "x"))
 
   spectra_harmonized <- spectra_filtered |>
     full_join(spectra_missing) |>
