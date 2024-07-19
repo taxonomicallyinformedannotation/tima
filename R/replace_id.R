@@ -5,6 +5,9 @@
 #'
 #' @importFrom stringi stri_replace_all_regex
 #'
+#' @include get_params.R
+#' @include parse_yaml_paths.R
+#'
 #' @param x a character string containing the default ID
 #' @param user_filename a user-specified value for a file name job ID
 #' @param user_gnps a user-specified value for a GNPS job ID
