@@ -1,6 +1,5 @@
 library(shinytest2)
 library(timaR)
-pkgload::load_all()
 
 test_that("{shinytest2} recording: app", {
   get_file(
