@@ -64,12 +64,6 @@ annotate_masses(
 \item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 10 ppm}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.1min}
-
-\item{adducts_masses_list}{Adducts masses}
-
-\item{clusters_neg}{Negative clusters to be used}
-
-\item{clusters_pos}{Positive clusters to be used}
 }
 \value{
 A table containing MS1 annotations based on exact mass

@@ -26,10 +26,7 @@
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
-#' @param adducts_masses_list Adducts masses
 #' @param clusters_list List of clusters to be used
-#' @param clusters_neg Negative clusters to be used
-#' @param clusters_pos Positive clusters to be used
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 10 ppm
