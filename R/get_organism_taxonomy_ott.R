@@ -300,6 +300,3 @@ get_organism_taxonomy_ott <- function(df,
     return(biological_metadata)
   }
 }
-
-## See https://github.com/markfairbanks/tidytable/issues/269
-.datatable.aware <- TRUE

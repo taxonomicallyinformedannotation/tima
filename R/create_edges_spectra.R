@@ -161,6 +161,3 @@ create_edges_spectra <- function(
 
   return(output[[1]])
 }
-
-## See https://github.com/markfairbanks/tidytable/issues/269
-.datatable.aware <- TRUE

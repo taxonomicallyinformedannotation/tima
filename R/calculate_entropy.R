@@ -47,6 +47,3 @@ calculate_entropy <- function(index,
     return(NULL)
   }
 }
-
-## See https://github.com/markfairbanks/tidytable/issues/269
-.datatable.aware <- TRUE
