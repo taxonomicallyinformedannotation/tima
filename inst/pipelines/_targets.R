@@ -5,6 +5,7 @@
 
 # Load packages required to define the pipeline:
 library(targets)
+library(timaR)
 
 # Set target options:
 tar_option_set(

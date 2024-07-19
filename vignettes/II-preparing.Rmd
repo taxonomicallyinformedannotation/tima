@@ -24,6 +24,10 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = "..")
 ```
 
+```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+library("timaR")
+```
+
 This vignette describes the main steps of the annotation process.
 
 ## Structural annotations of your features
@@ -40,10 +44,6 @@ For the moment, we support 3 different types of annotations:
 These annotations are of the lowest possible quality.
 However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
-
-```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-library("timaR")
-```
 
 ```{r annotate-masses-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 source(file = "inst/scripts/annotate_masses.R")
