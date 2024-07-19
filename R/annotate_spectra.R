@@ -414,6 +414,3 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
   return(output[[1]])
 }
-
-## See https://github.com/markfairbanks/tidytable/issues/269
-.datatable.aware <- TRUE
