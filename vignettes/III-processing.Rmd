@@ -24,12 +24,12 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = "..")
 ```
 
-This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
-If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
-
 ```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("timaR")
 ```
+
+This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
+If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
 
 ```{r weight-all, message=FALSE}
 source(file = "inst/scripts/weight_annotations.R")

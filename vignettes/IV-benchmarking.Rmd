@@ -30,6 +30,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+library("timaR")
+```
+
 This vignette simply shows the actual performance of TIMA.
 
 The benchmarking dataset was built using [https://zenodo.org/record/5186176](https://zenodo.org/record/5186176).
