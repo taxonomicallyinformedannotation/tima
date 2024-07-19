@@ -149,7 +149,7 @@ harmonize_spectra <- function(spectra,
   spectra_missing <- columns_missing |>
     data.frame() |>
     as_tidytable() |>
-    mutate(value = NA_character_) |>
+    bind_cols(tidytable(value = NA_character_)) |>
     pivot_wider(names_from = columns_missing) |>
     mutate(join = "x")
 
