@@ -179,7 +179,7 @@ harmonize_spectra <- function(spectra,
       mz,
       intensity
     ) |>
-    bind_cols(tidytable(join = "x"))
+    mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
     full_join(spectra_missing) |>
