@@ -143,6 +143,7 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
+    'timaR-package.R'
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
@@ -151,3 +152,4 @@ VignetteBuilder:
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
 X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
 Language: en-US
+Config/Needs/website: rmarkdown
