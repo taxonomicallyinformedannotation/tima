@@ -4,7 +4,7 @@
 #'    to be used for spectral matching
 #'
 #' @importFrom stringi stri_sub
-#' @importFrom tidytable bind_rows distinct mutate tidytable
+#' @importFrom tidytable bind_cols bind_rows distinct mutate tidytable
 #'
 #' @include export_spectra_2.R
 #' @include extract_spectra.R
@@ -126,18 +126,11 @@ prepare_libraries_spectra <-
           structure_smiles_no_stereo = smiles_no_stereo
         ) |>
         mutate(
-          structure_inchikey_no_stereo = stri_sub(
-            str = structure_inchikey,
-            from = 1,
-            to = 14
-          ),
-          organism_name = NA_character_
-        )
+          structure_inchikey_no_stereo = stri_sub(str = structure_inchikey, from = 1, to = 14)
+        ) |>
+        bind_cols(tidytable(organism_name = NA_character_))
       log_debug("Exporting")
-      export_output(
-        sop,
-        file = output_sop
-      )
+      export_output(sop, file = output_sop)
       export_spectra_2(
         file = output_pos,
         spectra = spectra_harmonized_pos,
