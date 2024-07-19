@@ -5,6 +5,7 @@
 #' @importFrom tidytable any_of bind_rows distinct filter left_join mutate select tidytable
 #'
 #' @include columns_model.R
+#' @include get_params.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
 #' @include read_from_sirius_zip.R

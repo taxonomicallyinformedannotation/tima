@@ -5,6 +5,7 @@
 #' @importFrom tidytable as_tidytable distinct mutate rename
 #'
 #' @include fake_sop_columns.R
+#' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'

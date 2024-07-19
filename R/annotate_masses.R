@@ -10,9 +10,9 @@
 #'
 #' @include decorate_masses.R
 #' @include dist_groups.R
+#' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include round_reals.R
-#'
 #'
 #' @param features Table containing your previous annotation to complement
 #' @param output_annotations Output for mass based structural annotations

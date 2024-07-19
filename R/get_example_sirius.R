@@ -2,7 +2,7 @@
 #'
 #' @description This function gets example SIRIUS annotations
 #'
-#' @include get_file.R
+#' @include parse_yaml_paths.R get_file.R
 #'
 #' @param url URL where the example is accessible
 #' @param export Path where to save the example

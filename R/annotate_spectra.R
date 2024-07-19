@@ -11,6 +11,7 @@
 #' @importFrom Spectra addProcessing applyProcessing concatenateSpectra filterIntensity filterPrecursorCharge
 #' @importFrom tidytable any_of arrange as_tidytable bind_rows coalesce desc distinct filter left_join mutate select tidytable
 #'
+#' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
 #'

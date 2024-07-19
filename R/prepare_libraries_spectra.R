@@ -8,6 +8,7 @@
 #'
 #' @include export_spectra_2.R
 #' @include extract_spectra.R
+#' @include get_params.R
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
 #' @include sanitize_spectra.R

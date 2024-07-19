@@ -7,6 +7,8 @@
 #' @importFrom pak pkg_status
 #' @importFrom yaml write_yaml
 #'
+#' @include parse_yaml_paths.R
+#'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved
 #' @param step step identifier to be included in the YAML file name

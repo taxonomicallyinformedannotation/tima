@@ -10,6 +10,7 @@
 #' @importFrom tidytable any_of bind_rows coalesce distinct everything filter full_join mutate select tidytable
 #'
 #' @include create_edges.R
+#' @include get_params.R
 #' @include import_spectra.R
 #' @include normalize_peaks.R
 #' @include remove_above_precursor.R

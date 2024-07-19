@@ -5,6 +5,7 @@
 #'
 #' @importFrom tidytable bind_rows distinct filter fread mutate select
 #'
+#' @include get_params.R
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file

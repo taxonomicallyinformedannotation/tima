@@ -6,6 +6,7 @@
 #'
 #' @include create_dir.R
 #' @include export_params.R
+#' @include get_params.R
 #' @include load_yaml_files.R
 #'
 #' @param params_small params_small

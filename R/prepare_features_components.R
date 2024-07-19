@@ -5,6 +5,8 @@
 #'
 #' @importFrom tidytable bind_rows distinct fread select
 #'
+#' @include get_params.R
+#'
 #' @param input Input file
 #' @param output Output file
 #'

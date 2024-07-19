@@ -4,6 +4,8 @@
 #'
 #' @importFrom tidytable all_of coalesce distinct fread full_join mutate rename select
 #'
+#' @include get_params.R
+#'
 #' @param input Input file if 'manual'
 #' @param output Output file
 #' @param name_source Name of the source features column

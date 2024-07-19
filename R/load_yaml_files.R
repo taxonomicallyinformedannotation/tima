@@ -4,6 +4,8 @@
 #'
 #' @importFrom yaml read_yaml
 #'
+#' @include parse_yaml_paths.R
+#'
 #' @return NULL
 #'
 #' @export

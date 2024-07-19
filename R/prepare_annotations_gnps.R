@@ -4,6 +4,7 @@
 #'
 #' @importFrom tidytable any_of bind_rows fread mutate select
 #'
+#' @include get_params.R
 #' @include select_annotations_columns.R
 #'
 #' @param input Input file
