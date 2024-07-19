@@ -3,6 +3,9 @@
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
+#' @importFrom stringi stri_detect_regex
+#' @importFrom tidytable contains distinct filter left_join mutate right_join select
+#'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation
 #' @param weight_spectral Weight for the spectral score
@@ -64,7 +67,7 @@ weight_chemo <-
              envir = parent.frame()
            )) {
     df2 <- annot_table_wei_bio_clean |>
-      tidytable::distinct(
+      distinct(
         candidate_structure_tax_cla_01kin,
         candidate_structure_tax_npc_01pat,
         candidate_structure_tax_cla_02sup,
@@ -97,16 +100,16 @@ weight_chemo <-
                score,
                score_name) {
         score <- df |>
-          tidytable::distinct(
+          distinct(
             !!as.name(candidates),
             !!as.name(features_val),
             !!as.name(features_score)
           ) |>
-          tidytable::filter(stringi::stri_detect_regex(
+          filter(stri_detect_regex(
             pattern = !!as.name(candidates),
             str = !!as.name(features_val)
           )) |>
-          tidytable::mutate(!!as.name(score_name) := !!as.name(score) * 1)
+          mutate(!!as.name(score_name) := !!as.name(score) * 1)
       }
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
@@ -174,14 +177,14 @@ weight_chemo <-
 
     log_debug("... keeping best chemical score \n")
     annot_table_wei_chemo <- df2 |>
-      tidytable::left_join(step_cla_kin) |>
-      tidytable::left_join(step_npc_pat) |>
-      tidytable::left_join(step_cla_sup) |>
-      tidytable::left_join(step_npc_sup) |>
-      tidytable::left_join(step_cla_cla) |>
-      tidytable::left_join(step_npc_cla) |>
-      tidytable::left_join(step_cla_par) |>
-      tidytable::mutate(
+      left_join(step_cla_kin) |>
+      left_join(step_npc_pat) |>
+      left_join(step_cla_sup) |>
+      left_join(step_npc_sup) |>
+      left_join(step_cla_cla) |>
+      left_join(step_npc_cla) |>
+      left_join(step_cla_par) |>
+      mutate(
         score_chemical = pmax(
           score_chemical_1,
           score_chemical_2,
@@ -194,12 +197,12 @@ weight_chemo <-
           na.rm = TRUE
         )
       ) |>
-      tidytable::select(
-        -tidytable::contains("score_chemical_")
+      select(
+        -contains("score_chemical_")
       ) |>
-      tidytable::right_join(annot_table_wei_bio_clean) |>
+      right_join(annot_table_wei_bio_clean) |>
       log_pipe("... calculating weighted chemical score \n") |>
-      tidytable::mutate(
+      mutate(
         score_pondered_chemo = (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_chemical * score_chemical + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )
 

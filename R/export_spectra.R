@@ -29,9 +29,9 @@ export_spectra <- function(file,
   #     perl = TRUE
   #   ),
   #   "mgf" = {
-  #     Spectra::Spectra(object = spectra) |>
-  #       Spectra::export(
-  #         backend = MsBackendMgf::MsBackendMgf(),
+  #     Spectra(object = spectra) |>
+  #       export(
+  #         backend = MsBackendMgf(),
   #         file = file
   #       )
   #   },
@@ -68,7 +68,7 @@ export_spectra <- function(file,
   #           )
   #         )
   #     }
-  #     CompoundDb::createCompDb(
+  #     createCompDb(
   #       x = cmps,
   #       metadata = metad,
   #       msms_spectra = spectra,

@@ -2,6 +2,9 @@
 #'
 #' @description This function prepares the LOTUS structure-organism pairs
 #'
+#' @importFrom stringi stri_sub
+#' @importFrom tidytable distinct fread mutate rename
+#'
 #' @include fake_sop_columns.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
@@ -20,21 +23,21 @@ prepare_libraries_sop_lotus <-
     if (file.exists(input)) {
       log_debug(x = "Loading and preparing LOTUS")
       lotus_prepared <- input |>
-        tidytable::fread(
+        fread(
           na.strings = c("", "NA"),
           colClasses = "character"
         ) |>
-        tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
+        mutate(
+          structure_inchikey_2D = stri_sub(
             str = structure_inchikey,
             from = 1,
             to = 14
           )
         ) |>
-        tidytable::rename(structure_name = structure_nameTraditional) |>
+        rename(structure_name = structure_nameTraditional) |>
         select_sop_columns() |>
         round_reals() |>
-        tidytable::distinct()
+        distinct()
     } else {
       log_debug("Sorry, LOTUS not found, returning an empty file instead")
       lotus_prepared <- fake_sop_columns()

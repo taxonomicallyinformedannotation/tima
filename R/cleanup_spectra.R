@@ -2,6 +2,8 @@
 #'
 #' @description This function cleans up spectra (keeps only merged MS2)
 #'
+#' @importFrom Spectra applyProcessing combineSpectra filterEmptySpectra reduceSpectra
+#'
 #' @param spectra Spectra object to clean
 #'
 #' @return Spectra object containing the imported spectra
@@ -11,17 +13,17 @@
 #' @examples NULL
 cleanup_spectra <- function(spectra) {
   spectra <- spectra |>
-    Spectra::reduceSpectra() |>
-    Spectra::applyProcessing()
+    reduceSpectra() |>
+    applyProcessing()
   if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
     spectra <- spectra[spectra$MSLEVEL == 2]
   }
   if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
     message("Combining spectra in case...")
     spectra <- spectra |>
-      Spectra::combineSpectra(f = spectra$FEATURE_ID)
+      combineSpectra(f = spectra$FEATURE_ID)
   }
   spectra <- spectra |>
-    Spectra::filterEmptySpectra()
+    filterEmptySpectra()
   return(spectra)
 }

@@ -3,6 +3,9 @@
 #' @description This function weights the eventually MS1
 #' complemented annotations according their biological source
 #'
+#' @importFrom stringi stri_detect_regex
+#' @importFrom tidytable across arrange case_when contains desc distinct filter inner_join left_join matches mutate na_if replace_na right_join select where
+#'
 #' @param annotation_table_taxed Table containing the initial annotation
 #' eventually complemented by additional MS1 annotations
 #' @param structure_organism_pairs_table Table containing the
@@ -79,7 +82,7 @@ weight_bio <-
              envir = parent.frame()
            )) {
     df0 <- annotation_table_taxed |>
-      tidytable::distinct(
+      distinct(
         candidate_structure_tax_cla_01kin,
         candidate_structure_tax_npc_01pat,
         candidate_structure_tax_cla_02sup,
@@ -89,17 +92,17 @@ weight_bio <-
         candidate_structure_tax_cla_04dirpar
       ) |>
       log_pipe("adding \"notClassified\" \n") |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::matches("candidate_structure_"),
+      mutate(
+        across(
+          .cols = matches("candidate_structure_"),
           .fns = function(x) {
-            tidytable::replace_na(x, "notClassified")
+            replace_na(x, "notClassified")
           }
         )
       )
 
     df1 <- annotation_table_taxed |>
-      tidytable::select(
+      select(
         candidate_structure_inchikey_no_stereo,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
@@ -117,11 +120,11 @@ weight_bio <-
         # sample_organism_09_1_subspecies,
         sample_organism_10_varietas
       ) |>
-      tidytable::distinct() |>
-      tidytable::left_join(
+      distinct() |>
+      left_join(
         structure_organism_pairs_table |>
-          tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-          tidytable::select(
+          filter(!is.na(structure_inchikey_no_stereo)) |>
+          select(
             candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
             candidate_organism_01_domain = organism_taxonomy_01domain,
             candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
@@ -142,17 +145,17 @@ weight_bio <-
             # organism_taxonomy_09_1subspecies,
             candidate_organism_10_varietas = organism_taxonomy_10varietas
           ) |>
-          tidytable::distinct() |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidytable::where(is.character),
+          distinct() |>
+          mutate(across(
+            .cols = where(is.character),
             .fns = function(x) {
-              tidytable::na_if(x, "")
+              na_if(x, "")
             }
           ))
       )
 
     df2 <- df1 |>
-      tidytable::distinct(
+      distinct(
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -189,19 +192,19 @@ weight_bio <-
     score_per_level_bio <-
       function(df, candidates, samples, score, score_name) {
         score <- df |>
-          tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
-          tidytable::filter(!is.na(!!as.name(samples))) |>
-          tidytable::filter(!!as.name(samples) != "ND") |>
-          tidytable::filter(!is.na(!!as.name(candidates))) |>
-          tidytable::filter(!!as.name(candidates) != "notClassified") |>
-          tidytable::filter(
-            stringi::stri_detect_regex(
+          distinct(!!as.name(candidates), !!as.name(samples)) |>
+          filter(!is.na(!!as.name(samples))) |>
+          filter(!!as.name(samples) != "ND") |>
+          filter(!is.na(!!as.name(candidates))) |>
+          filter(!!as.name(candidates) != "notClassified") |>
+          filter(
+            stri_detect_regex(
               pattern = !!as.name(candidates),
               str = !!as.name(samples)
             ) |
               !!as.name(samples) == "notClassified"
           ) |>
-          tidytable::mutate(
+          mutate(
             !!as.name(score_name) := ifelse(
               test = !!as.name(samples) != "notClassified",
               yes = !!as.name(score) * 1,
@@ -333,22 +336,22 @@ weight_bio <-
 
     log_debug("... keeping best biological score \n")
     annot_table_wei_bio <- df2 |>
-      tidytable::left_join(step_dom) |>
-      tidytable::left_join(step_kin) |>
-      tidytable::left_join(step_phy) |>
-      tidytable::left_join(step_cla) |>
-      tidytable::left_join(step_ord) |>
-      # tidytable::left_join(step_ord2) |>
-      tidytable::left_join(step_fam) |>
-      # tidytable::left_join(step_fam2) |>
-      tidytable::left_join(step_tri) |>
-      # tidytable::left_join(step_tri2) |>
-      tidytable::left_join(step_gen) |>
-      # tidytable::left_join(step_gen2) |>
-      tidytable::left_join(step_spe) |>
-      # tidytable::left_join(step_spe2) |>
-      tidytable::left_join(step_var) |>
-      tidytable::mutate(
+      left_join(step_dom) |>
+      left_join(step_kin) |>
+      left_join(step_phy) |>
+      left_join(step_cla) |>
+      left_join(step_ord) |>
+      # left_join(step_ord2) |>
+      left_join(step_fam) |>
+      # left_join(step_fam2) |>
+      left_join(step_tri) |>
+      # left_join(step_tri2) |>
+      left_join(step_gen) |>
+      # left_join(step_gen2) |>
+      left_join(step_spe) |>
+      # left_join(step_spe2) |>
+      left_join(step_var) |>
+      mutate(
         score_biological = pmax(
           score_biological_01,
           score_biological_02,
@@ -369,10 +372,10 @@ weight_bio <-
           na.rm = TRUE
         )
       ) |>
-      tidytable::select(
-        -tidytable::contains("score_biological_")
+      select(
+        -contains("score_biological_")
       ) |>
-      tidytable::mutate(candidate_structure_organism_occurrence_closest = tidytable::case_when(
+      mutate(candidate_structure_organism_occurrence_closest = case_when(
         score_biological == score_biological_domain
         ~ candidate_organism_01_domain,
         score_biological == score_biological_kingdom
@@ -405,9 +408,9 @@ weight_bio <-
           candidate_organism_10_varietas,
         .default = NA_character_
       )) |>
-      tidytable::right_join(df1) |>
-      tidytable::arrange(tidytable::desc(score_biological)) |>
-      tidytable::distinct(
+      right_join(df1) |>
+      arrange(desc(score_biological)) |>
+      distinct(
         candidate_structure_inchikey_no_stereo,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
@@ -426,27 +429,27 @@ weight_bio <-
         sample_organism_10_varietas,
         .keep_all = TRUE
       ) |>
-      tidytable::inner_join(annotation_table_taxed) |>
-      tidytable::select(
-        -tidytable::contains("candidate_organism"),
-        -tidytable::contains("sample_organism")
+      inner_join(annotation_table_taxed) |>
+      select(
+        -contains("candidate_organism"),
+        -contains("sample_organism")
       ) |>
-      tidytable::left_join(df0) |>
+      left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
       ## ISSUE see #146
-      tidytable::mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
-      tidytable::mutate(interim_2 = ifelse(test = interim > 1,
+      mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
+      mutate(interim_2 = ifelse(test = interim > 1,
         yes = 1,
         no = interim
       )) |>
-      tidytable::mutate(candidate_score_pseudo_initial = tidytable::case_when(
+      mutate(candidate_score_pseudo_initial = case_when(
         !is.na(candidate_score_similarity) & !is.na(interim_2) ~ (as.numeric(candidate_score_similarity) + interim_2) / 2,
         !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
         !is.na(interim_2) ~ interim_2,
         TRUE ~ 0
       )) |>
-      tidytable::select(-interim, -interim_2) |>
-      tidytable::mutate(
+      select(-interim, -interim_2) |>
+      mutate(
         score_pondered_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )
 

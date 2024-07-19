@@ -2,6 +2,9 @@
 #'
 #' @description This function parses adducts
 #'
+#' @importFrom MetaboCoreUtils calculateMass
+#' @importFrom stringi stri_extract_all_regex stri_match_all_regex stri_split_regex
+#'
 #' @param adduct_string Adduct to be parsed
 #' @param regex Regex used for parsing
 #'
@@ -12,7 +15,7 @@
 #' @examples NULL
 parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?") {
   ## Full match
-  matches <- stringi::stri_match_all_regex(str = adduct_string, pattern = regex)[[1]]
+  matches <- stri_match_all_regex(str = adduct_string, pattern = regex)[[1]]
 
   unexpected <- c(
     "n_mer" = 0,
@@ -48,19 +51,19 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
 
   ## Split modifications
   modifications_regex <- "[+-](\\d*)"
-  modifications_elem <- stringi::stri_split_regex(
+  modifications_elem <- stri_split_regex(
     str = modifications |>
       # Safety to allow for things like "[2M1-C6H12O6 (hexose)+NaCl+H]2+"
       gsub(pattern = " .*", replacement = ""),
     pattern = modifications_regex
   )[[1]][-1]
-  modifications_sign <- stringi::stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
+  modifications_sign <- stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
     gsub(pattern = "\\d*", replacement = "")
   modifications_sign <- ifelse(test = modifications_sign == "+",
     yes = 1,
     no = -1
   )
-  modifications_mult <- stringi::stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
+  modifications_mult <- stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
     gsub(pattern = "[+-]", replacement = "")
   modifications_mult <- ifelse(test = modifications_mult != "",
     yes = modifications_mult |>
@@ -70,7 +73,7 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
 
   ## Calculate mass
   modifications_masses <- modifications_elem |>
-    MetaboCoreUtils::calculateMass()
+    calculateMass()
 
   los_add_clu <- modifications_masses * modifications_mult * modifications_sign
   ## Extract n_charges

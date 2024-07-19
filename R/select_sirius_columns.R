@@ -2,6 +2,8 @@
 #'
 #' @description This function selects sirius columns (canopus)
 #'
+#' @importFrom tidytable any_of mutate select
+#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
@@ -12,11 +14,11 @@
 #' @examples NULL
 select_sirius_columns_canopus <- function(df, sirius_version) {
   df <- df |>
-    tidytable::mutate(feature_id = switch(sirius_version,
+    mutate(feature_id = switch(sirius_version,
       "5" = harmonize_names_sirius(id),
       "6" = mappingFeatureId
     )) |>
-    tidytable::select(tidytable::any_of(
+    select(any_of(
       c(
         "feature_id",
         "candidate_adduct" = "adduct",
@@ -47,6 +49,8 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @description This function selects sirius columns (formulas)
 #'
+#' @importFrom tidytable any_of mutate select
+#'
 #' @include harmonize_names_sirius.R
 #'
 #' @param df Dataframe
@@ -59,11 +63,11 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #' @examples NULL
 select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
-    tidytable::mutate(feature_id = switch(sirius_version,
+    mutate(feature_id = switch(sirius_version,
       "5" = harmonize_names_sirius(id),
       "6" = mappingFeatureId
     )) |>
-    tidytable::mutate(
+    mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
         as.numeric(`massErrorPrecursor(ppm)`) *
           as.numeric(ionMass) *
@@ -72,7 +76,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
         as.numeric(`massErrorPrecursor(ppm)`) *
         1E-6
     ) |>
-    tidytable::select(tidytable::any_of(c(
+    select(any_of(c(
       "feature_id",
       "candidate_adduct" = "adduct",
       "candidate_structure_molecular_formula" = "molecularFormula",
@@ -92,6 +96,8 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #'
 #' @description This function selects sirius columns (structures)
 #'
+#' @importFrom tidytable any_of distinct mutate select
+#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
@@ -102,7 +108,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #' @examples NULL
 select_sirius_columns_structures <- function(df, sirius_version) {
   df <- df |>
-    tidytable::select(tidytable::any_of(c(
+    select(any_of(c(
       "feature_id",
       "candidate_adduct" = "adduct",
       "candidate_structure_name" = "name",
@@ -118,8 +124,8 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       "candidate_score_sirius_csi" = "CSI:FingerIDScore",
       "candidate_score_sirius_msnovelist" = "ModelScore"
     ))) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
+    distinct() |>
+    mutate(
       candidate_library = "SIRIUS",
       candidate_structure_tax_npc_01pat = NA_character_,
       candidate_structure_tax_npc_02sup = NA_character_,

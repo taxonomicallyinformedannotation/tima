@@ -2,6 +2,8 @@
 #'
 #' @description This function fakes LOTUS in case the download failed
 #'
+#' @importFrom tidytable fwrite mutate tidytable
+#'
 #' @param export Path to save the file to
 #'
 #' @return NULL
@@ -11,8 +13,8 @@
 #' @examples NULL
 fake_lotus <- function(export) {
   log_debug("External failure. Returning empty file instead.")
-  tidytable::tidytable() |>
-    tidytable::mutate(
+  tidytable() |>
+    mutate(
       structure_wikidata = NA,
       structure_inchikey = NA,
       structure_inchi = NA,
@@ -53,6 +55,6 @@ fake_lotus <- function(export) {
       reference_doi = NA,
       manual_validation = NA
     ) |>
-    tidytable::fwrite(export)
+    fwrite(export)
   return(export)
 }

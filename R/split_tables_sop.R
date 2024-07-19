@@ -2,6 +2,8 @@
 #'
 #' @description This function splits the structure organism table.
 #'
+#' @importFrom tidytable across add_count distinct filter group_by replace_na select ungroup where
+#'
 #' @include clean_collapse.R
 #'
 #' @param table Table to split
@@ -15,21 +17,21 @@ split_tables_sop <- function(table) {
   log_debug(x = "Splitting the concatenated library into smaller pieces")
 
   table_keys <- table |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
-    tidytable::filter(!is.na(organism_name)) |>
-    tidytable::select(
+    filter(!is.na(structure_inchikey)) |>
+    filter(!is.na(structure_smiles)) |>
+    filter(!is.na(organism_name)) |>
+    select(
       structure_inchikey,
       structure_smiles,
       organism_name,
       reference_doi
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey, structure_smiles, organism_name) |>
-    tidytable::add_count() |>
-    tidytable::ungroup() |>
-    tidytable::filter(!is.na(reference_doi) | n == 1) |>
-    tidytable::select(-n)
+    distinct() |>
+    group_by(structure_inchikey, structure_smiles, organism_name) |>
+    add_count() |>
+    ungroup() |>
+    filter(!is.na(reference_doi) | n == 1) |>
+    select(-n)
   log_debug(
     x = "Led to",
     nrow(table_keys),
@@ -37,17 +39,17 @@ split_tables_sop <- function(table) {
   )
 
   table_structures_stereo <- table |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
-    tidytable::select(
+    filter(!is.na(structure_inchikey)) |>
+    filter(!is.na(structure_smiles)) |>
+    filter(!is.na(structure_inchikey_no_stereo)) |>
+    filter(!is.na(structure_smiles_no_stereo)) |>
+    select(
       structure_inchikey,
       structure_smiles,
       structure_inchikey_no_stereo,
       structure_smiles_no_stereo
     ) |>
-    tidytable::distinct()
+    distinct()
   log_debug(
     x = "Corresponding to",
     nrow(table_structures_stereo),
@@ -57,75 +59,75 @@ split_tables_sop <- function(table) {
     x = "and",
     nrow(
       table_structures_stereo |>
-        tidytable::distinct(structure_inchikey_no_stereo)
+        distinct(structure_inchikey_no_stereo)
     ),
     "unique structures without stereo"
   )
 
   table_structures_metadata <- table |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
-    tidytable::filter(!is.na(structure_molecular_formula)) |>
-    tidytable::filter(!is.na(structure_exact_mass)) |>
-    tidytable::filter(!is.na(structure_xlogp)) |>
-    tidytable::select(
+    filter(!is.na(structure_inchikey)) |>
+    filter(!is.na(structure_smiles)) |>
+    filter(!is.na(structure_molecular_formula)) |>
+    filter(!is.na(structure_exact_mass)) |>
+    filter(!is.na(structure_xlogp)) |>
+    select(
       structure_inchikey,
       structure_smiles,
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp
     ) |>
-    tidytable::distinct()
+    distinct()
 
   table_structures_names <- table |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
-    tidytable::filter(!is.na(structure_name)) |>
-    tidytable::select(
+    filter(!is.na(structure_inchikey)) |>
+    filter(!is.na(structure_smiles)) |>
+    filter(!is.na(structure_name)) |>
+    select(
       structure_inchikey,
       structure_smiles,
       structure_name
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(
+    distinct() |>
+    group_by(
       structure_inchikey,
       structure_smiles
     ) |>
     clean_collapse(cols = c("structure_name"))
 
   table_structures_taxonomy_npc <- table |>
-    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
-    tidytable::filter(
+    filter(!is.na(structure_smiles_no_stereo)) |>
+    filter(
       !is.na(structure_tax_npc_01pat) |
         !is.na(structure_tax_npc_02sup) |
         !is.na(structure_tax_npc_03cla)
     ) |>
-    tidytable::select(
+    select(
       structure_smiles_no_stereo,
       structure_tax_npc_01pat,
       structure_tax_npc_02sup,
       structure_tax_npc_03cla
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_smiles_no_stereo) |>
+    distinct() |>
+    group_by(structure_smiles_no_stereo) |>
     clean_collapse(cols = c(
       "structure_tax_npc_01pat",
       "structure_tax_npc_02sup",
       "structure_tax_npc_03cla"
     )) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::replace_na(x, "notClassified")
+          replace_na(x, "notClassified")
         }
       )
     )
 
   table_structures_taxonomy_cla <- table |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-    tidytable::filter(!is.na(structure_tax_cla_chemontid)) |>
-    tidytable::select(
+    filter(!is.na(structure_inchikey_no_stereo)) |>
+    filter(!is.na(structure_tax_cla_chemontid)) |>
+    select(
       structure_inchikey_no_stereo,
       structure_tax_cla_chemontid,
       structure_tax_cla_01kin,
@@ -133,8 +135,8 @@ split_tables_sop <- function(table) {
       structure_tax_cla_03cla,
       structure_tax_cla_04dirpar
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_no_stereo) |>
+    distinct() |>
+    group_by(structure_inchikey_no_stereo) |>
     clean_collapse(cols = c(
       "structure_tax_cla_chemontid",
       "structure_tax_cla_01kin",
@@ -142,26 +144,26 @@ split_tables_sop <- function(table) {
       "structure_tax_cla_03cla",
       "structure_tax_cla_04dirpar"
     )) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::replace_na(x, "notClassified")
+          replace_na(x, "notClassified")
         }
       )
     )
 
   table_organisms_names <- table |>
-    tidytable::filter(!is.na(organism_name)) |>
-    tidytable::select(organism_name) |>
-    tidytable::distinct()
+    filter(!is.na(organism_name)) |>
+    select(organism_name) |>
+    distinct()
 
   log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
 
   table_org_tax_ott <- table |>
-    tidytable::filter(!is.na(organism_name)) |>
-    tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
-    tidytable::select(
+    filter(!is.na(organism_name)) |>
+    filter(!is.na(organism_taxonomy_ottid)) |>
+    select(
       organism_name,
       organism_taxonomy_ottid,
       organism_taxonomy_01domain,
@@ -175,12 +177,12 @@ split_tables_sop <- function(table) {
       organism_taxonomy_09species,
       organism_taxonomy_10varietas
     ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidytable::where(is.character),
+    distinct() |>
+    mutate(
+      across(
+        .cols = where(is.character),
         .fns = function(x) {
-          tidytable::replace_na(x, "notClassified")
+          replace_na(x, "notClassified")
         }
       )
     )

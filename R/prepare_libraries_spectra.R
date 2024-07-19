@@ -3,6 +3,9 @@
 #' @description This function prepares spectra
 #'    to be used for spectral matching
 #'
+#' @importFrom stringi stri_sub
+#' @importFrom tidytable bind_rows distinct mutate tidytable
+#'
 #' @include export_spectra_2.R
 #' @include extract_spectra.R
 #' @include harmonize_spectra.R
@@ -77,16 +80,16 @@ prepare_libraries_spectra <-
           extract_spectra() |>
           harmonize_spectra(mode = "pos") |>
           ## TODO report the issue as otherwise precursorMz is lost
-          tidytable::mutate(precursor_mz = precursorMz)
+          mutate(precursor_mz = precursorMz)
         spectra_harmonized_neg <- spectra_sanitized |>
           extract_spectra() |>
           harmonize_spectra(mode = "neg") |>
           ## TODO report the issue as otherwise precursorMz is lost
-          tidytable::mutate(precursor_mz = precursorMz)
+          mutate(precursor_mz = precursorMz)
         rm(spectra_sanitized)
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
-        spectra_harmonized_pos <- tidytable::tidytable(
+        spectra_harmonized_pos <- tidytable(
           "compound_id" = "fake_compound",
           "adduct" = NA_character_,
           "collision_energy" = NA_character_,
@@ -115,14 +118,14 @@ prepare_libraries_spectra <-
       }
       log_debug("Extracting structures for the SOP library.")
       sop <- spectra_harmonized_pos |>
-        tidytable::bind_rows(spectra_harmonized_neg) |>
-        tidytable::distinct(
+        bind_rows(spectra_harmonized_neg) |>
+        distinct(
           structure_inchikey = inchikey,
           structure_smiles = smiles,
           structure_smiles_no_stereo = smiles_no_stereo
         ) |>
-        tidytable::mutate(
-          structure_inchikey_no_stereo = stringi::stri_sub(
+        mutate(
+          structure_inchikey_no_stereo = stri_sub(
             str = structure_inchikey,
             from = 1,
             to = 14

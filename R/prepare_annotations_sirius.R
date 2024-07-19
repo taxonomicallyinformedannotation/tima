@@ -2,6 +2,8 @@
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
+#' @importFrom tidytable any_of bind_rows distinct filter left_join mutate select tidytable
+#'
 #' @include columns_model.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
@@ -78,8 +80,8 @@ prepare_annotations_sirius <-
         denovo <- input_directory |>
           read_from_sirius_zip(file = denovo_filename)
       } else {
-        denovo <- tidytable::tidytable() |>
-          tidytable::mutate(mappingFeatureId = NA)
+        denovo <- tidytable() |>
+          mutate(mappingFeatureId = NA)
       }
 
       # TODO
@@ -131,9 +133,9 @@ prepare_annotations_sirius <-
       # Allow for summaries only
       if (length(structures_summary) != 0) {
         structures_summary_ready <- structures_summary |>
-          tidytable::bind_rows(.id = "feature_id")
+          bind_rows(.id = "feature_id")
       } else {
-        structures_summary_ready <- tidytable::tidytable()
+        structures_summary_ready <- tidytable()
       }
       rm(structures_summary)
 
@@ -151,7 +153,7 @@ prepare_annotations_sirius <-
       rm(structures_summary_ready)
 
       structures_prepared_2 <- structures |>
-        tidytable::mutate(feature_id = switch(sirius_version,
+        mutate(feature_id = switch(sirius_version,
           "5" = harmonize_names_sirius(id),
           "6" = mappingFeatureId
         )) |>
@@ -159,21 +161,21 @@ prepare_annotations_sirius <-
       rm(structures)
 
       structures_prepared <-
-        tidytable::bind_rows(structures_prepared, structures_prepared_2) |>
-        tidytable::distinct()
+        bind_rows(structures_prepared, structures_prepared_2) |>
+        distinct()
       rm(structures_prepared_2)
 
       denovo_prepared <- denovo |>
-        tidytable::mutate(feature_id = mappingFeatureId) |>
+        mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
 
       table <- structures_prepared |>
-        tidytable::left_join(formulas_prepared) |>
-        tidytable::left_join(canopus_prepared) |>
-        tidytable::left_join(denovo_prepared) |>
+        left_join(formulas_prepared) |>
+        left_join(canopus_prepared) |>
+        left_join(denovo_prepared) |>
         # TODO add spectral
-        tidytable::distinct() |>
-        tidytable::mutate(
+        distinct() |>
+        mutate(
           candidate_structure_tax_cla_chemontid = NA,
           candidate_structure_tax_cla_01kin = NA
         ) |>
@@ -183,7 +185,7 @@ prepare_annotations_sirius <-
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")
       table <- fake_annotations_columns() |>
-        tidytable::mutate(
+        mutate(
           feature_pred_tax_cla_02sup_val = NA,
           feature_pred_tax_cla_02sup_score = NA,
           feature_pred_tax_cla_03cla_val = NA,
@@ -206,7 +208,7 @@ prepare_annotations_sirius <-
           candidate_score_sirius_csi = NA,
           candidate_score_sirius_msnovelist = NA
         ) |>
-        tidytable::select(
+        select(
           -candidate_structure_error_rt,
           -candidate_score_similarity,
           -candidate_count_similarity_peaks_matched
@@ -216,24 +218,24 @@ prepare_annotations_sirius <-
     model <- columns_model()
 
     table_can <- table |>
-      tidytable::select(tidytable::any_of(
+      select(any_of(
         c(model$features_columns, model$features_calculated_columns)
       )) |>
-      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-      tidytable::distinct()
+      filter(!is.na(!!as.name(model$features_columns[1]))) |>
+      distinct()
 
     table_for <- table |>
-      tidytable::select(tidytable::any_of(
+      select(any_of(
         c(
           model$features_columns,
           model$candidates_sirius_for_columns
         )
       )) |>
-      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-      tidytable::distinct()
+      filter(!is.na(!!as.name(model$features_columns[1]))) |>
+      distinct()
 
     table_str <- table |>
-      tidytable::select(tidytable::any_of(
+      select(any_of(
         c(
           model$features_columns,
           model$candidates_structures_columns,
@@ -241,8 +243,8 @@ prepare_annotations_sirius <-
           model$candidates_sirius_str_columns
         )
       )) |>
-      tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-      tidytable::distinct()
+      filter(!is.na(!!as.name(model$features_columns[1]))) |>
+      distinct()
     rm(table)
 
     log_debug(x = "Exporting ...")

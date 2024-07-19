@@ -7,6 +7,7 @@
 * Expose more parameters to the GUI (#159)
 * Fix adducts and remove nitrogen rule
 * Fix number of matched peaks
+* Improved imports
 * Updated benchmarking steps
 
 # timaR 2.9.6

@@ -2,6 +2,8 @@
 #'
 #' @description This function parses YAML paths
 #'
+#' @importFrom yaml read_yaml
+#'
 #' @param file The file name of the YAML file containing the paths
 #'   (default is "inst/paths.yaml")
 #'
@@ -15,7 +17,7 @@ parse_yaml_paths <- function(file = system.file("extdata",
                                package = "timaR"
                              )) {
   ## Read the YAML file containing the paths
-  paths <- yaml::read_yaml(
+  paths <- read_yaml(
     file = file
   )
 

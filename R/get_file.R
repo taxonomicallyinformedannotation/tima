@@ -2,6 +2,8 @@
 #'
 #' @description This function get files
 #'
+#' @importFrom utils download.file
+#'
 #' @param url URL of the file to be downloaded
 #' @param export File path where the file should be saved
 #' @param limit Timeout limit (in seconds)
@@ -40,7 +42,7 @@ get_file <-
         for (i in 1:attempts) {
           tryCatch(
             {
-              utils::download.file(url = url, destfile = destfile)
+              download.file(url = url, destfile = destfile)
               if (file.exists(destfile)) {
                 return(TRUE)
               }

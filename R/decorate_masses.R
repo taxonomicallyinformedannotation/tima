@@ -2,6 +2,9 @@
 #'
 #' @description This function outputs information about MS1 annotation
 #'
+#' @importFrom crayon blue green
+#' @importFrom tidytable distinct filter
+#'
 #' @param annotation_table_ms1 Table to decorate
 #'
 #' @return Message indicating the number of annotations obtained by MS1
@@ -14,20 +17,20 @@ decorate_masses <- function(annotation_table_ms1 =
                                 envir = parent.frame()
                               )) {
   df_1 <- annotation_table_ms1 |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo) | candidate_structure_inchikey_no_stereo != "notAnnotated")
+    filter(!is.na(candidate_structure_inchikey_no_stereo) | candidate_structure_inchikey_no_stereo != "notAnnotated")
   log_debug(
     "MS1 annotation led to \n",
-    crayon::green(nrow(
+    green(nrow(
       df_1 |>
-        tidytable::distinct(candidate_structure_inchikey_no_stereo)
+        distinct(candidate_structure_inchikey_no_stereo)
     )),
-    crayon::green("annotations"),
+    green("annotations"),
     ", on \n",
-    crayon::blue(nrow(
+    blue(nrow(
       df_1 |>
-        tidytable::distinct(feature_id)
+        distinct(feature_id)
     )),
-    crayon::blue("features")
+    blue("features")
   )
   rm(df_1)
   return(annotation_table_ms1)

@@ -2,6 +2,10 @@
 #'
 #' @description This function create components from edges
 #'
+#' @importFrom igraph components graph_from_data_frame V
+#' @importFrom tidyfst rn_col
+#' @importFrom tidytable across arrange bind_rows distinct fread mutate select unnest where
+#'
 #' @param input Input file(s) containing edges
 #' @param output Output file.
 #'
@@ -19,41 +23,41 @@ create_components <-
 
     edges <- input |>
       lapply(
-        FUN = tidytable::fread,
+        FUN = fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      tidytable::bind_rows() |>
-      tidytable::select(feature_source, feature_target) |>
-      tidytable::distinct()
+      bind_rows() |>
+      select(feature_source, feature_target) |>
+      distinct()
 
     g <- edges |>
-      igraph::graph_from_data_frame(directed = FALSE)
+      graph_from_data_frame(directed = FALSE)
     rm(edges)
 
     feature_source <- g |>
-      igraph::V() |>
+      V() |>
       names() |>
-      split(igraph::components(graph = g)$membership)
+      split(components(graph = g)$membership)
     rm(g)
 
     clusters_ready <- feature_source |>
       rbind() |>
       t() |>
       data.frame() |>
-      tidyfst::rn_col("ComponentIndex") |>
-      tidytable::unnest(feature_source) |>
-      tidytable::distinct(
+      rn_col("ComponentIndex") |>
+      unnest(feature_source) |>
+      distinct(
         `cluster index` = feature_source,
         componentindex = ComponentIndex
       ) |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidytable::where(is.character),
+      mutate(
+        across(
+          .cols = where(is.character),
           .fns = as.numeric
         )
       ) |>
-      tidytable::arrange(`cluster index`)
+      arrange(`cluster index`)
     rm(feature_source)
 
     log_debug(x = "Exporting ...")
