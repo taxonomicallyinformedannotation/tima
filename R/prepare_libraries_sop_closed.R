@@ -1,7 +1,16 @@
+import::from(stringi, stri_sub, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, rename, .into = environment())
+
 #' @title Prepare libraries of structure organism pairs CLOSED
 #'
 #' @importFrom stringi stri_sub
-#' @importFrom tidytable distinct fread mutate rename
+#' @importFrom tidytable distinct
+#' @importFrom tidytable fread
+#' @importFrom tidytable mutate
+#' @importFrom tidytable rename
 #'
 #' @include fake_sop_columns.R
 #' @include get_params.R
@@ -22,20 +31,11 @@ prepare_libraries_sop_closed <-
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
-        fread(
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+        fread(na.strings = c("", "NA"), colClasses = "character")
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        mutate(
-          structure_inchikey_2D = stri_sub(
-            str = structure_inchikey,
-            from = 1,
-            to = 14
-          )
-        ) |>
+        mutate(structure_inchikey_2D = stri_sub(str = structure_inchikey, from = 1, to = 14)) |>
         rename(structure_name = structure_nameTraditional) |>
         mutate(reference_doi = NA) |>
         select_sop_columns() |>
@@ -49,7 +49,10 @@ prepare_libraries_sop_closed <-
     }
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_libraries_sop_closed"), step = "prepare_libraries_sop_closed")
+    export_params(
+      parameters = get_params(step = "prepare_libraries_sop_closed"),
+      step = "prepare_libraries_sop_closed"
+    )
     export_output(x = closed_prepared, file = output)
     rm(closed_prepared)
     return(output)

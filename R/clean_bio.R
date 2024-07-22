@@ -1,10 +1,47 @@
+import::from(stats, setNames, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, add_count, .into = environment())
+import::from(tidytable, anti_join, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, coalesce, .into = environment())
+import::from(tidytable, contains, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, everything, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, group_by, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, n_distinct, .into = environment())
+import::from(tidytable, right_join, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, ungroup, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Clean bio
 #'
 #' @description This function cleans the results
 #'    obtained after biological weighting
 #'
-#' @importFrom tidytable across add_count anti_join arrange bind_rows coalesce contains distinct everything filter group_by left_join mutate n_distinct right_join select ungroup where
 #' @importFrom stats setNames
+#' @importFrom tidytable across
+#' @importFrom tidytable add_count
+#' @importFrom tidytable anti_join
+#' @importFrom tidytable arrange
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable coalesce
+#' @importFrom tidytable contains
+#' @importFrom tidytable distinct
+#' @importFrom tidytable everything
+#' @importFrom tidytable filter
+#' @importFrom tidytable group_by
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable n_distinct
+#' @importFrom tidytable right_join
+#' @importFrom tidytable select
+#' @importFrom tidytable ungroup
+#' @importFrom tidytable where
 #'
 #' @param annot_table_wei_bio Table containing your
 #'    biologically weighted annotation
@@ -20,15 +57,9 @@
 #'
 #' @examples NULL
 clean_bio <-
-  function(annot_table_wei_bio = get("annot_table_wei_bio",
-             envir = parent.frame()
-           ),
-           edges_table = get("edges_table",
-             envir = parent.frame()
-           ),
-           minimal_consistency = get("minimal_consistency",
-             envir = parent.frame()
-           )) {
+  function(annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
+           edges_table = get("edges_table", envir = parent.frame()),
+           minimal_consistency = get("minimal_consistency", envir = parent.frame())) {
     df <- annot_table_wei_bio |>
       distinct(
         feature_id,
@@ -80,41 +111,28 @@ clean_bio <-
         freq <- df |>
           distinct(
             feature_source,
-            feature_target,
-            !!as.name(candidates),
+            feature_target, !!as.name(candidates),
             score_pondered_bio
           ) |>
           mutate(
             count = n_distinct(feature_target),
-            .by = c(
-              feature_source,
-              !!as.name(candidates)
-            )
+            .by = c(feature_source, !!as.name(candidates))
           ) |>
           mutate(
             !!as.name(consistency_name) := count /
               n_distinct(feature_target),
             .by = c(feature_source)
           ) |>
-          distinct(feature_source,
-            !!as.name(candidates),
-            .keep_all = TRUE
-          ) |>
+          distinct(feature_source, !!as.name(candidates), .keep_all = TRUE) |>
           mutate(
             !!as.name(feature_score_name) :=
               !!as.name(consistency_name) * score_pondered_bio,
-            .by = c(
-              feature_source,
-              !!as.name(candidates)
-            )
+            .by = c(feature_source, !!as.name(candidates))
           ) |>
           arrange(-!!as.name(feature_score_name)) |>
           distinct(feature_source, .keep_all = TRUE) |>
           select(
-            feature_source,
-            !!as.name(feature_val_name) := !!as.name(candidates),
-            !!as.name(consistency_name),
-            !!as.name(feature_score_name)
+            feature_source, !!as.name(feature_val_name) := !!as.name(candidates), !!as.name(consistency_name), !!as.name(feature_score_name)
           ) |>
           mutate(
             !!as.name(feature_val_name) := ifelse(
@@ -196,145 +214,40 @@ clean_bio <-
 
     log_debug("joining all except -1 together \n")
     annot_table_wei_bio_preclean <-
-      left_join(df2,
-        freq_cla_kin,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_npc_pat,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_cla_sup,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_npc_sup,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_cla_cla,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_npc_cla,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      left_join(freq_cla_par,
-        by = setNames(
-          "feature_source",
-          "feature_id"
-        )
-      ) |>
-      select(
-        feature_id,
-        everything()
-      ) |>
+      left_join(df2, freq_cla_kin, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_npc_pat, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_cla_sup, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_npc_sup, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_cla_cla, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_npc_cla, by = setNames("feature_source", "feature_id")) |>
+      left_join(freq_cla_par, by = setNames("feature_source", "feature_id")) |>
+      select(feature_id, everything()) |>
       ## In case there are no consensus at all because no network
-      mutate(across(
-        .cols = where(is.logical),
-        .fns = as.character
-      )) |>
+      mutate(across(.cols = where(is.logical), .fns = as.character)) |>
       log_pipe("adding dummy consistency for features
               with less than 2 neighbors \n") |>
       mutate(
-        feature_pred_tax_cla_01kin_val = coalesce(
-          feature_pred_tax_cla_01kin_val,
-          "dummy"
-        ),
-        consistency_structure_cla_kin = coalesce(
-          consistency_structure_cla_kin,
-          1
-        ),
-        feature_pred_tax_cla_01kin_score = coalesce(
-          feature_pred_tax_cla_01kin_score,
-          0
-        ),
-        feature_pred_tax_npc_01pat_val = coalesce(
-          feature_pred_tax_npc_01pat_val,
-          "dummy"
-        ),
-        consistency_structure_npc_pat = coalesce(
-          consistency_structure_npc_pat,
-          1
-        ),
-        feature_pred_tax_npc_01pat_score = coalesce(
-          feature_pred_tax_npc_01pat_score,
-          0
-        ),
-        feature_pred_tax_cla_02sup_val = coalesce(
-          feature_pred_tax_cla_02sup_val,
-          "dummy"
-        ),
-        consistency_structure_cla_sup = coalesce(
-          consistency_structure_cla_sup,
-          1
-        ),
-        feature_pred_tax_cla_02sup_score = coalesce(
-          feature_pred_tax_cla_02sup_score,
-          0
-        ),
-        feature_pred_tax_npc_02sup_val = coalesce(
-          feature_pred_tax_npc_02sup_val,
-          "dummy"
-        ),
-        consistency_structure_npc_sup = coalesce(
-          consistency_structure_npc_sup,
-          1
-        ),
-        feature_pred_tax_npc_02sup_score = coalesce(
-          feature_pred_tax_npc_02sup_score,
-          0
-        ),
-        feature_pred_tax_cla_03cla_val = coalesce(
-          feature_pred_tax_cla_03cla_val,
-          "dummy"
-        ),
-        consistency_structure_cla_cla = coalesce(
-          consistency_structure_cla_cla,
-          1
-        ),
-        feature_pred_tax_cla_03cla_score = coalesce(
-          feature_pred_tax_cla_03cla_score,
-          0
-        ),
-        feature_pred_tax_npc_03cla_val = coalesce(
-          feature_pred_tax_npc_03cla_val,
-          "dummy"
-        ),
-        consistency_structure_npc_cla = coalesce(
-          consistency_structure_npc_cla,
-          1
-        ),
-        feature_pred_tax_npc_03cla_score = coalesce(
-          feature_pred_tax_npc_03cla_score,
-          0
-        ),
-        feature_pred_tax_cla_04dirpar_val = coalesce(
-          feature_pred_tax_cla_04dirpar_val,
-          "dummy"
-        ),
-        consistency_structure_cla_par = coalesce(
-          consistency_structure_cla_par,
-          1
-        ),
-        feature_pred_tax_cla_04dirpar_score = coalesce(
-          feature_pred_tax_cla_04dirpar_score,
-          0
-        )
+        feature_pred_tax_cla_01kin_val = coalesce(feature_pred_tax_cla_01kin_val, "dummy"),
+        consistency_structure_cla_kin = coalesce(consistency_structure_cla_kin, 1),
+        feature_pred_tax_cla_01kin_score = coalesce(feature_pred_tax_cla_01kin_score, 0),
+        feature_pred_tax_npc_01pat_val = coalesce(feature_pred_tax_npc_01pat_val, "dummy"),
+        consistency_structure_npc_pat = coalesce(consistency_structure_npc_pat, 1),
+        feature_pred_tax_npc_01pat_score = coalesce(feature_pred_tax_npc_01pat_score, 0),
+        feature_pred_tax_cla_02sup_val = coalesce(feature_pred_tax_cla_02sup_val, "dummy"),
+        consistency_structure_cla_sup = coalesce(consistency_structure_cla_sup, 1),
+        feature_pred_tax_cla_02sup_score = coalesce(feature_pred_tax_cla_02sup_score, 0),
+        feature_pred_tax_npc_02sup_val = coalesce(feature_pred_tax_npc_02sup_val, "dummy"),
+        consistency_structure_npc_sup = coalesce(consistency_structure_npc_sup, 1),
+        feature_pred_tax_npc_02sup_score = coalesce(feature_pred_tax_npc_02sup_score, 0),
+        feature_pred_tax_cla_03cla_val = coalesce(feature_pred_tax_cla_03cla_val, "dummy"),
+        consistency_structure_cla_cla = coalesce(consistency_structure_cla_cla, 1),
+        feature_pred_tax_cla_03cla_score = coalesce(feature_pred_tax_cla_03cla_score, 0),
+        feature_pred_tax_npc_03cla_val = coalesce(feature_pred_tax_npc_03cla_val, "dummy"),
+        consistency_structure_npc_cla = coalesce(consistency_structure_npc_cla, 1),
+        feature_pred_tax_npc_03cla_score = coalesce(feature_pred_tax_npc_03cla_score, 0),
+        feature_pred_tax_cla_04dirpar_val = coalesce(feature_pred_tax_cla_04dirpar_val, "dummy"),
+        consistency_structure_cla_par = coalesce(consistency_structure_cla_par, 1),
+        feature_pred_tax_cla_04dirpar_score = coalesce(feature_pred_tax_cla_04dirpar_score, 0)
       )
 
     log_debug("adding already computed predictions back \n")

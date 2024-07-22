@@ -1,8 +1,24 @@
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+
 #' @title Prepare annotations SIRIUS
 #'
 #' @description This function prepares Sirius results to make them compatible
 #'
-#' @importFrom tidytable any_of bind_rows distinct filter left_join mutate select tidytable
+#' @importFrom tidytable any_of
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
+#' @importFrom tidytable tidytable
 #'
 #' @include columns_model.R
 #' @include get_params.R
@@ -181,7 +197,12 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_01kin = NA
         ) |>
         select_annotations_columns()
-      rm(structures_prepared, formulas_prepared, canopus_prepared, denovo_prepared)
+      rm(
+        structures_prepared,
+        formulas_prepared,
+        canopus_prepared,
+        denovo_prepared
+      )
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")

@@ -1,3 +1,5 @@
+import::from(stringi, stri_replace_all_regex, .into = environment())
+
 #' @title Replace ID in file paths
 #'
 #' @description This function replaces the default ID
@@ -68,7 +70,8 @@ replace_id <-
           test = !is.null(user_gnps),
           yes = user_gnps,
           no = user_filename
-        ), vectorize_all = FALSE
+        ),
+        vectorize_all = FALSE
       )
 
     final <- ifelse(test = path != file,

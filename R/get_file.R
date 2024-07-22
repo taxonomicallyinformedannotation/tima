@@ -1,3 +1,5 @@
+import::from(utils, download.file, .into = environment())
+
 #' @title Get file
 #'
 #' @description This function get files

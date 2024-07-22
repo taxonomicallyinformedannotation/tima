@@ -1,8 +1,18 @@
+import::from(jsonlite, stream_in, .into = environment())
+import::from(stringi, stri_sub, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, rename, .into = environment())
+
 #' @title Prepare libraries of structure organism pairs ECMDB
 #'
 #' @importFrom jsonlite stream_in
 #' @importFrom stringi stri_sub
-#' @importFrom tidytable as_tidytable distinct mutate rename
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable distinct
+#' @importFrom tidytable mutate
+#' @importFrom tidytable rename
 #'
 #' @include fake_sop_columns.R
 #' @include get_params.R
@@ -36,21 +46,14 @@ prepare_libraries_sop_ecmdb <-
         )
 
       ## Get rid of the annoying incomplete final line warning
-      ecmdb <- stream_in(con = unz(
-        description = input,
-        filename = file
-      )) |>
+      ecmdb <- stream_in(con = unz(description = input, filename = file)) |>
         data.frame() |>
         as_tidytable()
 
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         mutate(
-          structure_inchikey_2D = stri_sub(
-            str = moldb_inchikey,
-            from = 1,
-            to = 14
-          ),
+          structure_inchikey_2D = stri_sub(str = moldb_inchikey, from = 1, to = 14),
           ## ISSUE see #19
           structure_smiles_2D = NA_character_
         ) |>
@@ -97,7 +100,10 @@ prepare_libraries_sop_ecmdb <-
     }
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_libraries_sop_ecmdb"), step = "prepare_libraries_sop_closed")
+    export_params(
+      parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
+      step = "prepare_libraries_sop_closed"
+    )
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
     return(output)

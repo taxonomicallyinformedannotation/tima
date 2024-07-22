@@ -96,7 +96,12 @@ install_latest_version <- function() {
         {
           message("Installing remote version")
           pak::pkg_install(
-            pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
+            pkg = paste0(
+              "github::",
+              "taxonomicallyinformedannotation/tima-r@",
+              ref,
+              "?source&reinstall&nocache"
+            ),
             ask = FALSE,
             upgrade = FALSE
           )
@@ -113,7 +118,12 @@ install_latest_version <- function() {
         {
           message("Retrying remote version")
           pak::pkg_install(
-            pkg = paste0("github::", "taxonomicallyinformedannotation/tima-r@", ref, "?source&reinstall&nocache"),
+            pkg = paste0(
+              "github::",
+              "taxonomicallyinformedannotation/tima-r@",
+              ref,
+              "?source&reinstall&nocache"
+            ),
             ask = FALSE,
             upgrade = FALSE
           )

@@ -1,3 +1,15 @@
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, anti_join, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function prepares the libraries made of
@@ -6,7 +18,17 @@
 #' @details It can be restricted to specific taxa to have
 #'    more biologically meaningful annotation.
 #'
-#' @importFrom tidytable across anti_join as_tidytable bind_rows distinct filter fread left_join mutate select where
+#' @importFrom tidytable across
+#' @importFrom tidytable anti_join
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable fread
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
+#' @importFrom tidytable where
 #'
 #' @include get_organism_taxonomy_ott.R
 #' @include get_params.R
@@ -113,24 +135,15 @@ prepare_libraries_sop_merged <-
         bind_rows(
           table_org_tax_ott_full |>
             as_tidytable() |>
-            mutate(
-              across(
-                .cols = where(is.numeric),
-                .fns = as.character
-              )
-            ) |>
-            mutate(
-              across(
-                .cols = where(is.list),
-                .fns = as.character
-              )
-            ) |>
-            mutate(
-              across(
-                .cols = where(is.logical),
-                .fns = as.character
-              )
-            )
+            mutate(across(
+              .cols = where(is.numeric), .fns = as.character
+            )) |>
+            mutate(across(
+              .cols = where(is.list), .fns = as.character
+            )) |>
+            mutate(across(
+              .cols = where(is.logical), .fns = as.character
+            ))
         )
     }
 
@@ -177,35 +190,17 @@ prepare_libraries_sop_merged <-
     }
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_libraries_sop_merged"), step = "prepare_libraries_sop_merged")
-    export_output(
-      x = table_keys,
-      file = output_key
+    export_params(
+      parameters = get_params(step = "prepare_libraries_sop_merged"),
+      step = "prepare_libraries_sop_merged"
     )
-    export_output(
-      x = table_org_tax_ott,
-      file = output_org_tax_ott
-    )
-    export_output(
-      x = table_structures_stereo,
-      file = output_str_stereo
-    )
-    export_output(
-      x = table_structures_metadata,
-      file = output_str_met
-    )
-    export_output(
-      x = table_structures_names,
-      file = output_str_nam
-    )
-    export_output(
-      x = table_structures_taxonomy_cla,
-      file = output_str_tax_cla
-    )
-    export_output(
-      x = table_structures_taxonomy_npc,
-      file = output_str_tax_npc
-    )
+    export_output(x = table_keys, file = output_key)
+    export_output(x = table_org_tax_ott, file = output_org_tax_ott)
+    export_output(x = table_structures_stereo, file = output_str_stereo)
+    export_output(x = table_structures_metadata, file = output_str_met)
+    export_output(x = table_structures_names, file = output_str_nam)
+    export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
+    export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
 
     rm(
       table_keys,

@@ -1,3 +1,5 @@
+import::from(tidytable, filter, .into = environment())
+
 #' @title Export spectra 2
 #'
 #' @description This function export spectra.
@@ -15,17 +17,12 @@
 #' @export
 #'
 #' @examples NULL
-export_spectra_2 <- function(file,
-                             spectra,
-                             meta) {
+export_spectra_2 <- function(file, spectra, meta) {
   if (nrow(spectra |>
     filter(!is.na(compound_id))) != 0) {
     log_debug("Exporting")
     create_dir(export = file)
     spectra |>
-      export_spectra(
-        file = file,
-        metad = meta
-      )
+      export_spectra(file = file, metad = meta)
   }
 }

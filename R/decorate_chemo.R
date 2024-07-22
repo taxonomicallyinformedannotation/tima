@@ -1,9 +1,26 @@
+import::from(crayon, blue, .into = environment())
+import::from(crayon, cyan, .into = environment())
+import::from(crayon, green, .into = environment())
+import::from(crayon, magenta, .into = environment())
+import::from(crayon, red, .into = environment())
+import::from(crayon, silver, .into = environment())
+import::from(crayon, yellow, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+
 #' @title Decorate chemo
 #'
 #' @description This function outputs information about chemical weighting
 #'
-#' @importFrom crayon blue cyan green magenta red silver yellow
-#' @importFrom tidytable distinct filter
+#' @importFrom crayon blue
+#' @importFrom crayon cyan
+#' @importFrom crayon green
+#' @importFrom crayon magenta
+#' @importFrom crayon red
+#' @importFrom crayon silver
+#' @importFrom crayon yellow
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
 #'
 #' @param annot_table_wei_chemo Table to decorate
 #' @param score_chemical_cla_kingdom  Classyfire kingdom score
@@ -21,37 +38,21 @@
 #'
 #' @examples NULL
 decorate_chemo <- function(annot_table_wei_chemo =
-                             get("annot_table_wei_chemo",
-                               envir = parent.frame()
-                             ),
+                             get("annot_table_wei_chemo", envir = parent.frame()),
                            score_chemical_cla_kingdom =
-                             get("score_chemical_cla_kingdom",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_cla_kingdom", envir = parent.frame()),
                            score_chemical_cla_superclass =
-                             get("score_chemical_cla_superclass",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_cla_superclass", envir = parent.frame()),
                            score_chemical_cla_class =
-                             get("score_chemical_cla_class",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_cla_class", envir = parent.frame()),
                            score_chemical_cla_parent =
-                             get("score_chemical_cla_parent",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_cla_parent", envir = parent.frame()),
                            score_chemical_npc_pathway =
-                             get("score_chemical_npc_pathway",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_npc_pathway", envir = parent.frame()),
                            score_chemical_npc_superclass =
-                             get("score_chemical_npc_superclass",
-                               envir = parent.frame()
-                             ),
+                             get("score_chemical_npc_superclass", envir = parent.frame()),
                            score_chemical_npc_class =
-                             get("score_chemical_npc_class",
-                               envir = parent.frame()
-                             )) {
+                             get("score_chemical_npc_class", envir = parent.frame())) {
   df_cla_kin <- annot_table_wei_chemo |>
     filter(score_chemical >= score_chemical_cla_kingdom * 1) |>
     filter(

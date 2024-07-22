@@ -1,9 +1,16 @@
+import::from(MetaboCoreUtils, calculateMass, .into = environment())
+import::from(stringi, stri_extract_all_regex, .into = environment())
+import::from(stringi, stri_match_all_regex, .into = environment())
+import::from(stringi, stri_split_regex, .into = environment())
+
 #' @title Parse adduct
 #'
 #' @description This function parses adducts
 #'
 #' @importFrom MetaboCoreUtils calculateMass
-#' @importFrom stringi stri_extract_all_regex stri_match_all_regex stri_split_regex
+#' @importFrom stringi stri_extract_all_regex
+#' @importFrom stringi stri_match_all_regex
+#' @importFrom stringi stri_split_regex
 #'
 #' @param adduct_string Adduct to be parsed
 #' @param regex Regex used for parsing

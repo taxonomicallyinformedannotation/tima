@@ -5,7 +5,6 @@
 
 # Load packages required to define the pipeline:
 library(targets)
-pkgload::load_all()
 
 # Set target options:
 tar_option_set(

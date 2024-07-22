@@ -1,3 +1,25 @@
+import::from(stringi, stri_replace_all_fixed, .into = environment())
+import::from(tidyfst, col_rn, .into = environment())
+import::from(tidyfst, rn_col, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, all_of, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, everything, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, group_by, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, matches, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, pivot_longer, .into = environment())
+import::from(tidytable, rename, .into = environment())
+import::from(tidytable, replace_na, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, separate_rows, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Prepare taxa
 #'
 #' @description This function performs taxon name preparation
@@ -10,8 +32,26 @@
 #'    according to their relative intensities among the samples.
 #'
 #' @importFrom stringi stri_replace_all_fixed
-#' @importFrom tidyfst col_rn rn_col
-#' @importFrom tidytable across all_of arrange bind_rows distinct everything filter fread group_by left_join matches mutate pivot_longer rename replace_na select separate_rows where
+#' @importFrom tidyfst col_rn
+#' @importFrom tidyfst rn_col
+#' @importFrom tidytable across
+#' @importFrom tidytable all_of
+#' @importFrom tidytable arrange
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable everything
+#' @importFrom tidytable filter
+#' @importFrom tidytable fread
+#' @importFrom tidytable group_by
+#' @importFrom tidytable left_join
+#' @importFrom tidytable matches
+#' @importFrom tidytable mutate
+#' @importFrom tidytable pivot_longer
+#' @importFrom tidytable rename
+#' @importFrom tidytable replace_na
+#' @importFrom tidytable select
+#' @importFrom tidytable separate_rows
+#' @importFrom tidytable where
 #'
 #' @include clean_collapse.R
 #' @include get_params.R
@@ -82,11 +122,7 @@ prepare_taxa <-
               in columns (MZmine format)")
     log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
-      select(
-        all_of(c(name_features)),
-        matches(" Peak area"),
-        matches("quant_"),
-      ) |>
+      select(all_of(c(name_features)), matches(" Peak area"), matches("quant_"), ) |>
       select(-matches("quant_peaktable")) |>
       col_rn(var = name_features)
     colnames(feature_table) <- colnames(feature_table) |>
@@ -122,14 +158,13 @@ prepare_taxa <-
       filter(!is.na(!!as.name(colname))) |>
       distinct(!!as.name(colname)) |>
       select(organism = !!as.name(colname)) |>
-      separate_rows(organism,
-        sep = "\\|",
-      )
+      separate_rows(organism, sep = "\\|", )
 
     log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
     organism_table_filled <- organism_table |>
       left_join(
-        fread(org_tax_ott,
+        fread(
+          org_tax_ott,
           na.strings = c("", "NA"),
           colClasses = "character"
         ),
@@ -190,12 +225,8 @@ prepare_taxa <-
       )
     } else {
       metadata_table_joined <-
-        left_join(top_n,
-          metadata_table,
-          by = c("name" = name_filename)
-        ) |>
-        select(
-          feature_id := rowname,
+        left_join(top_n, metadata_table, by = c("name" = name_filename)) |>
+        select(feature_id := rowname,
           organismOriginal = all_of(colname),
           everything()
         )
@@ -223,12 +254,7 @@ prepare_taxa <-
         sample_organism_09_species = organism_taxonomy_09species,
         sample_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
-      mutate(
-        across(
-          .cols = everything(),
-          .fns = as.character
-        )
-      ) |>
+      mutate(across(.cols = everything(), .fns = as.character)) |>
       group_by(feature_id) |>
       clean_collapse(
         cols = c(
@@ -244,18 +270,19 @@ prepare_taxa <-
           "sample_organism_10_varietas"
         )
       ) |>
-      mutate(
-        across(
-          .cols = where(is.character),
-          .fns = function(x) {
-            replace_na(x, "ND")
-          }
-        )
-      )
+      mutate(across(
+        .cols = where(is.character),
+        .fns = function(x) {
+          replace_na(x, "ND")
+        }
+      ))
     rm(biological_metadata, metadata_table_joined)
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_taxa"), step = "prepare_taxa")
+    export_params(
+      parameters = get_params(step = "prepare_taxa"),
+      step = "prepare_taxa"
+    )
     export_output(x = taxed_features_table, file = output)
     rm(taxed_features_table)
     return(output)

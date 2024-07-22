@@ -1,9 +1,30 @@
+import::from(Spectra, peaksData, .into = environment())
+import::from(Spectra, spectraData, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, everything, .into = environment())
+import::from(tidytable, group_by, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, reframe, .into = environment())
+import::from(tidytable, rename, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Extract spectra from a Spectra object
 #'
 #' @description This function extracts spectra from a `Spectra`object
 #'
-#' @importFrom Spectra peaksData spectraData
-#' @importFrom tidytable across any_of as_tidytable everything group_by mutate reframe rename select
+#' @importFrom Spectra peaksData
+#' @importFrom Spectra spectraData
+#' @importFrom tidytable across
+#' @importFrom tidytable any_of
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable everything
+#' @importFrom tidytable group_by
+#' @importFrom tidytable mutate
+#' @importFrom tidytable reframe
+#' @importFrom tidytable rename
+#' @importFrom tidytable select
 #'
 #' @param object Object of class Spectra
 #'
@@ -29,10 +50,7 @@ extract_spectra <- function(object) {
     data.frame() |>
     as_tidytable() |>
     group_by(group) |>
-    reframe(across(
-      .cols = everything(),
-      .fns = list
-    ))
+    reframe(across(.cols = everything(), .fns = list))
 
   ## Extract spectra data and transform it into a data frame
   spectra <- object |>
@@ -55,25 +73,18 @@ extract_spectra <- function(object) {
 
   ## Columns types issue
   spectra <- spectra |>
-    mutate(across(
-      .cols = any_of(incoherent_logical),
-      .fns = as.logical
-    )) |>
-    mutate(across(
-      .cols = any_of(incoherent_integer),
-      .fns = as.integer
-    )) |>
-    mutate(across(
-      .cols = any_of(incoherent_numeric),
-      .fns = as.numeric
-    ))
+    mutate(across(.cols = any_of(incoherent_logical), .fns = as.logical)) |>
+    mutate(across(.cols = any_of(incoherent_integer), .fns = as.integer)) |>
+    mutate(across(.cols = any_of(incoherent_numeric), .fns = as.numeric))
 
   ## Select all columns except those specified in 'incoherent_colnames',
   ## and rename the remaining columns using the names in 'incoherent_colnames'
   incoherent_colnames <-
     incoherent_colnames[unname(incoherent_colnames) %in% colnames(spectra)]
   spectra <- spectra |>
-    select(-c(any_of(names(incoherent_colnames)))) |>
+    select(-c(any_of(names(
+      incoherent_colnames
+    )))) |>
     rename(any_of(incoherent_colnames))
 
   return(spectra)

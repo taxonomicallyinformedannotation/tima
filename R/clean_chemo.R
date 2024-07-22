@@ -1,9 +1,47 @@
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, contains, .into = environment())
+import::from(tidytable, dense_rank, .into = environment())
+import::from(tidytable, desc, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, everything, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, group_by, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, na_if, .into = environment())
+import::from(tidytable, pivot_longer, .into = environment())
+import::from(tidytable, reframe, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, ungroup, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Clean chemo
 #'
 #' @description This function cleans the results
 #'    obtained after chemical weighting
 #'
-#' @importFrom tidytable across any_of arrange bind_rows contains dense_rank desc distinct everything filter group_by left_join mutate na_if pivot_longer reframe select ungroup where
+#' @importFrom tidytable across
+#' @importFrom tidytable any_of
+#' @importFrom tidytable arrange
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable contains
+#' @importFrom tidytable dense_rank
+#' @importFrom tidytable desc
+#' @importFrom tidytable distinct
+#' @importFrom tidytable everything
+#' @importFrom tidytable filter
+#' @importFrom tidytable group_by
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable na_if
+#' @importFrom tidytable pivot_longer
+#' @importFrom tidytable reframe
+#' @importFrom tidytable select
+#' @importFrom tidytable ungroup
+#' @importFrom tidytable where
 #'
 #' @include clean_collapse.R
 #' @include columns_model.R
@@ -30,37 +68,16 @@
 #'
 #' @examples NULL
 clean_chemo <-
-  function(annot_table_wei_chemo = get("annot_table_wei_chemo",
-             envir = parent.frame()
-           ),
-           components_table = get("components_table",
-             envir = parent.frame()
-           ),
-           features_table = get("features_table",
-             envir = parent.frame()
-           ),
-           structure_organism_pairs_table = get(
-             "structure_organism_pairs_table",
-             envir = parent.frame()
-           ),
-           candidates_final = get("candidates_final",
-             envir = parent.frame()
-           ),
-           minimal_ms1_bio = get("minimal_ms1_bio",
-             envir = parent.frame()
-           ),
-           minimal_ms1_chemo = get("minimal_ms1_chemo",
-             envir = parent.frame()
-           ),
-           minimal_ms1_condition = get("minimal_ms1_condition",
-             envir = parent.frame()
-           ),
-           remove_ties = get("remove_ties",
-             envir = parent.frame()
-           ),
-           summarise = get("summarise",
-             envir = parent.frame()
-           )) {
+  function(annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
+           components_table = get("components_table", envir = parent.frame()),
+           features_table = get("features_table", envir = parent.frame()),
+           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
+           candidates_final = get("candidates_final", envir = parent.frame()),
+           minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
+           minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
+           minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
+           remove_ties = get("remove_ties", envir = parent.frame()),
+           summarise = get("summarise", envir = parent.frame())) {
     model <- columns_model()
 
     log_debug(
@@ -80,15 +97,27 @@ clean_chemo <-
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         filter(
-          (!is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)) |
-            (score_biological >= minimal_ms1_bio | score_chemical >= minimal_ms1_chemo)
+          (
+            !is.na(candidate_score_similarity) |
+              !is.na(candidate_score_sirius_csi)
+          ) |
+            (
+              score_biological >= minimal_ms1_bio |
+                score_chemical >= minimal_ms1_chemo
+            )
         )
     }
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         filter(
-          (!is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)) |
-            (score_biological >= minimal_ms1_bio & score_chemical >= minimal_ms1_chemo)
+          (
+            !is.na(candidate_score_similarity) |
+              !is.na(candidate_score_sirius_csi)
+          ) |
+            (
+              score_biological >= minimal_ms1_bio &
+                score_chemical >= minimal_ms1_chemo
+            )
         )
     }
 
@@ -99,9 +128,7 @@ clean_chemo <-
         .keep_all = TRUE
       ) |>
       mutate(
-        rank_initial = dense_rank(
-          -candidate_score_pseudo_initial
-        ),
+        rank_initial = dense_rank(-candidate_score_pseudo_initial),
         rank_final = dense_rank(-score_pondered_chemo),
         .by = c(feature_id)
       ) |>
@@ -126,61 +153,62 @@ clean_chemo <-
       #     sep = "\u00a7"
       #   )
       # ) |>
-      select(any_of(c(
-        "feature_id",
-        "feature_rt" = "rt",
-        "feature_mz" = "mz",
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        model$rank_columns,
-        "score_initial" = "candidate_score_pseudo_initial",
-        "score_biological",
-        "score_interim" = "score_pondered_bio",
-        "score_chemical",
-        "score_final" = "score_pondered_chemo"
-      ))) |>
+      select(any_of(
+        c(
+          "feature_id",
+          "feature_rt" = "rt",
+          "feature_mz" = "mz",
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          "score_initial" = "candidate_score_pseudo_initial",
+          "score_biological",
+          "score_interim" = "score_pondered_bio",
+          "score_chemical",
+          "score_final" = "score_pondered_chemo"
+        )
+      )) |>
       distinct() |>
       log_pipe("adding references \n") |>
-      left_join(structure_organism_pairs_table |>
-        select(
-          candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
-          reference_doi,
-          organism_name,
-          contains("organism_taxonomy_"),
-          -organism_taxonomy_ottid
-        ) |>
-        distinct() |>
-        pivot_longer(contains("organism_taxonomy_")) |>
-        filter(!is.na(value)) |>
-        filter(value != "notClassified") |>
-        distinct(
-          candidate_structure_inchikey_no_stereo,
-          candidate_structure_organism_occurrence_closest = value,
-          candidate_structure_organism_occurrence_reference = reference_doi
-        )) |>
-      group_by(
-        c(-candidate_structure_organism_occurrence_reference)
+      left_join(
+        structure_organism_pairs_table |>
+          select(
+            candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+            reference_doi,
+            organism_name,
+            contains("organism_taxonomy_"), -organism_taxonomy_ottid
+          ) |>
+          distinct() |>
+          pivot_longer(contains("organism_taxonomy_")) |>
+          filter(!is.na(value)) |>
+          filter(value != "notClassified") |>
+          distinct(
+            candidate_structure_inchikey_no_stereo,
+            candidate_structure_organism_occurrence_closest = value,
+            candidate_structure_organism_occurrence_reference = reference_doi
+          )
       ) |>
-      clean_collapse(
-        cols = c("candidate_structure_organism_occurrence_reference")
-      ) |>
-      select(any_of(c(
-        model$features_columns,
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        model$rank_columns,
-        model$score_columns
-      ))) |>
+      group_by(c(-candidate_structure_organism_occurrence_reference)) |>
+      clean_collapse(cols = c("candidate_structure_organism_occurrence_reference")) |>
+      select(any_of(
+        c(
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          model$score_columns
+        )
+      )) |>
       arrange(rank_final) |>
       ungroup()
     rm(df1)
@@ -216,10 +244,7 @@ clean_chemo <-
 
       df5 <- df4 |>
         left_join(df3 |>
-          select(
-            "feature_id",
-            !colnames(df4)
-          ) |>
+          select("feature_id", !colnames(df4)) |>
           distinct())
       rm(df4)
     } else {
@@ -229,26 +254,14 @@ clean_chemo <-
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
-      mutate(
-        across(
-          .cols = everything(),
-          .fns = as.character
-        )
-      ) |>
-      mutate(
-        across(
-          .cols = where(is.character),
-          .fns = trimws
-        )
-      ) |>
-      mutate(
-        across(
-          .cols = where(is.character),
-          .fns = function(x) {
-            na_if(x, "")
-          }
-        )
-      ) |>
+      mutate(across(.cols = everything(), .fns = as.character)) |>
+      mutate(across(.cols = where(is.character), .fns = trimws)) |>
+      mutate(across(
+        .cols = where(is.character),
+        .fns = function(x) {
+          na_if(x, "")
+        }
+      )) |>
       select(any_of(
         c(
           model$features_columns,
@@ -268,16 +281,17 @@ clean_chemo <-
     log_debug("adding consensus again to droped candidates \n")
     results <- bind_rows(
       df6 |>
-        filter(!is.na(candidate_structure_inchikey_no_stereo)),
+        filter(!is.na(
+          candidate_structure_inchikey_no_stereo
+        )),
       left_join(
         df6 |>
-          filter(is.na(candidate_structure_inchikey_no_stereo)) |>
+          filter(is.na(
+            candidate_structure_inchikey_no_stereo
+          )) |>
           distinct(model$features_columns),
         annot_table_wei_chemo |>
-          mutate(across(
-            .cols = everything(),
-            .fns = as.character
-          ))
+          mutate(across(.cols = everything(), .fns = as.character))
       ) |>
         select(any_of(
           c(

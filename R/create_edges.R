@@ -1,3 +1,5 @@
+import::from(tidytable, bind_rows, .into = environment())
+
 #' @title Create edges
 #'
 #' @description This function applies similarity calculation to a list of

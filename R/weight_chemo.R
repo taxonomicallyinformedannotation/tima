@@ -1,10 +1,25 @@
+import::from(stringi, stri_detect_regex, .into = environment())
+import::from(tidytable, contains, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, right_join, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Weight chemo
 #'
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
 #' @importFrom stringi stri_detect_regex
-#' @importFrom tidytable contains distinct filter left_join mutate right_join select
+#' @importFrom tidytable contains
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable right_join
+#' @importFrom tidytable select
 #'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation
@@ -33,39 +48,17 @@
 #'
 #' @examples NULL
 weight_chemo <-
-  function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean",
-             envir = parent.frame()
-           ),
-           weight_spectral = get("weight_spectral",
-             envir = parent.frame()
-           ),
-           weight_biological = get("weight_biological",
-             envir = parent.frame()
-           ),
-           weight_chemical = get("weight_chemical",
-             envir = parent.frame()
-           ),
-           score_chemical_cla_kingdom = get("score_chemical_cla_kingdom",
-             envir = parent.frame()
-           ),
-           score_chemical_cla_superclass = get("score_chemical_cla_superclass",
-             envir = parent.frame()
-           ),
-           score_chemical_cla_class = get("score_chemical_cla_class",
-             envir = parent.frame()
-           ),
-           score_chemical_cla_parent = get("score_chemical_cla_parent",
-             envir = parent.frame()
-           ),
-           score_chemical_npc_pathway = get("score_chemical_npc_pathway",
-             envir = parent.frame()
-           ),
-           score_chemical_npc_superclass = get("score_chemical_npc_superclass",
-             envir = parent.frame()
-           ),
-           score_chemical_npc_class = get("score_chemical_npc_class",
-             envir = parent.frame()
-           )) {
+  function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),
+           weight_spectral = get("weight_spectral", envir = parent.frame()),
+           weight_biological = get("weight_biological", envir = parent.frame()),
+           weight_chemical = get("weight_chemical", envir = parent.frame()),
+           score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
+           score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir = parent.frame()),
+           score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
+           score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
+           score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
+           score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
+           score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())) {
     df2 <- annot_table_wei_bio_clean |>
       distinct(
         candidate_structure_tax_cla_01kin,
@@ -197,13 +190,17 @@ weight_chemo <-
           na.rm = TRUE
         )
       ) |>
-      select(
-        -contains("score_chemical_")
-      ) |>
+      select(-contains("score_chemical_")) |>
       right_join(annot_table_wei_bio_clean) |>
       log_pipe("... calculating weighted chemical score \n") |>
       mutate(
-        score_pondered_chemo = (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_chemical * score_chemical + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_chemical + weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
+        score_pondered_chemo = (1 / (
+          weight_chemical + weight_biological + weight_spectral
+        )) * weight_chemical * score_chemical + (1 / (
+          weight_chemical + weight_biological + weight_spectral
+        )) * weight_biological * score_biological + (1 / (
+          weight_chemical + weight_biological + weight_spectral
+        )) * weight_spectral * candidate_score_pseudo_initial
       )
 
     rm(

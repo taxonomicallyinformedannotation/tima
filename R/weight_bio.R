@@ -1,10 +1,43 @@
+import::from(stringi, stri_detect_regex, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, case_when, .into = environment())
+import::from(tidytable, contains, .into = environment())
+import::from(tidytable, desc, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, inner_join, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, matches, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, na_if, .into = environment())
+import::from(tidytable, replace_na, .into = environment())
+import::from(tidytable, right_join, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Weight bio
 #'
 #' @description This function weights the eventually MS1
 #' complemented annotations according their biological source
 #'
 #' @importFrom stringi stri_detect_regex
-#' @importFrom tidytable across arrange case_when contains desc distinct filter inner_join left_join matches mutate na_if replace_na right_join select where
+#' @importFrom tidytable across
+#' @importFrom tidytable arrange
+#' @importFrom tidytable case_when
+#' @importFrom tidytable contains
+#' @importFrom tidytable desc
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable inner_join
+#' @importFrom tidytable left_join
+#' @importFrom tidytable matches
+#' @importFrom tidytable mutate
+#' @importFrom tidytable na_if
+#' @importFrom tidytable replace_na
+#' @importFrom tidytable right_join
+#' @importFrom tidytable select
+#' @importFrom tidytable where
 #'
 #' @param annotation_table_taxed Table containing the initial annotation
 #' eventually complemented by additional MS1 annotations
@@ -39,48 +72,20 @@
 #'
 #' @examples NULL
 weight_bio <-
-  function(annotation_table_taxed = get("annotation_table_taxed",
-             envir = parent.frame()
-           ),
-           structure_organism_pairs_table = get("structure_organism_pairs_table",
-             envir = parent.frame()
-           ),
-           weight_spectral = get("weight_spectral",
-             envir = parent.frame()
-           ),
-           weight_biological = get("weight_biological",
-             envir = parent.frame()
-           ),
-           score_biological_domain = get("score_biological_domain",
-             envir = parent.frame()
-           ),
-           score_biological_kingdom = get("score_biological_kingdom",
-             envir = parent.frame()
-           ),
-           score_biological_phylum = get("score_biological_phylum",
-             envir = parent.frame()
-           ),
-           score_biological_class = get("score_biological_class",
-             envir = parent.frame()
-           ),
-           score_biological_order = get("score_biological_order",
-             envir = parent.frame()
-           ),
-           score_biological_family = get("score_biological_family",
-             envir = parent.frame()
-           ),
-           score_biological_tribe = get("score_biological_tribe",
-             envir = parent.frame()
-           ),
-           score_biological_genus = get("score_biological_genus",
-             envir = parent.frame()
-           ),
-           score_biological_species = get("score_biological_species",
-             envir = parent.frame()
-           ),
-           score_biological_variety = get("score_biological_variety",
-             envir = parent.frame()
-           )) {
+  function(annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
+           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
+           weight_spectral = get("weight_spectral", envir = parent.frame()),
+           weight_biological = get("weight_biological", envir = parent.frame()),
+           score_biological_domain = get("score_biological_domain", envir = parent.frame()),
+           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
+           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
+           score_biological_class = get("score_biological_class", envir = parent.frame()),
+           score_biological_order = get("score_biological_order", envir = parent.frame()),
+           score_biological_family = get("score_biological_family", envir = parent.frame()),
+           score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
+           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
+           score_biological_species = get("score_biological_species", envir = parent.frame()),
+           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
     df0 <- annotation_table_taxed |>
       distinct(
         candidate_structure_tax_cla_01kin,
@@ -92,14 +97,12 @@ weight_bio <-
         candidate_structure_tax_cla_04dirpar
       ) |>
       log_pipe("adding \"notClassified\" \n") |>
-      mutate(
-        across(
-          .cols = matches("candidate_structure_"),
-          .fns = function(x) {
-            replace_na(x, "notClassified")
-          }
-        )
-      )
+      mutate(across(
+        .cols = matches("candidate_structure_"),
+        .fns = function(x) {
+          replace_na(x, "notClassified")
+        }
+      ))
 
     df1 <- annotation_table_taxed |>
       select(
@@ -190,7 +193,11 @@ weight_bio <-
 
     log_debug("calculating biological score at all levels ... \n")
     score_per_level_bio <-
-      function(df, candidates, samples, score, score_name) {
+      function(df,
+               candidates,
+               samples,
+               score,
+               score_name) {
         score <- df |>
           distinct(!!as.name(candidates), !!as.name(samples)) |>
           filter(!is.na(!!as.name(samples))) |>
@@ -372,42 +379,42 @@ weight_bio <-
           na.rm = TRUE
         )
       ) |>
-      select(
-        -contains("score_biological_")
+      select(-contains("score_biological_")) |>
+      mutate(
+        candidate_structure_organism_occurrence_closest = case_when(
+          score_biological == score_biological_domain
+          ~ candidate_organism_01_domain,
+          score_biological == score_biological_kingdom
+          ~ candidate_organism_02_kingdom,
+          score_biological == score_biological_phylum
+          ~ candidate_organism_03_phylum,
+          score_biological == score_biological_class
+          ~ candidate_organism_04_class,
+          score_biological == score_biological_order
+          ~ candidate_organism_05_order,
+          # score_biological == score_biological_05_1 ~
+          # candidate_organism_05_1_infraorder,
+          score_biological == score_biological_family
+          ~ candidate_organism_06_family,
+          # score_biological == score_biological_06_1 ~
+          # candidate_organism_06_1_subfamily,
+          score_biological == score_biological_tribe
+          ~ candidate_organism_07_tribe,
+          # score_biological == score_biological_07_1 ~
+          # candidate_organism_07_1_subtribe,
+          score_biological == score_biological_genus
+          ~ candidate_organism_08_genus,
+          # score_biological == score_biological_08_1 ~
+          # candidate_organism_08_1_subgenus,
+          score_biological == score_biological_species
+          ~ candidate_organism_09_species,
+          # score_biological == score_biological_09_1 ~
+          # candidate_organism_09_1_subspecies,
+          score_biological == score_biological_variety ~
+            candidate_organism_10_varietas,
+          .default = NA_character_
+        )
       ) |>
-      mutate(candidate_structure_organism_occurrence_closest = case_when(
-        score_biological == score_biological_domain
-        ~ candidate_organism_01_domain,
-        score_biological == score_biological_kingdom
-        ~ candidate_organism_02_kingdom,
-        score_biological == score_biological_phylum
-        ~ candidate_organism_03_phylum,
-        score_biological == score_biological_class
-        ~ candidate_organism_04_class,
-        score_biological == score_biological_order
-        ~ candidate_organism_05_order,
-        # score_biological == score_biological_05_1 ~
-        # candidate_organism_05_1_infraorder,
-        score_biological == score_biological_family
-        ~ candidate_organism_06_family,
-        # score_biological == score_biological_06_1 ~
-        # candidate_organism_06_1_subfamily,
-        score_biological == score_biological_tribe
-        ~ candidate_organism_07_tribe,
-        # score_biological == score_biological_07_1 ~
-        # candidate_organism_07_1_subtribe,
-        score_biological == score_biological_genus
-        ~ candidate_organism_08_genus,
-        # score_biological == score_biological_08_1 ~
-        # candidate_organism_08_1_subgenus,
-        score_biological == score_biological_species
-        ~ candidate_organism_09_species,
-        # score_biological == score_biological_09_1 ~
-        # candidate_organism_09_1_subspecies,
-        score_biological == score_biological_variety ~
-          candidate_organism_10_varietas,
-        .default = NA_character_
-      )) |>
       right_join(df1) |>
       arrange(desc(score_biological)) |>
       distinct(
@@ -438,16 +445,16 @@ weight_bio <-
       log_pipe("... calculating weighted biological score \n") |>
       ## ISSUE see #146
       mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
-      mutate(interim_2 = ifelse(test = interim > 1,
-        yes = 1,
-        no = interim
-      )) |>
-      mutate(candidate_score_pseudo_initial = case_when(
-        !is.na(candidate_score_similarity) & !is.na(interim_2) ~ (as.numeric(candidate_score_similarity) + interim_2) / 2,
-        !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
-        !is.na(interim_2) ~ interim_2,
-        TRUE ~ 0
-      )) |>
+      mutate(interim_2 = ifelse(test = interim > 1, yes = 1, no = interim)) |>
+      mutate(
+        candidate_score_pseudo_initial = case_when(
+          !is.na(candidate_score_similarity) &
+            !is.na(interim_2) ~ (as.numeric(candidate_score_similarity) + interim_2) / 2,
+          !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
+          !is.na(interim_2) ~ interim_2,
+          TRUE ~ 0
+        )
+      ) |>
       select(-interim, -interim_2) |>
       mutate(
         score_pondered_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial

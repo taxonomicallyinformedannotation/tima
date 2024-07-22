@@ -1,3 +1,5 @@
+import::from(yaml, read_yaml, .into = environment())
+
 #' @title Parse YAML parameters
 #'
 #' @description This function parses YAML parameters
@@ -12,12 +14,8 @@
 #' @export
 #'
 #' @examples NULL
-parse_yaml_params <- function(def = get("default_path",
-                                envir = parent.frame()
-                              ),
-                              usr = get("user_path",
-                                envir = parent.frame()
-                              )) {
+parse_yaml_params <- function(def = get("default_path", envir = parent.frame()),
+                              usr = get("user_path", envir = parent.frame())) {
   ## Read the default YAML file
   params <- read_yaml(file = def)
 
