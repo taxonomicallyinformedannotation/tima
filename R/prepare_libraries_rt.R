@@ -1,3 +1,21 @@
+import::from(jsonlite, fromJSON, .into = environment())
+import::from(pbapply, pblapply, .into = environment())
+import::from(stringi, stri_sub, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, na_if, .into = environment())
+import::from(tidytable, rowwise, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+import::from(tidytable, where, .into = environment())
+import::from(utils, URLencode, .into = environment())
+
 #' @title Prepare libraries of retention times
 #'
 #' @description This function prepares retention times libraries
@@ -6,7 +24,19 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom pbapply pblapply
 #' @importFrom stringi stri_sub
-#' @importFrom tidytable across any_of as_tidytable bind_rows distinct filter left_join na_if mutate rowwise select tidytable where
+#' @importFrom tidytable across
+#' @importFrom tidytable any_of
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable na_if
+#' @importFrom tidytable rowwise
+#' @importFrom tidytable select
+#' @importFrom tidytable tidytable
+#' @importFrom tidytable where
 #' @importFrom utils URLencode
 #'
 #' @include get_params.R
@@ -60,40 +90,40 @@ prepare_libraries_rt <-
       }
     }
     mgf_exp <- mgf_exp |>
-      lapply(
-        FUN = full_or_null
-      )
+      lapply(FUN = full_or_null)
     mgf_exp <- mgf_exp[mgf_exp |>
-      lapply(FUN = function(x) {
-        !is.null(x)
-      }) |>
+      lapply(
+        FUN = function(x) {
+          !is.null(x)
+        }
+      ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      lapply(
-        FUN = full_or_null
-      )
+      lapply(FUN = full_or_null)
     mgf_is <- mgf_is[mgf_is |>
-      lapply(FUN = function(x) {
-        !is.null(x)
-      }) |>
+      lapply(
+        FUN = function(x) {
+          !is.null(x)
+        }
+      ) |>
       unlist()]
     mgf_exp <- mgf_exp |>
-      lapply(
-        FUN = full_or_null
-      )
+      lapply(FUN = full_or_null)
     temp_exp <- temp_exp[temp_exp |>
-      lapply(FUN = function(x) {
-        !is.null(x)
-      }) |>
+      lapply(
+        FUN = function(x) {
+          !is.null(x)
+        }
+      ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      lapply(
-        FUN = full_or_null
-      )
+      lapply(FUN = full_or_null)
     temp_is <- temp_is[temp_is |>
-      lapply(FUN = function(x) {
-        !is.null(x)
-      }) |>
+      lapply(
+        FUN = function(x) {
+          !is.null(x)
+        }
+      ) |>
       unlist()]
     if (length(mgf_exp) == 0) {
       mgf_exp <- NULL
@@ -146,21 +176,13 @@ prepare_libraries_rt <-
       }
 
     polish_df <-
-      function(df,
-               type = "experimental",
-               unit = unit_rt) {
+      function(df, type = "experimental", unit = unit_rt) {
         df_polished <- df |>
           data.frame() |>
           mutate(type = type) |>
           rowwise() |>
-          mutate(rt = ifelse(unit == "seconds",
-            yes = as.numeric(rt) / 60,
-            no = rt
-          )) |>
-          bind_rows(data.frame(
-            inchikey = NA_character_,
-            smiles = NA_character_
-          )) |>
+          mutate(rt = ifelse(unit == "seconds", yes = as.numeric(rt) / 60, no = rt)) |>
+          bind_rows(data.frame(inchikey = NA_character_, smiles = NA_character_)) |>
           filter(!is.na(rt)) |>
           filter(!is.na(smiles)) |>
           distinct()
@@ -197,33 +219,24 @@ prepare_libraries_rt <-
         )
       }
 
-      inchikey <- pblapply(
-        X = smiles,
-        FUN = get_inchikey
-      ) |>
+      inchikey <- pblapply(X = smiles, FUN = get_inchikey) |>
         as.character()
       df_missing <- df_missing |>
         select(-inchikey) |>
-        left_join(tidytable(
-          smiles,
-          inchikey
-        ))
+        left_join(tidytable(smiles, inchikey))
       rm(smiles)
 
       df_completed <- df_full |>
         bind_rows(df_missing) |>
-        mutate(
-          across(
-            .cols = where(is.character),
-            .fns = function(x) {
-              na_if(x, "NA")
-            }
-          )
-        )
+        mutate(across(
+          .cols = where(is.character),
+          .fns = function(x) {
+            na_if(x, "NA")
+          }
+        ))
       rm(df_full, df_missing)
       df_completed <- df_completed |>
-        select(
-          rt,
+        select(rt,
           structure_smiles = smiles,
           structure_inchikey = inchikey,
           type
@@ -283,46 +296,32 @@ prepare_libraries_rt <-
       rts_is_2 <- empty_df
     }
 
-    df_rts <- bind_rows(
-      rts_exp_1,
-      rts_exp_2,
-      rts_is_1,
-      rts_is_2
-    ) |>
+    df_rts <- bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2) |>
       filter(!is.na(as.numeric(rt))) |>
       filter(!is.na((structure_inchikey)))
     rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
     sop <- df_rts |>
-      select(
-        structure_smiles,
-        structure_inchikey
-      ) |>
+      select(structure_smiles, structure_inchikey) |>
       distinct() |>
       mutate(
-        structure_inchikey_no_stereo = stri_sub(
-          str = structure_inchikey,
-          from = 1,
-          to = 14
-        ),
+        structure_inchikey_no_stereo = stri_sub(str = structure_inchikey, from = 1, to = 14),
         organism_name = NA_character_
       )
 
     rts <- df_rts |>
       select(-structure_smiles) |>
       distinct() |>
-      mutate(candidate_structure_inchikey_no_stereo = gsub(
-        pattern = "-.*",
-        replacement = "",
-        x = structure_inchikey,
-        perl = TRUE
-      )) |>
+      mutate(
+        candidate_structure_inchikey_no_stereo = gsub(
+          pattern = "-.*",
+          replacement = "",
+          x = structure_inchikey,
+          perl = TRUE
+        )
+      ) |>
       ## TODO REMINDER FOR NOW
-      distinct(
-        rt,
-        candidate_structure_inchikey_no_stereo,
-        type
-      )
+      distinct(rt, candidate_structure_inchikey_no_stereo, type)
     rm(df_rts)
 
     if (nrow(rts) == 0) {
@@ -343,14 +342,12 @@ prepare_libraries_rt <-
         type = NA_character_
       )
     }
-    export_params(parameters = get_params(step = "prepare_libraries_rt"), step = "prepare_libraries_rt")
+    export_params(
+      parameters = get_params(step = "prepare_libraries_rt"),
+      step = "prepare_libraries_rt"
+    )
     export_output(x = rts, file = output_rt)
     export_output(x = sop, file = output_sop)
     rm(rts, sop)
-    return(
-      c(
-        "rt" = output_rt,
-        "sop" = output_sop
-      )
-    )
+    return(c("rt" = output_rt, "sop" = output_sop))
   }

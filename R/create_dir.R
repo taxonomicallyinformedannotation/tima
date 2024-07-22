@@ -12,7 +12,11 @@
 #' @examples create_dir(export = "path/to/directory_of_file")
 create_dir <- function(export) {
   ## Check if the export path includes a file name
-  if (grepl(pattern = ".", x = export, fixed = TRUE)) {
+  if (grepl(
+    pattern = ".",
+    x = export,
+    fixed = TRUE
+  )) {
     dirname_path <- dirname(export)
   } else {
     dirname_path <- export

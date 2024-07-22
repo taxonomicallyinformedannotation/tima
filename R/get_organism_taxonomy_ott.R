@@ -1,13 +1,65 @@
+import::from(httr2, req_error, .into = environment())
+import::from(httr2, req_method, .into = environment())
+import::from(httr2, req_perform, .into = environment())
+import::from(httr2, request, .into = environment())
+import::from(httr2, resp_status_desc, .into = environment())
+import::from(rotl, tax_lineage, .into = environment())
+import::from(rotl, taxonomy_taxon_info, .into = environment())
+import::from(rotl, tnrs_match_names, .into = environment())
+import::from(stringi, stri_replace_all_fixed, .into = environment())
+import::from(stringi, stri_replace_all_regex, .into = environment())
+import::from(tidyfst, set, .into = environment())
+import::from(tidyfst, setDT, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, desc, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, matches, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, pivot_wider, .into = environment())
+import::from(tidytable, rename, .into = environment())
+import::from(tidytable, row_number, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
 #'
 #' @description This function retrieves taxonomy
 #'    from the Open Tree of Life taxonomy
 #'
-#' @importFrom httr2 req_error req_method req_perform resp_status_desc request
-#' @importFrom rotl tax_lineage taxonomy_taxon_info tnrs_match_names
-#' @importFrom stringi stri_replace_all_fixed stri_replace_all_regex
-#' @importFrom tidyfst set setDT
-#' @importFrom tidytable across arrange as_tidytable bind_rows desc distinct filter left_join matches mutate pivot_wider rename row_number select tidytable where
+#' @importFrom httr2 req_error
+#' @importFrom httr2 req_method
+#' @importFrom httr2 req_perform
+#' @importFrom httr2 request
+#' @importFrom httr2 resp_status_desc
+#' @importFrom rotl tax_lineage
+#' @importFrom rotl taxonomy_taxon_info
+#' @importFrom rotl tnrs_match_names
+#' @importFrom stringi stri_replace_all_fixed
+#' @importFrom stringi stri_replace_all_regex
+#' @importFrom tidyfst set
+#' @importFrom tidyfst setDT
+#' @importFrom tidytable across
+#' @importFrom tidytable arrange
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable desc
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable left_join
+#' @importFrom tidytable matches
+#' @importFrom tidytable mutate
+#' @importFrom tidytable pivot_wider
+#' @importFrom tidytable rename
+#' @importFrom tidytable row_number
+#' @importFrom tidytable select
+#' @importFrom tidytable tidytable
+#' @importFrom tidytable where
 #'
 #' @param df Dataframe containing your organism(s) name(s)
 #' @param url url of the ott api (for testing purposes)
@@ -18,9 +70,7 @@
 #' @export
 #'
 #' @examples NULL
-get_organism_taxonomy_ott <- function(df,
-                                      url = "https://api.opentreeoflife.org/v3/taxonomy/about",
-                                      retry = TRUE) {
+get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about", retry = TRUE) {
   organism_table <- df |>
     as_tidytable() |>
     mutate(organism = organism |>
@@ -43,14 +93,8 @@ get_organism_taxonomy_ott <- function(df,
     ) |>
     distinct() |>
     mutate(search_string = tolower(organism)) |>
-    distinct(
-      organism,
-      search_string
-    ) |>
-    select(
-      canonical_name = organism,
-      search_string
-    ) |>
+    distinct(organism, search_string) |>
+    select(canonical_name = organism, search_string) |>
     filter(!is.na(canonical_name))
 
   organisms <- organism_table$canonical_name
@@ -88,9 +132,12 @@ get_organism_taxonomy_ott <- function(df,
     ## cutting in smaller requests
     cut <- 100
     organisms_split <-
-      lapply(X = seq(1, length(organisms), cut), FUN = function(i) {
-        organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
-      })
+      lapply(
+        X = seq(1, length(organisms), cut),
+        FUN = function(i) {
+          organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
+        }
+      )
     new_matched_otl_exact_list <- organisms_split |>
       lapply(
         FUN = function(x) {
@@ -105,17 +152,13 @@ get_organism_taxonomy_ott <- function(df,
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
       bind_rows() |>
-      mutate(
-        across(
-          .cols = where(is.logical),
-          .fns = as.character
-        )
-      )
+      mutate(across(.cols = where(is.logical), .fns = as.character))
     new_ott_id <- new_matched_otl_exact |>
       filter(!is.na(ott_id)) |>
       distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
+    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
+      retry == TRUE) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         filter(!is.na(ott_id))
@@ -145,9 +188,12 @@ get_organism_taxonomy_ott <- function(df,
       ## TODO make it cleaner
       cut <- 100
       organisms_new_split <-
-        lapply(X = seq(1, length(organisms_new), cut), FUN = function(i) {
-          organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
-        })
+        lapply(
+          X = seq(1, length(organisms_new), cut),
+          FUN = function(i) {
+            organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
+          }
+        )
       log_debug("Retrying with", organisms_new)
       new_matched_otl_exact_list_2 <- organisms_new_split |>
         lapply(
@@ -163,12 +209,7 @@ get_organism_taxonomy_ott <- function(df,
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         bind_rows() |>
         filter(!is.na(ott_id)) |>
-        mutate(
-          across(
-            .cols = where(is.logical),
-            .fns = as.character
-          )
-        )
+        mutate(across(.cols = where(is.logical), .fns = as.character))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
         distinct(ott_id)
 
@@ -192,18 +233,20 @@ get_organism_taxonomy_ott <- function(df,
         tax_lineage()
 
       list_df <- seq_along(taxon_lineage) |>
-        lapply(FUN = function(x) {
-          bind_rows(
-            data.frame(
-              id = otts[x],
-              rank = taxon_info[[x]]$rank,
-              name = taxon_info[[x]]$name,
-              unique_name = taxon_info[[x]]$unique_name,
-              ott_id = as.character(taxon_info[[x]]$ott_id)
-            ),
-            data.frame(id = otts[x], taxon_lineage[[x]])
-          )
-        })
+        lapply(
+          FUN = function(x) {
+            bind_rows(
+              data.frame(
+                id = otts[x],
+                rank = taxon_info[[x]]$rank,
+                name = taxon_info[[x]]$name,
+                unique_name = taxon_info[[x]]$unique_name,
+                ott_id = as.character(taxon_info[[x]]$ott_id)
+              ),
+              data.frame(id = otts[x], taxon_lineage[[x]])
+            )
+          }
+        )
 
       otl <- bind_rows(list_df) |>
         mutate(ott_id = as.integer(ott_id)) |>
@@ -227,10 +270,7 @@ get_organism_taxonomy_ott <- function(df,
       left_join(organism_table, new_matched_otl_exact) |>
       left_join(
         otl |>
-          rename(
-            unique_name.y = unique_name,
-            ott_id.y = ott_id
-          ),
+          rename(unique_name.y = unique_name, ott_id.y = ott_id),
         by = c("ott_id" = "id")
       ) |>
       filter(

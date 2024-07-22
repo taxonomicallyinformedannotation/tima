@@ -1,8 +1,26 @@
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, add_count, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, group_by, .into = environment())
+import::from(tidytable, replace_na, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, ungroup, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Split Structure Organism Pairs table
 #'
 #' @description This function splits the structure organism table.
 #'
-#' @importFrom tidytable across add_count distinct filter group_by replace_na select ungroup where
+#' @importFrom tidytable across
+#' @importFrom tidytable add_count
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable group_by
+#' @importFrom tidytable replace_na
+#' @importFrom tidytable select
+#' @importFrom tidytable ungroup
+#' @importFrom tidytable where
 #'
 #' @include clean_collapse.R
 #'
@@ -32,11 +50,7 @@ split_tables_sop <- function(table) {
     ungroup() |>
     filter(!is.na(reference_doi) | n == 1) |>
     select(-n)
-  log_debug(
-    x = "Led to",
-    nrow(table_keys),
-    "referenced structure-organism pairs"
-  )
+  log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
 
   table_structures_stereo <- table |>
     filter(!is.na(structure_inchikey)) |>
@@ -83,16 +97,9 @@ split_tables_sop <- function(table) {
     filter(!is.na(structure_inchikey)) |>
     filter(!is.na(structure_smiles)) |>
     filter(!is.na(structure_name)) |>
-    select(
-      structure_inchikey,
-      structure_smiles,
-      structure_name
-    ) |>
+    select(structure_inchikey, structure_smiles, structure_name) |>
     distinct() |>
-    group_by(
-      structure_inchikey,
-      structure_smiles
-    ) |>
+    group_by(structure_inchikey, structure_smiles) |>
     clean_collapse(cols = c("structure_name"))
 
   table_structures_taxonomy_npc <- table |>
@@ -110,19 +117,19 @@ split_tables_sop <- function(table) {
     ) |>
     distinct() |>
     group_by(structure_smiles_no_stereo) |>
-    clean_collapse(cols = c(
-      "structure_tax_npc_01pat",
-      "structure_tax_npc_02sup",
-      "structure_tax_npc_03cla"
-    )) |>
-    mutate(
-      across(
-        .cols = where(is.character),
-        .fns = function(x) {
-          replace_na(x, "notClassified")
-        }
+    clean_collapse(
+      cols = c(
+        "structure_tax_npc_01pat",
+        "structure_tax_npc_02sup",
+        "structure_tax_npc_03cla"
       )
-    )
+    ) |>
+    mutate(across(
+      .cols = where(is.character),
+      .fns = function(x) {
+        replace_na(x, "notClassified")
+      }
+    ))
 
   table_structures_taxonomy_cla <- table |>
     filter(!is.na(structure_inchikey_no_stereo)) |>
@@ -137,21 +144,21 @@ split_tables_sop <- function(table) {
     ) |>
     distinct() |>
     group_by(structure_inchikey_no_stereo) |>
-    clean_collapse(cols = c(
-      "structure_tax_cla_chemontid",
-      "structure_tax_cla_01kin",
-      "structure_tax_cla_02sup",
-      "structure_tax_cla_03cla",
-      "structure_tax_cla_04dirpar"
-    )) |>
-    mutate(
-      across(
-        .cols = where(is.character),
-        .fns = function(x) {
-          replace_na(x, "notClassified")
-        }
+    clean_collapse(
+      cols = c(
+        "structure_tax_cla_chemontid",
+        "structure_tax_cla_01kin",
+        "structure_tax_cla_02sup",
+        "structure_tax_cla_03cla",
+        "structure_tax_cla_04dirpar"
       )
-    )
+    ) |>
+    mutate(across(
+      .cols = where(is.character),
+      .fns = function(x) {
+        replace_na(x, "notClassified")
+      }
+    ))
 
   table_organisms_names <- table |>
     filter(!is.na(organism_name)) |>
@@ -178,14 +185,12 @@ split_tables_sop <- function(table) {
       organism_taxonomy_10varietas
     ) |>
     distinct() |>
-    mutate(
-      across(
-        .cols = where(is.character),
-        .fns = function(x) {
-          replace_na(x, "notClassified")
-        }
-      )
-    )
+    mutate(across(
+      .cols = where(is.character),
+      .fns = function(x) {
+        replace_na(x, "notClassified")
+      }
+    ))
   rm(table)
 
   tables <-

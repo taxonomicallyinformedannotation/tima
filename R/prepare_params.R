@@ -1,3 +1,5 @@
+import::from(yaml, write_yaml, .into = environment())
+
 #' @title Prepare params
 #'
 #' @description This function prepares main parameters
@@ -788,7 +790,11 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   )
 
   yaml_export <- list$yaml_files |>
-    gsub(pattern = "default", replacement = "user", fixed = TRUE)
+    gsub(
+      pattern = "default",
+      replacement = "user",
+      fixed = TRUE
+    )
   names(yaml_export) <- list$yaml_names
 
   if (!is.na(step)) {
@@ -814,10 +820,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {
-      write_yaml(
-        x = yamls_params[[x]],
-        file = yaml_export[x]
-      )
+      write_yaml(x = yamls_params[[x]], file = yaml_export[x])
     }
   )
   return(yaml_export)

@@ -1,6 +1,12 @@
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, contains, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+
 #' @title Round reals
 #'
-#' @importFrom tidytable across contains mutate
+#' @importFrom tidytable across
+#' @importFrom tidytable contains
+#' @importFrom tidytable mutate
 #'
 #' @param df Dataframe to use
 #' @param dig Number of digits

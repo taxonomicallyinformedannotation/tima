@@ -1,9 +1,28 @@
+import::from(crayon, blue, .into = environment())
+import::from(crayon, cyan, .into = environment())
+import::from(crayon, green, .into = environment())
+import::from(crayon, magenta, .into = environment())
+import::from(crayon, red, .into = environment())
+import::from(crayon, silver, .into = environment())
+import::from(crayon, white, .into = environment())
+import::from(crayon, yellow, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+
 #' @title Decorate bio
 #'
 #' @description This function outputs information about biological weighting
 #'
-#' @importFrom crayon blue cyan green magenta red silver white yellow
-#' @importFrom tidytable distinct filter
+#' @importFrom crayon blue
+#' @importFrom crayon cyan
+#' @importFrom crayon green
+#' @importFrom crayon magenta
+#' @importFrom crayon red
+#' @importFrom crayon silver
+#' @importFrom crayon white
+#' @importFrom crayon yellow
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
 #'
 #' @param annot_table_wei_bio Table to decorate
 #' @param score_biological_kingdom  Kingdom score
@@ -23,36 +42,16 @@
 #'
 #' @examples NULL
 decorate_bio <-
-  function(annot_table_wei_bio = get("annot_table_wei_chemo",
-             envir = parent.frame()
-           ),
-           score_biological_kingdom = get("score_biological_kingdom",
-             envir = parent.frame()
-           ),
-           score_biological_phylum = get("score_biological_phylum",
-             envir = parent.frame()
-           ),
-           score_biological_class = get("score_biological_class",
-             envir = parent.frame()
-           ),
-           score_biological_order = get("score_biological_order",
-             envir = parent.frame()
-           ),
-           score_biological_family = get("score_biological_family",
-             envir = parent.frame()
-           ),
-           score_biological_tribe = get("score_biological_tribe",
-             envir = parent.frame()
-           ),
-           score_biological_genus = get("score_biological_genus",
-             envir = parent.frame()
-           ),
-           score_biological_species = get("score_biological_species",
-             envir = parent.frame()
-           ),
-           score_biological_variety = get("score_biological_variety",
-             envir = parent.frame()
-           )) {
+  function(annot_table_wei_bio = get("annot_table_wei_chemo", envir = parent.frame()),
+           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
+           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
+           score_biological_class = get("score_biological_class", envir = parent.frame()),
+           score_biological_order = get("score_biological_order", envir = parent.frame()),
+           score_biological_family = get("score_biological_family", envir = parent.frame()),
+           score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
+           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
+           score_biological_species = get("score_biological_species", envir = parent.frame()),
+           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
     df_kin <- annot_table_wei_bio |>
       filter(score_biological >= score_biological_kingdom * 1)
     df_phy <- df_kin |>

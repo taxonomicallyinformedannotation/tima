@@ -1,3 +1,5 @@
+import::from(stats, as.dist, .into = environment())
+
 #' @title Get the distance between two elements in a distance matrix
 #'
 #' @description This function calculates the distance between
@@ -32,6 +34,8 @@ dist_get <- function(d, idx1, idx2) {
   ifelse(i == j, 0, d[idx])
 }
 
+import::from(stats, as.dist, .into = environment())
+import::from(utils, combn, .into = environment())
 
 #' @title Dist groups
 #'
@@ -83,10 +87,7 @@ dist_groups <- function(d, g) {
     Group2 = g[idx2],
     Label = factor(ifelse(
       level1 == level2,
-      paste(
-        "Within",
-        level1
-      ),
+      paste("Within", level1),
       paste("Between", level1, "and", level2)
     )),
     Distance = round(x = dist_get(d, idx1, idx2), digits = 5),

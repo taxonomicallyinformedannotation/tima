@@ -1,10 +1,34 @@
+import::from(igraph, components, .into = environment())
+import::from(igraph, graph_from_data_frame, .into = environment())
+import::from(igraph, V, .into = environment())
+import::from(tidyfst, rn_col, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, unnest, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Create components
 #'
 #' @description This function create components from edges
 #'
-#' @importFrom igraph components graph_from_data_frame V
+#' @importFrom igraph components
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph V
 #' @importFrom tidyfst rn_col
-#' @importFrom tidytable across arrange bind_rows distinct fread mutate select unnest where
+#' @importFrom tidytable across
+#' @importFrom tidytable arrange
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable fread
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
+#' @importFrom tidytable unnest
+#' @importFrom tidytable where
 #'
 #' @include get_params.R
 #'
@@ -19,9 +43,8 @@
 create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {
-    stopifnot(
-      "Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
-    )
+    stopifnot("Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |>
+      unlist()))
 
     edges <- input |>
       lapply(
@@ -49,16 +72,8 @@ create_components <-
       data.frame() |>
       rn_col("ComponentIndex") |>
       unnest(feature_source) |>
-      distinct(
-        `cluster index` = feature_source,
-        componentindex = ComponentIndex
-      ) |>
-      mutate(
-        across(
-          .cols = where(is.character),
-          .fns = as.numeric
-        )
-      ) |>
+      distinct(`cluster index` = feature_source, componentindex = ComponentIndex) |>
+      mutate(across(.cols = where(is.character), .fns = as.numeric)) |>
       arrange(`cluster index`)
     rm(feature_source)
 
@@ -67,10 +82,7 @@ create_components <-
       parameters = get_params(step = "create_components"),
       step = "create_components"
     )
-    export_output(
-      x = clusters_ready,
-      file = output
-    )
+    export_output(x = clusters_ready, file = output)
     rm(clusters_ready)
 
     return(output)

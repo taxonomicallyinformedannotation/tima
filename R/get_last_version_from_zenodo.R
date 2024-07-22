@@ -1,3 +1,8 @@
+import::from(httr2, req_perform, .into = environment())
+import::from(httr2, request, .into = environment())
+import::from(jsonlite, fromJSON, .into = environment())
+import::from(stringi, stri_replace_all_fixed, .into = environment())
+
 #' @title Get last version from Zenodo
 #'
 #' @description This function gets the last version
@@ -6,7 +11,8 @@
 #' @details Credit goes to partially to
 #'    https://inbo.github.io/inborutils/
 #'
-#' @importFrom httr2 request req_perform
+#' @importFrom httr2 req_perform
+#' @importFrom httr2 request
 #' @importFrom jsonlite fromJSON
 #' @importFrom stringi stri_replace_all_fixed
 #'
@@ -54,7 +60,11 @@ get_last_version_from_zenodo <-
     filenames <- content$files$key
 
     ## Select the file URL and name matching the given pattern
-    indices <- grepl(pattern = pattern, x = filenames, fixed = TRUE)
+    indices <- grepl(
+      pattern = pattern,
+      x = filenames,
+      fixed = TRUE
+    )
     fileurl <- fileurls[indices]
     filename <- filenames[indices]
     ## Fix with new Zenodo (weird)

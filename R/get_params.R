@@ -1,3 +1,6 @@
+import::from(docopt, docopt, .into = environment())
+import::from(stringi, stri_replace_all_fixed, .into = environment())
+
 #' @title Get parameters
 #'
 #' @description This function gets the parameters for the job.
@@ -51,7 +54,11 @@ get_params <- function(step) {
 
   # for advanced parameters to work
   step <- step |>
-    gsub(pattern = "_advanced", replacement = "", fixed = TRUE)
+    gsub(
+      pattern = "_advanced",
+      replacement = "",
+      fixed = TRUE
+    )
 
   stopifnot("Your step does not exist." = step %in% steps)
 
@@ -61,10 +68,7 @@ get_params <- function(step) {
   user_path <-
     file.path(paths$params$user$path, paste0(step, ".yaml"))
 
-  doc <- readChar(
-    con = doc_path,
-    nchars = file.info(doc_path)$size
-  )
+  doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 
   params <- parse_yaml_params(def = default_path, usr = user_path)
 

@@ -24,12 +24,7 @@ get_massbank_spectra <-
     if (!file.exists(export)) {
       log_debug("Downloading MassBank", mb_version)
       get_file(
-        url = paste(
-          mb_url,
-          mb_version,
-          mb_file,
-          sep = "/"
-        ),
+        url = paste(mb_url, mb_version, mb_file, sep = "/"),
         export = export
       )
     } else {

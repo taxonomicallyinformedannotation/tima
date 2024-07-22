@@ -1,8 +1,16 @@
+import::from(Spectra, applyProcessing, .into = environment())
+import::from(Spectra, dropNaSpectraVariables, .into = environment())
+import::from(Spectra, filterFourierTransformArtefacts, .into = environment())
+import::from(Spectra, filterIntensity, .into = environment())
+
 #' @title Sanitize spectra
 #'
 #' @description This function sanitizes spectra
 #'
-#' @importFrom Spectra applyProcessing dropNaSpectraVariables filterFourierTransformArtefacts filterIntensity
+#' @importFrom Spectra applyProcessing
+#' @importFrom Spectra dropNaSpectraVariables
+#' @importFrom Spectra filterFourierTransformArtefacts
+#' @importFrom Spectra filterIntensity
 #'
 #' @include keep_peaks.R
 #'
@@ -44,10 +52,7 @@ sanitize_spectra <-
     #   ) |>
     #   applyProcessing()
 
-    spectra <- spectra[lapply(
-      X = spectra@backend@peaksData,
-      FUN = length
-    ) >= fragments * 2]
+    spectra <- spectra[lapply(X = spectra@backend@peaksData, FUN = length) >= fragments * 2]
 
     return(spectra)
   }

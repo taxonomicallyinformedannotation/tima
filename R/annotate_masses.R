@@ -1,12 +1,50 @@
+import::from(dplyr, join_by, .into = environment())
+import::from(MetaboCoreUtils, calculateMass, .into = environment())
+import::from(stats, dist, .into = environment())
+import::from(stats, setNames, .into = environment())
+import::from(stringi, stri_length, .into = environment())
+import::from(tidytable, across, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, everything, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, mutate_rowwise, .into = environment())
+import::from(tidytable, na_if, .into = environment())
+import::from(tidytable, rename, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+import::from(tidytable, where, .into = environment())
+
 #' @title Annotate masses
 #'
 #' @description This function annotates masses
 #'
 #' @importFrom dplyr join_by
 #' @importFrom MetaboCoreUtils calculateMass
-#' @importFrom tidytable across arrange as_tidytable bind_rows distinct everything filter fread left_join mutate mutate_rowwise na_if rename select tidytable where
-#' @importFrom stats dist setNames
+#' @importFrom stats dist
+#' @importFrom stats setNames
 #' @importFrom stringi stri_length
+#' @importFrom tidytable across
+#' @importFrom tidytable arrange
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable everything
+#' @importFrom tidytable filter
+#' @importFrom tidytable fread
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable mutate_rowwise
+#' @importFrom tidytable na_if
+#' @importFrom tidytable rename
+#' @importFrom tidytable select
+#' @importFrom tidytable tidytable
+#' @importFrom tidytable where
 #'
 #' @include decorate_masses.R
 #' @include dist_groups.R
@@ -133,28 +171,50 @@ annotate_masses <-
       # TODO this should be externalized
       adducts_translations <-
         c(
-          "-2H" = "-H2", # cliqueMS
-          "-3H" = "-H3", # cliqueMS
-          "-2H2O" = "-H4O2 (2xH2O)", # mzmine
-          "-3H2O" = "-H6O3 (3xH2O)", # mzmine
-          "-4H2O" = "-H8O4 (4xH2O)", # mzmine
-          "-5H2O" = "-H10O5 (5xH2O)", # mzmine
-          "-NH3" = "+H3N", # mzmine
-          "+2H" = "+H2", # mzmine
-          "+2K" = "+K2", # cliqueMS
-          "+2Na" = "+Na2", # mzmine
-          "+3K" = "+K3", # cliqueMS
-          "+3Na" = "+Na3", # cliqueMS
-          "+Acetate" = "+C2H3O2", # mzmine
-          "+ACN" = "+C2H3N", # mzmine
-          "+CH3COO" = "+C2H3O2", # GNPS
-          "+FA" = "+CHO2", # mzmine
-          "+HAc" = "+C2H4O2", # mzmine
-          "+Hac" = "+C2H4O2", # GNPS
-          "+HFA" = "+CH2O2", # mzmine
-          "+IsoProp" = "+C3H8O", # mzmine
-          "+MeOH" = "+CH4O", # mzmine
-          "+NH4" = "+H4N", # mzmine
+          "-2H" = "-H2",
+          # cliqueMS
+          "-3H" = "-H3",
+          # cliqueMS
+          "-2H2O" = "-H4O2 (2xH2O)",
+          # mzmine
+          "-3H2O" = "-H6O3 (3xH2O)",
+          # mzmine
+          "-4H2O" = "-H8O4 (4xH2O)",
+          # mzmine
+          "-5H2O" = "-H10O5 (5xH2O)",
+          # mzmine
+          "-NH3" = "+H3N",
+          # mzmine
+          "+2H" = "+H2",
+          # mzmine
+          "+2K" = "+K2",
+          # cliqueMS
+          "+2Na" = "+Na2",
+          # mzmine
+          "+3K" = "+K3",
+          # cliqueMS
+          "+3Na" = "+Na3",
+          # cliqueMS
+          "+Acetate" = "+C2H3O2",
+          # mzmine
+          "+ACN" = "+C2H3N",
+          # mzmine
+          "+CH3COO" = "+C2H3O2",
+          # GNPS
+          "+FA" = "+CHO2",
+          # mzmine
+          "+HAc" = "+C2H4O2",
+          # mzmine
+          "+Hac" = "+C2H4O2",
+          # GNPS
+          "+HFA" = "+CH2O2",
+          # mzmine
+          "+IsoProp" = "+C3H8O",
+          # mzmine
+          "+MeOH" = "+CH4O",
+          # mzmine
+          "+NH4" = "+H4N",
+          # mzmine
           "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
         )
       features_table <- features_table |>
@@ -192,12 +252,7 @@ annotate_masses <-
         mz_dest = mz.y,
         adduct_dest = adduct.y
       ) |>
-      select(
-        everything(),
-        feature_id_dest,
-        mz_dest,
-        adduct_dest
-      ) |>
+      select(everything(), feature_id_dest, mz_dest, adduct_dest) |>
       filter(feature_id != feature_id_dest) |>
       log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       filter(mz_dest >= mz) |>
@@ -286,17 +341,13 @@ annotate_masses <-
 
     log_debug("joining within given delta mz tolerance (neutral losses) \n")
     df_nl <- df_couples_diff |>
-      dplyr::inner_join(neutral_losses,
-        by = join_by(delta_min <= mass, delta_max >= mass)
-      ) |>
+      dplyr::inner_join(neutral_losses, by = join_by(delta_min <= mass, delta_max >= mass)) |>
       filter(!is.na(loss)) |>
       distinct(feature_id, adduct, loss, mass, feature_id_dest, adduct_dest)
 
     log_debug("joining within given delta mz tolerance (adducts) \n")
     df_add <- df_couples_diff |>
-      dplyr::inner_join(differences,
-        by = join_by(delta_min <= Distance, delta_max >= Distance)
-      ) |>
+      dplyr::inner_join(differences, by = join_by(delta_min <= Distance, delta_max >= Distance)) |>
       filter(!is.na(Group1)) |>
       mutate(across(.cols = c("rt"), .fns = as.character)) |>
       mutate(
@@ -476,8 +527,7 @@ annotate_masses <-
 
     log_debug("joining within given rt tolerance \n")
     df_multi_nl <- df_multi |>
-      dplyr::inner_join(
-        df_addlossed_rdy,
+      dplyr::inner_join(df_addlossed_rdy,
         by = join_by(rt_min <= rt, rt_max >= rt, mass_min <= mass, mass_max >= mass)
       )
     rm(df_fea_min, df_multi, neutral_losses, df_addlossed_rdy)

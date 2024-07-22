@@ -8,11 +8,7 @@
 #'
 #' @examples NULL
 columns_model <- function() {
-  features_columns <- c(
-    "feature_id",
-    "feature_mz",
-    "feature_rt"
-  )
+  features_columns <- c("feature_id", "feature_mz", "feature_rt")
 
   features_calculated_columns <- c(
     "feature_spectrum_entropy",
@@ -84,10 +80,7 @@ columns_model <- function() {
 
   components_columns <- c("component_id")
 
-  rank_columns <- c(
-    "rank_initial",
-    "rank_final"
-  )
+  rank_columns <- c("rank_initial", "rank_final")
 
   score_columns <- c(
     "score_initial",

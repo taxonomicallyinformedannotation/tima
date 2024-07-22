@@ -1,11 +1,28 @@
+import::from(stringi, stri_sub, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, slice_sample, .into = environment())
+
 #' @title Taxize spectra benchmark
 #'
 #' @description This function adds taxa to the benchmark
 #'
 #' @details Because they are still quite dirty
 #'
-#' @importFrom tidytable bind_rows distinct filter fread left_join mutate select slice_sample
 #' @importFrom stringi stri_sub
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable fread
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
+#' @importFrom tidytable slice_sample
 #'
 #' @param input Initial features
 #' @param keys SOP keys
@@ -18,37 +35,18 @@
 #'
 #' @examples NULL
 benchmark_taxize_spectra <-
-  function(input,
-           keys,
-           org_tax_ott,
-           output) {
+  function(input, keys, org_tax_ott, output) {
     features <- input |>
-      fread(
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
+      fread(na.strings = c("", "NA"), colClasses = "character")
     sop <- keys |>
-      fread(
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ) |>
-      mutate(inchikey_no_stereo = stri_sub(
-        str = structure_inchikey,
-        from = 1,
-        to = 14
-      ))
+      fread(na.strings = c("", "NA"), colClasses = "character") |>
+      mutate(inchikey_no_stereo = stri_sub(str = structure_inchikey, from = 1, to = 14))
     taxo <- org_tax_ott |>
-      fread(
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
+      fread(na.strings = c("", "NA"), colClasses = "character")
 
     features_pretaxed <- features |>
       left_join(sop |>
-        distinct(
-          organism_name,
-          inchikey_no_stereo
-        ))
+        distinct(organism_name, inchikey_no_stereo))
     rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>

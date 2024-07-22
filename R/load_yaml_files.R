@@ -1,3 +1,5 @@
+import::from(yaml, read_yaml, .into = environment())
+
 #' @title Load yaml files
 #'
 #' @description This function load yaml files

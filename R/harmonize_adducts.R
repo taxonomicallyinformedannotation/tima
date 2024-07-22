@@ -1,3 +1,5 @@
+import::from(stringi, stri_replace_all_fixed, .into = environment())
+
 #' @title Harmonize adducts
 #'
 #' @description This function annotates masses

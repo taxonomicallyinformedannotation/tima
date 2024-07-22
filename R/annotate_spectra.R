@@ -1,3 +1,25 @@
+import::from(dplyr, join_by, .into = environment())
+import::from(msentropy, calculate_entropy_similarity, .into = environment())
+import::from(msentropy, calculate_spectral_entropy, .into = environment())
+import::from(pbapply, pblapply, .into = environment())
+import::from(Spectra, addProcessing, .into = environment())
+import::from(Spectra, applyProcessing, .into = environment())
+import::from(Spectra, concatenateSpectra, .into = environment())
+import::from(Spectra, filterIntensity, .into = environment())
+import::from(Spectra, filterPrecursorCharge, .into = environment())
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, arrange, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, coalesce, .into = environment())
+import::from(tidytable, desc, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, left_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+
 #' @title Annotate spectra
 #'
 #' @description This function annotates spectra
@@ -6,10 +28,26 @@
 #'    A query file that will be matched against a library file.
 #'
 #' @importFrom dplyr join_by
-#' @importFrom msentropy calculate_entropy_similarity calculate_spectral_entropy
+#' @importFrom msentropy calculate_entropy_similarity
+#' @importFrom msentropy calculate_spectral_entropy
 #' @importFrom pbapply pblapply
-#' @importFrom Spectra addProcessing applyProcessing concatenateSpectra filterIntensity filterPrecursorCharge
-#' @importFrom tidytable any_of arrange as_tidytable bind_rows coalesce desc distinct filter left_join mutate select tidytable
+#' @importFrom Spectra addProcessing
+#' @importFrom Spectra applyProcessing
+#' @importFrom Spectra concatenateSpectra
+#' @importFrom Spectra filterIntensity
+#' @importFrom Spectra filterPrecursorCharge
+#' @importFrom tidytable any_of
+#' @importFrom tidytable arrange
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable coalesce
+#' @importFrom tidytable desc
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable left_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
+#' @importFrom tidytable tidytable
 #'
 #' @include get_params.R
 #' @include harmonize_adducts.R
@@ -43,12 +81,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
-  stopifnot(
-    "Library file(s) do(es) not exist" = all(lapply(
-      X = library,
-      FUN = file.exists
-    ) |> unlist())
-  )
+  stopifnot("Library file(s) do(es) not exist" = all(lapply(X = library, FUN = file.exists) |> unlist()))
 
   ## Not checking for ppm and Da limits, everyone is free.
 
@@ -122,22 +155,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       lib_precursors <-
         spectral_library@backend@spectraData$precursorMz
 
-      minimal <- pmin(
-        lib_precursors - dalton,
-        lib_precursors * (1 - (10^-6 * ppm))
-      )
-      maximal <- pmax(
-        lib_precursors + dalton,
-        lib_precursors * (1 + (10^-6 * ppm))
-      )
+      minimal <- pmin(lib_precursors - dalton, lib_precursors * (1 - (10^
+        -6 * ppm)))
+      maximal <- pmax(lib_precursors + dalton, lib_precursors * (1 + (10^
+        -6 * ppm)))
 
       df_3 <- dplyr::inner_join(
         tidytable(minimal, maximal, lib_precursors),
         tidytable(val = unique(query_precursors)),
-        by = join_by(
-          minimal < val,
-          maximal > val
-        )
+        by = join_by(minimal < val, maximal > val)
       ) |>
         distinct(minimal, .keep_all = TRUE)
 
@@ -148,22 +174,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
     lib_precursors <-
       spectral_library@backend@spectraData$precursorMz
-    minimal <- pmin(
-      lib_precursors - dalton,
-      lib_precursors * (1 - (10^-6 * ppm))
-    )
-    maximal <- pmax(
-      lib_precursors + dalton,
-      lib_precursors * (1 + (10^-6 * ppm))
-    )
+    minimal <- pmin(lib_precursors - dalton, lib_precursors * (1 - (10^
+      -6 * ppm)))
+    maximal <- pmax(lib_precursors + dalton, lib_precursors * (1 + (10^
+      -6 * ppm)))
 
     lib_id <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[lapply(
-      X = lib_spectra,
-      FUN = length
-    ) != 0]
+    safety <- lib_spectra[lapply(X = lib_spectra, FUN = length) != 0]
     if (length(safety) != 0) {
       calculate_entropy_score <-
         function(spectra,
@@ -211,15 +230,11 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                       calculate_spectral_entropy()
 
                     ## number of matched peaks (only Da for now)
-                    matched <- sum(
-                      abs(
-                        outer(
-                          X = spectra[[sp]][, 1],
-                          Y = lib[[index]][, 1],
-                          FUN = "-"
-                        )
-                      ) <= dalton
-                    )
+                    matched <- sum(abs(outer(
+                      X = spectra[[sp]][, 1],
+                      Y = lib[[index]][, 1],
+                      FUN = "-"
+                    )) <= dalton)
 
                     tidytable(
                       "feature_id" = query_ids[[spectrum]],
@@ -346,10 +361,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               ),
             no = target_inchikey_no_stereo
           ),
-          candidate_structure_smiles_no_stereo = coalesce(
-            target_smiles_no_stereo,
-            target_smiles
-          )
+          candidate_structure_smiles_no_stereo = coalesce(target_smiles_no_stereo, target_smiles)
         ) |>
         select(any_of(
           c(
@@ -409,14 +421,23 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               returning an empty dataframe")
       df_final <- df_empty
     }
-    rm(query_precursors, query_spectra, query_ids, minimal, maximal)
+    rm(
+      query_precursors,
+      query_spectra,
+      query_ids,
+      minimal,
+      maximal
+    )
   } else {
     log_debug("No spectra matched the given polarity,
               returning an empty dataframe")
     df_final <- df_empty
   }
 
-  export_params(parameters = get_params(step = "annotate_spectra"), step = "annotate_spectra")
+  export_params(
+    parameters = get_params(step = "annotate_spectra"),
+    step = "annotate_spectra"
+  )
   export_output(x = df_final, file = output[[1]])
   rm(df_final)
 

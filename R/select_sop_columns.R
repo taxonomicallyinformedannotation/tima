@@ -1,3 +1,5 @@
+import::from(tidytable, select, .into = environment())
+
 #' @title Select SOP columns
 #'
 #' @description This function selects sop columns

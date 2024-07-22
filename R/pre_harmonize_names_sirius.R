@@ -1,3 +1,5 @@
+import::from(stringi, stri_replace_all_regex, .into = environment())
+
 #' @title Pre harmonize names sirius
 #'
 #' @description This function pre harmonizes Sirius names

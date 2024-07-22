@@ -1,3 +1,7 @@
+import::from(crayon, green, .into = environment())
+import::from(pak, pkg_status, .into = environment())
+import::from(yaml, write_yaml, .into = environment())
+
 #' @title Export parameters
 #'
 #' @description This function writes the parameters
@@ -19,9 +23,7 @@
 #'
 #' @examples NULL
 export_params <-
-  function(parameters = get("parameters",
-             envir = parent.frame()
-           ),
+  function(parameters = get("parameters", envir = parent.frame()),
            directory = parse_yaml_paths()$data$interim$params$path,
            step) {
     # ## Use default system data directory
@@ -41,19 +43,16 @@ export_params <-
     log_debug(x = "... path to used parameters is", green(directory))
     tima_version <- pkg_status("timaR")$version[1]
 
-    write_yaml(
-      x = parameters,
-      file = file.path(
-        directory,
-        paste0(
-          format(Sys.time(), "%y%m%d_%H%M%OS"),
-          "_",
-          "timaR",
-          tima_version,
-          "_",
-          step,
-          ".yaml"
-        )
+    write_yaml(x = parameters, file = file.path(
+      directory,
+      paste0(
+        format(Sys.time(), "%y%m%d_%H%M%OS"),
+        "_",
+        "timaR",
+        tima_version,
+        "_",
+        step,
+        ".yaml"
       )
-    )
+    ))
   }

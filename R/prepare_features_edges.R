@@ -1,8 +1,24 @@
+import::from(tidytable, all_of, .into = environment())
+import::from(tidytable, coalesce, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, full_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, rename, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Prepare features edges
 #'
 #' @description This function prepares edges for further use
 #'
-#' @importFrom tidytable all_of coalesce distinct fread full_join mutate rename select
+#' @importFrom tidytable all_of
+#' @importFrom tidytable coalesce
+#' @importFrom tidytable distinct
+#' @importFrom tidytable fread
+#' @importFrom tidytable full_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable rename
+#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -21,9 +37,7 @@ prepare_features_edges <-
            output = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$prepared,
            name_source = get_params(step = "prepare_features_edges")$names$source,
            name_target = get_params(step = "prepare_features_edges")$names$target) {
-    stopifnot(
-      "Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
-    )
+    stopifnot("Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist()))
     ## Load edges table
     log_debug(x = "Loading edge table")
     edges_tables <- lapply(
@@ -38,9 +52,7 @@ prepare_features_edges <-
     rm(edges_tables)
     features_entropy <- edges_ms2 |>
       select(
-        all_of(c(
-          name_source
-        )),
+        all_of(c(name_source)),
         feature_spectrum_entropy,
         feature_spectrum_peaks
       ) |>
@@ -55,17 +67,15 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      mutate(
-        feature_target := coalesce(
-          feature_target,
-          feature_source
-        )
-      )
+      mutate(feature_target := coalesce(feature_target, feature_source))
     rm(edges_ms1, edges_ms2, features_entropy)
 
     ## Export edges table
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_features_edges"), step = "prepare_features_edges")
+    export_params(
+      parameters = get_params(step = "prepare_features_edges"),
+      step = "prepare_features_edges"
+    )
     export_output(x = edges_table_treated, file = output)
     rm(edges_table_treated)
 

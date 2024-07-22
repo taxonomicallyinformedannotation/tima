@@ -1,9 +1,21 @@
+import::from(tidytable, bind_rows, .into = environment())
+import::from(tidytable, distinct, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Prepare annotations MS2
 #'
 #' @description This function prepares the spectral matches
 #'    obtained previously to make them compatible
 #'
-#' @importFrom tidytable bind_rows distinct filter fread mutate select
+#' @importFrom tidytable bind_rows
+#' @importFrom tidytable distinct
+#' @importFrom tidytable filter
+#' @importFrom tidytable fread
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #' @include select_annotations_columns.R
@@ -29,9 +41,7 @@ prepare_annotations_spectra <-
            str_nam = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,
            str_tax_cla = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$npc) {
-    stopifnot(
-      "Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist())
-    )
+    stopifnot("Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist()))
     log_debug(x = "Loading and formatting spectral matches")
     table <-
       lapply(
@@ -72,7 +82,10 @@ prepare_annotations_spectra <-
       select_annotations_columns()
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_annotations_spectra"), step = "prepare_annotations_spectra")
+    export_params(
+      parameters = get_params(step = "prepare_annotations_spectra"),
+      step = "prepare_annotations_spectra"
+    )
     export_output(x = table, file = output[[1]])
     rm(table)
 

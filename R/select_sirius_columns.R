@@ -1,8 +1,14 @@
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Select sirius columns (canopus)
 #'
 #' @description This function selects sirius columns (canopus)
 #'
-#' @importFrom tidytable any_of mutate select
+#' @importFrom tidytable any_of
+#' @importFrom tidytable mutate
+#' @importFrom tidytable select
 #'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
@@ -76,19 +82,21 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
         as.numeric(`massErrorPrecursor(ppm)`) *
         1E-6
     ) |>
-    select(any_of(c(
-      "feature_id",
-      "candidate_adduct" = "adduct",
-      "candidate_structure_molecular_formula" = "molecularFormula",
-      "candidate_structure_exact_mass",
-      "candidate_structure_error_mz",
-      "candidate_score_sirius_zodiac" = "ZodiacScore",
-      "candidate_score_sirius_sirius" = "SiriusScore",
-      "candidate_score_sirius_tree" = "TreeScore",
-      "candidate_score_sirius_isotope" = "IsotopeScore",
-      "candidate_score_sirius_intensity" = "explainedIntensity",
-      "candidate_count_sirius_peaks_explained" = "numExplainedPeaks"
-    )))
+    select(any_of(
+      c(
+        "feature_id",
+        "candidate_adduct" = "adduct",
+        "candidate_structure_molecular_formula" = "molecularFormula",
+        "candidate_structure_exact_mass",
+        "candidate_structure_error_mz",
+        "candidate_score_sirius_zodiac" = "ZodiacScore",
+        "candidate_score_sirius_sirius" = "SiriusScore",
+        "candidate_score_sirius_tree" = "TreeScore",
+        "candidate_score_sirius_isotope" = "IsotopeScore",
+        "candidate_score_sirius_intensity" = "explainedIntensity",
+        "candidate_count_sirius_peaks_explained" = "numExplainedPeaks"
+      )
+    ))
   return(df)
 }
 
@@ -108,22 +116,24 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #' @examples NULL
 select_sirius_columns_structures <- function(df, sirius_version) {
   df <- df |>
-    select(any_of(c(
-      "feature_id",
-      "candidate_adduct" = "adduct",
-      "candidate_structure_name" = "name",
-      "candidate_structure_smiles_no_stereo" = "smiles",
-      "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
-      "candidate_structure_molecular_formula" = "molecularFormula",
-      "candidate_structure_xlogp" = "xlogp",
-      # ISSUE see #147
-      "candidate_score_sirius_confidence" = switch(sirius_version,
-        "5" = "ConfidenceScore",
-        "6" = "ConfidenceScoreApproximate"
-      ),
-      "candidate_score_sirius_csi" = "CSI:FingerIDScore",
-      "candidate_score_sirius_msnovelist" = "ModelScore"
-    ))) |>
+    select(any_of(
+      c(
+        "feature_id",
+        "candidate_adduct" = "adduct",
+        "candidate_structure_name" = "name",
+        "candidate_structure_smiles_no_stereo" = "smiles",
+        "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
+        "candidate_structure_molecular_formula" = "molecularFormula",
+        "candidate_structure_xlogp" = "xlogp",
+        # ISSUE see #147
+        "candidate_score_sirius_confidence" = switch(sirius_version,
+          "5" = "ConfidenceScore",
+          "6" = "ConfidenceScoreApproximate"
+        ),
+        "candidate_score_sirius_csi" = "CSI:FingerIDScore",
+        "candidate_score_sirius_msnovelist" = "ModelScore"
+      )
+    )) |>
     distinct() |>
     mutate(
       candidate_library = "SIRIUS",

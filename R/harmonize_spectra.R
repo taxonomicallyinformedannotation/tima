@@ -1,8 +1,24 @@
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, as_tidytable, .into = environment())
+import::from(tidytable, filter, .into = environment())
+import::from(tidytable, full_join, .into = environment())
+import::from(tidytable, mutate, .into = environment())
+import::from(tidytable, pivot_wider, .into = environment())
+import::from(tidytable, row_number, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Harmonize spectra
 #'
 #' @description This function harmonizes spectra headers
 #'
-#' @importFrom tidytable any_of as_tidytable filter full_join mutate pivot_wider row_number select
+#' @importFrom tidytable any_of
+#' @importFrom tidytable as_tidytable
+#' @importFrom tidytable filter
+#' @importFrom tidytable full_join
+#' @importFrom tidytable mutate
+#' @importFrom tidytable pivot_wider
+#' @importFrom tidytable row_number
+#' @importFrom tidytable select
 #'
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library
@@ -31,79 +47,25 @@
 #'
 #' @examples NULL
 harmonize_spectra <- function(spectra,
-                              metad = get(
-                                "metad",
-                                envir = parent.frame()
-                              ),
+                              metad = get("metad", envir = parent.frame()),
                               mode,
-                              col_ad = get(
-                                "col_ad",
-                                envir = parent.frame()
-                              ),
-                              col_ce = get(
-                                "col_ce",
-                                envir = parent.frame()
-                              ),
-                              col_ci = get(
-                                "col_ci",
-                                envir = parent.frame()
-                              ),
-                              col_em = get(
-                                "col_em",
-                                envir = parent.frame()
-                              ),
-                              col_in = get(
-                                "col_in",
-                                envir = parent.frame()
-                              ),
-                              col_io = get(
-                                "col_io",
-                                envir = parent.frame()
-                              ),
-                              col_ik = get(
-                                "col_ik",
-                                envir = parent.frame()
-                              ),
-                              col_il = get(
-                                "col_il",
-                                envir = parent.frame()
-                              ),
-                              col_mf = get(
-                                "col_mf",
-                                envir = parent.frame()
-                              ),
-                              col_na = get(
-                                "col_na",
-                                envir = parent.frame()
-                              ),
-                              col_po = get(
-                                "col_po",
-                                envir = parent.frame()
-                              ),
-                              col_sm = get(
-                                "col_sm",
-                                envir = parent.frame()
-                              ),
-                              col_sn = get(
-                                "col_sn",
-                                envir = parent.frame()
-                              ),
-                              col_si = get(
-                                "col_si",
-                                envir = parent.frame()
-                              ),
-                              col_sp = get(
-                                "col_sp",
-                                envir = parent.frame()
-                              ),
-                              col_sy = get(
-                                "col_sy",
-                                envir = parent.frame()
-                              ),
-                              col_xl = get(
-                                "col_xl",
-                                envir = parent.frame()
-                              )) {
+                              col_ad = get("col_ad", envir = parent.frame()),
+                              col_ce = get("col_ce", envir = parent.frame()),
+                              col_ci = get("col_ci", envir = parent.frame()),
+                              col_em = get("col_em", envir = parent.frame()),
+                              col_in = get("col_in", envir = parent.frame()),
+                              col_io = get("col_io", envir = parent.frame()),
+                              col_ik = get("col_ik", envir = parent.frame()),
+                              col_il = get("col_il", envir = parent.frame()),
+                              col_mf = get("col_mf", envir = parent.frame()),
+                              col_na = get("col_na", envir = parent.frame()),
+                              col_po = get("col_po", envir = parent.frame()),
+                              col_sm = get("col_sm", envir = parent.frame()),
+                              col_sn = get("col_sn", envir = parent.frame()),
+                              col_si = get("col_si", envir = parent.frame()),
+                              col_sp = get("col_sp", envir = parent.frame()),
+                              col_sy = get("col_sy", envir = parent.frame()),
+                              col_xl = get("col_xl", envir = parent.frame())) {
   columns <- c(
     "adduct",
     "collision_energy",

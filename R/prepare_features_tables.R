@@ -1,8 +1,14 @@
+import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, fread, .into = environment())
+import::from(tidytable, select, .into = environment())
+
 #' @title Prepare features table
 #'
 #' @description This function prepares features
 #'
-#' @importFrom tidytable any_of fread select
+#' @importFrom tidytable any_of
+#' @importFrom tidytable fread
+#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -29,19 +35,21 @@ prepare_features_tables <-
 
     log_debug("Preparing features table")
     features_prepared <- features |>
-      fread(
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ) |>
-      select(any_of(c(
-        feature_id = name_features,
-        rt = name_rt,
-        mz = name_mz,
-        adduct = name_adduct
-      )))
+      fread(na.strings = c("", "NA"), colClasses = "character") |>
+      select(any_of(
+        c(
+          feature_id = name_features,
+          rt = name_rt,
+          mz = name_mz,
+          adduct = name_adduct
+        )
+      ))
 
     log_debug(x = "Exporting ...")
-    export_params(parameters = get_params(step = "prepare_features_tables"), step = "prepare_features_tables")
+    export_params(
+      parameters = get_params(step = "prepare_features_tables"),
+      step = "prepare_features_tables"
+    )
     export_output(x = features_prepared, file = output)
     rm(features_prepared)
 

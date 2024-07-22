@@ -1,3 +1,8 @@
+import::from(MsBackendMgf, readMgfSplit, .into = environment())
+import::from(MsBackendMsp, readMsp, .into = environment())
+import::from(Spectra, Spectra, .into = environment())
+import::from(stringi, stri_replace_all_regex, .into = environment())
+
 #' @title Import spectra
 #'
 #' @description This function imports spectra from a file (.mgf or .sqlite)

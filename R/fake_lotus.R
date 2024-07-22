@@ -1,8 +1,12 @@
+import::from(tidytable, fwrite, .into = environment())
+import::from(tidytable, tidytable, .into = environment())
+
 #' @title Fake LOTUS
 #'
 #' @description This function fakes LOTUS in case the download failed
 #'
-#' @importFrom tidytable fwrite tidytable
+#' @importFrom tidytable fwrite
+#' @importFrom tidytable tidytable
 #'
 #' @param export Path to save the file to
 #'
