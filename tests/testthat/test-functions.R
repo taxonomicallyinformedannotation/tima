@@ -458,6 +458,7 @@ test_that(desc = "Test functions", code = {
   ### SIRIUS results
   prepare_annotations_sirius(input_directory = NULL)
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
+  prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist.xyz")
   ## When there is an input
   prepare_annotations_sirius(
     input_directory =
