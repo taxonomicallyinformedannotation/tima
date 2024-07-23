@@ -228,8 +228,11 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$ms$tolerances$mass$dalton$ms2 <-
         as.numeric(arguments$ms_tol_mas_dal_ms2)
     }
-    if (!is.null(arguments$ms_tol_rt_min)) {
-      parameters$ms$tolerances$rt$minutes <- as.numeric(arguments$ms_tol_rt_min)
+    if (!is.null(arguments$ms_tol_rt_add)) {
+      parameters$ms$tolerances$rt$adducts <- as.numeric(arguments$ms_tol_rt_add)
+    }
+    if (!is.null(arguments$ms_tol_rt_lib)) {
+      parameters$ms$tolerances$rt$library <- as.numeric(arguments$ms_tol_rt_lib)
     }
     if (!is.null(arguments$names_adduct)) {
       parameters$names$adduct <- as.character(arguments$names_adduct)

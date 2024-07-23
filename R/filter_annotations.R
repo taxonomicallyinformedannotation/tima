@@ -42,7 +42,7 @@ filter_annotations <-
            features = get_params(step = "filter_annotations")$files$features$prepared,
            rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
            output = get_params(step = "filter_annotations")$files$annotations$filtered,
-           tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes) {
+           tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$library) {
     stopifnot("Annotations file(s) do(es) not exist" = all(lapply(X = annotations, FUN = file.exists) |> unlist()))
     stopifnot("Retention time file(s) do(es) not exist" = all(lapply(X = rts, FUN = file.exists) |> unlist()))
     stopifnot("Your features file does not exist." = file.exists(features))
@@ -83,7 +83,7 @@ filter_annotations <-
     if (!is.null(rts)) {
       log_debug(
         "Filtering annotations outside of",
-        tolerance_rt * 3,
+        tolerance_rt,
         "minutes tolerance"
       )
       features_annotated_table_2 <- features_annotated_table_1 |>
@@ -92,9 +92,8 @@ filter_annotations <-
           as.numeric(rt_target)) |>
         arrange(abs(candidate_structure_error_rt)) |>
         distinct(-candidate_structure_error_rt, -rt_target, .keep_all = TRUE) |>
-        ## ISSUE see #149 adapt for types and improve the * 3
         filter(
-          abs(candidate_structure_error_rt) <= abs(tolerance_rt * 3) |
+          abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
             is.na(candidate_structure_error_rt)
         ) |>
         select(-rt_target, -type)
