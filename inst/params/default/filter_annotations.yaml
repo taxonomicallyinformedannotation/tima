@@ -39,5 +39,5 @@ ms:
   tolerances:
     #' For retention time.
     rt:
-      #' Retention time tolerance in minutes. FLOAT
-      minutes: 0.05
+      #' Retention time tolerance for library in minutes. FLOAT
+      library: 0.1

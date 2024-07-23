@@ -1498,7 +1498,7 @@ list(
               neutral_losses_list = par_ann_mas$ms$neutral_losses,
               ms_mode = par_ann_mas$ms$polarity,
               tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
-              tolerance_rt = par_ann_mas$ms$tolerances$rt$minutes
+              tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
             )
         }
       ),
@@ -1781,7 +1781,7 @@ list(
         features = fea_pre,
         rts = lib_rt_rts,
         output = par_fil_ann$files$annotations$filtered,
-        tolerance_rt = par_fil_ann$ms$tolerances$rt$minutes
+        tolerance_rt = par_fil_ann$ms$tolerances$rt$library
       )
     }
   ),
@@ -2215,7 +2215,7 @@ list(
             neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = "pos",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
+            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
           )
       }
     ),
@@ -2241,7 +2241,7 @@ list(
             neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = "neg",
             tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$minutes
+            tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
           )
       }
     ),
@@ -2533,7 +2533,7 @@ list(
           features = benchmark_pre_meta_neg,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
@@ -2551,7 +2551,7 @@ list(
           rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
@@ -2567,7 +2567,7 @@ list(
           features = benchmark_pre_meta_neg,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_neg.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
@@ -2583,7 +2583,7 @@ list(
           features = benchmark_pre_meta_pos,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_spe_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
@@ -2601,7 +2601,7 @@ list(
           rts = list(),
           output =
             "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
@@ -2617,7 +2617,7 @@ list(
           features = benchmark_pre_meta_pos,
           rts = list(),
           output = "data/interim/benchmark/benchmark_ann_ms1_fil_pos.tsv.gz",
-          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$minutes
+          tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
     ),
