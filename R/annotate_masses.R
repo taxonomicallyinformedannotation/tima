@@ -68,7 +68,7 @@ import::from(tidytable, where, .into = environment())
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 10 ppm
-#' @param tolerance_rt Tolerance to group adducts. Should be <= 0.1min
+#' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
 #'
 #' @return A table containing MS1 annotations based on exact mass
 #'
@@ -92,7 +92,7 @@ annotate_masses <-
            neutral_losses_list = get_params(step = "annotate_masses")$ms$neutral_losses,
            ms_mode = get_params(step = "annotate_masses")$ms$polarity,
            tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
-           tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes) {
+           tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts) {
     stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
     stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
 

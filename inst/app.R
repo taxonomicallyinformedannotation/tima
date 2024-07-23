@@ -398,18 +398,31 @@ ui <- shiny::fluidPage(
             content = c("Mass tolerance (in Da) used for MS2 annotation.")
           ),
         shiny::sliderInput(
-          inputId = "ms_tol_rt_min",
-          label = "Retention time tolerance in minutes",
-          min = 0.01,
-          max = 0.20,
-          value = 0.05,
+          inputId = "ms_tol_rt_add",
+          label = "Retention time tolerance for adducts annotation in minutes",
+          min = 0.005,
+          max = 0.1,
+          value = 0.02,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
             type = "inline",
             content = c(
-              "Retention time tolerance (minutes) used for adducts attribution",
-              "and annotation if an experimental library is provided.",
+              "Retention time tolerance (minutes) used for adducts annotation."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ms_tol_rt_lib",
+          label = "Retention time tolerance for library annotation in minutes",
+          min = 0.005,
+          max = 0.2,
+          value = 0.1,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Retention time tolerance (minutes) used for library annotation.",
               "If no experimental library is given, does not impact results."
             )
           ),
@@ -2018,8 +2031,10 @@ save_input <- function(input) {
     shiny::isolate(input$ms_tol_mas_dal_ms1)
   yaml_advanced$ms$tolerances$mass$dalton$ms2 <-
     shiny::isolate(input$ms_tol_mas_dal_ms2)
-  yaml_advanced$ms$tolerances$rt$minutes <-
-    shiny::isolate(input$ms_tol_rt_min)
+  yaml_advanced$ms$tolerances$rt$adducts <-
+    shiny::isolate(input$ms_tol_rt_add)
+  yaml_advanced$ms$tolerances$rt$library <-
+    shiny::isolate(input$ms_tol_rt_lib)
   yaml_advanced$names$adduct <-
     shiny::isolate(input$names_adduct)
   yaml_advanced$names$extension <-
