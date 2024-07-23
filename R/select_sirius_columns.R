@@ -1,4 +1,5 @@
 import::from(tidytable, any_of, .into = environment())
+import::from(tidytable, bind_cols, .into = environment())
 import::from(tidytable, mutate, .into = environment())
 import::from(tidytable, select, .into = environment())
 
@@ -7,6 +8,7 @@ import::from(tidytable, select, .into = environment())
 #' @description This function selects sirius columns (canopus)
 #'
 #' @importFrom tidytable any_of
+#' @importFrom tidytable bind_cols
 #' @importFrom tidytable mutate
 #' @importFrom tidytable select
 #'
@@ -135,7 +137,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       )
     )) |>
     distinct() |>
-    mutate(
+    bind_cols(tidytable(
       candidate_library = "SIRIUS",
       candidate_structure_tax_npc_01pat = NA_character_,
       candidate_structure_tax_npc_02sup = NA_character_,
@@ -145,6 +147,6 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       candidate_structure_tax_cla_02sup = NA_character_,
       candidate_structure_tax_cla_03cla = NA_character_,
       candidate_structure_tax_cla_04dirpar = NA_character_
-    )
+    ))
   return(df)
 }
