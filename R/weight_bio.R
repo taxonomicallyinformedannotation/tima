@@ -39,6 +39,8 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable select
 #' @importFrom tidytable where
 #'
+#' @include transform_score_sirius_csi.R
+#'
 #' @param annotation_table_taxed Table containing the initial annotation
 #' eventually complemented by additional MS1 annotations
 #' @param structure_organism_pairs_table Table containing the
@@ -443,19 +445,17 @@ weight_bio <-
       ) |>
       left_join(df0) |>
       log_pipe("... calculating weighted biological score \n") |>
-      ## ISSUE see #146
-      mutate(interim = -10 / as.numeric(candidate_score_sirius_csi)) |>
-      mutate(interim_2 = ifelse(test = interim > 1, yes = 1, no = interim)) |>
+      mutate(candidate_score_sirius_csi_tmp = transform_score_sirius_csi(candidate_score_sirius_csi)) |>
       mutate(
         candidate_score_pseudo_initial = case_when(
           !is.na(candidate_score_similarity) &
-            !is.na(interim_2) ~ (as.numeric(candidate_score_similarity) + interim_2) / 2,
+            !is.na(candidate_score_sirius_csi) ~ (as.numeric(candidate_score_similarity) + candidate_score_sirius_csi_tmp) / 2,
           !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
-          !is.na(interim_2) ~ interim_2,
+          !is.na(candidate_score_sirius_csi) ~ candidate_score_sirius_csi_tmp,
           TRUE ~ 0
         )
       ) |>
-      select(-interim, -interim_2) |>
+      select(-candidate_score_sirius_csi_tmp) |>
       mutate(
         score_pondered_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )

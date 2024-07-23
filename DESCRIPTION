@@ -146,6 +146,7 @@ Collate:
     'prepare_taxa.R'
     'replace_id.R'
     'timaR-package.R'
+    'transform_score_sirius_csi.R'
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
