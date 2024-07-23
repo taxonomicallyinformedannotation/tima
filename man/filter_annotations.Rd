@@ -10,7 +10,7 @@ filter_annotations(
   features = get_params(step = "filter_annotations")$files$features$prepared,
   rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
   output = get_params(step = "filter_annotations")$files$annotations$filtered,
-  tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$minutes
+  tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$library
 )
 }
 \arguments{

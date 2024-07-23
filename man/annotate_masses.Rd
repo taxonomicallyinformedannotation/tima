@@ -27,7 +27,7 @@ annotate_masses(
   neutral_losses_list = get_params(step = "annotate_masses")$ms$neutral_losses,
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
-  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$minutes
+  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts
 )
 }
 \arguments{
@@ -63,7 +63,7 @@ annotate_masses(
 
 \item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 10 ppm}
 
-\item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.1min}
+\item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 }
 \value{
 A table containing MS1 annotations based on exact mass

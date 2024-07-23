@@ -106,7 +106,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ms_tol_mas_ppm_ms2 <- params_advanced$ms$tolerances$mass$ppm$ms2
   ms_tol_mas_dal_ms1 <- params_advanced$ms$tolerances$mass$dalton$ms1
   ms_tol_mas_dal_ms2 <- params_advanced$ms$tolerances$mass$dalton$ms2
-  ms_tol_rt_min <- params_advanced$ms$tolerances$rt$minutes
+  ms_tol_rt_add <- params_advanced$ms$tolerances$rt$adducts
+  ms_tol_rt_lib <- params_advanced$ms$tolerances$rt$library
   names_extension <- params_advanced$names$extension
   names_features <- params_advanced$names$features
   names_filename <- params_advanced$names$filename
@@ -233,8 +234,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         ms_tol_mas_ppm_ms1
       yamls_params$annotate_masses$ms$tolerances$mass$dalton$ms1 <-
         ms_tol_mas_dal_ms1
-      yamls_params$annotate_masses$ms$tolerances$rt$minutes <-
-        ms_tol_rt_min
+      yamls_params$annotate_masses$ms$tolerances$rt$adducts <-
+        ms_tol_rt_add
       yamls_params$annotate_masses$names$source <-
         names_source
       yamls_params$annotate_masses$names$target <-
@@ -301,8 +302,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         fil_fea_pre
       yamls_params$filter_annotations$files$libraries$temporal$prepared <-
         fil_lib_tem_pre
-      yamls_params$filter_annotations$ms$tolerances$rt$minutes <-
-        ms_tol_rt_min
+      yamls_params$filter_annotations$ms$tolerances$rt$library <-
+        ms_tol_rt_lib
     },
     prepare_annotations_gnps = {
       yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
