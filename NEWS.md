@@ -4,6 +4,7 @@
 
 * Adding possibility to add internal libraries through the GUI (#159)
 * Adding number of peaks in spectrum
+* Clearer handling of SIRIUS scores (#146, #147)
 * Expose more parameters to the GUI (#159)
 * Fix adducts and remove nitrogen rule
 * Fix number of matched peaks
