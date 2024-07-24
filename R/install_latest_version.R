@@ -67,7 +67,7 @@ install_latest_version <- function(test = FALSE) {
       replacement = "",
       fixed = TRUE
     )
-  if (local_version == remote_version || isFALSE(test)) {
+  if (local_version == remote_version || isTRUE(test)) {
     message(
       "You already have the latest version (",
       local_version,
