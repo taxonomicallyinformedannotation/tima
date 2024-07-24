@@ -471,7 +471,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
       yamls_params$prepare_libraries_spectra$files$libraries$spectral$raw <-
         fil_lib_spe_raw
       yamls_params$prepare_libraries_spectra$names$libraries <-
-        names_lib
+        names_libraries
       yamls_params$prepare_libraries_spectra$names$mgf$adduct <-
         names_mgf_ad
       yamls_params$prepare_libraries_spectra$names$mgf$collision_energy <-
