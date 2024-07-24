@@ -8,6 +8,8 @@ test_that(desc = "Test functions", code = {
   install_latest_version()
   # When already present
   install_latest_version()
+  # Tests
+  install_latest_version(test = TRUE)
   withr::local_dir(new = fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
