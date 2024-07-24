@@ -2,11 +2,12 @@
 
 # timaR 2.9.7
 
-* Added possibility to add internal libraries through the GUI (#159)
+* Added the possibility to add internal libraries through the GUI (still some tests to implement) (#159)
+* Added the possibility to filter confident annotations only (#140)
 * Added number of peaks in spectrum
 * Clearer handling of SIRIUS scores (#146, #147)
 * Exposed more parameters to the GUI (#159)
-* Fixed adducts and remove nitrogen rule
+* Fixed adducts and removed nitrogen rule
 * Fixed number of matched peaks
 * Improved imports
 * Reduced warnings
@@ -30,7 +31,7 @@
 
 * Automated update
 * Added an option to remove ties (#134)
-* Added some details for SIRIUS, add manual workspace addition (#132)
+* Added some details for SIRIUS, added manual workspace addition (#132)
 * Additional preprocessing (reduction) of noisy spectra
 * Dependencies update
 * Docker updates (#131)
