@@ -45,8 +45,8 @@ prepare_libraries_sop_ecmdb <-
           perl = TRUE
         )
 
-      ## Get rid of the annoying incomplete final line warning
-      ecmdb <- stream_in(con = unz(description = input, filename = file)) |>
+      ecmdb <- stream_in(con = unz(description = input, filename = file),
+                         verbose = FALSE) |>
         data.frame() |>
         as_tidytable()
 

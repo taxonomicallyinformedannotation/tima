@@ -18,6 +18,9 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$ann_ms1only)) {
       parameters$annotations$ms1only <- as.logical(arguments$ann_ms1only)
     }
+    if (!is.null(arguments$ann_ms2_app)) {
+      parameters$annotations$ms2approx <- as.logical(arguments$ann_ms2_app)
+    }
     if (!is.null(arguments$ann_thr_con)) {
       parameters$annotations$thresholds$consistency <-
         as.numeric(arguments$ann_thr_con)
@@ -33,9 +36,6 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$ann_thr_ms1_con)) {
       parameters$annotations$thresholds$ms1$condition <-
         as.character(arguments$ann_thr_ms1_con)
-    }
-    if (!is.null(arguments$ann_ms2_app)) {
-      parameters$annotations$ms2approx <- as.logical(arguments$ann_ms2_app)
     }
     if (!is.null(arguments$ann_thr_ms2_sim_ann)) {
       parameters$annotations$thresholds$ms2$similarity <-
