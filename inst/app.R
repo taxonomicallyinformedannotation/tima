@@ -1509,7 +1509,10 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("If ticked, only compounds with high confidence will be reported.")
+            content = c(
+              "If ticked, only compounds with high confidence will be reported.",
+              "This is an important filter. Do not hesitate removing it for more coverage."
+            )
           ),
         shiny::checkboxInput(
           inputId = "remove_ties",
