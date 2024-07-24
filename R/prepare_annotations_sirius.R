@@ -6,6 +6,7 @@ import::from(tidytable, left_join, .into = environment())
 import::from(tidytable, mutate, .into = environment())
 import::from(tidytable, select, .into = environment())
 import::from(tidytable, tidytable, .into = environment())
+import::from(utils, unzip, .into = environment())
 
 #' @title Prepare annotations SIRIUS
 #'
@@ -19,6 +20,7 @@ import::from(tidytable, tidytable, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable select
 #' @importFrom tidytable tidytable
+#' @importFrom utils unzip
 #'
 #' @include columns_model.R
 #' @include get_params.R

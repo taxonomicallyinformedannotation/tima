@@ -1890,7 +1890,7 @@ list(
       name = benchmark_file,
       format = "file",
       command = {
-        unzip(zipfile = benchmark_zip)
+        utils::unzip(zipfile = benchmark_zip)
         dir.create(dirname(benchmark_path_file), recursive = TRUE)
         file.copy(from = "cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf", to = benchmark_path_file)
         unlink("cleaned_libraries_matchms", recursive = TRUE)
@@ -1994,7 +1994,7 @@ list(
             into = c("a", "b")
           ) |>
           tidytable::filter(!is.na(b)) |>
-          tidytable::filter(stringr::str_length(as.numeric(b)) > 1) |>
+          tidytable::filter(stringi::stri_length(as.numeric(b)) > 1) |>
           tidytable::select(-a, -b) |>
           tidytable::mutate(inchikey_no_stereo = gsub(
             pattern = "-.*",

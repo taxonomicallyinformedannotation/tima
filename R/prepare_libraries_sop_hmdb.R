@@ -7,6 +7,7 @@ import::from(tidytable, filter, .into = environment())
 import::from(tidytable, mutate, .into = environment())
 import::from(tidytable, na_if, .into = environment())
 import::from(tidytable, select, .into = environment())
+import::from(utils, unzip, .into = environment())
 
 #' @title Prepare libraries of structure organism pairs HMDB
 #'
@@ -21,6 +22,7 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable na_if
 #' @importFrom tidytable select
+#' @importFrom utils unzip
 #'
 #' @include fake_sop_columns.R
 #' @include get_params.R

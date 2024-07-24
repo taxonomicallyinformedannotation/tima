@@ -49,7 +49,7 @@ prepare_isdb_hmdb <-
         x = input,
         fixed = TRUE
       )
-    unzip(zipfile = input, exdir = newdir)
+    utils::unzip(zipfile = input, exdir = newdir)
 
     log_debug("Loading spectra (might take long)")
     spctra <- CompoundDb::msms_spectra_hmdb(x = newdir)
