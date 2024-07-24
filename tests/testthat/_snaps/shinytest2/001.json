@@ -46,8 +46,7 @@
     "gnps_workflow": "fbmn",
     "high_confidence": true,
     "launch": 0,
-    "lib_spe_exp_mgf": null,
-    "lib_spe_is_mgf": null,
+    "lib_spe_mgf": null,
     "lib_tmp_exp_csv": null,
     "lib_tmp_is_csv": null,
     "ms_add_neg": [
