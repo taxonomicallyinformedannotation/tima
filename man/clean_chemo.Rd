@@ -14,6 +14,7 @@ clean_chemo(
   minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
   minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
   minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
+  high_confidence = get("high_confidence", envir = parent.frame()),
   remove_ties = get("remove_ties", envir = parent.frame()),
   summarise = get("summarise", envir = parent.frame())
 )
@@ -36,6 +37,8 @@ structure - organism pairs}
 \item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
 
 \item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
+
+\item{high_confidence}{Report high confidence candidates only. BOOLEAN}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
 

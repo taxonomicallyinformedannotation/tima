@@ -47,6 +47,11 @@ test_that(desc = "Test functions", code = {
     user_gnps = "",
     user_filename = "Foo"
   )
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = "Foo",
+    user_filename = "Foo"
+  )
 
   ## Get all files
   ### Features table
@@ -388,6 +393,9 @@ test_that(desc = "Test functions", code = {
   prepare_features_tables()
 
   ## Performing MS1 annotation
+  ### Adducts
+  parse_adduct("foo bar") # to check for error
+
   ## TODO check values later on
   calculate_mass_of_m(adduct_string = "[2M1-2H2O+NaCl+H]2+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M+Na]+", mz = 123.456)
@@ -529,20 +537,21 @@ test_that(desc = "Test functions", code = {
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
     minimal_ms1_condition = "AND",
-    compounds_names = TRUE
+    compounds_names = TRUE,
+    high_confidence = FALSE
   )
 
   ## CLI arguments check
   arguments <- character()
-  arguments$ann_can_fin <- "x"
-  arguments$ann_ms1only <- "x"
-  arguments$ann_ms2_app <- "x"
-  arguments$ann_thr_con <- "x"
-  arguments$ann_thr_ms1_bio <- "x"
-  arguments$ann_thr_ms1_che <- "x"
+  arguments$ann_can_fin <- 0
+  arguments$ann_ms1only <- TRUE
+  arguments$ann_ms2_app <- TRUE
+  arguments$ann_thr_con <- 0
+  arguments$ann_thr_ms1_bio <- 0
+  arguments$ann_thr_ms1_che <- 0
   arguments$ann_thr_ms1_con <- "x"
-  arguments$ann_thr_ms2_sim_ann <- "x"
-  arguments$ann_thr_ms2_sim_edg <- "x"
+  arguments$ann_thr_ms2_sim_ann <- 0
+  arguments$ann_thr_ms2_sim_edg <- 0
   arguments$fil_pat <- "x"
   arguments$fil_ann_raw_spe <- "x"
   arguments$fil_ann_raw_spe_gnp <- "x"
@@ -588,15 +597,15 @@ test_that(desc = "Test functions", code = {
   arguments$ms_clu_pos <- "x"
   arguments$ms_neu <- "x"
   arguments$ms_pol <- "x"
-  arguments$ms_thr_ms2_int <- "x"
-  arguments$ms_tol_mas_ppm_ms1 <- "x"
-  arguments$ms_tol_mas_ppm_ms2 <- "x"
-  arguments$ms_tol_mas_dal_ms1 <- "x"
-  arguments$ms_tol_mas_dal_ms2 <- "x"
-  arguments$ms_tol_rt_add <- "x"
-  arguments$ms_tol_rt_lib <- "x"
+  arguments$ms_thr_ms2_int <- 0
+  arguments$ms_tol_mas_ppm_ms1 <- 0
+  arguments$ms_tol_mas_ppm_ms2 <- 0
+  arguments$ms_tol_mas_dal_ms1 <- 0
+  arguments$ms_tol_mas_dal_ms2 <- 0
+  arguments$ms_tol_rt_add <- 0
+  arguments$ms_tol_rt_lib <- 0
   arguments$names_adduct <- "x"
-  arguments$names_extension <- "x"
+  arguments$names_extension <- TRUE
   arguments$names_features <- "x"
   arguments$names_filename <- "x"
   arguments$names_inchikey <- "x"
@@ -627,47 +636,48 @@ test_that(desc = "Test functions", code = {
   arguments$names_source <- "x"
   arguments$names_target <- "x"
   arguments$names_taxon <- "x"
-  arguments$org_can <- "x"
-  arguments$org_fil_mod <- "x"
+  arguments$org_can <- 0
+  arguments$org_fil_mod <- TRUE
   arguments$org_fil_lev <- "x"
   arguments$org_fil_val <- "x"
   arguments$org_tax <- "x"
   arguments$too_met <- "x"
   arguments$too_net_spe_com <- "x"
   arguments$too_net_spe_edg <- "x"
+  arguments$too_sir_ver <- 0
   arguments$too_tax_bio <- "x"
   arguments$too_tax_che <- "x"
   arguments$units_rt <- "x"
-  arguments$wei_glo_bio <- "x"
-  arguments$wei_glo_che <- "x"
-  arguments$wei_glo_spe <- "x"
-  arguments$wei_bio_01 <- "x"
-  arguments$wei_bio_02 <- "x"
-  arguments$wei_bio_03 <- "x"
-  arguments$wei_bio_04 <- "x"
-  arguments$wei_bio_05 <- "x"
-  arguments$wei_bio_06 <- "x"
-  arguments$wei_bio_07 <- "x"
-  arguments$wei_bio_08 <- "x"
-  arguments$wei_bio_09 <- "x"
-  arguments$wei_bio_10 <- "x"
-  arguments$wei_bio_11 <- "x"
-  arguments$wei_bio_12 <- "x"
-  arguments$wei_bio_13 <- "x"
-  arguments$wei_bio_14 <- "x"
-  arguments$wei_bio_15 <- "x"
-  arguments$wei_che_11 <- "x"
-  arguments$wei_che_12 <- "x"
-  arguments$wei_che_13 <- "x"
-  arguments$wei_che_14 <- "x"
-  arguments$wei_che_21 <- "x"
-  arguments$wei_che_22 <- "x"
-  arguments$wei_che_23 <- "x"
-  arguments$compounds_names <- "x"
-  arguments$force <- "x"
-  arguments$nit_rul <- "x"
-  arguments$remove_ties <- "x"
-  arguments$summarise <- "x"
+  arguments$wei_glo_bio <- 0
+  arguments$wei_glo_che <- 0
+  arguments$wei_glo_spe <- 0
+  arguments$wei_bio_01 <- 0
+  arguments$wei_bio_02 <- 0
+  arguments$wei_bio_03 <- 0
+  arguments$wei_bio_04 <- 0
+  arguments$wei_bio_05 <- 0
+  arguments$wei_bio_06 <- 0
+  arguments$wei_bio_07 <- 0
+  arguments$wei_bio_08 <- 0
+  arguments$wei_bio_09 <- 0
+  arguments$wei_bio_10 <- 0
+  arguments$wei_bio_11 <- 0
+  arguments$wei_bio_12 <- 0
+  arguments$wei_bio_13 <- 0
+  arguments$wei_bio_14 <- 0
+  arguments$wei_bio_15 <- 0
+  arguments$wei_che_11 <- 0
+  arguments$wei_che_12 <- 0
+  arguments$wei_che_13 <- 0
+  arguments$wei_che_14 <- 0
+  arguments$wei_che_21 <- 0
+  arguments$wei_che_22 <- 0
+  arguments$wei_che_23 <- 0
+  arguments$compounds_names <- TRUE
+  arguments$force <- TRUE
+  arguments$high_confidence <- TRUE
+  arguments$remove_ties <- TRUE
+  arguments$summarise <- TRUE
 
   # Useless
   keep_peaks(x = 0, prop = 0)

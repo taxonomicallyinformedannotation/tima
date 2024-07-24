@@ -6,7 +6,7 @@
 #'
 #' @param csi_score Original CSI score
 #' @param K Shift
-#' @param anyone scale
+#' @param scale Scale
 #'
 #' @return A mass
 #'
