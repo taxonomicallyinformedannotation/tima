@@ -5,14 +5,8 @@
 \title{Prepare libraries of spectra}
 \usage{
 prepare_libraries_spectra(
-  input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$exp$raw,
-  output_neg = get_params(step =
-    "prepare_libraries_spectra")$files$libraries$spectral$exp$neg,
-  output_pos = get_params(step =
-    "prepare_libraries_spectra")$files$libraries$spectral$exp$pos,
-  output_sop = get_params(step =
-    "prepare_libraries_spectra")$files$libraries$sop$prepared$spectral,
-  metad = "myLib",
+  input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$raw,
+  nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
   col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
@@ -35,13 +29,7 @@ prepare_libraries_spectra(
 \arguments{
 \item{input}{File containing spectra}
 
-\item{output_neg}{Negative output file}
-
-\item{output_pos}{Positive output file}
-
-\item{output_sop}{SOP output file}
-
-\item{metad}{Metadata to identify the library}
+\item{nam_lib}{Metadata to identify the library}
 
 \item{col_ad}{Name of the adduct in mgf}
 

@@ -108,29 +108,17 @@ parse_cli_params <- function(arguments, parameters) {
       parameters$files$libraries$sop$prepared <-
         as.character(arguments$fil_lib_sop_pre)
     }
-    if (!is.null(arguments$fil_lib_spe_exp_neg)) {
-      parameters$files$libraries$spectral$exp$neg <-
-        as.character(arguments$fil_lib_spe_exp_neg)
+    if (!is.null(arguments$fil_lib_spe_neg)) {
+      parameters$files$libraries$spectral$neg <-
+        as.character(arguments$fil_lib_spe_neg)
     }
-    if (!is.null(arguments$fil_lib_spe_exp_pos)) {
-      parameters$files$libraries$spectral$exp$pos <-
-        as.character(arguments$fil_lib_spe_exp_pos)
+    if (!is.null(arguments$fil_lib_spe_pos)) {
+      parameters$files$libraries$spectral$pos <-
+        as.character(arguments$fil_lib_spe_pos)
     }
-    if (!is.null(arguments$fil_lib_spe_exp_raw)) {
-      parameters$files$libraries$spectral$exp$raw <-
-        as.character(arguments$fil_lib_spe_exp_raw)
-    }
-    if (!is.null(arguments$fil_lib_spe_is_neg)) {
-      parameters$files$libraries$spectral$is$neg <-
-        as.character(arguments$fil_lib_spe_is_neg)
-    }
-    if (!is.null(arguments$fil_lib_spe_is_pos)) {
-      parameters$files$libraries$spectral$is$pos <-
-        as.character(arguments$fil_lib_spe_is_pos)
-    }
-    if (!is.null(arguments$fil_lib_spe_is_raw)) {
-      parameters$files$libraries$spectral$is$raw <-
-        as.character(arguments$fil_lib_spe_is_raw)
+    if (!is.null(arguments$fil_lib_spe_raw)) {
+      parameters$files$libraries$spectral$raw <-
+        as.character(arguments$fil_lib_spe_raw)
     }
     if (!is.null(arguments$fil_lib_tem_exp_csv)) {
       parameters$files$libraries$temporal$exp$csv <-
@@ -248,6 +236,9 @@ parse_cli_params <- function(arguments, parameters) {
     }
     if (!is.null(arguments$names_inchikey)) {
       parameters$names$inchikey <- as.character(arguments$names_inchikey)
+    }
+    if (!is.null(arguments$names_lib)) {
+      parameters$names$libraries <- as.character(arguments$names_lib)
     }
     if (!is.null(arguments$names_mgf_ad)) {
       parameters$names$mgf$adduct <- as.character(arguments$names_mgf_ad)

@@ -3,7 +3,7 @@
 # timaR 2.9.7
 
 * Added alt text to vignettes
-* Added the possibility to add internal libraries through the GUI (still some tests to implement) (#159)
+* Added the possibility to add internal libraries through the GUI (#159)
 * Added the possibility to filter confident annotations only (#140)
 * Added number of peaks in spectrum
 * Clearer handling of SIRIUS scores (#146, #147)

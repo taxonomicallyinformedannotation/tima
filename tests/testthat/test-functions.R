@@ -243,81 +243,14 @@ test_that(desc = "Test functions", code = {
   get_massbank_spectra()
 
   ## Prepare libraries
-  ### Spectra
-  #### LOTUS
-  col_args <- list(
-    col_ad = NULL,
-    col_ce = NULL,
-    col_ci = "FILENAME",
-    col_em = "EXACTMASS",
-    col_in = NULL,
-    col_io = "INCHI",
-    col_ik = NULL,
-    col_il = "NAME",
-    col_mf = "MOLECULAR_FORMULA",
-    col_na = NULL,
-    col_po = "IONMODE",
-    col_sm = NULL,
-    col_sn = "SMILES",
-    col_si = NULL,
-    col_sp = NULL,
-    col_sy = NULL,
-    col_xl = NULL
-  )
-  ##### mgf
-  do.call(
-    what = prepare_libraries_spectra,
-    args = c(
-      col_args,
-      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(
-          pattern = "lotus_pos.rds",
-          replacement = "isdb_pos.mgf",
-          fixed = TRUE
-        ),
-      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
-      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
-    )
-  )
-  ##### Check the library already exists warning
-  do.call(
-    what = prepare_libraries_spectra,
-    args = c(
-      col_args,
-      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[2]] |>
-        gsub(
-          pattern = "lotus_pos.rds",
-          replacement = "isdb_pos.mgf",
-          fixed = TRUE
-        ),
-      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
-      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
-    )
-  )
-  ##### Without metadata
-  do.call(
-    what = prepare_libraries_spectra,
-    args = c(
-      col_args,
-      input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$raw[[1]] |>
-        gsub(
-          pattern = "lotus_neg.rds",
-          replacement = "isdb_neg.mgf",
-          fixed = TRUE
-        ),
-      output_pos = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$pos,
-      output_neg = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$is$neg
-    )
-  )
-  #### If does not exist
+  ### If does not exist
   prepare_libraries_spectra(
     input = "doesNotExists.txt",
-    output_pos = "data/interim/libraries/spectra/exp/nope_pos.rds",
-    output_neg = "data/interim/libraries/spectra/exp/nope_neg.rds",
+    nam_lib = "nope"
   )
-  #### Classical
+  ### Classical
   prepare_libraries_spectra()
-  #### Again
+  #### Check the library already exists warning
   prepare_libraries_spectra()
 
   ## for msp reading test
@@ -609,6 +542,7 @@ test_that(desc = "Test functions", code = {
   arguments$names_features <- "x"
   arguments$names_filename <- "x"
   arguments$names_inchikey <- "x"
+  arguments$names_lib <- "x"
   arguments$names_mgf_ad <- "x"
   arguments$names_mgf_ce <- "x"
   arguments$names_mgf_ci <- "x"

@@ -1117,30 +1117,7 @@ list(
             format = "file",
             command = {
               lib_spe_exp_int_pre <-
-                prepare_libraries_spectra(
-                  input = par_pre_lib_spe$files$libraries$spectral$exp$raw,
-                  output_pos = "data/interim/libraries/spectra/exp/internal_pos.rds",
-                  output_neg = "data/interim/libraries/spectra/exp/internal_neg.rds",
-                  output_sop = "data/interim/libraries/sop/spectral_int_prepared.tsv.gz",
-                  metad = "InternalLib",
-                  col_ad = NULL,
-                  col_ce = NULL,
-                  col_ci = "FILENAME",
-                  col_em = "EXACTMASS",
-                  col_in = "INCHI",
-                  col_io = NULL,
-                  col_ik = NULL,
-                  col_il = NULL,
-                  col_mf = NULL,
-                  col_na = "NAME",
-                  col_po = "IONMODE",
-                  col_sm = "SMILES",
-                  col_sn = NULL,
-                  col_si = "SPECTRUMID",
-                  col_sp = NULL,
-                  col_sy = NULL,
-                  col_xl = NULL
-                )
+                prepare_libraries_spectra()
             }
           ),
           tar_target(
@@ -1171,10 +1148,7 @@ list(
               lib_spe_exp_mb_pre <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
-                  output_pos = "data/interim/libraries/spectra/exp/massbank_pos.rds",
-                  output_neg = "data/interim/libraries/spectra/exp/massbank_neg.rds",
-                  output_sop = "data/interim/libraries/sop/spectral_mb_prepared.tsv.gz",
-                  metad = paste("MassBank",
+                  nam_lib = paste("MassBank",
                     paths_urls_massbank_version,
                     sep = " - "
                   ),

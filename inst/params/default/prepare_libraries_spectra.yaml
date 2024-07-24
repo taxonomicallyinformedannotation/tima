@@ -3,45 +3,18 @@
 files:
   #' Libraries files.
   libraries:
-    #' Structure organism pairs libraries.
-    sop:
-      #' List of prepared structure organism pairs libraries.
-      prepared:
-        #' Spectral prepared structure organism pairs library. STRING
-        spectral: data/interim/libraries/sop/spectral_prepared.tsv.gz
-    #' Spectral libraries. STRING
+    #' Spectral libraries.
     spectral:
-      #' Experimental libraries
-      exp:
-        #' List of negative experimental spectral libraries. STRING
-        neg:
-          - data/interim/libraries/spectra/exp/spectra_exp_neg.rds
-
-        #' List of positive experimental spectral libraries. STRING
-        pos:
-          - data/interim/libraries/spectra/exp/spectra_exp_pos.rds
-
-        #' List of raw experimental spectral libraries. STRING
-        raw:
-          - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
-
-      #' In silico libraries
-      is:
-        #' List of negative in silico spectral libraries. STRING
-        neg:
-          - data/interim/libraries/spectra/is/lotus_neg.rds
-
-        #' List of positive in silico spectral libraries. STRING
-        pos:
-          - data/interim/libraries/spectra/is/lotus_pos.rds
-
-        #' List of raw in silico spectral libraries. STRING
-        raw:
-          - data/source/libraries/spectra/is/lotus_neg.rds
-          - data/source/libraries/spectra/is/lotus_pos.rds
+      #' List of raw spectral libraries. STRING
+      raw:
+        - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
 #' Names of the different variables in the input files.
 names:
+  #' Names of the prepared libraries. STRING
+  libraries: 
+    - internal
+
   #' Name of fields present in the MGF.
   mgf:
     #' Name of "adduct" in MGF. STRING
@@ -51,7 +24,7 @@ names:
     collision_energy: ~
 
     #' Name of "compound ID" in MGF. STRING
-    compound_id: SPECTRUMID
+    compound_id: FILENAME
 
     #' Name of "exact mass" in MGF. STRING
     exact_mass: EXACTMASS
@@ -72,7 +45,7 @@ names:
     molecular_formula: ~
 
     #' Name of "name" in MGF. STRING
-    name: ~
+    name: NAME
 
     #' Name of "polarity" in MGF. STRING
     polarity: IONMODE
@@ -84,7 +57,7 @@ names:
     smiles_no_stereo: ~
 
     #' Name of "spectrum ID" in MGF. STRING
-    spectrum_id: ~
+    spectrum_id: SPECTRUMID
 
     #' Name of "SPLASH" in MGF. STRING
     splash: ~
