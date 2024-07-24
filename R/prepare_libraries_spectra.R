@@ -72,11 +72,11 @@ prepare_libraries_spectra <-
            col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
            col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp) {
     output_pos <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$path,
+      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")
     )
     output_neg <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$path,
+      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_neg.rds")
     )
     output_sop <- file.path(
@@ -101,7 +101,25 @@ prepare_libraries_spectra <-
         spectra_harmonized_pos <- lapply(
           X = spectra_extracted,
           FUN = harmonize_spectra,
-          mode = "pos"
+          mode = "pos",
+          metad = nam_lib,
+          col_ad,
+          col_ce,
+          col_ci,
+          col_em,
+          col_in,
+          col_io,
+          col_ik,
+          col_il,
+          col_mf,
+          col_na,
+          col_po,
+          col_sm,
+          col_sn,
+          col_si,
+          col_sp,
+          col_sy,
+          col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
@@ -113,7 +131,25 @@ prepare_libraries_spectra <-
         spectra_harmonized_neg <- lapply(
           X = spectra_extracted,
           FUN = harmonize_spectra,
-          mode = "neg"
+          mode = "neg",
+          metad = nam_lib,
+          col_ad,
+          col_ce,
+          col_ci,
+          col_em,
+          col_in,
+          col_io,
+          col_ik,
+          col_il,
+          col_mf,
+          col_na,
+          col_po,
+          col_sm,
+          col_sn,
+          col_si,
+          col_sp,
+          col_sy,
+          col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
