@@ -47,6 +47,11 @@ test_that(desc = "Test functions", code = {
     user_gnps = "",
     user_filename = "Foo"
   )
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = "Foo",
+    user_filename = "Foo"
+  )
 
   ## Get all files
   ### Features table
@@ -388,6 +393,9 @@ test_that(desc = "Test functions", code = {
   prepare_features_tables()
 
   ## Performing MS1 annotation
+  ### Adducts
+  parse_adduct("foo bar") # to check for error
+
   ## TODO check values later on
   calculate_mass_of_m(adduct_string = "[2M1-2H2O+NaCl+H]2+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M+Na]+", mz = 123.456)
@@ -636,6 +644,7 @@ test_that(desc = "Test functions", code = {
   arguments$too_met <- "x"
   arguments$too_net_spe_com <- "x"
   arguments$too_net_spe_edg <- "x"
+  arguments$too_sir_ver <- "x"
   arguments$too_tax_bio <- "x"
   arguments$too_tax_che <- "x"
   arguments$units_rt <- "x"
