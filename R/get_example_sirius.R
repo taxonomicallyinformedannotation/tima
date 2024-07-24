@@ -1,6 +1,10 @@
+import::from(utils, unzip, .into = environment())
+
 #' @title Get example sirius
 #'
 #' @description This function gets example SIRIUS annotations
+#'
+#' @importFrom utils unzip
 #'
 #' @include parse_yaml_paths.R get_file.R
 #'

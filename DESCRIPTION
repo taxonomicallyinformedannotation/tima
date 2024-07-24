@@ -56,7 +56,6 @@ Imports:
 Suggests: 
     BiocManager,
     knitr,
-    pak,
     pkgload,
     testthat,
     shinytest2,
