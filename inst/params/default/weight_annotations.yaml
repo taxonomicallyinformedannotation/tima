@@ -184,6 +184,9 @@ options:
   #' Do not use it. BOOLEAN
   force: no
 
+  #' Filter high confidence candidates only. BOOLEAN
+  high_confidence: yes
+
   #' Remove ties. BOOLEAN
   remove_ties: no
 
