@@ -80,7 +80,7 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
         stri_replace_all_fixed(
           pattern = " x ",
           replacement = "",
-          vectorize = FALSE
+          vectorize_all = FALSE
         )
     ) |>
     mutate(
@@ -88,7 +88,7 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
         stri_replace_all_fixed(
           pattern = "\u00D7 ",
           replacement = "",
-          vectorize = FALSE
+          vectorize_all = FALSE
         )
     ) |>
     distinct() |>
@@ -175,7 +175,7 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
           str = organism_table_2$search_string,
           pattern = " .*",
           replacement = "",
-          vectorize = FALSE
+          vectorize_all = FALSE
         )
       organisms <- unique(organism_table_2$search_string)
       organisms_new <-
@@ -183,7 +183,7 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
           str = organisms,
           pattern = " .*",
           replacement = "",
-          vectorize = FALSE
+          vectorize_all = FALSE
         )
       ## TODO make it cleaner
       cut <- 100
