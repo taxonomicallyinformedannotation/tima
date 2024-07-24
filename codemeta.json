@@ -69,18 +69,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "pak",
-      "name": "pak",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=pak"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "pkgload",
       "name": "pkgload",
       "provider": {
@@ -616,7 +604,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3181.629KB",
+  "fileSize": "3182.334KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
