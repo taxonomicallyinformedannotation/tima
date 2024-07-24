@@ -50,33 +50,27 @@ Of those, only 6,282 spectra (52.1%) corresponded to structures present in the l
 
 ## Best 100 candidates
 ### Positive
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_full_pos.svg")
-```
+
+![Benchmark ROC curves (positive mode)](./benchmark_full_pos.svg)\
 
 ### Negative
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_full_neg.svg")
-```
+
+![Benchmark ROC curves (negative mode)](./benchmark_full_neg.svg)\
 
 ## Best 25 candidates (zoomed)
 ### Positive
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_zoomed_pos.svg")
-```
+
+![Benchmark ROC curves zoomed on the first 25 candidates (positive mode)](./benchmark_zoomed_pos.svg)\
 
 ### Negative
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_zoomed_neg.svg")
-```
+
+![Benchmark ROC curves zoomed on the first 25 candidates (negative mode)](./benchmark_zoomed_neg.svg)\
 
 ## Candidates distribution
 ### Positive
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_comparison_pos.svg")
-```
+
+![Benchmark comparison (positive mode)](./benchmark_comparison_pos.svg)\
 
 ### Negative
-```{r, echo=FALSE}
-knitr::include_graphics("benchmark_comparison_neg.svg")
-```
+
+![Benchmark comparison (negative mode)](./benchmark_comparison_neg.svg)\

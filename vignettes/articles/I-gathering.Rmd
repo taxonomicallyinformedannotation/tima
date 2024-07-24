@@ -43,13 +43,13 @@ Some default parameters are available and can be accessed in the `inst/params/de
 If you prefer accessing them through the GUI, you can do so.
 Each parameter contains a small help menu, you can click on, as illustrated below.
 
-![](./figures/screenshot-1.svg)
+![Screenshot showing where the help menu is](./figures/screenshot-1.svg)\
 
-![](./figures/screenshot-2.svg)
+![Screenshot showing how the help menu looks like when opened](./figures/screenshot-2.svg)\
 
 For example, if you want to have an output compatible with Cytoscape, with multiple annotations per features:
 
-![](./figures/screenshot-3.svg)
+![Screenshot showing an example box ticked](./figures/screenshot-3.svg)\
 
 All parameters will be saved and reported at the end of your analysis.
 
