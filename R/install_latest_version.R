@@ -30,7 +30,7 @@ install_latest_version <- function() {
         strsplit(lib, .Platform$path.sep)[[1]][[1]]
       ), append = TRUE)
     }
-    install.packages(
+    utils::install.packages(
       "pak",
       repos = sprintf(
         "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
@@ -45,7 +45,7 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!"timaR" %in% installed.packages()) {
+  if (!"timaR" %in% utils::installed.packages()) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
