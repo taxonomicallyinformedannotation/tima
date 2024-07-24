@@ -2,12 +2,14 @@
 #'
 #' @description This function installs the latest version
 #'
+#' @param test Flag for tests
+#'
 #' @return NULL
 #'
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function() {
+install_latest_version <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
@@ -15,7 +17,7 @@ install_latest_version <- function() {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  if (!requireNamespace("pak", quietly = TRUE)) {
+  if (!requireNamespace("pak", quietly = TRUE) || isTRUE(test)) {
     lib <- Sys.getenv("R_LIBS_SITE")
     if (lib == "") {
       lib <- file.path(dirname(.Library), "site-library")
@@ -45,7 +47,7 @@ install_latest_version <- function() {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!"timaR" %in% utils::installed.packages()) {
+  if (!"timaR" %in% utils::installed.packages() || isTRUE(test)) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
@@ -65,7 +67,7 @@ install_latest_version <- function() {
       replacement = "",
       fixed = TRUE
     )
-  if (local_version == remote_version) {
+  if (local_version == remote_version || isFALSE(test)) {
     message(
       "You already have the latest version (",
       local_version,
@@ -91,7 +93,7 @@ install_latest_version <- function() {
       }
     )
     # If local version installation fails, try the URL from DESCRIPTION file
-    if (!success) {
+    if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
           message("Installing remote version")
@@ -113,7 +115,7 @@ install_latest_version <- function() {
       )
     }
     # If URL installation fails, try installing the remote version from GitHub
-    if (!success) {
+    if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
           message("Retrying remote version")
@@ -136,7 +138,7 @@ install_latest_version <- function() {
       )
     }
     # Final message if all attempts fail
-    if (!success) {
+    if (!success || isTRUE(test)) {
       message("All installation attempts failed")
     }
   }
