@@ -106,6 +106,7 @@ import::from(tidytable, where, .into = environment())
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param ms1_only Keep only MS1 annotations. BOOLEAN
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
+#' @param high_confidence Report high confidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarise Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
@@ -159,6 +160,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
                                minimal_ms1_condition = get_params(step = "weight_annotations")$annotations$thresholds$ms1$condition,
                                ms1_only = get_params(step = "weight_annotations")$annotations$ms1only,
                                compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
+                               high_confidence = get_params(step = "weight_annotations")$options$high_confidence,
                                remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
                                summarise = get_params(step = "weight_annotations")$options$summarise,
                                pattern = get_params(step = "weight_annotations")$files$pattern,

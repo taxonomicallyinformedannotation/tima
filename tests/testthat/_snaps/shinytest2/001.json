@@ -44,6 +44,7 @@
     "force": false,
     "gnps_id": "",
     "gnps_workflow": "fbmn",
+    "high_confidence": true,
     "launch": 0,
     "lib_spe_exp_mgf": null,
     "lib_spe_is_mgf": null,

@@ -529,7 +529,8 @@ test_that(desc = "Test functions", code = {
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
     minimal_ms1_condition = "AND",
-    compounds_names = TRUE
+    compounds_names = TRUE,
+    high_confidence = FALSE
   )
 
   ## CLI arguments check
@@ -665,7 +666,7 @@ test_that(desc = "Test functions", code = {
   arguments$wei_che_23 <- "x"
   arguments$compounds_names <- "x"
   arguments$force <- "x"
-  arguments$nit_rul <- "x"
+  arguments$high_confidence <- "x"
   arguments$remove_ties <- "x"
   arguments$summarise <- "x"
 
