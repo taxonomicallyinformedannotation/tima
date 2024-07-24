@@ -11,7 +11,7 @@ transform_score_sirius_csi(csi_score, K = 50, scale = 10)
 
 \item{K}{Shift}
 
-\item{anyone}{scale}
+\item{scale}{Scale}
 }
 \value{
 A mass

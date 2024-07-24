@@ -177,24 +177,24 @@ get_gnps_tables <-
       log_debug("No GNPS job ID provided")
       log_debug("Returning empty dataframes instead")
       fake_annotations <- data.frame(
-        `#Scan#` = NA,
-        MassDiff = NA,
-        MZErrorPPM = NA,
-        Precursor_MZ = NA,
-        LibraryName = NA,
-        Compound_Name = NA,
-        INCHI = NA,
-        InChIKey = NA,
-        `InChIKey-Planar` = NA,
-        ExactMass = NA,
-        MQScore = NA,
-        SharedPeaks = NA,
-        npclassifier_pathway = NA,
-        npclassifier_superclass = NA,
-        npclassifier_class = NA,
-        superclass = NA,
-        class = NA,
-        subclass = NA,
+        `#Scan#` = 0,
+        MassDiff = 0,
+        MZErrorPPM = 0,
+        Precursor_MZ = 0,
+        LibraryName = "foo",
+        Compound_Name = "bar",
+        INCHI = "bim",
+        InChIKey = "bam",
+        `InChIKey-Planar` = "bom",
+        ExactMass = 0,
+        MQScore = 0,
+        SharedPeaks = 0,
+        npclassifier_pathway = "aaa",
+        npclassifier_superclass = "bbb",
+        npclassifier_class = "ccc",
+        superclass = "ddd",
+        class = "eee",
+        subclass = "fff",
         check.names = FALSE
       )
       export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
@@ -216,7 +216,7 @@ get_gnps_tables <-
       if (length(path_metadata) == 0 ||
         !file.exists(path_metadata)) {
         path_metadata <- "data/source/metadata.tsv"
-        fake_metadata <- data.frame(filename = NA, ATTRIBUTE_species = NA)
+        fake_metadata <- data.frame(filename = "foo", ATTRIBUTE_species = "bar")
         export_output(x = fake_metadata, file = path_metadata)
       }
 

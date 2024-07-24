@@ -85,6 +85,7 @@ Collate:
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'clean_bio.R'
+    'filter_high_confidence_only.R'
     'columns_model.R'
     'clean_collapse.R'
     'clean_chemo.R'

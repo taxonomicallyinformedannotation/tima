@@ -175,6 +175,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   wei_che_23 <- params_advanced$weights$chemical$npc$class
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
+  opt_hig_con <- params_advanced$options$high_confidence
   opt_for <- params_advanced$options$force
   opt_rem_tie <- params_advanced$options$remove_ties
   opt_sum <- params_advanced$options$summarise
@@ -187,6 +188,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_ann_raw_spe_sir <- params_small$files$annotations$raw$spectral$sirius
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
+  opt_hig_con <- params_small$options$high_confidence
   opt_sum <- params_small$options$summarise
 
   if (!is.null(org_tax)) {
@@ -630,6 +632,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         opt_cpd_nam
       yamls_params$weight_annotations$options$force <-
         opt_for
+      yamls_params$weight_annotations$options$high_confidence <-
+        opt_hig_con
       yamls_params$weight_annotations$options$remove_ties <-
         opt_rem_tie
       yamls_params$weight_annotations$options$summarise <-

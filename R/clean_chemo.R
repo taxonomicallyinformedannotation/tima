@@ -45,6 +45,7 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @include clean_collapse.R
 #' @include columns_model.R
+#' @include filter_high_confidence_only.R
 #'
 #' @param annot_table_wei_chemo Table containing your
 #'    chemically weighted annotation
@@ -56,6 +57,7 @@ import::from(tidytable, where, .into = environment())
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
+#' @param high_confidence Report high confidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarise Boolean. summarise results (1 row per feature)
 #'
@@ -76,6 +78,7 @@ clean_chemo <-
            minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
            minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
            minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
+           high_confidence = get("high_confidence", envir = parent.frame()),
            remove_ties = get("remove_ties", envir = parent.frame()),
            summarise = get("summarise", envir = parent.frame())) {
     model <- columns_model()
@@ -119,6 +122,11 @@ clean_chemo <-
                 score_chemical >= minimal_ms1_chemo
             )
         )
+    }
+
+    if (high_confidence) {
+      df1 <- df1 |>
+        filter_high_confidence_only()
     }
 
     df1 <- df1 |>
