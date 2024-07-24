@@ -9,6 +9,7 @@
 * Fixed adducts and remove nitrogen rule
 * Fixed number of matched peaks
 * Improved imports
+* Reduced warnings
 * Updated benchmarking steps
 
 # timaR 2.9.6
