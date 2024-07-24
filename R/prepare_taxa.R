@@ -118,9 +118,9 @@ prepare_taxa <-
     }
 
     log_debug(x = "Formatting feature table ...")
-    log_debug(x = "... WARNING: requires 'Peak area'
+    log_debug(x = "... requires 'Peak area'
               in columns (MZmine format)")
-    log_debug(x = "... WARNING: or 'quant_' in columns (SLAW format)")
+    log_debug(x = "... or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
       select(all_of(c(name_features)), matches(" Peak area"), matches("quant_"), ) |>
       select(-matches("quant_peaktable")) |>
