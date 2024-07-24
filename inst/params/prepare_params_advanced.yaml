@@ -471,7 +471,7 @@ names:
     collision_energy: ~
 
     #' Name of "compound ID" in MGF. STRING
-    compound_id: SPECTRUMID
+    compound_id: FILENAME
 
     #' Name of "exact mass" in MGF. STRING
     exact_mass: EXACTMASS
@@ -492,7 +492,7 @@ names:
     molecular_formula: ~
 
     #' Name of "name" in MGF. STRING
-    name: ~
+    name: NAME
 
     #' Name of "polarity" in MGF. STRING
     polarity: IONMODE
@@ -507,7 +507,7 @@ names:
     smiles_no_stereo: ~
 
     #' Name of "spectrum ID" in MGF. STRING
-    spectrum_id: ~
+    spectrum_id: SPECTRUMID
 
     #' Name of "SPLASH" in MGF. STRING
     splash: ~
