@@ -45,8 +45,10 @@ prepare_libraries_sop_ecmdb <-
           perl = TRUE
         )
 
-      ecmdb <- stream_in(con = unz(description = input, filename = file),
-                         verbose = FALSE) |>
+      ecmdb <- stream_in(
+        con = unz(description = input, filename = file),
+        verbose = FALSE
+      ) |>
         data.frame() |>
         as_tidytable()
 
