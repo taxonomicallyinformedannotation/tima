@@ -170,34 +170,17 @@ files:
 
     #' Spectral libraries. STRING
     spectral:
-      #' Experimental libraries
-      exp:
-        #' List of negative experimental spectral libraries. STRING
-        neg:
-          - data/interim/libraries/spectra/exp/spectra_exp_neg.rds
+      #' List of negative spectral libraries. STRING
+      neg:
+        - data/interim/libraries/spectra/exp/internal_neg.rds
+      
+      #' List of positive spectral libraries. STRING
+      pos:
+        - data/interim/libraries/spectra/exp/internal_pos.rds
 
-        #' List of positive experimental spectral libraries. STRING
-        pos:
-          - data/interim/libraries/spectra/exp/spectra_exp_pos.rds
-
-        #' List of raw experimental spectral libraries. STRING
-        raw: 
-          - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
-
-      #' In silico libraries
-      is:
-        #' List of negative in silico spectral libraries. STRING
-        neg: 
-          - data/interim/libraries/spectra/is/lotus_neg.rds
-
-        #' List of positive in silico spectral libraries. STRING
-        pos: 
-          - data/interim/libraries/spectra/is/lotus_pos.rds
-
-        #' List of raw in silico spectral libraries. STRING
-        raw:
-          - data/source/libraries/spectra/is/lotus_neg.rds
-          - data/source/libraries/spectra/is/lotus_pos.rds
+      #' List of raw spectral libraries. STRING
+      raw: 
+        - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
     #' Temporal libraries. STRING
     temporal:
@@ -471,6 +454,10 @@ names:
 
   #' Name of "filename" variable in the input. STRING
   filename: filename
+
+  #' Names of the prepared libraries. STRING
+  libraries:
+    - internal
 
   #' Name of "InChIKey" variable in the input. STRING
   inchikey: inchikey

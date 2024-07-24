@@ -1567,7 +1567,7 @@ ui <- shiny::fluidPage(
             content = c(
               "A TSV of retention times.",
               "The default column names are `rt`, `smiles`, `inchikey`.",
-              "Do not forget to adapt MGF names parameters if needed.",
+              "Do not forget to adapt the names parameters if needed.",
               "Do not forget to fill down seconds or minutes below."
             )
           ),
@@ -1582,14 +1582,14 @@ ui <- shiny::fluidPage(
             content = c(
               "A TSV of retention times.",
               "The default column names are `rt`, `smiles`, `inchikey`.",
-              "Do not forget to adapt MGF names parameters if needed.",
+              "Do not forget to adapt the names parameters if needed.",
               "Do not forget to fill down seconds or minutes below."
             )
           ),
         shiny::h4("Spectral"),
         shiny::fileInput(
-          inputId = "lib_spe_exp_mgf",
-          label = "Experimental (MGF)",
+          inputId = "lib_spe_mgf",
+          label = "MGF",
           accept = c(".mgf"),
           multiple = TRUE
         ) |>
@@ -1601,18 +1601,15 @@ ui <- shiny::fluidPage(
               "Do not forget to fill down seconds or minutes below."
             )
           ),
-        shiny::fileInput(
-          inputId = "lib_spe_is_mgf",
-          label = "In silico (MGF)",
-          accept = c(".mgf"),
-          multiple = TRUE
+        shiny::textInput(
+          inputId = "names_libraries",
+          label = "Name of the library",
+          value = "internal"
         ) |>
           shinyhelper::helper(
             type = "inline",
             content = c(
-              "An MGF containing reference spectra.",
-              "If it contains retention times, they will also be used.",
-              "Do not forget to fill down seconds or minutes below."
+              "Name of the library. Related content will be identified with this name."
             )
           ),
         shiny::selectInput(
@@ -1889,10 +1886,8 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
   #   shiny::isolate(input$todo)
-  yaml_advanced$files$libraries$spectral$exp$raw <-
-    shiny::isolate(input$lib_spe_exp_mgf)
-  yaml_advanced$files$libraries$spectral$is$raw <-
-    shiny::isolate(input$lib_spe_is_mgf)
+  yaml_advanced$files$libraries$spectral$raw <-
+    shiny::isolate(input$lib_spe_mgf)
   yaml_advanced$files$libraries$temporal$exp$csv <-
     shiny::isolate(input$lib_tmp_exp_csv)
   yaml_advanced$files$libraries$temporal$is$csv <-
@@ -1960,6 +1955,8 @@ save_input <- function(input) {
     shiny::isolate(input$names_filename)
   yaml_advanced$names$inchikey <-
     shiny::isolate(input$names_inchikey)
+  yaml_advanced$names$libraries <-
+    shiny::isolate(input$names_libraries)
   yaml_advanced$names$mgf$adduct <-
     shiny::isolate(input$names_mgf_ad)
   yaml_advanced$names$mgf$collision_energy <-

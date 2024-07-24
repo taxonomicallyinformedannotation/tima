@@ -116,6 +116,7 @@
     "names_features": "row ID",
     "names_filename": "filename",
     "names_inchikey": "inchikey",
+    "names_libraries": "internal",
     "names_mgf_ad": "",
     "names_mgf_ce": "",
     "names_mgf_ci": "SPECTRUMID",

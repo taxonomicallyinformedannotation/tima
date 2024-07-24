@@ -71,12 +71,9 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_mer_str_nam <- params_advanced$files$libraries$sop$merged$structures$names
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
-  fil_lib_spe_exp_neg <- params_advanced$files$libraries$spectral$exp$neg
-  fil_lib_spe_exp_pos <- params_advanced$files$libraries$spectral$exp$pos
-  fil_lib_spe_exp_raw <- params_advanced$files$libraries$spectral$exp$raw
-  fil_lib_spe_is_neg <- params_advanced$files$libraries$spectral$is$neg
-  fil_lib_spe_is_pos <- params_advanced$files$libraries$spectral$is$pos
-  fil_lib_spe_is_raw <- params_advanced$files$libraries$spectral$is$raw
+  fil_lib_spe_neg <- params_advanced$files$libraries$spectral$neg
+  fil_lib_spe_pos <- params_advanced$files$libraries$spectral$pos
+  fil_lib_spe_raw <- params_advanced$files$libraries$spectral$raw
   fil_lib_tem_exp_csv <- params_advanced$files$libraries$temporal$exp$csv
   fil_lib_tem_exp_mgf_neg <- params_advanced$files$libraries$temporal$exp$mgf$neg
   fil_lib_tem_exp_mgf_pos <- params_advanced$files$libraries$temporal$exp$mgf$pos
@@ -112,6 +109,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   names_features <- params_advanced$names$features
   names_filename <- params_advanced$names$filename
   names_inchikey <- params_advanced$names$inchikey
+  names_libraries <- params_advanced$names$libraries
   names_mgf_ad <- params_advanced$names$mgf$adduct
   names_mgf_ce <- params_advanced$names$mgf$collision_energy
   names_mgf_ci <- params_advanced$names$mgf$compound_id
@@ -252,14 +250,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         ann_thr_ms2_sim_ann
       yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
         fil_ann_raw_spe_spe
-      yamls_params$annotate_spectra$files$libraries$spectral$exp$neg <-
-        fil_lib_spe_exp_neg
-      yamls_params$annotate_spectra$files$libraries$spectral$exp$pos <-
-        fil_lib_spe_exp_pos
-      yamls_params$annotate_spectra$files$libraries$spectral$is$neg <-
-        fil_lib_spe_is_neg
-      yamls_params$annotate_spectra$files$libraries$spectral$is$pos <-
-        fil_lib_spe_is_pos
+      yamls_params$annotate_spectra$files$libraries$spectral$neg <-
+        fil_lib_spe_neg
+      yamls_params$annotate_spectra$files$libraries$spectral$pos <-
+        fil_lib_spe_pos
       yamls_params$annotate_spectra$files$spectral$raw <-
         fil_spe_raw
       yamls_params$annotate_spectra$ms$thresholds$ms2$intensity <-
@@ -474,18 +468,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         org_fil_val
     },
     prepare_libraries_spectra = {
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$exp$neg <-
-        fil_lib_spe_exp_neg
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$exp$pos <-
-        fil_lib_spe_exp_pos
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$exp$raw <-
-        fil_lib_spe_exp_raw
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$is$neg <-
-        fil_lib_spe_is_neg
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$is$pos <-
-        fil_lib_spe_is_pos
-      yamls_params$prepare_libraries_spectra$files$libraries$spectral$is$raw <-
-        fil_lib_spe_is_raw
+      yamls_params$prepare_libraries_spectra$files$libraries$spectral$raw <-
+        fil_lib_spe_raw
+      yamls_params$prepare_libraries_spectra$names$libraries <-
+        names_lib
       yamls_params$prepare_libraries_spectra$names$mgf$adduct <-
         names_mgf_ad
       yamls_params$prepare_libraries_spectra$names$mgf$collision_energy <-
