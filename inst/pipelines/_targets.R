@@ -1117,7 +1117,27 @@ list(
             format = "file",
             command = {
               lib_spe_exp_int_pre <-
-                prepare_libraries_spectra()
+                prepare_libraries_spectra(
+                  input = par_pre_lib_spe$files$libraries$spectral$raw,
+                  nam_lib = par_pre_lib_spe$names$libraries,
+                  col_ad = par_pre_lib_spe$names$mgf$adduct,
+                  col_ce = par_pre_lib_spe$names$mgf$collision_energy,
+                  col_ci = par_pre_lib_spe$names$mgf$compound_id,
+                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
+                  col_in = par_pre_lib_spe$names$mgf$inchi,
+                  col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
+                  col_ik = par_pre_lib_spe$names$mgf$inchikey,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
+                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
+                  col_na = par_pre_lib_spe$names$mgf$name,
+                  col_po = par_pre_lib_spe$names$mgf$polarity,
+                  col_sm = par_pre_lib_spe$names$mgf$smiles,
+                  col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
+                  col_si = par_pre_lib_spe$names$mgf$spectrum_id,
+                  col_sp = par_pre_lib_spe$names$mgf$splash,
+                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
+                  col_xl = par_pre_lib_spe$names$mgf$xlogp
+                )
             }
           ),
           tar_target(
