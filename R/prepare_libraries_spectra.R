@@ -84,6 +84,9 @@ prepare_libraries_spectra <-
       paste0("spectral_prepared.tsv.gz")
     )
     if (!all(lapply(X = list(output_neg, output_pos), FUN = file.exists) |> unlist())) {
+      if (is.null(input)) {
+        input <- "fileDoesNotExist"
+      }
       if (file.exists(input)) {
         log_debug("Importing")
         spectra <- lapply(X = input, FUN = import_spectra)
