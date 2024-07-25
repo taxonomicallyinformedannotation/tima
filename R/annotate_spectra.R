@@ -52,6 +52,9 @@ import::from(tidytable, tidytable, .into = environment())
 #' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
+#' @include normalize_peaks.R
+#' @include remove_above_precursor.R
+#' @include sanitize_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param library Library containing spectra to match against.
