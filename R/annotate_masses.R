@@ -46,6 +46,7 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable tidytable
 #' @importFrom tidytable where
 #'
+#' @include calculate_mass_of_m.R
 #' @include decorate_masses.R
 #' @include dist_groups.R
 #' @include get_params.R

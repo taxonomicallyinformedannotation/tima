@@ -40,6 +40,7 @@ import::from(utils, URLencode, .into = environment())
 #' @importFrom utils URLencode
 #'
 #' @include get_params.R
+#' @include import_spectra.R
 #'
 #' @param mgf_exp MGF containing experimental retention times
 #' @param mgf_is MGF containing in silico predicted retention times

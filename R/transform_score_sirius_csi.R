@@ -2,8 +2,6 @@
 #'
 #' @description This function calculates the mass of M
 #'
-#' @include parse_adduct.R
-#'
 #' @param csi_score Original CSI score
 #' @param K Shift
 #' @param scale Scale
