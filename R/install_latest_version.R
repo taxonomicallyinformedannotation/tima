@@ -60,7 +60,8 @@ install_latest_version <- function(test = FALSE) {
       "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
       ref,
       "/DESCRIPTION"
-    )
+    ),
+    warn = FALSE
   )[[3]] |>
     gsub(
       pattern = "Version: ",
