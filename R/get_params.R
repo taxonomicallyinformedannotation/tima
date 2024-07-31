@@ -23,7 +23,7 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 get_params <- function(step) {
   paths <- parse_yaml_paths()
   steps <-
-    list.files(path = file.path(paths$inst$scripts$docopt)) |>
+    list.files(system.file("scripts/docopt", package = "tima")) |>
     stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   default_path <-
@@ -63,7 +63,7 @@ get_params <- function(step) {
   stopifnot("Your step does not exist." = step %in% steps)
 
   doc_path <-
-    file.path(paths$inst$scripts$docopt, paste0(step, ".txt"))
+    file.path(system.file("scripts/docopt", package = "tima"), paste0(step, ".txt"))
 
   user_path <-
     file.path(paths$params$user$path, paste0(step, ".yaml"))
