@@ -46,13 +46,13 @@ However, they allow to annotate unusual adducts, in-source fragments thanks to d
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
 
 ```{r annotate-masses-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/annotate_masses.R")
+targets::tar_make(names = matches("^ann_ms1_pre"))
 ```
 
 ### Spectral
 
 ```{r annotate-spectra-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/annotate_spectra.R")
+targets::tar_make(names = matches("^ann_spe_pre"))
 ```
 
 We use the `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
@@ -61,7 +61,7 @@ In case, a python implementation of the spectral matching steps is also availabl
 The python version also includes other similarity measures.
 
 ```{r annotate-spectra-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_annotations_spectra.R")
+targets::tar_make(names = c(matches("^ann_spe_is")))
 ```
 
 <!-- #### GNPS -->
@@ -70,7 +70,7 @@ source(file = "inst/scripts/prepare_annotations_spectra.R")
 <!-- Depending on the annotation tool you used, you can format its results using: -->
 
 ```{r annotate-gnps, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results="hide"}
-source(file = "inst/scripts/prepare_annotations_gnps.R")
+targets::tar_make(names = matches("^ann_spe_exp_gnp_pre"))
 ```
 
 ### Fingerprint-based
@@ -127,13 +127,13 @@ If you are using the cli, do not forget to generate the summaries with the `--fu
 You can get an example running:
 
 ```{r get-sirius, results="hide", message=FALSE, warning=FALSE}
-source(file = "inst/scripts/get_example_sirius.R")
+tima::get_example_sirius()
 ```
 
 The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).
 
 ```{r prepare-sirius, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_annotations_sirius.R")
+targets::tar_make(names = matches("^ann_sir_pre"))
 ```
 
 If you want to know how we attempt to combine the CSI score with other ones, see [R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
@@ -172,29 +172,32 @@ A network is generated during the process.
 The edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
 
 ```{r create-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/create_edges_spectra.R")
+targets::tar_make(names = matches("fea_edg_spe"))
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
 
 ```{r get-features, results="hide", message=FALSE, warning=FALSE}
-source(file = "inst/scripts/get_example_features.R")
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$features,
+  export = tima::parse_yaml_paths()$data$source$features
+)
 ```
 
 ```{r prepare-features, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_features_tables.R")
+targets::tar_make(names = matches("fea_pre"))
 ```
 
 ```{r prepare-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_features_edges.R")
+targets::tar_make(names = matches("fea_edg_pre"))
 ```
 
 ```{r create-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/create_components.R")
+targets::tar_make(names = matches("fea_com"))
 ```
 
 ```{r prepare-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_features_components.R")
+targets::tar_make(names = matches("fea_com_pre"))
 ```
 
 ## Biological source annotation
@@ -216,7 +219,7 @@ It is optional.
 If you do not have one, it will simply group the annotations of all tools. 
 
 ```{r filter-annotations, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/filter_annotations.R")
+targets::tar_make(names = matches("tax_pre"))
 ```
 
 You are almost there! See already all the steps accomplished!
