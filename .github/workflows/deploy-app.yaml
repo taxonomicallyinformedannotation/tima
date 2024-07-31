@@ -41,7 +41,10 @@ jobs:
             
       - name: Install package
         run: |
-          Rscript inst/scripts/install.R
+          install.packages("pak")
+          pak::pak("taxonomicallyinformedannotation/tima")
+          tima::install()
+        shell: Rscript {0}
 
       - name: Build site
         shell: Rscript {0}
