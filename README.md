@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tima <img src='https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg' align="right" height="139" />
+# tima <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg' align="right" height="139" />
 
 <!-- badges: start -->
 
