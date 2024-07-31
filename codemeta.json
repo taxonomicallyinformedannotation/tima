@@ -4,9 +4,9 @@
   "identifier": "tima",
   "description": "TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.",
   "name": "tima: Taxonomically Informed Metabolite Annotation",
-  "relatedLink": "https://taxonomicallyinformedannotation.github.io/tima/",
+  "relatedLink": "https://taxonomicallyinformedannotation.github.io/tima",
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
-  "issueTracker": "\n    https://github.com/taxonomicallyinformedannotation/tima/issues",
+  "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
   "version": "2.10.0",
   "programmingLanguage": {
@@ -657,7 +657,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3188.189KB",
+  "fileSize": "3188.24KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
