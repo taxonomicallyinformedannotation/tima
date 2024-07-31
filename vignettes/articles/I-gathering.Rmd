@@ -65,10 +65,19 @@ unlink("data/source/example_spectra.mgf")
 ```
 
 ```{r get-files, results="hide", message=FALSE, warning=FALSE}
-source(file = "inst/scripts/get_example_features.R")
-source(file = "inst/scripts/get_example_metadata.R")
-# source(file = "inst/scripts/get_example_sirius.R")
-source(file = "inst/scripts/get_example_spectra.R")
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$features,
+  export = tima::parse_yaml_paths()$data$source$features
+)
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$metadata,
+  export = tima::parse_yaml_paths()$data$source$metadata
+)
+# tima::get_example_sirius()
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$spectra,
+  export = tima::parse_yaml_paths()$data$source$spectra
+)
 ```
 
 ### Libraries
@@ -87,9 +96,9 @@ We currently support spectral libraries in MSP or MGF format.
 To get a small example:
 
 ```{r spectra-rt, results="hide", message=FALSE, warning=FALSE}
-get_file(
-  url = paths$urls$examples$spectral_lib_mini$with_rt,
-  export = paths$data$source$libraries$spectra$exp$with_rt
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$spectral_lib_mini$with_rt,
+  export = tima::parse_yaml_paths()$data$source$libraries$spectra$exp$with_rt
 )
 ```
 
@@ -98,7 +107,7 @@ get_file(
 MassBank is downloaded and used by default.
 
 ```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/get_massbank_spectra.R")
+targets::tar_make(names = matches("lib_spe_exp_mb_raw"))
 ```
 
 We are currently working to get all MONA and GNPS experimental spectra easily available.
@@ -120,11 +129,11 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
 ```{r get-isdb-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/get_isdb_lotus.R")
+targets::tar_make(names = matches("lib_spe_is_lot"))
 ```
 
 ```{r prepare-isdb-lotus-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_spectra_is_lotus.R")
+targets::tar_make(names = matches("lib_spe_is_lot_pre"))
 ```
 
 You can also complement with the in silico spectra from HMDB (not running by default as quite long):
@@ -132,7 +141,10 @@ You can also complement with the in silico spectra from HMDB (not running by def
 #### HMDB
 
 ```{r get-isdb-hmdb, eval=FALSE, include=TRUE}
-source(file = "inst/scripts/get_isdb_hmdb.R")
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$hmdb$spectra$predicted,
+  export = tima::parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
+)
 ```
 
 #### Retention times
@@ -144,7 +156,7 @@ It could also be a library of in silico predicted retention times.
 If you want to prepare you own library, have a look at `inst/params/user/prepare_libraries_rt.yaml`, and then:
 
 ```{r rts-2, results="hide", message=FALSE, warning=FALSE}
-source(file = "inst/scripts/prepare_libraries_rt.R")
+targets::tar_make(names = matches("lib_rt"))
 ```
 
 #### Structure-Organism Pairs
@@ -159,11 +171,11 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 
 ```{r get-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/get_lotus.R")
+targets::tar_make(names = matches("lib_sop_lot$"))
 ```
 
 ```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_sop_lotus.R")
+targets::tar_make(names = matches("lib_sop_lot_pre"))
 ```
 
 The process to download LOTUS looks like this:
@@ -188,7 +200,7 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
 
 ```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
+targets::tar_make(names = matches("lib_sop_ecm_pre"))
 ```
 
 ##### HMDB
@@ -196,7 +208,7 @@ source(file = "inst/scripts/prepare_libraries_sop_ecmdb.R")
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
 ```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_sop_hmdb.R")
+targets::tar_make(names = matches("lib_sop_hmd_pre"))
 ```
 
 For these first steps, you do not need to change any parameters as they are implemented *by default*.
@@ -211,7 +223,7 @@ If you need help formatting your library or would like to share it with us for i
 Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`
 
 ```{r prepare-closed, results="hide", message=FALSE, warning=FALSE}
-source(file = "inst/scripts/prepare_libraries_sop_closed.R")
+targets::tar_make(names = matches("lib_sop_clo_pre"))
 ```
 
 ##### Merging
@@ -219,7 +231,7 @@ source(file = "inst/scripts/prepare_libraries_sop_closed.R")
 Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
 
 ```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_libraries_sop_merged.R")
+targets::tar_make(names = matches("lib_sop_mer"))
 ```
 
 ```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}

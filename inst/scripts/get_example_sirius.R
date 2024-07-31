@@ -5,8 +5,6 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
-
 log_debug(
   "This script",
   crayon::green("downloads an example of SIRIUS output. \n")

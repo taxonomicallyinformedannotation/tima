@@ -5,8 +5,6 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
-
 log_debug(
   "This script",
   crayon::green("downloads HMDB structures in silico fragmented. \n")
@@ -18,8 +16,8 @@ log_debug("Contributors: ...")
 ## (see https://twitter.com/Adafede/status/1592543895094788096)
 log_debug("Downloading HMDB (might be long)")
 get_file(
-  url = paths$urls$hmdb$spectra$predicted,
-  export = paths$data$source$libraries$spectra$is$hmdb
+  url = parse_yaml_paths()$urls$hmdb$spectra$predicted,
+  export = parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
 )
 
 log_debug("Script finished in", crayon::green(format(end - start)))
