@@ -34,15 +34,14 @@ run_app <- function(dir = "inst",
         install()
       },
       error = function(e) {
-        source("R/install.R")
-        install()
+        message(e)
       }
     )
     system('echo "I\'m living in the real world!"')
   }
 
   shiny::runApp(
-    appDir = dir,
+    appDir = system.file(package="tima"),
     port = port,
     host = host,
     launch.browser = browser
