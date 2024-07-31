@@ -1,6 +1,6 @@
 # tima
 
-# tima 2.9.7
+# tima 2.10.0
 
 * Added alt text to vignettes
 * Added the possibility to add internal libraries through the GUI (#159)
@@ -9,6 +9,7 @@
 * Changed package name, `usethis` update
 * Clearer handling of SIRIUS scores (#146, #147)
 * Exposed more parameters to the GUI (#159)
+* Facilitated install, no need to clone the directory anymore
 * Fixed adducts and removed nitrogen rule
 * Fixed number of matched peaks
 * Improved imports
