@@ -41,14 +41,14 @@ export_params <-
 
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", green(directory))
-    tima_version <- pkg_status("timaR")$version[1]
+    tima_version <- pkg_status("tima")$version[1]
 
     write_yaml(x = parameters, file = file.path(
       directory,
       paste0(
         format(Sys.time(), "%y%m%d_%H%M%OS"),
         "_",
-        "timaR",
+        "tima",
         tima_version,
         "_",
         step,

@@ -14,7 +14,7 @@ import::from(yaml, read_yaml, .into = environment())
 #' @export
 #'
 #' @examples NULL
-parse_yaml_paths <- function(file = system.file("extdata", "paths.yaml", package = "timaR")) {
+parse_yaml_paths <- function(file = system.file("extdata", "paths.yaml", package = "tima")) {
   ## Read the YAML file containing the paths
   paths <- read_yaml(file = file)
 

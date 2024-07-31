@@ -1,5 +1,5 @@
 library(shiny)
-library(timaR)
+library(tima)
 
 # Check if runs in Docker environment or not
 i_am_a_whale <- file.exists("/.dockerenv")

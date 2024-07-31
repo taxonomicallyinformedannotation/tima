@@ -1,11 +1,12 @@
-# timaR
+# tima
 
-# timaR 2.9.7
+# tima 2.9.7
 
 * Added alt text to vignettes
 * Added the possibility to add internal libraries through the GUI (#159)
 * Added the possibility to filter confident annotations only (#140)
 * Added number of peaks in spectrum
+* Changed package name, `usethis` update
 * Clearer handling of SIRIUS scores (#146, #147)
 * Exposed more parameters to the GUI (#159)
 * Fixed adducts and removed nitrogen rule
@@ -14,7 +15,7 @@
 * Reduced warnings
 * Updated benchmarking steps
 
-# timaR 2.9.6
+# tima 2.9.6
 
 * Added light-switch thanks to `pkgdown 2.1.0`.
 * Attempt to simplify installation
@@ -22,13 +23,13 @@
 * Fixed some incorrect adduct differences annotations
 * Refactored adducts / neutral losses / dimers annotation to allow for more flexibility (#141, #144)
 
-# timaR 2.9.5
+# tima 2.9.5
 
 * Do not re-package if already the latest version
 * SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)
 * Updated to Massbank version `2024.06`
 
-# timaR 2.9.4
+# tima 2.9.4
 
 * Automated update
 * Added an option to remove ties (#134)
@@ -41,7 +42,7 @@
 * New working directory at `$HOME/.tima`
 * Updated R and Bioconductor versions
 
-# timaR 2.9.3
+# tima 2.9.3
 
 * Allowed for SIRIUS jobs containing only summaries
 * Allowed for underscores in job pattern
@@ -51,7 +52,7 @@
 * Removed further some inconsistent MS1 annotations
 * Removed tests dependencies by default
 
-# timaR 2.9.2
+# tima 2.9.2
 
 * Added Nitrogen rule to filter out some annotations
 * Better handling of partial downloads (#118)
@@ -59,7 +60,7 @@
 * Fixed some port issues in Shiny (#122)
 * Removed completely empty columns from final output to avoid confusion (#120)
 
-# timaR 2.9.1
+# tima 2.9.1
 
 * Added [Waystation](https://caltechlibrary.github.io/waystation/) action
 * Added structures from spectral libraries to SOP library (#113)
@@ -70,7 +71,7 @@
 * Updated to Massbank version `2023.11`
 * Updated SIRIUS preparation (#74, #115)
 
-# timaR 2.9.0
+# tima 2.9.0
 
 * Added compounds names as parameter
 * Added MassBank spectral library (#77)
@@ -89,7 +90,7 @@
 * Refactored Sirius scores (#92)
 * Removed GNPS dependency by default
 
-# timaR 2.8.2
+# tima 2.8.2
 
 * Added spectral entropy
 * Added MS1 only possibility
@@ -103,7 +104,7 @@
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Reduced warnings (CRAN and jscpd)
 
-# timaR 2.8.1
+# tima 2.8.1
 
 * Adapted tests
 * Added `retry` parameter to `get_organism_taxonomy_ott`
@@ -113,12 +114,12 @@
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Replaced `extdata` loading
 
-# timaR 2.8.0
+# tima 2.8.0
 
 * Added GUI prototype
 * Started using [renv](https://rstudio.github.io/renv/index.html)
 
-# timaR 2.7.4
+# tima 2.7.4
 
 * Clearer vocabulary
 * ECMDB support
@@ -131,7 +132,7 @@
 * Retention time matching additionally to MS2 if RT present in library
 * Steps refactoring
 
-# timaR 2.7.3
+# tima 2.7.3
 
 * Improved calculations over redundant formulas
 * Minor fixes
@@ -139,7 +140,7 @@
 * Spectral matching update (see <https://github.com/rformassspectrometry/MetaboAnnotation/issues/93>)
 * [Targets](https://books.ropensci.org/targets/) implementation
 
-# timaR 2.7.2
+# tima 2.7.2
 
 * Benchmark update (including negative mode)
 * Improved parameters documentation
@@ -147,7 +148,7 @@
 * Spectral comparison + intensity filtering update
 * Switched r-base Docker image to bioconductor with ARM support
 
-# timaR 2.7.1
+# tima 2.7.1
 
 * Added MONA helpers
 * Added parallelization on process_spectra
@@ -156,61 +157,61 @@
 * Improved testing time
 * Minor fixes
 
-# timaR 2.7.0
+# tima 2.7.0
 
 * Added HMDB helpers for both taxo and ISDB
 * Added MS2 annotation capability (kudos @jorainer for the awesome *Spectra* suite)
 * Minor fixes
 
-# timaR 2.6.0
+# tima 2.6.0
 
 * Added Docker container
 * Changed data architecture
 * Minor fixes
 
-# timaR 2.5.6
+# tima 2.5.6
 
 * Dependencies removal (e.g. metabo-store)
 * Minor fixes
 * Partial functions cleanup
 
-# timaR 2.5.5
+# tima 2.5.5
 
 * Automation and parameters improvement
 * Minor fixes
 
-# timaR 2.5.4
+# tima 2.5.4
 
 * Minor fixes
 * Metadata completion improvement
 * Molecular formula and adducts formalism improvement
 
-# timaR 2.5.3
+# tima 2.5.3
 
 * Imports improvements
 * LOTUS update
 
-# timaR 2.5.2
+# tima 2.5.2
 
 * Packaging improvements
 
-# timaR 2.5.1
+# tima 2.5.1
 
 * Improved support for SIRIUS (with new summaries)
 
-# timaR 2.5.0
+# tima 2.5.0
 
 * LOTUS update
 * Minor fixes
 
-# timaR 2.4.0
+# tima 2.4.0
 
 * Added chemical names and xlogp to output (#33)
 * Added support for case when no consensus is found (#30)
 * Improved output (#34)
 * Minor fixes
 
-# timaR 2.3.0
+# tima 2.3.0
 
 * Added support for annotation without MN (#28)
 * Added support for multi tool annotations (#27)
@@ -221,24 +222,24 @@
 * Minor fixes
 * Updated adducts
 
-# timaR 2.2.2
+# tima 2.2.2
 
 * Additional benchmark figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution))
 * Minor fixes
 
-# timaR 2.2.1
+# tima 2.2.1
 
 * Minor version name fixes
 
-# timaR 2.2.0
+# tima 2.2.0
 
 * Added benchmark ([here](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html))
 * Various fixes
 
-# timaR 2.1.0
+# tima 2.1.0
 
 * Fixes, deletion of binary dependencies.
 
-# timaR 2.0.0
+# tima 2.0.0
 
 * Initial version.

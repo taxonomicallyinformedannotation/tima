@@ -1,4 +1,4 @@
-citHeader("To cite timaR in publications use:")
+citHeader("To cite tima in publications use:")
 
 citEntry(
   entry    = "Article",

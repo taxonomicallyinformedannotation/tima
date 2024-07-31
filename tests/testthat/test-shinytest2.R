@@ -1,5 +1,5 @@
 library(shinytest2)
-library(timaR)
+library(tima)
 
 test_that("{shinytest2} recording: app", {
   get_file(

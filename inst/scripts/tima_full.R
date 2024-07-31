@@ -1,6 +1,6 @@
 start <- Sys.time()
 
-library("timaR")
+library("tima")
 
 log_debug(
   "This script",
