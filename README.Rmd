@@ -46,40 +46,38 @@ Optionally, you may want to add:
 
 ## Installation
 
-You can install the development version of tima from [GitHub](https://github.com/) with:
+As the package is not (yet) available on CRAN, you will need to install the development version [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
 pak::pak("taxonomicallyinformedannotation/tima")
 ```
 
-As the package is not (yet) available on CRAN, you will need to install the development version, therefore:
+Then, you should be able to install the rest with:
 
-``` bash
-git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
-cd tima-r
-Rscript inst/scripts/install.R
+``` r
+tima::install()
 ```
 
 Normally, everything you need should then be installed (as tested in [here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)).
 If for some reason, some packages were not installed, try to install them manually.
 To avoid such issues, we offer a containerized version (see [Docker](#docker)).
 
-Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima-r/articles/), with the major steps detailed.
+Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/), with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example data (set of 7,000+ spectra) using:
 
-``` bash
-Rscript inst/scripts/get_example_spectra.R
-Rscript inst/scripts/get_example_features.R
-Rscript inst/scripts/get_example_metadata.R
-# Rscript inst/scripts/get_example_sirius.R
+``` r
+tima::get_example_spectra()
+tima::get_example_features()
+tima::get_example_metadata()
+tima::get_example_sirius()
 ```
 
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 
-``` bash
-Rscript inst/scripts/run_app.R
+``` r
+tima::run_app()
 ```
 
 This command will open a small app in your default browser.
