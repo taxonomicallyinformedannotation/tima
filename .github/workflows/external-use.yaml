@@ -37,7 +37,10 @@ jobs:
           Ncpus: 2
       - name: Install package
         run: |
-          Rscript inst/scripts/install.R
+          install.packages("pak")
+          pak::pak("taxonomicallyinformedannotation/tima")
+          tima::install()
+        shell: Rscript {0}
       - name: Get example files
         run: |
           Rscript inst/scripts/get_example_spectra.R
