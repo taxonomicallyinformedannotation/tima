@@ -1,4 +1,3 @@
-library(shiny)
 library(tima)
 
 # Check if runs in Docker environment or not
@@ -2386,7 +2385,7 @@ server <- function(input, output, session) {
 }
 url <- "<http://127.0.0.1:3838>"
 log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
-shinyApp(
+shiny::shinyApp(
   ui = ui,
   server = server,
   onStart = function() {

@@ -45,6 +45,7 @@ jobs:
           plugin: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          version: v0.6.0 # Workaround for codecov/codecov-action#1487
 
       - name: Show testthat output
         if: always()
