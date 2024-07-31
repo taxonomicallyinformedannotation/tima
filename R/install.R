@@ -1,6 +1,6 @@
-#' @title Install latest version
+#' @title Install
 #'
-#' @description This function installs the latest version
+#' @description This function runs some required install
 #'
 #' @param test Flag for tests
 #'
@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples NULL
-install_latest_version <- function(test = FALSE) {
+install <- function(test = FALSE) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
@@ -17,7 +17,7 @@ install_latest_version <- function(test = FALSE) {
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  if (!requireNamespace("pak", quietly = TRUE) || isTRUE(test)) {
+  if (!"pak" %in% utils::installed.packages() || isTRUE(test)) {
     lib <- Sys.getenv("R_LIBS_SITE")
     if (lib == "") {
       lib <- file.path(dirname(.Library), "site-library")
