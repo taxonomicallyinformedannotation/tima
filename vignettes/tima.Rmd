@@ -78,11 +78,12 @@ targets::tar_visnetwork(
 
 Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima/articles).
 
-All coming steps admit you already cloned the repository and went to its root:
+All coming steps admit you already installed `tima`:
 
-```{bash eval=FALSE, include=TRUE}
-git clone https://github.com/taxonomicallyinformedannotation/tima.git
-cd tima
+```{r eval=FALSE, include=TRUE}
+# install.packages("pak")
+pak::pak("taxonomicallyinformedannotation/tima")
+tima::install()
 ```
 
 We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
@@ -91,12 +92,12 @@ We now recommend you to read the [first vignette](https://taxonomicallyinformeda
 
 If you do not feel like going through all the steps, then just do 🚀:
 
-```{bash eval=FALSE, include=TRUE}
-Rscript inst/scripts/run_app.R
+```{r eval=FALSE, include=TRUE}
+tima::run_app()
 ```
 
 If you do not even need a GUI ☠️:
 
-```{bash eval=FALSE, include=TRUE}
-Rscript inst/scripts/tima_full.R
+```{r eval=FALSE, include=TRUE}
+targets::tar_make(names = matches("^ann_pre$"))
 ```

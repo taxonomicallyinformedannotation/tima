@@ -657,7 +657,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3187.148KB",
+  "fileSize": "3188.167KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -729,6 +729,6 @@
   ],
   "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima/blob/master/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima/blob/main/README.md",
-  "contIntegration": ["https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r"],
+  "contIntegration": ["https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"
 }
