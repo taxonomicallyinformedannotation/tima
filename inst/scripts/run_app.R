@@ -7,11 +7,11 @@ if (file.exists("/.dockerenv")) {
   # Check if running latest version
   tryCatch(
     expr = {
-      install_latest_version()
+      install()
     },
     error = function(e) {
-      source("R/install_latest_version.R")
-      install_latest_version()
+      source("R/install.R")
+      install()
     }
   )
   system('echo "I\'m living in the real world!"')
