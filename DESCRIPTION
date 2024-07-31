@@ -1,4 +1,4 @@
-Package: timaR
+Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.9.7
 Authors@R: c(
@@ -8,26 +8,33 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
 Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
-Description: TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
+Description: TIMA provides the infrastructure to perform Taxonomically
+    Informed Metabolite Annotation.
 License: GPL (>= 3)
-URL: https://github.com/taxonomicallyinformedannotation/tima-r, https://taxonomicallyinformedannotation.github.io/tima-r/
-BugReports: https://github.com/taxonomicallyinformedannotation/tima-r/issues
+URL: https://github.com/taxonomicallyinformedannotation/tima-r,
+    https://taxonomicallyinformedannotation.github.io/tima-r/,
+    https://taxonomicallyinformedannotation.github.io/tima/
+BugReports: 
+    https://github.com/taxonomicallyinformedannotation/tima-r/issues
 Depends:
     R (>= 4.4.0)
 Imports:
     bs4Dash (>= 2.3.3),
+    cli (>= 3.6.3),
     crayon (>= 1.5.3),
     desc (>= 1.4.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
     DT (>= 0.33),
     fs (>= 1.6.4),
+    glue (>= 1.7.0),
     gt (>= 0.11.0),
     httr2 (>= 1.0.2),
     igraph (>= 2.0.3),
     import (>= 1.3.2),
     installr (>= 0.23.4),
     jsonlite (>= 1.8.8),
+    lifecycle (>= 1.0.4),
     MetaboCoreUtils (>= 1.12.0),
     MsBackendMgf (>= 1.12.0),
     MsBackendMsp (>= 1.8.0),
@@ -36,8 +43,9 @@ Imports:
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
     R.utils (>= 2.12.3),
+    rlang (>= 1.1.4),
     rotl (>= 3.1.0),
-    shiny (>= 1.8.1.1),
+    shiny (>= 1.9.0),
     shinybusy (>= 0.3.3),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
@@ -47,25 +55,35 @@ Imports:
     stats,
     stringi (>= 1.8.4),
     targets (>= 1.7.1),
-    tidytable (>= 0.11.1),
     tidyfst (>= 1.7.9),
+    tidytable (>= 0.11.1),
     utils,
     visNetwork (>= 2.1.2),
     withr (>= 3.0.0),
-    yaml (>= 2.3.9)
+    yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
     knitr,
     pkgload,
-    testthat,
     shinytest2,
-    spelling
+    spelling,
+    testthat (>= 3.0.0)
+VignetteBuilder:
+    knitr
+biocViews: metabolite annotation, chemotaxonomy, scoring system, natural
+    products, computational metabolomics, taxonomic distance, specialized
+    metabolome
+ByteCompile: true
+Config/Needs/website: rmarkdown
 Config/testthat/edition: 3
 Encoding: UTF-8
+Language: en-US
 LazyData: true
-ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
+    system, natural products, computational metabolomics, taxonomic
+    distance, specialized metabolome
 Collate:
     'round_reals.R'
     'harmonize_adducts.R'
@@ -119,6 +137,7 @@ Collate:
     'globals.R'
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
+    'import-standalone-purrr.R'
     'install_latest_version.R'
     'load_yaml_files.R'
     'log_debug.R'
@@ -145,14 +164,9 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
+    'tima-package.R'
     'timaR-package.R'
     'transform_score_sirius_csi.R'
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
-VignetteBuilder:
-    knitr
-biocViews: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
-X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome
-Language: en-US
-Config/Needs/website: rmarkdown

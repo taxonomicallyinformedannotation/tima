@@ -47,11 +47,11 @@ install_latest_version <- function(test = FALSE) {
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!"timaR" %in% utils::installed.packages() || isTRUE(test)) {
+  if (!"tima" %in% utils::installed.packages() || isTRUE(test)) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    status <- pak::pkg_status("timaR")
+    status <- pak::pkg_status("tima")
     local_version <- status$version[1]
     local_sha <- status$remotesha[1]
   }
@@ -177,7 +177,7 @@ install_latest_version <- function(test = FALSE) {
     },
     error = function(e) {
       message("Installing remote targets")
-      timaR::get_file(
+      tima::get_file(
         url = paste0(
           "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
           ref,
@@ -198,7 +198,7 @@ install_latest_version <- function(test = FALSE) {
     },
     error = function(e) {
       message("Getting remote DESCRIPTION")
-      timaR::get_file(
+      tima::get_file(
         url = paste0(
           "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
           ref,

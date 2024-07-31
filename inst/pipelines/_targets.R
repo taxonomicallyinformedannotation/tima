@@ -8,8 +8,8 @@ library(targets)
 
 # Set target options:
 tar_option_set(
-  packages = c("timaR"),
-  imports = c("timaR"),
+  packages = c("tima"),
+  imports = c("tima"),
   memory = "transient",
   garbage_collection = TRUE,
   resources = tar_resources(
@@ -35,7 +35,7 @@ list(
         name = yaml_paths,
         format = "file",
         command = {
-          yaml_paths <- system.file("extdata", "paths.yaml", package = "timaR")
+          yaml_paths <- system.file("extdata", "paths.yaml", package = "tima")
         }
       ),
       tar_target(

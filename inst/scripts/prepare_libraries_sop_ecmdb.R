@@ -1,7 +1,7 @@
 start <- Sys.time()
 
 require(
-  package = "timaR",
+  package = "tima",
   quietly = TRUE
 )
 

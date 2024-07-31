@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-library("timaR")
+library("tima")
 ```
 
 This vignette simply shows the actual performance of TIMA.
