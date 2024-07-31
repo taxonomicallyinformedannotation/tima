@@ -44,7 +44,7 @@ ui <- shiny::fluidPage(
     shiny::h1("Taxonomically Informed Metabolite Annotation"),
     shiny::h4(
       "This app helps performing TIMA as described in the",
-      shiny::a(href = "https://taxonomicallyinformedannotation.github.io/tima-r/", "following documentation")
+      shiny::a(href = "https://taxonomicallyinformedannotation.github.io/tima", "following documentation")
     ),
     shiny::strong(
       shiny::span("Created by "),
@@ -53,7 +53,7 @@ ui <- shiny::fluidPage(
       shiny::a("Main publication", href = "https://doi.org/10.3389/fpls.2019.01329"),
       shiny::HTML("&bull;"),
       shiny::span("Code"),
-      shiny::a("on GitHub", href = "https://github.com/taxonomicallyinformedannotation/tima-r/")
+      shiny::a("on GitHub", href = "https://github.com/taxonomicallyinformedannotation/tima")
     )
   ),
   shiny::fluidPage(shiny::div(
@@ -432,9 +432,9 @@ ui <- shiny::fluidPage(
               "please open an issue at:",
               as.character(
                 shiny::tags$a(
-                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  "https://github.com/taxonomicallyinformedannotation/tima/issues",
                   href =
-                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -464,9 +464,9 @@ ui <- shiny::fluidPage(
               "please open an issue at:",
               as.character(
                 shiny::tags$a(
-                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  "https://github.com/taxonomicallyinformedannotation/tima/issues",
                   href =
-                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -503,9 +503,9 @@ ui <- shiny::fluidPage(
               "please open an issue at:",
               as.character(
                 shiny::tags$a(
-                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  "https://github.com/taxonomicallyinformedannotation/tima/issues",
                   href =
-                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -538,9 +538,9 @@ ui <- shiny::fluidPage(
               "please open an issue at:",
               as.character(
                 shiny::tags$a(
-                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  "https://github.com/taxonomicallyinformedannotation/tima/issues",
                   href =
-                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -663,9 +663,9 @@ ui <- shiny::fluidPage(
               "please open an issue at:",
               as.character(
                 shiny::tags$a(
-                  "https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+                  "https://github.com/taxonomicallyinformedannotation/tima/issues",
                   href =
-                    "https://github.com/taxonomicallyinformedannotation/tima-r/issues"
+                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The supported versions can be found in detail in [releases](https://github.com/taxonomicallyinformedannotation/tima-r/releases).
+The supported versions can be found in detail in [releases](https://github.com/taxonomicallyinformedannotation/tima/releases).
 
 ## Reporting a Vulnerability
 

@@ -4,9 +4,9 @@
   "identifier": "tima",
   "description": "TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.",
   "name": "tima: Taxonomically Informed Metabolite Annotation",
-  "relatedLink": ["https://taxonomicallyinformedannotation.github.io/tima-r/", "https://taxonomicallyinformedannotation.github.io/tima/"],
-  "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima-r",
-  "issueTracker": "\n    https://github.com/taxonomicallyinformedannotation/tima-r/issues",
+  "relatedLink": "https://taxonomicallyinformedannotation.github.io/tima/",
+  "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
+  "issueTracker": "\n    https://github.com/taxonomicallyinformedannotation/tima/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
   "version": "2.9.7",
   "programmingLanguage": {
@@ -632,7 +632,7 @@
       "@type": "SoftwareApplication",
       "identifier": "withr",
       "name": "withr",
-      "version": ">= 3.0.0",
+      "version": ">= 3.0.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -657,7 +657,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3187.97KB",
+  "fileSize": "3187.463KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
@@ -727,7 +727,7 @@
       }
     }
   ],
-  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima-r/blob/master/NEWS.md",
+  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima/blob/master/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima/blob/main/README.md",
   "contIntegration": ["https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima-r"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"

@@ -11,11 +11,10 @@ Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
 Description: TIMA provides the infrastructure to perform Taxonomically
     Informed Metabolite Annotation.
 License: GPL (>= 3)
-URL: https://github.com/taxonomicallyinformedannotation/tima-r,
-    https://taxonomicallyinformedannotation.github.io/tima-r/,
+URL: https://github.com/taxonomicallyinformedannotation/tima,
     https://taxonomicallyinformedannotation.github.io/tima/
 BugReports: 
-    https://github.com/taxonomicallyinformedannotation/tima-r/issues
+    https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
     R (>= 4.4.0)
 Imports:
@@ -59,7 +58,7 @@ Imports:
     tidytable (>= 0.11.1),
     utils,
     visNetwork (>= 2.1.2),
-    withr (>= 3.0.0),
+    withr (>= 3.0.1),
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
@@ -165,7 +164,6 @@ Collate:
     'prepare_taxa.R'
     'replace_id.R'
     'tima-package.R'
-    'timaR-package.R'
     'transform_score_sirius_csi.R'
     'weight_chemo.R'
     'weight_bio.R'

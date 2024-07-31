@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tima
+# tima <img src='man/figures/logo.png' align="right" height="139" />
 
 <!-- badges: start -->
 
@@ -12,6 +12,8 @@ status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/p
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
+[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 <!-- badges: end -->
 
 The initial work is available at
@@ -20,7 +22,7 @@ since then. The workflow is illustrated below.
 
 <figure>
 <img
-src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/main/man/figures/tima.svg"
+src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg"
 alt="Workflow" />
 <figcaption aria-hidden="true">Workflow</figcaption>
 </figure>

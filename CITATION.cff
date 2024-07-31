@@ -11,7 +11,7 @@ authors:
     given-names: Pierre-Marie
     orcid: https://orcid.org/0000-0003-3389-2191
 title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
-url: "https://github.com/taxonomicallyinformedannotation/tima-r"
+url: "https://github.com/taxonomicallyinformedannotation/tima"
 preferred-citation:
   type: article
   authors:
