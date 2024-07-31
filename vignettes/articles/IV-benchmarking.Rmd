@@ -6,7 +6,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 opengraph:
     image:
-      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r timar, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
 ```
 

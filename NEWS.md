@@ -224,7 +224,7 @@
 
 # tima 2.2.2
 
-* Additional benchmark figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html#candidates-distribution))
+* Additional benchmark figure ([Candidates distribution](https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html#candidates-distribution))
 * Minor fixes
 
 # tima 2.2.1
@@ -233,7 +233,7 @@
 
 # tima 2.2.0
 
-* Added benchmark ([here](https://taxonomicallyinformedannotation.github.io/tima-r/articles/V-actual-performance.html))
+* Added benchmark ([here](https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html))
 * Various fixes
 
 # tima 2.1.0

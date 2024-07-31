@@ -6,7 +6,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 opengraph:
     image:
-      src: https://github.com/taxonomicallyinformedannotation/tima-r/blob/main/man/figures/logo.svg
+      src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
       alt: "Taxonomically Informed Metabolite Annotation"
     twitter:
       creator: "@adafede"
@@ -35,7 +35,7 @@ Our main goals were **flexibility** and **reproducibility**.
 To ensure flexibility, we tried to split the process in as much tiny parts as needed.
 So you can decide whether to skip an optional part, add your own processing, etc.
 We tried to cover most use cases, but of course they are not exhaustive.
-If you feel like something useful to other users is missing, please fill an [issue](https://github.com/taxonomicallyinformedannotation/tima-r/issues).
+If you feel like something useful to other users is missing, please fill an [issue](https://github.com/taxonomicallyinformedannotation/tima/issues).
 
 ### Reproducibility
 
@@ -76,16 +76,16 @@ targets::tar_visnetwork(
 
 ## Use
 
-Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima-r/articles).
+Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima/articles).
 
 All coming steps admit you already cloned the repository and went to its root:
 
 ```{bash eval=FALSE, include=TRUE}
-git clone https://github.com/taxonomicallyinformedannotation/tima-r.git
-cd tima-r
+git clone https://github.com/taxonomicallyinformedannotation/tima.git
+cd tima
 ```
 
-We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima-r/articles/I-gathering.html).
+We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
 
 ### tl;dr
 

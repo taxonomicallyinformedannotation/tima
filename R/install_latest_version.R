@@ -57,7 +57,7 @@ install_latest_version <- function(test = FALSE) {
   }
   remote_version <- readLines(
     paste0(
-      "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+      "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/",
       ref,
       "/DESCRIPTION"
     ),
@@ -101,7 +101,7 @@ install_latest_version <- function(test = FALSE) {
           pak::pkg_install(
             pkg = paste0(
               "github::",
-              "taxonomicallyinformedannotation/tima-r@",
+              "taxonomicallyinformedannotation/tima@",
               ref,
               "?source&reinstall&nocache"
             ),
@@ -123,7 +123,7 @@ install_latest_version <- function(test = FALSE) {
           pak::pkg_install(
             pkg = paste0(
               "github::",
-              "taxonomicallyinformedannotation/tima-r@",
+              "taxonomicallyinformedannotation/tima@",
               ref,
               "?source&reinstall&nocache"
             ),
@@ -179,7 +179,7 @@ install_latest_version <- function(test = FALSE) {
       message("Installing remote targets")
       tima::get_file(
         url = paste0(
-          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/",
           ref,
           "/_targets.yaml"
         ),
@@ -200,7 +200,7 @@ install_latest_version <- function(test = FALSE) {
       message("Getting remote DESCRIPTION")
       tima::get_file(
         url = paste0(
-          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-r/",
+          "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/",
           ref,
           "/DESCRIPTION"
         ),
