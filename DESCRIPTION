@@ -137,7 +137,7 @@ Collate:
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
     'import-standalone-purrr.R'
-    'install_latest_version.R'
+    'install.R'
     'load_yaml_files.R'
     'log_debug.R'
     'log_pipe.R'

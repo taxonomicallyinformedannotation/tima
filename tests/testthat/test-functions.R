@@ -5,11 +5,11 @@ library(tima)
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
   try(remove.packages("pak"))
-  install_latest_version()
+  install()
   # When already present
-  install_latest_version()
+  install()
   # Tests
-  install_latest_version(test = TRUE)
+  install(test = TRUE)
   withr::local_dir(new = fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()
