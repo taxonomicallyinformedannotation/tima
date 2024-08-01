@@ -161,6 +161,24 @@ prepare_libraries_spectra <-
             }
           )
         rm(spectra_extracted)
+
+        log_debug("Extracting structures for the SOP library.")
+        sop <- bind_rows(
+          spectra_harmonized_pos |>
+            bind_rows(),
+          spectra_harmonized_neg |>
+            bind_rows()
+        ) |>
+          distinct(
+            structure_inchikey = inchikey,
+            structure_smiles = smiles,
+            structure_smiles_no_stereo = smiles_no_stereo
+          ) |>
+          mutate(
+            structure_inchikey_no_stereo = structure_inchikey |>
+              gsub(pattern = "-.*", replacement = ""),
+            organism_name = NA_character_
+          )
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
         spectra_harmonized_pos <- list(
@@ -191,22 +209,14 @@ prepare_libraries_spectra <-
           )
         )
         spectra_harmonized_neg <- spectra_harmonized_pos
-      }
-      log_debug("Extracting structures for the SOP library.")
-      sop <- bind_rows(
-        spectra_harmonized_pos |>
-          bind_rows(),
-        spectra_harmonized_neg |> bind_rows()
-      ) |>
-        distinct(
-          structure_inchikey = inchikey,
-          structure_smiles = smiles,
-          structure_smiles_no_stereo = smiles_no_stereo
-        ) |>
-        mutate(
-          structure_inchikey_no_stereo = stri_sub(str = structure_inchikey, from = 1, to = 14),
-          organism_name = NA_character_
+        sop <- tidytable(
+          "structure_inchikey" = NA_character_,
+          "structure_smiles" = NA_character_,
+          "structure_smiles_no_stereo" = NA_character_,
+          "structure_inchikey_no_stereo" = NA_character_,
+          "organism_name" = NA_character_
         )
+      }
       log_debug("Exporting")
       export_output(sop, file = output_sop)
       mapply(
