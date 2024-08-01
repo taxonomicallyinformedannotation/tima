@@ -4,11 +4,10 @@ library(tima)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
-  install()
-  # When already present
-  install()
   # Tests
   install(test = TRUE)
+  # When already present
+  install()
   withr::local_dir(new = fs::path_home(".tima"))
   ## Prepare parameters
   paths <- parse_yaml_paths()

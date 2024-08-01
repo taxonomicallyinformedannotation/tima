@@ -78,12 +78,16 @@ install <- function(test = FALSE) {
     pak::pak_cleanup(force = TRUE)
     pak::pak_update()
     pak::pak(ask = FALSE, upgrade = TRUE)
-    # Try installing the local version first
     success <- tryCatch(
       {
-        message("Installing local version")
+        message("Installing remote version")
         pak::pkg_install(
-          pkg = ".",
+          pkg = paste0(
+            "github::",
+            "taxonomicallyinformedannotation/tima@",
+            ref,
+            "?source&reinstall&nocache"
+          ),
           ask = FALSE,
           upgrade = FALSE
         )
@@ -93,28 +97,7 @@ install <- function(test = FALSE) {
         FALSE
       }
     )
-    # If local version installation fails, try the URL from DESCRIPTION file
-    if (!success || isTRUE(test)) {
-      success <- tryCatch(
-        {
-          message("Installing remote version")
-          pak::pkg_install(
-            pkg = paste0(
-              "github::",
-              "taxonomicallyinformedannotation/tima@",
-              ref,
-              "?source&reinstall&nocache"
-            ),
-            ask = FALSE,
-            upgrade = FALSE
-          )
-          TRUE
-        },
-        error = function(e) {
-          FALSE
-        }
-      )
-    }
+
     # If URL installation fails, try installing the remote version from GitHub
     if (!success || isTRUE(test)) {
       success <- tryCatch(
@@ -138,6 +121,22 @@ install <- function(test = FALSE) {
         }
       )
     }
+    if (!success || isTRUE(test)) {
+      success <- tryCatch(
+        {
+          message("Installing local version")
+          pak::pkg_install(
+            pkg = ".",
+            ask = FALSE,
+            upgrade = FALSE
+          )
+          TRUE
+        },
+        error = function(e) {
+          FALSE
+        }
+      )
+    }
     # Final message if all attempts fail
     if (!success || isTRUE(test)) {
       message("All installation attempts failed")
@@ -146,4 +145,10 @@ install <- function(test = FALSE) {
   cache <- fs::path_home(".tima")
   message("Creating cache at ", cache)
   fs::dir_create(path = cache)
+  message("Copying default architecture ...")
+  fs::dir_copy(
+    path = system.file(package = "tima"),
+    new_path = file.path(cache, "inst"),
+    overwrite = TRUE
+  )
 }
