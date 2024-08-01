@@ -65,8 +65,13 @@ get_params <- function(step) {
   doc_path <-
     file.path(system.file("scripts/docopt", package = "tima"), paste0(step, ".txt"))
 
+  usr_path <- if (file.exists(paths$params$user$path)) {
+    paths$params$user$path
+  } else {
+    paths$params$user$path |> gsub(pattern = "inst", replacement = "")
+  }
   user_path <-
-    file.path(paths$params$user$path, paste0(step, ".yaml"))
+    file.path(usr_path, paste0(step, ".yaml"))
 
   doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 
