@@ -135,9 +135,9 @@ harmonize_spectra <- function(spectra,
     ) |>
     select(
       any_of(c(columns_full)),
-      precursorCharge,
+      any_of(c("precursorCharge")),
       precursorMz,
-      rtime,
+      any_of(c("rtime")),
       mz,
       intensity
     ) |>
@@ -145,29 +145,29 @@ harmonize_spectra <- function(spectra,
 
   spectra_harmonized <- spectra_filtered |>
     full_join(spectra_missing) |>
-    select(
-      adduct,
-      collision_energy,
-      compound_id,
-      exactmass,
-      formula,
-      inchi,
-      inchi_no_stereo,
-      inchikey,
-      inchikey_no_stereo,
-      name,
-      precursorMz,
-      precursorCharge,
-      smiles,
-      smiles_no_stereo,
-      spectrum_id,
-      splash,
-      synonyms,
-      xlogp,
-      rtime,
-      mz,
-      intensity
-    ) |>
+    select(any_of(c(
+      "adduct",
+      "collision_energy",
+      "compound_id",
+      "exactmass",
+      "formula",
+      "inchi",
+      "inchi_no_stereo",
+      "inchikey",
+      "inchikey_no_stereo",
+      "name",
+      "precursorMz",
+      "precursorCharge",
+      "smiles",
+      "smiles_no_stereo",
+      "spectrum_id",
+      "splash",
+      "synonyms",
+      "xlogp",
+      "rtime",
+      "mz",
+      "intensity"
+    ))) |>
     mutate(
       library = metad,
       exactmass = as.numeric(exactmass),
