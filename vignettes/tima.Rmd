@@ -68,7 +68,7 @@ targets::tar_visnetwork(
     contains("library_sop_lotus"),
     contains("library_sop_closed")
   ),
-  script = system.file("/pipelines/_targets.R", "tima"),
+  script = system.file("pipelines/_targets.R", package = "tima"),
   targets_only = TRUE,
   degree_from = 8,
   level_separation = 200
@@ -100,5 +100,5 @@ tima::run_app()
 If you do not even need a GUI ☠️:
 
 ```{r eval=FALSE, include=TRUE}
-targets::tar_make(names = matches("^ann_pre$"), script = system.file("/pipelines/_targets.R", "tima"))
+targets::tar_make(names = matches("^ann_pre$"), script = system.file("pipelines/_targets.R", package = "tima"))
 ```
