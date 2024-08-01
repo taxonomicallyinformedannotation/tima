@@ -21,8 +21,7 @@ services:
     user: tima-user
     volumes:
       - "./data:/home/tima-user/data"
-      - "./inst:/home/tima-user/inst"
-    command: Rscript inst/scripts/tima_full.R
+    command: Rscript -e "targets::tar_make(names = matches("^ann_pre$"))"
 
   tima-gui:
     build: "."
@@ -48,8 +47,7 @@ services:
     user: tima-user
     volumes:
       - "./data:/home/tima-user/data"
-      - "./inst:/home/tima-user/inst"
-    command: Rscript inst/scripts/run_app.R
+    command: Rscript -e "tima::run_app()"
 
 networks:
   service-service-frontend:
