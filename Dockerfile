@@ -22,8 +22,6 @@ USER tima-user
 WORKDIR /home/tima-user
 
 # Copy necessary files for dependency installation
-COPY --chown=tima-user:tima-user _targets.yaml ./_targets.yaml
-COPY --chown=tima-user:tima-user DESCRIPTION ./DESCRIPTION
 COPY --chown=tima-user:tima-user docker-compose.yml ./docker-compose.yml
 COPY --chown=tima-user:tima-user inst ./inst
 COPY --chown=tima-user:tima-user R ./R
