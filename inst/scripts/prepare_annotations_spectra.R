@@ -13,7 +13,7 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 ## Not ann_spe because of `ann_spe_int` (see #69)
-targets::tar_make(names = c(matches("^ann_spe_is")))
+targets::tar_make(names = c(matches("^ann_spe_is"), script = system.file("/pipelines/_targets.R", "tima")))
 
 end <- Sys.time()
 
