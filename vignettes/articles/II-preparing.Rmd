@@ -46,7 +46,7 @@ However, they allow to annotate unusual adducts, in-source fragments thanks to d
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
 
 ```{r annotate-masses-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("^ann_ms1_pre"))
+targets::tar_make(names = matches("^ann_ms1_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ### Spectral
@@ -61,7 +61,7 @@ In case, a python implementation of the spectral matching steps is also availabl
 The python version also includes other similarity measures.
 
 ```{r annotate-spectra-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = c(matches("^ann_spe_is")))
+targets::tar_make(names = c(matches("^ann_spe_is")), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 <!-- #### GNPS -->
@@ -70,7 +70,7 @@ targets::tar_make(names = c(matches("^ann_spe_is")))
 <!-- Depending on the annotation tool you used, you can format its results using: -->
 
 ```{r annotate-gnps, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results="hide"}
-targets::tar_make(names = matches("^ann_spe_exp_gnp_pre"))
+targets::tar_make(names = matches("^ann_spe_exp_gnp_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ### Fingerprint-based
@@ -133,7 +133,7 @@ tima::get_example_sirius()
 The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).
 
 ```{r prepare-sirius, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("^ann_sir_pre"))
+targets::tar_make(names = matches("^ann_sir_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 If you want to know how we attempt to combine the CSI score with other ones, see [R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
@@ -147,6 +147,7 @@ targets::tar_visnetwork(
     contains("par_"),
     contains("paths")
   ),
+  script = system.file("/pipelines/_targets.R", "tima"),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -172,7 +173,7 @@ A network is generated during the process.
 The edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
 
 ```{r create-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("fea_edg_spe"))
+targets::tar_make(names = matches("fea_edg_spe"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
@@ -185,19 +186,19 @@ tima::get_file(
 ```
 
 ```{r prepare-features, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("fea_pre"))
+targets::tar_make(names = matches("fea_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ```{r prepare-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("fea_edg_pre"))
+targets::tar_make(names = matches("fea_edg_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ```{r create-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("fea_com"))
+targets::tar_make(names = matches("fea_com"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ```{r prepare-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("fea_com_pre"))
+targets::tar_make(names = matches("fea_com_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ## Biological source annotation
@@ -208,7 +209,7 @@ If you have multiple extracts aligned, it will take the *n* (according to your p
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
 ```{r prepare-taxa, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "inst/scripts/prepare_taxa.R")
+targets::tar_make(names = matches("tax_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 ## Filter annotations (based on retention time)
@@ -219,7 +220,7 @@ It is optional.
 If you do not have one, it will simply group the annotations of all tools. 
 
 ```{r filter-annotations, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("tax_pre"))
+targets::tar_make(names = matches("^ann_fil"), script = system.file("/pipelines/_targets.R", "tima"))
 ```
 
 You are almost there! See already all the steps accomplished!
@@ -232,6 +233,7 @@ targets::tar_visnetwork(
     contains("par_"),
     contains("paths")
   ),
+  script = system.file("/pipelines/_targets.R", "tima"),
   targets_only = TRUE,
   degree_from = 8
 )

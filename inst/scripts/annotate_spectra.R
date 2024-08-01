@@ -15,7 +15,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-targets::tar_make(names = matches("^ann_spe_pre"))
+targets::tar_make(names = matches("^ann_spe_pre"), script = system.file("/pipelines/_targets.R", "tima"))
 
 end <- Sys.time()
 

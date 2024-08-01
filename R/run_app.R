@@ -41,7 +41,7 @@ run_app <- function(dir = "inst",
   }
 
   shiny::runApp(
-    appDir = system.file(package="tima"),
+    appDir = system.file(package = "tima"),
     port = port,
     host = host,
     launch.browser = browser

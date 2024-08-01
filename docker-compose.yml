@@ -21,7 +21,7 @@ services:
     user: tima-user
     volumes:
       - "./data:/home/tima-user/data"
-    command: Rscript -e "targets::tar_make(names = matches("^ann_pre$"))"
+    command: Rscript -e "targets::tar_make(names = matches("^ann_pre$"), script=system.file("/pipelines/_targets.R","tima"))"
 
   tima-gui:
     build: "."
