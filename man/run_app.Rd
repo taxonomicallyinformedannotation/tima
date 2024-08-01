@@ -4,11 +4,9 @@
 \alias{run_app}
 \title{Run app}
 \usage{
-run_app(dir = "inst", host = "127.0.0.1", port = 3838, browser = TRUE)
+run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
 }
 \arguments{
-\item{dir}{Directory of the app}
-
 \item{host}{Host. Default to 127.0.0.1}
 
 \item{port}{Port. Default to 3838}
