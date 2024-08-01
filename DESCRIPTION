@@ -42,7 +42,7 @@ Imports:
     R.utils (>= 2.12.3),
     rlang (>= 1.1.4),
     rotl (>= 3.1.0),
-    shiny (>= 1.9.1),
+    shiny (>= 1.9.0),
     shinybusy (>= 0.3.3),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
