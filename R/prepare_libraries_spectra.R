@@ -106,28 +106,28 @@ prepare_libraries_spectra <-
           FUN = harmonize_spectra,
           mode = "pos",
           metad = nam_lib,
-          col_ad,
-          col_ce,
-          col_ci,
-          col_em,
-          col_in,
-          col_io,
-          col_ik,
-          col_il,
-          col_mf,
-          col_na,
-          col_po,
-          col_sm,
-          col_sn,
-          col_si,
-          col_sp,
-          col_sy,
-          col_xl
+          col_ad = col_ad,
+          col_ce = col_ce,
+          col_ci = col_ci,
+          col_em = col_em,
+          col_in = col_in,
+          col_io = col_io,
+          col_ik = col_ik,
+          col_il = col_il,
+          col_mf = col_mf,
+          col_na = col_na,
+          col_po = col_po,
+          col_sm = col_sm,
+          col_sn = col_sn,
+          col_si = col_si,
+          col_sp = col_sp,
+          col_sy = col_sy,
+          col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
             FUN = function(x) {
-              x <- x |> mutate(precursor_mz = precursorMz)
+              x <- x |> rename(precursor_mz = precursorMz)
             }
           )
         log_debug("... neg")
@@ -136,28 +136,28 @@ prepare_libraries_spectra <-
           FUN = harmonize_spectra,
           mode = "neg",
           metad = nam_lib,
-          col_ad,
-          col_ce,
-          col_ci,
-          col_em,
-          col_in,
-          col_io,
-          col_ik,
-          col_il,
-          col_mf,
-          col_na,
-          col_po,
-          col_sm,
-          col_sn,
-          col_si,
-          col_sp,
-          col_sy,
-          col_xl
+          col_ad = col_ad,
+          col_ce = col_ce,
+          col_ci = col_ci,
+          col_em = col_em,
+          col_in = col_in,
+          col_io = col_io,
+          col_ik = col_ik,
+          col_il = col_il,
+          col_mf = col_mf,
+          col_na = col_na,
+          col_po = col_po,
+          col_sm = col_sm,
+          col_sn = col_sn,
+          col_si = col_si,
+          col_sp = col_sp,
+          col_sy = col_sy,
+          col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
             FUN = function(x) {
-              x <- x |> mutate(precursor_mz = precursorMz)
+              x <- x |> rename(precursor_mz = precursorMz)
             }
           )
         rm(spectra_extracted)
