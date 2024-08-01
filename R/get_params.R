@@ -26,30 +26,30 @@ get_params <- function(step) {
     list.files(system.file("scripts/docopt", package = "tima")) |>
     stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
+  get_path <- function(base_path) {
+    if (file.exists(base_path)) {
+      return(base_path)
+    } else {
+      new_path <- gsub(pattern = "inst/", replacement = "", base_path)
+      if (file.exists(new_path)) {
+        return(new_path)
+      } else {
+        return(gsub(
+          pattern = "inst/",
+          replacement = system.file(package = "tima"),
+          base_path
+        ))
+      }
+    }
+  }
+
   default_path <-
     if (step == "prepare_params") {
-      path_1 <- file.path(paths$params$prepare_params)
-      if (file.exists(path_1)) {
-        path_1
-      } else {
-        path_1 |> gsub(pattern = "inst/", replacement = "")
-      }
+      get_path(file.path(paths$params$prepare_params))
+    } else if (step == "prepare_params_advanced") {
+      get_path(file.path(paths$params$prepare_params_advanced))
     } else {
-      if (step == "prepare_params_advanced") {
-        path_2 <- file.path(paths$params$prepare_params_advanced)
-        if (file.exists(path_2)) {
-          path_2
-        } else {
-          path_2 |> gsub(pattern = "inst/", replacement = "")
-        }
-      } else {
-        path_3 <- file.path(paths$params$default$path, paste0(step, ".yaml"))
-        if (file.exists(path_3)) {
-          path_3
-        } else {
-          path_3 |> gsub(pattern = "inst/", replacement = "")
-        }
-      }
+      get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
     }
 
   # for advanced parameters to work
@@ -63,15 +63,13 @@ get_params <- function(step) {
   stopifnot("Your step does not exist." = step %in% steps)
 
   doc_path <-
-    file.path(system.file("scripts/docopt", package = "tima"), paste0(step, ".txt"))
+    file.path(
+      system.file("scripts/docopt", package = "tima"),
+      paste0(step, ".txt")
+    )
 
-  usr_path <- if (file.exists(paths$params$user$path)) {
-    paths$params$user$path
-  } else {
-    paths$params$user$path |> gsub(pattern = "inst", replacement = "")
-  }
   user_path <-
-    file.path(usr_path, paste0(step, ".yaml"))
+    file.path(get_path(paths$params$user$path), paste0(step, ".yaml"))
 
   doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 

@@ -3,7 +3,7 @@ library(testthat)
 library(tima)
 
 ## Test the package
-test_check(package = "tima")
+test_local()
 
 ## Test the app
 test_app(filter = "shinytest2")
