@@ -2,13 +2,18 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches:
+      - "main"
+      - "dev"
   pull_request:
-    branches: [main, master]
-
-name: test-coverage
+    branches:
+      - "main"
+      - "dev"
+  workflow_dispatch:
 
 permissions: read-all
+
+name: test-coverage
 
 jobs:
   test-coverage:

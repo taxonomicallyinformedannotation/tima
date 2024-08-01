@@ -52,7 +52,7 @@ targets::tar_make(names = matches("^ann_ms1_pre"), script = system.file("pipelin
 ### Spectral
 
 ```{r annotate-spectra-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("^ann_spe_pre"))
+targets::tar_make(names = matches("^ann_spe_pre"), script = system.file("pipelines/_targets.R", package = "tima"))
 ```
 
 We use the `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
