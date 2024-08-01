@@ -11,7 +11,7 @@ test_that("{shinytest2} recording: app", {
     export = "data/source/example_features.csv"
   )
 
-  app <- AppDriver$new()
+  app <- AppDriver$new(app_dir = system.file("app.R", package = "tima"))
   app$upload_file(fil_spe_raw = "data/source/example_spectra.mgf")
   app$upload_file(fil_fea_raw = "data/source/example_features.csv")
   app$click("save")
