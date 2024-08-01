@@ -8,7 +8,6 @@ import::from(shiny, runApp, .into = environment())
 #'
 #' @include install.R
 #'
-#' @param dir Directory of the app
 #' @param host Host. Default to 127.0.0.1
 #' @param port Port. Default to 3838
 #' @param browser Flag for browser use. Default to TRUE
@@ -18,8 +17,7 @@ import::from(shiny, runApp, .into = environment())
 #' @export
 #'
 #' @examples NULL
-run_app <- function(dir = "inst",
-                    host = "127.0.0.1",
+run_app <- function(host = "127.0.0.1",
                     port = 3838,
                     browser = TRUE) {
   # Check if runs in Docker environment or not
