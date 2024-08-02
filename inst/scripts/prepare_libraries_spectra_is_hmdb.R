@@ -33,13 +33,13 @@ prepare_isdb_hmdb <-
            output_pos = paths$data$interim$libraries$spectra$is$hmdb$pos,
            output_neg = paths$data$interim$libraries$spectra$is$hmdb$neg) {
     log_debug("Loading standardization function (temp)")
-    source(file = "inst/scripts/standardize.R")
+    source(file = "https://gist.githubusercontent.com/Adafede/0aceaf2afe423fb53651590213fac0f1/raw/5394b58eef333b24f7fc7b59a27473db90595d15/standardize.R")
 
     log_debug("Loading proton mass")
     proton <- MetaboCoreUtils::calculateMass("H") - 5.485799E-4
 
     log_debug("Loading metadata")
-    df_meta <- readr::read_tsv(file = metadata)
+    df_meta <- tidytable::fread(metadata)
 
     log_debug("Unzipping")
     newdir <-
