@@ -44,7 +44,7 @@ get_file <-
         for (i in 1:attempts) {
           tryCatch(
             {
-              download.file(url = url, destfile = destfile)
+              download.file(url = url, destfile = destfile, method = "libcurl")
               if (file.exists(destfile)) {
                 return(TRUE)
               }
