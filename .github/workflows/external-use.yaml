@@ -35,7 +35,7 @@ jobs:
         with:
           use-public-rspm: true
           Ncpus: 2
-      - name: Install package
+      - name: Install
         run: |
           install.packages("pak")
           pak::pak("taxonomicallyinformedannotation/tima")
@@ -43,12 +43,11 @@ jobs:
         shell: Rscript {0}
       - name: Get example files
         run: |
-          Rscript inst/scripts/get_example_spectra.R
-          Rscript inst/scripts/get_example_features.R
-          Rscript inst/scripts/get_example_metadata.R
-          # Rscript inst/scripts/get_example_sirius.R
-      - name: Run tests
+          tima::get_example_files()
+        shell: Rscript {0}
+      - name: Run pipeline
         run: |
-          Rscript inst/scripts/tima_full.R
+          tima::tima_full()
           # Check if targets works correctly
-          Rscript inst/scripts/tima_full.R
+          tima::tima_full()
+        shell: Rscript {0}
