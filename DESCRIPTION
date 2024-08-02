@@ -60,6 +60,7 @@ Imports:
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
+    CompoundDb,
     knitr,
     pkgload,
     shinytest2,

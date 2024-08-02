@@ -57,6 +57,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "CompoundDb",
+      "name": "CompoundDb",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/CompoundDb.html"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
       "provider": {
@@ -644,7 +656,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3181.235KB",
+  "fileSize": "3178.832KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
