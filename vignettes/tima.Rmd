@@ -103,5 +103,5 @@ tima::run_app()
 If you do not even need a GUI ☠️:
 
 ```{r eval=FALSE, include=TRUE}
-targets::tar_make(names = matches("^ann_pre$"))
+tima::tima_full()
 ```
