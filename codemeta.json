@@ -122,7 +122,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 4.4.0"
+      "version": ">= 4.3.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -323,7 +323,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
-      "version": ">= 1.12.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -336,7 +336,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.12.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -349,7 +349,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
-      "version": ">= 1.8.0",
+      "version": ">= 1.6.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -531,7 +531,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.14.1",
+      "version": ">= 1.12.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -644,7 +644,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3186.824KB",
+  "fileSize": "3181.235KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

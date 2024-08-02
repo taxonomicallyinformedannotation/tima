@@ -89,7 +89,7 @@ install <- function(test = FALSE) {
             "?source&reinstall&nocache"
           ),
           ask = FALSE,
-          upgrade = FALSE
+          upgrade = TRUE
         )
         TRUE
       },
@@ -111,7 +111,7 @@ install <- function(test = FALSE) {
               "?source&reinstall&nocache"
             ),
             ask = FALSE,
-            upgrade = FALSE
+            upgrade = TRUE
           )
           TRUE
         },
@@ -128,7 +128,7 @@ install <- function(test = FALSE) {
           pak::pkg_install(
             pkg = ".",
             ask = FALSE,
-            upgrade = FALSE
+            upgrade = TRUE
           )
           TRUE
         },
