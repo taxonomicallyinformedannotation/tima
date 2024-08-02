@@ -57,7 +57,6 @@ Imports:
     tidytable (>= 0.11.1),
     utils,
     visNetwork (>= 2.1.2),
-    withr (>= 3.0.0),
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
@@ -126,8 +125,10 @@ Collate:
     'fake_lotus.R'
     'fake_sop_columns.R'
     'filter_annotations.R'
+    'go_to_cache.R'
     'get_file.R'
     'get_example_sirius.R'
+    'get_example_files.R'
     'get_gnps_tables.R'
     'get_last_version_from_zenodo.R'
     'get_massbank_spectra.R'

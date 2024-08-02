@@ -88,6 +88,7 @@ All coming steps admit you already installed `tima`:
 # install.packages("pak")
 pak::pak("taxonomicallyinformedannotation/tima")
 tima::install()
+tima::get_example_files()
 ```
 
 We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
