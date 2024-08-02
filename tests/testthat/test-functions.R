@@ -5,10 +5,14 @@ library(tima)
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
   # Tests
+  ## Install
   install(test = TRUE)
-  # When already present
+  ## When already present
   install()
-  withr::local_dir(new = fs::path_home(".tima"))
+
+  ## Go to cache
+  go_to_cache()
+
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
@@ -619,6 +623,8 @@ test_that(desc = "Test functions", code = {
   remove_above_precursor()
 
   parse_cli_params(arguments = arguments, parameters = params)
+
+  tima_full()
 
   succeed()
 })

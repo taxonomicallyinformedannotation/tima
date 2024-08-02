@@ -12,6 +12,8 @@ import::from(targets, tar_make, .into = environment())
 #' @importFrom targets matches
 #' @importFrom targets tar_make
 #'
+#' @include go_to_cache.R
+#'
 #' @return Everything you need.
 #'
 #' @export
@@ -22,7 +24,7 @@ tima_full <- function() {
   log_debug("This script", green("does everything you ever dreamt of. \n"))
   log_debug("Authors: ", green("AR"), "\n")
   log_debug("Contributors: ", blue("PMA"), "\n")
-  setwd(dir = fs::path_home(".tima"))
+  go_to_cache()
   tar_make(names = matches("^ann_pre$"))
   end <- Sys.time()
   log_debug("Script finished in", green(format(end - start)))
