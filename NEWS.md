@@ -6,6 +6,7 @@
 * Added the possibility to add internal libraries through the GUI (#159)
 * Added the possibility to filter confident annotations only (#140)
 * Added number of peaks in spectrum
+* Brought back some older dependencies to be compatible with `oldrel`
 * Changed package name, `usethis` update
 * Clearer handling of SIRIUS scores (#146, #147)
 * Exposed more parameters to the GUI (#159)
