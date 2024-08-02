@@ -24,6 +24,10 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = "..")
 ```
 
+```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+library("tima")
+```
+
 This vignette describes the philosophy behind the infrastructure of **TIMA**.
 
 ## Philosophy
