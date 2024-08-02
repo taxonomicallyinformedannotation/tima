@@ -2364,7 +2364,6 @@ server <- function(input, output, session) {
       )
       targets::tar_make(
         names = targets::matches("^ann_pre$"),
-        script = system.file("pipelines/_targets.R", package = "tima"),
         garbage_collection = TRUE,
         reporter = "verbose_positives"
       )

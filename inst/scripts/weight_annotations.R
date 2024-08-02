@@ -20,7 +20,7 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-targets::tar_make(names = matches("ann_pre$"), script = system.file("pipelines/_targets.R", package = "tima"))
+targets::tar_make(names = matches("ann_pre$"))
 
 end <- Sys.time()
 
