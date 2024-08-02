@@ -1,10 +1,15 @@
-import::from(utils, download.file, .into = environment())
+import::from(httr2, req_perform, .into = environment())
+import::from(httr2, req_progress, .into = environment())
+import::from(httr2, request, .into = environment())
+
 
 #' @title Get file
 #'
 #' @description This function get files
 #'
-#' @importFrom utils download.file
+#' @importFrom httr2 req_perform
+#' @importFrom httr2 req_progress
+#' @importFrom httr2 request
 #'
 #' @param url URL of the file to be downloaded
 #' @param export File path where the file should be saved
@@ -44,7 +49,9 @@ get_file <-
         for (i in 1:attempts) {
           tryCatch(
             {
-              download.file(url = url, destfile = destfile, method = "libcurl")
+              httr2::request(url) |>
+                httr2::req_progress() |>
+                httr2::req_perform(path = destfile)
               if (file.exists(destfile)) {
                 return(TRUE)
               }

@@ -1,4 +1,6 @@
-import::from(MsBackendMgf, readMgfSplit, .into = environment())
+import::from(MsBackendMgf, readMgf, .into = environment())
+# TODO Change as soon as R 4.4.0 becomes oldrel
+# import::from(MsBackendMgf, readMgfSplit, .into = environment())
 import::from(MsBackendMsp, readMsp, .into = environment())
 import::from(Spectra, Spectra, .into = environment())
 import::from(stringi, stri_replace_all_regex, .into = environment())
@@ -7,7 +9,7 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'
 #' @description This function imports spectra from a file (.mgf or .sqlite)
 #'
-#' @importFrom MsBackendMgf readMgfSplit
+#' @importFrom MsBackendMgf readMgf
 #' @importFrom MsBackendMsp readMsp
 #' @importFrom Spectra Spectra
 #' @importFrom stringi stri_replace_all_regex
@@ -33,7 +35,9 @@ import_spectra <- function(file) {
   switch(
     EXPR = file_ext,
     "mgf" = {
-      readMgfSplit(f = file) |>
+      readMgf(f = file) |>
+        # TODO Change as soon as R 4.4.0 becomes oldrel
+        # readMgfSplit(f = file) |>
         Spectra() |>
         cleanup_spectra()
     },
