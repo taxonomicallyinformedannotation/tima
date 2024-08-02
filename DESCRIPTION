@@ -163,6 +163,7 @@ Collate:
     'replace_id.R'
     'run_app.R'
     'tima-package.R'
+    'tima_full.R'
     'transform_score_sirius_csi.R'
     'weight_chemo.R'
     'weight_bio.R'

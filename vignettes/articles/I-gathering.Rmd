@@ -153,11 +153,7 @@ This library is **optional**.
 As no standard LC method is shared (for now) among laboratories, this library
 will be heavily laboratory-dependent.
 It could also be a library of in silico predicted retention times.
-If you want to prepare you own library, have a look at `inst/params/user/prepare_libraries_rt.yaml`, and then:
-
-```{r rts-2, results="hide", message=FALSE, warning=FALSE}
-targets::tar_make(names = matches("lib_rt"))
-```
+If you want to prepare you own library, have a look at `inst/params/user/prepare_libraries_rt.yaml`.
 
 #### Structure-Organism Pairs
 
@@ -219,12 +215,7 @@ As we want our tool to be flexible, you can also add your own library to LOTUS.
 You just need to format it in order to be compatible.
 As example, we prepared some ways too format closed, *in house* libraries.
 If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
-
-Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`
-
-```{r prepare-closed, results="hide", message=FALSE, warning=FALSE}
-targets::tar_make(names = matches("lib_sop_clo_pre"))
-```
+Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`.
 
 ##### Merging
 
