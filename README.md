@@ -78,13 +78,22 @@ Once installed, you are ready to go through our
 with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example
-data (set of 7,000+ spectra) using:
+data (set of 5,000+ spectra) using:
 
 ``` r
-tima::get_example_spectra()
-tima::get_example_features()
-tima::get_example_metadata()
-tima::get_example_sirius()
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$features,
+  export = tima::parse_yaml_paths()$data$source$features
+)
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$metadata,
+  export = tima::parse_yaml_paths()$data$source$metadata
+)
+# tima::get_example_sirius()
+tima::get_file(
+  url = tima::parse_yaml_paths()$urls$examples$spectra,
+  export = tima::parse_yaml_paths()$data$source$spectra
+)
 ```
 
 Once you are done, you can open a small GUI to adapt your parameters and

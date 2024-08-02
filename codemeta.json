@@ -154,7 +154,7 @@
       "@type": "SoftwareApplication",
       "identifier": "CompoundDb",
       "name": "CompoundDb",
-      "version": ">=1.6.0",
+      "version": ">= 1.6.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -657,7 +657,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3178.842KB",
+  "fileSize": "3179.153KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
