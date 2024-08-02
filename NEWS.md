@@ -11,6 +11,7 @@
 * Clearer handling of SIRIUS scores (#146, #147)
 * Exposed more parameters to the GUI (#159)
 * Facilitated install, no need to clone the directory anymore
+* Finally made it to the [r-universe](https://r-universe.dev/builds/)
 * Fixed adducts and removed nitrogen rule
 * Fixed number of matched peaks
 * Improved imports
