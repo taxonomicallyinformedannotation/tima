@@ -12,7 +12,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-targets::tar_make(names = matches("fea_pre"), script = system.file("pipelines/_targets.R", package = "tima"))
+targets::tar_make(names = matches("fea_pre"))
 
 end <- Sys.time()
 
