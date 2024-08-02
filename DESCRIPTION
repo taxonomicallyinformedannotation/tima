@@ -19,7 +19,7 @@ Depends:
 Imports:
     bs4Dash (>= 2.3.3),
     cli (>= 3.6.3),
-    CompoundDb (>=1.6.0),
+    CompoundDb (>= 1.6.0),
     crayon (>= 1.5.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
