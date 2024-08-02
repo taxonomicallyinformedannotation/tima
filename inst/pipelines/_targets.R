@@ -1222,14 +1222,8 @@ list(
       format = "file",
       command = {
         lib_rt <- prepare_libraries_rt(
-          mgf_exp = list(
-            lib_spe_exp_int_pre_neg,
-            lib_spe_exp_int_pre_pos
-          ),
-          mgf_is = list(
-            lib_spe_is_lot_pre_neg,
-            lib_spe_is_lot_pre_pos
-          ),
+          mgf_exp = par_pre_lib_rt$files$libraries$temporal$exp$mgf,
+          mgf_is = par_pre_lib_rt$files$libraries$temporal$is$mgf,
           temp_exp = par_pre_lib_rt$files$libraries$temporal$exp$csv,
           temp_is = par_pre_lib_rt$files$libraries$temporal$is$csv,
           output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
