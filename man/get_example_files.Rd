@@ -4,7 +4,10 @@
 \alias{get_example_files}
 \title{Get example files}
 \usage{
-get_example_files()
+get_example_files(example = c("features", "metadata", "sirius", "spectra"))
+}
+\arguments{
+\item{example}{The example(s) you want to download}
 }
 \value{
 Example files.
