@@ -2,11 +2,8 @@ import::from(dplyr, join_by, .into = environment())
 import::from(msentropy, calculate_entropy_similarity, .into = environment())
 import::from(msentropy, calculate_spectral_entropy, .into = environment())
 import::from(pbapply, pblapply, .into = environment())
-import::from(Spectra, addProcessing, .into = environment())
 import::from(Spectra, applyProcessing, .into = environment())
 import::from(Spectra, concatenateSpectra, .into = environment())
-import::from(Spectra, filterIntensity, .into = environment())
-import::from(Spectra, filterPrecursorCharge, .into = environment())
 import::from(tidytable, any_of, .into = environment())
 import::from(tidytable, arrange, .into = environment())
 import::from(tidytable, as_tidytable, .into = environment())
@@ -31,11 +28,8 @@ import::from(tidytable, tidytable, .into = environment())
 #' @importFrom msentropy calculate_entropy_similarity
 #' @importFrom msentropy calculate_spectral_entropy
 #' @importFrom pbapply pblapply
-#' @importFrom Spectra addProcessing
 #' @importFrom Spectra applyProcessing
 #' @importFrom Spectra concatenateSpectra
-#' @importFrom Spectra filterIntensity
-#' @importFrom Spectra filterPrecursorCharge
 #' @importFrom tidytable any_of
 #' @importFrom tidytable arrange
 #' @importFrom tidytable as_tidytable
@@ -52,9 +46,6 @@ import::from(tidytable, tidytable, .into = environment())
 #' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
-#' @include normalize_peaks.R
-#' @include remove_above_precursor.R
-#' @include sanitize_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param library Library containing spectra to match against.
@@ -94,12 +85,12 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
   log_debug("Loading spectra...")
   spectra <- input |>
-    import_spectra() |>
-    filterPrecursorCharge(z = if (polarity == "pos") {
-      c(1, 2, 3)
-    } else {
-      c(-1, -2, -3)
-    })
+    import_spectra(
+      cutoff = qutoff,
+      dalton = dalton,
+      polarity = polarity,
+      ppm = ppm
+    )
 
   df_empty <- data.frame(
     feature_id = NA,
@@ -120,24 +111,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
-      lapply(FUN = import_spectra) |>
-      concatenateSpectra() |>
-      sanitize_spectra() |>
-      addProcessing(remove_above_precursor(),
-        spectraVariables = c("precursorMz")
+      lapply(
+        FUN = import_spectra,
+        cutoff = qutoff,
+        dalton = dalton,
+        polarity = polarity,
+        ppm = ppm
       ) |>
-      addProcessing(normalize_peaks()) |>
-      applyProcessing()
-
-    log_debug("Applying initial intensity filter to query spectra")
-    spectra <- spectra |>
-      sanitize_spectra() |>
-      filterIntensity(intensity = c(qutoff, Inf)) |>
-      addProcessing(remove_above_precursor(),
-        spectraVariables = c("precursorMz")
-      ) |>
-      addProcessing(normalize_peaks()) |>
-      applyProcessing()
+      lapply(FUN = applyProcessing) |>
+      concatenateSpectra()
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData

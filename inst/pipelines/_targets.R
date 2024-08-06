@@ -1904,24 +1904,14 @@ list(
       format = "file",
       command = {
         sp <- benchmark_converted |>
-          import_spectra() |>
-          sanitize_spectra(
-            cutoff = 0,
-            ratio = 10000,
-            fragments = 5
-          )
+          import_spectra()
 
         sp@backend@spectraData$precursorMz <-
           sp@backend@spectraData$PRECURSOR_MZ |>
           as.numeric()
 
         log_debug("Imported")
-        sp_clean <- sp |>
-          Spectra::addProcessing(remove_above_precursor(),
-            spectraVariables = c("precursorMz")
-          ) |>
-          Spectra::addProcessing(normalize_peaks()) |>
-          Spectra::applyProcessing()
+        sp_clean <- sp
 
         log_debug("Cleaned")
         df_meta <- tidytable::tidytable(
