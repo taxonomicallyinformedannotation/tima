@@ -617,11 +617,6 @@ test_that(desc = "Test functions", code = {
   arguments$remove_ties <- TRUE
   arguments$summarise <- TRUE
 
-  # Useless
-  keep_peaks(x = 0, prop = 0)
-  normalize_peaks()
-  remove_above_precursor()
-
   parse_cli_params(arguments = arguments, parameters = params)
 
   tima_full()

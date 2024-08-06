@@ -4,16 +4,27 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, ratio = 10000, cutoff = 0, fragments = 3)
+sanitize_spectra(
+  spectra,
+  cutoff = 0,
+  dalton = 0.01,
+  polarity = NA,
+  ppm = 10,
+  ratio = 10000
+)
 }
 \arguments{
 \item{spectra}{Spectra object}
 
-\item{ratio}{Minimal ratio to the max peak}
-
 \item{cutoff}{Absolute minimal intensity}
 
-\item{fragments}{Minimal number of fragments}
+\item{dalton}{Dalton tolerance}
+
+\item{polarity}{Polarity}
+
+\item{ppm}{PPM tolerance}
+
+\item{ratio}{Minimal ratio to the max peak}
 }
 \description{
 This function sanitizes spectra

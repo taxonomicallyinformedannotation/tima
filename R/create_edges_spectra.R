@@ -1,7 +1,5 @@
 import::from(msentropy, calculate_spectral_entropy, .into = environment())
 import::from(pbapply, pblapply, .into = environment())
-import::from(Spectra, addProcessing, .into = environment())
-import::from(Spectra, applyProcessing, .into = environment())
 import::from(tidyfst, rn_col, .into = environment())
 import::from(tidytable, any_of, .into = environment())
 import::from(tidytable, bind_rows, .into = environment())
@@ -21,8 +19,6 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @importFrom msentropy calculate_spectral_entropy
 #' @importFrom pbapply pblapply
-#' @importFrom Spectra addProcessing
-#' @importFrom Spectra applyProcessing
 #' @importFrom tidyfst rn_col
 #' @importFrom tidytable any_of
 #' @importFrom tidytable bind_rows
@@ -38,9 +34,6 @@ import::from(tidytable, tidytable, .into = environment())
 #' @include create_edges.R
 #' @include get_params.R
 #' @include import_spectra.R
-#' @include normalize_peaks.R
-#' @include remove_above_precursor.R
-#' @include sanitize_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
 #' @param output Output file.
@@ -69,16 +62,12 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
 
   log_debug("Loading spectra...")
   spectra <- input |>
-    import_spectra()
+    import_spectra(
+      cutoff = qutoff,
+      dalton = dalton,
+      ppm = ppm
+    )
   if (length(spectra) > 1) {
-    spectra <- spectra |>
-      sanitize_spectra(cutoff = qutoff) |>
-      # addProcessing(remove_above_precursor(),
-      #   spectraVariables = c("precursorMz")
-      # ) |>
-      addProcessing(normalize_peaks()) |>
-      applyProcessing()
-
     log_debug("Performing spectral comparison")
     log_debug("As we do not limit the precursors delta,
       expect a (relatively) long processing time.")
