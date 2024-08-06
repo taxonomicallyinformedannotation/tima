@@ -4,14 +4,7 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(
-  spectra,
-  cutoff = 0,
-  dalton = 0.01,
-  polarity = NA,
-  ppm = 10,
-  ratio = 10000
-)
+sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 }
 \arguments{
 \item{spectra}{Spectra object}

@@ -23,7 +23,6 @@ import::from(tidytable, tidytable, .into = environment())
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
 #' @include parse_yaml_paths.R
-#' @include sanitize_spectra.R
 #'
 #' @param input File containing spectra
 #' @param polarity MS polarity
@@ -91,13 +90,9 @@ prepare_libraries_spectra <-
         log_debug("Importing")
         spectra <- lapply(X = input, FUN = import_spectra)
 
-        log_debug("Sanitizing")
-        spectra_sanitized <- lapply(X = spectra, FUN = sanitize_spectra)
-        rm(spectra)
-
         log_debug("Extracting")
-        spectra_extracted <- lapply(X = spectra_sanitized, FUN = extract_spectra)
-        rm(spectra_sanitized)
+        spectra_extracted <- lapply(X = spectra, FUN = extract_spectra)
+        rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")

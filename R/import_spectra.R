@@ -21,6 +21,7 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @param dalton Dalton tolerance
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
+#' @param sanitize Flag indicating whether to sanitize. Default TRUE
 #'
 #' @return Spectra object containing the imported spectra
 #'
@@ -31,7 +32,8 @@ import_spectra <- function(file,
                            cutoff = 0,
                            dalton = 0.01,
                            polarity = NA,
-                           ppm = 10) {
+                           ppm = 10,
+                           sanitize = TRUE) {
   file_ext <-
     stri_replace_all_regex(
       str = file,
@@ -40,29 +42,17 @@ import_spectra <- function(file,
       vectorize_all = FALSE
     )
 
-  switch(
+  spectra <- switch(
     EXPR = file_ext,
     "mgf" = {
       readMgf(f = file) |>
         # TODO Change as soon as R 4.4.0 becomes oldrel
         # readMgfSplit(f = file) |>
-        Spectra() |>
-        sanitize_spectra(
-          cutoff = cutoff,
-          dalton = dalton,
-          polarity = polarity,
-          ppm = ppm
-        )
+        Spectra()
     },
     "msp" = {
       readMsp(f = file) |>
-        Spectra() |>
-        sanitize_spectra(
-          cutoff = cutoff,
-          dalton = dalton,
-          polarity = polarity,
-          ppm = ppm
-        )
+        Spectra()
     },
     # "sqlite" = {
     #   CompDb(x = file) |>
@@ -72,13 +62,17 @@ import_spectra <- function(file,
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
-        Spectra() |>
-        sanitize_spectra(
-          cutoff = cutoff,
-          dalton = dalton,
-          polarity = polarity,
-          ppm = ppm
-        )
+        Spectra()
     }
   )
+  if (sanitize) {
+    spectra <- spectra |>
+      sanitize_spectra(
+        cutoff = cutoff,
+        dalton = dalton,
+        polarity = polarity,
+        ppm = ppm
+      )
+  }
+  return(spectra)
 }
