@@ -20,24 +20,18 @@ import::from(shiny, runApp, .into = environment())
 run_app <- function(host = "127.0.0.1",
                     port = 3838,
                     browser = TRUE) {
-  # Check if runs in Docker environment or not
   if (file.exists("/.dockerenv")) {
     system('echo "I\'m inside the matrix ;("')
     browser <- FALSE
     host <- "0.0.0.0"
   } else {
-    # Check if running latest version
-    tryCatch(
-      expr = {
-        install()
-      },
-      error = function(e) {
-        message(e)
-      }
-    )
+    tryCatch(expr = {
+      install()
+    }, error = function(e) {
+      message(e)
+    })
     system('echo "I\'m living in the real world!"')
   }
-
   shiny::runApp(
     appDir = system.file(package = "tima"),
     port = port,
