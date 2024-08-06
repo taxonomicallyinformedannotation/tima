@@ -116,7 +116,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         cutoff = qutoff,
         dalton = dalton,
         polarity = polarity,
-        ppm = ppm
+        ppm = ppm,
+        sanitize = FALSE
       ) |>
       lapply(FUN = applyProcessing) |>
       concatenateSpectra()

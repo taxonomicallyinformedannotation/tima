@@ -45,8 +45,7 @@ sanitize_spectra <-
            cutoff = 0,
            dalton = 0.01,
            polarity = NA,
-           ppm = 10,
-           ratio = 10000) {
+           ppm = 10) {
     log_debug("Applying sanitization of the spectra")
 
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
@@ -74,8 +73,7 @@ sanitize_spectra <-
         ppm = ppm,
         mz = c(">=")
       ) |>
-      scalePeaks() |>
-      filterIntensity(intensity = c(1 / ratio, 1))
+      scalePeaks()
 
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       message("Combining spectra in case...")

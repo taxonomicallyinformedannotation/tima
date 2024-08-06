@@ -4,7 +4,14 @@
 \alias{import_spectra}
 \title{Import spectra}
 \usage{
-import_spectra(file, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
+import_spectra(
+  file,
+  cutoff = 0,
+  dalton = 0.01,
+  polarity = NA,
+  ppm = 10,
+  sanitize = TRUE
+)
 }
 \arguments{
 \item{file}{File path of the spectrum file to be imported}
@@ -16,6 +23,8 @@ import_spectra(file, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 \item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
+
+\item{sanitize}{Flag indicating whether to sanitize. Default TRUE}
 }
 \value{
 Spectra object containing the imported spectra
