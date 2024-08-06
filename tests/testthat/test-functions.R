@@ -13,6 +13,9 @@ test_that(desc = "Test functions", code = {
   ## Go to cache
   go_to_cache()
 
+  ## Get example files
+  get_example_files()
+
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
