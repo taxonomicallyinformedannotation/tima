@@ -84,14 +84,13 @@ install <- function(test = FALSE) {
     if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
-          message("Retrying install from source")
+          message("Retrying install")
           install.packages(
             "tima",
             repos = c(
               "https://taxonomicallyinformedannotation.r-universe.dev",
               "https://cloud.r-project.org"
-            ),
-            type = "source"
+            )
           )
           TRUE
         },
