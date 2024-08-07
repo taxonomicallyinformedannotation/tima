@@ -2,6 +2,8 @@
 
 # tima 2.10.1
 
+* Removed `CompoundDb` dependency as it was causing too many issues.
+* Removed `pak` install and switched to `r-universe`.
 * Replaced internal functions by `Spectra` equivalents (#166)
 
 # tima 2.10.0

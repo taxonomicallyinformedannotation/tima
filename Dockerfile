@@ -6,9 +6,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# To force Bioconductor to install from source
-ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
-
 # Add a non-root user and create the R library directory
 RUN useradd -m tima-user && \
     mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
