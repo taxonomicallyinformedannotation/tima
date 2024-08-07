@@ -8,8 +8,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
 Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
-Description: This package provides the infrastructure to perform Taxonomically
-    Informed Metabolite Annotation.
+Description: This package provides the infrastructure to perform
+    Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima,
     https://taxonomicallyinformedannotation.github.io/tima
