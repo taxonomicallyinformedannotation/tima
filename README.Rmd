@@ -50,7 +50,14 @@ Optionally, you may want to add:
 As the package is not (yet) available on CRAN, you will need to install with:
 
 ``` r
-install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://cloud.r-project.org"))
+install.packages(
+  "tima",
+  repos = c(
+    "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
+    "https://cloud.r-project.org"
+  )
+)
 ```
 
 Then, you should be able to install the rest with:
