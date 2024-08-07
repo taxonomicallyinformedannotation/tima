@@ -6,7 +6,7 @@
 \alias{tima-package}
 \title{tima: Taxonomically Informed Metabolite Annotation}
 \description{
-TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
+This package provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.
 }
 \seealso{
 Useful links:

@@ -457,7 +457,7 @@ weight_bio <-
       ) |>
       select(-candidate_score_sirius_csi_tmp) |>
       mutate(
-        score_pondered_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
+        score_weighted_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
       )
 
     rm(

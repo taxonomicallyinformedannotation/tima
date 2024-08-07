@@ -194,7 +194,7 @@ weight_chemo <-
       right_join(annot_table_wei_bio_clean) |>
       log_pipe("... calculating weighted chemical score \n") |>
       mutate(
-        score_pondered_chemo = (1 / (
+        score_weighted_chemo = (1 / (
           weight_chemical + weight_biological + weight_spectral
         )) * weight_chemical * score_chemical + (1 / (
           weight_chemical + weight_biological + weight_spectral
