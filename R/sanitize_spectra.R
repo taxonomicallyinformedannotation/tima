@@ -33,7 +33,6 @@ import::from(Spectra, scalePeaks, .into = environment())
 #' @param dalton Dalton tolerance
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
-#' @param ratio Minimal ratio to the max peak
 #'
 #' @return NULL
 #'

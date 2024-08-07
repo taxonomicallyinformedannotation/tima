@@ -16,8 +16,6 @@ sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 \item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
-
-\item{ratio}{Minimal ratio to the max peak}
 }
 \description{
 This function sanitizes spectra
