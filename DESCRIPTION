@@ -37,7 +37,6 @@ Imports:
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
     msentropy (>= 0.1.4),
-    pak (>= 0.7.2),
     pbapply (>= 1.7.2),
     pingr (>= 2.0.3),
     R.utils (>= 2.12.3),

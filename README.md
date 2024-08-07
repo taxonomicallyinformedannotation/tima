@@ -58,8 +58,7 @@ As the package is not (yet) available on CRAN, you will need to install
 the development version [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("taxonomicallyinformedannotation/tima")
+install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://cloud.r-project.org"))
 ```
 
 Then, you should be able to install the rest with:

@@ -37,8 +37,7 @@ jobs:
           Ncpus: 2
       - name: Install
         run: |
-          install.packages("pak")
-          pak::pak("taxonomicallyinformedannotation/tima")
+          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://cloud.r-project.org"))
           tima::install()
         shell: Rscript {0}
       - name: Get example files
