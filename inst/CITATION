@@ -3,7 +3,7 @@ citHeader("To cite tima in publications use:")
 citEntry(
   entry    = "Article",
   title    = "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
-  author   = personList(
+  author   = c(
     person(given = "Adriano", family = "Rutz"),
     person(given = "Miwa", family = "Dounoue-Kubo"),
     person(given = "Simon", family = "Ollivier"),
