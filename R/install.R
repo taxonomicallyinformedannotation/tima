@@ -39,9 +39,9 @@ install <- function(test = FALSE) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
+    # TODO change to SHA
     local_version <- installed_packages$Version[installed_packages$Package ==
       "tima"]
-    local_sha <- status$remotesha[1]
   }
   remote_version <- readLines(
     paste0(
