@@ -1,6 +1,18 @@
+import::from(fs, dir_copy, .into = environment())
+import::from(fs, dir_create, .into = environment())
+import::from(fs, path_home, .into = environment())
+import::from(utils, install.packages, .into = environment())
+import::from(utils, installed.packages, .into = environment())
+
 #' @title Install
 #'
 #' @description This function runs some required install
+#'
+#' @importFrom fs dir_copy
+#' @importFrom fs dir_create
+#' @importFrom fs path_home
+#' @importFrom utils install.packages
+#' @importFrom utils installed.packages
 #'
 #' @param test Flag for tests
 #'
@@ -10,49 +22,25 @@
 #'
 #' @examples NULL
 install <- function(test = FALSE) {
-  options(repos = c(CRAN = "https://cloud.r-project.org"))
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  if (!"pak" %in% utils::installed.packages() || isTRUE(test)) {
-    lib <- Sys.getenv("R_LIBS_SITE")
-    if (lib == "") {
-      lib <- file.path(dirname(.Library), "site-library")
-      cat(sprintf("R_LIBS_SITE=%s\n", lib), append = TRUE)
-      cat(sprintf("R_LIB_FOR_PAK=%s\n", lib), append = TRUE)
-
-      message("Setting R_LIBS_SITE to ", lib)
-    } else {
-      message("R_LIBS_SITE is already set to ", lib)
-      cat(sprintf(
-        "R_LIB_FOR_PAK=%s\n",
-        strsplit(lib, .Platform$path.sep)[[1]][[1]]
-      ), append = TRUE)
-    }
-    utils::install.packages(
-      "pak",
-      repos = sprintf(
-        "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
-        .Platform$pkgType,
-        R.Version()$os,
-        R.Version()$arch
-      )
-    )
-  }
   ref <- ifelse(
     test = Sys.getenv("BRANCH_NAME") != "",
     yes = Sys.getenv("BRANCH_NAME"),
     no = "main"
   )
-  if (!"tima" %in% utils::installed.packages() || isTRUE(test)) {
+  installed_packages <- installed.packages() |>
+    data.frame()
+  if (!"tima" %in% installed_packages$Package || isTRUE(test)) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    status <- pak::pkg_status("tima")
-    local_version <- status$version[1]
+    local_version <- installed_packages$Version[installed_packages$Package ==
+      "tima"]
     local_sha <- status$remotesha[1]
   }
   remote_version <- readLines(
@@ -75,21 +63,15 @@ install <- function(test = FALSE) {
       ") skipping"
     )
   } else {
-    pak::pak_cleanup(force = TRUE)
-    pak::pak_update()
-    pak::pak(ask = FALSE, upgrade = TRUE)
     success <- tryCatch(
       {
-        message("Installing remote version")
-        pak::pkg_install(
-          pkg = paste0(
-            "github::",
-            "taxonomicallyinformedannotation/tima@",
-            ref,
-            "?source&reinstall&nocache"
-          ),
-          ask = FALSE,
-          upgrade = TRUE
+        message("Installing latest version")
+        install.packages(
+          "tima",
+          repos = c(
+            "https://taxonomicallyinformedannotation.r-universe.dev",
+            "https://cloud.r-project.org"
+          )
         )
         TRUE
       },
@@ -98,41 +80,23 @@ install <- function(test = FALSE) {
       }
     )
 
-    # If URL installation fails, try installing the remote version from GitHub
+    # If URL installation fails, try installing from source
     if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
-          message("Retrying remote version")
-          pak::pkg_install(
-            pkg = paste0(
-              "github::",
-              "taxonomicallyinformedannotation/tima@",
-              ref,
-              "?source&reinstall&nocache"
+          message("Retrying install from source")
+          install.packages(
+            "tima",
+            repos = c(
+              "https://taxonomicallyinformedannotation.r-universe.dev",
+              "https://cloud.r-project.org"
             ),
-            ask = FALSE,
-            upgrade = TRUE
+            type = "source"
           )
           TRUE
         },
         error = function(e) {
           message("Install failed")
-          FALSE
-        }
-      )
-    }
-    if (!success || isTRUE(test)) {
-      success <- tryCatch(
-        {
-          message("Installing local version")
-          pak::pkg_install(
-            pkg = ".",
-            ask = FALSE,
-            upgrade = TRUE
-          )
-          TRUE
-        },
-        error = function(e) {
           FALSE
         }
       )

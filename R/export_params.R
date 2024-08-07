@@ -1,5 +1,5 @@
 import::from(crayon, green, .into = environment())
-import::from(pak, pkg_status, .into = environment())
+import::from(utils, installed.packages, .into = environment())
 import::from(yaml, write_yaml, .into = environment())
 
 #' @title Export parameters
@@ -8,7 +8,7 @@ import::from(yaml, write_yaml, .into = environment())
 #'    to a YAML file in the specified directory.
 #'
 #' @importFrom crayon green
-#' @importFrom pak pkg_status
+#' @importFrom utils installed.packages
 #' @importFrom yaml write_yaml
 #'
 #' @include parse_yaml_paths.R
@@ -41,7 +41,11 @@ export_params <-
 
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", green(directory))
-    tima_version <- pkg_status("tima")$version[1]
+    installed_packages <- installed.packages() |>
+      data.frame()
+    tima_version <- installed_packages$Version[installed_packages$Package ==
+      "tima"]
+    rm(installed_packages)
 
     write_yaml(x = parameters, file = file.path(
       directory,
