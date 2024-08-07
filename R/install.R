@@ -70,9 +70,10 @@ install <- function(test = FALSE) {
           "tima",
           repos = c(
             "https://taxonomicallyinformedannotation.r-universe.dev",
+            "https://bioc.r-universe.dev",
             "https://cloud.r-project.org"
           ),
-          INSTALL_opts = "--no-lock"
+          INSTALL_opts = c("--no-test-load")
         )
         TRUE
       },
@@ -81,18 +82,20 @@ install <- function(test = FALSE) {
       }
     )
 
-    # If URL installation fails, try installing from source
+    # If installation fails, try installing from source
     if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
-          message("Retrying install")
+          message("Retrying install from source")
           install.packages(
             "tima",
             repos = c(
               "https://taxonomicallyinformedannotation.r-universe.dev",
+              "https://bioc.r-universe.dev",
               "https://cloud.r-project.org"
             ),
-            INSTALL_opts = "--no-lock"
+            type = "source",
+            INSTALL_opts = c("--no-test-load")
           )
           TRUE
         },
