@@ -24,7 +24,7 @@ COPY --chown=tima-user:tima-user inst ./inst
 COPY --chown=tima-user:tima-user R ./R
 
 # Run R script to install dependencies
-RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://cloud.r-project.org')); tima::install()"
+RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cloud.r-project.org')); tima::install()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
