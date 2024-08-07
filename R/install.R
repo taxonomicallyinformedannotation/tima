@@ -70,7 +70,6 @@ install <- function(test = FALSE) {
           "tima",
           repos = c(
             "https://taxonomicallyinformedannotation.r-universe.dev",
-            "https://bioc.r-universe.dev",
             "https://cloud.r-project.org"
           ),
           INSTALL_opts = c("--no-test-load")
@@ -91,7 +90,6 @@ install <- function(test = FALSE) {
             "tima",
             repos = c(
               "https://taxonomicallyinformedannotation.r-universe.dev",
-              "https://bioc.r-universe.dev",
               "https://cloud.r-project.org"
             ),
             INSTALL_opts = c("--no-test-load"),
