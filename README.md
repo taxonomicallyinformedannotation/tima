@@ -55,7 +55,7 @@ Optionally, you may want to add:
 ## Installation
 
 As the package is not (yet) available on CRAN, you will need to install
-the development version [GitHub](https://github.com/) with:
+with:
 
 ``` r
 install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://cloud.r-project.org"))
