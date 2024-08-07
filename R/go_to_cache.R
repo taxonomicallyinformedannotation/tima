@@ -1,7 +1,6 @@
 import::from(fs, dir_create, .into = environment())
 import::from(fs, path_home, .into = environment())
 
-
 #' @title Go to cache
 #'
 #' @description This function goes to cache
