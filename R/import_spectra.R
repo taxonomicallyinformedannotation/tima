@@ -14,16 +14,26 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @importFrom Spectra Spectra
 #' @importFrom stringi stri_replace_all_regex
 #'
-#' @include cleanup_spectra.R
+#' @include sanitize_spectra.R
 #'
 #' @param file File path of the spectrum file to be imported
+#' @param cutoff Absolute minimal intensity
+#' @param dalton Dalton tolerance
+#' @param polarity Polarity
+#' @param ppm PPM tolerance
+#' @param sanitize Flag indicating whether to sanitize. Default TRUE
 #'
 #' @return Spectra object containing the imported spectra
 #'
 #' @export
 #'
 #' @examples NULL
-import_spectra <- function(file) {
+import_spectra <- function(file,
+                           cutoff = 0,
+                           dalton = 0.01,
+                           polarity = NA,
+                           ppm = 10,
+                           sanitize = TRUE) {
   file_ext <-
     stri_replace_all_regex(
       str = file,
@@ -32,19 +42,17 @@ import_spectra <- function(file) {
       vectorize_all = FALSE
     )
 
-  switch(
+  spectra <- switch(
     EXPR = file_ext,
     "mgf" = {
       readMgf(f = file) |>
         # TODO Change as soon as R 4.4.0 becomes oldrel
         # readMgfSplit(f = file) |>
-        Spectra() |>
-        cleanup_spectra()
+        Spectra()
     },
     "msp" = {
       readMsp(f = file) |>
-        Spectra() |>
-        cleanup_spectra()
+        Spectra()
     },
     # "sqlite" = {
     #   CompDb(x = file) |>
@@ -54,8 +62,17 @@ import_spectra <- function(file) {
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
-        Spectra() |>
-        cleanup_spectra()
+        Spectra()
     }
   )
+  if (sanitize) {
+    spectra <- spectra |>
+      sanitize_spectra(
+        cutoff = cutoff,
+        dalton = dalton,
+        polarity = polarity,
+        ppm = ppm
+      )
+  }
+  return(spectra)
 }

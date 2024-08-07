@@ -13,6 +13,9 @@ test_that(desc = "Test functions", code = {
   ## Go to cache
   go_to_cache()
 
+  ## Get example files
+  get_example_files()
+
   ## Prepare parameters
   paths <- parse_yaml_paths()
   params <- get_params(step = "prepare_params")
@@ -616,11 +619,6 @@ test_that(desc = "Test functions", code = {
   arguments$high_confidence <- TRUE
   arguments$remove_ties <- TRUE
   arguments$summarise <- TRUE
-
-  # Useless
-  keep_peaks(x = 0, prop = 0)
-  normalize_peaks()
-  remove_above_precursor()
 
   parse_cli_params(arguments = arguments, parameters = params)
 
