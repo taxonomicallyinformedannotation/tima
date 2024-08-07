@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "2.10.0",
+  "version": "2.10.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",

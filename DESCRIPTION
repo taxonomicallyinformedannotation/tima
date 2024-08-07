@@ -1,6 +1,6 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.10.0
+Version: 2.10.1
 Authors@R: c(
     person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -93,11 +93,7 @@ Collate:
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'annotate_masses.R'
-    'keep_peaks.R'
     'sanitize_spectra.R'
-    'remove_above_precursor.R'
-    'normalize_peaks.R'
-    'cleanup_spectra.R'
     'import_spectra.R'
     'annotate_spectra.R'
     'benchmark_taxize_spectra.R'

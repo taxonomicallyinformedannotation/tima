@@ -1,5 +1,9 @@
 # tima
 
+# tima 2.10.1
+
+* Replaced internal functions by `Spectra` equivalents (#166)
+
 # tima 2.10.0
 
 * Added alt text to vignettes

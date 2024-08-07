@@ -175,13 +175,10 @@ The edges are created based on the `spectral entropy similarity` calculated betw
 targets::tar_make(names = matches("fea_edg_spe"))
 ```
 
-If needed, you can get an example of what your minimal feature table should look like by running (no parameters needed):
+If needed, you can get an example of what your minimal feature table should look like by running:
 
 ```{r get-features, results="hide", message=FALSE, warning=FALSE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$features,
-  export = tima::parse_yaml_paths()$data$source$features
-)
+tima::get_example_files(example = "features")
 ```
 
 ```{r prepare-features, results="hide", message=FALSE, warning=FALSE, include = FALSE}
