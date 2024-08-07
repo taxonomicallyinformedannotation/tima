@@ -6,6 +6,9 @@
 \usage{
 go_to_cache(dir = ".tima")
 }
+\arguments{
+\item{dir}{Directory}
+}
 \value{
 Goes to cache
 }

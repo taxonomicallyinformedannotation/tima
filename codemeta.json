@@ -2,7 +2,7 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "tima",
-  "description": "TIMA provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.",
+  "description": "This package provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.",
   "name": "tima: Taxonomically Informed Metabolite Annotation",
   "relatedLink": "https://taxonomicallyinformedannotation.github.io/tima",
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
@@ -644,7 +644,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3166.651KB",
+  "fileSize": "3177.113KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

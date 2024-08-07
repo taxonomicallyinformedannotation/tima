@@ -13,7 +13,7 @@ status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/p
 [![R-Universe](https://taxonomicallyinformedannotation.r-universe.dev/badges/tima)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
 [![Codecov test
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
-[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima/)
+[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 <!-- badges: end -->
 
