@@ -71,7 +71,7 @@ clean_bio <-
         candidate_structure_tax_cla_03cla,
         candidate_structure_tax_npc_03cla,
         candidate_structure_tax_cla_04dirpar,
-        score_pondered_bio,
+        score_weighted_bio,
         .keep_all = TRUE
       )
 
@@ -95,7 +95,7 @@ clean_bio <-
             candidate_structure_tax_cla_03cla,
             candidate_structure_tax_npc_03cla,
             candidate_structure_tax_cla_04dirpar,
-            score_pondered_bio
+            score_weighted_bio
           ),
         by = setNames("feature_id", "feature_target")
       ) |>
@@ -112,7 +112,7 @@ clean_bio <-
           distinct(
             feature_source,
             feature_target, !!as.name(candidates),
-            score_pondered_bio
+            score_weighted_bio
           ) |>
           mutate(
             count = n_distinct(feature_target),
@@ -126,7 +126,7 @@ clean_bio <-
           distinct(feature_source, !!as.name(candidates), .keep_all = TRUE) |>
           mutate(
             !!as.name(feature_score_name) :=
-              !!as.name(consistency_name) * score_pondered_bio,
+              !!as.name(consistency_name) * score_weighted_bio,
             .by = c(feature_source, !!as.name(candidates))
           ) |>
           arrange(-!!as.name(feature_score_name)) |>

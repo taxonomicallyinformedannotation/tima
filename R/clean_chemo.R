@@ -130,14 +130,14 @@ clean_chemo <-
     }
 
     df1 <- df1 |>
-      arrange(desc(score_pondered_chemo)) |>
+      arrange(desc(score_weighted_chemo)) |>
       distinct(feature_id,
         candidate_structure_inchikey_no_stereo,
         .keep_all = TRUE
       ) |>
       mutate(
         rank_initial = dense_rank(-candidate_score_pseudo_initial),
-        rank_final = dense_rank(-score_pondered_chemo),
+        rank_final = dense_rank(-score_weighted_chemo),
         .by = c(feature_id)
       ) |>
       filter(rank_final <= candidates_final)
@@ -176,9 +176,9 @@ clean_chemo <-
           model$rank_columns,
           "score_initial" = "candidate_score_pseudo_initial",
           "score_biological",
-          "score_interim" = "score_pondered_bio",
+          "score_interim" = "score_weighted_bio",
           "score_chemical",
-          "score_final" = "score_pondered_chemo"
+          "score_final" = "score_weighted_chemo"
         )
       )) |>
       distinct() |>
