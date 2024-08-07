@@ -10,7 +10,7 @@ Authors@R: c(
 Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
 Description: This package provides the infrastructure to perform Taxonomically
     Informed Metabolite Annotation.
-License: GPL (>= 3)
+License: file LICENSE
 URL: https://github.com/taxonomicallyinformedannotation/tima,
     https://taxonomicallyinformedannotation.github.io/tima
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
