@@ -72,8 +72,7 @@ install <- function(test = FALSE) {
             "https://taxonomicallyinformedannotation.r-universe.dev",
             "https://bioc.r-universe.dev",
             "https://cloud.r-project.org"
-          ),
-          INSTALL_opts = c("--no-test-load")
+          )
         )
         TRUE
       },
@@ -94,8 +93,7 @@ install <- function(test = FALSE) {
               "https://bioc.r-universe.dev",
               "https://cloud.r-project.org"
             ),
-            type = "source",
-            INSTALL_opts = c("--no-test-load")
+            type = "source"
           )
           TRUE
         },
