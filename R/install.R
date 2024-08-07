@@ -71,7 +71,8 @@ install <- function(test = FALSE) {
           repos = c(
             "https://taxonomicallyinformedannotation.r-universe.dev",
             "https://cloud.r-project.org"
-          )
+          ),
+          INSTALL_opts = "--no-lock"
         )
         TRUE
       },
@@ -90,7 +91,8 @@ install <- function(test = FALSE) {
             repos = c(
               "https://taxonomicallyinformedannotation.r-universe.dev",
               "https://cloud.r-project.org"
-            )
+            ),
+            INSTALL_opts = "--no-lock"
           )
           TRUE
         },
