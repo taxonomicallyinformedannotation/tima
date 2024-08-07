@@ -1,10 +1,6 @@
-import::from(shiny, runApp, .into = environment())
-
 #' @title Run app
 #'
 #' @description This function runs the app
-#'
-#' @importFrom shiny runApp
 #'
 #' @include install.R
 #'
