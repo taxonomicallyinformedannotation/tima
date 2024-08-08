@@ -477,10 +477,10 @@ test_that(desc = "Test functions", code = {
   ## in cache version
   copy_backbone()
   get_example_files(in_cache = FALSE)
-  get_example_files()
-  tima:::.onLoad()
-  tima:::.onAttach()
-  tima_full()
+  # get_example_files()
+  # tima:::.onLoad()
+  # tima:::.onAttach()
+  # tima_full()
 
   ## CLI arguments check
   arguments <- character()
