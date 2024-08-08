@@ -41,6 +41,7 @@ install <- function(git_repo = "taxonomicallyinformedannotation/tima",
   if (github_info$sha[1] == r_universe_info$RemoteSha[r_universe_info$Package == "tima"]) {
     message("You already have the latest version, skipping")
   } else {
+    success <- FALSE
     success <- tryCatch({
       message("Installing latest version")
       install.packages(
