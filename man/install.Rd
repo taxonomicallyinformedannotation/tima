@@ -5,15 +5,16 @@
 \title{Install}
 \usage{
 install(
-  git_repo = "taxonomicallyinformedannotation/tima",
-  r_universe_repo = "taxonomicallyinformedannotation",
+  package = "tima",
+  repos = c("https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev", "https://cloud.r-project.org"),
   test = FALSE
 )
 }
 \arguments{
-\item{git_repo}{Git repo}
+\item{package}{Package}
 
-\item{r_universe_repo}{r-universe repo}
+\item{repos}{Repos}
 
 \item{test}{Flag for tests}
 }

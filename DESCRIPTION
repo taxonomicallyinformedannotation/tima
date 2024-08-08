@@ -102,6 +102,7 @@ Collate:
     'clean_collapse.R'
     'clean_chemo.R'
     'complement_metadata_structures.R'
+    'copy_backbone.R'
     'create_components.R'
     'create_dir.R'
     'create_edges.R'
