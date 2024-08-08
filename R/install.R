@@ -16,6 +16,8 @@ import::from(utils, installed.packages, .into = environment())
 #' @importFrom utils install.packages
 #' @importFrom utils installed.packages
 #'
+#' @param git_repo Git repo
+#' @param r_universe_repo r-universe repo
 #' @param test Flag for tests
 #'
 #' @return NULL
@@ -23,29 +25,20 @@ import::from(utils, installed.packages, .into = environment())
 #' @export
 #'
 #' @examples NULL
-install <- function(test = FALSE) {
+install <- function(git_repo = "taxonomicallyinformedannotation/tima",
+                    r_universe_repo = "taxonomicallyinformedannotation",
+                    test = FALSE) {
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
-  ref <- ifelse(
-    test = Sys.getenv("BRANCH_NAME") != "",
-    yes = Sys.getenv("BRANCH_NAME"),
-    no = "main"
-  )
-  installed_packages <- installed.packages() |>
-    data.frame()
-  if (!"tima" %in% installed_packages$Package || isTRUE(test)) {
-    message("Installing for the first time...")
-    local_version <- "myFirstInstallTrickToWork"
-  } else {
-    latest_commit <- fromJSON("https://api.github.com/repos/taxonomicallyinformedannotation/tima/commits")
-    latest_commit$sha[1]
-  }
-  r_universe_commit <- fromJSON("https://taxonomicallyinformedannotation.r-universe.dev/api/packages/")
-  if (latest_commit$sha[1] == r_universe_commit$RemoteSha[r_universe_commit$Package == "tima"]) {
+  github_info <- fromJSON(paste0("https://api.github.com/repos/", git_repo, "/commits"))
+  github_info$sha[1]
+  r_universe_url <- paste0("https://", r_universe_repo, ".r-universe.dev")
+  r_universe_info <- fromJSON(paste0(r_universe_url, "/api/packages/"))
+  if (github_info$sha[1] == r_universe_info$RemoteSha[r_universe_info$Package == "tima"]) {
     message("You already have the latest version, skipping")
   } else {
     success <- tryCatch(
@@ -53,10 +46,7 @@ install <- function(test = FALSE) {
         message("Installing latest version")
         install.packages(
           "tima",
-          repos = c(
-            "https://taxonomicallyinformedannotation.r-universe.dev",
-            "https://cloud.r-project.org"
-          ),
+          repos = c(r_universe_url, "https://cloud.r-project.org"),
           INSTALL_opts = c("--no-test-load")
         )
         TRUE
@@ -71,10 +61,7 @@ install <- function(test = FALSE) {
           message("Retrying install from source")
           install.packages(
             "tima",
-            repos = c(
-              "https://taxonomicallyinformedannotation.r-universe.dev",
-              "https://cloud.r-project.org"
-            ),
+            repos = c(r_universe_url, "https://cloud.r-project.org"),
             INSTALL_opts = c("--no-test-load"),
             type = "source"
           )
