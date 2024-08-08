@@ -1,6 +1,7 @@
 import::from(fs, dir_copy, .into = environment())
 import::from(fs, dir_create, .into = environment())
 import::from(fs, path_home, .into = environment())
+import::from(jsonlite, fromJSON, .into = environment())
 import::from(utils, install.packages, .into = environment())
 import::from(utils, installed.packages, .into = environment())
 
@@ -11,6 +12,7 @@ import::from(utils, installed.packages, .into = environment())
 #' @importFrom fs dir_copy
 #' @importFrom fs dir_create
 #' @importFrom fs path_home
+#' @importFrom jsonlite fromJSON
 #' @importFrom utils install.packages
 #' @importFrom utils installed.packages
 #'
@@ -39,29 +41,12 @@ install <- function(test = FALSE) {
     message("Installing for the first time...")
     local_version <- "myFirstInstallTrickToWork"
   } else {
-    # TODO change to SHA
-    local_version <- installed_packages$Version[installed_packages$Package ==
-      "tima"]
+    latest_commit <- fromJSON("https://api.github.com/repos/taxonomicallyinformedannotation/tima/commits")
+    latest_commit$sha[1]
   }
-  remote_version <- readLines(
-    paste0(
-      "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/",
-      ref,
-      "/DESCRIPTION"
-    ),
-    warn = FALSE
-  )[[3]] |>
-    gsub(
-      pattern = "Version: ",
-      replacement = "",
-      fixed = TRUE
-    )
-  if (local_version == remote_version) {
-    message(
-      "You already have the latest version (",
-      local_version,
-      ") skipping"
-    )
+  r_universe_commit <- fromJSON("https://taxonomicallyinformedannotation.r-universe.dev/api/packages/")
+  if (latest_commit$sha[1] == r_universe_commit$RemoteSha[r_universe_commit$Package == "tima"]) {
+    message("You already have the latest version, skipping")
   } else {
     success <- tryCatch(
       {
@@ -80,8 +65,6 @@ install <- function(test = FALSE) {
         FALSE
       }
     )
-
-    # If installation fails, try installing from source
     if (!success || isTRUE(test)) {
       success <- tryCatch(
         {
@@ -103,7 +86,6 @@ install <- function(test = FALSE) {
         }
       )
     }
-    # Final message if all attempts fail
     if (!success || isTRUE(test)) {
       message("All installation attempts failed")
     }
