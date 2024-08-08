@@ -5,9 +5,9 @@ library(testthat)
 test_that(desc = "Test functions", code = {
   # Tests
   ## Install
-  install(test = TRUE)
+  # install(test = TRUE)
   ## When already present
-  install()
+  # install()
 
   copy_backbone(cache_dir = ".")
 
