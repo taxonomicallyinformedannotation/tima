@@ -1,5 +1,4 @@
 import::from(crayon, green, .into = environment())
-import::from(utils, installed.packages, .into = environment())
 import::from(yaml, write_yaml, .into = environment())
 
 #' @title Export parameters
@@ -8,7 +7,6 @@ import::from(yaml, write_yaml, .into = environment())
 #'    to a YAML file in the specified directory.
 #'
 #' @importFrom crayon green
-#' @importFrom utils installed.packages
 #' @importFrom yaml write_yaml
 #'
 #' @include parse_yaml_paths.R
@@ -26,34 +24,16 @@ export_params <-
   function(parameters = get("parameters", envir = parent.frame()),
            directory = parse_yaml_paths()$data$interim$params$path,
            step) {
-    # ## Use default system data directory
-    # directory <- file.path(
-    #   rappdirs::user_data_dir(
-    #     appname = appname,
-    #     appauthor = appauthor,
-    #     version = version
-    #   ),
-    #   directory
-    # )
-
     ## Create directory if it does not exist
     create_dir(export = directory)
 
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", green(directory))
-    installed_packages <- installed.packages() |>
-      data.frame()
-    tima_version <- installed_packages$Version[installed_packages$Package ==
-      "tima"]
-    rm(installed_packages)
 
     write_yaml(x = parameters, file = file.path(
       directory,
       paste0(
         format(Sys.time(), "%y%m%d_%H%M%OS"),
-        "_",
-        "tima",
-        tima_version,
         "_",
         step,
         ".yaml"

@@ -971,22 +971,6 @@ list(
             }
           )
       }
-    ),
-    tar_target(
-      name = input_metadata,
-      format = "file",
-      command = {
-        input_metadata <- par_pre_tax$files$metadata$raw
-        # input_metadata <-
-        #   ifelse(
-        #     test = !is.null(gnps_metadata),
-        #     yes = ifelse(test = file.exists(gnps_metadata),
-        #       yes = gnps_metadata,
-        #       no = par_pre_tax$files$metadata$raw
-        #     ),
-        #     no = par_pre_tax$files$metadata$raw
-        #   )
-      }
     )
   ),
   ## libraries
@@ -1747,7 +1731,7 @@ list(
         name_filename = par_pre_tax$names$filename,
         extension = par_pre_tax$names$extension,
         colname = par_pre_tax$names$taxon,
-        metadata = input_metadata,
+        metadata = par_pre_tax$files$metadata$raw,
         top_k = par_pre_tax$organisms$candidates,
         org_tax_ott = lib_mer_org_tax_ott,
         output = par_pre_tax$files$metadata$prepared,

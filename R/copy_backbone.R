@@ -19,16 +19,15 @@ import::from(fs, path_home, .into = environment())
 #' @export
 #'
 #' @examples NULL
-copy_backbone <- function(cache_dir = ".tima",
+copy_backbone <- function(cache_dir = fs::path_home(".tima"),
                           package = "tima",
                           copy_dir = "inst") {
-  cache <- fs::path_home(cache_dir)
-  message("Creating cache at ", cache)
-  fs::dir_create(path = cache)
+  message("Creating cache at ", cache_dir)
+  fs::dir_create(path = cache_dir)
   message("Copying default architecture ...")
   fs::dir_copy(
     path = system.file(package = package),
-    new_path = file.path(cache, copy_dir),
+    new_path = file.path(cache_dir, copy_dir),
     overwrite = TRUE
   )
 }

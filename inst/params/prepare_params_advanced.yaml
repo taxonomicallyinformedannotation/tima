@@ -214,6 +214,16 @@ files:
       prepared:
         - data/interim/libraries/rt/prepared.tsv.gz
 
+  #' Metadata files.
+  metadata:
+    #' The path to the file containing your metadata.
+    #' Must be formatted accordingly.
+    #' If your experiment contains a single taxon, you can provide it below instead. STRING
+    raw: data/source/example_metadata.tsv
+
+    #' Taxonomically informed features file. STRING
+    prepared: data/interim/taxa/example_taxed.tsv.gz
+
   #' Networks files.
   networks:
     #' Spectral networks files.
@@ -238,16 +248,6 @@ files:
 
         #' Prepared components file. STRING
         prepared: data/interim/features/example_componentsPrepared.tsv
-
-  #' Metadata files.
-  metadata:
-    #' The path to the file containing your metadata.
-    #' Must be formatted accordingly.
-    #' If your experiment contains a single taxon, you can provide it below instead. STRING
-    raw: data/source/example_metadata.tsv
-
-    #' Taxonomically informed features file. STRING
-    prepared: data/interim/taxa/example_taxed.tsv.gz
 
   #' Spectral files.
   spectral:
