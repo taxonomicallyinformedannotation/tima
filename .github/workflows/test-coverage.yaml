@@ -47,13 +47,12 @@ jobs:
       #     extra-packages:  |
       #       any::covr
       #       any::shinytest2
-      #       any::spelling
       #       any::testthat
       #     needs: coverage
 
       - name: Install test dependencies manually
         run: |
-          install.packages(c("covr", "shinytest2", "spelling", "testthat"))
+          install.packages(c("covr", "shinytest2", "testthat"))
           install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"))
         shell: Rscript {0}
 
