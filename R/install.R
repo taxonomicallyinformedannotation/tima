@@ -41,37 +41,26 @@ install <- function(git_repo = "taxonomicallyinformedannotation/tima",
   if (github_info$sha[1] == r_universe_info$RemoteSha[r_universe_info$Package == "tima"]) {
     message("You already have the latest version, skipping")
   } else {
-    success <- tryCatch(
-      {
-        message("Installing latest version")
+    success <- tryCatch({
+      message("Installing latest version")
+      install.packages(
+        "tima",
+        repos = c(r_universe_url, "https://bioc.r-universe.dev", "https://cloud.r-project.org"),
+        INSTALL_opts = c("--no-lock", "--no-test-load")
+      )
+      TRUE
+    })
+    if (!success || isTRUE(test)) {
+      success <- tryCatch({
+        message("Retrying install from source")
         install.packages(
           "tima",
-          repos = c(r_universe_url, "https://cloud.r-project.org"),
-          INSTALL_opts = c("--no-test-load")
+          repos = c(r_universe_url, "https://bioc.r-universe.dev", "https://cloud.r-project.org"),
+          INSTALL_opts = c("--no-lock", "--no-test-load"),
+          type = "source"
         )
         TRUE
-      },
-      error = function(e) {
-        FALSE
-      }
-    )
-    if (!success || isTRUE(test)) {
-      success <- tryCatch(
-        {
-          message("Retrying install from source")
-          install.packages(
-            "tima",
-            repos = c(r_universe_url, "https://cloud.r-project.org"),
-            INSTALL_opts = c("--no-test-load"),
-            type = "source"
-          )
-          TRUE
-        },
-        error = function(e) {
-          message("Install failed")
-          FALSE
-        }
-      )
+      })
     }
     if (!success || isTRUE(test)) {
       message("All installation attempts failed")
