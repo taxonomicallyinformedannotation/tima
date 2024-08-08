@@ -474,6 +474,9 @@ test_that(desc = "Test functions", code = {
     high_confidence = FALSE
   )
 
+  ## cleanup
+  unlink("data", recursive = TRUE)
+
   ## in cache version
   copy_backbone()
   get_example_files(in_cache = FALSE)
