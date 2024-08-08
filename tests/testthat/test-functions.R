@@ -4,11 +4,6 @@ library(testthat)
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
   # Tests
-  ## Install
-  # install(test = TRUE)
-  ## When already present
-  # install()
-
   copy_backbone(cache_dir = ".")
 
   ## Prepare parameters
@@ -479,16 +474,28 @@ test_that(desc = "Test functions", code = {
 
   ## in cache version
   copy_backbone()
-  get_example_files(in_cache = FALSE)
+  get_example_files(
+    example = c(
+      "features",
+      "metadata",
+      "sirius",
+      "spectra",
+      "spectral_lib_with_rt"
+    ),
+    in_cache = FALSE
+  )
   ## for size to match for shinytest2
   unlink(paths$data$source$spectra)
   get_file(
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
+  ## Install
+  # install(test = TRUE)
+  ## When already present
+  # install()
   # get_example_files()
   # tima:::.onLoad()
-  # tima:::.onAttach()
   # tima_full()
 
   ## CLI arguments check
@@ -519,12 +526,9 @@ test_that(desc = "Test functions", code = {
   arguments$fil_lib_sop_raw_hmd <- "x"
   arguments$fil_lib_sop_raw_lot <- "x"
   arguments$fil_lib_sop_pre <- "x"
-  arguments$fil_lib_spe_exp_neg <- "x"
-  arguments$fil_lib_spe_exp_pos <- "x"
-  arguments$fil_lib_spe_exp_raw <- "x"
-  arguments$fil_lib_spe_is_neg <- "x"
-  arguments$fil_lib_spe_is_pos <- "x"
-  arguments$fil_lib_spe_is_raw <- "x"
+  arguments$fil_lib_spe_neg <- "x"
+  arguments$fil_lib_spe_pos <- "x"
+  arguments$fil_lib_spe_raw <- "x"
   arguments$fil_lib_tem_exp_csv <- "x"
   arguments$fil_lib_tem_exp_mgf_neg <- "x"
   arguments$fil_lib_tem_exp_mgf_pos <- "x"
