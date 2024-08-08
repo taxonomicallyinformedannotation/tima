@@ -4,9 +4,17 @@
 \alias{install}
 \title{Install}
 \usage{
-install(test = FALSE)
+install(
+  git_repo = "taxonomicallyinformedannotation/tima",
+  r_universe_repo = "taxonomicallyinformedannotation",
+  test = FALSE
+)
 }
 \arguments{
+\item{git_repo}{Git repo}
+
+\item{r_universe_repo}{r-universe repo}
+
 \item{test}{Flag for tests}
 }
 \description{
