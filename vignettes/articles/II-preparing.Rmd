@@ -26,6 +26,7 @@ knitr::opts_knit$set(root.dir = "../..")
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+go_to_cache()
 ```
 
 This vignette describes the main steps of the annotation process.
