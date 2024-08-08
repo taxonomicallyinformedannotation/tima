@@ -480,6 +480,12 @@ test_that(desc = "Test functions", code = {
   ## in cache version
   copy_backbone()
   get_example_files(in_cache = FALSE)
+  ## for size to match for shinytest2
+  unlink(paths$data$source$spectra)
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
   # get_example_files()
   # tima:::.onLoad()
   # tima:::.onAttach()
