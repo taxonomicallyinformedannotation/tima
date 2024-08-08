@@ -62,6 +62,7 @@ install.packages(
   "tima",
   repos = c(
     "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
     "https://cloud.r-project.org"
   )
 )
