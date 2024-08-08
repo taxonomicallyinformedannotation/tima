@@ -2,7 +2,6 @@ import::from(httr2, req_perform, .into = environment())
 import::from(httr2, req_progress, .into = environment())
 import::from(httr2, request, .into = environment())
 
-
 #' @title Get file
 #'
 #' @description This function get files
