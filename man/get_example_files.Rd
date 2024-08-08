@@ -4,10 +4,15 @@
 \alias{get_example_files}
 \title{Get example files}
 \usage{
-get_example_files(example = c("features", "metadata", "sirius", "spectra"))
+get_example_files(
+  example = c("features", "metadata", "sirius", "spectra"),
+  in_cache = TRUE
+)
 }
 \arguments{
 \item{example}{The example(s) you want to download}
+
+\item{in_cache}{Flag to indicate if storing the files in cache}
 }
 \value{
 Example files.

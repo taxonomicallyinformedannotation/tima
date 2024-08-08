@@ -26,7 +26,7 @@ knitr::opts_knit$set(root.dir = "../..")
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
-go_to_cache()
+copy_backbone()
 ```
 This vignette describes...
 
@@ -65,8 +65,12 @@ For this tutorial, we will use some example files you can get running:
 unlink("data/source/example_spectra.mgf")
 ```
 
-```{r get-files, results="hide", message=FALSE, warning=FALSE}
+```{r get-files, eval=FALSE, include=TRUE}
 tima::get_example_files()
+```
+
+```{r get-files-no-cache, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+tima::get_example_files(in_cache = FALSE)
 ```
 
 ### Libraries

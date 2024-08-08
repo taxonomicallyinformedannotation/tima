@@ -26,7 +26,6 @@ knitr::opts_knit$set(root.dir = "../..")
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
-go_to_cache()
 ```
 
 This vignette describes the main steps of the annotation process.
@@ -178,7 +177,7 @@ targets::tar_make(names = matches("fea_edg_spe"))
 
 If needed, you can get an example of what your minimal feature table should look like by running:
 
-```{r get-features, results="hide", message=FALSE, warning=FALSE}
+```{r get-features, eval=FALSE, include=TRUE}
 tima::get_example_files(example = "features")
 ```
 
