@@ -55,6 +55,7 @@ jobs:
         run: |
           install.packages(c("covr", "shinytest2", "spelling", "testthat"))
           install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"))
+        shell: Rscript {0}
 
       - name: Test coverage
         run: |
