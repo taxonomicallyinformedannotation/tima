@@ -10,6 +10,9 @@ test_that(desc = "Test functions", code = {
   ## When already present
   install()
 
+  ## Go to cache
+  go_to_cache()
+
   ## Get example files
   get_example_files()
 
