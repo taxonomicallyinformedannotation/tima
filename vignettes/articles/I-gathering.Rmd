@@ -58,26 +58,14 @@ All parameters will be saved and reported at the end of your analysis.
 ### Your own files
 
 You should provide your own files in the main menu.
-For this tutorial, we will use some example files as below:
+For this tutorial, we will use some example files you can get running:
 
 ```{r unlink-spectra, include = FALSE}
 unlink("data/source/example_spectra.mgf")
 ```
 
 ```{r get-files, results="hide", message=FALSE, warning=FALSE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$features,
-  export = tima::parse_yaml_paths()$data$source$features
-)
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$metadata,
-  export = tima::parse_yaml_paths()$data$source$metadata
-)
-# tima::get_example_sirius()
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$spectra,
-  export = tima::parse_yaml_paths()$data$source$spectra
-)
+tima::get_example_files()
 ```
 
 ### Libraries
@@ -96,10 +84,7 @@ We currently support spectral libraries in MSP or MGF format.
 To get a small example:
 
 ```{r spectra-rt, results="hide", message=FALSE, warning=FALSE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$spectral_lib_mini$with_rt,
-  export = tima::parse_yaml_paths()$data$source$libraries$spectra$exp$with_rt
-)
+tima::get_example_files("spectral_lib_with_rt")
 ```
 
 ###### MassBank
@@ -141,10 +126,7 @@ You can also complement with the in silico spectra from HMDB (not running by def
 #### HMDB
 
 ```{r get-isdb-hmdb, eval=FALSE, include=TRUE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$hmdb$spectra$predicted,
-  export = tima::parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
-)
+tima::get_example_files("hmdb_is")
 ```
 
 #### Retention times

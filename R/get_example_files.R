@@ -16,8 +16,15 @@
 #' @examples NULL
 get_example_files <- function(example = c("features", "metadata", "sirius", "spectra")) {
   stopifnot(
-    "Example files available are `features`, `metadata`, `sirius` and `spectra`." =
-      example %in% c("features", "metadata", "sirius", "spectra")
+    "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." =
+      example %in% c(
+        "features",
+        "hmdb_is",
+        "metadata",
+        "sirius",
+        "spectra",
+        "spectral_lib_with_rt"
+      )
   )
   go_to_cache()
   if ("features" %in% example) {
@@ -25,6 +32,13 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
     get_file(
       url = tima::parse_yaml_paths()$urls$examples$features,
       export = tima::parse_yaml_paths()$data$source$features
+    )
+  }
+  if ("hmdb_is" %in% example) {
+    message("HMDB in silico")
+    get_file(
+      url = tima::parse_yaml_paths()$urls$hmdb$spectra$predicted,
+      export = tima::parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
     )
   }
   if ("metadata" %in% example) {
@@ -43,6 +57,13 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
     get_file(
       url = tima::parse_yaml_paths()$urls$examples$spectra,
       export = tima::parse_yaml_paths()$data$source$spectra
+    )
+  }
+  if ("spectral_lib_with_rt" %in% example) {
+    message("Spectral library with retention times")
+    get_file(
+      url = tima::parse_yaml_paths()$urls$examples$spectral_lib_mini$with_rt,
+      export = tima::parse_yaml_paths()$data$source$libraries$spectra$exp$with_rt
     )
   }
 }

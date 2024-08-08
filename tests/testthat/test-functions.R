@@ -1,17 +1,14 @@
 library(testthat)
-library(tima)
 
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
+  library(tima)
   # Tests
   ## Install
   install(test = TRUE)
   ## When already present
   install()
-
-  ## Go to cache
-  go_to_cache()
 
   ## Get example files
   get_example_files()
