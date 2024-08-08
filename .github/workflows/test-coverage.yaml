@@ -41,14 +41,20 @@ jobs:
           && sudo apt-get clean \
           && sudo rm -rf /var/lib/apt/lists/*
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages:  |
-            any::covr
-            any::shinytest2
-            any::spelling
-            any::testthat
-          needs: coverage
+      # This does not work as it sets overriding repos
+      # - uses: r-lib/actions/setup-r-dependencies@v2
+      #   with:
+      #     extra-packages:  |
+      #       any::covr
+      #       any::shinytest2
+      #       any::spelling
+      #       any::testthat
+      #     needs: coverage
+
+      - name: Install test dependencies manually
+        run: |
+          install.packages(c("covr", "shinytest2", "spelling", "testthat"))
+          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"))
 
       - name: Test coverage
         run: |
