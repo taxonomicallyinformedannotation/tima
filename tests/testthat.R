@@ -1,6 +1,5 @@
 library(shinytest2)
 library(testthat)
-library(tima)
 
 ## Test the package
 test_package(package = "tima")

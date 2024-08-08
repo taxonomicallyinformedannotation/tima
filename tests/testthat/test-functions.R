@@ -3,18 +3,13 @@ library(testthat)
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
-  library(tima)
   # Tests
   ## Install
   install(test = TRUE)
   ## When already present
   install()
 
-  ## Go to cache
-  go_to_cache()
-
-  ## Get example files
-  get_example_files()
+  copy_backbone(cache_dir = ".")
 
   ## Prepare parameters
   paths <- parse_yaml_paths()
@@ -61,19 +56,10 @@ test_that(desc = "Test functions", code = {
   )
 
   ## Get all files
-  ### Features table
   get_file(
     url = paths$urls$examples$features,
     export = paths$data$source$features
   )
-  get_gnps_tables(
-    filename = "example",
-    path_features = paths$data$source$features,
-    path_metadata = paths$data$source$metadata,
-    path_spectra = paths$data$source$spectra,
-    gnps_job_id = params$gnps$id
-  )
-  ### Metadata table
   get_file(
     url = paths$urls$examples$metadata,
     export = paths$data$source$metadata
@@ -92,7 +78,14 @@ test_that(desc = "Test functions", code = {
         fixed = TRUE
       )
   )
-  ## Other GNPS job id (without metadata)
+  get_gnps_tables(
+    filename = "example",
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = params$gnps$id
+  )
+  ### Other GNPS job id (without metadata)
   get_gnps_tables(
     filename = "other",
     path_features = paths$data$source$features,
@@ -100,7 +93,7 @@ test_that(desc = "Test functions", code = {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = paths$gnps$example2
   )
-  ## When no GNPS job ID and no metadata are given
+  ### When no GNPS job ID and no metadata are given
   get_gnps_tables(
     filename = "noGNPS",
     path_features = paths$data$source$features,
@@ -481,6 +474,12 @@ test_that(desc = "Test functions", code = {
     high_confidence = FALSE
   )
 
+  ## in cache version
+  get_example_files()
+  tima:::.onLoad()
+  tima:::.onAttach()
+  tima_full()
+
   ## CLI arguments check
   arguments <- character()
   arguments$ann_can_fin <- 0
@@ -621,8 +620,6 @@ test_that(desc = "Test functions", code = {
   arguments$summarise <- TRUE
 
   parse_cli_params(arguments = arguments, parameters = params)
-
-  # tima_full()
 
   succeed()
 })

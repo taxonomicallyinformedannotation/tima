@@ -17,7 +17,7 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -33,13 +33,6 @@ jobs:
         with:
           use-public-rspm: true
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
-
-      - name: Install dependencies on Ubuntu
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
-          && sudo apt-get clean \
-          && sudo rm -rf /var/lib/apt/lists/*
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
