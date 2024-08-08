@@ -32,6 +32,8 @@ install <- function(git_repo = "taxonomicallyinformedannotation/tima",
     message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
+    message("You should install some dependencies using")
+    message("`sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev`")
     system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
   github_info <- fromJSON(paste0("https://api.github.com/repos/", git_repo, "/commits"))

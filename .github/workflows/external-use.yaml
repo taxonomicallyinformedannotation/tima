@@ -35,6 +35,12 @@ jobs:
         with:
           use-public-rspm: true
           Ncpus: 2
+      - name: Install dependencies on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
+          && sudo apt-get clean \
+          && sudo rm -rf /var/lib/apt/lists/*
       - name: Install
         run: |
           install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"))

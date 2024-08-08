@@ -2,7 +2,7 @@
 FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
 
 # Update apt and install necessary system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,7 +24,7 @@ COPY --chown=tima-user:tima-user inst ./inst
 COPY --chown=tima-user:tima-user R ./R
 
 # Run R script to install dependencies
-RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://cloud.r-project.org')); tima::install()"
+RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cloud.r-project.org')); tima::install()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
