@@ -35,7 +35,7 @@ jobs:
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
 
       - name: Install dependencies on Ubuntu
-        if: runner.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
           && sudo apt-get clean \
