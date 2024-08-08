@@ -8,13 +8,14 @@
 #' @include parse_yaml_paths.R
 #'
 #' @param example The example(s) you want to download
+#' @param in_cache Flag to indicate if storing the files in cache
 #'
 #' @return Example files.
 #'
 #' @export
 #'
 #' @examples NULL
-get_example_files <- function(example = c("features", "metadata", "sirius", "spectra")) {
+get_example_files <- function(example = c("features", "metadata", "sirius", "spectra"), in_cache = TRUE) {
   stopifnot(
     "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." =
       example %in% c(
@@ -26,7 +27,9 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
         "spectral_lib_with_rt"
       )
   )
-  go_to_cache()
+  if (in_cache) {
+    go_to_cache()
+  }
   if ("features" %in% example) {
     message("Features")
     get_file(
