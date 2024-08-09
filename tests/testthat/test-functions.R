@@ -374,12 +374,12 @@ test_that(desc = "Test functions", code = {
     tolerance_rt = 0.01,
     ms_mode = "pos"
   )
-  ### Adducts already attributed
+  ### Adducts already attributed (and check for wrong adducts)
   tidytable::tidytable(
-    "feature_id" = 1,
-    "mz" = "123.4567",
-    "rt" = 0.01,
-    "adduct" = "[M+H]+"
+    "feature_id" = c(1, 2),
+    "mz" = c(123.4567, 141.4678),
+    "rt" = c(0.01, 0.02),
+    "adduct" = c("[M+XYZ]+", "[M+XYZ-H2O]+")
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
   annotate_masses(features = "data/source/libraries/rt/example_features_adducts.csv")
