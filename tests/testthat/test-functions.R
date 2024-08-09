@@ -287,6 +287,11 @@ test_that(desc = "Test functions", code = {
     mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
     temp_exp = paths$data$source$libraries$rt$example_mini
   )
+  ### Just to check
+  prepare_libraries_rt(
+    mgf_is = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+    temp_is = paths$data$source$libraries$rt$example_mini
+  )
   ## Check wrong SMILES
   tidytable::tidytable(
     "rt" = 0.1,
@@ -369,6 +374,15 @@ test_that(desc = "Test functions", code = {
     tolerance_rt = 0.01,
     ms_mode = "pos"
   )
+  ### Adducts already attributed
+  tidytable::tidytable(
+    "feature_id" = 1,
+    "mz" = "123.4567",
+    "rt" = 0.01,
+    "adduct" = "[M+H]+"
+  ) |>
+    tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
+  annotate_masses(features = "data/source/libraries/rt/example_features_adducts.csv")
 
   ## Performing MS2 annotation
   ### Negative
@@ -512,8 +526,6 @@ test_that(desc = "Test functions", code = {
   )
   ## Install
   # install(test = TRUE)
-  ## When already present
-  # install()
   # get_example_files()
   # tima:::.onLoad()
   # tima_full()
