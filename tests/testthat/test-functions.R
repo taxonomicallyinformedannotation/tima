@@ -49,6 +49,11 @@ test_that(desc = "Test functions", code = {
     user_gnps = "Foo",
     user_filename = "Foo"
   )
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = parse_yaml_paths()$gnps$example,
+    user_filename = "Foo"
+  )
 
   ## Get all files
   get_file(
@@ -88,6 +93,8 @@ test_that(desc = "Test functions", code = {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = paths$gnps$example2
   )
+  ### When it is the example
+  get_gnps_tables(gnps_job_id = parse_yaml_paths()$gnps$example)
   ### When no GNPS job ID and no metadata are given
   get_gnps_tables(
     filename = "noGNPS",
@@ -243,18 +250,31 @@ test_that(desc = "Test functions", code = {
     input = "doesNotExists.txt",
     nam_lib = "nope"
   )
+  ### If NULL
+  prepare_libraries_spectra(
+    input = NULL,
+    nam_lib = "null"
+  )
   ### Classical
   prepare_libraries_spectra()
   #### Check the library already exists warning
   prepare_libraries_spectra()
 
   ## for msp reading test
-  # Spectrum 1 fails
+  ### Spectrum 1 fails
   import_spectra(dir(
     system.file("extdata", package = "MsBackendMsp"),
     full.names = TRUE,
     pattern = "msp$"
   )[8L])
+
+  ## for feature ID combination in spectra
+  data.frame(
+    FEATURE_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789))
+  ) |>
+    Spectra::Spectra() |>
+    sanitize_spectra()
 
   #### HMDB
   # prepare_isdb_hmdb()
