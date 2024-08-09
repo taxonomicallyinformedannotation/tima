@@ -425,10 +425,11 @@ annotate_masses <-
 
     ## Safety
     df_addlossed_min_1 <- df_addlossed_min |>
-      filter(mass != mz)
+      filter(mass != mz) |>
+      filter(mass != 0)
 
     df_addlossed_min_2 <- df_addlossed_min |>
-      filter(mass == mz)
+      filter(mass == mz | mass == 0)
 
     if (nrow(df_addlossed_min_2) != 0) {
       message("Some adducts were unproperly detected, defaulting to (de)protonated")
@@ -442,7 +443,8 @@ annotate_masses <-
 
     df_addlossed_rdy <- df_addlossed_min_1 |>
       bind_rows(df_addlossed_min_2) |>
-      select(-loss)
+      select(-loss) |>
+      distinct()
     rm(
       df_addlossed,
       df_addlossed_min,
