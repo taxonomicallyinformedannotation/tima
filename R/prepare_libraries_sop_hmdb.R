@@ -138,9 +138,9 @@ prepare_libraries_sop_hmdb <-
           file.remove(hmdb_structures)
           hmdb_prepared
         },
-        error = function(cond) {
+        error = function(e) {
           log_debug("Something went wrong, see original error message:")
-          log_debug(cond)
+          log_debug(e)
           hmdb_prepared <- fake_sop_columns()
         }
       )
