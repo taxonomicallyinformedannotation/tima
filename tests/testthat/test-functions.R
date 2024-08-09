@@ -525,7 +525,7 @@ test_that(desc = "Test functions", code = {
     export = paths$data$source$spectra
   )
   ## Install
-  # install(test = TRUE)
+  install(test = TRUE)
   # get_example_files()
   # tima:::.onLoad()
   # tima_full()
