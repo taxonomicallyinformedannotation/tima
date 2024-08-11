@@ -10,6 +10,7 @@ library(targets)
 tar_option_set(
   packages = c("tima"),
   imports = c("tima"),
+  library = c("tima"),
   memory = "transient",
   garbage_collection = TRUE,
   resources = tar_resources(
@@ -24,7 +25,7 @@ tar_option_set(
 # to allow use_targets() to configure tar_make_future() options.
 
 # Run the R scripts in the R/ folder with your custom functions:
-tar_source()
+tar_source(files = system.file("R", package = "tima"))
 
 # Replace the target list below with your own:
 list(
@@ -41,7 +42,7 @@ list(
       tar_target(
         name = paths,
         command = {
-          paths <- tima:::get_default_paths(yaml = yaml_paths)
+          paths <- get_default_paths(yaml = yaml_paths)
         }
       ),
       # tar_target(
