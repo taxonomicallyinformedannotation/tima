@@ -1,5 +1,3 @@
-library(tima)
-
 # Check if runs in Docker environment or not
 i_am_a_whale <- file.exists("/.dockerenv")
 if (i_am_a_whale) {
@@ -1690,13 +1688,13 @@ ui <- shiny::fluidPage(
 
 # save the results to a file
 save_input <- function(input) {
-  paths_data_source <- parse_yaml_paths()$data$source$path
+  paths_data_source <- tima:::parse_yaml_paths()$data$source$path
   paths_data_interim_annotations <-
-    parse_yaml_paths()$data$interim$annotations$path
+    tima:::parse_yaml_paths()$data$interim$annotations$path
   ## safety
-  create_dir(paths_data_source)
+  tima::create_dir(paths_data_source)
 
-  list <- load_yaml_files()
+  list <- tima:::load_yaml_files()
 
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
@@ -1746,7 +1744,7 @@ save_input <- function(input) {
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
-      create_dir(paths_data_interim_annotations)
+      tima::create_dir(paths_data_interim_annotations)
       fs::file_copy(
         path = prefil_sir_raw[[4]],
         new_path = file.path(prefil_sir_raw_1),
@@ -1777,8 +1775,8 @@ save_input <- function(input) {
   ms_pol <- shiny::isolate(input$ms_pol)
   summarise <- shiny::isolate(input$summarise)
 
-  log_debug(x = "Changing parameters ...")
-  log_debug(x = "... Small")
+  message(x = "Changing parameters ...")
+  message(x = "... Small")
   yaml_small <- yamls_params[["inst/params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
@@ -1792,7 +1790,7 @@ save_input <- function(input) {
   create_dir("inst/params")
   yaml::write_yaml(x = yaml_small, file = parse_yaml_paths()$params$prepare_params)
 
-  log_debug(x = "... Advanced")
+  message(x = "... Advanced")
   yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
@@ -1815,42 +1813,43 @@ save_input <- function(input) {
   yaml_advanced$files$pattern <- fil_pat
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |>
-    replace_id()
+    tima:::replace_id()
   # yaml_advanced$files$annotations$raw$sirius <-
   #   yaml_advanced$files$annotations$raw$sirius |>
-  #   replace_id()
+  #   tima:::replace_id()
   yaml_advanced$files$annotations$raw$sirius <- fil_sir_raw
   yaml_advanced$files$annotations$prepared$canopus <-
     yaml_advanced$files$annotations$prepared$canopus |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$formula <-
     yaml_advanced$files$annotations$prepared$formula |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$gnps <-
     yaml_advanced$files$annotations$prepared$structural$gnps |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$ms1 <-
     yaml_advanced$files$annotations$prepared$structural$ms1 |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$sirius <-
     yaml_advanced$files$annotations$prepared$structural$sirius |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$spectral <-
     yaml_advanced$files$annotations$prepared$structural$spectral |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$filtered <-
-    yaml_advanced$files$annotations$filtered |> replace_id()
+    yaml_advanced$files$annotations$filtered |>
+    tima:::replace_id()
   # yaml_advanced$files$annotations$processed <-
   #   yaml_advanced$files$annotations$processed |>
-  # replace_id()
+  #   tima:::replace_id()
   yaml_advanced$files$features$raw <-
     fil_fea_raw
   yaml_advanced$files$features$prepared <-
     yaml_advanced$files$features$prepared |>
-    replace_id()
+    tima:::replace_id()
   # TODO
   # yaml_advanced$files$libraries$sop$raw$closed <-
   #   shiny::isolate(input$todo)
@@ -1901,23 +1900,23 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
     yaml_advanced$files$networks$spectral$edges$raw$ms1 |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$edges$raw$spectral <-
     yaml_advanced$files$networks$spectral$edges$raw$spectral |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$edges$prepared <-
     yaml_advanced$files$networks$spectral$edges$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$components$raw <-
     yaml_advanced$files$networks$spectral$components$raw |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$components$prepared <-
     yaml_advanced$files$networks$spectral$components$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$metadata$raw <- fil_met_raw
   yaml_advanced$files$metadata$prepared <-
     yaml_advanced$files$metadata$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$spectral$raw <- fil_spe_raw
   yaml_advanced$gnps$id <- gnps_job_id
   yaml_advanced$gnps$workflow <-
@@ -2104,7 +2103,7 @@ save_input <- function(input) {
 
   yaml::write_yaml(
     x = yaml_advanced,
-    file = parse_yaml_paths()$params$prepare_params_advanced
+    file = tima:::parse_yaml_paths()$params$prepare_params_advanced
   )
 }
 
@@ -2384,7 +2383,7 @@ server <- function(input, output, session) {
   })
 }
 url <- "<http://127.0.0.1:3838>"
-log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
+message("Please, open:", url, "on your favorite browser, but not Edge.")
 shiny::shinyApp(
   ui = ui,
   server = server,
@@ -2393,7 +2392,7 @@ shiny::shinyApp(
       message("I'm inside the matrix ;(")
       setwd(dir = "..")
     } else {
-      go_to_cache()
+      tima:::go_to_cache()
     }
   }
 )

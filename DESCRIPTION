@@ -32,6 +32,7 @@ Imports:
     MsBackendMsp (>= 1.6.0),
     msentropy (>= 0.1.4),
     pbapply (>= 1.7.2),
+    R.utils (>= 2.12.3),
     rlang (>= 1.1.4),
     rotl (>= 3.1.0),
     shiny (>= 1.9.0),
@@ -53,7 +54,8 @@ Suggests:
     pkgload,
     shinytest2,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    visNetwork
 VignetteBuilder:
     knitr
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural
