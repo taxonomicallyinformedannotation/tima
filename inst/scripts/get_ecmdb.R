@@ -1,9 +1,6 @@
 start <- Sys.time()
 
-require(
-  package = "tima",
-  quietly = TRUE
-)
+library(tima)
 
 paths <- get_default_paths()
 
