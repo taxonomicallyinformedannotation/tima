@@ -4,8 +4,6 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 columns_model <- function() {
   features_columns <- c("feature_id", "feature_mz", "feature_rt")

@@ -23,8 +23,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @return Cleaned and collapsed dataframe
 #'
-#' @export
-#'
 #' @examples NULL
 clean_collapse <- function(grouped_df, cols = NA) {
   clean_collapse_df <- grouped_df |>

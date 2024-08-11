@@ -11,8 +11,6 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 get_massbank_spectra <-
   function(output_dir = "data/source/libraries/spectra/exp",

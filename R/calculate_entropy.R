@@ -18,8 +18,6 @@ import::from(tidytable, tidytable, .into = environment())
 #' @return A list containing the calculated entropy similarity values
 #'         or NULL if the score is below the threshold
 #'
-#' @export
-#'
 #' @examples NULL
 calculate_entropy <- function(index,
                               target,

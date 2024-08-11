@@ -4,8 +4,6 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 fake_annotations_columns <- function() {
   data.frame(

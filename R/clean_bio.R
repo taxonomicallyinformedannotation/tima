@@ -51,8 +51,6 @@ import::from(tidytable, where, .into = environment())
 #' @return A table containing the biologically weighted annotation
 #'    where only a given number of initial candidates are kept
 #'
-#' @export
-#'
 #' @seealso weight_bio
 #'
 #' @examples NULL

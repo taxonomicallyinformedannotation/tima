@@ -38,8 +38,6 @@ import::from(tidytable, filter, .into = environment())
 #' @return Message indicating the number of annotations
 #'     weighted at each biological level
 #'
-#' @export
-#'
 #' @examples NULL
 decorate_bio <-
   function(annot_table_wei_bio = get("annot_table_wei_chemo", envir = parent.frame()),

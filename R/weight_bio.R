@@ -70,8 +70,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @return A table containing the biologically weighted annotation
 #'
-#' @export
-#'
 #' @examples NULL
 weight_bio <-
   function(annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),

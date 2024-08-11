@@ -18,8 +18,6 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @return Character string with the GNPS job ID modified according
 #'    to the rules specified in the function
 #'
-#' @export
-#'
 #' @examples
 #' replace_id(
 #'   x = "example/123456_features.tsv",

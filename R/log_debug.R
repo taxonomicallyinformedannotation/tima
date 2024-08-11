@@ -6,8 +6,6 @@
 #'
 #' @return Message for debugging
 #'
-#' @export
-#'
 #' @examples log_debug("This is a debug message")
 log_debug <- function(...) {
   ## Concatenate the current time, the specified values,

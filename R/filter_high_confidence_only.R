@@ -19,8 +19,6 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 filter_high_confidence_only <-
   function(df,

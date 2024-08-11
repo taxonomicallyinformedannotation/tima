@@ -17,8 +17,6 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 get_params <- function(step) {
   paths <- parse_yaml_paths()

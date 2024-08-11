@@ -12,8 +12,6 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 fake_lotus <- function(export) {
   log_debug("External failure. Returning empty file instead.")

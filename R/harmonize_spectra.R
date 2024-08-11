@@ -43,8 +43,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 harmonize_spectra <- function(spectra,
                               metad = get("metad", envir = parent.frame()),

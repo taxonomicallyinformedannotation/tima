@@ -64,8 +64,6 @@ import::from(tidytable, where, .into = environment())
 #' @return A table containing the chemically weighted annotation
 #'    where only a given number of initial candidates are kept
 #'
-#' @export
-#'
 #' @seealso weight_chemo
 #'
 #' @examples NULL

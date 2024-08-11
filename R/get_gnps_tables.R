@@ -32,8 +32,6 @@ import::from(stringi, stri_length, .into = environment())
 #'
 #' @return The downloaded GNPS tables
 #'
-#' @export
-#'
 #' @examples NULL
 get_gnps_tables <-
   function(gnps_job_id,

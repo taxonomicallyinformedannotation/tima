@@ -16,8 +16,6 @@ import::from(fs, path_home, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 copy_backbone <- function(cache_dir = fs::path_home(".tima"),
                           package = "tima",

@@ -10,8 +10,6 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 load_yaml_files <- function() {
   log_debug(x = "Loading default params")

@@ -11,8 +11,6 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @return A list containing the parameters specified in the YAML files
 #'
-#' @export
-#'
 #' @examples NULL
 parse_yaml_params <- function(def = get("default_path", envir = parent.frame()),
                               usr = get("user_path", envir = parent.frame())) {

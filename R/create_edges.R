@@ -19,8 +19,6 @@ import::from(tidytable, bind_rows, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 create_edges <- function(index,
                          frags,
