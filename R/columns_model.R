@@ -2,6 +2,8 @@
 #'
 #' @description This function models columns
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @return NULL

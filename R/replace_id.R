@@ -5,6 +5,8 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @description This function replaces the default ID
 #'    in the example by a user-specified one
 #'
+#' @export
+#'
 #' @importFrom stringi stri_replace_all_regex
 #'
 #' @include get_default_paths.R

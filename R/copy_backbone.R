@@ -6,6 +6,8 @@ import::from(fs, path_home, .into = environment())
 #'
 #' @description This function copies backbone
 #'
+#' @export
+#'
 #' @importFrom fs dir_copy
 #' @importFrom fs dir_create
 #' @importFrom fs path_home

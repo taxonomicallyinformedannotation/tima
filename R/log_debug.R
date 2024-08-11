@@ -2,13 +2,15 @@
 #'
 #' @description Simple helper for debugging
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @param ... one or more values to be logged
 #'
 #' @return Message for debugging
 #'
-#' @examples tima:::log_debug("This is a debug message")
+#' @examples log_debug("This is a debug message")
 log_debug <- function(...) {
   ## Concatenate the current time, the specified values,
   ## and a newline character and print it

@@ -5,6 +5,8 @@ import::from(tidytable, bind_rows, .into = environment())
 #' @description This function applies similarity calculation to a list of
 #'        spectra to create edges
 #'
+#' @export
+#'
 #' @importFrom tidytable bind_rows
 #'
 #' @include calculate_entropy.R

@@ -12,6 +12,8 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @description This function outputs information about chemical weighting
 #'
+#' @export
+#'
 #' @importFrom crayon blue
 #' @importFrom crayon cyan
 #' @importFrom crayon green

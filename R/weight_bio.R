@@ -21,6 +21,8 @@ import::from(tidytable, where, .into = environment())
 #' @description This function weights the eventually MS1
 #' complemented annotations according their biological source
 #'
+#' @export
+#'
 #' @importFrom stringi stri_detect_regex
 #' @importFrom tidytable across
 #' @importFrom tidytable arrange

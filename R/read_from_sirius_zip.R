@@ -5,6 +5,8 @@ import::from(utils, unzip, .into = environment())
 #'
 #' @description This function reads files from Sirius compressed workspace
 #'
+#' @export
+#'
 #' @importFrom tidytable fread
 #' @importFrom utils unzip
 #'

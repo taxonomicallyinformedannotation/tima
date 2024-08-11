@@ -2,6 +2,8 @@
 #'
 #' @description Simple helper for debugging between pipes
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @param x value for the pipe

@@ -9,6 +9,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @description This function selects annotations columns
 #'
+#' @export
+#'
 #' @importFrom tidytable across
 #' @importFrom tidytable any_of
 #' @importFrom tidytable mutate

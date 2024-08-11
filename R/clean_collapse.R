@@ -10,6 +10,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @description This function collapses a grouped dataframe and trims it
 #'
+#' @export
+#'
 #' @importFrom tidytable across
 #' @importFrom tidytable everything
 #' @importFrom tidytable mutate

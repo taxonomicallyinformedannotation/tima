@@ -2,6 +2,8 @@
 #'
 #' @description This function gets MassBank spectra
 #'
+#' @export
+#'
 #' @include get_default_paths.R
 #'
 #' @noRd

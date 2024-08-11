@@ -2,6 +2,8 @@
 #'
 #' @description This function fakes ECMDB in case the download failed
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @param export Path to save the file to

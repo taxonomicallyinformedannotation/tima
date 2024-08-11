@@ -7,6 +7,8 @@ import::from(stats, as.dist, .into = environment())
 #'
 #' @details Credit goes to usedist package
 #'
+#' @export
+#'
 #' @importFrom stats as.dist
 #'
 #' @noRd
@@ -40,6 +42,8 @@ import::from(utils, combn, .into = environment())
 #' @title Dist groups
 #'
 #' @description This function gets distances per group
+#'
+#' @export
 #'
 #' @importFrom stats as.dist
 #' @importFrom utils combn

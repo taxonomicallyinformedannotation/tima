@@ -12,6 +12,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @description This function splits the structure organism table.
 #'
+#' @export
+#'
 #' @importFrom tidytable across
 #' @importFrom tidytable add_count
 #' @importFrom tidytable distinct

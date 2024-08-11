@@ -5,6 +5,8 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @description This function fakes LOTUS in case the download failed
 #'
+#' @export
+#'
 #' @importFrom tidytable fwrite
 #' @importFrom tidytable tidytable
 #'

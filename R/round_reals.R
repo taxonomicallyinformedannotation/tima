@@ -4,6 +4,10 @@ import::from(tidytable, mutate, .into = environment())
 
 #' @title Round reals
 #'
+#' @description This function rounds some reals in a dataframe
+
+#' @export
+#'
 #' @importFrom tidytable across
 #' @importFrom tidytable contains
 #' @importFrom tidytable mutate
