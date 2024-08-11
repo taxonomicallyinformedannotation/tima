@@ -46,6 +46,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/fake_sop_columns.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/filter_annotations.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/filter_high_confidence_only.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_default_paths.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_example_files.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_example_sirius.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_file.html</loc></url>
@@ -67,7 +68,6 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/parse_adduct.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/parse_cli_params.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/parse_yaml_params.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/parse_yaml_paths.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/pre_harmonize_names_sirius.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_annotations_gnps.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_annotations_sirius.html</loc></url>

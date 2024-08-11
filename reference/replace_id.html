@@ -59,7 +59,7 @@ in the example by a user-specified one</p>
 <span>  <span class="va">x</span>,</span>
 <span>  user_filename <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_params"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">pattern</span>,</span>
 <span>  user_gnps <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_params"</span><span class="op">)</span><span class="op">$</span><span class="va">gnps</span><span class="op">$</span><span class="va">id</span>,</span>
-<span>  example_gnps <span class="op">=</span> <span class="fu"><a href="parse_yaml_paths.html">parse_yaml_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">gnps</span><span class="op">$</span><span class="va">example</span></span>
+<span>  example_gnps <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">gnps</span><span class="op">$</span><span class="va">example</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,7 +96,7 @@ to the rules specified in the function</p>
 <span class="r-in"><span>  user_gnps <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>  user_filename <span class="op">=</span> <span class="st">"Foo"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "example/Foo_features.tsv"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in replace_id(x = "example/123456_features.tsv", user_gnps = NULL,     user_filename = "Foo"):</span> could not find function "replace_id"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
