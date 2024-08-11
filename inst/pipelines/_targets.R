@@ -10,7 +10,6 @@ library(targets)
 tar_option_set(
   packages = c("tima"),
   imports = c("tima"),
-  library = c("tima"),
   memory = "transient",
   garbage_collection = TRUE,
   resources = tar_resources(
