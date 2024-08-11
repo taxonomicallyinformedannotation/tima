@@ -22,6 +22,8 @@ import::from(tidytable, filter, .into = environment())
 #' @importFrom tidytable distinct
 #' @importFrom tidytable filter
 #'
+#' @noRd
+#'
 #' @param annot_table_wei_chemo Table to decorate
 #' @param score_chemical_cla_kingdom  Classyfire kingdom score
 #' @param score_chemical_cla_superclass  Classyfire superclass score

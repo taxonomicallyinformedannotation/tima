@@ -9,6 +9,8 @@ import::from(utils, unzip, .into = environment())
 #' @include get_default_paths.R
 #' @include get_file.R
 #'
+#' @noRd
+#'
 #' @param url URL where the example is accessible
 #' @param export Path where to save the example
 #'

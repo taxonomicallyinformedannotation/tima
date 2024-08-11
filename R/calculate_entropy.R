@@ -8,6 +8,8 @@ import::from(tidytable, tidytable, .into = environment())
 #' @importFrom msentropy calculate_entropy_similarity
 #' @importFrom tidytable tidytable
 #'
+#' @noRd
+#'
 #' @param index Index of the first spectrum
 #' @param target Index of the second spectrum
 #' @param frags List of fragments

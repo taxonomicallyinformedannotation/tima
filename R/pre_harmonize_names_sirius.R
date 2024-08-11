@@ -7,6 +7,8 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'
 #' @importFrom stringi stri_replace_all_regex
 #'
+#' @noRd
+#'
 #' @param x Character string containing a name
 #'
 #' @return Character string with the name modified according

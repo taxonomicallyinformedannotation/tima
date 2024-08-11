@@ -13,6 +13,8 @@ import::from(tidytable, filter, .into = environment())
 #' @importFrom crayon red
 #' @importFrom tidytable filter
 #'
+#' @noRd
+#'
 #' @param df Dataframe
 #' @param score_bio_min Minimal biological score. Current default to 0.85.
 #' @param score_ini_min Minimal initial score. Current default to 0.75.

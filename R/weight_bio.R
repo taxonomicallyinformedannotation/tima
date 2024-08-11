@@ -41,6 +41,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @include transform_score_sirius_csi.R
 #'
+#' @noRd
+#'
 #' @param annotation_table_taxed Table containing the initial annotation
 #' eventually complemented by additional MS1 annotations
 #' @param structure_organism_pairs_table Table containing the

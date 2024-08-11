@@ -3,6 +3,8 @@
 #' @description This function harmonizes the names of Sirius
 #'    outputs to make them compatible
 #'
+#' @noRd
+#'
 #' @param x Character string containing a name
 #'
 #' @return Character string with the name modified according

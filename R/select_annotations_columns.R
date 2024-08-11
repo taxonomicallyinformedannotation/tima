@@ -20,6 +20,8 @@ import::from(tidytable, where, .into = environment())
 #' @include complement_metadata_structures.R
 #' @include round_reals.R
 #'
+#' @noRd
+#'
 #' @param df Dataframe
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata

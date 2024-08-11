@@ -20,6 +20,8 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable row_number
 #' @importFrom tidytable select
 #'
+#' @noRd
+#'
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'

@@ -43,6 +43,8 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable ungroup
 #' @importFrom tidytable where
 #'
+#' @noRd
+#'
 #' @param annot_table_wei_bio Table containing your
 #'    biologically weighted annotation
 #' @param edges_table Table containing the edges between features

@@ -11,6 +11,8 @@ import::from(yaml, write_yaml, .into = environment())
 #'
 #' @include get_default_paths.R
 #'
+#' @noRd
+#'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved
 #' @param step step identifier to be included in the YAML file name

@@ -19,6 +19,8 @@ import::from(stringi, stri_length, .into = environment())
 #' @include get_default_paths.R
 #' @include get_file.R
 #'
+#' @noRd
+#'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example
 #' @param filename Name of the file

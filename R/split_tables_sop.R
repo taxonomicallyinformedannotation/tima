@@ -24,6 +24,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @include clean_collapse.R
 #'
+#' @noRd
+#'
 #' @param table Table to split
 #'
 #' @return NULL

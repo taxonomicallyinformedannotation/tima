@@ -47,6 +47,8 @@ import::from(tidytable, where, .into = environment())
 #' @include columns_model.R
 #' @include filter_high_confidence_only.R
 #'
+#' @noRd
+#'
 #' @param annot_table_wei_chemo Table containing your
 #'    chemically weighted annotation
 #' @param components_table Prepared components file

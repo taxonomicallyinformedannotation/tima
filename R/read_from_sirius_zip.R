@@ -8,6 +8,8 @@ import::from(utils, unzip, .into = environment())
 #' @importFrom tidytable fread
 #' @importFrom utils unzip
 #'
+#' @noRd
+#'
 #' @param sirius_zip Compressed directory containing the Sirius results
 #' @param file File to be read
 #'
