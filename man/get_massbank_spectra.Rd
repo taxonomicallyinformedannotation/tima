@@ -6,9 +6,9 @@
 \usage{
 get_massbank_spectra(
   output_dir = "data/source/libraries/spectra/exp",
-  mb_file = parse_yaml_paths()$urls$massbank$file,
-  mb_url = parse_yaml_paths()$urls$massbank$url,
-  mb_version = parse_yaml_paths()$urls$massbank$version
+  mb_file = get_default_paths()$urls$massbank$file,
+  mb_url = get_default_paths()$urls$massbank$url,
+  mb_version = get_default_paths()$urls$massbank$version
 )
 }
 \arguments{

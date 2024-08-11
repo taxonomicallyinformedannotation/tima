@@ -1688,9 +1688,9 @@ ui <- shiny::fluidPage(
 
 # save the results to a file
 save_input <- function(input) {
-  paths_data_source <- tima:::parse_yaml_paths()$data$source$path
+  paths_data_source <- tima:::get_default_paths()$data$source$path
   paths_data_interim_annotations <-
-    tima:::parse_yaml_paths()$data$interim$annotations$path
+    tima:::get_default_paths()$data$interim$annotations$path
   ## safety
   tima::create_dir(paths_data_source)
 
@@ -1788,7 +1788,7 @@ save_input <- function(input) {
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarise <- summarise
   create_dir("inst/params")
-  yaml::write_yaml(x = yaml_small, file = parse_yaml_paths()$params$prepare_params)
+  yaml::write_yaml(x = yaml_small, file = get_default_paths()$params$prepare_params)
 
   message(x = "... Advanced")
   yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
@@ -2103,7 +2103,7 @@ save_input <- function(input) {
 
   yaml::write_yaml(
     x = yaml_advanced,
-    file = tima:::parse_yaml_paths()$params$prepare_params_advanced
+    file = tima:::get_default_paths()$params$prepare_params_advanced
   )
 }
 

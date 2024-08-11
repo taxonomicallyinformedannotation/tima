@@ -7,8 +7,8 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'
 #' @importFrom stringi stri_replace_all_regex
 #'
+#' @include get_default_paths.R
 #' @include get_params.R
-#' @include parse_yaml_paths.R
 #'
 #' @param x a character string containing the default ID
 #' @param user_filename a user-specified value for a file name job ID
@@ -28,7 +28,7 @@ replace_id <-
   function(x,
            user_filename = get_params(step = "prepare_params")$files$pattern,
            user_gnps = get_params(step = "prepare_params")$gnps$id,
-           example_gnps = parse_yaml_paths()$gnps$example) {
+           example_gnps = get_default_paths()$gnps$example) {
     if (length(user_gnps) != 0) {
       if (user_gnps == "") {
         user_gnps <- NULL

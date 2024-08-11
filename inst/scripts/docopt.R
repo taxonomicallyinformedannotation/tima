@@ -6,7 +6,7 @@ require(
 )
 
 step <- "params"
-paths <- parse_yaml_paths()
+paths <- get_default_paths()
 params <- get_params(step = step)
 
 log_debug(

@@ -13,8 +13,8 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 get_file(
-  url = parse_yaml_paths()$urls$examples$features,
-  export = parse_yaml_paths()$data$source$features
+  url = get_default_paths()$urls$examples$features,
+  export = get_default_paths()$data$source$features
 )
 
 end <- Sys.time()

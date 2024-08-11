@@ -2,10 +2,10 @@
 #'
 #' @description This function downloads example files
 #'
+#' @include get_default_paths.R
 #' @include get_example_sirius.R
 #' @include get_file.R
 #' @include go_to_cache.R
-#' @include parse_yaml_paths.R
 #'
 #' @param example The example(s) you want to download
 #' @param in_cache Flag to indicate if storing the files in cache
@@ -33,22 +33,22 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
   if ("features" %in% example) {
     message("Features")
     get_file(
-      url = tima::parse_yaml_paths()$urls$examples$features,
-      export = tima::parse_yaml_paths()$data$source$features
+      url = get_default_paths()$urls$examples$features,
+      export = get_default_paths()$data$source$features
     )
   }
   if ("hmdb_is" %in% example) {
     message("HMDB in silico")
     get_file(
-      url = tima::parse_yaml_paths()$urls$hmdb$spectra$predicted,
-      export = tima::parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
+      url = get_default_paths()$urls$hmdb$spectra$predicted,
+      export = get_default_paths()$data$source$libraries$spectra$is$hmdb
     )
   }
   if ("metadata" %in% example) {
     message("Metadata")
     get_file(
-      url = tima::parse_yaml_paths()$urls$examples$metadata,
-      export = tima::parse_yaml_paths()$data$source$metadata
+      url = get_default_paths()$urls$examples$metadata,
+      export = get_default_paths()$data$source$metadata
     )
   }
   if ("sirius" %in% example) {
@@ -58,15 +58,15 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
   if ("spectra" %in% example) {
     message("Spectra")
     get_file(
-      url = tima::parse_yaml_paths()$urls$examples$spectra,
-      export = tima::parse_yaml_paths()$data$source$spectra
+      url = get_default_paths()$urls$examples$spectra,
+      export = get_default_paths()$data$source$spectra
     )
   }
   if ("spectral_lib_with_rt" %in% example) {
     message("Spectral library with retention times")
     get_file(
-      url = tima::parse_yaml_paths()$urls$examples$spectral_lib_mini$with_rt,
-      export = tima::parse_yaml_paths()$data$source$libraries$spectra$exp$with_rt
+      url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
+      export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
     )
   }
 }

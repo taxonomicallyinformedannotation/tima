@@ -115,6 +115,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "visNetwork",
+      "name": "visNetwork",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     }
   ],
   "softwareRequirements": {
@@ -321,6 +333,19 @@
     },
     "17": {
       "@type": "SoftwareApplication",
+      "identifier": "R.utils",
+      "name": "R.utils",
+      "version": ">= 2.12.3",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=R.utils"
+    },
+    "18": {
+      "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
       "version": ">= 1.1.4",
@@ -332,7 +357,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    "18": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -345,7 +370,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "19": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -358,7 +383,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "20": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "shinyhelper",
       "name": "shinyhelper",
@@ -371,7 +396,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyhelper"
     },
-    "21": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "shinyjs",
       "name": "shinyjs",
@@ -384,7 +409,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyjs"
     },
-    "22": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "shinyvalidate",
       "name": "shinyvalidate",
@@ -397,7 +422,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
@@ -410,7 +435,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -423,12 +448,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "25": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "26": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -441,7 +466,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "27": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -454,7 +479,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "28": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -467,7 +492,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "29": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -480,12 +505,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "30": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "31": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -501,7 +526,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2348.773KB",
+  "fileSize": "2349.125KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",

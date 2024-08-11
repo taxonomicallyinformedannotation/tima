@@ -19,10 +19,10 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @include export_spectra_2.R
 #' @include extract_spectra.R
+#' @include get_default_paths.R
 #' @include get_params.R
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
-#' @include parse_yaml_paths.R
 #'
 #' @param input File containing spectra
 #' @param polarity MS polarity
@@ -71,15 +71,15 @@ prepare_libraries_spectra <-
            col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
            col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp) {
     output_pos <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
+      get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")
     )
     output_neg <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
+      get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_neg.rds")
     )
     output_sop <- file.path(
-      parse_yaml_paths()$data$interim$libraries$sop$path,
+      get_default_paths()$data$interim$libraries$sop$path,
       paste0("spectral_prepared.tsv.gz")
     )
     if (!all(lapply(X = list(output_neg, output_pos), FUN = file.exists) |> unlist())) {

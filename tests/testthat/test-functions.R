@@ -7,7 +7,7 @@ test_that(desc = "Test functions", code = {
   copy_backbone(cache_dir = ".")
 
   ## Prepare parameters
-  paths <- parse_yaml_paths()
+  paths <- get_default_paths()
   params <- get_params(step = "prepare_params")
   ## For all steps
   params$organisms$taxon <- ""
@@ -51,7 +51,7 @@ test_that(desc = "Test functions", code = {
   )
   replace_id(
     x = "example/123456_features.tsv",
-    user_gnps = parse_yaml_paths()$gnps$example,
+    user_gnps = get_default_paths()$gnps$example,
     user_filename = "Foo"
   )
 
@@ -94,7 +94,7 @@ test_that(desc = "Test functions", code = {
     gnps_job_id = paths$gnps$example2
   )
   ### When it is the example
-  get_gnps_tables(gnps_job_id = parse_yaml_paths()$gnps$example)
+  get_gnps_tables(gnps_job_id = get_default_paths()$gnps$example)
   ### When no GNPS job ID and no metadata are given
   get_gnps_tables(
     filename = "noGNPS",
