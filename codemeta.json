@@ -126,32 +126,6 @@
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "bs4Dash",
-      "name": "bs4Dash",
-      "version": ">= 2.3.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=bs4Dash"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
-      "identifier": "cli",
-      "name": "cli",
-      "version": ">= 3.6.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=cli"
-    },
-    "4": {
-      "@type": "SoftwareApplication",
       "identifier": "crayon",
       "name": "crayon",
       "version": ">= 1.5.3",
@@ -163,7 +137,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=crayon"
     },
-    "5": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
@@ -176,7 +150,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "6": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -189,20 +163,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "7": {
-      "@type": "SoftwareApplication",
-      "identifier": "DT",
-      "name": "DT",
-      "version": ">= 0.33",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=DT"
-    },
-    "8": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
@@ -215,7 +176,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "9": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "glue",
       "name": "glue",
@@ -228,20 +189,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=glue"
     },
-    "10": {
-      "@type": "SoftwareApplication",
-      "identifier": "gt",
-      "name": "gt",
-      "version": ">= 0.11.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=gt"
-    },
-    "11": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -254,7 +202,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "12": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -267,7 +215,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "13": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "import",
       "name": "import",
@@ -280,20 +228,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=import"
     },
-    "14": {
-      "@type": "SoftwareApplication",
-      "identifier": "installr",
-      "name": "installr",
-      "version": ">= 0.23.4",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=installr"
-    },
-    "15": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -306,7 +241,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "16": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "lifecycle",
       "name": "lifecycle",
@@ -319,7 +254,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lifecycle"
     },
-    "17": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
@@ -332,7 +267,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboCoreUtils.html"
     },
-    "18": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -345,7 +280,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "19": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
@@ -358,7 +293,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
     },
-    "20": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -371,7 +306,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "21": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -384,33 +319,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "22": {
-      "@type": "SoftwareApplication",
-      "identifier": "pingr",
-      "name": "pingr",
-      "version": ">= 2.0.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=pingr"
-    },
-    "23": {
-      "@type": "SoftwareApplication",
-      "identifier": "R.utils",
-      "name": "R.utils",
-      "version": ">= 2.12.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=R.utils"
-    },
-    "24": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
@@ -423,7 +332,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    "25": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -436,7 +345,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "26": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -449,20 +358,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "27": {
-      "@type": "SoftwareApplication",
-      "identifier": "shinybusy",
-      "name": "shinybusy",
-      "version": ">= 0.3.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=shinybusy"
-    },
-    "28": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "shinyhelper",
       "name": "shinyhelper",
@@ -475,7 +371,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyhelper"
     },
-    "29": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "shinyjs",
       "name": "shinyjs",
@@ -488,7 +384,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyjs"
     },
-    "30": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "shinyvalidate",
       "name": "shinyvalidate",
@@ -501,7 +397,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
     },
-    "31": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
@@ -514,7 +410,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "32": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -527,12 +423,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "33": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "34": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -545,7 +441,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "35": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -558,7 +454,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "36": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -571,7 +467,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "37": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -584,25 +480,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "38": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "39": {
-      "@type": "SoftwareApplication",
-      "identifier": "visNetwork",
-      "name": "visNetwork",
-      "version": ">= 2.1.2",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
-    },
-    "40": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -618,7 +501,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2350.567KB",
+  "fileSize": "2350.359KB",
   "citation": [
     {
       "@type": "ScholarlyArticle",
