@@ -8,8 +8,6 @@
 #' @return Character string with the name modified according
 #'    to the rules specified in the function
 #'
-#' @export
-#'
 #' @examples harmonized_name <- harmonize_names_sirius("My_name")
 harmonize_names_sirius <- function(x) {
   ## Remove everything up to and including the last underscore from the name

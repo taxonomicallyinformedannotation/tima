@@ -11,8 +11,6 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @return A table with harmonized adducts
 #'
-#' @export
-#'
 #' @examples NULL
 harmonize_adducts <- function(df, adducts_colname = "adduct") {
   adducts_translations <-

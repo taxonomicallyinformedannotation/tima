@@ -17,8 +17,6 @@ import::from(yaml, write_yaml, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 export_params <-
   function(parameters = get("parameters", envir = parent.frame()),

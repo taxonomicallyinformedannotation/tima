@@ -15,8 +15,6 @@ import::from(stats, as.dist, .into = environment())
 #'
 #' @return Distance between the two elements
 #'
-#' @export
-#'
 #' @examples NULL
 dist_get <- function(d, idx1, idx2) {
   # Convert input to distance matrix

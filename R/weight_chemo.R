@@ -44,8 +44,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return A table containing the chemically weighted annotation
 #'
-#' @export
-#'
 #' @examples NULL
 weight_chemo <-
   function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),

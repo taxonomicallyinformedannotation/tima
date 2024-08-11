@@ -10,8 +10,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 select_sop_columns <- function(df) {
   df <- df |>

@@ -11,8 +11,6 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @return A list containing the paths specified in the YAML file
 #'
-#' @export
-#'
 #' @examples NULL
 parse_yaml_paths <- function(file = system.file("extdata", "paths.yaml", package = "tima")) {
   ## Read the YAML file containing the paths

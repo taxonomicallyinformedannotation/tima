@@ -28,8 +28,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 split_tables_sop <- function(table) {
   log_debug(x = "Splitting the concatenated library into smaller pieces")

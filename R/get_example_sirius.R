@@ -13,8 +13,6 @@ import::from(utils, unzip, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 get_example_sirius <-
   function(url = parse_yaml_paths()$urls$examples$sirius,

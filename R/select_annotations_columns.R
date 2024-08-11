@@ -29,8 +29,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 select_annotations_columns <- function(df,
                                        str_stereo = get("str_stereo", envir = parent.frame()),

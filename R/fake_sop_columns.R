@@ -4,8 +4,6 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 fake_sop_columns <- function() {
   data.frame(

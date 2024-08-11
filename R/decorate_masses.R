@@ -16,8 +16,6 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @return Message indicating the number of annotations obtained by MS1
 #'
-#' @export
-#'
 #' @examples NULL
 decorate_masses <- function(annotation_table_ms1 =
                               get("annotation_table_ms1", envir = parent.frame())) {

@@ -7,8 +7,6 @@
 #'
 #' @return Message for debugging
 #'
-#' @export
-#'
 #' @examples NULL
 log_pipe <- function(x, ...) {
   x2 <- x

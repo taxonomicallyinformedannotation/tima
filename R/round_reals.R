@@ -13,12 +13,11 @@ import::from(tidytable, mutate, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 round_reals <- function(df, dig = 5) {
   df |>
     ## Round to 5 digits to avoid small discrepancies
+    ## TODO rename it as for now it gives the feeling all reals in df will be
     mutate(across(
       .cols = c(
         contains("structure_exact_mass"),

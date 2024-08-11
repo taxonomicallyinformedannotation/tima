@@ -7,8 +7,6 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 parse_cli_params <- function(arguments, parameters) {
   if (exists("arguments")) {

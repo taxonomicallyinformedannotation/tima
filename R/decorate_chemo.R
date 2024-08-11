@@ -34,8 +34,6 @@ import::from(tidytable, filter, .into = environment())
 #' @return Message indicating the number of annotations
 #'     weighted at each chemical level
 #'
-#' @export
-#'
 #' @examples NULL
 decorate_chemo <- function(annot_table_wei_chemo =
                              get("annot_table_wei_chemo", envir = parent.frame()),

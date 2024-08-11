@@ -17,8 +17,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 select_sirius_columns_canopus <- function(df, sirius_version) {
   df <- df |>

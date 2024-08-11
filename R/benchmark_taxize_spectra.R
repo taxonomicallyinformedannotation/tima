@@ -31,8 +31,6 @@ import::from(tidytable, slice_sample, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 benchmark_taxize_spectra <-
   function(input, keys, org_tax_ott, output) {

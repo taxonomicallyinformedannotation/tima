@@ -13,8 +13,6 @@ import::from(utils, unzip, .into = environment())
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 read_from_sirius_zip <- function(sirius_zip, file) {
   sirius_no_zip <- sirius_zip |>
