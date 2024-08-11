@@ -14,6 +14,8 @@ import::from(tidytable, slice_sample, .into = environment())
 #'
 #' @details Because they are still quite dirty
 #'
+#' @export
+#'
 #' @importFrom stringi stri_sub
 #' @importFrom tidytable bind_rows
 #' @importFrom tidytable distinct

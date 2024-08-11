@@ -7,6 +7,8 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @description This function selects sirius columns (canopus)
 #'
+#' @export
+#'
 #' @importFrom tidytable any_of
 #' @importFrom tidytable bind_cols
 #' @importFrom tidytable mutate

@@ -2,6 +2,8 @@
 #'
 #' @description This function calculates the mass of M
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @param csi_score Original CSI score

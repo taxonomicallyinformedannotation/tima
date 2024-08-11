@@ -23,6 +23,8 @@ import::from(tidytable, where, .into = environment())
 #' @description This function cleans the results
 #'    obtained after chemical weighting
 #'
+#' @export
+#'
 #' @importFrom tidytable across
 #' @importFrom tidytable any_of
 #' @importFrom tidytable arrange

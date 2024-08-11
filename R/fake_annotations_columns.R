@@ -2,6 +2,8 @@
 #'
 #' @description This function fakes annotations columns
 #'
+#' @export
+#'
 #' @noRd
 #'
 #' @return NULL

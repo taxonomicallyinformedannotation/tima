@@ -1692,7 +1692,7 @@ save_input <- function(input) {
   paths_data_interim_annotations <-
     tima:::get_default_paths()$data$interim$annotations$path
   ## safety
-  tima::create_dir(paths_data_source)
+  tima:::create_dir(paths_data_source)
 
   list <- tima:::load_yaml_files()
 
@@ -1744,7 +1744,7 @@ save_input <- function(input) {
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
-      tima::create_dir(paths_data_interim_annotations)
+      tima:::create_dir(paths_data_interim_annotations)
       fs::file_copy(
         path = prefil_sir_raw[[4]],
         new_path = file.path(prefil_sir_raw_1),

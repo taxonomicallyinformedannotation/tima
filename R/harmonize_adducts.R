@@ -4,6 +4,8 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @description This function annotates masses
 #'
+#' @export
+#'
 #' @importFrom stringi stri_replace_all_fixed
 #'
 #' @noRd
