@@ -12,6 +12,8 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable select
 #'
+#' @include harmonize_names_sirius.R
+#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
