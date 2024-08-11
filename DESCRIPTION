@@ -75,9 +75,9 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
 Collate:
     'round_reals.R'
     'harmonize_adducts.R'
-    'parse_yaml_paths.R'
     'parse_yaml_params.R'
     'parse_cli_params.R'
+    'get_default_paths.R'
     'get_params.R'
     'dist_groups.R'
     'decorate_masses.R'

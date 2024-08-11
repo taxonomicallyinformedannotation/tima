@@ -41,7 +41,7 @@ list(
       tar_target(
         name = paths,
         command = {
-          paths <- parse_yaml_paths(file = yaml_paths)
+          paths <- tima:::get_default_paths(file = yaml_paths)
         }
       ),
       # tar_target(

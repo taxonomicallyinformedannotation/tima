@@ -9,17 +9,19 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #' @importFrom docopt docopt
 #' @importFrom stringi stri_replace_all_fixed
 #'
+#' @include get_default_paths.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
-#' @include parse_yaml_paths.R
 #'
 #' @param step Name of the step being performed
 #'
 #' @return NULL
 #'
+#' @export
+#'
 #' @examples NULL
 get_params <- function(step) {
-  paths <- parse_yaml_paths()
+  paths <- get_default_paths()
   steps <-
     list.files(system.file("scripts/docopt", package = "tima")) |>
     stri_replace_all_fixed(pattern = ".txt", replacement = "")

@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-paths <- parse_yaml_paths()
+paths <- get_default_paths()
 
 log_debug(
   "This script",

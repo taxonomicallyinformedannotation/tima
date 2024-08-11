@@ -6,7 +6,7 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @importFrom yaml read_yaml
 #'
-#' @include parse_yaml_paths.R
+#' @include get_default_paths.R
 #'
 #' @return NULL
 #'
@@ -15,23 +15,23 @@ load_yaml_files <- function() {
   log_debug(x = "Loading default params")
   yaml_files <- c(
     list.files(
-      path = file.path(parse_yaml_paths()$params$default),
+      path = file.path(get_default_paths()$params$default),
       pattern = ".yaml",
       full.names = TRUE
     ),
-    parse_yaml_paths()$params$prepare_params,
-    parse_yaml_paths()$params$prepare_params_advanced
+    get_default_paths()$params$prepare_params,
+    get_default_paths()$params$prepare_params_advanced
   )
 
-  if (length(list.files(parse_yaml_paths()$params$user$path)) >= length(list.files(parse_yaml_paths()$params$default$path))) {
+  if (length(list.files(get_default_paths()$params$user$path)) >= length(list.files(get_default_paths()$params$default$path))) {
     yaml_files <- c(
       list.files(
-        path = file.path(parse_yaml_paths()$params$user),
+        path = file.path(get_default_paths()$params$user),
         pattern = ".yaml",
         full.names = TRUE
       ),
-      parse_yaml_paths()$params$prepare_params,
-      parse_yaml_paths()$params$prepare_params_advanced
+      get_default_paths()$params$prepare_params,
+      get_default_paths()$params$prepare_params_advanced
     )
   }
 

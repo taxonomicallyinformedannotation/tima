@@ -35,8 +35,8 @@ import::from(tidytable, where, .into = environment())
 #' @include columns_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
+#' @include get_default_paths.R
 #' @include get_params.R
-#' @include parse_yaml_paths.R
 #' @include weight_bio.R
 #' @include weight_chemo.R
 #'
@@ -332,7 +332,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(
-    parse_yaml_paths()$data$processed$path,
+    get_default_paths()$data$processed$path,
     paste0(time, "_", pattern)
   )
   final_output <- file.path(dir_time, output)

@@ -16,7 +16,8 @@ import::from(stringi, stri_length, .into = environment())
 #' @importFrom httr2 resp_status_desc
 #' @importFrom stringi stri_length
 #'
-#' @include parse_yaml_paths.R get_file.R
+#' @include get_default_paths.R
+#' @include get_file.R
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example
@@ -35,15 +36,15 @@ import::from(stringi, stri_length, .into = environment())
 #' @examples NULL
 get_gnps_tables <-
   function(gnps_job_id,
-           gnps_job_example = parse_yaml_paths()$gnps$example,
+           gnps_job_example = get_default_paths()$gnps$example,
            filename,
            workflow = "fbmn",
            path_features,
            path_metadata,
            path_spectra,
-           path_source = parse_yaml_paths()$data$source$path,
-           path_interim_a = parse_yaml_paths()$data$interim$annotations$path,
-           path_interim_f = parse_yaml_paths()$data$interim$features$path) {
+           path_source = get_default_paths()$data$source$path,
+           path_interim_a = get_default_paths()$data$interim$annotations$path,
+           path_interim_f = get_default_paths()$data$interim$features$path) {
     if (!is.null(gnps_job_id)) {
       if (gnps_job_id == "") {
         gnps_job_id <- NULL

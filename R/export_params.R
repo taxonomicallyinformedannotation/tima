@@ -9,7 +9,7 @@ import::from(yaml, write_yaml, .into = environment())
 #' @importFrom crayon green
 #' @importFrom yaml write_yaml
 #'
-#' @include parse_yaml_paths.R
+#' @include get_default_paths.R
 #'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved
@@ -20,7 +20,7 @@ import::from(yaml, write_yaml, .into = environment())
 #' @examples NULL
 export_params <-
   function(parameters = get("parameters", envir = parent.frame()),
-           directory = parse_yaml_paths()$data$interim$params$path,
+           directory = get_default_paths()$data$interim$params$path,
            step) {
     ## Create directory if it does not exist
     create_dir(export = directory)
