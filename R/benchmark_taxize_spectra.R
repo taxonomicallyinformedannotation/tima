@@ -24,6 +24,8 @@ import::from(tidytable, slice_sample, .into = environment())
 #' @importFrom tidytable select
 #' @importFrom tidytable slice_sample
 #'
+#' @noRd
+#'
 #' @param input Initial features
 #' @param keys SOP keys
 #' @param org_tax_ott Taxonomy

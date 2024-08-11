@@ -8,6 +8,8 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @include get_default_paths.R
 #'
+#' @noRd
+#'
 #' @return NULL
 #'
 #' @examples NULL

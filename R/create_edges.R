@@ -9,6 +9,8 @@ import::from(tidytable, bind_rows, .into = environment())
 #'
 #' @include calculate_entropy.R
 #'
+#' @noRd
+#'
 #' @param index Indices
 #' @param frags Fragments
 #' @param precs Precursors

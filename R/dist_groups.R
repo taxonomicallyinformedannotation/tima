@@ -9,6 +9,8 @@ import::from(stats, as.dist, .into = environment())
 #'
 #' @importFrom stats as.dist
 #'
+#' @noRd
+#'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element
 #' @param idx2 Index of the second element
@@ -42,6 +44,8 @@ import::from(utils, combn, .into = environment())
 #' @importFrom stats as.dist
 #' @importFrom utils combn
 #'
+#' @noRd
+#'
 #' @param d A distance object
 #' @param g A grouping vector for the distance object
 #'
@@ -52,8 +56,6 @@ import::from(utils, combn, .into = environment())
 #'    and the distance between the observations.
 #'    The label column indicates whether the distance is
 #'    within a group or between groups.
-#'
-#' @export
 #'
 #' @examples NULL
 dist_groups <- function(d, g) {

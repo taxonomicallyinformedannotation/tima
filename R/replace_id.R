@@ -10,6 +10,8 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @include get_default_paths.R
 #' @include get_params.R
 #'
+#' @noRd
+#'
 #' @param x a character string containing the default ID
 #' @param user_filename a user-specified value for a file name job ID
 #' @param user_gnps a user-specified value for a GNPS job ID

@@ -10,6 +10,8 @@ import::from(fs, path_home, .into = environment())
 #' @importFrom fs dir_create
 #' @importFrom fs path_home
 #'
+#' @noRd
+#'
 #' @param cache_dir Cache directory
 #' @param package Package
 #' @param copy_dir Copy directory

@@ -8,6 +8,8 @@ import::from(tidytable, tidytable, .into = environment())
 #' @importFrom tidytable fwrite
 #' @importFrom tidytable tidytable
 #'
+#' @noRd
+#'
 #' @param export Path to save the file to
 #'
 #' @return NULL

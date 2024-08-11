@@ -2,6 +2,8 @@
 #'
 #' @description This function parses command line parameters
 #'
+#' @noRd
+#'
 #' @param arguments CLI arguments
 #' @param parameters Parameters
 #'

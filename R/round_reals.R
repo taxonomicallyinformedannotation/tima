@@ -8,6 +8,8 @@ import::from(tidytable, mutate, .into = environment())
 #' @importFrom tidytable contains
 #' @importFrom tidytable mutate
 #'
+#' @noRd
+#'
 #' @param df Dataframe to use
 #' @param dig Number of digits
 #'

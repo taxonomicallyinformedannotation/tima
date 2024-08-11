@@ -24,6 +24,8 @@ import::from(tidytable, filter, .into = environment())
 #' @importFrom tidytable distinct
 #' @importFrom tidytable filter
 #'
+#' @noRd
+#'
 #' @param annot_table_wei_bio Table to decorate
 #' @param score_biological_kingdom  Kingdom score
 #' @param score_biological_phylum  Phylum score

@@ -6,6 +6,8 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @importFrom stringi stri_replace_all_fixed
 #'
+#' @noRd
+#'
 #' @param df Dataframe
 #' @param adducts_colname Adducts colname
 #'

@@ -12,6 +12,8 @@ import::from(tidytable, filter, .into = environment())
 #' @importFrom tidytable distinct
 #' @importFrom tidytable filter
 #'
+#' @noRd
+#'
 #' @param annotation_table_ms1 Table to decorate
 #'
 #' @return Message indicating the number of annotations obtained by MS1

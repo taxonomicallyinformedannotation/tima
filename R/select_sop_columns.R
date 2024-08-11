@@ -6,6 +6,8 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @importFrom tidytable select
 #'
+#' @noRd
+#'
 #' @param df Dataframe
 #'
 #' @return NULL

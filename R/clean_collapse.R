@@ -18,6 +18,8 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable ungroup
 #' @importFrom tidytable where
 #'
+#' @noRd
+#'
 #' @param grouped_df Grouped dataframe
 #' @param cols Column(s) to apply collapse to
 #'

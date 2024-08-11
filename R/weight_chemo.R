@@ -21,6 +21,8 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable right_join
 #' @importFrom tidytable select
 #'
+#' @noRd
+#'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation
 #' @param weight_spectral Weight for the spectral score
