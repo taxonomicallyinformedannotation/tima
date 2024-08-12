@@ -76,14 +76,18 @@ or \code{neg} and retention time and mass tolerances should be given. The featur
 table is expected to be pre-formatted.
 }
 \examples{
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/"
+data_interim <- "main/data/interim/"
+dir <- paste0(github, repo, data_interim)
 annotate_masses(
-  features = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/features/example_features.tsv",
-  library = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/keys.tsv",
-  str_stereo = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/stereo.tsv",
-  str_met = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/metadata.tsv",
-  str_nam = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/names.tsv",
-  str_tax_cla = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/classyfire.tsv",
-  str_tax_npc = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/npc.tsv",
+  features = paste0(dir, "features/example_features.tsv"),
+  library = paste0(dir, "libraries/sop/merged/keys.tsv"),
+  str_stereo = paste0(dir, "libraries/sop/merged/structure/stereo.tsv"),
+  str_met = paste0(dir, "libraries/sop/merged/structure/metadata.tsv"),
+  str_nam = paste0(dir, "libraries/sop/merged/structure/names.tsv"),
+  str_tax_cla = paste0(dir, "libraries/sop/merged/structure/taxonomies/classyfire.tsv"),
+  str_tax_npc = paste0(dir, "libraries/sop/merged/structure/taxonomies/npc.tsv"),
   adducts_list = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
   clusters_list = list(pos = c("H2O"), neg = c("H2O")),
   neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
