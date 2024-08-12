@@ -217,14 +217,12 @@ prepare_libraries_spectra <-
       mapply(
         export_spectra_rds,
         output_pos,
-        spectra_harmonized_pos,
-        nam_lib
+        spectra_harmonized_pos
       )
       mapply(
         export_spectra_rds,
         output_neg,
-        spectra_harmonized_neg,
-        nam_lib
+        spectra_harmonized_neg
       )
       rm(spectra_harmonized_pos, spectra_harmonized_neg)
     } else {
