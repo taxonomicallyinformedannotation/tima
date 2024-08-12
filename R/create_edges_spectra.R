@@ -160,10 +160,12 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     )
   }
 
-  export_params(
-    parameters = get_params(step = "create_edges_spectra"),
-    step = "create_edges_spectra"
-  )
+  try(expr = {
+    export_params(
+      parameters = get_params(step = "create_edges_spectra"),
+      step = "create_edges_spectra"
+    )
+  })
   export_output(x = edges, file = output[[1]])
   rm(edges)
 

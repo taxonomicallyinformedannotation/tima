@@ -189,11 +189,12 @@ prepare_libraries_sop_merged <-
         try to change it." = nrow(table_keys) != 0)
     }
 
-    log_debug(x = "Exporting ...")
-    export_params(
-      parameters = get_params(step = "prepare_libraries_sop_merged"),
-      step = "prepare_libraries_sop_merged"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "prepare_libraries_sop_merged"),
+        step = "prepare_libraries_sop_merged"
+      )
+    })
     export_output(x = table_keys, file = output_key)
     export_output(x = table_org_tax_ott, file = output_org_tax_ott)
     export_output(x = table_structures_stereo, file = output_str_stereo)

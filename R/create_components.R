@@ -77,11 +77,12 @@ create_components <-
       arrange(`cluster index`)
     rm(feature_source)
 
-    log_debug(x = "Exporting ...")
-    export_params(
-      parameters = get_params(step = "create_components"),
-      step = "create_components"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "create_components"),
+        step = "create_components"
+      )
+    })
     export_output(x = clusters_ready, file = output)
     rm(clusters_ready)
 

@@ -336,16 +336,20 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     paste0(time, "_", pattern)
   )
   final_output <- file.path(dir_time, output)
-  export_params(
-    parameters = get_params(step = "prepare_params"),
-    directory = dir_time,
-    step = "prepare_params"
-  )
-  export_params(
-    parameters = get_params(step = "prepare_params_advanced"),
-    directory = dir_time,
-    step = "prepare_params_advanced"
-  )
+  try(expr = {
+    export_params(
+      parameters = get_params(step = "prepare_params"),
+      directory = dir_time,
+      step = "prepare_params"
+    )
+  })
+  try(expr = {
+    export_params(
+      parameters = get_params(step = "prepare_params_advanced"),
+      directory = dir_time,
+      step = "prepare_params_advanced"
+    )
+  })
   export_output(x = results, file = final_output)
   rm(results)
 

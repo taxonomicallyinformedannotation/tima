@@ -278,11 +278,12 @@ prepare_taxa <-
       ))
     rm(biological_metadata, metadata_table_joined)
 
-    log_debug(x = "Exporting ...")
-    export_params(
-      parameters = get_params(step = "prepare_taxa"),
-      step = "prepare_taxa"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "prepare_taxa"),
+        step = "prepare_taxa"
+      )
+    })
     export_output(x = taxed_features_table, file = output)
     rm(taxed_features_table)
     return(output)

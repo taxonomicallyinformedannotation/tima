@@ -48,11 +48,12 @@ prepare_libraries_sop_closed <-
       closed_prepared <- fake_sop_columns()
     }
 
-    log_debug(x = "Exporting ...")
-    export_params(
-      parameters = get_params(step = "prepare_libraries_sop_closed"),
-      step = "prepare_libraries_sop_closed"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "prepare_libraries_sop_closed"),
+        step = "prepare_libraries_sop_closed"
+      )
+    })
     export_output(x = closed_prepared, file = output)
     rm(closed_prepared)
     return(output)
