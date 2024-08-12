@@ -111,7 +111,7 @@ import::from(tidytable, where, .into = environment())
 #' @param summarise Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
 #'
-#' @return NULL
+#' @return The path to the weighted annotations
 #'
 #' @export
 #'

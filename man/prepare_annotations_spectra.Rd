@@ -36,6 +36,9 @@ prepare_annotations_spectra(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The path to the prepared spectral annotations
+}
 \description{
 This function prepares the spectral matches
 obtained previously to make them compatible

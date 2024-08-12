@@ -9,6 +9,9 @@ get_params(step)
 \arguments{
 \item{step}{Name of the step being performed}
 }
+\value{
+The parameters
+}
 \description{
 This function gets the parameters for the job.
 Combination of cli and yaml parameters

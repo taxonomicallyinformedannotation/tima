@@ -30,7 +30,7 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @param table Table to split
 #'
-#' @return NULL
+#' @return A list of tables from the structure organism pairs tables
 #'
 #' @examples NULL
 split_tables_sop <- function(table) {

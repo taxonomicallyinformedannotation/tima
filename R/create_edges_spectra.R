@@ -44,7 +44,7 @@ import::from(tidytable, tidytable, .into = environment())
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param qutoff Intensity under which ms2 fragments will be removed.
 #'
-#' @return NULL
+#' @return The path to the created spectral edges
 #'
 #' @export
 #'

@@ -19,7 +19,7 @@ import::from(tidytable, select, .into = environment())
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
 #'
-#' @return NULL
+#' @return The path to the prepared feature table
 #'
 #' @export
 #'

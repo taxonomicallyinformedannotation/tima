@@ -32,7 +32,7 @@ import::from(tidytable, select, .into = environment())
 #' @param output Output file
 #' @param tolerance_rt Tolerance to filter retention time
 #'
-#' @return NULL
+#' @return The path to the filtered annotations
 #'
 #' @export
 #'

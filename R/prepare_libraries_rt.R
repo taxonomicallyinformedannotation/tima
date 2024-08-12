@@ -56,7 +56,7 @@ import::from(utils, URLencode, .into = environment())
 #' @param name_smiles Name of the SMILES in file
 #' @param unit_rt Unit of the retention time. Must be "seconds" or "minutes"
 #'
-#' @return NULL
+#' @return The path to the prepared retention time library
 #'
 #' @export
 #'

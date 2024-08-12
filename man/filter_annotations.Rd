@@ -24,6 +24,9 @@ filter_annotations(
 
 \item{tolerance_rt}{Tolerance to filter retention time}
 }
+\value{
+The path to the filtered annotations
+}
 \description{
 This function filters initial annotations.
 }

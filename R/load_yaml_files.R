@@ -12,7 +12,7 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @noRd
 #'
-#' @return NULL
+#' @return A list of loaded yaml files
 #'
 #' @examples NULL
 load_yaml_files <- function() {

@@ -20,7 +20,7 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #' @param pattern Pattern to identify the file to download
 #' @param path Path to save the file to
 #'
-#' @return NULL
+#' @return The path to the file
 #'
 #' @export
 #'

@@ -17,6 +17,9 @@ prepare_params(
 
 \item{step}{Step}
 }
+\value{
+The path to the yaml file containing prepared parameters
+}
 \description{
 This function prepares main parameters
 }

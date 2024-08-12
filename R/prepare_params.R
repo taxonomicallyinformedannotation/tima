@@ -15,7 +15,7 @@ import::from(yaml, write_yaml, .into = environment())
 #' @param params_advanced params_advanced
 #' @param step Step
 #'
-#' @return NULL
+#' @return The path to the yaml file containing prepared parameters
 #'
 #' @export
 #'

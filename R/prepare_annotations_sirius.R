@@ -41,7 +41,7 @@ import::from(utils, unzip, .into = environment())
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
-#' @return NULL
+#' @return The path to the prepared SIRIUS annotations
 #'
 #' @export
 #'

@@ -14,7 +14,7 @@ import::from(httr2, request, .into = environment())
 #' @param export File path where the file should be saved
 #' @param limit Timeout limit (in seconds)
 #'
-#' @return NULL
+#' @return The path to the file
 #'
 #' @export
 #'

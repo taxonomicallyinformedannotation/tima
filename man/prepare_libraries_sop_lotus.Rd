@@ -15,6 +15,9 @@ prepare_libraries_sop_lotus(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library LOTUS
+}
 \description{
 This function prepares the LOTUS structure-organism pairs
 }

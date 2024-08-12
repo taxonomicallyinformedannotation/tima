@@ -70,7 +70,7 @@ import::from(tidytable, where, .into = environment())
 #' @param taxon If you want to enforce all features to a given taxon,
 #'    put its name here.
 #'
-#' @return NULL
+#' @return The path to the prepared taxa
 #'
 #' @export
 #'

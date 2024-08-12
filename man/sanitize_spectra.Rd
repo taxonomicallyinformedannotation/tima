@@ -17,6 +17,9 @@ sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 
 \item{ppm}{PPM tolerance}
 }
+\value{
+The sanitized spectra
+}
 \description{
 This function sanitizes spectra
 }

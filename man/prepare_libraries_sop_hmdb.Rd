@@ -15,6 +15,9 @@ prepare_libraries_sop_hmdb(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library HMDB
+}
 \description{
 This function prepares the HMDB structure-organism pairs
 }

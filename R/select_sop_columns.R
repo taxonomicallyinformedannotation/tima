@@ -12,7 +12,7 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @param df Dataframe
 #'
-#' @return NULL
+#' @return The dataframe with selected structure organism pairs columns
 #'
 #' @examples NULL
 select_sop_columns <- function(df) {

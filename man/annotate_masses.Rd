@@ -66,7 +66,7 @@ annotate_masses(
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 }
 \value{
-A table containing MS1 annotations based on exact mass
+The path to the files containing MS1 annotations and edges
 }
 \description{
 This function annotates masses

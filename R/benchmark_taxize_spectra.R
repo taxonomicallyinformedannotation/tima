@@ -33,7 +33,7 @@ import::from(tidytable, slice_sample, .into = environment())
 #' @param org_tax_ott Taxonomy
 #' @param output Prepared features
 #'
-#' @return NULL
+#' @return The path to the taxed benchmark
 #'
 #' @examples NULL
 benchmark_taxize_spectra <-

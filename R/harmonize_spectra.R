@@ -45,7 +45,7 @@ import::from(tidytable, select, .into = environment())
 #' @param col_sy Name of the synonyms in mgf
 #' @param col_xl Name of the xlogp in mgf
 #'
-#' @return NULL
+#' @return The harmonized spectra
 #'
 #' @examples NULL
 harmonize_spectra <- function(spectra,

@@ -11,6 +11,9 @@ export_output(x, file = output)
 
 \item{file}{path to the output file}
 }
+\value{
+The path of the exported file
+}
 \description{
 This function creates the output directory
 if it doesn't exist and exports the data frame to a tab-delimited file.

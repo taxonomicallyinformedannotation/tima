@@ -16,6 +16,9 @@ prepare_features_components(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared features' components
+}
 \description{
 This function prepares the components
 (clusters in molecular network) for further use

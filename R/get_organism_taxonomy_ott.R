@@ -65,7 +65,7 @@ import::from(tidytable, where, .into = environment())
 #' @param url url of the ott api (for testing purposes)
 #' @param retry Boolean. Retry with generic epithet
 #'
-#' @return NULL
+#' @return The path to the obtained OTT taxonomy
 #'
 #' @export
 #'

@@ -31,7 +31,7 @@ import::from(tidytable, where, .into = environment())
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
-#' @return NULL
+#' @return The dataframe with annotation columns selected
 #'
 #' @examples NULL
 select_annotations_columns <- function(df,

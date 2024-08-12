@@ -200,6 +200,9 @@ match (should be lower than \verb{NPC class})}
 
 \item{force}{Force parameters. Use it at your own risk}
 }
+\value{
+The path to the weighted annotations
+}
 \description{
 This function weights annotations.
 }

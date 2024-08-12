@@ -21,6 +21,9 @@ prepare_features_edges(
 
 \item{name_target}{Name of the target features column}
 }
+\value{
+The path to the prepared edges
+}
 \description{
 This function prepares edges for further use
 }

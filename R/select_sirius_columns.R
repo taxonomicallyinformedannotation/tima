@@ -21,7 +21,7 @@ import::from(tidytable, select, .into = environment())
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
-#' @return NULL
+#' @return The dataframe with selected canopus columns
 #'
 #' @examples NULL
 select_sirius_columns_canopus <- function(df, sirius_version) {
@@ -70,7 +70,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
-#' @return NULL
+#' @return The dataframe with selected sirius columns
 #'
 #' @export
 #'
@@ -119,7 +119,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
-#' @return NULL
+#' @return The dataframe with selected structure columns
 #'
 #' @export
 #'

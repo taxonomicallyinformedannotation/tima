@@ -13,7 +13,7 @@
 #' @param mb_url MassBank URL
 #' @param mb_version MassBank version
 #'
-#' @return NULL
+#' @return The path to MassBank spectra
 #'
 #' @examples NULL
 get_massbank_spectra <-

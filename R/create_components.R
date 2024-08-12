@@ -35,7 +35,7 @@ import::from(tidytable, where, .into = environment())
 #' @param input Input file(s) containing edges
 #' @param output Output file.
 #'
-#' @return NULL
+#' @return The path to the created components
 #'
 #' @export
 #'

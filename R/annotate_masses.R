@@ -71,7 +71,7 @@ import::from(tidytable, where, .into = environment())
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 10 ppm
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
 #'
-#' @return A table containing MS1 annotations based on exact mass
+#' @return The path to the files containing MS1 annotations and edges
 #'
 #' @export
 #'
