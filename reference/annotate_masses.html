@@ -177,11 +177,11 @@ table is expected to be pre-formatted.</p>
 <span class="r-in"><span><span class="fu">annotate_masses</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"features/example_features.tsv"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  library <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/keys.tsv"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  str_stereo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structure/stereo.tsv"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  str_met <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structure/metadata.tsv"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  str_nam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structure/names.tsv"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  str_tax_cla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structure/taxonomies/classyfire.tsv"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  str_tax_npc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structure/taxonomies/npc.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_stereo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/stereo.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_met <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/metadata.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_nam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/names.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_tax_cla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_tax_npc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  adducts_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M+H]+"</span><span class="op">)</span>, neg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M-H]-"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  clusters_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H2O"</span><span class="op">)</span>, neg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H2O"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  neutral_losses_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C6H10O4 (methylpentose/desoxyhexose-H2O)"</span><span class="op">)</span>,</span></span>
@@ -189,9 +189,253 @@ table is expected to be pre-formatted.</p>
 <span class="r-in"><span>  tolerance_ppm <span class="op">=</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>  tolerance_rt <span class="op">=</span> <span class="fl">0.01</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>downloaded length 0 != reported length 14</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open URL 'https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/stereo.tsv': HTTP status was '404 Not Found'</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in download.file(file, tmpFile, method = method, mode = "wb", quiet = !showProgress):</span> cannot open URL 'https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/stereo.tsv'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.746131 filtering desired adducts and adding mz tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.7561 No previously attributed adducts detected </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.763182 calculating rt tolerance ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.764767 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.773756 adding delta mz tolerance for single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.778603 forming adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.826545 calculating delta mz for single charge adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.840629 joining within given delta mz tolerance (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.845441 joining within given delta mz tolerance (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.855403 keeping initial and destination feature </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.862305 joining with initial results (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.865313 joining with initial results (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.903774 joining within given mz tol to exact mass library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.917141 keeping unique exact masses and molecular formulas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.926872 joining exact masses with single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.926991 Geting back to M </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.930984 calculating multicharged and in source dimers </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940174 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940297 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940452 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940521 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940657 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940722 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940857 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.940955 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941135 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941242 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941395 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941462 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94159 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941654 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941784 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941851 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.941977 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942045 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942168 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942232 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942356 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942418 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94254 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942608 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942733 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942798 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942921 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.942987 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943112 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943175 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943297 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943359 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943481 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943546 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943666 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943753 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.943894 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94396 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944084 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944148 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94427 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94433 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944454 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944515 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944637 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94471 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944835 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.944906 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945031 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945096 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94522 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945285 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945406 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945468 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94559 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945653 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945775 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945837 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.945958 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94602 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946147 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946214 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946346 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946409 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946533 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946596 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946719 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946782 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946907 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.946968 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947092 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947156 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947281 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947344 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947469 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947531 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947651 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94773 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947862 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.947927 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948052 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948114 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948235 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948297 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94842 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948483 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948603 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948667 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94879 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94886 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.948989 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949055 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94918 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949246 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949372 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94944 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949567 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949636 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949761 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.949826 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.94996 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950025 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950155 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950224 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950348 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950414 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950539 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950603 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950725 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950788 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.950914 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95098 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951103 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951166 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951289 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951351 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951476 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951539 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951663 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951745 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951883 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.951948 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952075 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952141 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952264 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952331 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952455 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952521 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952645 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95271 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952832 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.952897 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95302 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953086 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953208 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953274 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953396 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953461 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953587 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953651 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953774 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953839 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.953964 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954029 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954151 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954214 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954335 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954399 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954521 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954583 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954713 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954782 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954907 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.954971 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955096 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955161 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955285 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955347 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955469 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955532 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955653 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955732 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955865 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.955928 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956051 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956118 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956249 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956315 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956446 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956512 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956632 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956695 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956817 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.956881 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957014 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95708 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957205 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957272 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957396 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957458 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957582 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957647 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957771 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957835 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.957954 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958018 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958137 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958201 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958321 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958385 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958507 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95857 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958694 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958757 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958879 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.958941 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.959063 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.959127 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.95925 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.959315 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.959438 Invalid adduct format </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.959502 Returning 0 instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.963658 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.966051 joining within given mz tol and filtering possible adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.978164 joining single adducts, in source dimers, and multicharged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.983287 adding chemical classification </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-12 14:27:51.995351 MS1 annotation led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> <span style="color: #00BB00;">annotations</span> , on </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> <span style="color: #0000BB;">features</span> </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/work/_temp/Library/timaparams/default/annotate_masses.yaml': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
