@@ -273,17 +273,13 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
       .keep_all = TRUE
     )
   annotation_table_2 <- annotation_table |>
-    select(
-      any_of(
-        c(
-          model$features_columns,
-          model$candidates_sirius_str_columns,
-          model$candidates_structures_columns
-        )
-      ),
-      -candidate_structure_error_mz,
-      -candidate_structure_error_rt
-    ) |>
+    select(any_of(
+      c(
+        model$features_columns,
+        model$candidates_sirius_str_columns,
+        model$candidates_structures_columns
+      )
+    ), -candidate_structure_error_mz, -candidate_structure_error_rt) |>
     filter(!is.na(candidate_score_sirius_csi)) |>
     distinct()
 
@@ -342,14 +338,14 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
       directory = dir_time,
       step = "prepare_params"
     )
-  })
+  }, silent = TRUE)
   try(expr = {
     export_params(
       parameters = get_params(step = "prepare_params_advanced"),
       directory = dir_time,
       step = "prepare_params_advanced"
     )
-  })
+  }, silent = TRUE)
   export_output(x = results, file = final_output)
   rm(results)
 

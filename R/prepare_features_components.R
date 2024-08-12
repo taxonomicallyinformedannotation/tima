@@ -45,7 +45,7 @@ prepare_features_components <-
         parameters = get_params(step = "prepare_features_components"),
         step = "prepare_features_components"
       )
-    })
+    }, silent = TRUE)
     export_output(x = table, file = output)
     rm(table)
 

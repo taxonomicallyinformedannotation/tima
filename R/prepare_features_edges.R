@@ -75,7 +75,7 @@ prepare_features_edges <-
         parameters = get_params(step = "prepare_features_edges"),
         step = "prepare_features_edges"
       )
-    })
+    }, silent = TRUE)
     export_output(x = edges_table_treated, file = output)
     rm(edges_table_treated)
 

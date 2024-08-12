@@ -93,6 +93,8 @@ annotate_masses(
   neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
   ms_mode = "pos",
   tolerance_ppm = 10,
-  tolerance_rt = 0.01
+  tolerance_rt = 0.01,
+  output_annotations = "output_annotations.tsv",
+  output_edges = "output_edges.tsv"
 )
 }

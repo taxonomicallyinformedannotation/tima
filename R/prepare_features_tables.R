@@ -50,7 +50,7 @@ prepare_features_tables <-
         parameters = get_params(step = "prepare_features_tables"),
         step = "prepare_features_tables"
       )
-    })
+    }, silent = TRUE)
     export_output(x = features_prepared, file = output)
     rm(features_prepared)
 

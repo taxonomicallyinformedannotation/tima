@@ -425,7 +425,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       parameters = get_params(step = "annotate_spectra"),
       step = "annotate_spectra"
     )
-  })
+  }, silent = TRUE)
   export_output(x = df_final, file = output[[1]])
   rm(df_final)
 

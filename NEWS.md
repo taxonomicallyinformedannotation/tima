@@ -2,7 +2,7 @@
 
 # tima 2.10.1
 
-* Clearer documentation
+* Improved documentation
 * Reduced dependencies
 * Removed `CompoundDb` dependency as it was causing too many issues
 * Removed `pak` install and switched to `r-universe`

@@ -108,7 +108,8 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
 
     edges <- edges |>
       select(
-        !!as.name(name_source) := "feature_id", !!as.name(name_target) := "target_id",
+        !!as.name(name_source) := "feature_id",
+        !!as.name(name_target) := "target_id",
         everything()
       )
 
@@ -154,7 +155,8 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     edges <- tidytable(
       !!as.name(name_source) := NA,
       "feature_spectrum_entropy" = NA,
-      "feature_spectrum_peaks" = NA, !!as.name(name_target) := NA,
+      "feature_spectrum_peaks" = NA,
+      !!as.name(name_target) := NA,
       "candidate_score_similarity" = NA,
       "candidate_count_similarity_peaks_matched" = NA
     )
@@ -165,7 +167,7 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
       parameters = get_params(step = "create_edges_spectra"),
       step = "create_edges_spectra"
     )
-  })
+  }, silent = TRUE)
   export_output(x = edges, file = output[[1]])
   rm(edges)
 

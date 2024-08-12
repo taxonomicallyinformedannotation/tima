@@ -126,7 +126,7 @@ filter_annotations <-
         parameters = get_params(step = "filter_annotations"),
         step = "filter_annotations"
       )
-    })
+    }, silent = TRUE)
     export_output(x = final_table, file = output[[1]])
 
     rm(final_table)

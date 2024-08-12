@@ -214,16 +214,8 @@ prepare_libraries_spectra <-
       }
       log_debug("Exporting")
       export_output(sop, file = output_sop)
-      mapply(
-        export_spectra_rds,
-        output_pos,
-        spectra_harmonized_pos
-      )
-      mapply(
-        export_spectra_rds,
-        output_neg,
-        spectra_harmonized_neg
-      )
+      mapply(export_spectra_rds, output_pos, spectra_harmonized_pos)
+      mapply(export_spectra_rds, output_neg, spectra_harmonized_neg)
       rm(spectra_harmonized_pos, spectra_harmonized_neg)
     } else {
       log_debug("Library already exists")
@@ -233,7 +225,7 @@ prepare_libraries_spectra <-
         parameters = get_params(step = "prepare_libraries_spectra"),
         step = "prepare_libraries_spectra"
       )
-    })
+    }, silent = TRUE)
 
     return(c(
       "pos" = output_pos,
