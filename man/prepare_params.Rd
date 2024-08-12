@@ -18,11 +18,11 @@ prepare_params(
 \item{step}{Step}
 }
 \value{
-The path to the yaml file containing prepared parameters
+The path to the yaml files containing prepared parameters
 }
 \description{
 This function prepares main parameters
 }
 \examples{
-NULL
+prepare_params()
 }
