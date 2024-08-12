@@ -27,7 +27,7 @@ import::from(tidytable, select, .into = environment())
 #' @param name_source Name of the source features column
 #' @param name_target Name of the target features column
 #'
-#' @return NULL
+#' @return The path to the prepared edges
 #'
 #' @export
 #'

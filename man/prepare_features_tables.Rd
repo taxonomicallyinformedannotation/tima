@@ -26,6 +26,9 @@ prepare_features_tables(
 
 \item{name_mz}{Name of the m/z column in the features data}
 }
+\value{
+The path to the prepared feature table
+}
 \description{
 This function prepares features
 }

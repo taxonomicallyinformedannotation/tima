@@ -36,6 +36,9 @@ prepare_annotations_gnps(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The path to the prepared GNPS annotations
+}
 \description{
 This function prepares GNPS obtained annotations
 }

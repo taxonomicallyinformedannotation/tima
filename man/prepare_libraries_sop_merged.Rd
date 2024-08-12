@@ -50,6 +50,9 @@ e.g. 'Gentianaceae|Apocynaceae'}
 
 \item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
 }
+\value{
+The path to the prepared structure-organism pairs library MERGED
+}
 \description{
 This function prepares the libraries made of
 all sub-libraries containing structure-organism pairs

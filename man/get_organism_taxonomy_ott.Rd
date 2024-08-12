@@ -17,6 +17,9 @@ get_organism_taxonomy_ott(
 
 \item{retry}{Boolean. Retry with generic epithet}
 }
+\value{
+The path to the obtained OTT taxonomy
+}
 \description{
 This function retrieves taxonomy
 from the Open Tree of Life taxonomy

@@ -6,7 +6,7 @@
 #'
 #' @noRd
 #'
-#' @return NULL
+#' @return The columns model
 #'
 #' @examples NULL
 columns_model <- function() {

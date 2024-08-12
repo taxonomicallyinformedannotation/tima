@@ -14,6 +14,9 @@ create_components(
 
 \item{output}{Output file.}
 }
+\value{
+The path to the created components
+}
 \description{
 This function create components from edges
 }

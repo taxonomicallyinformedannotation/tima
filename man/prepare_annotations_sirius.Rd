@@ -47,6 +47,9 @@ prepare_annotations_sirius(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The path to the prepared SIRIUS annotations
+}
 \description{
 This function prepares Sirius results to make them compatible
 }

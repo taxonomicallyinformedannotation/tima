@@ -34,7 +34,7 @@ import::from(Spectra, scalePeaks, .into = environment())
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
 #'
-#' @return NULL
+#' @return The sanitized spectra
 #'
 #' @export
 #'

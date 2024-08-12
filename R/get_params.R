@@ -15,7 +15,7 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @param step Name of the step being performed
 #'
-#' @return NULL
+#' @return The parameters
 #'
 #' @export
 #'

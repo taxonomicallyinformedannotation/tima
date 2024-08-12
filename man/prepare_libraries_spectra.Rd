@@ -67,6 +67,9 @@ prepare_libraries_spectra(
 
 \item{polarity}{MS polarity}
 }
+\value{
+The path to the prepared spectral library
+}
 \description{
 This function prepares spectra
 to be used for spectral matching

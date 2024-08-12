@@ -15,6 +15,9 @@ prepare_libraries_sop_ecmdb(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library ECMDB
+}
 \description{
 Prepare libraries of structure organism pairs ECMDB
 }

@@ -21,7 +21,7 @@ import::from(tidytable, filter, .into = environment())
 #' @param score_bio_min Minimal biological score. Current default to 0.85.
 #' @param score_ini_min Minimal initial score. Current default to 0.75.
 #'
-#' @return NULL
+#' @return A dataframe containing only high confidence annotations
 #'
 #' @examples NULL
 filter_high_confidence_only <-

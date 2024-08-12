@@ -45,7 +45,7 @@ import::from(tidytable, tidytable, .into = environment())
 #' @param col_sy Name of the synonyms in mgf
 #' @param col_xl Name of the xlogp in mgf
 #'
-#' @return NULL
+#' @return The path to the prepared spectral library
 #'
 #' @export
 #'

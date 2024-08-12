@@ -47,6 +47,9 @@ prepare_libraries_rt(
 
 \item{unit_rt}{Unit of the retention time. Must be "seconds" or "minutes"}
 }
+\value{
+The path to the prepared retention time library
+}
 \description{
 This function prepares retention times libraries
 to be used for later

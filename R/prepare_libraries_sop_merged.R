@@ -48,7 +48,7 @@ import::from(tidytable, where, .into = environment())
 #' @param output_str_tax_cla Output file for structures taxonomy (Classyfire)
 #' @param output_str_tax_npc Output file for structures taxonomy (NPC)
 #'
-#' @return NULL
+#' @return The path to the prepared structure-organism pairs library MERGED
 #'
 #' @export
 #'

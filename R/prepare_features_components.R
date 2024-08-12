@@ -18,7 +18,7 @@ import::from(tidytable, select, .into = environment())
 #' @param input Input file
 #' @param output Output file
 #'
-#' @return NULL
+#' @return The path to the prepared features' components
 #'
 #' @export
 #'

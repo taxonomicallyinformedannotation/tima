@@ -12,7 +12,7 @@ import::from(crayon, green, .into = environment())
 #' @param x data frame to be exported
 #' @param file path to the output file
 #'
-#' @return NULL
+#' @return The path of the exported file
 #'
 #' @export
 #'

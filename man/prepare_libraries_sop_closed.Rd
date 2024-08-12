@@ -16,6 +16,9 @@ prepare_libraries_sop_closed(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library CLOSED
+}
 \description{
 Prepare libraries of structure organism pairs CLOSED
 }

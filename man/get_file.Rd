@@ -13,6 +13,9 @@ get_file(url, export, limit = 3600)
 
 \item{limit}{Timeout limit (in seconds)}
 }
+\value{
+The path to the file
+}
 \description{
 This function get files
 }

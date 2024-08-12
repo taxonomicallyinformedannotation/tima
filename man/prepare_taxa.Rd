@@ -41,6 +41,9 @@ prepare_taxa(
 \item{taxon}{If you want to enforce all features to a given taxon,
 put its name here.}
 }
+\value{
+The path to the prepared taxa
+}
 \description{
 This function performs taxon name preparation
 to match the Open Tree of Life taxonomy
