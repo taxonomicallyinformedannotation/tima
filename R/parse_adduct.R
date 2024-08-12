@@ -19,7 +19,8 @@ import::from(stringi, stri_split_regex, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples parse_adduct("[M+H]+")
+#' parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")
 parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?") {
   ## Full match
   matches <- stri_match_all_regex(str = adduct_string, pattern = regex)[[1]]
