@@ -121,10 +121,12 @@ filter_annotations <-
       features_annotated_table_2
     )
 
-    export_params(
-      parameters = get_params(step = "filter_annotations"),
-      step = "filter_annotations"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "filter_annotations"),
+        step = "filter_annotations"
+      )
+    })
     export_output(x = final_table, file = output[[1]])
 
     rm(final_table)

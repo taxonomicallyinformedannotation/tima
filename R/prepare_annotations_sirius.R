@@ -271,11 +271,12 @@ prepare_annotations_sirius <-
       distinct()
     rm(table)
 
-    log_debug(x = "Exporting ...")
-    export_params(
-      parameters = get_params(step = "prepare_annotations_sirius"),
-      step = "prepare_annotations_sirius"
-    )
+    try(expr = {
+      export_params(
+        parameters = get_params(step = "prepare_annotations_sirius"),
+        step = "prepare_annotations_sirius"
+      )
+    })
     export_output(x = table_can, file = output_can)
     export_output(x = table_for, file = output_for)
     export_output(x = table_str, file = output_ann[[1]])
