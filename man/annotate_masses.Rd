@@ -76,25 +76,5 @@ or \code{neg} and retention time and mass tolerances should be given. The featur
 table is expected to be pre-formatted.
 }
 \examples{
-github <- "https://raw.githubusercontent.com/"
-repo <- "taxonomicallyinformedannotation/tima-example-files/"
-data_interim <- "main/data/interim/"
-dir <- paste0(github, repo, data_interim)
-annotate_masses(
-  features = paste0(dir, "features/example_features.tsv"),
-  library = paste0(dir, "libraries/sop/merged/keys.tsv"),
-  str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
-  str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-  str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
-  str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
-  str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv"),
-  adducts_list = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
-  clusters_list = list(pos = c("H2O"), neg = c("H2O")),
-  neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
-  ms_mode = "pos",
-  tolerance_ppm = 10,
-  tolerance_rt = 0.01,
-  output_annotations = "output_annotations.tsv",
-  output_edges = "output_edges.tsv"
-)
+NULL
 }
