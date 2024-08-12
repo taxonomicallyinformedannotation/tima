@@ -659,12 +659,12 @@ annotate_masses <-
     )
     rm(df_nl, df_add)
 
-    try(expr = {
+    tryCatch(expr = {
       export_params(
         parameters = get_params(step = "annotate_masses"),
         step = "annotate_masses"
       )
-    }, silent = TRUE)
+    }, error = function(e) {})
     export_output(x = edges, file = output_edges[[1]])
     export_output(x = df_final, file = output_annotations[[1]])
 
