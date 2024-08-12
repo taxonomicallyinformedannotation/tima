@@ -17,7 +17,7 @@ import::from(tidytable, tidytable, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable tidytable
 #'
-#' @include export_spectra_2.R
+#' @include export_spectra_rds.R
 #' @include extract_spectra.R
 #' @include get_default_paths.R
 #' @include get_params.R
@@ -215,13 +215,13 @@ prepare_libraries_spectra <-
       log_debug("Exporting")
       export_output(sop, file = output_sop)
       mapply(
-        export_spectra_2,
+        export_spectra_rds,
         output_pos,
         spectra_harmonized_pos,
         nam_lib
       )
       mapply(
-        export_spectra_2,
+        export_spectra_rds,
         output_neg,
         spectra_harmonized_neg,
         nam_lib

@@ -26,6 +26,8 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @include clean_collapse.R
 #'
+#' @noRd
+#'
 #' @param df Data frame with structural metadata to be complemented
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata

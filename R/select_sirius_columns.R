@@ -65,6 +65,8 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @include harmonize_names_sirius.R
 #'
+#' @noRd
+#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
@@ -111,6 +113,8 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #' @description This function selects sirius columns (structures)
 #'
 #' @importFrom tidytable any_of distinct mutate select
+#'
+#' @noRd
 #'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
