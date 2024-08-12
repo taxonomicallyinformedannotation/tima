@@ -70,12 +70,12 @@ prepare_features_edges <-
       mutate(feature_target := coalesce(feature_target, feature_source))
     rm(edges_ms1, edges_ms2, features_entropy)
 
-    try(expr = {
+    tryCatch(expr = {
       export_params(
         parameters = get_params(step = "prepare_features_edges"),
         step = "prepare_features_edges"
       )
-    }, silent = TRUE)
+    }, error = function(e) {})
     export_output(x = edges_table_treated, file = output)
     rm(edges_table_treated)
 
