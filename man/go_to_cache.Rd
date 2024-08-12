@@ -16,5 +16,5 @@ Goes to cache
 This function goes to cache
 }
 \examples{
-NULL
+go_to_cache()
 }

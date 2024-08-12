@@ -22,7 +22,11 @@ import::from(tidytable, where, .into = environment())
 
 #' @title Annotate masses
 #'
-#' @description This function annotates masses
+#' @description This function annotates a feature table based on exact mass
+#' match. It requires a structural library, its metadata, and lists of adducts,
+#' clusters, and neutral losses to be considered. The polarity has to be `pos`
+#' or `neg` and retention time and mass tolerances should be given. The feature
+#' table is expected to be pre-formatted.
 #'
 #' @importFrom dplyr join_by
 #' @importFrom MetaboCoreUtils calculateMass
@@ -75,7 +79,21 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples annotate_masses(
+#'   features = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/features/example_features.tsv",
+#'   library = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/keys.tsv",
+#'   str_stereo = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/stereo.tsv",
+#'   str_met = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/metadata.tsv",
+#'   str_nam = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/names.tsv",
+#'   str_tax_cla = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/classyfire.tsv",
+#'   str_tax_npc = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/npc.tsv",
+#'   adducts_list = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
+#'   clusters_list = list(pos = c("H2O"), neg = c("H2O")),
+#'   neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
+#'   ms_mode = "pos",
+#'   tolerance_ppm = 10,
+#'   tolerance_rt = 0.01
+#' )
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
            output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,
@@ -556,8 +574,7 @@ annotate_masses <-
       ) |>
       select(structure_molecular_formula,
         library = library_name,
-        everything(),
-        -exact_mass,
+        everything(), -exact_mass,
       ) |>
       filter(!(library %in% forbidden_adducts)) |>
       mutate(library = as.character(library)) |>
@@ -618,16 +635,14 @@ annotate_masses <-
       df_add |>
         mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
         select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         distinct(),
       df_nl |>
         mutate(label = paste0(loss, " loss")) |>
         select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         distinct()

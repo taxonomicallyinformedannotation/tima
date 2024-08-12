@@ -19,7 +19,7 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples get_params(step = "prepare_params")
 get_params <- function(step) {
   paths <- get_default_paths()
   steps <-

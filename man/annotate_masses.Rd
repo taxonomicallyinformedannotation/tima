@@ -69,8 +69,26 @@ annotate_masses(
 The path to the files containing MS1 annotations and edges
 }
 \description{
-This function annotates masses
+This function annotates a feature table based on exact mass
+match. It requires a structural library, its metadata, and lists of adducts,
+clusters, and neutral losses to be considered. The polarity has to be \code{pos}
+or \code{neg} and retention time and mass tolerances should be given. The feature
+table is expected to be pre-formatted.
 }
 \examples{
-NULL
+annotate_masses(
+  features = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/features/example_features.tsv",
+  library = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/keys.tsv",
+  str_stereo = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/stereo.tsv",
+  str_met = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/metadata.tsv",
+  str_nam = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/names.tsv",
+  str_tax_cla = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/classyfire.tsv",
+  str_tax_npc = "https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima-example-files/main/data/interim/libraries/sop/merged/structure/taxonomies/npc.tsv",
+  adducts_list = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
+  clusters_list = list(pos = c("H2O"), neg = c("H2O")),
+  neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
+  ms_mode = "pos",
+  tolerance_ppm = 10,
+  tolerance_rt = 0.01
+)
 }

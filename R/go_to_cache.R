@@ -14,7 +14,7 @@ import::from(fs, path_home, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples go_to_cache()
 go_to_cache <- function(dir = ".tima") {
   cache <- path_home(dir)
   dir_create(cache)

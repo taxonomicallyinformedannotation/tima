@@ -22,5 +22,5 @@ install(
 This function runs some required install
 }
 \examples{
-NULL
+install()
 }

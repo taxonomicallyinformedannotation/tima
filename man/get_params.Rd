@@ -17,5 +17,5 @@ This function gets the parameters for the job.
 Combination of cli and yaml parameters
 }
 \examples{
-NULL
+get_params(step = "prepare_params")
 }
