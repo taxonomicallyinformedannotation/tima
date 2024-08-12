@@ -17,13 +17,11 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/annotate_masses.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/annotate_spectra.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/calculate_mass_of_m.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/complement_metadata_structures.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/create_components.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/create_dir.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/create_edges_spectra.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/export_output.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/export_spectra.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/export_spectra_2.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/export_spectra_rds.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/extract_spectra.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/filter_annotations.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_default_paths.html</loc></url>
@@ -54,8 +52,6 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_taxa.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/run_app.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/sanitize_spectra.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/select_sirius_columns_formulas.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/select_sirius_columns_structures.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/tima-package.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/tima_full.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/weight_annotations.html</loc></url>
