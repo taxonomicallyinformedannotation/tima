@@ -24,7 +24,11 @@ tar_option_set(
 # to allow use_targets() to configure tar_make_future() options.
 
 # Run the R scripts in the R/ folder with your custom functions:
-tar_source(files = system.file("R", package = "tima"))
+tar_source(files = list.files(
+  path = system.file("R", package = "tima"),
+  pattern = ".R$",
+  full.names = TRUE
+))
 
 # Replace the target list below with your own:
 list(
