@@ -106,7 +106,7 @@ prepare_libraries_sop_ecmdb <-
         parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
         step = "prepare_libraries_sop_closed"
       )
-    })
+    }, silent = TRUE)
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
     return(output)

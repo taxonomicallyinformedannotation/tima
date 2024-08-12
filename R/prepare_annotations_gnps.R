@@ -105,7 +105,7 @@ prepare_annotations_gnps <-
         parameters = get_params(step = "prepare_annotations_gnps"),
         step = "prepare_annotations_gnps"
       )
-    })
+    }, silent = TRUE)
     export_output(x = table, file = output[[1]])
     rm(table)
     return(output[[1]])

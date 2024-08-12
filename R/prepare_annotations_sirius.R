@@ -233,9 +233,7 @@ prepare_annotations_sirius <-
           candidate_score_sirius_msnovelist = NA
         ) |>
         select(
-          -candidate_structure_error_rt,
-          -candidate_score_similarity,
-          -candidate_count_similarity_peaks_matched
+          -candidate_structure_error_rt, -candidate_score_similarity, -candidate_count_similarity_peaks_matched
         )
     }
     log_debug("Splitting SIRIUS results")
@@ -276,7 +274,7 @@ prepare_annotations_sirius <-
         parameters = get_params(step = "prepare_annotations_sirius"),
         step = "prepare_annotations_sirius"
       )
-    })
+    }, silent = TRUE)
     export_output(x = table_can, file = output_can)
     export_output(x = table_for, file = output_for)
     export_output(x = table_str, file = output_ann[[1]])

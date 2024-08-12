@@ -53,7 +53,7 @@ prepare_libraries_sop_closed <-
         parameters = get_params(step = "prepare_libraries_sop_closed"),
         step = "prepare_libraries_sop_closed"
       )
-    })
+    }, silent = TRUE)
     export_output(x = closed_prepared, file = output)
     rm(closed_prepared)
     return(output)

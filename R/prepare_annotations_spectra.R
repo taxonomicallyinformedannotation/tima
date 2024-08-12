@@ -86,7 +86,7 @@ prepare_annotations_spectra <-
         parameters = get_params(step = "prepare_annotations_spectra"),
         step = "prepare_annotations_spectra"
       )
-    })
+    }, silent = TRUE)
     export_output(x = table, file = output[[1]])
     rm(table)
 

@@ -97,7 +97,9 @@ import::from(tidytable, where, .into = environment())
 #'   neutral_losses_list = c("C6H10O4 (methylpentose/desoxyhexose-H2O)"),
 #'   ms_mode = "pos",
 #'   tolerance_ppm = 10,
-#'   tolerance_rt = 0.01
+#'   tolerance_rt = 0.01,
+#'   output_annotations = "output_annotations.tsv",
+#'   output_edges = "output_edges.tsv"
 #' )
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
@@ -579,7 +581,8 @@ annotate_masses <-
       ) |>
       select(structure_molecular_formula,
         library = library_name,
-        everything(), -exact_mass,
+        everything(),
+        -exact_mass,
       ) |>
       filter(!(library %in% forbidden_adducts)) |>
       mutate(library = as.character(library)) |>
@@ -640,14 +643,16 @@ annotate_masses <-
       df_add |>
         mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
         select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         distinct(),
       df_nl |>
         mutate(label = paste0(loss, " loss")) |>
         select(
-          !!as.name(name_source) := feature_id, !!as.name(name_target) := feature_id_dest,
+          !!as.name(name_source) := feature_id,
+          !!as.name(name_target) := feature_id_dest,
           label
         ) |>
         distinct()
@@ -659,7 +664,7 @@ annotate_masses <-
         parameters = get_params(step = "annotate_masses"),
         step = "annotate_masses"
       )
-    })
+    }, silent = TRUE)
     export_output(x = edges, file = output_edges[[1]])
     export_output(x = df_final, file = output_annotations[[1]])
 

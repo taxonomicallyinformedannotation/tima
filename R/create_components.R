@@ -82,7 +82,7 @@ create_components <-
         parameters = get_params(step = "create_components"),
         step = "create_components"
       )
-    })
+    }, silent = TRUE)
     export_output(x = clusters_ready, file = output)
     rm(clusters_ready)
 
