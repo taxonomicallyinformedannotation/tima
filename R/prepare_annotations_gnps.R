@@ -100,12 +100,11 @@ prepare_annotations_gnps <-
       log_debug("No GNPS annotations found, returning an empty file instead")
       table <- fake_annotations_columns()
     }
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_annotations_gnps"),
-        step = "prepare_annotations_gnps"
-      )
-    }, error = function(e) {})
+
+    export_params(
+      parameters = get_params(step = "prepare_annotations_gnps"),
+      step = "prepare_annotations_gnps"
+    )
     export_output(x = table, file = output[[1]])
     rm(table)
     return(output[[1]])

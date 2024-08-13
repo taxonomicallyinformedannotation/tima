@@ -40,12 +40,10 @@ prepare_features_components <-
       select(feature_id = `cluster index`, component_id = componentindex) |>
       distinct()
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_features_components"),
-        step = "prepare_features_components"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "prepare_features_components"),
+      step = "prepare_features_components"
+    )
     export_output(x = table, file = output)
     rm(table)
 

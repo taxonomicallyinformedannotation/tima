@@ -101,12 +101,10 @@ prepare_libraries_sop_ecmdb <-
       ecmdb_prepared <- fake_sop_columns()
     }
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
-        step = "prepare_libraries_sop_closed"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
+      step = "prepare_libraries_sop_closed"
+    )
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
     return(output)
