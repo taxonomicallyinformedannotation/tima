@@ -77,9 +77,10 @@ table is expected to be pre-formatted.
 }
 \examples{
 github <- "https://raw.githubusercontent.com/"
-repo <- "taxonomicallyinformedannotation/tima-example-files/"
-data_interim <- "main/data/interim/"
-dir <- paste0(github, repo, data_interim)
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+data_interim <- "data/interim/"
+dir <- paste0(github, repo)
+dir <- paste0(dir, data_interim)
 annotate_masses(
   features = paste0(dir, "features/example_features.tsv"),
   library = paste0(dir, "libraries/sop/merged/keys.tsv"),
