@@ -3,16 +3,12 @@
 #' @description This function harmonizes the names of Sirius
 #'    outputs to make them compatible
 #'
-#' @export
-#'
-#' @noRd
-#'
 #' @param x Character string containing a name
 #'
 #' @return Character string with the name modified according
 #'    to the rules specified in the function
 #'
-#' @examples harmonized_name <- harmonize_names_sirius("My_name")
+#' @examples harmonized_name <- tima:::harmonize_names_sirius("My_name")
 harmonize_names_sirius <- function(x) {
   ## Remove everything up to and including the last underscore from the name
   harmonized_name <- gsub(

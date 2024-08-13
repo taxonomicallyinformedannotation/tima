@@ -2,10 +2,6 @@
 #'
 #' @description Simple helper for debugging between pipes
 #'
-#' @export
-#'
-#' @noRd
-#'
 #' @param x value for the pipe
 #' @param ... one or more values to be logged
 #'

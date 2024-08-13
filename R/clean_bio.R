@@ -23,8 +23,6 @@ import::from(tidytable, where, .into = environment())
 #' @description This function cleans the results
 #'    obtained after biological weighting
 #'
-#' @export
-#'
 #' @importFrom stats setNames
 #' @importFrom tidytable across
 #' @importFrom tidytable add_count
@@ -45,7 +43,7 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable ungroup
 #' @importFrom tidytable where
 #'
-#' @noRd
+#' @include log_pipe.R
 #'
 #' @param annot_table_wei_bio Table containing your
 #'    biologically weighted annotation

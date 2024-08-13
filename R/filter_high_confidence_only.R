@@ -8,14 +8,10 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @description This function filters highly confident annotations only.
 #'
-#' @export
-#'
 #' @importFrom crayon blue
 #' @importFrom crayon green
 #' @importFrom crayon red
 #' @importFrom tidytable filter
-#'
-#' @noRd
 #'
 #' @param df Dataframe
 #' @param score_bio_min Minimal biological score. Current default to 0.85.

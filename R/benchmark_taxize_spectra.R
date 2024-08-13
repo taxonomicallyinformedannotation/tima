@@ -14,8 +14,6 @@ import::from(tidytable, slice_sample, .into = environment())
 #'
 #' @details Because they are still quite dirty
 #'
-#' @export
-#'
 #' @importFrom stringi stri_sub
 #' @importFrom tidytable bind_rows
 #' @importFrom tidytable distinct
@@ -25,8 +23,6 @@ import::from(tidytable, slice_sample, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable select
 #' @importFrom tidytable slice_sample
-#'
-#' @noRd
 #'
 #' @param input Initial features
 #' @param keys SOP keys

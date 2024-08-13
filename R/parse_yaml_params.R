@@ -4,11 +4,7 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @description This function parses YAML parameters
 #'
-#' @export
-#'
 #' @importFrom yaml read_yaml
-#'
-#' @noRd
 #'
 #' @param def Default path
 #' @param usr User path

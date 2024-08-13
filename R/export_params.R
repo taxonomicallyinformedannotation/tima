@@ -6,14 +6,10 @@ import::from(yaml, write_yaml, .into = environment())
 #' @description This function writes the parameters
 #'    to a YAML file in the specified directory.
 #'
-#' @export
-#'
 #' @importFrom crayon green
 #' @importFrom yaml write_yaml
 #'
 #' @include get_default_paths.R
-#'
-#' @noRd
 #'
 #' @param parameters list of parameters to be exported
 #' @param directory directory where the YAML file will be saved

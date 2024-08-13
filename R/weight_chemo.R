@@ -12,8 +12,6 @@ import::from(tidytable, select, .into = environment())
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
-#' @export
-#'
 #' @importFrom stringi stri_detect_regex
 #' @importFrom tidytable contains
 #' @importFrom tidytable distinct
@@ -22,8 +20,7 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable mutate
 #' @importFrom tidytable right_join
 #' @importFrom tidytable select
-#'
-#' @noRd
+#' @include log_pipe.R
 #'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation

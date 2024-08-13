@@ -7,14 +7,10 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @description This function outputs information about MS1 annotation
 #'
-#' @export
-#'
 #' @importFrom crayon blue
 #' @importFrom crayon green
 #' @importFrom tidytable distinct
 #' @importFrom tidytable filter
-#'
-#' @noRd
 #'
 #' @param annotation_table_ms1 Table to decorate
 #'

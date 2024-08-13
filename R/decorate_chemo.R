@@ -12,8 +12,6 @@ import::from(tidytable, filter, .into = environment())
 #'
 #' @description This function outputs information about chemical weighting
 #'
-#' @export
-#'
 #' @importFrom crayon blue
 #' @importFrom crayon cyan
 #' @importFrom crayon green
@@ -23,8 +21,6 @@ import::from(tidytable, filter, .into = environment())
 #' @importFrom crayon yellow
 #' @importFrom tidytable distinct
 #' @importFrom tidytable filter
-#'
-#' @noRd
 #'
 #' @param annot_table_wei_chemo Table to decorate
 #' @param score_chemical_cla_kingdom  Classyfire kingdom score

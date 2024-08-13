@@ -11,8 +11,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @description This function harmonizes spectra headers
 #'
-#' @export
-#'
 #' @importFrom tidytable any_of
 #' @importFrom tidytable as_tidytable
 #' @importFrom tidytable filter
@@ -21,8 +19,6 @@ import::from(tidytable, select, .into = environment())
 #' @importFrom tidytable pivot_wider
 #' @importFrom tidytable row_number
 #' @importFrom tidytable select
-#'
-#' @noRd
 #'
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library

@@ -7,11 +7,7 @@ import::from(stats, as.dist, .into = environment())
 #'
 #' @details Credit goes to usedist package
 #'
-#' @export
-#'
 #' @importFrom stats as.dist
-#'
-#' @noRd
 #'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element
@@ -43,12 +39,8 @@ import::from(utils, combn, .into = environment())
 #'
 #' @description This function gets distances per group
 #'
-#' @export
-#'
 #' @importFrom stats as.dist
 #' @importFrom utils combn
-#'
-#' @noRd
 #'
 #' @param d A distance object
 #' @param g A grouping vector for the distance object

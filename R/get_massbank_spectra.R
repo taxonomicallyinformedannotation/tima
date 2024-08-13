@@ -2,11 +2,7 @@
 #'
 #' @description This function gets MassBank spectra
 #'
-#' @export
-#'
 #' @include get_default_paths.R
-#'
-#' @noRd
 #'
 #' @param output_dir Output where to store the spectra
 #' @param mb_file MassBank file

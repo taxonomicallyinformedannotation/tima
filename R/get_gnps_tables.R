@@ -9,8 +9,6 @@ import::from(stringi, stri_length, .into = environment())
 #'
 #' @description This function gets GNPS tables from corresponding job ID.
 #'
-#' @export
-#'
 #' @importFrom httr2 req_error
 #' @importFrom httr2 req_method
 #' @importFrom httr2 req_perform
@@ -20,8 +18,6 @@ import::from(stringi, stri_length, .into = environment())
 #'
 #' @include get_default_paths.R
 #' @include get_file.R
-#'
-#' @noRd
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example

@@ -41,5 +41,9 @@ This function create edges
 based on fragmentation spectra similarity
 }
 \examples{
-NULL
+get_file(
+  url = get_default_paths()$urls$examples$spectra_mini,
+  export = get_params(step = "create_edges_spectra")$files$spectral$raw
+)
+create_edges_spectra()
 }

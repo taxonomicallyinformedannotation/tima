@@ -24,8 +24,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return Data frame containing spectra data
 #'
-#' @export
-#'
 #' @examples NULL
 extract_spectra <- function(object) {
   ## issues

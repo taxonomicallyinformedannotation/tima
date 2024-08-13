@@ -5,14 +5,10 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @description This function replaces the default ID
 #'    in the example by a user-specified one
 #'
-#' @export
-#'
 #' @importFrom stringi stri_replace_all_regex
 #'
 #' @include get_default_paths.R
 #' @include get_params.R
-#'
-#' @noRd
 #'
 #' @param x a character string containing the default ID
 #' @param user_filename a user-specified value for a file name job ID
@@ -23,7 +19,7 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'    to the rules specified in the function
 #'
 #' @examples
-#' replace_id(
+#' tima:::replace_id(
 #'   x = "example/123456_features.tsv",
 #'   user_gnps = NULL,
 #'   user_filename = "Foo"

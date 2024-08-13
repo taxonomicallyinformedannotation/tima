@@ -55,6 +55,7 @@ import::from(tidytable, where, .into = environment())
 #' @include dist_groups.R
 #' @include get_params.R
 #' @include harmonize_adducts.R
+#' @include log_pipe.R
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
