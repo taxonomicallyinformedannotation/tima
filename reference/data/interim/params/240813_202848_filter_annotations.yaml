@@ -1,0 +1,18 @@
+files:
+  annotations:
+    filtered: data/interim/annotations/example_annotationsFiltered.tsv.gz
+    prepared:
+      structural:
+        gnps: data/interim/annotations/example_gnpsPrepared.tsv.gz
+        ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
+        sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
+        spectral: data/interim/annotations/example_spectralMatchesPrepared.tsv.gz
+  features:
+    prepared: data/interim/features/example_features.tsv.gz
+  libraries:
+    temporal:
+      prepared: data/interim/libraries/rt/prepared.tsv.gz
+ms:
+  tolerances:
+    rt:
+      library: 0.1

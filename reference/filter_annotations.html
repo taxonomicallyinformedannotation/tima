@@ -93,8 +93,47 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
+<span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
+<span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"filter_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">structural</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"filter_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rts</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"filter_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">temporal</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">annotations</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">annotations</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_ms1Prepared.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">features</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">features</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_features.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">rts</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">rts</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.069244 Directory data/interim/libraries/rt created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/rt/prepared.tsv"</span>
+<span class="r-in"><span><span class="fu">filter_annotations</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  annotations <span class="op">=</span> <span class="va">annotations</span>,</span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="va">features</span>,</span></span>
+<span class="r-in"><span>  rts <span class="op">=</span> <span class="va">rts</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.172378 ... features </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.173486 ... annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.175422 ... retention times </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.178725 Filtering annotations outside of 0.1 minutes tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.204905 <span style="color: #00BB00;">0</span> Candidates were removed based on retention time. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.208141 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:28:48.252823 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_annotationsFiltered.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_annotationsFiltered.tsv.gz"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
