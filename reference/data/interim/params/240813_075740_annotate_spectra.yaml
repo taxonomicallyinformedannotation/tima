@@ -1,0 +1,32 @@
+annotations:
+  ms2approx: no
+  thresholds:
+    ms2:
+      similarity:
+        annotation: 0.0
+files:
+  annotations:
+    raw:
+      spectral:
+        spectral: data/interim/annotations/example_spectralMatches.tsv.gz
+  libraries:
+    spectral:
+      neg:
+      - data/interim/libraries/spectra/exp/massbank_neg.rds
+      - data/interim/libraries/spectra/is/lotus_neg.rds
+      pos:
+      - data/interim/libraries/spectra/exp/massbank_pos.rds
+      - data/interim/libraries/spectra/is/lotus_pos.rds
+  spectral:
+    raw: data/source/example_spectra.mgf
+ms:
+  thresholds:
+    ms2:
+      intensity: 5
+  polarity: pos
+  tolerances:
+    mass:
+      ppm:
+        ms2: 10
+      dalton:
+        ms2: 0.01
