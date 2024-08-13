@@ -1,0 +1,7 @@
+files:
+  networks:
+    spectral:
+      edges:
+        prepared: data/interim/features/example_edges.tsv
+      components:
+        raw: data/interim/features/example_components.tsv
