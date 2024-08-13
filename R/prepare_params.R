@@ -11,6 +11,8 @@ import::from(yaml, write_yaml, .into = environment())
 #' @include get_params.R
 #' @include load_yaml_files.R
 #'
+#' @noRd
+#'
 #' @param params_small params_small
 #' @param params_advanced params_advanced
 #' @param step Step
@@ -19,7 +21,7 @@ import::from(yaml, write_yaml, .into = environment())
 #'
 #' @export
 #'
-#' @examples prepare_params()
+#' @examples NULL
 prepare_params <- function(params_small = get_params(step = "prepare_params"),
                            params_advanced = get_params(step = "prepare_params_advanced"),
                            step = NA) {

@@ -13,13 +13,15 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #'
+#' @noRd
+#'
 #' @param step Name of the step being performed
 #'
 #' @return The parameters
 #'
 #' @export
 #'
-#' @examples get_params(step = "prepare_params")
+#' @examples NULL
 get_params <- function(step) {
   paths <- get_default_paths()
   steps <-
