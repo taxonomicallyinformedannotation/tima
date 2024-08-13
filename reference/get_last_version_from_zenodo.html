@@ -86,8 +86,13 @@ https://inbo.github.io/inborutils/</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_last_version_from_zenodo</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  doi <span class="op">=</span> <span class="st">"10.5281/zenodo.5794106"</span>,</span></span>
+<span class="r-in"><span>  pattern <span class="op">=</span> <span class="st">"frozen.csv.gz"</span>,</span></span>
+<span class="r-in"><span>  path <span class="op">=</span> <span class="st">"frozen.csv.gz"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading 230106_frozen.csv.gz from https://doi.org/10.5281/zenodo.5794106 (The LOTUS Initiative for Open Natural Products Research: frozen dataset union wikidata (with metadata); unique identifier: https://doi.org/10.5281/zenodo.7534071)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "frozen.csv.gz"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

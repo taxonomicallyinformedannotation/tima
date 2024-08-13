@@ -73,8 +73,617 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_default_paths</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $base_dir</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "./"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$annotations$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$annotations$example_sirius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$annotations$example_sirius$v5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_sirius_5.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$annotations$example_sirius$v6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_sirius_6.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$features$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$adducts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$adducts$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/adducts"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$adducts$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/adducts/neg.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$adducts$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/adducts/pos.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$closed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/closed_prepared.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/hmdb_prepared.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$hmdb_minimal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/hmdb_minimal.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/lotus_prepared.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$keys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/keys.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms$names</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/names.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms$taxonomies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms$taxonomies$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/taxonomies"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$organisms$taxonomies$ott</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$stereo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/stereo.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$metadata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/metadata.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$names</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/names.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$taxonomies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$taxonomies$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/taxonomies"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$taxonomies$cla</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$sop$merged$structures$taxonomies$npc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$exp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$exp$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/exp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$exp$mona</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$exp$mona$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/exp/mona_pos.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$exp$mona$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/exp/mona_neg.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/is"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$hmdb$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/is/hmdb_pos.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$hmdb$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/is/hmdb_neg.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$lotus$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/is/lotus_pos.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$libraries$spectra$is$lotus$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/spectra/is/lotus_neg.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$params</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$params$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/params"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$taxa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$interim$taxa$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/taxa"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$processed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$processed$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/processed"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_features.csv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$metadata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_metadata.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_spectra.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/benchmark"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$cleaned</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/benchmark/cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$mgf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$mgf$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/benchmark/benchmark_neg.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$mgf$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/benchmark/benchmark_pos.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$benchmark$zip</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/benchmark/cleaned_libraries_matchms.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$rt$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/rt"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$rt$example_mini</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/rt/example_lib_mini_rt.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/sop"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop$closed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "../lotus-processor/data/processed/230224_closed_metadata.csv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop$ecmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/sop/ecmdb.json.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/sop/hmdb/structures.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$sop$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/sop/lotus.csv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$exp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$exp$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/exp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$exp$mona_lcmsms</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/exp/MoNA-export-LC-MS-MS_Spectra.sdf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$exp$with_rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$is</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$is$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/is/hmdb_predicted_msms_spectra.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$is$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$is$lotus$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/is/isdb_pos.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $data$source$libraries$spectra$is$lotus$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/is/isdb_neg.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $doc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $doc$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "doc"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $img</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $img$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "img"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$adducts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata/adducts.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$neutral_losses</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata/neutral_losses.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/scripts"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$docopt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$docopt$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/scripts/docopt"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gnps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gnps$example</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "41c6068e905d482db5698ad81d145d7c"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gnps$example2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "958d60d32e0c43bc9a06798b744f41c7"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate$masses</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/annotate_masses.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/annotate_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$components</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/create_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$edges</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$edges$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/create_edges_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$filter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$filter$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/filter_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$components</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$edges</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_edges.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$tables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_tables.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_rt.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$closed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_closed.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$ecmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_ecmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_hmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_lotus.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$merged</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_merged.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$gnps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_gnps.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$sirius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_sirius.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$taxa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_taxa.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$weight$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/weight_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$prepare_params</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/prepare_params.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$prepare_params_advanced</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/prepare_params_advanced.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate$masses</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/annotate_masses.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/annotate_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$components</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/create_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$edges</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$edges$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/create_edges_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$filter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$filter$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/filter_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$components</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$edges</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_edges.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$tables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_tables.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_rt.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$closed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_closed.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$ecmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_ecmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_hmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_lotus.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$merged</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_merged.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$gnps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_gnps.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$sirius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_sirius.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$taxa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_taxa.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$weight$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/weight_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $tests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $tests$mode</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $tests$path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "tests"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$benchmarking_set</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://zenodo.org/records/10160791/files/cleaned_libraries_matchms.zip?download=1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$lib_mini</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$lib_mini$rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_lib_mini_rt.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$metadata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_metadata.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$sirius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$sirius$v5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_5.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$sirius$v6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_sirius_6.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectra_mini</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectra_ms1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_ms1.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_neg.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_pos.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib_mini</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib_mini$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_neg.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib_mini$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_pos.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$examples$spectral_lib_mini$with_rt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_with_rt.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$ecmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$ecmdb$metabolites</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://ecmdb.ca/download/ecmdb.json.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$hmdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$hmdb$metabolites</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://hmdb.ca/system/downloads/current/hmdb_metabolites.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$hmdb$spectra</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$hmdb$spectra$predicted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$hmdb$structures</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://hmdb.ca/system/downloads/current/structures.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$doi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "10.5281/zenodo.5794106"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$pattern</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "frozen_metadata.csv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$metadata_doi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "10.5281/zenodo.6378223"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$metadata_pattern</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$metadata_pattern$organisms</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "organism_metadata.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$metadata_pattern$references</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "reference_metadata.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus$metadata_pattern$structures</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "structure_metadata.tsv.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus_isdb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus_isdb$doi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "10.5281/zenodo.5607185"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus_isdb$pattern</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus_isdb$pattern$pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "isdb_pos.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$lotus_isdb$pattern$neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "isdb_neg.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$massbank</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$massbank$file</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MassBank_NIST.msp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$massbank$url</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://github.com/MassBank/MassBank-data/releases/download"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $urls$massbank$version</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2024.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
