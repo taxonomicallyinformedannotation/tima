@@ -45,5 +45,16 @@ It takes two files as input.
 A query file that will be matched against a library file.
 }
 \examples{
-NULL
+get_file(
+  url = get_default_paths()$urls$examples$spectra_mini,
+  export = get_default_paths()$data$source$spectra
+)
+get_file(
+  url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
+  export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+)
+annotate_spectra(
+  input = get_default_paths()$data$source$spectra,
+  library = get_default_paths()$data$source$libraries$spectra$exp$with_rt,
+)
 }
