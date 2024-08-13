@@ -1,4 +1,4 @@
-#' @title A simplistic column model
+#' @title Columns model
 #'
 #' @description This function models columns
 #'

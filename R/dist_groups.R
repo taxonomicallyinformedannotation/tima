@@ -1,6 +1,6 @@
 import::from(stats, as.dist, .into = environment())
 
-#' @title Get the distance between two elements in a distance matrix
+#' @title Distance between two elements in a distance matrix
 #'
 #' @description This function calculates the distance between
 #'    two elements in a distance matrix
