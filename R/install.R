@@ -28,9 +28,8 @@ install <- function(package = "tima",
     message("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
-    message("You should install some dependencies using")
+    message("You should install some required dependencies using")
     message("`sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev`")
-    system(command = "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev")
   }
   success <- tryCatch(
     {
