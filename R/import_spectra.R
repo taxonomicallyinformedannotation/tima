@@ -27,7 +27,16 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' get_file(
+#'   url = get_default_paths()$urls$examples$spectra_mini,
+#'   export = get_default_paths()$data$source$spectra
+#' )
+#' import_spectra(file = get_default_paths()$data$source$spectra)
+#' import_spectra(
+#'   file = get_default_paths()$data$source$spectra,
+#'   sanitize = FALSE
+#' )
 import_spectra <- function(file,
                            cutoff = 0,
                            dalton = 0.01,
