@@ -1,0 +1,48 @@
+CLUSTERID1	CLUSTERID2	label
+9	1	[M+Cu]+ _ [M+H2O+Cu]+
+22	3	[M+Cu]+ _ [M+H2O+Cu]+
+22	6	[M+C2H3N+K]+ _ [M+NaCl+H4N]+
+25	16	[M+C2H3N+H]+ _ [M+H2O+K]+
+25	35	[M+C2H3N+K]+ _ [M+NaCl+H4N]+
+27	38	[M+H]+ _ [M+Na]+
+28	17	[M+Cu]+ _ [M+H2O+Cu]+
+28	66	[M+C2H3N+H]+ _ [M+H2O+K]+
+31	44	[M+H]+ _ [M+Na]+
+36	14	[M+H2O+K]+ _ [M+H4N]+
+36	72	[M+H2O+Na]+ _ [M+H4N]+
+48	58	[M+H]+ _ [M+Na]+
+49	87	[M+H]+ _ [M+Na]+
+65	6	[M+Cu]+ _ [M+H2O+Cu]+
+65	17	[M+C2H3N+K]+ _ [M+NaCl+H4N]+
+66	17	[M+C2H3N+H]+ _ [M+K]+
+70	74	[M+H4N]+ _ [M+H]+
+72	14	[M+K]+ _ [M+Na]+
+74	47	[M+H4N]+ _ [M+Na]+
+78	64	[M+H]+ _ [M+Na]+
+86	41	[M+Cu]+ _ [M+H2O+Cu]+
+2	26	O loss
+6	35	O loss
+9	1	H2O (water) loss
+16	14	C3H4O3 (pyruvic) loss
+16	24	C5H8O4 (pentose-H2O) loss
+16	72	H8O4 (4xH2O) loss
+17	3	C2H4 (2xCH2) loss
+17	30	CHON loss
+17	35	CH2O loss
+17	36	C3H6O3 (sugar) loss
+19	14	C6H10O5 (hexose-H2O) loss
+19	16	C3H6O2 (CH3-CH2-COOH) loss
+19	66	CH2O loss
+22	3	H2O (water) loss
+22	25	O loss
+24	34	C5H8O4 (pentose-H2O) loss
+28	17	H2O (water) loss
+28	22	C2H4 (2xCH2) loss
+28	36	C3H8O4 (combination) loss
+37	21	C6H10O5 (hexose-H2O) loss
+40	7	C6H10O5 (hexose-H2O) loss
+65	6	H2O (water) loss
+65	25	CH2O loss
+66	14	C5H8O4 (pentose-H2O) loss
+70	74	H3N (ammonia) loss
+86	41	H2O (water) loss

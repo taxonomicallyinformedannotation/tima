@@ -156,7 +156,7 @@ table is expected to be pre-formatted.</p>
 
 
 <dt id="arg-tolerance-ppm">tolerance_ppm<a class="anchor" aria-label="anchor" href="#arg-tolerance-ppm"></a></dt>
-<dd><p>Tolerance to perform annotation. Should be &lt;= 10 ppm</p></dd>
+<dd><p>Tolerance to perform annotation. Should be &lt;= 20 ppm</p></dd>
 
 
 <dt id="arg-tolerance-rt">tolerance_rt<a class="anchor" aria-label="anchor" href="#arg-tolerance-rt"></a></dt>
@@ -170,8 +170,72 @@ table is expected to be pre-formatted.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
+<span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/"</span></span></span>
+<span class="r-in"><span><span class="va">data_interim</span> <span class="op">&lt;-</span> <span class="st">"main/data/interim/"</span></span></span>
+<span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span>, <span class="va">data_interim</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">annotate_masses</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"features/example_features.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  library <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/keys.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_stereo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/stereo.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_met <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/metadata.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_nam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/names.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_tax_cla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  str_tax_npc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.54138 filtering desired adducts and adding mz tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.550996 No previously attributed adducts detected </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.55775 calculating rt tolerance ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.559243 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.567795 adding delta mz tolerance for single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.572329 forming adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.60426 calculating delta mz for single charge adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.661911 joining within given delta mz tolerance (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.667011 joining within given delta mz tolerance (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.677136 keeping initial and destination feature </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.683948 joining with initial results (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.68682 joining with initial results (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.756536 joining within given mz tol to exact mass library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.763098 keeping unique exact masses and molecular formulas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.773755 joining exact masses with single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.773863 Geting back to M </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:56.777993 calculating multicharged and in source dimers </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.23931 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.242232 joining within given mz tol and filtering possible adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.253802 joining single adducts, in source dimers, and multicharged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.258478 adding chemical classification </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.269775 MS1 annotation led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> <span style="color: #00BB00;">annotations</span> , on </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> <span style="color: #0000BB;">features</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.354623 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.354741 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.432783 Directory data/interim/features created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.432891 ... path to export is <span style="color: #00BB00;">data/interim/features/example_edgesMasses.tsv</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.46902 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:29:57.469119 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_ms1Prepared.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                           annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "data/interim/annotations/example_ms1Prepared.tsv.gz" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                 edges </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "data/interim/features/example_edgesMasses.tsv" </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
