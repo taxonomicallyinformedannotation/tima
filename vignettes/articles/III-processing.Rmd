@@ -32,7 +32,7 @@ This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**n
 If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
 
 ```{r weight-all, message=FALSE}
-targets::tar_make(names = matches("ann_pre$"))
+targets::tar_make(names = tidyselect::matches("ann_pre$"))
 ```
 
 The final exported file is formatted in order to be easily imported in [Cytoscape](https://cytoscape.org/) to further explore your data!

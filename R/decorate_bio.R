@@ -1,28 +1,6 @@
-import::from(crayon, blue, .into = environment())
-import::from(crayon, cyan, .into = environment())
-import::from(crayon, green, .into = environment())
-import::from(crayon, magenta, .into = environment())
-import::from(crayon, red, .into = environment())
-import::from(crayon, silver, .into = environment())
-import::from(crayon, white, .into = environment())
-import::from(crayon, yellow, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-
 #' @title Decorate bio
 #'
 #' @description This function outputs information about biological weighting
-#'
-#' @importFrom crayon blue
-#' @importFrom crayon cyan
-#' @importFrom crayon green
-#' @importFrom crayon magenta
-#' @importFrom crayon red
-#' @importFrom crayon silver
-#' @importFrom crayon white
-#' @importFrom crayon yellow
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
 #'
 #' @param annot_table_wei_bio Table to decorate
 #' @param score_biological_kingdom  Kingdom score
@@ -51,89 +29,89 @@ decorate_bio <-
            score_biological_species = get("score_biological_species", envir = parent.frame()),
            score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
     df_kin <- annot_table_wei_bio |>
-      filter(score_biological >= score_biological_kingdom * 1)
+      tidytable::filter(score_biological >= score_biological_kingdom * 1)
     df_phy <- df_kin |>
-      filter(score_biological >= score_biological_phylum * 1)
+      tidytable::filter(score_biological >= score_biological_phylum * 1)
     df_cla <- df_phy |>
-      filter(score_biological >= score_biological_class * 1)
+      tidytable::filter(score_biological >= score_biological_class * 1)
     df_ord <- df_cla |>
-      filter(score_biological >= score_biological_order * 1)
+      tidytable::filter(score_biological >= score_biological_order * 1)
     df_fam <- df_ord |>
-      filter(score_biological >= score_biological_family * 1)
+      tidytable::filter(score_biological >= score_biological_family * 1)
     df_tri <- df_fam |>
-      filter(score_biological >= score_biological_tribe * 1)
+      tidytable::filter(score_biological >= score_biological_tribe * 1)
     df_gen <- df_tri |>
-      filter(score_biological >= score_biological_genus * 1)
+      tidytable::filter(score_biological >= score_biological_genus * 1)
     df_spe <- df_gen |>
-      filter(score_biological >= score_biological_species * 1)
+      tidytable::filter(score_biological >= score_biological_species * 1)
     df_var <- df_spe |>
-      filter(score_biological >= score_biological_variety * 1)
+      tidytable::filter(score_biological >= score_biological_variety * 1)
 
     log_debug(
       "taxonomically informed scoring led to \n",
-      silver(nrow(
+      crayon::silver(nrow(
         df_kin |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      silver("kingdom"),
+      crayon::silver("kingdom"),
       "level, \n",
-      white(nrow(
+      crayon::white(nrow(
         df_phy |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      white("phylum"),
+      crayon::white("phylum"),
       "level, \n",
-      cyan(nrow(
+      crayon::cyan(nrow(
         df_cla |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      cyan("class"),
+      crayon::cyan("class"),
       "level, \n",
-      magenta(nrow(
+      crayon::magenta(nrow(
         df_ord |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      magenta("order"),
+      crayon::magenta("order"),
       "level, \n",
-      blue(nrow(
+      crayon::blue(nrow(
         df_fam |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      blue("family"),
+      crayon::blue("family"),
       "level, \n",
-      blue(nrow(
+      crayon::blue(nrow(
         df_tri |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      blue("tribe"),
+      crayon::blue("tribe"),
       "level, \n",
-      yellow(nrow(
+      crayon::yellow(nrow(
         df_gen |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      yellow("genus"),
+      crayon::yellow("genus"),
       "level, \n",
-      green(nrow(
+      crayon::green(nrow(
         df_spe |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      green("species"),
+      crayon::green("species"),
       "level, \n",
       "and",
-      red(nrow(
+      crayon::red(nrow(
         df_var |>
-          distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_no_stereo)
       )),
       "annotations reranked at the",
-      red("variety"),
+      crayon::red("variety"),
       "level. \n",
       "WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! (for later predictions)"
     )

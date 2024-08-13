@@ -1,10 +1,7 @@
-import::from(yaml, read_yaml, .into = environment())
-
 #' @title Load yaml files
 #'
 #' @description This function load yaml files
 #'
-#' @importFrom yaml read_yaml
 #'
 #' @include get_default_paths.R
 #'
@@ -52,7 +49,7 @@ load_yaml_files <- function() {
       fixed = TRUE
     )
 
-  yamls_default <- lapply(X = yaml_files, FUN = read_yaml)
+  yamls_default <- lapply(X = yaml_files, FUN = yaml::read_yaml)
 
   names(yamls_default) <- yaml_names
 

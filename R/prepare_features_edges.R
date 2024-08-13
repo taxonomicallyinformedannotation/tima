@@ -1,24 +1,6 @@
-import::from(tidytable, all_of, .into = environment())
-import::from(tidytable, coalesce, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, full_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, rename, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare features edges
 #'
 #' @description This function prepares edges for further use
-#'
-#' @importFrom tidytable all_of
-#' @importFrom tidytable coalesce
-#' @importFrom tidytable distinct
-#' @importFrom tidytable fread
-#' @importFrom tidytable full_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable rename
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -42,7 +24,7 @@ prepare_features_edges <-
     log_debug(x = "Loading edge table")
     edges_tables <- lapply(
       X = input,
-      FUN = fread,
+      FUN = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
     )
@@ -51,23 +33,23 @@ prepare_features_edges <-
     edges_ms2 <- edges_tables[["spectral"]]
     rm(edges_tables)
     features_entropy <- edges_ms2 |>
-      select(
-        all_of(c(name_source)),
+      tidytable::select(
+        tidyselect::all_of(c(name_source)),
         feature_spectrum_entropy,
         feature_spectrum_peaks
       ) |>
-      distinct()
+      tidytable::distinct()
 
     ## Format edges table
     log_debug(x = "Formatting edge table")
     edges_table_treated <- edges_ms1 |>
-      full_join(features_entropy) |>
-      full_join(edges_ms2) |>
-      rename(
+      tidytable::full_join(features_entropy) |>
+      tidytable::full_join(edges_ms2) |>
+      tidytable::rename(
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      mutate(feature_target := coalesce(feature_target, feature_source))
+      tidytable::mutate(feature_target := tidytable::coalesce(feature_target, feature_source))
     rm(edges_ms1, edges_ms2, features_entropy)
 
     export_params(

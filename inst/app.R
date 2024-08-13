@@ -2362,7 +2362,7 @@ server <- function(input, output, session) {
         )
       )
       targets::tar_make(
-        names = targets::matches("^ann_pre$"),
+        names = tidyselect::matches("^ann_pre$"),
         garbage_collection = TRUE,
         reporter = "verbose_positives"
       )

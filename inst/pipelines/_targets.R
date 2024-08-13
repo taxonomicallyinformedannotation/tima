@@ -1917,7 +1917,7 @@ list(
         ) |>
           tidytable::mutate(
             tidytable::across(
-              .cols = tidytable::everything(),
+              .cols = tidyselect::everything(),
               .fns = function(x) {
                 tidytable::na_if(x, "")
               }

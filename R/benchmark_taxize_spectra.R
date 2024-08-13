@@ -1,28 +1,8 @@
-import::from(stringi, stri_sub, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, slice_sample, .into = environment())
-
 #' @title Benchmark taxize spectra
 #'
 #' @description This function adds taxa to the benchmark
 #'
 #' @details Because they are still quite dirty
-#'
-#' @importFrom stringi stri_sub
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
-#' @importFrom tidytable slice_sample
 #'
 #' @param input Initial features
 #' @param keys SOP keys
@@ -35,28 +15,29 @@ import::from(tidytable, slice_sample, .into = environment())
 benchmark_taxize_spectra <-
   function(input, keys, org_tax_ott, output) {
     features <- input |>
-      fread(na.strings = c("", "NA"), colClasses = "character")
+      tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
     sop <- keys |>
-      fread(na.strings = c("", "NA"), colClasses = "character") |>
-      mutate(inchikey_no_stereo = stri_sub(str = structure_inchikey, from = 1, to = 14))
+      tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
+      tidytable::mutate(inchikey_no_stereo = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14))
     taxo <- org_tax_ott |>
-      fread(na.strings = c("", "NA"), colClasses = "character")
+      tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
 
     features_pretaxed <- features |>
-      left_join(sop |>
-        distinct(organism_name, inchikey_no_stereo))
+      tidytable::left_join(sop |>
+        tidytable::distinct(organism_name, inchikey_no_stereo))
     rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>
-      filter(!is.na(organism_name)) |>
-      slice_sample(n = 1, .by = feature_id) |>
-      bind_rows(features_pretaxed |> filter(is.na(organism_name)))
+      tidytable::filter(!is.na(organism_name)) |>
+      tidytable::slice_sample(n = 1, .by = feature_id) |>
+      tidytable::bind_rows(features_pretaxed |>
+        tidytable::filter(is.na(organism_name)))
     rm(features_pretaxed)
 
     features_taxed <- features_sampled |>
-      left_join(taxo |>
-        distinct(organism_name, .keep_all = TRUE)) |>
-      select(
+      tidytable::left_join(taxo |>
+        tidytable::distinct(organism_name, .keep_all = TRUE)) |>
+      tidytable::select(
         feature_id,
         sample_organism_01_domain = organism_taxonomy_01domain,
         sample_organism_02_kingdom = organism_taxonomy_02kingdom,

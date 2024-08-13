@@ -3,6 +3,7 @@
 # tima 2.10.1
 
 * Improved documentation
+* Fixed all CRAN warnings
 * Reduced dependencies
 * Reduced exports
 * Removed `CompoundDb` dependency as it was causing too many issues

@@ -1,47 +1,7 @@
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, arrange, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, contains, .into = environment())
-import::from(tidytable, dense_rank, .into = environment())
-import::from(tidytable, desc, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, everything, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, group_by, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, na_if, .into = environment())
-import::from(tidytable, pivot_longer, .into = environment())
-import::from(tidytable, reframe, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, ungroup, .into = environment())
-import::from(tidytable, where, .into = environment())
-
 #' @title Clean chemo
 #'
 #' @description This function cleans the results
 #'    obtained after chemical weighting
-#'
-#' @importFrom tidytable across
-#' @importFrom tidytable any_of
-#' @importFrom tidytable arrange
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable contains
-#' @importFrom tidytable dense_rank
-#' @importFrom tidytable desc
-#' @importFrom tidytable distinct
-#' @importFrom tidytable everything
-#' @importFrom tidytable filter
-#' @importFrom tidytable group_by
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable na_if
-#' @importFrom tidytable pivot_longer
-#' @importFrom tidytable reframe
-#' @importFrom tidytable select
-#' @importFrom tidytable ungroup
-#' @importFrom tidytable where
 #'
 #' @include clean_collapse.R
 #' @include columns_model.R
@@ -98,7 +58,7 @@ clean_chemo <-
     ## Or chemical consistency score is obtained
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
-        filter(
+        tidytable::filter(
           (
             !is.na(candidate_score_similarity) |
               !is.na(candidate_score_sirius_csi)
@@ -111,7 +71,7 @@ clean_chemo <-
     }
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
-        filter(
+        tidytable::filter(
           (
             !is.na(candidate_score_similarity) |
               !is.na(candidate_score_sirius_csi)
@@ -129,23 +89,23 @@ clean_chemo <-
     }
 
     df1 <- df1 |>
-      arrange(desc(score_weighted_chemo)) |>
-      distinct(feature_id,
+      tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+      tidytable::distinct(feature_id,
         candidate_structure_inchikey_no_stereo,
         .keep_all = TRUE
       ) |>
-      mutate(
-        rank_initial = dense_rank(-candidate_score_pseudo_initial),
-        rank_final = dense_rank(-score_weighted_chemo),
+      tidytable::mutate(
+        rank_initial = tidytable::dense_rank(-candidate_score_pseudo_initial),
+        rank_final = tidytable::dense_rank(-score_weighted_chemo),
         .by = c(feature_id)
       ) |>
-      filter(rank_final <= candidates_final)
+      tidytable::filter(rank_final <= candidates_final)
 
     log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
     df3 <- features_table |>
-      left_join(df1) |>
-      left_join(components_table) |>
-      # mutate(
+      tidytable::left_join(df1) |>
+      tidytable::left_join(components_table) |>
+      # tidytable::mutate(
       #   candidate_structure_tax_cla = paste(
       #     structure_tax_cla_01kin,
       #     structure_tax_cla_02sup,
@@ -160,7 +120,7 @@ clean_chemo <-
       #     sep = "\u00a7"
       #   )
       # ) |>
-      select(any_of(
+      tidytable::select(tidyselect::any_of(
         c(
           "feature_id",
           "feature_rt" = "rt",
@@ -180,29 +140,29 @@ clean_chemo <-
           "score_final" = "score_weighted_chemo"
         )
       )) |>
-      distinct() |>
+      tidytable::distinct() |>
       log_pipe("adding references \n") |>
-      left_join(
+      tidytable::left_join(
         structure_organism_pairs_table |>
-          select(
+          tidytable::select(
             candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
             reference_doi,
             organism_name,
-            contains("organism_taxonomy_"), -organism_taxonomy_ottid
+            tidyselect::contains("organism_taxonomy_"), -organism_taxonomy_ottid
           ) |>
-          distinct() |>
-          pivot_longer(contains("organism_taxonomy_")) |>
-          filter(!is.na(value)) |>
-          filter(value != "notClassified") |>
-          distinct(
+          tidytable::distinct() |>
+          tidytable::pivot_longer(tidyselect::contains("organism_taxonomy_")) |>
+          tidytable::filter(!is.na(value)) |>
+          tidytable::filter(value != "notClassified") |>
+          tidytable::distinct(
             candidate_structure_inchikey_no_stereo,
             candidate_structure_organism_occurrence_closest = value,
             candidate_structure_organism_occurrence_reference = reference_doi
           )
       ) |>
-      group_by(c(-candidate_structure_organism_occurrence_reference)) |>
+      tidytable::group_by(c(-candidate_structure_organism_occurrence_reference)) |>
       clean_collapse(cols = c("candidate_structure_organism_occurrence_reference")) |>
-      select(any_of(
+      tidytable::select(tidyselect::any_of(
         c(
           model$features_columns,
           model$features_calculated_columns,
@@ -216,14 +176,14 @@ clean_chemo <-
           model$score_columns
         )
       )) |>
-      arrange(rank_final) |>
-      ungroup()
+      tidytable::arrange(rank_final) |>
+      tidytable::ungroup()
     rm(df1)
 
     if (remove_ties == TRUE) {
       log_debug("Removing ties ...")
       df3 <- df3 |>
-        distinct(c(feature_id, rank_final), .keep_all = TRUE)
+        tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
     }
 
     if (summarise == TRUE) {
@@ -231,8 +191,8 @@ clean_chemo <-
       gc()
       log_debug("summarizing results \n")
       df4 <- df3 |>
-        group_by(feature_id) |>
-        reframe(across(
+        tidytable::group_by(feature_id) |>
+        tidytable::reframe(tidytable::across(
           .cols = colnames(df3)[grepl(
             pattern = "^candidate|^rank|^score",
             x = colnames(df3),
@@ -247,12 +207,12 @@ clean_chemo <-
             )
           }
         )) |>
-        ungroup()
+        tidytable::ungroup()
 
       df5 <- df4 |>
-        left_join(df3 |>
-          select("feature_id", !colnames(df4)) |>
-          distinct())
+        tidytable::left_join(df3 |>
+          tidytable::select("feature_id", !colnames(df4)) |>
+          tidytable::distinct())
       rm(df4)
     } else {
       df5 <- df3
@@ -261,15 +221,15 @@ clean_chemo <-
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
-      mutate(across(.cols = everything(), .fns = as.character)) |>
-      mutate(across(.cols = where(is.character), .fns = trimws)) |>
-      mutate(across(
-        .cols = where(is.character),
+      tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character)) |>
+      tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.character), .fns = trimws)) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(is.character),
         .fns = function(x) {
-          na_if(x, "")
+          tidytable::na_if(x, "")
         }
       )) |>
-      select(any_of(
+      tidytable::select(tidyselect::any_of(
         c(
           model$features_columns,
           model$features_calculated_columns,
@@ -286,30 +246,30 @@ clean_chemo <-
     rm(df5)
 
     log_debug("adding consensus again to droped candidates \n")
-    results <- bind_rows(
+    results <- tidytable::bind_rows(
       df6 |>
-        filter(!is.na(
+        tidytable::filter(!is.na(
           candidate_structure_inchikey_no_stereo
         )),
-      left_join(
+      tidytable::left_join(
         df6 |>
-          filter(is.na(
+          tidytable::filter(is.na(
             candidate_structure_inchikey_no_stereo
           )) |>
-          distinct(model$features_columns),
+          tidytable::distinct(model$features_columns),
         annot_table_wei_chemo |>
-          mutate(across(.cols = everything(), .fns = as.character))
+          tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character))
       ) |>
-        select(any_of(
+        tidytable::select(tidyselect::any_of(
           c(
             model$features_columns,
             model$features_calculated_columns,
             model$components_columns
           )
         )) |>
-        distinct()
+        tidytable::distinct()
     ) |>
-      arrange(as.numeric(feature_id))
+      tidytable::arrange(as.numeric(feature_id))
 
     rm(annot_table_wei_chemo, df6)
 

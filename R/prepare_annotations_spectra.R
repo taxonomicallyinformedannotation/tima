@@ -1,21 +1,7 @@
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare annotations MS2
 #'
 #' @description This function prepares the spectral matches
 #'    obtained previously to make them compatible
-#'
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #' @include select_annotations_columns.R
@@ -46,13 +32,13 @@ prepare_annotations_spectra <-
     table <-
       lapply(
         X = input,
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      bind_rows() |>
-      filter(!is.na(feature_id)) |>
-      distinct(
+      tidytable::bind_rows() |>
+      tidytable::filter(!is.na(feature_id)) |>
+      tidytable::distinct(
         feature_id,
         candidate_adduct,
         candidate_library,
@@ -68,7 +54,7 @@ prepare_annotations_spectra <-
         candidate_count_similarity_peaks_matched
       ) |>
       ## Add new columns
-      mutate(
+      tidytable::mutate(
         candidate_structure_exact_mass = as.numeric(candidate_structure_exact_mass),
         candidate_structure_tax_npc_01pat = NA_character_,
         candidate_structure_tax_npc_02sup = NA_character_,

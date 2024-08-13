@@ -1,11 +1,7 @@
-import::from(stringi, stri_replace_all_regex, .into = environment())
-
 #' @title Replace ID in file paths
 #'
 #' @description This function replaces the default ID
 #'    in the example by a user-specified one
-#'
-#' @importFrom stringi stri_replace_all_regex
 #'
 #' @include get_default_paths.R
 #' @include get_params.R
@@ -41,28 +37,28 @@ replace_id <-
     }
 
     path <- x |>
-      stri_replace_all_regex(
+      stringi::stri_replace_all_regex(
         pattern = "/[^/]*$",
         replacement = "",
         vectorize_all = FALSE
       )
 
     file <- x |>
-      stri_replace_all_regex(
+      stringi::stri_replace_all_regex(
         pattern = ".*/",
         replacement = "",
         vectorize_all = FALSE
       )
 
     old <- file |>
-      stri_replace_all_regex(
+      stringi::stri_replace_all_regex(
         pattern = "(.*)(_)(.*)",
         replacement = "$1",
         vectorize_all = FALSE
       )
 
     new <- file |>
-      stri_replace_all_regex(
+      stringi::stri_replace_all_regex(
         pattern = old,
         replacement = ifelse(
           test = !is.null(user_gnps),

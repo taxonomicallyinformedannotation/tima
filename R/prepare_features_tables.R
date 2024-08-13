@@ -1,14 +1,6 @@
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare features table
 #'
 #' @description This function prepares features
-#'
-#' @importFrom tidytable any_of
-#' @importFrom tidytable fread
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -35,8 +27,8 @@ prepare_features_tables <-
 
     log_debug("Preparing features table")
     features_prepared <- features |>
-      fread(na.strings = c("", "NA"), colClasses = "character") |>
-      select(any_of(
+      tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
+      tidytable::select(tidyselect::any_of(
         c(
           feature_id = name_features,
           rt = name_rt,

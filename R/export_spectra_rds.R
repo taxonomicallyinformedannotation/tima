@@ -1,10 +1,6 @@
-import::from(tidytable, filter, .into = environment())
-
 #' @title Export spectra RDS
 #'
 #' @description This function exports spectra in RDS
-#'
-#' @importFrom tidytable filter
 #'
 #' @include create_dir.R
 #'
@@ -16,7 +12,7 @@ import::from(tidytable, filter, .into = environment())
 #' @examples NULL
 export_spectra_rds <- function(file, spectra) {
   if (nrow(spectra |>
-    filter(!is.na(compound_id))) != 0) {
+    tidytable::filter(!is.na(compound_id))) != 0) {
     create_dir(export = file)
     spectra |>
       data.frame() |>

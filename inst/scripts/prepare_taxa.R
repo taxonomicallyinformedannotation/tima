@@ -15,7 +15,7 @@ log_debug(
 )
 log_debug("Contributors: ...")
 
-targets::tar_make(names = matches("tax_pre"))
+targets::tar_make(names = tidyselect::matches("tax_pre"))
 
 end <- Sys.time()
 

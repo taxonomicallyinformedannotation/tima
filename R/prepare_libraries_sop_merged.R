@@ -1,15 +1,3 @@
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, anti_join, .into = environment())
-import::from(tidytable, as_tidytable, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, where, .into = environment())
-
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function prepares the libraries made of
@@ -17,18 +5,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @details It can be restricted to specific taxa to have
 #'    more biologically meaningful annotation.
-#'
-#' @importFrom tidytable across
-#' @importFrom tidytable anti_join
-#' @importFrom tidytable as_tidytable
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
-#' @importFrom tidytable where
 #'
 #' @include get_organism_taxonomy_ott.R
 #' @include get_params.R
@@ -103,13 +79,13 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Loading and concatenating prepared libraries")
     libraries <- files |>
       lapply(
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       )
 
     tables <- libraries |>
-      bind_rows() |>
+      tidytable::bind_rows() |>
       split_tables_sop()
 
     log_debug(x = "Keeping keys")
@@ -121,8 +97,8 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Completing organisms taxonomy")
     table_org_tax_ott_2 <- table_keys |>
-      anti_join(table_org_tax_ott) |>
-      distinct(organism = organism_name) |>
+      tidytable::anti_join(table_org_tax_ott) |>
+      tidytable::distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_org_tax_ott_2) != 0) {
@@ -132,17 +108,17 @@ prepare_libraries_sop_merged <-
 
       table_org_tax_ott <-
         table_org_tax_ott |>
-        bind_rows(
+        tidytable::bind_rows(
           table_org_tax_ott_full |>
-            as_tidytable() |>
-            mutate(across(
-              .cols = where(is.numeric), .fns = as.character
+            tidytable::as_tidytable() |>
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.numeric), .fns = as.character
             )) |>
-            mutate(across(
-              .cols = where(is.list), .fns = as.character
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.list), .fns = as.character
             )) |>
-            mutate(across(
-              .cols = where(is.logical), .fns = as.character
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.logical), .fns = as.character
             ))
         )
     }
@@ -165,10 +141,10 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        left_join(table_org_tax_ott)
+        tidytable::left_join(table_org_tax_ott)
 
       table_keys <- table_keys |>
-        filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys),
@@ -177,13 +153,13 @@ prepare_libraries_sop_merged <-
           pattern = value,
           perl = TRUE
         )) |>
-        select(
+        tidytable::select(
           structure_inchikey,
           structure_smiles,
           organism_name,
           reference_doi
         ) |>
-        distinct()
+        tidytable::distinct()
 
       stopifnot("Your filter led to no entries,
         try to change it." = nrow(table_keys) != 0)

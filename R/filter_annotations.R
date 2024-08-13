@@ -1,28 +1,6 @@
-import::from(crayon, green, .into = environment())
-import::from(tidytable, arrange, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, rename, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Filter annotations
 #'
 #' @description This function filters initial annotations.
-#'
-#' @importFrom crayon green
-#' @importFrom tidytable arrange
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable rename
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -36,7 +14,36 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' annotations <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2]] |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' features <- get_params(step = "filter_annotations")$files$features$prepared |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' rts <- get_params(step = "filter_annotations")$files$libraries$temporal$prepared |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' get_file(url = paste0(dir, annotations), export = annotations)
+#' get_file(url = paste0(dir, features), export = features)
+#' get_file(url = paste0(dir, rts), export = rts)
+#' filter_annotations(
+#'   annotations = annotations,
+#'   features = features,
+#'   rts = rts
+#' )
 filter_annotations <-
   function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
            features = get_params(step = "filter_annotations")$files$features$prepared,
@@ -52,7 +59,7 @@ filter_annotations <-
     }
 
     log_debug(x = "... features")
-    features_table <- fread(
+    features_table <- tidytable::fread(
       file = features,
       colClasses = "character",
       na.strings = c("", "NA")
@@ -60,25 +67,25 @@ filter_annotations <-
     log_debug(x = "... annotations")
     annotation_table <- lapply(
       X = annotations,
-      FUN = fread,
+      FUN = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>
-      bind_rows()
+      tidytable::bind_rows()
     log_debug(x = "... retention times")
     if (!is.null(rts)) {
       rt_table <- lapply(
         X = rts,
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-        bind_rows() |>
-        rename(rt_target = rt)
+        tidytable::bind_rows() |>
+        tidytable::rename(rt_target = rt)
     }
 
     features_annotated_table_1 <- features_table |>
-      left_join(annotation_table)
+      tidytable::left_join(annotation_table)
 
     if (!is.null(rts)) {
       log_debug(
@@ -87,24 +94,24 @@ filter_annotations <-
         "minutes tolerance"
       )
       features_annotated_table_2 <- features_annotated_table_1 |>
-        left_join(rt_table) |>
-        mutate(candidate_structure_error_rt = as.numeric(rt) -
+        tidytable::left_join(rt_table) |>
+        tidytable::mutate(candidate_structure_error_rt = as.numeric(rt) -
           as.numeric(rt_target)) |>
-        arrange(abs(candidate_structure_error_rt)) |>
-        distinct(-candidate_structure_error_rt, -rt_target, .keep_all = TRUE) |>
-        filter(
+        tidytable::arrange(abs(candidate_structure_error_rt)) |>
+        tidytable::distinct(-candidate_structure_error_rt, -rt_target, .keep_all = TRUE) |>
+        tidytable::filter(
           abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
             is.na(candidate_structure_error_rt)
         ) |>
-        select(-rt_target, -type)
+        tidytable::select(-rt_target, -type)
     } else {
       log_debug("No RT library provided, not filtering anything")
       features_annotated_table_2 <- features_annotated_table_1 |>
-        mutate(candidate_structure_error_rt = NA)
+        tidytable::mutate(candidate_structure_error_rt = NA)
     }
 
     log_debug(
-      green(
+      crayon::green(
         nrow(features_annotated_table_1) - nrow(features_annotated_table_2)
       ),
       "Candidates were removed based on retention time."
@@ -112,7 +119,7 @@ filter_annotations <-
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
-      left_join(features_annotated_table_2)
+      tidytable::left_join(features_annotated_table_2)
 
     rm(
       features_table,
