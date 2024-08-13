@@ -8,7 +8,7 @@ import::from(tidytable, mutate, .into = environment())
 import::from(tidytable, select, .into = environment())
 import::from(tidytable, slice_sample, .into = environment())
 
-#' @title Taxize spectra benchmark
+#' @title Benchmark taxize spectra
 #'
 #' @description This function adds taxa to the benchmark
 #'

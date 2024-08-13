@@ -2,7 +2,7 @@
 % Please edit documentation in R/benchmark_taxize_spectra.R
 \name{benchmark_taxize_spectra}
 \alias{benchmark_taxize_spectra}
-\title{Taxize spectra benchmark}
+\title{Benchmark taxize spectra}
 \usage{
 benchmark_taxize_spectra(input, keys, org_tax_ott, output)
 }

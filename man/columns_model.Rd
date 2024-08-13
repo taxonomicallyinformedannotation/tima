@@ -2,7 +2,7 @@
 % Please edit documentation in R/columns_model.R
 \name{columns_model}
 \alias{columns_model}
-\title{A simplistic column model}
+\title{Columns model}
 \usage{
 columns_model()
 }
