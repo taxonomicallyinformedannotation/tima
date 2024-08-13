@@ -39,7 +39,17 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' data_interim <- "data/interim/"
+#' dir <- paste0(github, repo)
+#' dir <- paste0(dir, data_interim)
+#' get_file(
+#'   url = paste0(dir, "features/example_edges.tsv"),
+#'   export = get_params(step = "create_components")$files$networks$spectral$edges$prepared
+#' )
+#' create_components()
 create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {

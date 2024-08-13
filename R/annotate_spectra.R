@@ -65,18 +65,17 @@ import::from(tidytable, tidytable, .into = environment())
 #' @examples
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectra_mini,
-#'   export = get_default_paths()$data$source$spectra
+#'   export = get_params(step = "annotate_spectra")$files$spectral$raw
 #' )
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
 #'   export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 #' )
 #' annotate_spectra(
-#'   input = get_default_paths()$data$source$spectra,
-#'   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt,
+#'   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 #' )
 annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files$spectral$raw,
-                             library = get_params(step = "annotate_spectra")$files$libraries$spectral$exp,
+                             library = get_params(step = "annotate_spectra")$files$libraries$spectral,
                              polarity = get_params(step = "annotate_spectra")$ms$polarity,
                              output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
                              threshold = get_params(step = "annotate_spectra")$annotations$thresholds$ms2$similarity$annotation,
@@ -88,8 +87,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
   stopifnot("Library file(s) do(es) not exist" = all(lapply(X = library, FUN = file.exists) |>
-    unlist()) &
-    !is.null(lapply(X = library, FUN = file.exists) |> unlist()))
+    unlist()))
 
   ## Not checking for ppm and Da limits, everyone is free.
 
