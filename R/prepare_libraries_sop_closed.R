@@ -48,12 +48,10 @@ prepare_libraries_sop_closed <-
       closed_prepared <- fake_sop_columns()
     }
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_libraries_sop_closed"),
-        step = "prepare_libraries_sop_closed"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "prepare_libraries_sop_closed"),
+      step = "prepare_libraries_sop_closed"
+    )
     export_output(x = closed_prepared, file = output)
     rm(closed_prepared)
     return(output)

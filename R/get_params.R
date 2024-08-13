@@ -32,12 +32,12 @@ get_params <- function(step) {
     if (file.exists(base_path)) {
       return(base_path)
     } else {
-      new_path <- gsub(pattern = "inst/", replacement = "", base_path)
+      new_path <- gsub(pattern = "inst", replacement = "", base_path)
       if (file.exists(new_path)) {
         return(new_path)
       } else {
         return(gsub(
-          pattern = "inst/",
+          pattern = "inst",
           replacement = system.file(package = "tima"),
           base_path
         ))

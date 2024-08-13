@@ -45,12 +45,10 @@ prepare_features_tables <-
         )
       ))
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_features_tables"),
-        step = "prepare_features_tables"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "prepare_features_tables"),
+      step = "prepare_features_tables"
+    )
     export_output(x = features_prepared, file = output)
     rm(features_prepared)
 

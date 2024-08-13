@@ -220,12 +220,11 @@ prepare_libraries_spectra <-
     } else {
       log_debug("Library already exists")
     }
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_libraries_spectra"),
-        step = "prepare_libraries_spectra"
-      )
-    }, error = function(e) {})
+
+    export_params(
+      parameters = get_params(step = "prepare_libraries_spectra"),
+      step = "prepare_libraries_spectra"
+    )
 
     return(c(
       "pos" = output_pos,

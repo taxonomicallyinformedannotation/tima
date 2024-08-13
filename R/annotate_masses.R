@@ -72,14 +72,27 @@ import::from(tidytable, where, .into = environment())
 #' @param clusters_list List of clusters to be used
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
-#' @param tolerance_ppm Tolerance to perform annotation. Should be <= 10 ppm
+#' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
 #'
 #' @return The path to the files containing MS1 annotations and edges
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/"
+#' data_interim <- "main/data/interim/"
+#' dir <- paste0(github, repo, data_interim)
+#' annotate_masses(
+#'   features = paste0(dir, "features/example_features.tsv"),
+#'   library = paste0(dir, "libraries/sop/merged/keys.tsv"),
+#'   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
+#'   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
+#'   str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
+#'   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
+#'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+#' )
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
            output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,
@@ -516,20 +529,33 @@ annotate_masses <-
       mutate(join = "x")
     rm(adducts_table, add_clu_table)
 
-    # TODO add safety if no multicharged
+    if (nrow(adducts_table_multi) != 0) {
+      df_multi <- df_fea_min |>
+        select(-adduct) |>
+        mutate(join = "x") |>
+        left_join(adducts_table_multi) |>
+        mutate_rowwise(value = calculate_mass_of_m(adduct_string = adduct, mz = mz)) |>
+        mutate(
+          mass_min = value - (1E-6 * tolerance_ppm * value),
+          mass_max = value + (1E-6 * tolerance_ppm * value),
+          rt_min = rt - tolerance_rt,
+          rt_max = rt + tolerance_rt
+        ) |>
+        distinct()
+    } else {
+      df_multi <- tidytable(
+        "feature_id" = NA_real_,
+        "adduct" = NA_character_,
+        "rt" = NA_real_,
+        "rt_min" = NA_real_,
+        "rt_max" = NA_real_,
+        "mass_min" = NA_real_,
+        "mass_max" = NA_real_,
+        "mz" = NA_real_
+      )
+    }
 
-    df_multi <- df_fea_min |>
-      select(-adduct) |>
-      mutate(join = "x") |>
-      left_join(adducts_table_multi) |>
-      mutate_rowwise(value = calculate_mass_of_m(adduct_string = adduct, mz = mz)) |>
-      mutate(
-        mass_min = value - (1E-6 * tolerance_ppm * value),
-        mass_max = value + (1E-6 * tolerance_ppm * value),
-        rt_min = rt - tolerance_rt,
-        rt_max = rt + tolerance_rt
-      ) |>
-      distinct()
+
     rm(adducts_table_multi)
 
     log_debug("joining within given rt tolerance \n")
@@ -571,6 +597,7 @@ annotate_masses <-
     log_debug("joining single adducts, in source dimers, and multicharged \n")
     df_annotated_final <- bind_rows(df_annotated_1, df_annotated_2) |>
       left_join(df_str_unique) |>
+      # TODO decide if allowing this or not
       filter(!is.na(structure_inchikey_no_stereo)) |>
       select(
         feature_id,
@@ -638,12 +665,10 @@ annotate_masses <-
     )
     rm(df_nl, df_add)
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "annotate_masses"),
-        step = "annotate_masses"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "annotate_masses"),
+      step = "annotate_masses"
+    )
     export_output(x = edges, file = output_edges[[1]])
     export_output(x = df_final, file = output_annotations[[1]])
 

@@ -81,12 +81,10 @@ prepare_annotations_spectra <-
       ) |>
       select_annotations_columns()
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "prepare_annotations_spectra"),
-        step = "prepare_annotations_spectra"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "prepare_annotations_spectra"),
+      step = "prepare_annotations_spectra"
+    )
     export_output(x = table, file = output[[1]])
     rm(table)
 

@@ -77,12 +77,10 @@ create_components <-
       arrange(`cluster index`)
     rm(feature_source)
 
-    tryCatch(expr = {
-      export_params(
-        parameters = get_params(step = "create_components"),
-        step = "create_components"
-      )
-    }, error = function(e) {})
+    export_params(
+      parameters = get_params(step = "create_components"),
+      step = "create_components"
+    )
     export_output(x = clusters_ready, file = output)
     rm(clusters_ready)
 
