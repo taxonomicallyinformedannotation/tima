@@ -1,20 +1,6 @@
-import::from(httr2, req_error, .into = environment())
-import::from(httr2, req_method, .into = environment())
-import::from(httr2, req_perform, .into = environment())
-import::from(httr2, request, .into = environment())
-import::from(httr2, resp_status_desc, .into = environment())
-import::from(stringi, stri_length, .into = environment())
-
 #' @title Get GNPS Tables
 #'
 #' @description This function gets GNPS tables from corresponding job ID.
-#'
-#' @importFrom httr2 req_error
-#' @importFrom httr2 req_method
-#' @importFrom httr2 req_perform
-#' @importFrom httr2 request
-#' @importFrom httr2 resp_status_desc
-#' @importFrom stringi stri_length
 #'
 #' @include get_default_paths.R
 #' @include get_file.R
@@ -53,7 +39,7 @@ get_gnps_tables <-
     if (!is.null(gnps_job_id)) {
       stopifnot(
         "Your GNPS job ID is invalid" =
-          stri_length(str = gnps_job_id) == 32
+          stringi::stri_length(str = gnps_job_id) == 32
       )
       stopifnot(
         "Your workflow is not supported,
@@ -95,15 +81,15 @@ get_gnps_tables <-
 
         log_debug("Checking response...")
         if (url |>
-          request() |>
-          req_method("GET") |>
-          req_error(
+          httr2::request() |>
+          httr2::req_method("GET") |>
+          httr2::req_error(
             is_error = function(resp) {
               return(FALSE)
             }
           ) |>
-          req_perform() |>
-          resp_status_desc() == "OK") {
+          httr2::req_perform() |>
+          httr2::resp_status_desc() == "OK") {
           log_debug("Status OK!")
           get_file(url = url, export = file_metadata)
         } else {

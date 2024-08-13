@@ -1,14 +1,6 @@
-import::from(fs, dir_copy, .into = environment())
-import::from(fs, dir_create, .into = environment())
-import::from(fs, path_home, .into = environment())
-
 #' @title Copy backbone
 #'
 #' @description This function copies backbone
-#'
-#' @importFrom fs dir_copy
-#' @importFrom fs dir_create
-#' @importFrom fs path_home
 #'
 #' @param cache_dir Cache directory
 #' @param package Package

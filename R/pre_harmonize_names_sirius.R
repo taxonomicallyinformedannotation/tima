@@ -1,11 +1,7 @@
-import::from(stringi, stri_replace_all_regex, .into = environment())
-
 #' @title Pre harmonize names sirius
 #'
 #' @description This function pre harmonizes Sirius names
 #'     to make them compatible
-#'
-#' @importFrom stringi stri_replace_all_regex
 #'
 #' @param x Character string containing a name
 #'
@@ -16,7 +12,7 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 pre_harmonize_names_sirius <- function(x) {
   ## Remove any characters after and including the '/' character from the name
   y <- x |>
-    stri_replace_all_regex(
+    stringi::stri_replace_all_regex(
       pattern = "/.*",
       replacement = "",
       vectorize_all = FALSE

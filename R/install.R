@@ -1,10 +1,6 @@
-import::from(utils, install.packages, .into = environment())
-
 #' @title Install
 #'
 #' @description This function runs some required install
-#'
-#' @importFrom utils install.packages
 #'
 #' @include copy_backbone.R
 #'
@@ -34,7 +30,7 @@ install <- function(package = "tima",
   success <- tryCatch(
     {
       message("Installing latest version")
-      install.packages(
+      utils::install.packages(
         package,
         repos = repos,
         INSTALL_opts = c("--no-lock", "--no-test-load")
@@ -51,7 +47,7 @@ install <- function(package = "tima",
     success <- tryCatch(
       {
         message("Retrying install from source")
-        install.packages(
+        utils::install.packages(
           package,
           repos = repos,
           INSTALL_opts = c("--no-lock", "--no-test-load"),

@@ -1,13 +1,7 @@
-import::from(docopt, docopt, .into = environment())
-import::from(stringi, stri_replace_all_fixed, .into = environment())
-
 #' @title Get parameters
 #'
 #' @description This function gets the parameters for the job.
 #'    Combination of cli and yaml parameters
-#'
-#' @importFrom docopt docopt
-#' @importFrom stringi stri_replace_all_fixed
 #'
 #' @include get_default_paths.R
 #' @include parse_cli_params.R
@@ -24,7 +18,7 @@ get_params <- function(step) {
   paths <- get_default_paths()
   steps <-
     list.files(system.file("scripts/docopt", package = "tima")) |>
-    stri_replace_all_fixed(pattern = ".txt", replacement = "")
+    stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   get_path <- function(base_path) {
     if (file.exists(base_path)) {
@@ -76,7 +70,7 @@ get_params <- function(step) {
   params <- parse_yaml_params(def = default_path, usr = user_path)
 
   params <- parse_cli_params(
-    arguments = docopt(doc = doc, version = paths$version),
+    arguments = docopt::docopt(doc = doc, version = paths$version),
     parameters = params
   )
 

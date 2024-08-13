@@ -1,10 +1,6 @@
-import::from(yaml, write_yaml, .into = environment())
-
 #' @title Prepare params
 #'
 #' @description This function prepares main parameters
-#'
-#' @importFrom yaml write_yaml
 #'
 #' @include create_dir.R
 #' @include export_params.R
@@ -809,7 +805,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   lapply(
     X = seq_along(yamls_params),
     FUN = function(x) {
-      write_yaml(x = yamls_params[[x]], file = yaml_export[x])
+      yaml::write_yaml(x = yamls_params[[x]], file = yaml_export[x])
     }
   )
   return(yaml_export)

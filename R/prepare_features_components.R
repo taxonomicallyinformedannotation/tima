@@ -1,17 +1,7 @@
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare features components
 #'
 #' @description This function prepares the components
 #'    (clusters in molecular network) for further use
-#'
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable fread
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -32,13 +22,13 @@ prepare_features_components <-
     log_debug(x = "... components table")
     table <- lapply(
       X = input,
-      FUN = fread,
+      FUN = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>
-      bind_rows() |>
-      select(feature_id = `cluster index`, component_id = componentindex) |>
-      distinct()
+      tidytable::bind_rows() |>
+      tidytable::select(feature_id = `cluster index`, component_id = componentindex) |>
+      tidytable::distinct()
 
     export_params(
       parameters = get_params(step = "prepare_features_components"),

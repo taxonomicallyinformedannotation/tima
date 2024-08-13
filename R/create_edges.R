@@ -1,11 +1,7 @@
-import::from(tidytable, bind_rows, .into = environment())
-
 #' @title Create edges
 #'
 #' @description This function applies similarity calculation to a list of
 #'        spectra to create edges
-#'
-#' @importFrom tidytable bind_rows
 #'
 #' @include calculate_entropy.R
 #'
@@ -27,7 +23,7 @@ create_edges <- function(index,
                          ms2_tolerance,
                          ppm_tolerance,
                          threshold) {
-  # Calculate the similarity using tidytable::lapply
+  # Calculate the similarity using lapply
   inner_list <- (index + 1):nspecs |>
     lapply(
       FUN = function(target) {
@@ -41,7 +37,7 @@ create_edges <- function(index,
         )
       }
     ) |>
-    bind_rows()
+    tidytable::bind_rows()
 
   return(inner_list)
 }

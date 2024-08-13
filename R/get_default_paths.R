@@ -1,10 +1,6 @@
-import::from(yaml, read_yaml, .into = environment())
-
 #' @title Get default paths
 #'
 #' @description This function gets default paths
-#'
-#' @importFrom yaml read_yaml
 #'
 #' @param yaml The YAML file containing the paths
 #'   (default is "extdata/paths.yaml")
@@ -16,7 +12,7 @@ import::from(yaml, read_yaml, .into = environment())
 #' @examples get_default_paths()
 get_default_paths <- function(yaml = system.file("extdata", "paths.yaml", package = "tima")) {
   ## Read the YAML file containing the paths
-  paths <- read_yaml(file = yaml)
+  paths <- yaml::read_yaml(file = yaml)
 
   ## Set the working directory to the base directory specified in the YAML file
   setwd(paths$base_dir)

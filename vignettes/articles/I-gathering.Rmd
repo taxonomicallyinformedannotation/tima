@@ -97,7 +97,7 @@ tima::get_example_files("spectral_lib_with_rt")
 MassBank is downloaded and used by default.
 
 ```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_exp_mb_raw"))
+targets::tar_make(names = tidyselect::matches("lib_spe_exp_mb_raw"))
 ```
 
 We are currently working to get all MONA and GNPS experimental spectra easily available.
@@ -119,11 +119,11 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
 ```{r get-isdb-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_is_lot"))
+targets::tar_make(names = tidyselect::matches("lib_spe_is_lot"))
 ```
 
 ```{r prepare-isdb-lotus-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_is_lot_pre"))
+targets::tar_make(names = tidyselect::matches("lib_spe_is_lot_pre"))
 ```
 
 You can also complement with the in silico spectra from HMDB (not running by default as quite long):
@@ -154,20 +154,20 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 
 ```{r get-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_lot$"))
+targets::tar_make(names = tidyselect::matches("lib_sop_lot$"))
 ```
 
 ```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_lot_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_lot_pre"))
 ```
 
 The process to download LOTUS looks like this:
 
 ```{r prepare-lotus-3, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = matches("lib_sop_lot"),
+  names = tidyselect::matches("lib_sop_lot"),
   exclude = c(
-    contains("benchmark"),
+    tidyselect::contains("benchmark"),
   ),
   targets_only = TRUE,
   degree_from = 8
@@ -183,7 +183,7 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
 
 ```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_ecm_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_ecm_pre"))
 ```
 
 ##### HMDB
@@ -191,7 +191,7 @@ targets::tar_make(names = matches("lib_sop_ecm_pre"))
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
 ```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_hmd_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_hmd_pre"))
 ```
 
 For these first steps, you do not need to change any parameters as they are implemented *by default*.
@@ -209,16 +209,16 @@ Before running the corresponding code, do not forget to modify `inst/params/user
 Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
 
 ```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_mer"))
+targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
 ```
 
 ```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
   exclude = c(
-    contains("benchmark"),
-    contains("par_"),
-    contains("paths")
+    tidyselect::contains("benchmark"),
+    tidyselect::contains("par_"),
+    tidyselect::contains("paths")
   ),
   targets_only = TRUE,
   degree_from = 8
