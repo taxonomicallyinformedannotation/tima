@@ -73,9 +73,52 @@ Combination of cli and yaml parameters</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_params"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/work/_temp/Library/timaparams/prepare_params.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_params</span><span class="op">(</span><span class="st">"prepare_params"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$pattern</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "example"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$features$raw</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_features.csv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$metadata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$metadata$raw</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_metadata.tsv"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$spectral</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$spectral$raw</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_spectra.mgf"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$annotations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$annotations$raw</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $files$annotations$raw$sirius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_sirius.zip"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ms</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ms$polarity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "pos"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $organisms</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $organisms$taxon</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $options</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $options$high_confidence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $options$summarise</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -91,12 +91,12 @@ to the rules specified in the function</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">replace_id</span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tima</span><span class="fu">:::</span><span class="fu">replace_id</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  x <span class="op">=</span> <span class="st">"example/123456_features.tsv"</span>,</span></span>
 <span class="r-in"><span>  user_gnps <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>  user_filename <span class="op">=</span> <span class="st">"Foo"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in replace_id(x = "example/123456_features.tsv", user_gnps = NULL,     user_filename = "Foo"):</span> could not find function "replace_id"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "example/Foo_features.tsv"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
