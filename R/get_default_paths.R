@@ -13,7 +13,7 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples get_default_paths()
 get_default_paths <- function(yaml = system.file("extdata", "paths.yaml", package = "tima")) {
   ## Read the YAML file containing the paths
   paths <- read_yaml(file = yaml)
