@@ -1,0 +1,26 @@
+annotations:
+  thresholds:
+    ms2:
+      similarity:
+        edges: 0.7
+files:
+  networks:
+    spectral:
+      edges:
+        raw:
+          spectral: data/interim/features/example_edgesSpectra.tsv
+  spectral:
+    raw: data/source/example_spectra.mgf
+ms:
+  thresholds:
+    ms2:
+      intensity: 5
+  tolerances:
+    mass:
+      ppm:
+        ms2: 10
+      dalton:
+        ms2: 0.01
+names:
+  source: CLUSTERID1
+  target: CLUSTERID2
