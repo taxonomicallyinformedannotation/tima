@@ -25,5 +25,6 @@ This function retrieves taxonomy
 from the Open Tree of Life taxonomy
 }
 \examples{
-NULL
+df <- data.frame("organism" = "Homo sapiens")
+get_organism_taxonomy_ott(df)
 }

@@ -69,7 +69,9 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' df <- data.frame("organism" = "Homo sapiens")
+#' get_organism_taxonomy_ott(df)
 get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about", retry = TRUE) {
   organism_table <- df |>
     as_tidytable() |>
