@@ -29,7 +29,6 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_file.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_last_version_from_zenodo.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_organism_taxonomy_ott.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/get_params.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/go_to_cache.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/import_spectra.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/index.html</loc></url>
@@ -48,7 +47,6 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_libraries_sop_lotus.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_libraries_sop_merged.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_libraries_spectra.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_params.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/prepare_taxa.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/run_app.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima-r/reference/sanitize_spectra.html</loc></url>
