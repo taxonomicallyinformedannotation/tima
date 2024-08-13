@@ -19,5 +19,5 @@ A list containing the paths specified in the YAML file
 This function gets default paths
 }
 \examples{
-NULL
+get_default_paths()
 }

@@ -24,7 +24,12 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' get_last_version_from_zenodo(
+#'   doi = "10.5281/zenodo.5794106",
+#'   pattern = "frozen.csv.gz",
+#'   path = "frozen.csv.gz"
+#' )
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
     ## Remove the prefix from the DOI

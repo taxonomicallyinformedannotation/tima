@@ -21,5 +21,5 @@ Example files.
 This function downloads example files
 }
 \examples{
-NULL
+get_example_files(example = c("features"), in_cache = FALSE)
 }
