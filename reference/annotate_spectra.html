@@ -54,7 +54,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">annotate_spectra</span><span class="op">(</span></span>
 <span>  input <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">raw</span>,</span>
-<span>  library <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">exp</span>,</span>
+<span>  library <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectral</span>,</span>
 <span>  polarity <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">ms</span><span class="op">$</span><span class="va">polarity</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">raw</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">spectral</span>,</span>
 <span>  threshold <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span></span>
@@ -117,32 +117,31 @@ A query file that will be matched against a library file.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">spectra_mini</span>,</span></span>
-<span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">spectra</span></span></span>
+<span class="r-in"><span>  export <span class="op">=</span> <span class="fu">get_params</span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">raw</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:39.446167 Directory data/source created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:39.000867 Directory data/source created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_spectra.mgf"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">spectral_lib_mini</span><span class="op">$</span><span class="va">with_rt</span>,</span></span>
 <span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectra</span><span class="op">$</span><span class="va">exp</span><span class="op">$</span><span class="va">with_rt</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:39.795821 Directory data/source/libraries/spectra/exp created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:39.269857 Directory data/source/libraries/spectra/exp created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf"</span>
 <span class="r-in"><span><span class="fu">annotate_spectra</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  input <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">spectra</span>,</span></span>
-<span class="r-in"><span>  library <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectra</span><span class="op">$</span><span class="va">exp</span><span class="op">$</span><span class="va">with_rt</span>,</span></span>
+<span class="r-in"><span>  library <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectra</span><span class="op">$</span><span class="va">exp</span><span class="op">$</span><span class="va">with_rt</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.1036 Loading spectra... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.237413 Applying sanitization of the spectra </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:39.55015 Loading spectra... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:39.674181 Applying sanitization of the spectra </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering MS2 only</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.369248 Loading spectral library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:39.781574 Loading spectral library </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.70087 Reducing library size... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.707369 Performing spectral comparison </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.709296 Trying to harmonize adducts definitions... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.7154 Filtering results above threshold only... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.759063 1 Candidates were annotated on 2 features, with at least 0 similarity score. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.763198 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 07:57:40.821055 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_spectralMatches.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.119053 Reducing library size... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.124791 Performing spectral comparison </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.126408 Trying to harmonize adducts definitions... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.132059 Filtering results above threshold only... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.165444 1 Candidates were annotated on 2 features, with at least 0 similarity score. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.169743 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 08:36:40.228544 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_spectralMatches.tsv.gz</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_spectralMatches.tsv.gz"</span>
 </code></pre></div>
     </div>

@@ -1,0 +1,101 @@
+feature_source	feature_target	label	feature_spectrum_entropy	feature_spectrum_peaks	candidate_score_similarity
+2	1026	[M+C2H3N+K]+ _ [M+H2O+Cu]+	0.572183760930055	32	
+4	189	[M+H]+ _ [M+Na]+	2.013193184599	84	
+7	828	[M+H]+ _ [M+Na]+	3.24089365309371	166	
+9	1	[M+Cu]+ _ [M+H2O+Cu]+	3.10863071150946	122	
+12	114	[M+H]+ _ [M+Na]+	1.2136256074598	90	
+15	379	[M+H]+ _ [M+Na]+	2.08409531230824	110	
+18	448	[M+H]+ _ [M+Na]+	1.94754900728756	78	
+20	669	[M+H]+ _ [M+Na]+	2.44768166105412	100	
+22	3	[M+Cu]+ _ [M+H2O+Cu]+			
+22	6	[M+C2H3N+K]+ _ [M+NaCl+H4N]+			
+24	785	[M+C2H3N+H]+ _ [M+K]+			
+25	16	[M+C2H3N+H]+ _ [M+H2O+K]+			
+25	35	[M+C2H3N+K]+ _ [M+NaCl+H4N]+			
+26	2824	[M+C2H3N+Cu]+ _ [M+H]+			
+27	38	[M+H]+ _ [M+Na]+			
+27	829	[M+H]+ _ [M+K]+			
+28	17	[M+Cu]+ _ [M+H2O+Cu]+			
+28	66	[M+C2H3N+H]+ _ [M+H2O+K]+			
+28	756	[M+H4N]+ _ [M+Na]+			
+30	594	[M+H2O+Cu]+ _ [M+K]+			
+31	44	[M+H]+ _ [M+Na]+			
+31	147	[M+C2H3N+Na]+ _ [M+H]+			
+32	231	[M+H]+ _ [M+Na]+			
+32	2674	[M+H2O+K]+ _ [M+NaCl+H]+			
+33	291	[M+H]+ _ [M+Na]+			
+36	14	[M+H2O+K]+ _ [M+H4N]+			
+36	72	[M+H2O+Na]+ _ [M+H4N]+			
+36	172	[M+H]+ _ [M+K]+			
+36	283	[M+Cu]+ _ [M+H2O+Cu]+			
+38	770	[M+K]+ _ [M+Na]+			
+38	829	[M+K]+ _ [M+Na]+			
+44	147	[M+C2H3N+H]+ _ [M+H]+			
+46	301	[M+H]+ _ [M+Na]+			
+47	110	[M+C2H3N+H]+ _ [M+H]+			
+48	58	[M+H]+ _ [M+Na]+			
+48	203	[M+C2H3N+Na]+ _ [M+H]+			
+49	87	[M+H]+ _ [M+Na]+			
+55	1001	[M+H]+ _ [M+Na]+			
+57	2305	[M+C2H3N+H]+ _ [M+H2O+K]+			
+57	3980	[M+C2H3N+K]+ _ [M+NaCl+H]+			
+58	203	[M+C2H3N+H]+ _ [M+H]+			
+62	828	[M+H2O+Na]+ _ [M+H]+			
+63	415	[M+H]+ _ [M+Na]+			
+64	156	[M+C2H3N+H]+ _ [M+H]+			
+65	6	[M+Cu]+ _ [M+H2O+Cu]+			
+65	17	[M+C2H3N+K]+ _ [M+NaCl+H4N]+			
+66	17	[M+C2H3N+H]+ _ [M+K]+			
+67	1931	[M+C2H3N+H]+ _ [M+H2O+K]+			
+69	3125	[M+H2O+Cu]+ _ [M+NaCl+K]+			
+70	74	[M+H4N]+ _ [M+H]+			
+70	110	[M+C2H3N+Na]+ _ [M+H]+			
+72	14	[M+K]+ _ [M+Na]+			
+74	47	[M+H4N]+ _ [M+Na]+			
+74	110	[M+C2H3N+Na]+ _ [M+H4N]+			
+78	64	[M+H]+ _ [M+Na]+			
+78	156	[M+C2H3N+Na]+ _ [M+H]+			
+78	2878	[M+C2H3N+Cu]+ _ [M+K]+			
+81	1544	[M+H]+ _ [M+Na]+			
+82	253	[M+C2H3N+H]+ _ [M+H]+			
+83	590	[M+H]+ _ [M+Na]+			
+83	813	[M+C2H3N+Na]+ _ [M+H]+			
+86	41	[M+Cu]+ _ [M+H2O+Cu]+			
+89	2750	[M+H4N]+ _ [M+Na]+			
+93	1544	[M+H]+ _ [M+Na]+			
+97	394	[M+H]+ _ [M+Na]+			
+98	6815	[M+H2O+H4N]+ _ [M+H]+			
+100	451	[M+H]+ _ [M+Na]+			
+102	111	[M+K]+ _ [M+NaCl+H4N]+			
+102	505	[M+H2O+K]+ _ [M+NaCl+H4N]+			
+104	19	[M+H2O+K]+ _ [M+H4N]+			
+104	118	[M+H]+ _ [M+K]+			
+104	3695	[M+C2H3N+Na]+ _ [M+NaCl+H4N]+			
+104	3746	[M+H2O+Na]+ _ [M+H4N]+			
+108	2837	[M+Cu]+ _ [M+NaCl+Na]+			
+109	6405	[M+C2H3N+H]+ _ [M+H4N]+			
+111	116	[M+H4N]+ _ [M+H]+			
+111	117	[M+H]+ _ [M+Na]+			
+112	4376	[M+H2O+Na]+ _ [M+NaCl+Cu]+			
+113	71	[M+H]+ _ [M+Na]+			
+113	144	[M+H4N]+ _ [M+H]+			
+116	117	[M+H4N]+ _ [M+Na]+			
+118	19	[M+H2O+H]+ _ [M+H4N]+			
+127	112	[M+C2H3N+H4N]+ _ [M+K]+			
+128	3691	[M+C2H3N+H]+ _ [M+H4N]+			
+129	366	[M+C2H3N+H]+ _ [M+H]+			
+130	7599	[M+C2H3N+H]+ _ [M+H2O+H4N]+			
+131	170	[M+H2O+Na]+ _ [M+NaCl+K]+			
+134	194	[M+H4N]+ _ [M+Na]+			
+139	5225	[M+NaCl+H4N]+ _ [M+Na]+			
+140	80	[M+H4N]+ _ [M+Na]+			
+143	218	[M+H4N]+ _ [M+Na]+			
+144	71	[M+H4N]+ _ [M+Na]+			
+148	913	[M+Cu]+ _ [M+H2O+Cu]+			
+159	3328	[M+Cu]+ _ [M+K]+			
+162	95	[M+H4N]+ _ [M+H]+			
+164	6504	[M+C2H3N+Na]+ _ [M+H2O+Cu]+			
+165	269	[M+C2H3N+Na]+ _ [M+K]+			
+165	294	[M+C2H3N+Na]+ _ [M+H2O+H]+			
+165	5358	[M+C2H3N+Na]+ _ [M+H2O+H]+			
+172	14	[M+H2O+H]+ _ [M+H4N]+			
