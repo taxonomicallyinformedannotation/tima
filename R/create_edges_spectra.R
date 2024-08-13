@@ -48,7 +48,12 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' get_file(
+#'   url = get_default_paths()$urls$examples$spectra_mini,
+#'   export = get_params(step = "create_edges_spectra")$files$spectral$raw
+#' )
+#' create_edges_spectra()
 create_edges_spectra <- function(input = get_params(step = "create_edges_spectra")$files$spectral$raw,
                                  output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
                                  name_source = get_params(step = "create_edges_spectra")$names$source,

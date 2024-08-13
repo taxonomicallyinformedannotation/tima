@@ -4,13 +4,9 @@ import::from(yaml, read_yaml, .into = environment())
 #'
 #' @description This function load yaml files
 #'
-#' @export
-#'
 #' @importFrom yaml read_yaml
 #'
 #' @include get_default_paths.R
-#'
-#' @noRd
 #'
 #' @return A list of loaded yaml files
 #'

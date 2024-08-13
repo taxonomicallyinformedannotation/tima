@@ -5,12 +5,8 @@ import::from(tidytable, tidytable, .into = environment())
 #'
 #' @description This function calculates entropy similarity between two spectra
 #'
-#' @export
-#'
 #' @importFrom msentropy calculate_entropy_similarity
 #' @importFrom tidytable tidytable
-#'
-#' @noRd
 #'
 #' @param index Index of the first spectrum
 #' @param target Index of the second spectrum

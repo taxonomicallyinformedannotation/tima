@@ -23,8 +23,6 @@ import::from(tidytable, where, .into = environment())
 #' @description This function cleans the results
 #'    obtained after chemical weighting
 #'
-#' @export
-#'
 #' @importFrom tidytable across
 #' @importFrom tidytable any_of
 #' @importFrom tidytable arrange
@@ -48,8 +46,7 @@ import::from(tidytable, where, .into = environment())
 #' @include clean_collapse.R
 #' @include columns_model.R
 #' @include filter_high_confidence_only.R
-#'
-#' @noRd
+#' @include log_pipe.R
 #'
 #' @param annot_table_wei_chemo Table containing your
 #'    chemically weighted annotation

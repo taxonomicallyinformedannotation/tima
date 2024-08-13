@@ -4,8 +4,6 @@
 #'
 #' @export
 #'
-#' @noRd
-#'
 #' @param ... one or more values to be logged
 #'
 #' @return Message for debugging

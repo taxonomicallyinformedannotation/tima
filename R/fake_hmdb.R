@@ -2,10 +2,6 @@
 #'
 #' @description This function fakes HMDB in case the download failed
 #'
-#' @export
-#'
-#' @noRd
-#'
 #' @param export Path to save the file to
 #'
 #' @return NULL

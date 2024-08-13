@@ -4,14 +4,10 @@ import::from(utils, unzip, .into = environment())
 #'
 #' @description This function gets example SIRIUS annotations
 #'
-#' @export
-#'
 #' @importFrom utils unzip
 #'
 #' @include get_default_paths.R
 #' @include get_file.R
-#'
-#' @noRd
 #'
 #' @param url URL where the example is accessible
 #' @param export Path where to save the example

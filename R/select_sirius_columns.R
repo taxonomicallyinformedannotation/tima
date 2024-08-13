@@ -7,16 +7,12 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @description This function selects sirius columns (canopus)
 #'
-#' @export
-#'
 #' @importFrom tidytable any_of
 #' @importFrom tidytable bind_cols
 #' @importFrom tidytable mutate
 #' @importFrom tidytable select
 #'
 #' @include harmonize_names_sirius.R
-#'
-#' @noRd
 #'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
@@ -65,14 +61,10 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @include harmonize_names_sirius.R
 #'
-#' @noRd
-#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
 #' @return The dataframe with selected sirius columns
-#'
-#' @export
 #'
 #' @examples NULL
 select_sirius_columns_formulas <- function(df, sirius_version) {
@@ -114,14 +106,10 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #'
 #' @importFrom tidytable any_of distinct mutate select
 #'
-#' @noRd
-#'
 #' @param df Dataframe
 #' @param sirius_version Sirius version
 #'
 #' @return The dataframe with selected structure columns
-#'
-#' @export
 #'
 #' @examples NULL
 select_sirius_columns_structures <- function(df, sirius_version) {

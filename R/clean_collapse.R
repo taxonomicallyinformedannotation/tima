@@ -10,8 +10,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @description This function collapses a grouped dataframe and trims it
 #'
-#' @export
-#'
 #' @importFrom tidytable across
 #' @importFrom tidytable everything
 #' @importFrom tidytable mutate
@@ -19,8 +17,6 @@ import::from(tidytable, where, .into = environment())
 #' @importFrom tidytable reframe
 #' @importFrom tidytable ungroup
 #' @importFrom tidytable where
-#'
-#' @noRd
 #'
 #' @param grouped_df Grouped dataframe
 #' @param cols Column(s) to apply collapse to

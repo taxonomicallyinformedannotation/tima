@@ -4,11 +4,7 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @description This function selects sop columns
 #'
-#' @export
-#'
 #' @importFrom tidytable select
-#'
-#' @noRd
 #'
 #' @param df Dataframe
 #'

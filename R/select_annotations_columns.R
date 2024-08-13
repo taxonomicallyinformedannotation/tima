@@ -9,8 +9,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @description This function selects annotations columns
 #'
-#' @export
-#'
 #' @importFrom tidytable across
 #' @importFrom tidytable any_of
 #' @importFrom tidytable mutate
@@ -21,8 +19,6 @@ import::from(tidytable, where, .into = environment())
 #' @include columns_model.R
 #' @include complement_metadata_structures.R
 #' @include round_reals.R
-#'
-#' @noRd
 #'
 #' @param df Dataframe
 #' @param str_stereo File containing structures stereo

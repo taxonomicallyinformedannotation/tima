@@ -11,15 +11,11 @@ import::from(yaml, write_yaml, .into = environment())
 #' @include get_params.R
 #' @include load_yaml_files.R
 #'
-#' @noRd
-#'
 #' @param params_small params_small
 #' @param params_advanced params_advanced
 #' @param step Step
 #'
 #' @return The path to the yaml files containing prepared parameters
-#'
-#' @export
 #'
 #' @examples NULL
 prepare_params <- function(params_small = get_params(step = "prepare_params"),

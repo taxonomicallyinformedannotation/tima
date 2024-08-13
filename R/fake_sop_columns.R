@@ -2,10 +2,6 @@
 #'
 #' @description This function fakes sop columns
 #'
-#' @export
-#'
-#' @noRd
-#'
 #' @return NULL
 #'
 #' @examples NULL

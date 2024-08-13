@@ -26,8 +26,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @include clean_collapse.R
 #'
-#' @noRd
-#'
 #' @param df Data frame with structural metadata to be complemented
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
@@ -36,8 +34,6 @@ import::from(tidytable, where, .into = environment())
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
 #' @return Data frame with complemented structural metadata
-#'
-#' @export
 #'
 #' @examples NULL
 complement_metadata_structures <- function(df,

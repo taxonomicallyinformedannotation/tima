@@ -16,7 +16,7 @@ import::from(utils, install.packages, .into = environment())
 #'
 #' @export
 #'
-#' @examples install()
+#' @examples NULL
 install <- function(package = "tima",
                     repos = c(
                       "https://taxonomicallyinformedannotation.r-universe.dev",

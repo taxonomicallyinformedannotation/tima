@@ -5,18 +5,14 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #' @description This function pre harmonizes Sirius names
 #'     to make them compatible
 #'
-#' @export
-#'
 #' @importFrom stringi stri_replace_all_regex
-#'
-#' @noRd
 #'
 #' @param x Character string containing a name
 #'
 #' @return Character string with the name modified according
 #'    to the rules specified in the function
 #'
-#' @examples prepared_name <- pre_harmonize_names_sirius("My name/suffix")
+#' @examples prepared_name <- tima:::pre_harmonize_names_sirius("My name/suffix")
 pre_harmonize_names_sirius <- function(x) {
   ## Remove any characters after and including the '/' character from the name
   y <- x |>
