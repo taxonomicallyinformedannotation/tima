@@ -79,8 +79,15 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">prepare_libraries_sop_closed</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:16:13.2978 Sorry, you do not have access to the closed resource,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 returning an empty file instead </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:16:13.300517 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:16:13.300611 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:16:13.323478 Directory data/interim/libraries/sop created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:16:13.323619 ... path to export is <span style="color: #00BB00;">data/interim/libraries/sop/closed_prepared.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/closed_prepared.tsv.gz"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
