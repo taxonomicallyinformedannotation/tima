@@ -1,7 +1,18 @@
 citHeader("To cite tima in publications use:")
 
-citEntry(
-  entry    = "Article",
+bibentry(
+  bibtype  = "Manual",
+  title    = "tima: Taxonomically Informed Metabolite Annotation",
+  author   = c(
+    person(given = "Adriano", family = "Rutz", email = "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
+    ),
+  year     = "2024",
+  note     = "R package, version 2.10.1",
+  doi      = "10.5281/zenodo.5797920"
+)
+
+bibentry(
+  bibtype  = "Article",
   title    = "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz"),
@@ -13,7 +24,8 @@ citEntry(
     person(given = "Samad Nejad", family = "Ebrahimi"),
     person(given = "Kornkanok", family = "Ingkaninan"),
     person(given = "Jean-Luc", family = "Wolfender"),
-    person(given = "Pierre-Marie", family = "Allard")),
+    person(given = "Pierre-Marie", family = "Allard")
+    ),
   journal  = "Frontiers in Plant Science",
   year     = "2019",
   volume   = "10",
