@@ -15,7 +15,15 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' features <- "example_features.csv"
+#' features_file <- paste0("data/source/", features)
+#' get_file(url = paste0(dir, features), export = features_file)
+#' prepare_features_tables(features = features_file)
+#' unlink("data", recursive = TRUE)
 prepare_features_tables <-
   function(features = get_params(step = "prepare_features_tables")$files$features$raw,
            output = get_params(step = "prepare_features_tables")$files$features$prepared,
