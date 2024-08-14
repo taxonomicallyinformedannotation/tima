@@ -1,6 +1,7 @@
 citHeader("To cite tima in publications use:")
 
-bibentry(bibtype  = "Manual",
+bibentry(
+  bibtype  = "Manual",
   title    = "tima: Taxonomically Informed Metabolite Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
@@ -10,7 +11,8 @@ bibentry(bibtype  = "Manual",
   doi      = "10.5281/zenodo.5797920"
 )
 
-bibentry(bibtype  = "Article",
+bibentry(
+  bibtype  = "Article",
   title    = "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz", comment = c(ORCID = "0000-0003-0443-9902")),
@@ -36,6 +38,6 @@ bibentry(bibtype  = "Article",
   pmid     = "1708947",
   qid      = "Q91218352",
   textVersion = paste(
-  "Adriano Rutz; Miwa Dounoue-Kubo; Simon Ollivier; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. issn:1664-462X. pmc:PMC6824209. pmid:1708947. qid:Q91218352."
+  "Adriano Rutz; Miwa Dounoue-Kubo; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. issn:1664-462X. pmc:PMC6824209. pmid:1708947. qid:Q91218352."
   )
 )

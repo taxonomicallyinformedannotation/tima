@@ -28,5 +28,15 @@ The path to the prepared edges
 This function prepares edges for further use
 }
 \examples{
-NULL
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+input_1 <- get_params(step = "prepare_features_edges")$files$networks$spectral$edges$raw$ms1
+input_2 <- get_params(step = "prepare_features_edges")$files$networks$spectral$edges$raw$spectral
+get_file(url = paste0(dir, input_1), export = input_1)
+get_file(url = paste0(dir, input_2), export = input_2)
+prepare_features_edges(
+  input = list("ms1" = input_1, "spectral" = input_2)
+)
+unlink("data", recursive = TRUE)
 }
