@@ -14,7 +14,9 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' prepare_libraries_sop_hmdb()
+#' unlink("data", recursive = TRUE)
 prepare_libraries_sop_hmdb <-
   function(input = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$raw$hmdb,
            output = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$prepared$hmdb) {

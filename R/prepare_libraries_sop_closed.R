@@ -12,7 +12,9 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' prepare_libraries_sop_closed()
+#' unlink("data", recursive = TRUE)
 prepare_libraries_sop_closed <-
   function(input = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
            output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared$closed) {
