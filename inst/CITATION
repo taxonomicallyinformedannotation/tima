@@ -1,7 +1,6 @@
 citHeader("To cite tima in publications use:")
 
-bibentry(
-  bibtype  = "Manual",
+bibentry(bibtype  = "Manual",
   title    = "tima: Taxonomically Informed Metabolite Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
@@ -11,8 +10,7 @@ bibentry(
   doi      = "10.5281/zenodo.5797920"
 )
 
-bibentry(
-  bibtype  = "Article",
+bibentry(bibtype  = "Article",
   title    = "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz", comment = c(ORCID = "0000-0003-0443-9902")),
@@ -30,7 +28,14 @@ bibentry(
   year     = "2019",
   volume   = "10",
   url      = "https://doi.org/10.3389/fpls.2019.01329",
+  language = "en",
+  keywords = "metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome",
+  doi      = "10.3389/FPLS.2019.01329",
+  issn     = "1664-462X",
+  pmc      = "PMC6824209",
+  pmid     = "1708947",
+  qid      = "Q91218352",
   textVersion = paste(
-  "Adriano Rutz; Miwa Dounoue-Kubo; Simon Ollivier; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. ISSN 1664-462X. PMC 6824209. PMID 1708947. Wikidata Q91218352."
+  "Adriano Rutz; Miwa Dounoue-Kubo; Simon Ollivier; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. issn:1664-462X. pmc:PMC6824209. pmid:1708947. qid:Q91218352."
   )
 )

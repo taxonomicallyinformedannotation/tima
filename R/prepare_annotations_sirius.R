@@ -25,7 +25,9 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' prepare_annotations_sirius()
+#' unlink("data", recursive = TRUE)
 prepare_annotations_sirius <-
   function(input_directory = get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
            output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural$sirius,

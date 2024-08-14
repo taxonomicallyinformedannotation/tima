@@ -506,7 +506,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3221.686KB",
+  "fileSize": "3244.957KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -589,7 +589,10 @@
         }
       ],
       "name": "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
+      "identifier": "10.3389/FPLS.2019.01329",
       "url": "https://doi.org/10.3389/fpls.2019.01329",
+      "@id": "https://doi.org/10.3389/FPLS.2019.01329",
+      "sameAs": "https://doi.org/10.3389/FPLS.2019.01329",
       "isPartOf": {
         "@type": "PublicationIssue",
         "datePublished": "2019",
