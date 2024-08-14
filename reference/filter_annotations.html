@@ -115,25 +115,29 @@
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">annotations</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">annotations</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:55.966659 Directory data/interim/annotations created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_ms1Prepared.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">features</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">features</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.027327 Directory data/interim/features created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_features.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">rts</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">rts</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.3388 Directory data/interim/libraries/rt created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.045355 Directory data/interim/libraries/rt created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/rt/prepared.tsv"</span>
 <span class="r-in"><span><span class="fu">filter_annotations</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  annotations <span class="op">=</span> <span class="va">annotations</span>,</span></span>
 <span class="r-in"><span>  features <span class="op">=</span> <span class="va">features</span>,</span></span>
 <span class="r-in"><span>  rts <span class="op">=</span> <span class="va">rts</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.352925 ... features </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.353937 ... annotations </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.355802 ... retention times </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.358987 Filtering annotations outside of 0.1 minutes tolerance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.385212 <span style="color: #00BB00;">0</span> Candidates were removed based on retention time. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.388399 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-13 20:53:02.423958 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_annotationsFiltered.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.099771 ... features </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.100769 ... annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.102582 ... retention times </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.105742 Filtering annotations outside of 0.1 minutes tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.132289 <span style="color: #00BB00;">0</span> Candidates were removed based on retention time. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.135351 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.135455 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 06:41:56.171119 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_annotationsFiltered.tsv.gz</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_annotationsFiltered.tsv.gz"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
