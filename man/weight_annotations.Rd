@@ -207,7 +207,84 @@ The path to the weighted annotations
 This function weights annotations.
 }
 \examples{
-NULL
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+library <- get_params(step = "weight_annotations")$files$libraries$sop$merged$keys |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+org_tax_ott <- get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+str_stereo <- get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+annotations <- get_params(step = "weight_annotations")$files$annotations$filtered |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+canopus <- get_params(step = "weight_annotations")$files$annotations$prepared$canopus |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+formula <- get_params(step = "weight_annotations")$files$annotations$prepared$formula |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+components <- get_params(step = "weight_annotations")$files$networks$spectral$components$prepared |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+edges <- get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+taxa <- get_params(step = "weight_annotations")$files$metadata$prepared |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+get_file(url = paste0(dir, library), export = library)
+get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+get_file(url = paste0(dir, str_stereo), export = str_stereo)
+get_file(url = paste0(dir, annotations), export = annotations)
+get_file(url = paste0(dir, canopus), export = canopus)
+get_file(url = paste0(dir, formula), export = formula)
+get_file(url = paste0(dir, components), export = components)
+get_file(url = paste0(dir, edges), export = edges)
+get_file(url = paste0(dir, taxa), export = taxa)
+weight_annotations(
+  library = library,
+  org_tax_ott = org_tax_ott,
+  str_stereo = str_stereo,
+  annotations = annotations,
+  canopus = canopus,
+  formula = formula,
+  components = components,
+  edges = edges,
+  taxa = taxa
+)
+unlink("data", recursive = TRUE)
 }
 \seealso{
 annotate_masses weight_bio weight_chemo
