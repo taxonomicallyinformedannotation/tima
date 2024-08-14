@@ -24,5 +24,10 @@ The sanitized spectra
 This function sanitizes spectra
 }
 \examples{
-NULL
+data.frame(
+  FEATURE_ID = c("FT001", "FT002", "FT003"),
+  mz = c(list(123.4567, 234.5678, 345.6789))
+) |>
+  Spectra::Spectra() |>
+  sanitize_spectra()
 }

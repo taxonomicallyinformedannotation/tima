@@ -30,7 +30,26 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' org_tax_ott <- get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+#' get_file(
+#'   url = get_default_paths()$urls$examples$features,
+#'   export = get_params(step = "prepare_taxa")$files$features$raw
+#' )
+#' prepare_taxa(
+#'   taxon = "Homo sapiens",
+#'   org_tax_ott = org_tax_ott
+#' )
+#' unlink("data", recursive = TRUE)
 prepare_taxa <-
   function(input = get_params(step = "prepare_taxa")$files$features$raw,
            extension = get_params(step = "prepare_taxa")$names$extension,
