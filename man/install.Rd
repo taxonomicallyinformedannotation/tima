@@ -8,6 +8,7 @@ install(
   package = "tima",
   repos = c("https://taxonomicallyinformedannotation.r-universe.dev",
     "https://bioc.r-universe.dev", "https://cloud.r-project.org"),
+  dependencies = TRUE,
   test = FALSE
 )
 }
@@ -15,6 +16,8 @@ install(
 \item{package}{Package}
 
 \item{repos}{Repos}
+
+\item{dependencies}{Flag for dependencies}
 
 \item{test}{Flag for tests}
 }

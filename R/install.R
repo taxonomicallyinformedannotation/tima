@@ -6,6 +6,7 @@
 #'
 #' @param package Package
 #' @param repos Repos
+#' @param dependencies Flag for dependencies
 #' @param test Flag for tests
 #'
 #' @return NULL
@@ -19,6 +20,7 @@ install <- function(package = "tima",
                       "https://bioc.r-universe.dev",
                       "https://cloud.r-project.org"
                     ),
+                    dependencies = TRUE,
                     test = FALSE) {
   if (Sys.info()[["sysname"]] == "Windows") {
     message("You should install RTools if not already done")
@@ -33,6 +35,7 @@ install <- function(package = "tima",
       utils::install.packages(
         package,
         repos = repos,
+        dependencies = dependencies,
         INSTALL_opts = c("--no-lock", "--no-test-load")
       )
       TRUE
@@ -50,6 +53,7 @@ install <- function(package = "tima",
         utils::install.packages(
           package,
           repos = repos,
+          dependencies = dependencies,
           INSTALL_opts = c("--no-lock", "--no-test-load"),
           type = "source"
         )
