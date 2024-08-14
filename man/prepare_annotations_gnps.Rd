@@ -43,5 +43,6 @@ The path to the prepared GNPS annotations
 This function prepares GNPS obtained annotations
 }
 \examples{
-NULL
+prepare_annotations_gnps()
+unlink("data", recursive = TRUE)
 }

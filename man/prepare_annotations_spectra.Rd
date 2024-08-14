@@ -44,5 +44,25 @@ This function prepares the spectral matches
 obtained previously to make them compatible
 }
 \examples{
-NULL
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+data_interim <- "data/interim/"
+dir <- paste0(github, repo)
+input <- get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral |>
+  gsub(
+    pattern = ".tsv.gz",
+    replacement = "_pos.tsv",
+    fixed = TRUE
+  )
+get_file(url = paste0(dir, input), export = input)
+dir <- paste0(dir, data_interim)
+prepare_annotations_spectra(
+  input = input,
+  str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
+  str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
+  str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
+  str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
+  str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+)
+unlink("data", recursive = TRUE)
 }
