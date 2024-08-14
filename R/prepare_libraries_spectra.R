@@ -35,7 +35,9 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' prepare_libraries_spectra()
+#' unlink("data", recursive = TRUE)
 prepare_libraries_spectra <-
   function(input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$raw,
            nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,

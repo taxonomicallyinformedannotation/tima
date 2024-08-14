@@ -12,7 +12,13 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' data.frame(
+#'   FEATURE_ID = c("FT001", "FT002", "FT003"),
+#'   mz = c(list(123.4567, 234.5678, 345.6789))
+#' ) |>
+#'   Spectra::Spectra() |>
+#'   sanitize_spectra()
 sanitize_spectra <-
   function(spectra,
            cutoff = 0,

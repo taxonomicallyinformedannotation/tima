@@ -62,5 +62,16 @@ It can be restricted to specific taxa to have
 more biologically meaningful annotation.
 }
 \examples{
-NULL
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+get_file(url = paste0(dir, files), export = files)
+prepare_libraries_sop_merged(files = files)
+unlink("data", recursive = TRUE)
 }

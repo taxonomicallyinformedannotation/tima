@@ -75,5 +75,6 @@ This function prepares spectra
 to be used for spectral matching
 }
 \examples{
-NULL
+prepare_libraries_spectra()
+unlink("data", recursive = TRUE)
 }
