@@ -22,5 +22,6 @@ The path to the prepared structure-organism pairs library ECMDB
 Prepare libraries of structure organism pairs ECMDB
 }
 \examples{
-NULL
+prepare_libraries_sop_ecmdb()
+unlink("data", recursive = TRUE)
 }

@@ -14,7 +14,9 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' prepare_libraries_sop_lotus()
+#' unlink("data", recursive = TRUE)
 prepare_libraries_sop_lotus <-
   function(input = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$raw$lotus,
            output = get_params(step = "prepare_libraries_sop_lotus")$files$libraries$sop$prepared$lotus) {

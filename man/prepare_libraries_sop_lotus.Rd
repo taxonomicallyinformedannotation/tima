@@ -22,5 +22,6 @@ The path to the prepared structure-organism pairs library LOTUS
 This function prepares the LOTUS structure-organism pairs
 }
 \examples{
-NULL
+prepare_libraries_sop_lotus()
+unlink("data", recursive = TRUE)
 }

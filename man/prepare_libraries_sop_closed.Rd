@@ -23,5 +23,6 @@ The path to the prepared structure-organism pairs library CLOSED
 Prepare libraries of structure organism pairs CLOSED
 }
 \examples{
-NULL
+prepare_libraries_sop_closed()
+unlink("data", recursive = TRUE)
 }

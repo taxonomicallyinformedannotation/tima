@@ -55,5 +55,6 @@ This function prepares retention times libraries
 to be used for later
 }
 \examples{
-NULL
+prepare_libraries_rt()
+unlink("data", recursive = TRUE)
 }
