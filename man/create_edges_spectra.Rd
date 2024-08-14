@@ -46,4 +46,5 @@ get_file(
   export = get_params(step = "create_edges_spectra")$files$spectral$raw
 )
 create_edges_spectra()
+unlink("data", recursive = TRUE)
 }

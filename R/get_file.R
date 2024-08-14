@@ -20,6 +20,7 @@
 #'   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
 #'   export = "data/source/example_metadata.tsv"
 #' )
+#' unlink("data", recursive = TRUE)
 get_file <-
   function(url, export, limit = 3600) {
     # ## Use default system data directory

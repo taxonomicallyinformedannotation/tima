@@ -26,6 +26,7 @@
 #'   export = get_params(step = "create_edges_spectra")$files$spectral$raw
 #' )
 #' create_edges_spectra()
+#' unlink("data", recursive = TRUE)
 create_edges_spectra <- function(input = get_params(step = "create_edges_spectra")$files$spectral$raw,
                                  output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
                                  name_source = get_params(step = "create_edges_spectra")$names$source,

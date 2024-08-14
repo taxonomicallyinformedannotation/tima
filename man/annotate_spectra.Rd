@@ -56,4 +56,5 @@ get_file(
 annotate_spectra(
   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 )
+unlink("data", recursive = TRUE)
 }

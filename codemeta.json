@@ -20,7 +20,7 @@
       "@type": "Person",
       "givenName": "Adriano",
       "familyName": "Rutz",
-      "email": "rutz@imsb.biol.ethz.ch",
+      "email": "adafede@gmail.com",
       "@id": "https://orcid.org/0000-0003-0443-9902"
     }
   ],
@@ -38,7 +38,7 @@
       "@type": "Person",
       "givenName": "Adriano",
       "familyName": "Rutz",
-      "email": "rutz@imsb.biol.ethz.ch",
+      "email": "adafede@gmail.com",
       "@id": "https://orcid.org/0000-0003-0443-9902"
     }
   ],
@@ -506,8 +506,26 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "3220.049KB",
+  "fileSize": "3221.457KB",
   "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2024",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Adriano",
+          "familyName": "Rutz",
+          "email": "adafede@gmail.com",
+          "@id": "https://orcid.org/0000-0003-0443-9902"
+        }
+      ],
+      "name": "tima: Taxonomically Informed Metabolite Annotation",
+      "identifier": "10.5281/zenodo.5797920",
+      "description": "R package, version 2.10.1",
+      "@id": "https://doi.org/10.5281/zenodo.5797920",
+      "sameAs": "https://doi.org/10.5281/zenodo.5797920"
+    },
     {
       "@type": "ScholarlyArticle",
       "datePublished": "2019",
@@ -515,7 +533,8 @@
         {
           "@type": "Person",
           "givenName": "Adriano",
-          "familyName": "Rutz"
+          "familyName": "Rutz",
+          "@id": "https://orcid.org/0000-0003-0443-9902"
         },
         {
           "@type": "Person",
@@ -525,12 +544,14 @@
         {
           "@type": "Person",
           "givenName": "Simon",
-          "familyName": "Ollivier"
+          "familyName": "Ollivier",
+          "@id": "https://orcid.org/0000-0002-7671-1736"
         },
         {
           "@type": "Person",
           "givenName": "Jonathan",
-          "familyName": "Bisson"
+          "familyName": "Bisson",
+          "@id": "https://orcid.org/0000-0003-1640-9989"
         },
         {
           "@type": "Person",
@@ -545,22 +566,26 @@
         {
           "@type": "Person",
           "givenName": "Samad Nejad",
-          "familyName": "Ebrahimi"
+          "familyName": "Ebrahimi",
+          "@id": "https://orcid.org/0000-0003-2167-8032"
         },
         {
           "@type": "Person",
           "givenName": "Kornkanok",
-          "familyName": "Ingkaninan"
+          "familyName": "Ingkaninan",
+          "@id": "https://orcid.org/0000-0002-4415-8489"
         },
         {
           "@type": "Person",
           "givenName": "Jean-Luc",
-          "familyName": "Wolfender"
+          "familyName": "Wolfender",
+          "@id": "https://orcid.org/0000-0002-0125-952X"
         },
         {
           "@type": "Person",
           "givenName": "Pierre-Marie",
-          "familyName": "Allard"
+          "familyName": "Allard",
+          "@id": "https://orcid.org/0000-0003-3389-2191"
         }
       ],
       "name": "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",

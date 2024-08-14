@@ -22,4 +22,5 @@ This function downloads example files
 }
 \examples{
 get_example_files(example = c("features"), in_cache = FALSE)
+unlink("data", recursive = TRUE)
 }
