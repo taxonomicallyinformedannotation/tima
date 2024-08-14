@@ -22,6 +22,7 @@
 #'   export = get_params(step = "create_components")$files$networks$spectral$edges$prepared
 #' )
 #' create_components()
+#' unlink("data", recursive = TRUE)
 create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {

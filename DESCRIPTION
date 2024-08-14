@@ -2,12 +2,12 @@ Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.10.1
 Authors@R: c(
-    person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
+    person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
     person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
-Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
+Maintainer: Adriano Rutz <adafede@gmail.com>
 Description: This package provides the infrastructure to perform
     Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)

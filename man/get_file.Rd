@@ -29,4 +29,5 @@ get_file(
   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
   export = "data/source/example_metadata.tsv"
 )
+unlink("data", recursive = TRUE)
 }

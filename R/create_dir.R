@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples create_dir(export = "path/to/directory_of_file")
+#' unlink("path", recursive = TRUE)
 create_dir <- function(export) {
   ## Check if the export path includes a file name
   if (grepl(

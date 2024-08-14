@@ -30,4 +30,5 @@ get_last_version_from_zenodo(
   pattern = "frozen.csv.gz",
   path = "frozen.csv.gz"
 )
+unlink("frozen.csv.gz")
 }

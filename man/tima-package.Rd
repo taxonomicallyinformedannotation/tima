@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Adriano Rutz \email{rutz@imsb.biol.ethz.ch} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+\strong{Maintainer}: Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
 
 Other contributors:
 \itemize{

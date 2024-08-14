@@ -44,6 +44,7 @@
 #'   features = features,
 #'   rts = rts
 #' )
+#' unlink("data", recursive = TRUE)
 filter_annotations <-
   function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
            features = get_params(step = "filter_annotations")$files$features$prepared,

@@ -31,4 +31,5 @@ get_file(
   export = get_params(step = "create_components")$files$networks$spectral$edges$prepared
 )
 create_components()
+unlink("data", recursive = TRUE)
 }

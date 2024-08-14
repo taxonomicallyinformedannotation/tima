@@ -20,6 +20,7 @@
 #'   pattern = "frozen.csv.gz",
 #'   path = "frozen.csv.gz"
 #' )
+#' unlink("frozen.csv.gz")
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
     ## Remove the prefix from the DOI

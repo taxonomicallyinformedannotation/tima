@@ -60,4 +60,5 @@ filter_annotations(
   features = features,
   rts = rts
 )
+unlink("data", recursive = TRUE)
 }
