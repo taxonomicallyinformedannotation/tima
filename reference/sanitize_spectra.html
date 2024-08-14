@@ -86,8 +86,20 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  FEATURE_ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FT001"</span>, <span class="st">"FT002"</span>, <span class="st">"FT003"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  mz <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">123.4567</span>, <span class="fl">234.5678</span>, <span class="fl">345.6789</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">Spectra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Spectra/man/Spectra.html" class="external-link">Spectra</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">sanitize_spectra</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:40:02.270641 Applying sanitization of the spectra </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Combining spectra in case...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MSn data (Spectra) with 0 spectra in a MsBackendMemory backend:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Processing:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  For groups of peaks with similar m/z keep the one with the highest intensity. [Wed Aug 14 11:40:02 2024]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Remove fast fourier artefacts. [Wed Aug 14 11:40:02 2024]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Remove peaks with intensities outside [0, Inf] in spectra of MS level(s) NA. [Wed Aug 14 11:40:02 2024]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ...3 more processings. Use 'processingLog' to list all. </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

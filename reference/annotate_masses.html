@@ -184,55 +184,55 @@ table is expected to be pre-formatted.</p>
 <span class="r-in"><span>  str_tax_cla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  str_tax_npc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.801336 filtering desired adducts and adding mz tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.492627 filtering desired adducts and adding mz tolerance </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.810947 No previously attributed adducts detected </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.817649 calculating rt tolerance ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.502429 No previously attributed adducts detected </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.50925 calculating rt tolerance ... </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.819178 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.510801 joining within given rt tolerance </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.87653 adding delta mz tolerance for single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.569534 adding delta mz tolerance for single charge adducts </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:52.881163 forming adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:34.574118 forming adducts and clusters </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.801908 calculating delta mz for single charge adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.460256 calculating delta mz for single charge adducts and clusters </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.876994 joining within given delta mz tolerance (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.537151 joining within given delta mz tolerance (neutral losses) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.882924 joining within given delta mz tolerance (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.543257 joining within given delta mz tolerance (adducts) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.895181 keeping initial and destination feature </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.555609 keeping initial and destination feature </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.903347 joining with initial results (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.563836 joining with initial results (adducts) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.906772 joining with initial results (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.56736 joining with initial results (neutral losses) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.980253 joining within given mz tol to exact mass library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.642208 joining within given mz tol to exact mass library </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.986547 keeping unique exact masses and molecular formulas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.6491 keeping unique exact masses and molecular formulas </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.996956 joining exact masses with single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.659972 joining exact masses with single charge adducts </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:53.997062 Geting back to M </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.660089 Geting back to M </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.001271 calculating multicharged and in source dimers </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:35.664403 calculating multicharged and in source dimers </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.474989 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.139087 joining within given rt tolerance </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.47792 joining within given mz tol and filtering possible adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.142086 joining within given mz tol and filtering possible adducts </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.489387 joining single adducts, in source dimers, and multicharged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.154106 joining single adducts, in source dimers, and multicharged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.494095 adding chemical classification </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.505262 MS1 annotation led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.158889 adding chemical classification </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.170216 MS1 annotation led to </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> <span style="color: #00BB00;">annotations</span> , on </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> <span style="color: #0000BB;">features</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.591116 Directory data/interim/params created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.591229 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.669021 Directory data/interim/features created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.669129 ... path to export is <span style="color: #00BB00;">data/interim/features/example_edgesMasses.tsv</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.705526 Directory data/interim/annotations created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:15:54.705619 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_ms1Prepared.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.257785 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.257909 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.337754 Directory data/interim/features created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.337872 ... path to export is <span style="color: #00BB00;">data/interim/features/example_edgesMasses.tsv</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.374728 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.374833 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_ms1Prepared.tsv.gz</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                           annotations </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "data/interim/annotations/example_ms1Prepared.tsv.gz" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                 edges </span>
