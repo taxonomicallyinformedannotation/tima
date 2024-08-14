@@ -79,6 +79,16 @@ references:
   year: '2019'
   volume: '10'
   url: https://doi.org/10.3389/fpls.2019.01329
+  keywords:
+  - metabolite annotation
+  - chemotaxonomy
+  - scoring system
+  - natural products
+  - computational metabolomics
+  - taxonomic distance
+  - specialized metabolome
+  doi: 10.3389/FPLS.2019.01329
+  issn: 1664-462X
 - type: software
   title: 'R: A Language and Environment for Statistical Computing'
   notes: Depends
