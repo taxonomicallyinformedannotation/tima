@@ -357,8 +357,228 @@ match (should be lower than <code>NPC class</code>)</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="cn">NULL</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
+<span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
+<span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">library</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">keys</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">org_tax_ott</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">taxonomies</span><span class="op">$</span><span class="va">ott</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">str_stereo</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">structures</span><span class="op">$</span><span class="va">stereo</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">filtered</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">canopus</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">canopus</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">formula</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">components</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">components</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
+<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">library</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">library</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:28.929679 Directory data/interim/libraries/sop/merged created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/keys.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">org_tax_ott</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">org_tax_ott</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.005651 Directory data/interim/libraries/sop/merged/organisms/taxonomies created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">str_stereo</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">str_stereo</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.013154 Directory data/interim/libraries/sop/merged/structures created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/stereo.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">annotations</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">annotations</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.068138 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_annotationsFiltered.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">canopus</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">canopus</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_canopusPrepared.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">formula</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">formula</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_formulaPrepared.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">components</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">components</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.3699 Directory data/interim/features created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_componentsPrepared.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">edges</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">edges</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_edges.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">taxa</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">taxa</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.449343 Directory data/interim/taxa created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/taxa/example_taxed.tsv"</span>
+<span class="r-in"><span><span class="fu">weight_annotations</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  library <span class="op">=</span> <span class="va">library</span>,</span></span>
+<span class="r-in"><span>  org_tax_ott <span class="op">=</span> <span class="va">org_tax_ott</span>,</span></span>
+<span class="r-in"><span>  str_stereo <span class="op">=</span> <span class="va">str_stereo</span>,</span></span>
+<span class="r-in"><span>  annotations <span class="op">=</span> <span class="va">annotations</span>,</span></span>
+<span class="r-in"><span>  canopus <span class="op">=</span> <span class="va">canopus</span>,</span></span>
+<span class="r-in"><span>  formula <span class="op">=</span> <span class="va">formula</span>,</span></span>
+<span class="r-in"><span>  components <span class="op">=</span> <span class="va">components</span>,</span></span>
+<span class="r-in"><span>  edges <span class="op">=</span> <span class="va">edges</span>,</span></span>
+<span class="r-in"><span>  taxa <span class="op">=</span> <span class="va">taxa</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.657802 Loading files ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.657916 ... components </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.658769 ... edges </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.659483 ... structure-organism pairs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.664824 ... canopus </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.665363 ... formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.665863 ... annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.667761 Got c("ISDB", "TIMA MS1") initial annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2024-08-14 11:54:29.667761 Got c(86, 13) initial annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.675941 Re-arranging annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.89484 adding biological organism metadata </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.897355 performing taxonomically informed scoring </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:29.897862 filtering top  3  candidates and keeping only MS1 candidates with minimum </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0  biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  OR 0 chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.208686 adding "notClassified" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.225063 calculating biological score at all levels ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.22515 ... domain </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.336215 ... kingdom </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.443898 ... phylum </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.558251 ... class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.668945 ... order </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.776174 ... family </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:30.889902 ... tribe </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.000007 ... genus </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.107412 ... species </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.221523 ... varietas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.33646 ... keeping best biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.36397 ... calculating weighted biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.592374 taxonomically informed scoring led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #555555;">0</span> annotations reranked at the <span style="color: #555555;">kingdom</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBBBB;">0</span> annotations reranked at the <span style="color: #BBBBBB;">phylum</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BBBB;">0</span> annotations reranked at the <span style="color: #00BBBB;">class</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB00BB;">0</span> annotations reranked at the <span style="color: #BB00BB;">order</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">family</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">tribe</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBB00;">0</span> annotations reranked at the <span style="color: #BBBB00;">genus</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> annotations reranked at the <span style="color: #00BB00;">species</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  and <span style="color: #BB0000;">0</span> annotations reranked at the <span style="color: #BB0000;">variety</span> level. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! (for later predictions) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.611648 calculating chemical consistency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               features with at least 2 neighbors ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.62188 ... among all edges ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.621969 ... at the (classyfire) kingdom level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.739362 ... at the (NPC) pathway level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.755786 ... at the (classyfire) superclass level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.771351 ... at the (NPC) superclass level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.787016 ... at the (classyfire) class level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.802567 ... at the (NPC) class level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.818097 ... at the (classyfire) parent level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.833706 splitting already computed predictions </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.840836 joining all except -1 together </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.850649 adding dummy consistency for features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               with less than 2 neighbors </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.861947 adding already computed predictions back </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.870125 calculating chemical score at all levels ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.870218 ... (classyfire) kingdom </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:31.985333 ... (NPC) pathway </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.090976 ... (classyfire) superclass </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.194637 ... (NPC) superclass </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.308552 ... (classyfire) class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.415188 ... (NPC) class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.519348 ... (classyfire) parent </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.63279 ... keeping best chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.647793 ... calculating weighted chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.766076 chemically informed scoring led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #555555;">0</span> annotations reranked at the <span style="color: #555555;">(classyfire) kingdom</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BBBB;">0</span> annotations reranked at the <span style="color: #00BBBB;">(NPC) pathway</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB00BB;">0</span> annotations reranked at the <span style="color: #BB00BB;">(classyfire) superclass</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">(NPC) superclass</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBB00;">0</span> annotations reranked at the <span style="color: #BBBB00;">(classyfire) class</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> annotations reranked at the <span style="color: #00BB00;">(NPC) class</span> level, and </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">0</span> annotations reranked at the <span style="color: #BB0000;">(classyfire) parent</span> level. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.878812 Keeping high confidence candidates only... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.880533 Removed <span style="color: #BB0000;">91</span> low confidence candidates out of the <span style="color: #0000BB;">91</span> total ones. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.880813 <span style="color: #00BB00;">0</span> high confidence candidates remaining. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.888266 adding initial metadata (RT, etc.) and simplifying columns </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:32.891535 adding references </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.134113 selecting columns to export </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.156694 adding consensus again to droped candidates </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.170107 Exporting ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.385172 Directory data/processed/240814_115433_example created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.385301 ... path to used parameters is <span style="color: #00BB00;">data/processed/240814_115433_example</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.402556 ... path to used parameters is <span style="color: #00BB00;">data/processed/240814_115433_example</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:33.420264 ... path to export is <span style="color: #00BB00;">data/processed/240814_115433_example/annotations.tsv</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/processed/240814_115433_example/annotations.tsv"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -119,31 +119,31 @@ A query file that will be matched against a library file.</p>
 <span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">spectra_mini</span>,</span></span>
 <span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"annotate_spectra"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">raw</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.604023 Directory data/source created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:02.134768 Directory data/source created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_spectra.mgf"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">spectral_lib_mini</span><span class="op">$</span><span class="va">with_rt</span>,</span></span>
 <span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectra</span><span class="op">$</span><span class="va">exp</span><span class="op">$</span><span class="va">with_rt</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:36.968418 Directory data/source/libraries/spectra/exp created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:02.350587 Directory data/source/libraries/spectra/exp created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf"</span>
 <span class="r-in"><span><span class="fu">annotate_spectra</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  library <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">spectra</span><span class="op">$</span><span class="va">exp</span><span class="op">$</span><span class="va">with_rt</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:37.519899 Loading spectra... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:38.72855 Applying sanitization of the spectra </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:02.606741 Loading spectra... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.073042 Applying sanitization of the spectra </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering MS2 only</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:38.847572 Loading spectral library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.190136 Loading spectral library </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs introduced by coercion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.193478 Reducing library size... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.19958 Performing spectral comparison </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.252651 Trying to harmonize adducts definitions... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.258992 Filtering results above threshold only... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.297162 1 Candidates were annotated on 2 features, with at least 0 similarity score. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.301771 Directory data/interim/params created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.301882 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.370643 Directory data/interim/annotations created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:39:39.370768 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_spectralMatches.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.576673 Reducing library size... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.582453 Performing spectral comparison </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.633606 Trying to harmonize adducts definitions... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.639669 Filtering results above threshold only... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.67599 1 Candidates were annotated on 2 features, with at least 0 similarity score. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.680419 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.680518 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.738301 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-14 11:54:04.738426 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_spectralMatches.tsv.gz</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_spectralMatches.tsv.gz"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
