@@ -13,7 +13,10 @@
 #'
 #' @export
 #'
-#' @examples get_params("prepare_params")
+#' @examples
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' get_params("prepare_params")
 get_params <- function(step) {
   paths <- get_default_paths()
   steps <-

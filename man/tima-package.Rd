@@ -13,6 +13,7 @@ Useful links:
 \itemize{
   \item \url{https://github.com/taxonomicallyinformedannotation/tima}
   \item \url{https://taxonomicallyinformedannotation.github.io/tima}
+  \item \url{https://taxonomicallyinformedannotation.github.io/tima-shinylive}
   \item Report bugs at \url{https://github.com/taxonomicallyinformedannotation/tima/issues}
 }
 

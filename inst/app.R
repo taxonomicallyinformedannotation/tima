@@ -2392,6 +2392,7 @@ shiny::shinyApp(
       message("I'm inside the matrix ;(")
       setwd(dir = "..")
     } else {
+      tima:::copy_backbone()
       tima:::go_to_cache()
     }
   }

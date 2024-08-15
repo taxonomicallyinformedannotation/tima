@@ -1,6 +1,6 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.10.1
+Version: 2.11.0
 Authors@R: c(
     person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
@@ -12,7 +12,8 @@ Description: This package provides the infrastructure to perform
     Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima,
-    https://taxonomicallyinformedannotation.github.io/tima
+    https://taxonomicallyinformedannotation.github.io/tima,
+    https://taxonomicallyinformedannotation.github.io/tima-shinylive
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
     R (>= 4.3.0)
