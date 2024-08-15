@@ -4,13 +4,11 @@
 \alias{get_default_paths}
 \title{Get default paths}
 \usage{
-get_default_paths(
-  yaml = system.file("extdata", "paths.yaml", package = "tima")
-)
+get_default_paths(yaml = system.file("paths.yaml", package = "tima"))
 }
 \arguments{
 \item{yaml}{The YAML file containing the paths
-(default is "extdata/paths.yaml")}
+(default is "paths.yaml")}
 }
 \value{
 A list containing the paths specified in the YAML file

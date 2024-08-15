@@ -45,6 +45,7 @@ It takes two files as input.
 A query file that will be matched against a library file.
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 get_file(
   url = get_default_paths()$urls$examples$spectra_mini,
   export = get_params(step = "annotate_spectra")$files$spectral$raw

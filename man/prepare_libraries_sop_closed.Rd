@@ -23,6 +23,7 @@ The path to the prepared structure-organism pairs library CLOSED
 Prepare libraries of structure organism pairs CLOSED
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_libraries_sop_closed()
 unlink("data", recursive = TRUE)
 }

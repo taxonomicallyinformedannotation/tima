@@ -22,6 +22,7 @@ The path to the prepared structure-organism pairs library ECMDB
 Prepare libraries of structure organism pairs ECMDB
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_libraries_sop_ecmdb()
 unlink("data", recursive = TRUE)
 }

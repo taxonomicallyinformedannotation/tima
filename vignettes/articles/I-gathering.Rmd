@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = "../..")
+knitr::opts_knit$set(root.dir = system.file(package = "tima"))
 ```
 
 ```{r tima, include = FALSE}
@@ -34,13 +34,13 @@ This vignette describes...
 * All inputs you need
 
 ```{r change-tests, include = FALSE}
-source(file = "inst/scripts/change_tests.R")
+source(file = "scripts/change_tests.R")
 ```
 
 ## Parameters
 
 All steps require parameters.
-Some default parameters are available and can be accessed in the `inst/params/default` directory.
+Some default parameters are available and can be accessed in the `params/default` directory.
 If you prefer accessing them through the GUI, you can do so.
 Each parameter contains a small help menu, you can click on, as illustrated below.
 
@@ -104,9 +104,9 @@ We are currently working to get all MONA and GNPS experimental spectra easily av
 
 However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.
 
-So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `inst/scripts/prepare_libraries_spectra_exp_mona.R`).
+So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `scripts/prepare_libraries_spectra_exp_mona.R`).
 
-In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `inst/params/user/prepare_libraries_spectra.yaml` and `inst/params/user/annotate_spectra.yaml`.
+In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `params/user/prepare_libraries_spectra.yaml` and `params/user/annotate_spectra.yaml`.
 
 ##### *In silico*
 
@@ -140,7 +140,7 @@ This library is **optional**.
 As no standard LC method is shared (for now) among laboratories, this library
 will be heavily laboratory-dependent.
 It could also be a library of in silico predicted retention times.
-If you want to prepare you own library, have a look at `inst/params/user/prepare_libraries_rt.yaml`.
+If you want to prepare you own library, have a look at `params/user/prepare_libraries_rt.yaml`.
 
 #### Structure-Organism Pairs
 
@@ -202,7 +202,7 @@ As we want our tool to be flexible, you can also add your own library to LOTUS.
 You just need to format it in order to be compatible.
 As example, we prepared some ways too format closed, *in house* libraries.
 If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
-Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`.
+Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_closed.yaml`.
 
 ##### Merging
 

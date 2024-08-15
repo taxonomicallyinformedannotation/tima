@@ -22,6 +22,7 @@ The path to the prepared structure-organism pairs library HMDB
 This function prepares the HMDB structure-organism pairs
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_libraries_sop_hmdb()
 unlink("data", recursive = TRUE)
 }

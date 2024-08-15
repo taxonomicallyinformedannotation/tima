@@ -34,12 +34,12 @@ load_yaml_files <- function() {
 
   yaml_names <- yaml_files |>
     gsub(
-      pattern = "inst/params/default/",
+      pattern = "params/default/",
       replacement = "",
       fixed = TRUE
     ) |>
     gsub(
-      pattern = "inst/params/user/",
+      pattern = "params/user/",
       replacement = "",
       fixed = TRUE
     ) |>

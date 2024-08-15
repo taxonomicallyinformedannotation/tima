@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#' go_to_cache(dir = system.file(package = "tima"))
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)

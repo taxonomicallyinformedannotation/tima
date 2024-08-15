@@ -4,18 +4,12 @@
 \alias{copy_backbone}
 \title{Copy backbone}
 \usage{
-copy_backbone(
-  cache_dir = fs::path_home(".tima"),
-  package = "tima",
-  copy_dir = "inst"
-)
+copy_backbone(cache_dir = fs::path_home(".tima"), package = "tima")
 }
 \arguments{
 \item{cache_dir}{Cache directory}
 
 \item{package}{Package}
-
-\item{copy_dir}{Copy directory}
 }
 \description{
 This function copies backbone
