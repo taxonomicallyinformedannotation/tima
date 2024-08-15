@@ -207,7 +207,8 @@ The path to the weighted annotations
 This function weights annotations.
 }
 \examples{
-go_to_cache(dir = system.file(package = "tima"))
+tima:::copy_backbone()
+go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)

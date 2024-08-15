@@ -25,7 +25,8 @@
 #' @export
 #'
 #' @examples
-#' go_to_cache(dir = system.file(package = "tima"))
+#' tima:::copy_backbone()
+#' go_to_cache()
 #' prepare_libraries_rt()
 #' unlink("data", recursive = TRUE)
 prepare_libraries_rt <-
