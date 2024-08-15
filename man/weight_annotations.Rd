@@ -207,6 +207,7 @@ The path to the weighted annotations
 This function weights annotations.
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
@@ -287,6 +288,7 @@ weight_annotations(
   taxa = taxa
 )
 unlink("data", recursive = TRUE)
+}
 }
 \seealso{
 annotate_masses weight_bio weight_chemo

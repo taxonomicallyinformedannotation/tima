@@ -19,6 +19,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -42,6 +43,7 @@
 #'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_annotations_spectra <-
   function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral,
            output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural$spectral,

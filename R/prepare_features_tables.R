@@ -16,6 +16,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' get_file(
@@ -24,6 +25,7 @@
 #' )
 #' prepare_features_tables()
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_features_tables <-
   function(features = get_params(step = "prepare_features_tables")$files$features$raw,
            output = get_params(step = "prepare_features_tables")$files$features$prepared,

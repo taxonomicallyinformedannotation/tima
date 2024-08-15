@@ -33,6 +33,7 @@ The path to the prepared feature table
 This function prepares features
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 get_file(
@@ -41,4 +42,5 @@ get_file(
 )
 prepare_features_tables()
 unlink("data", recursive = TRUE)
+}
 }

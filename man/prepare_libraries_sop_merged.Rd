@@ -62,6 +62,7 @@ It can be restricted to specific taxa to have
 more biologically meaningful annotation.
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
@@ -76,4 +77,5 @@ files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$p
 get_file(url = paste0(dir, files), export = files)
 prepare_libraries_sop_merged(files = files)
 unlink("data", recursive = TRUE)
+}
 }

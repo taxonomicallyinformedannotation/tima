@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -27,6 +28,7 @@
 #'   input = list("ms1" = input_1, "spectral" = input_2)
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_features_edges <-
   function(input = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$raw,
            output = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$prepared,

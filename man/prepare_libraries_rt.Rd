@@ -55,8 +55,10 @@ This function prepares retention times libraries
 to be used for later
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_rt()
 unlink("data", recursive = TRUE)
+}
 }

@@ -31,6 +31,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -52,6 +53,7 @@
 #'   org_tax_ott = org_tax_ott
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_taxa <-
   function(input = get_params(step = "prepare_taxa")$files$features$raw,
            extension = get_params(step = "prepare_taxa")$names$extension,

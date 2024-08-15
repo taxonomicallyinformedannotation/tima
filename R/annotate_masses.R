@@ -37,6 +37,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -54,6 +55,7 @@
 #'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 annotate_masses <-
   function(features = get_params(step = "annotate_masses")$files$features$prepared,
            output_annotations = get_params(step = "annotate_masses")$files$annotations$prepared$structural$ms1,

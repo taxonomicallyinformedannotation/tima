@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -24,6 +25,7 @@
 #'   input = input
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_features_components <-
   function(input = get_params(step = "prepare_features_components")$files$networks$spectral$components$raw,
            output = get_params(step = "prepare_features_components")$files$networks$spectral$components$prepared) {
