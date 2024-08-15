@@ -578,6 +578,60 @@ references:
   year: '2024'
   doi: 10.32614/CRAN.package.BiocManager
 - type: software
+  title: DT
+  abstract: 'DT: A Wrapper of the JavaScript Library ''DataTables'''
+  notes: Suggests
+  url: https://github.com/rstudio/DT
+  repository: https://CRAN.R-project.org/package=DT
+  authors:
+  - family-names: Xie
+    given-names: Yihui
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Tan
+    given-names: Xianying
+  year: '2024'
+  doi: 10.32614/CRAN.package.DT
+- type: software
+  title: gt
+  abstract: 'gt: Easily Create Presentation-Ready Display Tables'
+  notes: Suggests
+  url: https://gt.rstudio.com
+  repository: https://CRAN.R-project.org/package=gt
+  authors:
+  - family-names: Iannone
+    given-names: Richard
+    email: rich@posit.co
+    orcid: https://orcid.org/0000-0003-3925-190X
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Hughes
+    given-names: Ellis
+    email: ellis.h.hughes@gsk.com
+    orcid: https://orcid.org/0000-0003-0637-4436
+  - family-names: Lauer
+    given-names: Alexandra
+    email: alexandralauer1@gmail.com
+    orcid: https://orcid.org/0000-0002-4191-6301
+  - family-names: Seo
+    given-names: JooYoung
+    email: jseo1005@illinois.edu
+    orcid: https://orcid.org/0000-0002-4064-6012
+  - family-names: Brevoort
+    given-names: Ken
+    email: ken@brevoort.com
+    orcid: https://orcid.org/0000-0002-4001-8358
+  - family-names: Roy
+    given-names: Olivier
+  year: '2024'
+  doi: 10.32614/CRAN.package.gt
+- type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
   notes: Suggests
@@ -606,6 +660,18 @@ references:
     orcid: https://orcid.org/0000-0003-4757-117X
   year: '2024'
   doi: 10.32614/CRAN.package.lifecycle
+- type: software
+  title: pingr
+  abstract: 'pingr: Check if a Remote Computer is Up'
+  notes: Suggests
+  url: https://r-lib.github.io/pingr/
+  repository: https://CRAN.R-project.org/package=pingr
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.pingr
 - type: software
   title: pkgload
   abstract: 'pkgload: Simulate Package Installation and Attach'
@@ -651,6 +717,20 @@ references:
     email: hadley@posit.co
   year: '2024'
   doi: 10.32614/CRAN.package.rlang
+- type: software
+  title: shinybusy
+  abstract: 'shinybusy: Busy Indicators and Notifications for ''Shiny'' Applications'
+  notes: Suggests
+  url: https://dreamrs.github.io/shinybusy/
+  repository: https://CRAN.R-project.org/package=shinybusy
+  authors:
+  - family-names: Meyer
+    given-names: Fanny
+  - family-names: Perrier
+    given-names: Victor
+    email: victor.perrier@dreamrs.fr
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinybusy
 - type: software
   title: shinyhelper
   abstract: 'shinyhelper: Easily Add Markdown Help Files to ''shiny'' App Elements'
