@@ -21,7 +21,9 @@ Imports:
     crayon (>= 1.5.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
+    DT,
     fs (>= 1.6.4),
+    gt,
     httr2 (>= 1.0.1),
     igraph (>= 2.0.3),
     jsonlite (>= 1.8.8),
@@ -30,8 +32,11 @@ Imports:
     MsBackendMsp (>= 1.6.0),
     msentropy (>= 0.1.4),
     pbapply (>= 1.7.2),
+    pingr,
     rotl (>= 3.1.0),
     shiny (>= 1.9.0),
+    shinybusy,
+    shinyWidgets,
     Spectra (>= 1.12.0),
     stats,
     stringi (>= 1.8.4),
@@ -40,26 +45,21 @@ Imports:
     tidyselect (>= 1.2.1),
     tidytable (>= 0.11.1),
     utils,
+    visNetwork,
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
-    DT,
-    gt,
     knitr,
     lifecycle,
-    pingr,
     pkgload,
     R.utils,
     rlang,
-    shinybusy,
     shinyhelper,
     shinyjs,
     shinytest2,
     shinyvalidate,
-    shinyWidgets,
     spelling,
-    testthat (>= 3.0.0),
-    visNetwork
+    testthat (>= 3.0.0)
 VignetteBuilder:
     knitr
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural
