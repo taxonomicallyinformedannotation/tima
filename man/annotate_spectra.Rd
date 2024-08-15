@@ -45,6 +45,7 @@ It takes two files as input.
 A query file that will be matched against a library file.
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 get_file(
@@ -59,4 +60,5 @@ annotate_spectra(
   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 )
 unlink("data", recursive = TRUE)
+}
 }

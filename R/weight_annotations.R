@@ -90,6 +90,7 @@
 #' @seealso annotate_masses weight_bio weight_chemo
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -170,6 +171,7 @@
 #'   taxa = taxa
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 weight_annotations <- function(library = get_params(step = "weight_annotations")$files$libraries$sop$merged$keys,
                                org_tax_ott = get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott,
                                str_stereo = get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo,

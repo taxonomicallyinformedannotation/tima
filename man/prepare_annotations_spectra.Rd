@@ -44,6 +44,7 @@ This function prepares the spectral matches
 obtained previously to make them compatible
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
@@ -67,4 +68,5 @@ prepare_annotations_spectra(
   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
 )
 unlink("data", recursive = TRUE)
+}
 }

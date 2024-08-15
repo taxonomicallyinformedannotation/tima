@@ -29,6 +29,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -43,6 +44,7 @@
 #' get_file(url = paste0(dir, files), export = files)
 #' prepare_libraries_sop_merged(files = files)
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_libraries_sop_merged <-
   function(files = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared,
            filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,

@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -25,6 +26,7 @@
 #' )
 #' create_components()
 #' unlink("data", recursive = TRUE)
+#' }
 create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {

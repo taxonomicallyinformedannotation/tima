@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
@@ -47,6 +48,7 @@
 #'   rts = rts
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 filter_annotations <-
   function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
            features = get_params(step = "filter_annotations")$files$features$prepared,

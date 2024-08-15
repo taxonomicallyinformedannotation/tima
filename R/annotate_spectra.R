@@ -25,6 +25,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' get_file(
@@ -39,6 +40,7 @@
 #'   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 #' )
 #' unlink("data", recursive = TRUE)
+#' }
 annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files$spectral$raw,
                              library = get_params(step = "annotate_spectra")$files$libraries$spectral,
                              polarity = get_params(step = "annotate_spectra")$ms$polarity,

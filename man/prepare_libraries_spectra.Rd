@@ -75,8 +75,10 @@ This function prepares spectra
 to be used for spectral matching
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_spectra()
 unlink("data", recursive = TRUE)
+}
 }

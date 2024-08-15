@@ -18,10 +18,12 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' prepare_annotations_gnps()
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_annotations_gnps <-
   function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral$gnps,
            output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural$gnps,

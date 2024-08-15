@@ -28,6 +28,7 @@ The path to the prepared edges
 This function prepares edges for further use
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
@@ -41,4 +42,5 @@ prepare_features_edges(
   input = list("ms1" = input_1, "spectral" = input_2)
 )
 unlink("data", recursive = TRUE)
+}
 }

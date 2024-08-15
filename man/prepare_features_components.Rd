@@ -24,6 +24,7 @@ This function prepares the components
 (clusters in molecular network) for further use
 }
 \examples{
+\donttest{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
@@ -35,4 +36,5 @@ prepare_features_components(
   input = input
 )
 unlink("data", recursive = TRUE)
+}
 }

@@ -25,10 +25,12 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_rt()
 #' unlink("data", recursive = TRUE)
+#' }
 prepare_libraries_rt <-
   function(mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp$mgf,
            mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is$mgf,
