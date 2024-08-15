@@ -357,8 +357,11 @@ match (should be lower than <code>NPC class</code>)</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span>dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"tima"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Working in /home/runner/home/runner/work/_temp/Library/tima</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tima</span><span class="fu">:::</span><span class="fu"><a href="copy_backbone.html">copy_backbone</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating cache at /home/runner/.tima</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Copying default architecture ...</span>
+<span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Working in /home/runner/.tima</span>
 <span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
 <span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
 <span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span><span class="op">)</span></span></span>
@@ -368,90 +371,78 @@ match (should be lower than <code>NPC class</code>)</p></dd>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">org_tax_ott</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">taxonomies</span><span class="op">$</span><span class="va">ott</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">str_stereo</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">structures</span><span class="op">$</span><span class="va">stereo</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">filtered</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">canopus</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">canopus</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">formula</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">components</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">components</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/weight_annotations.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">library</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">library</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file.exists(export):</span> invalid 'file' argument</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:56.885294 Directory data/interim/libraries/sop/merged created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/keys.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">org_tax_ott</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">org_tax_ott</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'org_tax_ott' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:56.943376 Directory data/interim/libraries/sop/merged/organisms/taxonomies created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">str_stereo</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">str_stereo</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'str_stereo' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:56.953437 Directory data/interim/libraries/sop/merged/structures created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/structures/stereo.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">annotations</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">annotations</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'annotations' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:56.976134 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_annotationsFiltered.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">canopus</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">canopus</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'canopus' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_canopusPrepared.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">formula</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">formula</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file.exists(export):</span> invalid 'file' argument</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/annotations/example_formulaPrepared.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">components</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">components</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'components' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.145228 Directory data/interim/features created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_componentsPrepared.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">edges</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">edges</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'edges' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_edges.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">taxa</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">taxa</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'taxa' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.216071 Directory data/interim/taxa created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/taxa/example_taxed.tsv"</span>
 <span class="r-in"><span><span class="fu">weight_annotations</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  library <span class="op">=</span> <span class="va">library</span>,</span></span>
 <span class="r-in"><span>  org_tax_ott <span class="op">=</span> <span class="va">org_tax_ott</span>,</span></span>
@@ -463,7 +454,135 @@ match (should be lower than <code>NPC class</code>)</p></dd>
 <span class="r-in"><span>  edges <span class="op">=</span> <span class="va">edges</span>,</span></span>
 <span class="r-in"><span>  taxa <span class="op">=</span> <span class="va">taxa</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'annotations' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.393424 Loading files ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.39353 ... components </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.394322 ... edges </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.395058 ... structure-organism pairs </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.400431 ... canopus </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.400965 ... formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.401457 ... annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.403311 Got c("ISDB", "TIMA MS1") initial annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2024-08-15 12:50:57.403311 Got c(86, 13) initial annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.411601 Re-arranging annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.627135 adding biological organism metadata </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.629603 performing taxonomically informed scoring </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.630141 filtering top  3  candidates and keeping only MS1 candidates with minimum </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0  biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  OR 0 chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.93831 adding "notClassified" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.955097 calculating biological score at all levels ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:57.955199 ... domain </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.062934 ... kingdom </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.16926 ... phylum </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.282481 ... class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.390822 ... order </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.496005 ... family </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.607926 ... tribe </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.715514 ... genus </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.820173 ... species </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:58.944987 ... varietas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.053294 ... keeping best biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.080816 ... calculating weighted biological score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.300319 taxonomically informed scoring led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #555555;">0</span> annotations reranked at the <span style="color: #555555;">kingdom</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBBBB;">0</span> annotations reranked at the <span style="color: #BBBBBB;">phylum</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BBBB;">0</span> annotations reranked at the <span style="color: #00BBBB;">class</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB00BB;">0</span> annotations reranked at the <span style="color: #BB00BB;">order</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">family</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">tribe</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBB00;">0</span> annotations reranked at the <span style="color: #BBBB00;">genus</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> annotations reranked at the <span style="color: #00BB00;">species</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  and <span style="color: #BB0000;">0</span> annotations reranked at the <span style="color: #BB0000;">variety</span> level. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! (for later predictions) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.319289 calculating chemical consistency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               features with at least 2 neighbors ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.32918 ... among all edges ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.329266 ... at the (classyfire) kingdom level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.444566 ... at the (NPC) pathway level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.461527 ... at the (classyfire) superclass level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.47682 ... at the (NPC) superclass level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.49188 ... at the (classyfire) class level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.506989 ... at the (NPC) class level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.521966 ... at the (classyfire) parent level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.53705 splitting already computed predictions </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.54396 joining all except -1 together </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.55354 adding dummy consistency for features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               with less than 2 neighbors </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.564811 adding already computed predictions back </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.572705 calculating chemical score at all levels ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.572793 ... (classyfire) kingdom </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.683378 ... (NPC) pathway </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.786495 ... (classyfire) superclass </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.887127 ... (NPC) superclass </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:59.99917 ... (classyfire) class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.105181 ... (NPC) class </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.210153 ... (classyfire) parent </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.32634 ... keeping best chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.341601 ... calculating weighted chemical score </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.461365 chemically informed scoring led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #555555;">0</span> annotations reranked at the <span style="color: #555555;">(classyfire) kingdom</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BBBB;">0</span> annotations reranked at the <span style="color: #00BBBB;">(NPC) pathway</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB00BB;">0</span> annotations reranked at the <span style="color: #BB00BB;">(classyfire) superclass</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> annotations reranked at the <span style="color: #0000BB;">(NPC) superclass</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BBBB00;">0</span> annotations reranked at the <span style="color: #BBBB00;">(classyfire) class</span> level, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> annotations reranked at the <span style="color: #00BB00;">(NPC) class</span> level, and </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">0</span> annotations reranked at the <span style="color: #BB0000;">(classyfire) parent</span> level. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.573929 Keeping high confidence candidates only... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.575754 Removed <span style="color: #BB0000;">91</span> low confidence candidates out of the <span style="color: #0000BB;">91</span> total ones. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.576055 <span style="color: #00BB00;">0</span> high confidence candidates remaining. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.584222 adding initial metadata (RT, etc.) and simplifying columns </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.587728 adding references </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.83309 selecting columns to export </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.858062 adding consensus again to droped candidates </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:00.872129 Exporting ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:01.088035 Directory data/processed/240815_125100_example created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:01.088178 ... path to used parameters is <span style="color: #00BB00;">data/processed/240815_125100_example</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:01.106043 ... path to used parameters is <span style="color: #00BB00;">data/processed/240815_125100_example</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:51:01.124627 ... path to export is <span style="color: #00BB00;">data/processed/240815_125100_example/annotations.tsv</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/processed/240815_125100_example/annotations.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>

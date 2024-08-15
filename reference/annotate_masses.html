@@ -170,7 +170,10 @@ table is expected to be pre-formatted.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">tima</span><span class="fu">:::</span><span class="fu"><a href="copy_backbone.html">copy_backbone</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating cache at /home/runner/.tima</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Copying default architecture ...</span>
+<span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Working in /home/runner/.tima</span>
 <span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
 <span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
@@ -186,8 +189,59 @@ table is expected to be pre-formatted.</p>
 <span class="r-in"><span>  str_tax_cla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  str_tax_npc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/annotate_masses.yaml': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.028695 filtering desired adducts and adding mz tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.038215 No previously attributed adducts detected </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.044977 calculating rt tolerance ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.046503 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.10357 adding delta mz tolerance for single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.108209 forming adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:28.990226 calculating delta mz for single charge adducts and clusters </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.063918 joining within given delta mz tolerance (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.069897 joining within given delta mz tolerance (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.082222 keeping initial and destination feature </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.090435 joining with initial results (adducts) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.093917 joining with initial results (neutral losses) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.166715 joining within given mz tol to exact mass library </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.172856 keeping unique exact masses and molecular formulas </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.183245 joining exact masses with single charge adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.183347 Geting back to M </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.187424 calculating multicharged and in source dimers </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.662764 joining within given rt tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.665703 joining within given mz tol and filtering possible adducts </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.677366 joining single adducts, in source dimers, and multicharged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.682142 adding chemical classification </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.693533 MS1 annotation led to </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">0</span> <span style="color: #00BB00;">annotations</span> , on </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #0000BB;">0</span> <span style="color: #0000BB;">features</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.779215 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.779336 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.85764 Directory data/interim/features created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.857755 ... path to export is <span style="color: #00BB00;">data/interim/features/example_edgesMasses.tsv</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.89428 Directory data/interim/annotations created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 12:50:29.894385 ... path to export is <span style="color: #00BB00;">data/interim/annotations/example_ms1Prepared.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                           annotations </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "data/interim/annotations/example_ms1Prepared.tsv.gz" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                 edges </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       "data/interim/features/example_edgesMasses.tsv" </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
