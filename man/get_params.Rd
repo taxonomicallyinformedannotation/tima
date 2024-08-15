@@ -17,5 +17,7 @@ This function gets the parameters for the job.
 Combination of cli and yaml parameters
 }
 \examples{
+tima:::copy_backbone()
+go_to_cache()
 get_params("prepare_params")
 }
