@@ -48,7 +48,7 @@ jobs:
       - name: Build site
         shell: Rscript {0}
         run: |
-          shinylive::export("inst", "site")
+          shinylive::export(system.file(package = "tima"), "site")
 
       - name: Upload site artifact
         if: github.ref == 'refs/heads/main'
