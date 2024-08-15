@@ -21,6 +21,7 @@
 #' @export
 #'
 #' @examples
+#' go_to_cache(dir = system.file(package = "tima"))
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectra_mini,
 #'   export = get_params(step = "create_edges_spectra")$files$spectral$raw

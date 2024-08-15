@@ -39,7 +39,7 @@ list(
         name = yaml_paths,
         format = "file",
         command = {
-          yaml_paths <- system.file("extdata", "paths.yaml", package = "tima")
+          yaml_paths <- system.file("paths.yaml", package = "tima")
         }
       ),
       tar_target(

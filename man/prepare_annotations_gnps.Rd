@@ -43,6 +43,7 @@ The path to the prepared GNPS annotations
 This function prepares GNPS obtained annotations
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_annotations_gnps()
 unlink("data", recursive = TRUE)
 }

@@ -1777,7 +1777,7 @@ save_input <- function(input) {
 
   message(x = "Changing parameters ...")
   message(x = "... Small")
-  yaml_small <- yamls_params[["inst/params/prepare_params"]]
+  yaml_small <- yamls_params[["params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
@@ -1787,11 +1787,11 @@ save_input <- function(input) {
   yaml_small$organisms$taxon <- org_tax
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarise <- summarise
-  create_dir("inst/params")
+  create_dir("params")
   yaml::write_yaml(x = yaml_small, file = get_default_paths()$params$prepare_params)
 
   message(x = "... Advanced")
-  yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
+  yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
   yaml_advanced$annotations$ms1only <-

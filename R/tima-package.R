@@ -7,7 +7,6 @@ NULL
 .datatable.aware <- TRUE
 
 .onLoad <- function(libname, pkgname) {
-  Sys.setenv(TAR_CONFIG = system.file("pipelines/_targets.yaml", package = "tima"))
   invisible()
 }
 

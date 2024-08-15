@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' go_to_cache(dir = system.file(package = "tima"))
 #' prepare_libraries_sop_lotus()
 #' unlink("data", recursive = TRUE)
 prepare_libraries_sop_lotus <-

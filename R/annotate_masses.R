@@ -37,6 +37,7 @@
 #' @export
 #'
 #' @examples
+#' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' data_interim <- "data/interim/"

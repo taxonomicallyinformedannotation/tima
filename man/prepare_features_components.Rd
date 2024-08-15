@@ -24,6 +24,7 @@ This function prepares the components
 (clusters in molecular network) for further use
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)

@@ -54,6 +54,7 @@ The path to the prepared SIRIUS annotations
 This function prepares Sirius results to make them compatible
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_annotations_sirius()
 unlink("data", recursive = TRUE)
 }

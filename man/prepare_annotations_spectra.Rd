@@ -44,6 +44,7 @@ This function prepares the spectral matches
 obtained previously to make them compatible
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 data_interim <- "data/interim/"

@@ -75,6 +75,7 @@ This function prepares spectra
 to be used for spectral matching
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 prepare_libraries_spectra()
 unlink("data", recursive = TRUE)
 }

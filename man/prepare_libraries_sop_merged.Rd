@@ -62,6 +62,7 @@ It can be restricted to specific taxa to have
 more biologically meaningful annotation.
 }
 \examples{
+go_to_cache(dir = system.file(package = "tima"))
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
