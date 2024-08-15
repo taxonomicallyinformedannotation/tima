@@ -43,11 +43,15 @@ Imports:
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
+    DT,
+    gt,
     knitr,
     lifecycle,
+    pingr,
     pkgload,
     R.utils,
     rlang,
+    shinybusy,
     shinyhelper,
     shinyjs,
     shinytest2,
