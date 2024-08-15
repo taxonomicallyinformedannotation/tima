@@ -141,34 +141,34 @@ according to their relative intensities among the samples.</p>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">org_tax_ott</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">org_tax_ott</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.408701 Directory data/interim/libraries/sop/merged/organisms/taxonomies created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.811521 Directory data/interim/libraries/sop/merged/organisms/taxonomies created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/libraries/sop/merged/organisms/taxonomies/ott.tsv"</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">features</span>,</span></span>
 <span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">raw</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.65139 Directory data/source created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.894298 Directory data/source created. </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/source/example_features.csv"</span>
 <span class="r-in"><span><span class="fu">prepare_taxa</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  taxon <span class="op">=</span> <span class="st">"Homo sapiens"</span>,</span></span>
 <span class="r-in"><span>  org_tax_ott <span class="op">=</span> <span class="va">org_tax_ott</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.715329 Loading feature table </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.753632 Formatting feature table ... </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.753762 ... requires 'Peak area'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.957242 Loading feature table </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.994627 Formatting feature table ... </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.99473 ... requires 'Peak area'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               in columns (MZmine format) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.753833 ... or 'quant_' in columns (SLAW format) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.786908 ... filtering top K intensities per feature </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.913393 Forcing all features to given organism </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.943454 Preparing organisms names </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.951739 Retrieving already computed Open Tree of Life Taxonomy </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.9544 Submitting the rest to OTL </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.957356 Joining top K with metadata table </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:54.96016 Joining with cleaned taxonomy table </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:55.611496 Directory data/interim/params created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:55.611627 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:55.672208 Directory data/interim/taxa created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 09:05:55.672328 ... path to export is <span style="color: #00BB00;">data/interim/taxa/example_taxed.tsv.gz</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:07.994798 ... or 'quant_' in columns (SLAW format) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.025951 ... filtering top K intensities per feature </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.167987 Forcing all features to given organism </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.19759 Preparing organisms names </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.205684 Retrieving already computed Open Tree of Life Taxonomy </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.208259 Submitting the rest to OTL </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.211355 Joining top K with metadata table </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.214154 Joining with cleaned taxonomy table </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.842775 Directory data/interim/params created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.842894 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.900265 Directory data/interim/taxa created. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:08.900359 ... path to export is <span style="color: #00BB00;">data/interim/taxa/example_taxed.tsv.gz</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/taxa/example_taxed.tsv.gz"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
