@@ -52,9 +52,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_default_paths</span><span class="op">(</span></span>
-<span>  yaml <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"paths.yaml"</span>, package <span class="op">=</span> <span class="st">"tima"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_default_paths</span><span class="op">(</span>yaml <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"paths.yaml"</span>, package <span class="op">=</span> <span class="st">"tima"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -63,7 +61,7 @@
 
 <dl><dt id="arg-yaml">yaml<a class="anchor" aria-label="anchor" href="#arg-yaml"></a></dt>
 <dd><p>The YAML file containing the paths
-(default is "extdata/paths.yaml")</p></dd>
+(default is "paths.yaml")</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -347,24 +345,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inst$path</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$adducts</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata/adducts.tsv"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $inst$extdata$neutral_losses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/extdata/neutral_losses.tsv"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/scripts"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "scripts"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$docopt</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inst$scripts$docopt$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/scripts/docopt"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "scripts/docopt"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -379,181 +366,181 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate$masses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/annotate_masses.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/annotate_masses.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$annotate$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/annotate_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/annotate_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$components</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/create_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/create_components.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$edges</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$create$edges$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/create_edges_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/create_edges_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$filter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$filter$annotations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/filter_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/filter_annotations.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$components</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_features_components.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$edges</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_edges.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_features_edges.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$features$tables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_features_tables.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_features_tables.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$rt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_rt.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_rt.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$closed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_closed.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_sop_closed.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$ecmdb</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_ecmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_sop_ecmdb.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$hmdb</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_hmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_sop_hmdb.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$lotus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_lotus.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_sop_lotus.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$sop$merged</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_sop_merged.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_sop_merged.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$libraries$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_libraries_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_libraries_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$gnps</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_gnps.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_annotations_gnps.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$sirius</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_sirius.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_annotations_sirius.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$annotations$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_annotations_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_annotations_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$prepare$taxa</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/prepare_taxa.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/prepare_taxa.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$default$weight$annotations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/default/weight_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/default/weight_annotations.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$prepare_params</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/prepare_params.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/prepare_params.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$prepare_params_advanced</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/prepare_params_advanced.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/prepare_params_advanced.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$path</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate$masses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/annotate_masses.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/annotate_masses.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$annotate$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/annotate_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/annotate_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$components</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/create_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/create_components.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$edges</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$create$edges$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/create_edges_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/create_edges_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$filter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$filter$annotations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/filter_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/filter_annotations.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$components</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_components.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_features_components.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$edges</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_edges.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_features_edges.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$features$tables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_features_tables.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_features_tables.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$rt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_rt.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_rt.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$closed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_closed.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_sop_closed.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$ecmdb</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_ecmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_sop_ecmdb.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$hmdb</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_hmdb.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_sop_hmdb.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$lotus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_lotus.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_sop_lotus.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$sop$merged</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_sop_merged.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_sop_merged.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$libraries$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_libraries_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_libraries_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$gnps</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_gnps.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_annotations_gnps.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$sirius</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_sirius.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_annotations_sirius.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$annotations$spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_annotations_spectra.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_annotations_spectra.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$prepare$taxa</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/prepare_taxa.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/prepare_taxa.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params$user$weight$annotations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "inst/params/user/weight_annotations.yaml"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "params/user/weight_annotations.yaml"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

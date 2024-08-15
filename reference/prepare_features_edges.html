@@ -88,25 +88,25 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span>dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"tima"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Working in /home/runner/home/runner/work/_temp/Library/tima</span>
+<span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
 <span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
 <span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">input_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_edges"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">raw</span><span class="op">$</span><span class="va">ms1</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/prepare_features_edges.yaml': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="va">input_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_edges"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">raw</span><span class="op">$</span><span class="va">spectral</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file 'params/default/prepare_features_edges.yaml': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt", encoding = fileEncoding):</span> cannot open the connection</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">input_1</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">input_1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:04.801998 Directory data/interim/features created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_edgesMasses.tsv"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input_1' not found</span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">input_2</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">input_2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_edgesSpectra.tsv"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input_2' not found</span>
 <span class="r-in"><span><span class="fu">prepare_features_edges</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"ms1"</span> <span class="op">=</span> <span class="va">input_1</span>, <span class="st">"spectral"</span> <span class="op">=</span> <span class="va">input_2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:04.936826 Loading edge table </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:05.012691 Formatting edge table </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:05.036597 Directory data/interim/params created. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:05.036711 ... path to used parameters is <span style="color: #00BB00;">data/interim/params</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-08-15 11:07:05.06749 ... path to export is <span style="color: #00BB00;">data/interim/features/example_edges.tsv</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "data/interim/features/example_edges.tsv"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input_1' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
