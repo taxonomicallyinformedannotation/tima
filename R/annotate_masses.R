@@ -37,6 +37,7 @@
 #' @export
 #'
 #' @examples
+#' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"

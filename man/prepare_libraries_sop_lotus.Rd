@@ -22,7 +22,8 @@ The path to the prepared structure-organism pairs library LOTUS
 This function prepares the LOTUS structure-organism pairs
 }
 \examples{
-go_to_cache(dir = system.file(package = "tima"))
+tima:::copy_backbone()
+go_to_cache()
 prepare_libraries_sop_lotus()
 unlink("data", recursive = TRUE)
 }

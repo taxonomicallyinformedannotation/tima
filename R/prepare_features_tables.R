@@ -16,7 +16,8 @@
 #' @export
 #'
 #' @examples
-#' go_to_cache(dir = system.file(package = "tima"))
+#' tima:::copy_backbone()
+#' go_to_cache()
 #' get_file(
 #'   url = get_default_paths()$urls$examples$features,
 #'   export = get_params(step = "prepare_features_tables")$files$features$raw
