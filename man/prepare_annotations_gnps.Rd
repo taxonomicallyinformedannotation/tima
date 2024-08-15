@@ -43,7 +43,7 @@ The path to the prepared GNPS annotations
 This function prepares GNPS obtained annotations
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 prepare_annotations_gnps()

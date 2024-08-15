@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' get_params("prepare_params")

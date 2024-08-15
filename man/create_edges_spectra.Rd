@@ -41,7 +41,7 @@ This function create edges
 based on fragmentation spectra similarity
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 get_file(

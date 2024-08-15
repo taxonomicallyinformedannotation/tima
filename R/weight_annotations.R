@@ -90,7 +90,7 @@
 #' @seealso annotate_masses weight_bio weight_chemo
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"

@@ -28,7 +28,7 @@ The path to the prepared edges
 This function prepares edges for further use
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

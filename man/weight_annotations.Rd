@@ -207,7 +207,7 @@ The path to the weighted annotations
 This function weights annotations.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

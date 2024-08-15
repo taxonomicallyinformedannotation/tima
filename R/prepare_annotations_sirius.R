@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' tima:::copy_backbone()
 #' go_to_cache()
 #' prepare_annotations_sirius()

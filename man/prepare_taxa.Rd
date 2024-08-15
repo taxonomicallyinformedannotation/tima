@@ -56,7 +56,7 @@ or attribute them to multiple ones,
 according to their relative intensities among the samples.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

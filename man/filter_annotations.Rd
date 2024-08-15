@@ -31,7 +31,7 @@ The path to the filtered annotations
 This function filters initial annotations.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

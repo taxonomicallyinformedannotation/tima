@@ -62,7 +62,7 @@ It can be restricted to specific taxa to have
 more biologically meaningful annotation.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

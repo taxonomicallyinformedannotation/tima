@@ -76,7 +76,7 @@ or \code{neg} and retention time and mass tolerances should be given. The featur
 table is expected to be pre-formatted.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"

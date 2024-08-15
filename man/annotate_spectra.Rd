@@ -45,7 +45,7 @@ It takes two files as input.
 A query file that will be matched against a library file.
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 get_file(
