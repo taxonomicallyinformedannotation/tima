@@ -10,6 +10,9 @@ license: GPL-3.0-or-later
 title: 'tima: Taxonomically Informed Metabolite Annotation'
 version: 2.11.0
 doi: 10.5281/zenodo.5797920
+identifiers:
+- type: url
+  value: https://taxonomicallyinformedannotation.github.io/tima-shinylive
 abstract: This package provides the infrastructure to perform Taxonomically Informed
   Metabolite Annotation.
 authors:
@@ -26,7 +29,7 @@ preferred-citation:
     email: adafede@gmail.com
     orcid: https://orcid.org/0000-0003-0443-9902
   year: '2024'
-  notes: R package, version 2.10.1
+  notes: R package, version 2.11.0
   doi: 10.5281/zenodo.5797920
 repository: https://bioconductor.org/
 repository-code: https://github.com/taxonomicallyinformedannotation/tima
