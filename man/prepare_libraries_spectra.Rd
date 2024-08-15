@@ -75,7 +75,7 @@ This function prepares spectra
 to be used for spectral matching
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_spectra()

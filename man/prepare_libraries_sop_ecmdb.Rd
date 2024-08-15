@@ -22,7 +22,7 @@ The path to the prepared structure-organism pairs library ECMDB
 Prepare libraries of structure organism pairs ECMDB
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_sop_ecmdb()

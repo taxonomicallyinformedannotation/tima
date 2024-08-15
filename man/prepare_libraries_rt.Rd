@@ -55,7 +55,7 @@ This function prepares retention times libraries
 to be used for later
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_rt()

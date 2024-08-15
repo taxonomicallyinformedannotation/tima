@@ -23,7 +23,7 @@ The path to the prepared structure-organism pairs library CLOSED
 Prepare libraries of structure organism pairs CLOSED
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 prepare_libraries_sop_closed()

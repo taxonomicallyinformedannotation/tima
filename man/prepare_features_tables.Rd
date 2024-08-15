@@ -33,7 +33,7 @@ The path to the prepared feature table
 This function prepares features
 }
 \examples{
-\donttest{
+\dontrun{
 tima:::copy_backbone()
 go_to_cache()
 get_file(
