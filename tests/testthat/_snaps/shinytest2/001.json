@@ -8,6 +8,7 @@
     "ann_thr_ms1_che": 0,
     "ann_thr_ms1_con": "OR",
     "ann_thr_ms2_sim": 0,
+    "close": 0,
     "compounds_names": false,
     "edg_thr_ms2_sim": 0.7,
     "fil_ann_raw_sir": null,
