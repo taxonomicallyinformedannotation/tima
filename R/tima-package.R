@@ -7,14 +7,6 @@ NULL
 .datatable.aware <- TRUE
 
 .onLoad <- function(libname, pkgname) {
-  ## Hack to avoid rcmdcheck warning since they are needed by {targets}
-  ## for shinylive
-  DT:::.packageName
-  gt:::.packageName
-  pingr:::.packageName
-  shinybusy:::.packageName
-  shinyWidgets:::.packageName
-  visNetwork:::.packageName
   invisible()
 }
 
