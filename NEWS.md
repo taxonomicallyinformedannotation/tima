@@ -2,6 +2,7 @@
 
 # tima 2.11.0
 
+* Added demo files download to the app
 * Better packaging
 * Improved documentation
 * Fixed all CRAN warnings

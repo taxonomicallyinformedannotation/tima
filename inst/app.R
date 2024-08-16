@@ -61,13 +61,13 @@ ui <- shiny::fluidPage(
       shiny::tabPanel(
         title = "Files",
         shiny::h3("Required files"),
-        shiny::h5("They SHOULD be located in `data/source`"),
         shiny::div(
           shiny::fileInput(
             inputId = "fil_spe_raw",
             label = .label_mandatory("MGF file"),
             accept = ".mgf"
-          )
+          ),
+          shiny::downloadButton(outputId = "demo_spe", "Download example spectra")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -78,10 +78,13 @@ ui <- shiny::fluidPage(
               # "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        shiny::fileInput(
-          inputId = "fil_fea_raw",
-          label = .label_mandatory("Features table"),
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+        shiny::div(
+          shiny::fileInput(
+            inputId = "fil_fea_raw",
+            label = .label_mandatory("Features table"),
+            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+          ),
+          shiny::downloadButton(outputId = "demo_fea", "Download example features")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -92,10 +95,13 @@ ui <- shiny::fluidPage(
               # "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        shiny::fileInput(
-          inputId = "fil_met_raw",
-          label = "Metadata table (mandatory if no taxon name)",
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+        shiny::div(
+          shiny::fileInput(
+            inputId = "fil_met_raw",
+            label = "Metadata table (mandatory if no taxon name)",
+            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+          ),
+          shiny::downloadButton(outputId = "demo_met", "Download example metadata")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -1787,8 +1793,8 @@ ui <- shiny::fluidPage(
   yaml_small$organisms$taxon <- org_tax
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarise <- summarise
-  create_dir("params")
-  yaml::write_yaml(x = yaml_small, file = get_default_paths()$params$prepare_params)
+  tima:::create_dir("params")
+  yaml::write_yaml(x = yaml_small, file = tima:::get_default_paths()$params$prepare_params)
 
   message(x = "... Advanced")
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
@@ -2110,6 +2116,27 @@ ui <- shiny::fluidPage(
 server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()
+
+  output$demo_spe <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$spectra),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$spectra_mini), file)
+    }
+  )
+
+  output$demo_fea <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$features),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$features), file)
+    }
+  )
+
+  output$demo_met <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$metadata),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$metadata), file)
+    }
+  )
 
   ## Mandatory fields
   fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
