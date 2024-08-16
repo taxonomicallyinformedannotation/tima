@@ -12,5 +12,5 @@
 log_debug <- function(...) {
   ## Concatenate the current time, the specified values,
   ## and a newline character and print it
-  cat(paste(Sys.time(), ..., "\n"))
+  cat(paste(format(Sys.time()), ..., "\n"))
 }
