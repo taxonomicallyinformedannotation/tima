@@ -73,8 +73,7 @@ targets::tar_visnetwork(
     tidyselect::contains("library_sop_closed")
   ),
   targets_only = TRUE,
-  degree_from = 8,
-  level_separation = 200
+  degree_from = 8
 )
 ```
 

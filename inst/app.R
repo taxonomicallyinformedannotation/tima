@@ -2218,7 +2218,6 @@ server <- function(input, output, session) {
         port = 3839,
         display = "graph",
         displays = c("summary", "graph"),
-        level_separation = 300,
         degree_from = 8,
         outdated = FALSE,
         targets_only = TRUE,
@@ -2410,7 +2409,7 @@ server <- function(input, output, session) {
   })
 }
 url <- "<http://127.0.0.1:3838>"
-message("Please, open:", url, "on your favorite browser, but not Edge.")
+message("Please, open:", url, " on your favorite browser, but not Edge.")
 shiny::shinyApp(
   ui = ui,
   server = server,
