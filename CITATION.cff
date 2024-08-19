@@ -703,18 +703,6 @@ references:
   year: '2024'
   doi: 10.32614/CRAN.package.lifecycle
 - type: software
-  title: pingr
-  abstract: 'pingr: Check if a Remote Computer is Up'
-  notes: Suggests
-  url: https://r-lib.github.io/pingr/
-  repository: https://CRAN.R-project.org/package=pingr
-  authors:
-  - family-names: Csárdi
-    given-names: Gábor
-    email: csardi.gabor@gmail.com
-  year: '2024'
-  doi: 10.32614/CRAN.package.pingr
-- type: software
   title: pkgload
   abstract: 'pkgload: Simulate Package Installation and Attach'
   notes: Suggests
