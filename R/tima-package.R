@@ -11,7 +11,6 @@ NULL
   ## for shinylive
   DT:::.packageName
   gt:::.packageName
-  pingr:::.packageName
   shinybusy:::.packageName
   shinyWidgets:::.packageName
   visNetwork:::.packageName

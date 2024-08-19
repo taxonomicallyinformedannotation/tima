@@ -81,18 +81,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "pingr",
-      "name": "pingr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=pingr"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "pkgload",
       "name": "pkgload",
       "provider": {
@@ -542,7 +530,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4073.615KB",
+  "fileSize": "4073.923KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
