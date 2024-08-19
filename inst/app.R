@@ -1692,7 +1692,13 @@ ui <- shiny::fluidPage(
       shiny::div(
         id = "targets",
         shiny::mainPanel(
-          targets::tar_watch_ui(id = "targets-shiny", seconds = 10, targets_only = TRUE)
+          targets::tar_watch_ui(
+            id = "targets-shiny",
+            seconds = 10,
+            targets_only = TRUE,
+            degree_from = 8,
+            display = "graph"
+          )
         )
       )
     ),
