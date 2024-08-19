@@ -1688,10 +1688,14 @@ ui <- shiny::fluidPage(
       id = "thankyou_msg",
       shiny::h3("Thanks, your parameters were saved successfully!")
     )),
-    ## WIP
-    # shinyjs::hidden(shiny::div(id = "targets", shiny::mainPanel(h4(
-    #   "Live show from `targets`"
-    # )))),
+    shinyjs::hidden(
+      shiny::div(
+        id = "targets",
+        shiny::mainPanel(
+          targets::tar_watch_ui(id = "targets-shiny", seconds = 10, targets_only = TRUE)
+        )
+      )
+    ),
     shinyjs::hidden(shiny::downloadButton(outputId = "results", "Download results")),
     shinyjs::hidden(shiny::actionButton(inputId = "close", label = "Close")),
     shinyjs::hidden(shiny::div(id = "job_msg", shiny::h3("Job is running!"))),
@@ -2223,7 +2227,7 @@ server <- function(input, output, session) {
 
   shiny::observeEvent(eventExpr = input$launch, handlerExpr = {
     shinyjs::show("job_msg")
-    # shinyjs::show("targets")
+    shinyjs::show("targets")
     shinyjs::hide("thankyou_msg")
     shinyjs::hide("error")
     shinyjs::hide("params")
@@ -2231,17 +2235,8 @@ server <- function(input, output, session) {
     shinyjs::hide("job_end")
     shinyjs::hide("results")
     shinyjs::hide("close")
-    targets::tar_watch(
-      host = "127.0.0.1",
-      port = 3839,
-      # browse = FALSE,
-      display = "graph",
-      displays = c("summary", "graph"),
-      degree_from = 8,
-      outdated = FALSE,
-      targets_only = TRUE,
-      supervise = TRUE,
-      verbose = TRUE,
+    targets::tar_watch_server(
+      id = "targets-shiny",
       exclude = c(
         "yaml_paths",
         "benchmark_ann_fil_ms1_neg",
@@ -2419,16 +2414,23 @@ server <- function(input, output, session) {
       ),
       n = 1
     )
-    shinyjs::show("results")
-    output$results <- downloadHandler(
-      filename = basename(results),
-      content = function(file) {
-        writeLines(readLines(results), file)
-      }
-    )
-    shinyjs::show("close")
-    shiny::observeEvent(eventExpr = input$close, handlerExpr = {
-      shiny::stopApp()
+    process <- reactiveValues(status = targets::tar_active())
+    observe({
+      shiny::invalidateLater(millis = 5000)
+      process$status <- targets::tar_active()
+      shinyjs::hide("job_msg")
+      shinyjs::show("job_end")
+      shinyjs::show("results")
+      output$results <- downloadHandler(
+        filename = basename(results),
+        content = function(file) {
+          writeLines(readLines(results), file)
+        }
+      )
+      shinyjs::show("close")
+      shiny::observeEvent(eventExpr = input$close, handlerExpr = {
+        shiny::stopApp()
+      })
     })
   })
 }
