@@ -153,6 +153,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "shinyvalidate",
+      "name": "shinyvalidate",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
       "provider": {
@@ -530,7 +542,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4073.923KB",
+  "fileSize": "4073.942KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
