@@ -786,6 +786,26 @@ references:
   year: '2024'
   doi: 10.32614/CRAN.package.shinytest2
 - type: software
+  title: shinyvalidate
+  abstract: 'shinyvalidate: Input Validation for Shiny Apps'
+  notes: Suggests
+  url: https://rstudio.github.io/shinyvalidate/
+  repository: https://CRAN.R-project.org/package=shinyvalidate
+  authors:
+  - family-names: Sievert
+    given-names: Carson
+    email: carson@posit.co
+    orcid: https://orcid.org/0000-0002-4958-2844
+  - family-names: Iannone
+    given-names: Richard
+    email: rich@posit.co
+    orcid: https://orcid.org/0000-0003-3925-190X
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinyvalidate
+- type: software
   title: spelling
   abstract: 'spelling: Tools for Spell Checking in R'
   notes: Suggests
