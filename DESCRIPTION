@@ -50,6 +50,7 @@ Suggests:
     BiocManager,
     knitr,
     lifecycle,
+    pingr,
     pkgload,
     R.utils,
     rlang,
