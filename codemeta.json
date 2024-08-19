@@ -153,30 +153,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "shinyvalidate",
-      "name": "shinyvalidate",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=shinyvalidate"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "shinyWidgets",
-      "name": "shinyWidgets",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
       "provider": {
@@ -199,18 +175,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "visNetwork",
-      "name": "visNetwork",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     }
   ],
   "softwareRequirements": {
@@ -261,6 +225,18 @@
     },
     "5": {
       "@type": "SoftwareApplication",
+      "identifier": "DT",
+      "name": "DT",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=DT"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
       "version": ">= 1.6.4",
@@ -272,7 +248,19 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "6": {
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "gt",
+      "name": "gt",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=gt"
+    },
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -285,7 +273,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "7": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -298,7 +286,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "8": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -311,7 +299,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "9": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
@@ -324,7 +312,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboCoreUtils.html"
     },
-    "10": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -337,7 +325,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "11": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
@@ -350,7 +338,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
     },
-    "12": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -363,7 +351,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "13": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "pbapply",
       "name": "pbapply",
@@ -376,7 +364,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=pbapply"
     },
-    "14": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -389,7 +377,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "15": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -402,7 +390,31 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "16": {
+    "18": {
+      "@type": "SoftwareApplication",
+      "identifier": "shinybusy",
+      "name": "shinybusy",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinybusy"
+    },
+    "19": {
+      "@type": "SoftwareApplication",
+      "identifier": "shinyWidgets",
+      "name": "shinyWidgets",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
+    },
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -415,12 +427,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "17": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "18": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -433,7 +445,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "19": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -446,7 +458,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "20": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -459,7 +471,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "21": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -472,7 +484,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "22": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -485,12 +497,24 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "23": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "24": {
+    "28": {
+      "@type": "SoftwareApplication",
+      "identifier": "visNetwork",
+      "name": "visNetwork",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=visNetwork"
+    },
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -506,7 +530,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "4071.351KB",
+  "fileSize": "4071.618KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
