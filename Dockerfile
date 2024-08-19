@@ -28,7 +28,6 @@ RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinforme
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
-EXPOSE 3839
 
 # Disable healthcheck (if you really want to disable it)
 HEALTHCHECK NONE
