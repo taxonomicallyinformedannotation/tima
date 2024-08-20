@@ -1692,7 +1692,7 @@ ui <- shiny::fluidPage(
         id = "targets",
         shiny::mainPanel(
           targets::tar_watch_ui(
-            id = "targets-shiny",
+            id = "targets-shiny-ui",
             seconds = 10,
             targets_only = TRUE,
             degree_from = 8,
@@ -2241,7 +2241,7 @@ server <- function(input, output, session) {
     shinyjs::hide("results")
     shinyjs::hide("close")
     targets::tar_watch_server(
-      id = "targets-shiny",
+      id = "targets-shiny-server",
       exclude = c(
         "yaml_paths",
         "benchmark_ann_fil_ms1_neg",
