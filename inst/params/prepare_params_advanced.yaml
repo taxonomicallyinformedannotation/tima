@@ -173,13 +173,13 @@ files:
       #' List of negative spectral libraries. STRING
       neg:
         - data/interim/libraries/spectra/exp/internal_neg.rds
-      
+
       #' List of positive spectral libraries. STRING
       pos:
         - data/interim/libraries/spectra/exp/internal_pos.rds
 
       #' List of raw spectral libraries. STRING
-      raw: 
+      raw:
         - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
     #' Temporal libraries. STRING
@@ -292,14 +292,17 @@ ms:
       - "[M+HK]2+"
       - "[M+Ca]2+"
       - "[M+Na2]2+"
+      - "[M+Fe]2+"
       - "[M+H]+"
       - "[M+H4N]+"
       - "[M+Na]+"
       - "[M+K]+"
+      - "[M+Fe-H]+"
       - "[M+Fe-H2]+"
       - "[M+Cu]+"
       - "[2M+Mg]2+"
       - "[2M+Ca]2+"
+      - "[2M+Fe]2+"
       - "[2M+H]+"
       - "[2M+H4N]+"
       - "[2M+Na]+"
