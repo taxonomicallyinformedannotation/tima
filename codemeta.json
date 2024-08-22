@@ -276,7 +276,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.0.2",
+      "version": ">= 1.0.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
