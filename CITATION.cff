@@ -239,7 +239,7 @@ references:
     email: hadley@posit.co
   year: '2024'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.0.3'
+  version: '>= 1.0.2'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
