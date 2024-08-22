@@ -228,6 +228,19 @@ references:
   year: '2024'
   doi: 10.32614/CRAN.package.gt
 - type: software
+  title: httr
+  abstract: 'httr: Tools for Working with URLs and HTTP'
+  notes: Imports
+  url: https://httr.r-lib.org/
+  repository: https://CRAN.R-project.org/package=httr
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.httr
+  version: '>= 1.4.7'
+- type: software
   title: httr2
   abstract: 'httr2: Perform HTTP Requests and Process the Responses'
   notes: Imports
