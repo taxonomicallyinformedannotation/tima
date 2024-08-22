@@ -24,7 +24,7 @@ Imports:
     DT,
     fs (>= 1.6.4),
     gt,
-    httr2 (>= 1.0.3),
+    httr2 (>= 1.0.2),
     igraph (>= 2.0.3),
     jsonlite (>= 1.8.8),
     MetaboCoreUtils (>= 1.10.0),
