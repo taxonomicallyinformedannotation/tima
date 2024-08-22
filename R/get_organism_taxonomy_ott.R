@@ -47,6 +47,8 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
   log_debug("Testing if Open Tree of Life API is up")
   if (url |>
     httr2::request() |>
+    # See https://github.com/ropensci/rotl/issues/147
+    httr2::req_options(ssl_verifypeer = FALSE) |>
     httr2::req_method("POST") |>
     ## weird hack to avoid error
     httr2::req_error(
@@ -86,10 +88,14 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
     new_matched_otl_exact_list <- organisms_split |>
       lapply(
         FUN = function(x) {
-          rotl::tnrs_match_names(
-            names = x,
-            do_approximate_matching = FALSE,
-            include_suppressed = FALSE
+          # See https://github.com/ropensci/rotl/issues/147
+          httr::with_config(
+            httr::config(ssl_verifypeer = FALSE),
+            rotl::tnrs_match_names(
+              names = x,
+              do_approximate_matching = FALSE,
+              include_suppressed = FALSE
+            )
           )
         }
       )
@@ -143,10 +149,14 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
       new_matched_otl_exact_list_2 <- organisms_new_split |>
         lapply(
           FUN = function(x) {
-            rotl::tnrs_match_names(
-              names = x,
-              do_approximate_matching = FALSE,
-              include_suppressed = FALSE
+            # See https://github.com/ropensci/rotl/issues/147
+            httr::with_config(
+              httr::config(ssl_verifypeer = FALSE),
+              rotl::tnrs_match_names(
+                names = x,
+                do_approximate_matching = FALSE,
+                include_suppressed = FALSE
+              )
             )
           }
         )
@@ -167,11 +177,16 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
       otts <- new_ott_id$ott_id
 
       log_debug("Getting taxonomy...")
-      taxon_info <- rotl::taxonomy_taxon_info(
-        ott_ids = otts,
-        include_lineage = TRUE,
-        include_terminal_descendants = TRUE
-      )
+      # See https://github.com/ropensci/rotl/issues/147
+      taxon_info <-
+        httr::with_config(
+          httr::config(ssl_verifypeer = FALSE),
+          rotl::taxonomy_taxon_info(
+            ott_ids = otts,
+            include_lineage = TRUE,
+            include_terminal_descendants = TRUE
+          )
+        )
       log_debug("Taxonomy retrieved!")
 
       taxon_lineage <- taxon_info |>
