@@ -62,7 +62,7 @@ jobs:
           retention-days: 1
 
   build-arm64:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Prepare
         run: |
