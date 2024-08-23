@@ -1,4 +1,3 @@
-# Use the specified Bioconductor Docker image
 FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
 
 # Update apt and install necessary system dependencies
@@ -18,13 +17,11 @@ ENV R_LIBS_USER=/home/tima-user/Library/Frameworks/R.framework/Resources/site-li
 USER tima-user
 WORKDIR /home/tima-user
 
-# Copy necessary files for dependency installation
-COPY --chown=tima-user:tima-user docker-compose.yml ./docker-compose.yml
-COPY --chown=tima-user:tima-user inst ./inst
-COPY --chown=tima-user:tima-user R ./R
+# Install R dependencies
+RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cloud.r-project.org'))"
 
-# Run R script to install dependencies
-RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cloud.r-project.org')); tima::install()"
+# Additional install
+RUN Rscript -e "tima::install()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
@@ -33,4 +30,4 @@ EXPOSE 3838
 HEALTHCHECK NONE
 
 # Define default command (commented out)
-# CMD ["Rscript inst/scripts/run_app.R", "Rscript inst/scripts/tima_full.R"]
+CMD ["Rscript -e 'tima::run_app()'"]

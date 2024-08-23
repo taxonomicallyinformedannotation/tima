@@ -1,6 +1,5 @@
 # Check if runs in Docker environment or not
-i_am_a_whale <- file.exists("/.dockerenv")
-if (i_am_a_whale) {
+if (file.exists("/.dockerenv")) {
   options(shiny.host = "0.0.0.0")
 } else {
   options(shiny.host = "127.0.0.1")
@@ -2452,12 +2451,7 @@ shiny::shinyApp(
   ui = ui,
   server = server,
   onStart = function() {
-    if (i_am_a_whale) {
-      message("I'm inside the matrix ;(")
-      setwd(dir = "..")
-    } else {
-      tima:::copy_backbone()
-      tima:::go_to_cache()
-    }
+    tima:::copy_backbone()
+    tima:::go_to_cache()
   }
 )

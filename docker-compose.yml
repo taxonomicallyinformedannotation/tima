@@ -20,10 +20,10 @@ services:
       - no-new-privileges:true
     user: tima-user
     volumes:
-      - "./data:/home/tima-user/data"
-    command: Rscript -e "targets::tar_make(names = matches('^ann_pre$'), script=system.file('pipelines/_targets.R', package = 'tima'))"
+      - "./data:/home/tima-user/.tima/data"
+    command: Rscript -e "tima::tima_full()"
 
-  tima-gui:
+  tima-run-app:
     build: "."
     deploy:
       resources:
@@ -45,7 +45,7 @@ services:
       - no-new-privileges:true
     user: tima-user
     volumes:
-      - "./data:/home/tima-user/data"
+      - "./data:/home/tima-user/.tima/data"
     command: Rscript -e "tima::run_app()"
 
 networks:
