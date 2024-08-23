@@ -68,9 +68,10 @@ jobs:
         run: |
           echo "PLATFORM_PAIR=linux-arm64" >> $GITHUB_ENV
 
-      - name: Install Docker
+      - name: Install Docker and related
         run: |
           brew install docker
+          brew install docker-buildx
           brew install qemu
           brew install lima
           brew install colima
