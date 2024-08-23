@@ -71,6 +71,7 @@ jobs:
       - name: Install Docker
         run: |
           brew install --cask docker
+          open /Applications/Docker.app
       
       - name: Docker meta
         id: meta
