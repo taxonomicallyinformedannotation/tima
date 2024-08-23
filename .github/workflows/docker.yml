@@ -15,7 +15,7 @@ env:
 
 jobs:
   build-amd64:
-    runs-on: macos-latest
+    runs-on: cirun-aws-t2-large-ubuntu2204
     steps:
       - name: Prepare
         run: |
@@ -62,7 +62,7 @@ jobs:
           retention-days: 1
 
   build-arm64:
-    runs-on: macos-latest
+    runs-on: cirun-aws-t2-large-ubuntu2204
     steps:
       - name: Prepare
         run: |
@@ -109,7 +109,7 @@ jobs:
           retention-days: 1
 
   merge:
-    runs-on: macos-latest
+    runs-on: cirun-aws-t2-large-ubuntu2204
     needs:
       - build-amd64
       - build-arm64
