@@ -69,7 +69,7 @@ jobs:
           echo "PLATFORM_PAIR=linux-arm64" >> $GITHUB_ENV
 
       - name: Install Docker
-        run:: |
+        run: |
           brew install docker
           colima start
       
