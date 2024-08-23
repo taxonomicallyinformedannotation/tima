@@ -14,7 +14,7 @@ WORKDIR /home/tima-user
 
 # Install R dependencies
 # RUN Rscript -e "devtools::install_github('taxonomicallyinformedannotation/tima')"
-RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://cloud.r-project.org'))"
+RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cran.r-universe.dev'))"
 
 # Additional install
 RUN Rscript -e "tima::install()"
