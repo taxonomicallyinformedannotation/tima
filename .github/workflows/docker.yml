@@ -11,7 +11,7 @@ on:
 
 env:
   DOCKER_SERVICE: tima-full
-  REGISTRY_IMAGE: adafede/tima-r:latest
+  REGISTRY_IMAGE: adafede/tima-r
 
 jobs:
   build-amd64:
@@ -54,8 +54,8 @@ jobs:
           platforms: linux/amd64
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-amd64
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-amd64,mode=max
       
       - name: Export digest
         run: |
@@ -111,8 +111,8 @@ jobs:
           platforms: linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-arm64
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-arm64,mode=max
       
       - name: Export digest
         run: |
@@ -157,11 +157,16 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Create manifest list and push
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
-      
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+      working-directory: /tmp/digests
+      run: |
+        # Add the 'latest' tag
+        docker buildx imagetools create \
+          -t ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }} \
+          -t ${{ env.REGISTRY_IMAGE }}:latest \
+          $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+
+    - name: Inspect image
+      run: |
+        docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+        docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:latest
