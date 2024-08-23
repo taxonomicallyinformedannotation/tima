@@ -11,7 +11,7 @@ on:
 
 env:
   DOCKER_SERVICE: tima-full
-  REGISTRY_IMAGE: adafede/tima-r
+  REGISTRY_IMAGE: adafede/tima-r:latest
 
 jobs:
   build-amd64:
