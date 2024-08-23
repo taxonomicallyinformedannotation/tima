@@ -17,7 +17,7 @@ run_app <- function(host = "127.0.0.1",
                     port = 3838,
                     browser = TRUE) {
   if (file.exists("/.dockerenv")) {
-    system('echo "I\'m inside the matrix ;("')
+    system('echo "I\'m inside the matrix!"')
     browser <- FALSE
     host <- "0.0.0.0"
   } else {
