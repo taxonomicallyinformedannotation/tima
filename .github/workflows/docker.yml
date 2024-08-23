@@ -70,8 +70,9 @@ jobs:
 
       - name: Install Docker
         run: |
-          brew install --cask docker
-          open /Applications/Docker.app
+          brew install colima
+          brew install docker docker-compose
+          colima start
       
       - name: Docker meta
         id: meta
