@@ -76,6 +76,7 @@ jobs:
           brew install lima
           brew install colima
           brew services start colima
+          open --background -a Docker
       
       - name: Docker meta
         id: meta
