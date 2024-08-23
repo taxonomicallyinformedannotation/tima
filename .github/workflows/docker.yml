@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_SERVICE: "tima-full"
-  REGISTRY_IMAGE: user/app
+  DOCKER_SERVICE: tima-full
+  REGISTRY_IMAGE: adafede/tima-r
 
 jobs:
   build:
