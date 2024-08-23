@@ -72,6 +72,7 @@ jobs:
         run: |
           brew install --cask docker
           open /Applications/Docker.app
+          ln -s /Applications/Docker.app/Contents/Resources/bin /usr/local/bin/docker
       
       - name: Docker meta
         id: meta
