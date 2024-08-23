@@ -17,13 +17,8 @@ jobs:
   build-amd64:
     runs-on: ubuntu-latest
     steps:
-      - name: Cache Docker layers
+      - name: Checkout code
         uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
 
       - name: Prepare
         run: |
@@ -54,6 +49,8 @@ jobs:
           platforms: linux/amd64
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache,mode=max
       
       - name: Export digest
         run: |
@@ -72,13 +69,8 @@ jobs:
   build-arm64:
     runs-on: warp-ubuntu-latest-arm64-2x
     steps:
-      - name: Cache Docker layers
+      - name: Checkout code
         uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
 
       - name: Prepare
         run: |
@@ -109,6 +101,8 @@ jobs:
           platforms: linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache,mode=max
       
       - name: Export digest
         run: |
