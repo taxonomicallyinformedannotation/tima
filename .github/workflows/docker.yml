@@ -19,6 +19,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       - name: Prepare
         run: |
@@ -71,6 +76,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       - name: Prepare
         run: |
