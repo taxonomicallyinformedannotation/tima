@@ -64,6 +64,9 @@ jobs:
   build-arm64:
     runs-on: warp-ubuntu-latest-arm64-2x
     steps:
+      - name: WarpCache
+        uses: WarpBuilds/cache@v1.2.1
+            
       - name: Prepare
         run: |
           echo "PLATFORM_PAIR=linux-arm64" >> $GITHUB_ENV
