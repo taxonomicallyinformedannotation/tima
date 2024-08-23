@@ -17,6 +17,14 @@ jobs:
   build-amd64:
     runs-on: ubuntu-latest
     steps:
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Prepare
         run: |
           echo "PLATFORM_PAIR=linux-amd64" >> $GITHUB_ENV
@@ -64,9 +72,14 @@ jobs:
   build-arm64:
     runs-on: warp-ubuntu-latest-arm64-2x
     steps:
-      - name: WarpCache
-        uses: WarpBuilds/cache@v1.2.1
-            
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Prepare
         run: |
           echo "PLATFORM_PAIR=linux-arm64" >> $GITHUB_ENV
