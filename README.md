@@ -106,12 +106,20 @@ A container is also available, together with a small compose file. Main
 commands are below:
 
 ``` bash
-docker pull adafede/tima-r
-# docker build . -t adafede/tima-r
+docker pull adafede/tima-r --platform linux/amd64
+# docker build . -t adafede/tima-r --platform linux/amd64
 ```
 
 ``` bash
-docker compose up tima-gui
+docker run --user tima-user -v "$(pwd)/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
+# docker run --user tima-user -v "$(pwd)/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::tima_full()"
+```
+
+Or alternatively (if you did pull the repository and are located at the
+right place):
+
+``` bash
+docker compose up tima-run-app
 # docker compose up tima-full
 ```
 

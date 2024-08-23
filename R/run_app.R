@@ -21,13 +21,9 @@ run_app <- function(host = "127.0.0.1",
     browser <- FALSE
     host <- "0.0.0.0"
   } else {
-    tryCatch(expr = {
-      install()
-    }, error = function(e) {
-      message(e)
-    })
     system('echo "I\'m living in the real world!"')
   }
+  install()
   shiny::runApp(
     appDir = system.file(package = "tima"),
     port = port,
