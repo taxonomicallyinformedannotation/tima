@@ -106,8 +106,8 @@ A container is also available, together with a small compose file. Main
 commands are below:
 
 ``` bash
-docker pull adafede/tima-r --platform linux/amd64
-# docker build . -t adafede/tima-r --platform linux/amd64
+docker pull adafede/tima-r
+# docker build . -t adafede/tima-r
 ```
 
 ``` bash

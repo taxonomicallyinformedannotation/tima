@@ -1,10 +1,5 @@
 FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
 
-# Update apt and install necessary system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 # Add a non-root user and create the R library directory
 RUN useradd -m tima-user && \
     mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
@@ -18,7 +13,7 @@ USER tima-user
 WORKDIR /home/tima-user
 
 # Install R dependencies
-RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cloud.r-project.org'))"
+RUN Rscript -e "devtools::install_github('taxonomicallyinformedannotation/tima')"
 
 # Additional install
 RUN Rscript -e "tima::install()"
