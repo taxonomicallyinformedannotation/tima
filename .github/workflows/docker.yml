@@ -70,9 +70,11 @@ jobs:
 
       - name: Install Docker
         run: |
-          brew install --cask docker
-          open /Applications/Docker.app
-          ln -s /Applications/Docker.app/Contents/Resources/bin /usr/local/bin/docker
+          brew install docker
+          brew install qemu
+          brew install lima
+          brew install colima
+          brew services start colima
       
       - name: Docker meta
         id: meta
