@@ -111,8 +111,8 @@ docker pull adafede/tima-r
 ```
 
 ``` bash
-docker run --user tima-user -v "$(pwd)/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
-# docker run --user tima-user -v "$(pwd)/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::tima_full()"
+docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
+# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::tima_full()"
 ```
 
 Or alternatively (if you did pull the repository and are located at the
