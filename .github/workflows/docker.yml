@@ -70,9 +70,8 @@ jobs:
 
       - name: Install Docker
         run: |
-          brew install colima
-          brew install docker docker-compose
-          colima start
+          brew install --cask docker
+          open /Applications/Docker.app
       
       - name: Docker meta
         id: meta
@@ -80,8 +79,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY_IMAGE }}
       
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
