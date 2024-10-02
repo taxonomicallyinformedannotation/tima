@@ -196,12 +196,14 @@ prepare_taxa <-
     }
     log_debug(x = "Joining top K with metadata table")
     if (!is.null(taxon)) {
-      metadata_table_joined <- cbind(
+      metadata_table_joined <- tidytable::inner_join(
         feature_table_0 |>
-          tidytable::mutate(feature_id = !!as.name(name_features)),
+          tidytable::mutate(feature_id = !!as.name(name_features), join = "x"),
         biological_metadata |>
-          tidytable::select(organismOriginal = organism_name)
-      )
+          tidytable::select(organismOriginal = organism_name) |>
+          tidytable::mutate(join = "x")
+      ) |>
+        tidytable::select(-join)
     } else {
       metadata_table_joined <-
         tidytable::left_join(top_n, metadata_table, by = c("name" = name_filename)) |>

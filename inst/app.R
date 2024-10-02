@@ -694,6 +694,7 @@ ui <- shiny::fluidPage(
               "You have to input the scientific name of your taxon.",
               "Will be used for the weighting of your annotations",
               "Example: Gentiana lutea",
+              "Example for multiple ones: Gentiana lutea|Swertia chirayta",
               "All features will be attributed to this source.",
               "For finer attribution,
               you need to provide a metadata file in the `Files` panel."
@@ -2192,7 +2193,14 @@ server <- function(input, output, session) {
     }
   })
   iv$add_rule("org_tax", function(taxon) {
-    if (is.na(rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id)) {
+    if (any(is.na(
+      stringi::stri_split_fixed(str = taxon, pattern = "|") |>
+      lapply(
+        FUN = function(taxon) {
+          rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id
+        }
+      )
+    ))) {
       "Taxon not found in Open Tree of Life"
     }
   })
