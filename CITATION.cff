@@ -252,7 +252,7 @@ references:
     email: hadley@posit.co
   year: '2024'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.0.1'
+  version: '>= 1.0.5'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -297,11 +297,11 @@ references:
   authors:
   - family-names: Ooms
     given-names: Jeroen
-    email: jeroen@berkeley.edu
+    email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2024'
   doi: 10.32614/CRAN.package.jsonlite
-  version: '>= 1.8.8'
+  version: '>= 1.8.9'
 - type: software
   title: MetaboCoreUtils
   abstract: 'MetaboCoreUtils: Core Utils for Metabolomics Data'
@@ -564,7 +564,7 @@ references:
     orcid: https://orcid.org/0000-0003-1878-3253
   year: '2024'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.7.1'
+  version: '>= 1.8.0'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
@@ -578,7 +578,7 @@ references:
     orcid: https://orcid.org/0000-0002-4151-3764
   year: '2024'
   doi: 10.32614/CRAN.package.tidyfst
-  version: '>= 1.7.8'
+  version: '>= 1.8.1'
 - type: software
   title: tidyselect
   abstract: 'tidyselect: Select from a Set of Strings'
@@ -682,7 +682,7 @@ references:
     orcid: https://orcid.org/0000-0002-5874-8148
   - family-names: Ramos
     given-names: Marcel
-    email: marcel.ramos@roswellpark.org
+    email: marcel.ramos@sph.cuny.edu
     orcid: https://orcid.org/0000-0002-3242-0582
   year: '2024'
   doi: 10.32614/CRAN.package.BiocManager
