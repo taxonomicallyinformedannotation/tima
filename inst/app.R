@@ -1785,6 +1785,28 @@ ui <- shiny::fluidPage(
   } else {
     prefil_sir_raw_1 <- NULL
   }
+  if (!is.null(lib_tmp_exp_csv)) {
+    if (!file.exists(lib_tmp_exp_csv)) {
+      fs::file_copy(
+        path = lib_tmp_exp_csv[[4]],
+        new_path = file.path(lib_tmp_exp_csv),
+        overwrite = TRUE
+      )
+    }
+  } else {
+    lib_tmp_exp_csv <- NULL
+  }
+  if (!is.null(lib_tmp_is_csv)) {
+    if (!file.exists(lib_tmp_is_csv)) {
+      fs::file_copy(
+        path = lib_tmp_is_csv[[4]],
+        new_path = file.path(lib_tmp_is_csv),
+        overwrite = TRUE
+      )
+    }
+  } else {
+    lib_tmp_is_csv <- NULL
+  }
 
   fil_fea_raw <- prefil_fea_raw_1
   fil_spe_raw <- prefil_spe_raw_1
