@@ -2444,11 +2444,24 @@ server <- function(input, output, session) {
         ".Random.seed"
       )
     )
-    targets::tar_make(
-      names = tidyselect::matches("^ann_pre$"),
-      garbage_collection = TRUE,
-      reporter = "verbose_positives"
-    )
+
+    ## For shinylive, see
+    ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
+    if (R.Version()$os != "emscripten") {
+      targets::tar_make(
+        names = tidyselect::matches("^ann_pre$"),
+        garbage_collection = TRUE,
+        reporter = "verbose_positives"
+      )
+    } else {
+      targets::tar_make(
+        names = tidyselect::matches("^ann_pre$"),
+        garbage_collection = TRUE,
+        reporter = "verbose_positives",
+        callr_function = NULL
+      )
+    }
+
     results <- tail(
       list.files(
         path = "data/processed",
