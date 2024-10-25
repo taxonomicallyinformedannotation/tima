@@ -6,6 +6,7 @@
 * Better packaging
 * Improved documentation
 * Fixed all CRAN warnings
+* Fixed some edge cases in spectra import
 * Reduced dependencies
 * Reduced exports
 * Removed `CompoundDb` dependency as it was causing too many issues

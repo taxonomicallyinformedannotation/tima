@@ -27,6 +27,12 @@ sanitize_spectra <-
            ppm = 10) {
     log_debug("Applying sanitization of the spectra")
 
+    ## Fix needed
+    if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
+      message("Harmonizing names")
+      spectra$msLevel <- spectra$MSLEVEL |> as.integer()
+    }
+
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
       message("Filtering MS2 only")
       spectra <- spectra |>
@@ -60,8 +66,12 @@ sanitize_spectra <-
         Spectra::combineSpectra(f = spectra$FEATURE_ID)
     }
 
-    spectra <- spectra |>
-      Spectra::filterEmptySpectra()
+    # Fix needed as some empty spectra are else not removed
+    spectra <- spectra[!spectra@backend@peaksData |>
+      lapply(is.nan) |>
+      lapply(any) |>
+      as.character() |>
+      as.logical()]
 
     return(spectra)
   }
