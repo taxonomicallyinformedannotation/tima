@@ -1736,6 +1736,8 @@ ui <- shiny::fluidPage(
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
   prefil_met_raw <- shiny::isolate(input$fil_met_raw)
   prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
+  lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
+  lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
 
   prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
@@ -1942,10 +1944,8 @@ ui <- shiny::fluidPage(
   #   shiny::isolate(input$todo)
   yaml_advanced$files$libraries$spectral$raw <-
     shiny::isolate(input$lib_spe_mgf)
-  yaml_advanced$files$libraries$temporal$exp$csv <-
-    shiny::isolate(input$lib_tmp_exp_csv)
-  yaml_advanced$files$libraries$temporal$is$csv <-
-    shiny::isolate(input$lib_tmp_is_csv)
+  yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
+  yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
   # TODO
   # other relative paths, not necessary
   # TODO
