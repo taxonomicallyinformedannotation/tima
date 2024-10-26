@@ -237,7 +237,7 @@ prepare_taxa <-
       ) |>
       tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character)) |>
       tidytable::group_by(feature_id) |>
-      clean_collapse(
+      tima:::clean_collapse(
         cols = c(
           "sample_organism_01_domain",
           "sample_organism_02_kingdom",
@@ -259,11 +259,11 @@ prepare_taxa <-
       ))
     rm(biological_metadata, metadata_table_joined)
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_taxa"),
       step = "prepare_taxa"
     )
-    export_output(x = taxed_features_table, file = output)
+    tima:::export_output(x = taxed_features_table, file = output)
     rm(taxed_features_table)
     return(output)
   }

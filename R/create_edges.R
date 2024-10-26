@@ -27,7 +27,7 @@ create_edges <- function(index,
   inner_list <- (index + 1):nspecs |>
     lapply(
       FUN = function(target) {
-        calculate_entropy(
+        tima:::calculate_entropy(
           index,
           target,
           frags,

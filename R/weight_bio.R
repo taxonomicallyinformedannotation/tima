@@ -61,7 +61,7 @@ weight_bio <-
         candidate_structure_tax_npc_03cla,
         candidate_structure_tax_cla_04dirpar
       ) |>
-      log_pipe("adding \"notClassified\" \n") |>
+      tima:::log_pipe("adding \"notClassified\" \n") |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::matches("candidate_structure_"),
         .fns = function(x) {
@@ -407,8 +407,8 @@ weight_bio <-
         -tidyselect::contains("sample_organism")
       ) |>
       tidytable::left_join(df0) |>
-      log_pipe("... calculating weighted biological score \n") |>
-      tidytable::mutate(candidate_score_sirius_csi_tmp = transform_score_sirius_csi(candidate_score_sirius_csi)) |>
+      tima:::log_pipe("... calculating weighted biological score \n") |>
+      tidytable::mutate(candidate_score_sirius_csi_tmp = tima:::transform_score_sirius_csi(candidate_score_sirius_csi)) |>
       tidytable::mutate(
         candidate_score_pseudo_initial = tidytable::case_when(
           !is.na(candidate_score_similarity) &

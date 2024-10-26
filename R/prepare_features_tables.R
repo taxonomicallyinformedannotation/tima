@@ -47,11 +47,11 @@ prepare_features_tables <-
         )
       ))
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_features_tables"),
       step = "prepare_features_tables"
     )
-    export_output(x = features_prepared, file = output)
+    tima:::export_output(x = features_prepared, file = output)
     rm(features_prepared)
 
     return(output)

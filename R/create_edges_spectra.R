@@ -61,7 +61,7 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     edges <-
       pbapply::pblapply(
         X = 1:(nspecz - 1),
-        FUN = create_edges,
+        FUN = tima:::create_edges,
         frags = fragz,
         precs = precz,
         nspecs = nspecz,
@@ -144,11 +144,11 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     )
   }
 
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "create_edges_spectra"),
     step = "create_edges_spectra"
   )
-  export_output(x = edges, file = output[[1]])
+  tima:::export_output(x = edges, file = output[[1]])
   rm(edges)
 
   return(output[[1]])

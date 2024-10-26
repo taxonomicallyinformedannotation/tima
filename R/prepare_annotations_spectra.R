@@ -90,13 +90,13 @@ prepare_annotations_spectra <-
         candidate_structure_tax_cla_03cla = NA_character_,
         candidate_structure_tax_cla_04dirpar = NA_character_,
       ) |>
-      select_annotations_columns()
+      tima:::select_annotations_columns()
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_annotations_spectra"),
       step = "prepare_annotations_spectra"
     )
-    export_output(x = table, file = output[[1]])
+    tima:::export_output(x = table, file = output[[1]])
     rm(table)
 
     return(output[[1]])

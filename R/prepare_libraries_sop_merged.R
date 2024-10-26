@@ -102,7 +102,7 @@ prepare_libraries_sop_merged <-
 
     tables <- libraries |>
       tidytable::bind_rows() |>
-      split_tables_sop()
+      tima:::split_tables_sop()
 
     log_debug(x = "Keeping keys")
     table_keys <- tables$key |>
@@ -181,17 +181,17 @@ prepare_libraries_sop_merged <-
         try to change it." = nrow(table_keys) != 0)
     }
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_libraries_sop_merged"),
       step = "prepare_libraries_sop_merged"
     )
-    export_output(x = table_keys, file = output_key)
-    export_output(x = table_org_tax_ott, file = output_org_tax_ott)
-    export_output(x = table_structures_stereo, file = output_str_stereo)
-    export_output(x = table_structures_metadata, file = output_str_met)
-    export_output(x = table_structures_names, file = output_str_nam)
-    export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
-    export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
+    tima:::export_output(x = table_keys, file = output_key)
+    tima:::export_output(x = table_org_tax_ott, file = output_org_tax_ott)
+    tima:::export_output(x = table_structures_stereo, file = output_str_stereo)
+    tima:::export_output(x = table_structures_metadata, file = output_str_met)
+    tima:::export_output(x = table_structures_names, file = output_str_nam)
+    tima:::export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
+    tima:::export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
 
     rm(
       table_keys,

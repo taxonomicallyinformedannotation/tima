@@ -67,11 +67,11 @@ prepare_features_edges <-
       tidytable::mutate(feature_target := tidytable::coalesce(feature_target, feature_source))
     rm(edges_ms1, edges_ms2, features_entropy)
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_features_edges"),
       step = "prepare_features_edges"
     )
-    export_output(x = edges_table_treated, file = output)
+    tima:::export_output(x = edges_table_treated, file = output)
     rm(edges_table_treated)
 
     return(output)

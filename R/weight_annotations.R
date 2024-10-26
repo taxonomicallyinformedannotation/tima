@@ -307,7 +307,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     tidytable::distinct(feature_id, rt, mz)
 
   log_debug(x = "Re-arranging annotations")
-  model <- columns_model()
+  model <- tima:::columns_model()
 
   annotation_table_1 <- annotation_table |>
     tidytable::select(tidyselect::any_of(
@@ -371,12 +371,12 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   rm(annotation_table, annotation_table_1, annotation_table_2)
 
   log_debug(x = "performing taxonomically informed scoring")
-  results <- weight_bio() |>
-    decorate_bio() |>
-    clean_bio() |>
-    weight_chemo() |>
-    decorate_chemo() |>
-    clean_chemo() |>
+  results <- tima:::weight_bio() |>
+    tima:::decorate_bio() |>
+    tima:::clean_bio() |>
+    tima:::weight_chemo() |>
+    tima:::decorate_chemo() |>
+    tima:::clean_chemo() |>
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
 
   log_debug(x = "Exporting ...")
@@ -386,17 +386,17 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     paste0(time, "_", pattern)
   )
   final_output <- file.path(dir_time, output)
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "prepare_params"),
     directory = dir_time,
     step = "prepare_params"
   )
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "prepare_params_advanced"),
     directory = dir_time,
     step = "prepare_params_advanced"
   )
-  export_output(x = results, file = final_output)
+  tima:::export_output(x = results, file = final_output)
   rm(results)
 
   return(final_output)

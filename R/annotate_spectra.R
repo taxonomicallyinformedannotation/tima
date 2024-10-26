@@ -307,7 +307,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         "target_precursorMz" = lib_precursors
       )
       df_meta <- df_meta |>
-        harmonize_adducts(adducts_colname = "target_adduct")
+        tima:::harmonize_adducts(adducts_colname = "target_adduct")
       rm(lib_precursors)
       df_final <- df_final |>
         tidytable::left_join(df_meta) |>
@@ -399,11 +399,11 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     df_final <- df_empty
   }
 
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "annotate_spectra"),
     step = "annotate_spectra"
   )
-  export_output(x = df_final, file = output[[1]])
+  tima:::export_output(x = df_final, file = output[[1]])
   rm(df_final)
 
   return(output[[1]])
