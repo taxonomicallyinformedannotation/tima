@@ -183,7 +183,7 @@ clean_bio <-
       tidytable::select(feature_id, tidyselect::everything()) |>
       ## In case there are no consensus at all because no network
       tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.logical), .fns = as.character)) |>
-      log_pipe("adding dummy consistency for features
+      tima:::log_pipe("adding dummy consistency for features
               with less than 2 neighbors \n") |>
       tidytable::mutate(
         feature_pred_tax_cla_01kin_val = tidytable::coalesce(feature_pred_tax_cla_01kin_val, "dummy"),

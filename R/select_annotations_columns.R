@@ -22,7 +22,7 @@ select_annotations_columns <- function(df,
                                        str_nam = get("str_nam", envir = parent.frame()),
                                        str_tax_cla = get("str_tax_cla", envir = parent.frame()),
                                        str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
-  model <- columns_model()
+  model <- tima:::columns_model()
   df <- df |>
     tidytable::select(tidyselect::any_of(
       c(
@@ -53,8 +53,8 @@ select_annotations_columns <- function(df,
         tidytable::na_if(x, "")
       }
     )) |>
-    round_reals() |>
+    tima:::round_reals() |>
     tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.numeric), .fns = as.character)) |>
-    complement_metadata_structures()
+    tima:::complement_metadata_structures()
   return(df)
 }

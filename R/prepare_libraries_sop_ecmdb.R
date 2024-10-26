@@ -84,8 +84,8 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_10varietas = NA_character_
         ) |>
         tidytable::mutate(reference_doi = NA) |>
-        select_sop_columns() |>
-        round_reals() |>
+        tima:::select_sop_columns() |>
+        tima:::round_reals() |>
         tidytable::distinct()
       rm(ecmdb)
     } else {
@@ -93,11 +93,11 @@ prepare_libraries_sop_ecmdb <-
       ecmdb_prepared <- fake_sop_columns()
     }
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
       step = "prepare_libraries_sop_closed"
     )
-    export_output(x = ecmdb_prepared, file = output)
+    tima:::export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
     return(output)
   }

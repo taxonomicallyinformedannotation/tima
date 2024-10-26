@@ -64,11 +64,11 @@ create_components <-
       tidytable::arrange(`cluster index`)
     rm(feature_source)
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "create_components"),
       step = "create_components"
     )
-    export_output(x = clusters_ready, file = output)
+    tima:::export_output(x = clusters_ready, file = output)
     rm(clusters_ready)
 
     return(output)

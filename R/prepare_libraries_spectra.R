@@ -83,14 +83,14 @@ prepare_libraries_spectra <-
         spectra <- lapply(X = input, FUN = import_spectra)
 
         log_debug("Extracting")
-        spectra_extracted <- lapply(X = spectra, FUN = extract_spectra)
+        spectra_extracted <- lapply(X = spectra, FUN = tima:::extract_spectra)
         rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")
         spectra_harmonized_pos <- lapply(
           X = spectra_extracted,
-          FUN = harmonize_spectra,
+          FUN = tima:::harmonize_spectra,
           mode = "pos",
           metad = nam_lib,
           col_ad = col_ad,
@@ -120,7 +120,7 @@ prepare_libraries_spectra <-
         log_debug("... neg")
         spectra_harmonized_neg <- lapply(
           X = spectra_extracted,
-          FUN = harmonize_spectra,
+          FUN = tima:::harmonize_spectra,
           mode = "neg",
           metad = nam_lib,
           col_ad = col_ad,
@@ -205,15 +205,15 @@ prepare_libraries_spectra <-
         )
       }
       log_debug("Exporting")
-      export_output(sop, file = output_sop)
-      mapply(export_spectra_rds, output_pos, spectra_harmonized_pos)
-      mapply(export_spectra_rds, output_neg, spectra_harmonized_neg)
+      tima:::export_output(sop, file = output_sop)
+      mapply(tima:::export_spectra_rds, output_pos, spectra_harmonized_pos)
+      mapply(tima:::export_spectra_rds, output_neg, spectra_harmonized_neg)
       rm(spectra_harmonized_pos, spectra_harmonized_neg)
     } else {
       log_debug("Library already exists")
     }
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )

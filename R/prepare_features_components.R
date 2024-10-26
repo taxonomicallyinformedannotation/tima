@@ -43,11 +43,11 @@ prepare_features_components <-
       tidytable::select(feature_id = `cluster index`, component_id = componentindex) |>
       tidytable::distinct()
 
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_features_components"),
       step = "prepare_features_components"
     )
-    export_output(x = table, file = output)
+    tima:::export_output(x = table, file = output)
     rm(table)
 
     return(output)

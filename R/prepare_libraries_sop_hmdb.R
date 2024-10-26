@@ -115,7 +115,7 @@ prepare_libraries_sop_hmdb <-
               organism_taxonomy_10varietas = NA_character_,
               reference_doi = NA_character_
             ) |>
-            round_reals() |>
+            tima:::round_reals() |>
             tidytable::distinct()
 
           log_debug("Deleting unzipped file...")
@@ -133,6 +133,6 @@ prepare_libraries_sop_hmdb <-
       hmdb_prepared <- fake_sop_columns()
     }
     log_debug(x = "Exporting ...")
-    export_output(x = hmdb_prepared, file = output)
+    tima:::export_output(x = hmdb_prepared, file = output)
     return(output)
   }
