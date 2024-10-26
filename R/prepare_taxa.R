@@ -15,7 +15,7 @@
 #'
 #' @param input File containing your features intensities
 #' @param extension Does your column names contain the file extension?
-#'    (MZmine mainly)
+#'    (mzmine mainly)
 #' @param name_features Name of the features column in the features file
 #' @param name_filename Name of the file name column in the metadata file
 #' @param colname Name of the column containing biological source information
@@ -99,6 +99,7 @@ prepare_taxa <-
     log_debug(x = "Formatting feature table ...")
     log_debug(x = "... requires 'Peak area'
               in columns (MZmine format)")
+              in columns (mzmine format)")
     log_debug(x = "... or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
       tidytable::select(tidyselect::all_of(c(name_features)), tidyselect::matches(" Peak area"), tidyselect::matches("quant_"), ) |>
