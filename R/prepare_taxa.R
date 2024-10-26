@@ -97,17 +97,32 @@ prepare_taxa <-
     }
 
     log_debug(x = "Formatting feature table ...")
-    log_debug(x = "... requires 'Peak area'
-              in columns (MZmine format)")
+    log_debug(x = "... requires 'Peak area' or ':area'
               in columns (mzmine format)")
     log_debug(x = "... or 'quant_' in columns (SLAW format)")
     feature_table <- feature_table_0 |>
-      tidytable::select(tidyselect::all_of(c(name_features)), tidyselect::matches(" Peak area"), tidyselect::matches("quant_"), ) |>
+      tidytable::select(
+        tidyselect::all_of(c(name_features)),
+        tidyselect::matches(" Peak area"),
+        tidyselect::matches(":area"),
+        tidyselect::matches("quant_")
+      ) |>
       tidytable::select(-tidyselect::matches("quant_peaktable")) |>
       tidyfst::col_rn(var = name_features)
     colnames(feature_table) <- colnames(feature_table) |>
       stringi::stri_replace_all_fixed(
         pattern = " Peak area",
+        replacement = "",
+        vectorize_all = FALSE
+      )
+    colnames(feature_table) <- colnames(feature_table) |>
+      stringi::stri_replace_all_fixed(
+        pattern = ":area",
+        replacement = "",
+        vectorize_all = FALSE
+      ) |>
+      stringi::stri_replace_all_fixed(
+        pattern = "datafile:",
         replacement = "",
         vectorize_all = FALSE
       )
