@@ -786,7 +786,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `adduct` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'annotation'"
             )
           ),
@@ -799,7 +799,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `feature id` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'slaw_id'"
             )
           ),
@@ -826,7 +826,7 @@ ui <- shiny::fluidPage(
             content = c(
               "Uncheck the box if you removed the files extensions",
               "of your file in the features file",
-              "The default corresponds to the default in MZmine."
+              "The default corresponds to the default in mzmine."
             )
           ),
         shiny::textInput(
@@ -847,7 +847,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `precursor m/z` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'mz'"
             )
           ),
@@ -860,7 +860,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `retention time` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'rt'",
               "Assumed to be in minutes."
             )

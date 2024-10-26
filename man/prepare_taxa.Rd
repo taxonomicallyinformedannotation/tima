@@ -22,7 +22,7 @@ prepare_taxa(
 \item{input}{File containing your features intensities}
 
 \item{extension}{Does your column names contain the file extension?
-(MZmine mainly)}
+(mzmine mainly)}
 
 \item{name_features}{Name of the features column in the features file}
 
