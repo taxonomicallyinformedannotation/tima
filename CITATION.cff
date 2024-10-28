@@ -227,7 +227,7 @@ references:
     given-names: Olivier
   year: '2024'
   doi: 10.32614/CRAN.package.gt
-  version: '>=0.10.1'
+  version: '>= 0.10.1'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
