@@ -227,6 +227,7 @@ references:
     given-names: Olivier
   year: '2024'
   doi: 10.32614/CRAN.package.gt
+  version: '>=0.10.1'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
@@ -287,7 +288,7 @@ references:
     orcid: https://orcid.org/0000-0002-1416-3412
   year: '2024'
   doi: 10.32614/CRAN.package.igraph
-  version: '>= 2.0.3'
+  version: '>= 2.0.2'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
@@ -827,7 +828,7 @@ references:
   authors:
   - family-names: Ooms
     given-names: Jeroen
-    email: jeroen@berkeley.edu
+    email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
   - family-names: Hester
     given-names: Jim
