@@ -246,6 +246,7 @@ test_that(desc = "Test functions", code = {
 
   ## Change small params
   get_example_files()
+  wd <- getwd()
   change_params_small()
   change_params_small(
     fil_pat = "myExamplePattern",
@@ -258,6 +259,7 @@ test_that(desc = "Test functions", code = {
     hig_con = TRUE,
     summarise = FALSE
   )
+  setwd(wd)
   ## Prepare libraries
   ### If does not exist
   prepare_libraries_spectra(
