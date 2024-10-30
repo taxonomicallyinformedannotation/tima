@@ -63,9 +63,9 @@ change_params_small <- function(fil_pat = NULL,
   if (!is.null(fil_fea_raw)) {
     stopifnot("Your features' file does not exist" = file.exists(fil_fea_raw))
     fil_fea_raw_rdy <- paths_data_source |>
-      file.path(basename(file_fea_raw))
+      file.path(basename(fil_fea_raw))
     fs::file_copy(
-      path = file_fea_raw,
+      path = fil_fea_raw,
       new_path = fil_fea_raw_rdy,
       overwrite = TRUE
     )
