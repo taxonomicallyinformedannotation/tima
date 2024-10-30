@@ -42,5 +42,18 @@ YAML file with changed parameters.
 This function helps changing convenience parameters.
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+tima::change_params_small(
+  fil_pat = "myExamplePattern",
+  fil_fea_raw = "myExampleDir/myExampleFeatures.csv",
+  fil_met_raw = "myExampleDir2SomeWhereElse/myOptionalMetadata.tsv",
+  fil_sir_raw = "myExampleDir3/myAwesomeSiriusProject.zip",
+  fil_spe_raw = "myBeautifulSpectra.mgf",
+  ms_pol = "pos",
+  org_tax = "Gentiana lutea",
+  hig_con = TRUE,
+  summarise = FALSE
+)
+}
 }

@@ -21,7 +21,21 @@
 #'
 #' @return YAML file with changed parameters.
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' tima::change_params_small(
+#'   fil_pat = "myExamplePattern",
+#'   fil_fea_raw = "myExampleDir/myExampleFeatures.csv",
+#'   fil_met_raw = "myExampleDir2SomeWhereElse/myOptionalMetadata.tsv",
+#'   fil_sir_raw = "myExampleDir3/myAwesomeSiriusProject.zip",
+#'   fil_spe_raw = "myBeautifulSpectra.mgf",
+#'   ms_pol = "pos",
+#'   org_tax = "Gentiana lutea",
+#'   hig_con = TRUE,
+#'   summarise = FALSE
+#' )
+#' }
 change_params_small <- function(fil_pat = NULL,
                                 fil_fea_raw = NULL,
                                 fil_met_raw = NULL,
