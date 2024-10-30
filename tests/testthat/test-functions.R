@@ -249,6 +249,19 @@ test_that(desc = "Test functions", code = {
   ## test it does not download it a second time
   get_massbank_spectra()
 
+  ## Change small params
+  change_params_small()
+  change_params_small(
+    fil_pat = "myExamplePattern",
+    fil_fea_raw = paths$data$source$features,
+    fil_met_raw = paths$data$source$metadata,
+    fil_sir_raw = paths$data$interim$annotations$example_sirius$v6,
+    fil_spe_raw = paths$data$source$spectra,
+    ms_pol = "pos",
+    org_tax = "Gentiana lutea",
+    hig_con = TRUE,
+    summarise = FALSE
+  )
   ## Prepare libraries
   ### If does not exist
   prepare_libraries_spectra(

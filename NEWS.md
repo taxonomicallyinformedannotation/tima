@@ -1,8 +1,20 @@
 # tima
 
-# tima 2.10.1
+# tima 2.11.0
 
+* Added convenience function to change small parameters (#177)
+* Added demo files download to the app
+* Better packaging
+* Improved documentation
+* Fixed all CRAN warnings
+* Fixed some edge cases in spectra import
+* Reduced dependencies
+* Reduced exports
+* Removed `CompoundDb` dependency as it was causing too many issues
+* Removed `pak` install and switched to `r-universe`
 * Replaced internal functions by `Spectra` equivalents (#166)
+* Shinylive version available at <https://taxonomicallyinformedannotation.github.io/tima-shinylive>
+* Simplified install and vignettes
 
 # tima 2.10.0
 
