@@ -2,6 +2,7 @@
 
 # tima 2.11.0
 
+* Added convenience function to change small parameters (#177)
 * Added demo files download to the app
 * Better packaging
 * Improved documentation
