@@ -244,22 +244,6 @@ test_that(desc = "Test functions", code = {
   ## test it does not download it a second time
   get_massbank_spectra()
 
-  ## Change small params
-  get_example_files()
-  wd <- getwd()
-  change_params_small()
-  change_params_small(
-    fil_pat = "myExamplePattern",
-    fil_fea_raw = paths$data$source$features,
-    fil_met_raw = paths$data$source$metadata,
-    fil_sir_raw = paths$data$interim$annotations$example_sirius$v6,
-    fil_spe_raw = paths$data$source$spectra,
-    ms_pol = "pos",
-    org_tax = "Gentiana lutea",
-    hig_con = TRUE,
-    summarise = FALSE
-  )
-  setwd(wd)
   ## Prepare libraries
   ### If does not exist
   prepare_libraries_spectra(
@@ -545,6 +529,21 @@ test_that(desc = "Test functions", code = {
   # get_example_files()
   # tima:::.onLoad()
   # tima_full()
+
+  ## Change small params
+  get_example_files()
+  change_params_small()
+  change_params_small(
+    fil_pat = "myExamplePattern",
+    fil_fea_raw = paths$data$source$features,
+    fil_met_raw = paths$data$source$metadata,
+    fil_sir_raw = paths$data$interim$annotations$example_sirius$v6,
+    fil_spe_raw = paths$data$source$spectra,
+    ms_pol = "pos",
+    org_tax = "Gentiana lutea",
+    hig_con = TRUE,
+    summarise = FALSE
+  )
 
   ## CLI arguments check
   arguments <- character()
