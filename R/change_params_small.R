@@ -1,12 +1,6 @@
-import::from(fs, file_copy, .into = environment())
-import::from(yaml, write_yaml, .into = environment())
-
 #' @title Change Params Small
 #'
 #' @description This function helps changing convenience parameters.
-#'
-#' @importFrom fs file_copy
-#' @importFrom yaml write_yaml
 #'
 #' @include create_dir.R
 #' @include get_default_paths.R
@@ -56,7 +50,7 @@ change_params_small <- function(fil_pat = NULL,
     stopifnot("Your features' file does not exist" = file.exists(fil_fea_raw))
     fil_fea_raw_rdy <- paths_data_source |>
       file.path(basename(file_fea_raw))
-    file_copy(
+    fs::file_copy(
       path = file_fea_raw,
       new_path = fil_fea_raw_rdy,
       overwrite = TRUE
@@ -67,7 +61,7 @@ change_params_small <- function(fil_pat = NULL,
     stopifnot("Your metadata file does not exist" = file.exists(fil_met_raw))
     fil_met_raw_rdy <- paths_data_source |>
       file.path(basename(fil_met_raw))
-    file_copy(
+    fs::file_copy(
       path = fil_met_raw,
       new_path = fil_met_raw_rdy,
       overwrite = TRUE
@@ -78,7 +72,7 @@ change_params_small <- function(fil_pat = NULL,
     stopifnot("Your sirius directory does not exist" = file.exists(fil_sir_raw))
     fil_sir_raw_rdy <- paths_data_interim_annotations |>
       file.path(basename(fil_sir_raw))
-    file_copy(
+    fs::file_copy(
       path = fil_sir_raw,
       new_path = fil_sir_raw_rdy,
       overwrite = TRUE
@@ -89,7 +83,7 @@ change_params_small <- function(fil_pat = NULL,
     stopifnot("Your spectra file does not exist" = file.exists(fil_spe_raw))
     fil_spe_raw_rdy <- paths_data_source |>
       file.path(basename(fil_spe_raw))
-    file_copy(
+    fs::file_copy(
       path = fil_spe_raw,
       new_path = fil_spe_raw_rdy,
       overwrite = TRUE
@@ -109,7 +103,7 @@ change_params_small <- function(fil_pat = NULL,
     yaml_small$options$summarise <- summarise
   }
 
-  write_yaml(
+  yaml::write_yaml(
     x = yaml_small,
     file = tima:::get_default_paths()$params$prepare_params
   )
