@@ -16,12 +16,18 @@ sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 \item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
-
-\item{ratio}{Minimal ratio to the max peak}
+}
+\value{
+The sanitized spectra
 }
 \description{
 This function sanitizes spectra
 }
 \examples{
-NULL
+data.frame(
+  FEATURE_ID = c("FT001", "FT002", "FT003"),
+  mz = c(list(123.4567, 234.5678, 345.6789))
+) |>
+  Spectra::Spectra() |>
+  sanitize_spectra()
 }

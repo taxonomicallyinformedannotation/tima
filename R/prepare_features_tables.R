@@ -1,14 +1,6 @@
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare features table
 #'
 #' @description This function prepares features
-#'
-#' @importFrom tidytable any_of
-#' @importFrom tidytable fread
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #'
@@ -19,11 +11,21 @@ import::from(tidytable, select, .into = environment())
 #' @param name_rt Name of the retention time column in the features data
 #' @param name_mz Name of the m/z column in the features data
 #'
-#' @return NULL
+#' @return The path to the prepared feature table
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' get_file(
+#'   url = get_default_paths()$urls$examples$features,
+#'   export = get_params(step = "prepare_features_tables")$files$features$raw
+#' )
+#' prepare_features_tables()
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_features_tables <-
   function(features = get_params(step = "prepare_features_tables")$files$features$raw,
            output = get_params(step = "prepare_features_tables")$files$features$prepared,
@@ -35,8 +37,8 @@ prepare_features_tables <-
 
     log_debug("Preparing features table")
     features_prepared <- features |>
-      fread(na.strings = c("", "NA"), colClasses = "character") |>
-      select(any_of(
+      tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
+      tidytable::select(tidyselect::any_of(
         c(
           feature_id = name_features,
           rt = name_rt,
@@ -45,12 +47,11 @@ prepare_features_tables <-
         )
       ))
 
-    log_debug(x = "Exporting ...")
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_features_tables"),
       step = "prepare_features_tables"
     )
-    export_output(x = features_prepared, file = output)
+    tima:::export_output(x = features_prepared, file = output)
     rm(features_prepared)
 
     return(output)

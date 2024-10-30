@@ -1,28 +1,6 @@
-import::from(stringi, stri_detect_fixed, .into = environment())
-import::from(stringi, stri_sub, .into = environment())
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, everything, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, na_if, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(utils, unzip, .into = environment())
-
 #' @title Prepare libraries of structure organism pairs HMDB
 #'
 #' @description This function prepares the HMDB structure-organism pairs
-#'
-#' @importFrom stringi stri_detect_fixed
-#' @importFrom stringi stri_sub
-#' @importFrom tidytable across
-#' @importFrom tidytable distinct
-#' @importFrom tidytable everything
-#' @importFrom tidytable filter
-#' @importFrom tidytable mutate
-#' @importFrom tidytable na_if
-#' @importFrom tidytable select
-#' @importFrom utils unzip
 #'
 #' @include fake_sop_columns.R
 #' @include get_params.R
@@ -32,11 +10,17 @@ import::from(utils, unzip, .into = environment())
 #' @param input Input file
 #' @param output Output file
 #'
-#' @return NULL
+#' @return The path to the prepared structure-organism pairs library HMDB
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' prepare_libraries_sop_hmdb()
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_libraries_sop_hmdb <-
   function(input = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$raw$hmdb,
            output = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$prepared$hmdb) {
@@ -44,7 +28,7 @@ prepare_libraries_sop_hmdb <-
       log_debug("Unzipping HMDB...")
       hmdb_prepared <- tryCatch(
         expr = {
-          unzip(zipfile = input, exdir = dirname(input))
+          utils::unzip(zipfile = input, exdir = dirname(input))
           hmdb_structures <- input |>
             gsub(
               pattern = ".zip",
@@ -56,7 +40,7 @@ prepare_libraries_sop_hmdb <-
 
           find_fixed_pattern_line_in_file <- function(file, pattern) {
             return(file |>
-              stri_detect_fixed(pattern = pattern) |>
+              stringi::stri_detect_fixed(pattern = pattern) |>
               which())
           }
 
@@ -84,10 +68,10 @@ prepare_libraries_sop_hmdb <-
 
           log_debug(x = "Formatting HMDB...")
           hmdb_prepared <- hmdb_df |>
-            mutate(across(.cols = everything(), .fns = na_if, "")) |>
-            filter(!is.na(inchikey)) |>
-            mutate(
-              structure_inchikey_2D = stri_sub(
+            tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = tidytable::na_if, "")) |>
+            tidytable::filter(!is.na(inchikey)) |>
+            tidytable::mutate(
+              structure_inchikey_2D = stringi::stri_sub(
                 str = inchikey,
                 from = 1,
                 to = 14
@@ -96,7 +80,7 @@ prepare_libraries_sop_hmdb <-
               structure_smiles_2D = NA_character_,
               structure_exact_mass = NA_real_
             ) |>
-            select(
+            tidytable::select(
               structure_name = name,
               structure_inchikey = inchikey,
               structure_smiles = smiles,
@@ -105,7 +89,7 @@ prepare_libraries_sop_hmdb <-
               structure_molecular_formula = formula,
               structure_exact_mass
             ) |>
-            mutate(
+            tidytable::mutate(
               structure_xlogp = NA_integer_,
               structure_taxonomy_npclassifier_01pathway = NA_character_,
               structure_taxonomy_npclassifier_02superclass = NA_character_,
@@ -116,7 +100,7 @@ prepare_libraries_sop_hmdb <-
               structure_taxonomy_classyfire_03class = NA_character_,
               structure_taxonomy_classyfire_04directparent = NA_character_,
             ) |>
-            mutate(
+            tidytable::mutate(
               organism_name = "Homo sapiens",
               organism_taxonomy_ottid = 770315,
               organism_taxonomy_01domain = "Eukaryota",
@@ -131,16 +115,16 @@ prepare_libraries_sop_hmdb <-
               organism_taxonomy_10varietas = NA_character_,
               reference_doi = NA_character_
             ) |>
-            round_reals() |>
-            distinct()
+            tima:::round_reals() |>
+            tidytable::distinct()
 
           log_debug("Deleting unzipped file...")
           file.remove(hmdb_structures)
           hmdb_prepared
         },
-        error = function(cond) {
+        error = function(e) {
           log_debug("Something went wrong, see original error message:")
-          log_debug(cond)
+          log_debug(e)
           hmdb_prepared <- fake_sop_columns()
         }
       )
@@ -149,6 +133,6 @@ prepare_libraries_sop_hmdb <-
       hmdb_prepared <- fake_sop_columns()
     }
     log_debug(x = "Exporting ...")
-    export_output(x = hmdb_prepared, file = output)
+    tima:::export_output(x = hmdb_prepared, file = output)
     return(output)
   }

@@ -2,23 +2,21 @@
 #'
 #' @description This function gets MassBank spectra
 #'
-#' @include parse_yaml_paths.R
+#' @include get_default_paths.R
 #'
 #' @param output_dir Output where to store the spectra
 #' @param mb_file MassBank file
 #' @param mb_url MassBank URL
 #' @param mb_version MassBank version
 #'
-#' @return NULL
-#'
-#' @export
+#' @return The path to MassBank spectra
 #'
 #' @examples NULL
 get_massbank_spectra <-
   function(output_dir = "data/source/libraries/spectra/exp",
-           mb_file = parse_yaml_paths()$urls$massbank$file,
-           mb_url = parse_yaml_paths()$urls$massbank$url,
-           mb_version = parse_yaml_paths()$urls$massbank$version) {
+           mb_file = get_default_paths()$urls$massbank$file,
+           mb_url = get_default_paths()$urls$massbank$url,
+           mb_version = get_default_paths()$urls$massbank$version) {
     log_debug("Checking if a previous MassBank version already exists")
     export <- file.path(output_dir, paste(mb_version, mb_file, sep = "_"))
     if (!file.exists(export)) {

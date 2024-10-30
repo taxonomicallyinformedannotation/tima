@@ -47,9 +47,17 @@ prepare_annotations_sirius(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The path to the prepared SIRIUS annotations
+}
 \description{
 This function prepares Sirius results to make them compatible
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_annotations_sirius()
+unlink("data", recursive = TRUE)
+}
 }

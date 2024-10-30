@@ -68,6 +68,9 @@ harmonize_spectra(
 
 \item{col_xl}{Name of the xlogp in mgf}
 }
+\value{
+The harmonized spectra
+}
 \description{
 This function harmonizes spectra headers
 }

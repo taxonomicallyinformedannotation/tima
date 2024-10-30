@@ -1,22 +1,9 @@
-import::from(httr2, req_error, .into = environment())
-import::from(httr2, req_method, .into = environment())
-import::from(httr2, req_perform, .into = environment())
-import::from(httr2, request, .into = environment())
-import::from(httr2, resp_status_desc, .into = environment())
-import::from(stringi, stri_length, .into = environment())
-
 #' @title Get GNPS Tables
 #'
 #' @description This function gets GNPS tables from corresponding job ID.
 #'
-#' @importFrom httr2 req_error
-#' @importFrom httr2 req_method
-#' @importFrom httr2 req_perform
-#' @importFrom httr2 request
-#' @importFrom httr2 resp_status_desc
-#' @importFrom stringi stri_length
-#'
-#' @include parse_yaml_paths.R get_file.R
+#' @include get_default_paths.R
+#' @include get_file.R
 #'
 #' @param gnps_job_id GNPS job ID
 #' @param gnps_job_example GNPS job example
@@ -32,20 +19,18 @@ import::from(stringi, stri_length, .into = environment())
 #'
 #' @return The downloaded GNPS tables
 #'
-#' @export
-#'
 #' @examples NULL
 get_gnps_tables <-
   function(gnps_job_id,
-           gnps_job_example = parse_yaml_paths()$gnps$example,
+           gnps_job_example = get_default_paths()$gnps$example,
            filename,
            workflow = "fbmn",
            path_features,
            path_metadata,
            path_spectra,
-           path_source = parse_yaml_paths()$data$source$path,
-           path_interim_a = parse_yaml_paths()$data$interim$annotations$path,
-           path_interim_f = parse_yaml_paths()$data$interim$features$path) {
+           path_source = get_default_paths()$data$source$path,
+           path_interim_a = get_default_paths()$data$interim$annotations$path,
+           path_interim_f = get_default_paths()$data$interim$features$path) {
     if (!is.null(gnps_job_id)) {
       if (gnps_job_id == "") {
         gnps_job_id <- NULL
@@ -54,7 +39,7 @@ get_gnps_tables <-
     if (!is.null(gnps_job_id)) {
       stopifnot(
         "Your GNPS job ID is invalid" =
-          stri_length(str = gnps_job_id) == 32
+          stringi::stri_length(str = gnps_job_id) == 32
       )
       stopifnot(
         "Your workflow is not supported,
@@ -96,22 +81,22 @@ get_gnps_tables <-
 
         log_debug("Checking response...")
         if (url |>
-          request() |>
-          req_method("GET") |>
-          req_error(
+          httr2::request() |>
+          httr2::req_method("GET") |>
+          httr2::req_error(
             is_error = function(resp) {
               return(FALSE)
             }
           ) |>
-          req_perform() |>
-          resp_status_desc() == "OK") {
+          httr2::req_perform() |>
+          httr2::resp_status_desc() == "OK") {
           log_debug("Status OK!")
           get_file(url = url, export = file_metadata)
         } else {
           log_debug("The given GNPS job ID has no metadata")
           log_debug("Returning empty dataframes instead")
           fake_metadata <- data.frame(filename = NULL, ATTRIBUTE_species = NULL)
-          export_output(x = fake_metadata, file = file_metadata)
+          tima:::export_output(x = fake_metadata, file = file_metadata)
         }
       }
 
@@ -197,16 +182,16 @@ get_gnps_tables <-
         subclass = "fff",
         check.names = FALSE
       )
-      export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
+      tima:::export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
       fake_components <- data.frame(
         `cluster index` = 0,
         componentindex = 0,
         check.names = FALSE
       )
-      export_output(x = fake_components, file = file.path(path_interim_f, paste0(filename, "_components.tsv")))
+      tima:::export_output(x = fake_components, file = file.path(path_interim_f, paste0(filename, "_components.tsv")))
 
       fake_edges <- data.frame(CLUSTERID1 = 0, CLUSTERID2 = 0)
-      export_output(x = fake_edges, file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv")))
+      tima:::export_output(x = fake_edges, file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv")))
       if (is.list(path_metadata)) {
         path_metadata <- unlist(path_metadata)
       }
@@ -217,7 +202,7 @@ get_gnps_tables <-
         !file.exists(path_metadata)) {
         path_metadata <- "data/source/metadata.tsv"
         fake_metadata <- data.frame(filename = "foo", ATTRIBUTE_species = "bar")
-        export_output(x = fake_metadata, file = path_metadata)
+        tima:::export_output(x = fake_metadata, file = path_metadata)
       }
 
       return(

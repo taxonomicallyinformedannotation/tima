@@ -13,6 +13,9 @@ get_file(url, export, limit = 3600)
 
 \item{limit}{Timeout limit (in seconds)}
 }
+\value{
+The path to the file
+}
 \description{
 This function get files
 }
@@ -26,4 +29,5 @@ get_file(
   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
   export = "data/source/example_metadata.tsv"
 )
+unlink("data", recursive = TRUE)
 }

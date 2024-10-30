@@ -16,9 +16,17 @@ prepare_libraries_sop_closed(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library CLOSED
+}
 \description{
 Prepare libraries of structure organism pairs CLOSED
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_libraries_sop_closed()
+unlink("data", recursive = TRUE)
+}
 }

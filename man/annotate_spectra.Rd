@@ -6,7 +6,7 @@
 \usage{
 annotate_spectra(
   input = get_params(step = "annotate_spectra")$files$spectral$raw,
-  library = get_params(step = "annotate_spectra")$files$libraries$spectral$exp,
+  library = get_params(step = "annotate_spectra")$files$libraries$spectral,
   polarity = get_params(step = "annotate_spectra")$ms$polarity,
   output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
   threshold = get_params(step =
@@ -45,5 +45,20 @@ It takes two files as input.
 A query file that will be matched against a library file.
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+get_file(
+  url = get_default_paths()$urls$examples$spectra_mini,
+  export = get_params(step = "annotate_spectra")$files$spectral$raw
+)
+get_file(
+  url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
+  export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+)
+annotate_spectra(
+  library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+)
+unlink("data", recursive = TRUE)
+}
 }

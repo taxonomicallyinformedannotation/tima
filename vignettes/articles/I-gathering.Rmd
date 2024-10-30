@@ -21,11 +21,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = "../..")
+knitr::opts_knit$set(root.dir = system.file(package = "tima"))
 ```
 
-```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r tima, include = FALSE}
 library("tima")
+tima:::copy_backbone()
 ```
 This vignette describes...
 
@@ -33,13 +34,13 @@ This vignette describes...
 * All inputs you need
 
 ```{r change-tests, include = FALSE}
-source(file = "inst/scripts/change_tests.R")
+source(file = "scripts/change_tests.R")
 ```
 
 ## Parameters
 
 All steps require parameters.
-Some default parameters are available and can be accessed in the `inst/params/default` directory.
+Some default parameters are available and can be accessed in the `params/default` directory.
 If you prefer accessing them through the GUI, you can do so.
 Each parameter contains a small help menu, you can click on, as illustrated below.
 
@@ -58,26 +59,18 @@ All parameters will be saved and reported at the end of your analysis.
 ### Your own files
 
 You should provide your own files in the main menu.
-For this tutorial, we will use some example files as below:
+For this tutorial, we will use some example files you can get running:
 
 ```{r unlink-spectra, include = FALSE}
 unlink("data/source/example_spectra.mgf")
 ```
 
-```{r get-files, results="hide", message=FALSE, warning=FALSE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$features,
-  export = tima::parse_yaml_paths()$data$source$features
-)
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$metadata,
-  export = tima::parse_yaml_paths()$data$source$metadata
-)
-# tima::get_example_sirius()
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$spectra,
-  export = tima::parse_yaml_paths()$data$source$spectra
-)
+```{r get-files, eval=FALSE, include=TRUE}
+tima::get_example_files()
+```
+
+```{r get-files-no-cache, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+tima::get_example_files(in_cache = FALSE)
 ```
 
 ### Libraries
@@ -96,10 +89,7 @@ We currently support spectral libraries in MSP or MGF format.
 To get a small example:
 
 ```{r spectra-rt, results="hide", message=FALSE, warning=FALSE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$examples$spectral_lib_mini$with_rt,
-  export = tima::parse_yaml_paths()$data$source$libraries$spectra$exp$with_rt
-)
+tima::get_example_files("spectral_lib_with_rt")
 ```
 
 ###### MassBank
@@ -107,16 +97,16 @@ tima::get_file(
 MassBank is downloaded and used by default.
 
 ```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_exp_mb_raw"))
+targets::tar_make(names = tidyselect::matches("lib_spe_exp_mb_raw"))
 ```
 
 We are currently working to get all MONA and GNPS experimental spectra easily available.
 
 However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.
 
-So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `inst/scripts/prepare_libraries_spectra_exp_mona.R`).
+So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `scripts/prepare_libraries_spectra_exp_mona.R`).
 
-In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `inst/params/user/prepare_libraries_spectra.yaml` and `inst/params/user/annotate_spectra.yaml`.
+In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `params/user/prepare_libraries_spectra.yaml` and `params/user/annotate_spectra.yaml`.
 
 ##### *In silico*
 
@@ -129,11 +119,11 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
 ```{r get-isdb-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_is_lot"))
+targets::tar_make(names = tidyselect::matches("lib_spe_is_lot"))
 ```
 
 ```{r prepare-isdb-lotus-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_spe_is_lot_pre"))
+targets::tar_make(names = tidyselect::matches("lib_spe_is_lot_pre"))
 ```
 
 You can also complement with the in silico spectra from HMDB (not running by default as quite long):
@@ -141,10 +131,7 @@ You can also complement with the in silico spectra from HMDB (not running by def
 #### HMDB
 
 ```{r get-isdb-hmdb, eval=FALSE, include=TRUE}
-tima::get_file(
-  url = tima::parse_yaml_paths()$urls$hmdb$spectra$predicted,
-  export = tima::parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
-)
+tima::get_example_files("hmdb_is")
 ```
 
 #### Retention times
@@ -153,7 +140,7 @@ This library is **optional**.
 As no standard LC method is shared (for now) among laboratories, this library
 will be heavily laboratory-dependent.
 It could also be a library of in silico predicted retention times.
-If you want to prepare you own library, have a look at `inst/params/user/prepare_libraries_rt.yaml`.
+If you want to prepare you own library, have a look at `params/user/prepare_libraries_rt.yaml`.
 
 #### Structure-Organism Pairs
 
@@ -167,20 +154,20 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 
 ```{r get-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_lot$"))
+targets::tar_make(names = tidyselect::matches("lib_sop_lot$"))
 ```
 
 ```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_lot_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_lot_pre"))
 ```
 
 The process to download LOTUS looks like this:
 
 ```{r prepare-lotus-3, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
-  names = matches("lib_sop_lot"),
+  names = tidyselect::matches("lib_sop_lot"),
   exclude = c(
-    contains("benchmark"),
+    tidyselect::contains("benchmark"),
   ),
   targets_only = TRUE,
   degree_from = 8
@@ -196,7 +183,7 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
 
 ```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_ecm_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_ecm_pre"))
 ```
 
 ##### HMDB
@@ -204,7 +191,7 @@ targets::tar_make(names = matches("lib_sop_ecm_pre"))
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
 ```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_hmd_pre"))
+targets::tar_make(names = tidyselect::matches("lib_sop_hmd_pre"))
 ```
 
 For these first steps, you do not need to change any parameters as they are implemented *by default*.
@@ -215,23 +202,23 @@ As we want our tool to be flexible, you can also add your own library to LOTUS.
 You just need to format it in order to be compatible.
 As example, we prepared some ways too format closed, *in house* libraries.
 If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
-Before running the corresponding code, do not forget to modify `inst/params/user/prepare_libraries_sop_closed.yaml`.
+Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_closed.yaml`.
 
 ##### Merging
 
 Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
 
 ```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = matches("lib_sop_mer"))
+targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
 ```
 
 ```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
   exclude = c(
-    contains("benchmark"),
-    contains("par_"),
-    contains("paths")
+    tidyselect::contains("benchmark"),
+    tidyselect::contains("par_"),
+    tidyselect::contains("paths")
   ),
   targets_only = TRUE,
   degree_from = 8

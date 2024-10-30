@@ -26,6 +26,9 @@ select_annotations_columns(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The dataframe with annotation columns selected
+}
 \description{
 This function selects annotations columns
 }

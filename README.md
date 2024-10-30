@@ -55,11 +55,17 @@ Optionally, you may want to add:
 ## Installation
 
 As the package is not (yet) available on CRAN, you will need to install
-the development version [GitHub](https://github.com/) with:
+with:
 
 ``` r
-# install.packages("pak")
-pak::pak("taxonomicallyinformedannotation/tima")
+install.packages(
+  "tima",
+  repos = c(
+    "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
+    "https://cloud.r-project.org"
+  )
+)
 ```
 
 Then, you should be able to install the rest with:
@@ -105,7 +111,15 @@ docker pull adafede/tima-r
 ```
 
 ``` bash
-docker compose up tima-gui
+docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
+# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::tima_full()"
+```
+
+Or alternatively (if you did pull the repository and are located at the
+right place):
+
+``` bash
+docker compose up tima-run-app
 # docker compose up tima-full
 ```
 

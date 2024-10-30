@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_knit$set(root.dir = "..")
+knitr::opts_knit$set(root.dir = system.file(package = "tima"))
 ```
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
@@ -62,19 +62,18 @@ Sys.setenv(TAR_WARN = "false")
 targets::tar_visnetwork(
   names = starts_with("ann"),
   exclude = c(
-    contains("benchmark"),
-    contains("par_"),
-    contains("gnps"),
-    contains("input"),
-    contains("paths"),
-    contains("_is"),
-    contains("_exp"),
-    contains("library_sop_lotus"),
-    contains("library_sop_closed")
+    tidyselect::contains("benchmark"),
+    tidyselect::contains("par_"),
+    tidyselect::contains("gnps"),
+    tidyselect::contains("input"),
+    tidyselect::contains("paths"),
+    tidyselect::contains("_is"),
+    tidyselect::contains("_exp"),
+    tidyselect::contains("library_sop_lotus"),
+    tidyselect::contains("library_sop_closed")
   ),
   targets_only = TRUE,
-  degree_from = 8,
-  level_separation = 200
+  degree_from = 8
 )
 ```
 
@@ -85,8 +84,14 @@ Each step is detailed in the related [vignettes](https://taxonomicallyinformedan
 All coming steps admit you already installed `tima`:
 
 ```{r eval=FALSE, include=TRUE}
-# install.packages("pak")
-pak::pak("taxonomicallyinformedannotation/tima")
+install.packages(
+  "tima",
+  repos = c(
+    "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
+    "https://cloud.r-project.org"
+  )
+)
 tima::install()
 tima::get_example_files()
 ```

@@ -8,8 +8,6 @@
 #'
 #' @return A mass
 #'
-#' @export
-#'
 #' @examples NULL
 transform_score_sirius_csi <- function(csi_score,
                                        K = 50,

@@ -1,24 +1,43 @@
 citHeader("To cite tima in publications use:")
 
-citEntry(
-  entry    = "Article",
+bibentry(
+  bibtype  = "Manual",
+  title    = "tima: Taxonomically Informed Metabolite Annotation",
+  author   = c(
+    person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
+    ),
+  year     = "2024",
+  note     = "R package, version 2.11.0",
+  doi      = "10.5281/zenodo.5797920"
+)
+
+bibentry(
+  bibtype  = "Article",
   title    = "Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation",
   author   = c(
-    person(given = "Adriano", family = "Rutz"),
+    person(given = "Adriano", family = "Rutz", comment = c(ORCID = "0000-0003-0443-9902")),
     person(given = "Miwa", family = "Dounoue-Kubo"),
-    person(given = "Simon", family = "Ollivier"),
-    person(given = "Jonathan", family = "Bisson"),
+    person(given = "Simon", family = "Ollivier", comment = c(ORCID = "0000-0002-7671-1736")),
+    person(given = "Jonathan", family = "Bisson", comment = c(ORCID = "0000-0003-1640-9989")),
     person(given = "Mohsen", family = "Bagheri"),
     person(given = "Tongchai", family = "Saesong"),
-    person(given = "Samad Nejad", family = "Ebrahimi"),
-    person(given = "Kornkanok", family = "Ingkaninan"),
-    person(given = "Jean-Luc", family = "Wolfender"),
-    person(given = "Pierre-Marie", family = "Allard")),
+    person(given = "Samad Nejad", family = "Ebrahimi", comment = c(ORCID = "0000-0003-2167-8032")),
+    person(given = "Kornkanok", family = "Ingkaninan", comment = c(ORCID = "0000-0002-4415-8489")),
+    person(given = "Jean-Luc", family = "Wolfender", comment = c(ORCID = "0000-0002-0125-952X")),
+    person(given = "Pierre-Marie", family = "Allard", comment = c(ORCID = "0000-0003-3389-2191"))
+    ),
   journal  = "Frontiers in Plant Science",
   year     = "2019",
   volume   = "10",
   url      = "https://doi.org/10.3389/fpls.2019.01329",
+  language = "en",
+  keywords = "metabolite annotation, chemotaxonomy, scoring system, natural products, computational metabolomics, taxonomic distance, specialized metabolome",
+  doi      = "10.3389/FPLS.2019.01329",
+  issn     = "1664-462X",
+  pmc      = "PMC6824209",
+  pmid     = "1708947",
+  qid      = "Q91218352",
   textVersion = paste(
-  " Adriano Rutz; Miwa Dounoue-Kubo; Simon Ollivier; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. ISSN 1664-462X. PMC 6824209. PMID 31708947. Wikidata Q91218352."
+  "Adriano Rutz; Miwa Dounoue-Kubo; et al. (25 October 2019). Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation. Frontiers in Plant Science. 10: 1329. doi:10.3389/FPLS.2019.01329. issn:1664-462X. pmc:PMC6824209. pmid:1708947. qid:Q91218352."
   )
 )

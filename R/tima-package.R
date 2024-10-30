@@ -2,15 +2,18 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @import rlang
-#' @importFrom glue glue
-#' @importFrom lifecycle deprecated
 ## usethis namespace: end
 NULL
 .datatable.aware <- TRUE
 
 .onLoad <- function(libname, pkgname) {
-  Sys.setenv(TAR_CONFIG = system.file("pipelines/_targets.yaml", package = "tima"))
+  ## Hack to avoid rcmdcheck warning since they are needed by {targets}
+  ## for shinylive
+  DT:::.packageName
+  gt:::.packageName
+  shinybusy:::.packageName
+  shinyWidgets:::.packageName
+  visNetwork:::.packageName
   invisible()
 }
 

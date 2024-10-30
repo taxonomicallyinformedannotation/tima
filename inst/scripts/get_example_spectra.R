@@ -1,9 +1,6 @@
 start <- Sys.time()
 
-require(
-  package = "tima",
-  quietly = TRUE
-)
+library(tima)
 
 log_debug(
   "This script",
@@ -13,8 +10,8 @@ log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
 get_file(
-  url = parse_yaml_paths()$urls$examples$spectra,
-  export = parse_yaml_paths()$data$source$spectra
+  url = get_default_paths()$urls$examples$spectra,
+  export = get_default_paths()$data$source$spectra
 )
 
 end <- Sys.time()

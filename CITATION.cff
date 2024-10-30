@@ -1,19 +1,55 @@
+# --------------------------------------------
+# CITATION file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# --------------------------------------------
+ 
 cff-version: 1.2.0
-message: "Please cite the following works when using this software: https://doi.org/10.3389/fpls.2019.01329 and https://doi.org/10.5281/zenodo.5797920"
+message: 'To cite package "tima" in publications use:'
+type: software
+license: GPL-3.0-or-later
+title: 'tima: Taxonomically Informed Metabolite Annotation'
+version: 2.11.0
+doi: 10.5281/zenodo.5797920
+identifiers:
+- type: url
+  value: https://taxonomicallyinformedannotation.github.io/tima-shinylive
+abstract: This package provides the infrastructure to perform Taxonomically Informed
+  Metabolite Annotation.
 authors:
+- family-names: Rutz
+  given-names: Adriano
+  email: adafede@gmail.com
+  orcid: https://orcid.org/0000-0003-0443-9902
+preferred-citation:
+  type: manual
+  title: 'tima: Taxonomically Informed Metabolite Annotation'
+  authors:
   - family-names: Rutz
     given-names: Adriano
+    email: adafede@gmail.com
     orcid: https://orcid.org/0000-0003-0443-9902
-  - family-names: Bisson
-    given-names: Jonathan
-    orcid: https://orcid.org/0000-0003-1640-9989
-  - family-names: Allard
-    given-names: Pierre-Marie
-    orcid: https://orcid.org/0000-0003-3389-2191
-title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
-url: "https://github.com/taxonomicallyinformedannotation/tima"
-preferred-citation:
-  type: article
+  year: '2024'
+  notes: R package, version 2.11.0
+  doi: 10.5281/zenodo.5797920
+repository: https://bioconductor.org/
+repository-code: https://github.com/taxonomicallyinformedannotation/tima
+url: https://taxonomicallyinformedannotation.github.io/tima
+contact:
+- family-names: Rutz
+  given-names: Adriano
+  email: adafede@gmail.com
+  orcid: https://orcid.org/0000-0003-0443-9902
+keywords:
+- metabolite annotation
+- chemotaxonomy
+- scoring system
+- natural products
+- computational metabolomics
+- taxonomic distance
+- specialized metabolome
+references:
+- type: article
+  title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
   authors:
   - family-names: Rutz
     given-names: Adriano
@@ -42,16 +78,773 @@ preferred-citation:
   - family-names: Allard
     given-names: Pierre-Marie
     orcid: https://orcid.org/0000-0003-3389-2191
-  title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
-  year: 2019
   journal: Frontiers in Plant Science
-  volume: 10
-  doi: 10.3389/fpls.2019.01329
-  url: "https://doi.org/10.3389/fpls.2019.01329"
-  identifiers:
-    - type: "doi"
-      value: "10.3389/fpls.2019.01329"
-    - type: "url"
-      value: "https://doi.org/10.3389/fpls.2019.01329"
-    - type: "other"
-      value: "urn:issn:1664-462X"
+  year: '2019'
+  volume: '10'
+  url: https://doi.org/10.3389/fpls.2019.01329
+  keywords:
+  - metabolite annotation
+  - chemotaxonomy
+  - scoring system
+  - natural products
+  - computational metabolomics
+  - taxonomic distance
+  - specialized metabolome
+  doi: 10.3389/FPLS.2019.01329
+  issn: 1664-462X
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Depends
+  url: https://www.R-project.org/
+  authors:
+  - name: R Core Team
+  institution:
+    name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
+  version: '>= 4.3.0'
+- type: software
+  title: crayon
+  abstract: 'crayon: Colored Terminal Output'
+  notes: Imports
+  url: https://r-lib.github.io/crayon/
+  repository: https://CRAN.R-project.org/package=crayon
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.crayon
+  version: '>= 1.5.3'
+- type: software
+  title: docopt
+  abstract: 'docopt: Command-Line Interface Specification Language'
+  notes: Imports
+  url: https://github.com/docopt/docopt.R
+  repository: https://CRAN.R-project.org/package=docopt
+  authors:
+  - family-names: Jonge
+    given-names: Edwin
+    name-particle: de
+  year: '2024'
+  doi: 10.32614/CRAN.package.docopt
+  version: '>= 0.7.1'
+- type: software
+  title: dplyr
+  abstract: 'dplyr: A Grammar of Data Manipulation'
+  notes: Imports
+  url: https://dplyr.tidyverse.org
+  repository: https://CRAN.R-project.org/package=dplyr
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+    orcid: https://orcid.org/0000-0003-4757-117X
+  - family-names: François
+    given-names: Romain
+    orcid: https://orcid.org/0000-0002-2444-4226
+  - family-names: Henry
+    given-names: Lionel
+  - family-names: Müller
+    given-names: Kirill
+    orcid: https://orcid.org/0000-0002-1416-3412
+  - family-names: Vaughan
+    given-names: Davis
+    email: davis@posit.co
+    orcid: https://orcid.org/0000-0003-4777-038X
+  year: '2024'
+  doi: 10.32614/CRAN.package.dplyr
+  version: '>= 1.1.4'
+- type: software
+  title: DT
+  abstract: 'DT: A Wrapper of the JavaScript Library ''DataTables'''
+  notes: Imports
+  url: https://github.com/rstudio/DT
+  repository: https://CRAN.R-project.org/package=DT
+  authors:
+  - family-names: Xie
+    given-names: Yihui
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Tan
+    given-names: Xianying
+  year: '2024'
+  doi: 10.32614/CRAN.package.DT
+- type: software
+  title: fs
+  abstract: 'fs: Cross-Platform File System Operations Based on ''libuv'''
+  notes: Imports
+  url: https://fs.r-lib.org
+  repository: https://CRAN.R-project.org/package=fs
+  authors:
+  - family-names: Hester
+    given-names: Jim
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.fs
+  version: '>= 1.6.4'
+- type: software
+  title: gt
+  abstract: 'gt: Easily Create Presentation-Ready Display Tables'
+  notes: Imports
+  url: https://gt.rstudio.com
+  repository: https://CRAN.R-project.org/package=gt
+  authors:
+  - family-names: Iannone
+    given-names: Richard
+    email: rich@posit.co
+    orcid: https://orcid.org/0000-0003-3925-190X
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Hughes
+    given-names: Ellis
+    email: ellis.h.hughes@gsk.com
+    orcid: https://orcid.org/0000-0003-0637-4436
+  - family-names: Lauer
+    given-names: Alexandra
+    email: alexandralauer1@gmail.com
+    orcid: https://orcid.org/0000-0002-4191-6301
+  - family-names: Seo
+    given-names: JooYoung
+    email: jseo1005@illinois.edu
+    orcid: https://orcid.org/0000-0002-4064-6012
+  - family-names: Brevoort
+    given-names: Ken
+    email: ken@brevoort.com
+    orcid: https://orcid.org/0000-0002-4001-8358
+  - family-names: Roy
+    given-names: Olivier
+  year: '2024'
+  doi: 10.32614/CRAN.package.gt
+- type: software
+  title: httr
+  abstract: 'httr: Tools for Working with URLs and HTTP'
+  notes: Imports
+  url: https://httr.r-lib.org/
+  repository: https://CRAN.R-project.org/package=httr
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.httr
+  version: '>= 1.4.7'
+- type: software
+  title: httr2
+  abstract: 'httr2: Perform HTTP Requests and Process the Responses'
+  notes: Imports
+  url: https://httr2.r-lib.org
+  repository: https://CRAN.R-project.org/package=httr2
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.httr2
+  version: '>= 1.0.5'
+- type: software
+  title: igraph
+  abstract: 'igraph: Network Analysis and Visualization'
+  notes: Imports
+  url: https://r.igraph.org/
+  repository: https://CRAN.R-project.org/package=igraph
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+    orcid: https://orcid.org/0000-0001-7098-9676
+  - family-names: Nepusz
+    given-names: Tamás
+    email: ntamas@gmail.com
+    orcid: https://orcid.org/0000-0002-1451-338X
+  - family-names: Traag
+    given-names: Vincent
+    orcid: https://orcid.org/0000-0003-3170-3879
+  - family-names: Horvát
+    given-names: Szabolcs
+    email: szhorvat@gmail.com
+    orcid: https://orcid.org/0000-0002-3100-523X
+  - family-names: Zanini
+    given-names: Fabio
+    email: fabio.zanini@unsw.edu.au
+    orcid: https://orcid.org/0000-0001-7097-8539
+  - family-names: Noom
+    given-names: Daniel
+  - family-names: Müller
+    given-names: Kirill
+    email: kirill@cynkra.com
+    orcid: https://orcid.org/0000-0002-1416-3412
+  year: '2024'
+  doi: 10.32614/CRAN.package.igraph
+  version: '>= 2.0.3'
+- type: software
+  title: jsonlite
+  abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
+  notes: Imports
+  url: https://jeroen.r-universe.dev/jsonlite
+  repository: https://CRAN.R-project.org/package=jsonlite
+  authors:
+  - family-names: Ooms
+    given-names: Jeroen
+    email: jeroenooms@gmail.com
+    orcid: https://orcid.org/0000-0002-4035-0289
+  year: '2024'
+  doi: 10.32614/CRAN.package.jsonlite
+  version: '>= 1.8.9'
+- type: software
+  title: MetaboCoreUtils
+  abstract: 'MetaboCoreUtils: Core Utils for Metabolomics Data'
+  notes: Imports
+  url: https://github.com/RforMassSpectrometry/MetaboCoreUtils
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Rainer
+    given-names: Johannes
+    email: Johannes.Rainer@eurac.edu
+    orcid: https://orcid.org/0000-0002-6977-7147
+  - family-names: Witting
+    given-names: Michael
+    email: michael.witting@helmholtz-muenchen.de
+    orcid: https://orcid.org/0000-0002-1462-4426
+  - family-names: Vicini
+    given-names: Andrea
+    email: andrea.vicini@eurac.edu
+  - family-names: Gibb
+    given-names: Sebastian
+    email: mail@sebastiangibb.de
+    orcid: https://orcid.org/0000-0001-7406-4443
+  - family-names: Gine
+    given-names: Roger
+    email: alrgibe9@gmail.com
+    orcid: https://orcid.org/0000-0003-0288-9619
+  - family-names: Louail
+    given-names: Philippine
+    email: philippine.louail@eurac.edu
+    orcid: https://orcid.org/0009-0007-5429-6846
+  year: '2024'
+  doi: 10.18129/B9.bioc.MetaboCoreUtils
+  version: '>= 1.10.0'
+- type: software
+  title: MsBackendMgf
+  abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
+    (mgf) Files'
+  notes: Imports
+  url: https://github.com/RforMassSpectrometry/MsBackendMgf
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Gatto
+    given-names: Laurent
+    email: laurent.gatto@uclouvain.be
+    orcid: https://orcid.org/0000-0002-1520-2268
+  - family-names: Rainer
+    given-names: Johannes
+    email: Johannes.Rainer@eurac.edu
+    orcid: https://orcid.org/0000-0002-6977-7147
+  - family-names: Gibb
+    given-names: Sebastian
+    email: mail@sebastiangibb.de
+    orcid: https://orcid.org/0000-0001-7406-4443
+  year: '2024'
+  doi: 10.18129/B9.bioc.MsBackendMgf
+  version: '>= 1.10.0'
+- type: software
+  title: MsBackendMsp
+  abstract: 'MsBackendMsp: Mass Spectrometry Data Backend for NIST msp Files'
+  notes: Imports
+  url: https://github.com/RforMassSpectrometry/MsBackendMsp
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Steffen
+    given-names: Neumann
+    email: sneumann@ipb-halle.de
+    orcid: https://orcid.org/0000-0002-7899-7192
+  - family-names: Rainer
+    given-names: Johannes
+    email: Johannes.Rainer@eurac.edu
+    orcid: https://orcid.org/0000-0002-6977-7147
+  year: '2024'
+  doi: 10.18129/B9.bioc.MsBackendMsp
+  version: '>= 1.6.0'
+- type: software
+  title: msentropy
+  abstract: 'msentropy: Spectral Entropy for Mass Spectrometry Data'
+  notes: Imports
+  url: https://github.com/YuanyueLi/MSEntropy
+  repository: https://CRAN.R-project.org/package=msentropy
+  authors:
+  - family-names: Li
+    given-names: Yuanyue
+    email: liyuanyue@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.msentropy
+  version: '>= 0.1.4'
+- type: software
+  title: pbapply
+  abstract: 'pbapply: Adding Progress Bar to ''*apply'' Functions'
+  notes: Imports
+  url: https://github.com/psolymos/pbapply
+  repository: https://CRAN.R-project.org/package=pbapply
+  authors:
+  - family-names: Solymos
+    given-names: Peter
+    email: psolymos@gmail.com
+    orcid: https://orcid.org/0000-0001-7337-1740
+  - family-names: Zawadzki
+    given-names: Zygmunt
+    email: zygmunt@zstat.pl
+  year: '2024'
+  doi: 10.32614/CRAN.package.pbapply
+  version: '>= 1.7.2'
+- type: software
+  title: rotl
+  abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
+  notes: Imports
+  url: https://docs.ropensci.org/rotl/
+  repository: https://CRAN.R-project.org/package=rotl
+  authors:
+  - family-names: Michonneau
+    given-names: Francois
+    email: francois.michonneau@gmail.com
+    orcid: https://orcid.org/0000-0002-9092-966X
+  - family-names: Brown
+    given-names: Joseph
+    orcid: https://orcid.org/0000-0002-3835-8062
+  - family-names: Winter
+    given-names: David
+    orcid: https://orcid.org/0000-0002-6165-0029
+  year: '2024'
+  doi: 10.32614/CRAN.package.rotl
+  version: '>= 3.1.0'
+- type: software
+  title: shiny
+  abstract: 'shiny: Web Application Framework for R'
+  notes: Imports
+  url: https://shiny.posit.co/
+  repository: https://CRAN.R-project.org/package=shiny
+  authors:
+  - family-names: Chang
+    given-names: Winston
+    email: winston@posit.co
+    orcid: https://orcid.org/0000-0002-1576-2126
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Allaire
+    given-names: JJ
+    email: jj@posit.co
+  - family-names: Sievert
+    given-names: Carson
+    email: carson@posit.co
+    orcid: https://orcid.org/0000-0002-4958-2844
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Xie
+    given-names: Yihui
+    email: yihui@posit.co
+  - family-names: Allen
+    given-names: Jeff
+  - family-names: McPherson
+    given-names: Jonathan
+    email: jonathan@posit.co
+  - family-names: Dipert
+    given-names: Alan
+  - family-names: Borges
+    given-names: Barbara
+  year: '2024'
+  doi: 10.32614/CRAN.package.shiny
+  version: '>= 1.9.1'
+- type: software
+  title: shinybusy
+  abstract: 'shinybusy: Busy Indicators and Notifications for ''Shiny'' Applications'
+  notes: Imports
+  url: https://dreamrs.github.io/shinybusy/
+  repository: https://CRAN.R-project.org/package=shinybusy
+  authors:
+  - family-names: Meyer
+    given-names: Fanny
+  - family-names: Perrier
+    given-names: Victor
+    email: victor.perrier@dreamrs.fr
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinybusy
+- type: software
+  title: shinyWidgets
+  abstract: 'shinyWidgets: Custom Inputs Widgets for Shiny'
+  notes: Imports
+  url: https://dreamrs.github.io/shinyWidgets/
+  repository: https://CRAN.R-project.org/package=shinyWidgets
+  authors:
+  - family-names: Perrier
+    given-names: Victor
+    email: victor.perrier@dreamrs.fr
+  - family-names: Meyer
+    given-names: Fanny
+  - family-names: Granjon
+    given-names: David
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinyWidgets
+- type: software
+  title: Spectra
+  abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
+  notes: Imports
+  url: https://github.com/RforMassSpectrometry/Spectra
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Gatto
+    given-names: Laurent
+    email: laurent.gatto@uclouvain.be
+    orcid: https://orcid.org/0000-0002-1520-2268
+  - family-names: Rainer
+    given-names: Johannes
+    email: Johannes.Rainer@eurac.edu
+    orcid: https://orcid.org/0000-0002-6977-7147
+  - family-names: Gibb
+    given-names: Sebastian
+    email: mail@sebastiangibb.de
+    orcid: https://orcid.org/0000-0001-7406-4443
+  - family-names: Louail
+    given-names: Philippine
+    email: philippine.louail@eurac.edu
+    orcid: https://orcid.org/0009-0007-5429-6846
+  year: '2024'
+  doi: 10.18129/B9.bioc.Spectra
+  version: '>= 1.12.0'
+- type: software
+  title: stats
+  abstract: 'R: A Language and Environment for Statistical Computing'
+  notes: Imports
+  authors:
+  - name: R Core Team
+  institution:
+    name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
+- type: software
+  title: stringi
+  abstract: 'stringi: Fast and Portable Character String Processing Facilities'
+  notes: Imports
+  url: https://stringi.gagolewski.com/
+  repository: https://CRAN.R-project.org/package=stringi
+  authors:
+  - family-names: Gagolewski
+    given-names: Marek
+    orcid: https://orcid.org/0000-0003-0637-6028
+  - family-names: Tartanus
+    given-names: Bartek
+  - family-names: Unicode
+    given-names: others;
+  - name: Inc.
+  - name: others
+  year: '2024'
+  doi: 10.32614/CRAN.package.stringi
+  version: '>= 1.8.4'
+- type: software
+  title: targets
+  abstract: 'targets: Dynamic Function-Oriented ''Make''-Like Declarative Pipelines'
+  notes: Imports
+  url: https://docs.ropensci.org/targets/
+  repository: https://CRAN.R-project.org/package=targets
+  authors:
+  - family-names: Landau
+    given-names: William Michael
+    email: will.landau.oss@gmail.com
+    orcid: https://orcid.org/0000-0003-1878-3253
+  year: '2024'
+  doi: 10.32614/CRAN.package.targets
+  version: '>= 1.8.0'
+- type: software
+  title: tidyfst
+  abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
+  notes: Imports
+  url: https://hope-data-science.github.io/tidyfst/
+  repository: https://CRAN.R-project.org/package=tidyfst
+  authors:
+  - family-names: Huang
+    given-names: Tian-Yuan
+    email: huang.tian-yuan@qq.com
+    orcid: https://orcid.org/0000-0002-4151-3764
+  year: '2024'
+  doi: 10.32614/CRAN.package.tidyfst
+  version: '>= 1.8.1'
+- type: software
+  title: tidyselect
+  abstract: 'tidyselect: Select from a Set of Strings'
+  notes: Imports
+  url: https://tidyselect.r-lib.org
+  repository: https://CRAN.R-project.org/package=tidyselect
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.tidyselect
+  version: '>= 1.2.1'
+- type: software
+  title: tidytable
+  abstract: 'tidytable: Tidy Interface to ''data.table'''
+  notes: Imports
+  url: https://markfairbanks.github.io/tidytable/
+  repository: https://CRAN.R-project.org/package=tidytable
+  authors:
+  - family-names: Fairbanks
+    given-names: Mark
+    email: mark.t.fairbanks@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.tidytable
+  version: '>= 0.11.1'
+- type: software
+  title: utils
+  abstract: 'R: A Language and Environment for Statistical Computing'
+  notes: Imports
+  authors:
+  - name: R Core Team
+  institution:
+    name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
+- type: software
+  title: visNetwork
+  abstract: 'visNetwork: Network Visualization using ''vis.js'' Library'
+  notes: Imports
+  url: https://datastorm-open.github.io/visNetwork/
+  repository: https://CRAN.R-project.org/package=visNetwork
+  authors:
+  - name: Almende B.V. and Contributors
+    website: https://visjs.org/
+  - family-names: Thieurmel
+    given-names: Benoit
+    email: bthieurmel@gmail.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.visNetwork
+- type: software
+  title: yaml
+  abstract: 'yaml: Methods to Convert R Data to YAML and Back'
+  notes: Imports
+  url: https://github.com/vubiostat/r-yaml/
+  repository: https://CRAN.R-project.org/package=yaml
+  authors:
+  - family-names: Garbett
+    given-names: Shawn P
+  - family-names: Stephens
+    given-names: Jeremy
+  - family-names: Simonov
+    given-names: Kirill
+  - family-names: Xie
+    given-names: Yihui
+  - family-names: Dong
+    given-names: Zhuoer
+  - family-names: Wickham
+    given-names: Hadley
+  - family-names: Horner
+    given-names: Jeffrey
+  - name: reikoch
+  - family-names: Beasley
+    given-names: Will
+  - family-names: O'Connor
+    given-names: Brendan
+  - family-names: Warnes
+    given-names: Gregory R.
+  - family-names: Quinn
+    given-names: Michael
+  - family-names: Kamvar
+    given-names: Zhian N.
+  - family-names: Gao
+    given-names: Charlie
+  year: '2024'
+  doi: 10.32614/CRAN.package.yaml
+  version: '>= 2.3.10'
+- type: software
+  title: BiocManager
+  abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
+  notes: Suggests
+  url: https://bioconductor.github.io/BiocManager/
+  repository: https://CRAN.R-project.org/package=BiocManager
+  authors:
+  - family-names: Morgan
+    given-names: Martin
+    email: martin.morgan@roswellpark.org
+    orcid: https://orcid.org/0000-0002-5874-8148
+  - family-names: Ramos
+    given-names: Marcel
+    email: marcel.ramos@sph.cuny.edu
+    orcid: https://orcid.org/0000-0002-3242-0582
+  year: '2024'
+  doi: 10.32614/CRAN.package.BiocManager
+- type: software
+  title: knitr
+  abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
+  notes: Suggests
+  url: https://yihui.org/knitr/
+  repository: https://CRAN.R-project.org/package=knitr
+  authors:
+  - family-names: Xie
+    given-names: Yihui
+    email: xie@yihui.name
+    orcid: https://orcid.org/0000-0003-0645-5666
+  year: '2024'
+  doi: 10.32614/CRAN.package.knitr
+- type: software
+  title: lifecycle
+  abstract: 'lifecycle: Manage the Life Cycle of your Package Functions'
+  notes: Suggests
+  url: https://lifecycle.r-lib.org/
+  repository: https://CRAN.R-project.org/package=lifecycle
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+    orcid: https://orcid.org/0000-0003-4757-117X
+  year: '2024'
+  doi: 10.32614/CRAN.package.lifecycle
+- type: software
+  title: pkgload
+  abstract: 'pkgload: Simulate Package Installation and Attach'
+  notes: Suggests
+  url: https://pkgload.r-lib.org
+  repository: https://CRAN.R-project.org/package=pkgload
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+  - family-names: Chang
+    given-names: Winston
+  - family-names: Hester
+    given-names: Jim
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.pkgload
+- type: software
+  title: R.utils
+  abstract: 'R.utils: Various Programming Utilities'
+  notes: Suggests
+  url: https://henrikbengtsson.github.io/R.utils/
+  repository: https://CRAN.R-project.org/package=R.utils
+  authors:
+  - family-names: Bengtsson
+    given-names: Henrik
+    email: henrikb@braju.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.R.utils
+- type: software
+  title: rlang
+  abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
+  notes: Suggests
+  url: https://rlang.r-lib.org
+  repository: https://CRAN.R-project.org/package=rlang
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.rlang
+- type: software
+  title: shinyhelper
+  abstract: 'shinyhelper: Easily Add Markdown Help Files to ''shiny'' App Elements'
+  notes: Suggests
+  url: https://github.com/cwthom/shinyhelper
+  repository: https://CRAN.R-project.org/package=shinyhelper
+  authors:
+  - family-names: Mason-Thom
+    given-names: Chris
+    email: christopher.w.thom@outlook.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinyhelper
+- type: software
+  title: shinyjs
+  abstract: 'shinyjs: Easily Improve the User Experience of Your Shiny Apps in Seconds'
+  notes: Suggests
+  url: https://deanattali.com/shinyjs/
+  repository: https://CRAN.R-project.org/package=shinyjs
+  authors:
+  - family-names: Attali
+    given-names: Dean
+    email: daattali@gmail.com
+    orcid: https://orcid.org/0000-0002-5645-3493
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinyjs
+- type: software
+  title: shinytest2
+  abstract: 'shinytest2: Testing for Shiny Applications'
+  notes: Suggests
+  url: https://rstudio.github.io/shinytest2/
+  repository: https://CRAN.R-project.org/package=shinytest2
+  authors:
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinytest2
+- type: software
+  title: shinyvalidate
+  abstract: 'shinyvalidate: Input Validation for Shiny Apps'
+  notes: Suggests
+  url: https://rstudio.github.io/shinyvalidate/
+  repository: https://CRAN.R-project.org/package=shinyvalidate
+  authors:
+  - family-names: Sievert
+    given-names: Carson
+    email: carson@posit.co
+    orcid: https://orcid.org/0000-0002-4958-2844
+  - family-names: Iannone
+    given-names: Richard
+    email: rich@posit.co
+    orcid: https://orcid.org/0000-0003-3925-190X
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.shinyvalidate
+- type: software
+  title: spelling
+  abstract: 'spelling: Tools for Spell Checking in R'
+  notes: Suggests
+  url: https://ropensci.r-universe.dev/spelling
+  repository: https://CRAN.R-project.org/package=spelling
+  authors:
+  - family-names: Ooms
+    given-names: Jeroen
+    email: jeroenooms@gmail.com
+    orcid: https://orcid.org/0000-0002-4035-0289
+  - family-names: Hester
+    given-names: Jim
+    email: james.hester@rstudio.com
+  year: '2024'
+  doi: 10.32614/CRAN.package.spelling
+- type: software
+  title: testthat
+  abstract: 'testthat: Unit Testing for R'
+  notes: Suggests
+  url: https://testthat.r-lib.org
+  repository: https://CRAN.R-project.org/package=testthat
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  doi: 10.32614/CRAN.package.testthat
+  version: '>= 3.0.0'
+

@@ -1,23 +1,13 @@
 library(testthat)
-library(tima)
 
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
 test_that(desc = "Test functions", code = {
   # Tests
-  ## Install
-  install(test = TRUE)
-  ## When already present
-  install()
-
-  ## Go to cache
-  go_to_cache()
-
-  ## Get example files
-  get_example_files()
+  copy_backbone(cache_dir = ".")
 
   ## Prepare parameters
-  paths <- parse_yaml_paths()
+  paths <- get_default_paths()
   params <- get_params(step = "prepare_params")
   ## For all steps
   params$organisms$taxon <- ""
@@ -59,21 +49,17 @@ test_that(desc = "Test functions", code = {
     user_gnps = "Foo",
     user_filename = "Foo"
   )
+  replace_id(
+    x = "example/123456_features.tsv",
+    user_gnps = get_default_paths()$gnps$example,
+    user_filename = "Foo"
+  )
 
   ## Get all files
-  ### Features table
   get_file(
     url = paths$urls$examples$features,
     export = paths$data$source$features
   )
-  get_gnps_tables(
-    filename = "example",
-    path_features = paths$data$source$features,
-    path_metadata = paths$data$source$metadata,
-    path_spectra = paths$data$source$spectra,
-    gnps_job_id = params$gnps$id
-  )
-  ### Metadata table
   get_file(
     url = paths$urls$examples$metadata,
     export = paths$data$source$metadata
@@ -92,7 +78,14 @@ test_that(desc = "Test functions", code = {
         fixed = TRUE
       )
   )
-  ## Other GNPS job id (without metadata)
+  get_gnps_tables(
+    filename = "example",
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = params$gnps$id
+  )
+  ### Other GNPS job id (without metadata)
   get_gnps_tables(
     filename = "other",
     path_features = paths$data$source$features,
@@ -100,7 +93,9 @@ test_that(desc = "Test functions", code = {
     path_spectra = paths$data$source$spectra,
     gnps_job_id = paths$gnps$example2
   )
-  ## When no GNPS job ID and no metadata are given
+  ### When it is the example
+  get_gnps_tables(gnps_job_id = get_default_paths()$gnps$example)
+  ### When no GNPS job ID and no metadata are given
   get_gnps_tables(
     filename = "noGNPS",
     path_features = paths$data$source$features,
@@ -268,18 +263,31 @@ test_that(desc = "Test functions", code = {
     input = "doesNotExists.txt",
     nam_lib = "nope"
   )
+  ### If NULL
+  prepare_libraries_spectra(
+    input = NULL,
+    nam_lib = "null"
+  )
   ### Classical
   prepare_libraries_spectra()
   #### Check the library already exists warning
   prepare_libraries_spectra()
 
   ## for msp reading test
-  # Spectrum 1 fails
+  ### Spectrum 1 fails
   import_spectra(dir(
     system.file("extdata", package = "MsBackendMsp"),
     full.names = TRUE,
     pattern = "msp$"
   )[8L])
+
+  ## for feature ID combination in spectra
+  data.frame(
+    FEATURE_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789))
+  ) |>
+    Spectra::Spectra() |>
+    sanitize_spectra()
 
   #### HMDB
   # prepare_isdb_hmdb()
@@ -291,6 +299,11 @@ test_that(desc = "Test functions", code = {
   prepare_libraries_rt(
     mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
     temp_exp = paths$data$source$libraries$rt$example_mini
+  )
+  ### Just to check
+  prepare_libraries_rt(
+    mgf_is = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+    temp_is = paths$data$source$libraries$rt$example_mini
   )
   ## Check wrong SMILES
   tidytable::tidytable(
@@ -374,6 +387,15 @@ test_that(desc = "Test functions", code = {
     tolerance_rt = 0.01,
     ms_mode = "pos"
   )
+  ### Adducts already attributed (and check for wrong adducts)
+  tidytable::tidytable(
+    "feature_id" = c(1, 2),
+    "mz" = c(123.4567, 141.4678),
+    "rt" = c(0.01, 0.02),
+    "adduct" = c("[M+XYZ]+", "[M+XYZ-H2O]+")
+  ) |>
+    tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
+  annotate_masses(features = "data/source/libraries/rt/example_features_adducts.csv")
 
   ## Performing MS2 annotation
   ### Negative
@@ -494,6 +516,33 @@ test_that(desc = "Test functions", code = {
     high_confidence = FALSE
   )
 
+  ## cleanup
+  unlink("data", recursive = TRUE)
+
+  ## in cache version
+  copy_backbone()
+  get_example_files(
+    example = c(
+      "features",
+      "metadata",
+      "sirius",
+      "spectra",
+      "spectral_lib_with_rt"
+    ),
+    in_cache = FALSE
+  )
+  ## for size to match for shinytest2
+  unlink(paths$data$source$spectra)
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  ## Install
+  install(test = TRUE)
+  # get_example_files()
+  # tima:::.onLoad()
+  # tima_full()
+
   ## CLI arguments check
   arguments <- character()
   arguments$ann_can_fin <- 0
@@ -522,12 +571,9 @@ test_that(desc = "Test functions", code = {
   arguments$fil_lib_sop_raw_hmd <- "x"
   arguments$fil_lib_sop_raw_lot <- "x"
   arguments$fil_lib_sop_pre <- "x"
-  arguments$fil_lib_spe_exp_neg <- "x"
-  arguments$fil_lib_spe_exp_pos <- "x"
-  arguments$fil_lib_spe_exp_raw <- "x"
-  arguments$fil_lib_spe_is_neg <- "x"
-  arguments$fil_lib_spe_is_pos <- "x"
-  arguments$fil_lib_spe_is_raw <- "x"
+  arguments$fil_lib_spe_neg <- "x"
+  arguments$fil_lib_spe_pos <- "x"
+  arguments$fil_lib_spe_raw <- "x"
   arguments$fil_lib_tem_exp_csv <- "x"
   arguments$fil_lib_tem_exp_mgf_neg <- "x"
   arguments$fil_lib_tem_exp_mgf_pos <- "x"
@@ -634,8 +680,6 @@ test_that(desc = "Test functions", code = {
   arguments$summarise <- TRUE
 
   parse_cli_params(arguments = arguments, parameters = params)
-
-  tima_full()
 
   succeed()
 })

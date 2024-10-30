@@ -6,6 +6,9 @@
 \usage{
 load_yaml_files()
 }
+\value{
+A list of loaded yaml files
+}
 \description{
 This function load yaml files
 }

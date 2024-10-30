@@ -1,13 +1,9 @@
-import::from(stats, as.dist, .into = environment())
-
-#' @title Get the distance between two elements in a distance matrix
+#' @title Distance between two elements in a distance matrix
 #'
 #' @description This function calculates the distance between
 #'    two elements in a distance matrix
 #'
 #' @details Credit goes to usedist package
-#'
-#' @importFrom stats as.dist
 #'
 #' @param d Distance matrix
 #' @param idx1 Index of the first element
@@ -15,12 +11,10 @@ import::from(stats, as.dist, .into = environment())
 #'
 #' @return Distance between the two elements
 #'
-#' @export
-#'
 #' @examples NULL
 dist_get <- function(d, idx1, idx2) {
   # Convert input to distance matrix
-  d <- as.dist(d)
+  d <- stats::as.dist(d)
 
   # Get size of distance matrix
   n <- attr(d, "Size")
@@ -34,15 +28,9 @@ dist_get <- function(d, idx1, idx2) {
   ifelse(i == j, 0, d[idx])
 }
 
-import::from(stats, as.dist, .into = environment())
-import::from(utils, combn, .into = environment())
-
 #' @title Dist groups
 #'
 #' @description This function gets distances per group
-#'
-#' @importFrom stats as.dist
-#' @importFrom utils combn
 #'
 #' @param d A distance object
 #' @param g A grouping vector for the distance object
@@ -55,12 +43,10 @@ import::from(utils, combn, .into = environment())
 #'    The label column indicates whether the distance is
 #'    within a group or between groups.
 #'
-#' @export
-#'
 #' @examples NULL
 dist_groups <- function(d, g) {
   ## Convert d to a dist object
-  d <- as.dist(d)
+  d <- stats::as.dist(d)
 
   ## Convert g to a factor
   g <- as.factor(g)
@@ -69,7 +55,7 @@ dist_groups <- function(d, g) {
   dsize <- attr(d, "Size")
 
   ## Get the combinations of indices for each pair of observations in d
-  idxs <- combn(dsize, 2)
+  idxs <- utils::combn(dsize, 2)
   idx1 <- idxs[1, ]
   idx2 <- idxs[2, ]
 

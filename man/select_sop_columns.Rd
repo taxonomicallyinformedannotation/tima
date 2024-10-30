@@ -9,6 +9,9 @@ select_sop_columns(df)
 \arguments{
 \item{df}{Dataframe}
 }
+\value{
+The dataframe with selected structure organism pairs columns
+}
 \description{
 This function selects sop columns
 }

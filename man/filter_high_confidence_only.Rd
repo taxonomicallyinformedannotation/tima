@@ -14,6 +14,9 @@ filter_high_confidence_only(df, score_bio_min = 0.85, score_ini_min = 0.75)
 
 \item{score_ini_min}{Minimal initial score. Current default to 0.75.}
 }
+\value{
+A dataframe containing only high confidence annotations
+}
 \description{
 This function filters highly confident annotations only.
 }

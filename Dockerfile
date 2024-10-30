@@ -1,13 +1,4 @@
-# Use the specified Bioconductor Docker image
 FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
-
-# Update apt and install necessary system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# To force Bioconductor to install from source
-ENV BIOCONDUCTOR_USE_CONTAINER_REPOSITORY=FALSE
 
 # Add a non-root user and create the R library directory
 RUN useradd -m tima-user && \
@@ -21,20 +12,18 @@ ENV R_LIBS_USER=/home/tima-user/Library/Frameworks/R.framework/Resources/site-li
 USER tima-user
 WORKDIR /home/tima-user
 
-# Copy necessary files for dependency installation
-COPY --chown=tima-user:tima-user docker-compose.yml ./docker-compose.yml
-COPY --chown=tima-user:tima-user inst ./inst
-COPY --chown=tima-user:tima-user R ./R
+# Install R dependencies
+RUN Rscript -e "devtools::install_github('taxonomicallyinformedannotation/tima')"
+# RUN Rscript -e "install.packages('tima', repos = c('https://taxonomicallyinformedannotation.r-universe.dev', 'https://bioc.r-universe.dev', 'https://cran.r-universe.dev'))"
 
-# Run R script to install dependencies
-RUN Rscript -e "install.packages(c('pak')); pak::pak('taxonomicallyinformedannotation/tima'); tima::install()"
+# Additional install
+RUN Rscript -e "tima::install()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
-EXPOSE 3839
 
 # Disable healthcheck (if you really want to disable it)
 HEALTHCHECK NONE
 
 # Define default command (commented out)
-# CMD ["Rscript inst/scripts/run_app.R", "Rscript inst/scripts/tima_full.R"]
+CMD ["Rscript -e 'tima::run_app()'"]

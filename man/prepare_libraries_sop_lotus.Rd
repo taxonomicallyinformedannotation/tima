@@ -15,9 +15,17 @@ prepare_libraries_sop_lotus(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library LOTUS
+}
 \description{
 This function prepares the LOTUS structure-organism pairs
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_libraries_sop_lotus()
+unlink("data", recursive = TRUE)
+}
 }

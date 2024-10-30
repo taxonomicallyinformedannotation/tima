@@ -1,45 +1,24 @@
-import::from(Spectra, addProcessing, .into = environment())
-import::from(Spectra, applyProcessing, .into = environment())
-import::from(Spectra, combineSpectra, .into = environment())
-import::from(Spectra, dropNaSpectraVariables, .into = environment())
-import::from(Spectra, filterEmptySpectra, .into = environment())
-import::from(Spectra, filterFourierTransformArtefacts, .into = environment())
-import::from(Spectra, filterIntensity, .into = environment())
-import::from(Spectra, filterMsLevel, .into = environment())
-import::from(Spectra, filterPrecursorCharge, .into = environment())
-import::from(Spectra, filterPrecursorPeaks, .into = environment())
-import::from(Spectra, reduceSpectra, .into = environment())
-import::from(Spectra, scalePeaks, .into = environment())
-
 #' @title Sanitize spectra
 #'
 #' @description This function sanitizes spectra
-#'
-#' @importFrom Spectra addProcessing
-#' @importFrom Spectra applyProcessing
-#' @importFrom Spectra combineSpectra
-#' @importFrom Spectra dropNaSpectraVariables
-#' @importFrom Spectra filterEmptySpectra
-#' @importFrom Spectra filterFourierTransformArtefacts
-#' @importFrom Spectra filterIntensity
-#' @importFrom Spectra filterMsLevel
-#' @importFrom Spectra filterPrecursorCharge
-#' @importFrom Spectra filterPrecursorPeaks
-#' @importFrom Spectra reduceSpectra
-#' @importFrom Spectra scalePeaks
 #'
 #' @param spectra Spectra object
 #' @param cutoff Absolute minimal intensity
 #' @param dalton Dalton tolerance
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
-#' @param ratio Minimal ratio to the max peak
 #'
-#' @return NULL
+#' @return The sanitized spectra
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' data.frame(
+#'   FEATURE_ID = c("FT001", "FT002", "FT003"),
+#'   mz = c(list(123.4567, 234.5678, 345.6789))
+#' ) |>
+#'   Spectra::Spectra() |>
+#'   sanitize_spectra()
 sanitize_spectra <-
   function(spectra,
            cutoff = 0,
@@ -48,15 +27,21 @@ sanitize_spectra <-
            ppm = 10) {
     log_debug("Applying sanitization of the spectra")
 
+    ## Fix needed
+    if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
+      message("Harmonizing names")
+      spectra$msLevel <- spectra$MSLEVEL |> as.integer()
+    }
+
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
       message("Filtering MS2 only")
       spectra <- spectra |>
-        filterMsLevel(2L)
+        Spectra::filterMsLevel(2L)
     }
 
     if (!is.na(polarity)) {
       spectra <- spectra |>
-        filterPrecursorCharge(z = if (polarity == "pos") {
+        Spectra::filterPrecursorCharge(z = if (polarity == "pos") {
           c(1, 2, 3)
         } else {
           c(-1, -2, -3)
@@ -64,25 +49,29 @@ sanitize_spectra <-
     }
 
     spectra <- spectra |>
-      dropNaSpectraVariables() |>
-      reduceSpectra(tolerance = dalton, ppm = ppm) |>
-      filterFourierTransformArtefacts() |> # fixed in Spectra 1.10.3
-      filterIntensity(intensity = c(cutoff, Inf)) |>
-      filterPrecursorPeaks(
+      Spectra::dropNaSpectraVariables() |>
+      Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
+      Spectra::filterFourierTransformArtefacts() |> # fixed in Spectra 1.10.3
+      Spectra::filterIntensity(intensity = c(cutoff, Inf)) |>
+      Spectra::filterPrecursorPeaks(
         tolerance = dalton,
         ppm = ppm,
         mz = c(">=")
       ) |>
-      scalePeaks()
+      Spectra::scalePeaks()
 
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       message("Combining spectra in case...")
       spectra <- spectra |>
-        combineSpectra(f = spectra$FEATURE_ID)
+        Spectra::combineSpectra(f = spectra$FEATURE_ID)
     }
 
-    spectra <- spectra |>
-      filterEmptySpectra()
+    # Fix needed as some empty spectra are else not removed
+    spectra <- spectra[!spectra@backend@peaksData |>
+      lapply(is.nan) |>
+      lapply(any) |>
+      as.character() |>
+      as.logical()]
 
     return(spectra)
   }

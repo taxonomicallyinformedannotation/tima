@@ -12,7 +12,7 @@ round_reals(df, dig = 5)
 \item{dig}{Number of digits}
 }
 \description{
-Round reals
+This function rounds some reals in a dataframe
 }
 \examples{
 NULL

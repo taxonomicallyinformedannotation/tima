@@ -33,10 +33,22 @@ create_edges_spectra(
 
 \item{qutoff}{Intensity under which ms2 fragments will be removed.}
 }
+\value{
+The path to the created spectral edges
+}
 \description{
 This function create edges
 based on fragmentation spectra similarity
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+get_file(
+  url = get_default_paths()$urls$examples$spectra_mini,
+  export = get_params(step = "create_edges_spectra")$files$spectral$raw
+)
+create_edges_spectra()
+unlink("data", recursive = TRUE)
+}
 }

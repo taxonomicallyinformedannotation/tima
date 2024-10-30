@@ -22,7 +22,7 @@ prepare_taxa(
 \item{input}{File containing your features intensities}
 
 \item{extension}{Does your column names contain the file extension?
-(MZmine mainly)}
+(mzmine mainly)}
 
 \item{name_features}{Name of the features column in the features file}
 
@@ -41,6 +41,9 @@ prepare_taxa(
 \item{taxon}{If you want to enforce all features to a given taxon,
 put its name here.}
 }
+\value{
+The path to the prepared taxa
+}
 \description{
 This function performs taxon name preparation
 to match the Open Tree of Life taxonomy
@@ -53,5 +56,27 @@ or attribute them to multiple ones,
 according to their relative intensities among the samples.
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+org_tax_ott <- get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+get_file(
+  url = get_default_paths()$urls$examples$features,
+  export = get_params(step = "prepare_taxa")$files$features$raw
+)
+prepare_taxa(
+  taxon = "Homo sapiens",
+  org_tax_ott = org_tax_ott
+)
+unlink("data", recursive = TRUE)
+}
 }

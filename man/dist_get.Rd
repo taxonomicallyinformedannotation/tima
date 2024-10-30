@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist_groups.R
 \name{dist_get}
 \alias{dist_get}
-\title{Get the distance between two elements in a distance matrix}
+\title{Distance between two elements in a distance matrix}
 \usage{
 dist_get(d, idx1, idx2)
 }

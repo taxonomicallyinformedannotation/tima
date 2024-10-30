@@ -173,13 +173,13 @@ files:
       #' List of negative spectral libraries. STRING
       neg:
         - data/interim/libraries/spectra/exp/internal_neg.rds
-      
+
       #' List of positive spectral libraries. STRING
       pos:
         - data/interim/libraries/spectra/exp/internal_pos.rds
 
       #' List of raw spectral libraries. STRING
-      raw: 
+      raw:
         - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
     #' Temporal libraries. STRING
@@ -214,6 +214,16 @@ files:
       prepared:
         - data/interim/libraries/rt/prepared.tsv.gz
 
+  #' Metadata files.
+  metadata:
+    #' The path to the file containing your metadata.
+    #' Must be formatted accordingly.
+    #' If your experiment contains a single taxon, you can provide it below instead. STRING
+    raw: data/source/example_metadata.tsv
+
+    #' Taxonomically informed features file. STRING
+    prepared: data/interim/taxa/example_taxed.tsv.gz
+
   #' Networks files.
   networks:
     #' Spectral networks files.
@@ -239,16 +249,6 @@ files:
         #' Prepared components file. STRING
         prepared: data/interim/features/example_componentsPrepared.tsv
 
-  #' Metadata files.
-  metadata:
-    #' The path to the file containing your metadata.
-    #' Must be formatted accordingly.
-    #' If your experiment contains a single taxon, you can provide it below instead. STRING
-    raw: data/source/example_metadata.tsv
-
-    #' Taxonomically informed features file. STRING
-    prepared: data/interim/taxa/example_taxed.tsv.gz
-
   #' Spectral files.
   spectral:
     #' Raw spectral file. STRING
@@ -271,6 +271,7 @@ ms:
     neg:
       - "[M-H3]3-"
       - "[M-H2]2-"
+      - "[M]-"
       - "[M-H]-"
       - "[M+F]-"
       - "[M+Na-H2]-"
@@ -293,10 +294,13 @@ ms:
       - "[M+Ca]2+"
       - "[M+Na2]2+"
       - "[M+Fe]2+"
+      - "[M]+"
       - "[M+H]+"
       - "[M+H4N]+"
       - "[M+Na]+"
       - "[M+K]+"
+      - "[M+Fe-H2]+"
+      - "[M+Fe-H]+"
       - "[M+Cu]+"
       - "[2M+Mg]2+"
       - "[2M+Ca]2+"
@@ -337,12 +341,16 @@ ms:
     - "H2O (water)"
     - "CHN"
     - "CO"
-    - "C2H4 (2xCH2)"
-    - "C2H5 (CH2-CH3)"
+    - "C2H4 (ethene)"
+    - "CH3N (methanimine)"
+    - "C2H5 (ethyl radical)"
+    - "H2O2 (dioxygen-dihydrogen)"
     - "CH2O"
+    - "H2S (dihydrosulphur)"
     - "H5ON (H2O-H3N)"
     - "H4O2 (2xH2O)"
-    - "C2H2O"
+    - "C2H2O (ethenone)"
+    - "C3H6 (propene)"
     - "CHON"
     - "CO2"
     - "CHO2"

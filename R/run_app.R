@@ -1,10 +1,6 @@
-import::from(shiny, runApp, .into = environment())
-
 #' @title Run app
 #'
 #' @description This function runs the app
-#'
-#' @importFrom shiny runApp
 #'
 #' @include install.R
 #'
@@ -21,17 +17,13 @@ run_app <- function(host = "127.0.0.1",
                     port = 3838,
                     browser = TRUE) {
   if (file.exists("/.dockerenv")) {
-    system('echo "I\'m inside the matrix ;("')
+    system('echo "I\'m inside the matrix!"')
     browser <- FALSE
     host <- "0.0.0.0"
   } else {
-    tryCatch(expr = {
-      install()
-    }, error = function(e) {
-      message(e)
-    })
     system('echo "I\'m living in the real world!"')
   }
+  install()
   shiny::runApp(
     appDir = system.file(package = "tima"),
     port = port,

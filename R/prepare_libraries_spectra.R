@@ -1,28 +1,14 @@
-import::from(stringi, stri_sub, .into = environment())
-import::from(tidytable, bind_cols, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, tidytable, .into = environment())
-
 #' @title Prepare libraries of spectra
 #'
 #' @description This function prepares spectra
 #'    to be used for spectral matching
 #'
-#' @importFrom stringi stri_sub
-#' @importFrom tidytable bind_cols
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable mutate
-#' @importFrom tidytable tidytable
-#'
-#' @include export_spectra_2.R
+#' @include export_spectra_rds.R
 #' @include extract_spectra.R
+#' @include get_default_paths.R
 #' @include get_params.R
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
-#' @include parse_yaml_paths.R
 #'
 #' @param input File containing spectra
 #' @param polarity MS polarity
@@ -45,11 +31,17 @@ import::from(tidytable, tidytable, .into = environment())
 #' @param col_sy Name of the synonyms in mgf
 #' @param col_xl Name of the xlogp in mgf
 #'
-#' @return NULL
+#' @return The path to the prepared spectral library
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' prepare_libraries_spectra()
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_libraries_spectra <-
   function(input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$raw,
            nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
@@ -71,15 +63,15 @@ prepare_libraries_spectra <-
            col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
            col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp) {
     output_pos <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
+      get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")
     )
     output_neg <- file.path(
-      parse_yaml_paths()$data$interim$libraries$spectra$exp$path,
+      get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_neg.rds")
     )
     output_sop <- file.path(
-      parse_yaml_paths()$data$interim$libraries$sop$path,
+      get_default_paths()$data$interim$libraries$sop$path,
       paste0("spectral_prepared.tsv.gz")
     )
     if (!all(lapply(X = list(output_neg, output_pos), FUN = file.exists) |> unlist())) {
@@ -91,14 +83,14 @@ prepare_libraries_spectra <-
         spectra <- lapply(X = input, FUN = import_spectra)
 
         log_debug("Extracting")
-        spectra_extracted <- lapply(X = spectra, FUN = extract_spectra)
+        spectra_extracted <- lapply(X = spectra, FUN = tima:::extract_spectra)
         rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")
         spectra_harmonized_pos <- lapply(
           X = spectra_extracted,
-          FUN = harmonize_spectra,
+          FUN = tima:::harmonize_spectra,
           mode = "pos",
           metad = nam_lib,
           col_ad = col_ad,
@@ -122,13 +114,13 @@ prepare_libraries_spectra <-
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
             FUN = function(x) {
-              x <- x |> rename(precursor_mz = precursorMz)
+              x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }
           )
         log_debug("... neg")
         spectra_harmonized_neg <- lapply(
           X = spectra_extracted,
-          FUN = harmonize_spectra,
+          FUN = tima:::harmonize_spectra,
           mode = "neg",
           metad = nam_lib,
           col_ad = col_ad,
@@ -152,24 +144,24 @@ prepare_libraries_spectra <-
           ## TODO report the issue as otherwise precursorMz is lost
           lapply(
             FUN = function(x) {
-              x <- x |> rename(precursor_mz = precursorMz)
+              x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }
           )
         rm(spectra_extracted)
 
         log_debug("Extracting structures for the SOP library.")
-        sop <- bind_rows(
+        sop <- tidytable::bind_rows(
           spectra_harmonized_pos |>
-            bind_rows(),
+            tidytable::bind_rows(),
           spectra_harmonized_neg |>
-            bind_rows()
+            tidytable::bind_rows()
         ) |>
-          distinct(
+          tidytable::distinct(
             structure_inchikey = inchikey,
             structure_smiles = smiles,
             structure_smiles_no_stereo = smiles_no_stereo
           ) |>
-          mutate(
+          tidytable::mutate(
             structure_inchikey_no_stereo = structure_inchikey |>
               gsub(pattern = "-.*", replacement = ""),
             organism_name = NA_character_
@@ -177,7 +169,7 @@ prepare_libraries_spectra <-
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
         spectra_harmonized_pos <- list(
-          tidytable(
+          tidytable::tidytable(
             "compound_id" = "fake_compound",
             "adduct" = NA_character_,
             "collision_energy" = NA_character_,
@@ -204,7 +196,7 @@ prepare_libraries_spectra <-
           )
         )
         spectra_harmonized_neg <- spectra_harmonized_pos
-        sop <- tidytable(
+        sop <- tidytable::tidytable(
           "structure_inchikey" = NA_character_,
           "structure_smiles" = NA_character_,
           "structure_smiles_no_stereo" = NA_character_,
@@ -213,24 +205,15 @@ prepare_libraries_spectra <-
         )
       }
       log_debug("Exporting")
-      export_output(sop, file = output_sop)
-      mapply(
-        export_spectra_2,
-        output_pos,
-        spectra_harmonized_pos,
-        nam_lib
-      )
-      mapply(
-        export_spectra_2,
-        output_neg,
-        spectra_harmonized_neg,
-        nam_lib
-      )
+      tima:::export_output(sop, file = output_sop)
+      mapply(tima:::export_spectra_rds, output_pos, spectra_harmonized_pos)
+      mapply(tima:::export_spectra_rds, output_neg, spectra_harmonized_neg)
       rm(spectra_harmonized_pos, spectra_harmonized_neg)
     } else {
       log_debug("Library already exists")
     }
-    export_params(
+
+    tima:::export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )

@@ -1,12 +1,6 @@
-import::from(msentropy, calculate_entropy_similarity, .into = environment())
-import::from(tidytable, tidytable, .into = environment())
-
 #' @title Calculate entropy
 #'
 #' @description This function calculates entropy similarity between two spectra
-#'
-#' @importFrom msentropy calculate_entropy_similarity
-#' @importFrom tidytable tidytable
 #'
 #' @param index Index of the first spectrum
 #' @param target Index of the second spectrum
@@ -18,8 +12,6 @@ import::from(tidytable, tidytable, .into = environment())
 #' @return A list containing the calculated entropy similarity values
 #'         or NULL if the score is below the threshold
 #'
-#' @export
-#'
 #' @examples NULL
 calculate_entropy <- function(index,
                               target,
@@ -27,7 +19,7 @@ calculate_entropy <- function(index,
                               ms2_tolerance,
                               ppm_tolerance,
                               threshold = 0.1) {
-  score <- calculate_entropy_similarity(
+  score <- msentropy::calculate_entropy_similarity(
     frags[[index]],
     frags[[target]],
     min_mz = 0,
@@ -41,7 +33,7 @@ calculate_entropy <- function(index,
 
   if (score >= threshold) {
     return(
-      tidytable(
+      tidytable::tidytable(
         feature_id = index,
         target_id = target,
         score = as.numeric(score),

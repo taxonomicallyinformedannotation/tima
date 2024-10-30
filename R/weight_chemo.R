@@ -1,25 +1,9 @@
-import::from(stringi, stri_detect_regex, .into = environment())
-import::from(tidytable, contains, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, right_join, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Weight chemo
 #'
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
-#' @importFrom stringi stri_detect_regex
-#' @importFrom tidytable contains
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable right_join
-#' @importFrom tidytable select
+#' @include log_pipe.R
 #'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation
@@ -44,8 +28,6 @@ import::from(tidytable, select, .into = environment())
 #'
 #' @return A table containing the chemically weighted annotation
 #'
-#' @export
-#'
 #' @examples NULL
 weight_chemo <-
   function(annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),
@@ -60,7 +42,7 @@ weight_chemo <-
            score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
            score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())) {
     df2 <- annot_table_wei_bio_clean |>
-      distinct(
+      tidytable::distinct(
         candidate_structure_tax_cla_01kin,
         candidate_structure_tax_npc_01pat,
         candidate_structure_tax_cla_02sup,
@@ -93,16 +75,16 @@ weight_chemo <-
                score,
                score_name) {
         score <- df |>
-          distinct(
+          tidytable::distinct(
             !!as.name(candidates),
             !!as.name(features_val),
             !!as.name(features_score)
           ) |>
-          filter(stri_detect_regex(
+          tidytable::filter(stringi::stri_detect_regex(
             pattern = !!as.name(candidates),
             str = !!as.name(features_val)
           )) |>
-          mutate(!!as.name(score_name) := !!as.name(score) * 1)
+          tidytable::mutate(!!as.name(score_name) := !!as.name(score) * 1)
       }
     log_debug("... (classyfire) kingdom \n")
     step_cla_kin <- df2 |>
@@ -170,14 +152,14 @@ weight_chemo <-
 
     log_debug("... keeping best chemical score \n")
     annot_table_wei_chemo <- df2 |>
-      left_join(step_cla_kin) |>
-      left_join(step_npc_pat) |>
-      left_join(step_cla_sup) |>
-      left_join(step_npc_sup) |>
-      left_join(step_cla_cla) |>
-      left_join(step_npc_cla) |>
-      left_join(step_cla_par) |>
-      mutate(
+      tidytable::left_join(step_cla_kin) |>
+      tidytable::left_join(step_npc_pat) |>
+      tidytable::left_join(step_cla_sup) |>
+      tidytable::left_join(step_npc_sup) |>
+      tidytable::left_join(step_cla_cla) |>
+      tidytable::left_join(step_npc_cla) |>
+      tidytable::left_join(step_cla_par) |>
+      tidytable::mutate(
         score_chemical = pmax(
           score_chemical_1,
           score_chemical_2,
@@ -190,10 +172,10 @@ weight_chemo <-
           na.rm = TRUE
         )
       ) |>
-      select(-contains("score_chemical_")) |>
-      right_join(annot_table_wei_bio_clean) |>
-      log_pipe("... calculating weighted chemical score \n") |>
-      mutate(
+      tidytable::select(-tidyselect::contains("score_chemical_")) |>
+      tidytable::right_join(annot_table_wei_bio_clean) |>
+      tima:::log_pipe("... calculating weighted chemical score \n") |>
+      tidytable::mutate(
         score_weighted_chemo = (1 / (
           weight_chemical + weight_biological + weight_spectral
         )) * weight_chemical * score_chemical + (1 / (

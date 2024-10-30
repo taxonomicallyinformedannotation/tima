@@ -1,8 +1,3 @@
-import::from(httr2, req_perform, .into = environment())
-import::from(httr2, request, .into = environment())
-import::from(jsonlite, fromJSON, .into = environment())
-import::from(stringi, stri_replace_all_fixed, .into = environment())
-
 #' @title Get last version from Zenodo
 #'
 #' @description This function gets the last version
@@ -11,25 +6,26 @@ import::from(stringi, stri_replace_all_fixed, .into = environment())
 #' @details Credit goes to partially to
 #'    https://inbo.github.io/inborutils/
 #'
-#' @importFrom httr2 req_perform
-#' @importFrom httr2 request
-#' @importFrom jsonlite fromJSON
-#' @importFrom stringi stri_replace_all_fixed
-#'
 #' @param doi DOI of the Zenodo record
 #' @param pattern Pattern to identify the file to download
 #' @param path Path to save the file to
 #'
-#' @return NULL
+#' @return The path to the file
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' get_last_version_from_zenodo(
+#'   doi = "10.5281/zenodo.5794106",
+#'   pattern = "frozen.csv.gz",
+#'   path = "frozen.csv.gz"
+#' )
+#' unlink("frozen.csv.gz")
 get_last_version_from_zenodo <-
   function(doi, pattern, path) {
     ## Remove the prefix from the DOI
     record <-
-      stri_replace_all_fixed(
+      stringi::stri_replace_all_fixed(
         str = doi,
         pattern = "10.5281/zenodo.",
         replacement = "",
@@ -41,9 +37,9 @@ get_last_version_from_zenodo <-
     ## Fix with new Zenodo since the conceptdoi does not work anymore
     base_url_api <- "https://zenodo.org/api/records/"
     record_new <-
-      request(base_url = paste0(base_url, record, "/latest")) |>
-      req_perform()
-    content <- fromJSON(txt = paste0(
+      httr2::request(base_url = paste0(base_url, record, "/latest")) |>
+      httr2::req_perform()
+    content <- jsonlite::fromJSON(txt = paste0(
       base_url_api,
       gsub(
         pattern = ".*/",

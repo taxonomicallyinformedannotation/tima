@@ -8,7 +8,7 @@ replace_id(
   x,
   user_filename = get_params(step = "prepare_params")$files$pattern,
   user_gnps = get_params(step = "prepare_params")$gnps$id,
-  example_gnps = parse_yaml_paths()$gnps$example
+  example_gnps = get_default_paths()$gnps$example
 )
 }
 \arguments{
@@ -29,7 +29,7 @@ This function replaces the default ID
 in the example by a user-specified one
 }
 \examples{
-replace_id(
+tima:::replace_id(
   x = "example/123456_features.tsv",
   user_gnps = NULL,
   user_filename = "Foo"

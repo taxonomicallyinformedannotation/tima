@@ -15,9 +15,17 @@ prepare_libraries_sop_hmdb(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library HMDB
+}
 \description{
 This function prepares the HMDB structure-organism pairs
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_libraries_sop_hmdb()
+unlink("data", recursive = TRUE)
+}
 }

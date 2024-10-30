@@ -16,10 +16,25 @@ prepare_features_components(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared features' components
+}
 \description{
 This function prepares the components
 (clusters in molecular network) for further use
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+input <- get_params(step = "prepare_features_components")$files$networks$spectral$components$raw
+get_file(url = paste0(dir, input), export = input)
+prepare_features_components(
+  input = input
+)
+unlink("data", recursive = TRUE)
+}
 }

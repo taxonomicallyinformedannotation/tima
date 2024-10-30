@@ -50,6 +50,9 @@ e.g. 'Gentianaceae|Apocynaceae'}
 
 \item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
 }
+\value{
+The path to the prepared structure-organism pairs library MERGED
+}
 \description{
 This function prepares the libraries made of
 all sub-libraries containing structure-organism pairs
@@ -59,5 +62,20 @@ It can be restricted to specific taxa to have
 more biologically meaningful annotation.
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
+  gsub(
+    pattern = ".gz",
+    replacement = "",
+    fixed = TRUE
+  )
+get_file(url = paste0(dir, files), export = files)
+prepare_libraries_sop_merged(files = files)
+unlink("data", recursive = TRUE)
+}
 }

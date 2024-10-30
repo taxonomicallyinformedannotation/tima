@@ -26,9 +26,21 @@ prepare_features_tables(
 
 \item{name_mz}{Name of the m/z column in the features data}
 }
+\value{
+The path to the prepared feature table
+}
 \description{
 This function prepares features
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+get_file(
+  url = get_default_paths()$urls$examples$features,
+  export = get_params(step = "prepare_features_tables")$files$features$raw
+)
+prepare_features_tables()
+unlink("data", recursive = TRUE)
+}
 }
