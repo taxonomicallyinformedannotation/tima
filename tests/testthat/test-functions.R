@@ -146,12 +146,6 @@ test_that(desc = "Test functions", code = {
     export = paths$data$source$libraries$rt$example_mini
   )
 
-  ### metadata
-  get_file(
-    url = paths$urls$examples$metadata,
-    export = paths$data$source$metadata
-  )
-
   #### SIRIUS
   ## mini version for tests
   get_example_sirius()
@@ -251,6 +245,7 @@ test_that(desc = "Test functions", code = {
   get_massbank_spectra()
 
   ## Change small params
+  get_example_files()
   change_params_small()
   change_params_small(
     fil_pat = "myExamplePattern",
