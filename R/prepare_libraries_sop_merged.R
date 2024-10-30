@@ -1,15 +1,3 @@
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, anti_join, .into = environment())
-import::from(tidytable, as_tidytable, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, where, .into = environment())
-
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function prepares the libraries made of
@@ -17,18 +5,6 @@ import::from(tidytable, where, .into = environment())
 #'
 #' @details It can be restricted to specific taxa to have
 #'    more biologically meaningful annotation.
-#'
-#' @importFrom tidytable across
-#' @importFrom tidytable anti_join
-#' @importFrom tidytable as_tidytable
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable left_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
-#' @importFrom tidytable where
 #'
 #' @include get_organism_taxonomy_ott.R
 #' @include get_params.R
@@ -48,11 +24,27 @@ import::from(tidytable, where, .into = environment())
 #' @param output_str_tax_cla Output file for structures taxonomy (Classyfire)
 #' @param output_str_tax_npc Output file for structures taxonomy (NPC)
 #'
-#' @return NULL
+#' @return The path to the prepared structure-organism pairs library MERGED
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' get_file(url = paste0(dir, files), export = files)
+#' prepare_libraries_sop_merged(files = files)
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_libraries_sop_merged <-
   function(files = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared,
            filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,
@@ -103,14 +95,14 @@ prepare_libraries_sop_merged <-
     log_debug(x = "Loading and concatenating prepared libraries")
     libraries <- files |>
       lapply(
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       )
 
     tables <- libraries |>
-      bind_rows() |>
-      split_tables_sop()
+      tidytable::bind_rows() |>
+      tima:::split_tables_sop()
 
     log_debug(x = "Keeping keys")
     table_keys <- tables$key |>
@@ -121,8 +113,8 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Completing organisms taxonomy")
     table_org_tax_ott_2 <- table_keys |>
-      anti_join(table_org_tax_ott) |>
-      distinct(organism = organism_name) |>
+      tidytable::anti_join(table_org_tax_ott) |>
+      tidytable::distinct(organism = organism_name) |>
       data.frame()
 
     if (nrow(table_org_tax_ott_2) != 0) {
@@ -132,17 +124,17 @@ prepare_libraries_sop_merged <-
 
       table_org_tax_ott <-
         table_org_tax_ott |>
-        bind_rows(
+        tidytable::bind_rows(
           table_org_tax_ott_full |>
-            as_tidytable() |>
-            mutate(across(
-              .cols = where(is.numeric), .fns = as.character
+            tidytable::as_tidytable() |>
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.numeric), .fns = as.character
             )) |>
-            mutate(across(
-              .cols = where(is.list), .fns = as.character
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.list), .fns = as.character
             )) |>
-            mutate(across(
-              .cols = where(is.logical), .fns = as.character
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::where(is.logical), .fns = as.character
             ))
         )
     }
@@ -165,10 +157,10 @@ prepare_libraries_sop_merged <-
     if (filter == TRUE) {
       log_debug(x = "Filtering library")
       table_keys <- table_keys |>
-        left_join(table_org_tax_ott)
+        tidytable::left_join(table_org_tax_ott)
 
       table_keys <- table_keys |>
-        filter(grepl(
+        tidytable::filter(grepl(
           x = !!as.name(colnames(table_keys)[grepl(
             pattern = level,
             x = colnames(table_keys),
@@ -177,30 +169,29 @@ prepare_libraries_sop_merged <-
           pattern = value,
           perl = TRUE
         )) |>
-        select(
+        tidytable::select(
           structure_inchikey,
           structure_smiles,
           organism_name,
           reference_doi
         ) |>
-        distinct()
+        tidytable::distinct()
 
       stopifnot("Your filter led to no entries,
         try to change it." = nrow(table_keys) != 0)
     }
 
-    log_debug(x = "Exporting ...")
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_libraries_sop_merged"),
       step = "prepare_libraries_sop_merged"
     )
-    export_output(x = table_keys, file = output_key)
-    export_output(x = table_org_tax_ott, file = output_org_tax_ott)
-    export_output(x = table_structures_stereo, file = output_str_stereo)
-    export_output(x = table_structures_metadata, file = output_str_met)
-    export_output(x = table_structures_names, file = output_str_nam)
-    export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
-    export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
+    tima:::export_output(x = table_keys, file = output_key)
+    tima:::export_output(x = table_org_tax_ott, file = output_org_tax_ott)
+    tima:::export_output(x = table_structures_stereo, file = output_str_stereo)
+    tima:::export_output(x = table_structures_metadata, file = output_str_met)
+    tima:::export_output(x = table_structures_names, file = output_str_nam)
+    tima:::export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
+    tima:::export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
 
     rm(
       table_keys,

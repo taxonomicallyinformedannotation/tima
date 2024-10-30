@@ -5,8 +5,8 @@
 \title{Get example sirius}
 \usage{
 get_example_sirius(
-  url = parse_yaml_paths()$urls$examples$sirius,
-  export = parse_yaml_paths()$data$interim$annotations$example_sirius
+  url = get_default_paths()$urls$examples$sirius,
+  export = get_default_paths()$data$interim$annotations$example_sirius
 )
 }
 \arguments{

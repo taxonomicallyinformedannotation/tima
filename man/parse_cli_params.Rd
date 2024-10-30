@@ -11,6 +11,9 @@ parse_cli_params(arguments, parameters)
 
 \item{parameters}{Parameters}
 }
+\value{
+Parameters coming from the CLI
+}
 \description{
 This function parses command line parameters
 }

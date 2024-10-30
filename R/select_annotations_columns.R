@@ -1,20 +1,6 @@
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, na_if, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, where, .into = environment())
-
 #' @title Select annotations columns
 #'
 #' @description This function selects annotations columns
-#'
-#' @importFrom tidytable across
-#' @importFrom tidytable any_of
-#' @importFrom tidytable mutate
-#' @importFrom tidytable na_if
-#' @importFrom tidytable select
-#' @importFrom tidytable where
 #'
 #' @include columns_model.R
 #' @include complement_metadata_structures.R
@@ -27,9 +13,7 @@ import::from(tidytable, where, .into = environment())
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
-#' @return NULL
-#'
-#' @export
+#' @return The dataframe with annotation columns selected
 #'
 #' @examples NULL
 select_annotations_columns <- function(df,
@@ -38,9 +22,9 @@ select_annotations_columns <- function(df,
                                        str_nam = get("str_nam", envir = parent.frame()),
                                        str_tax_cla = get("str_tax_cla", envir = parent.frame()),
                                        str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
-  model <- columns_model()
+  model <- tima:::columns_model()
   df <- df |>
-    select(any_of(
+    tidytable::select(tidyselect::any_of(
       c(
         "feature_id",
         model$features_calculated_columns,
@@ -51,26 +35,26 @@ select_annotations_columns <- function(df,
         model$candidates_structures_columns
       )
     )) |>
-    mutate(across(
-      .cols = where(is.character),
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.character),
       .fns = function(x) {
-        na_if(x, "N/A")
+        tidytable::na_if(x, "N/A")
       }
     )) |>
-    mutate(across(
-      .cols = where(is.character),
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.character),
       .fns = function(x) {
-        na_if(x, "null")
+        tidytable::na_if(x, "null")
       }
     )) |>
-    mutate(across(
-      .cols = where(is.character),
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.character),
       .fns = function(x) {
-        na_if(x, "")
+        tidytable::na_if(x, "")
       }
     )) |>
-    round_reals() |>
-    mutate(across(.cols = where(is.numeric), .fns = as.character)) |>
-    complement_metadata_structures()
+    tima:::round_reals() |>
+    tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.numeric), .fns = as.character)) |>
+    tima:::complement_metadata_structures()
   return(df)
 }

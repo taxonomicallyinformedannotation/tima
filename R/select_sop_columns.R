@@ -1,21 +1,15 @@
-import::from(tidytable, select, .into = environment())
-
 #' @title Select SOP columns
 #'
 #' @description This function selects sop columns
 #'
-#' @importFrom tidytable select
-#'
 #' @param df Dataframe
 #'
-#' @return NULL
-#'
-#' @export
+#' @return The dataframe with selected structure organism pairs columns
 #'
 #' @examples NULL
 select_sop_columns <- function(df) {
   df <- df |>
-    select(
+    tidytable::select(
       structure_name,
       structure_inchikey,
       structure_smiles,

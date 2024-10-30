@@ -18,4 +18,5 @@ if it does not already exist.
 }
 \examples{
 create_dir(export = "path/to/directory_of_file")
+unlink("path", recursive = TRUE)
 }

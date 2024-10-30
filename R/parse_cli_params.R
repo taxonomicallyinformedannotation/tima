@@ -5,9 +5,7 @@
 #' @param arguments CLI arguments
 #' @param parameters Parameters
 #'
-#' @return NULL
-#'
-#' @export
+#' @return Parameters coming from the CLI
 #'
 #' @examples NULL
 parse_cli_params <- function(arguments, parameters) {

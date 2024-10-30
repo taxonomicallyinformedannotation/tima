@@ -1,42 +1,14 @@
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, arrange, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, count, .into = environment())
-import::from(tidytable, desc, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, full_join, .into = environment())
-import::from(tidytable, group_by, .into = environment())
-import::from(tidytable, left_join, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, where, .into = environment())
-
 #' @title Weight annotations
 #'
 #' @description This function weights annotations.
-#'
-#' @importFrom tidytable any_of
-#' @importFrom tidytable arrange
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable count
-#' @importFrom tidytable desc
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable full_join
-#' @importFrom tidytable group_by
-#' @importFrom tidytable left_join
-#' @importFrom tidytable select
-#' @importFrom tidytable where
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
 #' @include columns_model.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
+#' @include get_default_paths.R
 #' @include get_params.R
-#' @include parse_yaml_paths.R
 #' @include weight_bio.R
 #' @include weight_chemo.R
 #'
@@ -111,13 +83,95 @@ import::from(tidytable, where, .into = environment())
 #' @param summarise Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
 #'
-#' @return NULL
+#' @return The path to the weighted annotations
 #'
 #' @export
 #'
 #' @seealso annotate_masses weight_bio weight_chemo
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' library <- get_params(step = "weight_annotations")$files$libraries$sop$merged$keys |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' org_tax_ott <- get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' str_stereo <- get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' annotations <- get_params(step = "weight_annotations")$files$annotations$filtered |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' canopus <- get_params(step = "weight_annotations")$files$annotations$prepared$canopus |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' formula <- get_params(step = "weight_annotations")$files$annotations$prepared$formula |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' components <- get_params(step = "weight_annotations")$files$networks$spectral$components$prepared |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' edges <- get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' taxa <- get_params(step = "weight_annotations")$files$metadata$prepared |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' get_file(url = paste0(dir, library), export = library)
+#' get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+#' get_file(url = paste0(dir, str_stereo), export = str_stereo)
+#' get_file(url = paste0(dir, annotations), export = annotations)
+#' get_file(url = paste0(dir, canopus), export = canopus)
+#' get_file(url = paste0(dir, formula), export = formula)
+#' get_file(url = paste0(dir, components), export = components)
+#' get_file(url = paste0(dir, edges), export = edges)
+#' get_file(url = paste0(dir, taxa), export = taxa)
+#' weight_annotations(
+#'   library = library,
+#'   org_tax_ott = org_tax_ott,
+#'   str_stereo = str_stereo,
+#'   annotations = annotations,
+#'   canopus = canopus,
+#'   formula = formula,
+#'   components = components,
+#'   edges = edges,
+#'   taxa = taxa
+#' )
+#' unlink("data", recursive = TRUE)
+#' }
 weight_annotations <- function(library = get_params(step = "weight_annotations")$files$libraries$sop$merged$keys,
                                org_tax_ott = get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott,
                                str_stereo = get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo,
@@ -177,14 +231,14 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   log_debug(x = "Loading files ...")
 
   log_debug(x = "... components")
-  components_table <- fread(
+  components_table <- tidytable::fread(
     file = components,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
   log_debug(x = "... edges")
-  edges_table <- fread(
+  edges_table <- tidytable::fread(
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
@@ -192,17 +246,17 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
 
   log_debug(x = "... structure-organism pairs")
   structure_organism_pairs_table <-
-    fread(
+    tidytable::fread(
       file = library,
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>
-    left_join(fread(
+    tidytable::left_join(tidytable::fread(
       file = str_stereo,
       na.strings = c("", "NA"),
       colClasses = "character"
     )) |>
-    left_join(fread(
+    tidytable::left_join(tidytable::fread(
       file = org_tax_ott,
       na.strings = c("", "NA"),
       colClasses = "character"
@@ -210,7 +264,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
 
   log_debug(x = "... canopus")
   canopus_table <-
-    fread(
+    tidytable::fread(
       file = canopus,
       na.strings = c("", "NA"),
       colClasses = "character"
@@ -218,7 +272,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
 
   log_debug(x = "... formula")
   formula_table <-
-    fread(
+    tidytable::fread(
       file = formula,
       na.strings = c("", "NA"),
       colClasses = "character"
@@ -227,36 +281,36 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   log_debug(x = "... annotations")
   annotation_table <- lapply(
     X = annotations,
-    FUN = fread,
+    FUN = tidytable::fread,
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
-    bind_rows()
+    tidytable::bind_rows()
 
   log_debug(
     x = "Got",
     annotation_table |>
-      filter(!is.na(
+      tidytable::filter(!is.na(
         candidate_structure_inchikey_no_stereo
       )) |>
-      distinct(
+      tidytable::distinct(
         feature_id,
         candidate_library,
         candidate_structure_inchikey_no_stereo
       ) |>
-      group_by(candidate_library) |>
-      count(),
+      tidytable::group_by(candidate_library) |>
+      tidytable::count(),
     "initial annotations"
   )
 
   features_table <- annotation_table |>
-    distinct(feature_id, rt, mz)
+    tidytable::distinct(feature_id, rt, mz)
 
   log_debug(x = "Re-arranging annotations")
-  model <- columns_model()
+  model <- tima:::columns_model()
 
   annotation_table_1 <- annotation_table |>
-    select(any_of(
+    tidytable::select(tidyselect::any_of(
       c(
         model$features_columns,
         model$candidates_calculated_columns,
@@ -265,35 +319,31 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
       )
     )) |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
-    arrange(desc(candidate_score_similarity)) |>
-    distinct(
+    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+    tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_no_stereo,
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
   annotation_table_2 <- annotation_table |>
-    select(
-      any_of(
-        c(
-          model$features_columns,
-          model$candidates_sirius_str_columns,
-          model$candidates_structures_columns
-        )
-      ),
-      -candidate_structure_error_mz,
-      -candidate_structure_error_rt
-    ) |>
-    filter(!is.na(candidate_score_sirius_csi)) |>
-    distinct()
+    tidytable::select(tidyselect::any_of(
+      c(
+        model$features_columns,
+        model$candidates_sirius_str_columns,
+        model$candidates_structures_columns
+      )
+    ), -candidate_structure_error_mz, -candidate_structure_error_rt) |>
+    tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
+    tidytable::distinct()
 
   annotation_table <- annotation_table_1 |>
-    full_join(annotation_table_2) |>
-    full_join(formula_table) |>
-    full_join(canopus_table) |>
-    left_join(
+    tidytable::full_join(annotation_table_2) |>
+    tidytable::full_join(formula_table) |>
+    tidytable::full_join(canopus_table) |>
+    tidytable::left_join(
       edges_table |>
-        distinct(
+        tidytable::distinct(
           feature_id = feature_source,
           feature_spectrum_entropy,
           feature_spectrum_peaks
@@ -302,17 +352,17 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>
-      filter(is.na(candidate_score_similarity) &
+      tidytable::filter(is.na(candidate_score_similarity) &
         is.na(candidate_score_sirius_csi))
   }
   if (compounds_names == FALSE) {
     annotation_table <- annotation_table |>
-      select(-candidate_structure_name)
+      tidytable::select(-candidate_structure_name)
   }
 
   log_debug(x = "adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
-    left_join(fread(
+    tidytable::left_join(tidytable::fread(
       file = taxa,
       na.strings = c("", "NA"),
       colClasses = "character"
@@ -321,32 +371,32 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   rm(annotation_table, annotation_table_1, annotation_table_2)
 
   log_debug(x = "performing taxonomically informed scoring")
-  results <- weight_bio() |>
-    decorate_bio() |>
-    clean_bio() |>
-    weight_chemo() |>
-    decorate_chemo() |>
-    clean_chemo() |>
-    select(where(~ any(!is.na(.))))
+  results <- tima:::weight_bio() |>
+    tima:::decorate_bio() |>
+    tima:::clean_bio() |>
+    tima:::weight_chemo() |>
+    tima:::decorate_chemo() |>
+    tima:::clean_chemo() |>
+    tidytable::select(tidyselect::where(~ any(!is.na(.))))
 
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(
-    parse_yaml_paths()$data$processed$path,
+    get_default_paths()$data$processed$path,
     paste0(time, "_", pattern)
   )
   final_output <- file.path(dir_time, output)
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "prepare_params"),
     directory = dir_time,
     step = "prepare_params"
   )
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "prepare_params_advanced"),
     directory = dir_time,
     step = "prepare_params_advanced"
   )
-  export_output(x = results, file = final_output)
+  tima:::export_output(x = results, file = final_output)
   rm(results)
 
   return(final_output)

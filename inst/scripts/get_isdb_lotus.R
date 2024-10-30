@@ -1,9 +1,6 @@
 start <- Sys.time()
 
-require(
-  package = "tima",
-  quietly = TRUE
-)
+library(tima)
 
 log_debug(
   "This script",
@@ -12,7 +9,7 @@ log_debug(
 log_debug("Authors: ", crayon::green("AR"), "\n")
 log_debug("Contributors: ...")
 
-targets::tar_make(names = matches("lib_spe_is_lot"))
+targets::tar_make(names = tidyselect::matches("lib_spe_is_lot"))
 
 end <- Sys.time()
 

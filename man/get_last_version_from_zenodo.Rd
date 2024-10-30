@@ -13,6 +13,9 @@ get_last_version_from_zenodo(doi, pattern, path)
 
 \item{path}{Path to save the file to}
 }
+\value{
+The path to the file
+}
 \description{
 This function gets the last version
 of a file from a Zenodo record
@@ -22,5 +25,10 @@ Credit goes to partially to
 https://inbo.github.io/inborutils/
 }
 \examples{
-NULL
+get_last_version_from_zenodo(
+  doi = "10.5281/zenodo.5794106",
+  pattern = "frozen.csv.gz",
+  path = "frozen.csv.gz"
+)
+unlink("frozen.csv.gz")
 }

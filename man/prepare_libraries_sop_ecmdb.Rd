@@ -15,9 +15,17 @@ prepare_libraries_sop_ecmdb(
 
 \item{output}{Output file}
 }
+\value{
+The path to the prepared structure-organism pairs library ECMDB
+}
 \description{
 Prepare libraries of structure organism pairs ECMDB
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_libraries_sop_ecmdb()
+unlink("data", recursive = TRUE)
+}
 }

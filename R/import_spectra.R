@@ -1,18 +1,6 @@
-import::from(MsBackendMgf, readMgf, .into = environment())
-# TODO Change as soon as R 4.4.0 becomes oldrel
-# import::from(MsBackendMgf, readMgfSplit, .into = environment())
-import::from(MsBackendMsp, readMsp, .into = environment())
-import::from(Spectra, Spectra, .into = environment())
-import::from(stringi, stri_replace_all_regex, .into = environment())
-
 #' @title Import spectra
 #'
 #' @description This function imports spectra from a file (.mgf or .sqlite)
-#'
-#' @importFrom MsBackendMgf readMgf
-#' @importFrom MsBackendMsp readMsp
-#' @importFrom Spectra Spectra
-#' @importFrom stringi stri_replace_all_regex
 #'
 #' @include sanitize_spectra.R
 #'
@@ -27,7 +15,16 @@ import::from(stringi, stri_replace_all_regex, .into = environment())
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' get_file(
+#'   url = get_default_paths()$urls$examples$spectra_mini,
+#'   export = get_default_paths()$data$source$spectra
+#' )
+#' import_spectra(file = get_default_paths()$data$source$spectra)
+#' import_spectra(
+#'   file = get_default_paths()$data$source$spectra,
+#'   sanitize = FALSE
+#' )
 import_spectra <- function(file,
                            cutoff = 0,
                            dalton = 0.01,
@@ -35,7 +32,7 @@ import_spectra <- function(file,
                            ppm = 10,
                            sanitize = TRUE) {
   file_ext <-
-    stri_replace_all_regex(
+    stringi::stri_replace_all_regex(
       str = file,
       pattern = ".*\\.",
       replacement = "",
@@ -45,24 +42,24 @@ import_spectra <- function(file,
   spectra <- switch(
     EXPR = file_ext,
     "mgf" = {
-      readMgf(f = file) |>
+      MsBackendMgf::readMgf(f = file) |>
         # TODO Change as soon as R 4.4.0 becomes oldrel
         # readMgfSplit(f = file) |>
-        Spectra()
+        Spectra::Spectra()
     },
     "msp" = {
-      readMsp(f = file) |>
-        Spectra()
+      MsBackendMsp::readMsp(f = file) |>
+        Spectra::Spectra()
     },
     # "sqlite" = {
     #   CompDb(x = file) |>
-    #     Spectra() |>
+    #     Spectra::Spectra() |>
     #     setBackend(MsBackendMemory())
     # },
     "rds" = {
       readRDS(file = file) |>
         data.frame() |>
-        Spectra()
+        Spectra::Spectra()
     }
   )
   if (sanitize) {

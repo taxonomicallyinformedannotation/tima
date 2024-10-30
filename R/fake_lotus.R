@@ -1,23 +1,15 @@
-import::from(tidytable, fwrite, .into = environment())
-import::from(tidytable, tidytable, .into = environment())
-
 #' @title Fake LOTUS
 #'
 #' @description This function fakes LOTUS in case the download failed
-#'
-#' @importFrom tidytable fwrite
-#' @importFrom tidytable tidytable
 #'
 #' @param export Path to save the file to
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples NULL
 fake_lotus <- function(export) {
   log_debug("External failure. Returning empty file instead.")
-  tidytable(
+  tidytable::tidytable(
     structure_wikidata = NA,
     structure_inchikey = NA,
     structure_inchi = NA,
@@ -58,6 +50,6 @@ fake_lotus <- function(export) {
     reference_doi = NA,
     manual_validation = NA
   ) |>
-    fwrite(export)
+    tidytable::fwrite(export)
   return(export)
 }

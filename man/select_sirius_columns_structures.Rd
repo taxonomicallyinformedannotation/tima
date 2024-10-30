@@ -11,6 +11,9 @@ select_sirius_columns_structures(df, sirius_version)
 
 \item{sirius_version}{Sirius version}
 }
+\value{
+The dataframe with selected structure columns
+}
 \description{
 This function selects sirius columns (structures)
 }

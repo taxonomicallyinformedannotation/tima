@@ -1,68 +1,63 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.10.1
+Version: 2.11.0
 Authors@R: c(
-    person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
+    person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
     person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
-Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
-Description: This package provides the infrastructure to perform Taxonomically
-    Informed Metabolite Annotation.
+Maintainer: Adriano Rutz <adafede@gmail.com>
+Description: This package provides the infrastructure to perform
+    Taxonomically Informed Metabolite Annotation.
 License: GPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima,
-    https://taxonomicallyinformedannotation.github.io/tima
+    https://taxonomicallyinformedannotation.github.io/tima,
+    https://taxonomicallyinformedannotation.github.io/tima-shinylive
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
     R (>= 4.3.0)
 Imports:
-    bs4Dash (>= 2.3.3),
-    cli (>= 3.6.3),
-    CompoundDb (>= 1.6.0),
     crayon (>= 1.5.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
-    DT (>= 0.33),
+    DT,
     fs (>= 1.6.4),
-    glue (>= 1.7.0),
-    gt (>= 0.11.0),
-    httr2 (>= 1.0.2),
+    gt,
+    httr (>= 1.4.7),
+    httr2 (>= 1.0.5),
     igraph (>= 2.0.3),
-    import (>= 1.3.2),
-    installr (>= 0.23.4),
-    jsonlite (>= 1.8.8),
-    lifecycle (>= 1.0.4),
+    jsonlite (>= 1.8.9),
     MetaboCoreUtils (>= 1.10.0),
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
     msentropy (>= 0.1.4),
-    pak (>= 0.7.2),
     pbapply (>= 1.7.2),
-    pingr (>= 2.0.3),
-    R.utils (>= 2.12.3),
-    rlang (>= 1.1.4),
     rotl (>= 3.1.0),
-    shiny (>= 1.9.0),
-    shinybusy (>= 0.3.3),
-    shinyhelper (>= 0.3.2),
-    shinyjs (>= 2.1.0),
-    shinyvalidate (>= 0.1.3),
-    shinyWidgets (>= 0.8.6),
+    shiny (>= 1.9.1),
+    shinybusy,
+    shinyWidgets,
     Spectra (>= 1.12.0),
     stats,
     stringi (>= 1.8.4),
-    targets (>= 1.7.1),
-    tidyfst (>= 1.7.9),
+    targets (>= 1.8.0),
+    tidyfst (>= 1.8.1),
+    tidyselect (>= 1.2.1),
     tidytable (>= 0.11.1),
     utils,
-    visNetwork (>= 2.1.2),
+    visNetwork,
     yaml (>= 2.3.10)
 Suggests: 
     BiocManager,
     knitr,
+    lifecycle,
     pkgload,
+    R.utils,
+    rlang,
+    shinyhelper,
+    shinyjs,
     shinytest2,
+    shinyvalidate,
     spelling,
     testthat (>= 3.0.0)
 VignetteBuilder:
@@ -83,10 +78,11 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
     distance, specialized metabolome
 Collate:
     'round_reals.R'
+    'log_pipe.R'
     'harmonize_adducts.R'
-    'parse_yaml_paths.R'
     'parse_yaml_params.R'
     'parse_cli_params.R'
+    'get_default_paths.R'
     'get_params.R'
     'dist_groups.R'
     'decorate_masses.R'
@@ -108,6 +104,7 @@ Collate:
     'clean_collapse.R'
     'clean_chemo.R'
     'complement_metadata_structures.R'
+    'copy_backbone.R'
     'create_components.R'
     'create_edges.R'
     'create_edges_spectra.R'
@@ -115,8 +112,7 @@ Collate:
     'decorate_chemo.R'
     'export_output.R'
     'export_params.R'
-    'export_spectra.R'
-    'export_spectra_2.R'
+    'export_spectra_rds.R'
     'extract_spectra.R'
     'fake_annotations_columns.R'
     'fake_ecmdb.R'
@@ -136,7 +132,6 @@ Collate:
     'harmonize_spectra.R'
     'install.R'
     'log_debug.R'
-    'log_pipe.R'
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'

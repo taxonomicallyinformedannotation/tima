@@ -16,8 +16,8 @@ log_debug("Contributors: ...")
 ## (see https://twitter.com/Adafede/status/1592543895094788096)
 log_debug("Downloading HMDB (might be long)")
 get_file(
-  url = parse_yaml_paths()$urls$hmdb$spectra$predicted,
-  export = parse_yaml_paths()$data$source$libraries$spectra$is$hmdb
+  url = get_default_paths()$urls$hmdb$spectra$predicted,
+  export = get_default_paths()$data$source$libraries$spectra$is$hmdb
 )
 
 log_debug("Script finished in", crayon::green(format(end - start)))

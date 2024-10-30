@@ -61,16 +61,38 @@ annotate_masses(
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
-\item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 10 ppm}
+\item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 20 ppm}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 }
 \value{
-A table containing MS1 annotations based on exact mass
+The path to the files containing MS1 annotations and edges
 }
 \description{
-This function annotates masses
+This function annotates a feature table based on exact mass
+match. It requires a structural library, its metadata, and lists of adducts,
+clusters, and neutral losses to be considered. The polarity has to be \code{pos}
+or \code{neg} and retention time and mass tolerances should be given. The feature
+table is expected to be pre-formatted.
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+data_interim <- "data/interim/"
+dir <- paste0(github, repo)
+dir <- paste0(dir, data_interim)
+annotate_masses(
+  features = paste0(dir, "features/example_features.tsv"),
+  library = paste0(dir, "libraries/sop/merged/keys.tsv"),
+  str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
+  str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
+  str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
+  str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
+  str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+)
+unlink("data", recursive = TRUE)
+}
 }

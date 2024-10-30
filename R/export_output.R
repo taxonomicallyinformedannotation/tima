@@ -1,22 +1,20 @@
-import::from(crayon, green, .into = environment())
-
 #' @title Export output
 #'
 #' @description This function creates the output directory
 #'    if it doesn't exist and exports the data frame to a tab-delimited file.
-#'
-#' @importFrom crayon green
 #'
 #' @include create_dir.R
 #'
 #' @param x data frame to be exported
 #' @param file path to the output file
 #'
-#' @return NULL
+#' @return The path of the exported file
 #'
 #' @export
 #'
-#' @examples export_output(x = data.frame(), file = "output/file.tsv")
+#' @examples
+#' export_output(x = data.frame(), file = "output/file.tsv")
+#' unlink("output", recursive = TRUE)
 export_output <- function(x, file = output) {
   # ## Use default system data directory
   # file <- file.path(
@@ -32,7 +30,7 @@ export_output <- function(x, file = output) {
   create_dir(export = file)
 
   ## Log the path to the output file
-  log_debug(x = "... path to export is", green(file))
+  log_debug(x = "... path to export is", crayon::green(file))
 
   ## Write the data frame to a tab-delimited file
   tidytable::fwrite(

@@ -1,30 +1,10 @@
-import::from(tidytable, across, .into = environment())
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, as_tidytable, .into = environment())
-import::from(tidytable, everything, .into = environment())
-import::from(tidytable, group_by, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, rename, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Extract spectra from a Spectra object
 #'
 #' @description This function extracts spectra from a `Spectra`object
 #'
-#' @importFrom tidytable across
-#' @importFrom tidytable any_of
-#' @importFrom tidytable as_tidytable
-#' @importFrom tidytable everything
-#' @importFrom tidytable group_by
-#' @importFrom tidytable mutate
-#' @importFrom tidytable rename
-#' @importFrom tidytable select
-#'
 #' @param object Object of class Spectra
 #'
 #' @return Data frame containing spectra data
-#'
-#' @export
 #'
 #' @examples NULL
 extract_spectra <- function(object) {
@@ -41,7 +21,7 @@ extract_spectra <- function(object) {
   ## Extract spectra data and transform it into a data frame
   spectra <- object@backend@spectraData |>
     data.frame() |>
-    as_tidytable()
+    tidytable::as_tidytable()
 
   ## Add 'mz' and 'intensity' columns from peaks data
   spectra$mz <- lapply(object@backend@peaksData, function(peakData) {
@@ -53,28 +33,28 @@ extract_spectra <- function(object) {
 
   ## Synonyms issue
   # spectra <- spectra |>
-  # group_by(c(-any_of("synonym"))) |>
-  # reframe(across(
-  # .cols = where(is.list),
+  # tidytable::group_by(c(-tidyselect::any_of("synonym"))) |>
+  # tidytable::reframe(tidytable::across(
+  # .cols = tidyselect::where(is.list),
   # .fns = as.character
   # )) |>
-  # ungroup()
+  # tidytable::ungroup()
 
   ## Columns types issue
   spectra <- spectra |>
-    mutate(across(.cols = any_of(incoherent_logical), .fns = as.logical)) |>
-    mutate(across(.cols = any_of(incoherent_integer), .fns = as.integer)) |>
-    mutate(across(.cols = any_of(incoherent_numeric), .fns = as.numeric))
+    tidytable::mutate(tidytable::across(.cols = tidyselect::any_of(incoherent_logical), .fns = as.logical)) |>
+    tidytable::mutate(tidytable::across(.cols = tidyselect::any_of(incoherent_integer), .fns = as.integer)) |>
+    tidytable::mutate(tidytable::across(.cols = tidyselect::any_of(incoherent_numeric), .fns = as.numeric))
 
   ## Select all columns except those specified in 'incoherent_colnames',
   ## and rename the remaining columns using the names in 'incoherent_colnames'
   incoherent_colnames <-
     incoherent_colnames[unname(incoherent_colnames) %in% colnames(spectra)]
   spectra <- spectra |>
-    select(-c(any_of(names(
+    tidytable::select(-c(tidyselect::any_of(names(
       incoherent_colnames
     )))) |>
-    rename(any_of(incoherent_colnames))
+    tidytable::rename(tidyselect::any_of(incoherent_colnames))
 
   return(spectra)
 }

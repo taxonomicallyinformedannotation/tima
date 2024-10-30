@@ -1,41 +1,40 @@
-import::from(docopt, docopt, .into = environment())
-import::from(stringi, stri_replace_all_fixed, .into = environment())
-
 #' @title Get parameters
 #'
 #' @description This function gets the parameters for the job.
 #'    Combination of cli and yaml parameters
 #'
-#' @importFrom docopt docopt
-#' @importFrom stringi stri_replace_all_fixed
-#'
+#' @include get_default_paths.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
-#' @include parse_yaml_paths.R
 #'
 #' @param step Name of the step being performed
 #'
-#' @return NULL
+#' @return The parameters
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' get_params("prepare_params")
+#' }
 get_params <- function(step) {
-  paths <- parse_yaml_paths()
+  paths <- get_default_paths()
   steps <-
     list.files(system.file("scripts/docopt", package = "tima")) |>
-    stri_replace_all_fixed(pattern = ".txt", replacement = "")
+    stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
 
   get_path <- function(base_path) {
     if (file.exists(base_path)) {
       return(base_path)
     } else {
-      new_path <- gsub(pattern = "inst/", replacement = "", base_path)
+      new_path <- gsub(pattern = "inst", replacement = "", base_path)
       if (file.exists(new_path)) {
         return(new_path)
       } else {
         return(gsub(
-          pattern = "inst/",
+          pattern = "inst",
           replacement = system.file(package = "tima"),
           base_path
         ))
@@ -73,10 +72,10 @@ get_params <- function(step) {
 
   doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 
-  params <- parse_yaml_params(def = default_path, usr = user_path)
+  params <- tima:::parse_yaml_params(def = default_path, usr = user_path)
 
-  params <- parse_cli_params(
-    arguments = docopt(doc = doc, version = paths$version),
+  params <- tima:::parse_cli_params(
+    arguments = docopt::docopt(doc = doc, version = paths$version),
     parameters = params
   )
 

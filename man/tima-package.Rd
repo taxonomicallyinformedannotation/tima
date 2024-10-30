@@ -13,12 +13,13 @@ Useful links:
 \itemize{
   \item \url{https://github.com/taxonomicallyinformedannotation/tima}
   \item \url{https://taxonomicallyinformedannotation.github.io/tima}
+  \item \url{https://taxonomicallyinformedannotation.github.io/tima-shinylive}
   \item Report bugs at \url{https://github.com/taxonomicallyinformedannotation/tima/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Adriano Rutz \email{rutz@imsb.biol.ethz.ch} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+\strong{Maintainer}: Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
 
 Other contributors:
 \itemize{

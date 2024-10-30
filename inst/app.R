@@ -1,8 +1,5 @@
-library(tima)
-
 # Check if runs in Docker environment or not
-i_am_a_whale <- file.exists("/.dockerenv")
-if (i_am_a_whale) {
+if (file.exists("/.dockerenv")) {
   options(shiny.host = "0.0.0.0")
 } else {
   options(shiny.host = "127.0.0.1")
@@ -21,7 +18,7 @@ options(shiny.maxRequestSize = 2000 * 1024^2)
 #' @export
 #'
 #' @examples NULL
-label_mandatory <- function(label) {
+.label_mandatory <- function(label) {
   shiny::tagList(label, shiny::span("*", class = "mandatory_star"))
 }
 
@@ -63,13 +60,13 @@ ui <- shiny::fluidPage(
       shiny::tabPanel(
         title = "Files",
         shiny::h3("Required files"),
-        shiny::h5("They SHOULD be located in `data/source`"),
         shiny::div(
           shiny::fileInput(
             inputId = "fil_spe_raw",
-            label = label_mandatory("MGF file"),
+            label = .label_mandatory("MGF file"),
             accept = ".mgf"
-          )
+          ),
+          shiny::downloadButton(outputId = "demo_spe", "Download example spectra")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -80,10 +77,13 @@ ui <- shiny::fluidPage(
               # "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        shiny::fileInput(
-          inputId = "fil_fea_raw",
-          label = label_mandatory("Features table"),
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+        shiny::div(
+          shiny::fileInput(
+            inputId = "fil_fea_raw",
+            label = .label_mandatory("Features table"),
+            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+          ),
+          shiny::downloadButton(outputId = "demo_fea", "Download example features")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -94,10 +94,13 @@ ui <- shiny::fluidPage(
               # "If you have a GNPS job ID, the spectra will be stored there."
             )
           ),
-        shiny::fileInput(
-          inputId = "fil_met_raw",
-          label = "Metadata table (mandatory if no taxon name)",
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+        shiny::div(
+          shiny::fileInput(
+            inputId = "fil_met_raw",
+            label = "Metadata table (mandatory if no taxon name)",
+            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+          ),
+          shiny::downloadButton(outputId = "demo_met", "Download example metadata")
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -134,7 +137,7 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "fil_pat",
-          label = label_mandatory("Pattern to identify your job locally"),
+          label = .label_mandatory("Pattern to identify your job locally"),
           value = "example"
         ) |>
           shinyhelper::helper(
@@ -408,10 +411,13 @@ ui <- shiny::fluidPage(
             "[M+Ca]2+",
             "[M+Na2]2+",
             "[M+Fe]2+",
+            "[M]+",
             "[M+H]+",
             "[M+H4N]+",
             "[M+Na]+",
             "[M+K]+",
+            "[M+Fe-H2]+",
+            "[M+Fe-H]+",
             "[M+Cu]+",
             "[2M+Mg]2+",
             "[2M+Ca]2+",
@@ -444,6 +450,7 @@ ui <- shiny::fluidPage(
           choices = list(
             "[M-H3]3-",
             "[M-H2]2-",
+            "[M]-",
             "[M-H]-",
             "[M+F]-",
             "[M+Na-H2]-",
@@ -555,12 +562,16 @@ ui <- shiny::fluidPage(
             "H2O (water)",
             "CHN",
             "CO",
-            "C2H4 (2xCH2)",
-            "C2H5 (CH2-CH3)",
+            "C2H4 (ethene)",
+            "CH3N (methanimine)",
+            "C2H5 (ethyl radical)",
+            "H2O2 (dioxygen-dihydrogen)",
             "CH2O",
+            "H2S (dihydrosulphur)",
             "H5ON (H2O-H3N)",
             "H4O2 (2xH2O)",
-            "C2H2O",
+            "C2H2O (ethenone)",
+            "C3H6 (propene)",
             "CHON",
             "CO2",
             "CHO2",
@@ -626,7 +637,7 @@ ui <- shiny::fluidPage(
             "H3N (ammonia)",
             "H2O (water)",
             "CO",
-            "C2H5 (CH2-CH3)",
+            "C2H5 (ethyl radical)",
             "H4O2 (2xH2O)",
             "CO2",
             "CHO2",
@@ -685,6 +696,7 @@ ui <- shiny::fluidPage(
               "You have to input the scientific name of your taxon.",
               "Will be used for the weighting of your annotations",
               "Example: Gentiana lutea",
+              "Example for multiple ones: Gentiana lutea|Swertia chirayta",
               "All features will be attributed to this source.",
               "For finer attribution,
               you need to provide a metadata file in the `Files` panel."
@@ -774,7 +786,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `adduct` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'annotation'"
             )
           ),
@@ -787,7 +799,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `feature id` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'slaw_id'"
             )
           ),
@@ -814,7 +826,7 @@ ui <- shiny::fluidPage(
             content = c(
               "Uncheck the box if you removed the files extensions",
               "of your file in the features file",
-              "The default corresponds to the default in MZmine."
+              "The default corresponds to the default in mzmine."
             )
           ),
         shiny::textInput(
@@ -835,7 +847,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `precursor m/z` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'mz'"
             )
           ),
@@ -848,7 +860,7 @@ ui <- shiny::fluidPage(
             type = "inline",
             content = c(
               "Name of the `retention time` column in your features file.",
-              "The default corresponds to the default in MZmine.",
+              "The default corresponds to the default in mzmine.",
               "If using SLAW, please input 'rt'",
               "Assumed to be in minutes."
             )
@@ -1684,19 +1696,36 @@ ui <- shiny::fluidPage(
       id = "thankyou_msg",
       shiny::h3("Thanks, your parameters were saved successfully!")
     )),
-    shinyjs::hidden(shiny::div(id = "job_msg", shiny::h3("Job is running!")))
+    shinyjs::hidden(
+      shiny::div(
+        id = "targets",
+        shiny::mainPanel(
+          targets::tar_watch_ui(
+            id = "targets-shiny",
+            seconds = 10,
+            targets_only = TRUE,
+            degree_from = 8,
+            display = "graph"
+          )
+        )
+      )
+    ),
+    shinyjs::hidden(shiny::downloadButton(outputId = "results", "Download results")),
+    shinyjs::hidden(shiny::actionButton(inputId = "close", label = "Close")),
+    shinyjs::hidden(shiny::div(id = "job_msg", shiny::h3("Job is running!"))),
+    shinyjs::hidden(shiny::div(id = "job_end", shiny::h3("Job finished!")))
   )
 )
 
 # save the results to a file
-save_input <- function(input) {
-  paths_data_source <- parse_yaml_paths()$data$source$path
+.save_input <- function(input) {
+  paths_data_source <- tima:::get_default_paths()$data$source$path
   paths_data_interim_annotations <-
-    parse_yaml_paths()$data$interim$annotations$path
+    tima:::get_default_paths()$data$interim$annotations$path
   ## safety
-  create_dir(paths_data_source)
+  tima:::create_dir(paths_data_source)
 
-  list <- load_yaml_files()
+  list <- tima:::load_yaml_files()
 
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
@@ -1707,6 +1736,8 @@ save_input <- function(input) {
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
   prefil_met_raw <- shiny::isolate(input$fil_met_raw)
   prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
+  lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
+  lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
 
   prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
@@ -1746,7 +1777,7 @@ save_input <- function(input) {
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
-      create_dir(paths_data_interim_annotations)
+      tima:::create_dir(paths_data_interim_annotations)
       fs::file_copy(
         path = prefil_sir_raw[[4]],
         new_path = file.path(prefil_sir_raw_1),
@@ -1755,6 +1786,28 @@ save_input <- function(input) {
     }
   } else {
     prefil_sir_raw_1 <- NULL
+  }
+  if (!is.null(lib_tmp_exp_csv)) {
+    if (!file.exists(lib_tmp_exp_csv)) {
+      fs::file_copy(
+        path = lib_tmp_exp_csv[[4]],
+        new_path = file.path(lib_tmp_exp_csv),
+        overwrite = TRUE
+      )
+    }
+  } else {
+    lib_tmp_exp_csv <- NULL
+  }
+  if (!is.null(lib_tmp_is_csv)) {
+    if (!file.exists(lib_tmp_is_csv)) {
+      fs::file_copy(
+        path = lib_tmp_is_csv[[4]],
+        new_path = file.path(lib_tmp_is_csv),
+        overwrite = TRUE
+      )
+    }
+  } else {
+    lib_tmp_is_csv <- NULL
   }
 
   fil_fea_raw <- prefil_fea_raw_1
@@ -1777,9 +1830,9 @@ save_input <- function(input) {
   ms_pol <- shiny::isolate(input$ms_pol)
   summarise <- shiny::isolate(input$summarise)
 
-  log_debug(x = "Changing parameters ...")
-  log_debug(x = "... Small")
-  yaml_small <- yamls_params[["inst/params/prepare_params"]]
+  message(x = "Changing parameters ...")
+  message(x = "... Small")
+  yaml_small <- yamls_params[["params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
@@ -1789,11 +1842,11 @@ save_input <- function(input) {
   yaml_small$organisms$taxon <- org_tax
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarise <- summarise
-  create_dir("inst/params")
-  yaml::write_yaml(x = yaml_small, file = parse_yaml_paths()$params$prepare_params)
+  tima:::create_dir("params")
+  yaml::write_yaml(x = yaml_small, file = tima:::get_default_paths()$params$prepare_params)
 
-  log_debug(x = "... Advanced")
-  yaml_advanced <- yamls_params[["inst/params/prepare_params_advanced"]]
+  message(x = "... Advanced")
+  yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
   yaml_advanced$annotations$ms1only <-
@@ -1815,42 +1868,43 @@ save_input <- function(input) {
   yaml_advanced$files$pattern <- fil_pat
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |>
-    replace_id()
+    tima:::replace_id()
   # yaml_advanced$files$annotations$raw$sirius <-
   #   yaml_advanced$files$annotations$raw$sirius |>
-  #   replace_id()
+  #   tima:::replace_id()
   yaml_advanced$files$annotations$raw$sirius <- fil_sir_raw
   yaml_advanced$files$annotations$prepared$canopus <-
     yaml_advanced$files$annotations$prepared$canopus |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$formula <-
     yaml_advanced$files$annotations$prepared$formula |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$gnps <-
     yaml_advanced$files$annotations$prepared$structural$gnps |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$ms1 <-
     yaml_advanced$files$annotations$prepared$structural$ms1 |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$sirius <-
     yaml_advanced$files$annotations$prepared$structural$sirius |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$prepared$structural$spectral <-
     yaml_advanced$files$annotations$prepared$structural$spectral |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$annotations$filtered <-
-    yaml_advanced$files$annotations$filtered |> replace_id()
+    yaml_advanced$files$annotations$filtered |>
+    tima:::replace_id()
   # yaml_advanced$files$annotations$processed <-
   #   yaml_advanced$files$annotations$processed |>
-  # replace_id()
+  #   tima:::replace_id()
   yaml_advanced$files$features$raw <-
     fil_fea_raw
   yaml_advanced$files$features$prepared <-
     yaml_advanced$files$features$prepared |>
-    replace_id()
+    tima:::replace_id()
   # TODO
   # yaml_advanced$files$libraries$sop$raw$closed <-
   #   shiny::isolate(input$todo)
@@ -1890,10 +1944,8 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   yaml_advanced$files$libraries$spectral$raw <-
     shiny::isolate(input$lib_spe_mgf)
-  yaml_advanced$files$libraries$temporal$exp$csv <-
-    shiny::isolate(input$lib_tmp_exp_csv)
-  yaml_advanced$files$libraries$temporal$is$csv <-
-    shiny::isolate(input$lib_tmp_is_csv)
+  yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
+  yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
   # TODO
   # other relative paths, not necessary
   # TODO
@@ -1901,23 +1953,23 @@ save_input <- function(input) {
   #   shiny::isolate(input$todo)
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
     yaml_advanced$files$networks$spectral$edges$raw$ms1 |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$edges$raw$spectral <-
     yaml_advanced$files$networks$spectral$edges$raw$spectral |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$edges$prepared <-
     yaml_advanced$files$networks$spectral$edges$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$components$raw <-
     yaml_advanced$files$networks$spectral$components$raw |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$networks$spectral$components$prepared <-
     yaml_advanced$files$networks$spectral$components$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$metadata$raw <- fil_met_raw
   yaml_advanced$files$metadata$prepared <-
     yaml_advanced$files$metadata$prepared |>
-    replace_id()
+    tima:::replace_id()
   yaml_advanced$files$spectral$raw <- fil_spe_raw
   yaml_advanced$gnps$id <- gnps_job_id
   yaml_advanced$gnps$workflow <-
@@ -2104,13 +2156,34 @@ save_input <- function(input) {
 
   yaml::write_yaml(
     x = yaml_advanced,
-    file = parse_yaml_paths()$params$prepare_params_advanced
+    file = tima:::get_default_paths()$params$prepare_params_advanced
   )
 }
 
 server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()
+
+  output$demo_spe <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$spectra),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$spectra_mini), file)
+    }
+  )
+
+  output$demo_fea <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$features),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$features), file)
+    }
+  )
+
+  output$demo_met <- downloadHandler(
+    filename = basename(tima:::get_default_paths()$urls$examples$metadata),
+    content = function(file) {
+      writeLines(readLines(tima:::get_default_paths()$urls$examples$metadata), file)
+    }
+  )
 
   ## Mandatory fields
   fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
@@ -2144,7 +2217,14 @@ server <- function(input, output, session) {
     }
   })
   iv$add_rule("org_tax", function(taxon) {
-    if (is.na(rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id)) {
+    if (any(is.na(
+      stringi::stri_split_fixed(str = taxon, pattern = "|") |>
+        lapply(
+          FUN = function(taxon) {
+            rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id
+          }
+        )
+    ))) {
       "Taxon not found in Open Tree of Life"
     }
   })
@@ -2156,11 +2236,15 @@ server <- function(input, output, session) {
     shinyjs::show("save_msg")
     shinyjs::enable("launch")
     shinyjs::hide("error")
+    shinyjs::hide("job_msg")
+    shinyjs::hide("job_end")
+    shinyjs::hide("results")
+    shinyjs::hide("close")
 
     ## Save the data (show an error message in case of error)
     tryCatch(
       expr = {
-        save_input(input = input)
+        .save_input(input = input)
         shinyjs::show("thankyou_msg")
       },
       error = function(err) {
@@ -2176,224 +2260,243 @@ server <- function(input, output, session) {
         shinyjs::enable("launch")
         shinyjs::hide("save_msg")
         shinyjs::hide("error")
+        shinyjs::hide("job_msg")
+        shinyjs::hide("job_end")
+        shinyjs::hide("results")
+        shinyjs::hide("close")
       }
     )
   })
 
   shiny::observeEvent(eventExpr = input$launch, handlerExpr = {
     shinyjs::show("job_msg")
+    shinyjs::show("targets")
     shinyjs::hide("thankyou_msg")
     shinyjs::hide("error")
     shinyjs::hide("params")
     shinyjs::hide("form")
-    tryCatch(expr = {
-      targets::tar_watch(
-        host = "127.0.0.1",
-        port = 3839,
-        display = "graph",
-        displays = c("summary", "graph"),
-        level_separation = 300,
-        degree_from = 8,
-        outdated = FALSE,
-        targets_only = TRUE,
-        supervise = TRUE,
-        verbose = TRUE,
-        exclude = c(
-          "yaml_paths",
-          "benchmark_ann_fil_ms1_neg",
-          "benchmark_ann_fil_ms1_pos",
-          "benchmark_ann_fil_spe_neg",
-          "benchmark_ann_fil_spe_pos",
-          "benchmark_ann_fil_spe_ms1_neg",
-          "benchmark_ann_fil_spe_ms1_pos",
-          "benchmark_ann_ms1_neg",
-          "benchmark_ann_ms2_pos",
-          "benchmark_ann_ms1_pre_neg",
-          "benchmark_ann_ms1_pre_pos",
-          "benchmark_ann_pre_ms1_ms2_b_c_neg",
-          "benchmark_ann_pre_ms1_ms2_b_c_pos",
-          "benchmark_ann_pre_ms1_ms2_b_neg",
-          "benchmark_ann_pre_ms1_ms2_b_pos",
-          "benchmark_ann_pre_ms2_b_c_neg",
-          "benchmark_ann_pre_ms2_b_c_pos",
-          "benchmark_ann_pre_ms2_b_neg",
-          "benchmark_ann_pre_ms2_b_pos",
-          "benchmark_ann_sir_pre",
-          "benchmark_ann_sir_pre_can",
-          "benchmark_ann_sir_pre_for",
-          "benchmark_ann_sir_pre_str",
-          "benchmark_ann_spe_neg",
-          "benchmark_ann_spe_pos",
-          "benchmark_ann_spe_pre_neg",
-          "benchmark_ann_spe_pre_pos",
-          "benchmark_com_neg",
-          "benchmark_com_pos",
-          "benchmark_com_pre_neg",
-          "benchmark_com_pre_pos",
-          "benchmark_converted",
-          "benchmark_copy",
-          "benchmark_def_ann_mas",
-          "benchmark_def_ann_spe",
-          "benchmark_def_cre_edg_com",
-          "benchmark_def_cre_edg_spe",
-          "benchmark_def_fil_ann",
-          "benchmark_def_pre_ann_sir",
-          "benchmark_def_pre_ann_spe",
-          "benchmark_def_pre_fea_com",
-          "benchmark_def_pre_fea_edg",
-          "benchmark_def_wei_ann",
-          "benchmark_edg_pre_neg",
-          "benchmark_edg_pre_pos",
-          "benchmark_edg_spe_neg",
-          "benchmark_edg_spe_pos",
-          "benchmark_file",
-          "benchmark_files_neg",
-          "benchmark_files_pos",
-          "benchmark_path_copy",
-          "benchmark_path_export",
-          "benchmark_path_file",
-          "benchmark_path_mgf_neg",
-          "benchmark_path_mgf_pos",
-          "benchmark_path_url",
-          "benchmark_path_zip",
-          "benchmark_prepared",
-          "benchmark_pre_meta_neg",
-          "benchmark_pre_meta_pos",
-          "benchmark_pre_mgf_neg",
-          "benchmark_pre_mgf_pos",
-          "benchmark_taxed_neg",
-          "benchmark_taxed_pos",
-          "benchmark_wei_par",
-          "benchmark_zip",
-          "paths",
-          "paths_data_interim_libraries_adducts_path",
-          "paths_data_source_benchmark_cleaned",
-          "paths_data_source_benchmark_copy",
-          "paths_data_source_benchmark_mgf_neg",
-          "paths_data_source_benchmark_mgf_pos",
-          "paths_data_source_benchmark_set",
-          "paths_data_source_benchmark_zip",
-          "paths_data_source_libraries_sop_ecmdb",
-          "paths_data_source_libraries_sop_hmdb",
-          "paths_data_source_libraries_sop_lotus",
-          "paths_data_source_libraries_spectra_is_lotus_pos",
-          "paths_data_source_libraries_spectra_is_lotus_neg",
-          "paths_data_source_spectra",
-          # "paths_gnps_example_id",
-          "paths_interim_a",
-          "paths_interim_f",
-          "paths_source",
-          "paths_test_mode",
-          "paths_urls_benchmarking_set",
-          "paths_urls_ecmdb_metabolites",
-          "paths_urls_hmdb_structures",
-          "paths_urls_lotus_doi",
-          "paths_urls_lotus_pattern",
-          "paths_urls_massbank_file",
-          "paths_urls_massbank_url",
-          "paths_urls_massbank_version",
-          "paths_urls_examples_spectra_mini",
-          "paths_urls_examples_spectral_lib_pos",
-          "paths_urls_examples_spectral_lib_neg",
-          "par_def_ann_mas",
-          "par_def_ann_spe",
-          "par_def_cre_com",
-          "par_def_cre_edg_spe",
-          "par_def_fil_ann",
-          "par_def_pre_ann_gnp",
-          "par_def_pre_ann_sir",
-          "par_def_pre_ann_spe",
-          "par_def_pre_fea_com",
-          "par_def_pre_fea_edg",
-          "par_def_pre_fea_tab",
-          "par_def_pre_lib_rt",
-          "par_def_pre_lib_sop_clo",
-          "par_def_pre_lib_sop_ecm",
-          "par_def_pre_lib_sop_hmd",
-          "par_def_pre_lib_sop_lot",
-          "par_def_pre_lib_sop_mer",
-          "par_def_pre_lib_spe",
-          "par_def_pre_tax",
-          "par_def_wei_ann",
-          "par_fin_par",
-          "par_fin_par2",
-          "par_pre_par",
-          "par_pre_par2",
-          "par_usr_ann_mas",
-          "par_usr_ann_spe",
-          "par_usr_cre_com",
-          "par_usr_cre_edg_spe",
-          "par_usr_fil_ann",
-          "par_usr_pre_ann_gnp",
-          "par_usr_pre_ann_sir",
-          "par_usr_pre_ann_spe",
-          "par_usr_pre_fea_com",
-          "par_usr_pre_fea_edg",
-          "par_usr_pre_fea_tab",
-          "par_usr_pre_lib_rt",
-          "par_usr_pre_lib_sop_clo",
-          "par_usr_pre_lib_sop_ecm",
-          "par_usr_pre_lib_sop_hmd",
-          "par_usr_pre_lib_sop_lot",
-          "par_usr_pre_lib_sop_mer",
-          "par_usr_pre_lib_spe",
-          "par_usr_pre_tax",
-          "par_usr_wei_ann",
-          "par_ann_mas",
-          "par_ann_spe",
-          "par_cre_com",
-          "par_cre_edg_spe",
-          "par_fil_ann",
-          "par_pre_ann_gnp",
-          "par_pre_ann_sir",
-          "par_pre_ann_spe",
-          "par_pre_fea_com",
-          "par_pre_fea_edg",
-          "par_pre_fea_tab",
-          "par_pre_lib_rt",
-          "par_pre_lib_sop_clo",
-          "par_pre_lib_sop_ecm",
-          "par_pre_lib_sop_hmd",
-          "par_pre_lib_sop_lot",
-          "par_pre_lib_sop_mer",
-          "par_pre_lib_spe",
-          "par_pre_tax",
-          "par_wei_ann",
-          ".Random.seed"
-        )
+    shinyjs::hide("job_end")
+    shinyjs::hide("results")
+    shinyjs::hide("close")
+    targets::tar_watch_server(
+      id = "targets-shiny",
+      exclude = c(
+        "yaml_paths",
+        "benchmark_ann_fil_ms1_neg",
+        "benchmark_ann_fil_ms1_pos",
+        "benchmark_ann_fil_spe_neg",
+        "benchmark_ann_fil_spe_pos",
+        "benchmark_ann_fil_spe_ms1_neg",
+        "benchmark_ann_fil_spe_ms1_pos",
+        "benchmark_ann_ms1_neg",
+        "benchmark_ann_ms2_pos",
+        "benchmark_ann_ms1_pre_neg",
+        "benchmark_ann_ms1_pre_pos",
+        "benchmark_ann_pre_ms1_ms2_b_c_neg",
+        "benchmark_ann_pre_ms1_ms2_b_c_pos",
+        "benchmark_ann_pre_ms1_ms2_b_neg",
+        "benchmark_ann_pre_ms1_ms2_b_pos",
+        "benchmark_ann_pre_ms2_b_c_neg",
+        "benchmark_ann_pre_ms2_b_c_pos",
+        "benchmark_ann_pre_ms2_b_neg",
+        "benchmark_ann_pre_ms2_b_pos",
+        "benchmark_ann_sir_pre",
+        "benchmark_ann_sir_pre_can",
+        "benchmark_ann_sir_pre_for",
+        "benchmark_ann_sir_pre_str",
+        "benchmark_ann_spe_neg",
+        "benchmark_ann_spe_pos",
+        "benchmark_ann_spe_pre_neg",
+        "benchmark_ann_spe_pre_pos",
+        "benchmark_com_neg",
+        "benchmark_com_pos",
+        "benchmark_com_pre_neg",
+        "benchmark_com_pre_pos",
+        "benchmark_converted",
+        "benchmark_copy",
+        "benchmark_def_ann_mas",
+        "benchmark_def_ann_spe",
+        "benchmark_def_cre_edg_com",
+        "benchmark_def_cre_edg_spe",
+        "benchmark_def_fil_ann",
+        "benchmark_def_pre_ann_sir",
+        "benchmark_def_pre_ann_spe",
+        "benchmark_def_pre_fea_com",
+        "benchmark_def_pre_fea_edg",
+        "benchmark_def_wei_ann",
+        "benchmark_edg_pre_neg",
+        "benchmark_edg_pre_pos",
+        "benchmark_edg_spe_neg",
+        "benchmark_edg_spe_pos",
+        "benchmark_file",
+        "benchmark_files_neg",
+        "benchmark_files_pos",
+        "benchmark_path_copy",
+        "benchmark_path_export",
+        "benchmark_path_file",
+        "benchmark_path_mgf_neg",
+        "benchmark_path_mgf_pos",
+        "benchmark_path_url",
+        "benchmark_path_zip",
+        "benchmark_prepared",
+        "benchmark_pre_meta_neg",
+        "benchmark_pre_meta_pos",
+        "benchmark_pre_mgf_neg",
+        "benchmark_pre_mgf_pos",
+        "benchmark_taxed_neg",
+        "benchmark_taxed_pos",
+        "benchmark_wei_par",
+        "benchmark_zip",
+        "paths",
+        "paths_data_interim_libraries_adducts_path",
+        "paths_data_source_benchmark_cleaned",
+        "paths_data_source_benchmark_copy",
+        "paths_data_source_benchmark_mgf_neg",
+        "paths_data_source_benchmark_mgf_pos",
+        "paths_data_source_benchmark_set",
+        "paths_data_source_benchmark_zip",
+        "paths_data_source_libraries_sop_ecmdb",
+        "paths_data_source_libraries_sop_hmdb",
+        "paths_data_source_libraries_sop_lotus",
+        "paths_data_source_libraries_spectra_is_lotus_pos",
+        "paths_data_source_libraries_spectra_is_lotus_neg",
+        "paths_data_source_spectra",
+        # "paths_gnps_example_id",
+        "paths_interim_a",
+        "paths_interim_f",
+        "paths_source",
+        "paths_test_mode",
+        "paths_urls_benchmarking_set",
+        "paths_urls_ecmdb_metabolites",
+        "paths_urls_hmdb_structures",
+        "paths_urls_lotus_doi",
+        "paths_urls_lotus_pattern",
+        "paths_urls_massbank_file",
+        "paths_urls_massbank_url",
+        "paths_urls_massbank_version",
+        "paths_urls_examples_spectra_mini",
+        "paths_urls_examples_spectral_lib_pos",
+        "paths_urls_examples_spectral_lib_neg",
+        "par_def_ann_mas",
+        "par_def_ann_spe",
+        "par_def_cre_com",
+        "par_def_cre_edg_spe",
+        "par_def_fil_ann",
+        "par_def_pre_ann_gnp",
+        "par_def_pre_ann_sir",
+        "par_def_pre_ann_spe",
+        "par_def_pre_fea_com",
+        "par_def_pre_fea_edg",
+        "par_def_pre_fea_tab",
+        "par_def_pre_lib_rt",
+        "par_def_pre_lib_sop_clo",
+        "par_def_pre_lib_sop_ecm",
+        "par_def_pre_lib_sop_hmd",
+        "par_def_pre_lib_sop_lot",
+        "par_def_pre_lib_sop_mer",
+        "par_def_pre_lib_spe",
+        "par_def_pre_tax",
+        "par_def_wei_ann",
+        "par_fin_par",
+        "par_fin_par2",
+        "par_pre_par",
+        "par_pre_par2",
+        "par_usr_ann_mas",
+        "par_usr_ann_spe",
+        "par_usr_cre_com",
+        "par_usr_cre_edg_spe",
+        "par_usr_fil_ann",
+        "par_usr_pre_ann_gnp",
+        "par_usr_pre_ann_sir",
+        "par_usr_pre_ann_spe",
+        "par_usr_pre_fea_com",
+        "par_usr_pre_fea_edg",
+        "par_usr_pre_fea_tab",
+        "par_usr_pre_lib_rt",
+        "par_usr_pre_lib_sop_clo",
+        "par_usr_pre_lib_sop_ecm",
+        "par_usr_pre_lib_sop_hmd",
+        "par_usr_pre_lib_sop_lot",
+        "par_usr_pre_lib_sop_mer",
+        "par_usr_pre_lib_spe",
+        "par_usr_pre_tax",
+        "par_usr_wei_ann",
+        "par_ann_mas",
+        "par_ann_spe",
+        "par_cre_com",
+        "par_cre_edg_spe",
+        "par_fil_ann",
+        "par_pre_ann_gnp",
+        "par_pre_ann_sir",
+        "par_pre_ann_spe",
+        "par_pre_fea_com",
+        "par_pre_fea_edg",
+        "par_pre_fea_tab",
+        "par_pre_lib_rt",
+        "par_pre_lib_sop_clo",
+        "par_pre_lib_sop_ecm",
+        "par_pre_lib_sop_hmd",
+        "par_pre_lib_sop_lot",
+        "par_pre_lib_sop_mer",
+        "par_pre_lib_spe",
+        "par_pre_tax",
+        "par_wei_ann",
+        ".Random.seed"
       )
+    )
+
+    ## For shinylive, see
+    ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
+    if (R.Version()$os != "emscripten") {
       targets::tar_make(
-        names = targets::matches("^ann_pre$"),
+        names = tidyselect::matches("^ann_pre$"),
         garbage_collection = TRUE,
         reporter = "verbose_positives"
       )
-    }, finally = {
-      shiny::stopApp()
-    })
-    process <-
-      shiny::reactiveValues(status = targets::tar_active())
-    shiny::observe({
+    } else {
+      targets::tar_make(
+        names = tidyselect::matches("^ann_pre$"),
+        garbage_collection = TRUE,
+        reporter = "verbose_positives",
+        callr_function = NULL
+      )
+    }
+
+    results <- tail(
+      list.files(
+        path = "data/processed",
+        full.names = TRUE,
+        recursive = TRUE
+      ),
+      n = 1
+    )
+    process <- reactiveValues(status = targets::tar_active())
+    observe({
       shiny::invalidateLater(millis = 5000)
       process$status <- targets::tar_active()
-    })
-
-    shiny::observeEvent(eventExpr = process$status, handlerExpr = {
-      message("Job finished")
-      shiny::stopApp()
+      shinyjs::hide("job_msg")
+      shinyjs::show("job_end")
+      shinyjs::show("results")
+      output$results <- downloadHandler(
+        filename = basename(results),
+        content = function(file) {
+          writeLines(readLines(results), file)
+        }
+      )
+      shinyjs::show("close")
+      shiny::observeEvent(eventExpr = input$close, handlerExpr = {
+        shiny::stopApp()
+      })
     })
   })
 }
 url <- "<http://127.0.0.1:3838>"
-log_debug("Please, open:", url, "on your favorite browser, but not Edge.")
+message("Please, open:", url, " on your favorite browser, but not Edge.")
 shiny::shinyApp(
   ui = ui,
   server = server,
   onStart = function() {
-    if (i_am_a_whale) {
-      message("I'm inside the matrix ;(")
-      setwd(dir = "..")
-    } else {
-      go_to_cache()
-    }
+    tima:::copy_backbone()
+    tima:::go_to_cache()
   }
 )

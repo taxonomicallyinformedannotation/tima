@@ -1,21 +1,12 @@
-import::from(httr2, req_perform, .into = environment())
-import::from(httr2, req_progress, .into = environment())
-import::from(httr2, request, .into = environment())
-
-
 #' @title Get file
 #'
 #' @description This function get files
-#'
-#' @importFrom httr2 req_perform
-#' @importFrom httr2 req_progress
-#' @importFrom httr2 request
 #'
 #' @param url URL of the file to be downloaded
 #' @param export File path where the file should be saved
 #' @param limit Timeout limit (in seconds)
 #'
-#' @return NULL
+#' @return The path to the file
 #'
 #' @export
 #'
@@ -29,6 +20,7 @@ import::from(httr2, request, .into = environment())
 #'   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
 #'   export = "data/source/example_metadata.tsv"
 #' )
+#' unlink("data", recursive = TRUE)
 get_file <-
   function(url, export, limit = 3600) {
     # ## Use default system data directory

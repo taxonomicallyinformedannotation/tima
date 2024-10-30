@@ -1,21 +1,7 @@
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare annotations MS2
 #'
 #' @description This function prepares the spectral matches
 #'    obtained previously to make them compatible
-#'
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable distinct
-#' @importFrom tidytable filter
-#' @importFrom tidytable fread
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #' @include select_annotations_columns.R
@@ -28,11 +14,36 @@ import::from(tidytable, select, .into = environment())
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
-#' @return NULL
+#' @return The path to the prepared spectral annotations
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' data_interim <- "data/interim/"
+#' dir <- paste0(github, repo)
+#' input <- get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral |>
+#'   gsub(
+#'     pattern = ".tsv.gz",
+#'     replacement = "_pos.tsv",
+#'     fixed = TRUE
+#'   )
+#' get_file(url = paste0(dir, input), export = input)
+#' dir <- paste0(dir, data_interim)
+#' prepare_annotations_spectra(
+#'   input = input,
+#'   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
+#'   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
+#'   str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
+#'   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
+#'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+#' )
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_annotations_spectra <-
   function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral,
            output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural$spectral,
@@ -46,13 +57,13 @@ prepare_annotations_spectra <-
     table <-
       lapply(
         X = input,
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-      bind_rows() |>
-      filter(!is.na(feature_id)) |>
-      distinct(
+      tidytable::bind_rows() |>
+      tidytable::filter(!is.na(feature_id)) |>
+      tidytable::distinct(
         feature_id,
         candidate_adduct,
         candidate_library,
@@ -68,7 +79,7 @@ prepare_annotations_spectra <-
         candidate_count_similarity_peaks_matched
       ) |>
       ## Add new columns
-      mutate(
+      tidytable::mutate(
         candidate_structure_exact_mass = as.numeric(candidate_structure_exact_mass),
         candidate_structure_tax_npc_01pat = NA_character_,
         candidate_structure_tax_npc_02sup = NA_character_,
@@ -79,14 +90,13 @@ prepare_annotations_spectra <-
         candidate_structure_tax_cla_03cla = NA_character_,
         candidate_structure_tax_cla_04dirpar = NA_character_,
       ) |>
-      select_annotations_columns()
+      tima:::select_annotations_columns()
 
-    log_debug(x = "Exporting ...")
-    export_params(
+    tima:::export_params(
       parameters = get_params(step = "prepare_annotations_spectra"),
       step = "prepare_annotations_spectra"
     )
-    export_output(x = table, file = output[[1]])
+    tima:::export_output(x = table, file = output[[1]])
     rm(table)
 
     return(output[[1]])

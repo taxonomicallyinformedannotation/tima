@@ -17,10 +17,15 @@ get_organism_taxonomy_ott(
 
 \item{retry}{Boolean. Retry with generic epithet}
 }
+\value{
+The path to the obtained OTT taxonomy
+}
 \description{
 This function retrieves taxonomy
 from the Open Tree of Life taxonomy
 }
 \examples{
-NULL
+df <- data.frame("organism" = "Homo sapiens")
+get_organism_taxonomy_ott(df)
+unlink("data", recursive = TRUE)
 }

@@ -1,7 +1,4 @@
-import::from(utils, globalVariables, .into = environment())
-
-#' @importFrom utils globalVariables
-globalVariables(
+utils::globalVariables(
   c(
     ":=",
     "!!",
@@ -86,6 +83,7 @@ globalVariables(
     "consistency_structure_npc_cla",
     "consistency_structure_npc_pat",
     "consistency_structure_npc_sup",
+    "count",
     "delta_max",
     "delta_min",
     "Distance",

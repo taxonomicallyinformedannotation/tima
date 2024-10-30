@@ -1,11 +1,8 @@
 start <- Sys.time()
 
-require(
-  package = "tima",
-  quietly = TRUE
-)
+library(tima)
 
-paths <- parse_yaml_paths()
+paths <- get_default_paths()
 
 log_debug(
   "This script",

@@ -36,9 +36,17 @@ prepare_annotations_gnps(
 
 \item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
+\value{
+The path to the prepared GNPS annotations
+}
 \description{
 This function prepares GNPS obtained annotations
 }
 \examples{
-NULL
+\dontrun{
+tima:::copy_backbone()
+go_to_cache()
+prepare_annotations_gnps()
+unlink("data", recursive = TRUE)
+}
 }

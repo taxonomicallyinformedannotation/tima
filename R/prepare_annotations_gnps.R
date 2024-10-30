@@ -1,18 +1,6 @@
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, fread, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Prepare annotations GNPS
 #'
 #' @description This function prepares GNPS obtained annotations
-#'
-#' @importFrom tidytable any_of
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable fread
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
 #'
 #' @include get_params.R
 #' @include select_annotations_columns.R
@@ -25,11 +13,17 @@ import::from(tidytable, select, .into = environment())
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #'
-#' @return NULL
+#' @return The path to the prepared GNPS annotations
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' prepare_annotations_gnps()
+#' unlink("data", recursive = TRUE)
+#' }
 prepare_annotations_gnps <-
   function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral$gnps,
            output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural$gnps,
@@ -46,15 +40,15 @@ prepare_annotations_gnps <-
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- lapply(
         X = input,
-        FUN = fread,
+        FUN = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
-        bind_rows() |>
-        mutate(candidate_structure_error_mz = as.numeric(MZErrorPPM) *
+        tidytable::bind_rows() |>
+        tidytable::mutate(candidate_structure_error_mz = as.numeric(MZErrorPPM) *
           1E-6 *
           as.numeric(Precursor_MZ)) |>
-        select(any_of(
+        tidytable::select(tidyselect::any_of(
           c(
             "feature_id" = "#Scan#",
             "candidate_adduct" = "Adduct",
@@ -76,7 +70,7 @@ prepare_annotations_gnps <-
             "candidate_structure_tax_cla_04dirpar" = "subclass"
           )
         )) |>
-        mutate(
+        tidytable::mutate(
           candidate_structure_smiles_no_stereo = NA,
           candidate_structure_molecular_formula = candidate_structure_inchi |>
             ## really dirty
@@ -95,17 +89,17 @@ prepare_annotations_gnps <-
           candidate_structure_tax_cla_chemontid = NA,
           candidate_structure_tax_cla_01kin = NA
         ) |>
-        select_annotations_columns()
+        tima:::select_annotations_columns()
     } else {
       log_debug("No GNPS annotations found, returning an empty file instead")
-      table <- fake_annotations_columns()
+      table <- tima:::fake_annotations_columns()
     }
-    log_debug(x = "Exporting ...")
-    export_params(
+
+    tima:::export_params(
       parameters = get_params(step = "prepare_annotations_gnps"),
       step = "prepare_annotations_gnps"
     )
-    export_output(x = table, file = output[[1]])
+    tima:::export_output(x = table, file = output[[1]])
     rm(table)
     return(output[[1]])
   }

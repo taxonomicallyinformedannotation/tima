@@ -1,35 +1,7 @@
-import::from(msentropy, calculate_spectral_entropy, .into = environment())
-import::from(pbapply, pblapply, .into = environment())
-import::from(tidyfst, rn_col, .into = environment())
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, bind_rows, .into = environment())
-import::from(tidytable, coalesce, .into = environment())
-import::from(tidytable, distinct, .into = environment())
-import::from(tidytable, everything, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, full_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, select, .into = environment())
-import::from(tidytable, tidytable, .into = environment())
-
 #' @title Create edges spectra
 #'
 #' @description This function create edges
 #'    based on fragmentation spectra similarity
-#'
-#' @importFrom msentropy calculate_spectral_entropy
-#' @importFrom pbapply pblapply
-#' @importFrom tidyfst rn_col
-#' @importFrom tidytable any_of
-#' @importFrom tidytable bind_rows
-#' @importFrom tidytable coalesce
-#' @importFrom tidytable distinct
-#' @importFrom tidytable everything
-#' @importFrom tidytable filter
-#' @importFrom tidytable full_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable select
-#' @importFrom tidytable tidytable
 #'
 #' @include create_edges.R
 #' @include get_params.R
@@ -44,11 +16,21 @@ import::from(tidytable, tidytable, .into = environment())
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param qutoff Intensity under which ms2 fragments will be removed.
 #'
-#' @return NULL
+#' @return The path to the created spectral edges
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima:::copy_backbone()
+#' go_to_cache()
+#' get_file(
+#'   url = get_default_paths()$urls$examples$spectra_mini,
+#'   export = get_params(step = "create_edges_spectra")$files$spectral$raw
+#' )
+#' create_edges_spectra()
+#' unlink("data", recursive = TRUE)
+#' }
 create_edges_spectra <- function(input = get_params(step = "create_edges_spectra")$files$spectral$raw,
                                  output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
                                  name_source = get_params(step = "create_edges_spectra")$names$source,
@@ -77,9 +59,9 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     fragz <- spectra@backend@peaksData
 
     edges <-
-      pblapply(
+      pbapply::pblapply(
         X = 1:(nspecz - 1),
-        FUN = create_edges,
+        FUN = tima:::create_edges,
         frags = fragz,
         precs = precz,
         nspecs = nspecz,
@@ -87,18 +69,18 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
         ppm_tolerance = ppm,
         threshold = threshold
       ) |>
-      bind_rows()
+      tidytable::bind_rows()
     rm(precz)
 
     log_debug("Calculating features' entropy")
-    entropy <- pblapply(
+    entropy <- pbapply::pblapply(
       X = seq_along(1:nspecz),
       FUN = function(x, peaks = fragz) {
-        return(peaks[[x]] |> calculate_spectral_entropy())
+        return(peaks[[x]] |> msentropy::calculate_spectral_entropy())
       }
     )
     log_debug("Calculating features' number of peaks")
-    npeaks <- pblapply(
+    npeaks <- pbapply::pblapply(
       X = seq_along(1:nspecz),
       FUN = function(x, peaks = fragz) {
         return(peaks[[x]] |> length())
@@ -107,25 +89,26 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     rm(nspecz, fragz)
 
     edges <- edges |>
-      select(
-        !!as.name(name_source) := "feature_id", !!as.name(name_target) := "target_id",
-        everything()
+      tidytable::select(
+        !!as.name(name_source) := "feature_id",
+        !!as.name(name_target) := "target_id",
+        tidyselect::everything()
       )
 
     ## ISSUE see #148 find a way to have consistency in spectrum IDs
     idz <- spectra@backend@spectraData$acquisitionNum
     rm(spectra)
     edges <- edges |>
-      mutate(name_source = idz[name_source], name_target = idz[name_target])
-    entropy_df <- tidytable(entropy) |>
-      rn_col(var = name_source) |>
-      mutate(
+      tidytable::mutate(name_source = idz[name_source], name_target = idz[name_target])
+    entropy_df <- tidytable::tidytable(entropy) |>
+      tidyfst::rn_col(var = name_source) |>
+      tidytable::mutate(
         name_source = idz[name_source],
         feature_spectrum_entropy = as.character(entropy),
         feature_spectrum_peaks = as.character(npeaks)
       ) |>
-      mutate(!!as.name(name_source) := as.integer(!!as.name(name_source))) |>
-      distinct(
+      tidytable::mutate(!!as.name(name_source) := as.integer(!!as.name(name_source))) |>
+      tidytable::distinct(
         !!as.name(name_source),
         feature_spectrum_entropy,
         feature_spectrum_peaks
@@ -133,7 +116,7 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     rm(entropy, npeaks, idz)
 
     edges <- edges |>
-      select(any_of(
+      tidytable::select(tidyselect::any_of(
         c(
           name_source,
           name_target,
@@ -143,28 +126,29 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
       ))
 
     edges <- edges |>
-      filter(candidate_score_similarity >= threshold)
+      tidytable::filter(candidate_score_similarity >= threshold)
 
     edges <- edges |>
-      full_join(entropy_df) |>
-      mutate(!!as.name(name_target) := coalesce(!!as.name(name_target), !!as.name(name_source)))
+      tidytable::full_join(entropy_df) |>
+      tidytable::mutate(!!as.name(name_target) := tidytable::coalesce(!!as.name(name_target), !!as.name(name_source)))
     rm(entropy_df)
   } else {
     log_debug("No spectra were found, returning an empty dataframe instead")
-    edges <- tidytable(
+    edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
       "feature_spectrum_entropy" = NA,
-      "feature_spectrum_peaks" = NA, !!as.name(name_target) := NA,
+      "feature_spectrum_peaks" = NA,
+      !!as.name(name_target) := NA,
       "candidate_score_similarity" = NA,
       "candidate_count_similarity_peaks_matched" = NA
     )
   }
 
-  export_params(
+  tima:::export_params(
     parameters = get_params(step = "create_edges_spectra"),
     step = "create_edges_spectra"
   )
-  export_output(x = edges, file = output[[1]])
+  tima:::export_output(x = edges, file = output[[1]])
   rm(edges)
 
   return(output[[1]])

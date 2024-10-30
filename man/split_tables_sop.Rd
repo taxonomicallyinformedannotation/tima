@@ -9,6 +9,9 @@ split_tables_sop(table)
 \arguments{
 \item{table}{Table to split}
 }
+\value{
+A list of tables from the structure organism pairs tables
+}
 \description{
 This function splits the structure organism table.
 }

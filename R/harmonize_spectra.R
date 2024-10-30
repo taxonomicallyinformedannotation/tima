@@ -1,24 +1,6 @@
-import::from(tidytable, any_of, .into = environment())
-import::from(tidytable, as_tidytable, .into = environment())
-import::from(tidytable, filter, .into = environment())
-import::from(tidytable, full_join, .into = environment())
-import::from(tidytable, mutate, .into = environment())
-import::from(tidytable, pivot_wider, .into = environment())
-import::from(tidytable, row_number, .into = environment())
-import::from(tidytable, select, .into = environment())
-
 #' @title Harmonize spectra
 #'
 #' @description This function harmonizes spectra headers
-#'
-#' @importFrom tidytable any_of
-#' @importFrom tidytable as_tidytable
-#' @importFrom tidytable filter
-#' @importFrom tidytable full_join
-#' @importFrom tidytable mutate
-#' @importFrom tidytable pivot_wider
-#' @importFrom tidytable row_number
-#' @importFrom tidytable select
 #'
 #' @param spectra Spectra object to be harmonized
 #' @param metad Metadata to identify the library
@@ -41,9 +23,7 @@ import::from(tidytable, select, .into = environment())
 #' @param col_sy Name of the synonyms in mgf
 #' @param col_xl Name of the xlogp in mgf
 #'
-#' @return NULL
-#'
-#' @export
+#' @return The harmonized spectra
 #'
 #' @examples NULL
 harmonize_spectra <- function(spectra,
@@ -110,15 +90,15 @@ harmonize_spectra <- function(spectra,
 
   spectra_missing <- columns_missing |>
     data.frame() |>
-    as_tidytable() |>
-    bind_cols(tidytable(value = NA_character_)) |>
-    pivot_wider(names_from = columns_missing) |>
-    mutate(join = "x")
+    tidytable::as_tidytable() |>
+    tidytable::bind_cols(tidytable::tidytable(value = NA_character_)) |>
+    tidytable::pivot_wider(names_from = columns_missing) |>
+    tidytable::mutate(join = "x")
 
   spectra_filtered <- spectra |>
     data.frame() |>
-    as_tidytable() |>
-    filter(
+    tidytable::as_tidytable() |>
+    tidytable::filter(
       grepl(
         pattern = mode,
         x = !!as.name(col_po),
@@ -133,19 +113,19 @@ harmonize_spectra <- function(spectra,
         ignore.case = TRUE
       )
     ) |>
-    select(
-      any_of(c(columns_full)),
-      any_of(c("precursorCharge")),
+    tidytable::select(
+      tidyselect::any_of(c(columns_full)),
+      tidyselect::any_of(c("precursorCharge")),
       precursorMz,
-      any_of(c("rtime")),
+      tidyselect::any_of(c("rtime")),
       mz,
       intensity
     ) |>
-    mutate(join = "x")
+    tidytable::mutate(join = "x")
 
   spectra_harmonized <- spectra_filtered |>
-    full_join(spectra_missing) |>
-    select(any_of(c(
+    tidytable::full_join(spectra_missing) |>
+    tidytable::select(tidyselect::any_of(c(
       "adduct",
       "collision_energy",
       "compound_id",
@@ -168,12 +148,12 @@ harmonize_spectra <- function(spectra,
       "mz",
       "intensity"
     ))) |>
-    mutate(
+    tidytable::mutate(
       library = metad,
       exactmass = as.numeric(exactmass),
       spectrum_id = ifelse(
         test = is.na(spectrum_id),
-        yes = row_number(),
+        yes = tidytable::row_number(),
         no = as.numeric(spectrum_id)
       ),
       compound_id = ifelse(

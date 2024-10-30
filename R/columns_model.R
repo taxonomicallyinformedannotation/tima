@@ -1,10 +1,8 @@
-#' @title A simplistic column model
+#' @title Columns model
 #'
 #' @description This function models columns
 #'
-#' @return NULL
-#'
-#' @export
+#' @return The columns model
 #'
 #' @examples NULL
 columns_model <- function() {
