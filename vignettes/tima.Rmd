@@ -111,3 +111,19 @@ If you do not even need a GUI ☠️:
 ```{r eval=FALSE, include=TRUE}
 tima::tima_full()
 ```
+
+In case you just want to change some small parameters between jobs, a convenience function is available:
+
+```{r eval=FALSE, include=TRUE}
+tima::change_params_small(
+  fil_pat = "myExamplePattern",
+  fil_fea_raw = "myExampleDir/myExampleFeatures.csv",
+  fil_met_raw = "myExampleDir2SomeWhereElse/myOptionalMetadata.tsv",
+  fil_sir_raw = "myExampleDir3/myAwesomeSiriusProject.zip",
+  fil_spe_raw = "myBeautifulSpectra.mgf",
+  ms_pol = "pos",
+  org_tax = "Gentiana lutea",
+  hig_con = TRUE,
+  summarise = FALSE
+)
+```
