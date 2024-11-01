@@ -46,10 +46,10 @@ If you feel like something useful to other users is missing, please fill an [iss
 After some time using TIMA, you will probably wonder:
 "*What was the parameters I used to generate this file?*" ...
 Or a collaborator might ask you to share your data and parameters.
-Writing them down each time might be time consuming and not really in line with modern computational approaches.
+Writing them down each time might be time-consuming and not really in line with modern computational approaches.
 Therefore, we chose to implement all parameters of all steps (almost...) as YAML files.
 They are human-readable and can be used in batches.
-If you do not like YAML, parameters of each steps can also be given as command line arguments.
+If you do not like YAML, parameters of each step can also be given as command line arguments.
 They will then be saved as YAML you will be able to share.
 
 To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
