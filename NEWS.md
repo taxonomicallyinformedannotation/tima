@@ -118,7 +118,7 @@
 * Documentation improvement
 * Fixed empty chemical classes
 * Fixed not classified taxa
-* Github Actions improvement
+* GitHub Actions improvement
 * [renv](https://rstudio.github.io/renv/index.html) removal
 * Performance improvement by replacing the [tidyverse](https://www.tidyverse.org) by the [fastverse](https://fastverse.github.io/fastverse) (in progress)
 * Reduced warnings (CRAN and jscpd)
