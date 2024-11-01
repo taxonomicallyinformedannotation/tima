@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev \
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libfribidi-dev libglpk-dev libharfbuzz-dev libxml2-dev \
           && sudo apt-get clean \
           && sudo rm -rf /var/lib/apt/lists/*
       - name: Install
