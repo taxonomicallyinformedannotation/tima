@@ -333,7 +333,6 @@ references:
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2024'
-  doi: 10.18129/B9.bioc.MetaboCoreUtils
   version: '>= 1.10.0'
 - type: software
   title: MsBackendMgf
@@ -356,7 +355,6 @@ references:
     email: mail@sebastiangibb.de
     orcid: https://orcid.org/0000-0001-7406-4443
   year: '2024'
-  doi: 10.18129/B9.bioc.MsBackendMgf
   version: '>= 1.10.0'
 - type: software
   title: MsBackendMsp
@@ -374,7 +372,6 @@ references:
     email: Johannes.Rainer@eurac.edu
     orcid: https://orcid.org/0000-0002-6977-7147
   year: '2024'
-  doi: 10.18129/B9.bioc.MsBackendMsp
   version: '>= 1.6.0'
 - type: software
   title: msentropy
@@ -520,7 +517,6 @@ references:
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2024'
-  doi: 10.18129/B9.bioc.Spectra
   version: '>= 1.12.0'
 - type: software
   title: stats
