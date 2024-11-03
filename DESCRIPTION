@@ -47,11 +47,6 @@ Imports:
     utils,
     visNetwork,
     yaml (>= 2.3.10)
-Remotes:
-    bioc/MetaboCoreUtils,
-    bioc/MsBackendMgf,
-    bioc/MsBackendMsp,
-    bioc/Spectra
 Suggests: 
     BiocManager,
     knitr,
