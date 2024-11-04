@@ -1,13 +1,13 @@
 ---
-title: "1 Gathering everything you need"
-author: "Adriano Rutz"
+title: 1 Gathering everything you need
+author: Adriano Rutz
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 opengraph:
     image:
       src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
-      alt: "Taxonomically Informed Metabolite Annotation"
+      alt: Taxonomically Informed Metabolite Annotation
     twitter:
       creator: "@adafede"
 vignette: >
@@ -28,6 +28,7 @@ knitr::opts_knit$set(root.dir = system.file(package = "tima"))
 library("tima")
 tima:::copy_backbone()
 ```
+
 This vignette describes...
 
 * All parameters you need
