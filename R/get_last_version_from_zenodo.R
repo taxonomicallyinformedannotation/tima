@@ -6,6 +6,9 @@
 #' @details Credit goes to partially to
 #'    https://inbo.github.io/inborutils/
 #'
+#' @include create_dir.R
+#' @include get_file.R
+#'
 #' @param doi DOI of the Zenodo record
 #' @param pattern Pattern to identify the file to download
 #' @param path Path to save the file to

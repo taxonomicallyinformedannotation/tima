@@ -26,6 +26,6 @@ create_dir <- function(export) {
   ## Create the directory at the specified path if it does not exist
   if (!dir.exists(dirname_path)) {
     dir.create(dirname_path, recursive = TRUE)
-    log_debug("Directory", dirname_path, "created.")
+    message("Directory", dirname_path, "created.")
   }
 }
