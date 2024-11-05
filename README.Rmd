@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then.
 The workflow is illustrated below.
 
-![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg)
+![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg)\
 
 This repository contains everything needed to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
 
