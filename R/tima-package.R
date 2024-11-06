@@ -18,5 +18,6 @@ NULL
 }
 
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("Welcome to Taxonomically Informed Metabolite Annotation")
+  packageStartupMessage("Welcome to  ", pkgname)
+  message(format(citation(pkgname)))
 }

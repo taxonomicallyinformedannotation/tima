@@ -1,7 +1,7 @@
 citHeader("To cite tima in publications use:")
 
 bibentry(
-  bibtype  = "Manual",
+  bibtype  = "Misc",
   title    = "tima: Taxonomically Informed Metabolite Annotation",
   author   = c(
     person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
