@@ -123,6 +123,7 @@ utils::globalVariables(
     "ionMass",
     "Item1",
     "Item2",
+    "join",
     "l",
     "label",
     "Label",
