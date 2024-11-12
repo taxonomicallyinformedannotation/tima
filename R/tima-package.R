@@ -19,5 +19,5 @@ NULL
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("Welcome to ", pkgname)
-  message(format(utils::citation(pkgname)))
+  packageStartupMessage(format(utils::citation(pkgname)))
 }
