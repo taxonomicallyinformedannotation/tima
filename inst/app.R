@@ -2450,13 +2450,11 @@ server <- function(input, output, session) {
     if (R.Version()$os != "emscripten") {
       targets::tar_make(
         names = tidyselect::matches("^ann_pre$"),
-        garbage_collection = TRUE,
         reporter = "verbose_positives"
       )
     } else {
       targets::tar_make(
         names = tidyselect::matches("^ann_pre$"),
-        garbage_collection = TRUE,
         reporter = "verbose_positives",
         callr_function = NULL
       )
