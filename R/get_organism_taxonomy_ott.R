@@ -79,15 +79,15 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
     ## cutting in smaller requests
     cut <- 100
     organisms_split <-
-      lapply(
-        X = seq(1, length(organisms), cut),
-        FUN = function(i) {
+      furrr::future_map(
+        .x = seq(1, length(organisms), cut),
+        .f = function(i) {
           organisms[i:(i + cut - 1)][!is.na(organisms[i:(i + cut - 1)])]
         }
       )
     new_matched_otl_exact_list <- organisms_split |>
-      lapply(
-        FUN = function(x) {
+      furrr::future_map(
+        .f = function(x) {
           # See https://github.com/ropensci/rotl/issues/147
           httr::with_config(
             httr::config(ssl_verifypeer = FALSE),
@@ -139,16 +139,16 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
       ## TODO make it cleaner
       cut <- 100
       organisms_new_split <-
-        lapply(
-          X = seq(1, length(organisms_new), cut),
-          FUN = function(i) {
+        furrr::future_map(
+          .x = seq(1, length(organisms_new), cut),
+          .f = function(i) {
             organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
           }
         )
       log_debug("Retrying with", organisms_new)
       new_matched_otl_exact_list_2 <- organisms_new_split |>
-        lapply(
-          FUN = function(x) {
+        furrr::future_map(
+          .f = function(x) {
             # See https://github.com/ropensci/rotl/issues/147
             httr::with_config(
               httr::config(ssl_verifypeer = FALSE),
@@ -193,8 +193,8 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
         rotl::tax_lineage()
 
       list_df <- seq_along(taxon_lineage) |>
-        lapply(
-          FUN = function(x) {
+        furrr::future_map(
+          .f = function(x) {
             tidytable::bind_rows(
               data.frame(
                 id = otts[x],

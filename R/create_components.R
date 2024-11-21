@@ -30,12 +30,12 @@
 create_components <-
   function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
            output = get_params(step = "create_components")$files$networks$spectral$components$raw) {
-    stopifnot("Your input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |>
+    stopifnot("Your input file(s) do(es) not exist" = all(furrr::future_map(.x = input, .f = file.exists) |>
       unlist()))
 
     edges <- input |>
-      lapply(
-        FUN = tidytable::fread,
+      furrr::future_map(
+        .f = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>

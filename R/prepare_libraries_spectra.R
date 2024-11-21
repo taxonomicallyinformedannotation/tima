@@ -74,23 +74,23 @@ prepare_libraries_spectra <-
       get_default_paths()$data$interim$libraries$sop$path,
       paste0("spectral_prepared.tsv.gz")
     )
-    if (!all(lapply(X = list(output_neg, output_pos), FUN = file.exists) |> unlist())) {
+    if (!all(furrr::future_map(.x = list(output_neg, output_pos), .f = file.exists) |> unlist())) {
       if (is.null(input)) {
         input <- "fileDoesNotExist"
       }
       if (file.exists(input)) {
         log_debug("Importing")
-        spectra <- lapply(X = input, FUN = import_spectra)
+        spectra <- furrr::future_map(.x = input, .f = import_spectra)
 
         log_debug("Extracting")
-        spectra_extracted <- lapply(X = spectra, FUN = tima:::extract_spectra)
+        spectra_extracted <- furrr::future_map(.x = spectra, .f = tima:::extract_spectra)
         rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")
-        spectra_harmonized_pos <- lapply(
-          X = spectra_extracted,
-          FUN = tima:::harmonize_spectra,
+        spectra_harmonized_pos <- furrr::future_map(
+          .x = spectra_extracted,
+          .f = tima:::harmonize_spectra,
           mode = "pos",
           metad = nam_lib,
           col_ad = col_ad,
@@ -112,15 +112,15 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
-          lapply(
-            FUN = function(x) {
+          furrr::future_map(
+            .f = function(x) {
               x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }
           )
         log_debug("... neg")
-        spectra_harmonized_neg <- lapply(
-          X = spectra_extracted,
-          FUN = tima:::harmonize_spectra,
+        spectra_harmonized_neg <- furrr::future_map(
+          .x = spectra_extracted,
+          .f = tima:::harmonize_spectra,
           mode = "neg",
           metad = nam_lib,
           col_ad = col_ad,
@@ -142,8 +142,8 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
-          lapply(
-            FUN = function(x) {
+          furrr::future_map(
+            .f = function(x) {
               x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }
           )

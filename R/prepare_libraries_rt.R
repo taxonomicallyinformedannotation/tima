@@ -61,37 +61,37 @@ prepare_libraries_rt <-
       }
     }
     mgf_exp <- mgf_exp |>
-      lapply(FUN = full_or_null)
+      furrr::future_map(.f = full_or_null)
     mgf_exp <- mgf_exp[mgf_exp |>
-      lapply(
-        FUN = function(x) {
+      furrr::future_map(
+        .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      lapply(FUN = full_or_null)
+      furrr::future_map(.f = full_or_null)
     mgf_is <- mgf_is[mgf_is |>
-      lapply(
-        FUN = function(x) {
+      furrr::future_map(
+        .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_exp <- mgf_exp |>
-      lapply(FUN = full_or_null)
+      furrr::future_map(.f = full_or_null)
     temp_exp <- temp_exp[temp_exp |>
-      lapply(
-        FUN = function(x) {
+      furrr::future_map(
+        .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      lapply(FUN = full_or_null)
+      furrr::future_map(.f = full_or_null)
     temp_is <- temp_is[temp_is |>
-      lapply(
-        FUN = function(x) {
+      furrr::future_map(
+        .f = function(x) {
           !is.null(x)
         }
       ) |>
@@ -113,10 +113,10 @@ prepare_libraries_rt <-
       function(mgf) {
         log_debug("Importing spectra ...")
         spectra <- mgf |>
-          lapply(FUN = import_spectra)
+          furrr::future_map(.f = import_spectra)
         log_debug("Extracting retention times...")
         rts <- spectra |>
-          lapply(function(x) {
+          furrr::future_map(.f = function(x) {
             x@backend@spectraData |>
               data.frame() |>
               tidytable::as_tidytable()
@@ -134,7 +134,7 @@ prepare_libraries_rt <-
       function(tab) {
         log_debug("Importing file ...")
         rts <- tab |>
-          lapply(FUN = tidytable::fread) |>
+          furrr::future_map(.f = tidytable::fread) |>
           tidytable::bind_rows() |>
           tidytable::select(tidyselect::any_of(
             c(
@@ -190,7 +190,7 @@ prepare_libraries_rt <-
         )
       }
 
-      inchikey <- pbapply::pblapply(X = smiles, FUN = get_inchikey) |>
+      inchikey <- furrr::future_map(.x = smiles, .f = get_inchikey) |>
         as.character()
       df_missing <- df_missing |>
         tidytable::select(-inchikey) |>

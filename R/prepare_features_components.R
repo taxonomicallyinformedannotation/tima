@@ -29,13 +29,13 @@
 prepare_features_components <-
   function(input = get_params(step = "prepare_features_components")$files$networks$spectral$components$raw,
            output = get_params(step = "prepare_features_components")$files$networks$spectral$components$prepared) {
-    stopifnot("Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist()))
+    stopifnot("Input file(s) do(es) not exist" = all(furrr::future_map(.x = input, .f = file.exists) |> unlist()))
 
     log_debug(x = "Loading files ...")
     log_debug(x = "... components table")
-    table <- lapply(
-      X = input,
-      FUN = tidytable::fread,
+    table <- furrr::future_map(
+      .x = input,
+      .f = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>

@@ -53,7 +53,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
-  stopifnot("Library file(s) do(es) not exist" = all(lapply(X = library, FUN = file.exists) |>
+  stopifnot("Library file(s) do(es) not exist" = all(furrr::future_map(.x = library, .f = file.exists) |>
     unlist()))
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -90,15 +90,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
-      lapply(
-        FUN = import_spectra,
+      furrr::future_map(
+        .f = import_spectra,
         cutoff = qutoff,
         dalton = dalton,
         polarity = polarity,
         ppm = ppm,
         sanitize = FALSE
       ) |>
-      lapply(FUN = Spectra::applyProcessing) |>
+      furrr::future_map(.f = Spectra::applyProcessing, BPPARAM = BiocParallel::SerialParam()) |>
       Spectra::concatenateSpectra()
 
     query_precursors <- spectra@backend@spectraData$precursorMz
@@ -147,7 +147,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     lib_id <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_id
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[lapply(X = lib_spectra, FUN = length) != 0]
+    safety <- lib_spectra[furrr::future_map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
       calculate_entropy_score <-
         function(spectra,
@@ -168,15 +168,17 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               indices <- minimal <= precursor & precursor <= maximal
               spectral_lib <- lib_spectra[indices]
 
+              p <- progressr::progressor(along = seq_along(spectral_lib))
               inner_list <-
-                lapply(
-                  X = seq_along(spectral_lib),
-                  FUN = function(index,
-                                 sp = spectrum,
-                                 spectra = query_spectra,
-                                 lib = spectral_lib,
-                                 dalton = daz,
-                                 ppm = ppmz) {
+                furrr::future_map(
+                  .x = seq_along(spectral_lib),
+                  .f = function(index,
+                                sp = spectrum,
+                                spectra = query_spectra,
+                                lib = spectral_lib,
+                                dalton = daz,
+                                ppm = ppmz) {
+                    p()
                     score <- msentropy::calculate_entropy_similarity(
                       peaks_a = spectra[[sp]],
                       peaks_b = lib[[index]],
@@ -218,9 +220,9 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
           log_debug("Performing spectral comparison")
           outer_list <-
-            pbapply::pblapply(
-              X = seq_along(spectra),
-              FUN = function(spectrum, qp = query_precursors) {
+            furrr::future_map(
+              .x = seq_along(spectra),
+              .f = function(spectrum, qp = query_precursors) {
                 precursor <- qp[spectrum]
                 calculate_score_and_create_inner_list(
                   spectrum = spectrum,
@@ -234,6 +236,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                 )
               }
             ) |>
+            progressr::with_progress(enable = TRUE) |>
             tidytable::bind_rows()
 
           return(outer_list)

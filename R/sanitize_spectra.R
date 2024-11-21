@@ -68,8 +68,8 @@ sanitize_spectra <-
 
     # Fix needed as some empty spectra are else not removed
     spectra <- spectra[!spectra@backend@peaksData |>
-      lapply(is.nan) |>
-      lapply(any) |>
+      furrr::future_map(.f = is.nan) |>
+      furrr::future_map(.f = any) |>
       as.character() |>
       as.logical()]
 

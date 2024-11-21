@@ -59,9 +59,9 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     fragz <- spectra@backend@peaksData
 
     edges <-
-      pbapply::pblapply(
-        X = 1:(nspecz - 1),
-        FUN = tima:::create_edges,
+      furrr::future_map(
+        .x = 1:(nspecz - 1),
+        .f = tima:::create_edges,
         frags = fragz,
         precs = precz,
         nspecs = nspecz,
@@ -69,20 +69,21 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
         ppm_tolerance = ppm,
         threshold = threshold
       ) |>
+      progressr::with_progress(enable = TRUE) |>
       tidytable::bind_rows()
     rm(precz)
 
     log_debug("Calculating features' entropy")
-    entropy <- pbapply::pblapply(
-      X = seq_along(1:nspecz),
-      FUN = function(x, peaks = fragz) {
+    entropy <- furrr::future_map(
+      .x = seq_along(1:nspecz),
+      .f = function(x, peaks = fragz) {
         return(peaks[[x]] |> msentropy::calculate_spectral_entropy())
       }
     )
     log_debug("Calculating features' number of peaks")
-    npeaks <- pbapply::pblapply(
-      X = seq_along(1:nspecz),
-      FUN = function(x, peaks = fragz) {
+    npeaks <- furrr::future_map(
+      .x = seq_along(1:nspecz),
+      .f = function(x, peaks = fragz) {
         return(peaks[[x]] |> length())
       }
     )

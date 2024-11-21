@@ -35,12 +35,12 @@ prepare_annotations_gnps <-
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
     }
-    if (all(lapply(X = input, FUN = file.exists) |> unlist())) {
+    if (all(furrr::future_map(.x = input, .f = file.exists) |> unlist())) {
       log_debug("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-      table <- lapply(
-        X = input,
-        FUN = tidytable::fread,
+      table <- furrr::future_map(
+        .x = input,
+        .f = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>
