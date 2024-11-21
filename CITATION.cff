@@ -104,6 +104,31 @@ references:
   year: '2024'
   version: '>= 4.3.0'
 - type: software
+  title: BiocParallel
+  abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
+  notes: Imports
+  url: https://github.com/Bioconductor/BiocParallel
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Morgan
+    given-names: Martin
+    email: mtmorgan.bioc@gmail.com
+  - family-names: Wang
+    given-names: Jiefei
+  - family-names: Obenchain
+    given-names: Valerie
+  - family-names: Lang
+    given-names: Michel
+    email: michellang@gmail.com
+  - family-names: Thompson
+    given-names: Ryan
+    email: rct@thompsonclan.org
+  - family-names: Turaga
+    given-names: Nitesh
+  year: '2024'
+  doi: 10.18129/B9.bioc.BiocParallel
+  version: '>= 1.36.0'
+- type: software
   title: crayon
   abstract: 'crayon: Colored Terminal Output'
   notes: Imports
