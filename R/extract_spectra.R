@@ -24,10 +24,10 @@ extract_spectra <- function(object) {
     tidytable::as_tidytable()
 
   ## Add 'mz' and 'intensity' columns from peaks data
-  spectra$mz <- lapply(object@backend@peaksData, function(peakData) {
+  spectra$mz <- furrr::future_map(.x = object@backend@peaksData, .f = function(peakData) {
     peakData[, 1]
   })
-  spectra$intensity <- lapply(object@backend@peaksData, function(peakData) {
+  spectra$intensity <- furrr::future_map(.x = object@backend@peaksData, .f = function(peakData) {
     peakData[, 2]
   })
 

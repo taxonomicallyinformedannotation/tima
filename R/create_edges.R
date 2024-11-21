@@ -23,10 +23,12 @@ create_edges <- function(index,
                          ms2_tolerance,
                          ppm_tolerance,
                          threshold) {
-  # Calculate the similarity using lapply
+  p <- progressr::progressor(along = (index + 1):nspecs)
+  # Calculate the similarity
   inner_list <- (index + 1):nspecs |>
-    lapply(
-      FUN = function(target) {
+    furrr::future_map(
+      .f = function(target) {
+        p()
         tima:::calculate_entropy(
           index,
           target,

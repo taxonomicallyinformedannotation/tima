@@ -122,9 +122,9 @@ prepare_annotations_sirius <-
         ) |>
         gsub(pattern = "^/", replacement = "")
 
-      structures_summary <- lapply(
-        X = summary_files,
-        FUN = tima:::read_from_sirius_zip,
+      structures_summary <- furrr::future_map(
+        .x = summary_files,
+        .f = tima:::read_from_sirius_zip,
         sirius_zip = input_directory
       )
 
@@ -133,7 +133,7 @@ prepare_annotations_sirius <-
         tima:::harmonize_names_sirius()
 
       structures_summary <-
-        structures_summary[lapply(structures_summary, nrow) > 0]
+        structures_summary[furrr::future_map(.x = structures_summary, .f = nrow) > 0]
 
       # Allow for summaries only
       if (length(structures_summary) != 0) {

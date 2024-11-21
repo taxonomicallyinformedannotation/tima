@@ -15,6 +15,7 @@
 * Replaced internal functions by `Spectra` equivalents (#166)
 * Shinylive version available at <https://taxonomicallyinformedannotation.github.io/tima-shinylive>
 * Simplified install and vignettes
+* Switched from `base::lapply` to `furrr::future_map`
 
 # tima 2.10.0
 

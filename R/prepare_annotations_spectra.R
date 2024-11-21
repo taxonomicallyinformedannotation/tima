@@ -52,12 +52,12 @@ prepare_annotations_spectra <-
            str_nam = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,
            str_tax_cla = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
            str_tax_npc = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$npc) {
-    stopifnot("Input file(s) do(es) not exist" = all(lapply(X = input, FUN = file.exists) |> unlist()))
+    stopifnot("Input file(s) do(es) not exist" = all(furrr::future_map(.x = input, .f = file.exists) |> unlist()))
     log_debug(x = "Loading and formatting spectral matches")
     table <-
-      lapply(
-        X = input,
-        FUN = tidytable::fread,
+      furrr::future_map(
+        .x = input,
+        .f = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"
       ) |>

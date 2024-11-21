@@ -55,7 +55,6 @@ They will then be saved as YAML you will be able to share.
 To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
 Each step of the whole pipeline will be described next.
 
-
 ```{r chunk-1, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 library(targets)
 Sys.setenv(TAR_WARN = "false")
@@ -97,6 +96,11 @@ tima::get_example_files()
 ```
 
 We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
+
+## A note about parallelization
+
+This package uses `{furrr}` from the [futureverse](https://www.futureverse.org/).
+If you think you could benefit from parallelization, have a look at <https://future.futureverse.org/reference/plan.html> to see how to set it up.
 
 ### tl;dr
 

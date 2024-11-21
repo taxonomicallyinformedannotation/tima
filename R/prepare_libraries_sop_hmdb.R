@@ -62,8 +62,8 @@ prepare_libraries_sop_hmdb <-
           )
 
           hmdb_df <- patterns |>
-            lapply(FUN = find_fixed_pattern_line_in_file, file = sdf_data) |>
-            lapply(FUN = return_next_line, file = sdf_data) |>
+            furrr::future_map(.f = find_fixed_pattern_line_in_file, file = sdf_data) |>
+            furrr::future_map(.f = return_next_line, file = sdf_data) |>
             data.frame()
 
           log_debug(x = "Formatting HMDB...")
