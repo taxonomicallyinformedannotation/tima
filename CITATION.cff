@@ -190,6 +190,22 @@ references:
   doi: 10.32614/CRAN.package.fs
   version: '>= 1.6.4'
 - type: software
+  title: furrr
+  abstract: 'furrr: Apply Mapping Functions in Parallel using Futures'
+  notes: Imports
+  url: https://furrr.futureverse.org/
+  repository: https://CRAN.R-project.org/package=furrr
+  authors:
+  - family-names: Vaughan
+    given-names: Davis
+    email: davis@rstudio.com
+  - family-names: Dancho
+    given-names: Matt
+    email: mdancho@business-science.io
+  year: '2024'
+  doi: 10.32614/CRAN.package.furrr
+  version: '>= 0.3.1'
+- type: software
   title: gt
   abstract: 'gt: Easily Create Presentation-Ready Display Tables'
   notes: Imports
@@ -390,22 +406,19 @@ references:
   doi: 10.32614/CRAN.package.msentropy
   version: '>= 0.1.4'
 - type: software
-  title: pbapply
-  abstract: 'pbapply: Adding Progress Bar to ''*apply'' Functions'
+  title: progressr
+  abstract: 'progressr: An Inclusive, Unifying API for Progress Updates'
   notes: Imports
-  url: https://github.com/psolymos/pbapply
-  repository: https://CRAN.R-project.org/package=pbapply
+  url: https://progressr.futureverse.org
+  repository: https://CRAN.R-project.org/package=progressr
   authors:
-  - family-names: Solymos
-    given-names: Peter
-    email: psolymos@gmail.com
-    orcid: https://orcid.org/0000-0001-7337-1740
-  - family-names: Zawadzki
-    given-names: Zygmunt
-    email: zygmunt@zstat.pl
+  - family-names: Bengtsson
+    given-names: Henrik
+    email: henrikb@braju.com
+    orcid: https://orcid.org/0000-0002-7579-5165
   year: '2024'
-  doi: 10.32614/CRAN.package.pbapply
-  version: '>= 1.7.2'
+  doi: 10.32614/CRAN.package.progressr
+  version: '>= 0.15.0'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
