@@ -20,10 +20,6 @@ authors:
   given-names: Adriano
   email: adafede@gmail.com
   orcid: https://orcid.org/0000-0003-0443-9902
-- family-names: Allard
-  given-names: Pierre-Marie
-  email: pierre-marie.allard@unifr.ch
-  orcid: https://orcid.org/0000-0003-3389-2191
 preferred-citation:
   type: manual
   title: 'tima: Taxonomically Informed Metabolite Annotation'
