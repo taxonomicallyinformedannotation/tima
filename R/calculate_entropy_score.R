@@ -29,6 +29,7 @@ calculate_entropy_score <- function(lib_ids,
                                     approx) {
   p <- progressr::progressor(along = seq_along(query_spectra))
   results <- furrr::future_map(
+    .options = furrr::furrr_options(seed = TRUE),
     .x = seq_along(query_spectra),
     .f = function(spectrum_idx) {
       p()
@@ -89,14 +90,18 @@ calculate_entropy_score <- function(lib_ids,
         if (any(similarities[1, ] >= threshold)) {
           valid_indices <- which(similarities[1, ] >= threshold)
 
-          tidytable::tidytable(
-            feature_id = current_id,
-            precursorMz = current_precursor,
-            target_id = filtered_lib_ids[valid_indices],
-            candidate_spectrum_entropy = similarities[2, valid_indices],
-            candidate_score_similarity = similarities[1, valid_indices],
-            candidate_count_similarity_peaks_matched = similarities[3, valid_indices]
-          )
+          if (length(valid_indices) > 0) {
+            tidytable::tidytable(
+              feature_id = current_id,
+              precursorMz = current_precursor,
+              target_id = filtered_lib_ids[valid_indices],
+              candidate_spectrum_entropy = similarities[2, valid_indices],
+              candidate_score_similarity = similarities[1, valid_indices],
+              candidate_count_similarity_peaks_matched = similarities[3, valid_indices]
+            )
+          } else {
+            NULL
+          }
         } else {
           NULL
         }
@@ -106,5 +111,16 @@ calculate_entropy_score <- function(lib_ids,
     }
   )
 
-  tidytable::bind_rows(results[!sapply(results, is.null)])
+  if (all(sapply(results, is.null))) {
+    tidytable::tidytable(
+      feature_id = NA_integer_,
+      precursorMz = NA_complex_,
+      target_id = NA_integer_,
+      candidate_spectrum_entropy = NA_complex_,
+      candidate_score_similarity = NA_complex_,
+      candidate_count_similarity_peaks_matched = NA_integer_,
+    )
+  } else {
+    tidytable::bind_rows(results[!sapply(results, is.null)])
+  }
 }
