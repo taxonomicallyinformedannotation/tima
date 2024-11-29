@@ -236,7 +236,6 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                 )
               }
             ) |>
-            progressr::with_progress(enable = TRUE) |>
             tidytable::bind_rows()
 
           return(outer_list)
