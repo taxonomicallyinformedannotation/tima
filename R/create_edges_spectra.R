@@ -55,23 +55,16 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
       expect a (relatively) long processing time.")
     log_debug("Take yourself a break, you deserve it.")
     nspecz <- length(spectra)
-    precz <- spectra$precursorMz
     fragz <- spectra@backend@peaksData
 
-    edges <-
-      furrr::future_map(
-        .x = 1:(nspecz - 1),
-        .f = tima:::create_edges,
-        frags = fragz,
-        precs = precz,
-        nspecs = nspecz,
-        ms2_tolerance = dalton,
-        ppm_tolerance = ppm,
-        threshold = threshold
-      ) |>
-      progressr::with_progress(enable = TRUE) |>
-      tidytable::bind_rows()
-    rm(precz)
+    edges <- create_edges(
+      frags = fragz,
+      nspecs = nspecz,
+      ms2_tolerance = dalton,
+      ppm_tolerance = ppm,
+      threshold = threshold
+    ) |>
+      progressr::with_progress(enable = TRUE)
 
     log_debug("Calculating features' entropy")
     entropy <- furrr::future_map(
