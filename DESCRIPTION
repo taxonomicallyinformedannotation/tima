@@ -95,7 +95,6 @@ Collate:
     'import_spectra.R'
     'annotate_spectra.R'
     'benchmark_taxize_spectra.R'
-    'calculate_entropy.R'
     'load_yaml_files.R'
     'go_to_cache.R'
     'create_dir.R'
