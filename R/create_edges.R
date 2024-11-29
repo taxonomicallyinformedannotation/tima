@@ -30,8 +30,8 @@ create_edges <- function(frags,
         target_indices,
         function(target) {
           msentropy::calculate_entropy_similarity(
-            frags[[index]],
-            frags[[target]],
+            peaks_a = frags[[index]],
+            peaks_b = frags[[target]],
             min_mz = 0,
             max_mz = 5000,
             noise_threshold = 0,
