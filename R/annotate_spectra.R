@@ -174,7 +174,6 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
           threshold = threshold,
           approx = approx
         ) |>
-        progressr::with_progress() |>
         tidytable::as_tidytable()
 
       lib_adduct <- spectral_library@backend@spectraData$adduct
