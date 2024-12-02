@@ -64,7 +64,7 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
       ppm_tolerance = ppm,
       threshold = threshold
     ) |>
-      progressr::with_progress(enable = TRUE)
+      progressr::with_progress()
 
     log_debug("Calculating features' entropy")
     entropy <- furrr::future_map(
