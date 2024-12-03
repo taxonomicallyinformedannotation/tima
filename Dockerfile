@@ -1,4 +1,4 @@
-FROM bioconductor/bioconductor_docker:3.19-R-4.4.0
+FROM bioconductor/bioconductor_docker:3.20-R-4.4.2
 
 # Add a non-root user and create the R library directory
 RUN useradd -m tima-user && \
