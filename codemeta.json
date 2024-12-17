@@ -581,7 +581,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2390.11KB",
+  "fileSize": "2390.008KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
