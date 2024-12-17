@@ -252,6 +252,7 @@
       "@type": "SoftwareApplication",
       "identifier": "DT",
       "name": "DT",
+      "version": ">= 0.33",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -264,7 +265,7 @@
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
-      "version": ">= 1.6.4",
+      "version": ">= 1.6.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -290,6 +291,7 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
+      "version": ">= 0.11.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -315,7 +317,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.0.5",
+      "version": ">= 1.0.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -328,7 +330,7 @@
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
-      "version": ">= 2.0.3",
+      "version": ">= 2.1.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -406,7 +408,7 @@
       "@type": "SoftwareApplication",
       "identifier": "progressr",
       "name": "progressr",
-      "version": ">= 0.15.0",
+      "version": ">= 0.15.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -432,7 +434,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
-      "version": ">= 1.9.1",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -445,6 +447,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
+      "version": ">= 0.3.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -457,6 +460,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
+      "version": ">= 0.8.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -500,7 +504,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.8.0",
+      "version": ">= 1.9.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -539,7 +543,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
-      "version": ">= 0.11.1",
+      "version": ">= 0.11.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -557,6 +561,7 @@
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
+      "version": ">= 2.1.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -581,7 +586,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2390.008KB",
+  "fileSize": "2390.064KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
