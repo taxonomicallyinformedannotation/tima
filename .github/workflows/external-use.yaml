@@ -46,7 +46,7 @@ jobs:
           && sudo rm -rf /var/lib/apt/lists/*
       - name: Install
         run: |
-          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"))
+          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type = "binary")
           tima::install()
         shell: Rscript {0}
       - name: Get example files
