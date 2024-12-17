@@ -200,6 +200,7 @@ references:
     given-names: Xianying
   year: '2024'
   doi: 10.32614/CRAN.package.DT
+  version: '>= 0.33'
 - type: software
   title: fs
   abstract: 'fs: Cross-Platform File System Operations Based on ''libuv'''
@@ -217,7 +218,7 @@ references:
     email: csardi.gabor@gmail.com
   year: '2024'
   doi: 10.32614/CRAN.package.fs
-  version: '>= 1.6.4'
+  version: '>= 1.6.5'
 - type: software
   title: furrr
   abstract: 'furrr: Apply Mapping Functions in Parallel using Futures'
@@ -272,6 +273,7 @@ references:
     given-names: Olivier
   year: '2024'
   doi: 10.32614/CRAN.package.gt
+  version: '>= 0.11.1'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
@@ -297,7 +299,7 @@ references:
     email: hadley@posit.co
   year: '2024'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.0.5'
+  version: '>= 1.0.7'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -332,7 +334,7 @@ references:
     orcid: https://orcid.org/0000-0002-1416-3412
   year: '2024'
   doi: 10.32614/CRAN.package.igraph
-  version: '>= 2.0.3'
+  version: '>= 2.1.2'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
@@ -447,7 +449,7 @@ references:
     orcid: https://orcid.org/0000-0002-7579-5165
   year: '2024'
   doi: 10.32614/CRAN.package.progressr
-  version: '>= 0.15.0'
+  version: '>= 0.15.1'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -507,7 +509,7 @@ references:
     given-names: Barbara
   year: '2024'
   doi: 10.32614/CRAN.package.shiny
-  version: '>= 1.9.1'
+  version: '>= 1.10.0'
 - type: software
   title: shinybusy
   abstract: 'shinybusy: Busy Indicators and Notifications for ''Shiny'' Applications'
@@ -522,6 +524,7 @@ references:
     email: victor.perrier@dreamrs.fr
   year: '2024'
   doi: 10.32614/CRAN.package.shinybusy
+  version: '>= 0.3.3'
 - type: software
   title: shinyWidgets
   abstract: 'shinyWidgets: Custom Inputs Widgets for Shiny'
@@ -538,6 +541,7 @@ references:
     given-names: David
   year: '2024'
   doi: 10.32614/CRAN.package.shinyWidgets
+  version: '>= 0.8.7'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
@@ -606,7 +610,7 @@ references:
     orcid: https://orcid.org/0000-0003-1878-3253
   year: '2024'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.8.0'
+  version: '>= 1.9.1'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
@@ -649,7 +653,7 @@ references:
     email: mark.t.fairbanks@gmail.com
   year: '2024'
   doi: 10.32614/CRAN.package.tidytable
-  version: '>= 0.11.1'
+  version: '>= 0.11.2'
 - type: software
   title: utils
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -674,6 +678,7 @@ references:
     email: bthieurmel@gmail.com
   year: '2024'
   doi: 10.32614/CRAN.package.visNetwork
+  version: '>= 2.1.2'
 - type: software
   title: yaml
   abstract: 'yaml: Methods to Convert R Data to YAML and Back'
