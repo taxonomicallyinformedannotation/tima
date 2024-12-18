@@ -34,10 +34,10 @@ prepare_features_edges <-
            output = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$prepared,
            name_source = get_params(step = "prepare_features_edges")$names$source,
            name_target = get_params(step = "prepare_features_edges")$names$target) {
-    stopifnot("Your input file(s) do(es) not exist" = all(furrr::future_map(.x = input, .f = file.exists) |> unlist()))
+    stopifnot("Your input file(s) do(es) not exist" = all(purrr::map(.x = input, .f = file.exists) |> unlist()))
     ## Load edges table
     log_debug(x = "Loading edge table")
-    edges_tables <- furrr::future_map(
+    edges_tables <- purrr::map(
       .x = input,
       .f = tidytable::fread,
       na.strings = c("", "NA"),

@@ -61,36 +61,36 @@ prepare_libraries_rt <-
       }
     }
     mgf_exp <- mgf_exp |>
-      furrr::future_map(.f = full_or_null)
+      purrr::map(.f = full_or_null)
     mgf_exp <- mgf_exp[mgf_exp |>
-      furrr::future_map(
+      purrr::map(
         .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      furrr::future_map(.f = full_or_null)
+      purrr::map(.f = full_or_null)
     mgf_is <- mgf_is[mgf_is |>
-      furrr::future_map(
+      purrr::map(
         .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_exp <- mgf_exp |>
-      furrr::future_map(.f = full_or_null)
+      purrr::map(.f = full_or_null)
     temp_exp <- temp_exp[temp_exp |>
-      furrr::future_map(
+      purrr::map(
         .f = function(x) {
           !is.null(x)
         }
       ) |>
       unlist()]
     mgf_is <- mgf_is |>
-      furrr::future_map(.f = full_or_null)
+      purrr::map(.f = full_or_null)
     temp_is <- temp_is[temp_is |>
-      furrr::future_map(
+      purrr::map(
         .f = function(x) {
           !is.null(x)
         }
@@ -113,10 +113,10 @@ prepare_libraries_rt <-
       function(mgf) {
         log_debug("Importing spectra ...")
         spectra <- mgf |>
-          furrr::future_map(.f = import_spectra)
+          purrr::map(.f = import_spectra)
         log_debug("Extracting retention times...")
         rts <- spectra |>
-          furrr::future_map(.f = function(x) {
+          purrr::map(.f = function(x) {
             x@backend@spectraData |>
               data.frame() |>
               tidytable::as_tidytable()
@@ -134,7 +134,7 @@ prepare_libraries_rt <-
       function(tab) {
         log_debug("Importing file ...")
         rts <- tab |>
-          furrr::future_map(.f = tidytable::fread) |>
+          purrr::map(.f = tidytable::fread) |>
           tidytable::bind_rows() |>
           tidytable::select(tidyselect::any_of(
             c(
@@ -190,7 +190,7 @@ prepare_libraries_rt <-
         )
       }
 
-      inchikey <- furrr::future_map(.x = smiles, .f = get_inchikey) |>
+      inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |>
         as.character()
       df_missing <- df_missing |>
         tidytable::select(-inchikey) |>

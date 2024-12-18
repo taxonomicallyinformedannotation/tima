@@ -219,7 +219,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
                                summarise = get_params(step = "weight_annotations")$options$summarise,
                                pattern = get_params(step = "weight_annotations")$files$pattern,
                                force = get_params(step = "weight_annotations")$options$force) {
-  stopifnot("Annotations file(s) do(es) not exist" = all(furrr::future_map(.x = annotations, .f = file.exists) |> unlist()))
+  stopifnot("Annotations file(s) do(es) not exist" = all(purrr::map(.x = annotations, .f = file.exists) |> unlist()))
   stopifnot("Your library file does not exist." = file.exists(library))
   stopifnot("Your components file does not exist." = file.exists(components))
   stopifnot("Your edges file does not exist." = file.exists(edges))
@@ -279,7 +279,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     )
 
   log_debug(x = "... annotations")
-  annotation_table <- furrr::future_map(
+  annotation_table <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
     na.strings = c("", "NA"),

@@ -94,7 +94,7 @@ prepare_libraries_sop_merged <-
 
     log_debug(x = "Loading and concatenating prepared libraries")
     libraries <- files |>
-      furrr::future_map(
+      purrr::map(
         .f = tidytable::fread,
         na.strings = c("", "NA"),
         colClasses = "character"

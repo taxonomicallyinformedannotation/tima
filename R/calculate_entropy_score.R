@@ -27,12 +27,9 @@ calculate_entropy_score <- function(lib_ids,
                                     ppm,
                                     threshold,
                                     approx) {
-  p <- progressr::progressor(along = seq_along(query_spectra))
-  results <- furrr::future_map(
-    .options = furrr::furrr_options(seed = TRUE),
+  results <- purrr::map(
     .x = seq_along(query_spectra),
     .f = function(spectrum_idx) {
-      p()
       current_spectrum <- query_spectra[[spectrum_idx]]
       current_precursor <- query_precursors[spectrum_idx]
       current_id <- query_ids[spectrum_idx]

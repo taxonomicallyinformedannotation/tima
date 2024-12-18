@@ -97,11 +97,6 @@ tima::get_example_files()
 
 We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
 
-## A note about parallelization
-
-This package uses `{furrr}` from the [futureverse](https://www.futureverse.org/).
-If you think you could benefit from parallelization, have a look at <https://future.futureverse.org/reference/plan.html> to see how to set it up.
-
 ### tl;dr
 
 If you do not feel like going through all the steps, then just do 🚀:

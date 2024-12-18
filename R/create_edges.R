@@ -18,13 +18,12 @@ create_edges <- function(frags,
                          ppm_tolerance,
                          threshold) {
   indices <- 1:(nspecs - 1)
-  p <- progressr::progressor(along = indices)
 
-  edges <- furrr::future_map(
+  edges <- purrr::map(
+    .progress = TRUE,
     .x = indices,
     .f = function(index) {
       target_indices <- (index + 1):nspecs
-      p()
 
       scores <- vapply(
         target_indices,

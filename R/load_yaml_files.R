@@ -49,7 +49,7 @@ load_yaml_files <- function() {
       fixed = TRUE
     )
 
-  yamls_default <- furrr::future_map(.x = yaml_files, .f = yaml::read_yaml)
+  yamls_default <- purrr::map(.x = yaml_files, .f = yaml::read_yaml)
 
   names(yamls_default) <- yaml_names
 
