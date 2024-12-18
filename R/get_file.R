@@ -56,7 +56,7 @@ get_file <-
         return(FALSE)
       }
       if (!download_with_retry(url = url, destfile = export)) {
-        message("Failed to download the file after multiple attempts.")
+        stop("Failed to download the file after multiple attempts.")
       }
     } else {
       message("File already exists. Skipping.")
