@@ -55,8 +55,8 @@ filter_annotations <-
            rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
            output = get_params(step = "filter_annotations")$files$annotations$filtered,
            tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$library) {
-    stopifnot("Annotations file(s) do(es) not exist" = all(furrr::future_map(.x = annotations, .f = file.exists) |> unlist()))
-    stopifnot("Retention time file(s) do(es) not exist" = all(furrr::future_map(.x = rts, .f = file.exists) |> unlist()))
+    stopifnot("Annotations file(s) do(es) not exist" = all(purrr::map(.x = annotations, .f = file.exists) |> unlist()))
+    stopifnot("Retention time file(s) do(es) not exist" = all(purrr::map(.x = rts, .f = file.exists) |> unlist()))
     stopifnot("Your features file does not exist." = file.exists(features))
 
     if (length(rts) == 0) {
@@ -70,7 +70,7 @@ filter_annotations <-
       na.strings = c("", "NA")
     )
     log_debug(x = "... annotations")
-    annotation_table <- furrr::future_map(
+    annotation_table <- purrr::map(
       .x = annotations,
       .f = tidytable::fread,
       na.strings = c("", "NA"),
@@ -79,7 +79,7 @@ filter_annotations <-
       tidytable::bind_rows()
     log_debug(x = "... retention times")
     if (!is.null(rts)) {
-      rt_table <- furrr::future_map(
+      rt_table <- purrr::map(
         .x = rts,
         .f = tidytable::fread,
         na.strings = c("", "NA"),

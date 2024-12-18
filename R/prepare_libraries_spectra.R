@@ -74,21 +74,21 @@ prepare_libraries_spectra <-
       get_default_paths()$data$interim$libraries$sop$path,
       paste0("spectral_prepared.tsv.gz")
     )
-    if (!all(furrr::future_map(.x = list(output_neg, output_pos), .f = file.exists) |> unlist())) {
+    if (!all(purrr::map(.x = list(output_neg, output_pos), .f = file.exists) |> unlist())) {
       if (is.null(input)) {
         input <- "fileDoesNotExist"
       }
       if (file.exists(input)) {
         log_debug("Importing")
-        spectra <- furrr::future_map(.x = input, .f = import_spectra)
+        spectra <- purrr::map(.x = input, .f = import_spectra)
 
         log_debug("Extracting")
-        spectra_extracted <- furrr::future_map(.x = spectra, .f = tima:::extract_spectra)
+        spectra_extracted <- purrr::map(.x = spectra, .f = tima:::extract_spectra)
         rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")
-        spectra_harmonized_pos <- furrr::future_map(
+        spectra_harmonized_pos <- purrr::map(
           .x = spectra_extracted,
           .f = tima:::harmonize_spectra,
           mode = "pos",
@@ -112,13 +112,13 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
-          furrr::future_map(
+          purrr::map(
             .f = function(x) {
               x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }
           )
         log_debug("... neg")
-        spectra_harmonized_neg <- furrr::future_map(
+        spectra_harmonized_neg <- purrr::map(
           .x = spectra_extracted,
           .f = tima:::harmonize_spectra,
           mode = "neg",
@@ -142,7 +142,7 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           ## TODO report the issue as otherwise precursorMz is lost
-          furrr::future_map(
+          purrr::map(
             .f = function(x) {
               x <- x |> tidytable::rename(precursor_mz = precursorMz)
             }

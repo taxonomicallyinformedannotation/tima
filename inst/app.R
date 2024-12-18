@@ -2219,7 +2219,7 @@ server <- function(input, output, session) {
   iv$add_rule("org_tax", function(taxon) {
     if (any(is.na(
       stringi::stri_split_fixed(str = taxon, pattern = "|") |>
-        furrr::future_map(
+        purrr::map(
           .f = function(taxon) {
             rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id
           }

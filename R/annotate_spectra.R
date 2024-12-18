@@ -53,7 +53,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
-  stopifnot("Library file(s) do(es) not exist" = all(furrr::future_map(.x = library, .f = file.exists) |>
+  stopifnot("Library file(s) do(es) not exist" = all(purrr::map(.x = library, .f = file.exists) |>
     unlist()))
 
   ## Not checking for ppm and Da limits, everyone is free.
@@ -90,7 +90,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
   if (length(spectra) > 0) {
     log_debug("Loading spectral library")
     spectral_library <- unlist(library) |>
-      furrr::future_map(
+      purrr::map(
         .f = import_spectra,
         cutoff = qutoff,
         dalton = dalton,
@@ -98,7 +98,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         ppm = ppm,
         sanitize = FALSE
       ) |>
-      furrr::future_map(
+      purrr::map(
         .f = Spectra::applyProcessing,
         BPPARAM = BiocParallel::SerialParam()
       ) |>
@@ -158,7 +158,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     lib_ids <- seq_along(spectral_library)
     spectral_library$spectrum_id <- lib_ids
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[furrr::future_map(.x = lib_spectra, .f = length) != 0]
+    safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
       log_debug("Annotating...")
       df_final <-

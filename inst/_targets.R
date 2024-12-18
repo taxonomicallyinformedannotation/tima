@@ -1906,7 +1906,7 @@ list(
           adduct = sp_clean$ADDUCT,
           inchikey = sp_clean$INCHIKEY,
           instrument = sp_clean$INSTRUMENT_TYPE,
-          fragments = furrr::future_map(.x = sp_clean@backend@peaksData, .f = length) |>
+          fragments = purrr::map(.x = sp_clean@backend@peaksData, .f = length) |>
             as.character() |>
             as.numeric() / 2,
           precursorMz = sp_clean$precursorMz,
