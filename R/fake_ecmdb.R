@@ -31,7 +31,8 @@ fake_ecmdb <- function(export) {
     "}]"
   ) |>
     writeLines(fake_export)
-  system(paste("zip", export, fake_export))
+  system(paste("zip", basename(export), fake_export))
+  system(paste("mv", basename(export), export))
   unlink(fake_export)
   return(export)
 }
