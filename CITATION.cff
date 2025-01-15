@@ -105,7 +105,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2024'
+  year: '2025'
   version: '>= 4.3.0'
 - type: software
   title: BiocParallel
@@ -129,7 +129,7 @@ references:
     email: rct@thompsonclan.org
   - family-names: Turaga
     given-names: Nitesh
-  year: '2024'
+  year: '2025'
   doi: 10.18129/B9.bioc.BiocParallel
   version: '>= 1.36.0'
 - type: software
@@ -142,7 +142,7 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.crayon
   version: '>= 1.5.3'
 - type: software
@@ -155,7 +155,7 @@ references:
   - family-names: Jonge
     given-names: Edwin
     name-particle: de
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.docopt
   version: '>= 0.7.1'
 - type: software
@@ -181,7 +181,7 @@ references:
     given-names: Davis
     email: davis@posit.co
     orcid: https://orcid.org/0000-0003-4777-038X
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.dplyr
   version: '>= 1.1.4'
 - type: software
@@ -198,7 +198,7 @@ references:
     email: joe@posit.co
   - family-names: Tan
     given-names: Xianying
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.DT
   version: '>= 0.33'
 - type: software
@@ -216,7 +216,7 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.fs
   version: '>= 1.6.5'
 - type: software
@@ -255,7 +255,7 @@ references:
     orcid: https://orcid.org/0000-0002-4001-8358
   - family-names: Roy
     given-names: Olivier
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.gt
   version: '>= 0.11.1'
 - type: software
@@ -268,7 +268,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.httr
   version: '>= 1.4.7'
 - type: software
@@ -281,7 +281,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.httr2
   version: '>= 1.0.7'
 - type: software
@@ -316,7 +316,7 @@ references:
     given-names: Kirill
     email: kirill@cynkra.com
     orcid: https://orcid.org/0000-0002-1416-3412
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.igraph
   version: '>= 2.1.2'
 - type: software
@@ -330,7 +330,7 @@ references:
     given-names: Jeroen
     email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.jsonlite
   version: '>= 1.8.9'
 - type: software
@@ -363,7 +363,7 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2024'
+  year: '2025'
   doi: 10.18129/B9.bioc.MetaboCoreUtils
   version: '>= 1.10.0'
 - type: software
@@ -386,7 +386,7 @@ references:
     given-names: Sebastian
     email: mail@sebastiangibb.de
     orcid: https://orcid.org/0000-0001-7406-4443
-  year: '2024'
+  year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMgf
   version: '>= 1.10.0'
 - type: software
@@ -404,7 +404,7 @@ references:
     given-names: Johannes
     email: Johannes.Rainer@eurac.edu
     orcid: https://orcid.org/0000-0002-6977-7147
-  year: '2024'
+  year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMsp
   version: '>= 1.6.0'
 - type: software
@@ -417,7 +417,7 @@ references:
   - family-names: Li
     given-names: Yuanyue
     email: liyuanyue@gmail.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.msentropy
   version: '>= 0.1.4'
 - type: software
@@ -434,7 +434,7 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@rstudio.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.purrr
   version: '>= 1.0.2'
 - type: software
@@ -454,7 +454,7 @@ references:
   - family-names: Winter
     given-names: David
     orcid: https://orcid.org/0000-0002-6165-0029
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.rotl
   version: '>= 3.1.0'
 - type: software
@@ -494,7 +494,7 @@ references:
     given-names: Alan
   - family-names: Borges
     given-names: Barbara
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shiny
   version: '>= 1.10.0'
 - type: software
@@ -509,7 +509,7 @@ references:
   - family-names: Perrier
     given-names: Victor
     email: victor.perrier@dreamrs.fr
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinybusy
   version: '>= 0.3.3'
 - type: software
@@ -526,7 +526,7 @@ references:
     given-names: Fanny
   - family-names: Granjon
     given-names: David
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinyWidgets
   version: '>= 0.8.7'
 - type: software
@@ -552,7 +552,7 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2024'
+  year: '2025'
   doi: 10.18129/B9.bioc.Spectra
   version: '>= 1.12.0'
 - type: software
@@ -564,7 +564,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2024'
+  year: '2025'
 - type: software
   title: stringi
   abstract: 'stringi: Fast and Portable Character String Processing Facilities'
@@ -581,7 +581,7 @@ references:
     given-names: others;
   - name: Inc.
   - name: others
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.stringi
   version: '>= 1.8.4'
 - type: software
@@ -595,9 +595,9 @@ references:
     given-names: William Michael
     email: will.landau.oss@gmail.com
     orcid: https://orcid.org/0000-0003-1878-3253
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.9.1'
+  version: '>= 1.10.0'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
@@ -609,7 +609,7 @@ references:
     given-names: Tian-Yuan
     email: huang.tian-yuan@qq.com
     orcid: https://orcid.org/0000-0002-4151-3764
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.tidyfst
   version: '>= 1.8.1'
 - type: software
@@ -625,7 +625,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.tidyselect
   version: '>= 1.2.1'
 - type: software
@@ -638,9 +638,9 @@ references:
   - family-names: Fairbanks
     given-names: Mark
     email: mark.t.fairbanks@gmail.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.tidytable
-  version: '>= 0.11.1'
+  version: '>= 0.11.2'
 - type: software
   title: utils
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -650,7 +650,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2024'
+  year: '2025'
 - type: software
   title: visNetwork
   abstract: 'visNetwork: Network Visualization using ''vis.js'' Library'
@@ -663,7 +663,7 @@ references:
   - family-names: Thieurmel
     given-names: Benoit
     email: bthieurmel@gmail.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.visNetwork
   version: '>= 2.1.2'
 - type: software
@@ -700,7 +700,7 @@ references:
     given-names: Zhian N.
   - family-names: Gao
     given-names: Charlie
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.yaml
   version: '>= 2.3.10'
 - type: software
@@ -718,7 +718,7 @@ references:
     given-names: Marcel
     email: marcel.ramos@sph.cuny.edu
     orcid: https://orcid.org/0000-0002-3242-0582
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.BiocManager
 - type: software
   title: knitr
@@ -731,7 +731,7 @@ references:
     given-names: Yihui
     email: xie@yihui.name
     orcid: https://orcid.org/0000-0003-0645-5666
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.knitr
 - type: software
   title: lifecycle
@@ -747,7 +747,7 @@ references:
     given-names: Hadley
     email: hadley@posit.co
     orcid: https://orcid.org/0000-0003-4757-117X
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.lifecycle
 - type: software
   title: pkgload
@@ -765,7 +765,7 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.pkgload
 - type: software
   title: R.utils
@@ -777,7 +777,7 @@ references:
   - family-names: Bengtsson
     given-names: Henrik
     email: henrikb@braju.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.R.utils
 - type: software
   title: rlang
@@ -792,7 +792,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.rlang
 - type: software
   title: shinyhelper
@@ -804,7 +804,7 @@ references:
   - family-names: Mason-Thom
     given-names: Chris
     email: christopher.w.thom@outlook.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinyhelper
 - type: software
   title: shinyjs
@@ -817,7 +817,7 @@ references:
     given-names: Dean
     email: daattali@gmail.com
     orcid: https://orcid.org/0000-0002-5645-3493
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinyjs
 - type: software
   title: shinytest2
@@ -830,7 +830,7 @@ references:
     given-names: Barret
     email: barret@posit.co
     orcid: https://orcid.org/0000-0001-9986-114X
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinytest2
 - type: software
   title: shinyvalidate
@@ -850,7 +850,7 @@ references:
   - family-names: Cheng
     given-names: Joe
     email: joe@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.shinyvalidate
 - type: software
   title: spelling
@@ -866,7 +866,7 @@ references:
   - family-names: Hester
     given-names: Jim
     email: james.hester@rstudio.com
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.spelling
 - type: software
   title: testthat
@@ -878,7 +878,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2024'
+  year: '2025'
   doi: 10.32614/CRAN.package.testthat
   version: '>= 3.0.0'
 
