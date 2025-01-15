@@ -41,10 +41,10 @@ Imports:
     Spectra (>= 1.12.0),
     stats,
     stringi (>= 1.8.4),
-    targets (>= 1.9.1),
+    targets (>= 1.10.0),
     tidyfst (>= 1.8.1),
     tidyselect (>= 1.2.1),
-    tidytable (>= 0.11.1),
+    tidytable (>= 0.11.2),
     utils,
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.10)
