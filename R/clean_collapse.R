@@ -8,16 +8,16 @@
 #' @return Cleaned and collapsed dataframe
 #'
 #' @examples NULL
-clean_collapse <- function(grouped_df, cols = NA) {
+clean_collapse <- function(grouped_df, cols = NULL) {
+  cols <- if (is.null(cols)) {
+    names(grouped_df)
+  } else {
+    as.character(cols)
+  }
+
   clean_collapse_df <- grouped_df |>
     tidytable::reframe(tidytable::across(
-      .cols = tidytable::if_else(
-        condition = is.na(cols),
-        true = tidyselect::everything() |>
-          as.character(),
-        false = cols |>
-          as.character()
-      ),
+      .cols = cols,
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
