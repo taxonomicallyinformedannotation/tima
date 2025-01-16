@@ -4,7 +4,7 @@
 \alias{clean_collapse}
 \title{Clean collapse}
 \usage{
-clean_collapse(grouped_df, cols = NA)
+clean_collapse(grouped_df, cols = NULL)
 }
 \arguments{
 \item{grouped_df}{Grouped dataframe}
