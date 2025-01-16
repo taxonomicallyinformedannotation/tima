@@ -11,10 +11,10 @@
 clean_collapse <- function(grouped_df, cols = NA) {
   clean_collapse_df <- grouped_df |>
     tidytable::reframe(tidytable::across(
-      .cols = ifelse(
-        test = is.na(cols),
-        yes = tidyselect::everything(),
-        no = cols
+      .cols = tidytable::if_else(
+        condition = is.na(cols),
+        true = tidyselect::everything(),
+        false = cols
       ),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))

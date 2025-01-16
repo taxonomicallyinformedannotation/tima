@@ -248,15 +248,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       df_final <- df_final |>
         tidytable::mutate(
           candidate_structure_error_mz = target_precursorMz - precursorMz,
-          candidate_structure_inchikey_no_stereo = ifelse(
-            test = is.na(target_inchikey_no_stereo),
-            yes = target_inchikey |>
+          candidate_structure_inchikey_no_stereo = tidytable::if_else(
+            condition = is.na(target_inchikey_no_stereo),
+            true = target_inchikey |>
               gsub(
                 pattern = "-.*",
                 replacement = "",
                 perl = TRUE
               ),
-            no = target_inchikey_no_stereo
+            false = target_inchikey_no_stereo
           ),
           candidate_structure_smiles_no_stereo = tidytable::coalesce(target_smiles_no_stereo, target_smiles)
         ) |>

@@ -151,15 +151,15 @@ harmonize_spectra <- function(spectra,
     tidytable::mutate(
       library = metad,
       exactmass = as.numeric(exactmass),
-      spectrum_id = ifelse(
-        test = is.na(spectrum_id),
-        yes = tidytable::row_number(),
-        no = as.numeric(spectrum_id)
+      spectrum_id = tidytable::if_else(
+        condition = is.na(spectrum_id),
+        true = tidytable::row_number(),
+        false = as.numeric(spectrum_id)
       ),
-      compound_id = ifelse(
-        test = is.na(compound_id),
-        yes = name,
-        no = compound_id
+      compound_id = tidytable::if_else(
+        condition = is.na(compound_id),
+        true = name,
+        false = compound_id
       )
     ) |>
     data.frame()

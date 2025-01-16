@@ -257,23 +257,25 @@ annotate_masses <-
       tidytable::left_join(clusters_table |>
         tidytable::mutate(join = "x")) |>
       tidytable::bind_rows(adducts_table) |>
-      tidytable::mutate(adduct = ifelse(
-        test = !is.na(cluster),
-        yes = paste0(
-          adduct |> gsub(
-            pattern = "M(?![a-z]).*",
-            replacement = "M",
-            perl = TRUE
-          ),
+      tidytable::mutate(adduct = tidytable::if_else(
+        condition = !is.na(cluster),
+        true = paste0(
+          adduct |>
+            gsub(
+              pattern = "M(?![a-z]).*",
+              replacement = "M",
+              perl = TRUE
+            ),
           "+",
           cluster,
-          adduct |> gsub(
-            pattern = ".*M(?![a-z])",
-            replacement = "",
-            perl = TRUE
-          )
+          adduct |>
+            gsub(
+              pattern = ".*M(?![a-z])",
+              replacement = "",
+              perl = TRUE
+            )
         ),
-        no = adduct
+        false = adduct
       )) |>
       # Single charge monomers only
       tidytable::filter(grepl(
@@ -332,15 +334,15 @@ annotate_masses <-
       tidytable::filter(!is.na(Group1)) |>
       tidytable::mutate(tidytable::across(.cols = c("rt"), .fns = as.character)) |>
       tidytable::mutate(
-        adduct = ifelse(
-          test = is.na(adduct),
-          yes = as.character(Group1),
-          no = adduct
+        adduct = tidytable::if_else(
+          condition = is.na(adduct),
+          true = as.character(Group1),
+          false = adduct
         ),
-        adduct_dest = ifelse(
-          test = is.na(adduct_dest),
-          yes = as.character(Group2),
-          no = adduct_dest
+        adduct_dest = tidytable::if_else(
+          condition = is.na(adduct_dest),
+          true = as.character(Group2),
+          false = adduct_dest
         )
       ) |>
       tidytable::distinct(feature_id, adduct, adduct_dest, !!as.name(paste("feature_id", "dest", sep = "_")))
@@ -380,23 +382,25 @@ annotate_masses <-
       tidytable::left_join(df_nl_min) |>
       tidytable::bind_rows(df_adducted) |>
       tidytable::distinct() |>
-      tidytable::mutate(adduct = ifelse(
-        test = !is.na(loss),
-        yes = paste0(
-          adduct |> gsub(
-            pattern = "M(?![a-z]).*",
-            replacement = "M",
-            perl = TRUE
-          ),
+      tidytable::mutate(adduct = tidytable::if_else(
+        condition = !is.na(loss),
+        true = paste0(
+          adduct |>
+            gsub(
+              pattern = "M(?![a-z]).*",
+              replacement = "M",
+              perl = TRUE
+            ),
           "-",
           loss,
-          adduct |> gsub(
-            pattern = ".*M(?![a-z])",
-            replacement = "",
-            perl = TRUE
-          )
+          adduct |>
+            gsub(
+              pattern = ".*M(?![a-z])",
+              replacement = "",
+              perl = TRUE
+            )
         ),
-        no = adduct
+        false = adduct
       ))
     rm(df_adducted, df_nl_min)
 

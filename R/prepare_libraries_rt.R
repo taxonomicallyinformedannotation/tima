@@ -152,7 +152,7 @@ prepare_libraries_rt <-
           data.frame() |>
           tidytable::mutate(type = type) |>
           tidytable::rowwise() |>
-          tidytable::mutate(rt = ifelse(unit == "seconds", yes = as.numeric(rt) / 60, no = rt)) |>
+          tidytable::mutate(rt = tidytable::if_else(condition = unit == "seconds", true = as.numeric(rt) / 60, false = rt)) |>
           tidytable::bind_rows(data.frame(inchikey = NA_character_, smiles = NA_character_)) |>
           tidytable::filter(!is.na(rt)) |>
           tidytable::filter(!is.na(smiles)) |>

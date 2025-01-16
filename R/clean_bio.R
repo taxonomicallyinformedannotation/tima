@@ -94,10 +94,10 @@ clean_bio <-
             feature_source, !!as.name(feature_val_name) := !!as.name(candidates), !!as.name(consistency_name), !!as.name(feature_score_name)
           ) |>
           tidytable::mutate(
-            !!as.name(feature_val_name) := ifelse(
-              test = !!as.name(feature_score_name) >= minimal_consistency,
-              yes = !!as.name(feature_val_name),
-              no = "notConsistent"
+            !!as.name(feature_val_name) := tidytable::if_else(
+              condition = !!as.name(feature_score_name) >= minimal_consistency,
+              true = !!as.name(feature_val_name),
+              false = "notConsistent"
             )
           )
       }
