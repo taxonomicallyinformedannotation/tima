@@ -2010,10 +2010,10 @@ list(
               rtime = tidytable::cur_group_id(),
               .by = "short_ik"
             ) |>
-            tidytable::mutate(precursorCharge = ifelse(
-              test = mode == "pos",
-              yes = as.integer(1),
-              no = as.integer(-1)
+            tidytable::mutate(precursorCharge = tidytable::if_else(
+              condition = mode == "pos",
+              true = as.integer(1),
+              false = as.integer(-1)
             )) |>
             tidytable::select(
               acquisitionNum,
