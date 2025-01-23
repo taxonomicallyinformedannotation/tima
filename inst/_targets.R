@@ -1813,7 +1813,7 @@ list(
         compounds_names = par_wei_ann$options$compounds_names,
         high_confidence = par_wei_ann$options$high_confidence,
         remove_ties = par_wei_ann$options$remove_ties,
-        summarise = par_wei_ann$options$summarise,
+        summarize = par_wei_ann$options$summarize,
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force
       )
@@ -2662,7 +2662,7 @@ list(
           compounds_names = benchmark_def_wei_ann$options$compounds_names,
           high_confidence = FALSE,
           remove_ties = benchmark_def_wei_ann$options$remove_ties,
-          summarise = benchmark_def_wei_ann$options$summarise,
+          summarize = benchmark_def_wei_ann$options$summarize,
           pattern = benchmark_def_wei_ann$files$pattern,
           force = benchmark_def_wei_ann$options$force
         )

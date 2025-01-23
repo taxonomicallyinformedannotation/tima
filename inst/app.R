@@ -1538,8 +1538,8 @@ ui <- shiny::fluidPage(
             )
           ),
         shiny::checkboxInput(
-          inputId = "summarise",
-          label = "Summarise results to one row per feature",
+          inputId = "summarize",
+          label = "summarize results to one row per feature",
           value = FALSE
         ) |>
           shinyhelper::helper(
@@ -1828,7 +1828,7 @@ ui <- shiny::fluidPage(
   }
   hig_con <- shiny::isolate(input$high_confidence)
   ms_pol <- shiny::isolate(input$ms_pol)
-  summarise <- shiny::isolate(input$summarise)
+  summarize <- shiny::isolate(input$summarize)
 
   message(x = "Changing parameters ...")
   message(x = "... Small")
@@ -1841,7 +1841,7 @@ ui <- shiny::fluidPage(
   yaml_small$ms$polarity <- ms_pol
   yaml_small$organisms$taxon <- org_tax
   yaml_small$options$high_confidence <- hig_con
-  yaml_small$options$summarise <- summarise
+  yaml_small$options$summarize <- summarize
   tima:::create_dir("params")
   yaml::write_yaml(x = yaml_small, file = tima:::get_default_paths()$params$prepare_params)
 
@@ -2144,7 +2144,7 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$force)
   yaml_advanced$options$remove_ties <-
     shiny::isolate(input$remove_ties)
-  yaml_advanced$options$summarise <- summarise
+  yaml_advanced$options$summarize <- summarize
 
   if (!is.null(prefil_met_raw)) {
     yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw

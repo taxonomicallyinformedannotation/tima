@@ -443,8 +443,8 @@ parse_cli_params <- function(arguments, parameters) {
     if (!is.null(arguments$remove_ties)) {
       parameters$options$remove_ties <- as.logical(arguments$remove_ties)
     }
-    if (!is.null(arguments$summarise)) {
-      parameters$options$summarise <- as.logical(arguments$summarise)
+    if (!is.null(arguments$summarize)) {
+      parameters$options$summarize <- as.logical(arguments$summarize)
     }
   }
   return(parameters)

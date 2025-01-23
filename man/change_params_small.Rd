@@ -13,7 +13,7 @@ change_params_small(
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
-  summarise = NULL
+  summarize = NULL
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ change_params_small(
 
 \item{hig_con}{Filter high confidence candidates only. BOOLEAN}
 
-\item{summarise}{Summarize all candidates per feature to a single row. BOOLEAN}
+\item{summarize}{Summarize all candidates per feature to a single row. BOOLEAN}
 }
 \value{
 YAML file with changed parameters.
@@ -53,7 +53,7 @@ tima::change_params_small(
   ms_pol = "pos",
   org_tax = "Gentiana lutea",
   hig_con = TRUE,
-  summarise = FALSE
+  summarize = FALSE
 )
 }
 }

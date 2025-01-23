@@ -123,6 +123,6 @@ tima::change_params_small(
   ms_pol = "pos",
   org_tax = "Gentiana lutea",
   hig_con = TRUE,
-  summarise = FALSE
+  summarize = FALSE
 )
 ```

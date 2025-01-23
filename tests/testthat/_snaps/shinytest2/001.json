@@ -149,7 +149,7 @@
     "org_tax": "",
     "remove_ties": false,
     "save": 1,
-    "summarise": false,
+    "summarize": false,
     "targets-shiny-accordion": "Choose display",
     "targets-shiny-degree_from": 8,
     "targets-shiny-degree_to": 1,

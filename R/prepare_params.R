@@ -170,7 +170,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   opt_hig_con <- params_advanced$options$high_confidence
   opt_for <- params_advanced$options$force
   opt_rem_tie <- params_advanced$options$remove_ties
-  opt_sum <- params_advanced$options$summarise
+  opt_sum <- params_advanced$options$summarize
 
   log_debug(x = "Small params")
   fil_pat <- params_small$files$pattern
@@ -181,7 +181,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_hig_con <- params_small$options$high_confidence
-  opt_sum <- params_small$options$summarise
+  opt_sum <- params_small$options$summarize
 
   if (!is.null(org_tax)) {
     if (org_tax == "") {
@@ -616,7 +616,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
         opt_hig_con
       yamls_params$weight_annotations$options$remove_ties <-
         opt_rem_tie
-      yamls_params$weight_annotations$options$summarise <-
+      yamls_params$weight_annotations$options$summarize <-
         opt_sum
     }
   )

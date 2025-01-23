@@ -190,5 +190,5 @@ options:
   #' Remove ties. BOOLEAN
   remove_ties: no
 
-  #' Summarise results to one row per feature. BOOLEAN
-  summarise: no
+  #' summarize results to one row per feature. BOOLEAN
+  summarize: no
