@@ -20,7 +20,7 @@
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param high_confidence Report high confidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
-#' @param summarise Boolean. summarise results (1 row per feature)
+#' @param summarize Boolean. summarize results (1 row per feature)
 #'
 #' @return A table containing the chemically weighted annotation
 #'    where only a given number of initial candidates are kept
@@ -39,7 +39,7 @@ clean_chemo <-
            minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
            high_confidence = get("high_confidence", envir = parent.frame()),
            remove_ties = get("remove_ties", envir = parent.frame()),
-           summarise = get("summarise", envir = parent.frame())) {
+           summarize = get("summarize", envir = parent.frame())) {
     model <- tima:::columns_model()
 
     log_debug(
@@ -186,7 +186,7 @@ clean_chemo <-
         tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
     }
 
-    if (summarise == TRUE) {
+    if (summarize == TRUE) {
       log_debug("Collecting garbage ...")
       gc()
       log_debug("summarizing results \n")

@@ -16,7 +16,7 @@ clean_chemo(
   minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
   high_confidence = get("high_confidence", envir = parent.frame()),
   remove_ties = get("remove_ties", envir = parent.frame()),
-  summarise = get("summarise", envir = parent.frame())
+  summarize = get("summarize", envir = parent.frame())
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ structure - organism pairs}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
 
-\item{summarise}{Boolean. summarise results (1 row per feature)}
+\item{summarize}{Boolean. summarize results (1 row per feature)}
 }
 \value{
 A table containing the chemically weighted annotation

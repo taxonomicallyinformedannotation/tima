@@ -495,7 +495,7 @@ test_that(desc = "Test functions", code = {
   weight_annotations(
     ms1_only = TRUE,
     remove_ties = TRUE,
-    summarise = TRUE,
+    summarize = TRUE,
     candidates_final = 1,
     minimal_ms1_bio = 0.8,
     minimal_ms1_condition = "AND",
@@ -542,7 +542,7 @@ test_that(desc = "Test functions", code = {
     ms_pol = "pos",
     org_tax = "Gentiana lutea",
     hig_con = TRUE,
-    summarise = FALSE
+    summarize = FALSE
   )
 
   ## CLI arguments check
@@ -679,7 +679,7 @@ test_that(desc = "Test functions", code = {
   arguments$force <- TRUE
   arguments$high_confidence <- TRUE
   arguments$remove_ties <- TRUE
-  arguments$summarise <- TRUE
+  arguments$summarize <- TRUE
 
   parse_cli_params(arguments = arguments, parameters = params)
 

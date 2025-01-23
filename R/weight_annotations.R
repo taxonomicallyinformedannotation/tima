@@ -80,7 +80,7 @@
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
 #' @param high_confidence Report high confidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
-#' @param summarise Summarize results (1 row per feature). BOOLEAN
+#' @param summarize Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
 #'
 #' @return The path to the weighted annotations
@@ -216,7 +216,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
                                compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
                                high_confidence = get_params(step = "weight_annotations")$options$high_confidence,
                                remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
-                               summarise = get_params(step = "weight_annotations")$options$summarise,
+                               summarize = get_params(step = "weight_annotations")$options$summarize,
                                pattern = get_params(step = "weight_annotations")$files$pattern,
                                force = get_params(step = "weight_annotations")$options$force) {
   stopifnot("Annotations file(s) do(es) not exist" = all(purrr::map(.x = annotations, .f = file.exists) |> unlist()))

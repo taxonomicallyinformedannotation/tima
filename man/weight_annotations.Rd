@@ -78,7 +78,7 @@ weight_annotations(
   compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
   high_confidence = get_params(step = "weight_annotations")$options$high_confidence,
   remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
-  summarise = get_params(step = "weight_annotations")$options$summarise,
+  summarize = get_params(step = "weight_annotations")$options$summarize,
   pattern = get_params(step = "weight_annotations")$files$pattern,
   force = get_params(step = "weight_annotations")$options$force
 )
@@ -194,7 +194,7 @@ match (should be lower than \verb{NPC class})}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
 
-\item{summarise}{Summarize results (1 row per feature). BOOLEAN}
+\item{summarize}{Summarize results (1 row per feature). BOOLEAN}
 
 \item{pattern}{Pattern to identify your job. STRING}
 

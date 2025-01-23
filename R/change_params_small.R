@@ -15,7 +15,7 @@
 #' @param ms_pol The polarity used. Must be either "pos" or "neg". STRING
 #' @param org_tax If your experiment contains a single taxon, its scientific name. "Homo sapiens". STRING
 #' @param hig_con Filter high confidence candidates only. BOOLEAN
-#' @param summarise Summarize all candidates per feature to a single row. BOOLEAN
+#' @param summarize Summarize all candidates per feature to a single row. BOOLEAN
 #'
 #' @export
 #'
@@ -33,7 +33,7 @@
 #'   ms_pol = "pos",
 #'   org_tax = "Gentiana lutea",
 #'   hig_con = TRUE,
-#'   summarise = FALSE
+#'   summarize = FALSE
 #' )
 #' }
 change_params_small <- function(fil_pat = NULL,
@@ -44,7 +44,7 @@ change_params_small <- function(fil_pat = NULL,
                                 ms_pol = NULL,
                                 org_tax = NULL,
                                 hig_con = NULL,
-                                summarise = NULL) {
+                                summarize = NULL) {
   tima:::go_to_cache()
   paths_data_source <- tima:::get_default_paths()$data$source$path
   paths_data_interim_annotations <-
@@ -113,8 +113,8 @@ change_params_small <- function(fil_pat = NULL,
   if (!is.null(hig_con)) {
     yaml_small$options$high_confidence <- hig_con
   }
-  if (!is.null(summarise)) {
-    yaml_small$options$summarise <- summarise
+  if (!is.null(summarize)) {
+    yaml_small$options$summarize <- summarize
   }
 
   yaml::write_yaml(
