@@ -25,23 +25,19 @@ create_edges <- function(frags,
     .f = function(index) {
       target_indices <- (index + 1):nspecs
 
-      scores <- vapply(
-        target_indices,
-        function(target) {
-          msentropy::calculate_entropy_similarity(
-            peaks_a = frags[[index]],
-            peaks_b = frags[[target]],
-            min_mz = 0,
-            max_mz = 5000,
-            noise_threshold = 0,
-            ms2_tolerance_in_da = ms2_tolerance,
-            ms2_tolerance_in_ppm = ppm_tolerance,
-            max_peak_num = -1,
-            clean_spectra = TRUE
-          )
-        },
-        numeric(1)
-      )
+      scores <- vapply(target_indices, function(target) {
+        msentropy::calculate_entropy_similarity(
+          peaks_a = frags[[index]],
+          peaks_b = frags[[target]],
+          min_mz = 0,
+          max_mz = 5000,
+          noise_threshold = 0,
+          ms2_tolerance_in_da = ms2_tolerance,
+          ms2_tolerance_in_ppm = ppm_tolerance,
+          max_peak_num = -1,
+          clean_spectra = TRUE
+        )
+      }, numeric(1))
 
       valid_indices <- which(scores >= threshold)
 
@@ -56,6 +52,14 @@ create_edges <- function(frags,
       }
     }
   )
-
-  tidytable::bind_rows(edges[!sapply(edges, is.null)])
+  edges <- edges[!sapply(edges, is.null)]
+  if (length(edges) > 0) {
+    tidytable::bind_rows(edges)
+  } else {
+    tidytable::tidytable(
+      feature_id = NA_integer_,
+      target_id = NA_integer_,
+      score = NA_real_
+    )
+  }
 }
