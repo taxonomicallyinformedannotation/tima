@@ -2,9 +2,15 @@ Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.11.1
 Authors@R: c(
-    person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
+    person(given = "Adriano",
+           family = "Rutz",
+           email = "adafede@gmail.com",
+           role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
-    person("Pierre-Marie", "Allard", , "pierre-marie.allard@unifr.ch", role = "ctb",
+    person(given = "Pierre-Marie",
+           family = "Allard",
+           email = "pierre-marie.allard@unifr.ch",
+           role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
 Maintainer: Adriano Rutz <adafede@gmail.com>
