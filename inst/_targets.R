@@ -233,151 +233,140 @@ list(
         name = par_def_ann_mas,
         format = "file",
         command = {
-          par_def_ann_mas <- paths$params$default$annotate$masses
+          par_def_ann_mas <- system.file("params/default/annotate_masses.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_ann_spe,
         format = "file",
         command = {
-          par_def_ann_spe <- paths$params$default$annotate$spectra
+          par_def_ann_spe <- system.file("params/default/annotate_spectra.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_cre_com,
         format = "file",
         command = {
-          par_def_cre_com <- paths$params$default$create$components
+          par_def_cre_com <- system.file("params/default/create_components.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_cre_edg_spe,
         format = "file",
         command = {
-          par_def_cre_edg_spe <- paths$params$default$create$edges$spectra
+          par_def_cre_edg_spe <- system.file("params/default/create_edges_spectra.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_fil_ann,
         format = "file",
         command = {
-          par_def_fil_ann <-
-            paths$params$default$filter$annotations
+          par_def_fil_ann <- system.file("params/default/filter_annotations.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_ann_gnp,
         format = "file",
         command = {
-          par_def_pre_ann_gnp <- paths$params$default$prepare$annotations$gnps
+          par_def_pre_ann_gnp <- system.file("params/default/prepare_annotations_gnps.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_ann_sir,
         format = "file",
         command = {
-          par_def_pre_ann_sir <-
-            paths$params$default$prepare$annotations$sirius
+          par_def_pre_ann_sir <- system.file("params/default/prepare_annotations_sirius.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_ann_spe,
         format = "file",
         command = {
-          par_def_pre_ann_spe <-
-            paths$params$default$prepare$annotations$spectra
+          par_def_pre_ann_spe <- system.file("params/default/prepare_annotations_spectra.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_fea_com,
         format = "file",
         command = {
-          par_def_pre_fea_com <-
-            paths$params$default$prepare$features$components
+          par_def_pre_fea_com <- system.file("params/default/prepare_features_components.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_fea_edg,
         format = "file",
         command = {
-          par_def_pre_fea_edg <- paths$params$default$prepare$features$edges
+          par_def_pre_fea_edg <- system.file("params/default/prepare_features_edges.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_fea_tab,
         format = "file",
         command = {
-          par_def_pre_fea_tab <- paths$params$default$prepare$features$tables
+          par_def_pre_fea_tab <- system.file("params/default/prepare_features_tables.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_rt,
         format = "file",
         command = {
-          par_def_pre_lib_rt <-
-            paths$params$default$prepare$libraries$rt
+          par_def_pre_lib_rt <- system.file("params/default/prepare_libraries_rt.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_clo,
         format = "file",
         command = {
-          par_def_pre_lib_sop_clo <-
-            paths$params$default$prepare$libraries$sop$closed
+          par_def_pre_lib_sop_clo <- system.file("params/default/prepare_libraries_sop_closed.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_ecm,
         format = "file",
         command = {
-          par_def_pre_lib_sop_ecm <-
-            paths$params$default$prepare$libraries$sop$ecmdb
+          par_def_pre_lib_sop_ecm <- system.file("params/default/prepare_libraries_sop_ecmdb.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_hmd,
         format = "file",
         command = {
-          par_def_pre_lib_sop_hmd <-
-            paths$params$default$prepare$libraries$sop$hmdb
+          par_def_pre_lib_sop_hmd <- system.file("params/default/prepare_libraries_sop_hmdb.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_lot,
         format = "file",
         command = {
-          par_def_pre_lib_sop_lot <-
-            paths$params$default$prepare$libraries$sop$lotus
+          par_def_pre_lib_sop_lot <- system.file("params/default/prepare_libraries_sop_lotus.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_mer,
         format = "file",
         command = {
-          par_def_pre_lib_sop_mer <-
-            paths$params$default$prepare$libraries$sop$merged
+          par_def_pre_lib_sop_mer <- system.file("params/default/prepare_libraries_sop_merged.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_lib_spe,
         format = "file",
         command = {
-          par_def_pre_lib_spe <-
-            paths$params$default$prepare$libraries$spectra
+          par_def_pre_lib_spe <- system.file("params/default/prepare_libraries_spectra.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_pre_tax,
         format = "file",
         command = {
-          par_def_pre_tax <- paths$params$default$prepare$taxa
+          par_def_pre_tax <- system.file("params/default/prepare_taxa.yaml", package = "tima")
         }
       ),
       tar_target(
         name = par_def_wei_ann,
         format = "file",
         command = {
-          par_def_wei_ann <- paths$params$default$weight$annotations
+          par_def_wei_ann <- system.file("params/default/weight_annotations.yaml", package = "tima")
         }
       )
     ),
