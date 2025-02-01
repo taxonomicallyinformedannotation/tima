@@ -131,7 +131,7 @@ references:
     given-names: Nitesh
   year: '2025'
   doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.36.0'
+  version: '>= 1.40.0'
 - type: software
   title: crayon
   abstract: 'crayon: Colored Terminal Output'
@@ -365,7 +365,7 @@ references:
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2025'
   doi: 10.18129/B9.bioc.MetaboCoreUtils
-  version: '>= 1.10.0'
+  version: '>= 1.14.0'
 - type: software
   title: MsBackendMgf
   abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
@@ -388,7 +388,7 @@ references:
     orcid: https://orcid.org/0000-0001-7406-4443
   year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMgf
-  version: '>= 1.10.0'
+  version: '>= 1.14.0'
 - type: software
   title: MsBackendMsp
   abstract: 'MsBackendMsp: Mass Spectrometry Data Backend for NIST msp Files'
@@ -406,7 +406,7 @@ references:
     orcid: https://orcid.org/0000-0002-6977-7147
   year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMsp
-  version: '>= 1.6.0'
+  version: '>= 1.10.0'
 - type: software
   title: msentropy
   abstract: 'msentropy: Spectral Entropy for Mass Spectrometry Data'
@@ -554,7 +554,7 @@ references:
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2025'
   doi: 10.18129/B9.bioc.Spectra
-  version: '>= 1.12.0'
+  version: '>= 1.16.0'
 - type: software
   title: stats
   abstract: 'R: A Language and Environment for Statistical Computing'
