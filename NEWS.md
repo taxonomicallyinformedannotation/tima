@@ -1,5 +1,9 @@
 # tima
 
+# tima 2.11.1
+
+* Added `SIRIUS` feature tables support (#185)
+
 # tima 2.11.0
 
 * Added convenience function to change small parameters (#177)
