@@ -100,12 +100,15 @@ prepare_taxa <-
     log_debug(x = "... requires 'Peak area' or ':area'
               in columns (mzmine format)")
     log_debug(x = "... or 'quant_' in columns (SLAW format)")
+    log_debug(x = "... or 'Peak height' in columns (SIRIUS format)")
+    
     feature_table <- feature_table_0 |>
       tidytable::select(
         tidyselect::all_of(c(name_features)),
         tidyselect::matches(" Peak area"),
         tidyselect::matches(":area"),
-        tidyselect::matches("quant_")
+        tidyselect::matches("quant_"),
+        tidyselect::matches(" Peak height")
       ) |>
       tidytable::select(-tidyselect::matches("quant_peaktable")) |>
       tidyfst::col_rn(var = name_features)
@@ -129,6 +132,12 @@ prepare_taxa <-
     colnames(feature_table) <- colnames(feature_table) |>
       stringi::stri_replace_all_fixed(
         pattern = "quant_",
+        replacement = "",
+        vectorize_all = FALSE
+      )
+    colnames(feature_table) <- colnames(feature_table) |>
+      stringi::stri_replace_all_fixed(
+        pattern = " Peak height",
         replacement = "",
         vectorize_all = FALSE
       )
