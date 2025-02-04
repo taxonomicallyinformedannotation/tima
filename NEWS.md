@@ -3,6 +3,7 @@
 # tima 2.11.1
 
 * Added `SIRIUS` feature tables support (#185)
+* Added `.rar` compression support for `SIRIUS` workspaces (#186)
 
 # tima 2.11.0
 
