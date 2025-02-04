@@ -101,7 +101,7 @@ prepare_taxa <-
               in columns (mzmine format)")
     log_debug(x = "... or 'quant_' in columns (SLAW format)")
     log_debug(x = "... or 'Peak height' in columns (SIRIUS format)")
-    
+
     feature_table <- feature_table_0 |>
       tidytable::select(
         tidyselect::all_of(c(name_features)),
