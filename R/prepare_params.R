@@ -33,7 +33,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_pat <- params_advanced$files$pattern
   fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
-  fil_ann_raw_spe_sir <- params_advanced$files$annotations$raw$spectral$sirius
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
   fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
@@ -177,7 +176,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
-  fil_ann_raw_spe_sir <- params_small$files$annotations$raw$spectral$sirius
+  fil_ann_raw_sir <- params_small$files$annotations$raw$sirius
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
   opt_hig_con <- params_small$options$high_confidence
@@ -188,7 +187,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   yamls_params$`params/prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`params/prepare_params_advanced`$files$metadata$raw <- fil_met_raw
   yamls_params$`params/prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
-  yamls_params$`params/prepare_params_advanced`$files$annotations$raw$spectral$sirius <- fil_ann_raw_spe_sir
+  yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
   yamls_params$`params/prepare_params_advanced`$ms$polarity <- ms_pol
   yamls_params$`params/prepare_params_advanced`$organisms$taxon <- org_tax
   yamls_params$`params/prepare_params_advanced`$options$high_confidence <- opt_hig_con
