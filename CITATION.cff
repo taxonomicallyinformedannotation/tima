@@ -283,7 +283,7 @@ references:
     email: hadley@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.0.7'
+  version: '>= 1.1.0'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -318,7 +318,7 @@ references:
     orcid: https://orcid.org/0000-0002-1416-3412
   year: '2025'
   doi: 10.32614/CRAN.package.igraph
-  version: '>= 2.1.2'
+  version: '>= 2.1.4'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
@@ -597,7 +597,7 @@ references:
     orcid: https://orcid.org/0000-0003-1878-3253
   year: '2025'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.10.0'
+  version: '>= 1.10.1'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
