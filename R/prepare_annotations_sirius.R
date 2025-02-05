@@ -51,7 +51,7 @@ prepare_annotations_sirius <-
       sirius_version <- as.character(sirius_version)
       canopus_filename <- switch(sirius_version,
         "5" = "canopus_compound_summary.tsv",
-        "6" = "canopus_structure_summary.tsv"
+        "6" = "canopus_formula_summary_all.tsv"
       )
       formulas_filename <- switch(sirius_version,
         "5" = "formula_identifications_all.tsv",
@@ -81,7 +81,10 @@ prepare_annotations_sirius <-
         tima:::read_from_sirius_zip(file = structures_filename)
 
       # TODO
-      if (!is.null(denovo_filename)) {
+      files <- input_directory |>
+        utils::unzip(list = TRUE)
+      if (grepl(pattern = denovo_filename, x = files$Name) |>
+        any()) {
         denovo <- input_directory |>
           tima:::read_from_sirius_zip(file = denovo_filename)
       } else {
@@ -90,7 +93,8 @@ prepare_annotations_sirius <-
       }
 
       # TODO
-      if (!is.null(spectral_filename)) {
+      if (grepl(pattern = spectral_filename, x = files$Name) |>
+        any()) {
         spectral <- input_directory |>
           tima:::read_from_sirius_zip(file = spectral_filename)
       }
