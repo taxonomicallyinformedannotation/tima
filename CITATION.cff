@@ -122,7 +122,7 @@ references:
     email: csardi.gabor@gmail.com
   year: '2025'
   doi: 10.32614/CRAN.package.archive
-  version: '>= 1.1.10'
+  version: '>= 1.1.11'
 - type: software
   title: BiocParallel
   abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
