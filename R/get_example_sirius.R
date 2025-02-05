@@ -15,5 +15,9 @@ get_example_sirius <-
   function(url = get_default_paths()$urls$examples$sirius,
            export = get_default_paths()$data$interim$annotations$example_sirius) {
     get_file(url = url$v5, export = export$v5)
-    get_file(url = url$v6, export = export$v6)
+    get_file(
+      url = url$v6,
+      export = export$v6 |>
+        gsub(pattern = "_6", replacement = "")
+    )
   }
