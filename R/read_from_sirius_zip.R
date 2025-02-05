@@ -22,5 +22,6 @@ read_from_sirius_zip <- function(sirius_zip, file) {
       na.strings = c("", "NA"),
       colClasses = "character",
       stringsAsFactors = FALSE
-    )
+    ) |>
+    tidytable::tidytable()
 }
