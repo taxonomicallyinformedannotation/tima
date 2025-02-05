@@ -83,20 +83,24 @@ prepare_annotations_sirius <-
       # TODO
       files <- input_directory |>
         utils::unzip(list = TRUE)
-      if (grepl(pattern = denovo_filename, x = files$Name) |>
-        any()) {
-        denovo <- input_directory |>
-          tima:::read_from_sirius_zip(file = denovo_filename)
-      } else {
-        denovo <- tidytable::tidytable() |>
-          tidytable::mutate(mappingFeatureId = NA)
+
+      denovo <- tidytable::tidytable() |>
+        tidytable::mutate(mappingFeatureId = NA)
+      if (!is.null(denovo_filename)) {
+        if (grepl(pattern = denovo_filename, x = files$Name) |>
+          any()) {
+          denovo <- input_directory |>
+            tima:::read_from_sirius_zip(file = denovo_filename)
+        }
       }
 
       # TODO
-      if (grepl(pattern = spectral_filename, x = files$Name) |>
-        any()) {
-        spectral <- input_directory |>
-          tima:::read_from_sirius_zip(file = spectral_filename)
+      if (!is.null(spectral_filename)) {
+        if (grepl(pattern = spectral_filename, x = files$Name) |>
+          any()) {
+          spectral <- input_directory |>
+            tima:::read_from_sirius_zip(file = spectral_filename)
+        }
       }
 
       # dirty to support old zip
