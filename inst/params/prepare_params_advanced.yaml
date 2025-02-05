@@ -58,7 +58,7 @@ files:
         spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
       #' The directory containing the sirius annotations. STRING
-      sirius: data/interim/annotations/example_sirius
+      sirius: data/interim/annotations/example_sirius.zip
 
     #' List of filtered annotations. STRING
     filtered: data/interim/annotations/example_annotationsFiltered.tsv.gz

@@ -16,9 +16,4 @@ get_example_sirius <-
            export = get_default_paths()$data$interim$annotations$example_sirius) {
     get_file(url = url$v5, export = export$v5)
     get_file(url = url$v6, export = export$v6)
-    utils::unzip(
-      zipfile = export$v6,
-      exdir = dirname(export$v6),
-      overwrite = TRUE
-    )
   }
