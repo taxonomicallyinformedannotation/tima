@@ -34,6 +34,7 @@ test_that(desc = "Test functions", code = {
   prepare_params(step = "prepare_libraries_spectra")
   prepare_params(step = "prepare_taxa")
   prepare_params(step = "weight_annotations")
+  params <- get_params(step = "prepare_params_advanced")
 
   ## When previous params exist
   prepare_params()
@@ -543,7 +544,7 @@ test_that(desc = "Test functions", code = {
   )
 
   ## CLI arguments check
-  arguments <- character()
+  arguments <- list()
   arguments$ann_can_fin <- 0
   arguments$ann_ms1only <- TRUE
   arguments$ann_ms2_app <- TRUE
