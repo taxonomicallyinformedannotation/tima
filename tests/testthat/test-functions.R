@@ -430,11 +430,8 @@ test_that(desc = "Test functions", code = {
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist.xyz")
   ## When there is an input
-  prepare_annotations_sirius(
-    input_directory =
-      get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
-  )
-  prepare_annotations_sirius(input_directory = "data/interim/annotations/example_sirius.zip", sirius_version = 5)
+  prepare_annotations_sirius(input_directory = "data/interim/annotations/example_sirius_5.zip", sirius_version = 5)
+  prepare_annotations_sirius()
 
   ### ISDB results
   prepare_annotations_spectra()

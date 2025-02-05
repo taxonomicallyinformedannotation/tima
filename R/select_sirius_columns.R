@@ -118,7 +118,9 @@ select_sirius_columns_structures <- function(df, sirius_version) {
           "5" = "ConfidenceScore",
           "6" = "ConfidenceScoreApproximate"
         ),
-        "candidate_score_sirius_csi" = "CSI:FingerIDScore",
+        "candidate_score_sirius_csi" = "CSI.FingerIDScore",
+        # tidytable version
+        # "candidate_score_sirius_csi" = "CSI:FingerIDScore",
         "candidate_score_sirius_msnovelist" = "ModelScore"
       )
     )) |>
