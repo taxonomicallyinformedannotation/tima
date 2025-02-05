@@ -21,25 +21,49 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
         "feature_id",
         "candidate_adduct" = "adduct",
         "candidate_structure_molecular_formula" = "molecularFormula",
-        "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
-        "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
-        "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
-        "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
-        "feature_pred_tax_npc_03cla_val" = "NPC#class",
-        "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
-        "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
-        "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
-        "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
-        "feature_pred_tax_cla_02sup_score" =
-          "ClassyFire#superclass probability",
-        "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
-        "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
-        "feature_pred_tax_cla_04dirpar_val" =
-          "ClassyFire#most specific class",
-        "feature_pred_tax_cla_04dirpar_score" =
-          "ClassyFire#most specific class Probability"
+        "feature_pred_tax_npc_01pat_val" = "NPC.pathway",
+        "feature_pred_tax_npc_01pat_score" = "NPC.pathway.Probability",
+        "feature_pred_tax_npc_02sup_val" = "NPC.superclass",
+        "feature_pred_tax_npc_02sup_score" = "NPC.superclass.Probability",
+        "feature_pred_tax_npc_03cla_val" = "NPC.class",
+        "feature_pred_tax_npc_03cla_score" = "NPC.class.Probability",
+        # "feature_pred_tax_cla_01kin_val" = "ClassyFire.TODO",
+        # "feature_pred_tax_cla_01kin_score" = "ClassyFire.TODO.Probability",
+        "feature_pred_tax_cla_02sup_val" = "ClassyFire.superclass",
+        "feature_pred_tax_cla_02sup_score" = "ClassyFire.superclass.probability",
+        "feature_pred_tax_cla_03cla_val" = "ClassyFire.class",
+        "feature_pred_tax_cla_03cla_score" = "ClassyFire.class.Probability",
+        # "feature_pred_tax_cla_04sub_val" = "ClassyFire.subclass",
+        # "feature_pred_tax_cla_04sub_score" ="ClassyFire.subclass.Probability",
+        # "feature_pred_tax_cla_05lev_val" = "ClassyFire.level.5",
+        # "feature_pred_tax_cla_05lev_score" ="ClassyFire.level.5.Probability",
+        "feature_pred_tax_cla_04dirpar_val" = "ClassyFire.most.specific.class",
+        "feature_pred_tax_cla_04dirpar_score" = "ClassyFire.most.specific.class.Probability"
+        # tidytable version
+        # "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
+        # "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
+        # "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
+        # "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
+        # "feature_pred_tax_npc_03cla_val" = "NPC#class",
+        # "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
+        # "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
+        # "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
+        # "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
+        # "feature_pred_tax_cla_02sup_score" =
+        #   "ClassyFire#superclass probability",
+        # "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
+        # "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
+        # "feature_pred_tax_cla_04dirpar_val" =
+        #   "ClassyFire#most specific class",
+        # "feature_pred_tax_cla_04dirpar_score" =
+        #   "ClassyFire#most specific class Probability"
       )
-    ))
+    )) |>
+    # tidytable::bind_cols(tidytable::tidytable(
+    #   "feature_pred_tax_cla_01kin_val" = NA_character_,
+    #   "feature_pred_tax_cla_01kin_score" = 0
+    # )) |>
+    tidytable::distinct()
   return(df)
 }
 
@@ -64,8 +88,8 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
     tidytable::mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
         as.numeric(`massErrorPrecursor.ppm.`) *
-        # tidytable version
-        # as.numeric(`massErrorPrecursor(ppm)`) *
+          # tidytable version
+          # as.numeric(`massErrorPrecursor(ppm)`) *
           as.numeric(ionMass) *
           1E-6,
       candidate_structure_error_mz = as.numeric(ionMass) *
