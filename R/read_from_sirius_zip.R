@@ -12,7 +12,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
   f <- sirius_zip |>
     utils::unzip(list = TRUE) |>
     tidytable::filter(Name |>
-                        grepl(pattern = file)) |>
+      grepl(pattern = file)) |>
     tidytable::arrange(Name, decreasing = TRUE) |>
     tidytable::pull(Name) |>
     # because of structures and denovo sharing their name
