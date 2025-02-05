@@ -63,11 +63,15 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
     )) |>
     tidytable::mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
-        as.numeric(`massErrorPrecursor(ppm)`) *
+        as.numeric(`massErrorPrecursor.ppm.`) *
+        # tidytable version
+        # as.numeric(`massErrorPrecursor(ppm)`) *
           as.numeric(ionMass) *
           1E-6,
       candidate_structure_error_mz = as.numeric(ionMass) *
-        as.numeric(`massErrorPrecursor(ppm)`) *
+        as.numeric(`massErrorPrecursor.ppm.`) *
+        # tidytable version
+        # as.numeric(`massErrorPrecursor(ppm)`) *
         1E-6
     ) |>
     tidytable::select(tidyselect::any_of(
