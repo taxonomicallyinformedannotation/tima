@@ -9,37 +9,16 @@
 #'
 #' @examples NULL
 read_from_sirius_zip <- function(sirius_zip, file) {
-  sirius_no_zip <- sirius_zip |>
-    gsub(
-      pattern = "\\.(zip|rar)$",
-      replacement = "",
-      ignore.case = TRUE
-    )
-  if (sirius_zip != sirius_no_zip) {
-    temp <- tempdir() |>
-      normalizePath()
-    sirius_dir <- file.path(temp, sirius_no_zip |>
-      basename())
-    if (!file.exists(sirius_dir)) {
-      if (sirius_zip |> endsWith(".zip")) {
-        utils::unzip(sirius_zip, exdir = temp)
-      } else if (sirius_zip |> endsWith(".rar")) {
-        utils::untar(sirius_zip, exdir = temp)
-        sirius_dir <- sirius_dir |>
-          gsub(
-            pattern = sirius_no_zip |>
-              basename(),
-            replacement = ""
-          )
-      }
-    }
-  } else {
-    sirius_dir <- sirius_no_zip |>
-      normalizePath()
-  }
-
+  f <- sirius_zip |>
+    utils::unzip(list = TRUE) |>
+    tidytable::filter(Name |>
+                        grepl(pattern = file)) |>
+    tidytable::arrange(Name, decreasing = TRUE) |>
+    tidytable::pull(Name) |>
+    # because of structures and denovo sharing their name
+    head(1)
   tidytable::fread(
-    file = file.path(sirius_dir, file),
+    file = utils::unzip(sirius_zip, f),
     na.strings = c("", "NA"),
     colClasses = "character"
   )
