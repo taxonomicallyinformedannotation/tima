@@ -36,7 +36,7 @@ parse_cli_params <- function(arguments, parameters) {
         as.character(arguments$ann_thr_ms1_con)
     }
     if (!is.null(arguments$ann_thr_ms2_sim_ann)) {
-      parameters$annotations$thresholds$ms2$similarity <-
+      parameters$annotations$thresholds$ms2$similarity$annotation <-
         as.numeric(arguments$ann_thr_ms2_sim_ann)
     }
     if (!is.null(arguments$ann_thr_ms2_sim_edg)) {
