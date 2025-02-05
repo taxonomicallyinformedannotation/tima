@@ -108,6 +108,22 @@ references:
   year: '2025'
   version: '>= 4.3.0'
 - type: software
+  title: archive
+  abstract: 'archive: Multi-Format Archive and Compression Support'
+  notes: Imports
+  url: https://archive.r-lib.org/
+  repository: https://CRAN.R-project.org/package=archive
+  authors:
+  - family-names: Hester
+    given-names: Jim
+    orcid: https://orcid.org/0000-0002-2739-7082
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  year: '2025'
+  doi: 10.32614/CRAN.package.archive
+  version: '>= 1.1.10'
+- type: software
   title: BiocParallel
   abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
   notes: Imports
