@@ -11,24 +11,19 @@
 read_from_sirius_zip <- function(sirius_zip, file) {
   sirius_no_zip <- sirius_zip |>
     gsub(
-      pattern = ".zip",
+      pattern = "\\.(zip|rar)$",
       replacement = "",
-      fixed = TRUE
-    ) |>
-    gsub(
-      pattern = ".rar",
-      replacement = "",
-      fixed = TRUE
+      ignore.case = TRUE
     )
   if (sirius_zip != sirius_no_zip) {
-    temp <- tempdir()
+    temp <- tempdir() |>
+      normalizePath()
     sirius_dir <- file.path(temp, sirius_no_zip |>
       basename())
     if (!file.exists(sirius_dir)) {
       if (sirius_zip |> endsWith(".zip")) {
         utils::unzip(sirius_zip, exdir = temp)
-      }
-      if (sirius_zip |> endsWith(".rar")) {
+      } else if (sirius_zip |> endsWith(".rar")) {
         utils::untar(sirius_zip, exdir = temp)
         sirius_dir <- sirius_dir |>
           gsub(
@@ -39,7 +34,8 @@ read_from_sirius_zip <- function(sirius_zip, file) {
       }
     }
   } else {
-    sirius_dir <- sirius_no_zip
+    sirius_dir <- sirius_no_zip |>
+      normalizePath()
   }
 
   tidytable::fread(
