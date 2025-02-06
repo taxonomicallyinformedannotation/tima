@@ -9,11 +9,11 @@ NULL
 .onLoad <- function(libname, pkgname) {
   ## Hack to avoid rcmdcheck warning since they are needed by {targets}
   ## for shinylive
-  DT:::.packageName
-  gt:::.packageName
-  shinybusy:::.packageName
-  shinyWidgets:::.packageName
-  visNetwork:::.packageName
+  DT::`%>%`
+  gt::`%>%`
+  shinybusy::use_busy_spinner()
+  shinyWidgets::animations
+  visNetwork::`%>%`
   invisible()
 }
 
