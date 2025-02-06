@@ -34,7 +34,7 @@ jobs:
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"),
-            exclusions = "R/run_app.R"
+            line_exclusions = list("R/run_app.R", "R/tima_full.R", "R/tima-package.R")
           )
           covr::to_cobertura(cov)
         shell: Rscript {0}
