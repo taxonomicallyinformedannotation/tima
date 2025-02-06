@@ -501,9 +501,6 @@ test_that(desc = "Test functions", code = {
     high_confidence = FALSE
   )
 
-  ## cleanup
-  unlink("data", recursive = TRUE)
-
   ## in cache version
   copy_backbone()
   get_example_files(
@@ -516,26 +513,18 @@ test_that(desc = "Test functions", code = {
     ),
     in_cache = FALSE
   )
-  ## for size to match for shinytest2
-  unlink(paths$data$source$spectra)
   get_file(
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  ## Install
-  install(test = TRUE)
-  # get_example_files()
-  # tima:::.onLoad()
-  # tima_full()
-
+  
   ## Change small params
   get_example_files()
-  change_params_small()
   change_params_small(
     fil_pat = "myExamplePattern",
     fil_fea_raw = paths$data$source$features,
     fil_met_raw = paths$data$source$metadata,
-    fil_sir_raw = paths$data$interim$annotations$example_sirius$v6,
+    fil_sir_raw = "data/interim/annotations/example_sirius.zip",
     fil_spe_raw = paths$data$source$spectra,
     ms_pol = "pos",
     org_tax = "Gentiana lutea",
@@ -549,6 +538,12 @@ test_that(desc = "Test functions", code = {
 
   parse_cli_params(arguments = arguments, parameters = params)
 
+  ## Install
+  install(test = TRUE)
+  # get_example_files()
+  # tima:::.onLoad()
+  # tima_full()
+  
   ## cleanup
   unlink("data", recursive = TRUE)
 
