@@ -369,54 +369,38 @@ match (should be lower than <code>NPC class</code>)</p></dd>
 <span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
 <span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">org_tax_ott</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">taxonomies</span><span class="op">$</span><span class="va">ott</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">str_stereo</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">structures</span><span class="op">$</span><span class="va">stereo</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">filtered</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">canopus</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">canopus</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">prepared</span><span class="op">$</span><span class="va">formula</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">components</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">components</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">prepared</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    pattern <span class="op">=</span> <span class="st">".gz"</span>,</span></span>
-<span class="r-in"><span>    replacement <span class="op">=</span> <span class="st">""</span>,</span></span>
-<span class="r-in"><span>    fixed <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">org_tax_ott</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/libraries/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"sop/merged/organisms/taxonomies/ott.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">str_stereo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/libraries/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"sop/merged/structures/stereo.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/annotations/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_annotationsFiltered.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">canopus</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/annotations/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_canopusPrepared.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/annotations/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_formulaPrepared.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">components</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/features/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_componentsPrepared.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/features/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_edges.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">taxa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/interim/taxa/"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"example_taxed.tsv"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">library</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">library</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">org_tax_ott</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">org_tax_ott</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">str_stereo</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">str_stereo</span><span class="op">)</span></span></span>
