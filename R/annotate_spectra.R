@@ -26,7 +26,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectra_mini,
@@ -234,7 +234,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         "target_precursorMz" = lib_precursors
       )
       df_meta <- df_meta |>
-        tima:::harmonize_adducts(adducts_colname = "target_adduct")
+        harmonize_adducts(adducts_colname = "target_adduct")
       rm(lib_precursors)
 
       df_final$candidate_spectrum_entropy <- as.numeric(df_final$candidate_spectrum_entropy)
@@ -331,11 +331,11 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     df_final <- df_empty
   }
 
-  tima:::export_params(
+  export_params(
     parameters = get_params(step = "annotate_spectra"),
     step = "annotate_spectra"
   )
-  tima:::export_output(x = df_final, file = output[[1]])
+  export_output(x = df_final, file = output[[1]])
   rm(df_final)
 
   return(output[[1]])

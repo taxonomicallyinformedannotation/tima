@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectra_mini,
@@ -137,11 +137,11 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     )
   }
 
-  tima:::export_params(
+  export_params(
     parameters = get_params(step = "create_edges_spectra"),
     step = "create_edges_spectra"
   )
-  tima:::export_output(x = edges, file = output[[1]])
+  export_output(x = edges, file = output[[1]])
   rm(edges)
 
   return(output[[1]])

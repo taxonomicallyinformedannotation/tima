@@ -96,7 +96,7 @@ get_gnps_tables <-
           log_debug("The given GNPS job ID has no metadata")
           log_debug("Returning empty dataframes instead")
           fake_metadata <- data.frame(filename = NULL, ATTRIBUTE_species = NULL)
-          tima:::export_output(x = fake_metadata, file = file_metadata)
+          export_output(x = fake_metadata, file = file_metadata)
         }
       }
 
@@ -182,16 +182,16 @@ get_gnps_tables <-
         subclass = "fff",
         check.names = FALSE
       )
-      tima:::export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
+      export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
       fake_components <- data.frame(
         `cluster index` = 0,
         componentindex = 0,
         check.names = FALSE
       )
-      tima:::export_output(x = fake_components, file = file.path(path_interim_f, paste0(filename, "_components.tsv")))
+      export_output(x = fake_components, file = file.path(path_interim_f, paste0(filename, "_components.tsv")))
 
       fake_edges <- data.frame(CLUSTERID1 = 0, CLUSTERID2 = 0)
-      tima:::export_output(x = fake_edges, file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv")))
+      export_output(x = fake_edges, file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv")))
       if (is.list(path_metadata)) {
         path_metadata <- unlist(path_metadata)
       }
@@ -202,7 +202,7 @@ get_gnps_tables <-
         !file.exists(path_metadata)) {
         path_metadata <- "data/source/metadata.tsv"
         fake_metadata <- data.frame(filename = "foo", ATTRIBUTE_species = "bar")
-        tima:::export_output(x = fake_metadata, file = path_metadata)
+        export_output(x = fake_metadata, file = path_metadata)
       }
 
       return(

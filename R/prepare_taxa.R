@@ -32,7 +32,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
@@ -262,7 +262,7 @@ prepare_taxa <-
       ) |>
       tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character)) |>
       tidytable::group_by(feature_id) |>
-      tima:::clean_collapse(
+      clean_collapse(
         cols = c(
           "sample_organism_01_domain",
           "sample_organism_02_kingdom",
@@ -284,11 +284,11 @@ prepare_taxa <-
       ))
     rm(biological_metadata, metadata_table_joined)
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_taxa"),
       step = "prepare_taxa"
     )
-    tima:::export_output(x = taxed_features_table, file = output)
+    export_output(x = taxed_features_table, file = output)
     rm(taxed_features_table)
     return(output)
   }

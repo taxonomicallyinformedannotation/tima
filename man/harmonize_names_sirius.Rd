@@ -18,5 +18,5 @@ This function harmonizes the names of Sirius
 outputs to make them compatible
 }
 \examples{
-harmonized_name <- tima:::harmonize_names_sirius("My_name")
+harmonized_name <- harmonize_names_sirius("My_name")
 }

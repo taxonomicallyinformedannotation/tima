@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' get_params("prepare_params")
 #' }
@@ -72,9 +72,9 @@ get_params <- function(step) {
 
   doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 
-  params <- tima:::parse_yaml_params(def = default_path, usr = user_path)
+  params <- parse_yaml_params(def = default_path, usr = user_path)
 
-  params <- tima:::parse_cli_params(
+  params <- parse_cli_params(
     arguments = docopt::docopt(doc = doc, version = paths$version),
     parameters = params
   )

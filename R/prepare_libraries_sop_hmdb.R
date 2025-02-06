@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_sop_hmdb()
 #' unlink("data", recursive = TRUE)

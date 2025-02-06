@@ -56,7 +56,7 @@ to be used for later
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 prepare_libraries_rt()
 unlink("data", recursive = TRUE)

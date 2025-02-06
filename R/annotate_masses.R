@@ -38,7 +38,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
@@ -125,7 +125,7 @@ annotate_masses <-
       )) |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::mutate(tidytable::across(.cols = c("structure_exact_mass"), .fns = as.numeric)) |>
-      tima:::round_reals()
+      round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
     df_add_em <- structure_organism_pairs_table |>
@@ -199,7 +199,7 @@ annotate_masses <-
           "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
         )
       features_table <- features_table |>
-        tima:::harmonize_adducts()
+        harmonize_adducts()
     }
 
     df_fea_min <- features_table |>
@@ -235,7 +235,7 @@ annotate_masses <-
       ) |>
       tidytable::select(tidyselect::everything(), feature_id_dest, mz_dest, adduct_dest) |>
       tidytable::filter(feature_id != feature_id_dest) |>
-      tima:::log_pipe("adding delta mz tolerance for single charge adducts \n") |>
+      log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       tidytable::filter(mz_dest >= mz) |>
       tidytable::mutate(
         delta_min = (mz_dest - (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz),
@@ -292,7 +292,7 @@ annotate_masses <-
 
     log_debug("calculating delta mz for single charge adducts and clusters \n")
     differences <-
-      tima:::dist_groups(
+      dist_groups(
         d = stats::dist(add_clu_table$adduct_mass),
         g = add_clu_table$adduct
       ) |>
@@ -610,7 +610,7 @@ annotate_masses <-
     rm(structure_organism_pairs_table, df_annotated_final)
 
     df_final |>
-      tima:::decorate_masses()
+      decorate_masses()
 
     edges <- tidytable::bind_rows(
       df_add |>
@@ -632,12 +632,12 @@ annotate_masses <-
     )
     rm(df_nl, df_add)
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "annotate_masses"),
       step = "annotate_masses"
     )
-    tima:::export_output(x = edges, file = output_edges[[1]])
-    tima:::export_output(x = df_final, file = output_annotations[[1]])
+    export_output(x = edges, file = output_edges[[1]])
+    export_output(x = df_final, file = output_annotations[[1]])
 
     rm(edges, df_final)
     return(c("annotations" = output_annotations[[1]], "edges" = output_edges[[1]]))

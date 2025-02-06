@@ -52,7 +52,7 @@ benchmark_taxize_spectra <-
       )
     rm(features_sampled, taxo)
 
-    tima:::export_output(x = features_taxed, file = output)
+    export_output(x = features_taxed, file = output)
     rm(features_taxed)
 
     return(c(output))

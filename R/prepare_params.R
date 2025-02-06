@@ -17,7 +17,7 @@
 prepare_params <- function(params_small = get_params(step = "prepare_params"),
                            params_advanced = get_params(step = "prepare_params_advanced"),
                            step = NA) {
-  list <- tima:::load_yaml_files()
+  list <- load_yaml_files()
   yamls_params <- list$yamls_params
 
   log_debug(x = "All params")
@@ -632,103 +632,103 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     yamls_params$annotate_masses$files$annotations$prepared$structural |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$annotate_masses$files$features$prepared <-
     yamls_params$annotate_masses$files$features$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$annotate_masses$files$networks$spectral$edges$raw <-
     yamls_params$annotate_masses$files$networks$spectral$edges$raw |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## annotate_spectra
   yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
     yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   # yamls_params$annotate_spectra$files$spectral$raw <-
   #   yamls_params$annotate_spectra$files$spectral$raw |>
-  #   purrr::map(.f = tima:::replace_id)
+  #   purrr::map(.f = replace_id)
 
   ## create_edges_spectra
   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
     yamls_params$create_edges_spectra$files$networks$spectral$edges$raw |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   # yamls_params$create_edges_spectra$files$spectral$raw <-
   #   yamls_params$create_edges_spectra$files$spectral$raw |>
-  #   purrr::map(.f = tima:::replace_id)
+  #   purrr::map(.f = replace_id)
 
   ## create_components
   yamls_params$create_components$files$networks$spectral$edges$prepared <-
     yamls_params$create_components$files$networks$spectral$edges$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$create_components$files$networks$spectral$components$raw <-
     yamls_params$create_components$files$networks$spectral$components$raw |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## filter_annotations
   yamls_params$filter_annotations$files$annotations$filtered <-
     yamls_params$filter_annotations$files$annotations$filtered |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$filter_annotations$files$annotations$prepared$structural$gnps <-
     yamls_params$filter_annotations$files$annotations$prepared$structural$gnps |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$filter_annotations$files$annotations$prepared$structural$ms1 <-
     yamls_params$filter_annotations$files$annotations$prepared$structural$ms1 |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$filter_annotations$files$annotations$prepared$structural$sirius <-
     yamls_params$filter_annotations$files$annotations$prepared$structural$sirius |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$filter_annotations$files$annotations$prepared$structural$spectral <-
     yamls_params$filter_annotations$files$annotations$prepared$structural$spectral |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$filter_annotations$files$features$prepared <-
     yamls_params$filter_annotations$files$features$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## prepare_features_tables
   # yamls_params$prepare_features_tables$files$features$raw <-
   #   yamls_params$prepare_features_tables$files$features$raw |>
-  #   purrr::map(.f = tima:::replace_id)
+  #   purrr::map(.f = replace_id)
   yamls_params$prepare_features_tables$files$features$prepared <-
     yamls_params$prepare_features_tables$files$features$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## prepare_features_components
   yamls_params$prepare_features_components$files$networks$spectral$components$raw <-
     yamls_params$prepare_features_components$files$networks$spectral$components$raw |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_features_components$files$networks$spectral$components$prepared <-
     yamls_params$prepare_features_components$files$networks$spectral$components$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## prepare_features_edges
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
     yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## prepare_annotations_gnps
   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
     yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
     yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
 
   ## prepare_annotations_sirius
   # yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius <-
   #   yamls_params$prepare_annotations_sirius$files$annotations$raw$sirius |>
-  #   purrr::map(.f = tima:::replace_id)
+  #   purrr::map(.f = replace_id)
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus <-
     yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula <-
     yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula |>
-    purrr::map(.f = tima:::replace_id)
+    purrr::map(.f = replace_id)
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural <-
     yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural |>
     purrr::map(.f = tima:::replace_id)

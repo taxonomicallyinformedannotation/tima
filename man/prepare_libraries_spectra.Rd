@@ -76,7 +76,7 @@ to be used for spectral matching
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 prepare_libraries_spectra()
 unlink("data", recursive = TRUE)

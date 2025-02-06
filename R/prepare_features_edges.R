@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
@@ -67,11 +67,11 @@ prepare_features_edges <-
       tidytable::mutate(feature_target := tidytable::coalesce(feature_target, feature_source))
     rm(edges_ms1, edges_ms2, features_entropy)
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_features_edges"),
       step = "prepare_features_edges"
     )
-    tima:::export_output(x = edges_table_treated, file = output)
+    export_output(x = edges_table_treated, file = output)
     rm(edges_table_treated)
 
     return(output)

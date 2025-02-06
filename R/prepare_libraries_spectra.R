@@ -37,7 +37,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_spectra()
 #' unlink("data", recursive = TRUE)
@@ -83,14 +83,14 @@ prepare_libraries_spectra <-
         spectra <- purrr::map(.x = input, .f = import_spectra)
 
         log_debug("Extracting")
-        spectra_extracted <- purrr::map(.x = spectra, .f = tima:::extract_spectra)
+        spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
         rm(spectra)
 
         log_debug("Harmonizing ...")
         log_debug("... pos")
         spectra_harmonized_pos <- purrr::map(
           .x = spectra_extracted,
-          .f = tima:::harmonize_spectra,
+          .f = harmonize_spectra,
           mode = "pos",
           metad = nam_lib,
           col_ad = col_ad,

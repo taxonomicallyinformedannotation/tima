@@ -55,7 +55,7 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
   }
   if ("sirius" %in% example) {
     message("Sirius")
-    tima:::get_example_sirius()
+    get_example_sirius()
   }
   if ("spectra" %in% example) {
     message("Spectra")
