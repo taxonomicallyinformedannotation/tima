@@ -7,7 +7,7 @@ test_that("{shinytest2} recording: app", {
     timeout = 100000,
     load_timeout = 100000,
     shiny_args = list(
-      appDir = system.file(package = "tima"),
+      app = shiny::shinyAppFile(system.file("app.R", package = "tima")),
       host = "127.0.0.1",
       port = 3838,
       launch.browser = TRUE
