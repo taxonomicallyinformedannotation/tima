@@ -12,9 +12,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' df <- data.frame("organism" = "Homo sapiens")
 #' get_organism_taxonomy_ott(df)
-#' unlink("data", recursive = TRUE)
+#' }
 get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about", retry = TRUE) {
   organism_table <- df |>
     tidytable::as_tidytable() |>

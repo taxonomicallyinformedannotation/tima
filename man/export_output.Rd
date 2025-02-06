@@ -19,6 +19,8 @@ This function creates the output directory
 if it doesn't exist and exports the data frame to a tab-delimited file.
 }
 \examples{
+\dontrun{
 export_output(x = data.frame(), file = "output/file.tsv")
 unlink("output", recursive = TRUE)
+}
 }

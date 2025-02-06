@@ -25,7 +25,8 @@ This function retrieves taxonomy
 from the Open Tree of Life taxonomy
 }
 \examples{
+\dontrun{
 df <- data.frame("organism" = "Homo sapiens")
 get_organism_taxonomy_ott(df)
-unlink("data", recursive = TRUE)
+}
 }

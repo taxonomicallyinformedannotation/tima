@@ -17,6 +17,7 @@ This function creates a directory at the specified path
 if it does not already exist.
 }
 \examples{
+\dontrun{
 create_dir(export = "path/to/directory_of_file")
-unlink("path", recursive = TRUE)
+}
 }

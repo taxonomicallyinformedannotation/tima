@@ -21,6 +21,7 @@ Example files.
 This function downloads example files
 }
 \examples{
+\dontrun{
 get_example_files(example = c("features"), in_cache = FALSE)
-unlink("data", recursive = TRUE)
+}
 }

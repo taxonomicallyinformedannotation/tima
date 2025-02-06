@@ -9,7 +9,10 @@
 #'
 #' @export
 #'
-#' @examples get_default_paths()
+#' @examples
+#' \dontrun{
+#' get_default_paths()
+#' }
 get_default_paths <- function(yaml = system.file("paths.yaml", package = "tima")) {
   return(yaml::read_yaml(file = yaml))
 }

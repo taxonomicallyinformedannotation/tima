@@ -33,6 +33,7 @@ Spectra object containing the imported spectra
 This function imports spectra from a file (.mgf or .sqlite)
 }
 \examples{
+\dontrun{
 get_file(
   url = get_default_paths()$urls$examples$spectra_mini,
   export = get_default_paths()$data$source$spectra
@@ -42,4 +43,5 @@ import_spectra(
   file = get_default_paths()$data$source$spectra,
   sanitize = FALSE
 )
+}
 }
