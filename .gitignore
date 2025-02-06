@@ -13,6 +13,7 @@ renv
 megalinter-reports
 pkg.lock
 
+data
 _targets
 # {shinytest2}: Ignore new debug snapshots for `$expect_values()`
 *_.new.png
