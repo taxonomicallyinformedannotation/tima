@@ -9,443 +9,441 @@
 #'
 #' @examples NULL
 parse_cli_params <- function(arguments, parameters) {
-  if (exists("arguments")) {
-    if (!is.null(arguments$ann_can_fin)) {
-      parameters$annotations$candidates$final <- as.numeric(arguments$ann_can_fin)
-    }
-    if (!is.null(arguments$ann_ms1only)) {
-      parameters$annotations$ms1only <- as.logical(arguments$ann_ms1only)
-    }
-    if (!is.null(arguments$ann_ms2_app)) {
-      parameters$annotations$ms2approx <- as.logical(arguments$ann_ms2_app)
-    }
-    if (!is.null(arguments$ann_thr_con)) {
-      parameters$annotations$thresholds$consistency <-
-        as.numeric(arguments$ann_thr_con)
-    }
-    if (!is.null(arguments$ann_thr_ms1_bio)) {
-      parameters$annotations$thresholds$ms1$biological <-
-        as.numeric(arguments$ann_thr_ms1_bio)
-    }
-    if (!is.null(arguments$ann_thr_ms1_che)) {
-      parameters$annotations$thresholds$ms1$chemical <-
-        as.numeric(arguments$ann_thr_ms1_che)
-    }
-    if (!is.null(arguments$ann_thr_ms1_con)) {
-      parameters$annotations$thresholds$ms1$condition <-
-        as.character(arguments$ann_thr_ms1_con)
-    }
-    if (!is.null(arguments$ann_thr_ms2_sim_ann)) {
-      parameters$annotations$thresholds$ms2$similarity$annotation <-
-        as.numeric(arguments$ann_thr_ms2_sim_ann)
-    }
-    if (!is.null(arguments$ann_thr_ms2_sim_edg)) {
-      parameters$annotations$thresholds$ms2$similarity$edges <-
-        as.numeric(arguments$ann_thr_ms2_sim_edg)
-    }
-    if (!is.null(arguments$fil_pat)) {
-      parameters$files$pattern <- as.character(arguments$fil_pat)
-    }
-    # if (!is.null(arguments$fil_ann_raw_spe)) {
-    #   parameters$files$annotations$raw$spectral <-
-    #     as.character(arguments$fil_ann_raw_spe)
-    # }
-    if (!is.null(arguments$fil_ann_raw_spe_gnp)) {
-      parameters$files$annotations$raw$spectral$gnps <-
-        as.character(arguments$fil_ann_raw_spe_gnp)
-    }
-    if (!is.null(arguments$fil_ann_raw_spe_spe)) {
-      parameters$files$annotations$raw$spectral$spectral <-
-        as.character(arguments$fil_ann_raw_spe_spe)
-    }
-    if (!is.null(arguments$fil_ann_raw_sir)) {
-      parameters$files$annotations$raw$sirius <-
-        as.character(arguments$fil_ann_raw_sir)
-    }
-    if (!is.null(arguments$fil_ann_fil)) {
-      parameters$files$annotations$filtered <- as.character(arguments$fil_ann_fil)
-    }
-    if (!is.null(arguments$fil_ann_pre_can)) {
-      parameters$files$annotations$prepared$canopus <-
-        as.character(arguments$fil_ann_pre_can)
-    }
-    if (!is.null(arguments$fil_ann_pre_for)) {
-      parameters$files$annotations$prepared$formula <-
-        as.character(arguments$fil_ann_pre_for)
-    }
-    if (!is.null(arguments$fil_ann_pre_str)) {
-      parameters$files$annotations$prepared$structural <-
-        as.character(arguments$fil_ann_pre_str)
-    }
-    if (!is.null(arguments$fil_ann_pro)) {
-      parameters$files$annotations$processed <- as.character(arguments$fil_ann_pro)
-    }
-    if (!is.null(arguments$fil_fea_raw)) {
-      parameters$files$features$raw <- as.character(arguments$fil_fea_raw)
-    }
-    if (!is.null(arguments$fil_fea_pre)) {
-      parameters$files$features$prepared <- as.character(arguments$fil_fea_pre)
-    }
-    if (!is.null(arguments$fil_lib_sop_raw_clo)) {
-      parameters$files$libraries$sop$raw$closed <-
-        as.character(arguments$fil_lib_sop_raw_clo)
-    }
-    if (!is.null(arguments$fil_lib_sop_raw_ecm)) {
-      parameters$files$libraries$sop$raw$ecmdb <-
-        as.character(arguments$fil_lib_sop_raw_ecm)
-    }
-    if (!is.null(arguments$fil_lib_sop_raw_hmd)) {
-      parameters$files$libraries$sop$raw$hmdb <-
-        as.character(arguments$fil_lib_sop_raw_hmd)
-    }
-    if (!is.null(arguments$fil_lib_sop_raw_lot)) {
-      parameters$files$libraries$sop$raw$lotus <-
-        as.character(arguments$fil_lib_sop_raw_lot)
-    }
-    if (!is.null(arguments$fil_lib_sop_pre)) {
-      parameters$files$libraries$sop$prepared <-
-        as.character(arguments$fil_lib_sop_pre)
-    }
-    if (!is.null(arguments$fil_lib_spe_neg)) {
-      parameters$files$libraries$spectral$neg <-
-        as.character(arguments$fil_lib_spe_neg)
-    }
-    if (!is.null(arguments$fil_lib_spe_pos)) {
-      parameters$files$libraries$spectral$pos <-
-        as.character(arguments$fil_lib_spe_pos)
-    }
-    if (!is.null(arguments$fil_lib_spe_raw)) {
-      parameters$files$libraries$spectral$raw <-
-        as.character(arguments$fil_lib_spe_raw)
-    }
-    if (!is.null(arguments$fil_lib_tem_exp_csv)) {
-      parameters$files$libraries$temporal$exp$csv <-
-        as.character(arguments$fil_lib_tem_exp_csv)
-    }
-    if (!is.null(arguments$fil_lib_tem_exp_mgf_neg)) {
-      parameters$files$libraries$temporal$exp$mgf$neg <-
-        as.character(arguments$fil_lib_tem_exp_mgf_neg)
-    }
-    if (!is.null(arguments$fil_lib_tem_exp_mgf_pos)) {
-      parameters$files$libraries$temporal$exp$mgf$pos <-
-        as.character(arguments$fil_lib_tem_exp_mgf_pos)
-    }
-    if (!is.null(arguments$fil_lib_tem_is_csv)) {
-      parameters$files$libraries$temporal$is$csv <-
-        as.character(arguments$fil_lib_tem_is_csv)
-    }
-    if (!is.null(arguments$fil_lib_tem_is_mgf_neg)) {
-      parameters$files$libraries$temporal$is$mgf$neg <-
-        as.character(arguments$fil_lib_tem_is_mgf_neg)
-    }
-    if (!is.null(arguments$fil_lib_tem_is_mgf_pos)) {
-      parameters$files$libraries$temporal$is$mgf$pos <-
-        as.character(arguments$fil_lib_tem_is_mgf_pos)
-    }
-    if (!is.null(arguments$fil_lib_tem_pre)) {
-      parameters$files$libraries$temporal$prepared <-
-        as.character(arguments$fil_lib_tem_pre)
-    }
-    if (!is.null(arguments$fil_net_spe_edg_raw)) {
-      parameters$files$networks$spectral$edges$raw <-
-        as.character(arguments$fil_net_spe_edg_raw)
-    }
-    if (!is.null(arguments$fil_net_spe_edg_pre)) {
-      parameters$files$networks$spectral$edges$prepared <-
-        as.character(arguments$fil_net_spe_edg_pre)
-    }
-    if (!is.null(arguments$fil_net_spe_com_raw)) {
-      parameters$files$networks$spectral$components$raw <-
-        as.character(arguments$fil_net_spe_com_raw)
-    }
-    if (!is.null(arguments$fil_net_spe_com_pre)) {
-      parameters$files$networks$spectral$components$prepared <-
-        as.character(arguments$fil_net_spe_com_pre)
-    }
-    if (!is.null(arguments$fil_met_raw)) {
-      parameters$files$metadata$raw <- as.character(arguments$fil_met_raw)
-    }
-    if (!is.null(arguments$fil_met_pre)) {
-      parameters$files$metadata$prepared <- as.character(arguments$fil_met_pre)
-    }
-    if (!is.null(arguments$fil_spe_raw)) {
-      parameters$files$spectral$raw <- as.character(arguments$fil_spe_raw)
-    }
-    if (!is.null(arguments$gnps_id)) {
-      parameters$gnps$id <- as.character(arguments$gnps_id)
-    }
-    if (!is.null(arguments$gnps_workflow)) {
-      parameters$gnps$workflow <- as.character(arguments$gnps_workflow)
-    }
-    if (!is.null(arguments$ms_add_neg)) {
-      parameters$ms$adducts$neg <- as.character(arguments$ms_add_neg)
-    }
-    if (!is.null(arguments$ms_add_pos)) {
-      parameters$ms$adducts$pos <- as.character(arguments$ms_add_pos)
-    }
-    if (!is.null(arguments$ms_clu_neg)) {
-      parameters$ms$clusters$neg <- as.character(arguments$ms_clu_neg)
-    }
-    if (!is.null(arguments$ms_clu_pos)) {
-      parameters$ms$clusters$pos <- as.character(arguments$ms_clu_pos)
-    }
-    if (!is.null(arguments$ms_neu)) {
-      parameters$ms$neutral_losses <- as.character(arguments$ms_neu)
-    }
-    if (!is.null(arguments$ms_pol)) {
-      parameters$ms$polarity <- as.character(arguments$ms_pol)
-    }
-    if (!is.null(arguments$ms_thr_ms2_int)) {
-      parameters$ms$thresholds$ms2$intensity <- as.numeric(arguments$ms_thr_ms2_int)
-    }
-    if (!is.null(arguments$ms_tol_mas_ppm_ms1)) {
-      parameters$ms$tolerances$mass$ppm$ms1 <-
-        as.numeric(arguments$ms_tol_mas_ppm_ms1)
-    }
-    if (!is.null(arguments$ms_tol_mas_ppm_ms2)) {
-      parameters$ms$tolerances$mass$ppm$ms2 <-
-        as.numeric(arguments$ms_tol_mas_ppm_ms2)
-    }
-    if (!is.null(arguments$ms_tol_mas_dal_ms1)) {
-      parameters$ms$tolerances$mass$dalton$ms1 <-
-        as.numeric(arguments$ms_tol_mas_dal_ms1)
-    }
-    if (!is.null(arguments$ms_tol_mas_dal_ms2)) {
-      parameters$ms$tolerances$mass$dalton$ms2 <-
-        as.numeric(arguments$ms_tol_mas_dal_ms2)
-    }
-    if (!is.null(arguments$ms_tol_rt_add)) {
-      parameters$ms$tolerances$rt$adducts <- as.numeric(arguments$ms_tol_rt_add)
-    }
-    if (!is.null(arguments$ms_tol_rt_lib)) {
-      parameters$ms$tolerances$rt$library <- as.numeric(arguments$ms_tol_rt_lib)
-    }
-    if (!is.null(arguments$names_adduct)) {
-      parameters$names$adduct <- as.character(arguments$names_adduct)
-    }
-    if (!is.null(arguments$names_extension)) {
-      parameters$names$extension <- as.logical(arguments$names_extension)
-    }
-    if (!is.null(arguments$names_features)) {
-      parameters$names$features <- as.character(arguments$names_features)
-    }
-    if (!is.null(arguments$names_filename)) {
-      parameters$names$filename <- as.character(arguments$names_filename)
-    }
-    if (!is.null(arguments$names_inchikey)) {
-      parameters$names$inchikey <- as.character(arguments$names_inchikey)
-    }
-    if (!is.null(arguments$names_lib)) {
-      parameters$names$libraries <- as.character(arguments$names_lib)
-    }
-    if (!is.null(arguments$names_mgf_ad)) {
-      parameters$names$mgf$adduct <- as.character(arguments$names_mgf_ad)
-    }
-    if (!is.null(arguments$names_mgf_ce)) {
-      parameters$names$mgf$collision_energy <- as.character(arguments$names_mgf_ce)
-    }
-    if (!is.null(arguments$names_mgf_ci)) {
-      parameters$names$mgf$compound_id <- as.character(arguments$names_mgf_ci)
-    }
-    if (!is.null(arguments$names_mgf_em)) {
-      parameters$names$mgf$exact_mass <- as.character(arguments$names_mgf_em)
-    }
-    if (!is.null(arguments$names_mgf_in)) {
-      parameters$names$mgf$inchi <- as.character(arguments$names_mgf_in)
-    }
-    if (!is.null(arguments$names_mgf_io)) {
-      parameters$names$mgf$inchi_no_stereo <- as.character(arguments$names_mgf_io)
-    }
-    if (!is.null(arguments$names_mgf_ik)) {
-      parameters$names$mgf$inchikey <- as.character(arguments$names_mgf_ik)
-    }
-    if (!is.null(arguments$names_mgf_il)) {
-      parameters$names$mgf$inchikey_no_stereo <-
-        as.character(arguments$names_mgf_il)
-    }
-    if (!is.null(arguments$names_mgf_mf)) {
-      parameters$names$mgf$molecular_formula <- as.character(arguments$names_mgf_mf)
-    }
-    if (!is.null(arguments$names_mgf_na)) {
-      parameters$names$mgf$name <- as.character(arguments$names_mgf_na)
-    }
-    if (!is.null(arguments$names_mgf_po)) {
-      parameters$names$mgf$polarity <- as.character(arguments$names_mgf_po)
-    }
-    # if (!is.null(arguments$names_mgf_pc)) {
-    #   parameters$names$mgf$precursor_charge <-
-    #     as.character(arguments$names_mgf_pc)
-    # }
-    # if (!is.null(arguments$names_mgf_pm)) {
-    #   parameters$names$mgf$precursor_mz <- as.character(arguments$names_mgf_pm)
-    # }
-    if (!is.null(arguments$names_mgf_sm)) {
-      parameters$names$mgf$smiles <- as.character(arguments$names_mgf_sm)
-    }
-    if (!is.null(arguments$names_mgf_sn)) {
-      parameters$names$mgf$smiles_no_stereo <- as.character(arguments$names_mgf_sn)
-    }
-    if (!is.null(arguments$names_mgf_si)) {
-      parameters$names$mgf$spectrum_id <- as.character(arguments$names_mgf_si)
-    }
-    if (!is.null(arguments$names_mgf_sp)) {
-      parameters$names$mgf$splash <- as.character(arguments$names_mgf_sp)
-    }
-    if (!is.null(arguments$names_mgf_sy)) {
-      parameters$names$mgf$synonyms <- as.character(arguments$names_mgf_sy)
-    }
-    if (!is.null(arguments$names_mgf_xl)) {
-      parameters$names$mgf$xlogp <- as.character(arguments$names_mgf_xl)
-    }
-    if (!is.null(arguments$names_precursor)) {
-      parameters$names$precursor <- as.character(arguments$names_precursor)
-    }
-    if (!is.null(arguments$names_rt_fea)) {
-      parameters$names$rt$features <- as.character(arguments$names_rt_fea)
-    }
-    if (!is.null(arguments$names_rt_lib)) {
-      parameters$names$rt$library <- as.character(arguments$names_rt_lib)
-    }
-    if (!is.null(arguments$names_smiles)) {
-      parameters$names$smiles <- as.character(arguments$names_smiles)
-    }
-    if (!is.null(arguments$names_source)) {
-      parameters$names$source <- as.character(arguments$names_source)
-    }
-    if (!is.null(arguments$names_target)) {
-      parameters$names$target <- as.character(arguments$names_target)
-    }
-    if (!is.null(arguments$names_taxon)) {
-      parameters$names$taxon <- as.character(arguments$names_taxon)
-    }
-    if (!is.null(arguments$org_can)) {
-      parameters$organisms$candidates <- as.numeric(arguments$org_can)
-    }
-    if (!is.null(arguments$org_fil_mod)) {
-      parameters$organisms$filter$mode <- as.logical(arguments$org_fil_mod)
-    }
-    if (!is.null(arguments$org_fil_lev)) {
-      parameters$organisms$filter$level <- as.character(arguments$org_fil_lev)
-    }
-    if (!is.null(arguments$org_fil_val)) {
-      parameters$organisms$filter$value <- as.character(arguments$org_fil_val)
-    }
-    if (!is.null(arguments$org_tax)) {
-      parameters$organisms$taxon <- as.character(arguments$org_tax)
-    }
-    if (!is.null(arguments$too_met)) {
-      parameters$tools$metadata <- as.character(arguments$too_met)
-    }
-    if (!is.null(arguments$too_net_spe_com)) {
-      parameters$tools$networks$spectral$components <-
-        as.character(arguments$too_net_spe_com)
-    }
-    if (!is.null(arguments$too_net_spe_edg)) {
-      parameters$tools$networks$spectral$edges <-
-        as.character(arguments$too_net_spe_edg)
-    }
-    if (!is.null(arguments$too_sir_ver)) {
-      parameters$tools$sirius$version <- as.integer(arguments$too_sir_ver)
-    }
-    if (!is.null(arguments$too_tax_bio)) {
-      parameters$tools$taxonomies$biological <- as.character(arguments$too_tax_bio)
-    }
-    if (!is.null(arguments$too_tax_che)) {
-      parameters$tools$taxonomies$chemical <- as.character(arguments$too_tax_che)
-    }
-    if (!is.null(arguments$units_rt)) {
-      parameters$units$rt <- as.character(arguments$units_rt)
-    }
-    if (!is.null(arguments$wei_glo_bio)) {
-      parameters$weights$global$biological <- as.numeric(arguments$wei_glo_bio)
-    }
-    if (!is.null(arguments$wei_glo_che)) {
-      parameters$weights$global$chemical <- as.numeric(arguments$wei_glo_che)
-    }
-    if (!is.null(arguments$wei_glo_spe)) {
-      parameters$weights$global$spectral <- as.numeric(arguments$wei_glo_spe)
-    }
-    if (!is.null(arguments$wei_bio_01)) {
-      parameters$weights$biological$domain <- as.numeric(arguments$wei_bio_01)
-    }
-    if (!is.null(arguments$wei_bio_02)) {
-      parameters$weights$biological$kingdom <- as.numeric(arguments$wei_bio_02)
-    }
-    if (!is.null(arguments$wei_bio_03)) {
-      parameters$weights$biological$phylum <- as.numeric(arguments$wei_bio_03)
-    }
-    if (!is.null(arguments$wei_bio_04)) {
-      parameters$weights$biological$class <- as.numeric(arguments$wei_bio_04)
-    }
-    if (!is.null(arguments$wei_bio_05)) {
-      parameters$weights$biological$order <- as.numeric(arguments$wei_bio_05)
-    }
-    if (!is.null(arguments$wei_bio_06)) {
-      parameters$weights$biological$infraorder <- as.numeric(arguments$wei_bio_06)
-    }
-    if (!is.null(arguments$wei_bio_07)) {
-      parameters$weights$biological$family <- as.numeric(arguments$wei_bio_07)
-    }
-    if (!is.null(arguments$wei_bio_08)) {
-      parameters$weights$biological$subfamily <- as.numeric(arguments$wei_bio_08)
-    }
-    if (!is.null(arguments$wei_bio_09)) {
-      parameters$weights$biological$tribe <- as.numeric(arguments$wei_bio_09)
-    }
-    if (!is.null(arguments$wei_bio_10)) {
-      parameters$weights$biological$subtribe <- as.numeric(arguments$wei_bio_10)
-    }
-    if (!is.null(arguments$wei_bio_11)) {
-      parameters$weights$biological$genus <- as.numeric(arguments$wei_bio_11)
-    }
-    if (!is.null(arguments$wei_bio_12)) {
-      parameters$weights$biological$subgenus <- as.numeric(arguments$wei_bio_12)
-    }
-    if (!is.null(arguments$wei_bio_13)) {
-      parameters$weights$biological$species <- as.numeric(arguments$wei_bio_13)
-    }
-    if (!is.null(arguments$wei_bio_14)) {
-      parameters$weights$biological$subspecies <- as.numeric(arguments$wei_bio_14)
-    }
-    if (!is.null(arguments$wei_bio_15)) {
-      parameters$weights$biological$variety <- as.numeric(arguments$wei_bio_15)
-    }
-    if (!is.null(arguments$wei_che_11)) {
-      parameters$weights$chemical$cla$kingdom <- as.numeric(arguments$wei_che_11)
-    }
-    if (!is.null(arguments$wei_che_12)) {
-      parameters$weights$chemical$cla$superclass <- as.numeric(arguments$wei_che_12)
-    }
-    if (!is.null(arguments$wei_che_13)) {
-      parameters$weights$chemical$cla$class <- as.numeric(arguments$wei_che_13)
-    }
-    if (!is.null(arguments$wei_che_14)) {
-      parameters$weights$chemical$cla$parent <- as.numeric(arguments$wei_che_14)
-    }
-    if (!is.null(arguments$wei_che_21)) {
-      parameters$weights$chemical$npc$pathway <- as.numeric(arguments$wei_che_21)
-    }
-    if (!is.null(arguments$wei_che_22)) {
-      parameters$weights$chemical$npc$superclass <- as.numeric(arguments$wei_che_22)
-    }
-    if (!is.null(arguments$wei_che_23)) {
-      parameters$weights$chemical$npc$class <- as.numeric(arguments$wei_che_23)
-    }
-    if (!is.null(arguments$compounds_names)) {
-      parameters$options$compounds_names <- as.logical(arguments$compounds_names)
-    }
-    if (!is.null(arguments$force)) {
-      parameters$options$force <- as.logical(arguments$force)
-    }
-    if (!is.null(arguments$high_confidence)) {
-      parameters$options$high_confidence <- as.logical(arguments$high_confidence)
-    }
-    if (!is.null(arguments$remove_ties)) {
-      parameters$options$remove_ties <- as.logical(arguments$remove_ties)
-    }
-    if (!is.null(arguments$summarize)) {
-      parameters$options$summarize <- as.logical(arguments$summarize)
-    }
-  }
+  mappings <- list(
+    ann_can_fin = list(
+      path = c("annotations", "candidates", "final"),
+      type = as.numeric
+    ),
+    ann_ms1only = list(path = c("annotations", "ms1only"), type = as.logical),
+    ann_ms2_app = list(
+      path = c("annotations", "ms2approx"),
+      type = as.logical
+    ),
+    ann_thr_con = list(
+      path = c("annotations", "thresholds", "consistency"),
+      type = as.numeric
+    ),
+    ann_thr_ms1_bio = list(
+      path = c("annotations", "thresholds", "ms1", "biological"),
+      type = as.numeric
+    ),
+    ann_thr_ms1_che = list(
+      path = c("annotations", "thresholds", "ms1", "chemical"),
+      type = as.numeric
+    ),
+    ann_thr_ms1_con = list(
+      path = c("annotations", "thresholds", "ms1", "condition"),
+      type = as.character
+    ),
+    ann_thr_ms2_sim_ann = list(
+      path = c(
+        "annotations",
+        "thresholds",
+        "ms2",
+        "similarity",
+        "annotation"
+      ),
+      type = as.numeric
+    ),
+    ann_thr_ms2_sim_edg = list(
+      path = c("annotations", "thresholds", "ms2", "similarity", "edges"),
+      type = as.numeric
+    ),
+    fil_pat = list(path = c("files", "pattern"), type = as.character),
+    # fil_ann_raw_spe = list(path = c("files", "annotations", "raw", "spectral"),
+    #                        type = as.character),
+    fil_ann_raw_spe_gnp = list(
+      path = c("files", "annotations", "raw", "spectral", "gnps"),
+      type = as.character
+    ),
+    fil_ann_raw_spe_spe = list(
+      path = c("files", "annotations", "raw", "spectral", "spectral"),
+      type = as.character
+    ),
+    fil_ann_raw_sir = list(
+      path = c("files", "annotations", "raw", "sirius"),
+      type = as.character
+    ),
+    fil_ann_fil = list(
+      path = c("files", "annotations", "filtered"),
+      type = as.character
+    ),
+    fil_ann_pre_can = list(
+      path = c("files", "annotations", "prepared", "canopus"),
+      type = as.character
+    ),
+    fil_ann_pre_for = list(
+      path = c("files", "annotations", "prepared", "formula"),
+      type = as.character
+    ),
+    fil_ann_pre_str = list(
+      path = c("files", "annotations", "prepared", "structural"),
+      type = as.character
+    ),
+    fil_ann_pro = list(
+      path = c("files", "annotations", "processed"),
+      type = as.character
+    ),
+    fil_fea_raw = list(
+      path = c("files", "features", "raw"),
+      type = as.character
+    ),
+    fil_fea_pre = list(
+      path = c("files", "features", "prepared"),
+      type = as.character
+    ),
+    fil_lib_sop_raw_clo = list(
+      path = c("files", "libraries", "sop", "raw", "closed"),
+      type = as.character
+    ),
+    fil_lib_sop_raw_ecm = list(
+      path = c("files", "libraries", "sop", "raw", "ecmdb"),
+      type = as.character
+    ),
+    fil_lib_sop_raw_hmd = list(
+      path = c("files", "libraries", "sop", "raw", "hmdb"),
+      type = as.character
+    ),
+    fil_lib_sop_raw_lot = list(
+      path = c("files", "libraries", "sop", "raw", "lotus"),
+      type = as.character
+    ),
+    fil_lib_sop_pre = list(
+      path = c("files", "libraries", "sop", "prepared"),
+      type = as.character
+    ),
+    fil_lib_spe_neg = list(
+      path = c("files", "libraries", "spectral", "neg"),
+      type = as.character
+    ),
+    fil_lib_spe_pos = list(
+      path = c("files", "libraries", "spectral", "pos"),
+      type = as.character
+    ),
+    fil_lib_spe_raw = list(
+      path = c("files", "libraries", "spectral", "raw"),
+      type = as.character
+    ),
+    fil_lib_tem_exp_csv = list(
+      path = c("files", "libraries", "temporal", "exp", "csv"),
+      type = as.character
+    ),
+    fil_lib_tem_exp_mgf_neg = list(
+      path = c("files", "libraries", "temporal", "exp", "mgf", "neg"),
+      type = as.character
+    ),
+    fil_lib_tem_exp_mgf_pos = list(
+      path = c("files", "libraries", "temporal", "exp", "mgf", "pos"),
+      type = as.character
+    ),
+    fil_lib_tem_is_csv = list(
+      path = c("files", "libraries", "temporal", "is", "csv"),
+      type = as.character
+    ),
+    fil_lib_tem_is_mgf_neg = list(
+      path = c("files", "libraries", "temporal", "is", "mgf", "neg"),
+      type = as.character
+    ),
+    fil_lib_tem_is_mgf_pos = list(
+      path = c("files", "libraries", "temporal", "is", "mgf", "pos"),
+      type = as.character
+    ),
+    fil_lib_tem_pre = list(
+      path = c("files", "libraries", "temporal", "prepared"),
+      type = as.character
+    ),
+    fil_net_spe_edg_raw = list(
+      path = c("files", "networks", "spectral", "edges", "raw"),
+      type = as.character
+    ),
+    fil_net_spe_edg_pre = list(
+      path = c("files", "networks", "spectral", "edges", "prepared"),
+      type = as.character
+    ),
+    fil_net_spe_com_raw = list(
+      path = c("files", "networks", "spectral", "components", "raw"),
+      type = as.character
+    ),
+    fil_net_spe_com_pre = list(
+      path = c("files", "networks", "spectral", "components", "prepared"),
+      type = as.character
+    ),
+    fil_met_raw = list(
+      path = c("files", "metadata", "raw"),
+      type = as.character
+    ),
+    fil_met_pre = list(
+      path = c("files", "metadata", "prepared"),
+      type = as.character
+    ),
+    fil_spe_raw = list(
+      path = c("files", "spectral", "raw"),
+      type = as.character
+    ),
+    gnps_id = list(path = c("gnps", "id"), type = as.character),
+    gnps_workflow = list(path = c("gnps", "workflow"), type = as.character),
+    ms_add_neg = list(path = c("ms", "adducts", "neg"), type = as.character),
+    ms_add_pos = list(path = c("ms", "adducts", "pos"), type = as.character),
+    ms_clu_neg = list(path = c("ms", "clusters", "neg"), type = as.character),
+    ms_clu_pos = list(path = c("ms", "clusters", "pos"), type = as.character),
+    ms_neu = list(path = c("ms", "neutral_losses"), type = as.character),
+    ms_pol = list(path = c("ms", "polarity"), type = as.character),
+    ms_thr_ms2_int = list(
+      path = c("ms", "thresholds", "ms2", "intensity"),
+      type = as.numeric
+    ),
+    ms_tol_mas_ppm_ms1 = list(
+      path = c("ms", "tolerances", "mass", "ppm", "ms1"),
+      type = as.numeric
+    ),
+    ms_tol_mas_ppm_ms2 = list(
+      path = c("ms", "tolerances", "mass", "ppm", "ms2"),
+      type = as.numeric
+    ),
+    ms_tol_mas_dal_ms1 = list(
+      path = c("ms", "tolerances", "mass", "dalton", "ms1"),
+      type = as.numeric
+    ),
+    ms_tol_mas_dal_ms2 = list(
+      path = c("ms", "tolerances", "mass", "dalton", "ms2"),
+      type = as.numeric
+    ),
+    ms_tol_rt_add = list(
+      path = c("ms", "tolerances", "rt", "adducts"),
+      type = as.numeric
+    ),
+    ms_tol_rt_lib = list(
+      path = c("ms", "tolerances", "rt", "library"),
+      type = as.numeric
+    ),
+    names_adduct = list(path = c("names", "adduct"), type = as.character),
+    names_extension = list(path = c("names", "extension"), type = as.character),
+    names_features = list(path = c("names", "features"), type = as.character),
+    names_filename = list(path = c("names", "filename"), type = as.character),
+    names_inchikey = list(path = c("names", "inchikey"), type = as.character),
+    names_lib = list(path = c("names", "libraries"), type = as.character),
+    names_mgf_ad = list(path = c("names", "mgf", "adduct"), type = as.character),
+    names_mgf_ce = list(
+      path = c("names", "mgf", "collision_energy"),
+      type = as.character
+    ),
+    names_mgf_ci = list(
+      path = c("names", "mgf", "compound_id"),
+      type = as.character
+    ),
+    names_mgf_em = list(
+      path = c("names", "mgf", "exact_mass"),
+      type = as.character
+    ),
+    names_mgf_in = list(path = c("names", "mgf", "inchi"), type = as.character),
+    names_mgf_io = list(
+      path = c("names", "mgf", "inchi_no_stereo"),
+      type = as.character
+    ),
+    names_mgf_ik = list(
+      path = c("names", "mgf", "inchikey"),
+      type = as.character
+    ),
+    names_mgf_il = list(
+      path = c("names", "mgf", "inchikey_no_stereo"),
+      type = as.character
+    ),
+    names_mgf_mf = list(
+      path = c("names", "mgf", "molecular_formula"),
+      type = as.character
+    ),
+    names_mgf_na = list(path = c("names", "mgf", "name"), type = as.character),
+    names_mgf_po = list(
+      path = c("names", "mgf", "polarity"),
+      type = as.character
+    ),
+    # names_mgf_pc = list(path = c("names", "mgf", "precursor_charge"), type = as.character),
+    # names_mgf_pm = list(path = c("names", "mgf", "precursor_mz"), type = as.character),
+    names_mgf_sm = list(path = c("names", "mgf", "smiles"), type = as.character),
+    names_mgf_sn = list(
+      path = c("names", "mgf", "smiles_no_stereo"),
+      type = as.character
+    ),
+    names_mgf_si = list(
+      path = c("names", "mgf", "spectrum_id"),
+      type = as.character
+    ),
+    names_mgf_sp = list(path = c("names", "mgf", "splash"), type = as.character),
+    names_mgf_sy = list(
+      path = c("names", "mgf", "synonyms"),
+      type = as.character
+    ),
+    names_mgf_xl = list(path = c("names", "mgf", "xlogp"), type = as.character),
+    names_precursor = list(path = c("names", "precursor"), type = as.character),
+    names_rt_fea = list(path = c("names", "rt", "features"), type = as.character),
+    names_rt_lib = list(path = c("names", "rt", "library"), type = as.character),
+    names_smiles = list(path = c("names", "smiles"), type = as.character),
+    names_source = list(path = c("names", "source"), type = as.character),
+    names_target = list(path = c("names", "target"), type = as.character),
+    names_taxon = list(path = c("names", "taxon"), type = as.character),
+    org_can = list(
+      path = c("organisms", "candidates"),
+      type = as.integer
+    ),
+    org_fil_mod = list(
+      path = c("organisms", "filter", "mode"),
+      type = as.logical
+    ),
+    org_fil_lev = list(
+      path = c("organisms", "filter", "level"),
+      type = as.character
+    ),
+    org_fil_val = list(
+      path = c("organisms", "filter", "value"),
+      type = as.character
+    ),
+    org_tax = list(path = c("organisms", "taxon"), type = as.character),
+    too_met = list(path = c("tools", "metadata"), type = as.character),
+    too_net_spe_com = list(
+      path = c("tools", "networks", "spectral", "components"),
+      type = as.character
+    ),
+    too_net_spe_edg = list(
+      path = c("tools", "networks", "spectral", "edges"),
+      type = as.character
+    ),
+    too_sir_ver = list(
+      path = c("tools", "sirius", "version"),
+      type = as.integer
+    ),
+    too_tax_bio = list(
+      path = c("tools", "taxonomies", "biological"),
+      type = as.character
+    ),
+    too_tax_che = list(
+      path = c("tools", "taxonomies", "chemical"),
+      type = as.character
+    ),
+    units_rt = list(path = c("units", "rt"), type = as.character),
+    wei_glo_bio = list(
+      path = c("weights", "global", "biological"),
+      type = as.numeric
+    ),
+    wei_glo_che = list(
+      path = c("weights", "global", "chemical"),
+      type = as.numeric
+    ),
+    wei_glo_spe = list(
+      path = c("weights", "global", "spectral"),
+      type = as.numeric
+    ),
+    wei_bio_01 = list(
+      path = c("weights", "biological", "domain"),
+      type = as.numeric
+    ),
+    wei_bio_02 = list(
+      path = c("weights", "biological", "kingdom"),
+      type = as.numeric
+    ),
+    wei_bio_03 = list(
+      path = c("weights", "biological", "phylum"),
+      type = as.numeric
+    ),
+    wei_bio_04 = list(
+      path = c("weights", "biological", "class"),
+      type = as.numeric
+    ),
+    wei_bio_05 = list(
+      path = c("weights", "biological", "order"),
+      type = as.numeric
+    ),
+    wei_bio_06 = list(
+      path = c("weights", "biological", "infraorder"),
+      type = as.numeric
+    ),
+    wei_bio_07 = list(
+      path = c("weights", "biological", "family"),
+      type = as.numeric
+    ),
+    wei_bio_08 = list(
+      path = c("weights", "biological", "subfamily"),
+      type = as.numeric
+    ),
+    wei_bio_09 = list(
+      path = c("weights", "biological", "tribe"),
+      type = as.numeric
+    ),
+    wei_bio_10 = list(
+      path = c("weights", "biological", "subtribe"),
+      type = as.numeric
+    ),
+    wei_bio_11 = list(
+      path = c("weights", "biological", "genus"),
+      type = as.numeric
+    ),
+    wei_bio_12 = list(
+      path = c("weights", "biological", "subgenus"),
+      type = as.numeric
+    ),
+    wei_bio_13 = list(
+      path = c("weights", "biological", "species"),
+      type = as.numeric
+    ),
+    wei_bio_14 = list(
+      path = c("weights", "biological", "subspecies"),
+      type = as.numeric
+    ),
+    wei_bio_15 = list(
+      path = c("weights", "biological", "variety"),
+      type = as.numeric
+    ),
+    wei_che11 = list(
+      path = c("weights", "chemical", "cla", "kingdom"),
+      type = as.numeric
+    ),
+    wei_che12 = list(
+      path = c("weights", "chemical", "cla", "superclass"),
+      type = as.numeric
+    ),
+    wei_che13 = list(
+      path = c("weights", "chemical", "cla", "class"),
+      type = as.numeric
+    ),
+    wei_che14 = list(
+      path = c("weights", "chemical", "cla", "parent"),
+      type = as.numeric
+    ),
+    wei_che21 = list(
+      path = c("weights", "chemical", "npc", "pathway"),
+      type = as.numeric
+    ),
+    wei_che22 = list(
+      path = c("weights", "chemical", "npc", "superclass"),
+      type = as.numeric
+    ),
+    wei_che23 = list(
+      path = c("weights", "chemical", "npc", "class"),
+      type = as.numeric
+    ),
+    compounds_names = list(
+      path = c("options", "compounds_names"),
+      type = as.logical
+    ),
+    force = list(path = c("options", "force"), type = as.logical),
+    high_confidence = list(
+      path = c("options", "high_confidence"),
+      type = as.logical
+    ),
+    remove_ties = list(path = c("options", "remove_ties"), type = as.logical),
+    summarize = list(path = c("options", "summarize"), type = as.logical)
+  )
+
+  parameters <- names(mappings) |>
+    purrr::reduce(
+      .f = function(parameters, arg_name) {
+        if (!is.null(arguments[[arg_name]])) {
+          parameters |>
+            purrr::modify_in(mappings[[arg_name]]$path, ~ mappings[[arg_name]]$type(arguments[[arg_name]]))
+        } else {
+          parameters
+        }
+      },
+      .init = parameters
+    )
   return(parameters)
 }
