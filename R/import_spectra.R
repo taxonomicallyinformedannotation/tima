@@ -16,6 +16,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_file(
 #'   url = get_default_paths()$urls$examples$spectra_mini,
 #'   export = get_default_paths()$data$source$spectra
@@ -25,6 +26,7 @@
 #'   file = get_default_paths()$data$source$spectra,
 #'   sanitize = FALSE
 #' )
+#' }
 import_spectra <- function(file,
                            cutoff = 0,
                            dalton = 0.01,

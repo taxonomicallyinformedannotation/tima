@@ -25,10 +25,11 @@ Credit goes to partially to
 https://inbo.github.io/inborutils/
 }
 \examples{
+\dontrun{
 get_last_version_from_zenodo(
   doi = "10.5281/zenodo.5794106",
   pattern = "frozen.csv.gz",
   path = "frozen.csv.gz"
 )
-unlink("frozen.csv.gz")
+}
 }

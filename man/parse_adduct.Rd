@@ -21,6 +21,8 @@ Parsed elements from adduct
 This function parses adducts
 }
 \examples{
+\dontrun{
 parse_adduct("[M+H]+")
 parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")
+}
 }

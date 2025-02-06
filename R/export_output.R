@@ -13,8 +13,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' export_output(x = data.frame(), file = "output/file.tsv")
 #' unlink("output", recursive = TRUE)
+#' }
 export_output <- function(x, file = output) {
   # ## Use default system data directory
   # file <- file.path(

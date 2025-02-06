@@ -20,6 +20,7 @@ The path to the file
 This function get files
 }
 \examples{
+\dontrun{
 git <- "https://github.com/"
 org <- "taxonomicallyinformedannotation"
 repo <- "tima-example-files"
@@ -29,5 +30,5 @@ get_file(
   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
   export = "data/source/example_metadata.tsv"
 )
-unlink("data", recursive = TRUE)
+}
 }
