@@ -37,12 +37,10 @@
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' org_tax_ott <- get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott |>
-#'   gsub(
-#'     pattern = ".gz",
-#'     replacement = "",
-#'     fixed = TRUE
-#'   )
+#' org_tax_ott <- paste0(
+#'   "data/interim/libraries/",
+#'   "sop/merged/organisms/taxonomies/ott.tsv"
+#' )
 #' get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
 #' get_file(
 #'   url = get_default_paths()$urls$examples$features,

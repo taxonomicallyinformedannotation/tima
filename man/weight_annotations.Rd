@@ -219,54 +219,38 @@ library <- get_params(step = "weight_annotations")$files$libraries$sop$merged$ke
     replacement = "",
     fixed = TRUE
   )
-org_tax_ott <- get_params(step = "weight_annotations")$files$libraries$sop$merged$organisms$taxonomies$ott |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-str_stereo <- get_params(step = "weight_annotations")$files$libraries$sop$merged$structures$stereo |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-annotations <- get_params(step = "weight_annotations")$files$annotations$filtered |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-canopus <- get_params(step = "weight_annotations")$files$annotations$prepared$canopus |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-formula <- get_params(step = "weight_annotations")$files$annotations$prepared$formula |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-components <- get_params(step = "weight_annotations")$files$networks$spectral$components$prepared |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-edges <- get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
-taxa <- get_params(step = "weight_annotations")$files$metadata$prepared |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
+org_tax_ott <- paste0(
+  "data/interim/libraries/",
+  "sop/merged/organisms/taxonomies/ott.tsv"
+)
+str_stereo <- paste0(
+  "data/interim/libraries/",
+  "sop/merged/structures/stereo.tsv"
+)
+annotations <- paste0(
+  "data/interim/annotations/",
+  "example_annotationsFiltered.tsv"
+)
+canopus <- paste0(
+  "data/interim/annotations/",
+  "example_canopusPrepared.tsv"
+)
+formula <- paste0(
+  "data/interim/annotations/",
+  "example_formulaPrepared.tsv"
+)
+components <- paste0(
+  "data/interim/features/",
+  "example_componentsPrepared.tsv"
+)
+edges <- paste0(
+  "data/interim/features/",
+  "example_edges.tsv"
+)
+taxa <- paste0(
+  "data/interim/taxa/",
+  "example_taxed.tsv"
+)
 get_file(url = paste0(dir, library), export = library)
 get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
 get_file(url = paste0(dir, str_stereo), export = str_stereo)
