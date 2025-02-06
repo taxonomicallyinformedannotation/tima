@@ -18,5 +18,7 @@ This function pre harmonizes Sirius names
 to make them compatible
 }
 \examples{
-prepared_name <- tima:::pre_harmonize_names_sirius("My name/suffix")
+\dontrun{
+prepared_name <- pre_harmonize_names_sirius("My name/suffix")
+}
 }

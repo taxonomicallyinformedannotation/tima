@@ -18,5 +18,7 @@ This function harmonizes the names of Sirius
 outputs to make them compatible
 }
 \examples{
+\dontrun{
 harmonized_name <- harmonize_names_sirius("My_name")
+}
 }

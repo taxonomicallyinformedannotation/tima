@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_sop_closed()
 #' unlink("data", recursive = TRUE)
@@ -32,8 +32,8 @@ prepare_libraries_sop_closed <-
         tidytable::mutate(structure_inchikey_2D = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14)) |>
         tidytable::rename(structure_name = structure_nameTraditional) |>
         tidytable::mutate(reference_doi = NA) |>
-        tima:::select_sop_columns() |>
-        tima:::round_reals() |>
+        select_sop_columns() |>
+        round_reals() |>
         tidytable::distinct()
       rm(closed)
     } else {
@@ -42,11 +42,11 @@ prepare_libraries_sop_closed <-
       closed_prepared <- fake_sop_columns()
     }
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_libraries_sop_closed"),
       step = "prepare_libraries_sop_closed"
     )
-    tima:::export_output(x = closed_prepared, file = output)
+    export_output(x = closed_prepared, file = output)
     rm(closed_prepared)
     return(output)
   }

@@ -29,9 +29,11 @@ This function replaces the default ID
 in the example by a user-specified one
 }
 \examples{
+\dontrun{
 replace_id(
   x = "example/123456_features.tsv",
   user_gnps = NULL,
   user_filename = "Foo"
 )
+}
 }

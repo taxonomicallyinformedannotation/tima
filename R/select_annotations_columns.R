@@ -53,8 +53,8 @@ select_annotations_columns <- function(df,
         tidytable::na_if(x, "")
       }
     )) |>
-    tima:::round_reals() |>
+    round_reals() |>
     tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.numeric), .fns = as.character)) |>
-    tima:::complement_metadata_structures()
+    complement_metadata_structures()
   return(df)
 }

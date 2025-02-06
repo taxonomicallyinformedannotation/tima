@@ -73,7 +73,7 @@ complement_metadata_structures <- function(df,
       structure_name
     ) |>
     tidytable::group_by(structure_inchikey_no_stereo, structure_smiles_no_stereo) |>
-    tima:::clean_collapse(cols = c("structure_name")) |>
+    clean_collapse(cols = c("structure_name")) |>
     ## Avoid small discrepancies
     tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE) |>
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)

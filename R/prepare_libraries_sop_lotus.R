@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_sop_lotus()
 #' unlink("data", recursive = TRUE)
@@ -30,8 +30,8 @@ prepare_libraries_sop_lotus <-
         tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
         tidytable::mutate(structure_inchikey_2D = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14)) |>
         tidytable::rename(structure_name = structure_nameTraditional) |>
-        tima:::select_sop_columns() |>
-        tima:::round_reals() |>
+        select_sop_columns() |>
+        round_reals() |>
         tidytable::distinct()
     } else {
       log_debug("Sorry, LOTUS not found, returning an empty file instead")
@@ -39,7 +39,7 @@ prepare_libraries_sop_lotus <-
     }
 
     log_debug(x = "Exporting ...")
-    tima:::export_output(x = lotus_prepared, file = output)
+    export_output(x = lotus_prepared, file = output)
     rm(lotus_prepared)
     return(output)
   }

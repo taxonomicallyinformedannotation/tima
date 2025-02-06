@@ -72,13 +72,13 @@ prepare_annotations_sirius <-
 
       log_debug("Loading and formatting SIRIUS results")
       canopus <- input_directory |>
-        tima:::read_from_sirius_zip(file = canopus_filename)
+        read_from_sirius_zip(file = canopus_filename)
 
       formulas <- input_directory |>
-        tima:::read_from_sirius_zip(file = formulas_filename)
+        read_from_sirius_zip(file = formulas_filename)
 
       structures <- input_directory |>
-        tima:::read_from_sirius_zip(file = structures_filename)
+        read_from_sirius_zip(file = structures_filename)
 
       # TODO
       files <- input_directory |>
@@ -90,7 +90,7 @@ prepare_annotations_sirius <-
         if (grepl(pattern = denovo_filename, x = files$Name) |>
           any()) {
           denovo <- input_directory |>
-            tima:::read_from_sirius_zip(file = denovo_filename)
+            read_from_sirius_zip(file = denovo_filename)
         }
       }
 
@@ -99,7 +99,7 @@ prepare_annotations_sirius <-
         if (grepl(pattern = spectral_filename, x = files$Name) |>
           any()) {
           spectral <- input_directory |>
-            tima:::read_from_sirius_zip(file = spectral_filename)
+            read_from_sirius_zip(file = spectral_filename)
         }
       }
 
@@ -132,13 +132,13 @@ prepare_annotations_sirius <-
 
       structures_summary <- purrr::map(
         .x = summary_files,
-        .f = tima:::read_from_sirius_zip,
+        .f = read_from_sirius_zip,
         sirius_zip = input_directory
       )
 
       names(structures_summary) <- summary_files |>
-        tima:::pre_harmonize_names_sirius() |>
-        tima:::harmonize_names_sirius()
+        pre_harmonize_names_sirius() |>
+        harmonize_names_sirius()
 
       structures_summary <-
         structures_summary[purrr::map(.x = structures_summary, .f = nrow) > 0]
@@ -153,24 +153,24 @@ prepare_annotations_sirius <-
       rm(structures_summary)
 
       canopus_prepared <- canopus |>
-        tima:::select_sirius_columns_canopus(sirius_version = sirius_version)
+        select_sirius_columns_canopus(sirius_version = sirius_version)
 
       rm(canopus)
 
       formulas_prepared <- formulas |>
-        tima:::select_sirius_columns_formulas(sirius_version = sirius_version)
+        select_sirius_columns_formulas(sirius_version = sirius_version)
       rm(formulas)
 
       structures_prepared <- structures_summary_ready |>
-        tima:::select_sirius_columns_structures(sirius_version = sirius_version)
+        select_sirius_columns_structures(sirius_version = sirius_version)
       rm(structures_summary_ready)
 
       structures_prepared_2 <- structures |>
         tidytable::mutate(feature_id = switch(sirius_version,
-          "5" = tima:::harmonize_names_sirius(id),
+          "5" = harmonize_names_sirius(id),
           "6" = mappingFeatureId
         )) |>
-        tima:::select_sirius_columns_structures(sirius_version = sirius_version)
+        select_sirius_columns_structures(sirius_version = sirius_version)
       rm(structures)
 
       structures_prepared <-
@@ -180,7 +180,7 @@ prepare_annotations_sirius <-
 
       denovo_prepared <- denovo |>
         tidytable::mutate(feature_id = mappingFeatureId) |>
-        tima:::select_sirius_columns_structures(sirius_version = sirius_version)
+        select_sirius_columns_structures(sirius_version = sirius_version)
 
       table <- structures_prepared |>
         tidytable::left_join(formulas_prepared) |>
@@ -192,7 +192,7 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_chemontid = NA,
           candidate_structure_tax_cla_01kin = NA
         ) |>
-        tima:::select_annotations_columns()
+        select_annotations_columns()
       rm(
         structures_prepared,
         formulas_prepared,
@@ -202,7 +202,7 @@ prepare_annotations_sirius <-
     } else {
       log_debug("Sorry, your input directory does not exist,
                 returning an empty file instead")
-      table <- tima:::fake_annotations_columns() |>
+      table <- fake_annotations_columns() |>
         tidytable::mutate(
           feature_pred_tax_cla_02sup_val = NA,
           feature_pred_tax_cla_02sup_score = NA,
@@ -231,7 +231,7 @@ prepare_annotations_sirius <-
         )
     }
     log_debug("Splitting SIRIUS results")
-    model <- tima:::columns_model()
+    model <- columns_model()
 
     table_can <- table |>
       tidytable::select(tidyselect::any_of(
@@ -263,13 +263,13 @@ prepare_annotations_sirius <-
       tidytable::distinct()
     rm(table)
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_annotations_sirius"),
       step = "prepare_annotations_sirius"
     )
-    tima:::export_output(x = table_can, file = output_can)
-    tima:::export_output(x = table_for, file = output_for)
-    tima:::export_output(x = table_str, file = output_ann[[1]])
+    export_output(x = table_can, file = output_can)
+    export_output(x = table_for, file = output_for)
+    export_output(x = table_str, file = output_ann[[1]])
 
     rm(table_can, table_for, table_str)
     return(c(

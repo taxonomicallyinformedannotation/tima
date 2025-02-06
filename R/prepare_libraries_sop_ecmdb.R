@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_sop_ecmdb()
 #' unlink("data", recursive = TRUE)
@@ -84,8 +84,8 @@ prepare_libraries_sop_ecmdb <-
           organism_taxonomy_10varietas = NA_character_
         ) |>
         tidytable::mutate(reference_doi = NA) |>
-        tima:::select_sop_columns() |>
-        tima:::round_reals() |>
+        select_sop_columns() |>
+        round_reals() |>
         tidytable::distinct()
       rm(ecmdb)
     } else {
@@ -93,11 +93,11 @@ prepare_libraries_sop_ecmdb <-
       ecmdb_prepared <- fake_sop_columns()
     }
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_libraries_sop_ecmdb"),
       step = "prepare_libraries_sop_closed"
     )
-    tima:::export_output(x = ecmdb_prepared, file = output)
+    export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
     return(output)
   }
