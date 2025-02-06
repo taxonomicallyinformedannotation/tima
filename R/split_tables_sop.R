@@ -78,7 +78,7 @@ split_tables_sop <- function(table) {
     tidytable::select(structure_inchikey, structure_smiles, structure_name) |>
     tidytable::distinct() |>
     tidytable::group_by(structure_inchikey, structure_smiles) |>
-    tima:::clean_collapse(cols = c("structure_name"))
+    clean_collapse(cols = c("structure_name"))
 
   table_structures_taxonomy_npc <- table |>
     tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
@@ -95,7 +95,7 @@ split_tables_sop <- function(table) {
     ) |>
     tidytable::distinct() |>
     tidytable::group_by(structure_smiles_no_stereo) |>
-    tima:::clean_collapse(
+    clean_collapse(
       cols = c(
         "structure_tax_npc_01pat",
         "structure_tax_npc_02sup",
@@ -122,7 +122,7 @@ split_tables_sop <- function(table) {
     ) |>
     tidytable::distinct() |>
     tidytable::group_by(structure_inchikey_no_stereo) |>
-    tima:::clean_collapse(
+    clean_collapse(
       cols = c(
         "structure_tax_cla_chemontid",
         "structure_tax_cla_01kin",

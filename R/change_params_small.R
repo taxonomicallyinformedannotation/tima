@@ -23,7 +23,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' tima::change_params_small(
 #'   fil_pat = "myExamplePattern",
 #'   fil_fea_raw = "myExampleDir/myExampleFeatures.csv",
@@ -45,12 +45,12 @@ change_params_small <- function(fil_pat = NULL,
                                 org_tax = NULL,
                                 hig_con = NULL,
                                 summarize = NULL) {
-  tima:::go_to_cache()
-  paths_data_source <- tima:::get_default_paths()$data$source$path
+  go_to_cache()
+  paths_data_source <- get_default_paths()$data$source$path
   paths_data_interim_annotations <-
-    tima:::get_default_paths()$data$interim$annotations$path
-  tima:::create_dir(paths_data_source)
-  list <- tima:::load_yaml_files()
+    get_default_paths()$data$interim$annotations$path
+  create_dir(paths_data_source)
+  list <- load_yaml_files()
 
   yamls_params <- list$yamls_params
   yaml_files <- list$yaml_files
@@ -119,6 +119,6 @@ change_params_small <- function(fil_pat = NULL,
 
   yaml::write_yaml(
     x = yaml_small,
-    file = tima:::get_default_paths()$params$prepare_params
+    file = get_default_paths()$params$prepare_params
   )
 }

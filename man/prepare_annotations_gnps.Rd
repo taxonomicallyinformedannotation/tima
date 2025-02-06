@@ -44,7 +44,7 @@ This function prepares GNPS obtained annotations
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 prepare_annotations_gnps()
 unlink("data", recursive = TRUE)

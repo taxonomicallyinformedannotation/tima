@@ -19,7 +19,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_annotations_gnps()
 #' unlink("data", recursive = TRUE)
@@ -89,17 +89,17 @@ prepare_annotations_gnps <-
           candidate_structure_tax_cla_chemontid = NA,
           candidate_structure_tax_cla_01kin = NA
         ) |>
-        tima:::select_annotations_columns()
+        select_annotations_columns()
     } else {
       log_debug("No GNPS annotations found, returning an empty file instead")
-      table <- tima:::fake_annotations_columns()
+      table <- fake_annotations_columns()
     }
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_annotations_gnps"),
       step = "prepare_annotations_gnps"
     )
-    tima:::export_output(x = table, file = output[[1]])
+    export_output(x = table, file = output[[1]])
     rm(table)
     return(output[[1]])
   }

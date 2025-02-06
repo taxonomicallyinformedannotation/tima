@@ -174,7 +174,7 @@ weight_chemo <-
       ) |>
       tidytable::select(-tidyselect::contains("score_chemical_")) |>
       tidytable::right_join(annot_table_wei_bio_clean) |>
-      tima:::log_pipe("... calculating weighted chemical score \n") |>
+      log_pipe("... calculating weighted chemical score \n") |>
       tidytable::mutate(
         score_weighted_chemo = (1 / (
           weight_chemical + weight_biological + weight_spectral

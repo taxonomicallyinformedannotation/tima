@@ -77,7 +77,7 @@ table is expected to be pre-formatted.
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"

@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
@@ -133,11 +133,11 @@ filter_annotations <-
       features_annotated_table_2
     )
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "filter_annotations"),
       step = "filter_annotations"
     )
-    tima:::export_output(x = final_table, file = output[[1]])
+    export_output(x = final_table, file = output[[1]])
 
     rm(final_table)
     return(output[[1]])

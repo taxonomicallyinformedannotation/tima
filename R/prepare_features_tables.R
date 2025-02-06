@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' get_file(
 #'   url = get_default_paths()$urls$examples$features,
@@ -47,11 +47,11 @@ prepare_features_tables <-
         )
       ))
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_features_tables"),
       step = "prepare_features_tables"
     )
-    tima:::export_output(x = features_prepared, file = output)
+    export_output(x = features_prepared, file = output)
     rm(features_prepared)
 
     return(output)

@@ -43,7 +43,7 @@ This function helps changing convenience parameters.
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 tima::change_params_small(
   fil_pat = "myExamplePattern",
   fil_fea_raw = "myExampleDir/myExampleFeatures.csv",

@@ -40,7 +40,7 @@ clean_chemo <-
            high_confidence = get("high_confidence", envir = parent.frame()),
            remove_ties = get("remove_ties", envir = parent.frame()),
            summarize = get("summarize", envir = parent.frame())) {
-    model <- tima:::columns_model()
+    model <- columns_model()
 
     log_debug(
       "filtering top ",
@@ -85,7 +85,7 @@ clean_chemo <-
 
     if (high_confidence) {
       df1 <- df1 |>
-        tima:::filter_high_confidence_only()
+        filter_high_confidence_only()
     }
 
     df1 <- df1 |>
@@ -141,7 +141,7 @@ clean_chemo <-
         )
       )) |>
       tidytable::distinct() |>
-      tima:::log_pipe("adding references \n") |>
+      log_pipe("adding references \n") |>
       tidytable::left_join(
         structure_organism_pairs_table |>
           tidytable::select(

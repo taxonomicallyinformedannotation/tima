@@ -15,7 +15,7 @@
 #'    to the rules specified in the function
 #'
 #' @examples
-#' tima:::replace_id(
+#' replace_id(
 #'   x = "example/123456_features.tsv",
 #'   user_gnps = NULL,
 #'   user_filename = "Foo"

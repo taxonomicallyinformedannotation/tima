@@ -18,7 +18,7 @@ Combination of cli and yaml parameters
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 get_params("prepare_params")
 }

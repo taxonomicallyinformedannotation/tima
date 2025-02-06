@@ -34,7 +34,7 @@ This function prepares features
 }
 \examples{
 \dontrun{
-tima:::copy_backbone()
+copy_backbone()
 go_to_cache()
 get_file(
   url = get_default_paths()$urls$examples$features,

@@ -29,7 +29,7 @@ This function replaces the default ID
 in the example by a user-specified one
 }
 \examples{
-tima:::replace_id(
+replace_id(
   x = "example/123456_features.tsv",
   user_gnps = NULL,
   user_filename = "Foo"

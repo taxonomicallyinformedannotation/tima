@@ -13,7 +13,7 @@
 select_sirius_columns_canopus <- function(df, sirius_version) {
   df <- df |>
     tidytable::mutate(feature_id = switch(sirius_version,
-      "5" = tima:::harmonize_names_sirius(id),
+      "5" = harmonize_names_sirius(id),
       "6" = mappingFeatureId
     )) |>
     tidytable::select(tidyselect::any_of(
@@ -82,7 +82,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
     tidytable::mutate(feature_id = switch(sirius_version,
-      "5" = tima:::harmonize_names_sirius(id),
+      "5" = harmonize_names_sirius(id),
       "6" = mappingFeatureId
     )) |>
     tidytable::mutate(

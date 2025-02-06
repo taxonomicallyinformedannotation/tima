@@ -26,7 +26,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' prepare_libraries_rt()
 #' unlink("data", recursive = TRUE)
@@ -314,12 +314,12 @@ prepare_libraries_rt <-
       )
     }
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_libraries_rt"),
       step = "prepare_libraries_rt"
     )
-    tima:::export_output(x = rts, file = output_rt)
-    tima:::export_output(x = sop, file = output_sop)
+    export_output(x = rts, file = output_rt)
+    export_output(x = sop, file = output_sop)
     rm(rts, sop)
     return(c("rt" = output_rt, "sop" = output_sop))
   }

@@ -22,7 +22,7 @@ select_annotations_columns <- function(df,
                                        str_nam = get("str_nam", envir = parent.frame()),
                                        str_tax_cla = get("str_tax_cla", envir = parent.frame()),
                                        str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
-  model <- tima:::columns_model()
+  model <- columns_model()
   df <- df |>
     tidytable::select(tidyselect::any_of(
       c(
