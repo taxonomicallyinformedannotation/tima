@@ -681,5 +681,8 @@ test_that(desc = "Test functions", code = {
 
   parse_cli_params(arguments = arguments, parameters = params)
 
+  ## cleanup
+  unlink("data", recursive = TRUE)
+
   succeed()
 })
