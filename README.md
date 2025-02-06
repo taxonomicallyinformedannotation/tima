@@ -110,14 +110,6 @@ docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p
 # docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::tima_full()"
 ```
 
-Or alternatively (if you did pull the repository and are located at the
-right place):
-
-``` bash
-docker compose up tima-run-app
-# docker compose up tima-full
-```
-
 ## Main Citations
 
 According to which steps you used, please give credit to the authors of
