@@ -15,11 +15,13 @@
 #'    to the rules specified in the function
 #'
 #' @examples
+#' \dontrun{
 #' replace_id(
 #'   x = "example/123456_features.tsv",
 #'   user_gnps = NULL,
 #'   user_filename = "Foo"
 #' )
+#' }
 replace_id <-
   function(x,
            user_filename = get_params(step = "prepare_params")$files$pattern,

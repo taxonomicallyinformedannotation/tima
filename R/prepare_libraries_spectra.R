@@ -120,7 +120,7 @@ prepare_libraries_spectra <-
         log_debug("... neg")
         spectra_harmonized_neg <- purrr::map(
           .x = spectra_extracted,
-          .f = tima:::harmonize_spectra,
+          .f = harmonize_spectra,
           mode = "neg",
           metad = nam_lib,
           col_ad = col_ad,
@@ -205,15 +205,15 @@ prepare_libraries_spectra <-
         )
       }
       log_debug("Exporting")
-      tima:::export_output(sop, file = output_sop)
-      mapply(tima:::export_spectra_rds, output_pos, spectra_harmonized_pos)
-      mapply(tima:::export_spectra_rds, output_neg, spectra_harmonized_neg)
+      export_output(sop, file = output_sop)
+      mapply(export_spectra_rds, output_pos, spectra_harmonized_pos)
+      mapply(export_spectra_rds, output_neg, spectra_harmonized_neg)
       rm(spectra_harmonized_pos, spectra_harmonized_neg)
     } else {
       log_debug("Library already exists")
     }
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )

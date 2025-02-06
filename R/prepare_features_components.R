@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' tima:::copy_backbone()
+#' copy_backbone()
 #' go_to_cache()
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
@@ -43,11 +43,11 @@ prepare_features_components <-
       tidytable::select(feature_id = `cluster index`, component_id = componentindex) |>
       tidytable::distinct()
 
-    tima:::export_params(
+    export_params(
       parameters = get_params(step = "prepare_features_components"),
       step = "prepare_features_components"
     )
-    tima:::export_output(x = table, file = output)
+    export_output(x = table, file = output)
     rm(table)
 
     return(output)

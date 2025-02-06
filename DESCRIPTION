@@ -85,6 +85,7 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
     system, natural products, computational metabolomics, taxonomic
     distance, specialized metabolome
 Collate:
+    '_disable_autoload.R'
     'round_reals.R'
     'log_pipe.R'
     'harmonize_adducts.R'
