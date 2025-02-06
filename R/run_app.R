@@ -25,7 +25,7 @@ run_app <- function(host = "127.0.0.1",
   }
   install()
   shiny::runApp(
-    appDir = system.file(package = "tima"),
+    appDir = shiny::shinyAppFile(system.file("app.R", package = "tima")),
     port = port,
     host = host,
     launch.browser = browser
