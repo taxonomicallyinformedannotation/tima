@@ -100,6 +100,8 @@ classes \
 structures \
 denovo-structures \
 summaries \
+--chemvista \
+--feature-quality-summary \
 --full-summary
 
 # this is run on SIRIUS 5
