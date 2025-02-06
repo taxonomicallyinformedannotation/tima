@@ -1701,7 +1701,7 @@ ui <- shiny::fluidPage(
         id = "targets",
         shiny::mainPanel(
           targets::tar_watch_ui(
-            id = "targets-shiny",
+            id = "progress",
             seconds = 10,
             targets_only = TRUE,
             degree_from = 8,
