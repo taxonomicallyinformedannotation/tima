@@ -35,18 +35,12 @@ calculate_entropy_score <- function(lib_ids,
       current_id <- query_ids[spectrum_idx]
 
       if (approx == FALSE) {
-        minimum <- min(current_precursor - dalton, current_precursor * (1 - (10^
-          -6 * ppm)))
-        maximum <- max(current_precursor + dalton, current_precursor * (1 + (10^
-          -6 * ppm)))
-        val_ind <- lib_precursors >= minimum &
-          lib_precursors <= maximum
+        val_ind <- lib_precursors >= min(current_precursor - dalton, current_precursor * (1 - (10^-6 * ppm))) &
+          lib_precursors <= max(current_precursor + dalton, current_precursor * (1 + (10^-6 * ppm)))
 
-        filtered_lib_spectra <- lib_spectra[val_ind]
-        filtered_lib_ids <- lib_ids[val_ind]
-      } else {
-        filtered_lib_spectra <- lib_spectra
-        filtered_lib_ids <- lib_ids
+        lib_spectra <- lib_spectra[val_ind]
+        lib_precursors <- lib_precursors[val_ind]
+        lib_ids <- lib_ids[val_ind]
       }
 
       if (length(filtered_lib_ids) != 0) {
