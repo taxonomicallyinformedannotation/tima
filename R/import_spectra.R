@@ -46,7 +46,7 @@ import_spectra <- function(file,
     "mgf" = {
       MsBackendMgf::readMgf(f = file) |>
         # TODO Change as soon as R 4.4.0 becomes oldrel
-        # readMgfSplit(f = file) |>
+        # MsBackendMgf::readMgfSplit(f = file) |>
         Spectra::Spectra()
     },
     "msp" = {
