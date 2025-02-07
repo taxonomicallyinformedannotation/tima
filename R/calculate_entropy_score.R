@@ -56,6 +56,8 @@ calculate_entropy_score <- function(lib_ids,
             ms2_tolerance_in_ppm = ppm,
             max_peak_num = -1,
             clean_spectra = TRUE
+      if (length(lib_ids) != 0) {
+          lib_spectrum <- lib_spectra[[lib_idx]]
           )
           entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
           ## number of matched peaks (only Da for now)
@@ -85,7 +87,7 @@ calculate_entropy_score <- function(lib_ids,
             tidytable::tidytable(
               feature_id = current_id,
               precursorMz = current_precursor,
-              target_id = filtered_lib_ids[valid_indices],
+              target_id = lib_ids[valid_indices],
               candidate_spectrum_entropy = similarities[2, valid_indices],
               candidate_score_similarity = similarities[1, valid_indices],
               candidate_count_similarity_peaks_matched = similarities[3, valid_indices]
