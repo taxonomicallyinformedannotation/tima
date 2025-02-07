@@ -57,6 +57,7 @@ calculate_entropy_score <- function(lib_ids,
             max_peak_num = -1,
             clean_spectra = TRUE
       if (length(lib_ids) != 0) {
+        similarities <- vapply(X = seq_along(lib_spectra), function(lib_idx) {
           lib_spectrum <- lib_spectra[[lib_idx]]
           )
           entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
