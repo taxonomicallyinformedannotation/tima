@@ -172,11 +172,13 @@ files:
     spectral:
       #' List of negative spectral libraries. STRING
       neg:
-        - data/interim/libraries/spectra/exp/internal_neg.rds
+        - data/interim/libraries/spectra/exp/massbank_neg.rds
+        - data/interim/libraries/spectra/is/lotus_neg.rds
 
       #' List of positive spectral libraries. STRING
       pos:
-        - data/interim/libraries/spectra/exp/internal_pos.rds
+        - data/interim/libraries/spectra/exp/massbank_pos.rds
+        - data/interim/libraries/spectra/is/lotus_pos.rds
 
       #' List of raw spectral libraries. STRING
       raw:
