@@ -40,7 +40,6 @@ calculate_similarity <- function(method,
     ),
     "gnps" = tryCatch(
       {
-        lib_precursor <- lib_precursors[[lib_idx]]
         map <- MsCoreUtils::join_gnps(
           x = query_spectrum[, 1],
           y = target_spectrum[, 1],
