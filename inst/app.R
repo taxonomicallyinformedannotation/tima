@@ -158,7 +158,7 @@ ui <- shiny::fluidPage(
           label = "Number of final candidates",
           min = 1,
           max = 500,
-          value = 3,
+          value = 1,
           step = 1,
           ticks = FALSE
         ) |>
