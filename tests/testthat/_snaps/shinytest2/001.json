@@ -1,6 +1,6 @@
 {
   "input": {
-    "ann_can_fin": 3,
+    "ann_can_fin": 1,
     "ann_ms1only": false,
     "ann_ms2_app": false,
     "ann_thr_con": 0,
