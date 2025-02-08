@@ -5,6 +5,7 @@
 * Added `SIRIUS` feature tables support (#185)
 * Added `.rar` compression support for `SIRIUS` workspaces (#186)
 * Introduced similarity method argument (entropy and GNPS for now)
+* Updated to Massbank version `2024.11`
 
 # tima 2.11.0
 

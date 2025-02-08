@@ -223,4 +223,4 @@ urls:
   massbank:
     file: MassBank_NIST.msp
     url: https://github.com/MassBank/MassBank-data/releases/download
-    version: 2024.06
+    version: 2024.11
