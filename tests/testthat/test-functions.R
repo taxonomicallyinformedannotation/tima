@@ -386,6 +386,45 @@ test_that(desc = "Test functions", code = {
   annotate_masses(features = "data/source/libraries/rt/example_features_adducts.csv")
 
   ## Performing MS2 annotation
+  x <- cbind(
+    mz = c(10, 36, 63, 91, 93),
+    intensity = c(14, 15, 999, 650, 1)
+  ) |>
+    list()
+  y <- cbind(
+    mz = c(10, 12, 50, 63, 105),
+    intensity = c(35, 5, 16, 999, 450)
+  ) |>
+    list()
+  ## The precursor m/z
+  pmz_x <- 91
+  pmz_y <- 105
+  calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = pmz_y,
+    lib_spectra = y,
+    query_ids = 1L,
+    query_precursors = pmz_x,
+    query_spectra = x,
+    dalton = 0.01,
+    ppm = 1,
+    threshold = 0,
+    method = "gnps",
+    approx = FALSE
+  )
+  calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = pmz_y,
+    lib_spectra = y,
+    query_ids = 1L,
+    query_precursors = pmz_x,
+    query_spectra = x,
+    dalton = 0.01,
+    ppm = 1,
+    threshold = 0,
+    method = "entropy",
+    approx = TRUE
+  )
   ### Negative
   annotate_spectra(
     library = list(
@@ -404,7 +443,9 @@ test_that(desc = "Test functions", code = {
     library = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
     ## shallow tolerance to speed up tests
     ppm = 1,
-    dalton = 0.001
+    dalton = 0.001,
+    approx = TRUE,
+    threshold = 2
   )
 
   ## Create MS2 based edges
