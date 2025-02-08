@@ -21,12 +21,10 @@ calculate_similarity <- function(method,
                                  target_precursor,
                                  dalton,
                                  ppm) {
-  # Pre-validate inputs to avoid unnecessary computations
   if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
     return(NA_real_)
   }
 
-  # Create function lookup table instead of using switch
   similarity_functions <- list(
     entropy = function() {
       msentropy::calculate_entropy_similarity(
@@ -42,7 +40,6 @@ calculate_similarity <- function(method,
       )
     },
     gnps = function() {
-      # Pre-compute the mass values to avoid repeated column access
       query_masses <- query_spectrum[, 1]
       target_masses <- target_spectrum[, 1]
 
@@ -55,11 +52,13 @@ calculate_similarity <- function(method,
         ppm = ppm
       )
 
-      # Only proceed if we have matches
-      if (length(map[[1]]) > 0 && length(map[[2]]) > 0) {
+      matched_x <- map[[1]]
+      matched_y <- map[[2]]
+
+      if (length(matched_x) > 0 && length(matched_y) > 0) {
         MsCoreUtils::gnps(
-          x = query_spectrum[map[[1]], ],
-          y = target_spectrum[map[[2]], ],
+          x = query_spectrum[matched_x, ],
+          y = target_spectrum[matched_y, ],
           .check = FALSE
         )
       } else {
@@ -68,7 +67,6 @@ calculate_similarity <- function(method,
     }
   )
 
-  # Execute selected method with error handling
   tryCatch(
     similarity_functions[[method]](),
     error = function(e) NA_real_
