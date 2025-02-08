@@ -3,6 +3,8 @@
 #' @description This function applies similarity calculation to a list of
 #'        spectra to obtain entropy scores
 #'
+#' @include calculate_similarity.R
+#'
 #' @param lib_ids Lib Ids
 #' @param lib_precursors Lib precursors
 #' @param lib_spectra Lib spectra
