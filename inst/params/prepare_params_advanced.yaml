@@ -30,16 +30,6 @@ annotations:
       #' Example: Minimum 0.3 biological AND 0.3 chemical. STRING
       condition: OR
 
-    #' MS2 annotation related parameters.
-    ms2:
-      #' For similarity.
-      similarity:
-        #' For annotation. FLOAT
-        annotation: 0.0
-
-        #' For edges. FLOAT
-        edges: 0.7
-
 #' Files.
 files:
   #' Pattern to identify the files. STRING
@@ -576,6 +566,26 @@ organisms:
   #' If you provide both, this one will have priority.
   #' Example: "Homo sapiens". STRING
   taxon: ~
+
+#' Similarity related parameters.
+similarities:
+  #' Method used.
+  methods:
+    #' Similarity method used for annotations.
+    #' Currently "gnps" or "entropy" supported. STRING
+    annotations: gnps
+
+    #' Similarity method used to create edges.
+    #' Currently "gnps" or "entropy" supported. STRING
+    edges: gnps
+
+  #' Threshold used.
+  thresholds:
+    #' For annotations. FLOAT
+    annotations: 0.0
+
+    #' For edges. FLOAT
+    edges: 0.7
 
 #' Tools used for each step.
 tools:

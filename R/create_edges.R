@@ -5,6 +5,8 @@
 #'
 #' @param frags Fragments
 #' @param nspecs Number of spectra
+#' @param precs Precursors
+#' @param method Method
 #' @param ms2_tolerance MS2 tolerance
 #' @param ppm_tolerance ppm tolerance
 #' @param threshold Threshold
@@ -14,6 +16,8 @@
 #' @examples NULL
 create_edges <- function(frags,
                          nspecs,
+                         precs,
+                         method,
                          ms2_tolerance,
                          ppm_tolerance,
                          threshold) {
@@ -26,16 +30,14 @@ create_edges <- function(frags,
       target_indices <- (index + 1):nspecs
 
       scores <- vapply(target_indices, function(target) {
-        msentropy::calculate_entropy_similarity(
-          peaks_a = frags[[index]],
-          peaks_b = frags[[target]],
-          min_mz = 0,
-          max_mz = 5000,
-          noise_threshold = 0,
-          ms2_tolerance_in_da = ms2_tolerance,
-          ms2_tolerance_in_ppm = ppm_tolerance,
-          max_peak_num = -1,
-          clean_spectra = TRUE
+        calculate_similarity(
+          method = method,
+          query_spectrum = frags[[index]],
+          target_spectrum = frags[[target]],
+          query_precursor = precs[[index]],
+          target_precursor = precs[[target]],
+          dalton = ms2_tolerance,
+          ppm = ppm_tolerance
         )
       }, numeric(1))
 

@@ -35,20 +35,6 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("annotations", "thresholds", "ms1", "condition"),
       type = as.character
     ),
-    ann_thr_ms2_sim_ann = list(
-      path = c(
-        "annotations",
-        "thresholds",
-        "ms2",
-        "similarity",
-        "annotation"
-      ),
-      type = as.numeric
-    ),
-    ann_thr_ms2_sim_edg = list(
-      path = c("annotations", "thresholds", "ms2", "similarity", "edges"),
-      type = as.numeric
-    ),
     fil_pat = list(path = c("files", "pattern"), type = as.character),
     # fil_ann_raw_spe = list(path = c("files", "annotations", "raw", "spectral"),
     #                        type = as.character),
@@ -298,6 +284,10 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.character
     ),
     org_tax = list(path = c("organisms", "taxon"), type = as.character),
+    sim_met_ann = list(path = c("similarities", "methods", "annotations"), type = as.character),
+    sim_met_edg = list(path = c("similarities", "methods", "edges"), type = as.character),
+    sim_thr_ann = list(path = c("similarities", "thresholds", "annotations"), type = as.numeric),
+    sim_thr_edg = list(path = c("similarities", "thresholds", "edges"), type = as.numeric),
     too_met = list(path = c("tools", "metadata"), type = as.character),
     too_net_spe_com = list(
       path = c("tools", "networks", "spectral", "components"),

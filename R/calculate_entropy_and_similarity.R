@@ -9,6 +9,7 @@
 #' @param query_ids Query Ids
 #' @param query_precursors Query precursors
 #' @param query_spectra Query spectra
+#' @param method Method
 #' @param dalton Dalton
 #' @param ppm Ppm
 #' @param threshold Threshold
@@ -17,16 +18,17 @@
 #' @return NULL
 #'
 #' @examples NULL
-calculate_entropy_score <- function(lib_ids,
-                                    lib_precursors,
-                                    lib_spectra,
-                                    query_ids,
-                                    query_precursors,
-                                    query_spectra,
-                                    dalton,
-                                    ppm,
-                                    threshold,
-                                    approx) {
+calculate_entropy_and_similarity <- function(lib_ids,
+                                             lib_precursors,
+                                             lib_spectra,
+                                             query_ids,
+                                             query_precursors,
+                                             query_spectra,
+                                             method,
+                                             dalton,
+                                             ppm,
+                                             threshold,
+                                             approx) {
   results <- purrr::map(
     .x = seq_along(query_spectra),
     .f = function(spectrum_idx) {
@@ -43,22 +45,17 @@ calculate_entropy_score <- function(lib_ids,
         lib_ids <- lib_ids[val_ind]
       }
 
-      if (length(filtered_lib_ids) != 0) {
-        similarities <- vapply(X = seq_along(filtered_lib_spectra), function(lib_idx) {
-          lib_spectrum <- filtered_lib_spectra[[lib_idx]]
-          score <- msentropy::calculate_entropy_similarity(
-            peaks_a = current_spectrum,
-            peaks_b = lib_spectrum,
-            min_mz = 0,
-            max_mz = 5000,
-            noise_threshold = 0,
-            ms2_tolerance_in_da = dalton,
-            ms2_tolerance_in_ppm = ppm,
-            max_peak_num = -1,
-            clean_spectra = TRUE
       if (length(lib_ids) != 0) {
         similarities <- vapply(X = seq_along(lib_spectra), function(lib_idx) {
           lib_spectrum <- lib_spectra[[lib_idx]]
+          score <- calculate_similarity(
+            method = method,
+            query_spectrum = current_spectrum,
+            target_spectrum = lib_spectrum,
+            query_precursor = current_precursor,
+            target_precursor = lib_precursor,
+            dalton = dalton,
+            ppm = ppm
           )
           entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
           ## number of matched peaks (only Da for now)
@@ -108,10 +105,10 @@ calculate_entropy_score <- function(lib_ids,
   if (all(sapply(results, is.null))) {
     tidytable::tidytable(
       feature_id = NA_integer_,
-      precursorMz = NA_complex_,
+      precursorMz = NA_real_,
       target_id = NA_integer_,
-      candidate_spectrum_entropy = NA_complex_,
-      candidate_score_similarity = NA_complex_,
+      candidate_spectrum_entropy = NA_real_,
+      candidate_score_similarity = NA_real_,
       candidate_count_similarity_peaks_matched = NA_integer_,
     )
   } else {

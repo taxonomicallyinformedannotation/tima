@@ -9,8 +9,8 @@ create_edges_spectra(
   output = get_params(step = "create_edges_spectra")$files$networks$spectral$edges$raw,
   name_source = get_params(step = "create_edges_spectra")$names$source,
   name_target = get_params(step = "create_edges_spectra")$names$target,
-  threshold = get_params(step =
-    "create_edges_spectra")$annotations$thresholds$ms2$similarity$edges,
+  method = get_params(step = "create_edges_spectra")$similarities$methods$edges,
+  threshold = get_params(step = "create_edges_spectra")$similarities$thresholds$edges,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
@@ -24,6 +24,8 @@ create_edges_spectra(
 \item{name_source}{Name of the source features column}
 
 \item{name_target}{Name of the target features column}
+
+\item{method}{Similarity method}
 
 \item{threshold}{Minimal similarity to report}
 

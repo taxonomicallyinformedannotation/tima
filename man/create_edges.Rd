@@ -4,12 +4,24 @@
 \alias{create_edges}
 \title{Create edges}
 \usage{
-create_edges(frags, nspecs, ms2_tolerance, ppm_tolerance, threshold)
+create_edges(
+  frags,
+  nspecs,
+  precs,
+  method,
+  ms2_tolerance,
+  ppm_tolerance,
+  threshold
+)
 }
 \arguments{
 \item{frags}{Fragments}
 
 \item{nspecs}{Number of spectra}
+
+\item{precs}{Precursors}
+
+\item{method}{Method}
 
 \item{ms2_tolerance}{MS2 tolerance}
 

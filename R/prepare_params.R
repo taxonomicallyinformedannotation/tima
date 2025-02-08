@@ -28,8 +28,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ann_thr_ms1_bio <- params_advanced$annotations$thresholds$ms1$biological
   ann_thr_ms1_che <- params_advanced$annotations$thresholds$ms1$chemical
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
-  ann_thr_ms2_sim_ann <- params_advanced$annotations$thresholds$ms2$similarity$annotation
-  ann_thr_ms2_sim_edg <- params_advanced$annotations$thresholds$ms2$similarity$edges
   fil_pat <- params_advanced$files$pattern
   fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
@@ -133,6 +131,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   org_fil_lev <- params_advanced$organisms$filter$level
   org_fil_val <- params_advanced$organisms$filter$value
   org_tax <- params_advanced$organisms$taxon
+  sim_met_ann <- params_advanced$similarities$methods$annotations
+  sim_met_edg <- params_advanced$similarities$methods$edges
+  sim_thr_ann <- params_advanced$similarities$thresholds$annotations
+  sim_thr_edg <- params_advanced$similarities$thresholds$edges
   too_met <- params_advanced$tools$metadata
   too_net_spe_com <- params_advanced$tools$networks$spectral$components
   too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
@@ -249,8 +251,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ## annotate_spectra
   yamls_params$annotate_spectra$annotations$ms2approx <-
     ann_ms2_app
-  yamls_params$annotate_spectra$annotations$thresholds$ms2$similarity$annotation <-
-    ann_thr_ms2_sim_ann
   yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
     fil_ann_raw_spe_spe
   yamls_params$annotate_spectra$files$libraries$spectral$neg <-
@@ -267,6 +267,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     ms_tol_mas_ppm_ms2
   yamls_params$annotate_spectra$ms$tolerances$mass$dalton$ms2 <-
     ms_tol_mas_dal_ms2
+  yamls_params$annotate_spectra$similarities$methods$annotations <-
+    sim_met_ann
+  yamls_params$annotate_spectra$similarities$thresholds$annotations <-
+    sim_thr_ann
 
   ## create_components
   yamls_params$create_components$files$networks$spectral$edges$prepared <-
@@ -275,8 +279,6 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     fil_net_spe_com_raw
 
   ## create_edges_spectra
-  yamls_params$create_edges_spectra$annotations$thresholds$ms2$similarity$edges <-
-    ann_thr_ms2_sim_edg
   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw$spectral <-
     fil_net_spe_edg_raw_spe
   yamls_params$create_edges_spectra$files$spectral$raw <-
@@ -291,6 +293,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     names_source
   yamls_params$create_edges_spectra$names$target <-
     names_target
+  yamls_params$create_edges_spectra$similarities$methods$edges <-
+    sim_met_edg
+  yamls_params$create_edges_spectra$similarities$thresholds$edges <-
+    sim_thr_edg
 
   ## filter_annotations
   yamls_params$filter_annotations$files$annotations$filtered <-
