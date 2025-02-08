@@ -7,10 +7,8 @@
     "ann_thr_ms1_bio": 0,
     "ann_thr_ms1_che": 0,
     "ann_thr_ms1_con": "OR",
-    "ann_thr_ms2_sim": 0,
     "close": 0,
     "compounds_names": false,
-    "edg_thr_ms2_sim": 0.7,
     "fil_ann_raw_sir": null,
     "fil_fea_raw": {
       "name": [
@@ -162,6 +160,10 @@
     "progress-watch": true,
     "remove_ties": false,
     "save": 1,
+    "sim_met_ann": "gnps",   
+    "sim_met_edg": "gnps",   
+    "sim_thr_ann": 0,        
+    "sim_thr_edg": 0.7,    
     "summarize": false,
     "too_sir_ver": "6",
     "uni_rt": "seconds",
