@@ -18,9 +18,9 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     tidytable::filter(!Name |> startsWith("_")) |>
     tidytable::pull(Name) |>
     # because of structures and denovo sharing their name
-    head(1)
+    utils::head(1)
   archive::archive_read(sirius_zip, f) |>
-    read.delim(
+    utils::read.delim(
       na.strings = c("", "NA"),
       colClasses = "character",
       stringsAsFactors = FALSE
