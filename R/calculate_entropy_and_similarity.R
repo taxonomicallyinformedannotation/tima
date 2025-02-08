@@ -55,7 +55,7 @@ calculate_entropy_and_similarity <- function(lib_ids,
             query_spectrum = current_spectrum,
             target_spectrum = lib_spectrum,
             query_precursor = current_precursor,
-            target_precursor = lib_precursor,
+            target_precursor = lib_precursors[[lib_idx]],
             dalton = dalton,
             ppm = ppm
           )
