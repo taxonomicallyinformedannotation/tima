@@ -5,6 +5,7 @@
 #' @details It takes two files as input.
 #'    A query file that will be matched against a library file.
 #'
+#' @include calculate_entropy_and_similarity.R
 #' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include import_spectra.R

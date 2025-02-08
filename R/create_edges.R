@@ -3,6 +3,8 @@
 #' @description This function applies similarity calculation to a list of
 #'        spectra to create edges
 #'
+#' @include calculate_similarity.R
+#'
 #' @param frags Fragments
 #' @param nspecs Number of spectra
 #' @param precs Precursors
