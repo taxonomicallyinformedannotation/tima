@@ -410,13 +410,15 @@ test_that(desc = "Test functions", code = {
   )
 
   ## Create MS2 based edges
-  create_edges_spectra( ## shallow tolerance to speed up tests
-    ppm = 1, dalton = 0.001
+  ## shallow tolerance to speed up tests
+  create_edges_spectra(
+    ppm = 1,
+    dalton = 0.001,
+    method = "entropy"
   )
   ## if MS1 only
   create_edges_spectra(
     input = "data/source/example_spectra_ms1.mgf",
-    ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001
   )
@@ -517,7 +519,7 @@ test_that(desc = "Test functions", code = {
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  
+
   ## Change small params
   get_example_files()
   change_params_small(
@@ -543,7 +545,7 @@ test_that(desc = "Test functions", code = {
   # get_example_files()
   # tima:::.onLoad()
   # tima_full()
-  
+
   ## cleanup
   unlink("data", recursive = TRUE)
 

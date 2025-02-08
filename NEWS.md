@@ -4,6 +4,7 @@
 
 * Added `SIRIUS` feature tables support (#185)
 * Added `.rar` compression support for `SIRIUS` workspaces (#186)
+* Introduced similarity method argument (entropy and GNPS for now)
 
 # tima 2.11.0
 

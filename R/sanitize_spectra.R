@@ -34,7 +34,7 @@ sanitize_spectra <-
       message("Harmonizing names")
       spectra$msLevel <- spectra$MSLEVEL |> as.integer()
     }
-    
+
     if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
       message("Harmonizing names")
       spectra$precursorMz <- spectra$PRECURSOR_MZ |> as.numeric()

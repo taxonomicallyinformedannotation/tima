@@ -1527,7 +1527,8 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
+              method = par_ann_spe$similarities$methods$annotations,
+              threshold = par_ann_spe$similarities$thresholds$annotations,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
@@ -1633,7 +1634,8 @@ list(
           output = par_cre_edg_spe$files$networks$spectral$edges$raw,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
-          threshold = par_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
+          method = par_cre_edg_spe$similarities$methods$edges,
+          threshold = par_cre_edg_spe$similarities$thresholds$edges,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
@@ -2354,8 +2356,8 @@ list(
           ),
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
-          threshold =
-            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity$annotation,
+          method = benchmark_def_ann_spe$similarities$methods$annotations,
+          threshold = benchmark_def_ann_spe$similarities$thresholds$annotations,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,
@@ -2375,8 +2377,8 @@ list(
           ),
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
-          threshold =
-            benchmark_def_ann_spe$annotations$thresholds$ms2$similarity$annotation,
+          method = benchmark_def_ann_spe$similarities$methods$annotations,
+          threshold = benchmark_def_ann_spe$similarities$thresholds$annotations,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0,

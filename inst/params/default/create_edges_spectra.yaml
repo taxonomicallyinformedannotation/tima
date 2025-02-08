@@ -1,15 +1,4 @@
 ---
-#' Annotations related parameters.
-annotations:
-  #' Thresholds related parameters.
-  thresholds:
-    #' MS2 annotation related parameters.
-    ms2:
-      #' For similarity.
-      similarity:
-        #' For edges. FLOAT
-        edges: 0.7
-
 #' Files.
 files:
   #' Networks files.
@@ -58,3 +47,16 @@ names:
 
   #' Name of "target IDs" variable in the input. STRING
   target: CLUSTERID2
+
+#' Similarity related parameters.
+similarities:
+  #' Method used.
+  methods:
+    #' Similarity method used to create edges.
+    #' Currently "gnps" or "entropy" supported. STRING
+    edges: gnps
+
+  #' Threshold used.
+  thresholds:
+    #' For edges. FLOAT
+    edges: 0.7

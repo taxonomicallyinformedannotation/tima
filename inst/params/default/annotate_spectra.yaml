@@ -4,15 +4,6 @@ annotations:
   #' Perform approximative matching without precursor matching? BOOLEAN
   ms2approx: no
 
-  #' Thresholds related parameters.
-  thresholds:
-    #' MS2 annotation related parameters.
-    ms2:
-      #' For similarity.
-      similarity:
-        #' For annotation. FLOAT
-        annotation: 0.0
-
 #' Files.
 files:
   #' Annotations files.
@@ -68,3 +59,16 @@ ms:
       dalton:
         #' Absolute mass tolerance for MS2 in Dalton. FLOAT
         ms2: 0.01
+
+#' Similarity related parameters.
+similarities:
+  #' Method used.
+  methods:
+    #' Similarity method used for annotations.
+    #' Currently "gnps" or "entropy" supported. STRING
+    annotations: gnps
+
+  #' Threshold used.
+  thresholds:
+    #' For annotations. FLOAT
+    annotations: 0.0

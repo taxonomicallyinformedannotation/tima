@@ -14,6 +14,7 @@
 #'    Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
+#' @param method Similarity method
 #' @param threshold Minimal similarity to report
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
@@ -45,7 +46,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
                              library = get_params(step = "annotate_spectra")$files$libraries$spectral,
                              polarity = get_params(step = "annotate_spectra")$ms$polarity,
                              output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
-                             threshold = get_params(step = "annotate_spectra")$annotations$thresholds$ms2$similarity$annotation,
+                             method = get_params(step = "annotate_spectra")$similarities$methods$annotations,
+                             threshold = get_params(step = "annotate_spectra")$similarities$thresholds$annotations,
                              ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
                              dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
                              qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
@@ -162,13 +164,14 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     if (length(safety) != 0) {
       log_debug("Annotating...")
       df_final <-
-        calculate_entropy_score(
+        calculate_entropy_and_similarity(
           lib_ids = lib_ids,
           lib_precursors = lib_precursors,
           lib_spectra = lib_spectra,
           query_ids = query_ids,
           query_precursors = query_precursors,
           query_spectra = query_spectra,
+          method = method,
           dalton = dalton,
           ppm = ppm,
           threshold = threshold,

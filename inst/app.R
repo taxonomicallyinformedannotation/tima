@@ -260,8 +260,21 @@ ui <- shiny::fluidPage(
               "Takes a lot of time."
             )
           ),
+        shiny::selectInput(
+          inputId = "sim_met_ann",
+          label = "Similarity method (annotation)",
+          choices = c("entropy", "gnps"),
+          selected = "gnps"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Similarity method to be used.",
+              "Entropy is faster."
+            )
+          ),
         shiny::sliderInput(
-          inputId = "ann_thr_ms2_sim",
+          inputId = "sim_thr_ann",
           label = "Minimal similarity score (annotation)",
           min = 0,
           max = 1,
@@ -276,8 +289,21 @@ ui <- shiny::fluidPage(
               "To keep MS2 annotation."
             )
           ),
+        shiny::selectInput(
+          inputId = "sim_met_edg",
+          label = "Similarity method (edges)",
+          choices = c("entropy", "gnps"),
+          selected = "gnps"
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Similarity method to be used.",
+              "Entropy is faster."
+            )
+          ),
         shiny::sliderInput(
-          inputId = "edg_thr_ms2_sim",
+          inputId = "sim_thr_edg",
           label = "Minimal similarity score (edges)",
           min = 0.5,
           max = 1,
@@ -1861,10 +1887,6 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$ann_thr_ms1_che)
   yaml_advanced$annotations$thresholds$ms1$condition <-
     shiny::isolate(input$ann_thr_ms1_con)
-  yaml_advanced$annotations$thresholds$ms2$similarity$annotation <-
-    shiny::isolate(input$ann_thr_ms2_sim)
-  yaml_advanced$annotations$thresholds$ms2$similarity$edges <-
-    shiny::isolate(input$edg_thr_ms2_sim)
   yaml_advanced$files$pattern <- fil_pat
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
@@ -2071,6 +2093,14 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$org_fil_val)
   yaml_advanced$organisms$taxon <-
     org_tax
+  yaml_advanced$similarities$methods$annotations <-
+    shiny::isolate(input$sim_met_ann)
+  yaml_advanced$similarities$methods$edges <-
+    shiny::isolate(input$sim_met_edg)
+  yaml_advanced$similarities$thresholds$annotations <-
+    shiny::isolate(input$sim_thr_ann)
+  yaml_advanced$similarities$thresholds$edges <-
+    shiny::isolate(input$sim_thr_edg)
   # TODO
   # yaml_advanced$tools$metadata <-
   #   shiny::isolate(input$too_x)

@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/annotate_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-lib-spe-pos data/interim/libraries/spectra/is/lotus_pos.rds --fil-ann-raw-spe-spe data/interim/annotations/example_spectralMatches.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ann-thr-ms2-sim-ann 0.0 --ms-thr-ms2-int 5 --ann-ms2-app false
 
 Usage:
-  annotate_spectra.R [--ann-ms2-app=<ann-ms2-app>] [--ann-thr-ms2-sim-ann=<ann-thr-ms2-sim-ann>] [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>]
+  annotate_spectra.R [--ann-ms2-app=<ann-ms2-app>] [--fil-ann-raw-spe=<fil-ann-raw-spe>] [--fil-lib-spe-neg=<fil-lib-spe-neg>] [--fil-lib-spe-pos=<fil-lib-spe-pos>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--sim-met-ann=<sim-met-ann>] [--sim-thr-ann=<sim-thr-ann>]
 
 Arguments:
   ann-ms2-app                Perform approximative matching without precursor matching? BOOLEAN
@@ -18,6 +18,9 @@ Arguments:
   ms-tol-mas-ppm-ms2         Relative mass tolerance for MS2 in ppm. FLOAT
   ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT
+
+  sim-met-ann                Similarity method. STRING
+  sim-thr-ann                Similarity threhsold for annotation. FLOAT
 
 Options:
   -h --help                  Shows this screen.
