@@ -404,9 +404,7 @@ test_that(desc = "Test functions", code = {
     library = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
     ## shallow tolerance to speed up tests
     ppm = 1,
-    dalton = 0.001,
-    threshold = 2,
-    approx = TRUE
+    dalton = 0.001
   )
 
   ## Create MS2 based edges
