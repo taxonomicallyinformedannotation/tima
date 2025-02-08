@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_similarity.R
 \name{calculate_similarity}
 \alias{calculate_similarity}
-\title{Calculate similarity}
+\title{Calculate similarity between spectra}
 \usage{
 calculate_similarity(
   method,
@@ -15,23 +15,26 @@ calculate_similarity(
 )
 }
 \arguments{
-\item{method}{Method}
+\item{method}{Method ("entropy" or "gnps")}
 
-\item{query_spectrum}{Query spectrum}
+\item{query_spectrum}{Query spectrum matrix}
 
-\item{target_spectrum}{Target spectrum}
+\item{target_spectrum}{Target spectrum matrix}
 
 \item{query_precursor}{Query precursor}
 
 \item{target_precursor}{Target precursor}
 
-\item{dalton}{Dalton}
+\item{dalton}{Dalton tolerance}
 
-\item{ppm}{Ppm}
+\item{ppm}{PPM tolerance}
+}
+\value{
+Similarity score or NA_real_ if calculation fails
 }
 \description{
-This function applies similarity calculation to a list of
-spectra to obtain similarity scores
+Efficiently calculates similarity scores between query and target spectra
+using either entropy or GNPS methods
 }
 \examples{
 NULL
