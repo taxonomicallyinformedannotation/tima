@@ -9,7 +9,7 @@ using namespace arma;
 // [[Rcpp::export]]
 double gnps_cpp(NumericMatrix x, NumericMatrix y) {
   const int n = x.nrow();
-  
+
   if (n != y.nrow()) {
     stop("'x' and 'y' must have the same number of rows.");
   }
@@ -24,7 +24,7 @@ double gnps_cpp(NumericMatrix x, NumericMatrix y) {
   // **First pass: Compute intensity sums and track unique m/z values**
   for (int i = 0; i < n; i++) {
     const double x_mz = x(i, 0), y_mz = y(i, 0);
-    
+
     if (!NumericVector::is_na(x_mz) && seen_x.insert(x_mz).second) {
       x_sum += x(i, 1);
     }
@@ -48,7 +48,7 @@ double gnps_cpp(NumericMatrix x, NumericMatrix y) {
       keep_idx.push_back(i);
     }
   }
-  
+
   const int l = keep_idx.size();
   if (l == 0) return 0.0;
 
@@ -56,7 +56,7 @@ double gnps_cpp(NumericMatrix x, NumericMatrix y) {
   std::unordered_map<double, int> x_map, y_map;
   x_map.reserve(l);
   y_map.reserve(l);
-  
+
   arma::vec x_int_kept(l), y_int_kept(l);
   arma::umat assignments(2, l);
 
@@ -83,7 +83,7 @@ double gnps_cpp(NumericMatrix x, NumericMatrix y) {
 
   // **Construct similarity matrix (sparse-friendly)**
   arma::mat score_mat(x_count, y_count, fill::zeros);
-  
+
   for (int i = 0; i < l; i++) {
     score_mat(assignments(0, i), assignments(1, i)) = x_int_kept[i] * y_int_kept[i];
   }
