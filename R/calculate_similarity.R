@@ -21,10 +21,6 @@ calculate_similarity <- function(method,
                                  target_precursor,
                                  dalton,
                                  ppm) {
-  if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
-    return(NA_real_)
-  }
-
   similarity_functions <- list(
     entropy = function() {
       msentropy::calculate_entropy_similarity(
@@ -43,7 +39,9 @@ calculate_similarity <- function(method,
       query_masses <- query_spectrum[, 1]
       target_masses <- target_spectrum[, 1]
 
-      map <- MsCoreUtils::join_gnps(
+      ## Replaced with internal Rcpp version
+      # map <- MsCoreUtils::join_gnps(
+      map <- join_gnps_cpp(
         x = query_masses,
         y = target_masses,
         xPrecursorMz = query_precursor,
@@ -56,10 +54,11 @@ calculate_similarity <- function(method,
       matched_y <- map[[2]]
 
       if (length(matched_x) > 0 && length(matched_y) > 0) {
-        MsCoreUtils::gnps(
+        ## Replaced with internal Rcpp version
+        # MsCoreUtils::gnps(
+        gnps_cpp(
           x = query_spectrum[matched_x, ],
-          y = target_spectrum[matched_y, ],
-          .check = FALSE
+          y = target_spectrum[matched_y, ]
         )
       } else {
         NA_real_
@@ -69,6 +68,8 @@ calculate_similarity <- function(method,
 
   tryCatch(
     similarity_functions[[method]](),
-    error = function(e) NA_real_
+    error = function(e) {
+      NA_real_
+    }
   )
 }
