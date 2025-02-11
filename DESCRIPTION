@@ -42,6 +42,8 @@ Imports:
     MsBackendMsp (>= 1.6.0),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.2),
+    Rcpp,
+    RcppArmadillo,
     rotl (>= 3.1.0),
     shiny (>= 1.10.0),
     shinybusy (>= 0.3.3),
