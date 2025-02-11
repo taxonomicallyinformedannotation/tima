@@ -61,7 +61,7 @@ calculate_similarity <- function(method,
           y = target_spectrum[matched_y, ]
         )
       } else {
-        NA_real_
+        0.0
       }
     }
   )
@@ -69,7 +69,7 @@ calculate_similarity <- function(method,
   tryCatch(
     similarity_functions[[method]](),
     error = function(e) {
-      NA_real_
+      0.0
     }
   )
 }
