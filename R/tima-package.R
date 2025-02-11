@@ -2,6 +2,8 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+#' @useDynLib tima, .registration = TRUE
 ## usethis namespace: end
 NULL
 .datatable.aware <- TRUE
