@@ -21,7 +21,7 @@ calculate_similarity <- function(method,
                                  target_precursor,
                                  dalton,
                                  ppm) {
-  similarity_functions <- list(
+  similarity_fn <- switch(method,
     entropy = function() {
       msentropy::calculate_entropy_similarity(
         peaks_a = query_spectrum,
@@ -53,21 +53,18 @@ calculate_similarity <- function(method,
       matched_x <- map[[1]]
       matched_y <- map[[2]]
 
-      if (length(matched_x) > 0 && length(matched_y) > 0) {
-        ## Replaced with internal Rcpp version
-        # MsCoreUtils::gnps(
-        gnps_cpp(
-          x = query_spectrum[matched_x, ],
-          y = target_spectrum[matched_y, ]
-        )
-      } else {
-        0.0
+      if (length(matched_x) == 0 ||
+        length(matched_y) == 0) {
+        return(0.0)
       }
+      ## Replaced with internal Rcpp version
+      # MsCoreUtils::gnps(
+      gnps_cpp(query_spectrum[matched_x, , drop = FALSE], target_spectrum[matched_y, , drop = FALSE])
     }
   )
 
   tryCatch(
-    similarity_functions[[method]](),
+    similarity_fn(),
     error = function(e) {
       0.0
     }
