@@ -9,10 +9,11 @@ NULL
 .datatable.aware <- TRUE
 
 .onLoad <- function(libname, pkgname) {
-  ## Hack to avoid rcmdcheck warning since they are needed by {targets}
-  ## for shinylive
+  ## Hack to avoid rcmdcheck warning
+  clue::cl_tabulate(1)
   DT::`%>%`
   gt::`%>%`
+  RcppArmadillo::armadillo_get_number_of_omp_threads()
   shinybusy::use_busy_spinner()
   shinyWidgets::animations
   visNetwork::`%>%`
