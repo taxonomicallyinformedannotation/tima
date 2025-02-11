@@ -27,7 +27,7 @@ List join_gnps_cpp(NumericVector x, NumericVector y,
   for (size_t i = 0; i < x_size; i++) {
     const double x_val = x[i];
     const double allowed_diff = tolerance + (ppm * x_val * 1e-6);
-    
+
     auto lower = std::lower_bound(y_sorted_idx.begin(), y_sorted_idx.end(), x_val - allowed_diff,
                                   [&y](size_t idx, double val) { return y[idx] < val; });
 
