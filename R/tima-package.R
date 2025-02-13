@@ -9,7 +9,6 @@ NULL
 
 .onLoad <- function(libname, pkgname) {
   ## Hack to avoid rcmdcheck warning
-  clue::cl_tabulate(1)
   DT::`%>%`
   gt::`%>%`
   shinybusy::use_busy_spinner()
