@@ -39,9 +39,10 @@ calculate_similarity <- function(method,
       query_masses <- query_spectrum[, 1]
       target_masses <- target_spectrum[, 1]
 
-      ## Replaced with internal Rcpp version
-      # map <- MsCoreUtils::join_gnps(
-      map <- join_gnps_cpp(
+      ## Replaced with internal C version
+      map <- MsCoreUtils::join_gnps(
+      # map <- .Call(
+        # "join_gnps",
         x = query_masses,
         y = target_masses,
         xPrecursorMz = query_precursor,
@@ -57,16 +58,18 @@ calculate_similarity <- function(method,
         length(matched_y) == 0) {
         return(0.0)
       }
-      ## Replaced with internal Rcpp version
-      # MsCoreUtils::gnps(
-      gnps_cpp(query_spectrum[matched_x, , drop = FALSE], target_spectrum[matched_y, , drop = FALSE])
+      x_mat <- query_spectrum[matched_x, , drop = FALSE]
+      y_mat <- target_spectrum[matched_y, , drop = FALSE]
+
+      ## Replaced with internal C version
+      MsCoreUtils::gnps(
+      # .Call(
+        # "gnps",
+        x = query_spectrum[matched_x, , drop = FALSE],
+        y = target_spectrum[matched_y, , drop = FALSE]
+      )
     }
   )
 
-  tryCatch(
-    similarity_fn(),
-    error = function(e) {
-      0.0
-    }
-  )
+  similarity_fn()
 }

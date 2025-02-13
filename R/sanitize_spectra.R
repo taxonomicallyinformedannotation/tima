@@ -34,6 +34,10 @@ sanitize_spectra <-
       message("Harmonizing names")
       spectra$msLevel <- spectra$MSLEVEL |> as.integer()
     }
+    if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
+      message("Harmonizing names")
+      spectra$msLevel <- spectra$MS_LEVEL |> as.integer()
+    }
 
     if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
       message("Harmonizing names")
@@ -74,11 +78,7 @@ sanitize_spectra <-
     }
 
     # Fix needed as some empty spectra are else not removed
-    spectra <- spectra[!spectra@backend@peaksData |>
-      purrr::map(.f = is.nan) |>
-      purrr::map(.f = any) |>
-      as.character() |>
-      as.logical()]
-
+    spectra <- spectra |>
+      Spectra::filterEmptySpectra()
     return(spectra)
   }

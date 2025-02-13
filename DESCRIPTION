@@ -26,7 +26,6 @@ Depends:
 Imports:
     archive (>= 1.1.11),
     BiocParallel (>= 1.36.0),
-    clue,
     crayon (>= 1.5.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
@@ -40,10 +39,9 @@ Imports:
     MetaboCoreUtils (>= 1.10.0),
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
+    MsCoreUtils (>= 1.14.1),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.2),
-    Rcpp,
-    RcppArmadillo,
     rotl (>= 3.1.0),
     shiny (>= 1.10.0),
     shinybusy (>= 0.3.3),
@@ -58,10 +56,7 @@ Imports:
     utils,
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.10)
-LinkingTo:
-    Rcpp,
-    RcppArmadillo
-Suggests: 
+Suggests:
     BiocManager,
     knitr,
     lifecycle,
@@ -91,7 +86,6 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
     system, natural products, computational metabolomics, taxonomic
     distance, specialized metabolome
 Collate:
-    'RcppExports.R'
     'round_reals.R'
     'log_pipe.R'
     'harmonize_adducts.R'
