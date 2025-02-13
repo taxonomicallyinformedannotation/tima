@@ -2,7 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @importFrom Rcpp sourceCpp
 #' @useDynLib tima, .registration = TRUE
 ## usethis namespace: end
 NULL
@@ -13,7 +12,6 @@ NULL
   clue::cl_tabulate(1)
   DT::`%>%`
   gt::`%>%`
-  RcppArmadillo::armadillo_get_number_of_omp_threads()
   shinybusy::use_busy_spinner()
   shinyWidgets::animations
   visNetwork::`%>%`
