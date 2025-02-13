@@ -21,8 +21,8 @@ calculate_similarity <- function(method,
                                  target_precursor,
                                  dalton,
                                  ppm) {
-  similarity_fn <- switch(method,
-    entropy = function() {
+  if (method == "entropy") {
+    return(
       msentropy::calculate_entropy_similarity(
         peaks_a = query_spectrum,
         peaks_b = target_spectrum,
@@ -34,42 +34,42 @@ calculate_similarity <- function(method,
         max_peak_num = -1,
         clean_spectra = TRUE
       )
-    },
-    gnps = function() {
-      query_masses <- query_spectrum[, 1]
-      target_masses <- target_spectrum[, 1]
+    )
+  } else if (method == "gnps") {
+    query_masses <- query_spectrum[, 1]
+    target_masses <- target_spectrum[, 1]
 
-      ## Replaced with internal C version
-      map <- MsCoreUtils::join_gnps(
-      # map <- .Call(
-        # "join_gnps",
-        x = query_masses,
-        y = target_masses,
-        xPrecursorMz = query_precursor,
-        yPrecursorMz = target_precursor,
-        tolerance = dalton,
-        ppm = ppm
-      )
+    ## Replaced with internal C version
+    # map <- MsCoreUtils::join_gnps(
+    map <- .Call(
+      "join_gnps",
+      x = query_masses,
+      y = target_masses,
+      xPrecursorMz = query_precursor,
+      yPrecursorMz = target_precursor,
+      tolerance = dalton,
+      ppm = ppm
+    )
 
-      matched_x <- map[[1]]
-      matched_y <- map[[2]]
+    matched_x <- map[[1]]
+    matched_y <- map[[2]]
 
-      if (length(matched_x) == 0 ||
-        length(matched_y) == 0) {
-        return(0.0)
-      }
-      x_mat <- query_spectrum[matched_x, , drop = FALSE]
-      y_mat <- target_spectrum[matched_y, , drop = FALSE]
-
-      ## Replaced with internal C version
-      MsCoreUtils::gnps(
-      # .Call(
-        # "gnps",
-        x = query_spectrum[matched_x, , drop = FALSE],
-        y = target_spectrum[matched_y, , drop = FALSE]
-      )
+    if (length(matched_x) == 0 || length(matched_y) == 0) {
+      return(0.0)
     }
-  )
 
-  similarity_fn()
+    x_mat <- query_spectrum[matched_x, , drop = FALSE]
+    y_mat <- target_spectrum[matched_y, , drop = FALSE]
+
+    return(
+      # MsCoreUtils::gnps(
+      .Call(
+        "gnps",
+        x = x_mat,
+        y = y_mat
+      )
+    )
+  } else {
+    stop("Invalid method. Choose 'entropy' or 'gnps'.")
+  }
 }
