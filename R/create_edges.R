@@ -30,18 +30,22 @@ create_edges <- function(frags,
     .x = indices,
     .f = function(index) {
       target_indices <- (index + 1):nspecs
+      query_spectrum <- frags[[index]]
+      query_precursor <- precs[[index]]
 
-      scores <- vapply(target_indices, function(target) {
-        calculate_similarity(
+
+      scores <- purrr::map_dbl(
+        target_indices,
+        ~ calculate_similarity(
           method = method,
-          query_spectrum = frags[[index]],
-          target_spectrum = frags[[target]],
-          query_precursor = precs[[index]],
-          target_precursor = precs[[target]],
+          query_spectrum = query_spectrum,
+          target_spectrum = frags[[.x]],
+          query_precursor = query_precursor,
+          target_precursor = precs[[.x]],
           dalton = ms2_tolerance,
           ppm = ppm_tolerance
         )
-      }, numeric(1))
+      )
 
       valid_indices <- which(scores >= threshold)
 
