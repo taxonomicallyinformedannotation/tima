@@ -149,18 +149,6 @@ references:
   doi: 10.18129/B9.bioc.BiocParallel
   version: '>= 1.36.0'
 - type: software
-  title: clue
-  abstract: 'clue: Cluster Ensembles'
-  notes: Imports
-  repository: https://CRAN.R-project.org/package=clue
-  authors:
-  - family-names: Hornik
-    given-names: Kurt
-    email: Kurt.Hornik@R-project.org
-    orcid: https://orcid.org/0000-0003-4198-9911
-  year: '2025'
-  doi: 10.32614/CRAN.package.clue
-- type: software
   title: crayon
   abstract: 'crayon: Colored Terminal Output'
   notes: Imports
@@ -436,6 +424,32 @@ references:
   doi: 10.18129/B9.bioc.MsBackendMsp
   version: '>= 1.6.0'
 - type: software
+  title: MsCoreUtils
+  abstract: 'MsCoreUtils: Core Utils for Mass Spectrometry Data'
+  notes: Imports
+  url: https://github.com/RforMassSpectrometry/MsCoreUtils
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Gatto
+    given-names: Laurent
+    email: laurent.gatto@uclouvain.be
+    orcid: https://orcid.org/0000-0002-1520-2268
+  - family-names: Rainer
+    given-names: Johannes
+    email: Johannes.Rainer@eurac.edu
+    orcid: https://orcid.org/0000-0002-6977-7147
+  - family-names: Gibb
+    given-names: Sebastian
+    email: mail@sebastiangibb.de
+    orcid: https://orcid.org/0000-0001-7406-4443
+  - family-names: Louail
+    given-names: Philippine
+    email: philippine.louail@eurac.edu
+    orcid: https://orcid.org/0009-0007-5429-6846
+  year: '2025'
+  doi: 10.18129/B9.bioc.MsCoreUtils
+  version: '>= 1.14.1'
+- type: software
   title: msentropy
   abstract: 'msentropy: Spectral Entropy for Mass Spectrometry Data'
   notes: Imports
@@ -465,66 +479,6 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.purrr
   version: '>= 1.0.2'
-- type: software
-  title: Rcpp
-  abstract: 'Rcpp: Seamless R and C++ Integration'
-  notes: Imports
-  url: https://www.rcpp.org
-  repository: https://CRAN.R-project.org/package=Rcpp
-  authors:
-  - family-names: Eddelbuettel
-    given-names: Dirk
-    email: edd@debian.org
-    orcid: https://orcid.org/0000-0001-6419-907X
-  - family-names: Francois
-    given-names: Romain
-    orcid: https://orcid.org/0000-0002-2444-4226
-  - family-names: Allaire
-    given-names: JJ
-    orcid: https://orcid.org/0000-0003-0174-9868
-  - family-names: Ushey
-    given-names: Kevin
-    orcid: https://orcid.org/0000-0003-2880-7407
-  - family-names: Kou
-    given-names: Qiang
-    orcid: https://orcid.org/0000-0001-6786-5453
-  - family-names: Russell
-    given-names: Nathan
-  - family-names: Ucar
-    given-names: Iñaki
-    orcid: https://orcid.org/0000-0001-6403-5550
-  - family-names: Bates
-    given-names: Doug
-    orcid: https://orcid.org/0000-0001-8316-9503
-  - family-names: Chambers
-    given-names: John
-  year: '2025'
-  doi: 10.32614/CRAN.package.Rcpp
-- type: software
-  title: RcppArmadillo
-  abstract: 'RcppArmadillo: ''Rcpp'' Integration for the ''Armadillo'' Templated Linear
-    Algebra Library'
-  notes: Imports
-  url: https://dirk.eddelbuettel.com/code/rcpp.armadillo.html
-  repository: https://CRAN.R-project.org/package=RcppArmadillo
-  authors:
-  - family-names: Eddelbuettel
-    given-names: Dirk
-    email: edd@debian.org
-    orcid: https://orcid.org/0000-0001-6419-907X
-  - family-names: Francois
-    given-names: Romain
-    orcid: https://orcid.org/0000-0002-2444-4226
-  - family-names: Bates
-    given-names: Doug
-    orcid: https://orcid.org/0000-0001-8316-9503
-  - family-names: Ni
-    given-names: Binxiang
-  - family-names: Sanderson
-    given-names: Conrad
-    orcid: https://orcid.org/0000-0002-0049-4501
-  year: '2025'
-  doi: 10.32614/CRAN.package.RcppArmadillo
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
