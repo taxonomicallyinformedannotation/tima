@@ -74,7 +74,8 @@ sanitize_spectra <-
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       message("Combining spectra in case...")
       spectra <- spectra |>
-        Spectra::combineSpectra(f = spectra$FEATURE_ID)
+        Spectra::combineSpectra(f = spectra$FEATURE_ID) |>
+        Spectra::combinePeaks()
     }
 
     # Removing empty spectra
@@ -82,10 +83,10 @@ sanitize_spectra <-
       Spectra::filterEmptySpectra()
     # Fix needed as some empty spectra are else not removed
     spectra <- spectra[!spectra@backend@peaksData |>
-                         purrr::map(.f = is.nan) |>
-                         purrr::map(.f = any) |>
-                         as.character() |>
-                         as.logical()]
+      purrr::map(.f = is.nan) |>
+      purrr::map(.f = any) |>
+      as.character() |>
+      as.logical()]
 
     return(spectra)
   }
