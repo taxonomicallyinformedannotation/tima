@@ -259,9 +259,11 @@ SEXP gnps(SEXP x, SEXP y) {
     double *y_data = REAL(y);
     if (!x_data || !y_data) error("Null input data.");
 
-    // Arrays for tracking unique values
+    // Calculate sums for unique m/z values
+    double x_sum = 0.0, y_sum = 0.0;
     double *seen_x = (double*)malloc(n * sizeof(double));
     double *seen_y = (double*)malloc(n * sizeof(double));
+
     if (!seen_x || !seen_y) {
         free(seen_x);
         free(seen_y);
@@ -269,17 +271,20 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     int seen_x_count = 0, seen_y_count = 0;
-    double x_sum = 0.0, y_sum = 0.0;
 
-    // First pass: find unique values and calculate sums (like the original hash table)
+    // Sum intensities for unique m/z values
     for (int i = 0; i < n; i++) {
-        double x_mz = x_data[i], y_mz = y_data[i];
+        double x_mz = x_data[i];
         if (!ISNA(x_mz)) {
             if (!find_value(x_mz, seen_x, seen_x_count)) {
                 seen_x[seen_x_count++] = x_mz;
                 x_sum += x_data[i + n];
             }
         }
+    }
+
+    for (int i = 0; i < n; i++) {
+        double y_mz = y_data[i];
         if (!ISNA(y_mz)) {
             if (!find_value(y_mz, seen_y, seen_y_count)) {
                 seen_y[seen_y_count++] = y_mz;
@@ -288,20 +293,16 @@ SEXP gnps(SEXP x, SEXP y) {
         }
     }
 
+    free(seen_x);
+    free(seen_y);
+
     if (x_sum == 0.0 || y_sum == 0.0) {
-        free(seen_x);
-        free(seen_y);
         return ScalarReal(0.0);
     }
 
-    double x_norm = sqrt(1.0 / x_sum);
-    double y_norm = sqrt(1.0 / y_sum);
-
-    // Find non-NA pairs for assignment
+    // Find complete cases (non-NA pairs)
     int *keep_idx = (int*)malloc(n * sizeof(int));
     if (!keep_idx) {
-        free(seen_x);
-        free(seen_y);
         error("Memory allocation failed.");
     }
 
@@ -313,47 +314,105 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     if (l == 0) {
-        free(seen_x);
-        free(seen_y);
         free(keep_idx);
         return ScalarReal(0.0);
     }
 
-    double *score_mat = (double*)calloc(l * l, sizeof(double));
-    if (!score_mat) {
-        free(seen_x);
-        free(seen_y);
+    // Calculate normalized intensities
+    double *scores = (double*)malloc(l * sizeof(double));
+    if (!scores) {
         free(keep_idx);
         error("Memory allocation failed.");
     }
 
     for (int i = 0; i < l; i++) {
         int idx = keep_idx[i];
-        score_mat[i * l + i] = sqrt(x_data[idx + n]) * x_norm * sqrt(y_data[idx + n]) * y_norm;
+        scores[i] = sqrt(x_data[idx + n]) / sqrt(x_sum) *
+                    sqrt(y_data[idx + n]) / sqrt(y_sum);
     }
 
-    int* best = solve_hungarian(l, l, score_mat);
-    if (!best) {
-        free(score_mat);
-        free(seen_x);
-        free(seen_y);
+    // Create factor indices for x and y m/z values
+    int *x_idx = (int*)malloc(l * sizeof(int));
+    int *y_idx = (int*)malloc(l * sizeof(int));
+    if (!x_idx || !y_idx) {
         free(keep_idx);
+        free(scores);
+        free(x_idx);
+        free(y_idx);
+        error("Memory allocation failed.");
+    }
+
+    // Create factor indices (1-based like R)
+    for (int i = 0; i < l; i++) {
+        int idx = keep_idx[i];
+        int x_factor = 1, y_factor = 1;
+        double x_mz = x_data[idx];
+        double y_mz = y_data[idx];
+
+        for (int j = 0; j < i; j++) {
+            int prev_idx = keep_idx[j];
+            if (x_data[prev_idx] == x_mz) {
+                x_factor = x_idx[j];
+                break;
+            } else if (x_idx[j] >= x_factor) {
+                x_factor = x_idx[j] + 1;
+            }
+        }
+        x_idx[i] = x_factor;
+
+        for (int j = 0; j < i; j++) {
+            int prev_idx = keep_idx[j];
+            if (y_data[prev_idx] == y_mz) {
+                y_factor = y_idx[j];
+                break;
+            } else if (y_idx[j] >= y_factor) {
+                y_factor = y_idx[j] + 1;
+            }
+        }
+        y_idx[i] = y_factor;
+    }
+
+    // Create and fill score matrix
+    double *score_mat = (double*)calloc(l * l, sizeof(double));
+    if (!score_mat) {
+        free(keep_idx);
+        free(scores);
+        free(x_idx);
+        free(y_idx);
+        error("Memory allocation failed.");
+    }
+
+    // Fill score matrix (using 0-based indices for C)
+    for (int i = 0; i < l; i++) {
+        score_mat[(x_idx[i] - 1) * l + (y_idx[i] - 1)] = scores[i];
+    }
+
+    // Solve assignment problem
+    int* assignment = solve_hungarian(l, l, score_mat);
+    if (!assignment) {
+        free(keep_idx);
+        free(scores);
+        free(x_idx);
+        free(y_idx);
+        free(score_mat);
         return ScalarReal(0.0);
     }
 
+    // Calculate final score
     double total_score = 0.0;
     for (int i = 0; i < l; i++) {
-        int best_index = best[i] - 1;
-        if (best_index >= 0 && best_index < l) {
-            total_score += score_mat[i * l + best_index];
+        int j = assignment[i] - 1;
+        if (j >= 0 && j < l) {
+            total_score += score_mat[i * l + j];
         }
     }
 
-    free(best);
-    free(score_mat);
-    free(seen_x);
-    free(seen_y);
     free(keep_idx);
+    free(scores);
+    free(x_idx);
+    free(y_idx);
+    free(score_mat);
+    free(assignment);
 
     return ScalarReal(total_score);
 }
