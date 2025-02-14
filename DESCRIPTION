@@ -39,7 +39,6 @@ Imports:
     MetaboCoreUtils (>= 1.10.0),
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
-    MsCoreUtils (>= 1.14.1),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.2),
     rotl (>= 3.1.0),
