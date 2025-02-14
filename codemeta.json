@@ -393,19 +393,6 @@
     },
     "17": {
       "@type": "SoftwareApplication",
-      "identifier": "MsCoreUtils",
-      "name": "MsCoreUtils",
-      "version": ">= 1.14.1",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
-    },
-    "18": {
-      "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
       "version": ">= 0.1.4",
@@ -417,7 +404,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "19": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
@@ -430,7 +417,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -443,7 +430,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "21": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -456,7 +443,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "22": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
@@ -469,7 +456,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinybusy"
     },
-    "23": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
@@ -482,7 +469,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "24": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -495,12 +482,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "25": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "26": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -513,7 +500,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "27": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -526,7 +513,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "28": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -539,7 +526,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "29": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -552,7 +539,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "30": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -565,12 +552,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "31": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "32": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
@@ -583,7 +570,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     },
-    "33": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -599,7 +586,7 @@
     "SystemRequirements": null
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2394.232KB",
+  "fileSize": "2365.793KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
