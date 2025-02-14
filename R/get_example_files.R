@@ -61,8 +61,8 @@ get_example_files <- function(example = c("features", "metadata", "sirius", "spe
   if ("spectra" %in% example) {
     message("Spectra")
     get_file(
-      # url = get_default_paths()$urls$examples$spectra,
-      url = get_default_paths()$urls$examples$spectra_mini,
+      url = get_default_paths()$urls$examples$spectra,
+      # url = get_default_paths()$urls$examples$spectra_mini,
       export = get_default_paths()$data$source$spectra
     )
   }

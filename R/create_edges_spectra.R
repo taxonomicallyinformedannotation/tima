@@ -74,14 +74,16 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
     entropy <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
-        return(peaks[[x]] |> msentropy::calculate_spectral_entropy())
+        return(peaks[[x]] |>
+          msentropy::calculate_spectral_entropy())
       }
     )
     log_debug("Calculating features' number of peaks")
     npeaks <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
-        return(peaks[[x]] |> length())
+        return(peaks[[x]] |>
+          length())
       }
     )
     rm(nspecz, fragz)
