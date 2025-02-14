@@ -33,18 +33,21 @@ create_edges <- function(frags,
       query_spectrum <- frags[[index]]
       query_precursor <- precs[[index]]
 
-
       scores <- purrr::map_dbl(
-        target_indices,
-        ~ calculate_similarity(
-          method = method,
-          query_spectrum = query_spectrum,
-          target_spectrum = frags[[.x]],
-          query_precursor = query_precursor,
-          target_precursor = precs[[.x]],
-          dalton = ms2_tolerance,
-          ppm = ppm_tolerance
-        )
+        .x = target_indices,
+        .f = function(index) {
+          target_spectrum <- frags[[index]]
+          target_precursor <- precs[[index]]
+          calculate_similarity(
+            method = method,
+            query_spectrum = query_spectrum,
+            target_spectrum = target_spectrum,
+            query_precursor = query_precursor,
+            target_precursor = target_precursor,
+            dalton = ms2_tolerance,
+            ppm = ppm_tolerance
+          )
+        }
       )
 
       valid_indices <- which(scores >= threshold)
