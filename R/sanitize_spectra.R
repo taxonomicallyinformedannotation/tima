@@ -77,8 +77,15 @@ sanitize_spectra <-
         Spectra::combineSpectra(f = spectra$FEATURE_ID)
     }
 
-    # Fix needed as some empty spectra are else not removed
+    # Removing empty spectra
     spectra <- spectra |>
       Spectra::filterEmptySpectra()
+    # Fix needed as some empty spectra are else not removed
+    spectra <- spectra[!spectra@backend@peaksData |>
+                         purrr::map(.f = is.nan) |>
+                         purrr::map(.f = any) |>
+                         as.character() |>
+                         as.logical()]
+
     return(spectra)
   }
