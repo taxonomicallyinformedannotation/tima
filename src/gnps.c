@@ -2,6 +2,7 @@
 #include <Rinternals.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     int n_rows;
@@ -15,6 +16,7 @@ typedef struct {
 
 // Helper function to find if value exists in array
 static int find_value(double value, double* array, int size) {
+    if (!array) return 0;
     for (int i = 0; i < size; i++) {
         if (array[i] == value) return 1;
     }
@@ -22,12 +24,19 @@ static int find_value(double value, double* array, int size) {
 }
 
 Hungarian* hungarian_new(int n_rows, int n_cols, double* costs) {
-    int max_dim = (n_rows > n_cols) ? n_rows : n_cols;
-    size_t total_size = (max_dim * max_dim * sizeof(double)) +
-                        (4 * max_dim * sizeof(int));
+    if (!costs || n_rows <= 0 || n_cols <= 0) return NULL;
 
-    Hungarian* h = (Hungarian*)malloc(sizeof(Hungarian) + total_size);
-    char* mem = (char*)(h + 1);
+    int max_dim = (n_rows > n_cols) ? n_rows : n_cols;
+    size_t total_size = (max_dim * max_dim * sizeof(double)) + (4 * max_dim * sizeof(int));
+
+    Hungarian* h = (Hungarian*)malloc(sizeof(Hungarian));
+    if (!h) return NULL;
+
+    char* mem = (char*)malloc(total_size);
+    if (!mem) {
+        free(h);
+        return NULL;
+    }
 
     h->n_rows = max_dim;
     h->n_cols = max_dim;
@@ -39,12 +48,12 @@ Hungarian* hungarian_new(int n_rows, int n_cols, double* costs) {
 
     memset(h->costs, 0, max_dim * max_dim * sizeof(double));
     memset(h->row_covered, 0, 4 * max_dim * sizeof(int));
-    
+
     for (int i = 0; i < max_dim; i++) {
         h->starred_zeros[i] = -1;
         h->primed_zeros[i] = -1;
     }
-    
+
     for (int i = 0; i < n_rows; i++) {
         for (int j = 0; j < n_cols; j++) {
             h->costs[i * max_dim + j] = -costs[i * n_cols + j];
@@ -54,7 +63,10 @@ Hungarian* hungarian_new(int n_rows, int n_cols, double* costs) {
 }
 
 void hungarian_free(Hungarian* h) {
-    free(h);
+    if (h) {
+        if (h->costs) free(h->costs);
+        free(h);
+    }
 }
 
 static void step1(Hungarian* h) {
@@ -235,20 +247,27 @@ int* solve_hungarian(int n_rows, int n_cols, double* costs) {
 }
 
 SEXP gnps(SEXP x, SEXP y) {
+    if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices.");
     SEXP x_dim = getAttrib(x, R_DimSymbol);
     SEXP y_dim = getAttrib(y, R_DimSymbol);
-    int n = INTEGER(x_dim)[0];
+    if (!isInteger(x_dim) || !isInteger(y_dim)) error("Dimensions must be integer vectors.");
 
-    if (n != INTEGER(y_dim)[0]) {
-        error("'x' and 'y' must have the same number of rows.");
-    }
+    int n = INTEGER(x_dim)[0];
+    if (n != INTEGER(y_dim)[0]) error("'x' and 'y' must have the same number of rows.");
 
     double *x_data = REAL(x);
     double *y_data = REAL(y);
+    if (!x_data || !y_data) error("Null input data.");
 
     // Arrays for tracking unique values
     double *seen_x = (double*)malloc(n * sizeof(double));
     double *seen_y = (double*)malloc(n * sizeof(double));
+    if (!seen_x || !seen_y) {
+        free(seen_x);
+        free(seen_y);
+        error("Memory allocation failed.");
+    }
+
     int seen_x_count = 0, seen_y_count = 0;
     double x_sum = 0.0, y_sum = 0.0;
 
@@ -280,6 +299,12 @@ SEXP gnps(SEXP x, SEXP y) {
 
     // Find non-NA pairs for assignment
     int *keep_idx = (int*)malloc(n * sizeof(int));
+    if (!keep_idx) {
+        free(seen_x);
+        free(seen_y);
+        error("Memory allocation failed.");
+    }
+
     int l = 0;
     for (int i = 0; i < n; i++) {
         if (!ISNA(x_data[i]) && !ISNA(y_data[i])) {
@@ -294,69 +319,41 @@ SEXP gnps(SEXP x, SEXP y) {
         return ScalarReal(0.0);
     }
 
-    // Arrays to track unique indices (like the original x_map/y_map)
-    double *x_mz_kept = (double*)malloc(l * sizeof(double));
-    double *y_mz_kept = (double*)malloc(l * sizeof(double));
-    int *x_indices = (int*)malloc(l * sizeof(int));
-    int *y_indices = (int*)malloc(l * sizeof(int));
-    double *x_int_kept = (double*)malloc(l * sizeof(double));
-    double *y_int_kept = (double*)malloc(l * sizeof(double));
-    int x_count = 0, y_count = 0;
+    double *score_mat = (double*)calloc(l * l, sizeof(double));
+    if (!score_mat) {
+        free(seen_x);
+        free(seen_y);
+        free(keep_idx);
+        error("Memory allocation failed.");
+    }
 
-    // Build mapping arrays (similar to original hash map logic)
     for (int i = 0; i < l; i++) {
         int idx = keep_idx[i];
-        double x_mz = x_data[idx], y_mz = y_data[idx];
-
-        x_int_kept[i] = sqrt(x_data[idx + n]) * x_norm;
-        y_int_kept[i] = sqrt(y_data[idx + n]) * y_norm;
-
-        int x_found = -1, y_found = -1;
-        for (int j = 0; j < x_count; j++) {
-            if (x_mz_kept[j] == x_mz) {
-                x_found = j;
-                break;
-            }
-        }
-        if (x_found == -1) {
-            x_mz_kept[x_count] = x_mz;
-            x_found = x_count++;
-        }
-        x_indices[i] = x_found;
-
-        for (int j = 0; j < y_count; j++) {
-            if (y_mz_kept[j] == y_mz) {
-                y_found = j;
-                break;
-            }
-        }
-        if (y_found == -1) {
-            y_mz_kept[y_count] = y_mz;
-            y_found = y_count++;
-        }
-        y_indices[i] = y_found;
+        score_mat[i * l + i] = sqrt(x_data[idx + n]) * x_norm * sqrt(y_data[idx + n]) * y_norm;
     }
 
-    // Create score matrix exactly as in original
-    double *score_mat = (double*)calloc(x_count * y_count, sizeof(double));
-    for (int i = 0; i < l; i++) {
-        score_mat[x_indices[i] * y_count + y_indices[i]] = x_int_kept[i] * y_int_kept[i];
+    int* best = solve_hungarian(l, l, score_mat);
+    if (!best) {
+        free(score_mat);
+        free(seen_x);
+        free(seen_y);
+        free(keep_idx);
+        return ScalarReal(0.0);
     }
-
-    int* best = solve_hungarian(x_count, y_count, score_mat);
 
     double total_score = 0.0;
-    for (int i = 0; i < x_count; i++) {
+    for (int i = 0; i < l; i++) {
         int best_index = best[i] - 1;
-        if (best_index >= 0 && best_index < y_count) {
-            total_score += score_mat[i * y_count + best_index];
+        if (best_index >= 0 && best_index < l) {
+            total_score += score_mat[i * l + best_index];
         }
     }
 
     free(best);
+    free(score_mat);
     free(seen_x);
     free(seen_y);
-    free(score_mat);
+    free(keep_idx);
 
     return ScalarReal(total_score);
 }

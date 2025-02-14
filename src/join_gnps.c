@@ -32,7 +32,7 @@ SEXP join_gnps(SEXP x, SEXP y,
     R_xlen_t x_size = xlength(x);
     R_xlen_t y_size = xlength(y);
     double pdiff = y_precursor - x_precursor;
-    
+
     // Allocate and initialize sorting structures
     MassIndex* x_sorted = (MassIndex*)malloc(x_size * sizeof(MassIndex));
     MassIndex* y_sorted = (MassIndex*)malloc(y_size * sizeof(MassIndex));
@@ -60,13 +60,13 @@ SEXP join_gnps(SEXP x, SEXP y,
             valid_y++;
         }
     }
+
+    // Sort only if there are valid elements
+    if (valid_x > 1) qsort(x_sorted, valid_x, sizeof(MassIndex), compare_mass);
+    if (valid_y > 1) qsort(y_sorted, valid_y, sizeof(MassIndex), compare_mass);
     
-    // Sort arrays
-    qsort(x_sorted, valid_x, sizeof(MassIndex), compare_mass);
-    qsort(y_sorted, valid_y, sizeof(MassIndex), compare_mass);
-    
-    // Allocate result vectors with maximum possible size
-    R_xlen_t max_matches = x_size + y_size + (x_size * 2);
+    // Allocate result vectors with a reasonable initial size
+    R_xlen_t max_matches = valid_x + valid_y + (valid_x * 2);
     SEXP matches_x = PROTECT(allocVector(INTSXP, max_matches));
     SEXP matches_y = PROTECT(allocVector(INTSXP, max_matches));
     int* matches_x_ptr = INTEGER(matches_x);
@@ -80,7 +80,7 @@ SEXP join_gnps(SEXP x, SEXP y,
     }
     
     R_xlen_t match_count = 0;
-    
+
     // Handle NAs in x first
     for (R_xlen_t i = 0; i < x_size; i++) {
         if (ISNAN(x_ptr[i])) {
@@ -89,18 +89,17 @@ SEXP join_gnps(SEXP x, SEXP y,
             match_count++;
         }
     }
-    
+
     // Find matches using binary search approach
     for (R_xlen_t i = 0; i < valid_x; i++) {
         double x_mass = x_sorted[i].mass;
         double allowed_diff = tol + (ppm_val * x_mass * 1e-6);
         double lower_bound = x_mass - allowed_diff;
         double upper_bound = x_mass + allowed_diff;
-        
+
         // Binary search for lower bound
-        R_xlen_t left = 0, right = valid_y - 1;
-        R_xlen_t start_idx = valid_y;
-        
+        R_xlen_t left = 0, right = valid_y - 1, start_idx = valid_y;
+
         while (left <= right) {
             R_xlen_t mid = left + (right - left) / 2;
             if (y_sorted[mid].mass >= lower_bound) {
@@ -110,7 +109,7 @@ SEXP join_gnps(SEXP x, SEXP y,
                 left = mid + 1;
             }
         }
-        
+
         // Scan through potential matches
         int found_match = 0;
         for (R_xlen_t j = start_idx; j < valid_y && y_sorted[j].mass <= upper_bound; j++) {
@@ -121,14 +120,14 @@ SEXP join_gnps(SEXP x, SEXP y,
             match_count++;
             found_match = 1;
         }
-        
+
         if (!found_match) {
             matches_x_ptr[match_count] = x_sorted[i].index + 1;
             matches_y_ptr[match_count] = NA_INTEGER;
             match_count++;
         }
     }
-    
+
     // Handle precursor mass difference matches
     if (!ISNAN(x_precursor) && !ISNAN(y_precursor)) {
         for (R_xlen_t i = 0; i < valid_x; i++) {
@@ -136,11 +135,10 @@ SEXP join_gnps(SEXP x, SEXP y,
             double allowed_diff = tol + (ppm_val * x_sorted[i].mass * 1e-6);
             double lower_bound = x_adjusted - allowed_diff;
             double upper_bound = x_adjusted + allowed_diff;
-            
+
             // Binary search for lower bound
-            R_xlen_t left = 0, right = valid_y - 1;
-            R_xlen_t start_idx = valid_y;
-            
+            R_xlen_t left = 0, right = valid_y - 1, start_idx = valid_y;
+
             while (left <= right) {
                 R_xlen_t mid = left + (right - left) / 2;
                 if (y_sorted[mid].mass >= lower_bound) {
@@ -150,7 +148,7 @@ SEXP join_gnps(SEXP x, SEXP y,
                     left = mid + 1;
                 }
             }
-            
+
             // Scan through potential matches
             for (R_xlen_t j = start_idx; j < valid_y && y_sorted[j].mass <= upper_bound; j++) {
                 matches_x_ptr[match_count] = x_sorted[i].index + 1;
@@ -159,7 +157,7 @@ SEXP join_gnps(SEXP x, SEXP y,
             }
         }
     }
-    
+
     // Add unmatched y values
     for (R_xlen_t i = 0; i < y_size; i++) {
         if (!ISNAN(y_ptr[i]) && !y_used[i]) {
@@ -168,29 +166,29 @@ SEXP join_gnps(SEXP x, SEXP y,
             match_count++;
         }
     }
-    
+
     // Create final result vectors
     SEXP result_x = PROTECT(allocVector(INTSXP, match_count));
     SEXP result_y = PROTECT(allocVector(INTSXP, match_count));
-    
+
     memcpy(INTEGER(result_x), matches_x_ptr, match_count * sizeof(int));
     memcpy(INTEGER(result_y), matches_y_ptr, match_count * sizeof(int));
-    
+
     // Create named list for return
     SEXP result = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(result, 0, result_x);
     SET_VECTOR_ELT(result, 1, result_y);
-    
+
     SEXP names = PROTECT(allocVector(STRSXP, 2));
     SET_STRING_ELT(names, 0, mkChar("x"));
     SET_STRING_ELT(names, 1, mkChar("y"));
     setAttrib(result, R_NamesSymbol, names);
-    
+
     // Clean up
     free(x_sorted);
     free(y_sorted);
     free(y_used);
     UNPROTECT(6);
-    
+
     return result;
 }
