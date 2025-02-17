@@ -16,7 +16,9 @@ static int compare_mass(const void* a, const void* b) {
     return (mass_a > mass_b) - (mass_a < mass_b);
 }
 
-SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolerance, SEXP ppm) {
+SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, 
+               SEXP tolerance, SEXP ppm) {
+    // No PROTECT needed for inputs.
     if (!isReal(x) || !isReal(y)) {
         error("x and y must be numeric vectors");
     }
@@ -32,17 +34,16 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
     R_xlen_t y_size = xlength(y);
     double pdiff = y_precursor - x_precursor;
 
-    // Allocate sorting structures
-    MassIndex* x_sorted = (MassIndex*)calloc(x_size, sizeof(MassIndex));
-    MassIndex* y_sorted = (MassIndex*)calloc(y_size, sizeof(MassIndex));
-
+    // Allocate sorting arrays
+    MassIndex* x_sorted = (MassIndex*) calloc(x_size, sizeof(MassIndex));
+    MassIndex* y_sorted = (MassIndex*) calloc(y_size, sizeof(MassIndex));
     if (!x_sorted || !y_sorted) {
         free(x_sorted);
         free(y_sorted);
         error("Memory allocation failed");
     }
 
-    // Filter valid values and initialize sorting arrays
+    // Filter valid values into sorted arrays.
     R_xlen_t valid_x = 0, valid_y = 0;
     R_xlen_t na_count_x = 0;
     for (R_xlen_t i = 0; i < x_size; i++) {
@@ -62,21 +63,19 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
         }
     }
 
-    // Sort arrays
     qsort(x_sorted, valid_x, sizeof(MassIndex), compare_mass);
     qsort(y_sorted, valid_y, sizeof(MassIndex), compare_mass);
 
-    // Calculate maximum possible matches
-    // Each x can match with all y values in worst case, plus precursor matches
+    // Estimate maximum matches.
     R_xlen_t max_matches = (valid_x * valid_y * 2) + na_count_x + y_size;
 
-    // Allocate result vectors
-    SEXP matches_x = PROTECT(allocVector(INTSXP, max_matches));
-    SEXP matches_y = PROTECT(allocVector(INTSXP, max_matches));
+    int protect_count = 0;  // we'll count PROTECT calls manually.
+
+    SEXP matches_x = allocVector(INTSXP, max_matches); PROTECT(matches_x); protect_count++;
+    SEXP matches_y = allocVector(INTSXP, max_matches); PROTECT(matches_y); protect_count++;
     int* matches_x_ptr = INTEGER(matches_x);
     int* matches_y_ptr = INTEGER(matches_y);
-    char* y_used = (char*)calloc(y_size, sizeof(char));
-
+    char* y_used = (char*) calloc(y_size, sizeof(char));
     if (!y_used) {
         free(x_sorted);
         free(y_sorted);
@@ -85,7 +84,7 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
 
     R_xlen_t match_count = 0;
 
-    // Handle NAs in x first
+    // Record NA matches from x.
     for (R_xlen_t i = 0; i < x_size; i++) {
         if (ISNAN(x_ptr[i])) {
             matches_x_ptr[match_count] = i + 1;
@@ -94,14 +93,14 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
         }
     }
 
-    // Find matches using binary search
+    // Find matches for each valid x.
     for (R_xlen_t i = 0; i < valid_x; i++) {
         double x_mass = x_sorted[i].mass;
         double allowed_diff = tol + (ppm_val * x_mass * 1e-6);
         double lower_bound = x_mass - allowed_diff;
         double upper_bound = x_mass + allowed_diff;
 
-        // Binary search for lower bound
+        // Binary search in y_sorted for first candidate index.
         R_xlen_t left = 0, right = valid_y - 1;
         R_xlen_t start_idx = valid_y;
         while (left <= right) {
@@ -114,7 +113,6 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
             }
         }
 
-        // Scan through potential matches
         int found_match = 0;
         for (R_xlen_t j = start_idx; j < valid_y && y_sorted[j].mass <= upper_bound; j++) {
             matches_x_ptr[match_count] = x_sorted[i].index + 1;
@@ -123,7 +121,6 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
             match_count++;
             found_match = 1;
         }
-
         if (!found_match) {
             matches_x_ptr[match_count] = x_sorted[i].index + 1;
             matches_y_ptr[match_count] = NA_INTEGER;
@@ -131,15 +128,15 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
         }
     }
 
-    // Handle precursor mass difference matches
+    // Precursor mass difference matching.
     if (!ISNAN(x_precursor) && !ISNAN(y_precursor)) {
         for (R_xlen_t i = 0; i < valid_x; i++) {
-            double x_adjusted = x_sorted[i].mass + pdiff;
-            double allowed_diff = tol + (ppm_val * x_sorted[i].mass * 1e-6);
+            double x_mass = x_sorted[i].mass;
+            double x_adjusted = x_mass + pdiff;
+            double allowed_diff = tol + (ppm_val * x_adjusted * 1e-6);
             double lower_bound = x_adjusted - allowed_diff;
             double upper_bound = x_adjusted + allowed_diff;
 
-            // Binary search for lower bound
             R_xlen_t left = 0, right = valid_y - 1, start_idx = valid_y;
             while (left <= right) {
                 R_xlen_t mid = left + (right - left) / 2;
@@ -151,7 +148,6 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
                 }
             }
 
-            // Scan through potential matches
             for (R_xlen_t j = start_idx; j < valid_y && y_sorted[j].mass <= upper_bound; j++) {
                 matches_x_ptr[match_count] = x_sorted[i].index + 1;
                 matches_y_ptr[match_count] = y_sorted[j].index + 1;
@@ -160,7 +156,7 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
         }
     }
 
-    // Add unmatched y values
+    // Add unmatched y values.
     for (R_xlen_t i = 0; i < y_size; i++) {
         if (!ISNAN(y_ptr[i]) && !y_used[i]) {
             matches_x_ptr[match_count] = NA_INTEGER;
@@ -169,17 +165,22 @@ SEXP join_gnps(SEXP x, SEXP y, SEXP xPrecursorMz, SEXP yPrecursorMz, SEXP tolera
         }
     }
 
-    // Create final result vectors
-    SEXP result_x = PROTECT(allocVector(INTSXP, match_count));
-    SEXP result_y = PROTECT(allocVector(INTSXP, match_count));
+    // Create final result vectors.
+    SEXP result_x = allocVector(INTSXP, match_count); PROTECT(result_x); protect_count++;
+    SEXP result_y = allocVector(INTSXP, match_count); PROTECT(result_y); protect_count++;
     memcpy(INTEGER(result_x), matches_x_ptr, match_count * sizeof(int));
-    memcpy(INTEGER(result_y), matches_y_ptr, match_count * sizeof(int));
+    memcpy(INTEGER(result_y), INTEGER(matches_y), match_count * sizeof(int));
 
-    // Create named list for return
-    SEXP result = PROTECT(allocVector(VECSXP, 2));
+    SEXP result = allocVector(VECSXP, 2); PROTECT(result); protect_count++;
     SET_VECTOR_ELT(result, 0, result_x);
     SET_VECTOR_ELT(result, 1, result_y);
-    UNPROTECT(5);
+    
+    SEXP names = allocVector(STRSXP, 2); PROTECT(names); protect_count++;
+    SET_STRING_ELT(names, 0, mkChar("x"));
+    SET_STRING_ELT(names, 1, mkChar("y"));
+    setAttrib(result, R_NamesSymbol, names);
+
+    UNPROTECT(protect_count);
 
     free(x_sorted);
     free(y_sorted);
