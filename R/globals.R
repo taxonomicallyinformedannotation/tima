@@ -1,7 +1,7 @@
 utils::globalVariables(
   c(
-    "_tima_gnps_cpp",
-    "_tima_join_gnps_cpp",
+    "_tima_gnps",
+    "_tima_join_gnps",
     ":=",
     "!!",
     "adduct",
