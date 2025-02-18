@@ -15,7 +15,6 @@ export_spectra_rds <- function(file, spectra) {
     tidytable::filter(!is.na(compound_id))) != 0) {
     create_dir(export = file)
     spectra |>
-      data.frame() |>
       saveRDS(file = file)
   }
 }

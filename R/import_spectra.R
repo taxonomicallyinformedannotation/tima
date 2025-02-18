@@ -59,9 +59,7 @@ import_spectra <- function(file,
     #     setBackend(MsBackendMemory())
     # },
     "rds" = {
-      readRDS(file = file) |>
-        data.frame() |>
-        Spectra::Spectra()
+      readRDS(file = file)
     }
   )
   if (sanitize) {
