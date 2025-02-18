@@ -99,6 +99,7 @@ Collate:
     'annotate_masses.R'
     'sanitize_spectra.R'
     'import_spectra.R'
+    'get_spectra_ids.R'
     'calculate_similarity.R'
     'calculate_entropy_and_similarity.R'
     'annotate_spectra.R'

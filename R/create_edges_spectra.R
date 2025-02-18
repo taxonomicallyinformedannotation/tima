@@ -5,6 +5,7 @@
 #'
 #' @include create_edges.R
 #' @include get_params.R
+#' @include get_spectra_ids.R
 #' @include import_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
@@ -95,8 +96,8 @@ create_edges_spectra <- function(input = get_params(step = "create_edges_spectra
         tidyselect::everything()
       )
 
-    ## ISSUE see #148 find a way to have consistency in spectrum IDs
-    idz <- spectra@backend@spectraData$acquisitionNum
+    idz <- spectra |>
+      get_spectra_ids()
     rm(spectra)
     edges <- edges |>
       tidytable::mutate(name_source = idz[name_source], name_target = idz[name_target])
