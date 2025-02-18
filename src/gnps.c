@@ -94,7 +94,7 @@ static inline int binary_search_double(const double* arr, int n, double val) {
 */
 static inline int* generate_factor_indices(const double* data, const int* keep_idx, int n) {
     double *temp = (double*) safe_malloc(n * sizeof(double));
-    // Parallelize copying the values; each iteration is independent.
+    /* Parallelize copying; each iteration is independent. */
     #pragma omp parallel for
     for (int i = 0; i < n; i++)
         temp[i] = data[keep_idx[i]];
@@ -108,7 +108,7 @@ static inline int* generate_factor_indices(const double* data, const int* keep_i
     }
 
     int *factors = (int*) safe_malloc(n * sizeof(int));
-    // Parallelize computing factor indices.
+    /* Parallelize computing factor indices. */
     #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         double val = data[keep_idx[i]];
@@ -240,6 +240,8 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     int max_x = 0, max_y = 0;
+    /* Parallel reduction to find maximum factor values */
+    #pragma omp parallel for reduction(max:max_x) reduction(max:max_y)
     for (int i = 0; i < l; i++) {
         if (x_idx[i] > max_x) max_x = x_idx[i];
         if (y_idx[i] > max_y) max_y = y_idx[i];
@@ -254,6 +256,8 @@ SEXP gnps(SEXP x, SEXP y) {
         free(y_idx);
         error("Memory allocation failed.");
     }
+    /* Parallelize filling the score matrix. */
+    #pragma omp parallel for
     for (int i = 0; i < l; i++) {
         int row = y_idx[i] - 1;
         int col = x_idx[i] - 1;
@@ -271,7 +275,7 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     double total_score = 0.0;
-    // Use OpenMP reduction to safely sum in parallel.
+    /* Use OpenMP reduction to safely sum the total score in parallel */
     #pragma omp parallel for reduction(+:total_score)
     for (int i = 0; i < m; i++) {
         int j = assignment[i] - 1;
