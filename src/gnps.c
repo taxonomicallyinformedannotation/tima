@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 /* --- Safe Memory Allocation Functions --- */
 static inline void *safe_malloc(size_t size) {
@@ -91,15 +94,22 @@ static inline int binary_search_double(const double* arr, int n, double val) {
 */
 static inline int* generate_factor_indices(const double* data, const int* keep_idx, int n) {
     double *temp = (double*) safe_malloc(n * sizeof(double));
+    // Parallelize copying the values; each iteration is independent.
+    #pragma omp parallel for
     for (int i = 0; i < n; i++)
         temp[i] = data[keep_idx[i]];
+
     qsort(temp, n, sizeof(double), compare_doubles);
+
     int unique_count = 0;
     for (int i = 0; i < n; i++) {
         if (i == 0 || temp[i] != temp[i-1])
             temp[unique_count++] = temp[i];
     }
+
     int *factors = (int*) safe_malloc(n * sizeof(int));
+    // Parallelize computing factor indices.
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         double val = data[keep_idx[i]];
         int pos = binary_search_double(temp, unique_count, val);
@@ -211,6 +221,8 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     double *scores = (double*) safe_malloc(l * sizeof(double));
+    // Parallelize score computation. Each iteration is independent.
+    #pragma omp parallel for
     for (int i = 0; i < l; i++) {
         int idx = keep_idx[i];
         scores[i] = (sqrt(x_data[idx + n]) / sqrt(x_sum)) *
@@ -259,6 +271,8 @@ SEXP gnps(SEXP x, SEXP y) {
     }
 
     double total_score = 0.0;
+    // Use OpenMP reduction to safely sum in parallel.
+    #pragma omp parallel for reduction(+:total_score)
     for (int i = 0; i < m; i++) {
         int j = assignment[i] - 1;
         if (j >= 0 && j < m)
