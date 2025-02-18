@@ -7,6 +7,7 @@
 #'
 #' @include calculate_entropy_and_similarity.R
 #' @include get_params.R
+#' @include get_spectra_ids.R
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
 #'
@@ -109,17 +110,8 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
-    ## ISSUE see #148 find a way to have consistency in spectrum IDs
-    query_ids <- spectra@backend@spectraData$acquisitionNum
-    if (is.null(query_ids)) {
-      query_ids <- spectra@backend@spectraData$spectrum_id
-    }
-    if (is.null(query_ids)) {
-      query_ids <- spectra@backend@spectraData$SLAW_ID
-    }
-    if (is.null(query_ids)) {
-      query_ids <- spectra@backend@spectraData$FEATURE_ID
-    }
+    query_ids <- spectra |>
+      get_spectra_ids()
     rm(spectra)
 
     ## Fix needed

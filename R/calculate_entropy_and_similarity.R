@@ -38,47 +38,51 @@ calculate_entropy_and_similarity <- function(lib_ids,
       current_precursor <- query_precursors[spectrum_idx]
       current_id <- query_ids[spectrum_idx]
 
+      # If not approximating, filter the library to only spectra within tolerance
       if (approx == FALSE) {
         val_ind <- lib_precursors >= min(current_precursor - dalton, current_precursor * (1 - (10^-6 * ppm))) &
           lib_precursors <= max(current_precursor + dalton, current_precursor * (1 + (10^-6 * ppm)))
 
-        lib_spectra <- lib_spectra[val_ind]
-        lib_precursors <- lib_precursors[val_ind]
-        lib_ids <- lib_ids[val_ind]
+        lib_spectra_sub <- lib_spectra[val_ind]
+        lib_precursors_sub <- lib_precursors[val_ind]
+        lib_ids_sub <- lib_ids[val_ind]
+      } else {
+        lib_spectra_sub <- lib_spectra
+        lib_precursors_sub <- lib_precursors
+        lib_ids_sub <- lib_ids
       }
 
-      if (length(lib_ids) != 0) {
-        similarities <- vapply(X = seq_along(lib_spectra), function(lib_idx) {
-          lib_spectrum <- lib_spectra[[lib_idx]]
-          score <- calculate_similarity(
-            method = method,
-            query_spectrum = current_spectrum,
-            target_spectrum = lib_spectrum,
-            query_precursor = current_precursor,
-            target_precursor = lib_precursors[[lib_idx]],
-            dalton = dalton,
-            ppm = ppm
-          )
-          entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
-          ## number of matched peaks (only Da for now)
-          matched_peaks <- sum(apply(abs(
-            outer(
-              X = current_spectrum[, 1],
-              Y = lib_spectrum[, 1],
-              FUN = "-"
+      if (length(lib_ids_sub) != 0) {
+        similarities <- vapply(
+          X = seq_along(lib_spectra_sub),
+          FUN = function(lib_idx) {
+            lib_spectrum <- lib_spectra_sub[[lib_idx]]
+            score <- calculate_similarity(
+              method = method,
+              query_spectrum = current_spectrum,
+              target_spectrum = lib_spectrum,
+              query_precursor = current_precursor,
+              target_precursor = lib_precursors_sub[[lib_idx]],
+              dalton = dalton,
+              ppm = ppm
             )
-          ) <= dalton, 2, any))
-
-          list(
-            score = as.numeric(score),
-            entropy = entropy_target,
-            matched = matched_peaks
+            entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
+            # Count the number of peaks in the query that have a match (by Dalton tolerance)
+            matched_peaks <- sum(apply(abs(
+              outer(X = current_spectrum[, 1], Y = lib_spectrum[, 1], FUN = "-")
+            ) <= dalton, 2, any))
+            list(
+              score = as.numeric(score),
+              entropy = entropy_target,
+              matched = matched_peaks
+            )
+          },
+          FUN.VALUE = list(
+            score = numeric(1),
+            entropy = numeric(1),
+            matched = integer(1)
           )
-        }, FUN.VALUE = list(
-          score = numeric(1),
-          entropy = numeric(1),
-          matched = integer(1)
-        ))
+        )
 
         if (any(similarities[1, ] >= threshold)) {
           valid_indices <- which(similarities[1, ] >= threshold)
@@ -87,7 +91,7 @@ calculate_entropy_and_similarity <- function(lib_ids,
             tidytable::tidytable(
               feature_id = current_id,
               precursorMz = current_precursor,
-              target_id = lib_ids[valid_indices],
+              target_id = lib_ids_sub[valid_indices],
               candidate_spectrum_entropy = similarities[2, valid_indices],
               candidate_score_similarity = similarities[1, valid_indices],
               candidate_count_similarity_peaks_matched = similarities[3, valid_indices]
@@ -111,7 +115,7 @@ calculate_entropy_and_similarity <- function(lib_ids,
       target_id = NA_integer_,
       candidate_spectrum_entropy = NA_real_,
       candidate_score_similarity = NA_real_,
-      candidate_count_similarity_peaks_matched = NA_integer_,
+      candidate_count_similarity_peaks_matched = NA_integer_
     )
   } else {
     tidytable::bind_rows(results[!sapply(results, is.null)])
