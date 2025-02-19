@@ -32,9 +32,10 @@ split_tables_sop <- function(table) {
 
   table_structures_stereo <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::filter(!is.na(structure_smiles) |
+      !is.na(structure_smiles_no_stereo)) |>
     tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
+    tidytable::filter() |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
@@ -44,7 +45,8 @@ split_tables_sop <- function(table) {
     tidytable::distinct()
   log_debug(
     x = "Corresponding to",
-    nrow(table_structures_stereo),
+    nrow(table_structures_stereo |>
+      tidytable::distinct(structure_inchikey)),
     "unique structures with stereo..."
   )
   log_debug(
@@ -58,13 +60,11 @@ split_tables_sop <- function(table) {
 
   table_structures_metadata <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
     tidytable::filter(!is.na(structure_molecular_formula)) |>
     tidytable::filter(!is.na(structure_exact_mass)) |>
     tidytable::filter(!is.na(structure_xlogp)) |>
     tidytable::select(
       structure_inchikey,
-      structure_smiles,
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp
@@ -73,11 +73,10 @@ split_tables_sop <- function(table) {
 
   table_structures_names <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
     tidytable::filter(!is.na(structure_name)) |>
-    tidytable::select(structure_inchikey, structure_smiles, structure_name) |>
+    tidytable::select(structure_inchikey, structure_name) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey, structure_smiles) |>
+    tidytable::group_by(structure_inchikey) |>
     clean_collapse(cols = c("structure_name"))
 
   table_structures_taxonomy_npc <- table |>
