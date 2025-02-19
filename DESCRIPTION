@@ -35,10 +35,13 @@ Imports:
     httr (>= 1.4.7),
     httr2 (>= 1.1.0),
     igraph (>= 2.1.4),
+    IRanges (>= 2.36.0),
     jsonlite (>= 1.8.9),
+    methods,
     MetaboCoreUtils (>= 1.10.0),
     MsBackendMgf (>= 1.10.0),
     MsBackendMsp (>= 1.6.0),
+    MsCoreUtils (>= 1.14.1),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.2),
     rotl (>= 3.1.0),
@@ -98,6 +101,7 @@ Collate:
     'calculate_mass_of_m.R'
     'annotate_masses.R'
     'sanitize_spectra.R'
+    'read_mgf_opti.R'
     'import_spectra.R'
     'get_spectra_ids.R'
     'calculate_similarity.R'
