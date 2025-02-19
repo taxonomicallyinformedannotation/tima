@@ -122,7 +122,6 @@ prepare_libraries_spectra <-
           )
         spectra_pos <- spectra_harmonized_pos |>
           purrr::map(.f = Spectra::Spectra)
-        rm(spectra_harmonized_pos)
 
         log_debug("... neg")
         spectra_harmonized_neg <- purrr::map(
@@ -159,7 +158,6 @@ prepare_libraries_spectra <-
         rm(spectra_extracted)
         spectra_neg <- spectra_harmonized_neg |>
           purrr::map(.f = Spectra::Spectra)
-        rm(spectra_harmonized_neg)
 
         log_debug("Extracting structures for the SOP library.")
         sop <- tidytable::bind_rows(
@@ -179,6 +177,7 @@ prepare_libraries_spectra <-
               gsub(pattern = "-.*", replacement = ""),
             organism_name = NA_character_
           )
+        rm(spectra_harmonized_pos, spectra_harmonized_neg)
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
         spectra_pos <- list(
