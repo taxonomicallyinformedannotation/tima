@@ -2,9 +2,10 @@
 
 # tima 2.12.0
 
+* Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
 * Introduced similarity method argument (entropy and GNPS for now)
 * Implemented GNPS similarity method in C
-* New ISDB version with 1 million compounds (see <>)
+* New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Updated to Massbank version `2024.11`
 
 # tima 2.11.1 (unreleased)
