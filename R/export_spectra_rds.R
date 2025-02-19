@@ -11,8 +11,7 @@
 #'
 #' @examples NULL
 export_spectra_rds <- function(file, spectra) {
-  if (nrow(spectra |>
-    tidytable::filter(!is.na(compound_id))) != 0) {
+  if (length(spectra[!is.na(spectra$compound_id)]) != 0) {
     create_dir(export = file)
     spectra |>
       saveRDS(file = file)
