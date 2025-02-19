@@ -28,21 +28,21 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   ann_thr_ms1_bio <- params_advanced$annotations$thresholds$ms1$biological
   ann_thr_ms1_che <- params_advanced$annotations$thresholds$ms1$chemical
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
-  fil_pat <- params_advanced$files$pattern
-  fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
+  # fil_pat <- params_advanced$files$pattern
+  # fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
-  fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
+  # fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
   fil_ann_pre_for <- params_advanced$files$annotations$prepared$formula
   fil_ann_pre_str <- params_advanced$files$annotations$prepared$structural
   fil_ann_pre_str_gnp <- params_advanced$files$annotations$prepared$structural$gnps
-  fil_ann_pre_str_ms1 <- params_advanced$files$annotations$prepared$structural$ms1
+  # fil_ann_pre_str_ms1 <- params_advanced$files$annotations$prepared$structural$ms1
   fil_ann_pre_str_sir <- params_advanced$files$annotations$prepared$structural$sirius
   fil_ann_pre_str_spe <- params_advanced$files$annotations$prepared$structural$spectral
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
-  fil_fea_raw <- params_advanced$files$features$raw
+  # fil_fea_raw <- params_advanced$files$features$raw
   fil_fea_pre <- params_advanced$files$features$prepared
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
@@ -54,6 +54,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_pre_hmd <- params_advanced$files$libraries$sop$prepared$hmdb
   fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
   fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
+  # fil_lib_sop_pre_spe <- params_advanced$files$libraries$sop$prepared$spectral
+  # fil_lib_sop_pre_wik <- params_advanced$files$libraries$sop$prepared$wikidata
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
   fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
   fil_lib_sop_mer_org_tax_ott <- params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
@@ -72,23 +74,23 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_tem_is_mgf_neg <- params_advanced$files$libraries$temporal$is$mgf$neg
   fil_lib_tem_is_mgf_pos <- params_advanced$files$libraries$temporal$is$mgf$pos
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
-  fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
+  # fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
   fil_net_spe_edg_raw_ms1 <- params_advanced$files$networks$spectral$edges$raw$ms1
   fil_net_spe_edg_raw_spe <- params_advanced$files$networks$spectral$edges$raw$spectral
   fil_net_spe_edg_pre <- params_advanced$files$networks$spectral$edges$prepared
   fil_net_spe_com_raw <- params_advanced$files$networks$spectral$components$raw
   fil_net_spe_com_pre <- params_advanced$files$networks$spectral$components$prepared
-  fil_met_raw <- params_advanced$files$metadata$raw
+  # fil_met_raw <- params_advanced$files$metadata$raw
   fil_met_pre <- params_advanced$files$metadata$prepared
-  fil_spe_raw <- params_advanced$files$spectral$raw
-  gnps_id <- params_advanced$gnps$id
-  gnps_workflow <- params_advanced$gnps$workflow
+  # fil_spe_raw <- params_advanced$files$spectral$raw
+  # gnps_id <- params_advanced$gnps$id
+  # gnps_workflow <- params_advanced$gnps$workflow
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
   ms_clu_neg <- params_advanced$ms$clusters$neg
   ms_clu_pos <- params_advanced$ms$clusters$pos
   ms_neu <- params_advanced$ms$neutral_losses
-  ms_pol <- params_advanced$ms$polarity
+  # ms_pol <- params_advanced$ms$polarity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
   ms_tol_mas_ppm_ms1 <- params_advanced$ms$tolerances$mass$ppm$ms1
   ms_tol_mas_ppm_ms2 <- params_advanced$ms$tolerances$mass$ppm$ms2
@@ -130,17 +132,17 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   org_fil_mod <- params_advanced$organisms$filter$mode
   org_fil_lev <- params_advanced$organisms$filter$level
   org_fil_val <- params_advanced$organisms$filter$value
-  org_tax <- params_advanced$organisms$taxon
+  # org_tax <- params_advanced$organisms$taxon
   sim_met_ann <- params_advanced$similarities$methods$annotations
   sim_met_edg <- params_advanced$similarities$methods$edges
   sim_thr_ann <- params_advanced$similarities$thresholds$annotations
   sim_thr_edg <- params_advanced$similarities$thresholds$edges
-  too_met <- params_advanced$tools$metadata
-  too_net_spe_com <- params_advanced$tools$networks$spectral$components
-  too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
+  # too_met <- params_advanced$tools$metadata
+  # too_net_spe_com <- params_advanced$tools$networks$spectral$components
+  # too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
   too_sir_ver <- params_advanced$tools$sirius$version
-  too_tax_bio <- params_advanced$tools$taxonomies$biological
-  too_tax_che <- params_advanced$tools$taxonomies$chemical
+  # too_tax_bio <- params_advanced$tools$taxonomies$biological
+  # too_tax_che <- params_advanced$tools$taxonomies$chemical
   units_rt <- params_advanced$units$rt
   wei_glo_bio <- params_advanced$weights$global$biological
   wei_glo_che <- params_advanced$weights$global$chemical
@@ -168,10 +170,10 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   wei_che_23 <- params_advanced$weights$chemical$npc$class
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
-  opt_hig_con <- params_advanced$options$high_confidence
+  # opt_hig_con <- params_advanced$options$high_confidence
   opt_for <- params_advanced$options$force
   opt_rem_tie <- params_advanced$options$remove_ties
-  opt_sum <- params_advanced$options$summarize
+  # opt_sum <- params_advanced$options$summarize
 
   log_debug(x = "Small params")
   fil_pat <- params_small$files$pattern

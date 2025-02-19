@@ -113,18 +113,18 @@ In case you want to format your own spectral library to use it for spectral matc
 
 As the availability of experimental spectra is limited, we can take advantage of *in silico* generated spectra.
 
-#### LOTUS
+#### Wikidata
 
-We generated an *in silico* spectral library of the structures found in LOTUS using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465).
+We generated an *in silico* spectral library of the structures found in Wikidata using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465).
 For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
-```{r get-isdb-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_is_lot"))
+```{r get-isdb-wikidata, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+targets::tar_make(names = tidyselect::matches("lib_spe_is_wik"))
 ```
 
-```{r prepare-isdb-lotus-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_is_lot_pre"))
+```{r prepare-isdb-wikidata-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+targets::tar_make(names = tidyselect::matches("lib_spe_is_wik_pre"))
 ```
 
 You can also complement with the in silico spectra from HMDB (not running by default as quite long):

@@ -19,6 +19,8 @@ files:
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
         #' Spectral prepared structure organism pairs library. STRING
         spectral: data/interim/libraries/sop/spectral_prepared.tsv.gz
+        #' Wikidata spectral prepared structure organism pairs library. STRING
+        wikidata: data/interim/libraries/sop/wikidata_spectral_prepared.tsv.gz
 
       #' Merged structure organism pairs library.
       merged:
