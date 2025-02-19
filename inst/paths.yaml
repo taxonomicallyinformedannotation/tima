@@ -95,8 +95,8 @@ data:
         is:
           hmdb: data/source/libraries/spectra/is/hmdb_predicted_msms_spectra.zip
           wikidata:
-            pos: data/source/libraries/spectra/is/isdb_wikidata_pos_energyAll.mgf
-            neg: data/source/libraries/spectra/is/isdb_wikidata_neg_energyAll.mgf
+            pos: data/source/libraries/spectra/is/isdb_wikidata_pos_energySum.mgf
+            neg: data/source/libraries/spectra/is/isdb_wikidata_neg_energySum.mgf
 doc:
   path: doc
 img:
@@ -224,5 +224,5 @@ urls:
   wikidata_isdb:
     doi: 10.5281/zenodo.5607185
     pattern:
-      pos: isdb_wikidata_pos_energyAll.mgf
-      neg: isdb_wikidata_neg_energyAll.mgf
+      pos: isdb_wikidata_pos_energySum.mgf
+      neg: isdb_wikidata_neg_energySum.mgf
