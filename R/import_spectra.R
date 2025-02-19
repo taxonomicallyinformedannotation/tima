@@ -43,7 +43,9 @@ import_spectra <- function(file,
 
   ## Temporary for large MGFs
   ## Mimicks the `MsBackendMgf` implementation but much lower memory for large files
-  read_mgf_opti <- function(f) {
+  read_mgf_opti <- function(f,
+                            msLevel = 2L,
+                            mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())) {
     requireNamespace("MsBackendMgf", quietly = TRUE)
     if (length(f) != 1L) {
       stop("Please provide a single MGF file.")
@@ -58,6 +60,7 @@ import_spectra <- function(file,
     line_counter <- 0
 
     con <- file(f, "r")
+    on.exit(close(con), add = TRUE) # Ensure the file is closed on exit
 
     while (TRUE) {
       line <- readLines(con, n = 1, warn = FALSE)
@@ -97,10 +100,6 @@ import_spectra <- function(file,
         current_spectrum[[line_counter]] <- line
       }
     }
-
-    close(con)
-
-    sp <- unlist(sp_list, recursive = FALSE)
 
     res <- MsCoreUtils::rbindFill(sp_list)
 
