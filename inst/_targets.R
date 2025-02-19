@@ -996,7 +996,7 @@ list(
                   url = paths_urls_examples_spectral_lib_pos,
                   export = paths_data_source_libraries_spectra_is_wikidata_pos |>
                     gsub(
-                      pattern = "isdb_wikidata_pos_energyAll.mgf",
+                      pattern = "isdb_wikidata_pos_energySum.mgf",
                       replacement = "wikidata_pos.rds",
                       fixed = TRUE
                     )
@@ -1028,7 +1028,7 @@ list(
                   url = paths_urls_examples_spectral_lib_neg,
                   export = paths_data_source_libraries_spectra_is_wikidata_neg |>
                     gsub(
-                      pattern = "isdb_wikidata_neg_energyAll.mgf",
+                      pattern = "isdb_wikidata_neg_energySum.mgf",
                       replacement = "wikidata_neg.rds",
                       fixed = TRUE
                     )
