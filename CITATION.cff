@@ -365,7 +365,7 @@ references:
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2025'
   doi: 10.32614/CRAN.package.jsonlite
-  version: '>= 1.8.9'
+  version: '>= 1.9.0'
 - type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -505,7 +505,7 @@ references:
     email: lionel@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.purrr
-  version: '>= 1.0.2'
+  version: '>= 1.0.4'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
