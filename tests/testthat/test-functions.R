@@ -239,6 +239,10 @@ test_that(desc = "Test functions", code = {
     url = paths$urls$examples$spectral_lib_mini$neg,
     export = paths$data$source$libraries$spectra$is$wikidata$neg
   )
+  get_file(
+    url = paths$urls$examples$wikidata_spectral_prepared,
+    export = paths$data$interim$libraries$sop$wikidata
+  )
 
   #### MassBank
   get_massbank_spectra()
