@@ -45,17 +45,35 @@ split_tables_sop <- function(table) {
     tidytable::distinct()
   log_debug(
     x = "Corresponding to",
-    nrow(table_structures_stereo |>
-      tidytable::distinct(structure_inchikey)),
-    "unique structures with stereo..."
+    nrow(
+      table_structures_stereo |>
+        tidytable::filter(
+          !grepl(pattern = "-UHFFFAOYSA-", x = structure_inchikey, fixed = TRUE)
+        ) |>
+        tidytable::distinct(structure_inchikey)
+    ),
+    "unique stereoisomers (excluding structures without stereochemistry)..."
   )
+
+  log_debug(
+    x = "... and",
+    nrow(
+      table_structures_stereo |>
+        tidytable::filter(
+          grepl(pattern = "-UHFFFAOYSA-", x = structure_inchikey, fixed = TRUE)
+        ) |>
+        tidytable::distinct(structure_inchikey)
+    ),
+    "unique structures without stereochemistry..."
+  )
+
   log_debug(
     x = "and",
     nrow(
       table_structures_stereo |>
         tidytable::distinct(structure_inchikey_no_stereo)
     ),
-    "unique structures without stereo"
+    "unique constitutional isomers (ignoring stereochemistry)"
   )
 
   table_structures_metadata <- table |>
