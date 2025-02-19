@@ -23,6 +23,7 @@ data:
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         hmdb_minimal: data/interim/libraries/sop/hmdb_minimal.tsv.gz
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
+        wikidata: data/interim/libraries/sop/wikidata_spectral_prepared.tsv.gz
         merged:
           path: data/interim/libraries/sop/merged
           keys: data/interim/libraries/sop/merged/keys.tsv.gz
@@ -53,9 +54,9 @@ data:
           hmdb:
             pos: data/interim/libraries/spectra/is/hmdb_pos.rds
             neg: data/interim/libraries/spectra/is/hmdb_neg.rds
-          lotus:
-            pos: data/interim/libraries/spectra/is/lotus_pos.rds
-            neg: data/interim/libraries/spectra/is/lotus_neg.rds
+          wikidata:
+            pos: data/interim/libraries/spectra/is/wikidata_pos.rds
+            neg: data/interim/libraries/spectra/is/wikidata_neg.rds
     params:
       path: data/interim/params
     taxa:
@@ -93,9 +94,9 @@ data:
           with_rt: data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
         is:
           hmdb: data/source/libraries/spectra/is/hmdb_predicted_msms_spectra.zip
-          lotus:
-            pos: data/source/libraries/spectra/is/isdb_pos.mgf
-            neg: data/source/libraries/spectra/is/isdb_neg.mgf
+          wikidata:
+            pos: data/source/libraries/spectra/is/isdb_wikidata_pos_energyAll.mgf
+            neg: data/source/libraries/spectra/is/isdb_wikidata_neg_energyAll.mgf
 doc:
   path: doc
 img:
@@ -194,12 +195,13 @@ urls:
     spectra_mini: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf
     spectra_ms1: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_ms1.mgf
     spectral_lib:
-      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_neg.rds
-      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/lotus_pos.rds
+      neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/wikidata_neg.rds
+      pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/wikidata_pos.rds
     spectral_lib_mini:
       neg: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_neg.mgf
       pos: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_pos.mgf
       with_rt: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/spectral_lib_mini_with_rt.mgf
+    wikidata_spectral_prepared: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/wikidata_spectral_prepared.tsv.gz
   ecmdb:
     metabolites: https://ecmdb.ca/download/ecmdb.json.zip
   hmdb:
@@ -215,12 +217,12 @@ urls:
       organisms: organism_metadata.tsv.gz
       references: reference_metadata.tsv.gz
       structures: structure_metadata.tsv.gz
-  lotus_isdb:
-    doi: 10.5281/zenodo.5607185
-    pattern:
-      pos: isdb_pos.mgf
-      neg: isdb_neg.mgf
   massbank:
     file: MassBank_NIST.msp
     url: https://github.com/MassBank/MassBank-data/releases/download
     version: 2024.11
+  wikidata_isdb:
+    doi: 10.5281/zenodo.5607185
+    pattern:
+      pos: isdb_wikidata_pos_energyAll.mgf
+      neg: isdb_wikidata_neg_energyAll.mgf

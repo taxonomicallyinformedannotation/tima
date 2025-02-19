@@ -215,7 +215,7 @@ test_that(desc = "Test functions", code = {
   ## smaller version for testing
   # get_file(
   #   url = paths$urls$examples$spectral_lib$pos,
-  #   export = paths$data$source$libraries$spectra$is$lotus$pos |>
+  #   export = paths$data$source$libraries$spectra$is$wikidata$pos |>
   #     gsub(
   #       pattern = "isdb_pos.mgf",
   #       replacement = "lotus_pos.rds",
@@ -224,11 +224,11 @@ test_that(desc = "Test functions", code = {
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$pos,
-    export = paths$data$source$libraries$spectra$is$lotus$pos
+    export = paths$data$source$libraries$spectra$is$wikidata$pos
   )
   # get_file(
   #   url = paths$urls$examples$spectral_lib$neg,
-  #   export = paths$data$source$libraries$spectra$is$lotus$neg |>
+  #   export = paths$data$source$libraries$spectra$is$wikidata$neg |>
   #     gsub(
   #       pattern = "isdb_neg.mgf",
   #       replacement = "lotus_neg.rds",
@@ -237,7 +237,7 @@ test_that(desc = "Test functions", code = {
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$neg,
-    export = paths$data$source$libraries$spectra$is$lotus$neg
+    export = paths$data$source$libraries$spectra$is$wikidata$neg
   )
 
   #### MassBank

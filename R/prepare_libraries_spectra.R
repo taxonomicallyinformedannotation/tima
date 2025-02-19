@@ -74,7 +74,8 @@ prepare_libraries_spectra <-
       get_default_paths()$data$interim$libraries$sop$path,
       paste0("spectral_prepared.tsv.gz")
     )
-    if (!all(purrr::map(.x = list(output_neg, output_pos), .f = file.exists) |> unlist())) {
+    if (!all(purrr::map(.x = list(output_neg, output_pos), .f = file.exists) |>
+      unlist())) {
       if (is.null(input)) {
         input <- "fileDoesNotExist"
       }
@@ -114,9 +115,15 @@ prepare_libraries_spectra <-
           ## TODO report the issue as otherwise precursorMz is lost
           purrr::map(
             .f = function(x) {
-              x <- x |> tidytable::rename(precursor_mz = precursorMz)
+              x <- x |>
+                tidytable::rename(precursor_mz = precursorMz) |>
+                data.frame()
             }
           )
+        spectra_pos <- spectra_harmonized_pos |>
+          purrr::map(.f = Spectra::Spectra)
+        rm(spectra_harmonized_pos)
+
         log_debug("... neg")
         spectra_harmonized_neg <- purrr::map(
           .x = spectra_extracted,
@@ -144,10 +151,15 @@ prepare_libraries_spectra <-
           ## TODO report the issue as otherwise precursorMz is lost
           purrr::map(
             .f = function(x) {
-              x <- x |> tidytable::rename(precursor_mz = precursorMz)
+              x <- x |>
+                tidytable::rename(precursor_mz = precursorMz) |>
+                data.frame()
             }
           )
         rm(spectra_extracted)
+        spectra_neg <- spectra_harmonized_neg |>
+          purrr::map(.f = Spectra::Spectra)
+        rm(spectra_harmonized_neg)
 
         log_debug("Extracting structures for the SOP library.")
         sop <- tidytable::bind_rows(
@@ -156,6 +168,7 @@ prepare_libraries_spectra <-
           spectra_harmonized_neg |>
             tidytable::bind_rows()
         ) |>
+          tidytable::filter(!is.na(inchikey)) |>
           tidytable::distinct(
             structure_inchikey = inchikey,
             structure_smiles = smiles,
@@ -168,7 +181,7 @@ prepare_libraries_spectra <-
           )
       } else {
         log_debug("Your input file does not exist, returning empty lib instead.")
-        spectra_harmonized_pos <- list(
+        spectra_pos <- list(
           tidytable::tidytable(
             "compound_id" = "fake_compound",
             "adduct" = NA_character_,
@@ -193,9 +206,11 @@ prepare_libraries_spectra <-
             "intensity" = c(1, 2, 3) |> list(),
             "library" = NA_character_,
             "precursor_mz" = 0
-          )
+          ) |>
+            data.frame() |>
+            Spectra::Spectra()
         )
-        spectra_harmonized_neg <- spectra_harmonized_pos
+        spectra_neg <- spectra_pos
         sop <- tidytable::tidytable(
           "structure_inchikey" = NA_character_,
           "structure_smiles" = NA_character_,
@@ -206,9 +221,9 @@ prepare_libraries_spectra <-
       }
       log_debug("Exporting")
       export_output(sop, file = output_sop)
-      mapply(export_spectra_rds, output_pos, spectra_harmonized_pos)
-      mapply(export_spectra_rds, output_neg, spectra_harmonized_neg)
-      rm(spectra_harmonized_pos, spectra_harmonized_neg)
+      mapply(export_spectra_rds, output_pos, spectra_pos)
+      mapply(export_spectra_rds, output_neg, spectra_neg)
+      rm(spectra_pos, spectra_neg)
     } else {
       log_debug("Library already exists")
     }

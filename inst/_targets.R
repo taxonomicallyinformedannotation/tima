@@ -103,6 +103,12 @@ list(
         }
       ),
       tar_target(
+        name = paths_urls_examples_wikidata_spectral_prepared,
+        command = {
+          paths_urls_examples_wikidata_spectral_prepared <- paths$urls$examples$wikidata_spectral_prepared
+        }
+      ),
+      tar_target(
         name = paths_data_source_spectra,
         command = {
           paths_data_source_spectra <- paths$data$source$spectra
@@ -154,6 +160,13 @@ list(
         }
       ),
       tar_target(
+        name = paths_data_interim_libraries_sop_wikidata,
+        command = {
+          paths_data_interim_libraries_sop_wikidata <-
+            paths$data$interim$libraries$sop$wikidata
+        }
+      ),
+      tar_target(
         name = paths_urls_examples_spectral_lib_pos,
         command = {
           paths_urls_examples_spectral_lib_pos <-
@@ -161,10 +174,10 @@ list(
         }
       ),
       tar_target(
-        name = paths_data_source_libraries_spectra_is_lotus_pos,
+        name = paths_data_source_libraries_spectra_is_wikidata_pos,
         command = {
-          paths_data_source_libraries_spectra_is_lotus_pos <-
-            paths$data$source$libraries$spectra$is$lotus$pos
+          paths_data_source_libraries_spectra_is_wikidata_pos <-
+            paths$data$source$libraries$spectra$is$wikidata$pos
         }
       ),
       tar_target(
@@ -175,10 +188,10 @@ list(
         }
       ),
       tar_target(
-        name = paths_data_source_libraries_spectra_is_lotus_neg,
+        name = paths_data_source_libraries_spectra_is_wikidata_neg,
         command = {
-          paths_data_source_libraries_spectra_is_lotus_neg <-
-            paths$data$source$libraries$spectra$is$lotus$neg
+          paths_data_source_libraries_spectra_is_wikidata_neg <-
+            paths$data$source$libraries$spectra$is$wikidata$neg
         }
       ),
       tar_target(
@@ -974,29 +987,29 @@ list(
         list(
           ## TODO ADD ISDB HMDB,
           tar_target(
-            name = lib_spe_is_lot_pos,
+            name = lib_spe_is_wik_pos,
             format = "file",
             command = {
-              lib_spe_is_lot_pos <-
+              lib_spe_is_wik_pos <-
                 # if (paths_test_mode == FALSE) {
                 get_file(
                   url = paths_urls_examples_spectral_lib_pos,
-                  export = paths_data_source_libraries_spectra_is_lotus_pos |>
+                  export = paths_data_source_libraries_spectra_is_wikidata_pos |>
                     gsub(
-                      pattern = "isdb_pos.mgf",
-                      replacement = "lotus_pos.rds",
+                      pattern = "isdb_wikidata_pos_energyAll.mgf",
+                      replacement = "wikidata_pos.rds",
                       fixed = TRUE
                     )
                 )
               # get_last_version_from_zenodo(
               #   doi = paths_urls_lotus_isdb_doi,
               #   pattern = paths_urls_lotus_isdb_pattern_pos,
-              #   path = paths_data_source_libraries_spectra_is_lotus_pos
+              #   path = paths_data_source_libraries_spectra_is_wikidata_pos
               # )
               # } else {
               #   get_file(
               #     url = paths_urls_examples_spectral_lib_pos,
-              #     export = paths_data_source_libraries_spectra_is_lotus_pos
+              #     export = paths_data_source_libraries_spectra_is_wikidata_pos
               #   )
               # }
             }
@@ -1006,29 +1019,29 @@ list(
             # cue = tar_cue(mode = "thorough")
           ),
           tar_target(
-            name = lib_spe_is_lot_neg,
+            name = lib_spe_is_wik_neg,
             format = "file",
             command = {
-              lib_spe_is_lot_neg <-
+              lib_spe_is_wik_neg <-
                 # if (paths_test_mode == FALSE) {
                 get_file(
                   url = paths_urls_examples_spectral_lib_neg,
-                  export = paths_data_source_libraries_spectra_is_lotus_neg |>
+                  export = paths_data_source_libraries_spectra_is_wikidata_neg |>
                     gsub(
-                      pattern = "isdb_neg.mgf",
-                      replacement = "lotus_neg.rds",
+                      pattern = "isdb_wikidata_neg_energyAll.mgf",
+                      replacement = "wikidata_neg.rds",
                       fixed = TRUE
                     )
                 )
               # get_last_version_from_zenodo(
               #   doi = paths_urls_lotus_isdb_doi,
               #   pattern = paths_urls_lotus_isdb_pattern_neg,
-              #   path = paths_data_source_libraries_spectra_is_lotus_neg
+              #   path = paths_data_source_libraries_spectra_is_wikidata_neg
               # )
               # } else {
               #   get_file(
               #     url = paths_urls_examples_spectral_lib_neg,
-              #     export = paths_data_source_libraries_spectra_is_lotus_neg
+              #     export = paths_data_source_libraries_spectra_is_wikidata_neg
               #   )
               # }
             }
@@ -1043,19 +1056,29 @@ list(
       list(
         ## TODO ADD IS HMDB PREPARED,
         tar_target(
-          name = lib_spe_is_lot_pre_pos,
+          name = lib_spe_is_wik_pre_pos,
           format = "file",
           command = {
-            lib_spe_is_lot_pre_pos <-
-              lib_spe_is_lot_pos
+            lib_spe_is_wik_pre_pos <-
+              lib_spe_is_wik_pos
           }
         ),
         tar_target(
-          name = lib_spe_is_lot_pre_neg,
+          name = lib_spe_is_wik_pre_neg,
           format = "file",
           command = {
-            lib_spe_is_lot_pre_neg <-
-              lib_spe_is_lot_neg
+            lib_spe_is_wik_pre_neg <-
+              lib_spe_is_wik_neg
+          }
+        ),
+        tar_target(
+          name = lib_spe_is_wik_pre_sop,
+          format = "file",
+          command = {
+            lib_spe_is_wik_pre_sop <- get_file(
+              url = paths_urls_examples_wikidata_spectral_prepared,
+              export = paths_data_interim_libraries_sop_wikidata
+            )
           }
         )
       ),
@@ -1377,7 +1400,8 @@ list(
                 lib_sop_lot_pre,
                 lib_rt_sop,
                 lib_spe_exp_int_pre_sop,
-                lib_spe_exp_mb_pre_sop
+                lib_spe_exp_mb_pre_sop,
+                lib_spe_is_wik_pre_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
               level = par_pre_lib_sop_mer$organisms$filter$level,
@@ -1515,7 +1539,7 @@ list(
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
               library = c(
-                lib_spe_is_lot_pre_pos,
+                lib_spe_is_wik_pre_pos,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_pos,
                 lib_spe_exp_mb_pre_pos
@@ -1543,7 +1567,7 @@ list(
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
               library = c(
-                lib_spe_is_lot_pre_neg,
+                lib_spe_is_wik_pre_neg,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_neg,
                 lib_spe_exp_mb_pre_neg
@@ -2351,7 +2375,7 @@ list(
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
           library = c(
-            lib_spe_is_lot_pre_pos,
+            lib_spe_is_wik_pre_pos,
             lib_spe_exp_mb_pre_pos
           ),
           polarity = "pos",
@@ -2372,7 +2396,7 @@ list(
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
           library = c(
-            lib_spe_is_lot_pre_neg,
+            lib_spe_is_wik_pre_neg,
             lib_spe_exp_mb_pre_neg
           ),
           polarity = "neg",

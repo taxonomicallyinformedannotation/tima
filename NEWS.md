@@ -1,11 +1,16 @@
 # tima
 
-# tima 2.11.1
+# tima 2.12.0
+
+* Introduced similarity method argument (entropy and GNPS for now)
+* Implemented GNPS similarity method in C
+* New ISDB version with 1 million compounds (see <>)
+* Updated to Massbank version `2024.11`
+
+# tima 2.11.1 (unreleased)
 
 * Added `SIRIUS` feature tables support (#185)
 * Added `.rar` compression support for `SIRIUS` workspaces (#186)
-* Introduced similarity method argument (entropy and GNPS for now)
-* Updated to Massbank version `2024.11`
 
 # tima 2.11.0
 
