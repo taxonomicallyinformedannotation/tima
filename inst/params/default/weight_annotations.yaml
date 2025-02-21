@@ -7,7 +7,7 @@ annotations:
     final: 1
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
-  ms1only: no
+  ms1only: false
 
   #' Thresholds related parameters.
   thresholds:
@@ -179,16 +179,16 @@ weights:
 #' Options.
 options:
   #' Report compounds names. Can be very large. BOOLEAN
-  compounds_names: no
+  compounds_names: false
 
   #' Do not use it. BOOLEAN
-  force: no
+  force: false
 
   #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: yes
+  high_confidence: true
 
   #' Remove ties. BOOLEAN
-  remove_ties: no
+  remove_ties: false
 
   #' summarize results to one row per feature. BOOLEAN
-  summarize: no
+  summarize: false

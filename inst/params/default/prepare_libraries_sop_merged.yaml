@@ -61,7 +61,7 @@ organisms:
   #' Organisms filter related parameters.
   filter:
     #' Filter library to restrict it to a portion of organisms only. BOOLEAN
-    mode: no
+    mode: false
 
     #' Level at which the library will be filtered.
     #' Must be one of "domain", "phylum", "class", "order",

@@ -28,9 +28,9 @@ organisms:
   #' Else, you will need to provide a metadata file above.
   #' If you provide both, this one will have priority.
   #' Example: "Homo sapiens". STRING
-  taxon: ~
+  taxon: null
 options:
   #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: yes
+  high_confidence: true
   #' Summarize all candidates per feature to a single row. BOOLEAN
-  summarize: no
+  summarize: false
