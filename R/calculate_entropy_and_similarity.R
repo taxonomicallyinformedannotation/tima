@@ -32,6 +32,7 @@ calculate_entropy_and_similarity <- function(lib_ids,
                                              threshold,
                                              approx) {
   results <- purrr::map(
+    .progress = TRUE,
     .x = seq_along(query_spectra),
     .f = function(spectrum_idx) {
       current_spectrum <- query_spectra[[spectrum_idx]]
