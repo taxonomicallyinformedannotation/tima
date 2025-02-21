@@ -32,7 +32,7 @@ files:
 #' Names of the different variables in the input files.
 names:
   #' The file(s) extension is present in the sample name. BOOLEAN
-  extension: yes
+  extension: true
 
   #' Name of "feature IDs" variable in the input. STRING
   features: row ID
@@ -52,4 +52,4 @@ organisms:
   #' Else, you will need to provide a metadata file above.
   #' If you provide both, this one will have priority.
   #' Example: "Homo sapiens". STRING
-  taxon: ~
+  taxon: null

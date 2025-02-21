@@ -2,7 +2,7 @@
 #' Annotations related parameters.
 annotations:
   #' Perform approximative matching without precursor matching? BOOLEAN
-  ms2approx: no
+  ms2approx: false
 
 #' Files.
 files:

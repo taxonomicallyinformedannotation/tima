@@ -7,10 +7,10 @@ annotations:
     final: 1
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
-  ms1only: no
+  ms1only: false
 
   #' Perform approximative matching without precursor matching? BOOLEAN
-  ms2approx: no
+  ms2approx: false
 
   #' Thresholds related parameters.
   thresholds:
@@ -182,7 +182,7 @@ files:
       #' List of experimental temporal libraries.
       exp:
         #' List of experimental temporal libraries (CSV). STRING
-        csv: ~
+        csv: null
 
         #' List of experimental temporal libraries (MGF).
         mgf:
@@ -195,7 +195,7 @@ files:
       #' List of in silico temporal libraries. STRING
       is:
         #' List of in silico temporal libraries (CSV). STRING
-        csv: ~
+        csv: null
 
         #' List of in silico temporal libraries (MGF).
         mgf:
@@ -450,7 +450,7 @@ names:
   adduct: best ion
 
   #' The file(s) extension is present in the sample name. BOOLEAN
-  extension: yes
+  extension: true
 
   #' Name of "feature IDs" variable in the input. STRING
   features: row ID
@@ -468,10 +468,10 @@ names:
   #' Name of fields present in the MGF.
   mgf:
     #' Name of "adduct" in MGF. STRING
-    adduct: ~
+    adduct: null
 
     #' Name of "collision energy" in MGF. STRING
-    collision_energy: ~
+    collision_energy: null
 
     #' Name of "compound ID" in MGF. STRING
     compound_id: FILENAME
@@ -483,16 +483,16 @@ names:
     inchi: INCHI
 
     #' Name of "InChI without stereo" in MGF. STRING
-    inchi_no_stereo: ~
+    inchi_no_stereo: null
 
     #' Name of "InChIKey" in MGF. STRING
-    inchikey: ~
+    inchikey: null
 
     #' Name of "InChIKey without stereo" in MGF. STRING
-    inchikey_no_stereo: ~
+    inchikey_no_stereo: null
 
     #' Name of "molecular formula" in MGF. STRING
-    molecular_formula: ~
+    molecular_formula: null
 
     #' Name of "name" in MGF. STRING
     name: NAME
@@ -507,19 +507,19 @@ names:
     smiles: SMILES
 
     #' Name of "SMILES without stereo" in MGF. STRING
-    smiles_no_stereo: ~
+    smiles_no_stereo: null
 
     #' Name of "spectrum ID" in MGF. STRING
     spectrum_id: SPECTRUMID
 
     #' Name of "SPLASH" in MGF. STRING
-    splash: ~
+    splash: null
 
     #' Name of "synonyms" in MGF. STRING
-    synonyms: ~
+    synonyms: null
 
     #' Name of "xlogP" in MGF. STRING
-    xlogp: ~
+    xlogp: null
 
   #' Name of "precursor m/z" variable in the input. STRING
   precursor: row m/z
@@ -552,7 +552,7 @@ organisms:
   #' Organisms filter related parameters.
   filter:
     #' Filter library to restrict it to a portion of organisms only. BOOLEAN
-    mode: no
+    mode: false
 
     #' Level at which the library will be filtered.
     #' Must be one of "domain", "phylum", "class", "order",
@@ -568,7 +568,7 @@ organisms:
   #' Else, you will need to provide a metadata file above.
   #' If you provide both, this one will have priority.
   #' Example: "Homo sapiens". STRING
-  taxon: ~
+  taxon: null
 
 #' Similarity related parameters.
 similarities:
@@ -719,16 +719,16 @@ weights:
 #' Options.
 options:
   #' Report compounds names. Can be very large. BOOLEAN
-  compounds_names: no
+  compounds_names: false
 
   #' Do not use it. BOOLEAN
-  force: no
+  force: false
 
   #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: yes
+  high_confidence: true
 
   #' Remove ties. BOOLEAN
-  remove_ties: no
+  remove_ties: false
 
   #' Summarize all candidates per feature to a single row. BOOLEAN
-  summarize: no
+  summarize: false
