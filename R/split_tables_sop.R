@@ -68,7 +68,7 @@ split_tables_sop <- function(table) {
   )
 
   log_debug(
-    x = "and",
+    x = "or",
     nrow(
       table_structures_stereo |>
         tidytable::distinct(structure_inchikey_no_stereo)
