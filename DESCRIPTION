@@ -89,7 +89,6 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
     distance, specialized metabolome
 Collate:
     'round_reals.R'
-    'log_pipe.R'
     'harmonize_adducts.R'
     'parse_yaml_params.R'
     'parse_cli_params.R'

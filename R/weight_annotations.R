@@ -226,12 +226,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
-  ) |>
-    tidytable::distinct(
-      feature_id = feature_source,
-      feature_spectrum_entropy,
-      feature_spectrum_peaks
-    )
+  )
 
   log_debug(x = "... structure-organism pairs")
   library_table <- tidytable::fread(
@@ -333,18 +328,25 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
       .keep_all = TRUE
     )
   annotation_table_2 <- annotation_table |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        model$features_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_structures_columns
-      )
-    ), -candidate_structure_error_mz, -candidate_structure_error_rt) |>
+    tidytable::select(
+      tidyselect::any_of(
+        c(
+          model$features_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_structures_columns
+        )
+      ), -candidate_structure_error_mz, -candidate_structure_error_rt
+    ) |>
     tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
     tidytable::distinct()
   rm(annotation_table)
 
-  tables_full <- list(annotation_table_1, annotation_table_2, formula_table, canopus_table, edges_table)
+  tables_full <- list(
+    annotation_table_1,
+    annotation_table_2,
+    formula_table,
+    canopus_table
+  )
   annotation_table <- purrr::reduce(
     .x = tables_full,
     .f = function(x, y) {
@@ -352,7 +354,14 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     }
   )
   annotation_table <- annotation_table |>
-    tidytable::left_join(edges_table)
+    tidytable::left_join(
+      edges_table |>
+        tidytable::distinct(
+          feature_id = feature_source,
+          feature_spectrum_entropy,
+          feature_spectrum_peaks
+        )
+    )
 
   log_debug(x = "adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
@@ -368,18 +377,26 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     annotation_table_2,
     formula_table,
     canopus_table,
-    edges_table,
     tables_full
   )
 
   log_debug(x = "performing taxonomically informed scoring")
-  results <- weight_bio() |>
-    decorate_bio() |>
-    clean_bio() |>
-    weight_chemo() |>
-    decorate_chemo() |>
+  results_bio <- weight_bio()
+  rm(annotation_table_taxed)
+  results_bio |>
+    decorate_bio()
+  results_bio_cleaned <- results_bio |>
+    clean_bio()
+  rm(results_bio)
+  results_chemo <- results_bio_cleaned |>
+    weight_chemo()
+  rm(results_bio_cleaned)
+  results_chemo |>
+    decorate_chemo()
+  results <- results_chemo |>
     clean_chemo() |>
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
+  rm(results_chemo)
 
   log_debug(x = "Exporting ...")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")

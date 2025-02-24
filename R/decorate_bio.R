@@ -18,7 +18,7 @@
 #'
 #' @examples NULL
 decorate_bio <-
-  function(annot_table_wei_bio = get("annot_table_wei_chemo", envir = parent.frame()),
+  function(annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
            score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
            score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
            score_biological_class = get("score_biological_class", envir = parent.frame()),
