@@ -4,9 +4,9 @@
 #' @description This function filters highly confident annotations only.
 #'
 #' @param df Dataframe
-#' @param score_bio_min Minimal biological score. Current default to 0.9.
-#' @param score_ini_min Minimal initial score. Current default to 0.9.
-#' @param score_final_min Minimal final score. Current default to 0.45.
+#' @param score_bio_min Minimal biological score. Current default to 0.85.
+#' @param score_ini_min Minimal initial score. Current default to 0.95.
+#' @param score_final_min Minimal final score. Current default to 0.75.
 #'
 #' @return A dataframe containing only high confidence annotations
 #'
@@ -14,7 +14,7 @@
 filter_high_confidence_only <-
   function(df,
            score_bio_min = 0.85,
-           score_ini_min = 0.85,
+           score_ini_min = 0.95,
            score_final_min = 0.75) {
     log_debug("Keeping high confidence candidates only...")
     before <- nrow(df)
