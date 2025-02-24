@@ -95,13 +95,13 @@ prepare_annotations_sirius <-
       }
 
       # TODO
-      if (!is.null(spectral_filename)) {
-        if (grepl(pattern = spectral_filename, x = files$Name) |>
-          any()) {
-          spectral <- input_directory |>
-            read_from_sirius_zip(file = spectral_filename)
-        }
-      }
+      # if (!is.null(spectral_filename)) {
+      #   if (grepl(pattern = spectral_filename, x = files$Name) |>
+      #     any()) {
+      #     spectral <- input_directory |>
+      #       read_from_sirius_zip(file = spectral_filename)
+      #   }
+      # }
 
       # dirty to support old zip
       list <- tryCatch(
