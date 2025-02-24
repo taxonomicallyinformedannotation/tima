@@ -72,10 +72,12 @@ prepare_annotations_sirius <-
 
       log_debug("Loading and formatting SIRIUS results")
       canopus <- input_directory |>
-        read_from_sirius_zip(file = canopus_filename)
+        read_from_sirius_zip(file = canopus_filename) |>
+        tidytable::filter(formulaRank == 1L)
 
       formulas <- input_directory |>
-        read_from_sirius_zip(file = formulas_filename)
+        read_from_sirius_zip(file = formulas_filename) |>
+        tidytable::filter(formulaRank == 1L)
 
       structures <- input_directory |>
         read_from_sirius_zip(file = structures_filename)
@@ -241,6 +243,7 @@ prepare_annotations_sirius <-
       tidytable::select(tidyselect::any_of(
         c(model$features_columns, model$features_calculated_columns)
       )) |>
+      tidytable::filter(!is.na(!!as.name(model$features_calculated_columns[5]))) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
@@ -251,6 +254,7 @@ prepare_annotations_sirius <-
           model$candidates_sirius_for_columns
         )
       )) |>
+      tidytable::filter(!is.na(!!as.name(model$candidates_sirius_for_columns[2]))) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
