@@ -118,7 +118,7 @@ annotate_masses <-
 
     structure_organism_pairs_table <- joined_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::mutate(across(.cols = "structure_exact_mass", .fns = as.numeric)) |>
+      tidytable::mutate(tidytable::across(.cols = c("structure_exact_mass"), .fns = as.numeric)) |>
       round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")
