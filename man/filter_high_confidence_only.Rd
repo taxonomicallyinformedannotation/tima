@@ -7,19 +7,19 @@
 \usage{
 filter_high_confidence_only(
   df,
-  score_bio_min = 0.9,
-  score_ini_min = 0.9,
-  score_final_min = 0.45
+  score_bio_min = 0.85,
+  score_ini_min = 0.95,
+  score_final_min = 0.75
 )
 }
 \arguments{
 \item{df}{Dataframe}
 
-\item{score_bio_min}{Minimal biological score. Current default to 0.9.}
+\item{score_bio_min}{Minimal biological score. Current default to 0.85.}
 
-\item{score_ini_min}{Minimal initial score. Current default to 0.9.}
+\item{score_ini_min}{Minimal initial score. Current default to 0.95.}
 
-\item{score_final_min}{Minimal final score. Current default to 0.45.}
+\item{score_final_min}{Minimal final score. Current default to 0.75.}
 }
 \value{
 A dataframe containing only high confidence annotations
