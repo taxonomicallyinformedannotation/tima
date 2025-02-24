@@ -172,14 +172,22 @@ clean_bio <-
       tidytable::bind_rows(df1b)
 
     log_debug("joining all except -1 together \n")
-    annot_table_wei_bio_preclean <-
-      tidytable::left_join(df2, freq_cla_kin, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_npc_pat, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_cla_sup, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_npc_sup, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_cla_cla, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_npc_cla, by = stats::setNames("feature_source", "feature_id")) |>
-      tidytable::left_join(freq_cla_par, by = stats::setNames("feature_source", "feature_id")) |>
+    supp_tables <- list(
+      freq_cla_kin,
+      freq_npc_pat,
+      freq_cla_sup,
+      freq_npc_sup,
+      freq_cla_cla,
+      freq_npc_cla,
+      freq_cla_par
+    )
+    annot_table_wei_bio_preclean <- purrr::reduce(
+      .x = supp_tables,
+      .init = df2,
+      .f = function(x, y) {
+        tidytable::left_join(x, y, by = stats::setNames("feature_source", "feature_id"))
+      }
+    ) |>
       tidytable::select(feature_id, tidyselect::everything()) |>
       ## In case there are no consensus at all because no network
       tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.logical), .fns = as.character)) |>
