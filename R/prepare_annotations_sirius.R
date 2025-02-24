@@ -72,12 +72,20 @@ prepare_annotations_sirius <-
 
       log_debug("Loading and formatting SIRIUS results")
       canopus <- input_directory |>
-        read_from_sirius_zip(file = canopus_filename) |>
-        tidytable::filter(formulaRank == 1L)
+        read_from_sirius_zip(file = canopus_filename)
+      # not available in previous SIRIUS version
+      if (sirius_version == "6") {
+        canopus <- canopus |>
+          tidytable::filter(formulaRank == 1L)
+      }
 
       formulas <- input_directory |>
-        read_from_sirius_zip(file = formulas_filename) |>
-        tidytable::filter(formulaRank == 1L)
+        read_from_sirius_zip(file = formulas_filename)
+      # not available in previous SIRIUS version
+      if (sirius_version == "6") {
+        formulas <- formulas |>
+          tidytable::filter(formulaRank == 1L)
+      }
 
       structures <- input_directory |>
         read_from_sirius_zip(file = structures_filename)
