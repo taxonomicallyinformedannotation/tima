@@ -11,7 +11,6 @@
 #' @include dist_groups.R
 #' @include get_params.R
 #' @include harmonize_adducts.R
-#' @include log_pipe.R
 #' @include round_reals.R
 #'
 #' @param features Table containing your previous annotation to complement
@@ -229,7 +228,6 @@ annotate_masses <-
       ) |>
       tidytable::select(tidyselect::everything(), feature_id_dest, mz_dest, adduct_dest) |>
       tidytable::filter(feature_id != feature_id_dest) |>
-      log_pipe("adding delta mz tolerance for single charge adducts \n") |>
       tidytable::filter(mz_dest >= mz) |>
       tidytable::mutate(
         delta_min = (mz_dest - (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz),

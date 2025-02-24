@@ -4,7 +4,6 @@
 #' complemented annotations according their biological source
 #'
 #' @include transform_score_sirius_csi.R
-#' @include log_pipe.R
 #'
 #' @param annotation_table_taxed Table containing the initial annotation
 #' eventually complemented by additional MS1 annotations
@@ -61,7 +60,6 @@ weight_bio <-
         candidate_structure_tax_npc_03cla,
         candidate_structure_tax_cla_04dirpar
       ) |>
-      log_pipe("adding \"notClassified\" \n") |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::matches("candidate_structure_"),
         .fns = function(x) {
@@ -324,9 +322,27 @@ weight_bio <-
       # step_spe2,
       step_var
     )
+    rm(
+      step_dom,
+      step_kin,
+      step_phy,
+      step_cla,
+      step_ord,
+      ## step_ord2,
+      step_fam,
+      ## step_fam2,
+      step_tri,
+      ## step_tri2,
+      step_gen,
+      ## step_gen2,
+      step_spe,
+      ## step_spe2,
+      step_var
+    )
 
-    annot_table_wei_bio <- purrr::reduce(
-      .x = c(list(df2), supp_tables),
+    annot_table_wei_bio_init <- purrr::reduce(
+      .x = supp_tables,
+      .init = df2,
       .f = function(x, y) {
         tidytable::left_join(x, y)
       }
@@ -408,14 +424,28 @@ weight_bio <-
         # sample_organism_09_1_subspecies,
         sample_organism_10_varietas,
         .keep_all = TRUE
-      ) |>
+      )
+    rm(
+      supp_tables,
+      df1
+    )
+
+    annot_table_wei_bio_interim <- annot_table_wei_bio_init |>
       tidytable::inner_join(annotation_table_taxed) |>
       tidytable::select(
         -tidyselect::contains("candidate_organism"),
         -tidyselect::contains("sample_organism")
-      ) |>
-      tidytable::left_join(df0) |>
-      log_pipe("... calculating weighted biological score \n") |>
+      )
+    rm(
+      annot_table_wei_bio_init,
+      annotation_table_taxed
+    )
+
+    annot_table_wei_bio_big <- annot_table_wei_bio_interim |>
+      tidytable::left_join(df0)
+    rm(annot_table_wei_bio_interim)
+
+    annot_table_wei_bio <- annot_table_wei_bio_big |>
       tidytable::mutate(candidate_score_sirius_csi_tmp = transform_score_sirius_csi(candidate_score_sirius_csi)) |>
       tidytable::mutate(
         candidate_score_pseudo_initial = tidytable::case_when(
@@ -432,25 +462,7 @@ weight_bio <-
       )
 
     rm(
-      annotation_table_taxed,
-      df0,
-      df1,
-      df2,
-      step_dom,
-      step_kin,
-      step_phy,
-      step_cla,
-      step_ord,
-      ## step_ord2,
-      step_fam,
-      ## step_fam2,
-      step_tri,
-      ## step_tri2,
-      step_gen,
-      ## step_gen2,
-      step_spe,
-      ## step_spe2,
-      step_var
+      annot_table_wei_bio_big
     )
 
     return(annot_table_wei_bio)

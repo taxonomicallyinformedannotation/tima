@@ -6,7 +6,6 @@
 #' @include clean_collapse.R
 #' @include columns_model.R
 #' @include filter_high_confidence_only.R
-#' @include log_pipe.R
 #'
 #' @param annot_table_wei_chemo Table containing your
 #'    chemically weighted annotation
@@ -141,7 +140,6 @@ clean_chemo <-
         )
       )) |>
       tidytable::distinct() |>
-      log_pipe("adding references \n") |>
       tidytable::left_join(
         structure_organism_pairs_table |>
           tidytable::select(

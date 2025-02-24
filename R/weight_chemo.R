@@ -3,8 +3,6 @@
 #' @description This function weights the biologically weighted annotations
 #' according their chemical consistency
 #'
-#' @include log_pipe.R
-#'
 #' @param annot_table_wei_bio_clean Table containing the biologically
 #' weighted annotation
 #' @param weight_spectral Weight for the spectral score
@@ -75,11 +73,7 @@ weight_chemo <-
                score,
                score_name) {
         score <- df |>
-          tidytable::distinct(
-            !!as.name(candidates),
-            !!as.name(features_val),
-            !!as.name(features_score)
-          ) |>
+          tidytable::distinct(!!as.name(candidates), !!as.name(features_val), !!as.name(features_score)) |>
           tidytable::filter(stringi::stri_detect_regex(
             pattern = !!as.name(candidates),
             str = !!as.name(features_val)
@@ -160,9 +154,19 @@ weight_chemo <-
       step_npc_cla,
       step_cla_par
     )
+    rm(
+      step_cla_kin,
+      step_npc_pat,
+      step_cla_sup,
+      step_npc_sup,
+      step_cla_cla,
+      step_npc_cla,
+      step_cla_par
+    )
 
-    annot_table_wei_chemo <- purrr::reduce(
-      .x = c(list(df2), supp_tables),
+    annot_table_wei_chemo_init <- purrr::reduce(
+      .x = supp_tables,
+      .init = df2,
       .f = function(x, y) {
         tidytable::left_join(x, y)
       }
@@ -180,9 +184,14 @@ weight_chemo <-
           na.rm = TRUE
         )
       ) |>
-      tidytable::select(-tidyselect::contains("score_chemical_")) |>
-      tidytable::right_join(annot_table_wei_bio_clean) |>
-      log_pipe("... calculating weighted chemical score \n") |>
+      tidytable::select(-tidyselect::contains("score_chemical_"))
+    rm(df2, supp_tables)
+
+    annot_table_wei_chemo_interim <- annot_table_wei_chemo_init |>
+      tidytable::right_join(annot_table_wei_bio_clean)
+    rm(annot_table_wei_chemo_init, annot_table_wei_bio_clean)
+
+    annot_table_wei_chemo <- annot_table_wei_chemo_interim |>
       tidytable::mutate(
         score_weighted_chemo = (1 / (
           weight_chemical + weight_biological + weight_spectral
@@ -193,17 +202,7 @@ weight_chemo <-
         )) * weight_spectral * candidate_score_pseudo_initial
       )
 
-    rm(
-      annot_table_wei_bio_clean,
-      df2,
-      step_cla_kin,
-      step_npc_pat,
-      step_cla_sup,
-      step_npc_sup,
-      step_cla_cla,
-      step_npc_cla,
-      step_cla_par
-    )
+    rm(annot_table_wei_chemo_interim)
 
     return(annot_table_wei_chemo)
   }
