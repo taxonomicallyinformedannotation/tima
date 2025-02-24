@@ -5,6 +5,7 @@
 * Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
 * Introduced similarity method argument (entropy and GNPS for now)
 * Implemented GNPS similarity method in C
+* Improved high confidence filtering
 * Keep (only) best molecular formula and canopus annotations from SIRIUS
 * New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Updated to Massbank version `2024.11`
