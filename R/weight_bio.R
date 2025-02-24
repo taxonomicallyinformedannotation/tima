@@ -307,22 +307,30 @@ weight_bio <-
       )
 
     log_debug("... keeping best biological score \n")
-    annot_table_wei_bio <- df2 |>
-      tidytable::left_join(step_dom) |>
-      tidytable::left_join(step_kin) |>
-      tidytable::left_join(step_phy) |>
-      tidytable::left_join(step_cla) |>
-      tidytable::left_join(step_ord) |>
-      # tidytable::left_join(step_ord2) |>
-      tidytable::left_join(step_fam) |>
-      # tidytable::left_join(step_fam2) |>
-      tidytable::left_join(step_tri) |>
-      # tidytable::left_join(step_tri2) |>
-      tidytable::left_join(step_gen) |>
-      # tidytable::left_join(step_gen2) |>
-      tidytable::left_join(step_spe) |>
-      # tidytable::left_join(step_spe2) |>
-      tidytable::left_join(step_var) |>
+    supp_tables <- list(
+      step_dom,
+      step_kin,
+      step_phy,
+      step_cla,
+      step_ord,
+      # step_ord2,
+      step_fam,
+      # step_fam2,
+      step_tri,
+      # step_tri2,
+      step_gen,
+      # step_gen2,
+      step_spe,
+      # step_spe2,
+      step_var
+    )
+
+    annot_table_wei_bio <- purrr::reduce(
+      .x = c(list(df2), supp_tables),
+      .f = function(x, y) {
+        tidytable::left_join(x, y)
+      }
+    ) |>
       tidytable::mutate(
         score_biological = pmax(
           score_biological_01,

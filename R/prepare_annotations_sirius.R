@@ -182,11 +182,15 @@ prepare_annotations_sirius <-
         tidytable::mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
 
-      table <- structures_prepared |>
-        tidytable::left_join(formulas_prepared) |>
-        tidytable::left_join(canopus_prepared) |>
-        tidytable::left_join(denovo_prepared) |>
-        # TODO add spectral
+      # TODO add spectral
+      supp_tables <- list(formulas_prepared, canopus_prepared, denovo_prepared)
+      table <- purrr::reduce(
+        .x = supp_tables,
+        .init = structures_prepared,
+        .f = function(x, y) {
+          tidytable::left_join(x, y)
+        }
+      ) |>
         tidytable::distinct() |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA,

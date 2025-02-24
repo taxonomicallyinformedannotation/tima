@@ -226,25 +226,37 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
-  )
+  ) |>
+    tidytable::distinct(
+      feature_id = feature_source,
+      feature_spectrum_entropy,
+      feature_spectrum_peaks
+    )
 
   log_debug(x = "... structure-organism pairs")
-  structure_organism_pairs_table <-
-    tidytable::fread(
-      file = library,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ) |>
-    tidytable::left_join(tidytable::fread(
-      file = str_stereo,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )) |>
-    tidytable::left_join(tidytable::fread(
-      file = org_tax_ott,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ))
+  library_table <- tidytable::fread(
+    file = library,
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+  supp_files <- list(str_stereo, org_tax_ott)
+
+  supp_tables <- purrr::map(
+    .x = supp_files,
+    .f = function(file.path) {
+      tidytable::fread(
+        file = file.path,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    }
+  )
+
+  structure_organism_pairs_table <- purrr::reduce(
+    .x = supp_tables,
+    .init = library_table,
+    .f = tidytable::left_join
+  )
 
   log_debug(x = "... canopus")
   canopus_table <-
@@ -321,18 +333,16 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
     tidytable::distinct()
 
-  annotation_table <- annotation_table_1 |>
-    tidytable::full_join(annotation_table_2) |>
-    tidytable::full_join(formula_table) |>
-    tidytable::full_join(canopus_table) |>
-    tidytable::left_join(
-      edges_table |>
-        tidytable::distinct(
-          feature_id = feature_source,
-          feature_spectrum_entropy,
-          feature_spectrum_peaks
-        )
-    )
+  tables_full <- list(annotation_table_1, annotation_table_2, formula_table, canopus_table, edges_table)
+  annotation_table <- purrr::reduce(
+    .x = tables_full,
+    .f = function(x, y) {
+      tidytable::full_join(x, y)
+    }
+  )
+  annotation_table <- annotation_table |>
+    tidytable::left_join(edges_table, by = "id")
+
 
   if (ms1_only == TRUE) {
     annotation_table <- annotation_table |>

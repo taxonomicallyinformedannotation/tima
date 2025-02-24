@@ -92,39 +92,33 @@ annotate_masses <-
       clusters <- clusters_list$neg
     }
 
-    structure_organism_pairs_table <-
+    library_table <-
       tidytable::fread(
         file = library,
         na.strings = c("", "NA"),
         colClasses = "character"
-      ) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_stereo,
+      )
+
+    supp_files <- list(str_stereo, str_met, str_nam, str_tax_cla, str_tax_npc)
+
+    supp_tables <- purrr::map(.x = supp_files, .f = function(file_path) {
+      tidytable::fread(
+        file = file_path,
         na.strings = c("", "NA"),
         colClasses = "character"
-      )) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_met,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_nam,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_tax_cla,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )) |>
-      tidytable::left_join(tidytable::fread(
-        file = str_tax_npc,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )) |>
+      )
+    })
+
+    joined_table <- purrr::reduce(
+      .x = c(list(library_table), supp_tables),
+      .f = function(x, y) {
+        tidytable::left_join(x, y)
+      }
+    )
+
+    structure_organism_pairs_table <- joined_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::mutate(tidytable::across(.cols = c("structure_exact_mass"), .fns = as.numeric)) |>
+      tidytable::mutate(across(.cols = "structure_exact_mass", .fns = as.numeric)) |>
       round_reals()
 
     log_debug("filtering desired adducts and adding mz tolerance \n")

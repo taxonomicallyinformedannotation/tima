@@ -151,14 +151,22 @@ weight_chemo <-
       )
 
     log_debug("... keeping best chemical score \n")
-    annot_table_wei_chemo <- df2 |>
-      tidytable::left_join(step_cla_kin) |>
-      tidytable::left_join(step_npc_pat) |>
-      tidytable::left_join(step_cla_sup) |>
-      tidytable::left_join(step_npc_sup) |>
-      tidytable::left_join(step_cla_cla) |>
-      tidytable::left_join(step_npc_cla) |>
-      tidytable::left_join(step_cla_par) |>
+    supp_tables <- list(
+      step_cla_kin,
+      step_npc_pat,
+      step_cla_sup,
+      step_npc_sup,
+      step_cla_cla,
+      step_npc_cla,
+      step_cla_par
+    )
+
+    annot_table_wei_chemo <- purrr::reduce(
+      .x = c(list(df2), supp_tables),
+      .f = function(x, y) {
+        tidytable::left_join(x, y)
+      }
+    ) |>
       tidytable::mutate(
         score_chemical = pmax(
           score_chemical_1,
