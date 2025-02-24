@@ -283,6 +283,16 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   ) |>
     tidytable::bind_rows()
 
+  if (ms1_only == TRUE) {
+    annotation_table <- annotation_table |>
+      tidytable::filter(is.na(candidate_score_similarity) &
+        is.na(candidate_score_sirius_csi))
+  }
+  if (compounds_names == FALSE) {
+    annotation_table <- annotation_table |>
+      tidytable::select(-candidate_structure_name)
+  }
+
   log_debug(
     x = "Got",
     annotation_table |>
@@ -332,6 +342,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     ), -candidate_structure_error_mz, -candidate_structure_error_rt) |>
     tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
     tidytable::distinct()
+  rm(annotation_table)
 
   tables_full <- list(annotation_table_1, annotation_table_2, formula_table, canopus_table, edges_table)
   annotation_table <- purrr::reduce(
@@ -341,18 +352,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     }
   )
   annotation_table <- annotation_table |>
-    tidytable::left_join(edges_table, by = "id")
-
-
-  if (ms1_only == TRUE) {
-    annotation_table <- annotation_table |>
-      tidytable::filter(is.na(candidate_score_similarity) &
-        is.na(candidate_score_sirius_csi))
-  }
-  if (compounds_names == FALSE) {
-    annotation_table <- annotation_table |>
-      tidytable::select(-candidate_structure_name)
-  }
+    tidytable::left_join(edges_table)
 
   log_debug(x = "adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
@@ -362,7 +362,15 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
       colClasses = "character"
     ))
 
-  rm(annotation_table, annotation_table_1, annotation_table_2)
+  rm(
+    annotation_table,
+    annotation_table_1,
+    annotation_table_2,
+    formula_table,
+    canopus_table,
+    edges_table,
+    tables_full
+  )
 
   log_debug(x = "performing taxonomically informed scoring")
   results <- weight_bio() |>
