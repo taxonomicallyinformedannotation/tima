@@ -13,9 +13,9 @@
 #' @examples NULL
 filter_high_confidence_only <-
   function(df,
-           score_bio_min = 0.9,
-           score_ini_min = 0.9,
-           score_final_min = 0.45) {
+           score_bio_min = 0.85,
+           score_ini_min = 0.85,
+           score_final_min = 0.75) {
     log_debug("Keeping high confidence candidates only...")
     before <- nrow(df)
     # TODO this is very basic for now but already massively filters.
