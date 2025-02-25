@@ -116,6 +116,7 @@ utils::globalVariables(
     "feature_target",
     "filename",
     "formula",
+    "formulaRank",
     "Group1",
     "Group2",
     "id",
@@ -130,6 +131,7 @@ utils::globalVariables(
     "label",
     "Label",
     "library_name",
+    "logp",
     "loss",
     "mappingFeatureId",
     "mass",
@@ -250,6 +252,7 @@ utils::globalVariables(
     "val",
     "value",
     "value_max",
-    "value_min"
+    "value_min",
+    "xlogp"
   )
 )

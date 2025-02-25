@@ -91,10 +91,7 @@ filter_annotations <-
 
     features_annotated_table_1 <- features_table |>
       tidytable::left_join(annotation_table)
-    rm(
-      features_table,
-      annotation_table
-    )
+    rm(annotation_table)
 
     if (!is.null(rts)) {
       log_debug(
@@ -131,6 +128,7 @@ filter_annotations <-
       tidytable::left_join(features_annotated_table_2)
 
     rm(
+      features_table,
       features_annotated_table_1,
       features_annotated_table_2
     )
