@@ -175,6 +175,12 @@ prepare_libraries_spectra <-
             structure_exact_mass = exactmass,
             structure_xlogp = xlogp
           ) |>
+          # Because some slight discrepancies appear in some DBs
+          tidytable::distinct(structure_inchikey,
+            structure_smiles,
+            structure_smiles_no_stereo,
+            .keep_all = TRUE
+          ) |>
           tidytable::mutate(
             structure_inchikey_no_stereo = structure_inchikey |>
               gsub(pattern = "-.*", replacement = ""),
