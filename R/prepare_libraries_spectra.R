@@ -170,7 +170,10 @@ prepare_libraries_spectra <-
           tidytable::distinct(
             structure_inchikey = inchikey,
             structure_smiles = smiles,
-            structure_smiles_no_stereo = smiles_no_stereo
+            structure_smiles_no_stereo = smiles_no_stereo,
+            structure_molecular_fromula = formula,
+            structure_exact_mass = exactmass,
+            structure_xlogp = xlogp
           ) |>
           tidytable::mutate(
             structure_inchikey_no_stereo = structure_inchikey |>
