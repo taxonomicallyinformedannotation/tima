@@ -42,6 +42,14 @@ split_tables_sop <- function(table) {
       structure_inchikey_no_stereo,
       structure_smiles_no_stereo
     ) |>
+    tidytable::distinct() |>
+    tidytable::group_by(structure_inchikey) |>
+    tidytable::fill(structure_smiles) |>
+    tidytable::ungroup() |>
+    tidytable::distinct() |>
+    tidytable::group_by(structure_inchikey_no_stereo) |>
+    tidytable::fill(structure_smiles_no_stereo) |>
+    tidytable::ungroup() |>
     tidytable::distinct()
   log_debug(
     x = "Corresponding to",
@@ -80,13 +88,20 @@ split_tables_sop <- function(table) {
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_molecular_formula)) |>
     tidytable::filter(!is.na(structure_exact_mass)) |>
-    tidytable::filter(!is.na(structure_xlogp)) |>
+    # tidytable::filter(!is.na(structure_xlogp)) |>
     tidytable::select(
       structure_inchikey,
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp
     ) |>
+    tidytable::group_by(structure_inchikey) |>
+    tidytable::fill(
+      structure_molecular_formula,
+      structure_exact_mass,
+      structure_xlogp
+    ) |>
+    tidytable::ungroup() |>
     tidytable::distinct()
 
   table_structures_names <- table |>
