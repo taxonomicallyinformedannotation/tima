@@ -55,42 +55,63 @@ prepare_libraries_sop_hmdb <-
             # "inchi" = "> <INCHI_IDENTIFIER>",
             "inchikey" = "> <INCHI_KEY>",
             "formula" = "> <FORMULA>",
-            ## Because they do not have the same number of entries (weirdly...)
-            # "mass" = "> <EXACT_MASS>",
-            # "logp" = "> <JCHEM_LOGP>",
+            "mass" = "> <EXACT_MASS>",
+            "logp" = "> <JCHEM_LOGP>",
             "name" = "> <GENERIC_NAME>"
           )
 
-          hmdb_df <- patterns |>
+          hmdb_list <- patterns |>
             purrr::map(.f = find_fixed_pattern_line_in_file, file = sdf_data) |>
-            purrr::map(.f = return_next_line, file = sdf_data) |>
-            data.frame()
+            purrr::map(.f = return_next_line, file = sdf_data)
+
+          # Function to align a vector to the reference (id)
+          align_column <- function(ref, col) {
+            aligned <- rep(NA, length(ref))
+            j <- 1
+
+            for (i in seq_along(ref)) {
+              if (j <= length(col) && !is.na(col[j])) {
+                aligned[i] <- col[j]
+                j <- j + 1
+              }
+            }
+            return(aligned)
+          }
+
+          hmdb_df <- data.frame(
+            id = hmdb_list$id,
+            smiles = hmdb_list$smiles,
+            inchikey = hmdb_list$inchikey,
+            formula = hmdb_list$formula,
+            mass = align_column(ref = hmdb_list$id, hmdb_list$mass),
+            logp = align_column(ref = hmdb_list$id, hmdb_list$logp),
+            name = hmdb_list$name
+          )
 
           log_debug(x = "Formatting HMDB...")
           hmdb_prepared <- hmdb_df |>
             tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = tidytable::na_if, "")) |>
             tidytable::filter(!is.na(inchikey)) |>
             tidytable::mutate(
-              structure_inchikey_2D = stringi::stri_sub(
+              structure_inchikey_no_stereo = stringi::stri_sub(
                 str = inchikey,
                 from = 1,
                 to = 14
               ),
               ## ISSUE see #19
-              structure_smiles_2D = NA_character_,
-              structure_exact_mass = NA_real_
+              structure_smiles_no_stereo = NA_character_,
             ) |>
             tidytable::select(
               structure_name = name,
               structure_inchikey = inchikey,
               structure_smiles = smiles,
-              structure_inchikey_2D,
-              structure_smiles_2D,
+              structure_inchikey_no_stereo,
+              structure_smiles_no_stereo,
               structure_molecular_formula = formula,
-              structure_exact_mass
+              structure_exact_mass = mass,
+              structure_xlogp = logp
             ) |>
             tidytable::mutate(
-              structure_xlogp = NA_integer_,
               structure_taxonomy_npclassifier_01pathway = NA_character_,
               structure_taxonomy_npclassifier_02superclass = NA_character_,
               structure_taxonomy_npclassifier_03class = NA_character_,
