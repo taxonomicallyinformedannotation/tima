@@ -61,30 +61,39 @@ prepare_libraries_sop_hmdb <-
           )
 
           hmdb_list <- patterns |>
-            purrr::map(.f = find_fixed_pattern_line_in_file, file = sdf_data) |>
-            purrr::map(.f = return_next_line, file = sdf_data)
+            purrr::map(.f = find_fixed_pattern_line_in_file, file = sdf_data)
 
-          # Function to align a vector to the reference (id)
-          align_column <- function(ref, col) {
-            aligned <- rep(NA, length(ref))
+          # Function to realign vectors with missing values
+          realign_vectors <- function(vec1, vec2) {
+            result <- numeric(length(vec1))
+            result[] <- NA
+            i <- 1
             j <- 1
-
-            for (i in seq_along(ref)) {
-              if (j <= length(col) && !is.na(col[j])) {
-                aligned[i] <- col[j]
+            while (i <= length(vec1) && j <= length(vec2)) {
+              if (i < length(vec1) && vec2[j] > vec1[i + 1]) {
+                i <- i + 1
+              } else {
+                result[i] <- vec2[j]
+                i <- i + 1
                 j <- j + 1
               }
             }
-            return(aligned)
+
+            return(result)
           }
+          hmdb_list$mass <- realign_vectors(hmdb_list$formula, hmdb_list$mass)
+          hmdb_list$logp <- realign_vectors(hmdb_list$formula, hmdb_list$logp)
+
+          hmdb_list <- hmdb_list |>
+            purrr::map(.f = return_next_line, file = sdf_data)
 
           hmdb_df <- data.frame(
             id = hmdb_list$id,
             smiles = hmdb_list$smiles,
             inchikey = hmdb_list$inchikey,
             formula = hmdb_list$formula,
-            mass = align_column(ref = hmdb_list$id, hmdb_list$mass),
-            logp = align_column(ref = hmdb_list$id, hmdb_list$logp),
+            mass = hmdb_list$mass,
+            logp = hmdb_list$logp,
             name = hmdb_list$name
           )
 
