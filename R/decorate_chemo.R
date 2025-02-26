@@ -36,49 +36,49 @@ decorate_chemo <- function(annot_table_wei_chemo =
     tidytable::filter(
       feature_pred_tax_cla_01kin_val != "notAnnotated" &
         feature_pred_tax_cla_01kin_val != "notConsistent" &
-        feature_pred_tax_cla_01kin_val != "dummy"
+        feature_pred_tax_cla_01kin_val != "empty"
     )
   df_npc_pat <- annot_table_wei_chemo |>
     tidytable::filter(score_chemical >= score_chemical_npc_pathway * 1) |>
     tidytable::filter(
       feature_pred_tax_npc_01pat_val != "notAnnotated" &
         feature_pred_tax_npc_01pat_val != "notConsistent" &
-        feature_pred_tax_npc_01pat_val != "dummy"
+        feature_pred_tax_npc_01pat_val != "empty"
     )
   df_cla_sup <- df_cla_kin |>
     tidytable::filter(score_chemical >= score_chemical_cla_superclass * 1) |>
     tidytable::filter(
       feature_pred_tax_cla_02sup_val != "notAnnotated" &
         feature_pred_tax_cla_02sup_val != "notConsistent" &
-        feature_pred_tax_cla_02sup_val != "dummy"
+        feature_pred_tax_cla_02sup_val != "empty"
     )
   df_npc_sup <- df_npc_pat |>
     tidytable::filter(score_chemical >= score_chemical_npc_superclass * 1) |>
     tidytable::filter(
       feature_pred_tax_npc_02sup_val != "notAnnotated" &
         feature_pred_tax_npc_02sup_val != "notConsistent" &
-        feature_pred_tax_npc_02sup_val != "dummy"
+        feature_pred_tax_npc_02sup_val != "empty"
     )
   df_cla_cla <- df_cla_sup |>
     tidytable::filter(score_chemical >= score_chemical_cla_class * 1) |>
     tidytable::filter(
       feature_pred_tax_cla_03cla_val != "notAnnotated" &
         feature_pred_tax_cla_03cla_val != "notConsistent" &
-        feature_pred_tax_cla_03cla_val != "dummy"
+        feature_pred_tax_cla_03cla_val != "empty"
     )
   df_npc_cla <- df_npc_sup |>
     tidytable::filter(score_chemical >= score_chemical_npc_class * 1) |>
     tidytable::filter(
       feature_pred_tax_npc_03cla_val != "notAnnotated" &
         feature_pred_tax_npc_03cla_val != "notConsistent" &
-        feature_pred_tax_npc_03cla_val != "dummy"
+        feature_pred_tax_npc_03cla_val != "empty"
     )
   df_cla_par <- df_cla_cla |>
     tidytable::filter(score_chemical >= score_chemical_cla_parent * 1) |>
     tidytable::filter(
       feature_pred_tax_cla_04dirpar_val != "notAnnotated" &
         feature_pred_tax_cla_04dirpar_val != "notConsistent" &
-        feature_pred_tax_cla_04dirpar_val != "dummy"
+        feature_pred_tax_cla_04dirpar_val != "empty"
     )
 
   log_debug(
