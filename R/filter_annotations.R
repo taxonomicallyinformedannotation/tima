@@ -77,21 +77,26 @@ filter_annotations <-
       colClasses = "character"
     )
 
-    log_debug(x = "... removing MS1 annotations for which we have spectral hits")
-    annotations_tables_spectral <- annotation_tables_list[names(annotation_tables_list)[names(annotation_tables_list) !=
-      "ms1"]] |>
-      tidytable::bind_rows()
+    if ("ms1" %in% names(annotation_tables_list)) {
+      log_debug(x = "... removing MS1 annotations for which we have spectral hits")
+      annotations_tables_spectral <- annotation_table[names(annotation_tables_list)[names(annotation_tables_list) !=
+        "ms1"]] |>
+        tidytable::bind_rows()
 
-    spectral_keys <- annotations_tables_spectral |>
-      tidytable::distinct(
-        feature_id,
-        ## Comment not taking into account because of inconsistencies among tools
-        # candidate_adduct,
-        candidate_structure_inchikey_no_stereo
-      )
-    annotation_table <- annotation_tables_list[["ms1"]] |>
-      tidytable::anti_join(spectral_keys) |>
-      tidytable::bind_rows(annotations_tables_spectral)
+      spectral_keys <- annotations_tables_spectral |>
+        tidytable::distinct(
+          feature_id,
+          ## Comment not taking into account because of inconsistencies among tools
+          # candidate_adduct,
+          candidate_structure_inchikey_no_stereo
+        )
+      annotation_table <- annotation_tables_list[["ms1"]] |>
+        tidytable::anti_join(spectral_keys) |>
+        tidytable::bind_rows(annotations_tables_spectral)
+    } else {
+      annotation_table <- annotation_tables_list |>
+        tidytable::bind_rows()
+    }
     rm(
       annotation_tables_list,
       annotations_tables_spectral,
