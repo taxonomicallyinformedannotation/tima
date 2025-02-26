@@ -1765,10 +1765,10 @@ list(
     command = {
       ann_fil <- filter_annotations(
         annotations = c(
-          ann_spe_exp_gnp_pre,
-          ann_spe_pre,
-          ann_sir_pre_str,
-          ann_ms1_pre_ann
+          "gnps" = ann_spe_exp_gnp_pre,
+          "spectral" = ann_spe_pre,
+          "sirius" = ann_sir_pre_str,
+          "ms1" = ann_ms1_pre_ann
         ),
         features = fea_pre,
         rts = lib_rt_rts,
