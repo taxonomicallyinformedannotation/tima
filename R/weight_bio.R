@@ -346,7 +346,10 @@ weight_bio <-
       .f = function(x, y) {
         tidytable::left_join(x, y)
       }
-    ) |>
+    )
+    rm(supp_tables, df2)
+
+    annot_table_wei_bio_init <- annot_table_wei_bio_init |>
       tidytable::mutate(
         score_biological = pmax(
           score_biological_01,
@@ -404,7 +407,10 @@ weight_bio <-
           .default = NA_character_
         )
       ) |>
-      tidytable::right_join(df1) |>
+      tidytable::right_join(df1)
+    rm(df1)
+
+    annot_table_wei_bio_init <- annot_table_wei_bio_init |>
       tidytable::arrange(tidytable::desc(score_biological)) |>
       tidytable::distinct(
         candidate_structure_inchikey_no_stereo,
@@ -425,10 +431,6 @@ weight_bio <-
         sample_organism_10_varietas,
         .keep_all = TRUE
       )
-    rm(
-      supp_tables,
-      df1
-    )
 
     annot_table_wei_bio_interim <- annot_table_wei_bio_init |>
       tidytable::inner_join(annotation_table_taxed) |>

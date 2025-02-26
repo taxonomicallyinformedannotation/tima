@@ -44,11 +44,11 @@ split_tables_sop <- function(table) {
     ) |>
     tidytable::distinct() |>
     tidytable::group_by(structure_inchikey) |>
-    tidytable::fill(structure_smiles) |>
+    tidytable::fill(structure_smiles, .direction = "downup") |>
     tidytable::ungroup() |>
     tidytable::distinct() |>
     tidytable::group_by(structure_inchikey_no_stereo) |>
-    tidytable::fill(structure_smiles_no_stereo) |>
+    tidytable::fill(structure_smiles_no_stereo, .direction = "downup") |>
     tidytable::ungroup() |>
     tidytable::distinct()
   log_debug(
@@ -99,7 +99,8 @@ split_tables_sop <- function(table) {
     tidytable::fill(
       structure_molecular_formula,
       structure_exact_mass,
-      structure_xlogp
+      structure_xlogp,
+      .direction = "downup"
     ) |>
     tidytable::ungroup() |>
     tidytable::distinct()
