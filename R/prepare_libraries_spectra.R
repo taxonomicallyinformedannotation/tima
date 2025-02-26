@@ -72,7 +72,11 @@ prepare_libraries_spectra <-
     )
     output_sop <- file.path(
       get_default_paths()$data$interim$libraries$sop$path,
-      paste0("spectral_prepared.tsv.gz")
+      ifelse(
+        test = nam_lib == "internal",
+        yes = "internal_spectral_prepared.tsv.gz",
+        no = "spectral_prepared.tsv.gz"
+      )
     )
     if (!all(purrr::map(.x = list(output_neg, output_pos, output_sop), .f = file.exists) |>
       unlist())) {

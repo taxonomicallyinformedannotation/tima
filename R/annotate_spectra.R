@@ -96,7 +96,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     spectral_library <- unlist(library) |>
       purrr::map(
         .f = import_spectra,
-        cutoff = qutoff,
+        cutoff = 0,
         dalton = dalton,
         polarity = polarity,
         ppm = ppm,
