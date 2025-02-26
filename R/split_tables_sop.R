@@ -56,7 +56,11 @@ split_tables_sop <- function(table) {
     nrow(
       table_structures_stereo |>
         tidytable::filter(
-          !grepl(pattern = "-UHFFFAOYSA-", x = structure_inchikey, fixed = TRUE)
+          !grepl(
+            pattern = "-UHFFFAOYSA-",
+            x = structure_inchikey,
+            fixed = TRUE
+          )
         ) |>
         tidytable::distinct(structure_inchikey)
     ),
@@ -68,7 +72,11 @@ split_tables_sop <- function(table) {
     nrow(
       table_structures_stereo |>
         tidytable::filter(
-          grepl(pattern = "-UHFFFAOYSA-", x = structure_inchikey, fixed = TRUE)
+          grepl(
+            pattern = "-UHFFFAOYSA-",
+            x = structure_inchikey,
+            fixed = TRUE
+          )
         ) |>
         tidytable::distinct(structure_inchikey)
     ),
@@ -95,12 +103,20 @@ split_tables_sop <- function(table) {
       structure_exact_mass,
       structure_xlogp
     ) |>
+    tidytable::distinct() |>
     tidytable::group_by(structure_inchikey) |>
-    tidytable::fill(
-      structure_molecular_formula,
+    tidytable::fill(structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp,
       .direction = "downup"
+    ) |>
+    tidytable::ungroup() |>
+    tidytable::distinct() |>
+    # COMMENT else duplicate enties
+    tidytable::group_by(structure_inchikey, structure_molecular_formula) |>
+    tidytable::mutate(
+      structure_exact_mass = mean(as.numeric(structure_exact_mass), na.rm = TRUE),
+      structure_xlogp = mean(as.numeric(structure_xlogp), na.rm = TRUE)
     ) |>
     tidytable::ungroup() |>
     tidytable::distinct()
