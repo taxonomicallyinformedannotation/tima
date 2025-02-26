@@ -70,13 +70,34 @@ filter_annotations <-
       na.strings = c("", "NA")
     )
     log_debug(x = "... annotations")
-    annotation_table <- purrr::map(
+    annotation_tables_list <- purrr::map(
       .x = annotations,
       .f = tidytable::fread,
       na.strings = c("", "NA"),
       colClasses = "character"
-    ) |>
+    )
+
+    log_debug(x = "... removing MS1 annotations for which we have spectral hits")
+    annotations_tables_spectral <- annotation_tables_list[names(annotation_tables_list)[names(annotation_tables_list) !=
+      "ms1"]] |>
       tidytable::bind_rows()
+
+    spectral_keys <- annotations_tables_spectral |>
+      tidytable::distinct(
+        feature_id,
+        ## Comment not taking into account because of inconsistencies among tools
+        # candidate_adduct,
+        candidate_structure_inchikey_no_stereo
+      )
+    annotation_table <- annotation_tables_list[["ms1"]] |>
+      tidytable::anti_join(spectral_keys) |>
+      tidytable::bind_rows(annotations_tables_spectral)
+    rm(
+      annotation_tables_list,
+      annotations_tables_spectral,
+      spectral_keys
+    )
+
     log_debug(x = "... retention times")
     if (!is.null(rts)) {
       rt_table <- purrr::map(
@@ -122,6 +143,7 @@ filter_annotations <-
       ),
       "Candidates were removed based on retention time."
     )
+    rm(features_annotated_table_1)
 
     ## in case some features had a single filtered annotation
     final_table <- features_table |>
@@ -129,7 +151,6 @@ filter_annotations <-
 
     rm(
       features_table,
-      features_annotated_table_1,
       features_annotated_table_2
     )
 
