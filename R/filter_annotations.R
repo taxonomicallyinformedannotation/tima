@@ -79,7 +79,7 @@ filter_annotations <-
 
     if ("ms1" %in% names(annotation_tables_list)) {
       log_debug(x = "... removing MS1 annotations for which we have spectral hits")
-      annotations_tables_spectral <- annotation_table[names(annotation_tables_list)[names(annotation_tables_list) !=
+      annotations_tables_spectral <- annotation_tables_list[names(annotation_tables_list)[names(annotation_tables_list) !=
         "ms1"]] |>
         tidytable::bind_rows()
 
