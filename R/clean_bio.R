@@ -32,6 +32,7 @@ clean_bio <-
         score_weighted_bio,
         .keep_all = TRUE
       )
+    rm(annot_table_wei_bio)
 
     log_debug("calculating chemical consistency
               features with at least 2 neighbors ... \n")
@@ -157,6 +158,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_cla_04dirpar_score",
         feature_val_name = "feature_pred_tax_cla_04dirpar_val"
       )
+    rm(df3)
 
     log_debug("splitting already computed predictions \n")
     df1 <- df |>
@@ -169,6 +171,7 @@ clean_bio <-
       tidytable::select(-tidyselect::contains("feature_pred_tax")) |>
       tidytable::anti_join(df1) |>
       tidytable::bind_rows(df1b)
+    rm(df)
 
     log_debug("joining all except -1 together \n")
     supp_tables <- list(
@@ -180,6 +183,16 @@ clean_bio <-
       freq_npc_cla,
       freq_cla_par
     )
+    rm(
+      freq_cla_kin,
+      freq_npc_pat,
+      freq_cla_sup,
+      freq_npc_sup,
+      freq_cla_cla,
+      freq_npc_cla,
+      freq_cla_par
+    )
+
     annot_table_wei_bio_preclean <- purrr::reduce(
       .x = supp_tables,
       .init = df2,
@@ -213,6 +226,7 @@ clean_bio <-
         consistency_structure_cla_par = tidytable::coalesce(consistency_structure_cla_par, 1),
         feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(feature_pred_tax_cla_04dirpar_score, 0)
       )
+    rm(df2, supp_tables)
 
     log_debug("adding already computed predictions back \n")
     annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
@@ -220,13 +234,9 @@ clean_bio <-
       tidytable::bind_rows(df1)
 
     rm(
-      annot_table_wei_bio,
       annot_table_wei_bio_preclean,
-      df,
       df1,
-      df1b,
-      df2,
-      df3
+      df1b
     )
 
     return(annot_table_wei_bio_clean)
