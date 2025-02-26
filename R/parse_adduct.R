@@ -48,7 +48,7 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
   ## Extract modifications
   modifications <- matches[4] |>
     # Safety to allow for things like "[2M1-C6H12O6 (hexose)+NaCl+H]2+"
-    gsub(pattern = " .*", replacement = "")
+    gsub(pattern = " \\(.*\\)", replacement = "")
 
   ## Split modifications
   modifications_regex <- "[+-](\\d*)"
