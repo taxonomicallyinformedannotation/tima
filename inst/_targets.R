@@ -1579,7 +1579,8 @@ list(
                 x = par_ann_spe$files$annotations$raw$spectral$spectral,
                 fixed = TRUE
               ),
-              threshold = par_ann_spe$annotations$thresholds$ms2$similarity$annotation,
+              method = par_ann_spe$similarities$methods$annotations,
+              threshold = par_ann_spe$similarities$thresholds$annotations,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
