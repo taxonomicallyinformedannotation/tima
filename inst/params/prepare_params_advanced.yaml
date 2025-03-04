@@ -488,8 +488,8 @@ names:
     #' Name of "InChIKey" in MGF. STRING
     inchikey: null
 
-    #' Name of "InChIKey without stereo" in MGF. STRING
-    inchikey_no_stereo: null
+    #' Name of "InChIKey connectivity layer" in MGF. STRING
+    inchikey_connectivity_layer: null
 
     #' Name of "molecular formula" in MGF. STRING
     molecular_formula: null

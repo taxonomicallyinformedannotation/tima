@@ -21,7 +21,7 @@ clean_bio <-
     df <- annot_table_wei_bio |>
       tidytable::distinct(
         feature_id,
-        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer,
         candidate_structure_tax_cla_01kin,
         candidate_structure_tax_npc_01pat,
         candidate_structure_tax_cla_02sup,

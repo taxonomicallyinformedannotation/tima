@@ -102,7 +102,7 @@ prepare_libraries_sop_hmdb <-
             tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = tidytable::na_if, "")) |>
             tidytable::filter(!is.na(inchikey)) |>
             tidytable::mutate(
-              structure_inchikey_no_stereo = stringi::stri_sub(
+              structure_inchikey_connectivity_layer = stringi::stri_sub(
                 str = inchikey,
                 from = 1,
                 to = 14
@@ -114,7 +114,7 @@ prepare_libraries_sop_hmdb <-
               structure_name = name,
               structure_inchikey = inchikey,
               structure_smiles = smiles,
-              structure_inchikey_no_stereo,
+              structure_inchikey_connectivity_layer,
               structure_smiles_no_stereo,
               structure_molecular_formula = formula,
               structure_exact_mass = mass,

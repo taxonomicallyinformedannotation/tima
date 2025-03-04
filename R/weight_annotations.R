@@ -291,12 +291,12 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
   log_debug(x = "Initial annotations:")
   annotation_table |>
     tidytable::filter(!is.na(
-      candidate_structure_inchikey_no_stereo
+      candidate_structure_inchikey_connectivity_layer
     )) |>
     tidytable::distinct(
       feature_id,
       candidate_library,
-      candidate_structure_inchikey_no_stereo
+      candidate_structure_inchikey_connectivity_layer
     ) |>
     tidytable::group_by(candidate_library) |>
     tidytable::count() |>
@@ -321,7 +321,7 @@ weight_annotations <- function(library = get_params(step = "weight_annotations")
     tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
     tidytable::distinct(
       feature_id,
-      candidate_structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer,
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )

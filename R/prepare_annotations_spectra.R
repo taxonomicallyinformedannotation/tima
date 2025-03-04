@@ -70,7 +70,7 @@ prepare_annotations_spectra <-
         candidate_spectrum_entropy,
         candidate_structure_error_mz,
         candidate_structure_name,
-        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer,
         candidate_structure_smiles_no_stereo,
         candidate_structure_molecular_formula,
         candidate_structure_exact_mass,

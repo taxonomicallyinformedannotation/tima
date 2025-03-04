@@ -110,7 +110,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   names_mgf_in <- params_advanced$names$mgf$inchi
   names_mgf_io <- params_advanced$names$mgf$inchi_no_stereo
   names_mgf_ik <- params_advanced$names$mgf$inchikey
-  names_mgf_il <- params_advanced$names$mgf$inchikey_no_stereo
+  names_mgf_il <- params_advanced$names$mgf$inchikey_connectivity_layer
   names_mgf_mf <- params_advanced$names$mgf$molecular_formula
   names_mgf_na <- params_advanced$names$mgf$name
   names_mgf_po <- params_advanced$names$mgf$polarity
@@ -497,7 +497,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     names_mgf_io
   yamls_params$prepare_libraries_spectra$names$mgf$inchikey <-
     names_mgf_ik
-  yamls_params$prepare_libraries_spectra$names$mgf$inchikey_no_stereo <-
+  yamls_params$prepare_libraries_spectra$names$mgf$inchikey_connectivity_layer <-
     names_mgf_il
   yamls_params$prepare_libraries_spectra$names$mgf$molecular_formula <-
     names_mgf_mf

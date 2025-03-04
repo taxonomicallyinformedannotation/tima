@@ -13,7 +13,7 @@ select_sop_columns <- function(df) {
       structure_name,
       structure_inchikey,
       structure_smiles,
-      structure_inchikey_no_stereo = structure_inchikey_2D,
+      structure_inchikey_connectivity_layer = structure_inchikey_2D,
       structure_smiles_no_stereo = structure_smiles_2D,
       structure_molecular_formula,
       structure_exact_mass,

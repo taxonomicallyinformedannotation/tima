@@ -90,7 +90,7 @@ clean_chemo <-
     df1 <- df1 |>
       tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
       tidytable::distinct(feature_id,
-        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer,
         .keep_all = TRUE
       ) |>
       tidytable::mutate(
@@ -143,7 +143,7 @@ clean_chemo <-
       tidytable::left_join(
         structure_organism_pairs_table |>
           tidytable::select(
-            candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+            candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
             reference_doi,
             organism_name,
             tidyselect::contains("organism_taxonomy_"), -organism_taxonomy_ottid
@@ -153,7 +153,7 @@ clean_chemo <-
           tidytable::filter(!is.na(value)) |>
           tidytable::filter(value != "notClassified") |>
           tidytable::distinct(
-            candidate_structure_inchikey_no_stereo,
+            candidate_structure_inchikey_connectivity_layer,
             candidate_structure_organism_occurrence_closest = value,
             candidate_structure_organism_occurrence_reference = reference_doi
           )
@@ -247,12 +247,12 @@ clean_chemo <-
     results <- tidytable::bind_rows(
       df6 |>
         tidytable::filter(!is.na(
-          candidate_structure_inchikey_no_stereo
+          candidate_structure_inchikey_connectivity_layer
         )),
       tidytable::left_join(
         df6 |>
           tidytable::filter(is.na(
-            candidate_structure_inchikey_no_stereo
+            candidate_structure_inchikey_connectivity_layer
           )) |>
           tidytable::distinct(model$features_columns),
         annot_table_wei_chemo |>

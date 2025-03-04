@@ -1011,12 +1011,12 @@ ui <- shiny::fluidPage(
           ),
         shiny::textInput(
           inputId = "names_mgf_il",
-          label = "Name of `InChIKey no stereo` variable in the MGF",
+          label = "Name of `InChIKey connectivity layer` variable in the MGF",
           value = NULL
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `InChIKey no stereo` column in your MGF file.")
+            content = c("Name of the `InChIKey connectivity layer` column in your MGF file.")
           ),
         shiny::textInput(
           inputId = "names_mgf_mf",
@@ -2047,7 +2047,7 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$names_mgf_io)
   yaml_advanced$names$mgf$inchikey <-
     shiny::isolate(input$names_mgf_ik)
-  yaml_advanced$names$mgf$inchikey_no_stereo <-
+  yaml_advanced$names$mgf$inchikey_connectivity_layer <-
     shiny::isolate(input$names_mgf_il)
   yaml_advanced$names$mgf$molecular_formula <-
     shiny::isolate(input$names_mgf_mf)

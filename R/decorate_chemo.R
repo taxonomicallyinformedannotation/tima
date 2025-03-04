@@ -86,49 +86,49 @@ decorate_chemo <- function(annot_table_wei_chemo =
       "chemically informed scoring led to \n",
       crayon::silver(nrow(
         df_cla_kin |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::silver("(classyfire) kingdom"),
       "level, \n",
       crayon::cyan(nrow(
         df_npc_pat |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::cyan("(NPC) pathway"),
       "level, \n",
       crayon::magenta(nrow(
         df_cla_sup |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::magenta("(classyfire) superclass"),
       "level, \n",
       crayon::blue(nrow(
         df_npc_sup |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::blue("(NPC) superclass"),
       "level, \n",
       crayon::yellow(nrow(
         df_cla_cla |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::yellow("(classyfire) class"),
       "level, \n",
       crayon::green(nrow(
         df_npc_cla |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::green("(NPC) class"),
       "level, and \n",
       crayon::red(nrow(
         df_cla_par |>
-          tidytable::distinct(candidate_structure_inchikey_no_stereo)
+          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       )),
       "annotations reranked at the",
       crayon::red("(classyfire) parent"),

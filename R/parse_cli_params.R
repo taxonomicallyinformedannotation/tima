@@ -231,7 +231,7 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.character
     ),
     names_mgf_il = list(
-      path = c("names", "mgf", "inchikey_no_stereo"),
+      path = c("names", "mgf", "inchikey_connectivity_layer"),
       type = as.character
     ),
     names_mgf_mf = list(

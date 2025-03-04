@@ -442,7 +442,7 @@ annotate_masses <-
     df_str_unique <- structure_organism_pairs_table |>
       tidytable::distinct(
         structure_name,
-        structure_inchikey_no_stereo,
+        structure_inchikey_connectivity_layer,
         structure_smiles_no_stereo,
         structure_molecular_formula,
         structure_exact_mass,
@@ -450,7 +450,7 @@ annotate_masses <-
       ) |>
       ## Avoid SMILES redundancy
       tidytable::distinct(
-        structure_inchikey_no_stereo,
+        structure_inchikey_connectivity_layer,
         structure_molecular_formula,
         structure_exact_mass,
         structure_xlogp,
@@ -557,12 +557,12 @@ annotate_masses <-
     df_annotated_final <- tidytable::bind_rows(df_annotated_1, df_annotated_2) |>
       tidytable::left_join(df_str_unique) |>
       # TODO decide if allowing this or not
-      tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
+      tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
       tidytable::select(
         feature_id,
         candidate_structure_error_mz = error_mz,
         candidate_structure_name = structure_name,
-        candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
         candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
         candidate_structure_molecular_formula = structure_molecular_formula,
         candidate_structure_exact_mass = structure_exact_mass,
@@ -578,7 +578,7 @@ annotate_masses <-
       df_annotated_final,
       structure_organism_pairs_table |>
         tidytable::distinct(
-          candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
           candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
           candidate_structure_tax_npc_01pat = structure_tax_npc_01pat,
           candidate_structure_tax_npc_02sup = structure_tax_npc_02sup,

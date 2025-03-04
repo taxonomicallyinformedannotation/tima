@@ -69,7 +69,7 @@ weight_bio <-
 
     df1 <- annotation_table_taxed |>
       tidytable::select(
-        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -89,9 +89,9 @@ weight_bio <-
       tidytable::distinct() |>
       tidytable::left_join(
         structure_organism_pairs_table |>
-          tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
+          tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
           tidytable::select(
-            candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+            candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
             candidate_organism_01_domain = organism_taxonomy_01domain,
             candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
             candidate_organism_03_phylum = organism_taxonomy_03phylum,
@@ -413,7 +413,7 @@ weight_bio <-
     annot_table_wei_bio_init <- annot_table_wei_bio_init |>
       tidytable::arrange(tidytable::desc(score_biological)) |>
       tidytable::distinct(
-        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,

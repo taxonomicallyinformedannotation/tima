@@ -28,7 +28,7 @@ complement_metadata_structures <- function(df,
 
   stereo_s <- stereo |>
     tidytable::select(
-      candidate_structure_inchikey_no_stereo_s = structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer_s = structure_inchikey_connectivity_layer,
       candidate_structure_smiles_no_stereo = structure_smiles_no_stereo
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
@@ -36,11 +36,11 @@ complement_metadata_structures <- function(df,
 
   stereo_i <- stereo |>
     tidytable::select(
-      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       candidate_structure_smiles_no_stereo_i = structure_smiles_no_stereo
     ) |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-    tidytable::distinct(candidate_structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::filter(!is.na(candidate_structure_inchikey_connectivity_layer)) |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer, .keep_all = TRUE)
 
   met_2d <- tidytable::fread(str_met,
     na.strings = c("", "NA"),
@@ -48,16 +48,16 @@ complement_metadata_structures <- function(df,
   ) |>
     tidytable::left_join(stereo) |>
     tidytable::distinct(
-      structure_inchikey_no_stereo,
+      structure_inchikey_connectivity_layer,
       structure_smiles_no_stereo,
       structure_exact_mass,
       structure_xlogp,
       structure_molecular_formula
     ) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
+    tidytable::filter(!is.na(structure_inchikey_connectivity_layer) |
       !is.na(structure_smiles_no_stereo)) |>
     ## Avoid small discrepancies
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE) |>
+    tidytable::distinct(structure_inchikey_connectivity_layer, .keep_all = TRUE) |>
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
 
   nam_2d <- tidytable::fread(str_nam,
@@ -65,17 +65,17 @@ complement_metadata_structures <- function(df,
     colClasses = "character"
   ) |>
     tidytable::left_join(stereo) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo) |
+    tidytable::filter(!is.na(structure_inchikey_connectivity_layer) |
       !is.na(structure_smiles_no_stereo)) |>
     tidytable::distinct(
-      structure_inchikey_no_stereo,
+      structure_inchikey_connectivity_layer,
       structure_smiles_no_stereo,
       structure_name
     ) |>
-    tidytable::group_by(structure_inchikey_no_stereo, structure_smiles_no_stereo) |>
+    tidytable::group_by(structure_inchikey_connectivity_layer, structure_smiles_no_stereo) |>
     clean_collapse(cols = c("structure_name")) |>
     ## Avoid small discrepancies
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE) |>
+    tidytable::distinct(structure_inchikey_connectivity_layer, .keep_all = TRUE) |>
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
 
   tax_cla <- tidytable::fread(str_tax_cla,
@@ -83,7 +83,7 @@ complement_metadata_structures <- function(df,
     colClasses = "character"
   ) |>
     tidytable::select(
-      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       candidate_structure_tax_cla_chemontid_i =
         structure_tax_cla_chemontid,
       candidate_structure_tax_cla_01kin_i =
@@ -95,8 +95,8 @@ complement_metadata_structures <- function(df,
       candidate_structure_tax_cla_04dirpar_i =
         structure_tax_cla_04dirpar
     ) |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-    tidytable::distinct(candidate_structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::filter(!is.na(candidate_structure_inchikey_connectivity_layer)) |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer, .keep_all = TRUE)
 
   tax_npc <- tidytable::fread(str_tax_npc,
     na.strings = c("", "NA"),
@@ -116,13 +116,13 @@ complement_metadata_structures <- function(df,
 
   met_i <- met_2d |>
     tidytable::select(
-      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       candidate_structure_molecular_formula_i = structure_molecular_formula,
       candidate_structure_exact_mass_i = structure_exact_mass,
       candidate_structure_xlogp_i = structure_xlogp
     ) |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-    tidytable::distinct(candidate_structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::filter(!is.na(candidate_structure_inchikey_connectivity_layer)) |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer, .keep_all = TRUE)
 
   met_s <- met_2d |>
     tidytable::select(
@@ -137,11 +137,11 @@ complement_metadata_structures <- function(df,
 
   nam_i <- nam_2d |>
     tidytable::select(
-      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       candidate_structure_name_i = structure_name
     ) |>
-    tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-    tidytable::distinct(candidate_structure_inchikey_no_stereo, .keep_all = TRUE)
+    tidytable::filter(!is.na(candidate_structure_inchikey_connectivity_layer)) |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer, .keep_all = TRUE)
 
   nam_s <- nam_2d |>
     tidytable::select(
@@ -162,13 +162,13 @@ complement_metadata_structures <- function(df,
         candidate_structure_smiles_no_stereo_i,
         candidate_structure_smiles_no_stereo
       ),
-      candidate_structure_inchikey_no_stereo = tidytable::coalesce(
-        candidate_structure_inchikey_no_stereo_s,
-        candidate_structure_inchikey_no_stereo
+      candidate_structure_inchikey_connectivity_layer = tidytable::coalesce(
+        candidate_structure_inchikey_connectivity_layer_s,
+        candidate_structure_inchikey_connectivity_layer
       )
     ) |>
     tidytable::select(
-      -candidate_structure_smiles_no_stereo_i, -candidate_structure_inchikey_no_stereo_s
+      -candidate_structure_smiles_no_stereo_i, -candidate_structure_inchikey_connectivity_layer_s
     ) |>
     tidytable::left_join(met_i) |>
     tidytable::left_join(met_s) |>

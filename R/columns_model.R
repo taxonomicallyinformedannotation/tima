@@ -58,7 +58,7 @@ columns_model <- function() {
     "candidate_structure_exact_mass",
     "candidate_structure_molecular_formula",
     "candidate_structure_xlogp",
-    "candidate_structure_inchikey_no_stereo",
+    "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_smiles_no_stereo",
     "candidate_structure_tax_cla_chemontid",
     "candidate_structure_tax_cla_01kin",

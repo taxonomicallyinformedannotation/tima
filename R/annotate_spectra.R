@@ -82,7 +82,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
     candidate_library = NA,
     candidate_structure_error_mz = NA,
     candidate_structure_name = NA,
-    candidate_structure_inchikey_no_stereo = NA,
+    candidate_structure_inchikey_connectivity_layer = NA,
     candidate_structure_smiles_no_stereo = NA,
     candidate_structure_molecular_formula = NA,
     candidate_structure_exact_mass = NA,
@@ -219,7 +219,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         "target_id" = lib_ids,
         "target_adduct" = lib_adduct,
         "target_inchikey" = lib_inchikey,
-        "target_inchikey_no_stereo" = lib_inchikey2D,
+        "target_inchikey_connectivity_layer" = lib_inchikey2D,
         "target_smiles" = lib_smiles,
         "target_smiles_no_stereo" = lib_smiles2D,
         "target_library" = lib_library,
@@ -244,15 +244,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       df_final <- df_final |>
         tidytable::mutate(
           candidate_structure_error_mz = target_precursorMz - precursorMz,
-          candidate_structure_inchikey_no_stereo = tidytable::if_else(
-            condition = is.na(target_inchikey_no_stereo),
+          candidate_structure_inchikey_connectivity_layer = tidytable::if_else(
+            condition = is.na(target_inchikey_connectivity_layer),
             true = target_inchikey |>
               gsub(
                 pattern = "-.*",
                 replacement = "",
                 perl = TRUE
               ),
-            false = target_inchikey_no_stereo
+            false = target_inchikey_connectivity_layer
           ),
           candidate_structure_smiles_no_stereo = tidytable::coalesce(target_smiles_no_stereo, target_smiles)
         ) |>
@@ -263,7 +263,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
             "candidate_library" = "target_library",
             "candidate_structure_error_mz",
             "candidate_structure_name" = "target_name",
-            "candidate_structure_inchikey_no_stereo",
+            "candidate_structure_inchikey_connectivity_layer",
             "candidate_structure_smiles_no_stereo",
             "candidate_structure_molecular_formula" = "target_formula",
             "candidate_structure_exact_mass" = "target_exactmass",
@@ -285,7 +285,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         tidytable::distinct(
           feature_id,
           candidate_library,
-          candidate_structure_inchikey_no_stereo,
+          candidate_structure_inchikey_connectivity_layer,
           .keep_all = TRUE
         )
 
@@ -294,7 +294,7 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
           df_final |>
             ## else doesn't work if some are empty
             tidytable::distinct(
-              candidate_structure_inchikey_no_stereo,
+              candidate_structure_inchikey_connectivity_layer,
               candidate_structure_smiles_no_stereo
             )
         ),
