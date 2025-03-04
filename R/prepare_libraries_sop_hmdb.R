@@ -102,20 +102,20 @@ prepare_libraries_sop_hmdb <-
             tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = tidytable::na_if, "")) |>
             tidytable::filter(!is.na(inchikey)) |>
             tidytable::mutate(
-              structure_inchikey_connectivity_layer = stringi::stri_sub(
+              structure_inchikey_2D = stringi::stri_sub(
                 str = inchikey,
                 from = 1,
                 to = 14
               ),
               ## ISSUE see #19
-              structure_smiles_no_stereo = NA_character_,
+              structure_smiles_2D = NA_character_,
             ) |>
             tidytable::select(
               structure_name = name,
               structure_inchikey = inchikey,
               structure_smiles = smiles,
-              structure_inchikey_connectivity_layer,
-              structure_smiles_no_stereo,
+              structure_inchikey_2D,
+              structure_smiles_2D,
               structure_molecular_formula = formula,
               structure_exact_mass = mass,
               structure_xlogp = logp
@@ -145,6 +145,7 @@ prepare_libraries_sop_hmdb <-
               organism_taxonomy_10varietas = NA_character_,
               reference_doi = NA_character_
             ) |>
+            select_sop_columns() |>
             round_reals() |>
             tidytable::distinct()
 
