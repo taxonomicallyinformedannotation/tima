@@ -18,13 +18,13 @@ benchmark_taxize_spectra <-
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
     sop <- keys |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
-      tidytable::mutate(inchikey_no_stereo = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14))
+      tidytable::mutate(inchikey_connectivity_layer = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14))
     taxo <- org_tax_ott |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
 
     features_pretaxed <- features |>
       tidytable::left_join(sop |>
-        tidytable::distinct(organism_name, inchikey_no_stereo))
+        tidytable::distinct(organism_name, inchikey_connectivity_layer))
     rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>

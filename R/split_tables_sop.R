@@ -34,12 +34,12 @@ split_tables_sop <- function(table) {
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_smiles) |
       !is.na(structure_smiles_no_stereo)) |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
+    tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter() |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
-      structure_inchikey_no_stereo,
+      structure_inchikey_connectivity_layer,
       structure_smiles_no_stereo
     ) |>
     tidytable::distinct() |>
@@ -47,7 +47,7 @@ split_tables_sop <- function(table) {
     tidytable::fill(structure_smiles, .direction = "downup") |>
     tidytable::ungroup() |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_no_stereo) |>
+    tidytable::group_by(structure_inchikey_connectivity_layer) |>
     tidytable::fill(structure_smiles_no_stereo, .direction = "downup") |>
     tidytable::ungroup() |>
     tidytable::distinct()
@@ -87,7 +87,7 @@ split_tables_sop <- function(table) {
     x = "or",
     nrow(
       table_structures_stereo |>
-        tidytable::distinct(structure_inchikey_no_stereo)
+        tidytable::distinct(structure_inchikey_connectivity_layer)
     ),
     "unique constitutional isomers (ignoring stereochemistry)"
   )
@@ -159,10 +159,10 @@ split_tables_sop <- function(table) {
     ))
 
   table_structures_taxonomy_cla <- table |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
+    tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(structure_tax_cla_chemontid)) |>
     tidytable::select(
-      structure_inchikey_no_stereo,
+      structure_inchikey_connectivity_layer,
       structure_tax_cla_chemontid,
       structure_tax_cla_01kin,
       structure_tax_cla_02sup,
@@ -170,7 +170,7 @@ split_tables_sop <- function(table) {
       structure_tax_cla_04dirpar
     ) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_no_stereo) |>
+    tidytable::group_by(structure_inchikey_connectivity_layer) |>
     clean_collapse(
       cols = c(
         "structure_tax_cla_chemontid",

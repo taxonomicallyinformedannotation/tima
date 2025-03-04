@@ -59,7 +59,7 @@ prepare_annotations_gnps <-
             "candidate_count_similarity_peaks_matched" = "SharedPeaks",
             "candidate_structure_inchi" = "INCHI",
             "candidate_structure_inchikey" = "InChIKey",
-            "candidate_structure_inchikey_no_stereo" = "InChIKey-Planar",
+            "candidate_structure_inchikey_connectivity_layer" = "InChIKey-Planar",
             "candidate_structure_tax_npc_01pat" = "npclassifier_pathway",
             "candidate_structure_tax_npc_02sup" = "npclassifier_superclass",
             "candidate_structure_tax_npc_03cla" = "npclassifier_class",

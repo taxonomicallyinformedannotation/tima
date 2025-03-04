@@ -1127,7 +1127,7 @@ list(
                   col_in = par_pre_lib_spe$names$mgf$inchi,
                   col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
                   col_ik = par_pre_lib_spe$names$mgf$inchikey,
-                  col_il = par_pre_lib_spe$names$mgf$inchikey_no_stereo,
+                  col_il = par_pre_lib_spe$names$mgf$inchikey_connectivity_layer,
                   col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
                   col_na = par_pre_lib_spe$names$mgf$name,
                   col_po = par_pre_lib_spe$names$mgf$polarity,
@@ -1978,18 +1978,18 @@ list(
           tidytable::filter(!is.na(b)) |>
           tidytable::filter(stringi::stri_length(as.numeric(b)) > 1) |>
           tidytable::select(-a, -b) |>
-          tidytable::mutate(inchikey_no_stereo = gsub(
+          tidytable::mutate(inchikey_connectivity_layer = gsub(
             pattern = "-.*",
             replacement = "",
             x = inchikey,
             perl = TRUE
           )) |>
-          tidytable::distinct(inchikey_no_stereo, adduct, .keep_all = TRUE) |>
+          tidytable::distinct(inchikey_connectivity_layer, adduct, .keep_all = TRUE) |>
           tidytable::mutate(mz = precursorMz) |>
           ## Weird way to have some kind of retention time
           tidytable::mutate(
             rt = tidytable::cur_group_id(),
-            .by = "inchikey_no_stereo"
+            .by = "inchikey_connectivity_layer"
           )
 
         df_clean_neg <- df_clean |>
@@ -2071,7 +2071,7 @@ list(
               rt = rtime,
               feature_id = spectrum_id
             ) |>
-            tidytable::mutate(inchikey_no_stereo = gsub(
+            tidytable::mutate(inchikey_connectivity_layer = gsub(
               pattern = "-.*",
               replacement = "",
               x = inchikey,

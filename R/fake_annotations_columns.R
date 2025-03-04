@@ -11,7 +11,7 @@ fake_annotations_columns <- function() {
     candidate_structure_error_mz = NA,
     candidate_structure_error_rt = NA,
     candidate_structure_name = NA,
-    candidate_structure_inchikey_no_stereo = NA,
+    candidate_structure_inchikey_connectivity_layer = NA,
     candidate_structure_smiles_no_stereo = NA,
     candidate_structure_molecular_formula = NA,
     candidate_structure_exact_mass = NA,

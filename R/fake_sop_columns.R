@@ -10,7 +10,7 @@ fake_sop_columns <- function() {
     structure_name = NA,
     structure_inchikey = NA,
     structure_smiles = NA,
-    structure_inchikey_no_stereo = NA,
+    structure_inchikey_connectivity_layer = NA,
     structure_smiles_no_stereo = NA,
     structure_molecular_formula = NA,
     structure_exact_mass = NA,

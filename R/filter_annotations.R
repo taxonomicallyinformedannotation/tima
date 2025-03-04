@@ -88,7 +88,7 @@ filter_annotations <-
           feature_id,
           ## Comment not taking into account because of inconsistencies among tools
           # candidate_adduct,
-          candidate_structure_inchikey_no_stereo
+          candidate_structure_inchikey_connectivity_layer
         )
       annotation_table <- annotation_tables_list[["ms1"]] |>
         tidytable::anti_join(spectral_keys) |>

@@ -134,7 +134,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
         "candidate_adduct" = "adduct",
         "candidate_structure_name" = "name",
         "candidate_structure_smiles_no_stereo" = "smiles",
-        "candidate_structure_inchikey_no_stereo" = "InChIkey2D",
+        "candidate_structure_inchikey_connectivity_layer" = "InChIkey2D",
         "candidate_structure_molecular_formula" = "molecularFormula",
         "candidate_structure_xlogp" = "xlogp",
         # ISSUE see #147

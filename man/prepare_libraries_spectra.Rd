@@ -14,7 +14,7 @@ prepare_libraries_spectra(
   col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
   col_io = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi_no_stereo,
   col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
-  col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_no_stereo,
+  col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_connectivity_layer,
   col_mf = get_params(step = "prepare_libraries_spectra")$names$mgf$molecular_formula,
   col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
   col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,

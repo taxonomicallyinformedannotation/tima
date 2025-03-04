@@ -52,7 +52,7 @@ prepare_libraries_spectra <-
            col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
            col_io = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi_no_stereo,
            col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
-           col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_no_stereo,
+           col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_connectivity_layer,
            col_mf = get_params(step = "prepare_libraries_spectra")$names$mgf$molecular_formula,
            col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
            col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
@@ -186,7 +186,7 @@ prepare_libraries_spectra <-
             .keep_all = TRUE
           ) |>
           tidytable::mutate(
-            structure_inchikey_no_stereo = structure_inchikey |>
+            structure_inchikey_connectivity_layer = structure_inchikey |>
               gsub(pattern = "-.*", replacement = ""),
             organism_name = NA_character_
           )
@@ -203,7 +203,7 @@ prepare_libraries_spectra <-
             "inchi" = NA_character_,
             "inchi_no_stereo" = NA_character_,
             "inchikey" = NA_character_,
-            "inchikey_no_stereo" = NA_character_,
+            "inchikey_connectivity_layer" = NA_character_,
             "name" = NA_character_,
             "precursorMz" = 0,
             "precursorCharge" = NA_integer_,
@@ -227,7 +227,7 @@ prepare_libraries_spectra <-
           "structure_inchikey" = NA_character_,
           "structure_smiles" = NA_character_,
           "structure_smiles_no_stereo" = NA_character_,
-          "structure_inchikey_no_stereo" = NA_character_,
+          "structure_inchikey_connectivity_layer" = NA_character_,
           "organism_name" = NA_character_
         )
       }
