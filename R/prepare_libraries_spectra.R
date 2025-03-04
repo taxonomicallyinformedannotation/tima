@@ -175,7 +175,7 @@ prepare_libraries_spectra <-
             structure_inchikey = inchikey,
             structure_smiles = smiles,
             structure_smiles_no_stereo = smiles_no_stereo,
-            structure_molecular_fromula = formula,
+            structure_molecular_formula = formula,
             structure_exact_mass = exactmass,
             structure_xlogp = xlogp
           ) |>
