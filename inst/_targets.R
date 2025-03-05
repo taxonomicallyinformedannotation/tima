@@ -1092,7 +1092,7 @@ list(
           format = "file",
           command = {
             lib_sop_mer_str_pro <- get_file(
-              url = paths_urls_examples_wikidata_spectral_prepared,
+              url = paths_urls_examples_structures_processed,
               export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
             )
           }
