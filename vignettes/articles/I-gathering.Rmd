@@ -26,7 +26,6 @@ knitr::opts_knit$set(root.dir = system.file(package = "tima"))
 
 ```{r tima, include = FALSE}
 library("tima")
-tima::install()
 tima:::copy_backbone()
 ```
 
