@@ -60,6 +60,8 @@ all sub-libraries containing structure-organism pairs</p>
 <span>  filter <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_libraries_sop_merged"</span><span class="op">)</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">filter</span><span class="op">$</span><span class="va">mode</span>,</span>
 <span>  level <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_libraries_sop_merged"</span><span class="op">)</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">filter</span><span class="op">$</span><span class="va">level</span>,</span>
 <span>  value <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_libraries_sop_merged"</span><span class="op">)</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">filter</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>  cache <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span></span>
+<span>    <span class="st">"prepare_libraries_sop_merged"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">structures</span><span class="op">$</span><span class="va">processed</span>,</span>
 <span>  output_key <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span></span>
 <span>    <span class="st">"prepare_libraries_sop_merged"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">keys</span>,</span>
 <span>  output_org_tax_ott <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span></span>
@@ -97,6 +99,10 @@ Kingdom, phylum, family, genus, ...</p></dd>
 <dt id="arg-value">value<a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
 <dd><p>Name of the taxon or taxa to be kept,
 e.g. 'Gentianaceae|Apocynaceae'</p></dd>
+
+
+<dt id="arg-cache">cache<a class="anchor" aria-label="anchor" href="#arg-cache"></a></dt>
+<dd><p>Cache where already processed SMILES are located</p></dd>
 
 
 <dt id="arg-output-key">output_key<a class="anchor" aria-label="anchor" href="#arg-output-key"></a></dt>
