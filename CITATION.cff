@@ -507,6 +507,26 @@ references:
   doi: 10.32614/CRAN.package.purrr
   version: '>= 1.0.4'
 - type: software
+  title: reticulate
+  abstract: 'reticulate: Interface to ''Python'''
+  notes: Imports
+  url: https://rstudio.github.io/reticulate/
+  repository: https://CRAN.R-project.org/package=reticulate
+  authors:
+  - family-names: Ushey
+    given-names: Kevin
+    email: kevin@posit.co
+  - family-names: Allaire
+    given-names: JJ
+    email: jj@posit.co
+  - family-names: Tang
+    given-names: Yuan
+    email: terrytangyuan@gmail.com
+    orcid: https://orcid.org/0000-0001-5243-233X
+  year: '2025'
+  doi: 10.32614/CRAN.package.reticulate
+  version: '>= 1.41.0'
+- type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
   notes: Imports
