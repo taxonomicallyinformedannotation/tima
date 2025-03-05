@@ -56,9 +56,11 @@ split_tables_sop <- function(table, cache) {
 
   table_keys <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
+    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(
       structure_inchikey,
+      structure_smiles_no_stereo,
       organism_name,
       reference_doi
     ) |>

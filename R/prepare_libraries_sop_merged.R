@@ -173,7 +173,7 @@ prepare_libraries_sop_merged <-
         )) |>
         tidytable::select(
           structure_inchikey,
-          structure_smiles,
+          structure_smiles_no_stereo,
           organism_name,
           reference_doi
         ) |>
