@@ -28,7 +28,7 @@ process_smiles <- function(df,
   input_smi_file <- tempfile(fileext = ".smi")
   output_csv_file <- tempfile(fileext = ".csv.gz")
 
-  log_debug(x = "Passing ", nrow(table_smiles_to_process), " to RDKit")
+  log_debug(x = "Passing ", nrow(table_smiles_to_process), " SMILES to RDKit")
   tidytable::fwrite(x = table_smiles_to_process, input_smi_file)
 
   # Pass to Python
