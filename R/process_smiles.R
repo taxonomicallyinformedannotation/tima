@@ -12,7 +12,7 @@
 process_smiles <- function(df,
                            smiles_colname = "structure_smiles_initial",
                            cache) {
-  log_debug(x = "Processing SMILES using RDKit")
+  log_debug(x = "Processing SMILES...")
   reticulate::source_python(file = system.file("python/process_smiles.py", package = "tima"))
   table_smiles <- df |>
     tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
@@ -28,6 +28,7 @@ process_smiles <- function(df,
   input_smi_file <- tempfile(fileext = ".smi")
   output_csv_file <- tempfile(fileext = ".csv.gz")
 
+  log_debug(x = "Passing ", nrow(table_smiles_to_process), " to RDKit")
   tidytable::fwrite(x = table_smiles_to_process, input_smi_file)
 
   # Pass to Python
