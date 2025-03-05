@@ -1954,6 +1954,8 @@ ui <- shiny::fluidPage(
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$organisms$taxonomies$ott <-
   #   shiny::isolate(input$todo)
+  # yaml_advanced$files$libraries$sop$merged$structures$processed <-
+  #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$structures$stereo <-
   #   shiny::isolate(input$todo)
   # yaml_advanced$files$libraries$sop$merged$structures$metadata <-

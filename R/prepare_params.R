@@ -59,6 +59,7 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
   fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
   fil_lib_sop_mer_org_tax_ott <- params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
+  fil_lib_sop_mer_str_pro <- params_advanced$files$libraries$sop$merged$structures$processed
   fil_lib_sop_mer_str_ste <- params_advanced$files$libraries$sop$merged$structures$stereo
   fil_lib_sop_mer_str_met <- params_advanced$files$libraries$sop$merged$structures$metadata
   fil_lib_sop_mer_str_nam <- params_advanced$files$libraries$sop$merged$structures$names
@@ -461,6 +462,8 @@ prepare_params <- function(params_small = get_params(step = "prepare_params"),
     fil_lib_sop_mer_org_nam
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$organisms$taxonomies$ott <-
     fil_lib_sop_mer_org_tax_ott
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$processed <-
+    fil_lib_sop_mer_str_pro
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$stereo <-
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$metadata <-

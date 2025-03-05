@@ -14,6 +14,7 @@ NULL
   shinybusy::use_busy_spinner()
   shinyWidgets::animations
   visNetwork::`%>%`
+  reticulate::py_require("rdkit")
   invisible()
 }
 

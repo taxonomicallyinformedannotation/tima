@@ -44,6 +44,7 @@ Imports:
     MsCoreUtils (>= 1.14.1),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.4),
+    reticulate (>= 1.41.0),
     rotl (>= 3.1.0),
     shiny (>= 1.10.0),
     shinybusy (>= 0.3.3),
@@ -71,6 +72,8 @@ Suggests:
     shinyvalidate,
     spelling,
     testthat (>= 3.0.0)
+SystemRequirements:
+    python (>= 3.10)
 VignetteBuilder:
     knitr
 biocViews: metabolite annotation, chemotaxonomy, scoring system, natural
@@ -161,6 +164,7 @@ Collate:
     'prepare_libraries_sop_ecmdb.R'
     'prepare_libraries_sop_hmdb.R'
     'prepare_libraries_sop_lotus.R'
+    'process_smiles.R'
     'split_tables_sop.R'
     'prepare_libraries_sop_merged.R'
     'prepare_libraries_spectra.R'

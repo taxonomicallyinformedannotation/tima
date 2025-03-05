@@ -16,6 +16,7 @@
 #'    Kingdom, phylum, family, genus, ...
 #' @param value Name of the taxon or taxa to be kept,
 #'    e.g. 'Gentianaceae|Apocynaceae'
+#' @param cache Cache where already processed SMILES are located
 #' @param output_key Output file for keys
 #' @param output_org_tax_ott Output file for organisms taxonomy (OTT)
 #' @param output_str_stereo Output file for structures stereo
@@ -50,6 +51,7 @@ prepare_libraries_sop_merged <-
            filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,
            level = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$level,
            value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
+           cache = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$processed,
            output_key = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
            ## document it above in case
            # output_org_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
@@ -102,7 +104,7 @@ prepare_libraries_sop_merged <-
 
     tables <- libraries |>
       tidytable::bind_rows() |>
-      split_tables_sop()
+      split_tables_sop(cache = cache)
 
     log_debug(x = "Keeping keys")
     table_keys <- tables$key |>

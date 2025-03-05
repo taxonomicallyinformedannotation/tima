@@ -103,6 +103,12 @@ list(
         }
       ),
       tar_target(
+        name = paths_urls_examples_structures_processed,
+        command = {
+          paths_urls_examples_structures_processed <- paths$urls$examples$structures_processed
+        }
+      ),
+      tar_target(
         name = paths_urls_examples_wikidata_spectral_prepared,
         command = {
           paths_urls_examples_wikidata_spectral_prepared <- paths$urls$examples$wikidata_spectral_prepared
@@ -1080,6 +1086,16 @@ list(
               export = paths_data_interim_libraries_sop_wikidata
             )
           }
+        ),
+        tar_target(
+          name = lib_sop_mer_str_pro,
+          format = "file",
+          command = {
+            lib_sop_mer_str_pro <- get_file(
+              url = paths_urls_examples_wikidata_spectral_prepared,
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
+            )
+          }
         )
       ),
       ## Experimental
@@ -1406,6 +1422,7 @@ list(
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
               level = par_pre_lib_sop_mer$organisms$filter$level,
               value = par_pre_lib_sop_mer$organisms$filter$value,
+              cache = lib_sop_mer_str_pro,
               output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
               output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,
