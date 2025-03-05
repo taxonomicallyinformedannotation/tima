@@ -144,6 +144,9 @@ files:
 
         #' Structures libraries.
         structures:
+          #' Structures processed. STRING
+          processed: data/interim/libraries/sop/merged/structures/processed.csv.gz
+
           #' Structures stereo. STRING
           stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
 

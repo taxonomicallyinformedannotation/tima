@@ -38,6 +38,8 @@ install <- function(package = "tima",
         dependencies = dependencies,
         INSTALL_opts = c("--no-lock", "--no-test-load")
       )
+      reticulate::install_python()
+      reticulate::py_install("rdkit")
       TRUE
     },
     error = function(e) {
@@ -57,6 +59,8 @@ install <- function(package = "tima",
           INSTALL_opts = c("--no-lock", "--no-test-load"),
           type = "source"
         )
+        reticulate::install_python()
+        reticulate::py_install("rdkit")
         TRUE
       },
       error = function(e) {

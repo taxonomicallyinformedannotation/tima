@@ -4,10 +4,12 @@
 \alias{split_tables_sop}
 \title{Split Structure Organism Pairs table}
 \usage{
-split_tables_sop(table)
+split_tables_sop(table, cache)
 }
 \arguments{
 \item{table}{Table to split}
+
+\item{cache}{Cache where already processed SMILES are located}
 }
 \value{
 A list of tables from the structure organism pairs tables

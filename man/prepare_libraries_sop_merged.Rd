@@ -9,6 +9,8 @@ prepare_libraries_sop_merged(
   filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,
   level = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$level,
   value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
+  cache = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$processed,
   output_key = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
   output_org_tax_ott = get_params(step =
@@ -35,6 +37,8 @@ Kingdom, phylum, family, genus, ...}
 
 \item{value}{Name of the taxon or taxa to be kept,
 e.g. 'Gentianaceae|Apocynaceae'}
+
+\item{cache}{Cache where already processed SMILES are located}
 
 \item{output_key}{Output file for keys}
 

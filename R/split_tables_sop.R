@@ -3,34 +3,75 @@
 #' @description This function splits the structure organism table.
 #'
 #' @include clean_collapse.R
+#' @include process_smiles.R
 #'
 #' @param table Table to split
+#' @param cache Cache where already processed SMILES are located
 #'
 #' @return A list of tables from the structure organism pairs tables
 #'
 #' @examples NULL
-split_tables_sop <- function(table) {
-  log_debug(x = "Splitting the concatenated library into smaller pieces")
+split_tables_sop <- function(table, cache) {
+  log_debug(x = "Splitting the concatenated library into smaller standardized pieces")
+
+  table <- table |>
+    tidytable::mutate(
+      structure_smiles_initial = tidytable::coalesce(structure_smiles, structure_smiles_no_stereo)
+    )
+  table_structural_initial <- table |>
+    tidytable::select(tidytable::contains("structure")) |>
+    tidytable::distinct()
+
+  table_organisms <- table |>
+    tidytable::select(
+      tidytable::contains("organism")
+    ) |>
+    tidytable::filter(!is.na(organism_name)) |>
+    tidytable::distinct()
+
+  log_debug(x = "Sanitizing structures")
+  table_structural_standardized <- table_structural_initial |>
+    process_smiles(cache = cache)
+
+  table_structural <- table_structural_initial |>
+    tidytable::select(
+      structure_smiles_initial,
+      structure_name,
+      tidytable::contains("_tax")
+    ) |>
+    tidytable::distinct() |>
+    tidytable::inner_join(table_structural_standardized) |>
+    tidytable::distinct()
+  rm(table_structural_initial, table_structural_standardized)
+
+  table <- table |>
+    tidytable::select(
+      structure_smiles_initial,
+      tidytable::contains("organism"),
+      tidytable::contains("reference")
+    ) |>
+    tidytable::distinct() |>
+    tidytable::inner_join(table_structural) |>
+    tidytable::distinct()
 
   table_keys <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(
       structure_inchikey,
-      structure_smiles,
       organism_name,
       reference_doi
     ) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey, structure_smiles, organism_name) |>
+    tidytable::group_by(structure_inchikey, organism_name) |>
     tidytable::add_count() |>
     tidytable::ungroup() |>
     tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
+  rm(table)
   log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
 
-  table_structures_stereo <- table |>
+  table_structures_stereo <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_smiles) |
       !is.na(structure_smiles_no_stereo)) |>
@@ -42,14 +83,6 @@ split_tables_sop <- function(table) {
       structure_inchikey_connectivity_layer,
       structure_smiles_no_stereo
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey) |>
-    tidytable::fill(structure_smiles, .direction = "downup") |>
-    tidytable::ungroup() |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_connectivity_layer) |>
-    tidytable::fill(structure_smiles_no_stereo, .direction = "downup") |>
-    tidytable::ungroup() |>
     tidytable::distinct()
   log_debug(
     x = "Corresponding to",
@@ -92,7 +125,7 @@ split_tables_sop <- function(table) {
     "unique constitutional isomers (ignoring stereochemistry)"
   )
 
-  table_structures_metadata <- table |>
+  table_structures_metadata <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_molecular_formula)) |>
     tidytable::filter(!is.na(structure_exact_mass)) |>
@@ -103,25 +136,9 @@ split_tables_sop <- function(table) {
       structure_exact_mass,
       structure_xlogp
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey) |>
-    tidytable::fill(structure_molecular_formula,
-      structure_exact_mass,
-      structure_xlogp,
-      .direction = "downup"
-    ) |>
-    tidytable::ungroup() |>
-    tidytable::distinct() |>
-    # COMMENT else duplicate enties
-    tidytable::group_by(structure_inchikey, structure_molecular_formula) |>
-    tidytable::mutate(
-      structure_exact_mass = mean(as.numeric(structure_exact_mass), na.rm = TRUE),
-      structure_xlogp = mean(as.numeric(structure_xlogp), na.rm = TRUE)
-    ) |>
-    tidytable::ungroup() |>
     tidytable::distinct()
 
-  table_structures_names <- table |>
+  table_structures_names <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_name)) |>
     tidytable::select(structure_inchikey, structure_name) |>
@@ -129,7 +146,7 @@ split_tables_sop <- function(table) {
     tidytable::group_by(structure_inchikey) |>
     clean_collapse(cols = c("structure_name"))
 
-  table_structures_taxonomy_npc <- table |>
+  table_structures_taxonomy_npc <- table_structural |>
     tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
     tidytable::filter(
       !is.na(structure_tax_npc_01pat) |
@@ -158,7 +175,7 @@ split_tables_sop <- function(table) {
       }
     ))
 
-  table_structures_taxonomy_cla <- table |>
+  table_structures_taxonomy_cla <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(structure_tax_cla_chemontid)) |>
     tidytable::select(
@@ -187,30 +204,15 @@ split_tables_sop <- function(table) {
       }
     ))
 
-  table_organisms_names <- table |>
+  table_organisms_names <- table_organisms |>
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
   log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
 
-  table_org_tax_ott <- table |>
-    tidytable::filter(!is.na(organism_name)) |>
+  table_org_tax_ott <- table_organisms |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
-    tidytable::select(
-      organism_name,
-      organism_taxonomy_ottid,
-      organism_taxonomy_01domain,
-      organism_taxonomy_02kingdom,
-      organism_taxonomy_03phylum,
-      organism_taxonomy_04class,
-      organism_taxonomy_05order,
-      organism_taxonomy_06family,
-      organism_taxonomy_07tribe,
-      organism_taxonomy_08genus,
-      organism_taxonomy_09species,
-      organism_taxonomy_10varietas
-    ) |>
     tidytable::distinct() |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
@@ -218,7 +220,7 @@ split_tables_sop <- function(table) {
         tidytable::replace_na(x, "notClassified")
       }
     ))
-  rm(table)
+  rm(table_organisms)
 
   tables <-
     list(

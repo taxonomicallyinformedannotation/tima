@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
+  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
   "author": [
     {
       "@type": "Person",
@@ -450,6 +450,19 @@
     },
     "22": {
       "@type": "SoftwareApplication",
+      "identifier": "reticulate",
+      "name": "reticulate",
+      "version": ">= 1.41.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=reticulate"
+    },
+    "23": {
+      "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
       "version": ">= 3.1.0",
@@ -461,7 +474,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
@@ -474,7 +487,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shiny"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "shinybusy",
       "name": "shinybusy",
@@ -487,7 +500,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinybusy"
     },
-    "25": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "shinyWidgets",
       "name": "shinyWidgets",
@@ -500,7 +513,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=shinyWidgets"
     },
-    "26": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -513,12 +526,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "27": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "28": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -531,7 +544,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "29": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -544,7 +557,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "30": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
@@ -557,7 +570,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyfst"
     },
-    "31": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -570,7 +583,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "32": {
+    "33": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -583,12 +596,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "33": {
+    "34": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "34": {
+    "35": {
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
@@ -601,7 +614,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=visNetwork"
     },
-    "35": {
+    "36": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -614,10 +627,10 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=yaml"
     },
-    "SystemRequirements": null
+    "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2375.159KB",
+  "fileSize": "2384.794KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
