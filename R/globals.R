@@ -223,6 +223,7 @@ utils::globalVariables(
     "structure_nameTraditional",
     "structure_smiles",
     "structure_smiles_2D",
+    "structure_smiles_initial",
     "structure_smiles_no_stereo",
     "structure_tax_cla_01kin",
     "structure_tax_cla_02sup",

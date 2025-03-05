@@ -2,6 +2,7 @@
 
 # tima 2.12.0
 
+* Added `RDKit`-based structures processing through `reticulate` (#19)
 * Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
 * Introduced similarity method argument (entropy and GNPS for now)
 * Implemented GNPS similarity method in C
