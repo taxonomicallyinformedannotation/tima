@@ -4,25 +4,18 @@
 \alias{join_gnps_wrapper}
 \title{Wrapper for the C function "join_gnps"}
 \usage{
-join_gnps_wrapper(
-  query_masses,
-  target_masses,
-  query_precursor,
-  target_precursor,
-  dalton,
-  ppm
-)
+join_gnps_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 }
 \arguments{
-\item{query_masses}{Numeric vector or matrix for query masses.}
+\item{x}{Numeric vector or matrix for query masses.}
 
-\item{target_masses}{Numeric vector or matrix for target masses.}
+\item{y}{Numeric vector or matrix for target masses.}
 
-\item{query_precursor}{Numeric vector of precursor values for queries.}
+\item{xPrecursorMz}{Numeric vector of precursor values for queries.}
 
-\item{target_precursor}{Numeric vector of precursor values for targets.}
+\item{yPrecursorMz}{Numeric vector of precursor values for targets.}
 
-\item{dalton}{Numeric value specifying the tolerance in daltons.}
+\item{tolerance}{Numeric value specifying the tolerance in daltons.}
 
 \item{ppm}{Numeric value specifying the tolerance in ppm.}
 }
