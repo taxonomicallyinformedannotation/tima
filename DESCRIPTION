@@ -106,6 +106,7 @@ Collate:
     'read_mgf_opti.R'
     'import_spectra.R'
     'get_spectra_ids.R'
+    'c_wrappers.R'
     'calculate_similarity.R'
     'calculate_entropy_and_similarity.R'
     'annotate_spectra.R'
