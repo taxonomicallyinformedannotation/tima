@@ -57,6 +57,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_organism_taxonomy_ott.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_params.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_spectra_ids.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/gnps_wrapper.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/go_to_cache.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/harmonize_adducts.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/harmonize_names_sirius.html</loc></url>
@@ -64,6 +65,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/import_spectra.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/index.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/install.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/join_gnps_wrapper.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/load_yaml_files.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/log_debug.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/parse_adduct.html</loc></url>
