@@ -4,12 +4,12 @@
 \alias{gnps_wrapper}
 \title{Wrapper for the C function "gnps"}
 \usage{
-gnps_wrapper(x_mat, y_mat)
+gnps_wrapper(x, y)
 }
 \arguments{
-\item{x_mat}{A numeric matrix.}
+\item{x}{A numeric matrix.}
 
-\item{y_mat}{A numeric matrix.}
+\item{y}{A numeric matrix.}
 }
 \value{
 The result from the C function.
