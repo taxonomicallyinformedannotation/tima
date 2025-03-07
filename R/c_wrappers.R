@@ -24,11 +24,11 @@ gnps_wrapper <- function(x, y) {
 join_gnps_wrapper <- function(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm) {
   .Call(
     "join_gnps",
-    x = query_masses,
-    y = target_masses,
-    xPrecursorMz = query_precursor,
-    yPrecursorMz = target_precursor,
-    tolerance = dalton,
+    x = x,
+    y = y,
+    xPrecursorMz = xPrecursorMz,
+    yPrecursorMz = yPrecursorMz,
+    tolerance = tolerance,
     ppm = ppm
   )
 }
