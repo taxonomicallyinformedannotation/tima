@@ -52,37 +52,30 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">join_gnps_wrapper</span><span class="op">(</span></span>
-<span>  <span class="va">query_masses</span>,</span>
-<span>  <span class="va">target_masses</span>,</span>
-<span>  <span class="va">query_precursor</span>,</span>
-<span>  <span class="va">target_precursor</span>,</span>
-<span>  <span class="va">dalton</span>,</span>
-<span>  <span class="va">ppm</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">join_gnps_wrapper</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">xPrecursorMz</span>, <span class="va">yPrecursorMz</span>, <span class="va">tolerance</span>, <span class="va">ppm</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-query-masses">query_masses<a class="anchor" aria-label="anchor" href="#arg-query-masses"></a></dt>
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>Numeric vector or matrix for query masses.</p></dd>
 
 
-<dt id="arg-target-masses">target_masses<a class="anchor" aria-label="anchor" href="#arg-target-masses"></a></dt>
+<dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>Numeric vector or matrix for target masses.</p></dd>
 
 
-<dt id="arg-query-precursor">query_precursor<a class="anchor" aria-label="anchor" href="#arg-query-precursor"></a></dt>
+<dt id="arg-xprecursormz">xPrecursorMz<a class="anchor" aria-label="anchor" href="#arg-xprecursormz"></a></dt>
 <dd><p>Numeric vector of precursor values for queries.</p></dd>
 
 
-<dt id="arg-target-precursor">target_precursor<a class="anchor" aria-label="anchor" href="#arg-target-precursor"></a></dt>
+<dt id="arg-yprecursormz">yPrecursorMz<a class="anchor" aria-label="anchor" href="#arg-yprecursormz"></a></dt>
 <dd><p>Numeric vector of precursor values for targets.</p></dd>
 
 
-<dt id="arg-dalton">dalton<a class="anchor" aria-label="anchor" href="#arg-dalton"></a></dt>
+<dt id="arg-tolerance">tolerance<a class="anchor" aria-label="anchor" href="#arg-tolerance"></a></dt>
 <dd><p>Numeric value specifying the tolerance in daltons.</p></dd>
 
 
