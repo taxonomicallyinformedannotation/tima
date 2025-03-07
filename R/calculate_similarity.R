@@ -3,6 +3,8 @@
 #' @description Efficiently calculates similarity scores between query and target spectra
 #'        using either entropy or GNPS methods
 #'
+#' @include c_wrappers.R
+#'
 #' @param method Method ("entropy" or "gnps")
 #' @param query_spectrum Query spectrum matrix
 #' @param target_spectrum Target spectrum matrix
@@ -41,8 +43,7 @@ calculate_similarity <- function(method,
 
     ## Replaced with internal C version
     # map <- MsCoreUtils::join_gnps(
-    map <- .Call(
-      "join_gnps",
+    map <- join_gnps_wrapper(
       x = query_masses,
       y = target_masses,
       xPrecursorMz = query_precursor,
@@ -63,8 +64,7 @@ calculate_similarity <- function(method,
 
     return(
       # MsCoreUtils::gnps(
-      .Call(
-        "gnps",
+      gnps_wrapper(
         x = x_mat,
         y = y_mat
       )
