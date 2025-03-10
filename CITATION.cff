@@ -299,7 +299,7 @@ references:
     email: hadley@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.1.0'
+  version: '>= 1.1.1'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -365,7 +365,7 @@ references:
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2025'
   doi: 10.32614/CRAN.package.jsonlite
-  version: '>= 1.9.0'
+  version: '>= 1.9.1'
 - type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -525,7 +525,7 @@ references:
     orcid: https://orcid.org/0000-0001-5243-233X
   year: '2025'
   doi: 10.32614/CRAN.package.reticulate
-  version: '>= 1.41.0'
+  version: '>= 1.41.0.1'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -617,7 +617,7 @@ references:
     given-names: David
   year: '2025'
   doi: 10.32614/CRAN.package.shinyWidgets
-  version: '>= 0.8.7'
+  version: '>= 0.9.0'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
