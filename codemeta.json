@@ -452,7 +452,7 @@
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
-      "version": ">= 1.41.0.1",
+      "version": ">= 1.41.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -630,7 +630,7 @@
     "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2388.399KB",
+  "fileSize": "2388.291KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
