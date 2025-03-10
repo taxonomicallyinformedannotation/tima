@@ -44,7 +44,7 @@ Imports:
     MsCoreUtils (>= 1.14.1),
     msentropy (>= 0.1.4),
     purrr (>= 1.0.4),
-    reticulate (>= 1.41.0.1),
+    reticulate (>= 1.41.0),
     rotl (>= 3.1.0),
     shiny (>= 1.10.0),
     shinybusy (>= 0.3.3),
