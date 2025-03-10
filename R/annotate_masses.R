@@ -6,6 +6,8 @@
 #' or `neg` and retention time and mass tolerances should be given. The feature
 #' table is expected to be pre-formatted.
 #'
+#' @include adducts_forbidden.R
+#' @include adducts_translations.R
 #' @include calculate_mass_of_m.R
 #' @include decorate_masses.R
 #' @include dist_groups.R
@@ -142,55 +144,6 @@ annotate_masses <-
           tidytable::filter(!is.na(adduct))),
         "adducts previously detected"
       )
-      # TODO this should be externalized
-      adducts_translations <-
-        c(
-          "-2H" = "-H2",
-          # cliqueMS
-          "-3H" = "-H3",
-          # cliqueMS
-          "-2H2O" = "-H4O2 (2xH2O)",
-          # mzmine
-          "-3H2O" = "-H6O3 (3xH2O)",
-          # mzmine
-          "-4H2O" = "-H8O4 (4xH2O)",
-          # mzmine
-          "-5H2O" = "-H10O5 (5xH2O)",
-          # mzmine
-          "-NH3" = "+H3N",
-          # mzmine
-          "+2H" = "+H2",
-          # mzmine
-          "+2K" = "+K2",
-          # cliqueMS
-          "+2Na" = "+Na2",
-          # mzmine
-          "+3K" = "+K3",
-          # cliqueMS
-          "+3Na" = "+Na3",
-          # cliqueMS
-          "+Acetate" = "+C2H3O2",
-          # mzmine
-          "+ACN" = "+C2H3N",
-          # mzmine
-          "+CH3COO" = "+C2H3O2",
-          # GNPS
-          "+FA" = "+CHO2",
-          # mzmine
-          "+HAc" = "+C2H4O2",
-          # mzmine
-          "+Hac" = "+C2H4O2",
-          # GNPS
-          "+HFA" = "+CH2O2",
-          # mzmine
-          "+IsoProp" = "+C3H8O",
-          # mzmine
-          "+MeOH" = "+CH4O",
-          # mzmine
-          "+NH4" = "+H4N",
-          # mzmine
-          "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
-        )
       features_table <- features_table |>
         harmonize_adducts()
     }
@@ -458,19 +411,6 @@ annotate_masses <-
       ) |>
       tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.numeric), .fns = as.character))
 
-    ## TODO This should be externalized somehow
-    forbidden_adducts <- c(
-      "[M-H2O (water)+H2O-H]-",
-      "[M-H3O4P (phosphoric)+H3O4P-H]-",
-      "[M-H3N (ammonia)+C2H7N-H]-",
-      "[M-H3N (ammonia)+C2H3N-H]-",
-      "[M-H3N (ammonia)+H4N]+",
-      "[M-H2O (water)+H2O+H]+",
-      "[M-H3O4P (phosphoric)+H3O4P+H]+",
-      "[M-H3N (ammonia)+C2H7N+H]+",
-      "[M-H3N (ammonia)+C2H3N+H]+"
-    )
-
     log_debug("joining exact masses with single charge adducts \n")
     log_debug("Geting back to M \n")
     df_annotated_1 <- tidytable::left_join(
@@ -478,7 +418,7 @@ annotate_masses <-
       y = df_em_mf,
       by = stats::setNames("structure_exact_mass", "exact_mass")
     ) |>
-      tidytable::filter(!(library %in% forbidden_adducts)) |>
+      tidytable::filter(!(library %in% adducts_forbidden)) |>
       tidytable::distinct()
     rm(df_addlossed_em)
 
@@ -548,7 +488,7 @@ annotate_masses <-
         tidyselect::everything(),
         -exact_mass,
       ) |>
-      tidytable::filter(!(library %in% forbidden_adducts)) |>
+      tidytable::filter(!(library %in% adducts_forbidden)) |>
       tidytable::mutate(library = as.character(library)) |>
       tidytable::distinct()
     rm(df_em_mf, df_multi_nl_em)
@@ -556,7 +496,6 @@ annotate_masses <-
     log_debug("joining single adducts, in source dimers, and multicharged \n")
     df_annotated_final <- tidytable::bind_rows(df_annotated_1, df_annotated_2) |>
       tidytable::left_join(df_str_unique) |>
-      # TODO decide if allowing this or not
       tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
       tidytable::select(
         feature_id,

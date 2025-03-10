@@ -137,7 +137,6 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
           replacement = "",
           vectorize_all = FALSE
         )
-      ## TODO make it cleaner
       cut <- 100
       organisms_new_split <-
         purrr::map(
