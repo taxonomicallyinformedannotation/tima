@@ -16,11 +16,12 @@ def process_molecule(mol, original_smiles):
         return None
     try:
         smiles = MolToSmiles(mol)
+        inchikey = MolToInchiKey(mol)
         RemoveStereochemistry(mol)
         return [
             original_smiles,
             smiles,
-            MolToInchiKey(mol),
+            inchikey,
             CalcMolFormula(mol),
             ExactMolWt(mol),
             MolToSmiles(mol),
