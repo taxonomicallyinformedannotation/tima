@@ -525,7 +525,7 @@ references:
     orcid: https://orcid.org/0000-0001-5243-233X
   year: '2025'
   doi: 10.32614/CRAN.package.reticulate
-  version: '>= 1.41.0.1'
+  version: '>= 1.41.0'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
