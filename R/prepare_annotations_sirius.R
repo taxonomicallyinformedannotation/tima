@@ -90,7 +90,6 @@ prepare_annotations_sirius <-
       structures <- input_directory |>
         read_from_sirius_zip(file = structures_filename)
 
-      # TODO
       files <- input_directory |>
         utils::unzip(list = TRUE)
 

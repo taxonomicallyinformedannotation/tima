@@ -29,49 +29,52 @@ install <- function(package = "tima",
     message("You should install some required dependencies using")
     message("`sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev`")
   }
-  success <- tryCatch({
-    message("Installing latest version")
-    utils::install.packages(
-      package,
-      repos = repos,
-      dependencies = dependencies,
-      INSTALL_opts = c("--no-lock", "--no-test-load")
-    )
-    message("Installing Python environment")
-    reticulate::install_python()
-    message("Installing RDKit for Python")
-    reticulate::py_install("rdkit")
-    TRUE
-  }, error = function(e) {
-    message("Install failed")
-    message(e)
-    FALSE
-  })
-  if (!success || isTRUE(test))
-  {
-    success <- tryCatch({
-      message("Retrying install from source")
+  success <- tryCatch(
+    {
+      message("Installing latest version")
       utils::install.packages(
         package,
         repos = repos,
         dependencies = dependencies,
-        INSTALL_opts = c("--no-lock", "--no-test-load"),
-        type = "source"
+        INSTALL_opts = c("--no-lock", "--no-test-load")
       )
       message("Installing Python environment")
       reticulate::install_python()
       message("Installing RDKit for Python")
       reticulate::py_install("rdkit")
       TRUE
-    }, error = function(e)
-    {
+    },
+    error = function(e) {
       message("Install failed")
       message(e)
       FALSE
-    })
+    }
+  )
+  if (!success || isTRUE(test)) {
+    success <- tryCatch(
+      {
+        message("Retrying install from source")
+        utils::install.packages(
+          package,
+          repos = repos,
+          dependencies = dependencies,
+          INSTALL_opts = c("--no-lock", "--no-test-load"),
+          type = "source"
+        )
+        message("Installing Python environment")
+        reticulate::install_python()
+        message("Installing RDKit for Python")
+        reticulate::py_install("rdkit")
+        TRUE
+      },
+      error = function(e) {
+        message("Install failed")
+        message(e)
+        FALSE
+      }
+    )
   }
-  if (!success || isTRUE(test))
-  {
+  if (!success || isTRUE(test)) {
     message("All installation attempts failed")
   }
   copy_backbone()
