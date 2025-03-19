@@ -2196,21 +2196,21 @@ server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()
 
-  output$demo_spe <- downloadHandler(
+  output$demo_spe <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$spectra),
     content = function(file) {
       writeLines(readLines(tima:::get_default_paths()$urls$examples$spectra_mini), file)
     }
   )
 
-  output$demo_fea <- downloadHandler(
+  output$demo_fea <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$features),
     content = function(file) {
       writeLines(readLines(tima:::get_default_paths()$urls$examples$features), file)
     }
   )
 
-  output$demo_met <- downloadHandler(
+  output$demo_met <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$metadata),
     content = function(file) {
       writeLines(readLines(tima:::get_default_paths()$urls$examples$metadata), file)

@@ -2,7 +2,7 @@ library(testthat)
 
 ## need to do all in one because of outputs needed in the same temp dir
 ## use fixtures instead in the future
-test_that(desc = "Test functions", code = {
+testthat::test_that(desc = "Test functions", code = {
   # Tests
   copy_backbone(cache_dir = ".")
 
