@@ -72,8 +72,12 @@ sanitize_spectra <-
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       message("Combining spectra in case...")
       spectra <- spectra |>
-        Spectra::combineSpectra(f = spectra$FEATURE_ID) |>
-        Spectra::combinePeaks()
+        Spectra::combineSpectra(
+          f = spectra$FEATURE_ID,
+          tolerance = dalton,
+          ppm = ppm
+        ) |>
+        Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
     }
 
     # Removing empty spectra
