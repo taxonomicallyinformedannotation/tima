@@ -40,16 +40,25 @@ ui <- shiny::fluidPage(
     shiny::h1("Taxonomically Informed Metabolite Annotation"),
     shiny::h4(
       "This app helps performing TIMA as described in the",
-      shiny::a(href = "https://taxonomicallyinformedannotation.github.io/tima", "following documentation")
+      shiny::a(
+        href = "https://taxonomicallyinformedannotation.github.io/tima",
+        "following documentation"
+      )
     ),
     shiny::strong(
       shiny::span("Created by "),
       shiny::a("Adriano Rutz", href = "https://adafede.github.io/"),
       shiny::HTML("&bull;"),
-      shiny::a("Main publication", href = "https://doi.org/10.3389/fpls.2019.01329"),
+      shiny::a(
+        "Main publication",
+        href = "https://doi.org/10.3389/fpls.2019.01329"
+      ),
       shiny::HTML("&bull;"),
       shiny::span("Code"),
-      shiny::a("on GitHub", href = "https://github.com/taxonomicallyinformedannotation/tima")
+      shiny::a(
+        "on GitHub",
+        href = "https://github.com/taxonomicallyinformedannotation/tima"
+      )
     )
   ),
   shiny::fluidPage(shiny::div(
@@ -66,7 +75,10 @@ ui <- shiny::fluidPage(
             label = .label_mandatory("MGF file"),
             accept = ".mgf"
           ),
-          shiny::downloadButton(outputId = "demo_spe", "Download example spectra")
+          shiny::downloadButton(
+            outputId = "demo_spe",
+            "Download example spectra"
+          )
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -81,9 +93,19 @@ ui <- shiny::fluidPage(
           shiny::fileInput(
             inputId = "fil_fea_raw",
             label = .label_mandatory("Features table"),
-            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+            accept = c(
+              ".csv",
+              ".tsv",
+              ".csv.gz",
+              ".tsv.gz",
+              ".csv.zip",
+              ".tsv.zip"
+            )
           ),
-          shiny::downloadButton(outputId = "demo_fea", "Download example features")
+          shiny::downloadButton(
+            outputId = "demo_fea",
+            "Download example features"
+          )
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -98,9 +120,19 @@ ui <- shiny::fluidPage(
           shiny::fileInput(
             inputId = "fil_met_raw",
             label = "Metadata table (mandatory if no taxon name)",
-            accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip")
+            accept = c(
+              ".csv",
+              ".tsv",
+              ".csv.gz",
+              ".tsv.gz",
+              ".csv.zip",
+              ".tsv.zip"
+            )
           ),
-          shiny::downloadButton(outputId = "demo_met", "Download example metadata")
+          shiny::downloadButton(
+            outputId = "demo_met",
+            "Download example metadata"
+          )
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -133,7 +165,10 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("The SIRIUS version used.", "We highly recommend 6, the default.")
+            content = c(
+              "The SIRIUS version used.",
+              "We highly recommend 6, the default."
+            )
           ),
         shiny::textInput(
           inputId = "fil_pat",
@@ -405,7 +440,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Retention time tolerance (minutes) used for adducts annotation.")
+            content = c(
+              "Retention time tolerance (minutes) used for adducts annotation."
+            )
           ),
         shiny::sliderInput(
           inputId = "ms_tol_rt_lib",
@@ -453,7 +490,13 @@ ui <- shiny::fluidPage(
             "[2M+Na]+",
             "[2M+K]+"
           ),
-          selected = list("[M+H2]2+", "[M+H]+", "[M+H4N]+", "[M+Na]+", "[2M+H]+")
+          selected = list(
+            "[M+H2]2+",
+            "[M+H]+",
+            "[M+H4N]+",
+            "[M+Na]+",
+            "[2M+H]+"
+          )
         ) |>
           shinyhelper::helper(
             type = "inline",
@@ -464,8 +507,7 @@ ui <- shiny::fluidPage(
               as.character(
                 shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                  href =
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
+                  href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -497,8 +539,7 @@ ui <- shiny::fluidPage(
               as.character(
                 shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                  href =
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
+                  href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -536,8 +577,7 @@ ui <- shiny::fluidPage(
               as.character(
                 shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                  href =
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
+                  href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -571,8 +611,7 @@ ui <- shiny::fluidPage(
               as.character(
                 shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                  href =
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
+                  href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -700,8 +739,7 @@ ui <- shiny::fluidPage(
               as.character(
                 shiny::tags$a(
                   "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                  href =
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues"
+                  href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
                 )
               )
             )
@@ -898,7 +936,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `retention time` column in your rt library file.")
+            content = c(
+              "Name of the `retention time` column in your rt library file."
+            )
           ),
         shiny::textInput(
           inputId = "names_smiles",
@@ -962,7 +1002,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `collision energy` column in your MGF file.")
+            content = c(
+              "Name of the `collision energy` column in your MGF file."
+            )
           ),
         shiny::textInput(
           inputId = "names_mgf_ci",
@@ -998,7 +1040,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `InChI no stereo` column in your MGF file.")
+            content = c(
+              "Name of the `InChI no stereo` column in your MGF file."
+            )
           ),
         shiny::textInput(
           inputId = "names_mgf_ik",
@@ -1016,7 +1060,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `InChIKey connectivity layer` column in your MGF file.")
+            content = c(
+              "Name of the `InChIKey connectivity layer` column in your MGF file."
+            )
           ),
         shiny::textInput(
           inputId = "names_mgf_mf",
@@ -1025,7 +1071,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `molecular formula` column in your MGF file.")
+            content = c(
+              "Name of the `molecular formula` column in your MGF file."
+            )
           ),
         shiny::textInput(
           inputId = "names_mgf_na",
@@ -1070,7 +1118,9 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Name of the `SMILES no stereo` column in your MGF file.")
+            content = c(
+              "Name of the `SMILES no stereo` column in your MGF file."
+            )
           ),
         shiny::textInput(
           inputId = "names_mgf_si",
@@ -1599,7 +1649,14 @@ ui <- shiny::fluidPage(
         shiny::fileInput(
           inputId = "lib_tmp_exp_csv",
           label = "Experimental (CSV)",
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip"),
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
           multiple = TRUE
         ) |>
           shinyhelper::helper(
@@ -1614,7 +1671,14 @@ ui <- shiny::fluidPage(
         shiny::fileInput(
           inputId = "lib_tmp_is_csv",
           label = "In silico (CSV)",
-          accept = c(".csv", ".tsv", ".csv.gz", ".tsv.gz", ".csv.zip", ".tsv.zip"),
+          accept = c(
+            ".csv",
+            ".tsv",
+            ".csv.gz",
+            ".tsv.gz",
+            ".csv.zip",
+            ".tsv.zip"
+          ),
           multiple = TRUE
         ) |>
           shinyhelper::helper(
@@ -1660,7 +1724,10 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("Unit of the retention time.", "Must be `seconds` or `minutes`.")
+            content = c(
+              "Unit of the retention time.",
+              "Must be `seconds` or `minutes`."
+            )
           ),
       ),
       shiny::tabPanel(
@@ -1690,8 +1757,10 @@ ui <- shiny::fluidPage(
         ) |>
           shinyhelper::helper(
             type = "inline",
-            content = c("We advise `fbmn`,
-                        but we also support `classical` jobs.")
+            content = c(
+              "We advise `fbmn`,
+                        but we also support `classical` jobs."
+            )
           )
       )
     )
@@ -1706,11 +1775,14 @@ ui <- shiny::fluidPage(
       ),
       shinyjs::hidden(
         shiny::span(id = "save_msg", "Saving parameters..."),
-        shiny::div(id = "error", shiny::div(
-          shiny::br(),
-          shiny::tags$b("Error: "),
-          shiny::span(id = "error_msg")
-        ))
+        shiny::div(
+          id = "error",
+          shiny::div(
+            shiny::br(),
+            shiny::tags$b("Error: "),
+            shiny::span(id = "error_msg")
+          )
+        )
       ),
       shiny::actionButton(
         inputId = "launch",
@@ -1736,7 +1808,10 @@ ui <- shiny::fluidPage(
         )
       )
     ),
-    shinyjs::hidden(shiny::downloadButton(outputId = "results", "Download results")),
+    shinyjs::hidden(shiny::downloadButton(
+      outputId = "results",
+      "Download results"
+    )),
     shinyjs::hidden(shiny::actionButton(inputId = "close", label = "Close")),
     shinyjs::hidden(shiny::div(id = "job_msg", shiny::h3("Job is running!"))),
     shinyjs::hidden(shiny::div(id = "job_end", shiny::h3("Job finished!")))
@@ -1869,7 +1944,10 @@ ui <- shiny::fluidPage(
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarize <- summarize
   tima:::create_dir("params")
-  yaml::write_yaml(x = yaml_small, file = tima:::get_default_paths()$params$prepare_params)
+  yaml::write_yaml(
+    x = yaml_small,
+    file = tima:::get_default_paths()$params$prepare_params
+  )
 
   message(x = "... Advanced")
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
@@ -2199,21 +2277,30 @@ server <- function(input, output, session) {
   output$demo_spe <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$spectra),
     content = function(file) {
-      writeLines(readLines(tima:::get_default_paths()$urls$examples$spectra_mini), file)
+      writeLines(
+        readLines(tima:::get_default_paths()$urls$examples$spectra_mini),
+        file
+      )
     }
   )
 
   output$demo_fea <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$features),
     content = function(file) {
-      writeLines(readLines(tima:::get_default_paths()$urls$examples$features), file)
+      writeLines(
+        readLines(tima:::get_default_paths()$urls$examples$features),
+        file
+      )
     }
   )
 
   output$demo_met <- shiny::downloadHandler(
     filename = basename(tima:::get_default_paths()$urls$examples$metadata),
     content = function(file) {
-      writeLines(readLines(tima:::get_default_paths()$urls$examples$metadata), file)
+      writeLines(
+        readLines(tima:::get_default_paths()$urls$examples$metadata),
+        file
+      )
     }
   )
 
@@ -2240,23 +2327,30 @@ server <- function(input, output, session) {
   ## Special check for taxon name
   iv <- shinyvalidate::InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
-    if (!grepl(
-      pattern = "^[[:upper:]]",
-      x = taxon,
-      perl = TRUE
-    )) {
+    if (
+      !grepl(
+        pattern = "^[[:upper:]]",
+        x = taxon,
+        perl = TRUE
+      )
+    ) {
       "Please provide your taxon name with capital letter"
     }
   })
   iv$add_rule("org_tax", function(taxon) {
-    if (any(is.na(
-      stringi::stri_split_fixed(str = taxon, pattern = "|") |>
-        purrr::map(
-          .f = function(taxon) {
-            rotl::tnrs_match_names(names = taxon, do_approximate_matching = FALSE)$ott_id
-          }
-        )
-    ))) {
+    if (
+      any(is.na(
+        stringi::stri_split_fixed(str = taxon, pattern = "|") |>
+          purrr::map(
+            .f = function(taxon) {
+              rotl::tnrs_match_names(
+                names = taxon,
+                do_approximate_matching = FALSE
+              )$ott_id
+            }
+          )
+      ))
+    ) {
       "Taxon not found in Open Tree of Life"
     }
   })

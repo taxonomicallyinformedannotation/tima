@@ -32,19 +32,33 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_rt <-
-  function(mgf_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp$mgf,
-           mgf_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is$mgf,
-           temp_exp = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$exp$csv,
-           temp_is = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$is$csv,
-           output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
-           output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared$rt,
-           col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
-           col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
-           col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
-           name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
-           name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
-           name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
-           unit_rt = get_params(step = "prepare_libraries_rt")$units$rt) {
+  function(
+    mgf_exp = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$temporal$exp$mgf,
+    mgf_is = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$temporal$is$mgf,
+    temp_exp = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$temporal$exp$csv,
+    temp_is = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$temporal$is$csv,
+    output_rt = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$temporal$prepared,
+    output_sop = get_params(
+      step = "prepare_libraries_rt"
+    )$files$libraries$sop$prepared$rt,
+    col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
+    col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
+    col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
+    name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
+    name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
+    name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
+    unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
+  ) {
     ## default transforms from `Spectra`
     if (col_rt == "RTINSECONDS") {
       col_rt <- "rtime"
@@ -62,40 +76,48 @@ prepare_libraries_rt <-
     }
     mgf_exp <- mgf_exp |>
       purrr::map(.f = full_or_null)
-    mgf_exp <- mgf_exp[mgf_exp |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()]
+    mgf_exp <- mgf_exp[
+      mgf_exp |>
+        purrr::map(
+          .f = function(x) {
+            !is.null(x)
+          }
+        ) |>
+        unlist()
+    ]
     mgf_is <- mgf_is |>
       purrr::map(.f = full_or_null)
-    mgf_is <- mgf_is[mgf_is |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()]
+    mgf_is <- mgf_is[
+      mgf_is |>
+        purrr::map(
+          .f = function(x) {
+            !is.null(x)
+          }
+        ) |>
+        unlist()
+    ]
     mgf_exp <- mgf_exp |>
       purrr::map(.f = full_or_null)
-    temp_exp <- temp_exp[temp_exp |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()]
+    temp_exp <- temp_exp[
+      temp_exp |>
+        purrr::map(
+          .f = function(x) {
+            !is.null(x)
+          }
+        ) |>
+        unlist()
+    ]
     mgf_is <- mgf_is |>
       purrr::map(.f = full_or_null)
-    temp_is <- temp_is[temp_is |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()]
+    temp_is <- temp_is[
+      temp_is |>
+        purrr::map(
+          .f = function(x) {
+            !is.null(x)
+          }
+        ) |>
+        unlist()
+    ]
     if (length(mgf_exp) == 0) {
       mgf_exp <- NULL
     }
@@ -152,8 +174,17 @@ prepare_libraries_rt <-
           data.frame() |>
           tidytable::mutate(type = type) |>
           tidytable::rowwise() |>
-          tidytable::mutate(rt = tidytable::if_else(condition = unit == "seconds", true = as.numeric(rt) / 60, false = as.numeric(rt))) |>
-          tidytable::bind_rows(data.frame(inchikey = NA_character_, smiles = NA_character_)) |>
+          tidytable::mutate(
+            rt = tidytable::if_else(
+              condition = unit == "seconds",
+              true = as.numeric(rt) / 60,
+              false = as.numeric(rt)
+            )
+          ) |>
+          tidytable::bind_rows(data.frame(
+            inchikey = NA_character_,
+            smiles = NA_character_
+          )) |>
           tidytable::filter(!is.na(rt)) |>
           tidytable::filter(!is.na(smiles)) |>
           tidytable::distinct()
@@ -206,7 +237,8 @@ prepare_libraries_rt <-
         ))
       rm(df_full, df_missing)
       df_completed <- df_completed |>
-        tidytable::select(rt,
+        tidytable::select(
+          rt,
           structure_smiles = smiles,
           structure_inchikey = inchikey,
           type
@@ -214,10 +246,12 @@ prepare_libraries_rt <-
         tidytable::distinct()
       log_debug(
         "There were still",
-        nrow(df_completed |>
-          tidytable::filter(is.na(
-            structure_inchikey
-          ))),
+        nrow(
+          df_completed |>
+            tidytable::filter(is.na(
+              structure_inchikey
+            ))
+        ),
         "entries for which no InChIKey could not be found in the end."
       )
       return(df_completed)
@@ -275,7 +309,11 @@ prepare_libraries_rt <-
       tidytable::select(structure_smiles, structure_inchikey) |>
       tidytable::distinct() |>
       tidytable::mutate(
-        structure_inchikey_connectivity_layer = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14),
+        structure_inchikey_connectivity_layer = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1,
+          to = 14
+        ),
         organism_name = NA_character_
       )
 
@@ -291,11 +329,17 @@ prepare_libraries_rt <-
         )
       ) |>
       ## TODO REMINDER FOR NOW
-      tidytable::distinct(rt, candidate_structure_inchikey_connectivity_layer, type)
+      tidytable::distinct(
+        rt,
+        candidate_structure_inchikey_connectivity_layer,
+        type
+      )
     rm(df_rts)
 
     if (nrow(rts) == 0) {
-      log_debug("No retention time library found, returning empty organism table.")
+      log_debug(
+        "No retention time library found, returning empty organism table."
+      )
       sop <- tidytable::tidytable(
         structure_smiles = NA_character_,
         structure_inchikey = NA_character_,
@@ -305,7 +349,9 @@ prepare_libraries_rt <-
     }
 
     if (nrow(rts) == 0) {
-      log_debug("No retention time library found, returning empty retention time table.")
+      log_debug(
+        "No retention time library found, returning empty retention time table."
+      )
       rts <- tidytable::tidytable(
         rt = NA_real_,
         candidate_structure_inchikey_connectivity_layer = NA_character_,

@@ -43,25 +43,45 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_spectra <-
-  function(input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$raw,
-           nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
-           col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
-           col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
-           col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
-           col_em = get_params(step = "prepare_libraries_spectra")$names$mgf$exact_mass,
-           col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
-           col_io = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi_no_stereo,
-           col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
-           col_il = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey_connectivity_layer,
-           col_mf = get_params(step = "prepare_libraries_spectra")$names$mgf$molecular_formula,
-           col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
-           col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
-           col_sm = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles,
-           col_sn = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles_no_stereo,
-           col_si = get_params(step = "prepare_libraries_spectra")$names$mgf$spectrum_id,
-           col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
-           col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
-           col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp) {
+  function(
+    input = get_params(
+      step = "prepare_libraries_spectra"
+    )$files$libraries$spectral$raw,
+    nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
+    col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
+    col_ce = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$collision_energy,
+    col_ci = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$compound_id,
+    col_em = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$exact_mass,
+    col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
+    col_io = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$inchi_no_stereo,
+    col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
+    col_il = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$inchikey_connectivity_layer,
+    col_mf = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$molecular_formula,
+    col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
+    col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
+    col_sm = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles,
+    col_sn = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$smiles_no_stereo,
+    col_si = get_params(
+      step = "prepare_libraries_spectra"
+    )$names$mgf$spectrum_id,
+    col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
+    col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
+    col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
+  ) {
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")
@@ -78,8 +98,15 @@ prepare_libraries_spectra <-
         no = "spectral_prepared.tsv.gz"
       )
     )
-    if (!all(purrr::map(.x = list(output_neg, output_pos, output_sop), .f = file.exists) |>
-      unlist())) {
+    if (
+      !all(
+        purrr::map(
+          .x = list(output_neg, output_pos, output_sop),
+          .f = file.exists
+        ) |>
+          unlist()
+      )
+    ) {
       if (is.null(input)) {
         input <- "fileDoesNotExist"
       }
@@ -180,7 +207,8 @@ prepare_libraries_spectra <-
             structure_xlogp = xlogp
           ) |>
           # Because some slight discrepancies appear in some DBs
-          tidytable::distinct(structure_inchikey,
+          tidytable::distinct(
+            structure_inchikey,
             structure_smiles,
             structure_smiles_no_stereo,
             .keep_all = TRUE
@@ -192,7 +220,9 @@ prepare_libraries_spectra <-
           )
         rm(spectra_harmonized_pos, spectra_harmonized_neg)
       } else {
-        log_debug("Your input file does not exist, returning empty lib instead.")
+        log_debug(
+          "Your input file does not exist, returning empty lib instead."
+        )
         spectra_pos <- list(
           tidytable::tidytable(
             "compound_id" = "fake_compound",

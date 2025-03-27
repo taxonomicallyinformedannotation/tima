@@ -53,16 +53,20 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_taxa <-
-  function(input = get_params(step = "prepare_taxa")$files$features$raw,
-           extension = get_params(step = "prepare_taxa")$names$extension,
-           name_features = get_params(step = "prepare_taxa")$names$features,
-           name_filename = get_params(step = "prepare_taxa")$names$filename,
-           colname = get_params(step = "prepare_taxa")$names$taxon,
-           metadata = get_params(step = "prepare_taxa")$files$metadata$raw,
-           top_k = get_params(step = "prepare_taxa")$organisms$candidates,
-           org_tax_ott = get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
-           output = get_params(step = "prepare_taxa")$files$metadata$prepared,
-           taxon = get_params(step = "prepare_taxa")$organisms$taxon) {
+  function(
+    input = get_params(step = "prepare_taxa")$files$features$raw,
+    extension = get_params(step = "prepare_taxa")$names$extension,
+    name_features = get_params(step = "prepare_taxa")$names$features,
+    name_filename = get_params(step = "prepare_taxa")$names$filename,
+    colname = get_params(step = "prepare_taxa")$names$taxon,
+    metadata = get_params(step = "prepare_taxa")$files$metadata$raw,
+    top_k = get_params(step = "prepare_taxa")$organisms$candidates,
+    org_tax_ott = get_params(
+      step = "prepare_taxa"
+    )$files$libraries$sop$merged$organisms$taxonomies$ott,
+    output = get_params(step = "prepare_taxa")$files$metadata$prepared,
+    taxon = get_params(step = "prepare_taxa")$organisms$taxon
+  ) {
     if (!is.null(taxon)) {
       if (taxon == "") {
         taxon <- NULL
@@ -74,8 +78,8 @@ prepare_taxa <-
     }
 
     stopifnot(
-      "Your top k organisms parameter should be lower or equal to 5" =
-        top_k <= 5
+      "Your top k organisms parameter should be lower or equal to 5" = top_k <=
+        5
     )
 
     log_debug(x = "Loading feature table")
@@ -95,8 +99,10 @@ prepare_taxa <-
     }
 
     log_debug(x = "Formatting feature table ...")
-    log_debug(x = "... requires 'Peak area' or ':area'
-              in columns (mzmine format)")
+    log_debug(
+      x = "... requires 'Peak area' or ':area'
+              in columns (mzmine format)"
+    )
     log_debug(x = "... or 'quant_' in columns (SLAW format)")
     log_debug(x = "... or 'Peak height' in columns (SIRIUS format)")
 
@@ -229,8 +235,13 @@ prepare_taxa <-
         tidytable::select(-join)
     } else {
       metadata_table_joined <-
-        tidytable::left_join(top_n, metadata_table, by = c("name" = name_filename)) |>
-        tidytable::select(feature_id := rowname,
+        tidytable::left_join(
+          top_n,
+          metadata_table,
+          by = c("name" = name_filename)
+        ) |>
+        tidytable::select(
+          feature_id := rowname,
           organismOriginal = tidyselect::all_of(colname),
           tidyselect::everything()
         )
@@ -258,7 +269,10 @@ prepare_taxa <-
         sample_organism_09_species = organism_taxonomy_09species,
         sample_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
-      tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character)) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::everything(),
+        .fns = as.character
+      )) |>
       tidytable::group_by(feature_id) |>
       clean_collapse(
         cols = c(

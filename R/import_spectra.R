@@ -28,12 +28,14 @@
 #'   sanitize = FALSE
 #' )
 #' }
-import_spectra <- function(file,
-                           cutoff = 0,
-                           dalton = 0.01,
-                           polarity = NA,
-                           ppm = 10,
-                           sanitize = TRUE) {
+import_spectra <- function(
+  file,
+  cutoff = 0,
+  dalton = 0.01,
+  polarity = NA,
+  ppm = 10,
+  sanitize = TRUE
+) {
   file_ext <-
     stringi::stri_replace_all_regex(
       str = file,

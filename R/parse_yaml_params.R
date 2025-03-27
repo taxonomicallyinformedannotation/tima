@@ -8,8 +8,10 @@
 #' @return A list containing the parameters specified in the YAML files
 #'
 #' @examples NULL
-parse_yaml_params <- function(def = get("default_path", envir = parent.frame()),
-                              usr = get("user_path", envir = parent.frame())) {
+parse_yaml_params <- function(
+  def = get("default_path", envir = parent.frame()),
+  usr = get("user_path", envir = parent.frame())
+) {
   ## Read the default YAML file
   params <- yaml::read_yaml(file = def)
 

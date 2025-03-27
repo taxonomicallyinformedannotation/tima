@@ -30,11 +30,21 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_features_edges <-
-  function(input = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$raw,
-           output = get_params(step = "prepare_features_edges")$files$networks$spectral$edges$prepared,
-           name_source = get_params(step = "prepare_features_edges")$names$source,
-           name_target = get_params(step = "prepare_features_edges")$names$target) {
-    stopifnot("Your input file(s) do(es) not exist" = all(purrr::map(.x = input, .f = file.exists) |> unlist()))
+  function(
+    input = get_params(
+      step = "prepare_features_edges"
+    )$files$networks$spectral$edges$raw,
+    output = get_params(
+      step = "prepare_features_edges"
+    )$files$networks$spectral$edges$prepared,
+    name_source = get_params(step = "prepare_features_edges")$names$source,
+    name_target = get_params(step = "prepare_features_edges")$names$target
+  ) {
+    stopifnot(
+      "Your input file(s) do(es) not exist" = all(
+        purrr::map(.x = input, .f = file.exists) |> unlist()
+      )
+    )
     ## Load edges table
     log_debug(x = "Loading edge table")
     edges_tables <- purrr::map(
@@ -64,7 +74,9 @@ prepare_features_edges <-
         feature_source = !!as.name(name_source),
         feature_target = !!as.name(name_target)
       ) |>
-      tidytable::mutate(feature_target := tidytable::coalesce(feature_target, feature_source))
+      tidytable::mutate(
+        feature_target := tidytable::coalesce(feature_target, feature_source)
+      )
     rm(edges_ms1, edges_ms2, features_entropy)
 
     export_params(

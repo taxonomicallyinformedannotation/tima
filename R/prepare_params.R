@@ -14,9 +14,11 @@
 #' @return The path to the yaml files containing prepared parameters
 #'
 #' @examples NULL
-prepare_params <- function(params_small = get_params(step = "prepare_params"),
-                           params_advanced = get_params(step = "prepare_params_advanced"),
-                           step = NA) {
+prepare_params <- function(
+  params_small = get_params(step = "prepare_params"),
+  params_advanced = get_params(step = "prepare_params_advanced"),
+  step = NA
+) {
   list <- load_yaml_files()
   yamls_params <- list$yamls_params
 

@@ -24,16 +24,19 @@ targets::tar_option_set(
 # to allow use_targets() to configure tar_make_future() options.
 
 # Run the R scripts in the R/ folder with your custom functions:
-targets::tar_source(files = list.files(
-  path = system.file("R", package = "tima"),
-  pattern = ".R$",
-  full.names = TRUE
-))
+targets::tar_source(
+  files = list.files(
+    path = system.file("R", package = "tima"),
+    pattern = ".R$",
+    full.names = TRUE
+  )
+)
 
 # Replace the target list below with your own:
 list(
   ## Architecture
-  list( ## Paths
+  list(
+    ## Paths
     list(
       tar_target(
         name = yaml_paths,
@@ -252,140 +255,200 @@ list(
         name = par_def_ann_mas,
         format = "file",
         command = {
-          par_def_ann_mas <- system.file("params/default/annotate_masses.yaml", package = "tima")
+          par_def_ann_mas <- system.file(
+            "params/default/annotate_masses.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_ann_spe,
         format = "file",
         command = {
-          par_def_ann_spe <- system.file("params/default/annotate_spectra.yaml", package = "tima")
+          par_def_ann_spe <- system.file(
+            "params/default/annotate_spectra.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_cre_com,
         format = "file",
         command = {
-          par_def_cre_com <- system.file("params/default/create_components.yaml", package = "tima")
+          par_def_cre_com <- system.file(
+            "params/default/create_components.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_cre_edg_spe,
         format = "file",
         command = {
-          par_def_cre_edg_spe <- system.file("params/default/create_edges_spectra.yaml", package = "tima")
+          par_def_cre_edg_spe <- system.file(
+            "params/default/create_edges_spectra.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_fil_ann,
         format = "file",
         command = {
-          par_def_fil_ann <- system.file("params/default/filter_annotations.yaml", package = "tima")
+          par_def_fil_ann <- system.file(
+            "params/default/filter_annotations.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_ann_gnp,
         format = "file",
         command = {
-          par_def_pre_ann_gnp <- system.file("params/default/prepare_annotations_gnps.yaml", package = "tima")
+          par_def_pre_ann_gnp <- system.file(
+            "params/default/prepare_annotations_gnps.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_ann_sir,
         format = "file",
         command = {
-          par_def_pre_ann_sir <- system.file("params/default/prepare_annotations_sirius.yaml", package = "tima")
+          par_def_pre_ann_sir <- system.file(
+            "params/default/prepare_annotations_sirius.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_ann_spe,
         format = "file",
         command = {
-          par_def_pre_ann_spe <- system.file("params/default/prepare_annotations_spectra.yaml", package = "tima")
+          par_def_pre_ann_spe <- system.file(
+            "params/default/prepare_annotations_spectra.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_fea_com,
         format = "file",
         command = {
-          par_def_pre_fea_com <- system.file("params/default/prepare_features_components.yaml", package = "tima")
+          par_def_pre_fea_com <- system.file(
+            "params/default/prepare_features_components.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_fea_edg,
         format = "file",
         command = {
-          par_def_pre_fea_edg <- system.file("params/default/prepare_features_edges.yaml", package = "tima")
+          par_def_pre_fea_edg <- system.file(
+            "params/default/prepare_features_edges.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_fea_tab,
         format = "file",
         command = {
-          par_def_pre_fea_tab <- system.file("params/default/prepare_features_tables.yaml", package = "tima")
+          par_def_pre_fea_tab <- system.file(
+            "params/default/prepare_features_tables.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_rt,
         format = "file",
         command = {
-          par_def_pre_lib_rt <- system.file("params/default/prepare_libraries_rt.yaml", package = "tima")
+          par_def_pre_lib_rt <- system.file(
+            "params/default/prepare_libraries_rt.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_clo,
         format = "file",
         command = {
-          par_def_pre_lib_sop_clo <- system.file("params/default/prepare_libraries_sop_closed.yaml", package = "tima")
+          par_def_pre_lib_sop_clo <- system.file(
+            "params/default/prepare_libraries_sop_closed.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_ecm,
         format = "file",
         command = {
-          par_def_pre_lib_sop_ecm <- system.file("params/default/prepare_libraries_sop_ecmdb.yaml", package = "tima")
+          par_def_pre_lib_sop_ecm <- system.file(
+            "params/default/prepare_libraries_sop_ecmdb.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_hmd,
         format = "file",
         command = {
-          par_def_pre_lib_sop_hmd <- system.file("params/default/prepare_libraries_sop_hmdb.yaml", package = "tima")
+          par_def_pre_lib_sop_hmd <- system.file(
+            "params/default/prepare_libraries_sop_hmdb.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_lot,
         format = "file",
         command = {
-          par_def_pre_lib_sop_lot <- system.file("params/default/prepare_libraries_sop_lotus.yaml", package = "tima")
+          par_def_pre_lib_sop_lot <- system.file(
+            "params/default/prepare_libraries_sop_lotus.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_sop_mer,
         format = "file",
         command = {
-          par_def_pre_lib_sop_mer <- system.file("params/default/prepare_libraries_sop_merged.yaml", package = "tima")
+          par_def_pre_lib_sop_mer <- system.file(
+            "params/default/prepare_libraries_sop_merged.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_lib_spe,
         format = "file",
         command = {
-          par_def_pre_lib_spe <- system.file("params/default/prepare_libraries_spectra.yaml", package = "tima")
+          par_def_pre_lib_spe <- system.file(
+            "params/default/prepare_libraries_spectra.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_pre_tax,
         format = "file",
         command = {
-          par_def_pre_tax <- system.file("params/default/prepare_taxa.yaml", package = "tima")
+          par_def_pre_tax <- system.file(
+            "params/default/prepare_taxa.yaml",
+            package = "tima"
+          )
         }
       ),
       tar_target(
         name = par_def_wei_ann,
         format = "file",
         command = {
-          par_def_wei_ann <- system.file("params/default/weight_annotations.yaml", package = "tima")
+          par_def_wei_ann <- system.file(
+            "params/default/weight_annotations.yaml",
+            package = "tima"
+          )
         }
       )
     ),
@@ -988,8 +1051,10 @@ list(
   ## libraries
   list(
     ## Spectra
-    list( ## In silico
-      list( ## Raw
+    list(
+      ## In silico
+      list(
+        ## Raw
         list(
           ## TODO ADD ISDB HMDB,
           tar_target(
@@ -1018,9 +1083,8 @@ list(
               #     export = paths_data_source_libraries_spectra_is_wikidata_pos
               #   )
               # }
-            }
+            },
             ## To always check if a newest version is available
-            ,
             cue = tar_cue(mode = "always")
             # cue = tar_cue(mode = "thorough")
           ),
@@ -1050,9 +1114,8 @@ list(
               #     export = paths_data_source_libraries_spectra_is_wikidata_neg
               #   )
               # }
-            }
+            },
             ## To always check if a newest version is available
-            ,
             cue = tar_cue(mode = "always")
             # cue = tar_cue(mode = "thorough")
           )
@@ -1184,7 +1247,8 @@ list(
               lib_spe_exp_mb_pre <-
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
-                  nam_lib = paste("MassBank",
+                  nam_lib = paste(
+                    "MassBank",
                     paths_urls_massbank_version,
                     sep = " - "
                   ),
@@ -1294,8 +1358,11 @@ list(
                 )
               },
               error = function(e) {
-                return(tima:::fake_ecmdb(export = paths_data_source_libraries_sop_ecmdb))
-              }, finally = {
+                return(tima:::fake_ecmdb(
+                  export = paths_data_source_libraries_sop_ecmdb
+                ))
+              },
+              finally = {
                 return(paths_data_source_libraries_sop_ecmdb)
               }
             )
@@ -1314,13 +1381,20 @@ list(
               },
               warning = function(w) {
                 ## See #118
-                log_debug("HMDB download failed partially, returning empty file instead")
+                log_debug(
+                  "HMDB download failed partially, returning empty file instead"
+                )
                 unlink(paths_data_source_libraries_sop_hmdb)
-                return(tima:::fake_hmdb(export = paths_data_source_libraries_sop_hmdb))
+                return(tima:::fake_hmdb(
+                  export = paths_data_source_libraries_sop_hmdb
+                ))
               },
               error = function(e) {
-                return(tima:::fake_hmdb(export = paths_data_source_libraries_sop_hmdb))
-              }, finally = {
+                return(tima:::fake_hmdb(
+                  export = paths_data_source_libraries_sop_hmdb
+                ))
+              },
+              finally = {
                 return(paths_data_source_libraries_sop_hmdb)
               }
             )
@@ -1340,8 +1414,11 @@ list(
                 )
               },
               error = function(e) {
-                return(tima:::fake_lotus(export = paths_data_source_libraries_sop_lotus))
-              }, finally = {
+                return(tima:::fake_lotus(
+                  export = paths_data_source_libraries_sop_lotus
+                ))
+              },
+              finally = {
                 return(paths_data_source_libraries_sop_lotus)
               }
             )
@@ -1435,43 +1512,50 @@ list(
         ),
         tar_target(
           name = lib_mer_key,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_key <- lib_sop_mer[[1]]
           }
         ),
         tar_target(
           name = lib_mer_org_tax_ott,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_org_tax_ott <- lib_sop_mer[[2]]
           }
         ),
         tar_target(
           name = lib_mer_str_stereo,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_str_stereo <- lib_sop_mer[[3]]
           }
         ),
         tar_target(
           name = lib_mer_str_met,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_str_met <- lib_sop_mer[[4]]
           }
         ),
         tar_target(
           name = lib_mer_str_nam,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_str_nam <- lib_sop_mer[[5]]
           }
         ),
         tar_target(
           name = lib_mer_str_tax_cla,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_str_tax_cla <- lib_sop_mer[[6]]
           }
         ),
         tar_target(
           name = lib_mer_str_tax_npc,
-          format = "file", command = {
+          format = "file",
+          command = {
             lib_mer_str_tax_npc <- lib_sop_mer[[7]]
           }
         )
@@ -1647,19 +1731,22 @@ list(
     ),
     tar_target(
       name = ann_sir_pre_can,
-      format = "file", command = {
+      format = "file",
+      command = {
         ann_sir_pre_can <- ann_sir_pre[[1]]
       }
     ),
     tar_target(
       name = ann_sir_pre_for,
-      format = "file", command = {
+      format = "file",
+      command = {
         ann_sir_pre_for <- ann_sir_pre[[2]]
       }
     ),
     tar_target(
       name = ann_sir_pre_str,
-      format = "file", command = {
+      format = "file",
+      command = {
         ann_sir_pre_str <- ann_sir_pre[[3]]
       }
     ),
@@ -1829,19 +1916,16 @@ list(
         score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
         score_biological_variety = par_wei_ann$weights$biological$variety,
         score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
-        score_chemical_cla_superclass =
-          par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
         score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
         score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
         score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
-        score_chemical_npc_superclass =
-          par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
         score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
         minimal_consistency = par_wei_ann$annotations$thresholds$consistency,
         minimal_ms1_bio = par_wei_ann$annotations$thresholds$ms1$biological,
         minimal_ms1_chemo = par_wei_ann$annotations$thresholds$ms1$chemical,
-        minimal_ms1_condition =
-          par_wei_ann$annotations$thresholds$ms1$condition,
+        minimal_ms1_condition = par_wei_ann$annotations$thresholds$ms1$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         compounds_names = par_wei_ann$options$compounds_names,
         high_confidence = par_wei_ann$options$high_confidence,
@@ -1901,7 +1985,10 @@ list(
       command = {
         utils::unzip(zipfile = benchmark_zip)
         dir.create(dirname(benchmark_path_file), recursive = TRUE)
-        file.copy(from = "cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf", to = benchmark_path_file)
+        file.copy(
+          from = "cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf",
+          to = benchmark_path_file
+        )
         unlink("cleaned_libraries_matchms", recursive = TRUE)
         return(benchmark_path_file)
       }
@@ -1939,9 +2026,13 @@ list(
           adduct = sp_clean$ADDUCT,
           inchikey = sp_clean$INCHIKEY,
           instrument = sp_clean$INSTRUMENT_TYPE,
-          fragments = purrr::map(.x = sp_clean@backend@peaksData, .f = length) |>
+          fragments = purrr::map(
+            .x = sp_clean@backend@peaksData,
+            .f = length
+          ) |>
             as.character() |>
-            as.numeric() / 2,
+            as.numeric() /
+            2,
           precursorMz = sp_clean$precursorMz,
           smiles = sp_clean$SMILES,
           ccmslib = sp_clean$SPECTRUM_ID,
@@ -1962,29 +2053,37 @@ list(
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::filter(fragments >= 5) |>
           tidytable::filter(fragments <= 250) |>
-          tidytable::filter(!grepl(
-            pattern = "QQQ",
-            x = instrument,
-            fixed = TRUE
-          )) |>
+          tidytable::filter(
+            !grepl(
+              pattern = "QQQ",
+              x = instrument,
+              fixed = TRUE
+            )
+          ) |>
           ## fragments are nominal mass
-          tidytable::filter(!grepl(
-            pattern = "ReSpect",
-            x = name,
-            fixed = TRUE
-          )) |>
+          tidytable::filter(
+            !grepl(
+              pattern = "ReSpect",
+              x = name,
+              fixed = TRUE
+            )
+          ) |>
           ## remove spectral matches
-          tidytable::filter(!grepl(
-            pattern = "Spectral Match to",
-            x = name,
-            fixed = TRUE
-          )) |>
+          tidytable::filter(
+            !grepl(
+              pattern = "Spectral Match to",
+              x = name,
+              fixed = TRUE
+            )
+          ) |>
           ## remove putatives
-          tidytable::filter(!grepl(
-            pattern = "putative",
-            x = name,
-            fixed = TRUE
-          )) |>
+          tidytable::filter(
+            !grepl(
+              pattern = "putative",
+              x = name,
+              fixed = TRUE
+            )
+          ) |>
           tidytable::select(-name) |>
           tidytable::mutate(mass = precursorMz) |>
           tidytable::separate(
@@ -1995,13 +2094,19 @@ list(
           tidytable::filter(!is.na(b)) |>
           tidytable::filter(stringi::stri_length(as.numeric(b)) > 1) |>
           tidytable::select(-a, -b) |>
-          tidytable::mutate(inchikey_connectivity_layer = gsub(
-            pattern = "-.*",
-            replacement = "",
-            x = inchikey,
-            perl = TRUE
-          )) |>
-          tidytable::distinct(inchikey_connectivity_layer, adduct, .keep_all = TRUE) |>
+          tidytable::mutate(
+            inchikey_connectivity_layer = gsub(
+              pattern = "-.*",
+              replacement = "",
+              x = inchikey,
+              perl = TRUE
+            )
+          ) |>
+          tidytable::distinct(
+            inchikey_connectivity_layer,
+            adduct,
+            .keep_all = TRUE
+          ) |>
           tidytable::mutate(mz = precursorMz) |>
           ## Weird way to have some kind of retention time
           tidytable::mutate(
@@ -2033,21 +2138,25 @@ list(
             tima:::extract_spectra() |>
             tidytable::mutate(acquisitionNum = tidytable::row_number()) |>
             tidytable::mutate(spectrum_id = acquisitionNum) |>
-            tidytable::mutate(short_ik = gsub(
-              pattern = "-.*",
-              replacement = "",
-              INCHIKEY,
-              perl = TRUE
-            )) |>
+            tidytable::mutate(
+              short_ik = gsub(
+                pattern = "-.*",
+                replacement = "",
+                INCHIKEY,
+                perl = TRUE
+              )
+            ) |>
             tidytable::mutate(
               rtime = tidytable::cur_group_id(),
               .by = "short_ik"
             ) |>
-            tidytable::mutate(precursorCharge = tidytable::if_else(
-              condition = mode == "pos",
-              true = as.integer(1),
-              false = as.integer(-1)
-            )) |>
+            tidytable::mutate(
+              precursorCharge = tidytable::if_else(
+                condition = mode == "pos",
+                true = as.integer(1),
+                false = as.integer(-1)
+              )
+            ) |>
             tidytable::select(
               acquisitionNum,
               precursorCharge,
@@ -2088,12 +2197,14 @@ list(
               rt = rtime,
               feature_id = spectrum_id
             ) |>
-            tidytable::mutate(inchikey_connectivity_layer = gsub(
-              pattern = "-.*",
-              replacement = "",
-              x = inchikey,
-              perl = TRUE
-            )) |>
+            tidytable::mutate(
+              inchikey_connectivity_layer = gsub(
+                pattern = "-.*",
+                replacement = "",
+                x = inchikey,
+                perl = TRUE
+              )
+            ) |>
             data.frame()
           return(df)
         }
@@ -2300,7 +2411,10 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
-          input = list("spectral" = benchmark_edg_spe_pos, "ms1" = benchmark_ann_ms1_pre_pos[[2]]),
+          input = list(
+            "spectral" = benchmark_edg_spe_pos,
+            "ms1" = benchmark_ann_ms1_pre_pos[[2]]
+          ),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2312,7 +2426,10 @@ list(
       format = "file",
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
-          input = list("spectral" = benchmark_edg_spe_neg, "ms1" = benchmark_ann_ms1_pre_neg[[2]]),
+          input = list(
+            "spectral" = benchmark_edg_spe_neg,
+            "ms1" = benchmark_ann_ms1_pre_neg[[2]]
+          ),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
           name_target = benchmark_def_pre_fea_edg$names$target
@@ -2496,19 +2613,22 @@ list(
     ),
     tar_target(
       name = benchmark_ann_sir_pre_can,
-      format = "file", command = {
+      format = "file",
+      command = {
         benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_for,
-      format = "file", command = {
+      format = "file",
+      command = {
         benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_str,
-      format = "file", command = {
+      format = "file",
+      command = {
         benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
       }
     ),
@@ -2549,8 +2669,7 @@ list(
           ),
           features = benchmark_pre_meta_neg,
           rts = list(),
-          output =
-            "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
+          output = "data/interim/benchmark/benchmark_ann_spe_ms1_fil_neg.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
@@ -2599,8 +2718,7 @@ list(
           ),
           features = benchmark_pre_meta_pos,
           rts = list(),
-          output =
-            "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
+          output = "data/interim/benchmark/benchmark_ann_spe_ms1_fil_pos.tsv.gz",
           tolerance_rt = benchmark_def_fil_ann$ms$tolerances$rt$library
         )
       }
@@ -2640,58 +2758,32 @@ list(
           org_tax_ott = lib_mer_org_tax_ott,
           str_stereo = lib_mer_str_stereo,
           candidates_final = 500,
-          score_biological_domain =
-            benchmark_def_wei_ann$weights$biological$domain,
-          score_biological_kingdom =
-            benchmark_def_wei_ann$weights$biological$kingdom,
-          score_biological_phylum =
-            benchmark_def_wei_ann$weights$biological$phylum,
-          score_biological_class =
-            benchmark_def_wei_ann$weights$biological$class,
-          score_biological_order =
-            benchmark_def_wei_ann$weights$biological$order,
-          score_biological_infraorder =
-            benchmark_def_wei_ann$weights$biological$infraorder,
-          score_biological_family =
-            benchmark_def_wei_ann$weights$biological$family,
-          score_biological_subfamily =
-            benchmark_def_wei_ann$weights$biological$subfamily,
-          score_biological_tribe =
-            benchmark_def_wei_ann$weights$biological$tribe,
-          score_biological_subtribe =
-            benchmark_def_wei_ann$weights$biological$subtribe,
-          score_biological_genus =
-            benchmark_def_wei_ann$weights$biological$genus,
-          score_biological_subgenus =
-            benchmark_def_wei_ann$weights$biological$subgenus,
-          score_biological_species =
-            benchmark_def_wei_ann$weights$biological$species,
-          score_biological_subspecies =
-            benchmark_def_wei_ann$weights$biological$subspecies,
-          score_biological_variety =
-            benchmark_def_wei_ann$weights$biological$variety,
-          score_chemical_cla_kingdom =
-            benchmark_def_wei_ann$weights$chemical$cla$kingdom,
-          score_chemical_cla_superclass =
-            benchmark_def_wei_ann$weights$chemical$cla$superclass,
-          score_chemical_cla_class =
-            benchmark_def_wei_ann$weights$chemical$cla$class,
-          score_chemical_cla_parent =
-            benchmark_def_wei_ann$weights$chemical$cla$parent,
-          score_chemical_npc_pathway =
-            benchmark_def_wei_ann$weights$chemical$npc$pathway,
-          score_chemical_npc_superclass =
-            benchmark_def_wei_ann$weights$chemical$npc$superclass,
-          score_chemical_npc_class =
-            benchmark_def_wei_ann$weights$chemical$npc$class,
-          minimal_consistency =
-            benchmark_def_wei_ann$annotations$thresholds$consistency,
-          minimal_ms1_bio =
-            benchmark_def_wei_ann$annotations$thresholds$ms1$biological,
-          minimal_ms1_chemo =
-            benchmark_def_wei_ann$annotations$thresholds$ms1$chemical,
-          minimal_ms1_condition =
-            benchmark_def_wei_ann$annotations$thresholds$ms1$condition,
+          score_biological_domain = benchmark_def_wei_ann$weights$biological$domain,
+          score_biological_kingdom = benchmark_def_wei_ann$weights$biological$kingdom,
+          score_biological_phylum = benchmark_def_wei_ann$weights$biological$phylum,
+          score_biological_class = benchmark_def_wei_ann$weights$biological$class,
+          score_biological_order = benchmark_def_wei_ann$weights$biological$order,
+          score_biological_infraorder = benchmark_def_wei_ann$weights$biological$infraorder,
+          score_biological_family = benchmark_def_wei_ann$weights$biological$family,
+          score_biological_subfamily = benchmark_def_wei_ann$weights$biological$subfamily,
+          score_biological_tribe = benchmark_def_wei_ann$weights$biological$tribe,
+          score_biological_subtribe = benchmark_def_wei_ann$weights$biological$subtribe,
+          score_biological_genus = benchmark_def_wei_ann$weights$biological$genus,
+          score_biological_subgenus = benchmark_def_wei_ann$weights$biological$subgenus,
+          score_biological_species = benchmark_def_wei_ann$weights$biological$species,
+          score_biological_subspecies = benchmark_def_wei_ann$weights$biological$subspecies,
+          score_biological_variety = benchmark_def_wei_ann$weights$biological$variety,
+          score_chemical_cla_kingdom = benchmark_def_wei_ann$weights$chemical$cla$kingdom,
+          score_chemical_cla_superclass = benchmark_def_wei_ann$weights$chemical$cla$superclass,
+          score_chemical_cla_class = benchmark_def_wei_ann$weights$chemical$cla$class,
+          score_chemical_cla_parent = benchmark_def_wei_ann$weights$chemical$cla$parent,
+          score_chemical_npc_pathway = benchmark_def_wei_ann$weights$chemical$npc$pathway,
+          score_chemical_npc_superclass = benchmark_def_wei_ann$weights$chemical$npc$superclass,
+          score_chemical_npc_class = benchmark_def_wei_ann$weights$chemical$npc$class,
+          minimal_consistency = benchmark_def_wei_ann$annotations$thresholds$consistency,
+          minimal_ms1_bio = benchmark_def_wei_ann$annotations$thresholds$ms1$biological,
+          minimal_ms1_chemo = benchmark_def_wei_ann$annotations$thresholds$ms1$chemical,
+          minimal_ms1_condition = benchmark_def_wei_ann$annotations$thresholds$ms1$condition,
           compounds_names = benchmark_def_wei_ann$options$compounds_names,
           high_confidence = FALSE,
           remove_ties = benchmark_def_wei_ann$options$remove_ties,

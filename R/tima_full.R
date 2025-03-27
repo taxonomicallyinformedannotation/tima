@@ -11,7 +11,10 @@
 #' @examples NULL
 tima_full <- function() {
   start <- Sys.time()
-  log_debug("This script", crayon::green("does everything you ever dreamt of. \n"))
+  log_debug(
+    "This script",
+    crayon::green("does everything you ever dreamt of. \n")
+  )
   log_debug("Authors: ", crayon::green("AR"), "\n")
   log_debug("Contributors: ", crayon::blue("PMA"), "\n")
   go_to_cache()

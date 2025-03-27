@@ -21,16 +21,18 @@
 #'
 #' @examples NULL
 get_gnps_tables <-
-  function(gnps_job_id,
-           gnps_job_example = get_default_paths()$gnps$example,
-           filename,
-           workflow = "fbmn",
-           path_features,
-           path_metadata,
-           path_spectra,
-           path_source = get_default_paths()$data$source$path,
-           path_interim_a = get_default_paths()$data$interim$annotations$path,
-           path_interim_f = get_default_paths()$data$interim$features$path) {
+  function(
+    gnps_job_id,
+    gnps_job_example = get_default_paths()$gnps$example,
+    filename,
+    workflow = "fbmn",
+    path_features,
+    path_metadata,
+    path_spectra,
+    path_source = get_default_paths()$data$source$path,
+    path_interim_a = get_default_paths()$data$interim$annotations$path,
+    path_interim_f = get_default_paths()$data$interim$features$path
+  ) {
     if (!is.null(gnps_job_id)) {
       if (gnps_job_id == "") {
         gnps_job_id <- NULL
@@ -38,13 +40,15 @@ get_gnps_tables <-
     }
     if (!is.null(gnps_job_id)) {
       stopifnot(
-        "Your GNPS job ID is invalid" =
-          stringi::stri_length(str = gnps_job_id) == 32
+        "Your GNPS job ID is invalid" = stringi::stri_length(
+          str = gnps_job_id
+        ) ==
+          32
       )
       stopifnot(
         "Your workflow is not supported,
-        supported workflows are 'fbmn' and 'classical'" =
-          workflow %in% c("fbmn", "classical")
+        supported workflows are 'fbmn' and 'classical'" = workflow %in%
+          c("fbmn", "classical")
       )
 
       gnps_url <-
@@ -80,16 +84,19 @@ get_gnps_tables <-
         url <- paste0(gnps_url, gnps_job_id, gnps_block, "metadata_table/")
 
         log_debug("Checking response...")
-        if (url |>
-          httr2::request() |>
-          httr2::req_method("GET") |>
-          httr2::req_error(
-            is_error = function(resp) {
-              return(FALSE)
-            }
-          ) |>
-          httr2::req_perform() |>
-          httr2::resp_status_desc() == "OK") {
+        if (
+          url |>
+            httr2::request() |>
+            httr2::req_method("GET") |>
+            httr2::req_error(
+              is_error = function(resp) {
+                return(FALSE)
+              }
+            ) |>
+            httr2::req_perform() |>
+            httr2::resp_status_desc() ==
+            "OK"
+        ) {
           log_debug("Status OK!")
           get_file(url = url, export = file_metadata)
         } else {
@@ -112,30 +119,50 @@ get_gnps_tables <-
 
       log_debug("... Results")
       log_debug("... Annotations")
-      file_annotations <- file.path(path_interim_a, paste0(names(gnps_job_id), "_gnps.tsv"))
+      file_annotations <- file.path(
+        path_interim_a,
+        paste0(names(gnps_job_id), "_gnps.tsv")
+      )
       if (!file.exists(file_annotations)) {
         get_file(
-          url = paste0(gnps_url, gnps_job_id, gnps_block, switch(workflow,
-            "fbmn" = "DB_result/",
-            "classical" = "result_specnets_DB/"
-          )),
+          url = paste0(
+            gnps_url,
+            gnps_job_id,
+            gnps_block,
+            switch(
+              workflow,
+              "fbmn" = "DB_result/",
+              "classical" = "result_specnets_DB/"
+            )
+          ),
           export = file_annotations
         )
       }
       log_debug("... Components")
-      file_components <- file.path(path_interim_f, paste0(names(gnps_job_id), "_components.tsv"))
+      file_components <- file.path(
+        path_interim_f,
+        paste0(names(gnps_job_id), "_components.tsv")
+      )
       if (!file.exists(file_components)) {
         get_file(
-          url = paste0(gnps_url, gnps_job_id, gnps_block, switch(workflow,
-            "fbmn" = "clusterinfo_summary/",
-            "classical" =
-              "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
-          )),
+          url = paste0(
+            gnps_url,
+            gnps_job_id,
+            gnps_block,
+            switch(
+              workflow,
+              "fbmn" = "clusterinfo_summary/",
+              "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
+            )
+          ),
           export = file_components
         )
       }
       log_debug("... Edges")
-      file_edges <- file.path(path_interim_f, paste0(names(gnps_job_id), "_edges_spectra.tsv"))
+      file_edges <- file.path(
+        path_interim_f,
+        paste0(names(gnps_job_id), "_edges_spectra.tsv")
+      )
       if (!file.exists(file_edges)) {
         get_file(
           url = paste0(
@@ -182,24 +209,35 @@ get_gnps_tables <-
         subclass = "fff",
         check.names = FALSE
       )
-      export_output(x = fake_annotations, file = file.path(path_interim_a, paste0(filename, "_gnps.tsv")))
+      export_output(
+        x = fake_annotations,
+        file = file.path(path_interim_a, paste0(filename, "_gnps.tsv"))
+      )
       fake_components <- data.frame(
         `cluster index` = 0,
         componentindex = 0,
         check.names = FALSE
       )
-      export_output(x = fake_components, file = file.path(path_interim_f, paste0(filename, "_components.tsv")))
+      export_output(
+        x = fake_components,
+        file = file.path(path_interim_f, paste0(filename, "_components.tsv"))
+      )
 
       fake_edges <- data.frame(CLUSTERID1 = 0, CLUSTERID2 = 0)
-      export_output(x = fake_edges, file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv")))
+      export_output(
+        x = fake_edges,
+        file = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv"))
+      )
       if (is.list(path_metadata)) {
         path_metadata <- unlist(path_metadata)
       }
       if (is.null(path_metadata)) {
         path_metadata <- ""
       }
-      if (length(path_metadata) == 0 ||
-        !file.exists(path_metadata)) {
+      if (
+        length(path_metadata) == 0 ||
+          !file.exists(path_metadata)
+      ) {
         path_metadata <- "data/source/metadata.tsv"
         fake_metadata <- data.frame(filename = "foo", ATTRIBUTE_species = "bar")
         export_output(x = fake_metadata, file = path_metadata)
@@ -210,9 +248,18 @@ get_gnps_tables <-
           "features" = path_features,
           "metadata" = path_metadata,
           "spectra" = path_spectra,
-          "annotations" = file.path(path_interim_a, paste0(filename, "_gnps.tsv")),
-          "components" = file.path(path_interim_f, paste0(filename, "_components.tsv")),
-          "edges" = file.path(path_interim_f, paste0(filename, "_edges_spectra.tsv"))
+          "annotations" = file.path(
+            path_interim_a,
+            paste0(filename, "_gnps.tsv")
+          ),
+          "components" = file.path(
+            path_interim_f,
+            paste0(filename, "_components.tsv")
+          ),
+          "edges" = file.path(
+            path_interim_f,
+            paste0(filename, "_edges_spectra.tsv")
+          )
         )
       )
     }

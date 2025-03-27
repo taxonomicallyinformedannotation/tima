@@ -36,20 +36,58 @@
 #'
 #' @examples NULL
 weight_bio <-
-  function(annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
-           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
-           weight_spectral = get("weight_spectral", envir = parent.frame()),
-           weight_biological = get("weight_biological", envir = parent.frame()),
-           score_biological_domain = get("score_biological_domain", envir = parent.frame()),
-           score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
-           score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
-           score_biological_class = get("score_biological_class", envir = parent.frame()),
-           score_biological_order = get("score_biological_order", envir = parent.frame()),
-           score_biological_family = get("score_biological_family", envir = parent.frame()),
-           score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
-           score_biological_genus = get("score_biological_genus", envir = parent.frame()),
-           score_biological_species = get("score_biological_species", envir = parent.frame()),
-           score_biological_variety = get("score_biological_variety", envir = parent.frame())) {
+  function(
+    annotation_table_taxed = get(
+      "annotation_table_taxed",
+      envir = parent.frame()
+    ),
+    structure_organism_pairs_table = get(
+      "structure_organism_pairs_table",
+      envir = parent.frame()
+    ),
+    weight_spectral = get("weight_spectral", envir = parent.frame()),
+    weight_biological = get("weight_biological", envir = parent.frame()),
+    score_biological_domain = get(
+      "score_biological_domain",
+      envir = parent.frame()
+    ),
+    score_biological_kingdom = get(
+      "score_biological_kingdom",
+      envir = parent.frame()
+    ),
+    score_biological_phylum = get(
+      "score_biological_phylum",
+      envir = parent.frame()
+    ),
+    score_biological_class = get(
+      "score_biological_class",
+      envir = parent.frame()
+    ),
+    score_biological_order = get(
+      "score_biological_order",
+      envir = parent.frame()
+    ),
+    score_biological_family = get(
+      "score_biological_family",
+      envir = parent.frame()
+    ),
+    score_biological_tribe = get(
+      "score_biological_tribe",
+      envir = parent.frame()
+    ),
+    score_biological_genus = get(
+      "score_biological_genus",
+      envir = parent.frame()
+    ),
+    score_biological_species = get(
+      "score_biological_species",
+      envir = parent.frame()
+    ),
+    score_biological_variety = get(
+      "score_biological_variety",
+      envir = parent.frame()
+    )
+  ) {
     df0 <- annotation_table_taxed |>
       tidytable::distinct(
         candidate_structure_tax_cla_01kin,
@@ -156,11 +194,7 @@ weight_bio <-
 
     log_debug("calculating biological score at all levels ... \n")
     score_per_level_bio <-
-      function(df,
-               candidates,
-               samples,
-               score,
-               score_name) {
+      function(df, candidates, samples, score, score_name) {
         score <- df |>
           tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
           tidytable::filter(!is.na(!!as.name(samples))) |>
@@ -374,32 +408,32 @@ weight_bio <-
       tidytable::select(-tidyselect::contains("score_biological_")) |>
       tidytable::mutate(
         candidate_structure_organism_occurrence_closest = tidytable::case_when(
-          score_biological == score_biological_domain
-          ~ candidate_organism_01_domain,
-          score_biological == score_biological_kingdom
-          ~ candidate_organism_02_kingdom,
-          score_biological == score_biological_phylum
-          ~ candidate_organism_03_phylum,
-          score_biological == score_biological_class
-          ~ candidate_organism_04_class,
-          score_biological == score_biological_order
-          ~ candidate_organism_05_order,
+          score_biological == score_biological_domain ~
+            candidate_organism_01_domain,
+          score_biological == score_biological_kingdom ~
+            candidate_organism_02_kingdom,
+          score_biological == score_biological_phylum ~
+            candidate_organism_03_phylum,
+          score_biological == score_biological_class ~
+            candidate_organism_04_class,
+          score_biological == score_biological_order ~
+            candidate_organism_05_order,
           # score_biological == score_biological_05_1 ~
           # candidate_organism_05_1_infraorder,
-          score_biological == score_biological_family
-          ~ candidate_organism_06_family,
+          score_biological == score_biological_family ~
+            candidate_organism_06_family,
           # score_biological == score_biological_06_1 ~
           # candidate_organism_06_1_subfamily,
-          score_biological == score_biological_tribe
-          ~ candidate_organism_07_tribe,
+          score_biological == score_biological_tribe ~
+            candidate_organism_07_tribe,
           # score_biological == score_biological_07_1 ~
           # candidate_organism_07_1_subtribe,
-          score_biological == score_biological_genus
-          ~ candidate_organism_08_genus,
+          score_biological == score_biological_genus ~
+            candidate_organism_08_genus,
           # score_biological == score_biological_08_1 ~
           # candidate_organism_08_1_subgenus,
-          score_biological == score_biological_species
-          ~ candidate_organism_09_species,
+          score_biological == score_biological_species ~
+            candidate_organism_09_species,
           # score_biological == score_biological_09_1 ~
           # candidate_organism_09_1_subspecies,
           score_biological == score_biological_variety ~
@@ -448,19 +482,32 @@ weight_bio <-
     rm(annot_table_wei_bio_interim)
 
     annot_table_wei_bio <- annot_table_wei_bio_big |>
-      tidytable::mutate(candidate_score_sirius_csi_tmp = transform_score_sirius_csi(candidate_score_sirius_csi)) |>
+      tidytable::mutate(
+        candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
+          candidate_score_sirius_csi
+        )
+      ) |>
       tidytable::mutate(
         candidate_score_pseudo_initial = tidytable::case_when(
           !is.na(candidate_score_similarity) &
-            !is.na(candidate_score_sirius_csi) ~ (as.numeric(candidate_score_similarity) + candidate_score_sirius_csi_tmp) / 2,
-          !is.na(candidate_score_similarity) ~ as.numeric(candidate_score_similarity),
+            !is.na(candidate_score_sirius_csi) ~
+            (as.numeric(candidate_score_similarity) +
+              candidate_score_sirius_csi_tmp) /
+              2,
+          !is.na(candidate_score_similarity) ~
+            as.numeric(candidate_score_similarity),
           !is.na(candidate_score_sirius_csi) ~ candidate_score_sirius_csi_tmp,
           TRUE ~ 0
         )
       ) |>
       tidytable::select(-candidate_score_sirius_csi_tmp) |>
       tidytable::mutate(
-        score_weighted_bio = (1 / (weight_biological + weight_spectral)) * weight_biological * score_biological + (1 / (weight_biological + weight_spectral)) * weight_spectral * candidate_score_pseudo_initial
+        score_weighted_bio = (1 / (weight_biological + weight_spectral)) *
+          weight_biological *
+          score_biological +
+          (1 / (weight_biological + weight_spectral)) *
+            weight_spectral *
+            candidate_score_pseudo_initial
       )
 
     rm(

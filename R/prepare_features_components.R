@@ -27,9 +27,19 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_features_components <-
-  function(input = get_params(step = "prepare_features_components")$files$networks$spectral$components$raw,
-           output = get_params(step = "prepare_features_components")$files$networks$spectral$components$prepared) {
-    stopifnot("Input file(s) do(es) not exist" = all(purrr::map(.x = input, .f = file.exists) |> unlist()))
+  function(
+    input = get_params(
+      step = "prepare_features_components"
+    )$files$networks$spectral$components$raw,
+    output = get_params(
+      step = "prepare_features_components"
+    )$files$networks$spectral$components$prepared
+  ) {
+    stopifnot(
+      "Input file(s) do(es) not exist" = all(
+        purrr::map(.x = input, .f = file.exists) |> unlist()
+      )
+    )
 
     log_debug(x = "Loading files ...")
     log_debug(x = "... components table")
@@ -40,7 +50,10 @@ prepare_features_components <-
       colClasses = "character"
     ) |>
       tidytable::bind_rows() |>
-      tidytable::select(feature_id = `cluster index`, component_id = componentindex) |>
+      tidytable::select(
+        feature_id = `cluster index`,
+        component_id = componentindex
+      ) |>
       tidytable::distinct()
 
     export_params(

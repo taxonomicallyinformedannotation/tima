@@ -13,22 +13,27 @@
 #'
 #' @examples NULL
 export_params <-
-  function(parameters = get("parameters", envir = parent.frame()),
-           directory = get_default_paths()$data$interim$params$path,
-           step) {
+  function(
+    parameters = get("parameters", envir = parent.frame()),
+    directory = get_default_paths()$data$interim$params$path,
+    step
+  ) {
     ## Create directory if it does not exist
     create_dir(export = directory)
 
     ## Log the path to the used parameters
     log_debug(x = "... path to used parameters is", crayon::green(directory))
 
-    yaml::write_yaml(x = parameters, file = file.path(
-      directory,
-      paste0(
-        format(Sys.time(), "%y%m%d_%H%M%OS"),
-        "_",
-        step,
-        ".yaml"
+    yaml::write_yaml(
+      x = parameters,
+      file = file.path(
+        directory,
+        paste0(
+          format(Sys.time(), "%y%m%d_%H%M%OS"),
+          "_",
+          step,
+          ".yaml"
+        )
       )
-    ))
+    )
   }

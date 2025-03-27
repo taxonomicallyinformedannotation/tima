@@ -44,21 +44,33 @@
 #' )
 #' unlink("data", recursive = TRUE)
 #' }
-annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files$spectral$raw,
-                             library = get_params(step = "annotate_spectra")$files$libraries$spectral,
-                             polarity = get_params(step = "annotate_spectra")$ms$polarity,
-                             output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
-                             method = get_params(step = "annotate_spectra")$similarities$methods$annotations,
-                             threshold = get_params(step = "annotate_spectra")$similarities$thresholds$annotations,
-                             ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
-                             dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
-                             qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
-                             approx = get_params(step = "annotate_spectra")$annotations$ms2approx) {
+annotate_spectra <- function(
+  input = get_params(step = "annotate_spectra")$files$spectral$raw,
+  library = get_params(step = "annotate_spectra")$files$libraries$spectral,
+  polarity = get_params(step = "annotate_spectra")$ms$polarity,
+  output = get_params(
+    step = "annotate_spectra"
+  )$files$annotations$raw$spectral$spectral,
+  method = get_params(
+    step = "annotate_spectra"
+  )$similarities$methods$annotations,
+  threshold = get_params(
+    step = "annotate_spectra"
+  )$similarities$thresholds$annotations,
+  ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
+  dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
+  qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
+) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
   ## Check if library file(s) exists
-  stopifnot("Library file(s) do(es) not exist" = all(purrr::map(.x = library, .f = file.exists) |>
-    unlist()))
+  stopifnot(
+    "Library file(s) do(es) not exist" = all(
+      purrr::map(.x = library, .f = file.exists) |>
+        unlist()
+    )
+  )
 
   ## Not checking for ppm and Da limits, everyone is free.
 
@@ -116,14 +128,20 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
     ## Fix needed
     lib_precursors <- spectral_library@backend@spectraData |>
-      tidytable::transmute(precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
-        c("precursorMz", "precursor_mz")
-      )))) |>
+      tidytable::transmute(
+        precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
+          c("precursorMz", "precursor_mz")
+        )))
+      ) |>
       tidytable::pull()
-    minimal <- pmin(lib_precursors - dalton, lib_precursors * (1 - (10^
-      -6 * ppm)))
-    maximal <- pmax(lib_precursors + dalton, lib_precursors * (1 + (10^
-      -6 * ppm)))
+    minimal <- pmin(
+      lib_precursors - dalton,
+      lib_precursors * (1 - (10^-6 * ppm))
+    )
+    maximal <- pmax(
+      lib_precursors + dalton,
+      lib_precursors * (1 + (10^-6 * ppm))
+    )
 
     if (approx == FALSE) {
       log_debug("Reducing library size...")
@@ -139,14 +157,20 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
 
       ## Fix needed
       lib_precursors <- spectral_library@backend@spectraData |>
-        tidytable::transmute(precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
-          c("precursorMz", "precursor_mz")
-        )))) |>
+        tidytable::transmute(
+          precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
+            c("precursorMz", "precursor_mz")
+          )))
+        ) |>
         tidytable::pull()
-      minimal <- pmin(lib_precursors - dalton, lib_precursors * (1 - (10^
-        -6 * ppm)))
-      maximal <- pmax(lib_precursors + dalton, lib_precursors * (1 + (10^
-        -6 * ppm)))
+      minimal <- pmin(
+        lib_precursors - dalton,
+        lib_precursors * (1 - (10^-6 * ppm))
+      )
+      maximal <- pmax(
+        lib_precursors + dalton,
+        lib_precursors * (1 + (10^-6 * ppm))
+      )
       rm(df_3)
     }
 
@@ -233,9 +257,15 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         harmonize_adducts(adducts_colname = "target_adduct")
       rm(lib_precursors)
 
-      df_final$candidate_spectrum_entropy <- as.numeric(df_final$candidate_spectrum_entropy)
-      df_final$candidate_score_similarity <- as.numeric(df_final$candidate_score_similarity)
-      df_final$candidate_count_similarity_peaks_matched <- as.integer(df_final$candidate_count_similarity_peaks_matched)
+      df_final$candidate_spectrum_entropy <- as.numeric(
+        df_final$candidate_spectrum_entropy
+      )
+      df_final$candidate_score_similarity <- as.numeric(
+        df_final$candidate_score_similarity
+      )
+      df_final$candidate_count_similarity_peaks_matched <- as.integer(
+        df_final$candidate_count_similarity_peaks_matched
+      )
 
       df_final <- df_final |>
         tidytable::left_join(df_meta) |>
@@ -254,7 +284,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
               ),
             false = target_inchikey_connectivity_layer
           ),
-          candidate_structure_smiles_no_stereo = tidytable::coalesce(target_smiles_no_stereo, target_smiles)
+          candidate_structure_smiles_no_stereo = tidytable::coalesce(
+            target_smiles_no_stereo,
+            target_smiles
+          )
         ) |>
         tidytable::select(tidyselect::any_of(
           c(
@@ -299,8 +332,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
             )
         ),
         "Candidates were annotated on",
-        nrow(df_final |>
-          tidytable::distinct(feature_id)),
+        nrow(
+          df_final |>
+            tidytable::distinct(feature_id)
+        ),
         "features, with at least",
         threshold,
         "similarity score."
@@ -310,8 +345,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
         df_final <- df_empty
       }
     } else {
-      log_debug("No spectra left in the library,
-              returning an empty dataframe")
+      log_debug(
+        "No spectra left in the library,
+              returning an empty dataframe"
+      )
       df_final <- df_empty
     }
     rm(
@@ -322,8 +359,10 @@ annotate_spectra <- function(input = get_params(step = "annotate_spectra")$files
       maximal
     )
   } else {
-    log_debug("No spectra matched the given polarity,
-              returning an empty dataframe")
+    log_debug(
+      "No spectra matched the given polarity,
+              returning an empty dataframe"
+    )
     df_final <- df_empty
   }
 

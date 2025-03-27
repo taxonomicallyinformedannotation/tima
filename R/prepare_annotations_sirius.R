@@ -33,39 +33,66 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_annotations_sirius <-
-  function(input_directory = get_params(step = "prepare_annotations_sirius")$files$annotations$raw$sirius,
-           output_ann = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$structural$sirius,
-           output_can = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$canopus,
-           output_for = get_params(step = "prepare_annotations_sirius")$files$annotations$prepared$formula,
-           sirius_version = get_params(step = "prepare_annotations_sirius")$tools$sirius$version,
-           str_stereo = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$stereo,
-           str_met = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$metadata,
-           str_nam = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$names,
-           str_tax_cla = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc = get_params(step = "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc) {
+  function(
+    input_directory = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$annotations$raw$sirius,
+    output_ann = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$annotations$prepared$structural$sirius,
+    output_can = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$annotations$prepared$canopus,
+    output_for = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$annotations$prepared$formula,
+    sirius_version = get_params(
+      step = "prepare_annotations_sirius"
+    )$tools$sirius$version,
+    str_stereo = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$libraries$sop$merged$structures$stereo,
+    str_met = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$libraries$sop$merged$structures$metadata,
+    str_nam = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$libraries$sop$merged$structures$names,
+    str_tax_cla = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$libraries$sop$merged$structures$taxonomies$cla,
+    str_tax_npc = get_params(
+      step = "prepare_annotations_sirius"
+    )$files$libraries$sop$merged$structures$taxonomies$npc
+  ) {
     if (is.null(input_directory)) {
       input_directory <- "Th1sd1rw0nt3x1st"
     }
     if (file.exists(input_directory)) {
       log_debug("Loading parameters for SIRIUS", sirius_version)
       sirius_version <- as.character(sirius_version)
-      canopus_filename <- switch(sirius_version,
+      canopus_filename <- switch(
+        sirius_version,
         "5" = "canopus_compound_summary.tsv",
         "6" = "canopus_formula_summary_all.tsv"
       )
-      formulas_filename <- switch(sirius_version,
+      formulas_filename <- switch(
+        sirius_version,
         "5" = "formula_identifications_all.tsv",
         "6" = "formula_identifications_all.tsv"
       )
-      structures_filename <- switch(sirius_version,
+      structures_filename <- switch(
+        sirius_version,
         "5" = "compound_identifications_all.tsv",
         "6" = "structure_identifications_all.tsv"
       )
-      denovo_filename <- switch(sirius_version,
+      denovo_filename <- switch(
+        sirius_version,
         "5" = NULL,
         "6" = "denovo_structure_identifications_all.tsv"
       )
-      spectral_filename <- switch(sirius_version,
+      spectral_filename <- switch(
+        sirius_version,
         "5" = NULL,
         "6" = "spectral_matches_all.tsv"
       )
@@ -96,8 +123,10 @@ prepare_annotations_sirius <-
       denovo <- tidytable::tidytable() |>
         tidytable::mutate(mappingFeatureId = NA)
       if (!is.null(denovo_filename)) {
-        if (grepl(pattern = denovo_filename, x = files$Name) |>
-          any()) {
+        if (
+          grepl(pattern = denovo_filename, x = files$Name) |>
+            any()
+        ) {
           denovo <- input_directory |>
             read_from_sirius_zip(file = denovo_filename)
         }
@@ -123,11 +152,13 @@ prepare_annotations_sirius <-
           return(list)
         }
       )
-      summary_files <- list$Name[list$Name |>
-        grepl(
-          pattern = "structure_candidates.tsv", fixed =
-            TRUE
-        )] |>
+      summary_files <- list$Name[
+        list$Name |>
+          grepl(
+            pattern = "structure_candidates.tsv",
+            fixed = TRUE
+          )
+      ] |>
         gsub(
           pattern = basename(input_directory) |>
             gsub(
@@ -175,10 +206,13 @@ prepare_annotations_sirius <-
       rm(structures_summary_ready)
 
       structures_prepared_2 <- structures |>
-        tidytable::mutate(feature_id = switch(sirius_version,
-          "5" = harmonize_names_sirius(id),
-          "6" = mappingFeatureId
-        )) |>
+        tidytable::mutate(
+          feature_id = switch(
+            sirius_version,
+            "5" = harmonize_names_sirius(id),
+            "6" = mappingFeatureId
+          )
+        ) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
       rm(structures)
 
@@ -213,8 +247,10 @@ prepare_annotations_sirius <-
         denovo_prepared
       )
     } else {
-      log_debug("Sorry, your input directory does not exist,
-                returning an empty file instead")
+      log_debug(
+        "Sorry, your input directory does not exist,
+                returning an empty file instead"
+      )
       table <- fake_annotations_columns() |>
         tidytable::mutate(
           feature_pred_tax_cla_02sup_val = NA,
@@ -240,7 +276,9 @@ prepare_annotations_sirius <-
           candidate_score_sirius_msnovelist = NA
         ) |>
         tidytable::select(
-          -candidate_structure_error_rt, -candidate_score_similarity, -candidate_count_similarity_peaks_matched
+          -candidate_structure_error_rt,
+          -candidate_score_similarity,
+          -candidate_count_similarity_peaks_matched
         )
     }
     log_debug("Splitting SIRIUS results")
@@ -250,7 +288,9 @@ prepare_annotations_sirius <-
       tidytable::select(tidyselect::any_of(
         c(model$features_columns, model$features_calculated_columns)
       )) |>
-      tidytable::filter(!is.na(!!as.name(model$features_calculated_columns[5]))) |>
+      tidytable::filter(
+        !is.na(!!as.name(model$features_calculated_columns[5]))
+      ) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 
@@ -261,7 +301,9 @@ prepare_annotations_sirius <-
           model$candidates_sirius_for_columns
         )
       )) |>
-      tidytable::filter(!is.na(!!as.name(model$candidates_sirius_for_columns[2]))) |>
+      tidytable::filter(
+        !is.na(!!as.name(model$candidates_sirius_for_columns[2]))
+      ) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
 

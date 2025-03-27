@@ -13,6 +13,8 @@
 #' \dontrun{
 #' get_default_paths()
 #' }
-get_default_paths <- function(yaml = system.file("paths.yaml", package = "tima")) {
+get_default_paths <- function(
+  yaml = system.file("paths.yaml", package = "tima")
+) {
   return(yaml::read_yaml(file = yaml))
 }

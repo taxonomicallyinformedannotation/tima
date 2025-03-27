@@ -16,12 +16,14 @@
 #' @return The dataframe with annotation columns selected
 #'
 #' @examples NULL
-select_annotations_columns <- function(df,
-                                       str_stereo = get("str_stereo", envir = parent.frame()),
-                                       str_met = get("str_met", envir = parent.frame()),
-                                       str_nam = get("str_nam", envir = parent.frame()),
-                                       str_tax_cla = get("str_tax_cla", envir = parent.frame()),
-                                       str_tax_npc = get("str_tax_npc", envir = parent.frame())) {
+select_annotations_columns <- function(
+  df,
+  str_stereo = get("str_stereo", envir = parent.frame()),
+  str_met = get("str_met", envir = parent.frame()),
+  str_nam = get("str_nam", envir = parent.frame()),
+  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
+  str_tax_npc = get("str_tax_npc", envir = parent.frame())
+) {
   model <- columns_model()
   df <- df |>
     tidytable::select(tidyselect::any_of(
@@ -54,7 +56,10 @@ select_annotations_columns <- function(df,
       }
     )) |>
     round_reals() |>
-    tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.numeric), .fns = as.character)) |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.numeric),
+      .fns = as.character
+    )) |>
     complement_metadata_structures()
   return(df)
 }

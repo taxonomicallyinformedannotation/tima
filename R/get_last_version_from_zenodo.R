@@ -43,15 +43,17 @@ get_last_version_from_zenodo <-
     record_new <-
       httr2::request(base_url = paste0(base_url, record, "/latest")) |>
       httr2::req_perform()
-    content <- jsonlite::fromJSON(txt = paste0(
-      base_url_api,
-      gsub(
-        pattern = ".*/",
-        replacement = "",
-        x = record_new$url,
-        perl = TRUE
+    content <- jsonlite::fromJSON(
+      txt = paste0(
+        base_url_api,
+        gsub(
+          pattern = ".*/",
+          replacement = "",
+          x = record_new$url,
+          perl = TRUE
+        )
       )
-    ))
+    )
 
     ## Extract individual file names and urls
     fileurls <- content$files$links$self

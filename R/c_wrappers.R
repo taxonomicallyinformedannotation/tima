@@ -21,7 +21,14 @@ gnps_wrapper <- function(x, y) {
 #' @param ppm Numeric value specifying the tolerance in ppm.
 #' @return The result returned from the C function "join_gnps".
 #' @export
-join_gnps_wrapper <- function(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm) {
+join_gnps_wrapper <- function(
+  x,
+  y,
+  xPrecursorMz,
+  yPrecursorMz,
+  tolerance,
+  ppm
+) {
   .Call(
     "join_gnps",
     x = x,

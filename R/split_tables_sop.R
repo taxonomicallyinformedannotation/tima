@@ -12,11 +12,16 @@
 #'
 #' @examples NULL
 split_tables_sop <- function(table, cache) {
-  log_debug(x = "Splitting the concatenated library into smaller standardized pieces")
+  log_debug(
+    x = "Splitting the concatenated library into smaller standardized pieces"
+  )
 
   table <- table |>
     tidytable::mutate(
-      structure_smiles_initial = tidytable::coalesce(structure_smiles, structure_smiles_no_stereo)
+      structure_smiles_initial = tidytable::coalesce(
+        structure_smiles,
+        structure_smiles_no_stereo
+      )
     )
   table_structural_initial <- table |>
     tidytable::select(tidytable::contains("structure")) |>
@@ -71,12 +76,18 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
   rm(table)
-  log_debug(x = "Led to", nrow(table_keys), "referenced structure-organism pairs")
+  log_debug(
+    x = "Led to",
+    nrow(table_keys),
+    "referenced structure-organism pairs"
+  )
 
   table_structures_stereo <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles) |
-      !is.na(structure_smiles_no_stereo)) |>
+    tidytable::filter(
+      !is.na(structure_smiles) |
+        !is.na(structure_smiles_no_stereo)
+    ) |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter() |>
     tidytable::select(

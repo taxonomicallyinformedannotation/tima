@@ -20,8 +20,14 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_sop_ecmdb <-
-  function(input = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$raw$ecmdb,
-           output = get_params(step = "prepare_libraries_sop_ecmdb")$files$libraries$sop$prepared$ecmdb) {
+  function(
+    input = get_params(
+      step = "prepare_libraries_sop_ecmdb"
+    )$files$libraries$sop$raw$ecmdb,
+    output = get_params(
+      step = "prepare_libraries_sop_ecmdb"
+    )$files$libraries$sop$prepared$ecmdb
+  ) {
     if (file.exists(input)) {
       log_debug(x = "Loading ECMDB resources")
 
@@ -47,7 +53,11 @@ prepare_libraries_sop_ecmdb <-
       log_debug(x = "Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(str = moldb_inchikey, from = 1, to = 14),
+          structure_inchikey_2D = stringi::stri_sub(
+            str = moldb_inchikey,
+            from = 1,
+            to = 14
+          ),
           structure_smiles_2D = NA_character_
         ) |>
         tidytable::rename(

@@ -18,10 +18,13 @@
 #' \dontrun{
 #' get_example_files(example = c("features"), in_cache = FALSE)
 #' }
-get_example_files <- function(example = c("features", "metadata", "sirius", "spectra"), in_cache = TRUE) {
+get_example_files <- function(
+  example = c("features", "metadata", "sirius", "spectra"),
+  in_cache = TRUE
+) {
   stopifnot(
-    "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." =
-      example %in% c(
+    "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." = example %in%
+      c(
         "features",
         "hmdb_is",
         "metadata",

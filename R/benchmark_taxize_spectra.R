@@ -18,25 +18,37 @@ benchmark_taxize_spectra <-
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
     sop <- keys |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
-      tidytable::mutate(inchikey_connectivity_layer = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14))
+      tidytable::mutate(
+        inchikey_connectivity_layer = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1,
+          to = 14
+        )
+      )
     taxo <- org_tax_ott |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
 
     features_pretaxed <- features |>
-      tidytable::left_join(sop |>
-        tidytable::distinct(organism_name, inchikey_connectivity_layer))
+      tidytable::left_join(
+        sop |>
+          tidytable::distinct(organism_name, inchikey_connectivity_layer)
+      )
     rm(features, sop)
     set.seed(42)
     features_sampled <- features_pretaxed |>
       tidytable::filter(!is.na(organism_name)) |>
       tidytable::slice_sample(n = 1, .by = feature_id) |>
-      tidytable::bind_rows(features_pretaxed |>
-        tidytable::filter(is.na(organism_name)))
+      tidytable::bind_rows(
+        features_pretaxed |>
+          tidytable::filter(is.na(organism_name))
+      )
     rm(features_pretaxed)
 
     features_taxed <- features_sampled |>
-      tidytable::left_join(taxo |>
-        tidytable::distinct(organism_name, .keep_all = TRUE)) |>
+      tidytable::left_join(
+        taxo |>
+          tidytable::distinct(organism_name, .keep_all = TRUE)
+      ) |>
       tidytable::select(
         feature_id,
         sample_organism_01_domain = organism_taxonomy_01domain,

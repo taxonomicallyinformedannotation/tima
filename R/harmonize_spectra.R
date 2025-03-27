@@ -26,26 +26,28 @@
 #' @return The harmonized spectra
 #'
 #' @examples NULL
-harmonize_spectra <- function(spectra,
-                              metad = get("metad", envir = parent.frame()),
-                              mode,
-                              col_ad = get("col_ad", envir = parent.frame()),
-                              col_ce = get("col_ce", envir = parent.frame()),
-                              col_ci = get("col_ci", envir = parent.frame()),
-                              col_em = get("col_em", envir = parent.frame()),
-                              col_in = get("col_in", envir = parent.frame()),
-                              col_io = get("col_io", envir = parent.frame()),
-                              col_ik = get("col_ik", envir = parent.frame()),
-                              col_il = get("col_il", envir = parent.frame()),
-                              col_mf = get("col_mf", envir = parent.frame()),
-                              col_na = get("col_na", envir = parent.frame()),
-                              col_po = get("col_po", envir = parent.frame()),
-                              col_sm = get("col_sm", envir = parent.frame()),
-                              col_sn = get("col_sn", envir = parent.frame()),
-                              col_si = get("col_si", envir = parent.frame()),
-                              col_sp = get("col_sp", envir = parent.frame()),
-                              col_sy = get("col_sy", envir = parent.frame()),
-                              col_xl = get("col_xl", envir = parent.frame())) {
+harmonize_spectra <- function(
+  spectra,
+  metad = get("metad", envir = parent.frame()),
+  mode,
+  col_ad = get("col_ad", envir = parent.frame()),
+  col_ce = get("col_ce", envir = parent.frame()),
+  col_ci = get("col_ci", envir = parent.frame()),
+  col_em = get("col_em", envir = parent.frame()),
+  col_in = get("col_in", envir = parent.frame()),
+  col_io = get("col_io", envir = parent.frame()),
+  col_ik = get("col_ik", envir = parent.frame()),
+  col_il = get("col_il", envir = parent.frame()),
+  col_mf = get("col_mf", envir = parent.frame()),
+  col_na = get("col_na", envir = parent.frame()),
+  col_po = get("col_po", envir = parent.frame()),
+  col_sm = get("col_sm", envir = parent.frame()),
+  col_sn = get("col_sn", envir = parent.frame()),
+  col_si = get("col_si", envir = parent.frame()),
+  col_sp = get("col_sp", envir = parent.frame()),
+  col_sy = get("col_sy", envir = parent.frame()),
+  col_xl = get("col_xl", envir = parent.frame())
+) {
   columns <- c(
     "adduct",
     "collision_energy",
@@ -103,15 +105,16 @@ harmonize_spectra <- function(spectra,
         pattern = mode,
         x = !!as.name(col_po),
         ignore.case = TRUE
-      ) | grepl(
-        pattern = if (mode == "pos") {
-          1
-        } else {
-          0
-        },
-        x = !!as.name(col_po),
-        ignore.case = TRUE
-      )
+      ) |
+        grepl(
+          pattern = if (mode == "pos") {
+            1
+          } else {
+            0
+          },
+          x = !!as.name(col_po),
+          ignore.case = TRUE
+        )
     ) |>
     tidytable::select(
       tidyselect::any_of(c(columns_full)),

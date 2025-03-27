@@ -28,17 +28,28 @@
 #'
 #' @examples NULL
 clean_chemo <-
-  function(annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-           components_table = get("components_table", envir = parent.frame()),
-           features_table = get("features_table", envir = parent.frame()),
-           structure_organism_pairs_table = get("structure_organism_pairs_table", envir = parent.frame()),
-           candidates_final = get("candidates_final", envir = parent.frame()),
-           minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
-           minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
-           minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
-           high_confidence = get("high_confidence", envir = parent.frame()),
-           remove_ties = get("remove_ties", envir = parent.frame()),
-           summarize = get("summarize", envir = parent.frame())) {
+  function(
+    annot_table_wei_chemo = get(
+      "annot_table_wei_chemo",
+      envir = parent.frame()
+    ),
+    components_table = get("components_table", envir = parent.frame()),
+    features_table = get("features_table", envir = parent.frame()),
+    structure_organism_pairs_table = get(
+      "structure_organism_pairs_table",
+      envir = parent.frame()
+    ),
+    candidates_final = get("candidates_final", envir = parent.frame()),
+    minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
+    minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
+    minimal_ms1_condition = get(
+      "minimal_ms1_condition",
+      envir = parent.frame()
+    ),
+    high_confidence = get("high_confidence", envir = parent.frame()),
+    remove_ties = get("remove_ties", envir = parent.frame()),
+    summarize = get("summarize", envir = parent.frame())
+  ) {
     model <- columns_model()
 
     log_debug(
@@ -58,27 +69,19 @@ clean_chemo <-
     if (minimal_ms1_condition == "OR") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          (
-            !is.na(candidate_score_similarity) |
-              !is.na(candidate_score_sirius_csi)
-          ) |
-            (
-              score_biological >= minimal_ms1_bio |
-                score_chemical >= minimal_ms1_chemo
-            )
+          (!is.na(candidate_score_similarity) |
+            !is.na(candidate_score_sirius_csi)) |
+            (score_biological >= minimal_ms1_bio |
+              score_chemical >= minimal_ms1_chemo)
         )
     }
     if (minimal_ms1_condition == "AND") {
       df1 <- annot_table_wei_chemo |>
         tidytable::filter(
-          (
-            !is.na(candidate_score_similarity) |
-              !is.na(candidate_score_sirius_csi)
-          ) |
-            (
-              score_biological >= minimal_ms1_bio &
-                score_chemical >= minimal_ms1_chemo
-            )
+          (!is.na(candidate_score_similarity) |
+            !is.na(candidate_score_sirius_csi)) |
+            (score_biological >= minimal_ms1_bio &
+              score_chemical >= minimal_ms1_chemo)
         )
     }
 
@@ -89,7 +92,8 @@ clean_chemo <-
 
     df1 <- df1 |>
       tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
-      tidytable::distinct(feature_id,
+      tidytable::distinct(
+        feature_id,
         candidate_structure_inchikey_connectivity_layer,
         .keep_all = TRUE
       ) |>
@@ -146,7 +150,8 @@ clean_chemo <-
             candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
             reference_doi,
             organism_name,
-            tidyselect::contains("organism_taxonomy_"), -organism_taxonomy_ottid
+            tidyselect::contains("organism_taxonomy_"),
+            -organism_taxonomy_ottid
           ) |>
           tidytable::distinct() |>
           tidytable::pivot_longer(tidyselect::contains("organism_taxonomy_")) |>
@@ -158,8 +163,12 @@ clean_chemo <-
             candidate_structure_organism_occurrence_reference = reference_doi
           )
       ) |>
-      tidytable::group_by(c(-candidate_structure_organism_occurrence_reference)) |>
-      clean_collapse(cols = c("candidate_structure_organism_occurrence_reference")) |>
+      tidytable::group_by(c(
+        -candidate_structure_organism_occurrence_reference
+      )) |>
+      clean_collapse(
+        cols = c("candidate_structure_organism_occurrence_reference")
+      ) |>
       tidytable::select(tidyselect::any_of(
         c(
           model$features_columns,
@@ -208,9 +217,11 @@ clean_chemo <-
         tidytable::ungroup()
 
       df5 <- df4 |>
-        tidytable::left_join(df3 |>
-          tidytable::select("feature_id", !colnames(df4)) |>
-          tidytable::distinct())
+        tidytable::left_join(
+          df3 |>
+            tidytable::select("feature_id", !colnames(df4)) |>
+            tidytable::distinct()
+        )
       rm(df4)
     } else {
       df5 <- df3
@@ -219,8 +230,14 @@ clean_chemo <-
 
     log_debug("selecting columns to export \n")
     df6 <- df5 |>
-      tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character)) |>
-      tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.character), .fns = trimws)) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::everything(),
+        .fns = as.character
+      )) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(is.character),
+        .fns = trimws
+      )) |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(is.character),
         .fns = function(x) {
@@ -246,9 +263,11 @@ clean_chemo <-
     log_debug("adding consensus again to droped candidates \n")
     results <- tidytable::bind_rows(
       df6 |>
-        tidytable::filter(!is.na(
-          candidate_structure_inchikey_connectivity_layer
-        )),
+        tidytable::filter(
+          !is.na(
+            candidate_structure_inchikey_connectivity_layer
+          )
+        ),
       tidytable::left_join(
         df6 |>
           tidytable::filter(is.na(
@@ -256,7 +275,10 @@ clean_chemo <-
           )) |>
           tidytable::distinct(model$features_columns),
         annot_table_wei_chemo |>
-          tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = as.character))
+          tidytable::mutate(tidytable::across(
+            .cols = tidyselect::everything(),
+            .fns = as.character
+          ))
       ) |>
         tidytable::select(tidyselect::any_of(
           c(

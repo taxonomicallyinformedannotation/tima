@@ -28,10 +28,20 @@
 #' unlink("data", recursive = TRUE)
 #' }
 create_components <-
-  function(input = get_params(step = "create_components")$files$networks$spectral$edges$prepared,
-           output = get_params(step = "create_components")$files$networks$spectral$components$raw) {
-    stopifnot("Your input file(s) do(es) not exist" = all(purrr::map(.x = input, .f = file.exists) |>
-      unlist()))
+  function(
+    input = get_params(
+      step = "create_components"
+    )$files$networks$spectral$edges$prepared,
+    output = get_params(
+      step = "create_components"
+    )$files$networks$spectral$components$raw
+  ) {
+    stopifnot(
+      "Your input file(s) do(es) not exist" = all(
+        purrr::map(.x = input, .f = file.exists) |>
+          unlist()
+      )
+    )
 
     edges <- input |>
       purrr::map(
@@ -59,8 +69,14 @@ create_components <-
       data.frame() |>
       tidyfst::rn_col("ComponentIndex") |>
       tidytable::unnest(feature_source) |>
-      tidytable::distinct(`cluster index` = feature_source, componentindex = ComponentIndex) |>
-      tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.character), .fns = as.numeric)) |>
+      tidytable::distinct(
+        `cluster index` = feature_source,
+        componentindex = ComponentIndex
+      ) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(is.character),
+        .fns = as.numeric
+      )) |>
       tidytable::arrange(`cluster index`)
     rm(feature_source)
 
