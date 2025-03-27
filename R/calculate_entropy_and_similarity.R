@@ -20,17 +20,19 @@
 #' @return NULL
 #'
 #' @examples NULL
-calculate_entropy_and_similarity <- function(lib_ids,
-                                             lib_precursors,
-                                             lib_spectra,
-                                             query_ids,
-                                             query_precursors,
-                                             query_spectra,
-                                             method,
-                                             dalton,
-                                             ppm,
-                                             threshold,
-                                             approx) {
+calculate_entropy_and_similarity <- function(
+  lib_ids,
+  lib_precursors,
+  lib_spectra,
+  query_ids,
+  query_precursors,
+  query_spectra,
+  method,
+  dalton,
+  ppm,
+  threshold,
+  approx
+) {
   results <- purrr::map(
     .progress = TRUE,
     .x = seq_along(query_spectra),
@@ -41,8 +43,16 @@ calculate_entropy_and_similarity <- function(lib_ids,
 
       # If not approximating, filter the library to only spectra within tolerance
       if (approx == FALSE) {
-        val_ind <- lib_precursors >= min(current_precursor - dalton, current_precursor * (1 - (10^-6 * ppm))) &
-          lib_precursors <= max(current_precursor + dalton, current_precursor * (1 + (10^-6 * ppm)))
+        val_ind <- lib_precursors >=
+          min(
+            current_precursor - dalton,
+            current_precursor * (1 - (10^-6 * ppm))
+          ) &
+          lib_precursors <=
+            max(
+              current_precursor + dalton,
+              current_precursor * (1 + (10^-6 * ppm))
+            )
 
         lib_spectra_sub <- lib_spectra[val_ind]
         lib_precursors_sub <- lib_precursors[val_ind]
@@ -67,11 +77,22 @@ calculate_entropy_and_similarity <- function(lib_ids,
               dalton = dalton,
               ppm = ppm
             )
-            entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
+            entropy_target <- msentropy::calculate_spectral_entropy(
+              lib_spectrum
+            )
             # Count the number of peaks in the query that have a match (by Dalton tolerance)
-            matched_peaks <- sum(apply(abs(
-              outer(X = current_spectrum[, 1], Y = lib_spectrum[, 1], FUN = "-")
-            ) <= dalton, 2, any))
+            matched_peaks <- sum(apply(
+              abs(
+                outer(
+                  X = current_spectrum[, 1],
+                  Y = lib_spectrum[, 1],
+                  FUN = "-"
+                )
+              ) <=
+                dalton,
+              2,
+              any
+            ))
             list(
               score = as.numeric(score),
               entropy = entropy_target,
@@ -95,7 +116,10 @@ calculate_entropy_and_similarity <- function(lib_ids,
               target_id = lib_ids_sub[valid_indices],
               candidate_spectrum_entropy = similarities[2, valid_indices],
               candidate_score_similarity = similarities[1, valid_indices],
-              candidate_count_similarity_peaks_matched = similarities[3, valid_indices]
+              candidate_count_similarity_peaks_matched = similarities[
+                3,
+                valid_indices
+              ]
             )
           } else {
             NULL

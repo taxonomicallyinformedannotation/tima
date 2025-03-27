@@ -25,13 +25,29 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_annotations_gnps <-
-  function(input = get_params(step = "prepare_annotations_gnps")$files$annotations$raw$spectral$gnps,
-           output = get_params(step = "prepare_annotations_gnps")$files$annotations$prepared$structural$gnps,
-           str_stereo = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$stereo,
-           str_met = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$metadata,
-           str_nam = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$names,
-           str_tax_cla = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc = get_params(step = "prepare_annotations_gnps")$files$libraries$sop$merged$structures$taxonomies$npc) {
+  function(
+    input = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$annotations$raw$spectral$gnps,
+    output = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$annotations$prepared$structural$gnps,
+    str_stereo = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$libraries$sop$merged$structures$stereo,
+    str_met = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$libraries$sop$merged$structures$metadata,
+    str_nam = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$libraries$sop$merged$structures$names,
+    str_tax_cla = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$libraries$sop$merged$structures$taxonomies$cla,
+    str_tax_npc = get_params(
+      step = "prepare_annotations_gnps"
+    )$files$libraries$sop$merged$structures$taxonomies$npc
+  ) {
     if (length(input) == 0) {
       input <- "w1llN3v3r3v3r3x1st"
     }
@@ -45,9 +61,11 @@ prepare_annotations_gnps <-
         colClasses = "character"
       ) |>
         tidytable::bind_rows() |>
-        tidytable::mutate(candidate_structure_error_mz = as.numeric(MZErrorPPM) *
-          1E-6 *
-          as.numeric(Precursor_MZ)) |>
+        tidytable::mutate(
+          candidate_structure_error_mz = as.numeric(MZErrorPPM) *
+            1E-6 *
+            as.numeric(Precursor_MZ)
+        ) |>
         tidytable::select(tidyselect::any_of(
           c(
             "feature_id" = "#Scan#",

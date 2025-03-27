@@ -11,8 +11,10 @@
 read_from_sirius_zip <- function(sirius_zip, file) {
   f <- sirius_zip |>
     utils::unzip(list = TRUE) |>
-    tidytable::filter(Name |>
-      grepl(pattern = file)) |>
+    tidytable::filter(
+      Name |>
+        grepl(pattern = file)
+    ) |>
     tidytable::arrange(Name, decreasing = TRUE) |>
     # avoid empty files
     tidytable::filter(!Name |> startsWith("_")) |>

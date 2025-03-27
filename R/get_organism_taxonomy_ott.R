@@ -16,11 +16,17 @@
 #' df <- data.frame("organism" = "Homo sapiens")
 #' get_organism_taxonomy_ott(df)
 #' }
-get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/v3/taxonomy/about", retry = TRUE) {
+get_organism_taxonomy_ott <- function(
+  df,
+  url = "https://api.opentreeoflife.org/v3/taxonomy/about",
+  retry = TRUE
+) {
   organism_table <- df |>
     tidytable::as_tidytable() |>
-    tidytable::mutate(organism = organism |>
-      trimws()) |>
+    tidytable::mutate(
+      organism = organism |>
+        trimws()
+    ) |>
     tidytable::mutate(
       organism = organism |>
         stringi::stri_replace_all_fixed(
@@ -46,19 +52,22 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
   organisms <- organism_table$canonical_name
 
   log_debug("Testing if Open Tree of Life API is up")
-  if (url |>
-    httr2::request() |>
-    # See https://github.com/ropensci/rotl/issues/147
-    httr2::req_options(ssl_verifypeer = FALSE) |>
-    httr2::req_method("POST") |>
-    ## weird hack to avoid error
-    httr2::req_error(
-      is_error = function(resp) {
-        return(FALSE)
-      }
-    ) |>
-    httr2::req_perform() |>
-    httr2::resp_status_desc() != "OK") {
+  if (
+    url |>
+      httr2::request() |>
+      # See https://github.com/ropensci/rotl/issues/147
+      httr2::req_options(ssl_verifypeer = FALSE) |>
+      httr2::req_method("POST") |>
+      ## weird hack to avoid error
+      httr2::req_error(
+        is_error = function(resp) {
+          return(FALSE)
+        }
+      ) |>
+      httr2::req_perform() |>
+      httr2::resp_status_desc() !=
+      "OK"
+  ) {
     log_debug("Sorry, Open Tree of Life API is down")
     log_debug("Failing gracefuly and returning empty results")
     new_matched_otl_exact <-
@@ -104,13 +113,18 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
       tidytable::bind_rows() |>
-      tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.logical), .fns = as.character))
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(is.logical),
+        .fns = as.character
+      ))
     new_ott_id <- new_matched_otl_exact |>
       tidytable::filter(!is.na(ott_id)) |>
       tidytable::distinct(ott_id)
 
-    if (nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
-      retry == TRUE) {
+    if (
+      nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
+        retry == TRUE
+    ) {
       ## keep obtained results
       pretable <- new_matched_otl_exact |>
         tidytable::filter(!is.na(ott_id))
@@ -120,7 +134,9 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
 
       organism_table_2 <- organism_table |>
         tidytable::as_tidytable() |>
-        tidytable::filter(!organism_table$search_string %in% pretable$search_string)
+        tidytable::filter(
+          !organism_table$search_string %in% pretable$search_string
+        )
 
       organism_table_2$search_string <-
         stringi::stri_replace_all_regex(
@@ -142,7 +158,9 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
         purrr::map(
           .x = seq(1, length(organisms_new), cut),
           .f = function(i) {
-            organisms_new[i:(i + cut - 1)][!is.na(organisms_new[i:(i + cut - 1)])]
+            organisms_new[i:(i + cut - 1)][
+              !is.na(organisms_new[i:(i + cut - 1)])
+            ]
           }
         )
       log_debug("Retrying with", organisms_new)
@@ -164,7 +182,10 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
       new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
         tidytable::bind_rows() |>
         tidytable::filter(!is.na(ott_id)) |>
-        tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.logical), .fns = as.character))
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(is.logical),
+          .fns = as.character
+        ))
       new_ott_id_2 <- new_matched_otl_exact_2 |>
         tidytable::distinct(ott_id)
 
@@ -234,23 +255,24 @@ get_organism_taxonomy_ott <- function(df, url = "https://api.opentreeoflife.org/
         by = c("ott_id" = "id")
       ) |>
       tidytable::filter(
-        rank %in% c(
-          "domain",
-          "kingdom",
-          "phylum",
-          "class",
-          "order",
-          "infraorder",
-          "family",
-          "subfamily",
-          "tribe",
-          "subtribe",
-          "genus",
-          "subgenus",
-          "species",
-          "subspecies",
-          "varietas"
-        )
+        rank %in%
+          c(
+            "domain",
+            "kingdom",
+            "phylum",
+            "class",
+            "order",
+            "infraorder",
+            "family",
+            "subfamily",
+            "tribe",
+            "subtribe",
+            "genus",
+            "subgenus",
+            "species",
+            "subspecies",
+            "varietas"
+          )
       ) |>
       tidytable::distinct() |>
       tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)

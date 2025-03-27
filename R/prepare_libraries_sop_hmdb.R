@@ -22,8 +22,14 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_sop_hmdb <-
-  function(input = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$raw$hmdb,
-           output = get_params(step = "prepare_libraries_sop_hmdb")$files$libraries$sop$prepared$hmdb) {
+  function(
+    input = get_params(
+      step = "prepare_libraries_sop_hmdb"
+    )$files$libraries$sop$raw$hmdb,
+    output = get_params(
+      step = "prepare_libraries_sop_hmdb"
+    )$files$libraries$sop$prepared$hmdb
+  ) {
     if (file.exists(input)) {
       log_debug("Unzipping HMDB...")
       hmdb_prepared <- tryCatch(
@@ -39,9 +45,11 @@ prepare_libraries_sop_hmdb <-
           sdf_data <- readLines(con = hmdb_structures, warn = FALSE)
 
           find_fixed_pattern_line_in_file <- function(file, pattern) {
-            return(file |>
-              stringi::stri_detect_fixed(pattern = pattern) |>
-              which())
+            return(
+              file |>
+                stringi::stri_detect_fixed(pattern = pattern) |>
+                which()
+            )
           }
 
           return_next_line <- function(x, file) {
@@ -99,7 +107,11 @@ prepare_libraries_sop_hmdb <-
 
           log_debug(x = "Formatting HMDB...")
           hmdb_prepared <- hmdb_df |>
-            tidytable::mutate(tidytable::across(.cols = tidyselect::everything(), .fns = tidytable::na_if, "")) |>
+            tidytable::mutate(tidytable::across(
+              .cols = tidyselect::everything(),
+              .fns = tidytable::na_if,
+              ""
+            )) |>
             tidytable::filter(!is.na(inchikey)) |>
             tidytable::mutate(
               structure_inchikey_2D = stringi::stri_sub(

@@ -309,7 +309,11 @@ testthat::test_that(desc = "Test functions", code = {
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
   prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv")
-  expect_warning(object = prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv"))
+  expect_warning(
+    object = prepare_libraries_rt(
+      temp_exp = "data/source/libraries/rt/example_bad.tsv"
+    )
+  )
 
   ### SOP
   #### Closed
@@ -350,7 +354,10 @@ testthat::test_that(desc = "Test functions", code = {
     "sample.mzML Peak area" = 98765.43
   ) |>
     tidytable::fwrite("data/source/example_features_no_rt.csv")
-  prepare_features_tables(features = "data/source/example_features_no_rt.csv", output = "data/interim/features/example_features_no_rt.tsv.gz")
+  prepare_features_tables(
+    features = "data/source/example_features_no_rt.csv",
+    output = "data/interim/features/example_features_no_rt.tsv.gz"
+  )
   #### classical
   prepare_features_tables()
 
@@ -364,8 +371,14 @@ testthat::test_that(desc = "Test functions", code = {
   calculate_mass_of_m(adduct_string = "[M+H]+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M+]+", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M]+", mz = 123.456)
-  calculate_mass_of_m(adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+", mz = 123.456)
-  calculate_mass_of_m(adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+", mz = 123.456)
+  calculate_mass_of_m(
+    adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+",
+    mz = 123.456
+  )
+  calculate_mass_of_m(
+    adduct_string = "[M-C6H14O7 (hexose-H2O)+H]+",
+    mz = 123.456
+  )
   calculate_mass_of_m(adduct_string = "[M+CH3COO]-/[M-CH3]-", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M+K-2H]-", mz = 123.456)
   ### Negative and no RT
@@ -391,7 +404,9 @@ testthat::test_that(desc = "Test functions", code = {
     "adduct" = c("[M+XYZ]+", "[M+XYZ-H2O]+")
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
-  annotate_masses(features = "data/source/libraries/rt/example_features_adducts.csv")
+  annotate_masses(
+    features = "data/source/libraries/rt/example_features_adducts.csv"
+  )
 
   ## Performing MS2 annotation
   x <- cbind(
@@ -445,7 +460,9 @@ testthat::test_that(desc = "Test functions", code = {
     polarity = "neg"
   )
   ### Empty
-  annotate_spectra(library = list("data/interim/libraries/spectra/exp/nope_pos.rds"))
+  annotate_spectra(
+    library = list("data/interim/libraries/spectra/exp/nope_pos.rds")
+  )
   ### Approx
   annotate_spectra(
     library = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
@@ -480,7 +497,10 @@ testthat::test_that(desc = "Test functions", code = {
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist.xyz")
   ## When there is an input
-  prepare_annotations_sirius(input_directory = "data/interim/annotations/example_sirius_5.zip", sirius_version = 5)
+  prepare_annotations_sirius(
+    input_directory = "data/interim/annotations/example_sirius_5.zip",
+    sirius_version = 5
+  )
   prepare_annotations_sirius()
 
   ### ISDB results
@@ -518,15 +538,19 @@ testthat::test_that(desc = "Test functions", code = {
   wrong_taxon_df <- data.frame("organism" = "Gentiano luteo")
   get_organism_taxonomy_ott(df = fake_taxon_df)
   get_organism_taxonomy_ott(df = wrong_taxon_df)
-  get_organism_taxonomy_ott(df = fake_taxon_df, url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown")
+  get_organism_taxonomy_ott(
+    df = fake_taxon_df,
+    url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
+  )
   ## Stupid tests for benchmark
   data.frame(feature_id = 1, organism_name = "Gentiana lutea") |>
     export_output("data/interim/benchmark/bench_test_in.tsv.gz")
   benchmark_taxize_spectra(
     input = "data/interim/benchmark/bench_test_in.tsv.gz",
     keys = paths$data$interim$libraries$sop$merged$keys,
-    org_tax_ott =
-      get_params(step = "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
+    org_tax_ott = get_params(
+      step = "prepare_taxa"
+    )$files$libraries$sop$merged$organisms$taxonomies$ott,
     output = "data/interim/benchmark/bench_test_out.tsv.gz"
   )
 

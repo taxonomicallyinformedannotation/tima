@@ -13,10 +13,12 @@
 #'
 #' @examples NULL
 get_massbank_spectra <-
-  function(output_dir = "data/source/libraries/spectra/exp",
-           mb_file = get_default_paths()$urls$massbank$file,
-           mb_url = get_default_paths()$urls$massbank$url,
-           mb_version = get_default_paths()$urls$massbank$version) {
+  function(
+    output_dir = "data/source/libraries/spectra/exp",
+    mb_file = get_default_paths()$urls$massbank$file,
+    mb_url = get_default_paths()$urls$massbank$url,
+    mb_version = get_default_paths()$urls$massbank$version
+  ) {
     log_debug("Checking if a previous MassBank version already exists")
     export <- file.path(output_dir, paste(mb_version, mb_file, sep = "_"))
     if (!file.exists(export)) {

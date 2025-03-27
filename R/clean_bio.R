@@ -15,9 +15,11 @@
 #'
 #' @examples NULL
 clean_bio <-
-  function(annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
-           edges_table = get("edges_table", envir = parent.frame()),
-           minimal_consistency = get("minimal_consistency", envir = parent.frame())) {
+  function(
+    annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
+    edges_table = get("edges_table", envir = parent.frame()),
+    minimal_consistency = get("minimal_consistency", envir = parent.frame())
+  ) {
     df <- annot_table_wei_bio |>
       tidytable::distinct(
         feature_id,
@@ -34,8 +36,10 @@ clean_bio <-
       )
     rm(annot_table_wei_bio)
 
-    log_debug("calculating chemical consistency
-              features with at least 2 neighbors ... \n")
+    log_debug(
+      "calculating chemical consistency
+              features with at least 2 neighbors ... \n"
+    )
     df3 <-
       tidytable::right_join(
         edges_table |>
@@ -62,15 +66,18 @@ clean_bio <-
 
     log_debug("... among all edges ... \n")
     clean_per_level_bio <-
-      function(df,
-               candidates,
-               consistency_name,
-               feature_score_name,
-               feature_val_name) {
+      function(
+        df,
+        candidates,
+        consistency_name,
+        feature_score_name,
+        feature_val_name
+      ) {
         freq <- df |>
           tidytable::distinct(
             feature_source,
-            feature_target, !!as.name(candidates),
+            feature_target,
+            !!as.name(candidates),
             score_weighted_bio
           ) |>
           tidytable::mutate(
@@ -82,16 +89,23 @@ clean_bio <-
               tidytable::n_distinct(feature_target),
             .by = c(feature_source)
           ) |>
-          tidytable::distinct(feature_source, !!as.name(candidates), .keep_all = TRUE) |>
+          tidytable::distinct(
+            feature_source,
+            !!as.name(candidates),
+            .keep_all = TRUE
+          ) |>
           tidytable::mutate(
-            !!as.name(feature_score_name) :=
-              !!as.name(consistency_name) * score_weighted_bio,
+            !!as.name(feature_score_name) := !!as.name(consistency_name) *
+              score_weighted_bio,
             .by = c(feature_source, !!as.name(candidates))
           ) |>
           tidytable::arrange(-!!as.name(feature_score_name)) |>
           tidytable::distinct(feature_source, .keep_all = TRUE) |>
           tidytable::select(
-            feature_source, !!as.name(feature_val_name) := !!as.name(candidates), !!as.name(consistency_name), !!as.name(feature_score_name)
+            feature_source,
+            !!as.name(feature_val_name) := !!as.name(candidates),
+            !!as.name(consistency_name),
+            !!as.name(feature_score_name)
           ) |>
           tidytable::mutate(
             !!as.name(feature_val_name) := tidytable::if_else(
@@ -197,34 +211,104 @@ clean_bio <-
       .x = supp_tables,
       .init = df2,
       .f = function(x, y) {
-        tidytable::left_join(x, y, by = stats::setNames("feature_source", "feature_id"))
+        tidytable::left_join(
+          x,
+          y,
+          by = stats::setNames("feature_source", "feature_id")
+        )
       }
     ) |>
       tidytable::select(feature_id, tidyselect::everything()) |>
       ## In case there are no consensus at all because no network
-      tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.logical), .fns = as.character)) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(is.logical),
+        .fns = as.character
+      )) |>
       tidytable::mutate(
-        feature_pred_tax_cla_01kin_val = tidytable::coalesce(feature_pred_tax_cla_01kin_val, "empty"),
-        consistency_structure_cla_kin = tidytable::coalesce(consistency_structure_cla_kin, 1),
-        feature_pred_tax_cla_01kin_score = tidytable::coalesce(feature_pred_tax_cla_01kin_score, 0),
-        feature_pred_tax_npc_01pat_val = tidytable::coalesce(feature_pred_tax_npc_01pat_val, "empty"),
-        consistency_structure_npc_pat = tidytable::coalesce(consistency_structure_npc_pat, 1),
-        feature_pred_tax_npc_01pat_score = tidytable::coalesce(feature_pred_tax_npc_01pat_score, 0),
-        feature_pred_tax_cla_02sup_val = tidytable::coalesce(feature_pred_tax_cla_02sup_val, "empty"),
-        consistency_structure_cla_sup = tidytable::coalesce(consistency_structure_cla_sup, 1),
-        feature_pred_tax_cla_02sup_score = tidytable::coalesce(feature_pred_tax_cla_02sup_score, 0),
-        feature_pred_tax_npc_02sup_val = tidytable::coalesce(feature_pred_tax_npc_02sup_val, "empty"),
-        consistency_structure_npc_sup = tidytable::coalesce(consistency_structure_npc_sup, 1),
-        feature_pred_tax_npc_02sup_score = tidytable::coalesce(feature_pred_tax_npc_02sup_score, 0),
-        feature_pred_tax_cla_03cla_val = tidytable::coalesce(feature_pred_tax_cla_03cla_val, "empty"),
-        consistency_structure_cla_cla = tidytable::coalesce(consistency_structure_cla_cla, 1),
-        feature_pred_tax_cla_03cla_score = tidytable::coalesce(feature_pred_tax_cla_03cla_score, 0),
-        feature_pred_tax_npc_03cla_val = tidytable::coalesce(feature_pred_tax_npc_03cla_val, "empty"),
-        consistency_structure_npc_cla = tidytable::coalesce(consistency_structure_npc_cla, 1),
-        feature_pred_tax_npc_03cla_score = tidytable::coalesce(feature_pred_tax_npc_03cla_score, 0),
-        feature_pred_tax_cla_04dirpar_val = tidytable::coalesce(feature_pred_tax_cla_04dirpar_val, "empty"),
-        consistency_structure_cla_par = tidytable::coalesce(consistency_structure_cla_par, 1),
-        feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(feature_pred_tax_cla_04dirpar_score, 0)
+        feature_pred_tax_cla_01kin_val = tidytable::coalesce(
+          feature_pred_tax_cla_01kin_val,
+          "empty"
+        ),
+        consistency_structure_cla_kin = tidytable::coalesce(
+          consistency_structure_cla_kin,
+          1
+        ),
+        feature_pred_tax_cla_01kin_score = tidytable::coalesce(
+          feature_pred_tax_cla_01kin_score,
+          0
+        ),
+        feature_pred_tax_npc_01pat_val = tidytable::coalesce(
+          feature_pred_tax_npc_01pat_val,
+          "empty"
+        ),
+        consistency_structure_npc_pat = tidytable::coalesce(
+          consistency_structure_npc_pat,
+          1
+        ),
+        feature_pred_tax_npc_01pat_score = tidytable::coalesce(
+          feature_pred_tax_npc_01pat_score,
+          0
+        ),
+        feature_pred_tax_cla_02sup_val = tidytable::coalesce(
+          feature_pred_tax_cla_02sup_val,
+          "empty"
+        ),
+        consistency_structure_cla_sup = tidytable::coalesce(
+          consistency_structure_cla_sup,
+          1
+        ),
+        feature_pred_tax_cla_02sup_score = tidytable::coalesce(
+          feature_pred_tax_cla_02sup_score,
+          0
+        ),
+        feature_pred_tax_npc_02sup_val = tidytable::coalesce(
+          feature_pred_tax_npc_02sup_val,
+          "empty"
+        ),
+        consistency_structure_npc_sup = tidytable::coalesce(
+          consistency_structure_npc_sup,
+          1
+        ),
+        feature_pred_tax_npc_02sup_score = tidytable::coalesce(
+          feature_pred_tax_npc_02sup_score,
+          0
+        ),
+        feature_pred_tax_cla_03cla_val = tidytable::coalesce(
+          feature_pred_tax_cla_03cla_val,
+          "empty"
+        ),
+        consistency_structure_cla_cla = tidytable::coalesce(
+          consistency_structure_cla_cla,
+          1
+        ),
+        feature_pred_tax_cla_03cla_score = tidytable::coalesce(
+          feature_pred_tax_cla_03cla_score,
+          0
+        ),
+        feature_pred_tax_npc_03cla_val = tidytable::coalesce(
+          feature_pred_tax_npc_03cla_val,
+          "empty"
+        ),
+        consistency_structure_npc_cla = tidytable::coalesce(
+          consistency_structure_npc_cla,
+          1
+        ),
+        feature_pred_tax_npc_03cla_score = tidytable::coalesce(
+          feature_pred_tax_npc_03cla_score,
+          0
+        ),
+        feature_pred_tax_cla_04dirpar_val = tidytable::coalesce(
+          feature_pred_tax_cla_04dirpar_val,
+          "empty"
+        ),
+        consistency_structure_cla_par = tidytable::coalesce(
+          consistency_structure_cla_par,
+          1
+        ),
+        feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(
+          feature_pred_tax_cla_04dirpar_score,
+          0
+        )
       )
     rm(df2, supp_tables)
 

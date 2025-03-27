@@ -11,7 +11,10 @@ get_spectra_ids <- function(spectra) {
   ## ISSUE see #148 find a way to have consistency in spectrum IDs
   possible_ids <- c("SLAW_ID", "FEATURE_ID", "acquisitionNum", "spectrum_id")
 
-  valid_field <- purrr::detect(possible_ids, ~ !is.null(spectra@backend@spectraData[[.x]]))
+  valid_field <- purrr::detect(
+    possible_ids,
+    ~ !is.null(spectra@backend@spectraData[[.x]])
+  )
 
   if (!is.null(valid_field)) {
     return(spectra@backend@spectraData[[valid_field]])

@@ -36,15 +36,17 @@
 #'   summarize = FALSE
 #' )
 #' }
-change_params_small <- function(fil_pat = NULL,
-                                fil_fea_raw = NULL,
-                                fil_met_raw = NULL,
-                                fil_sir_raw = NULL,
-                                fil_spe_raw = NULL,
-                                ms_pol = NULL,
-                                org_tax = NULL,
-                                hig_con = NULL,
-                                summarize = NULL) {
+change_params_small <- function(
+  fil_pat = NULL,
+  fil_fea_raw = NULL,
+  fil_met_raw = NULL,
+  fil_sir_raw = NULL,
+  fil_spe_raw = NULL,
+  ms_pol = NULL,
+  org_tax = NULL,
+  hig_con = NULL,
+  summarize = NULL
+) {
   go_to_cache()
   paths_data_source <- get_default_paths()$data$source$path
   paths_data_interim_annotations <-

@@ -9,9 +9,7 @@
 #' @return A mass
 #'
 #' @examples NULL
-transform_score_sirius_csi <- function(csi_score,
-                                       K = 50,
-                                       scale = 10) {
+transform_score_sirius_csi <- function(csi_score, K = 50, scale = 10) {
   ## COMMENT: This is a random transform, not approved by anyone
   LL_prime <- as.numeric(csi_score) + K
   return(1 / (1 + exp(-LL_prime * 1 / scale)))

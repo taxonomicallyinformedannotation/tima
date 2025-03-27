@@ -23,10 +23,12 @@
 #' )
 #' }
 replace_id <-
-  function(x,
-           user_filename = get_params(step = "prepare_params")$files$pattern,
-           user_gnps = get_params(step = "prepare_params")$gnps$id,
-           example_gnps = get_default_paths()$gnps$example) {
+  function(
+    x,
+    user_filename = get_params(step = "prepare_params")$files$pattern,
+    user_gnps = get_params(step = "prepare_params")$gnps$id,
+    example_gnps = get_default_paths()$gnps$example
+  ) {
     if (length(user_gnps) != 0) {
       if (user_gnps == "") {
         user_gnps <- NULL
@@ -70,10 +72,7 @@ replace_id <-
         vectorize_all = FALSE
       )
 
-    final <- ifelse(test = path != file,
-      yes = file.path(path, new),
-      no = new
-    )
+    final <- ifelse(test = path != file, yes = file.path(path, new), no = new)
 
     return(final)
   }

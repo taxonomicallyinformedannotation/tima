@@ -9,11 +9,15 @@
 #' @return NULL
 #'
 #' @examples NULL
-process_smiles <- function(df,
-                           smiles_colname = "structure_smiles_initial",
-                           cache) {
+process_smiles <- function(
+  df,
+  smiles_colname = "structure_smiles_initial",
+  cache
+) {
   log_debug(x = "Processing SMILES...")
-  reticulate::source_python(file = system.file("python/process_smiles.py", package = "tima"))
+  reticulate::source_python(
+    file = system.file("python/process_smiles.py", package = "tima")
+  )
   table_smiles <- df |>
     tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
     # tidytable::slice_sample(10000L) |>
@@ -38,9 +42,13 @@ process_smiles <- function(df,
     tidytable::fread()
 
   table_final <- table_smiles |>
-    tidytable::inner_join(table_processed_1 |> tidytable::bind_rows(table_processed_2)) |>
-    tidytable::mutate(structure_inchikey_connectivity_layer = structure_inchikey |>
-      stringi::stri_sub(from = 1, to = 14))
+    tidytable::inner_join(
+      table_processed_1 |> tidytable::bind_rows(table_processed_2)
+    ) |>
+    tidytable::mutate(
+      structure_inchikey_connectivity_layer = structure_inchikey |>
+        stringi::stri_sub(from = 1, to = 14)
+    )
 
   return(table_final)
 }

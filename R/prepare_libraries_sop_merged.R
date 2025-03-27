@@ -47,23 +47,49 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_sop_merged <-
-  function(files = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared,
-           filter = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$mode,
-           level = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$level,
-           value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
-           cache = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$processed,
-           output_key = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
-           ## document it above in case
-           # output_org_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
-           output_org_tax_ott = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$taxonomies$ott,
-           output_str_stereo = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$stereo,
-           output_str_met = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$metadata,
-           output_str_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$names,
-           output_str_tax_cla = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$cla,
-           output_str_tax_npc = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$npc) {
+  function(
+    files = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$prepared,
+    filter = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$organisms$filter$mode,
+    level = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$organisms$filter$level,
+    value = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$organisms$filter$value,
+    cache = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$processed,
+    output_key = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$keys,
+    ## document it above in case
+    # output_org_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
+    output_org_tax_ott = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$organisms$taxonomies$ott,
+    output_str_stereo = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$stereo,
+    output_str_met = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$metadata,
+    output_str_nam = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$names,
+    output_str_tax_cla = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$taxonomies$cla,
+    output_str_tax_npc = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$merged$structures$taxonomies$npc
+  ) {
     stopifnot(
-      "Your filter parameter must be 'true' or 'false'" =
-        filter %in% c(TRUE, FALSE)
+      "Your filter parameter must be 'true' or 'false'" = filter %in%
+        c(TRUE, FALSE)
     )
 
     if (isTRUE(filter)) {
@@ -79,18 +105,19 @@ prepare_libraries_sop_merged <-
       'genus',
       'species',
       'varietas'
-      " = level %in% c(
-          "domain",
-          "kingdom",
-          "phylum",
-          "class",
-          "order",
-          "family",
-          "tribe",
-          "genus",
-          "species",
-          "varietas"
-        )
+      " = level %in%
+          c(
+            "domain",
+            "kingdom",
+            "phylum",
+            "class",
+            "order",
+            "family",
+            "tribe",
+            "genus",
+            "species",
+            "varietas"
+          )
       )
     }
 
@@ -130,13 +157,16 @@ prepare_libraries_sop_merged <-
           table_org_tax_ott_full |>
             tidytable::as_tidytable() |>
             tidytable::mutate(tidytable::across(
-              .cols = tidyselect::where(is.numeric), .fns = as.character
+              .cols = tidyselect::where(is.numeric),
+              .fns = as.character
             )) |>
             tidytable::mutate(tidytable::across(
-              .cols = tidyselect::where(is.list), .fns = as.character
+              .cols = tidyselect::where(is.list),
+              .fns = as.character
             )) |>
             tidytable::mutate(tidytable::across(
-              .cols = tidyselect::where(is.logical), .fns = as.character
+              .cols = tidyselect::where(is.logical),
+              .fns = as.character
             ))
         )
     }
@@ -149,7 +179,6 @@ prepare_libraries_sop_merged <-
     table_structures_taxonomy_npc <- tables$str_tax_npc
 
     ## ISSUE see #19
-    # log_debug(x = "Completing structures metadata")
     # log_debug(x = "Completing structures names")
     # log_debug(x = "Completing structures taxonomy (classyfire)")
     # log_debug(x = "Completing structures taxonomy (NPC)")
@@ -179,8 +208,10 @@ prepare_libraries_sop_merged <-
         ) |>
         tidytable::distinct()
 
-      stopifnot("Your filter led to no entries,
-        try to change it." = nrow(table_keys) != 0)
+      stopifnot(
+        "Your filter led to no entries,
+        try to change it." = nrow(table_keys) != 0
+      )
     }
 
     export_params(

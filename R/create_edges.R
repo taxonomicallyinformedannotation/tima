@@ -16,13 +16,15 @@
 #' @return NULL
 #'
 #' @examples NULL
-create_edges <- function(frags,
-                         nspecs,
-                         precs,
-                         method,
-                         ms2_tolerance,
-                         ppm_tolerance,
-                         threshold) {
+create_edges <- function(
+  frags,
+  nspecs,
+  precs,
+  method,
+  ms2_tolerance,
+  ppm_tolerance,
+  threshold
+) {
   indices <- 1:(nspecs - 1)
 
   edges <- purrr::map(

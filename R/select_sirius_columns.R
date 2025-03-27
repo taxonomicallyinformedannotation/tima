@@ -12,10 +12,13 @@
 #' @examples NULL
 select_sirius_columns_canopus <- function(df, sirius_version) {
   df <- df |>
-    tidytable::mutate(feature_id = switch(sirius_version,
-      "5" = harmonize_names_sirius(id),
-      "6" = mappingFeatureId
-    )) |>
+    tidytable::mutate(
+      feature_id = switch(
+        sirius_version,
+        "5" = harmonize_names_sirius(id),
+        "6" = mappingFeatureId
+      )
+    ) |>
     tidytable::select(tidyselect::any_of(
       c(
         "feature_id",
@@ -81,10 +84,13 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #' @examples NULL
 select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
-    tidytable::mutate(feature_id = switch(sirius_version,
-      "5" = harmonize_names_sirius(id),
-      "6" = mappingFeatureId
-    )) |>
+    tidytable::mutate(
+      feature_id = switch(
+        sirius_version,
+        "5" = harmonize_names_sirius(id),
+        "6" = mappingFeatureId
+      )
+    ) |>
     tidytable::mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
         as.numeric(`massErrorPrecursor.ppm.`) *
@@ -138,7 +144,8 @@ select_sirius_columns_structures <- function(df, sirius_version) {
         "candidate_structure_molecular_formula" = "molecularFormula",
         "candidate_structure_xlogp" = "xlogp",
         # ISSUE see #147
-        "candidate_score_sirius_confidence" = switch(sirius_version,
+        "candidate_score_sirius_confidence" = switch(
+          sirius_version,
           "5" = "ConfidenceScore",
           "6" = "ConfidenceScoreApproximate"
         ),

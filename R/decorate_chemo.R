@@ -15,22 +15,37 @@
 #'     weighted at each chemical level
 #'
 #' @examples NULL
-decorate_chemo <- function(annot_table_wei_chemo =
-                             get("annot_table_wei_chemo", envir = parent.frame()),
-                           score_chemical_cla_kingdom =
-                             get("score_chemical_cla_kingdom", envir = parent.frame()),
-                           score_chemical_cla_superclass =
-                             get("score_chemical_cla_superclass", envir = parent.frame()),
-                           score_chemical_cla_class =
-                             get("score_chemical_cla_class", envir = parent.frame()),
-                           score_chemical_cla_parent =
-                             get("score_chemical_cla_parent", envir = parent.frame()),
-                           score_chemical_npc_pathway =
-                             get("score_chemical_npc_pathway", envir = parent.frame()),
-                           score_chemical_npc_superclass =
-                             get("score_chemical_npc_superclass", envir = parent.frame()),
-                           score_chemical_npc_class =
-                             get("score_chemical_npc_class", envir = parent.frame())) {
+decorate_chemo <- function(
+  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
+  score_chemical_cla_kingdom = get(
+    "score_chemical_cla_kingdom",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_superclass = get(
+    "score_chemical_cla_superclass",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_class = get(
+    "score_chemical_cla_class",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_parent = get(
+    "score_chemical_cla_parent",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_pathway = get(
+    "score_chemical_npc_pathway",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_superclass = get(
+    "score_chemical_npc_superclass",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_class = get(
+    "score_chemical_npc_class",
+    envir = parent.frame()
+  )
+) {
   df_cla_kin <- annot_table_wei_chemo |>
     tidytable::filter(score_chemical >= score_chemical_cla_kingdom * 1) |>
     tidytable::filter(

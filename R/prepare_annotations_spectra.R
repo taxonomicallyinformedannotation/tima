@@ -45,14 +45,34 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_annotations_spectra <-
-  function(input = get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral,
-           output = get_params(step = "prepare_annotations_spectra")$files$annotations$prepared$structural$spectral,
-           str_stereo = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$stereo,
-           str_met = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$metadata,
-           str_nam = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,
-           str_tax_cla = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
-           str_tax_npc = get_params(step = "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$npc) {
-    stopifnot("Input file(s) do(es) not exist" = all(purrr::map(.x = input, .f = file.exists) |> unlist()))
+  function(
+    input = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$annotations$raw$spectral$spectral,
+    output = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$annotations$prepared$structural$spectral,
+    str_stereo = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$libraries$sop$merged$structures$stereo,
+    str_met = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$libraries$sop$merged$structures$metadata,
+    str_nam = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$libraries$sop$merged$structures$names,
+    str_tax_cla = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$libraries$sop$merged$structures$taxonomies$cla,
+    str_tax_npc = get_params(
+      step = "prepare_annotations_spectra"
+    )$files$libraries$sop$merged$structures$taxonomies$npc
+  ) {
+    stopifnot(
+      "Input file(s) do(es) not exist" = all(
+        purrr::map(.x = input, .f = file.exists) |> unlist()
+      )
+    )
     log_debug(x = "Loading and formatting spectral matches")
     table <-
       purrr::map(
@@ -80,7 +100,9 @@ prepare_annotations_spectra <-
       ) |>
       ## Add new columns
       tidytable::mutate(
-        candidate_structure_exact_mass = as.numeric(candidate_structure_exact_mass),
+        candidate_structure_exact_mass = as.numeric(
+          candidate_structure_exact_mass
+        ),
         candidate_structure_tax_npc_01pat = NA_character_,
         candidate_structure_tax_npc_02sup = NA_character_,
         candidate_structure_tax_npc_03cla = NA_character_,

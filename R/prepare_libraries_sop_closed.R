@@ -20,8 +20,14 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_sop_closed <-
-  function(input = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$raw$closed,
-           output = get_params(step = "prepare_libraries_sop_closed")$files$libraries$sop$prepared$closed) {
+  function(
+    input = get_params(
+      step = "prepare_libraries_sop_closed"
+    )$files$libraries$sop$raw$closed,
+    output = get_params(
+      step = "prepare_libraries_sop_closed"
+    )$files$libraries$sop$prepared$closed
+  ) {
     if (file.exists(input)) {
       log_debug(x = "Loading closed resources")
       closed <- input |>
@@ -29,7 +35,13 @@ prepare_libraries_sop_closed <-
 
       log_debug(x = "Formatting closed resource")
       closed_prepared <- closed |>
-        tidytable::mutate(structure_inchikey_2D = stringi::stri_sub(str = structure_inchikey, from = 1, to = 14)) |>
+        tidytable::mutate(
+          structure_inchikey_2D = stringi::stri_sub(
+            str = structure_inchikey,
+            from = 1,
+            to = 14
+          )
+        ) |>
         tidytable::rename(structure_name = structure_nameTraditional) |>
         tidytable::mutate(reference_doi = NA) |>
         select_sop_columns() |>
@@ -37,8 +49,10 @@ prepare_libraries_sop_closed <-
         tidytable::distinct()
       rm(closed)
     } else {
-      log_debug("Sorry, you do not have access to the closed resource,
-                returning an empty file instead")
+      log_debug(
+        "Sorry, you do not have access to the closed resource,
+                returning an empty file instead"
+      )
       closed_prepared <- fake_sop_columns()
     }
 

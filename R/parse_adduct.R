@@ -14,9 +14,15 @@
 #' parse_adduct("[M+H]+")
 #' parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")
 #' }
-parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?") {
+parse_adduct <- function(
+  adduct_string,
+  regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
+) {
   ## Full match
-  matches <- stringi::stri_match_all_regex(str = adduct_string, pattern = regex)[[1]]
+  matches <- stringi::stri_match_all_regex(
+    str = adduct_string,
+    pattern = regex
+  )[[1]]
 
   unexpected <- c(
     "n_mer" = 0,
@@ -32,14 +38,16 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
   }
 
   ## Extract n_mer
-  n_mer <- ifelse(test = matches[2] != "",
+  n_mer <- ifelse(
+    test = matches[2] != "",
     yes = matches[2] |>
       as.integer(),
     no = 1
   )
 
   ## Extract n_iso
-  n_iso <- ifelse(test = matches[3] != "",
+  n_iso <- ifelse(
+    test = matches[3] != "",
     yes = matches[3] |>
       as.integer(),
     no = 0
@@ -58,15 +66,23 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
       gsub(pattern = " .*", replacement = ""),
     pattern = modifications_regex
   )[[1]][-1]
-  modifications_sign <- stringi::stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
+  modifications_sign <- stringi::stri_extract_all_regex(
+    str = modifications,
+    pattern = modifications_regex
+  )[[1]] |>
     gsub(pattern = "\\d*", replacement = "")
-  modifications_sign <- ifelse(test = modifications_sign == "+",
+  modifications_sign <- ifelse(
+    test = modifications_sign == "+",
     yes = 1,
     no = -1
   )
-  modifications_mult <- stringi::stri_extract_all_regex(str = modifications, pattern = modifications_regex)[[1]] |>
+  modifications_mult <- stringi::stri_extract_all_regex(
+    str = modifications,
+    pattern = modifications_regex
+  )[[1]] |>
     gsub(pattern = "[+-]", replacement = "")
-  modifications_mult <- ifelse(test = modifications_mult != "",
+  modifications_mult <- ifelse(
+    test = modifications_mult != "",
     yes = modifications_mult |>
       as.integer(),
     no = 1
@@ -78,7 +94,8 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
 
   los_add_clu <- modifications_masses * modifications_mult * modifications_sign
   ## Extract n_charges
-  n_charges <- ifelse(test = matches[5] != "",
+  n_charges <- ifelse(
+    test = matches[5] != "",
     yes = matches[5] |>
       as.integer(),
     no = 1
@@ -86,14 +103,20 @@ parse_adduct <- function(adduct_string, regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][
 
   ## Extract charge
   charge <- matches[6]
-  charge <- ifelse(test = charge == "+",
-    yes = 1,
-    no = -1
-  )
+  charge <- ifelse(test = charge == "+", yes = 1, no = -1)
 
-  if (any(is.na(c(
-    n_mer, n_iso, los_add_clu, n_charges, charge
-  )) == TRUE)) {
+  if (
+    any(
+      is.na(c(
+        n_mer,
+        n_iso,
+        los_add_clu,
+        n_charges,
+        charge
+      )) ==
+        TRUE
+    )
+  ) {
     log_debug("Something went unexpected with the calculations")
     return(unexpected)
   } else {

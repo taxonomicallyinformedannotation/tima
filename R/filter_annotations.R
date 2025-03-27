@@ -50,13 +50,29 @@
 #' unlink("data", recursive = TRUE)
 #' }
 filter_annotations <-
-  function(annotations = get_params(step = "filter_annotations")$files$annotations$prepared$structural,
-           features = get_params(step = "filter_annotations")$files$features$prepared,
-           rts = get_params(step = "filter_annotations")$files$libraries$temporal$prepared,
-           output = get_params(step = "filter_annotations")$files$annotations$filtered,
-           tolerance_rt = get_params(step = "filter_annotations")$ms$tolerances$rt$library) {
-    stopifnot("Annotations file(s) do(es) not exist" = all(purrr::map(.x = annotations, .f = file.exists) |> unlist()))
-    stopifnot("Retention time file(s) do(es) not exist" = all(purrr::map(.x = rts, .f = file.exists) |> unlist()))
+  function(
+    annotations = get_params(
+      step = "filter_annotations"
+    )$files$annotations$prepared$structural,
+    features = get_params(step = "filter_annotations")$files$features$prepared,
+    rts = get_params(
+      step = "filter_annotations"
+    )$files$libraries$temporal$prepared,
+    output = get_params(step = "filter_annotations")$files$annotations$filtered,
+    tolerance_rt = get_params(
+      step = "filter_annotations"
+    )$ms$tolerances$rt$library
+  ) {
+    stopifnot(
+      "Annotations file(s) do(es) not exist" = all(
+        purrr::map(.x = annotations, .f = file.exists) |> unlist()
+      )
+    )
+    stopifnot(
+      "Retention time file(s) do(es) not exist" = all(
+        purrr::map(.x = rts, .f = file.exists) |> unlist()
+      )
+    )
     stopifnot("Your features file does not exist." = file.exists(features))
 
     if (length(rts) == 0) {
@@ -78,9 +94,12 @@ filter_annotations <-
     )
 
     if ("ms1" %in% names(annotation_tables_list)) {
-      log_debug(x = "... removing MS1 annotations for which we have spectral hits")
-      annotations_tables_spectral <- annotation_tables_list[names(annotation_tables_list)[names(annotation_tables_list) !=
-        "ms1"]] |>
+      log_debug(
+        x = "... removing MS1 annotations for which we have spectral hits"
+      )
+      annotations_tables_spectral <- annotation_tables_list[names(
+        annotation_tables_list
+      )[names(annotation_tables_list) != "ms1"]] |>
         tidytable::bind_rows()
 
       spectral_keys <- annotations_tables_spectral |>
@@ -127,10 +146,16 @@ filter_annotations <-
       )
       features_annotated_table_2 <- features_annotated_table_1 |>
         tidytable::left_join(rt_table) |>
-        tidytable::mutate(candidate_structure_error_rt = as.numeric(rt) -
-          as.numeric(rt_target)) |>
+        tidytable::mutate(
+          candidate_structure_error_rt = as.numeric(rt) -
+            as.numeric(rt_target)
+        ) |>
         tidytable::arrange(abs(candidate_structure_error_rt)) |>
-        tidytable::distinct(-candidate_structure_error_rt, -rt_target, .keep_all = TRUE) |>
+        tidytable::distinct(
+          -candidate_structure_error_rt,
+          -rt_target,
+          .keep_all = TRUE
+        ) |>
         tidytable::filter(
           abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
             is.na(candidate_structure_error_rt)

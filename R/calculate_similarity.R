@@ -16,13 +16,15 @@
 #' @return Similarity score or NA_real_ if calculation fails
 #'
 #' @examples NULL
-calculate_similarity <- function(method,
-                                 query_spectrum,
-                                 target_spectrum,
-                                 query_precursor,
-                                 target_precursor,
-                                 dalton,
-                                 ppm) {
+calculate_similarity <- function(
+  method,
+  query_spectrum,
+  target_spectrum,
+  query_precursor,
+  target_precursor,
+  dalton,
+  ppm
+) {
   if (method == "entropy") {
     return(
       msentropy::calculate_entropy_similarity(

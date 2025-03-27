@@ -208,7 +208,10 @@ parse_cli_params <- function(arguments, parameters) {
     names_filename = list(path = c("names", "filename"), type = as.character),
     names_inchikey = list(path = c("names", "inchikey"), type = as.character),
     names_lib = list(path = c("names", "libraries"), type = as.character),
-    names_mgf_ad = list(path = c("names", "mgf", "adduct"), type = as.character),
+    names_mgf_ad = list(
+      path = c("names", "mgf", "adduct"),
+      type = as.character
+    ),
     names_mgf_ce = list(
       path = c("names", "mgf", "collision_energy"),
       type = as.character
@@ -245,7 +248,10 @@ parse_cli_params <- function(arguments, parameters) {
     ),
     # names_mgf_pc = list(path = c("names", "mgf", "precursor_charge"), type = as.character),
     # names_mgf_pm = list(path = c("names", "mgf", "precursor_mz"), type = as.character),
-    names_mgf_sm = list(path = c("names", "mgf", "smiles"), type = as.character),
+    names_mgf_sm = list(
+      path = c("names", "mgf", "smiles"),
+      type = as.character
+    ),
     names_mgf_sn = list(
       path = c("names", "mgf", "smiles_no_stereo"),
       type = as.character
@@ -254,15 +260,24 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("names", "mgf", "spectrum_id"),
       type = as.character
     ),
-    names_mgf_sp = list(path = c("names", "mgf", "splash"), type = as.character),
+    names_mgf_sp = list(
+      path = c("names", "mgf", "splash"),
+      type = as.character
+    ),
     names_mgf_sy = list(
       path = c("names", "mgf", "synonyms"),
       type = as.character
     ),
     names_mgf_xl = list(path = c("names", "mgf", "xlogp"), type = as.character),
     names_precursor = list(path = c("names", "precursor"), type = as.character),
-    names_rt_fea = list(path = c("names", "rt", "features"), type = as.character),
-    names_rt_lib = list(path = c("names", "rt", "library"), type = as.character),
+    names_rt_fea = list(
+      path = c("names", "rt", "features"),
+      type = as.character
+    ),
+    names_rt_lib = list(
+      path = c("names", "rt", "library"),
+      type = as.character
+    ),
     names_smiles = list(path = c("names", "smiles"), type = as.character),
     names_source = list(path = c("names", "source"), type = as.character),
     names_target = list(path = c("names", "target"), type = as.character),
@@ -284,10 +299,22 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.character
     ),
     org_tax = list(path = c("organisms", "taxon"), type = as.character),
-    sim_met_ann = list(path = c("similarities", "methods", "annotations"), type = as.character),
-    sim_met_edg = list(path = c("similarities", "methods", "edges"), type = as.character),
-    sim_thr_ann = list(path = c("similarities", "thresholds", "annotations"), type = as.numeric),
-    sim_thr_edg = list(path = c("similarities", "thresholds", "edges"), type = as.numeric),
+    sim_met_ann = list(
+      path = c("similarities", "methods", "annotations"),
+      type = as.character
+    ),
+    sim_met_edg = list(
+      path = c("similarities", "methods", "edges"),
+      type = as.character
+    ),
+    sim_thr_ann = list(
+      path = c("similarities", "thresholds", "annotations"),
+      type = as.numeric
+    ),
+    sim_thr_edg = list(
+      path = c("similarities", "thresholds", "edges"),
+      type = as.numeric
+    ),
     too_met = list(path = c("tools", "metadata"), type = as.character),
     too_net_spe_com = list(
       path = c("tools", "networks", "spectral", "components"),
@@ -428,7 +455,10 @@ parse_cli_params <- function(arguments, parameters) {
       .f = function(parameters, arg_name) {
         if (!is.null(arguments[[arg_name]])) {
           parameters |>
-            purrr::modify_in(mappings[[arg_name]]$path, ~ mappings[[arg_name]]$type(arguments[[arg_name]]))
+            purrr::modify_in(
+              mappings[[arg_name]]$path,
+              ~ mappings[[arg_name]]$type(arguments[[arg_name]])
+            )
         } else {
           parameters
         }

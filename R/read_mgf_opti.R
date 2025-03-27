@@ -20,7 +20,8 @@
   } else {
     ms <- matrix(
       as.double(unlist(spec, use.names = FALSE, recursive = FALSE)),
-      ncol = length(spec[[1L]]), byrow = TRUE
+      ncol = length(spec[[1L]]),
+      byrow = TRUE
     )
   }
 
@@ -37,7 +38,8 @@
   desc[c("PEPMASS", "PEPMASSINT")] <-
     strsplit(desc["PEPMASS"], "[[:space:]]+", perl = TRUE)[[1L]][c(1L, 2L)]
 
-  res <- as.data.frame.matrix(matrix(desc,
+  res <- as.data.frame.matrix(matrix(
+    desc,
     nrow = 1,
     dimnames = list(NULL, names(desc))
   ))
@@ -78,9 +80,11 @@
 #' @return A `DataFrame` containing the parsed spectra data.
 #' @examples NULL
 #' @export
-read_mgf_opti <- function(f,
-                          msLevel = 2L,
-                          mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())) {
+read_mgf_opti <- function(
+  f,
+  msLevel = 2L,
+  mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())
+) {
   requireNamespace("MsBackendMgf", quietly = TRUE)
   if (length(f) != 1L) {
     stop("Please provide a single MGF file.")

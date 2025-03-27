@@ -20,7 +20,10 @@ load_yaml_files <- function() {
     get_default_paths()$params$prepare_params_advanced
   )
 
-  if (length(list.files(get_default_paths()$params$user$path)) >= length(list.files(get_default_paths()$params$default$path))) {
+  if (
+    length(list.files(get_default_paths()$params$user$path)) >=
+      length(list.files(get_default_paths()$params$default$path))
+  ) {
     yaml_files <- c(
       list.files(
         path = file.path(get_default_paths()$params$user),

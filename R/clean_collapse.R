@@ -23,8 +23,14 @@ clean_collapse <- function(grouped_df, cols = NULL) {
       }
     )) |>
     tidytable::ungroup() |>
-    tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.list), .fns = as.character)) |>
-    tidytable::mutate(tidytable::across(.cols = tidyselect::where(is.character), .fns = trimws)) |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.list),
+      .fns = as.character
+    )) |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.character),
+      .fns = trimws
+    )) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
       .fns = function(x) {

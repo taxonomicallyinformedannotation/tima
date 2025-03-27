@@ -22,11 +22,7 @@
 #'   sanitize_spectra()
 #' }
 sanitize_spectra <-
-  function(spectra,
-           cutoff = 0,
-           dalton = 0.01,
-           polarity = NA,
-           ppm = 10) {
+  function(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10) {
     log_debug("Applying sanitization of the spectra")
 
     ## Fix needed
@@ -52,11 +48,13 @@ sanitize_spectra <-
 
     if (!is.na(polarity)) {
       spectra <- spectra |>
-        Spectra::filterPrecursorCharge(z = if (polarity == "pos") {
-          c(1, 2, 3)
-        } else {
-          c(-1, -2, -3)
-        })
+        Spectra::filterPrecursorCharge(
+          z = if (polarity == "pos") {
+            c(1, 2, 3)
+          } else {
+            c(-1, -2, -3)
+          }
+        )
     }
 
     spectra <- spectra |>
@@ -82,11 +80,13 @@ sanitize_spectra <-
     spectra <- spectra |>
       Spectra::filterEmptySpectra()
     # Fix needed as some empty spectra are else not removed
-    spectra <- spectra[!spectra@backend@peaksData |>
-      purrr::map(.f = is.nan) |>
-      purrr::map(.f = any) |>
-      as.character() |>
-      as.logical()]
+    spectra <- spectra[
+      !spectra@backend@peaksData |>
+        purrr::map(.f = is.nan) |>
+        purrr::map(.f = any) |>
+        as.character() |>
+        as.logical()
+    ]
 
     return(spectra)
   }
