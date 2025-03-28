@@ -67,7 +67,6 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/install.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/join_gnps_wrapper.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/load_yaml_files.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/log_debug.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/parse_adduct.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/parse_cli_params.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/parse_yaml_params.html</loc></url>
@@ -99,6 +98,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/select_sirius_columns_formulas.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/select_sirius_columns_structures.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/select_sop_columns.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/setup_logger.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/split_tables_sop.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/tima-package.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/tima_full.html</loc></url>
