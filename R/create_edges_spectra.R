@@ -53,7 +53,6 @@ create_edges_spectra <- function(
   stopifnot("Your input file does not exist." = file.exists(input))
   ## Not checking for ppm and Da limits, everyone is free.
 
-  log_debug("Loading spectra...")
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,
@@ -61,12 +60,12 @@ create_edges_spectra <- function(
       ppm = ppm
     )
   if (length(spectra) > 1) {
-    log_debug("Performing spectral comparison")
-    log_debug(
+    logger::log_info("Performing spectral comparison")
+    logger::log_info(
       "As we do not limit the precursors delta,
       expect a (relatively) long processing time."
     )
-    log_debug("Take yourself a break, you deserve it.")
+    logger::log_with_separator("Take yourself a break, you deserve it.")
     nspecz <- length(spectra)
     fragz <- spectra@backend@peaksData
     precz <- spectra@backend@spectraData$precursorMz
@@ -81,7 +80,7 @@ create_edges_spectra <- function(
       threshold = threshold
     )
 
-    log_debug("Calculating features' entropy")
+    logger::log_info("Calculating features' entropy")
     entropy <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
@@ -91,7 +90,7 @@ create_edges_spectra <- function(
         )
       }
     )
-    log_debug("Calculating features' number of peaks")
+    logger::log_info("Calculating features' number of peaks")
     npeaks <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
@@ -158,7 +157,9 @@ create_edges_spectra <- function(
       )
     rm(entropy_df)
   } else {
-    log_debug("No spectra were found, returning an empty dataframe instead")
+    logger::log_info(
+      "No spectra were found, returning an empty dataframe instead"
+    )
     edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
       "feature_spectrum_entropy" = NA,

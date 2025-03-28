@@ -73,7 +73,7 @@ prepare_annotations_spectra <-
         purrr::map(.x = input, .f = file.exists) |> unlist()
       )
     )
-    log_debug(x = "Loading and formatting spectral matches")
+    logger::log_info("Loading and formatting spectral matches")
     table <-
       purrr::map(
         .x = input,

@@ -82,7 +82,7 @@ prepare_taxa <-
         5
     )
 
-    log_debug(x = "Loading feature table")
+    logger::log_info("Loading feature table")
     feature_table_0 <- tidytable::fread(
       file = input,
       na.strings = c("", "NA"),
@@ -90,7 +90,7 @@ prepare_taxa <-
     )
 
     if (is.null(taxon)) {
-      log_debug(x = "Loading metadata table")
+      logger::log_info("Loading metadata table")
       metadata_table <- tidytable::fread(
         file = metadata,
         na.strings = c("", "NA"),
@@ -98,13 +98,12 @@ prepare_taxa <-
       )
     }
 
-    log_debug(x = "Formatting feature table ...")
-    log_debug(
-      x = "... requires 'Peak area' or ':area'
-              in columns (mzmine format)"
+    logger::log_info("Formatting feature table")
+    logger::log_info(
+      "... requires 'Peak area' or ':area' in columns (mzmine format)"
     )
-    log_debug(x = "... or 'quant_' in columns (SLAW format)")
-    log_debug(x = "... or 'Peak height' in columns (SIRIUS format)")
+    logger::log_info("... or 'quant_' in columns (SLAW format)")
+    logger::log_info("... or 'Peak height' in columns (SIRIUS format)")
 
     feature_table <- feature_table_0 |>
       tidytable::select(
@@ -145,7 +144,7 @@ prepare_taxa <-
         replacement = "",
         vectorize_all = FALSE
       )
-    log_debug(x = "... filtering top K intensities per feature")
+    logger::log_info("Filtering top K intensities per feature")
     top_n <- feature_table |>
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = seq_len(ncol(feature_table)) + 1) |>
@@ -156,19 +155,21 @@ prepare_taxa <-
     rm(feature_table)
 
     if (!is.null(taxon)) {
-      log_debug(x = "Forcing all features to given organism")
+      logger::log_info("Forcing all features to given organism")
       metadata_table <- data.frame(taxon)
       colnames(metadata_table) <- colname
     }
 
-    log_debug(x = "Preparing organisms names")
+    logger::log_info("Preparing organisms names")
     organism_table <- metadata_table |>
       tidytable::filter(!is.na(!!as.name(colname))) |>
       tidytable::distinct(!!as.name(colname)) |>
       tidytable::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism, sep = "\\|", )
 
-    log_debug(x = "Retrieving already computed Open Tree of Life Taxonomy")
+    logger::log_info(
+      "Retrieving already computed Open Tree of Life Taxonomy"
+    )
     organism_table_filled <- organism_table |>
       tidytable::left_join(
         tidytable::fread(
@@ -180,7 +181,7 @@ prepare_taxa <-
       )
     rm(organism_table)
 
-    log_debug(x = "Submitting the rest to OTL")
+    logger::log_info("Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
       tidytable::filter(is.na(organism_taxonomy_ottid))
 
@@ -188,7 +189,7 @@ prepare_taxa <-
       biological_metadata_1 <- organism_table_missing |>
         get_organism_taxonomy_ott()
 
-      log_debug(x = "Joining all results")
+      logger::log_info("Joining all results")
       biological_metadata <- organism_table_filled |>
         tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism) |>
@@ -203,7 +204,7 @@ prepare_taxa <-
 
     if (is.null(taxon)) {
       if (extension == FALSE) {
-        log_debug("Removing filename extensions")
+        logger::log_info("Removing filename extensions")
         metadata_table <- metadata_table |>
           tidytable::mutate(
             filename = stringi::stri_replace_all_fixed(
@@ -223,7 +224,7 @@ prepare_taxa <-
           )
       }
     }
-    log_debug(x = "Joining top K with metadata table")
+    logger::log_info("Joining top K with metadata table")
     if (!is.null(taxon)) {
       metadata_table_joined <- tidytable::inner_join(
         feature_table_0 |>
@@ -248,7 +249,7 @@ prepare_taxa <-
     }
     rm(feature_table_0, metadata_table)
 
-    log_debug(x = "Joining with cleaned taxonomy table")
+    logger::log_info("Joining with cleaned taxonomy table")
     taxed_features_table <-
       tidytable::left_join(
         metadata_table_joined,

@@ -29,7 +29,7 @@ prepare_libraries_sop_ecmdb <-
     )$files$libraries$sop$prepared$ecmdb
   ) {
     if (file.exists(input)) {
-      log_debug(x = "Loading ECMDB resources")
+      logger::log_info("Loading ECMDB resources")
 
       file <- gsub(
         pattern = ".zip",
@@ -50,7 +50,7 @@ prepare_libraries_sop_ecmdb <-
         data.frame() |>
         tidytable::as_tidytable()
 
-      log_debug(x = "Formatting ECMDB")
+      logger::log_info("Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
@@ -98,7 +98,9 @@ prepare_libraries_sop_ecmdb <-
         tidytable::distinct()
       rm(ecmdb)
     } else {
-      log_debug("Sorry, ECMDB not found, returning an empty file instead")
+      logger::log_info(
+        "Sorry, ECMDB not found, returning an empty file instead"
+      )
       ecmdb_prepared <- fake_sop_columns()
     }
 

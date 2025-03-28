@@ -2,12 +2,11 @@ start <- Sys.time()
 
 library(tima)
 
-log_debug(
-  "This script",
-  crayon::green("downloads an example of metadata table. \n")
+logger::log_info(
+  "This script downloads an example of metadata table."
 )
-log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ...")
+logger::log_info("Authors: AR")
+logger::log_info("Contributors: ...")
 
 get_file(
   url = get_default_paths()$urls$examples$metadata,
@@ -16,4 +15,4 @@ get_file(
 
 end <- Sys.time()
 
-log_debug("Script finished in", crayon::green(format(end - start)))
+logger::log_info("Script finished in ", format(end - start))

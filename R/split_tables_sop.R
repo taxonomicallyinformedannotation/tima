@@ -12,8 +12,8 @@
 #'
 #' @examples NULL
 split_tables_sop <- function(table, cache) {
-  log_debug(
-    x = "Splitting the concatenated library into smaller standardized pieces"
+  logger::log_info(
+    "Splitting the concatenated library into smaller standardized pieces"
   )
 
   table <- table |>
@@ -34,7 +34,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  log_debug(x = "Sanitizing structures")
+  logger::log_info("Sanitizing structures")
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 
@@ -76,10 +76,8 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
   rm(table)
-  log_debug(
-    x = "Led to",
-    nrow(table_keys),
-    "referenced structure-organism pairs"
+  logger::log_info(
+    "Led to {nrow(table_keys)} referenced structure-organism pairs"
   )
 
   table_structures_stereo <- table_structural |>
@@ -97,8 +95,8 @@ split_tables_sop <- function(table, cache) {
       structure_smiles_no_stereo
     ) |>
     tidytable::distinct()
-  log_debug(
-    x = "Corresponding to",
+  logger::log_info(
+    "Corresponding to ",
     nrow(
       table_structures_stereo |>
         tidytable::filter(
@@ -110,11 +108,11 @@ split_tables_sop <- function(table, cache) {
         ) |>
         tidytable::distinct(structure_inchikey)
     ),
-    "unique stereoisomers (excluding structures without stereochemistry)..."
+    " unique stereoisomers (excluding structures without stereochemistry)..."
   )
 
-  log_debug(
-    x = "... and",
+  logger::log_info(
+    "... and ",
     nrow(
       table_structures_stereo |>
         tidytable::filter(
@@ -126,16 +124,16 @@ split_tables_sop <- function(table, cache) {
         ) |>
         tidytable::distinct(structure_inchikey)
     ),
-    "unique structures without stereochemistry..."
+    " unique structures without stereochemistry..."
   )
 
-  log_debug(
-    x = "or",
+  logger::log_info(
+    "... or ",
     nrow(
       table_structures_stereo |>
         tidytable::distinct(structure_inchikey_connectivity_layer)
     ),
-    "unique constitutional isomers (ignoring stereochemistry)"
+    " unique constitutional isomers (ignoring stereochemistry)"
   )
 
   table_structures_metadata <- table_structural |>
@@ -222,7 +220,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
-  log_debug(x = "among", nrow(table_organisms_names), "unique organisms")
+  logger::log_info("... among ", nrow(table_organisms_names), " unique organisms")
 
   table_org_tax_ott <- table_organisms |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>

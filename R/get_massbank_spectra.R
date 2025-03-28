@@ -19,16 +19,16 @@ get_massbank_spectra <-
     mb_url = get_default_paths()$urls$massbank$url,
     mb_version = get_default_paths()$urls$massbank$version
   ) {
-    log_debug("Checking if a previous MassBank version already exists")
+    logger::log_info("Checking if a previous MassBank version already exists")
     export <- file.path(output_dir, paste(mb_version, mb_file, sep = "_"))
     if (!file.exists(export)) {
-      log_debug("Downloading MassBank", mb_version)
+      logger::log_info("Downloading MassBank", mb_version)
       get_file(
         url = paste(mb_url, mb_version, mb_file, sep = "/"),
         export = export
       )
     } else {
-      log_debug(
+      logger::log_info(
         "It appears you already have",
         "the most recent MassBank version available!"
       )

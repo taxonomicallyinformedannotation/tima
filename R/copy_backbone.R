@@ -12,9 +12,9 @@ copy_backbone <- function(
   cache_dir = fs::path_home(".tima"),
   package = "tima"
 ) {
-  message("Creating cache at ", cache_dir)
+  logger::log_info("Creating cache at ", cache_dir)
   fs::dir_create(path = cache_dir)
-  message("Copying default architecture ...")
+  logger::log_info("Copying default architecture")
   fs::dir_copy(
     path = system.file(package = package),
     new_path = cache_dir,

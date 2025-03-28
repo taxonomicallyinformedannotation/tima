@@ -79,13 +79,13 @@ filter_annotations <-
       rts <- NULL
     }
 
-    log_debug(x = "... features")
+    logger::log_info("... features")
     features_table <- tidytable::fread(
       file = features,
       colClasses = "character",
       na.strings = c("", "NA")
     )
-    log_debug(x = "... annotations")
+    logger::log_info("... annotations")
     annotation_tables_list <- purrr::map(
       .x = annotations,
       .f = tidytable::fread,
@@ -94,8 +94,8 @@ filter_annotations <-
     )
 
     if ("ms1" %in% names(annotation_tables_list)) {
-      log_debug(
-        x = "... removing MS1 annotations for which we have spectral hits"
+      logger::log_info(
+        "Removing MS1 annotations for which we have spectral hits"
       )
       annotations_tables_spectral <- annotation_tables_list[names(
         annotation_tables_list
@@ -122,7 +122,7 @@ filter_annotations <-
       spectral_keys
     )
 
-    log_debug(x = "... retention times")
+    logger::log_info("... retention times")
     if (!is.null(rts)) {
       rt_table <- purrr::map(
         .x = rts,
@@ -139,10 +139,10 @@ filter_annotations <-
     rm(annotation_table)
 
     if (!is.null(rts)) {
-      log_debug(
-        "Filtering annotations outside of",
-        tolerance_rt,
-        "minutes tolerance"
+      logger::log_info(
+        "Filtering annotations outside of
+        {tolerance_rt}
+        minutes tolerance"
       )
       features_annotated_table_2 <- features_annotated_table_1 |>
         tidytable::left_join(rt_table) |>
@@ -162,16 +162,13 @@ filter_annotations <-
         ) |>
         tidytable::select(-rt_target, -type)
     } else {
-      log_debug("No RT library provided, not filtering anything")
+      logger::log_info("No RT library provided, not filtering anything")
       features_annotated_table_2 <- features_annotated_table_1 |>
         tidytable::mutate(candidate_structure_error_rt = NA)
     }
 
-    log_debug(
-      crayon::green(
-        nrow(features_annotated_table_1) - nrow(features_annotated_table_2)
-      ),
-      "Candidates were removed based on retention time."
+    logger::log_info(
+      "{nrow(features_annotated_table_1) - nrow(features_annotated_table_2)} candidates were removed based on retention time."
     )
     rm(features_annotated_table_1)
 

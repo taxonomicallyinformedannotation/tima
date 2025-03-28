@@ -2,15 +2,14 @@ start <- Sys.time()
 
 library(tima)
 
-log_debug(
-  "This script",
-  crayon::green("downloads an example of SIRIUS output. \n")
+logger::log_info(
+  "This script downloads an example of SIRIUS output."
 )
-log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ...")
+logger::log_info("Authors: AR")
+logger::log_info("Contributors: ...")
 
 get_example_sirius()
 
 end <- Sys.time()
 
-log_debug("Script finished in", crayon::green(format(end - start)))
+logger::log_info("Script finished in ", format(end - start))

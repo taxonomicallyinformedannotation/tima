@@ -76,72 +76,54 @@ decorate_bio <-
     df_var <- df_spe |>
       tidytable::filter(score_biological >= score_biological_variety * 1)
 
-    log_debug(
-      "taxonomically informed scoring led to \n",
-      crayon::silver(nrow(
+    logger::log_info(
+      "Taxonomically informed metabolite annotation led to \n",
+      nrow(
         df_kin |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::silver("kingdom"),
-      "level, \n",
-      crayon::white(nrow(
+      ),
+      " annotations reranked at the kingdom level, \n",
+      nrow(
         df_phy |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::white("phylum"),
-      "level, \n",
-      crayon::cyan(nrow(
+      ),
+      " annotations reranked at the phylum level, \n",
+      nrow(
         df_cla |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::cyan("class"),
-      "level, \n",
-      crayon::magenta(nrow(
+      ),
+      " annotations reranked at the class level, \n",
+      nrow(
         df_ord |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::magenta("order"),
-      "level, \n",
-      crayon::blue(nrow(
+      ),
+      " annotations reranked at the order level, \n",
+      nrow(
         df_fam |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::blue("family"),
-      "level, \n",
-      crayon::blue(nrow(
+      ),
+      " annotations reranked at the family level, \n",
+      nrow(
         df_tri |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::blue("tribe"),
-      "level, \n",
-      crayon::yellow(nrow(
+      ),
+      " annotations reranked at the tribe level, \n",
+      nrow(
         df_gen |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::yellow("genus"),
-      "level, \n",
-      crayon::green(nrow(
+      ),
+      " annotations reranked at the genus level, \n",
+      nrow(
         df_spe |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::green("species"),
-      "level, \n",
-      "and",
-      crayon::red(nrow(
+      ),
+      " annotations reranked at the species level, \n",
+      " and ",
+      nrow(
         df_var |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::red("variety"),
-      "level. \n",
+      ),
+      " annotations reranked at the variety level. \n",
       "WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! (for later predictions)"
     )
     rm(

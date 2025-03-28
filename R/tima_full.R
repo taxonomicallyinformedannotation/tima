@@ -11,14 +11,24 @@
 #' @examples NULL
 tima_full <- function() {
   start <- Sys.time()
-  log_debug(
-    "This script",
-    crayon::green("does everything you ever dreamt of. \n")
+  if (file.exists("tima.log")) {
+    file.remove("tima.log")
+  }
+  logger::log_info(
+    "This script does everything you ever dreamt of."
   )
-  log_debug("Authors: ", crayon::green("AR"), "\n")
-  log_debug("Contributors: ", crayon::blue("PMA"), "\n")
+  logger::log_info("Authors: AR")
+  logger::log_info("Contributors: PMA")
   go_to_cache()
   targets::tar_make(names = tidyselect::matches("^ann_pre$"))
   end <- Sys.time()
-  log_debug("Script finished in", crayon::green(format(end - start)))
+  logger::log_info("Script finished in ", format(end - start))
+  file.rename(
+    from = "tima.log",
+    to = paste0(
+      "data/processed/",
+      format(end, format = "%Y%m%d_%H%M%S"),
+      "_tima.log"
+    )
+  )
 }

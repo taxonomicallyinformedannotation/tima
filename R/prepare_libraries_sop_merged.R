@@ -121,7 +121,7 @@ prepare_libraries_sop_merged <-
       )
     }
 
-    log_debug(x = "Loading and concatenating prepared libraries")
+    logger::log_info("Loading and concatenating prepared libraries")
     libraries <- files |>
       purrr::map(
         .f = tidytable::fread,
@@ -133,14 +133,14 @@ prepare_libraries_sop_merged <-
       tidytable::bind_rows() |>
       split_tables_sop(cache = cache)
 
-    log_debug(x = "Keeping keys")
+    logger::log_info("Keeping keys")
     table_keys <- tables$key |>
       data.frame()
 
-    log_debug(x = "Keeping organisms")
+    logger::log_info("Keeping organisms")
     table_org_tax_ott <- tables$org_tax_ott
 
-    log_debug(x = "Completing organisms taxonomy")
+    logger::log_info("Completing organisms taxonomy")
     table_org_tax_ott_2 <- table_keys |>
       tidytable::anti_join(table_org_tax_ott) |>
       tidytable::distinct(organism = organism_name) |>
@@ -171,7 +171,7 @@ prepare_libraries_sop_merged <-
         )
     }
 
-    log_debug(x = "Keeping structures")
+    logger::log_info("Keeping structures")
     table_structures_stereo <- tables$str_stereo
     table_structures_metadata <- tables$str_met
     table_structures_names <- tables$str_nam
@@ -179,14 +179,14 @@ prepare_libraries_sop_merged <-
     table_structures_taxonomy_npc <- tables$str_tax_npc
 
     ## ISSUE see #19
-    # log_debug(x = "Completing structures names")
-    # log_debug(x = "Completing structures taxonomy (classyfire)")
-    # log_debug(x = "Completing structures taxonomy (NPC)")
+    # logger::log_info("Completing structures names")
+    # logger::log_info("Completing structures taxonomy (classyfire)")
+    # logger::log_info("Completing structures taxonomy (NPC)")
 
     ## If filter is TRUE,
     ## filter the library based on the specified level and value
     if (filter == TRUE) {
-      log_debug(x = "Filtering library")
+      logger::log_info("Filtering library")
       table_keys <- table_keys |>
         tidytable::left_join(table_org_tax_ott)
 

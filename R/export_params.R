@@ -22,7 +22,9 @@ export_params <-
     create_dir(export = directory)
 
     ## Log the path to the used parameters
-    log_debug(x = "... path to used parameters is", crayon::green(directory))
+    logger::log_info(
+      "... path to used parameters is {directory}"
+    )
 
     yaml::write_yaml(
       x = parameters,

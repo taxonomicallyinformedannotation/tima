@@ -37,32 +37,32 @@ get_example_files <- function(
     go_to_cache()
   }
   if ("features" %in% example) {
-    message("Features")
+    logger::log_info("Features")
     get_file(
       url = get_default_paths()$urls$examples$features,
       export = get_default_paths()$data$source$features
     )
   }
   if ("hmdb_is" %in% example) {
-    message("HMDB in silico")
+    logger::log_info("HMDB in silico")
     get_file(
       url = get_default_paths()$urls$hmdb$spectra$predicted,
       export = get_default_paths()$data$source$libraries$spectra$is$hmdb
     )
   }
   if ("metadata" %in% example) {
-    message("Metadata")
+    logger::log_info("Metadata")
     get_file(
       url = get_default_paths()$urls$examples$metadata,
       export = get_default_paths()$data$source$metadata
     )
   }
   if ("sirius" %in% example) {
-    message("Sirius")
+    logger::log_info("Sirius")
     get_example_sirius()
   }
   if ("spectra" %in% example) {
-    message("Spectra")
+    logger::log_info("Spectra")
     get_file(
       url = get_default_paths()$urls$examples$spectra,
       # url = get_default_paths()$urls$examples$spectra_mini,
@@ -70,7 +70,7 @@ get_example_files <- function(
     )
   }
   if ("spectral_lib_with_rt" %in% example) {
-    message("Spectral library with retention times")
+    logger::log_info("Spectral library with retention times")
     get_file(
       url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
       export = get_default_paths()$data$source$libraries$spectra$exp$with_rt

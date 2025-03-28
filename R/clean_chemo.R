@@ -52,15 +52,16 @@ clean_chemo <-
   ) {
     model <- columns_model()
 
-    log_debug(
-      "filtering top ",
+    logger::log_info(
+      "Filtering top ",
       candidates_final,
-      " candidates and keeping only MS1 candidates with minimum \n",
+      " candidates and keeping only MS1 candidates with minimum ",
       minimal_ms1_bio,
-      " biological score \n",
+      " biological score ",
       minimal_ms1_condition,
+      " ",
       minimal_ms1_chemo,
-      "chemical score \n"
+      " chemical score "
     )
 
     ## Those lines are to keep ms1 annotation
@@ -104,7 +105,9 @@ clean_chemo <-
       ) |>
       tidytable::filter(rank_final <= candidates_final)
 
-    log_debug("adding initial metadata (RT, etc.) and simplifying columns \n")
+    logger::log_info(
+      "Adding initial metadata (RT, etc.) and simplifying columns"
+    )
     df3 <- features_table |>
       tidytable::left_join(df1) |>
       tidytable::left_join(components_table) |>
@@ -188,15 +191,15 @@ clean_chemo <-
     rm(df1)
 
     if (remove_ties == TRUE) {
-      log_debug("Removing ties ...")
+      logger::log_info("Removing ties")
       df3 <- df3 |>
         tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
     }
 
     if (summarize == TRUE) {
-      log_debug("Collecting garbage ...")
+      logger::log_info("Collecting garbage")
       gc()
-      log_debug("summarizing results \n")
+      logger::log_info("Summarizing results")
       df4 <- df3 |>
         tidytable::group_by(feature_id) |>
         tidytable::reframe(tidytable::across(
@@ -228,7 +231,7 @@ clean_chemo <-
     }
     rm(df3)
 
-    log_debug("selecting columns to export \n")
+    logger::log_info("selecting columns to export")
     df6 <- df5 |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::everything(),
@@ -260,7 +263,7 @@ clean_chemo <-
       ))
     rm(df5)
 
-    log_debug("adding consensus again to droped candidates \n")
+    logger::log_info("adding consensus again to droped candidates")
     results <- tidytable::bind_rows(
       df6 |>
         tidytable::filter(

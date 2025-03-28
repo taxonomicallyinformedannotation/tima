@@ -8,7 +8,7 @@
 #'
 #' @examples NULL
 fake_hmdb <- function(export) {
-  log_debug("External failure. Returning empty file instead.")
+  logger::log_error("External failure. Returning empty file instead.")
   fake_export <- export |>
     gsub(
       pattern = ".*/",

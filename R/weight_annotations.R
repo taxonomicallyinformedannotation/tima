@@ -298,23 +298,23 @@ weight_annotations <- function(
     "Condition must be 'OR' or 'AND'." = minimal_ms1_condition %in%
       c("OR", "AND")
   )
-  log_debug(x = "Loading files ...")
+  logger::log_info("Loading files ...")
 
-  log_debug(x = "... components")
+  logger::log_info("... components")
   components_table <- tidytable::fread(
     file = components,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  log_debug(x = "... edges")
+  logger::log_info("... edges")
   edges_table <- tidytable::fread(
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  log_debug(x = "... structure-organism pairs")
+  logger::log_info("... structure-organism pairs")
   library_table <- tidytable::fread(
     file = library,
     na.strings = c("", "NA"),
@@ -339,7 +339,7 @@ weight_annotations <- function(
     .f = tidytable::left_join
   )
 
-  log_debug(x = "... canopus")
+  logger::log_info("... canopus")
   canopus_table <-
     tidytable::fread(
       file = canopus,
@@ -347,7 +347,7 @@ weight_annotations <- function(
       colClasses = "character"
     )
 
-  log_debug(x = "... formula")
+  logger::log_info("... formula")
   formula_table <-
     tidytable::fread(
       file = formula,
@@ -355,7 +355,7 @@ weight_annotations <- function(
       colClasses = "character"
     )
 
-  log_debug(x = "... annotations")
+  logger::log_info("... annotations")
   annotation_table <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
@@ -376,7 +376,7 @@ weight_annotations <- function(
       tidytable::select(-candidate_structure_name)
   }
 
-  log_debug(x = "Initial annotations:")
+  logger::log_info("Initial annotations:")
   annotation_table |>
     tidytable::filter(
       !is.na(
@@ -395,7 +395,7 @@ weight_annotations <- function(
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
 
-  log_debug(x = "Re-arranging annotations")
+  logger::log_info("Re-arranging annotations")
   model <- columns_model()
 
   annotation_table_1 <- annotation_table |>
@@ -453,7 +453,7 @@ weight_annotations <- function(
         )
     )
 
-  log_debug(x = "adding biological organism metadata")
+  logger::log_info("adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
     tidytable::left_join(tidytable::fread(
       file = taxa,
@@ -470,7 +470,7 @@ weight_annotations <- function(
     tables_full
   )
 
-  log_debug(x = "performing taxonomically informed scoring")
+  logger::log_info("performing taxonomically informed scoring")
   results_bio <- weight_bio()
   rm(annotation_table_taxed)
   results_bio |>
@@ -488,7 +488,7 @@ weight_annotations <- function(
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
   rm(results_chemo)
 
-  log_debug(x = "Exporting ...")
+  logger::log_info("Exporting")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(
     get_default_paths()$data$processed$path,

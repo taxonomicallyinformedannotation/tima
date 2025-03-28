@@ -9,7 +9,7 @@
 #'
 #' @examples NULL
 load_yaml_files <- function() {
-  log_debug(x = "Loading default params")
+  logger::log_info("Loading default params")
   yaml_files <- c(
     list.files(
       path = file.path(get_default_paths()$params$default),

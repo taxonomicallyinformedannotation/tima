@@ -9,13 +9,12 @@ step <- "params"
 paths <- get_default_paths()
 params <- get_params(step = step)
 
-log_debug(
-  "This script",
-  crayon::green("is a test script")
+logger::log_info(
+  "This script is a test script"
 )
-log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ...")
+logger::log_info("Authors: AR")
+logger::log_info("Contributors: ...")
 
 end <- Sys.time()
 
-log_debug("Script finished in", crayon::green(format(end - start)))
+logger::log_info("Script finished in ", format(end - start))

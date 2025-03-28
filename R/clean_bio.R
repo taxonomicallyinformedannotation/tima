@@ -36,9 +36,8 @@ clean_bio <-
       )
     rm(annot_table_wei_bio)
 
-    log_debug(
-      "calculating chemical consistency
-              features with at least 2 neighbors ... \n"
+    logger::log_info(
+      "Calculating chemical consistency of features with at least 2 neighbors"
     )
     df3 <-
       tidytable::right_join(
@@ -64,7 +63,7 @@ clean_bio <-
       ) |>
       tidytable::filter(!is.na(feature_source))
 
-    log_debug("... among all edges ... \n")
+    logger::log_info("Among all edges")
     clean_per_level_bio <-
       function(
         df,
@@ -116,7 +115,7 @@ clean_bio <-
           )
       }
 
-    log_debug("... at the (classyfire) kingdom level \n")
+    logger::log_info("... at the (classyfire) kingdom level")
     freq_cla_kin <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_cla_01kin",
@@ -124,7 +123,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_cla_01kin_score",
         feature_val_name = "feature_pred_tax_cla_01kin_val"
       )
-    log_debug("... at the (NPC) pathway level \n")
+    logger::log_info("... at the (NPC) pathway level")
     freq_npc_pat <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_npc_01pat",
@@ -132,7 +131,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_npc_01pat_score",
         feature_val_name = "feature_pred_tax_npc_01pat_val"
       )
-    log_debug("... at the (classyfire) superclass level \n")
+    logger::log_info("... at the (classyfire) superclass level")
     freq_cla_sup <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_cla_02sup",
@@ -140,7 +139,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_cla_02sup_score",
         feature_val_name = "feature_pred_tax_cla_02sup_val"
       )
-    log_debug("... at the (NPC) superclass level \n")
+    logger::log_info("... at the (NPC) superclass level")
     freq_npc_sup <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_npc_02sup",
@@ -148,7 +147,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_npc_02sup_score",
         feature_val_name = "feature_pred_tax_npc_02sup_val"
       )
-    log_debug("... at the (classyfire) class level \n")
+    logger::log_info("... at the (classyfire) class level")
     freq_cla_cla <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_cla_03cla",
@@ -156,7 +155,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_cla_03cla_score",
         feature_val_name = "feature_pred_tax_cla_03cla_val"
       )
-    log_debug("... at the (NPC) class level \n")
+    logger::log_info("... at the (NPC) class level")
     freq_npc_cla <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_npc_03cla",
@@ -164,7 +163,7 @@ clean_bio <-
         feature_score_name = "feature_pred_tax_npc_03cla_score",
         feature_val_name = "feature_pred_tax_npc_03cla_val"
       )
-    log_debug("... at the (classyfire) parent level \n")
+    logger::log_info("... at the (classyfire) parent level")
     freq_cla_par <- df3 |>
       clean_per_level_bio(
         candidates = "candidate_structure_tax_cla_04dirpar",
@@ -174,7 +173,7 @@ clean_bio <-
       )
     rm(df3)
 
-    log_debug("splitting already computed predictions \n")
+    logger::log_info("splitting already computed predictions")
     df1 <- df |>
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
@@ -187,7 +186,7 @@ clean_bio <-
       tidytable::bind_rows(df1b)
     rm(df)
 
-    log_debug("joining all except -1 together \n")
+    logger::log_info("joining all except -1 together")
     supp_tables <- list(
       freq_cla_kin,
       freq_npc_pat,
@@ -312,7 +311,7 @@ clean_bio <-
       )
     rm(df2, supp_tables)
 
-    log_debug("adding already computed predictions back \n")
+    logger::log_info("adding already computed predictions back")
     annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
       tidytable::anti_join(df1b) |>
       tidytable::bind_rows(df1)

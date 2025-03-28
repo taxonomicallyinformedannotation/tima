@@ -96,60 +96,44 @@ decorate_chemo <- function(
         feature_pred_tax_cla_04dirpar_val != "empty"
     )
 
-  log_debug(
-    x = paste(
-      "chemically informed scoring led to \n",
-      crayon::silver(nrow(
-        df_cla_kin |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::silver("(classyfire) kingdom"),
-      "level, \n",
-      crayon::cyan(nrow(
-        df_npc_pat |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::cyan("(NPC) pathway"),
-      "level, \n",
-      crayon::magenta(nrow(
-        df_cla_sup |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::magenta("(classyfire) superclass"),
-      "level, \n",
-      crayon::blue(nrow(
-        df_npc_sup |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::blue("(NPC) superclass"),
-      "level, \n",
-      crayon::yellow(nrow(
-        df_cla_cla |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::yellow("(classyfire) class"),
-      "level, \n",
-      crayon::green(nrow(
-        df_npc_cla |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::green("(NPC) class"),
-      "level, and \n",
-      crayon::red(nrow(
-        df_cla_par |>
-          tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-      )),
-      "annotations reranked at the",
-      crayon::red("(classyfire) parent"),
-      "level. \n",
-      "WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT!"
-    )
+  logger::log_info(
+    "Chemically informed scoring led to \n",
+    nrow(
+      df_cla_kin |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (classyfire) kingdom level, \n",
+    nrow(
+      df_npc_pat |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (NPC) pathway level, \n",
+    nrow(
+      df_cla_sup |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (classyfire) superclass level, \n",
+    nrow(
+      df_npc_sup |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (NPC) superclass level, \n",
+    nrow(
+      df_cla_cla |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (classyfire) class level, \n",
+    nrow(
+      df_npc_cla |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (NPC) class level, and \n",
+    nrow(
+      df_cla_par |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+    ),
+    " annotations reranked at the (classyfire) parent level. \n",
+    "WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT!"
   )
   rm(
     df_cla_kin,
