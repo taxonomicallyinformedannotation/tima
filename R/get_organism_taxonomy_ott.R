@@ -163,7 +163,7 @@ get_organism_taxonomy_ott <- function(
             ]
           }
         )
-      logger::log_info("Retrying with", organisms_new)
+      logger::log_info("Retrying with ", paste(organisms_new, collapse = ", "))
       new_matched_otl_exact_list_2 <- organisms_new_split |>
         purrr::map(
           .f = function(x) {
