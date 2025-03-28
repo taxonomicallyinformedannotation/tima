@@ -8,7 +8,7 @@
 #'
 #' @examples NULL
 fake_ecmdb <- function(export) {
-  log_error("External failure. Returning empty file instead.")
+  logger::log_error("External failure. Returning empty file instead.")
   fake_export <- export |>
     gsub(
       pattern = ".*/",
