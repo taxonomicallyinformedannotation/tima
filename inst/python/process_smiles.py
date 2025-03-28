@@ -65,7 +65,7 @@ def process_smiles(input_smi_file, output_csv_file, num_workers=None, batch_size
                             writer.writerow(result)
                             count += 1
                             if count % progress_interval == 0:
-                                print(f"Processed {count} molecules...")
+                                print(f"Processed {count} molecules")
                     batch.clear()
                     original_smiles_list.clear()
             
