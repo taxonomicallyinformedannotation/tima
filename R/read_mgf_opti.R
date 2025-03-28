@@ -127,7 +127,7 @@ read_mgf_opti <- function(
       total_processed <- total_processed + 1
 
       if (total_processed %% batch_size == 0) {
-        message(sprintf("Read %d spectra...", total_processed))
+        logger::log_info(sprintf("Read %d spectra...", total_processed))
       }
 
       current_spectrum <- list()

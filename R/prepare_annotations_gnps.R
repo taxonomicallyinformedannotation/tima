@@ -52,7 +52,7 @@ prepare_annotations_gnps <-
       input <- "w1llN3v3r3v3r3x1st"
     }
     if (all(purrr::map(.x = input, .f = file.exists) |> unlist())) {
-      log_debug("Loading and formatting GNPS results")
+      logger::log_info("Loading and formatting GNPS results")
       ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
       table <- purrr::map(
         .x = input,
@@ -109,7 +109,9 @@ prepare_annotations_gnps <-
         ) |>
         select_annotations_columns()
     } else {
-      log_debug("No GNPS annotations found, returning an empty file instead")
+      logger::log_info(
+        "No GNPS annotations found, returning an empty file instead"
+      )
       table <- fake_annotations_columns()
     }
 

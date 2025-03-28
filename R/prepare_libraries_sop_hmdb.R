@@ -31,7 +31,7 @@ prepare_libraries_sop_hmdb <-
     )$files$libraries$sop$prepared$hmdb
   ) {
     if (file.exists(input)) {
-      log_debug("Unzipping HMDB...")
+      logger::log_info("Unzipping HMDB")
       hmdb_prepared <- tryCatch(
         expr = {
           utils::unzip(zipfile = input, exdir = dirname(input))
@@ -41,7 +41,7 @@ prepare_libraries_sop_hmdb <-
               replacement = ".sdf",
               fixed = TRUE
             )
-          log_debug(x = "Loading HMDB...")
+          logger::log_info("Loading HMDB")
           sdf_data <- readLines(con = hmdb_structures, warn = FALSE)
 
           find_fixed_pattern_line_in_file <- function(file, pattern) {
@@ -105,7 +105,7 @@ prepare_libraries_sop_hmdb <-
             name = hmdb_list$name
           )
 
-          log_debug(x = "Formatting HMDB...")
+          logger::log_info("Formatting HMDB")
           hmdb_prepared <- hmdb_df |>
             tidytable::mutate(tidytable::across(
               .cols = tidyselect::everything(),
@@ -160,21 +160,21 @@ prepare_libraries_sop_hmdb <-
             round_reals() |>
             tidytable::distinct()
 
-          log_debug("Deleting unzipped file...")
+          logger::log_info("Deleting unzipped file")
           file.remove(hmdb_structures)
           hmdb_prepared
         },
         error = function(e) {
-          log_debug("Something went wrong, see original error message:")
-          log_debug(e)
+          logger::log_info("Something went wrong, see original error message:")
+          logger::log_info(e)
           hmdb_prepared <- fake_sop_columns()
         }
       )
     } else {
-      log_debug("Sorry, HMDB not found, returning an empty file instead")
+      logger::log_info("Sorry, HMDB not found, returning an empty file instead")
       hmdb_prepared <- fake_sop_columns()
     }
-    log_debug(x = "Exporting ...")
+    logger::log_info("Exporting ...")
     export_output(x = hmdb_prepared, file = output)
     return(output)
   }

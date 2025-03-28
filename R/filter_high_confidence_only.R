@@ -18,7 +18,7 @@ filter_high_confidence_only <-
     score_ini_min = 0.95,
     score_final_min = 0.75
   ) {
-    log_debug("Keeping high confidence candidates only...")
+    logger::log_info("Keeping high confidence candidates only")
     before <- nrow(df)
     # TODO this is very basic for now but already massively filters.
     # TODO Later implement SIRIUS/internal library filters.
@@ -29,14 +29,10 @@ filter_high_confidence_only <-
           score_weighted_chemo >= score_final_min
       )
     after <- nrow(df)
-    log_debug(
-      "Removed",
-      crayon::red(before - after),
-      "low confidence candidates out of the",
-      crayon::blue(before),
-      "total ones."
+    logger::log_info(
+      "Removed {before - after} low confidence candidates out of the {before} total ones."
     )
-    log_debug(crayon::green(after), "high confidence candidates remaining.")
+    logger::log_info("{after} high confidence candidates remaining.")
     rm(before, after)
     return(df)
   }

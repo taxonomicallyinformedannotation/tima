@@ -224,19 +224,6 @@
     },
     "4": {
       "@type": "SoftwareApplication",
-      "identifier": "crayon",
-      "name": "crayon",
-      "version": ">= 1.5.3",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=crayon"
-    },
-    "5": {
-      "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
       "version": ">= 0.7.1",
@@ -248,7 +235,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -261,7 +248,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "DT",
       "name": "DT",
@@ -274,7 +261,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=DT"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
@@ -287,7 +274,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
@@ -300,7 +287,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=gt"
     },
-    "10": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
@@ -313,7 +300,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr"
     },
-    "11": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -326,7 +313,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "12": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -339,7 +326,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "13": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "IRanges",
       "name": "IRanges",
@@ -352,7 +339,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/IRanges.html"
     },
-    "14": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -364,6 +351,19 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    "14": {
+      "@type": "SoftwareApplication",
+      "identifier": "logger",
+      "name": "logger",
+      "version": ">= 0.4.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=logger"
     },
     "15": {
       "@type": "SoftwareApplication",
@@ -630,7 +630,7 @@
     "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2395.131KB",
+  "fileSize": "2394.431KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

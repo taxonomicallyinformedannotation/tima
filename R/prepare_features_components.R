@@ -41,8 +41,8 @@ prepare_features_components <-
       )
     )
 
-    log_debug(x = "Loading files ...")
-    log_debug(x = "... components table")
+    logger::log_info("Loading files")
+    logger::log_info("Components table")
     table <- purrr::map(
       .x = input,
       .f = tidytable::fread,

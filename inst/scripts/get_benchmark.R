@@ -7,15 +7,11 @@ require(
 
 paths <- get_default_paths()
 
-log_debug(
-  "This script",
-  crayon::green(
-    "downloads benchmarking set",
-    "from matchms work on GNPS dataset. \n"
-  )
+logger::log_info(
+  "This script downloads benchmarking set from matchms work on GNPS dataset."
 )
-log_debug("Authors: ", crayon::green("AR"), "\n")
-log_debug("Contributors: ...")
+logger::log_info("Authors: AR")
+logger::log_info("Contributors: ...")
 
 get_file(
   url = paths$urls$benchmarking_set,
@@ -24,4 +20,4 @@ get_file(
 
 end <- Sys.time()
 
-log_debug("Script finished in", crayon::green(format(end - start)))
+logger::log_info("Script finished in ", format(end - start))

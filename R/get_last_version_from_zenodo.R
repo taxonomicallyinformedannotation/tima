@@ -82,7 +82,7 @@ get_last_version_from_zenodo <-
     ## If the local file does not exist or the sizes are different,
     ## download the file from Zenodo
     if (is.na(local_size) || zenodo_size != local_size) {
-      message(
+      logger::log_info(
         "Downloading ",
         filename,
         " from https://doi.org/",
@@ -91,13 +91,13 @@ get_last_version_from_zenodo <-
         content$metadata$title,
         "; unique identifier: ",
         content$doi_url,
-        ")\n"
+        ")"
       )
       create_dir(export = path)
       ## Fix with new Zenodo (weird)
       get_file(url = file, export = path)
     } else {
-      message("A file with the same size is already present. Skipping")
+      logger::log_info("A file with the same size is already present. Skipping")
     }
     return(path)
   }

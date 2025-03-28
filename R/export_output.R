@@ -32,7 +32,7 @@ export_output <- function(x, file = output) {
   create_dir(export = file)
 
   ## Log the path to the output file
-  log_debug(x = "... path to export is", crayon::green(file))
+  logger::log_info("... path to export is {file}")
 
   ## Write the data frame to a tab-delimited file
   tidytable::fwrite(

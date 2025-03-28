@@ -15,19 +15,14 @@ decorate_masses <- function(
       !is.na(candidate_structure_inchikey_connectivity_layer) |
         candidate_structure_inchikey_connectivity_layer != "notAnnotated"
     )
-  log_debug(
-    "MS1 annotation led to \n",
-    crayon::green(nrow(
+  logger::log_info(
+    "MS1 annotation led to {nrow(
       df_1 |>
         tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-    )),
-    crayon::green("annotations"),
-    ", on \n",
-    crayon::blue(nrow(
+    )} annotations on {nrow(
       df_1 |>
         tidytable::distinct(feature_id)
-    )),
-    crayon::blue("features")
+    )} features"
   )
   rm(df_1)
   return(annotation_table_ms1)

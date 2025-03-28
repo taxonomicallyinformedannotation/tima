@@ -78,7 +78,7 @@ annotate_spectra <- function(
     library <- library[grepl(polarity, library, fixed = TRUE)]
   }
 
-  log_debug("Loading spectra...")
+  logger::log_info("Loading spectra")
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,
@@ -104,7 +104,7 @@ annotate_spectra <- function(
   )
 
   if (length(spectra) > 0) {
-    log_debug("Loading spectral library")
+    logger::log_info("Loading spectral library")
     spectral_library <- unlist(library) |>
       purrr::map(
         .f = import_spectra,
@@ -144,7 +144,7 @@ annotate_spectra <- function(
     )
 
     if (approx == FALSE) {
-      log_debug("Reducing library size...")
+      logger::log_info("Reducing library size")
       df_3 <- dplyr::inner_join(
         tidytable::tidytable(minimal, maximal, lib_precursors),
         tidytable::tidytable(val = unique(query_precursors)),
@@ -179,7 +179,7 @@ annotate_spectra <- function(
     lib_spectra <- spectral_library@backend@peaksData
     safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
-      log_debug("Annotating...")
+      logger::log_info("Annotating")
       df_final <-
         calculate_entropy_and_similarity(
           lib_ids = lib_ids,
@@ -310,7 +310,7 @@ annotate_spectra <- function(
       ## COMMENT AR: Not doing it because of thresholding
       ## df_final[is.na(df_final)] <- 0
 
-      log_debug("Filtering results above threshold only...")
+      logger::log_info("Filtering results above threshold only")
       df_final <- df_final |>
         tidytable::filter(candidate_score_similarity >= threshold) |>
         tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
@@ -322,7 +322,7 @@ annotate_spectra <- function(
           .keep_all = TRUE
         )
 
-      log_debug(
+      logger::log_info(
         nrow(
           df_final |>
             ## else doesn't work if some are empty
@@ -331,23 +331,24 @@ annotate_spectra <- function(
               candidate_structure_smiles_no_stereo
             )
         ),
-        "Candidates were annotated on",
+        " Candidates were annotated on ",
         nrow(
           df_final |>
             tidytable::distinct(feature_id)
         ),
-        "features, with at least",
+        " features, with at least ",
         threshold,
-        "similarity score."
+        " similarity score."
       )
       if (nrow(df_final) == 0) {
-        log_debug("No spectra were matched, returning an empty dataframe")
+        logger::log_info(
+          "No spectra were matched, returning an empty dataframe"
+        )
         df_final <- df_empty
       }
     } else {
-      log_debug(
-        "No spectra left in the library,
-              returning an empty dataframe"
+      logger::log_info(
+        "No spectra left in the library, returning an empty dataframe"
       )
       df_final <- df_empty
     }
@@ -359,9 +360,8 @@ annotate_spectra <- function(
       maximal
     )
   } else {
-    log_debug(
-      "No spectra matched the given polarity,
-              returning an empty dataframe"
+    logger::log_info(
+      "No spectra matched the given polarity, returning an empty dataframe"
     )
     df_final <- df_empty
   }

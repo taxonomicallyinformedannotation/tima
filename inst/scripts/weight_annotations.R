@@ -2,23 +2,14 @@ start <- Sys.time()
 
 library(tima)
 
-log_debug(
-  "This script performs",
-  crayon::green("taxonomically informed scoring"),
-  "and followed by",
-  crayon::blue("chemical consistency informed scoring")
+logger::log_info(
+  "This script performs taxonomically informed scoring."
 )
-log_debug(
-  "Authors: ",
-  crayon::green("AR"),
-  ",",
-  crayon::blue("PMA"),
-  "\n"
-)
-log_debug("Contributors: ...")
+logger::log_info("Authors: AR, PMA")
+logger::log_info("Contributors: ...")
 
 targets::tar_make(names = tidyselect::matches("ann_pre$"))
 
 end <- Sys.time()
 
-log_debug("Script finished in", crayon::green(format(end - start)))
+logger::log_info("Script finished in ", format(end - start))

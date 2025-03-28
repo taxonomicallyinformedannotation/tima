@@ -15,10 +15,12 @@ NULL
   shinyWidgets::animations
   visNetwork::`%>%`
   reticulate::py_require("rdkit")
+  setup_logger(filename = paste0(pkgname, ".log"))
   invisible()
 }
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("Welcome to ", pkgname)
   packageStartupMessage(format(utils::citation(pkgname)))
+  setup_logger(filename = paste0(pkgname, ".log"))
 }

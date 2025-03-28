@@ -133,10 +133,10 @@ prepare_libraries_rt <-
 
     rts_from_mgf <-
       function(mgf) {
-        log_debug("Importing spectra ...")
+        logger::log_info("Importing spectra")
         spectra <- mgf |>
           purrr::map(.f = import_spectra)
-        log_debug("Extracting retention times...")
+        logger::log_info("Extracting retention times")
         rts <- spectra |>
           purrr::map(.f = function(x) {
             x@backend@spectraData |>
@@ -154,7 +154,7 @@ prepare_libraries_rt <-
 
     rts_from_tab <-
       function(tab) {
-        log_debug("Importing file ...")
+        logger::log_info("Importing file")
         rts <- tab |>
           purrr::map(.f = tidytable::fread) |>
           tidytable::bind_rows() |>
@@ -196,7 +196,7 @@ prepare_libraries_rt <-
         tidytable::filter(!is.na(inchikey))
       df_missing <- df |>
         tidytable::filter(is.na(inchikey))
-      log_debug(
+      logger::log_info(
         "There are",
         nrow(df_missing),
         "entries without InChIKey.",
@@ -244,7 +244,7 @@ prepare_libraries_rt <-
           type
         ) |>
         tidytable::distinct()
-      log_debug(
+      logger::log_info(
         "There were still",
         nrow(
           df_completed |>
@@ -337,8 +337,8 @@ prepare_libraries_rt <-
     rm(df_rts)
 
     if (nrow(rts) == 0) {
-      log_debug(
-        "No retention time library found, returning empty organism table."
+      logger::log_info(
+        "No retention time library found, returning empty sop table."
       )
       sop <- tidytable::tidytable(
         structure_smiles = NA_character_,
@@ -349,7 +349,7 @@ prepare_libraries_rt <-
     }
 
     if (nrow(rts) == 0) {
-      log_debug(
+      logger::log_info(
         "No retention time library found, returning empty retention time table."
       )
       rts <- tidytable::tidytable(

@@ -26,7 +26,6 @@ Depends:
 Imports:
     archive (>= 1.1.11),
     BiocParallel (>= 1.36.0),
-    crayon (>= 1.5.3),
     docopt (>= 0.7.1),
     dplyr (>= 1.1.4),
     DT (>= 0.33),
@@ -37,6 +36,7 @@ Imports:
     igraph (>= 2.1.4),
     IRanges (>= 2.36.0),
     jsonlite (>= 1.9.1),
+    logger (>= 0.4.0),
     methods,
     MetaboCoreUtils (>= 1.10.0),
     MsBackendMgf (>= 1.10.0),
@@ -91,8 +91,8 @@ X-schema.org-keywords: metabolite annotation, chemotaxonomy, scoring
     system, natural products, computational metabolomics, taxonomic
     distance, specialized metabolome
 Collate:
+    'adducts_forbidden.R'
     'adducts_translations.R'
-    'aducts_forbidden.R'
     'round_reals.R'
     'harmonize_adducts.R'
     'parse_yaml_params.R'
@@ -150,7 +150,6 @@ Collate:
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
     'install.R'
-    'log_debug.R'
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
@@ -175,6 +174,7 @@ Collate:
     'prepare_taxa.R'
     'replace_id.R'
     'run_app.R'
+    'setup_logger.R'
     'tima-package.R'
     'tima_full.R'
     'transform_score_sirius_csi.R'

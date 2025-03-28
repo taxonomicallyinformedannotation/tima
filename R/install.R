@@ -25,39 +25,39 @@ install <- function(
   test = FALSE
 ) {
   if (Sys.info()[["sysname"]] == "Windows") {
-    message("You should install RTools if not already done")
+    logger::log_info("You should install RTools if not already done")
   }
   if (Sys.info()[["sysname"]] == "Linux") {
-    message("You should install some required dependencies using")
-    message(
+    logger::log_info("You should install some required dependencies using")
+    logger::log_info(
       "`sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev`"
     )
   }
   success <- tryCatch(
     {
-      message("Installing latest version")
+      logger::log_info("Installing latest version")
       utils::install.packages(
         package,
         repos = repos,
         dependencies = dependencies,
         INSTALL_opts = c("--no-lock", "--no-test-load")
       )
-      message("Installing Python environment")
+      logger::log_info("Installing Python environment")
       reticulate::install_python()
-      message("Installing RDKit for Python")
+      logger::log_info("Installing RDKit for Python")
       reticulate::py_install("rdkit")
       TRUE
     },
     error = function(e) {
-      message("Install failed")
-      message(e)
+      logger::log_error("Install failed")
+      logger::log_error(e)
       FALSE
     }
   )
   if (!success || isTRUE(test)) {
     success <- tryCatch(
       {
-        message("Retrying install from source")
+        logger::log_warn("Retrying install from source")
         utils::install.packages(
           package,
           repos = repos,
@@ -65,21 +65,21 @@ install <- function(
           INSTALL_opts = c("--no-lock", "--no-test-load"),
           type = "source"
         )
-        message("Installing Python environment")
+        logger::log_info("Installing Python environment")
         reticulate::install_python()
-        message("Installing RDKit for Python")
+        logger::log_info("Installing RDKit for Python")
         reticulate::py_install("rdkit")
         TRUE
       },
       error = function(e) {
-        message("Install failed")
-        message(e)
+        logger::log_error("Install failed")
+        logger::log_error(e)
         FALSE
       }
     )
   }
   if (!success || isTRUE(test)) {
-    message("All installation attempts failed")
+    logger::log_error("All installation attempts failed")
   }
   copy_backbone()
 }

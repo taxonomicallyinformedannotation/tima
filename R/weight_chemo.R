@@ -90,7 +90,7 @@ weight_chemo <-
         feature_pred_tax_cla_04dirpar_score
       )
 
-    log_debug("calculating chemical score at all levels ... \n")
+    logger::log_info("Calculating chemical score at all levels ...")
     score_per_level_chemo <-
       function(
         df,
@@ -112,7 +112,7 @@ weight_chemo <-
           )) |>
           tidytable::mutate(!!as.name(score_name) := !!as.name(score) * 1)
       }
-    log_debug("... (classyfire) kingdom \n")
+    logger::log_info("... (classyfire) kingdom")
     step_cla_kin <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_cla_01kin",
@@ -121,7 +121,7 @@ weight_chemo <-
         score = "score_chemical_cla_kingdom",
         score_name = "score_chemical_1"
       )
-    log_debug("... (NPC) pathway \n")
+    logger::log_info("... (NPC) pathway")
     step_npc_pat <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_npc_01pat",
@@ -130,7 +130,7 @@ weight_chemo <-
         score = "score_chemical_npc_pathway",
         score_name = "score_chemical_2"
       )
-    log_debug("... (classyfire) superclass \n")
+    logger::log_info("... (classyfire) superclass")
     step_cla_sup <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_cla_02sup",
@@ -139,7 +139,7 @@ weight_chemo <-
         score = "score_chemical_cla_superclass",
         score_name = "score_chemical_3"
       )
-    log_debug("... (NPC) superclass \n")
+    logger::log_info("... (NPC) superclass")
     step_npc_sup <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_npc_02sup",
@@ -148,7 +148,7 @@ weight_chemo <-
         score = "score_chemical_npc_superclass",
         score_name = "score_chemical_4"
       )
-    log_debug("... (classyfire) class \n")
+    logger::log_info("... (classyfire) class")
     step_cla_cla <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_cla_03cla",
@@ -157,7 +157,7 @@ weight_chemo <-
         score = "score_chemical_cla_class",
         score_name = "score_chemical_5"
       )
-    log_debug("... (NPC) class \n")
+    logger::log_info("... (NPC) class")
     step_npc_cla <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_npc_03cla",
@@ -166,7 +166,7 @@ weight_chemo <-
         score = "score_chemical_npc_class",
         score_name = "score_chemical_6"
       )
-    log_debug("... (classyfire) parent \n")
+    logger::log_info("... (classyfire) parent")
     step_cla_par <- df2 |>
       score_per_level_chemo(
         candidates = "candidate_structure_tax_cla_04dirpar",
@@ -176,7 +176,7 @@ weight_chemo <-
         score_name = "score_chemical_7"
       )
 
-    log_debug("... keeping best chemical score \n")
+    logger::log_info("... keeping best chemical score")
     supp_tables <- list(
       step_cla_kin,
       step_npc_pat,

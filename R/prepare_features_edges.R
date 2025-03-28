@@ -46,7 +46,7 @@ prepare_features_edges <-
       )
     )
     ## Load edges table
-    log_debug(x = "Loading edge table")
+    logger::log_info("Loading edge table")
     edges_tables <- purrr::map(
       .x = input,
       .f = tidytable::fread,
@@ -66,7 +66,7 @@ prepare_features_edges <-
       tidytable::distinct()
 
     ## Format edges table
-    log_debug(x = "Formatting edge table")
+    logger::log_info("Formatting edge table")
     edges_table_treated <- edges_ms1 |>
       tidytable::full_join(features_entropy) |>
       tidytable::full_join(edges_ms2) |>

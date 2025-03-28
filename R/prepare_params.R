@@ -22,7 +22,7 @@ prepare_params <- function(
   list <- load_yaml_files()
   yamls_params <- list$yamls_params
 
-  log_debug(x = "All params")
+  logger::log_info("All params")
   ann_can_fin <- params_advanced$annotations$candidates$final
   ann_ms1only <- params_advanced$annotations$ms1only
   ann_ms2_app <- params_advanced$annotations$ms2approx
@@ -178,7 +178,7 @@ prepare_params <- function(
   opt_rem_tie <- params_advanced$options$remove_ties
   # opt_sum <- params_advanced$options$summarize
 
-  log_debug(x = "Small params")
+  logger::log_info("Small params")
   fil_pat <- params_small$files$pattern
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
@@ -189,7 +189,7 @@ prepare_params <- function(
   opt_hig_con <- params_small$options$high_confidence
   opt_sum <- params_small$options$summarize
 
-  log_debug(x = "Advanced params")
+  logger::log_info("Advanced params")
   yamls_params$`params/prepare_params_advanced`$files$pattern <- fil_pat
   yamls_params$`params/prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`params/prepare_params_advanced`$files$metadata$raw <- fil_met_raw
@@ -208,7 +208,7 @@ prepare_params <- function(
     }
   }
 
-  log_debug(x = "Changing params")
+  logger::log_info("Changing params")
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     fil_ann_pre_str
@@ -641,7 +641,7 @@ prepare_params <- function(
   yamls_params$weight_annotations$options$summarize <-
     opt_sum
 
-  log_debug(x = "Changing filenames")
+  logger::log_info("Changing filenames")
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     yamls_params$annotate_masses$files$annotations$prepared$structural |>
@@ -887,7 +887,7 @@ prepare_params <- function(
       )]
   }
 
-  log_debug(x = "Exporting params ...")
+  logger::log_info("Exporting params ...")
   create_dir(export = yaml_export[[1]])
   purrr::map(
     .x = seq_along(yamls_params),

@@ -60,7 +60,7 @@ harmonize_adducts <- function(df, adducts_colname = "adduct") {
       "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-"
       # weird MassBank
     )
-  log_debug("Trying to harmonize adducts definitions...")
+  logger::log_info("Trying to harmonize adducts definitions")
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
     str = df[[adducts_colname]],
     pattern = names(adducts_translations),

@@ -50,7 +50,10 @@ get_file <-
               }
             },
             error = function(e) {
-              message("Something seems wrong...retrying... attempt ", i)
+              logger::log_error(
+                "Something seems wrong...retrying... attempt ",
+                i
+              )
             }
           )
         }
@@ -60,7 +63,7 @@ get_file <-
         stop("Failed to download the file after multiple attempts.")
       }
     } else {
-      message("File already exists. Skipping.")
+      logger::log_info("File already exists. Skipping.")
     }
     return(export)
   }

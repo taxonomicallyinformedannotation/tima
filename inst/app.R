@@ -1774,7 +1774,7 @@ ui <- shiny::fluidPage(
         class = "btn-primary"
       ),
       shinyjs::hidden(
-        shiny::span(id = "save_msg", "Saving parameters..."),
+        shiny::span(id = "save_msg", "Saving parameters"),
         shiny::div(
           id = "error",
           shiny::div(
@@ -1931,8 +1931,8 @@ ui <- shiny::fluidPage(
   ms_pol <- shiny::isolate(input$ms_pol)
   summarize <- shiny::isolate(input$summarize)
 
-  message(x = "Changing parameters ...")
-  message(x = "... Small")
+  logger::log_info("Changing parameters ...")
+  logger::log_info("... Small")
   yaml_small <- yamls_params[["params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
@@ -1949,7 +1949,7 @@ ui <- shiny::fluidPage(
     file = tima:::get_default_paths()$params$prepare_params
   )
 
-  message(x = "... Advanced")
+  logger::log_info("... Advanced")
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
@@ -2615,7 +2615,9 @@ server <- function(input, output, session) {
   })
 }
 url <- "<http://127.0.0.1:3838>"
-message("Please, open:", url, " on your favorite browser, but not Edge.")
+logger::log_info(
+  "Please, open: {url} on your favorite browser, but not Edge."
+)
 shiny::shinyApp(
   ui = ui,
   server = server,

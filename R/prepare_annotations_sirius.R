@@ -69,7 +69,7 @@ prepare_annotations_sirius <-
       input_directory <- "Th1sd1rw0nt3x1st"
     }
     if (file.exists(input_directory)) {
-      log_debug("Loading parameters for SIRIUS", sirius_version)
+      logger::log_info("Loading parameters for SIRIUS", sirius_version)
       sirius_version <- as.character(sirius_version)
       canopus_filename <- switch(
         sirius_version,
@@ -97,7 +97,7 @@ prepare_annotations_sirius <-
         "6" = "spectral_matches_all.tsv"
       )
 
-      log_debug("Loading and formatting SIRIUS results")
+      logger::log_info("Loading and formatting SIRIUS results")
       canopus <- input_directory |>
         read_from_sirius_zip(file = canopus_filename)
       # not available in previous SIRIUS version
@@ -247,7 +247,7 @@ prepare_annotations_sirius <-
         denovo_prepared
       )
     } else {
-      log_debug(
+      logger::log_info(
         "Sorry, your input directory does not exist,
                 returning an empty file instead"
       )
@@ -281,7 +281,7 @@ prepare_annotations_sirius <-
           -candidate_count_similarity_peaks_matched
         )
     }
-    log_debug("Splitting SIRIUS results")
+    logger::log_info("Splitting SIRIUS results")
     model <- columns_model()
 
     table_can <- table |>
