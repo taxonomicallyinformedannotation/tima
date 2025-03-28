@@ -22,7 +22,7 @@ complement_metadata_structures <- function(
   str_tax_cla = get("str_tax_cla", envir = parent.frame()),
   str_tax_npc = get("str_tax_npc", envir = parent.frame())
 ) {
-  log_debug("Trying to look for already computed metadata")
+  logger::log_info("Trying to look for already computed metadata")
   stereo <- tidytable::fread(
     str_stereo,
     na.strings = c("", "NA"),
