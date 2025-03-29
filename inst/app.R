@@ -1931,8 +1931,8 @@ ui <- shiny::fluidPage(
   ms_pol <- shiny::isolate(input$ms_pol)
   summarize <- shiny::isolate(input$summarize)
 
-  logger::log_info("Changing parameters ...")
-  logger::log_info("... Small")
+  logger::log_trace("Changing parameters ...")
+  logger::log_trace("... Small")
   yaml_small <- yamls_params[["params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
@@ -1949,7 +1949,7 @@ ui <- shiny::fluidPage(
     file = tima:::get_default_paths()$params$prepare_params
   )
 
-  logger::log_info("... Advanced")
+  logger::log_trace("... Advanced")
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)

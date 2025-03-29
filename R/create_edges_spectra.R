@@ -60,8 +60,8 @@ create_edges_spectra <- function(
       ppm = ppm
     )
   if (length(spectra) > 1) {
-    logger::log_info("Performing spectral comparison")
-    logger::log_info(
+    logger::log_trace("Performing spectral comparison")
+    logger::log_trace(
       "As we do not limit the precursors delta,
       expect a (relatively) long processing time."
     )
@@ -80,7 +80,7 @@ create_edges_spectra <- function(
       threshold = threshold
     )
 
-    logger::log_info("Calculating features' entropy")
+    logger::log_trace("Calculating features' entropy")
     entropy <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
@@ -90,7 +90,7 @@ create_edges_spectra <- function(
         )
       }
     )
-    logger::log_info("Calculating features' number of peaks")
+    logger::log_trace("Counting features' number of peaks")
     npeaks <- purrr::map(
       .x = seq_along(1:nspecz),
       .f = function(x, peaks = fragz) {
@@ -157,7 +157,7 @@ create_edges_spectra <- function(
       )
     rm(entropy_df)
   } else {
-    logger::log_info(
+    logger::log_warn(
       "No spectra were found, returning an empty dataframe instead"
     )
     edges <- tidytable::tidytable(

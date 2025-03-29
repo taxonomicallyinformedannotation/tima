@@ -2,11 +2,11 @@ start <- Sys.time()
 
 library(tima)
 
-logger::log_info(
+logger::log_trace(
   "This script downloads an example of minimal feature table"
 )
-logger::log_info("Authors: AR")
-logger::log_info("Contributors: ...")
+logger::log_trace("Authors: AR")
+logger::log_trace("Contributors: ...")
 
 get_file(
   url = get_default_paths()$urls$examples$features,
@@ -15,4 +15,4 @@ get_file(
 
 end <- Sys.time()
 
-logger::log_info("Script finished in ", format(end - start))
+logger::log_success("Script finished in ", format(end - start))

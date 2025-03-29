@@ -23,25 +23,25 @@
 #' }
 sanitize_spectra <-
   function(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10) {
-    logger::log_info("Applying sanitization of the spectra")
+    logger::log_trace("Applying sanitization of the spectra")
 
     ## Fix needed
     if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_info("Harmonizing names")
+      logger::log_trace("Harmonizing names")
       spectra$msLevel <- spectra$MSLEVEL |> as.integer()
     }
     if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_info("Harmonizing names")
+      logger::log_trace("Harmonizing names")
       spectra$msLevel <- spectra$MS_LEVEL |> as.integer()
     }
 
     if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_info("Harmonizing names")
+      logger::log_trace("Harmonizing names")
       spectra$precursorMz <- spectra$PRECURSOR_MZ |> as.numeric()
     }
 
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_info("Filtering MS2 only")
+      logger::log_trace("Filtering MS2 only")
       spectra <- spectra |>
         Spectra::filterMsLevel(2L)
     }
@@ -70,7 +70,7 @@ sanitize_spectra <-
       Spectra::scalePeaks()
 
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_info("Combining spectra in case")
+      logger::log_trace("Combining spectra in case")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$FEATURE_ID,

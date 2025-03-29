@@ -192,7 +192,7 @@ weight_bio <-
         candidate_organism_10_varietas
       )
 
-    logger::log_info("Calculating biological score at all levels ...")
+    logger::log_trace("Calculating biological score at all levels ...")
     score_per_level_bio <-
       function(df, candidates, samples, score, score_name) {
         score <- df |>
@@ -217,7 +217,7 @@ weight_bio <-
           )
       }
 
-    logger::log_info("... domain")
+    logger::log_trace("... domain")
     step_dom <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_01_domain",
@@ -225,7 +225,7 @@ weight_bio <-
         score = "score_biological_domain",
         score_name = "score_biological_01"
       )
-    logger::log_info("... kingdom")
+    logger::log_trace("... kingdom")
     step_kin <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_02_kingdom",
@@ -233,7 +233,7 @@ weight_bio <-
         score = "score_biological_kingdom",
         score_name = "score_biological_02"
       )
-    logger::log_info("... phylum")
+    logger::log_trace("... phylum")
     step_phy <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_03_phylum",
@@ -241,7 +241,7 @@ weight_bio <-
         score = "score_biological_phylum",
         score_name = "score_biological_03"
       )
-    logger::log_info("... class")
+    logger::log_trace("... class")
     step_cla <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_04_class",
@@ -249,7 +249,7 @@ weight_bio <-
         score = "score_biological_class",
         score_name = "score_biological_04"
       )
-    logger::log_info("... order")
+    logger::log_trace("... order")
     step_ord <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_05_order",
@@ -257,7 +257,7 @@ weight_bio <-
         score = "score_biological_order",
         score_name = "score_biological_05"
       )
-    # logger::log_info("... infraorder")
+    # logger::log_trace("... infraorder")
     # step_ord2 <- df2 |>
     #   score_per_level_bio(
     #     candidates = "candidate_organism_05_1_infraorder",
@@ -265,7 +265,7 @@ weight_bio <-
     #     score = "score_biological_infraorder",
     #     score_name = "score_biological_05_1"
     #   )
-    logger::log_info("... family")
+    logger::log_trace("... family")
     step_fam <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_06_family",
@@ -273,7 +273,7 @@ weight_bio <-
         score = "score_biological_family",
         score_name = "score_biological_06"
       )
-    # logger::log_info("... subfamily")
+    # logger::log_trace("... subfamily")
     # step_fam2 <- df2 |>
     #   score_per_level_bio(
     #     candidates = "candidate_organism_06_1_subfamily",
@@ -281,7 +281,7 @@ weight_bio <-
     #     score = "score_biological_subfamily",
     #     score_name = "score_biological_06_1"
     #   )
-    logger::log_info("... tribe")
+    logger::log_trace("... tribe")
     step_tri <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_07_tribe",
@@ -289,7 +289,7 @@ weight_bio <-
         score = "score_biological_tribe",
         score_name = "score_biological_07"
       )
-    # logger::log_info("... subtribe")
+    # logger::log_trace("... subtribe")
     # step_tri2 <- df2 |>
     #   score_per_level_bio(
     #     candidates = "candidate_organism_07_1_subtribe",
@@ -297,7 +297,7 @@ weight_bio <-
     #     score = "score_biological_subtribe",
     #     score_name = "score_biological_07_1"
     #   )
-    logger::log_info("... genus")
+    logger::log_trace("... genus")
     step_gen <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_08_genus",
@@ -305,7 +305,7 @@ weight_bio <-
         score = "score_biological_genus",
         score_name = "score_biological_08"
       )
-    # logger::log_info("... subgenus")
+    # logger::log_trace("... subgenus")
     # step_gen2 <- df2 |>
     #   score_per_level_bio(
     #     candidates = "candidate_organism_08_1_subgenus",
@@ -313,7 +313,7 @@ weight_bio <-
     #     score = "score_biological_subgenus",
     #     score_name = "score_biological_08_1"
     #   )
-    logger::log_info("... species")
+    logger::log_trace("... species")
     step_spe <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_09_species",
@@ -321,7 +321,7 @@ weight_bio <-
         score = "score_biological_species",
         score_name = "score_biological_09"
       )
-    # logger::log_info("... subspecies")
+    # logger::log_trace("... subspecies")
     # step_spe2 <- df2 |>
     #   score_per_level_bio(
     #     candidates = "candidate_organism_09_1_subspecies",
@@ -329,7 +329,7 @@ weight_bio <-
     #     score = "score_biological_subspecies",
     #     score_name = "score_biological_09_1"
     #   )
-    logger::log_info("... varietas")
+    logger::log_trace("... varietas")
     step_var <- df2 |>
       score_per_level_bio(
         candidates = "candidate_organism_10_varietas",
@@ -338,7 +338,7 @@ weight_bio <-
         score_name = "score_biological_10"
       )
 
-    logger::log_info("Keeping best biological score")
+    logger::log_trace("Keeping best biological score")
     supp_tables <- list(
       step_dom,
       step_kin,

@@ -39,7 +39,7 @@ prepare_features_tables <-
   ) {
     stopifnot("Your features file does not exist" = file.exists(features))
 
-    logger::log_info("Preparing features table")
+    logger::log_trace("Preparing features table")
     features_prepared <- features |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
       tidytable::select(tidyselect::any_of(

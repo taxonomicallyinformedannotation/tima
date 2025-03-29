@@ -12,7 +12,7 @@
 #'
 #' @examples NULL
 split_tables_sop <- function(table, cache) {
-  logger::log_info(
+  logger::log_trace(
     "Splitting the concatenated library into smaller standardized pieces"
   )
 
@@ -34,7 +34,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  logger::log_info("Sanitizing structures")
+  logger::log_trace("Sanitizing structures")
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 
@@ -220,7 +220,11 @@ split_tables_sop <- function(table, cache) {
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
-  logger::log_info("... among ", nrow(table_organisms_names), " unique organisms")
+  logger::log_info(
+    "... among ",
+    nrow(table_organisms_names),
+    " unique organisms"
+  )
 
   table_org_tax_ott <- table_organisms |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>

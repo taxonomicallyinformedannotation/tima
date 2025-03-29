@@ -9,12 +9,12 @@ step <- "params"
 paths <- get_default_paths()
 params <- get_params(step = step)
 
-logger::log_info(
+logger::log_trace(
   "This script is a test script"
 )
-logger::log_info("Authors: AR")
-logger::log_info("Contributors: ...")
+logger::log_trace("Authors: AR")
+logger::log_trace("Contributors: ...")
 
 end <- Sys.time()
 
-logger::log_info("Script finished in ", format(end - start))
+logger::log_success("Script finished in ", format(end - start))

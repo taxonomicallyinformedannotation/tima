@@ -2,14 +2,14 @@ start <- Sys.time()
 
 library(tima)
 
-logger::log_info(
+logger::log_trace(
   "This script annotates based on exact mass (MS1)"
 )
-logger::log_info("Authors: AR")
-logger::log_info("Contributors: CH, MS")
+logger::log_trace("Authors: AR")
+logger::log_trace("Contributors: CH, MS")
 
 targets::tar_make(names = tidyselect::matches("^ann_ms1_pre"))
 
 end <- Sys.time()
 
-logger::log_info("Script finished in ", format(end - start))
+logger::log_success("Script finished in ", format(end - start))

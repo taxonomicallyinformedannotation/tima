@@ -82,7 +82,7 @@ prepare_taxa <-
         5
     )
 
-    logger::log_info("Loading feature table")
+    logger::log_trace("Loading feature table")
     feature_table_0 <- tidytable::fread(
       file = input,
       na.strings = c("", "NA"),
@@ -90,7 +90,7 @@ prepare_taxa <-
     )
 
     if (is.null(taxon)) {
-      logger::log_info("Loading metadata table")
+      logger::log_trace("Loading metadata table")
       metadata_table <- tidytable::fread(
         file = metadata,
         na.strings = c("", "NA"),
@@ -98,12 +98,12 @@ prepare_taxa <-
       )
     }
 
-    logger::log_info("Formatting feature table")
-    logger::log_info(
+    logger::log_trace("Formatting feature table")
+    logger::log_trace(
       "... requires 'Peak area' or ':area' in columns (mzmine format)"
     )
-    logger::log_info("... or 'quant_' in columns (SLAW format)")
-    logger::log_info("... or 'Peak height' in columns (SIRIUS format)")
+    logger::log_trace("... or 'quant_' in columns (SLAW format)")
+    logger::log_trace("... or 'Peak height' in columns (SIRIUS format)")
 
     feature_table <- feature_table_0 |>
       tidytable::select(
@@ -144,7 +144,7 @@ prepare_taxa <-
         replacement = "",
         vectorize_all = FALSE
       )
-    logger::log_info("Filtering top K intensities per feature")
+    logger::log_trace("Filtering top K intensities per feature")
     top_n <- feature_table |>
       tidyfst::rn_col() |>
       tidytable::pivot_longer(cols = seq_len(ncol(feature_table)) + 1) |>
@@ -155,19 +155,19 @@ prepare_taxa <-
     rm(feature_table)
 
     if (!is.null(taxon)) {
-      logger::log_info("Forcing all features to given organism")
+      logger::log_trace("Forcing all features to given organism")
       metadata_table <- data.frame(taxon)
       colnames(metadata_table) <- colname
     }
 
-    logger::log_info("Preparing organisms names")
+    logger::log_trace("Preparing organisms names")
     organism_table <- metadata_table |>
       tidytable::filter(!is.na(!!as.name(colname))) |>
       tidytable::distinct(!!as.name(colname)) |>
       tidytable::select(organism = !!as.name(colname)) |>
       tidytable::separate_rows(organism, sep = "\\|", )
 
-    logger::log_info(
+    logger::log_trace(
       "Retrieving already computed Open Tree of Life Taxonomy"
     )
     organism_table_filled <- organism_table |>
@@ -181,7 +181,7 @@ prepare_taxa <-
       )
     rm(organism_table)
 
-    logger::log_info("Submitting the rest to OTL")
+    logger::log_trace("Submitting the rest to OTL")
     organism_table_missing <- organism_table_filled |>
       tidytable::filter(is.na(organism_taxonomy_ottid))
 
@@ -189,7 +189,7 @@ prepare_taxa <-
       biological_metadata_1 <- organism_table_missing |>
         get_organism_taxonomy_ott()
 
-      logger::log_info("Joining all results")
+      logger::log_trace("Joining all results")
       biological_metadata <- organism_table_filled |>
         tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
         tidytable::rename(organism_name = organism) |>
@@ -204,7 +204,7 @@ prepare_taxa <-
 
     if (is.null(taxon)) {
       if (extension == FALSE) {
-        logger::log_info("Removing filename extensions")
+        logger::log_trace("Removing filename extensions")
         metadata_table <- metadata_table |>
           tidytable::mutate(
             filename = stringi::stri_replace_all_fixed(
@@ -224,7 +224,7 @@ prepare_taxa <-
           )
       }
     }
-    logger::log_info("Joining top K with metadata table")
+    logger::log_trace("Joining top K with metadata table")
     if (!is.null(taxon)) {
       metadata_table_joined <- tidytable::inner_join(
         feature_table_0 |>
@@ -249,7 +249,7 @@ prepare_taxa <-
     }
     rm(feature_table_0, metadata_table)
 
-    logger::log_info("Joining with cleaned taxonomy table")
+    logger::log_trace("Joining with cleaned taxonomy table")
     taxed_features_table <-
       tidytable::left_join(
         metadata_table_joined,

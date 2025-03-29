@@ -14,7 +14,7 @@ copy_backbone <- function(
 ) {
   logger::log_info("Creating cache at ", cache_dir)
   fs::dir_create(path = cache_dir)
-  logger::log_info("Copying default architecture")
+  logger::log_trace("Copying default architecture")
   fs::dir_copy(
     path = system.file(package = package),
     new_path = cache_dir,

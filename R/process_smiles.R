@@ -14,7 +14,7 @@ process_smiles <- function(
   smiles_colname = "structure_smiles_initial",
   cache
 ) {
-  logger::log_info("Processing SMILES")
+  logger::log_trace("Processing SMILES")
   reticulate::source_python(
     file = system.file("python/process_smiles.py", package = "tima")
   )

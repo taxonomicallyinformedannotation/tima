@@ -79,13 +79,13 @@ filter_annotations <-
       rts <- NULL
     }
 
-    logger::log_info("... features")
+    logger::log_trace("... features")
     features_table <- tidytable::fread(
       file = features,
       colClasses = "character",
       na.strings = c("", "NA")
     )
-    logger::log_info("... annotations")
+    logger::log_trace("... annotations")
     annotation_tables_list <- purrr::map(
       .x = annotations,
       .f = tidytable::fread,
@@ -94,7 +94,7 @@ filter_annotations <-
     )
 
     if ("ms1" %in% names(annotation_tables_list)) {
-      logger::log_info(
+      logger::log_trace(
         "Removing MS1 annotations for which we have spectral hits"
       )
       annotations_tables_spectral <- annotation_tables_list[names(
@@ -122,7 +122,7 @@ filter_annotations <-
       spectral_keys
     )
 
-    logger::log_info("... retention times")
+    logger::log_trace("... retention times")
     if (!is.null(rts)) {
       rt_table <- purrr::map(
         .x = rts,

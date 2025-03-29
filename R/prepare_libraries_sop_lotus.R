@@ -31,7 +31,7 @@ prepare_libraries_sop_lotus <-
     )$files$libraries$sop$prepared$lotus
   ) {
     if (file.exists(input)) {
-      logger::log_info("Loading and preparing LOTUS")
+      logger::log_trace("Loading and preparing LOTUS")
       lotus_prepared <- input |>
         tidytable::fread(na.strings = c("", "NA"), colClasses = "character") |>
         tidytable::mutate(
@@ -46,13 +46,12 @@ prepare_libraries_sop_lotus <-
         round_reals() |>
         tidytable::distinct()
     } else {
-      logger::log_info(
+      logger::log_warn(
         "Sorry, LOTUS not found, returning an empty file instead"
       )
       lotus_prepared <- fake_sop_columns()
     }
 
-    logger::log_info("Exporting")
     export_output(x = lotus_prepared, file = output)
     rm(lotus_prepared)
     return(output)
