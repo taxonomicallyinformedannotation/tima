@@ -1381,7 +1381,7 @@ list(
               },
               warning = function(w) {
                 ## See #118
-                logger::log_warning(
+                logger::log_warn(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths_data_source_libraries_sop_hmdb)

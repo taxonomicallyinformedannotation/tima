@@ -79,7 +79,7 @@ install <- function(
     )
   }
   if (!success || isTRUE(test)) {
-    logger::log_error("All installation attempts failed")
+    logger::log_fatal("All installation attempts failed")
   }
   copy_backbone()
 }
