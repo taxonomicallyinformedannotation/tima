@@ -341,13 +341,13 @@ annotate_spectra <- function(
         " similarity score."
       )
       if (nrow(df_final) == 0) {
-        logger::log_warning(
+        logger::log_warn(
           "No spectra were matched, returning an empty dataframe"
         )
         df_final <- df_empty
       }
     } else {
-      logger::log_warning(
+      logger::log_warn(
         "No spectra left in the library, returning an empty dataframe"
       )
       df_final <- df_empty
@@ -360,7 +360,7 @@ annotate_spectra <- function(
       maximal
     )
   } else {
-    logger::log_warning(
+    logger::log_warn(
       "No spectra matched the given polarity, returning an empty dataframe"
     )
     df_final <- df_empty
