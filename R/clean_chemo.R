@@ -105,7 +105,7 @@ clean_chemo <-
       ) |>
       tidytable::filter(rank_final <= candidates_final)
 
-    logger::log_info(
+    logger::log_trace(
       "Adding initial metadata (RT, etc.) and simplifying columns"
     )
     df3 <- features_table |>
@@ -197,9 +197,9 @@ clean_chemo <-
     }
 
     if (summarize == TRUE) {
-      logger::log_info("Collecting garbage")
+      logger::log_trace("Collecting garbage")
       gc()
-      logger::log_info("Summarizing results")
+      logger::log_trace("Summarizing results")
       df4 <- df3 |>
         tidytable::group_by(feature_id) |>
         tidytable::reframe(tidytable::across(
@@ -231,7 +231,7 @@ clean_chemo <-
     }
     rm(df3)
 
-    logger::log_info("selecting columns to export")
+    logger::log_trace("Selecting columns to export")
     df6 <- df5 |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::everything(),
@@ -263,7 +263,7 @@ clean_chemo <-
       ))
     rm(df5)
 
-    logger::log_info("adding consensus again to droped candidates")
+    logger::log_trace("Adding consensus again to droped candidates")
     results <- tidytable::bind_rows(
       df6 |>
         tidytable::filter(

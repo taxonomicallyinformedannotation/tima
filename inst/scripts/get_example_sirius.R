@@ -2,14 +2,14 @@ start <- Sys.time()
 
 library(tima)
 
-logger::log_info(
+logger::log_trace(
   "This script downloads an example of SIRIUS output."
 )
-logger::log_info("Authors: AR")
-logger::log_info("Contributors: ...")
+logger::log_trace("Authors: AR")
+logger::log_trace("Contributors: ...")
 
 get_example_sirius()
 
 end <- Sys.time()
 
-logger::log_info("Script finished in ", format(end - start))
+logger::log_success("Script finished in ", format(end - start))

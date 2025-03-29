@@ -111,15 +111,15 @@ prepare_libraries_spectra <-
         input <- "fileDoesNotExist"
       }
       if (file.exists(input)) {
-        logger::log_info("Importing")
+        logger::log_trace("Importing")
         spectra <- purrr::map(.x = input, .f = import_spectra)
 
-        logger::log_info("Extracting")
+        logger::log_trace("Extracting")
         spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
         rm(spectra)
 
-        logger::log_info("Harmonizing")
-        logger::log_info("... pos")
+        logger::log_trace("Harmonizing")
+        logger::log_trace("... pos")
         spectra_harmonized_pos <- purrr::map(
           .x = spectra_extracted,
           .f = harmonize_spectra,
@@ -154,7 +154,7 @@ prepare_libraries_spectra <-
         spectra_pos <- spectra_harmonized_pos |>
           purrr::map(.f = Spectra::Spectra)
 
-        logger::log_info("... neg")
+        logger::log_trace("... neg")
         spectra_harmonized_neg <- purrr::map(
           .x = spectra_extracted,
           .f = harmonize_spectra,
@@ -190,7 +190,7 @@ prepare_libraries_spectra <-
         spectra_neg <- spectra_harmonized_neg |>
           purrr::map(.f = Spectra::Spectra)
 
-        logger::log_info("Extracting structures for the SOP library.")
+        logger::log_trace("Extracting structures for the SOP library.")
         sop <- tidytable::bind_rows(
           spectra_harmonized_pos |>
             tidytable::bind_rows(),
@@ -220,7 +220,7 @@ prepare_libraries_spectra <-
           )
         rm(spectra_harmonized_pos, spectra_harmonized_neg)
       } else {
-        logger::log_info(
+        logger::log_warn(
           "Your input file does not exist, returning empty lib instead."
         )
         spectra_pos <- list(
@@ -261,7 +261,6 @@ prepare_libraries_spectra <-
           "organism_name" = NA_character_
         )
       }
-      logger::log_info("Exporting")
       export_output(sop, file = output_sop)
       mapply(export_spectra_rds, output_pos, spectra_pos)
       mapply(export_spectra_rds, output_neg, spectra_neg)

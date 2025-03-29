@@ -7,11 +7,11 @@ require(
 
 paths <- get_default_paths()
 
-logger::log_info(
+logger::log_trace(
   "This script downloads benchmarking set from matchms work on GNPS dataset."
 )
-logger::log_info("Authors: AR")
-logger::log_info("Contributors: ...")
+logger::log_trace("Authors: AR")
+logger::log_trace("Contributors: ...")
 
 get_file(
   url = paths$urls$benchmarking_set,
@@ -20,4 +20,4 @@ get_file(
 
 end <- Sys.time()
 
-logger::log_info("Script finished in ", format(end - start))
+logger::log_success("Script finished in ", format(end - start))

@@ -29,11 +29,11 @@ prepare_libraries_sop_closed <-
     )$files$libraries$sop$prepared$closed
   ) {
     if (file.exists(input)) {
-      logger::log_info("Loading closed resources")
+      logger::log_trace("Loading closed resources")
       closed <- input |>
         tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
 
-      logger::log_info("Formatting closed resource")
+      logger::log_trace("Formatting closed resource")
       closed_prepared <- closed |>
         tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
@@ -49,7 +49,7 @@ prepare_libraries_sop_closed <-
         tidytable::distinct()
       rm(closed)
     } else {
-      logger::log_info(
+      logger::log_warn(
         "Sorry, you do not have access to the closed resource,
                 returning an empty file instead"
       )

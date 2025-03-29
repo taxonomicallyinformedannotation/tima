@@ -14,15 +14,15 @@ tima_full <- function() {
   if (file.exists("tima.log")) {
     file.remove("tima.log")
   }
-  logger::log_info(
+  logger::log_trace(
     "This script does everything you ever dreamt of."
   )
-  logger::log_info("Authors: AR")
-  logger::log_info("Contributors: PMA")
+  logger::log_trace("Authors: AR")
+  logger::log_trace("Contributors: PMA")
   go_to_cache()
   targets::tar_make(names = tidyselect::matches("^ann_pre$"))
   end <- Sys.time()
-  logger::log_info("Script finished in ", format(end - start))
+  logger::log_success("Script finished in ", format(end - start))
   file.rename(
     from = "tima.log",
     to = paste0(

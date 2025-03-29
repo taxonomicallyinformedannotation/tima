@@ -35,16 +35,16 @@ install <- function(
   }
   success <- tryCatch(
     {
-      logger::log_info("Installing latest version")
+      logger::log_trace("Installing latest version")
       utils::install.packages(
         package,
         repos = repos,
         dependencies = dependencies,
         INSTALL_opts = c("--no-lock", "--no-test-load")
       )
-      logger::log_info("Installing Python environment")
+      logger::log_trace("Installing Python environment")
       reticulate::install_python()
-      logger::log_info("Installing RDKit for Python")
+      logger::log_trace("Installing RDKit for Python")
       reticulate::py_install("rdkit")
       TRUE
     },
@@ -65,9 +65,9 @@ install <- function(
           INSTALL_opts = c("--no-lock", "--no-test-load"),
           type = "source"
         )
-        logger::log_info("Installing Python environment")
+        logger::log_trace("Installing Python environment")
         reticulate::install_python()
-        logger::log_info("Installing RDKit for Python")
+        logger::log_trace("Installing RDKit for Python")
         reticulate::py_install("rdkit")
         TRUE
       },

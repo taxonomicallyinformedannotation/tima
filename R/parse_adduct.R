@@ -32,8 +32,8 @@ parse_adduct <- function(
     "charge" = 0
   )
   if (is.na(matches[1, 1])) {
-    logger::log_info("Invalid adduct format")
-    logger::log_info("Returning 0 instead")
+    logger::log_warn("Invalid adduct format")
+    logger::log_warn("Returning 0 instead")
     return(unexpected)
   }
 
@@ -117,7 +117,7 @@ parse_adduct <- function(
         TRUE
     )
   ) {
-    logger::log_info("Something went unexpected with the calculations")
+    logger::log_warn("Something went unexpected with the calculations")
     return(unexpected)
   } else {
     return(

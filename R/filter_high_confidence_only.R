@@ -18,7 +18,7 @@ filter_high_confidence_only <-
     score_ini_min = 0.95,
     score_final_min = 0.75
   ) {
-    logger::log_info("Keeping high confidence candidates only")
+    logger::log_trace("Keeping high confidence candidates only")
     before <- nrow(df)
     # TODO this is very basic for now but already massively filters.
     # TODO Later implement SIRIUS/internal library filters.

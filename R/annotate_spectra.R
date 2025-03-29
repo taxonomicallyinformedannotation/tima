@@ -78,7 +78,7 @@ annotate_spectra <- function(
     library <- library[grepl(polarity, library, fixed = TRUE)]
   }
 
-  logger::log_info("Loading spectra")
+  logger::log_trace("Loading spectra")
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,
@@ -104,7 +104,7 @@ annotate_spectra <- function(
   )
 
   if (length(spectra) > 0) {
-    logger::log_info("Loading spectral library")
+    logger::log_trace("Loading spectral library")
     spectral_library <- unlist(library) |>
       purrr::map(
         .f = import_spectra,
@@ -144,7 +144,7 @@ annotate_spectra <- function(
     )
 
     if (approx == FALSE) {
-      logger::log_info("Reducing library size")
+      logger::log_trace("Reducing library size")
       df_3 <- dplyr::inner_join(
         tidytable::tidytable(minimal, maximal, lib_precursors),
         tidytable::tidytable(val = unique(query_precursors)),
@@ -179,7 +179,7 @@ annotate_spectra <- function(
     lib_spectra <- spectral_library@backend@peaksData
     safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
-      logger::log_info("Annotating")
+      logger::log_trace("Annotating")
       df_final <-
         calculate_entropy_and_similarity(
           lib_ids = lib_ids,
@@ -310,7 +310,7 @@ annotate_spectra <- function(
       ## COMMENT AR: Not doing it because of thresholding
       ## df_final[is.na(df_final)] <- 0
 
-      logger::log_info("Filtering results above threshold only")
+      logger::log_trace("Filtering results above threshold only")
       df_final <- df_final |>
         tidytable::filter(candidate_score_similarity >= threshold) |>
         tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
@@ -341,13 +341,13 @@ annotate_spectra <- function(
         " similarity score."
       )
       if (nrow(df_final) == 0) {
-        logger::log_info(
+        logger::log_warning(
           "No spectra were matched, returning an empty dataframe"
         )
         df_final <- df_empty
       }
     } else {
-      logger::log_info(
+      logger::log_warning(
         "No spectra left in the library, returning an empty dataframe"
       )
       df_final <- df_empty
@@ -360,7 +360,7 @@ annotate_spectra <- function(
       maximal
     )
   } else {
-    logger::log_info(
+    logger::log_warning(
       "No spectra matched the given polarity, returning an empty dataframe"
     )
     df_final <- df_empty

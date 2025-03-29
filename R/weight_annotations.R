@@ -298,23 +298,23 @@ weight_annotations <- function(
     "Condition must be 'OR' or 'AND'." = minimal_ms1_condition %in%
       c("OR", "AND")
   )
-  logger::log_info("Loading files ...")
+  logger::log_trace("Loading files ...")
 
-  logger::log_info("... components")
+  logger::log_trace("... components")
   components_table <- tidytable::fread(
     file = components,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  logger::log_info("... edges")
+  logger::log_trace("... edges")
   edges_table <- tidytable::fread(
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  logger::log_info("... structure-organism pairs")
+  logger::log_trace("... structure-organism pairs")
   library_table <- tidytable::fread(
     file = library,
     na.strings = c("", "NA"),
@@ -339,7 +339,7 @@ weight_annotations <- function(
     .f = tidytable::left_join
   )
 
-  logger::log_info("... canopus")
+  logger::log_trace("... canopus")
   canopus_table <-
     tidytable::fread(
       file = canopus,
@@ -347,7 +347,7 @@ weight_annotations <- function(
       colClasses = "character"
     )
 
-  logger::log_info("... formula")
+  logger::log_trace("... formula")
   formula_table <-
     tidytable::fread(
       file = formula,
@@ -355,7 +355,7 @@ weight_annotations <- function(
       colClasses = "character"
     )
 
-  logger::log_info("... annotations")
+  logger::log_trace("... annotations")
   annotation_table <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
@@ -376,7 +376,7 @@ weight_annotations <- function(
       tidytable::select(-candidate_structure_name)
   }
 
-  logger::log_info("Initial annotations:")
+  logger::log_trace("Initial annotations:")
   annotation_table |>
     tidytable::filter(
       !is.na(
@@ -395,7 +395,7 @@ weight_annotations <- function(
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
 
-  logger::log_info("Re-arranging annotations")
+  logger::log_trace("Re-arranging annotations")
   model <- columns_model()
 
   annotation_table_1 <- annotation_table |>
@@ -453,7 +453,7 @@ weight_annotations <- function(
         )
     )
 
-  logger::log_info("adding biological organism metadata")
+  logger::log_trace("Adding biological organism metadata")
   annotation_table_taxed <- annotation_table |>
     tidytable::left_join(tidytable::fread(
       file = taxa,
@@ -470,7 +470,7 @@ weight_annotations <- function(
     tables_full
   )
 
-  logger::log_info("performing taxonomically informed scoring")
+  logger::log_trace("Performing taxonomically informed scoring")
   results_bio <- weight_bio()
   rm(annotation_table_taxed)
   results_bio |>
@@ -488,7 +488,6 @@ weight_annotations <- function(
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
   rm(results_chemo)
 
-  logger::log_info("Exporting")
   time <- format(Sys.time(), "%y%m%d_%H%M%OS")
   dir_time <- file.path(
     get_default_paths()$data$processed$path,

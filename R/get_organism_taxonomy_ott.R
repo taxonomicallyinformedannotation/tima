@@ -51,7 +51,7 @@ get_organism_taxonomy_ott <- function(
 
   organisms <- organism_table$canonical_name
 
-  logger::log_info("Testing if Open Tree of Life API is up")
+  logger::log_trace("Testing if Open Tree of Life API is up")
   if (
     url |>
       httr2::request() |>
@@ -68,8 +68,8 @@ get_organism_taxonomy_ott <- function(
       httr2::resp_status_desc() !=
       "OK"
   ) {
-    logger::log_info("Sorry, Open Tree of Life API is down")
-    logger::log_info("Failing gracefuly and returning empty results")
+    logger::log_error("Sorry, Open Tree of Life API is down")
+    logger::log_error("Failing gracefuly and returning empty results")
     new_matched_otl_exact <-
       data.frame(
         "search_string" = NA_character_,
@@ -85,7 +85,7 @@ get_organism_taxonomy_ott <- function(
         "ott_id" = NA_integer_
       )
   } else {
-    logger::log_info("Success! Submitting request")
+    logger::log_trace("Success! Submitting request")
     ## cutting in smaller requests
     cut <- 100
     organisms_split <-
@@ -109,7 +109,7 @@ get_organism_taxonomy_ott <- function(
           )
         }
       )
-    logger::log_info("Request finished!")
+    logger::log_trace("Request finished!")
 
     new_matched_otl_exact <- new_matched_otl_exact_list |>
       tidytable::bind_rows() |>
@@ -197,7 +197,7 @@ get_organism_taxonomy_ott <- function(
     if (nrow(new_ott_id) != 0) {
       otts <- new_ott_id$ott_id
 
-      logger::log_info("Getting taxonomy")
+      logger::log_trace("Getting taxonomy")
       # See https://github.com/ropensci/rotl/issues/147
       taxon_info <-
         httr::with_config(
@@ -208,7 +208,7 @@ get_organism_taxonomy_ott <- function(
             include_terminal_descendants = TRUE
           )
         )
-      logger::log_info("Taxonomy retrieved!")
+      logger::log_trace("Taxonomy retrieved!")
 
       taxon_lineage <- taxon_info |>
         rotl::tax_lineage()
@@ -236,7 +236,7 @@ get_organism_taxonomy_ott <- function(
         tidytable::arrange(tidytable::desc(n)) |>
         tidytable::select(-n)
     } else {
-      logger::log_info("Nothing found, returning empty dataframe")
+      logger::log_warn("Nothing found, returning empty dataframe")
       otl <-
         tidytable::tidytable(
           id = NA_integer_,
@@ -324,7 +324,7 @@ get_organism_taxonomy_ott <- function(
       }
     }
 
-    logger::log_info("Got OTTaxonomy!")
+    logger::log_trace("Got OTTaxonomy!")
     return(biological_metadata)
   }
 }

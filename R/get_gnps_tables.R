@@ -62,8 +62,8 @@ get_gnps_tables <-
         names(gnps_job_id) <- gnps_job_id
       }
 
-      logger::log_info("... Inputs")
-      logger::log_info("... Features")
+      logger::log_trace("... Inputs")
+      logger::log_trace("... Features")
       file_features <-
         file.path(path_source, paste0(names(gnps_job_id), "_features.csv"))
       if (!file.exists(file_features)) {
@@ -77,13 +77,13 @@ get_gnps_tables <-
           export = file_features
         )
       }
-      logger::log_info("... Metadata")
+      logger::log_trace("... Metadata")
       file_metadata <-
         file.path(path_source, paste0(names(gnps_job_id), "_metadata.tsv"))
       if (!file.exists(file_metadata)) {
         url <- paste0(gnps_url, gnps_job_id, gnps_block, "metadata_table/")
 
-        logger::log_info("Checking response")
+        logger::log_trace("Checking response")
         if (
           url |>
             httr2::request() |>
@@ -97,17 +97,17 @@ get_gnps_tables <-
             httr2::resp_status_desc() ==
             "OK"
         ) {
-          logger::log_info("Status OK!")
+          logger::log_trace("Status OK!")
           get_file(url = url, export = file_metadata)
         } else {
-          logger::log_info("The given GNPS job ID has no metadata")
-          logger::log_info("Returning empty dataframes instead")
+          logger::log_warn("The given GNPS job ID has no metadata")
+          logger::log_warn("Returning empty dataframes instead")
           fake_metadata <- data.frame(filename = NULL, ATTRIBUTE_species = NULL)
           export_output(x = fake_metadata, file = file_metadata)
         }
       }
 
-      logger::log_info("... Spectra")
+      logger::log_trace("... Spectra")
       file_spectra <-
         file.path(path_source, paste0(names(gnps_job_id), "_spectra.mgf"))
       if (!file.exists(file_spectra)) {
@@ -117,8 +117,8 @@ get_gnps_tables <-
         )
       }
 
-      logger::log_info("... Results")
-      logger::log_info("... Annotations")
+      logger::log_trace("... Results")
+      logger::log_trace("... Annotations")
       file_annotations <- file.path(
         path_interim_a,
         paste0(names(gnps_job_id), "_gnps.tsv")
@@ -138,7 +138,7 @@ get_gnps_tables <-
           export = file_annotations
         )
       }
-      logger::log_info("... Components")
+      logger::log_trace("... Components")
       file_components <- file.path(
         path_interim_f,
         paste0(names(gnps_job_id), "_components.tsv")
@@ -158,7 +158,7 @@ get_gnps_tables <-
           export = file_components
         )
       }
-      logger::log_info("... Edges")
+      logger::log_trace("... Edges")
       file_edges <- file.path(
         path_interim_f,
         paste0(names(gnps_job_id), "_edges_spectra.tsv")
@@ -186,8 +186,8 @@ get_gnps_tables <-
         )
       )
     } else {
-      logger::log_info("No GNPS job ID provided")
-      logger::log_info("Returning empty dataframes instead")
+      logger::log_warn("No GNPS job ID provided")
+      logger::log_warn("Returning empty dataframes instead")
       fake_annotations <- data.frame(
         `#Scan#` = 0,
         MassDiff = 0,
