@@ -4,7 +4,14 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
+sanitize_spectra(
+  spectra,
+  cutoff = 0,
+  dalton = 0.01,
+  polarity = NA,
+  ppm = 10,
+  combine = TRUE
+)
 }
 \arguments{
 \item{spectra}{Spectra object}
@@ -16,6 +23,8 @@ sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 \item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
+
+\item{combine}{Flag indicating whether to combine Default TRUE}
 }
 \value{
 The sanitized spectra

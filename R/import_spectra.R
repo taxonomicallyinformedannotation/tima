@@ -11,6 +11,7 @@
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
 #' @param sanitize Flag indicating whether to sanitize. Default TRUE
+#' @param combine Flag indicating whether to combine Default TRUE
 #'
 #' @return Spectra object containing the imported spectra
 #'
@@ -34,7 +35,8 @@ import_spectra <- function(
   dalton = 0.01,
   polarity = NA,
   ppm = 10,
-  sanitize = TRUE
+  sanitize = TRUE,
+  combine = TRUE
 ) {
   file_ext <-
     stringi::stri_replace_all_regex(
@@ -71,7 +73,8 @@ import_spectra <- function(
         cutoff = cutoff,
         dalton = dalton,
         polarity = polarity,
-        ppm = ppm
+        ppm = ppm,
+        combine = combine
       )
   }
   return(spectra)

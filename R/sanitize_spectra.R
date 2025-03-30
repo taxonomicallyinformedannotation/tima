@@ -7,6 +7,7 @@
 #' @param dalton Dalton tolerance
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
+#' @param combine Flag indicating whether to combine Default TRUE
 #'
 #' @return The sanitized spectra
 #'
@@ -22,7 +23,14 @@
 #'   sanitize_spectra()
 #' }
 sanitize_spectra <-
-  function(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10) {
+  function(
+    spectra,
+    cutoff = 0,
+    dalton = 0.01,
+    polarity = NA,
+    ppm = 10,
+    combine = TRUE
+  ) {
     logger::log_trace("Applying sanitization of the spectra")
 
     ## Fix needed
@@ -69,7 +77,7 @@ sanitize_spectra <-
       ) |>
       Spectra::scalePeaks()
 
-    if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
+    if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData) && combine) {
       logger::log_trace("Combining spectra in case")
       spectra <- spectra |>
         Spectra::combineSpectra(

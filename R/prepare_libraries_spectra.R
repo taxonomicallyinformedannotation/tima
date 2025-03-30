@@ -116,7 +116,7 @@ prepare_libraries_spectra <-
         )
       ) {
         logger::log_trace("Importing")
-        spectra <- purrr::map(.x = input, .f = import_spectra)
+        spectra <- purrr::map(.x = input, .f = import_spectra, combine = FALSE)
 
         logger::log_trace("Extracting")
         spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
