@@ -339,6 +339,9 @@ testthat::test_that(desc = "Test functions", code = {
 
   #### MERGED
   prepare_libraries_sop_merged(
+    files = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$prepared[1:4],
     filter = TRUE,
     level = "family",
     value = "Simaroubaceae|Gentianaceae",
