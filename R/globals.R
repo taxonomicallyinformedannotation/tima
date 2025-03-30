@@ -254,6 +254,7 @@ utils::globalVariables(
     "target_smiles",
     "target_smiles_no_stereo",
     "type",
+    "unique_comnectivities",
     "unique_name",
     "val",
     "value",
