@@ -1475,9 +1475,10 @@ list(
                 prepare_libraries_spectra(
                   input = lib_spe_exp_mb_raw,
                   nam_lib = paste(
-                    "MassBank",
-                    paths_urls_massbank_version,
-                    sep = " - "
+                    "massbank",
+                    paths_urls_massbank_version |>
+                      gsub(pattern = ".", replacement = "_", fixed = TRUE),
+                    sep = "_"
                   ),
                   col_ad = "Precursor_type",
                   col_ce = "Collision_energy",
