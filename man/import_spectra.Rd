@@ -10,7 +10,8 @@ import_spectra(
   dalton = 0.01,
   polarity = NA,
   ppm = 10,
-  sanitize = TRUE
+  sanitize = TRUE,
+  combine = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ import_spectra(
 \item{ppm}{PPM tolerance}
 
 \item{sanitize}{Flag indicating whether to sanitize. Default TRUE}
+
+\item{combine}{Flag indicating whether to combine Default TRUE}
 }
 \value{
 Spectra object containing the imported spectra
