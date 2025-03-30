@@ -344,7 +344,11 @@ testthat::test_that(desc = "Test functions", code = {
     value = "Simaroubaceae|Gentianaceae",
     output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
   )
-  prepare_libraries_sop_merged()
+  prepare_libraries_sop_merged(
+    files = get_params(
+      step = "prepare_libraries_sop_merged"
+    )$files$libraries$sop$prepared[1:4]
+  )
 
   ### Features
   #### if no RT
