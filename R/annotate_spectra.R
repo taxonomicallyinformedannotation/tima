@@ -129,7 +129,7 @@ annotate_spectra <- function(
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
-      tidytable::select(library, spectra, unique_connectivities) |> 
+      tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct()
     logger::log_info(
       "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
