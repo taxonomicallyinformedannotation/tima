@@ -2484,6 +2484,7 @@ server <- function(input, output, session) {
         "paths_data_source_libraries_sop_ecmdb",
         "paths_data_source_libraries_sop_hmdb",
         "paths_data_source_libraries_sop_lotus",
+        "paths_data_source_libraries_spectra_exp_path",
         "paths_data_source_libraries_spectra_is_wikidata_pos",
         "paths_data_source_libraries_spectra_is_wikidata_neg",
         "paths_data_source_spectra",
@@ -2497,6 +2498,8 @@ server <- function(input, output, session) {
         "paths_urls_hmdb_structures",
         "paths_urls_lotus_doi",
         "paths_urls_lotus_pattern",
+        "paths_urls_merlin_doi",
+        "paths_urls_lotus_patterns",
         "paths_urls_massbank_file",
         "paths_urls_massbank_url",
         "paths_urls_massbank_version",
@@ -2549,6 +2552,7 @@ server <- function(input, output, session) {
         "par_usr_wei_ann",
         "par_ann_mas",
         "par_ann_spe",
+        "par_ann_spe_fil_spe_raw",
         "par_cre_com",
         "par_cre_edg_spe",
         "par_fil_ann",
@@ -2566,6 +2570,7 @@ server <- function(input, output, session) {
         "par_pre_lib_sop_mer",
         "par_pre_lib_spe",
         "par_pre_tax",
+        "par_pre_tax_fil_fea_raw",
         "par_wei_ann",
         ".Random.seed"
       )

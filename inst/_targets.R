@@ -162,6 +162,18 @@ list(
         }
       ),
       tar_target(
+        name = paths_urls_merlin_doi,
+        command = {
+          paths_urls_merlin_doi <- paths$urls$merlin$doi
+        }
+      ),
+      tar_target(
+        name = paths_urls_merlin_pattern,
+        command = {
+          paths_urls_merlin_pattern <- paths$urls$merlin$pattern
+        }
+      ),
+      tar_target(
         name = paths_data_source_libraries_sop_lotus,
         command = {
           paths_data_source_libraries_sop_lotus <-
@@ -180,6 +192,13 @@ list(
         command = {
           paths_urls_examples_spectral_lib_pos <-
             paths$urls$examples$spectral_lib$pos
+        }
+      ),
+      tar_target(
+        name = paths_data_source_libraries_spectra_exp_path,
+        command = {
+          paths_data_source_libraries_spectra_exp_path <-
+            paths$data$source$libraries$spectra$exp$path
         }
       ),
       tar_target(
@@ -1005,10 +1024,16 @@ list(
   ## Inputs
   list(
     tar_target(
+      name = par_pre_tax_fil_fea_raw,
+      command = {
+        par_pre_tax_fil_fea_raw <- par_pre_tax$files$features$raw
+      }
+    ),
+    tar_target(
       name = input_features,
       format = "file",
       command = {
-        input_features <- par_pre_tax$files$features$raw
+        input_features <- par_pre_tax_fil_fea_raw
         # input_features <-
         #   ifelse(
         #     test = !is.null(gnps_features),
@@ -1021,13 +1046,19 @@ list(
       }
     ),
     tar_target(
+      name = par_ann_spe_fil_spe_raw,
+      command = {
+        par_ann_spe_fil_spe_raw <- par_ann_spe$files$spectral$raw
+      }
+    ),
+    tar_target(
       name = input_spectra,
       format = "file",
       command = {
         input_spectra <-
           ifelse(
             test = paths_test_mode == FALSE,
-            yes = par_ann_spe$files$spectral$raw,
+            yes = par_ann_spe_fil_spe_raw,
             # yes = ifelse(
             #   test = !is.null(gnps_spectra),
             #   yes =
@@ -1187,6 +1218,202 @@ list(
                 mb_version = paths_urls_massbank_version
               )
             }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_01_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_01_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$enamdisc_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$enamdisc_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_02_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_02_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$enamdisc_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$enamdisc_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_03_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_03_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$enammol_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$enammol_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_04_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_04_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$enammol_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$enammol_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_05_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_05_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcebio_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcebio_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_06_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_06_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcebio_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcebio_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_07_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_07_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcedrug_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcedrug_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_08_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_08_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcedrug_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcedrug_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_09_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_09_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcescaf_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcescaf_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_10_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_10_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$mcescaf_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$mcescaf_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_11_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_11_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$nihnp_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$nihnp_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_12_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_12_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$nihnp_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$nihnp_pos
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_13_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_13_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$otavapep_neg,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$otavapep_neg
+                )
+              )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_14_raw,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_14_raw <- tima:::get_last_version_from_zenodo(
+                doi = paths_urls_merlin_doi,
+                pattern = paths_urls_merlin_pattern$otavapep_pos,
+                path = file.path(
+                  paths_data_source_libraries_spectra_exp_path,
+                  paths_urls_merlin_pattern$otavapep_pos
+                )
+              )
+            }
           )
         ),
         ## Prepared
@@ -1291,6 +1518,71 @@ list(
             format = "file",
             command = {
               lib_spe_exp_mb_pre_sop <- lib_spe_exp_mb_pre[[3]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_pre,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_pre <-
+                prepare_libraries_spectra(
+                  input = c(
+                    lib_spe_exp_mer_01_raw,
+                    lib_spe_exp_mer_02_raw,
+                    lib_spe_exp_mer_03_raw,
+                    lib_spe_exp_mer_03_raw,
+                    lib_spe_exp_mer_04_raw,
+                    lib_spe_exp_mer_05_raw,
+                    lib_spe_exp_mer_06_raw,
+                    lib_spe_exp_mer_07_raw,
+                    lib_spe_exp_mer_08_raw,
+                    lib_spe_exp_mer_09_raw,
+                    lib_spe_exp_mer_10_raw,
+                    lib_spe_exp_mer_11_raw,
+                    lib_spe_exp_mer_12_raw,
+                    lib_spe_exp_mer_13_raw,
+                    lib_spe_exp_mer_14_raw
+                  ),
+                  nam_lib = "merlin",
+                  col_ad = "ADDUCT",
+                  col_ce = "COLLISION_ENERGY",
+                  col_ci = NULL,
+                  col_em = "EXACTMASS",
+                  col_in = "INCHI",
+                  col_io = NULL,
+                  col_ik = "INCHIAUX",
+                  col_il = NULL,
+                  col_mf = "FORMULA",
+                  col_na = "NAME",
+                  col_po = "IONMODE",
+                  col_sm = "SMILES",
+                  col_sn = NULL,
+                  col_si = "USI",
+                  col_sp = NULL,
+                  col_sy = NULL,
+                  col_xl = NULL
+                )
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_pre_pos,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_pre_pos <- lib_spe_exp_mer_pre[[1]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_pre_neg,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_pre_neg <- lib_spe_exp_mer_pre[[2]]
+            }
+          ),
+          tar_target(
+            name = lib_spe_exp_mer_pre_sop,
+            format = "file",
+            command = {
+              lib_spe_exp_mer_pre_sop <- lib_spe_exp_mer_pre[[3]]
             }
           )
         )
@@ -1494,6 +1786,7 @@ list(
                 lib_rt_sop,
                 lib_spe_exp_int_pre_sop,
                 lib_spe_exp_mb_pre_sop,
+                lib_spe_exp_mer_pre_sop,
                 lib_spe_is_wik_pre_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
@@ -1643,7 +1936,8 @@ list(
                 lib_spe_is_wik_pre_pos,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_pos,
-                lib_spe_exp_mb_pre_pos
+                lib_spe_exp_mb_pre_pos,
+                lib_spe_exp_mer_pre_pos
               ),
               polarity = "pos",
               output = gsub(
@@ -1671,7 +1965,8 @@ list(
                 lib_spe_is_wik_pre_neg,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_neg,
-                lib_spe_exp_mb_pre_neg
+                lib_spe_exp_mb_pre_neg,
+                lib_spe_exp_mer_pre_neg
               ),
               polarity = "neg",
               output = gsub(
@@ -2510,7 +2805,8 @@ list(
           input = benchmark_pre_mgf_pos,
           library = c(
             lib_spe_is_wik_pre_pos,
-            lib_spe_exp_mb_pre_pos
+            lib_spe_exp_mb_pre_pos,
+            lib_spe_exp_mer_pre_pos
           ),
           polarity = "pos",
           output = "data/interim/benchmark/benchmark_ann_spe_pos.tsv.gz",
@@ -2531,7 +2827,8 @@ list(
           input = benchmark_pre_mgf_neg,
           library = c(
             lib_spe_is_wik_pre_neg,
-            lib_spe_exp_mb_pre_neg
+            lib_spe_exp_mb_pre_neg,
+            lib_spe_exp_mer_pre_neg
           ),
           polarity = "neg",
           output = "data/interim/benchmark/benchmark_ann_spe_neg.tsv.gz",
