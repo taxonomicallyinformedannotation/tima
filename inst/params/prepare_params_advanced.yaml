@@ -121,8 +121,11 @@ files:
         #' RT prepared structure organism pairs library. STRING
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
-        #' Spectral prepared structure organism pairs library. STRING
-        spectral: data/interim/libraries/sop/spectral_prepared.tsv.gz
+        #' Massbank spectral prepared structure organism pairs library. STRING
+        massbank: data/interim/libraries/sop/massbank_spectral_prepared.tsv.gz
+
+        #' Merlin spectral prepared structure organism pairs library. STRING
+        merlin: data/interim/libraries/sop/merlin_spectral_prepared.tsv.gz
 
         #' Wikidata spectral prepared structure organism pairs library. STRING
         wikidata: data/interim/libraries/sop/wikidata_spectral_prepared.tsv.gz
@@ -169,11 +172,12 @@ files:
       #' List of negative spectral libraries. STRING
       neg:
         - data/interim/libraries/spectra/exp/massbank_neg.rds
+        - data/interim/libraries/spectra/exp/merlin_neg.rds
         - data/interim/libraries/spectra/is/wikidata_neg.rds
 
       #' List of positive spectral libraries. STRING
       pos:
-        - data/interim/libraries/spectra/exp/massbank_pos.rds
+        - data/interim/libraries/spectra/exp/merlin_pos.rds
         - data/interim/libraries/spectra/is/wikidata_pos.rds
 
       #' List of raw spectral libraries. STRING

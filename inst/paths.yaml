@@ -223,6 +223,24 @@ urls:
     file: MassBank_NIST.msp
     url: https://github.com/MassBank/MassBank-data/releases/download
     version: 2024.11
+  merlin:
+    doi: 10.5281/zenodo.13911806
+    patterns:
+      enamdisc_neg: 20241003_enamdisc_neg_ms2.mgf
+      enamdisc_pos: 20241003_enamdisc_pos_ms2.mgf
+      enammol_neg: 20241003_enammol_neg_ms2.mgf
+      enammol_pos: 20241003_enammol_pos_ms2.mgf
+      mcebio_neg: 20241003_mcebio_neg_ms2.mgf
+      mcebio_pos: 20241003_mcebio_pos_ms2.mgf
+      mcedrug_neg: 20241003_mcedrug_neg_ms2.mgf
+      mcedrug_pos: 20241003_mcedrug_pos_ms2.mgf
+      mcescaf_neg: 20241003_mcescaf_neg_ms2.mgf
+      mcescaf_pos: 20241003_mcescaf_pos_ms2.mgf
+      nihnp_neg: 20241003_nihnp_neg_ms2.mgf
+      nihnp_pos: 20241003_nihnp_pos_ms2.mgf
+      otavapep_neg: 20241003_otavapep_neg_ms2.mgf
+      otavapep_pos: 20241003_otavapep_pos_ms2.mgf
+      
   wikidata_isdb:
     doi: 10.5281/zenodo.5607185
     pattern:

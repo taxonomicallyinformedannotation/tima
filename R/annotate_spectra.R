@@ -120,6 +120,20 @@ annotate_spectra <- function(
       ) |>
       Spectra::concatenateSpectra()
 
+    logger::log_info("Annotating using following libraries")
+    library_stats <- spectral_library |>
+      Spectra::spectraData() |>
+      data.frame() |>
+      tidytable::group_by(library) |>
+      tidytable::add_count(name = "spectra") |>
+      tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
+      tidytable::add_count(name = "unique_connectivities") |>
+      tidytable::select(library, spectra, unique_connectivities) |>
+      tibble::tibble()
+    logger::log_info(
+      "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
+    )
+
     query_precursors <- spectra@backend@spectraData$precursorMz
     query_spectra <- spectra@backend@peaksData
     query_ids <- spectra |>

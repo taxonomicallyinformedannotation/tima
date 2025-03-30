@@ -92,11 +92,7 @@ prepare_libraries_spectra <-
     )
     output_sop <- file.path(
       get_default_paths()$data$interim$libraries$sop$path,
-      ifelse(
-        test = nam_lib == "internal",
-        yes = "internal_spectral_prepared.tsv.gz",
-        no = "spectral_prepared.tsv.gz"
-      )
+      paste0(nam_lib, "_prepared.tsv.gz")
     )
     if (
       !all(
@@ -110,7 +106,15 @@ prepare_libraries_spectra <-
       if (is.null(input)) {
         input <- "fileDoesNotExist"
       }
-      if (file.exists(input)) {
+      if (
+        all(
+          purrr::map(
+            .x = input,
+            .f = file.exists
+          ) |>
+            unlist()
+        )
+      ) {
         logger::log_trace("Importing")
         spectra <- purrr::map(.x = input, .f = import_spectra)
 
@@ -143,11 +147,15 @@ prepare_libraries_spectra <-
           col_sy = col_sy,
           col_xl = col_xl
         ) |>
-          ## TODO report the issue as otherwise precursorMz is lost
           purrr::map(
             .f = function(x) {
               x <- x |>
+                ## TODO report the issue as otherwise precursorMz is lost
                 tidytable::rename(precursor_mz = precursorMz) |>
+                tidytable::mutate(
+                  inchikey_connectivity_layer = inchikey |>
+                    gsub(pattern = "-.*", replacement = "")
+                ) |>
                 data.frame()
             }
           )
@@ -178,11 +186,15 @@ prepare_libraries_spectra <-
           col_sy = col_sy,
           col_xl = col_xl
         ) |>
-          ## TODO report the issue as otherwise precursorMz is lost
           purrr::map(
             .f = function(x) {
               x <- x |>
+                ## TODO report the issue as otherwise precursorMz is lost
                 tidytable::rename(precursor_mz = precursorMz) |>
+                tidytable::mutate(
+                  inchikey_connectivity_layer = inchikey |>
+                    gsub(pattern = "-.*", replacement = "")
+                ) |>
                 data.frame()
             }
           )
@@ -200,6 +212,7 @@ prepare_libraries_spectra <-
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::distinct(
             structure_inchikey = inchikey,
+            structure_inchikey_connectivity_layer = inchikey_connectivity_layer,
             structure_smiles = smiles,
             structure_smiles_no_stereo = smiles_no_stereo,
             structure_molecular_formula = formula,
@@ -209,13 +222,12 @@ prepare_libraries_spectra <-
           # Because some slight discrepancies appear in some DBs
           tidytable::distinct(
             structure_inchikey,
+            structure_inchikey_connectivity_layer,
             structure_smiles,
             structure_smiles_no_stereo,
             .keep_all = TRUE
           ) |>
           tidytable::mutate(
-            structure_inchikey_connectivity_layer = structure_inchikey |>
-              gsub(pattern = "-.*", replacement = ""),
             organism_name = NA_character_
           )
         rm(spectra_harmonized_pos, spectra_harmonized_neg)
