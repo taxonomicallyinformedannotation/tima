@@ -389,8 +389,10 @@ weight_annotations <- function(
       candidate_structure_inchikey_connectivity_layer
     ) |>
     tidytable::group_by(candidate_library) |>
-    tidytable::count() |>
-    print()
+    tidytable::count()
+  logger::log_info(
+    "\n{paste(capture.output(print(annotation_table)), collapse = '\n')}"
+  )
 
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
