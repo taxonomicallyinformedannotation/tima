@@ -377,7 +377,7 @@ weight_annotations <- function(
   }
 
   logger::log_trace("Initial annotations:")
-  annotation_table |>
+  annotation_stats <- annotation_table |>
     tidytable::filter(
       !is.na(
         candidate_structure_inchikey_connectivity_layer
@@ -391,7 +391,7 @@ weight_annotations <- function(
     tidytable::group_by(candidate_library) |>
     tidytable::count()
   logger::log_info(
-    "\n{paste(capture.output(print(annotation_table)), collapse = '\n')}"
+    "\n{paste(capture.output(print(annotation_stats)), collapse = '\n')}"
   )
 
   features_table <- annotation_table |>
