@@ -69,7 +69,7 @@ prepare_annotations_sirius <-
       input_directory <- "Th1sd1rw0nt3x1st"
     }
     if (file.exists(input_directory)) {
-      logger::log_info("Loading parameters for SIRIUS", sirius_version)
+      logger::log_info("Loading parameters for SIRIUS ", sirius_version)
       sirius_version <- as.character(sirius_version)
       canopus_filename <- switch(
         sirius_version,
