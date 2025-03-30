@@ -52,7 +52,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sanitize_spectra</span><span class="op">(</span><span class="va">spectra</span>, cutoff <span class="op">=</span> <span class="fl">0</span>, dalton <span class="op">=</span> <span class="fl">0.01</span>, polarity <span class="op">=</span> <span class="cn">NA</span>, ppm <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sanitize_spectra</span><span class="op">(</span></span>
+<span>  <span class="va">spectra</span>,</span>
+<span>  cutoff <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  dalton <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  polarity <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  ppm <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  combine <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -77,6 +84,10 @@
 
 <dt id="arg-ppm">ppm<a class="anchor" aria-label="anchor" href="#arg-ppm"></a></dt>
 <dd><p>PPM tolerance</p></dd>
+
+
+<dt id="arg-combine">combine<a class="anchor" aria-label="anchor" href="#arg-combine"></a></dt>
+<dd><p>Flag indicating whether to combine Default TRUE</p></dd>
 
 </dl></div>
     <div class="section level2">
