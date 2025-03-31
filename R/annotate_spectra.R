@@ -136,21 +136,19 @@ annotate_spectra <- function(
       Spectra::spectraData() |>
       data.frame() |>
       tidytable::filter(!is.na(library)) |>
-      tidytable::group_by(library) |>
+      ## Avoid "library" variable
+      tidytable::rename(library_name = library) |>
+      tidytable::group_by(library_name) |>
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::ungroup() |>
-      tidytable::mutate(
-        library = library |>
-          as.character()
-      ) |>
-      tidytable::select(library, spectra, unique_connectivities) |>
+      tidytable::select(library_name, spectra, unique_connectivities) |>
       tidytable::distinct() |>
       ## temporary fix
       tidytable::mutate(
         unique_connectivities = ifelse(
-          test = library == "ISDB - Wikidata",
+          test = library_name == "ISDB - Wikidata",
           yes = spectra,
           no = unique_connectivities
         )
