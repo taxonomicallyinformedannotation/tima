@@ -117,8 +117,7 @@ decorate_bio <-
         df_spe |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
       ),
-      " annotations reranked at the species level, \n",
-      " and ",
+      " annotations reranked at the species level, and \n",
       nrow(
         df_var |>
           tidytable::distinct(candidate_structure_inchikey_connectivity_layer)

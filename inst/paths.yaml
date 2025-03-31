@@ -13,10 +13,6 @@ data:
       path: data/interim/features
     libraries:
       path: data/interim/libraries
-      adducts:
-        path: data/interim/libraries/adducts
-        neg: data/interim/libraries/adducts/neg.tsv.gz
-        pos: data/interim/libraries/adducts/pos.tsv.gz
       sop:
         path: data/interim/libraries/sop
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
