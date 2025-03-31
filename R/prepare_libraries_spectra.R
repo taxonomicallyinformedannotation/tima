@@ -158,9 +158,10 @@ prepare_libraries_spectra <-
                 ) |>
                 data.frame()
             }
-          )
+          ) |>
+          purrr::list_rbind()
         spectra_pos <- spectra_harmonized_pos |>
-          purrr::map(.f = Spectra::Spectra)
+          Spectra::Spectra()
 
         logger::log_trace("... neg")
         spectra_harmonized_neg <- purrr::map(
@@ -197,17 +198,16 @@ prepare_libraries_spectra <-
                 ) |>
                 data.frame()
             }
-          )
+          ) |>
+          purrr::list_rbind()
         rm(spectra_extracted)
         spectra_neg <- spectra_harmonized_neg |>
-          purrr::map(.f = Spectra::Spectra)
+          Spectra::Spectra()
 
         logger::log_trace("Extracting structures for the SOP library.")
         sop <- tidytable::bind_rows(
-          spectra_harmonized_pos |>
-            tidytable::bind_rows(),
-          spectra_harmonized_neg |>
-            tidytable::bind_rows()
+          spectra_harmonized_pos,
+          spectra_harmonized_neg
         ) |>
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::distinct(
@@ -235,7 +235,7 @@ prepare_libraries_spectra <-
         logger::log_warn(
           "Your input file does not exist, returning empty lib instead."
         )
-        spectra_pos <- list(
+        spectra_pos <-
           tidytable::tidytable(
             "compound_id" = "fake_compound",
             "adduct" = NA_character_,
@@ -261,9 +261,8 @@ prepare_libraries_spectra <-
             "library" = NA_character_,
             "precursor_mz" = 0
           ) |>
-            data.frame() |>
-            Spectra::Spectra()
-        )
+          data.frame() |>
+          Spectra::Spectra()
         spectra_neg <- spectra_pos
         sop <- tidytable::tidytable(
           "structure_inchikey" = NA_character_,
@@ -274,8 +273,8 @@ prepare_libraries_spectra <-
         )
       }
       export_output(sop, file = output_sop)
-      mapply(export_spectra_rds, output_pos, spectra_pos)
-      mapply(export_spectra_rds, output_neg, spectra_neg)
+      export_spectra_rds(file = output_pos, spectra = spectra_pos)
+      export_spectra_rds(file = output_neg, spectra = spectra_neg)
       rm(spectra_pos, spectra_neg)
     } else {
       logger::log_info("Library already exists")
