@@ -133,7 +133,7 @@ annotate_spectra <- function(
       tidytable::mutate(
         inchikey_connectivity_layer = ifelse(
           test = library == "ISDB - Wikidata",
-          yes = n(),
+          yes = tidytable::n(),
           no = inchikey_connectivity_layer
         )
       ) |>
