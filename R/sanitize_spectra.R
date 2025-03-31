@@ -99,6 +99,13 @@ sanitize_spectra <-
         as.character() |>
         as.logical()
     ]
+    spectra <- spectra[
+      !spectra@backend@peaksData |>
+        purrr::map(.f = is.null) |>
+        purrr::map(.f = any) |>
+        as.character() |>
+        as.logical()
+    ]
 
     return(spectra)
   }
