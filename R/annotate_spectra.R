@@ -118,9 +118,17 @@ annotate_spectra <- function(
       purrr::map(
         .f = Spectra::applyProcessing,
         BPPARAM = BiocParallel::SerialParam()
-      ) |>
-      ## Safety in case
-      purrr::map(.f = Spectra::filterEmptySpectra) |>
+      )
+    spectral_library <- spectral_library |>
+      purrr::map(.f = function(spectra) {
+        spectra <- spectra[
+          !spectra@backend@peaksData |>
+            purrr::map(.f = is.null) |>
+            purrr::map(.f = any) |>
+            as.character() |>
+            as.logical()
+        ]
+      }) |>
       Spectra::concatenateSpectra()
 
     logger::log_info("Annotating using following libraries")
@@ -133,8 +141,10 @@ annotate_spectra <- function(
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::ungroup() |>
-      tidytable::mutate(library = library |>
-        as.character())|>
+      tidytable::mutate(
+        library = library |>
+          as.character()
+      ) |>
       tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct() |>
       ## temporary fix
