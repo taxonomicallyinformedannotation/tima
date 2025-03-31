@@ -93,7 +93,7 @@ clean_chemo <-
 
     df1 <- df1 |>
       tidytable::arrange(
-        core_weighted_chemo |>
+        score_weighted_chemo |>
           tidytable::desc()
       ) |>
       tidytable::distinct(
