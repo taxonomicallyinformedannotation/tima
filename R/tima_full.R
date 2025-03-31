@@ -23,12 +23,21 @@ tima_full <- function() {
   targets::tar_make(names = tidyselect::matches("^ann_pre$"))
   end <- Sys.time()
   logger::log_success("Script finished in ", format(end - start))
-  file.rename(
+  ## Not using file.rename because of Docker
+  logs <- "tima.log"
+  success <- file.copy(
     from = "tima.log",
     to = paste0(
       "data/processed/",
       format(end, format = "%Y%m%d_%H%M%S"),
-      "_tima.log"
+      "_",
+      logs
     )
   )
+  if (
+    success |>
+      all()
+  ) {
+    file.remove(logs)
+  }
 }
