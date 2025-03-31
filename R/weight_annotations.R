@@ -389,7 +389,11 @@ weight_annotations <- function(
       candidate_structure_inchikey_connectivity_layer
     ) |>
     tidytable::group_by(candidate_library) |>
-    tidytable::count()
+    tidytable::count() |>
+    tidytable::arrange(
+      n |>
+        tidytable::desc()
+    )
   logger::log_info(
     "\n{paste(capture.output(print(annotation_stats)), collapse = '\n')}"
   )
@@ -410,7 +414,7 @@ weight_annotations <- function(
       )
     )) |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
-    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+    tidytable::arrange(candidate_score_similarity |> tidytable::desc()) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,

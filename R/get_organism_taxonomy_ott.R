@@ -233,7 +233,10 @@ get_organism_taxonomy_ott <- function(
         tidytable::mutate(ott_id = as.integer(ott_id)) |>
         ## feeling it is better that way
         tidytable::mutate(n = tidytable::row_number()) |>
-        tidytable::arrange(tidytable::desc(n)) |>
+        tidytable::arrange(
+          n |>
+            tidytable::desc()
+        ) |>
         tidytable::select(-n)
     } else {
       logger::log_warn("Nothing found, returning empty dataframe")
