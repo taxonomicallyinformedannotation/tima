@@ -494,7 +494,7 @@ weight_annotations <- function(
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
   rm(results_chemo)
 
-  time <- format(Sys.time(), "%y%m%d_%H%M%OS")
+  time <- format(Sys.time(), "%Y%m%d_%H%M%S")
   dir_time <- file.path(
     get_default_paths()$data$processed$path,
     paste0(time, "_", pattern)
