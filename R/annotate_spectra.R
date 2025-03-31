@@ -112,12 +112,15 @@ annotate_spectra <- function(
         dalton = dalton,
         polarity = polarity,
         ppm = ppm,
-        sanitize = FALSE
+        sanitize = FALSE,
+        combine = FALSE
       ) |>
       purrr::map(
         .f = Spectra::applyProcessing,
         BPPARAM = BiocParallel::SerialParam()
       ) |>
+      ## Safety in case
+      purrr::map(.f = Spectra::filterEmptySpectra) |>
       Spectra::concatenateSpectra()
 
     logger::log_info("Annotating using following libraries")
@@ -125,12 +128,21 @@ annotate_spectra <- function(
       Spectra::spectraData() |>
       data.frame() |>
       tidytable::filter(!is.na(library)) |>
+      ## temporary fix
+      tidytable::mutate(
+        inchikey_connectivity_layer = ifelse(
+          test = library == "ISDB - Wikidata",
+          yes = compound_id,
+          no = inchikey_connectivity_layer
+        )
+      ) |>
       tidytable::group_by(library) |>
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::select(library, spectra, unique_connectivities) |>
-      tidytable::distinct()
+      tidytable::distinct() |>
+      tidytable::arrange(tidytable::desc(spectra))
     logger::log_info(
       "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
     )
