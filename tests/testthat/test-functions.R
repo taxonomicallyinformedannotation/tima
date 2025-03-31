@@ -472,7 +472,9 @@ testthat::test_that(desc = "Test functions", code = {
   )
   ### Approx
   annotate_spectra(
-    libraries = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+    libraries = list(
+      pos = "data/interim/libraries/spectra/exp/internal_pos.rds"
+    ),
     ## shallow tolerance to speed up tests
     ppm = 1,
     dalton = 0.001,
