@@ -129,19 +129,19 @@ annotate_spectra <- function(
       data.frame() |>
       tidytable::filter(!is.na(library)) |>
       tidytable::group_by(library) |>
-      ## temporary fix
-      tidytable::mutate(
-        inchikey_connectivity_layer = ifelse(
-          test = library == "ISDB - Wikidata",
-          yes = tidytable::n(),
-          no = inchikey_connectivity_layer
-        )
-      ) |>
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct() |>
+      ## temporary fix
+      tidytable::mutate(
+        unique_connectivities = ifelse(
+          test = library == "ISDB - Wikidata",
+          yes = spectra,
+          no = unique_connectivities
+        )
+      ) |>
       tidytable::arrange(tidytable::desc(spectra))
     logger::log_info(
       "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
