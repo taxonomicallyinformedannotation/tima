@@ -1933,7 +1933,7 @@ list(
           command = {
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
-              library = c(
+              libraries = c(
                 lib_spe_is_wik_pre_pos,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_pos,
@@ -1962,7 +1962,7 @@ list(
           command = {
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
-              library = c(
+              libraries = c(
                 lib_spe_is_wik_pre_neg,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_neg,
@@ -2804,7 +2804,7 @@ list(
       command = {
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
-          library = c(
+          libraries = c(
             lib_spe_is_wik_pre_pos,
             lib_spe_exp_mb_pre_pos,
             lib_spe_exp_mer_pre_pos
@@ -2826,7 +2826,7 @@ list(
       command = {
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
-          library = c(
+          libraries = c(
             lib_spe_is_wik_pre_neg,
             lib_spe_exp_mb_pre_neg,
             lib_spe_exp_mer_pre_neg
