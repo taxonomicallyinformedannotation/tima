@@ -67,7 +67,7 @@ annotate_spectra <- function(
   ## Check if libraries exist
   stopifnot(
     "Library file(s) do(es) not exist" = all(
-      purrr::map(.x = library, .f = file.exists) |>
+      purrr::map(.x = libraries, .f = file.exists) |>
         unlist()
     )
   )
