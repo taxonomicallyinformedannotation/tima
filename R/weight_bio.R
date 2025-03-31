@@ -445,7 +445,10 @@ weight_bio <-
     rm(df1)
 
     annot_table_wei_bio_init <- annot_table_wei_bio_init |>
-      tidytable::arrange(tidytable::desc(score_biological)) |>
+      tidytable::arrange(
+        score_biological |>
+          tidytable::desc()
+      ) |>
       tidytable::distinct(
         candidate_structure_inchikey_connectivity_layer,
         sample_organism_01_domain,

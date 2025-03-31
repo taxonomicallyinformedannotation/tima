@@ -150,7 +150,10 @@ annotate_spectra <- function(
           no = unique_connectivities
         )
       ) |>
-      tidytable::arrange(tidytable::desc(spectra))
+      tidytable::arrange(
+        spectra |>
+          tidytable::desc()
+      )
     logger::log_info(
       "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
     )
@@ -348,7 +351,7 @@ annotate_spectra <- function(
       logger::log_trace("Filtering results above threshold only")
       df_final <- df_final |>
         tidytable::filter(candidate_score_similarity >= threshold) |>
-        tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+        tidytable::arrange(candidate_score_similarity |> tidytable::desc()) |>
         ## keep only the best result (per library for now)
         tidytable::distinct(
           feature_id,

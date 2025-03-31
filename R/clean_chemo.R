@@ -92,7 +92,10 @@ clean_chemo <-
     }
 
     df1 <- df1 |>
-      tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+      tidytable::arrange(
+        core_weighted_chemo |>
+          tidytable::desc()
+      ) |>
       tidytable::distinct(
         feature_id,
         candidate_structure_inchikey_connectivity_layer,
