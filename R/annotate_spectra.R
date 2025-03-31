@@ -12,7 +12,7 @@
 #' @include import_spectra.R
 #'
 #' @param input Query file containing spectra. Currently an '.mgf' file
-#' @param library Library containing spectra to match against.
+#' @param libraries Libraries containing spectra to match against.
 #'    Can be '.mgf' or '.sqlite' (Spectra formatted)
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
@@ -40,13 +40,13 @@
 #'   export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 #' )
 #' annotate_spectra(
-#'   library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+#'   libraries = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 #' )
 #' unlink("data", recursive = TRUE)
 #' }
 annotate_spectra <- function(
   input = get_params(step = "annotate_spectra")$files$spectral$raw,
-  library = get_params(step = "annotate_spectra")$files$libraries$spectral,
+  libraries = get_params(step = "annotate_spectra")$files$libraries$spectral,
   polarity = get_params(step = "annotate_spectra")$ms$polarity,
   output = get_params(
     step = "annotate_spectra"
@@ -64,7 +64,7 @@ annotate_spectra <- function(
 ) {
   stopifnot("Your input file does not exist." = file.exists(input))
   stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
-  ## Check if library file(s) exists
+  ## Check if libraries exist
   stopifnot(
     "Library file(s) do(es) not exist" = all(
       purrr::map(.x = library, .f = file.exists) |>
@@ -73,9 +73,8 @@ annotate_spectra <- function(
   )
 
   ## Not checking for ppm and Da limits, everyone is free.
-
-  if (length(library) > 1) {
-    library <- library[grepl(polarity, library, fixed = TRUE)]
+  if (length(libraries) > 1) {
+    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
   }
 
   logger::log_trace("Loading spectra")
@@ -104,8 +103,8 @@ annotate_spectra <- function(
   )
 
   if (length(spectra) > 0) {
-    logger::log_trace("Loading spectral library")
-    spectral_library <- unlist(library) |>
+    logger::log_trace("Loading spectral libraries")
+    spectral_library <- unlist(libraries) |>
       purrr::map(
         .f = import_spectra,
         cutoff = 0,
@@ -136,19 +135,17 @@ annotate_spectra <- function(
       Spectra::spectraData() |>
       data.frame() |>
       tidytable::filter(!is.na(library)) |>
-      ## Avoid "library" variable
-      tidytable::rename(library_name = library) |>
-      tidytable::group_by(library_name) |>
+      tidytable::group_by(library) |>
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::ungroup() |>
-      tidytable::select(library_name, spectra, unique_connectivities) |>
+      tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct() |>
       ## temporary fix
       tidytable::mutate(
         unique_connectivities = ifelse(
-          test = library_name == "ISDB - Wikidata",
+          test = library == "ISDB - Wikidata",
           yes = spectra,
           no = unique_connectivities
         )

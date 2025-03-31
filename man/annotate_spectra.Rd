@@ -6,7 +6,7 @@
 \usage{
 annotate_spectra(
   input = get_params(step = "annotate_spectra")$files$spectral$raw,
-  library = get_params(step = "annotate_spectra")$files$libraries$spectral,
+  libraries = get_params(step = "annotate_spectra")$files$libraries$spectral,
   polarity = get_params(step = "annotate_spectra")$ms$polarity,
   output = get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral,
   method = get_params(step = "annotate_spectra")$similarities$methods$annotations,
@@ -20,7 +20,7 @@ annotate_spectra(
 \arguments{
 \item{input}{Query file containing spectra. Currently an '.mgf' file}
 
-\item{library}{Library containing spectra to match against.
+\item{libraries}{Libraries containing spectra to match against.
 Can be '.mgf' or '.sqlite' (Spectra formatted)}
 
 \item{polarity}{MS polarity. Must be 'pos' or 'neg'.}
@@ -59,7 +59,7 @@ get_file(
   export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 )
 annotate_spectra(
-  library = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+  libraries = get_default_paths()$data$source$libraries$spectra$exp$with_rt
 )
 unlink("data", recursive = TRUE)
 }
