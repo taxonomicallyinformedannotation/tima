@@ -132,11 +132,11 @@ annotate_spectra <- function(
       tidytable::add_count(name = "spectra") |>
       tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
       tidytable::add_count(name = "unique_connectivities") |>
+      tidytable::mutate(library = library |>
+        as.character())|>
       tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct() |>
       ## temporary fix
-      tidytable::mutate(library = library |>
-      as.character())|>
       tidytable::mutate(
         unique_connectivities = ifelse(
           test = library == "ISDB - Wikidata",
