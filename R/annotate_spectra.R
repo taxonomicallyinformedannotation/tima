@@ -135,6 +135,8 @@ annotate_spectra <- function(
       tidytable::select(library, spectra, unique_connectivities) |>
       tidytable::distinct() |>
       ## temporary fix
+      tidytable::mutate(library = library |>
+      as.character())|>
       tidytable::mutate(
         unique_connectivities = ifelse(
           test = library == "ISDB - Wikidata",
