@@ -197,11 +197,11 @@ prepare_libraries_rt <-
       df_missing <- df |>
         tidytable::filter(is.na(inchikey))
       logger::log_warn(
-        "There are",
+        "There are ",
         nrow(df_missing),
-        "entries without InChIKey.",
-        "We would recommend you adding them but will try completing.",
-        "We will query them on the fly, this might take some time."
+        " entries without InChIKey.",
+        " We would recommend you adding them but will try completing.",
+        " We will query them on the fly, this might take some time."
       )
       smiles <- unique(df_missing$smiles)
 
