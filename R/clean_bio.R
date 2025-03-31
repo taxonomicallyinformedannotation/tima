@@ -173,7 +173,7 @@ clean_bio <-
       )
     rm(df3)
 
-    logger::log_trace("splitting already computed predictions")
+    logger::log_trace("Splitting already computed predictions")
     df1 <- df |>
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 

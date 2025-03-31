@@ -40,7 +40,6 @@ list(
     list(
       tar_target(
         name = yaml_paths,
-        format = "file",
         command = {
           yaml_paths <- system.file("paths.yaml", package = "tima")
         }
@@ -57,24 +56,24 @@ list(
       #     paths_gnps_example_id <- paths$gnps$example
       #   }
       # ),
-      tar_target(
-        name = paths_source,
-        command = {
-          paths_source <- paths$data$source$path
-        }
-      ),
-      tar_target(
-        name = paths_interim_a,
-        command = {
-          paths_interim_a <- paths$data$interim$annotations$path
-        }
-      ),
-      tar_target(
-        name = paths_interim_f,
-        command = {
-          paths_interim_f <- paths$data$interim$features$path
-        }
-      ),
+      # tar_target(
+      #   name = paths_source,
+      #   command = {
+      #     paths_source <- paths$data$source$path
+      #   }
+      # ),
+      # tar_target(
+      #   name = paths_interim_a,
+      #   command = {
+      #     paths_interim_a <- paths$data$interim$annotations$path
+      #   }
+      # ),
+      # tar_target(
+      #   name = paths_interim_f,
+      #   command = {
+      #     paths_interim_f <- paths$data$interim$features$path
+      #   }
+      # ),
       tar_target(
         name = paths_test_mode,
         command = {
@@ -223,13 +222,6 @@ list(
         }
       ),
       tar_target(
-        name = paths_data_interim_libraries_adducts_path,
-        command = {
-          paths_data_interim_libraries_adducts_path <-
-            paths$data$interim$libraries$adducts$path
-        }
-      ),
-      tar_target(
         name = paths_urls_benchmarking_set,
         command = {
           paths_urls_benchmarking_set <-
@@ -272,7 +264,6 @@ list(
     list(
       tar_target(
         name = par_def_ann_mas,
-        format = "file",
         command = {
           par_def_ann_mas <- system.file(
             "params/default/annotate_masses.yaml",
@@ -282,7 +273,6 @@ list(
       ),
       tar_target(
         name = par_def_ann_spe,
-        format = "file",
         command = {
           par_def_ann_spe <- system.file(
             "params/default/annotate_spectra.yaml",
@@ -292,7 +282,6 @@ list(
       ),
       tar_target(
         name = par_def_cre_com,
-        format = "file",
         command = {
           par_def_cre_com <- system.file(
             "params/default/create_components.yaml",
@@ -302,7 +291,6 @@ list(
       ),
       tar_target(
         name = par_def_cre_edg_spe,
-        format = "file",
         command = {
           par_def_cre_edg_spe <- system.file(
             "params/default/create_edges_spectra.yaml",
@@ -312,7 +300,6 @@ list(
       ),
       tar_target(
         name = par_def_fil_ann,
-        format = "file",
         command = {
           par_def_fil_ann <- system.file(
             "params/default/filter_annotations.yaml",
@@ -322,7 +309,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_ann_gnp,
-        format = "file",
         command = {
           par_def_pre_ann_gnp <- system.file(
             "params/default/prepare_annotations_gnps.yaml",
@@ -332,7 +318,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_ann_sir,
-        format = "file",
         command = {
           par_def_pre_ann_sir <- system.file(
             "params/default/prepare_annotations_sirius.yaml",
@@ -342,7 +327,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_ann_spe,
-        format = "file",
         command = {
           par_def_pre_ann_spe <- system.file(
             "params/default/prepare_annotations_spectra.yaml",
@@ -352,7 +336,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_fea_com,
-        format = "file",
         command = {
           par_def_pre_fea_com <- system.file(
             "params/default/prepare_features_components.yaml",
@@ -362,7 +345,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_fea_edg,
-        format = "file",
         command = {
           par_def_pre_fea_edg <- system.file(
             "params/default/prepare_features_edges.yaml",
@@ -372,7 +354,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_fea_tab,
-        format = "file",
         command = {
           par_def_pre_fea_tab <- system.file(
             "params/default/prepare_features_tables.yaml",
@@ -382,7 +363,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_rt,
-        format = "file",
         command = {
           par_def_pre_lib_rt <- system.file(
             "params/default/prepare_libraries_rt.yaml",
@@ -392,7 +372,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_sop_clo,
-        format = "file",
         command = {
           par_def_pre_lib_sop_clo <- system.file(
             "params/default/prepare_libraries_sop_closed.yaml",
@@ -402,7 +381,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_sop_ecm,
-        format = "file",
         command = {
           par_def_pre_lib_sop_ecm <- system.file(
             "params/default/prepare_libraries_sop_ecmdb.yaml",
@@ -412,7 +390,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_sop_hmd,
-        format = "file",
         command = {
           par_def_pre_lib_sop_hmd <- system.file(
             "params/default/prepare_libraries_sop_hmdb.yaml",
@@ -422,7 +399,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_sop_lot,
-        format = "file",
         command = {
           par_def_pre_lib_sop_lot <- system.file(
             "params/default/prepare_libraries_sop_lotus.yaml",
@@ -432,7 +408,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_sop_mer,
-        format = "file",
         command = {
           par_def_pre_lib_sop_mer <- system.file(
             "params/default/prepare_libraries_sop_merged.yaml",
@@ -442,7 +417,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_lib_spe,
-        format = "file",
         command = {
           par_def_pre_lib_spe <- system.file(
             "params/default/prepare_libraries_spectra.yaml",
@@ -452,7 +426,6 @@ list(
       ),
       tar_target(
         name = par_def_pre_tax,
-        format = "file",
         command = {
           par_def_pre_tax <- system.file(
             "params/default/prepare_taxa.yaml",
@@ -462,7 +435,6 @@ list(
       ),
       tar_target(
         name = par_def_wei_ann,
-        format = "file",
         command = {
           par_def_wei_ann <- system.file(
             "params/default/weight_annotations.yaml",
@@ -476,14 +448,12 @@ list(
       list(
         tar_target(
           name = par_pre_par,
-          format = "file",
           command = {
             par_pre_par <- paths$params$prepare_params
           }
         ),
         tar_target(
           name = par_pre_par2,
-          format = "file",
           command = {
             par_pre_par2 <- paths$params$prepare_params_advanced
           }
@@ -511,7 +481,6 @@ list(
       list(
         tar_target(
           name = par_usr_ann_mas,
-          format = "file",
           command = {
             par_usr_ann_mas <-
               tima:::prepare_params(
@@ -523,7 +492,6 @@ list(
         ),
         tar_target(
           name = par_usr_ann_spe,
-          format = "file",
           command = {
             par_usr_ann_spe <-
               tima:::prepare_params(
@@ -535,7 +503,6 @@ list(
         ),
         tar_target(
           name = par_usr_cre_com,
-          format = "file",
           command = {
             par_usr_cre_com <-
               tima:::prepare_params(
@@ -547,7 +514,6 @@ list(
         ),
         tar_target(
           name = par_usr_fil_ann,
-          format = "file",
           command = {
             par_usr_fil_ann <-
               tima:::prepare_params(
@@ -559,7 +525,6 @@ list(
         ),
         tar_target(
           name = par_usr_cre_edg_spe,
-          format = "file",
           command = {
             par_usr_cre_edg_spe <-
               tima:::prepare_params(
@@ -571,7 +536,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_ann_gnp,
-          format = "file",
           command = {
             par_usr_pre_ann_gnp <-
               tima:::prepare_params(
@@ -583,7 +547,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_ann_sir,
-          format = "file",
           command = {
             par_usr_pre_ann_sir <-
               tima:::prepare_params(
@@ -595,7 +558,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_ann_spe,
-          format = "file",
           command = {
             par_usr_pre_ann_spe <-
               tima:::prepare_params(
@@ -607,7 +569,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_fea_com,
-          format = "file",
           command = {
             par_usr_pre_fea_com <-
               tima:::prepare_params(
@@ -619,7 +580,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_fea_edg,
-          format = "file",
           command = {
             par_usr_pre_fea_edg <-
               tima:::prepare_params(
@@ -631,7 +591,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_fea_tab,
-          format = "file",
           command = {
             par_usr_pre_fea_tab <-
               tima:::prepare_params(
@@ -643,7 +602,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_rt,
-          format = "file",
           command = {
             par_usr_pre_lib_rt <-
               tima:::prepare_params(
@@ -655,7 +613,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_sop_clo,
-          format = "file",
           command = {
             par_usr_pre_lib_sop_clo <-
               tima:::prepare_params(
@@ -667,7 +624,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_sop_ecm,
-          format = "file",
           command = {
             par_usr_pre_lib_sop_ecm <-
               tima:::prepare_params(
@@ -679,7 +635,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_sop_hmd,
-          format = "file",
           command = {
             par_usr_pre_lib_sop_hmd <-
               tima:::prepare_params(
@@ -691,7 +646,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_sop_lot,
-          format = "file",
           command = {
             par_usr_pre_lib_sop_lot <-
               tima:::prepare_params(
@@ -703,7 +657,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_sop_mer,
-          format = "file",
           command = {
             par_usr_pre_lib_sop_mer <-
               tima:::prepare_params(
@@ -715,7 +668,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_lib_spe,
-          format = "file",
           command = {
             par_usr_pre_lib_spe <-
               tima:::prepare_params(
@@ -727,7 +679,6 @@ list(
         ),
         tar_target(
           name = par_usr_pre_tax,
-          format = "file",
           command = {
             par_usr_pre_tax <-
               tima:::prepare_params(
@@ -739,7 +690,6 @@ list(
         ),
         tar_target(
           name = par_usr_wei_ann,
-          format = "file",
           command = {
             par_usr_wei_ann <-
               tima:::prepare_params(
@@ -959,7 +909,6 @@ list(
   # list(
   #   tar_target(
   #     name = gnps_tables,
-  #     format = "file",
   #     command = {
   #       gnps_tables <- tima:::get_gnps_tables(
   #         gnps_job_id = par_fin_par$gnps$id,
@@ -978,21 +927,18 @@ list(
   #   list(
   #     tar_target(
   #       name = gnps_features,
-  #       format = "file",
   #       command = {
   #         gnps_features <- gnps_tables[[1]]
   #       }
   #     ),
   #     tar_target(
   #       name = gnps_metadata,
-  #       format = "file",
   #       command = {
   #         gnps_metadata <- gnps_tables[[2]]
   #       }
   #     ),
   #     tar_target(
   #       name = gnps_spectra,
-  #       format = "file",
   #       command = {
   #         gnps_spectra <- gnps_tables[[3]]
   #       }
@@ -1000,21 +946,17 @@ list(
   #     # TODO think to change this also if uncommenting
   #     tar_target(
   #       name = gnps_annotations,
-  #       format = "file",
-  #       command = {
   #         gnps_annotations <- gnps_tables[[4]]
   #       }
   #     ),
   #     tar_target(
   #       name = gnps_components,
-  #       format = "file",
   #       command = {
   #         gnps_components <- gnps_tables[[5]]
   #       }
   #     ),
   #     tar_target(
   #       name = gnps_edges,
-  #       format = "file",
   #       command = {
   #         gnps_edges <- gnps_tables[[6]]
   #       }
@@ -1031,7 +973,6 @@ list(
     ),
     tar_target(
       name = input_features,
-      format = "file",
       command = {
         input_features <- par_pre_tax_fil_fea_raw
         # input_features <-
@@ -1053,7 +994,6 @@ list(
     ),
     tar_target(
       name = input_spectra,
-      format = "file",
       command = {
         input_spectra <-
           ifelse(
@@ -1090,7 +1030,6 @@ list(
           ## TODO ADD ISDB HMDB,
           tar_target(
             name = lib_spe_is_wik_pos,
-            format = "file",
             command = {
               lib_spe_is_wik_pos <-
                 # if (paths_test_mode == FALSE) {
@@ -1121,7 +1060,6 @@ list(
           ),
           tar_target(
             name = lib_spe_is_wik_neg,
-            format = "file",
             command = {
               lib_spe_is_wik_neg <-
                 # if (paths_test_mode == FALSE) {
@@ -1157,7 +1095,6 @@ list(
         ## TODO ADD IS HMDB PREPARED,
         tar_target(
           name = lib_spe_is_wik_pre_pos,
-          format = "file",
           command = {
             lib_spe_is_wik_pre_pos <-
               lib_spe_is_wik_pos
@@ -1165,7 +1102,6 @@ list(
         ),
         tar_target(
           name = lib_spe_is_wik_pre_neg,
-          format = "file",
           command = {
             lib_spe_is_wik_pre_neg <-
               lib_spe_is_wik_neg
@@ -1173,7 +1109,6 @@ list(
         ),
         tar_target(
           name = lib_spe_is_wik_pre_sop,
-          format = "file",
           command = {
             lib_spe_is_wik_pre_sop <- get_file(
               url = paths_urls_examples_wikidata_spectral_prepared,
@@ -1183,7 +1118,6 @@ list(
         ),
         tar_target(
           name = lib_sop_mer_str_pro,
-          format = "file",
           command = {
             lib_sop_mer_str_pro <- get_file(
               url = paths_urls_examples_structures_processed,
@@ -1201,7 +1135,6 @@ list(
           ## So targets will not check if the input file changed automatically.
           # tar_target(
           #   name = lib_spe_exp_int_raw,
-          # .  format = "file",
           #   command = {
           #     lib_spe_exp_int_raw <-
           #       par_pre_lib_spe$files$libraries$spectral$exp$raw
@@ -1210,7 +1143,6 @@ list(
           ### MassBank
           tar_target(
             name = lib_spe_exp_mb_raw,
-            format = "file",
             command = {
               lib_spe_exp_mb_raw <- tima:::get_massbank_spectra(
                 mb_file = paths_urls_massbank_file,
@@ -1221,7 +1153,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_01_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_01_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1235,7 +1166,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_02_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_02_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1249,7 +1179,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_03_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_03_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1263,7 +1192,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_04_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_04_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1277,7 +1205,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_05_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_05_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1291,7 +1218,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_06_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_06_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1305,7 +1231,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_07_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_07_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1319,7 +1244,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_08_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_08_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1333,7 +1257,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_09_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_09_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1347,7 +1270,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_10_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_10_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1361,7 +1283,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_11_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_11_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1375,7 +1296,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_12_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_12_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1389,7 +1309,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_13_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_13_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1403,7 +1322,6 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_14_raw,
-            format = "file",
             command = {
               lib_spe_exp_mer_14_raw <- tima:::get_last_version_from_zenodo(
                 doi = paths_urls_merlin_doi,
@@ -1420,7 +1338,6 @@ list(
         list(
           tar_target(
             name = lib_spe_exp_int_pre,
-            format = "file",
             command = {
               lib_spe_exp_int_pre <-
                 prepare_libraries_spectra(
@@ -1448,28 +1365,24 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_int_pre_pos,
-            format = "file",
             command = {
               lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
             }
           ),
           tar_target(
             name = lib_spe_exp_int_pre_neg,
-            format = "file",
             command = {
               lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
             }
           ),
           tar_target(
             name = lib_spe_exp_int_pre_sop,
-            format = "file",
             command = {
               lib_spe_exp_int_pre_sop <- lib_spe_exp_int_pre[[3]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mb_pre,
-            format = "file",
             command = {
               lib_spe_exp_mb_pre <-
                 prepare_libraries_spectra(
@@ -1502,28 +1415,24 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mb_pre_pos,
-            format = "file",
             command = {
               lib_spe_exp_mb_pre_pos <- lib_spe_exp_mb_pre[[1]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mb_pre_neg,
-            format = "file",
             command = {
               lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mb_pre_sop,
-            format = "file",
             command = {
               lib_spe_exp_mb_pre_sop <- lib_spe_exp_mb_pre[[3]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mer_pre,
-            format = "file",
             command = {
               lib_spe_exp_mer_pre <-
                 prepare_libraries_spectra(
@@ -1567,21 +1476,18 @@ list(
           ),
           tar_target(
             name = lib_spe_exp_mer_pre_pos,
-            format = "file",
             command = {
               lib_spe_exp_mer_pre_pos <- lib_spe_exp_mer_pre[[1]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mer_pre_neg,
-            format = "file",
             command = {
               lib_spe_exp_mer_pre_neg <- lib_spe_exp_mer_pre[[2]]
             }
           ),
           tar_target(
             name = lib_spe_exp_mer_pre_sop,
-            format = "file",
             command = {
               lib_spe_exp_mer_pre_sop <- lib_spe_exp_mer_pre[[3]]
             }
@@ -1592,7 +1498,6 @@ list(
     ## Retention times
     list(tar_target(
       name = lib_rt,
-      format = "file",
       command = {
         lib_rt <- prepare_libraries_rt(
           mgf_exp = par_pre_lib_rt$files$libraries$temporal$exp$mgf,
@@ -1613,14 +1518,12 @@ list(
     )),
     tar_target(
       name = lib_rt_rts,
-      format = "file",
       command = {
         lib_rt_rts <- lib_rt[[1]]
       }
     ),
     tar_target(
       name = lib_rt_sop,
-      format = "file",
       command = {
         lib_rt_sop <- lib_rt[[2]]
       }
@@ -1633,14 +1536,12 @@ list(
         ## So targets will not check if the input file changed automatically.
         # tar_target(
         #   name = lib_sop_clo,
-        #   format = "file",
         #   command = {
         #     lib_sop_clo <- paths$data$source$libraries$sop$closed
         #   }
         # ),
         tar_target(
           name = lib_sop_ecm,
-          format = "file",
           command = {
             ## Because ECMDB certificate is expired
             lib_sop_ecm <- tryCatch(
@@ -1663,7 +1564,6 @@ list(
         ),
         tar_target(
           name = lib_sop_hmd,
-          format = "file",
           command = {
             lib_sop_hmd <- tryCatch(
               expr = {
@@ -1696,7 +1596,6 @@ list(
         ## TODO ADD GET HMDB
         tar_target(
           name = lib_sop_lot,
-          format = "file",
           command = {
             lib_sop_lot <- tryCatch(
               expr = {
@@ -1725,7 +1624,6 @@ list(
       list(
         tar_target(
           name = lib_sop_clo_pre,
-          format = "file",
           command = {
             lib_sop_clo_pre <-
               prepare_libraries_sop_closed(
@@ -1736,7 +1634,6 @@ list(
         ),
         tar_target(
           name = lib_sop_ecm_pre,
-          format = "file",
           command = {
             lib_sop_ecm_pre <-
               prepare_libraries_sop_ecmdb(
@@ -1747,7 +1644,6 @@ list(
         ),
         tar_target(
           name = lib_sop_hmd_pre,
-          format = "file",
           command = {
             lib_sop_hmd_pre <-
               prepare_libraries_sop_hmdb(
@@ -1758,7 +1654,6 @@ list(
         ),
         tar_target(
           name = lib_sop_lot_pre,
-          format = "file",
           command = {
             lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
@@ -1776,7 +1671,6 @@ list(
       list(
         tar_target(
           name = lib_sop_mer,
-          format = "file",
           command = {
             lib_sop_mer <- prepare_libraries_sop_merged(
               files = c(
@@ -1806,49 +1700,42 @@ list(
         ),
         tar_target(
           name = lib_mer_key,
-          format = "file",
           command = {
             lib_mer_key <- lib_sop_mer[[1]]
           }
         ),
         tar_target(
           name = lib_mer_org_tax_ott,
-          format = "file",
           command = {
             lib_mer_org_tax_ott <- lib_sop_mer[[2]]
           }
         ),
         tar_target(
           name = lib_mer_str_stereo,
-          format = "file",
           command = {
             lib_mer_str_stereo <- lib_sop_mer[[3]]
           }
         ),
         tar_target(
           name = lib_mer_str_met,
-          format = "file",
           command = {
             lib_mer_str_met <- lib_sop_mer[[4]]
           }
         ),
         tar_target(
           name = lib_mer_str_nam,
-          format = "file",
           command = {
             lib_mer_str_nam <- lib_sop_mer[[5]]
           }
         ),
         tar_target(
           name = lib_mer_str_tax_cla,
-          format = "file",
           command = {
             lib_mer_str_tax_cla <- lib_sop_mer[[6]]
           }
         ),
         tar_target(
           name = lib_mer_str_tax_npc,
-          format = "file",
           command = {
             lib_mer_str_tax_npc <- lib_sop_mer[[7]]
           }
@@ -1862,7 +1749,6 @@ list(
     list(
       tar_target(
         name = ann_ms1_pre,
-        format = "file",
         command = {
           ann_ms1_pre <-
             annotate_masses(
@@ -1888,7 +1774,6 @@ list(
       ),
       tar_target(
         name = ann_ms1_pre_ann,
-        format = "file",
         command = {
           ann_ms1_pre_ann <-
             ann_ms1_pre[[1]]
@@ -1896,7 +1781,6 @@ list(
       ),
       tar_target(
         name = ann_ms1_pre_edg,
-        format = "file",
         command = {
           ann_ms1_pre_edg <- ann_ms1_pre[[2]]
         }
@@ -1908,7 +1792,6 @@ list(
       list(
         tar_target(
           name = ann_spe_exp_gnp_pre,
-          format = "file",
           command = {
             ann_spe_exp_gnp_pre <-
               prepare_annotations_gnps(
@@ -1929,7 +1812,6 @@ list(
         ## TODO improve polarity handling, suboptimal
         tar_target(
           name = ann_spe_pos,
-          format = "file",
           command = {
             ann_spe_pos <- annotate_spectra(
               input = input_spectra,
@@ -1958,7 +1840,6 @@ list(
         ),
         tar_target(
           name = ann_spe_neg,
-          format = "file",
           command = {
             ann_spe_neg <- annotate_spectra(
               input = input_spectra,
@@ -1987,7 +1868,6 @@ list(
         ),
         tar_target(
           name = ann_spe_pre,
-          format = "file",
           command = {
             ann_spe_pre <- prepare_annotations_spectra(
               input = c(
@@ -2008,7 +1888,6 @@ list(
     # SIRIUS
     tar_target(
       name = ann_sir_pre,
-      format = "file",
       command = {
         ann_sir_pre <-
           prepare_annotations_sirius(
@@ -2027,21 +1906,18 @@ list(
     ),
     tar_target(
       name = ann_sir_pre_can,
-      format = "file",
       command = {
         ann_sir_pre_can <- ann_sir_pre[[1]]
       }
     ),
     tar_target(
       name = ann_sir_pre_for,
-      format = "file",
       command = {
         ann_sir_pre_for <- ann_sir_pre[[2]]
       }
     ),
     tar_target(
       name = ann_sir_pre_str,
-      format = "file",
       command = {
         ann_sir_pre_str <- ann_sir_pre[[3]]
       }
@@ -2052,7 +1928,6 @@ list(
   list(
     tar_target(
       name = fea_edg_spe,
-      format = "file",
       command = {
         fea_edg_spe <- create_edges_spectra(
           input = input_spectra,
@@ -2069,7 +1944,6 @@ list(
     ),
     tar_target(
       name = fea_com,
-      format = "file",
       command = {
         fea_com <- create_components(
           input = fea_edg_pre,
@@ -2081,7 +1955,6 @@ list(
     list(
       tar_target(
         name = int_com,
-        format = "file",
         command = {
           int_com <- fea_com
           # int_com <-
@@ -2094,7 +1967,6 @@ list(
       ),
       tar_target(
         name = edg_spe,
-        format = "file",
         command = {
           edg_spe <- fea_edg_spe
           # edg_spe <-
@@ -2107,7 +1979,6 @@ list(
     ),
     tar_target(
       name = fea_edg_pre,
-      format = "file",
       command = {
         fea_edg_pre <- prepare_features_edges(
           input = c("ms1" = ann_ms1_pre_edg, "spectral" = edg_spe),
@@ -2119,7 +1990,6 @@ list(
     ),
     tar_target(
       name = fea_com_pre,
-      format = "file",
       command = {
         fea_com_pre <- prepare_features_components(
           input = int_com,
@@ -2129,7 +1999,6 @@ list(
     ),
     tar_target(
       name = fea_pre,
-      format = "file",
       command = {
         fea_pre <- prepare_features_tables(
           features = input_features,
@@ -2143,7 +2012,6 @@ list(
   ),
   tar_target(
     name = tax_pre,
-    format = "file",
     command = {
       tax_pre <- prepare_taxa(
         input = input_features,
@@ -2161,7 +2029,6 @@ list(
   ),
   tar_target(
     name = ann_fil,
-    format = "file",
     command = {
       ann_fil <- filter_annotations(
         annotations = c(
@@ -2179,7 +2046,6 @@ list(
   ),
   tar_target(
     name = ann_pre,
-    format = "file",
     command = {
       ann_pre <- weight_annotations(
         library = lib_mer_key,
@@ -2266,7 +2132,6 @@ list(
     ),
     tar_target(
       name = benchmark_zip,
-      format = "file",
       command = {
         benchmark_zip <- get_file(
           url = benchmark_path_url,
@@ -2277,7 +2142,6 @@ list(
     ),
     tar_target(
       name = benchmark_file,
-      format = "file",
       command = {
         utils::unzip(zipfile = benchmark_zip)
         dir.create(dirname(benchmark_path_file), recursive = TRUE)
@@ -2291,7 +2155,6 @@ list(
     ),
     tar_target(
       name = benchmark_converted,
-      format = "file",
       command = {
         sp <- benchmark_file |>
           import_spectra()
@@ -2305,7 +2168,6 @@ list(
     ),
     tar_target(
       name = benchmark_prepared,
-      format = "file",
       command = {
         sp <- benchmark_converted |>
           import_spectra()
@@ -2540,35 +2402,30 @@ list(
     ),
     tar_target(
       name = benchmark_pre_mgf_pos,
-      format = "file",
       command = {
         benchmark_pre_mgf_pos <- benchmark_prepared[[1]]
       }
     ),
     tar_target(
       name = benchmark_pre_mgf_neg,
-      format = "file",
       command = {
         benchmark_pre_mgf_neg <- benchmark_prepared[[2]]
       }
     ),
     tar_target(
       name = benchmark_pre_meta_pos,
-      format = "file",
       command = {
         benchmark_pre_meta_pos <- benchmark_prepared[[3]]
       }
     ),
     tar_target(
       name = benchmark_pre_meta_neg,
-      format = "file",
       command = {
         benchmark_pre_meta_neg <- benchmark_prepared[[4]]
       }
     ),
     tar_target(
       name = benchmark_taxed_pos,
-      format = "file",
       command = {
         benchmark_taxed_pos <- benchmark_pre_meta_pos |>
           tima:::benchmark_taxize_spectra(
@@ -2580,7 +2437,6 @@ list(
     ),
     tar_target(
       name = benchmark_taxed_neg,
-      format = "file",
       command = {
         benchmark_taxed_neg <- benchmark_pre_meta_neg |>
           tima:::benchmark_taxize_spectra(
@@ -2601,7 +2457,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_ms1_pre_pos,
-      format = "file",
       command = {
         benchmark_ann_ms1_pre_pos <-
           annotate_masses(
@@ -2627,7 +2482,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_ms1_pre_neg,
-      format = "file",
       command = {
         benchmark_ann_ms1_pre_neg <-
           annotate_masses(
@@ -2662,7 +2516,6 @@ list(
     ),
     tar_target(
       name = benchmark_edg_spe_pos,
-      format = "file",
       command = {
         benchmark_edg_spe_pos <- create_edges_spectra(
           input = benchmark_pre_mgf_pos,
@@ -2678,7 +2531,6 @@ list(
     ),
     tar_target(
       name = benchmark_edg_spe_neg,
-      format = "file",
       command = {
         benchmark_edg_spe_neg <- create_edges_spectra(
           input = benchmark_pre_mgf_neg,
@@ -2703,7 +2555,6 @@ list(
     ),
     tar_target(
       name = benchmark_edg_pre_pos,
-      format = "file",
       command = {
         benchmark_edg_pre_pos <- prepare_features_edges(
           input = list(
@@ -2718,7 +2569,6 @@ list(
     ),
     tar_target(
       name = benchmark_edg_pre_neg,
-      format = "file",
       command = {
         benchmark_edg_pre_neg <- prepare_features_edges(
           input = list(
@@ -2742,7 +2592,6 @@ list(
     ),
     tar_target(
       name = benchmark_com_pos,
-      format = "file",
       command = {
         benchmark_com_pos <- create_components(
           input = benchmark_edg_pre_pos,
@@ -2752,7 +2601,6 @@ list(
     ),
     tar_target(
       name = benchmark_com_neg,
-      format = "file",
       command = {
         benchmark_com_neg <- create_components(
           input = benchmark_edg_pre_neg,
@@ -2771,7 +2619,6 @@ list(
     ),
     tar_target(
       name = benchmark_com_pre_pos,
-      format = "file",
       command = {
         benchmark_com_pre_pos <- prepare_features_components(
           input = benchmark_com_pos,
@@ -2781,7 +2628,6 @@ list(
     ),
     tar_target(
       name = benchmark_com_pre_neg,
-      format = "file",
       command = {
         benchmark_com_pre_neg <- prepare_features_components(
           input = benchmark_com_neg,
@@ -2800,7 +2646,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_spe_pos,
-      format = "file",
       command = {
         benchmark_ann_spe_pos <- annotate_spectra(
           input = benchmark_pre_mgf_pos,
@@ -2822,7 +2667,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_spe_neg,
-      format = "file",
       command = {
         benchmark_ann_spe_neg <- annotate_spectra(
           input = benchmark_pre_mgf_neg,
@@ -2853,7 +2697,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_spe_pre_pos,
-      format = "file",
       command = {
         benchmark_ann_spe_pre_pos <- prepare_annotations_spectra(
           input = c(benchmark_ann_spe_pos),
@@ -2868,7 +2711,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_spe_pre_neg,
-      format = "file",
       command = {
         benchmark_ann_spe_pre_neg <- prepare_annotations_spectra(
           input = c(benchmark_ann_spe_neg),
@@ -2892,7 +2734,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_sir_pre,
-      format = "file",
       command = {
         benchmark_ann_sir_pre <-
           prepare_annotations_sirius(
@@ -2910,21 +2751,18 @@ list(
     ),
     tar_target(
       name = benchmark_ann_sir_pre_can,
-      format = "file",
       command = {
         benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_for,
-      format = "file",
       command = {
         benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_str,
-      format = "file",
       command = {
         benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
       }
@@ -2940,7 +2778,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_spe_neg,
-      format = "file",
       command = {
         benchmark_ann_fil_spe_neg <- filter_annotations(
           annotations = c(
@@ -2956,7 +2793,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_spe_ms1_neg,
-      format = "file",
       command = {
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
           annotations = c(
@@ -2973,7 +2809,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_ms1_neg,
-      format = "file",
       command = {
         benchmark_ann_fil_ms1_neg <- filter_annotations(
           annotations = c(
@@ -2989,7 +2824,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_spe_pos,
-      format = "file",
       command = {
         benchmark_ann_fil_spe_pos <- filter_annotations(
           annotations = c(
@@ -3005,7 +2839,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_spe_ms1_pos,
-      format = "file",
       command = {
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
           annotations = c(
@@ -3022,7 +2855,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_fil_ms1_pos,
-      format = "file",
       command = {
         benchmark_ann_fil_ms1_pos <- filter_annotations(
           annotations = c(
@@ -3112,7 +2944,6 @@ list(
     ),
     # tar_target(
     #   name = benchmark_ann_pre_ms1_pos,
-    # .  format = "file",
     #   command = {
     #     benchmark_ann_pre_ms1_pos <-
     #       do.call(
@@ -3132,7 +2963,6 @@ list(
     # ),
     tar_target(
       name = benchmark_ann_pre_ms2_b_pos,
-      format = "file",
       command = {
         benchmark_ann_pre_ms2_b_pos <-
           do.call(
@@ -3152,7 +2982,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_pos,
-      format = "file",
       command = {
         benchmark_ann_pre_ms1_ms2_b_pos <-
           do.call(
@@ -3172,7 +3001,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms2_b_c_pos,
-      format = "file",
       command = {
         benchmark_ann_pre_ms2_b_c_pos <-
           do.call(
@@ -3192,7 +3020,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_c_pos,
-      format = "file",
       command = {
         benchmark_ann_pre_ms1_ms2_b_c_pos <-
           do.call(
@@ -3212,7 +3039,6 @@ list(
     ),
     # tar_target(
     #   name = benchmark_ann_pre_ms1_neg,
-    # .  format = "file",
     #   command = {
     #     benchmark_ann_pre_ms1_neg <-
     #       do.call(
@@ -3232,7 +3058,6 @@ list(
     # ),
     tar_target(
       name = benchmark_ann_pre_ms2_b_neg,
-      format = "file",
       command = {
         benchmark_ann_pre_ms2_b_neg <-
           do.call(
@@ -3252,7 +3077,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_neg,
-      format = "file",
       command = {
         benchmark_ann_pre_ms1_ms2_b_neg <-
           do.call(
@@ -3272,7 +3096,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms2_b_c_neg,
-      format = "file",
       command = {
         benchmark_ann_pre_ms2_b_c_neg <-
           do.call(
@@ -3292,7 +3115,6 @@ list(
     ),
     tar_target(
       name = benchmark_ann_pre_ms1_ms2_b_c_neg,
-      format = "file",
       command = {
         benchmark_ann_pre_ms1_ms2_b_c_neg <-
           do.call(

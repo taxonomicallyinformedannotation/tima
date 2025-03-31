@@ -140,9 +140,7 @@ filter_annotations <-
 
     if (!is.null(rts)) {
       logger::log_info(
-        "Filtering annotations outside of
-        {tolerance_rt}
-        minutes tolerance"
+        "Filtering annotations outside of {tolerance_rt} minutes tolerance"
       )
       features_annotated_table_2 <- features_annotated_table_1 |>
         tidytable::left_join(rt_table) |>
