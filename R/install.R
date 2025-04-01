@@ -80,6 +80,8 @@ install <- function(
   }
   if (!success || isTRUE(test)) {
     logger::log_fatal("All installation attempts failed")
+    stop()
   }
   copy_backbone()
+  targets::tar_destroy(ask = FALSE)
 }

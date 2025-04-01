@@ -61,16 +61,13 @@ Sys.setenv(TAR_WARN = "false")
 targets::tar_visnetwork(
   names = starts_with("ann"),
   exclude = c(
-    tidyselect::contains("benchmark"),
-    tidyselect::contains("par_"),
-    tidyselect::contains("gnps"),
-    tidyselect::contains("input"),
-    tidyselect::contains("paths"),
-    tidyselect::contains("_is"),
-    tidyselect::contains("_exp"),
-    tidyselect::contains("library_sop_lotus"),
-    tidyselect::contains("library_sop_closed")
-  ),
+    "benchmark",
+    "par_",
+    "paths",
+    "_is",
+    "_exp"
+  ) |> 
+    tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
 )

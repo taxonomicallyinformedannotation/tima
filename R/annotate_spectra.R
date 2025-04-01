@@ -144,10 +144,11 @@ annotate_spectra <- function(
       tidytable::distinct() |>
       ## temporary fix
       tidytable::mutate(
-        unique_connectivities = ifelse(
-          test = library == "ISDB - Wikidata",
-          yes = spectra,
-          no = unique_connectivities
+        unique_connectivities = tidytable::case_when(
+          library == "ISDB - Wikidata" ~ spectra,
+          ## solved now (using <10.5281/zenodo.11566051> instead of <10.5281/zenodo.11193898>)
+          # library == "gnps" ~ NA_integer_,
+          TRUE ~ unique_connectivities
         )
       ) |>
       tidytable::arrange(

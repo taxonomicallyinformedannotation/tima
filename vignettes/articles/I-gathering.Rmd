@@ -168,8 +168,9 @@ The process to download LOTUS looks like this:
 targets::tar_visnetwork(
   names = tidyselect::matches("lib_sop_lot"),
   exclude = c(
-    tidyselect::contains("benchmark"),
-  ),
+    "benchmark"
+  ) |>
+    tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -217,10 +218,11 @@ targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
   exclude = c(
-    tidyselect::contains("benchmark"),
-    tidyselect::contains("par_"),
-    tidyselect::contains("paths")
-  ),
+    "benchmark",
+    "par_",
+    "paths"
+  ) |> 
+    tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
 )

@@ -145,10 +145,11 @@ Note that starting from SIRIUS6, the _approx_ confidence score is the one consid
 targets::tar_visnetwork(
   names = starts_with("ann_s"),
   exclude = c(
-    tidyselect::contains("benchmark"),
-    tidyselect::contains("par_"),
-    tidyselect::contains("paths")
-  ),
+    "benchmark",
+    "par_",
+    "paths"
+  ) |> 
+    tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -227,10 +228,11 @@ You are almost there! See already all the steps accomplished!
 targets::tar_visnetwork(
   names = tidyselect::matches("^ann"),
   exclude = c(
-    tidyselect::contains("benchmark"),
-    tidyselect::contains("par_"),
-    tidyselect::contains("paths")
-  ),
+    "benchmark",
+    "par_",
+    "paths"
+  ) |> 
+    tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
 )
