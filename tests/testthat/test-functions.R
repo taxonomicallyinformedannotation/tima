@@ -214,8 +214,8 @@ testthat::test_that(desc = "Test functions", code = {
   #### ISDB
   ## smaller version for testing
   # get_file(
-  #   url = paths$urls$examples$spectral_lib$pos,
-  #   export = paths$data$source$libraries$spectra$is$wikidata$pos |>
+  #   url = paths$urls$spectra$pos$isdb,
+  #   export = paths$data$interim$libraries$spectra$is$pos$isdb |>
   #     gsub(
   #       pattern = "isdb_pos.mgf",
   #       replacement = "lotus_pos.rds",
@@ -224,11 +224,11 @@ testthat::test_that(desc = "Test functions", code = {
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$pos,
-    export = paths$data$source$libraries$spectra$is$wikidata$pos
+    export = paths$data$interim$libraries$spectra$is$pos$isdb
   )
   # get_file(
-  #   url = paths$urls$examples$spectral_lib$neg,
-  #   export = paths$data$source$libraries$spectra$is$wikidata$neg |>
+  #   url = paths$urls$spectra$neg$isdb,
+  #   export = paths$data$interim$libraries$spectra$is$neg$isdb |>
   #     gsub(
   #       pattern = "isdb_neg.mgf",
   #       replacement = "lotus_neg.rds",
@@ -237,21 +237,16 @@ testthat::test_that(desc = "Test functions", code = {
   # )
   get_file(
     url = paths$urls$examples$spectral_lib_mini$neg,
-    export = paths$data$source$libraries$spectra$is$wikidata$neg
+    export = paths$data$interim$libraries$spectra$is$neg$isdb
   )
   get_file(
-    url = paths$urls$examples$wikidata_spectral_prepared,
-    export = paths$data$interim$libraries$sop$wikidata
+    url = paths$urls$sop$isdb,
+    export = paths$data$interim$libraries$sop$isdb
   )
   get_file(
     url = paths$urls$examples$structures_processed,
     export = paths$data$interim$libraries$sop$merged$structures$processed
   )
-
-  #### MassBank
-  get_massbank_spectra()
-  ## test it does not download it a second time
-  get_massbank_spectra()
 
   ## Prepare libraries
   ### If does not exist

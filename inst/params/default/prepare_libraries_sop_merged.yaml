@@ -11,6 +11,8 @@ files:
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
+        #' GNPS prepared structure organism pairs library. STRING
+        gnps: data/interim/libraries/sop/gnps_11193898_prepared.tsv.gz
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         #' Lotus prepared structure organism pairs library. STRING
@@ -18,11 +20,11 @@ files:
         #' RT prepared structure organism pairs library. STRING
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
         #' Massbank spectral prepared structure organism pairs library. STRING
-        massbank: data/interim/libraries/sop/massbank_prepared.tsv.gz
+        massbank: data/interim/libraries/sop/massbank_202411_prepared.tsv.gz
         #' Merlin spectral prepared structure organism pairs library. STRING
-        merlin: data/interim/libraries/sop/merlin_prepared.tsv.gz
+        merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
         #' Wikidata spectral prepared structure organism pairs library. STRING
-        wikidata: data/interim/libraries/sop/wikidata_spectral_prepared.tsv.gz
+        wikidata: data/interim/libraries/sop/wikidata_spectral_5607185_prepared.tsv.gz
 
       #' Merged structure organism pairs library.
       merged:

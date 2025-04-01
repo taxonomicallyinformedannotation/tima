@@ -144,7 +144,6 @@ Collate:
     'get_example_files.R'
     'get_gnps_tables.R'
     'get_last_version_from_zenodo.R'
-    'get_massbank_spectra.R'
     'get_organism_taxonomy_ott.R'
     'globals.R'
     'harmonize_names_sirius.R'
