@@ -24,16 +24,6 @@
 #' }
 get_file <-
   function(url, export, limit = 3600) {
-    # ## Use default system data directory
-    # export <- file.path(
-    #   rappdirs::user_data_dir(
-    #     appname = appname,
-    #     appauthor = appauthor,
-    #     version = version
-    #   ),
-    #   export
-    # )
-
     if (!file.exists(export)) {
       options(timeout = limit)
       create_dir(export = export)
@@ -51,16 +41,21 @@ get_file <-
             },
             error = function(e) {
               logger::log_error(
-                "Something seems wrong...retrying... attempt ",
+                "Something went wrong...retrying... attempt ",
                 i
               )
+              logger::log_error(e |> paste())
             }
           )
         }
         return(FALSE)
       }
       if (!download_with_retry(url = url, destfile = export)) {
-        stop("Failed to download the file after multiple attempts.")
+        logger::log_fatal(
+          "Failed to download the file after multiple attempts."
+        )
+        file.remove(export)
+        stop()
       }
     } else {
       logger::log_info("File already exists. Skipping.")
