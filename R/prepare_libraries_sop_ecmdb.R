@@ -28,7 +28,7 @@ prepare_libraries_sop_ecmdb <-
       step = "prepare_libraries_sop_ecmdb"
     )$files$libraries$sop$prepared$ecmdb
   ) {
-    if (!file.exists(output) && file.size(output) > 100000) {
+    if (!file.exists(output) || file.size(output) < 100000) {
       if (file.exists(input)) {
         logger::log_trace("Loading ECMDB resources")
 

@@ -30,7 +30,7 @@ prepare_libraries_sop_hmdb <-
       step = "prepare_libraries_sop_hmdb"
     )$files$libraries$sop$prepared$hmdb
   ) {
-    if (!file.exists(output) && file.size(output) > 100000) {
+    if (!file.exists(output) || file.size(output) < 100000) {
       if (file.exists(input)) {
         logger::log_trace("Unzipping HMDB")
         hmdb_prepared <- tryCatch(
