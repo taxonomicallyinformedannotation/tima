@@ -42,219 +42,15 @@ list(
         name = yaml_paths,
         command = {
           yaml_paths <- system.file("paths.yaml", package = "tima")
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = paths,
         command = {
           paths <- get_default_paths(yaml = yaml_paths)
-        }
-      ),
-      # tar_target(
-      #   name = paths_gnps_example_id,
-      #   command = {
-      #     paths_gnps_example_id <- paths$gnps$example
-      #   }
-      # ),
-      # tar_target(
-      #   name = paths_source,
-      #   command = {
-      #     paths_source <- paths$data$source$path
-      #   }
-      # ),
-      # tar_target(
-      #   name = paths_interim_a,
-      #   command = {
-      #     paths_interim_a <- paths$data$interim$annotations$path
-      #   }
-      # ),
-      # tar_target(
-      #   name = paths_interim_f,
-      #   command = {
-      #     paths_interim_f <- paths$data$interim$features$path
-      #   }
-      # ),
-      tar_target(
-        name = paths_test_mode,
-        command = {
-          paths_test_mode <- paths$tests$mode
-        }
-      ),
-      tar_target(
-        name = paths_urls_massbank_file,
-        command = {
-          paths_urls_massbank_file <- paths$urls$massbank$file
-        }
-      ),
-      tar_target(
-        name = paths_urls_massbank_url,
-        command = {
-          paths_urls_massbank_url <- paths$urls$massbank$url
-        }
-      ),
-      tar_target(
-        name = paths_urls_massbank_version,
-        command = {
-          paths_urls_massbank_version <- paths$urls$massbank$version
-        }
-      ),
-      tar_target(
-        name = paths_urls_examples_spectra_mini,
-        command = {
-          paths_urls_examples_spectra_mini <- paths$urls$examples$spectra_mini
-        }
-      ),
-      tar_target(
-        name = paths_urls_examples_structures_processed,
-        command = {
-          paths_urls_examples_structures_processed <- paths$urls$examples$structures_processed
-        }
-      ),
-      tar_target(
-        name = paths_urls_examples_wikidata_spectral_prepared,
-        command = {
-          paths_urls_examples_wikidata_spectral_prepared <- paths$urls$examples$wikidata_spectral_prepared
-        }
-      ),
-      tar_target(
-        name = paths_data_source_spectra,
-        command = {
-          paths_data_source_spectra <- paths$data$source$spectra
-        }
-      ),
-      tar_target(
-        name = paths_urls_ecmdb_metabolites,
-        command = {
-          paths_urls_ecmdb_metabolites <- paths$urls$ecmdb$metabolites
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_sop_ecmdb,
-        command = {
-          paths_data_source_libraries_sop_ecmdb <-
-            paths$data$source$libraries$sop$ecmdb
-        }
-      ),
-      tar_target(
-        name = paths_urls_hmdb_structures,
-        command = {
-          paths_urls_hmdb_structures <- paths$urls$hmdb$structures
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_sop_hmdb,
-        command = {
-          paths_data_source_libraries_sop_hmdb <-
-            paths$data$source$libraries$sop$hmdb
-        }
-      ),
-      tar_target(
-        name = paths_urls_lotus_doi,
-        command = {
-          paths_urls_lotus_doi <- paths$urls$lotus$doi
-        }
-      ),
-      tar_target(
-        name = paths_urls_lotus_pattern,
-        command = {
-          paths_urls_lotus_pattern <- paths$urls$lotus$pattern
-        }
-      ),
-      tar_target(
-        name = paths_urls_merlin_doi,
-        command = {
-          paths_urls_merlin_doi <- paths$urls$merlin$doi
-        }
-      ),
-      tar_target(
-        name = paths_urls_merlin_pattern,
-        command = {
-          paths_urls_merlin_pattern <- paths$urls$merlin$pattern
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_sop_lotus,
-        command = {
-          paths_data_source_libraries_sop_lotus <-
-            paths$data$source$libraries$sop$lotus
-        }
-      ),
-      tar_target(
-        name = paths_data_interim_libraries_sop_wikidata,
-        command = {
-          paths_data_interim_libraries_sop_wikidata <-
-            paths$data$interim$libraries$sop$wikidata
-        }
-      ),
-      tar_target(
-        name = paths_urls_examples_spectral_lib_pos,
-        command = {
-          paths_urls_examples_spectral_lib_pos <-
-            paths$urls$examples$spectral_lib$pos
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_spectra_exp_path,
-        command = {
-          paths_data_source_libraries_spectra_exp_path <-
-            paths$data$source$libraries$spectra$exp$path
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_spectra_is_wikidata_pos,
-        command = {
-          paths_data_source_libraries_spectra_is_wikidata_pos <-
-            paths$data$source$libraries$spectra$is$wikidata$pos
-        }
-      ),
-      tar_target(
-        name = paths_urls_examples_spectral_lib_neg,
-        command = {
-          paths_urls_examples_spectral_lib_neg <-
-            paths$urls$examples$spectral_lib$neg
-        }
-      ),
-      tar_target(
-        name = paths_data_source_libraries_spectra_is_wikidata_neg,
-        command = {
-          paths_data_source_libraries_spectra_is_wikidata_neg <-
-            paths$data$source$libraries$spectra$is$wikidata$neg
-        }
-      ),
-      tar_target(
-        name = paths_urls_benchmarking_set,
-        command = {
-          paths_urls_benchmarking_set <-
-            paths$urls$benchmarking_set
-        }
-      ),
-      tar_target(
-        name = paths_data_source_benchmark_zip,
-        command = {
-          paths_data_source_benchmark_zip <-
-            paths$data$source$benchmark$zip
-        }
-      ),
-      tar_target(
-        name = paths_data_source_benchmark_cleaned,
-        command = {
-          paths_data_source_benchmark_cleaned <-
-            paths$data$source$benchmark$cleaned
-        }
-      ),
-      tar_target(
-        name = paths_data_source_benchmark_mgf_neg,
-        command = {
-          paths_data_source_benchmark_mgf_neg <-
-            paths$data$source$benchmark$mgf$neg
-        }
-      ),
-      tar_target(
-        name = paths_data_source_benchmark_mgf_pos,
-        command = {
-          paths_data_source_benchmark_mgf_pos <-
-            paths$data$source$benchmark$mgf$pos
-        }
+        },
+        format = "rds"
       )
     )
   ),
@@ -269,7 +65,8 @@ list(
             "params/default/annotate_masses.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_ann_spe,
@@ -278,7 +75,8 @@ list(
             "params/default/annotate_spectra.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_cre_com,
@@ -287,7 +85,8 @@ list(
             "params/default/create_components.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_cre_edg_spe,
@@ -296,7 +95,8 @@ list(
             "params/default/create_edges_spectra.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_fil_ann,
@@ -305,7 +105,8 @@ list(
             "params/default/filter_annotations.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_ann_gnp,
@@ -314,7 +115,8 @@ list(
             "params/default/prepare_annotations_gnps.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_ann_sir,
@@ -323,7 +125,8 @@ list(
             "params/default/prepare_annotations_sirius.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_ann_spe,
@@ -332,7 +135,8 @@ list(
             "params/default/prepare_annotations_spectra.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_fea_com,
@@ -341,7 +145,8 @@ list(
             "params/default/prepare_features_components.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_fea_edg,
@@ -350,7 +155,8 @@ list(
             "params/default/prepare_features_edges.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_fea_tab,
@@ -359,7 +165,8 @@ list(
             "params/default/prepare_features_tables.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_rt,
@@ -368,7 +175,8 @@ list(
             "params/default/prepare_libraries_rt.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_sop_clo,
@@ -377,7 +185,8 @@ list(
             "params/default/prepare_libraries_sop_closed.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_sop_ecm,
@@ -386,7 +195,8 @@ list(
             "params/default/prepare_libraries_sop_ecmdb.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_sop_hmd,
@@ -395,7 +205,8 @@ list(
             "params/default/prepare_libraries_sop_hmdb.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_sop_lot,
@@ -404,7 +215,8 @@ list(
             "params/default/prepare_libraries_sop_lotus.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_sop_mer,
@@ -413,7 +225,8 @@ list(
             "params/default/prepare_libraries_sop_merged.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_lib_spe,
@@ -422,7 +235,8 @@ list(
             "params/default/prepare_libraries_spectra.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_pre_tax,
@@ -431,7 +245,8 @@ list(
             "params/default/prepare_taxa.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = par_def_wei_ann,
@@ -440,7 +255,8 @@ list(
             "params/default/weight_annotations.yaml",
             package = "tima"
           )
-        }
+        },
+        format = "auto"
       )
     ),
     list(
@@ -450,13 +266,15 @@ list(
           name = par_pre_par,
           command = {
             par_pre_par <- paths$params$prepare_params
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_pre_par2,
           command = {
             par_pre_par2 <- paths$params$prepare_params_advanced
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_fin_par,
@@ -465,7 +283,8 @@ list(
               def = par_pre_par,
               usr = par_pre_par
             )
-          }
+          },
+          format = "rds"
         ),
         tar_target(
           name = par_fin_par2,
@@ -474,7 +293,8 @@ list(
               def = par_pre_par2,
               usr = par_pre_par2
             )
-          }
+          },
+          format = "rds"
         )
       ),
       ## User
@@ -488,7 +308,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "annotate_masses"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_ann_spe,
@@ -499,7 +320,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "annotate_spectra"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_cre_com,
@@ -510,7 +332,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "create_components"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_fil_ann,
@@ -521,7 +344,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "filter_annotations"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_cre_edg_spe,
@@ -532,7 +356,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "create_edges_spectra"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_ann_gnp,
@@ -543,7 +368,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_gnps"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_ann_sir,
@@ -554,7 +380,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_sirius"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_ann_spe,
@@ -565,7 +392,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_spectra"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_fea_com,
@@ -576,7 +404,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_features_components"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_fea_edg,
@@ -587,7 +416,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_features_edges"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_fea_tab,
@@ -598,7 +428,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_features_tables"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_rt,
@@ -609,7 +440,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_rt"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_sop_clo,
@@ -620,7 +452,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_closed"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_sop_ecm,
@@ -631,7 +464,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_ecmdb"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_sop_hmd,
@@ -642,7 +476,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_hmdb"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_sop_lot,
@@ -653,7 +488,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_lotus"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_sop_mer,
@@ -664,7 +500,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_merged"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_lib_spe,
@@ -675,7 +512,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_spectra"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_pre_tax,
@@ -686,7 +524,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "prepare_taxa"
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = par_usr_wei_ann,
@@ -697,7 +536,8 @@ list(
                 params_advanced = par_fin_par2,
                 step = "weight_annotations"
               )
-          }
+          },
+          format = "auto"
         )
       )
     ),
@@ -709,9 +549,10 @@ list(
           par_ann_mas <-
             tima:::parse_yaml_params(
               def = par_def_ann_mas,
-              usr = par_usr_ann_mas[1]
+              usr = par_usr_ann_mas[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_ann_spe,
@@ -719,9 +560,10 @@ list(
           par_ann_spe <-
             tima:::parse_yaml_params(
               def = par_def_ann_spe,
-              usr = par_usr_ann_spe[1]
+              usr = par_usr_ann_spe[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_cre_com,
@@ -729,9 +571,10 @@ list(
           par_cre_com <-
             tima:::parse_yaml_params(
               def = par_def_cre_com,
-              usr = par_usr_cre_com[1]
+              usr = par_usr_cre_com[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_cre_edg_spe,
@@ -739,9 +582,10 @@ list(
           par_cre_edg_spe <-
             tima:::parse_yaml_params(
               def = par_def_cre_edg_spe,
-              usr = par_usr_cre_edg_spe[1]
+              usr = par_usr_cre_edg_spe[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_fil_ann,
@@ -749,9 +593,10 @@ list(
           par_fil_ann <-
             tima:::parse_yaml_params(
               def = par_def_fil_ann,
-              usr = par_usr_fil_ann[1]
+              usr = par_usr_fil_ann[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_ann_gnp,
@@ -759,9 +604,10 @@ list(
           par_pre_ann_gnp <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_gnp,
-              usr = par_usr_pre_ann_gnp[1]
+              usr = par_usr_pre_ann_gnp[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_ann_sir,
@@ -769,9 +615,10 @@ list(
           par_pre_ann_sir <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_sir,
-              usr = par_usr_pre_ann_sir[1]
+              usr = par_usr_pre_ann_sir[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_ann_spe,
@@ -779,9 +626,10 @@ list(
           par_pre_ann_spe <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_spe,
-              usr = par_usr_pre_ann_spe[1]
+              usr = par_usr_pre_ann_spe[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_fea_com,
@@ -789,9 +637,10 @@ list(
           par_pre_fea_com <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_com,
-              usr = par_usr_pre_fea_com[1]
+              usr = par_usr_pre_fea_com[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_fea_edg,
@@ -799,9 +648,10 @@ list(
           par_pre_fea_edg <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_edg,
-              usr = par_usr_pre_fea_edg[1]
+              usr = par_usr_pre_fea_edg[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_fea_tab,
@@ -809,9 +659,10 @@ list(
           par_pre_fea_tab <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_tab,
-              usr = par_usr_pre_fea_tab[1]
+              usr = par_usr_pre_fea_tab[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_rt,
@@ -819,9 +670,10 @@ list(
           par_pre_lib_rt <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_rt,
-              usr = par_usr_pre_lib_rt[1]
+              usr = par_usr_pre_lib_rt[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_sop_clo,
@@ -829,9 +681,10 @@ list(
           par_pre_lib_sop_clo <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_clo,
-              usr = par_usr_pre_lib_sop_clo[1]
+              usr = par_usr_pre_lib_sop_clo[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_sop_ecm,
@@ -839,9 +692,10 @@ list(
           par_pre_lib_sop_ecm <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_ecm,
-              usr = par_usr_pre_lib_sop_ecm[1]
+              usr = par_usr_pre_lib_sop_ecm[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_sop_hmd,
@@ -849,9 +703,10 @@ list(
           par_pre_lib_sop_hmd <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_hmd,
-              usr = par_usr_pre_lib_sop_hmd[1]
+              usr = par_usr_pre_lib_sop_hmd[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_sop_lot,
@@ -859,9 +714,10 @@ list(
           par_pre_lib_sop_lot <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_lot,
-              usr = par_usr_pre_lib_sop_lot[1]
+              usr = par_usr_pre_lib_sop_lot[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_sop_mer,
@@ -869,9 +725,10 @@ list(
           par_pre_lib_sop_mer <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_mer,
-              usr = par_usr_pre_lib_sop_mer[1]
+              usr = par_usr_pre_lib_sop_mer[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_lib_spe,
@@ -879,9 +736,10 @@ list(
           par_pre_lib_spe <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_spe,
-              usr = par_usr_pre_lib_spe[1]
+              usr = par_usr_pre_lib_spe[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_pre_tax,
@@ -889,9 +747,10 @@ list(
           par_pre_tax <-
             tima:::parse_yaml_params(
               def = par_def_pre_tax,
-              usr = par_usr_pre_tax[1]
+              usr = par_usr_pre_tax[[1]]
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = par_wei_ann,
@@ -899,77 +758,21 @@ list(
           par_wei_ann <-
             tima:::parse_yaml_params(
               def = par_def_wei_ann,
-              usr = par_usr_wei_ann[1]
+              usr = par_usr_wei_ann[[1]]
             )
-        }
+        },
+        format = "rds"
       )
     )
   ),
-  # ## GNPS
-  # list(
-  #   tar_target(
-  #     name = gnps_tables,
-  #     command = {
-  #       gnps_tables <- tima:::get_gnps_tables(
-  #         gnps_job_id = par_fin_par$gnps$id,
-  #         gnps_job_example = paths_gnps_example_id,
-  #         filename = par_fin_par$files$pattern,
-  #         workflow = par_fin_par$gnps$workflow,
-  #         path_features = par_pre_fea_tab$files$features$raw,
-  #         path_metadata = par_pre_tax$files$metadata$raw,
-  #         path_spectra = par_ann_spe$files$spectral$raw,
-  #         path_source = paths_source,
-  #         path_interim_a = paths_interim_a,
-  #         path_interim_f = paths_interim_f
-  #       )
-  #     }
-  #   ),
-  #   list(
-  #     tar_target(
-  #       name = gnps_features,
-  #       command = {
-  #         gnps_features <- gnps_tables[[1]]
-  #       }
-  #     ),
-  #     tar_target(
-  #       name = gnps_metadata,
-  #       command = {
-  #         gnps_metadata <- gnps_tables[[2]]
-  #       }
-  #     ),
-  #     tar_target(
-  #       name = gnps_spectra,
-  #       command = {
-  #         gnps_spectra <- gnps_tables[[3]]
-  #       }
-  #     ),
-  #     # TODO think to change this also if uncommenting
-  #     tar_target(
-  #       name = gnps_annotations,
-  #         gnps_annotations <- gnps_tables[[4]]
-  #       }
-  #     ),
-  #     tar_target(
-  #       name = gnps_components,
-  #       command = {
-  #         gnps_components <- gnps_tables[[5]]
-  #       }
-  #     ),
-  #     tar_target(
-  #       name = gnps_edges,
-  #       command = {
-  #         gnps_edges <- gnps_tables[[6]]
-  #       }
-  #     )
-  #   )
-  # ),
   ## Inputs
   list(
     tar_target(
       name = par_pre_tax_fil_fea_raw,
       command = {
         par_pre_tax_fil_fea_raw <- par_pre_tax$files$features$raw
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = input_features,
@@ -984,20 +787,22 @@ list(
         #     ),
         #     no = par_pre_tax$files$features$raw
         #   )
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = par_ann_spe_fil_spe_raw,
       command = {
         par_ann_spe_fil_spe_raw <- par_ann_spe$files$spectral$raw
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = input_spectra,
       command = {
         input_spectra <-
           ifelse(
-            test = paths_test_mode == FALSE,
+            test = paths$test$mode == FALSE,
             yes = par_ann_spe_fil_spe_raw,
             # yes = ifelse(
             #   test = !is.null(gnps_spectra),
@@ -1011,12 +816,13 @@ list(
             # ),
             no = {
               get_file(
-                url = paths_urls_examples_spectra_mini,
-                export = paths_data_source_spectra
+                url = paths$urls$examples$spectra$mini,
+                export = paths$data$source$spectra
               )
             }
           )
-      }
+      },
+      format = "auto"
     )
   ),
   ## libraries
@@ -1029,101 +835,51 @@ list(
         list(
           ## TODO ADD ISDB HMDB,
           tar_target(
-            name = lib_spe_is_wik_pos,
+            name = lib_spe_is_wik_pre_pos,
             command = {
-              lib_spe_is_wik_pos <-
-                # if (paths_test_mode == FALSE) {
+              lib_spe_is_wik_pre_pos <-
                 get_file(
-                  url = paths_urls_examples_spectral_lib_pos,
-                  export = paths_data_source_libraries_spectra_is_wikidata_pos |>
-                    gsub(
-                      pattern = "isdb_wikidata_pos_energySum.mgf",
-                      replacement = "wikidata_pos.rds",
-                      fixed = TRUE
-                    )
+                  url = paths$urls$spectra$pos$isdb,
+                  export = paths$data$interim$libraries$spectra$is$pos$isdb
                 )
-              # get_last_version_from_zenodo(
-              #   doi = paths_urls_lotus_isdb_doi,
-              #   pattern = paths_urls_lotus_isdb_pattern_pos,
-              #   path = paths_data_source_libraries_spectra_is_wikidata_pos
-              # )
-              # } else {
-              #   get_file(
-              #     url = paths_urls_examples_spectral_lib_pos,
-              #     export = paths_data_source_libraries_spectra_is_wikidata_pos
-              #   )
-              # }
             },
-            ## To always check if a newest version is available
-            cue = tar_cue(mode = "always")
-            # cue = tar_cue(mode = "thorough")
+            format = "auto"
           ),
           tar_target(
-            name = lib_spe_is_wik_neg,
+            name = lib_spe_is_wik_pre_neg,
             command = {
-              lib_spe_is_wik_neg <-
-                # if (paths_test_mode == FALSE) {
+              lib_spe_is_wik_pre_neg <-
                 get_file(
-                  url = paths_urls_examples_spectral_lib_neg,
-                  export = paths_data_source_libraries_spectra_is_wikidata_neg |>
-                    gsub(
-                      pattern = "isdb_wikidata_neg_energySum.mgf",
-                      replacement = "wikidata_neg.rds",
-                      fixed = TRUE
-                    )
+                  url = paths$urls$spectra$neg$isdb,
+                  export = paths$data$interim$libraries$spectra$is$neg$isdb
                 )
-              # get_last_version_from_zenodo(
-              #   doi = paths_urls_lotus_isdb_doi,
-              #   pattern = paths_urls_lotus_isdb_pattern_neg,
-              #   path = paths_data_source_libraries_spectra_is_wikidata_neg
-              # )
-              # } else {
-              #   get_file(
-              #     url = paths_urls_examples_spectral_lib_neg,
-              #     export = paths_data_source_libraries_spectra_is_wikidata_neg
-              #   )
-              # }
             },
-            ## To always check if a newest version is available
-            cue = tar_cue(mode = "always")
-            # cue = tar_cue(mode = "thorough")
+            format = "auto"
           )
         )
       ),
       ## Prepared
       list(
-        ## TODO ADD IS HMDB PREPARED,
-        tar_target(
-          name = lib_spe_is_wik_pre_pos,
-          command = {
-            lib_spe_is_wik_pre_pos <-
-              lib_spe_is_wik_pos
-          }
-        ),
-        tar_target(
-          name = lib_spe_is_wik_pre_neg,
-          command = {
-            lib_spe_is_wik_pre_neg <-
-              lib_spe_is_wik_neg
-          }
-        ),
+        ## TODO ADD IS HMDB PREPARED
         tar_target(
           name = lib_spe_is_wik_pre_sop,
           command = {
             lib_spe_is_wik_pre_sop <- get_file(
-              url = paths_urls_examples_wikidata_spectral_prepared,
-              export = paths_data_interim_libraries_sop_wikidata
+              url = paths$urls$sop$isdb,
+              export = paths$data$interim$libraries$sop$isdb
             )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_sop_mer_str_pro,
           command = {
             lib_sop_mer_str_pro <- get_file(
-              url = paths_urls_examples_structures_processed,
+              url = paths$urls$examples$structures$processed,
               export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
             )
-          }
+          },
+          format = "auto"
         )
       ),
       ## Experimental
@@ -1140,198 +896,107 @@ list(
           #       par_pre_lib_spe$files$libraries$spectral$exp$raw
           #   }
           # ),
+          ### GNPS
+          tar_target(
+            name = lib_spe_exp_gnp_pre_pos,
+            command = {
+              lib_spe_exp_gnp_pre_pos <-
+                get_file(
+                  url = paths$urls$spectra$exp$pos$gnps,
+                  export = paths$data$interim$libraries$spectra$exp$pos$gnps
+                )
+            },
+            format = "auto"
+          ),
+          tar_target(
+            name = lib_spe_exp_gnp_pre_neg,
+            command = {
+              lib_spe_exp_gnp_pre_neg <-
+                get_file(
+                  url = paths$urls$spectra$exp$neg$gnps,
+                  export = paths$data$interim$libraries$spectra$exp$neg$gnps
+                )
+            },
+            format = "auto"
+          ),
+          tar_target(
+            name = lib_spe_exp_gnp_pre_sop,
+            command = {
+              lib_spe_exp_gnp_pre_sop <-
+                get_file(
+                  url = paths$urls$sop$gnps,
+                  export = paths$data$interim$libraries$sop$gnps
+                )
+            },
+            format = "auto"
+          ),
           ### MassBank
           tar_target(
-            name = lib_spe_exp_mb_raw,
+            name = lib_spe_exp_mb_pre_pos,
             command = {
-              lib_spe_exp_mb_raw <- tima:::get_massbank_spectra(
-                mb_file = paths_urls_massbank_file,
-                mb_url = paths_urls_massbank_url,
-                mb_version = paths_urls_massbank_version
-              )
-            }
+              lib_spe_exp_mb_pre_pos <-
+                get_file(
+                  url = paths$urls$spectra$exp$pos$massbank,
+                  export = paths$data$interim$libraries$spectra$exp$pos$massbank
+                )
+            },
+            format = "auto"
           ),
           tar_target(
-            name = lib_spe_exp_mer_01_raw,
+            name = lib_spe_exp_mb_pre_neg,
             command = {
-              lib_spe_exp_mer_01_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$enamdisc_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$enamdisc_neg
+              lib_spe_exp_mb_pre_neg <-
+                get_file(
+                  url = paths$urls$spectra$exp$neg$massbank,
+                  export = paths$data$interim$libraries$spectra$exp$neg$massbank
                 )
-              )
-            }
+            },
+            format = "auto"
           ),
           tar_target(
-            name = lib_spe_exp_mer_02_raw,
+            name = lib_spe_exp_mb_pre_sop,
             command = {
-              lib_spe_exp_mer_02_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$enamdisc_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$enamdisc_pos
+              lib_spe_exp_mb_pre_sop <-
+                get_file(
+                  url = paths$urls$sop$massbank,
+                  export = paths$data$interim$libraries$sop$massbank
                 )
-              )
-            }
+            },
+            format = "auto"
+          ),
+          ### Merlin
+          tar_target(
+            name = lib_spe_exp_mer_pre_pos,
+            command = {
+              lib_spe_exp_mer_pre_pos <-
+                get_file(
+                  url = paths$urls$spectra$exp$pos$merlin,
+                  export = paths$data$interim$libraries$spectra$exp$pos$merlin
+                )
+            },
+            format = "auto"
           ),
           tar_target(
-            name = lib_spe_exp_mer_03_raw,
+            name = lib_spe_exp_mer_pre_neg,
             command = {
-              lib_spe_exp_mer_03_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$enammol_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$enammol_neg
+              lib_spe_exp_mer_pre_neg <-
+                get_file(
+                  url = paths$urls$spectr$exp$neg$merlin,
+                  export = paths$data$interim$libraries$spectra$exp$neg$merlin
                 )
-              )
-            }
+            },
+            format = "auto"
           ),
           tar_target(
-            name = lib_spe_exp_mer_04_raw,
+            name = lib_spe_exp_mer_pre_sop,
             command = {
-              lib_spe_exp_mer_04_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$enammol_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$enammol_pos
+              lib_spe_exp_mer_pre_sop <-
+                get_file(
+                  url = paths$urls$sop$merlin,
+                  export = paths$data$interim$libraries$sop$merlin
                 )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_05_raw,
-            command = {
-              lib_spe_exp_mer_05_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcebio_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcebio_neg
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_06_raw,
-            command = {
-              lib_spe_exp_mer_06_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcebio_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcebio_pos
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_07_raw,
-            command = {
-              lib_spe_exp_mer_07_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcedrug_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcedrug_neg
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_08_raw,
-            command = {
-              lib_spe_exp_mer_08_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcedrug_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcedrug_pos
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_09_raw,
-            command = {
-              lib_spe_exp_mer_09_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcescaf_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcescaf_neg
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_10_raw,
-            command = {
-              lib_spe_exp_mer_10_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$mcescaf_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$mcescaf_pos
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_11_raw,
-            command = {
-              lib_spe_exp_mer_11_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$nihnp_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$nihnp_neg
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_12_raw,
-            command = {
-              lib_spe_exp_mer_12_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$nihnp_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$nihnp_pos
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_13_raw,
-            command = {
-              lib_spe_exp_mer_13_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$otavapep_neg,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$otavapep_neg
-                )
-              )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_14_raw,
-            command = {
-              lib_spe_exp_mer_14_raw <- tima:::get_last_version_from_zenodo(
-                doi = paths_urls_merlin_doi,
-                pattern = paths_urls_merlin_pattern$otavapep_pos,
-                path = file.path(
-                  paths_data_source_libraries_spectra_exp_path,
-                  paths_urls_merlin_pattern$otavapep_pos
-                )
-              )
-            }
+            },
+            format = "auto"
           )
         ),
         ## Prepared
@@ -1361,136 +1026,29 @@ list(
                   col_sy = par_pre_lib_spe$names$mgf$synonyms,
                   col_xl = par_pre_lib_spe$names$mgf$xlogp
                 )
-            }
+            },
+            format = "rds"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_pos,
             command = {
               lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
-            }
+            },
+            format = "auto"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_neg,
             command = {
               lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
-            }
+            },
+            format = "auto"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_sop,
             command = {
               lib_spe_exp_int_pre_sop <- lib_spe_exp_int_pre[[3]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre,
-            command = {
-              lib_spe_exp_mb_pre <-
-                prepare_libraries_spectra(
-                  input = lib_spe_exp_mb_raw,
-                  nam_lib = paste(
-                    "massbank",
-                    paths_urls_massbank_version |>
-                      gsub(pattern = ".", replacement = "_", fixed = TRUE),
-                    sep = "_"
-                  ),
-                  col_ad = "Precursor_type",
-                  col_ce = "Collision_energy",
-                  col_ci = NULL,
-                  col_em = "ExactMass",
-                  col_in = "InChI",
-                  col_io = NULL,
-                  col_ik = "InChIKey",
-                  col_il = NULL,
-                  col_mf = "Formula",
-                  col_na = "Name",
-                  col_po = "Ion_mode",
-                  col_sm = "smiles",
-                  col_sn = NULL,
-                  col_si = "accession",
-                  col_sp = "Splash",
-                  col_sy = "Synon",
-                  col_xl = NULL
-                )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre_pos,
-            command = {
-              lib_spe_exp_mb_pre_pos <- lib_spe_exp_mb_pre[[1]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre_neg,
-            command = {
-              lib_spe_exp_mb_pre_neg <- lib_spe_exp_mb_pre[[2]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mb_pre_sop,
-            command = {
-              lib_spe_exp_mb_pre_sop <- lib_spe_exp_mb_pre[[3]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_pre,
-            command = {
-              lib_spe_exp_mer_pre <-
-                prepare_libraries_spectra(
-                  input = c(
-                    lib_spe_exp_mer_01_raw,
-                    lib_spe_exp_mer_02_raw,
-                    lib_spe_exp_mer_03_raw,
-                    lib_spe_exp_mer_03_raw,
-                    lib_spe_exp_mer_04_raw,
-                    lib_spe_exp_mer_05_raw,
-                    lib_spe_exp_mer_06_raw,
-                    lib_spe_exp_mer_07_raw,
-                    lib_spe_exp_mer_08_raw,
-                    lib_spe_exp_mer_09_raw,
-                    lib_spe_exp_mer_10_raw,
-                    lib_spe_exp_mer_11_raw,
-                    lib_spe_exp_mer_12_raw,
-                    lib_spe_exp_mer_13_raw,
-                    lib_spe_exp_mer_14_raw
-                  ),
-                  nam_lib = "merlin",
-                  col_ad = "ADDUCT",
-                  col_ce = "COLLISION_ENERGY",
-                  col_ci = NULL,
-                  col_em = "EXACTMASS",
-                  col_in = "INCHI",
-                  col_io = NULL,
-                  col_ik = "INCHIAUX",
-                  col_il = NULL,
-                  col_mf = "FORMULA",
-                  col_na = "NAME",
-                  col_po = "IONMODE",
-                  col_sm = "SMILES",
-                  col_sn = NULL,
-                  col_si = "USI",
-                  col_sp = NULL,
-                  col_sy = NULL,
-                  col_xl = NULL
-                )
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_pre_pos,
-            command = {
-              lib_spe_exp_mer_pre_pos <- lib_spe_exp_mer_pre[[1]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_pre_neg,
-            command = {
-              lib_spe_exp_mer_pre_neg <- lib_spe_exp_mer_pre[[2]]
-            }
-          ),
-          tar_target(
-            name = lib_spe_exp_mer_pre_sop,
-            command = {
-              lib_spe_exp_mer_pre_sop <- lib_spe_exp_mer_pre[[3]]
-            }
+            },
+            format = "auto"
           )
         )
       )
@@ -1514,19 +1072,22 @@ list(
           name_smiles = par_pre_lib_rt$names$smiles,
           unit_rt = par_pre_lib_rt$units$rt
         )
-      }
+      },
+      format = "rds"
     )),
     tar_target(
       name = lib_rt_rts,
       command = {
         lib_rt_rts <- lib_rt[[1]]
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = lib_rt_sop,
       command = {
         lib_rt_sop <- lib_rt[[2]]
-      }
+      },
+      format = "auto"
     ),
     ## Structure organism pairs
     list(
@@ -1547,20 +1108,21 @@ list(
             lib_sop_ecm <- tryCatch(
               expr = {
                 get_file(
-                  url = paths_urls_ecmdb_metabolites,
-                  export = paths_data_source_libraries_sop_ecmdb
+                  url = paths$urls$ecmdb$metabolites,
+                  export = paths$data$source$libraries$sop$ecmdb
                 )
               },
               error = function(e) {
-                return(tima:::fake_ecmdb(
-                  export = paths_data_source_libraries_sop_ecmdb
-                ))
+                tima:::fake_ecmdb(
+                  export = paths$data$source$libraries$sop$ecmdb
+                )
               },
               finally = {
-                return(paths_data_source_libraries_sop_ecmdb)
+                paths$data$source$libraries$sop$ecmdb
               }
             )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_sop_hmd,
@@ -1568,8 +1130,8 @@ list(
             lib_sop_hmd <- tryCatch(
               expr = {
                 get_file(
-                  url = paths_urls_hmdb_structures,
-                  export = paths_data_source_libraries_sop_hmdb
+                  url = paths$urls$hmdb$structures,
+                  export = paths$data$source$libraries$sop$hmdb
                 )
               },
               warning = function(w) {
@@ -1577,21 +1139,22 @@ list(
                 logger::log_warn(
                   "HMDB download failed partially, returning empty file instead"
                 )
-                unlink(paths_data_source_libraries_sop_hmdb)
-                return(tima:::fake_hmdb(
-                  export = paths_data_source_libraries_sop_hmdb
-                ))
+                unlink(paths$data$source$libraries$sop$hmdb)
+                tima:::fake_hmdb(
+                  export = paths$data$source$libraries$sop$hmdb
+                )
               },
               error = function(e) {
-                return(tima:::fake_hmdb(
-                  export = paths_data_source_libraries_sop_hmdb
-                ))
+                tima:::fake_hmdb(
+                  export = paths$data$source$libraries$sop$hmdb
+                )
               },
               finally = {
-                return(paths_data_source_libraries_sop_hmdb)
+                paths$data$source$libraries$sop$hmdb
               }
             )
-          }
+          },
+          format = "auto"
         ),
         ## TODO ADD GET HMDB
         tar_target(
@@ -1600,24 +1163,22 @@ list(
             lib_sop_lot <- tryCatch(
               expr = {
                 get_last_version_from_zenodo(
-                  doi = paths_urls_lotus_doi,
-                  pattern = paths_urls_lotus_pattern,
-                  path = paths_data_source_libraries_sop_lotus
+                  doi = paths$urls$lotus$doi,
+                  pattern = paths$urls$lotus$pattern,
+                  path = paths$data$source$libraries$sop$lotus
                 )
               },
               error = function(e) {
-                return(tima:::fake_lotus(
-                  export = paths_data_source_libraries_sop_lotus
-                ))
+                tima:::fake_lotus(
+                  export = paths$data$source$libraries$sop$lotus
+                )
               },
               finally = {
-                return(paths_data_source_libraries_sop_lotus)
+                paths$data$source$libraries$sop$lotus
               }
             )
           },
-          ## To always check if a newest version is available
-          cue = tar_cue(mode = "always")
-          # cue = tar_cue(mode = "thorough")
+          format = "auto"
         )
       ),
       ## Prepared
@@ -1630,7 +1191,8 @@ list(
                 input = par_pre_lib_sop_clo$files$libraries$sop$raw$closed,
                 output = par_pre_lib_sop_clo$files$libraries$sop$prepared$closed
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_sop_ecm_pre,
@@ -1640,7 +1202,8 @@ list(
                 input = lib_sop_ecm,
                 output = par_pre_lib_sop_ecm$files$libraries$sop$prepared$ecmdb
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_sop_hmd_pre,
@@ -1650,21 +1213,23 @@ list(
                 input = lib_sop_hmd,
                 output = par_pre_lib_sop_hmd$files$libraries$sop$prepared$hmdb
               )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_sop_lot_pre,
           command = {
             lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
-                input = if (paths_test_mode == FALSE) {
+                input = if (paths$test$mode == FALSE) {
                   lib_sop_lot
                 } else {
-                  paths_data_source_libraries_sop_lotus
+                  paths$data$source$libraries$sop$lotus
                 },
                 output = par_pre_lib_sop_lot$files$libraries$sop$prepared$lotus
               )
-          }
+          },
+          format = "auto"
         )
       ),
       ## Merged
@@ -1680,6 +1245,7 @@ list(
                 lib_sop_lot_pre,
                 lib_rt_sop,
                 lib_spe_exp_int_pre_sop,
+                lib_spe_exp_gnp_pre_sop,
                 lib_spe_exp_mb_pre_sop,
                 lib_spe_exp_mer_pre_sop,
                 lib_spe_is_wik_pre_sop
@@ -1696,49 +1262,57 @@ list(
               output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
               output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
             )
-          }
+          },
+          format = "rds"
         ),
         tar_target(
           name = lib_mer_key,
           command = {
             lib_mer_key <- lib_sop_mer[[1]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_org_tax_ott,
           command = {
             lib_mer_org_tax_ott <- lib_sop_mer[[2]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_str_stereo,
           command = {
             lib_mer_str_stereo <- lib_sop_mer[[3]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_str_met,
           command = {
             lib_mer_str_met <- lib_sop_mer[[4]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_str_nam,
           command = {
             lib_mer_str_nam <- lib_sop_mer[[5]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_str_tax_cla,
           command = {
             lib_mer_str_tax_cla <- lib_sop_mer[[6]]
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = lib_mer_str_tax_npc,
           command = {
             lib_mer_str_tax_npc <- lib_sop_mer[[7]]
-          }
+          },
+          format = "auto"
         )
       )
     )
@@ -1770,20 +1344,23 @@ list(
               tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
               tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
             )
-        }
+        },
+        format = "rds"
       ),
       tar_target(
         name = ann_ms1_pre_ann,
         command = {
           ann_ms1_pre_ann <-
             ann_ms1_pre[[1]]
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = ann_ms1_pre_edg,
         command = {
           ann_ms1_pre_edg <- ann_ms1_pre[[2]]
-        }
+        },
+        format = "auto"
       )
     ),
     ## Spectral
@@ -1804,7 +1381,8 @@ list(
                 str_tax_cla = lib_mer_str_tax_cla,
                 str_tax_npc = lib_mer_str_tax_npc
               )
-          }
+          },
+          format = "auto"
         )
       ),
       ## Classic
@@ -1819,6 +1397,7 @@ list(
                 lib_spe_is_wik_pre_pos,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_pos,
+                lib_spe_exp_gnp_pre_pos,
                 lib_spe_exp_mb_pre_pos,
                 lib_spe_exp_mer_pre_pos
               ),
@@ -1836,7 +1415,8 @@ list(
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
               approx = par_ann_spe$annotations$ms2approx
             )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = ann_spe_neg,
@@ -1847,6 +1427,7 @@ list(
                 lib_spe_is_wik_pre_neg,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_neg,
+                lib_spe_exp_gnp_pre_neg,
                 lib_spe_exp_mb_pre_neg,
                 lib_spe_exp_mer_pre_neg
               ),
@@ -1864,7 +1445,8 @@ list(
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
               approx = par_ann_spe$annotations$ms2approx
             )
-          }
+          },
+          format = "auto"
         ),
         tar_target(
           name = ann_spe_pre,
@@ -1881,7 +1463,8 @@ list(
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc
             )
-          }
+          },
+          format = "auto"
         )
       )
     ),
@@ -1902,25 +1485,29 @@ list(
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc
           )
-      }
+      },
+      format = "rds"
     ),
     tar_target(
       name = ann_sir_pre_can,
       command = {
         ann_sir_pre_can <- ann_sir_pre[[1]]
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = ann_sir_pre_for,
       command = {
         ann_sir_pre_for <- ann_sir_pre[[2]]
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = ann_sir_pre_str,
       command = {
         ann_sir_pre_str <- ann_sir_pre[[3]]
-      }
+      },
+      format = "auto"
     ),
     list()
   ),
@@ -1940,7 +1527,8 @@ list(
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
         )
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = fea_com,
@@ -1949,7 +1537,8 @@ list(
           input = fea_edg_pre,
           output = par_cre_com$files$networks$spectral$components$raw
         )
-      }
+      },
+      format = "auto"
     ),
     ## Interim
     list(
@@ -1963,7 +1552,8 @@ list(
           #   } else {
           #     gnps_components
           #   }
-        }
+        },
+        format = "auto"
       ),
       tar_target(
         name = edg_spe,
@@ -1974,7 +1564,8 @@ list(
           #     yes = fea_edg_spe,
           #     no = gnps_edges
           #   )
-        }
+        },
+        format = "auto"
       )
     ),
     tar_target(
@@ -1986,7 +1577,8 @@ list(
           name_source = par_pre_fea_edg$names$source,
           name_target = par_pre_fea_edg$names$target
         )
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = fea_com_pre,
@@ -1995,7 +1587,8 @@ list(
           input = int_com,
           output = par_pre_fea_com$files$networks$spectral$components$prepared
         )
-      }
+      },
+      format = "auto"
     ),
     tar_target(
       name = fea_pre,
@@ -2007,7 +1600,8 @@ list(
           name_rt = par_pre_fea_tab$names$rt$features,
           name_mz = par_pre_fea_tab$names$precursor
         )
-      }
+      },
+      format = "auto"
     )
   ),
   tar_target(
@@ -2025,7 +1619,8 @@ list(
         output = par_pre_tax$files$metadata$prepared,
         taxon = par_pre_tax$organisms$taxon
       )
-    }
+    },
+    format = "auto"
   ),
   tar_target(
     name = ann_fil,
@@ -2042,7 +1637,8 @@ list(
         output = par_fil_ann$files$annotations$filtered,
         tolerance_rt = par_fil_ann$ms$tolerances$rt$library
       )
-    }
+    },
+    format = "auto"
   ),
   tar_target(
     name = ann_pre,
@@ -2096,38 +1692,39 @@ list(
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force
       )
-    }
+    },
+    format = "auto"
   ),
   list(
     ## Benchmark
     tar_target(
       name = benchmark_path_url,
       command = {
-        benchmark_path_url <- paths_urls_benchmarking_set
+        benchmark_path_url <- paths$urls$benchmarking$set
       }
     ),
     tar_target(
       name = benchmark_path_zip,
       command = {
-        benchmark_path_zip <- paths_data_source_benchmark_zip
+        benchmark_path_zip <- paths$data$source$benchmark$zip
       }
     ),
     tar_target(
       name = benchmark_path_file,
       command = {
-        benchmark_path_file <- paths_data_source_benchmark_cleaned
+        benchmark_path_file <- paths$data$source$benchmark$cleaned
       }
     ),
     tar_target(
       name = benchmark_path_mgf_neg,
       command = {
-        benchmark_path_mgf_neg <- paths_data_source_benchmark_mgf_neg
+        benchmark_path_mgf_neg <- paths$data$source$benchmark$mgf$neg
       }
     ),
     tar_target(
       name = benchmark_path_mgf_pos,
       command = {
-        benchmark_path_mgf_pos <- paths_data_source_benchmark_mgf_pos
+        benchmark_path_mgf_pos <- paths$data$source$benchmark$mgf$pos
       }
     ),
     tar_target(

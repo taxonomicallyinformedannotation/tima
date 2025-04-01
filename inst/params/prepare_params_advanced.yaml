@@ -112,6 +112,9 @@ files:
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
 
+        #' GNPS prepared structure organism pairs library. STRING
+        gnps: data/interim/libraries/sop/gnps_11193898_prepared.tsv.gz
+        
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
 
@@ -122,13 +125,13 @@ files:
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
         #' Massbank spectral prepared structure organism pairs library. STRING
-        massbank: data/interim/libraries/sop/massbank_prepared.tsv.gz
+        massbank: data/interim/libraries/sop/massbank_202411_prepared.tsv.gz
 
         #' Merlin spectral prepared structure organism pairs library. STRING
-        merlin: data/interim/libraries/sop/merlin_prepared.tsv.gz
+        merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
 
         #' Wikidata spectral prepared structure organism pairs library. STRING
-        wikidata: data/interim/libraries/sop/wikidata_spectral_prepared.tsv.gz
+        wikidata: data/interim/libraries/sop/wikidata_spectral_5607185_prepared.tsv.gz
 
       #' Merged structure organism pairs library.
       merged:
@@ -171,15 +174,17 @@ files:
     spectral:
       #' List of negative spectral libraries. STRING
       neg:
-        - data/interim/libraries/spectra/exp/massbank_neg.rds
-        - data/interim/libraries/spectra/exp/merlin_neg.rds
-        - data/interim/libraries/spectra/is/wikidata_neg.rds
+        - data/interim/libraries/spectra/exp/gnps_11193898_neg.rds
+        - data/interim/libraries/spectra/exp/massbank_202411_neg.rds
+        - data/interim/libraries/spectra/exp/merlin_13911806_neg.rds
+        - data/interim/libraries/spectra/is/wikidata_5607185_neg.rds
 
       #' List of positive spectral libraries. STRING
       pos:
-        - data/interim/libraries/spectra/exp/massbank_pos.rds
-        - data/interim/libraries/spectra/exp/merlin_pos.rds
-        - data/interim/libraries/spectra/is/wikidata_pos.rds
+        - data/interim/libraries/spectra/exp/gnps_11193898_pos.rds
+        - data/interim/libraries/spectra/exp/massbank_202411_pos.rds
+        - data/interim/libraries/spectra/exp/merlin_13911806_pos.rds
+        - data/interim/libraries/spectra/is/wikidata_5607185_pos.rds
 
       #' List of raw spectral libraries. STRING
       raw:

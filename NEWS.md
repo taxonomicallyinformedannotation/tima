@@ -5,6 +5,7 @@
 * Added MERLIN spectral libraries (#190)
 * Added `RDKit`-based structures processing through `reticulate` (#19)
 * Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
+* Externalized spectral libraries preparation to [SpectRalLibRaRies](https://github.com/Adafede/SpectRalLibRaRies)
 * Introduced similarity method argument (entropy and GNPS for now)
 * Implemented GNPS similarity method in C
 * Improved high confidence filtering
