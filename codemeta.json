@@ -548,14 +548,14 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.10.1",
+      "version": ">= 1.10.1.9011",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=targets"
+      "sameAs": "https://github.com/ropensci/targets"
     },
     "31": {
       "@type": "SoftwareApplication",
@@ -630,7 +630,7 @@
     "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2379.997KB",
+  "fileSize": "2383.036KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
