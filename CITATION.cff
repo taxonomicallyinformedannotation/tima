@@ -149,19 +149,6 @@ references:
   doi: 10.18129/B9.bioc.BiocParallel
   version: '>= 1.36.0'
 - type: software
-  title: crayon
-  abstract: 'crayon: Colored Terminal Output'
-  notes: Imports
-  url: https://r-lib.github.io/crayon/
-  repository: https://CRAN.R-project.org/package=crayon
-  authors:
-  - family-names: Csárdi
-    given-names: Gábor
-    email: csardi.gabor@gmail.com
-  year: '2025'
-  doi: 10.32614/CRAN.package.crayon
-  version: '>= 1.5.3'
-- type: software
   title: docopt
   abstract: 'docopt: Command-Line Interface Specification Language'
   notes: Imports
@@ -171,6 +158,8 @@ references:
   - family-names: Jonge
     given-names: Edwin
     name-particle: de
+    email: edwindjonge@gmail.com
+    orcid: https://orcid.org/0000-0002-6580-4718
   year: '2025'
   doi: 10.32614/CRAN.package.docopt
   version: '>= 0.7.1'
@@ -366,6 +355,24 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.jsonlite
   version: '>= 1.9.1'
+- type: software
+  title: logger
+  abstract: 'logger: A Lightweight, Modern and Flexible Logging Utility'
+  notes: Imports
+  url: https://daroczig.github.io/logger/
+  repository: https://CRAN.R-project.org/package=logger
+  authors:
+  - family-names: Daróczi
+    given-names: Gergely
+    email: daroczig@rapporter.net
+    orcid: https://orcid.org/0000-0003-3149-8537
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+    orcid: https://orcid.org/0000-0003-4757-117X
+  year: '2025'
+  doi: 10.32614/CRAN.package.logger
+  version: '>= 0.4.0'
 - type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -663,13 +670,8 @@ references:
   authors:
   - family-names: Gagolewski
     given-names: Marek
+    email: marek@gagolewski.com
     orcid: https://orcid.org/0000-0003-0637-6028
-  - family-names: Tartanus
-    given-names: Bartek
-  - family-names: Unicode
-    given-names: others;
-  - name: Inc.
-  - name: others
   year: '2025'
   doi: 10.32614/CRAN.package.stringi
   version: '>= 1.8.4'
@@ -686,7 +688,7 @@ references:
     orcid: https://orcid.org/0000-0003-1878-3253
   year: '2025'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.10.1'
+  version: '>= 1.10.1.9011'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
