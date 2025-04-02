@@ -342,10 +342,19 @@ testthat::test_that(desc = "Test functions", code = {
     value = "Simaroubaceae|Gentianaceae",
     output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
   )
+  ## To trigger SMILES processing
   prepare_libraries_sop_merged(
-    files = get_params(
-      step = "prepare_libraries_sop_merged"
-    )$files$libraries$sop$prepared$lotus
+    files = c(
+      get_params(
+        step = "prepare_libraries_sop_merged"
+      )$files$libraries$sop$prepared$closed,
+      get_params(
+        step = "prepare_libraries_sop_merged"
+      )$files$libraries$sop$prepared$ecmdb,
+      get_params(
+        step = "prepare_libraries_sop_merged"
+      )$files$libraries$sop$prepared$lotus
+    )
   )
 
   ### Features

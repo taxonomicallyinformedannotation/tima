@@ -18,6 +18,7 @@ process_smiles <- function(
   reticulate::source_python(
     file = system.file("python/process_smiles.py", package = "tima")
   )
+
   table_smiles <- df |>
     tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
     # tidytable::slice_sample(10000L) |>
@@ -29,6 +30,11 @@ process_smiles <- function(
   table_smiles_to_process <- table_smiles |>
     tidytable::anti_join(table_processed_1)
 
+  if (nrow(table_smiles_to_process) == 0) {
+    logger::log_info("No new SMILES to process. Returning cached results.")
+    return(table_processed_1)
+  }
+
   input_smi_file <- tempfile(fileext = ".smi")
   output_csv_file <- tempfile(fileext = ".csv.gz")
 
@@ -37,6 +43,7 @@ process_smiles <- function(
     nrow(table_smiles_to_process),
     " SMILES to RDKit"
   )
+
   tidytable::fwrite(x = table_smiles_to_process, input_smi_file)
 
   # Pass to Python
