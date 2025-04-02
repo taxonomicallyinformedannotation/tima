@@ -165,12 +165,14 @@ annotate_masses <-
     if (!"adduct" %in% colnames(features_table)) {
       logger::log_info("No previously attributed adducts detected")
       features_table$adduct <- NA_character_
+      already_assigned <- tidytable::tidytable(feature_id = NA_character_)
     } else {
+      already_assigned <- features_table |>
+        tidytable::distinct(feature_id, adduct) |>
+        tidytable::filter(!is.na(adduct))
       logger::log_info(
         "Already {
-        nrow(features_table |>
-        tidytable::filter(!is.na(adduct))
-        )
+        nrow(already_assigned)
         } adducts previously detected"
       )
       features_table <- features_table |>
@@ -223,13 +225,29 @@ annotate_masses <-
       tidytable::filter(feature_id != feature_id_dest) |>
       tidytable::filter(mz_dest >= mz) |>
       tidytable::mutate(
+        delta = mz_dest - mz,
         delta_min = (mz_dest -
           (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) -
           mz),
         delta_max = (mz_dest + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz)
       )
 
-    rm(df_rt_tol, features_table)
+    bins <- df_couples_diff[, .N, by = .(bin = cut(delta, breaks = 10000L))] |>
+      tidytable::arrange(N |> tidytable::desc()) |>
+      tidytable::slice_head(n = 10L)
+    logger::log_info(
+      "Here are the top 10 observed m/z differences inside the RT windows:"
+    )
+    logger::log_info(
+      "\n{paste(capture.output(print(bins)), collapse = '\n')}"
+    )
+    logger::log_info(
+      "These differences may help identify potential preprocessing issues"
+    )
+    df_couples_diff <- df_couples_diff |>
+      tidytable::select(-delta)
+
+    rm(df_rt_tol, features_table, bins)
 
     adducts_table <- adducts |>
       tidytable::tidytable() |>
@@ -308,7 +326,9 @@ annotate_masses <-
       tidytable::mutate(l = stringi::stri_length(Group1)) |>
       tidytable::arrange(l) |>
       tidytable::select(-l) |>
-      tidytable::distinct(Distance, .keep_all = TRUE)
+      tidytable::distinct(Distance, .keep_all = TRUE) |>
+      ## Using max because ppm tolerance tends to be overconfident
+      tidytable::filter(Distance >= tolerance_ppm * 1E-6 * max(df_fea_min$mz))
 
     neutral_losses <- neutral_losses_list |>
       tidytable::tidytable() |>
@@ -385,12 +405,14 @@ annotate_masses <-
         adduct = adduct_dest
       )
 
-    ## Always considering [M+H]+ and [M-H]- ions by default
+    ## Always considering [M+H]+ and [M-H]- ions for unassigned features
     df_add_enforced <- df_fea_min |>
       tidytable::distinct(feature_id) |>
+      tidytable::anti_join(already_assigned) |>
       tidytable::mutate(
         adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
       )
+    rm(already_assigned)
 
     df_add_full <- tidytable::bind_rows(df_add_a, df_add_b, df_add_enforced) |>
       tidytable::distinct()
@@ -406,6 +428,7 @@ annotate_masses <-
     df_addlossed <- df_adducted |>
       tidytable::left_join(df_nl_min) |>
       tidytable::bind_rows(df_adducted) |>
+      tidytable::filter(!is.na(adduct)) |>
       tidytable::distinct() |>
       tidytable::mutate(
         adduct = tidytable::if_else(
