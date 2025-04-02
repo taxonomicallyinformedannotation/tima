@@ -504,11 +504,12 @@ testthat::test_that(desc = "Test functions", code = {
     nrow = 1,
     dimnames = list(NULL, c("mz", "int"))
   )
+  # checks some of the internal if's...
   create_edges(
     frags = rep(list(frag_matrix), 3),
     nspecs = 3,
     precs = c(123.456, 234.567, 345.678),
-    method = "entropy",
+    method = "gnps",
     ms2_tolerance = 0.01,
     ppm_tolerance = 10,
     threshold = 0.1
