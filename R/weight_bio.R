@@ -88,78 +88,78 @@ weight_bio <-
       envir = parent.frame()
     )
   ) {
-    df0 <- annotation_table_taxed |>
-      tidytable::distinct(
-        candidate_structure_tax_cla_01kin,
-        candidate_structure_tax_npc_01pat,
-        candidate_structure_tax_cla_02sup,
-        candidate_structure_tax_npc_02sup,
-        candidate_structure_tax_cla_03cla,
-        candidate_structure_tax_npc_03cla,
-        candidate_structure_tax_cla_04dirpar
+    df0 <- structure_organism_pairs_table |>
+      tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
+      tidytable::select(
+        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+        candidate_organism_name = organism_name,
+        candidate_organism_01_domain = organism_taxonomy_01domain,
+        candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
+        candidate_organism_03_phylum = organism_taxonomy_03phylum,
+        candidate_organism_04_class = organism_taxonomy_04class,
+        candidate_organism_05_order = organism_taxonomy_05order,
+        # candidate_organism_05_1_infraorder =
+        # organism_taxonomy_05_1infraorder,
+        candidate_organism_06_family = organism_taxonomy_06family,
+        # candidate_organism_06_1_subfamily =
+        # organism_taxonomy_06_1subfamily,
+        candidate_organism_07_tribe = organism_taxonomy_07tribe,
+        # candidate_organism_07_1_subtribe = organism_taxonomy_07_1subtribe,
+        candidate_organism_08_genus = organism_taxonomy_08genus,
+        # candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
+        candidate_organism_09_species = organism_taxonomy_09species,
+        # candidate_organism_09_1_subspecies =
+        # organism_taxonomy_09_1subspecies,
+        candidate_organism_10_varietas = organism_taxonomy_10varietas
       ) |>
+      tidytable::distinct() |>
       tidytable::mutate(tidytable::across(
-        .cols = tidyselect::matches("candidate_structure_"),
+        .cols = tidyselect::where(is.character),
         .fns = function(x) {
-          tidytable::replace_na(x, "notClassified")
+          tidytable::na_if(x, "")
         }
       ))
-
     df1 <- annotation_table_taxed |>
       tidytable::select(
         candidate_structure_inchikey_connectivity_layer,
-        sample_organism_01_domain,
-        sample_organism_02_kingdom,
-        sample_organism_03_phylum,
-        sample_organism_04_class,
-        sample_organism_05_order,
-        # sample_organism_05_1_infraorder,
-        sample_organism_06_family,
-        # sample_organism_06_1_subfamily,
-        sample_organism_07_tribe,
-        # sample_organism_07_1_subtribe,
-        sample_organism_08_genus,
-        # sample_organism_08_1_subgenus,
-        sample_organism_09_species,
-        # sample_organism_09_1_subspecies,
-        sample_organism_10_varietas
+        sample_organism_name
       ) |>
       tidytable::distinct() |>
       tidytable::left_join(
-        structure_organism_pairs_table |>
-          tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
+        df0 |>
           tidytable::select(
-            candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-            candidate_organism_01_domain = organism_taxonomy_01domain,
-            candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
-            candidate_organism_03_phylum = organism_taxonomy_03phylum,
-            candidate_organism_04_class = organism_taxonomy_04class,
-            candidate_organism_05_order = organism_taxonomy_05order,
-            # candidate_organism_05_1_infraorder =
-            # organism_taxonomy_05_1infraorder,
-            candidate_organism_06_family = organism_taxonomy_06family,
-            # candidate_organism_06_1_subfamily =
-            # organism_taxonomy_06_1subfamily,
-            candidate_organism_07_tribe = organism_taxonomy_07tribe,
-            # candidate_organism_07_1_subtribe = organism_taxonomy_07_1subtribe,
-            candidate_organism_08_genus = organism_taxonomy_08genus,
-            # candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
-            candidate_organism_09_species = organism_taxonomy_09species,
-            # candidate_organism_09_1_subspecies =
-            # organism_taxonomy_09_1subspecies,
-            candidate_organism_10_varietas = organism_taxonomy_10varietas
+            candidate_structure_inchikey_connectivity_layer,
+            candidate_organism_name
           ) |>
-          tidytable::distinct() |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidyselect::where(is.character),
-            .fns = function(x) {
-              tidytable::na_if(x, "")
-            }
-          ))
+          tidytable::distinct()
       )
 
     df2 <- df1 |>
+      tidytable::inner_join(
+        annotation_table_taxed |>
+          tidytable::select(
+            sample_organism_name,
+            sample_organism_01_domain,
+            sample_organism_02_kingdom,
+            sample_organism_03_phylum,
+            sample_organism_04_class,
+            sample_organism_05_order,
+            # sample_organism_05_1_infraorder,
+            sample_organism_06_family,
+            # sample_organism_06_1_subfamily,
+            sample_organism_07_tribe,
+            # sample_organism_07_1_subtribe,
+            sample_organism_08_genus,
+            # sample_organism_08_1_subgenus,
+            sample_organism_09_species,
+            # sample_organism_09_1_subspecies,
+            sample_organism_10_varietas
+          ) |>
+          tidytable::distinct()
+      ) |>
+      tidytable::inner_join(df0) |>
       tidytable::distinct(
+        sample_organism_name,
         sample_organism_01_domain,
         sample_organism_02_kingdom,
         sample_organism_03_phylum,
@@ -175,6 +175,7 @@ weight_bio <-
         sample_organism_09_species,
         # sample_organism_09_1_subspecies,
         sample_organism_10_varietas,
+        candidate_organism_name,
         candidate_organism_01_domain,
         candidate_organism_02_kingdom,
         candidate_organism_03_phylum,
@@ -191,6 +192,7 @@ weight_bio <-
         # candidate_organism_09_1_subspecies,
         candidate_organism_10_varietas
       )
+    rm(df0)
 
     logger::log_trace("Calculating biological score at all levels ...")
     score_per_level_bio <-
@@ -205,8 +207,7 @@ weight_bio <-
             stringi::stri_detect_regex(
               pattern = !!as.name(candidates),
               str = !!as.name(samples)
-            ) |
-              !!as.name(samples) == "notClassified"
+            )
           ) |>
           tidytable::mutate(
             !!as.name(score_name) := tidytable::if_else(
@@ -380,7 +381,13 @@ weight_bio <-
       .f = function(x, y) {
         tidytable::left_join(x, y)
       }
-    )
+    ) |>
+      tidytable::select(
+        sample_organism_name,
+        -tidyselect::contains("sample_organism_0"),
+        tidyselect::contains("candidate_organism"),
+        tidyselect::contains("score")
+      )
     rm(supp_tables, df2)
 
     annot_table_wei_bio_init <- annot_table_wei_bio_init |>
@@ -441,6 +448,17 @@ weight_bio <-
           .default = NA_character_
         )
       ) |>
+      tidytable::filter(
+        !is.na(candidate_structure_organism_occurrence_closest)
+      ) |>
+      tidytable::select(
+        sample_organism_name,
+        candidate_organism_name,
+        score_biological,
+        candidate_structure_organism_occurrence_closest
+      ) |>
+      tidytable::distinct()
+    annot_table_wei_bio_init <- annot_table_wei_bio_init |>
       tidytable::right_join(df1)
     rm(df1)
 
@@ -451,25 +469,11 @@ weight_bio <-
       ) |>
       tidytable::distinct(
         candidate_structure_inchikey_connectivity_layer,
-        sample_organism_01_domain,
-        sample_organism_02_kingdom,
-        sample_organism_03_phylum,
-        sample_organism_04_class,
-        sample_organism_05_order,
-        # sample_organism_05_1_infraorder,
-        sample_organism_06_family,
-        # sample_organism_06_1_subfamily,
-        sample_organism_07_tribe,
-        # sample_organism_07_1_subtribe,
-        sample_organism_08_genus,
-        # sample_organism_08_1_subgenus,
-        sample_organism_09_species,
-        # sample_organism_09_1_subspecies,
-        sample_organism_10_varietas,
+        sample_organism_name,
         .keep_all = TRUE
       )
 
-    annot_table_wei_bio_interim <- annot_table_wei_bio_init |>
+    annot_table_wei_bio_big <- annot_table_wei_bio_init |>
       tidytable::inner_join(annotation_table_taxed) |>
       tidytable::select(
         -tidyselect::contains("candidate_organism"),
@@ -480,11 +484,13 @@ weight_bio <-
       annotation_table_taxed
     )
 
-    annot_table_wei_bio_big <- annot_table_wei_bio_interim |>
-      tidytable::left_join(df0)
-    rm(annot_table_wei_bio_interim)
-
     annot_table_wei_bio <- annot_table_wei_bio_big |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::matches("candidate_structure_tax"),
+        .fns = function(x) {
+          tidytable::replace_na(x, "notClassified")
+        }
+      )) |>
       tidytable::mutate(
         candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
           candidate_score_sirius_csi

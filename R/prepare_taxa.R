@@ -259,6 +259,7 @@ prepare_taxa <-
       tidytable::distinct() |>
       tidytable::select(
         feature_id,
+        sample_organism_name = organismOriginal,
         sample_organism_01_domain = organism_taxonomy_01domain,
         sample_organism_02_kingdom = organism_taxonomy_02kingdom,
         sample_organism_03_phylum = organism_taxonomy_03phylum,
@@ -277,6 +278,7 @@ prepare_taxa <-
       tidytable::group_by(feature_id) |>
       clean_collapse(
         cols = c(
+          "sample_organism_name",
           "sample_organism_01_domain",
           "sample_organism_02_kingdom",
           "sample_organism_03_phylum",
