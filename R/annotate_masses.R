@@ -232,22 +232,27 @@ annotate_masses <-
         delta_max = (mz_dest + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2) - mz)
       )
 
-    bins <- df_couples_diff[, .N, by = .(bin = cut(delta, breaks = 10000L))] |>
-      tidytable::arrange(N |> tidytable::desc()) |>
-      tidytable::slice_head(n = 10L)
-    logger::log_info(
-      "Here are the top 10 observed m/z differences inside the RT windows:"
-    )
-    logger::log_info(
-      "\n{paste(capture.output(print.data.frame(bins, row.names = FALSE)), collapse = '\n')}"
-    )
-    logger::log_info(
-      "These differences may help identify potential preprocessing issues"
-    )
+    if (nrow(df_couples_diff) > 0) {
+      bins <- df_couples_diff[,
+        .N,
+        by = .(bin = cut(delta, breaks = 10000L))
+      ] |>
+        tidytable::arrange(N |> tidytable::desc()) |>
+        tidytable::slice_head(n = 10L)
+      logger::log_info(
+        "Here are the top 10 observed m/z differences inside the RT windows:"
+      )
+      logger::log_info(
+        "\n{paste(capture.output(print.data.frame(bins, row.names = FALSE)), collapse = '\n')}"
+      )
+      logger::log_info(
+        "These differences may help identify potential preprocessing issues"
+      )
+      rm(bins)
+    }
     df_couples_diff <- df_couples_diff |>
       tidytable::select(-delta)
-
-    rm(df_rt_tol, features_table, bins)
+    rm(df_rt_tol, features_table)
 
     adducts_table <- adducts |>
       tidytable::tidytable() |>
