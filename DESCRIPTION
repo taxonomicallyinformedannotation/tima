@@ -52,7 +52,7 @@ Imports:
     Spectra (>= 1.12.0),
     stats,
     stringi (>= 1.8.4),
-    targets (>= 1.10.1.9011),
+    targets (>= 1.10.1),
     tidyfst (>= 1.8.1),
     tidyselect (>= 1.2.1),
     tidytable (>= 0.11.2),
