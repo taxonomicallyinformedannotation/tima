@@ -156,7 +156,7 @@ annotate_spectra <- function(
           tidytable::desc()
       )
     logger::log_info(
-      "\n{paste(capture.output(print(library_stats)), collapse = '\n')}"
+      "\n{paste(capture.output(print.data.frame(library_stats, row.names = FALSE)), collapse = '\n')}"
     )
 
     query_precursors <- spectra@backend@spectraData$precursorMz

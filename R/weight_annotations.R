@@ -395,7 +395,7 @@ weight_annotations <- function(
         tidytable::desc()
     )
   logger::log_info(
-    "\n{paste(capture.output(print(annotation_stats)), collapse = '\n')}"
+    "\n{paste(capture.output(print.data.frame(annotation_stats, row.names = FALSE)), collapse = '\n')}"
   )
   rm(annotation_stats)
 

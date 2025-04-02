@@ -239,7 +239,7 @@ annotate_masses <-
       "Here are the top 10 observed m/z differences inside the RT windows:"
     )
     logger::log_info(
-      "\n{paste(capture.output(print(bins)), collapse = '\n')}"
+      "\n{paste(capture.output(print.data.frame(bins, row.names = FALSE)), collapse = '\n')}"
     )
     logger::log_info(
       "These differences may help identify potential preprocessing issues"
