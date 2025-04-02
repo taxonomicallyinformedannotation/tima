@@ -15,7 +15,7 @@ annotations:
   #' Thresholds related parameters.
   thresholds:
     #' Minimal consistency score (chemical) to consider a class. FLOAT
-    consistency: 0.65
+    consistency: 0.0
 
     #' MS1 annotation related parameters.
     ms1:

@@ -42,6 +42,7 @@ clean_bio <-
     df3 <-
       tidytable::right_join(
         edges_table |>
+          tidytable::filter(feature_source != feature_target) |>
           tidytable::group_by(feature_source) |>
           tidytable::add_count() |>
           tidytable::ungroup() |>

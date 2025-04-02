@@ -875,7 +875,7 @@ list(
           name = lib_sop_mer_str_pro,
           command = {
             lib_sop_mer_str_pro <- get_file(
-              url = paths$urls$examples$structures$processed,
+              url = paths$urls$examples$structures_processed,
               export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
             )
           },
