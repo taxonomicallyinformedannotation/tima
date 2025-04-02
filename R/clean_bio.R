@@ -43,6 +43,10 @@ clean_bio <-
       tidytable::right_join(
         edges_table |>
           tidytable::filter(feature_source != feature_target) |>
+          ## TODO filter further later, for now extremely minimal
+          ## Maybe already filter during edge creation step
+          tidytable::filter(feature_spectrum_entropy > 0 | !is.na(label)) |>
+          tidytable::distinct(feature_source, feature_target) |>
           tidytable::group_by(feature_source) |>
           tidytable::add_count() |>
           tidytable::ungroup() |>
