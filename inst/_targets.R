@@ -902,7 +902,7 @@ list(
             command = {
               lib_spe_exp_gnp_pre_pos <-
                 get_file(
-                  url = paths$urls$spectra$exp$pos$gnps,
+                  url = paths$urls$spectra$pos$gnps,
                   export = paths$data$interim$libraries$spectra$exp$pos$gnps
                 )
             },
@@ -913,7 +913,7 @@ list(
             command = {
               lib_spe_exp_gnp_pre_neg <-
                 get_file(
-                  url = paths$urls$spectra$exp$neg$gnps,
+                  url = paths$urls$spectra$neg$gnps,
                   export = paths$data$interim$libraries$spectra$exp$neg$gnps
                 )
             },
@@ -936,7 +936,7 @@ list(
             command = {
               lib_spe_exp_mb_pre_pos <-
                 get_file(
-                  url = paths$urls$spectra$exp$pos$massbank,
+                  url = paths$urls$spectra$pos$massbank,
                   export = paths$data$interim$libraries$spectra$exp$pos$massbank
                 )
             },
@@ -947,7 +947,7 @@ list(
             command = {
               lib_spe_exp_mb_pre_neg <-
                 get_file(
-                  url = paths$urls$spectra$exp$neg$massbank,
+                  url = paths$urls$spectra$neg$massbank,
                   export = paths$data$interim$libraries$spectra$exp$neg$massbank
                 )
             },
@@ -970,7 +970,7 @@ list(
             command = {
               lib_spe_exp_mer_pre_pos <-
                 get_file(
-                  url = paths$urls$spectra$exp$pos$merlin,
+                  url = paths$urls$spectra$pos$merlin,
                   export = paths$data$interim$libraries$spectra$exp$pos$merlin
                 )
             },
@@ -981,7 +981,7 @@ list(
             command = {
               lib_spe_exp_mer_pre_neg <-
                 get_file(
-                  url = paths$urls$spectr$exp$neg$merlin,
+                  url = paths$urls$spectra$neg$merlin,
                   export = paths$data$interim$libraries$spectra$exp$neg$merlin
                 )
             },
