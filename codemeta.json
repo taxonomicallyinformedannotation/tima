@@ -629,8 +629,8 @@
     },
     "SystemRequirements": "\n    python (>= 3.10)"
   },
-  "keywords": ["metaboliteannotation", "chemotaxonomy", "scoringsystem", "naturalproducts", "computationalmetabolomics", "taxonomicdistance", "specializedmetabolome"],
-  "fileSize": "2383.733KB",
+  "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
+  "fileSize": "2384.6KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
