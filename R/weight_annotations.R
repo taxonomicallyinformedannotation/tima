@@ -397,6 +397,7 @@ weight_annotations <- function(
   logger::log_info(
     "\n{paste(capture.output(print(annotation_stats)), collapse = '\n')}"
   )
+  rm(annotation_stats)
 
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
