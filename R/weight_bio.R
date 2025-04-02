@@ -90,6 +90,7 @@ weight_bio <-
   ) {
     df0 <- structure_organism_pairs_table |>
       tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
+      tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
       tidytable::select(
         candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
         candidate_organism_name = organism_name,
@@ -459,7 +460,14 @@ weight_bio <-
       ) |>
       tidytable::distinct()
     annot_table_wei_bio_init <- annot_table_wei_bio_init |>
-      tidytable::right_join(df1)
+      tidytable::right_join(df1) |>
+      tidytable::mutate(
+        score_biological = tidytable::if_else(
+          condition = is.na(score_biological),
+          true = 0,
+          false = score_biological
+        )
+      )
     rm(df1)
 
     annot_table_wei_bio_init <- annot_table_wei_bio_init |>
