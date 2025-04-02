@@ -23,10 +23,11 @@ get_example_files <- function(
   in_cache = TRUE
 ) {
   stopifnot(
-    "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." = example %in%
+    # "Example files available are `features`, `hmdb_is`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." = example %in%
+    "Example files available are `features`, `metadata`, `sirius`, `spectra` and `spectral_lib_with_rt`." = example %in%
       c(
         "features",
-        "hmdb_is",
+        # "hmdb_is",
         "metadata",
         "sirius",
         "spectra",
@@ -43,13 +44,13 @@ get_example_files <- function(
       export = get_default_paths()$data$source$features
     )
   }
-  if ("hmdb_is" %in% example) {
-    logger::log_trace("HMDB in silico")
-    get_file(
-      url = get_default_paths()$urls$hmdb$spectra$predicted,
-      export = get_default_paths()$data$source$libraries$spectra$is$hmdb
-    )
-  }
+  # if ("hmdb_is" %in% example) {
+  #   logger::log_trace("HMDB in silico")
+  #   get_file(
+  #     url = get_default_paths()$urls$hmdb$spectra$predicted,
+  #     export = get_default_paths()$data$source$libraries$spectra$is$hmdb
+  #   )
+  # }
   if ("metadata" %in% example) {
     logger::log_trace("Metadata")
     get_file(

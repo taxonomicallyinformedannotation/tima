@@ -499,6 +499,20 @@ testthat::test_that(desc = "Test functions", code = {
     ppm = 1,
     dalton = 0.001
   )
+  frag_matrix <- matrix(
+    c(123.456, 234.567),
+    nrow = 1,
+    dimnames = list(NULL, c("mz", "int"))
+  )
+  create_edges(
+    frags = rep(list(frag_matrix), 3),
+    nspecs = 3,
+    precs = c(123.456, 234.567, 345.678),
+    method = "entropy",
+    ms2_tolerance = 0.01,
+    ppm_tolerance = 10,
+    threshold = 0.1
+  )
 
   ### GNPS results
   prepare_annotations_gnps(input = "fileDoesNotExist")
