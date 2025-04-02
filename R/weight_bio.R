@@ -527,9 +527,7 @@ weight_bio <-
             candidate_score_pseudo_initial
       )
 
-    rm(
-      annot_table_wei_bio_big
-    )
+    rm(annot_table_wei_bio_big)
 
     return(annot_table_wei_bio)
   }
