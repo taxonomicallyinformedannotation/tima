@@ -10,11 +10,8 @@ library(targets)
 targets::tar_option_set(
   packages = c("tima"),
   imports = c("tima"),
-  memory = "transient",
-  garbage_collection = TRUE,
-  resources = tar_resources(
-    qs = tar_resources_qs(preset = "fast")
-  )
+  memory = "auto",
+  garbage_collection = TRUE
 )
 
 # tar_make_clustermq() configuration (okay to leave alone):
