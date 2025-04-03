@@ -215,6 +215,7 @@ annotate_spectra <- function(
     }
 
     lib_ids <- seq_along(spectral_library)
+    spectrum_ids <- spectral_library$spectrum_id
     spectral_library$spectrum_id <- lib_ids
     lib_spectra <- spectral_library@backend@peaksData
     safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
@@ -281,7 +282,7 @@ annotate_spectra <- function(
       # if (is.null(lib_splash)) {
       #   lib_splash <- rep(NA_character_, length(spectral_library))
       # }
-      lib_spectrum_id <- spectral_library@backend@spectraData$spectrum_id
+      lib_spectrum_id <- spectrum_ids
       if (is.null(lib_spectrum_id)) {
         lib_spectrum_id <- rep(NA_character_, length(spectral_library))
       }
