@@ -48,6 +48,11 @@ sanitize_spectra <-
       spectra$precursorMz <- spectra$PRECURSOR_MZ |> as.numeric()
     }
 
+    if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
+      logger::log_trace("Harmonizing spectrum id")
+      spectra$spectrum_id <- spectra$spectrum_id |> as.character()
+    }
+
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Filtering MS2 only")
       spectra <- spectra |>
