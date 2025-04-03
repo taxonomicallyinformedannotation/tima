@@ -563,7 +563,7 @@ ui <- shiny::fluidPage(
             "C2H3N" # (acetonitrile)
             # "C2H7N", # (ethylamine)
             # "C2H6O", # (ethanol)
-            # "NaCl", # (sodium chloride)
+            "NaCl", # (sodium chloride)
             # "C3H8O", # (isopropanol)
             # "C2H6OS" # (dmso)
           )
@@ -596,9 +596,9 @@ ui <- shiny::fluidPage(
           selected = list(
             "H2O", # (water)
             "CH2O2", # (formic)
-            # "NaCl", # (sodium chloride)
-            # "C2H4O2", # (acetic)
-            "H2PO4" # (phosphoric)
+            "NaCl", # (sodium chloride)
+            "C2H4O2", # (acetic)
+            # "H2PO4" # (phosphoric)
             # "C2HF3O2" # (tfa)
           )
         ) |>
