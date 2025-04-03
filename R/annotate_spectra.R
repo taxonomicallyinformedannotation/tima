@@ -239,6 +239,10 @@ annotate_spectra <- function(
       if (is.null(lib_adduct)) {
         lib_adduct <- rep(NA_character_, length(spectral_library))
       }
+      # lib_collision_energy <- spectral_library@backend@spectraData$collision_energy
+      # if (is.null(lib_collision_energy)) {
+      #   lib_collision_energy <- rep(NA_character_, length(spectral_library))
+      # }
       lib_inchikey <- spectral_library@backend@spectraData$inchikey
       if (is.null(lib_inchikey)) {
         lib_inchikey <- rep(NA_character_, length(spectral_library))
@@ -272,6 +276,14 @@ annotate_spectra <- function(
       if (is.null(lib_name)) {
         lib_name <- rep(NA_character_, length(spectral_library))
       }
+      # lib_splash <- spectral_library@backend@spectraData$splash
+      # if (is.null(lib_splash)) {
+      #   lib_splash <- rep(NA_character_, length(spectral_library))
+      # }
+      lib_spectrum_id <- spectral_library@backend@spectraData$spectrum_id
+      if (is.null(lib_spectrum_id)) {
+        lib_spectrum_id <- rep(NA_character_, length(spectral_library))
+      }
       lib_xlogp <- spectral_library@backend@spectraData$xlogp
       if (is.null(lib_xlogp)) {
         lib_xlogp <- rep(NA_real_, length(spectral_library))
@@ -281,6 +293,7 @@ annotate_spectra <- function(
       df_meta <- tidytable::tidytable(
         "target_id" = lib_ids,
         "target_adduct" = lib_adduct,
+        "target_spectrum_id" = lib_spectrum_id,
         "target_inchikey" = lib_inchikey,
         "target_inchikey_connectivity_layer" = lib_inchikey2D,
         "target_smiles" = lib_smiles,
@@ -333,6 +346,7 @@ annotate_spectra <- function(
             "feature_id",
             "candidate_adduct" = "target_adduct",
             "candidate_library" = "target_library",
+            "candidate_spectrum_id" = "target_spectrum_id",
             "candidate_structure_error_mz",
             "candidate_structure_name" = "target_name",
             "candidate_structure_inchikey_connectivity_layer",
