@@ -29,6 +29,7 @@ utils::globalVariables(
     "candidate_score_sirius_csi",
     "candidate_score_sirius_csi_tmp",
     "candidate_spectrum_entropy",
+    "candidate_spectrum_id",
     "candidate_structure_error_mz",
     "candidate_structure_error_rt",
     "candidate_structure_exact_mass",
