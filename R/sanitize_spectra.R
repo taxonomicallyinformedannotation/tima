@@ -85,7 +85,19 @@ sanitize_spectra <-
           tolerance = dalton,
           ppm = ppm
         ) |>
-        Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
+        Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
+        Spectra::scalePeaks()
+    }
+    if ("SLAW_ID" %in% colnames(spectra@backend@spectraData) && combine) {
+      logger::log_trace("Combining spectra in case")
+      spectra <- spectra |>
+        Spectra::combineSpectra(
+          f = spectra$SLAW_ID,
+          tolerance = dalton,
+          ppm = ppm
+        ) |>
+        Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
+        Spectra::scalePeaks()
     }
 
     # Removing empty spectra
