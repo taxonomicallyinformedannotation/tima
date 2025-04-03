@@ -279,6 +279,13 @@ testthat::test_that(desc = "Test functions", code = {
   ) |>
     Spectra::Spectra() |>
     sanitize_spectra()
+  ## for slaw ID combination in spectra
+  data.frame(
+    SLAW_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789))
+  ) |>
+    Spectra::Spectra() |>
+    sanitize_spectra()
 
   #### HMDB
   # prepare_isdb_hmdb()
