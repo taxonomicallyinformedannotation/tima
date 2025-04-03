@@ -272,10 +272,10 @@ prepare_libraries_spectra <-
           "organism_name" = NA_character_
         )
       }
-      export_output(sop, file = output_sop)
       export_spectra_rds(file = output_pos, spectra = spectra_pos)
       export_spectra_rds(file = output_neg, spectra = spectra_neg)
-      rm(spectra_pos, spectra_neg)
+      export_output(sop, file = output_sop)
+      rm(spectra_pos, spectra_neg, sop)
     } else {
       logger::log_info("Library already exists")
     }
