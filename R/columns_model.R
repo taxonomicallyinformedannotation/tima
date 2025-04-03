@@ -48,6 +48,7 @@ columns_model <- function() {
 
   candidates_spectra_columns <- c(
     "candidate_library",
+    "candidate_spectrum_id",
     "candidate_adduct",
     "candidate_count_similarity_peaks_matched",
     "candidate_score_similarity"
