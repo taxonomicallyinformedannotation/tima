@@ -91,6 +91,7 @@ annotate_spectra <- function(
     candidate_spectrum_entropy = NA,
     candidate_adduct = NA,
     candidate_library = NA,
+    candidate_spectrum_id = NA,
     candidate_structure_error_mz = NA,
     candidate_structure_name = NA,
     candidate_structure_inchikey_connectivity_layer = NA,
