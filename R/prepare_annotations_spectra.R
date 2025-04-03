@@ -87,6 +87,7 @@ prepare_annotations_spectra <-
         feature_id,
         candidate_adduct,
         candidate_library,
+        candidate_spectrum_id,
         candidate_spectrum_entropy,
         candidate_structure_error_mz,
         candidate_structure_name,
