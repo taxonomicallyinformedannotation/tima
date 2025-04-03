@@ -97,61 +97,53 @@ Rutz</h4>
 steps successfully, this should be a piece of cake, you deserve it!</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">targets</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/targets/reference/tar_make.html" class="external-link">tar_make</a></span><span class="op">(</span>names <span class="op">=</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"ann_pre$"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">+</span> <span style="color: #0000BB;">par_def_wei_ann</span> dispatched</span></span>
-<span><span class="co">#&gt; Welcome to tima</span></span>
-<span><span class="co">#&gt; To cite tima in publications use:  Rutz A, Allard P (2024). _tima: Taxonomically Informed Metabolite</span></span>
-<span><span class="co">#&gt;   Annotation_. doi:10.5281/zenodo.5797920</span></span>
-<span><span class="co">#&gt;   &lt;https://doi.org/10.5281/zenodo.5797920&gt;, R package, version 2.11.0.  Adriano Rutz; Miwa Dounoue-Kubo; et al. (25 October 2019).</span></span>
-<span><span class="co">#&gt;   Taxonomically Informed Scoring Enhances Confidence in Natural</span></span>
-<span><span class="co">#&gt;   Products Annotation. Frontiers in Plant Science. 10: 1329.</span></span>
-<span><span class="co">#&gt;   doi:10.3389/FPLS.2019.01329. issn:1664-462X. pmc:PMC6824209.</span></span>
-<span><span class="co">#&gt;   pmid:1708947. qid:Q91218352.To see these entries in BibTeX format, use 'format(&lt;citation&gt;,</span></span>
-<span><span class="co">#&gt; bibtex=TRUE)', or 'toBibtex(.)'.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">par_def_wei_ann</span> completed [0.025 seconds, 4.976 kilobytes]</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">+</span> <span style="color: #0000BB;">par_usr_wei_ann</span> dispatched</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] Loading default params</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] All params</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] Small params</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] Advanced params</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] Changing params</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:12] Changing filenames</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:13] Exporting params</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> 61 done [1.8s]</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">par_usr_wei_ann</span> completed [1.317 seconds, 1.739 kilobytes]</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> 61 done [1.8s]<span style="color: #555555;">+</span> <span style="color: #0000BB;">par_wei_ann</span> dispatched</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> 61 done [1.8s]<span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">par_wei_ann</span> completed [0.001 seconds, 922 bytes]</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> 61 done [1.8s]<span style="color: #555555;">+</span> <span style="color: #0000BB;">ann_pre</span> dispatched</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■                </span> 61 done [1.8s]TRACE [2025-04-03 16:20:14] Loading files ...</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:14] ... components</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:14] ... edges</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:14] ... structure-organism pairs</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:27] ... canopus</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:27] ... formula</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:28] ... annotations</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:29] Initial annotations:</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:29]  candidate_library      n</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✔ skipping targets (1 so far)...</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ▶ dispatched target par_def_wei_ann</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ● completed target par_def_wei_ann [0.027 seconds, 4.976 kilobytes]</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ▶ dispatched target par_usr_wei_ann</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; </span>TRACE [2025-04-03 19:57:30] Loading default params</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:30] All params</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:30] Small params</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:30] Advanced params</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:30] Changing params</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:30] Changing filenames</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:31] Exporting params</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">● completed target par_usr_wei_ann [1.315 seconds, 1.739 kilobytes]</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ✔ skipping targets (60 so far)...</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ▶ dispatched target par_wei_ann</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ● completed target par_wei_ann [0.001 seconds, 922 bytes]</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ▶ dispatched target ann_pre</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; </span>TRACE [2025-04-03 19:57:31] Loading files ...</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:31] ... components</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:31] ... edges</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:31] ... structure-organism pairs</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:44] ... canopus</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:44] ... formula</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:45] ... annotations</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:46] Initial annotations:</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:57:47]  candidate_library      n</span></span>
 <span><span class="co">#&gt;           TIMA MS1 197995</span></span>
 <span><span class="co">#&gt;    ISDB - Wikidata   4556</span></span>
 <span><span class="co">#&gt;             SIRIUS    479</span></span>
 <span><span class="co">#&gt;             merlin    156</span></span>
 <span><span class="co">#&gt;               gnps    139</span></span>
 <span><span class="co">#&gt;           massbank     31</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:29] Re-arranging annotations</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:31] Adding biological organism metadata</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:31] Performing taxonomically informed scoring</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] Calculating biological score at all levels ...</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... domain</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... kingdom</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... phylum</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... class</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... order</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... family</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... tribe</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... genus</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:33] ... species</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:34] ... varietas</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:34] Keeping best biological score</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:35] Taxonomically informed metabolite annotation led to </span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:47] Re-arranging annotations</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:48] Adding biological organism metadata</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:48] Performing taxonomically informed scoring</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] Calculating biological score at all levels ...</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... domain</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... kingdom</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... phylum</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... class</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... order</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... family</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... tribe</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... genus</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... species</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] ... varietas</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:51] Keeping best biological score</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:57:53] Taxonomically informed metabolite annotation led to </span></span>
 <span><span class="co">#&gt; 37109 annotations reranked at the kingdom level, </span></span>
 <span><span class="co">#&gt; 36774 annotations reranked at the phylum level, </span></span>
 <span><span class="co">#&gt; 31381 annotations reranked at the class level, </span></span>
@@ -162,28 +154,28 @@ steps successfully, this should be a piece of cake, you deserve it!</p>
 <span><span class="co">#&gt; 362 annotations reranked at the species level, and </span></span>
 <span><span class="co">#&gt; 0 annotations reranked at the variety level. </span></span>
 <span><span class="co">#&gt; WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT! (for later predictions)</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:35] Calculating chemical consistency of features with at least 2 neighbors</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:35] Among all edges</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:35] ... at the (classyfire) kingdom level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:35] ... at the (NPC) pathway level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:36] ... at the (classyfire) superclass level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:36] ... at the (NPC) superclass level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:36] ... at the (classyfire) class level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:37] ... at the (NPC) class level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:37] ... at the (classyfire) parent level</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:38] Splitting already computed predictions</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:38] Joining all except -1 together</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:40] Adding already computed predictions back</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] Calculating chemical score at all levels ...</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (classyfire) kingdom</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (NPC) pathway</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (classyfire) superclass</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (NPC) superclass</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (classyfire) class</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (NPC) class</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... (classyfire) parent</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:41] ... keeping best chemical score</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:43] Chemically informed scoring led to </span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:53] Calculating chemical consistency of features with at least 2 neighbors</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:53] Among all edges</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:53] ... at the (classyfire) kingdom level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:53] ... at the (NPC) pathway level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:54] ... at the (classyfire) superclass level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:54] ... at the (NPC) superclass level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:54] ... at the (classyfire) class level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:54] ... at the (NPC) class level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:55] ... at the (classyfire) parent level</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:56] Splitting already computed predictions</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:56] Joining all except -1 together</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:57] Adding already computed predictions back</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] Calculating chemical score at all levels ...</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (classyfire) kingdom</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (NPC) pathway</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (classyfire) superclass</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (NPC) superclass</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (classyfire) class</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (NPC) class</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... (classyfire) parent</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:57:59] ... keeping best chemical score</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:00] Chemically informed scoring led to </span></span>
 <span><span class="co">#&gt; 26931 annotations reranked at the (classyfire) kingdom level, </span></span>
 <span><span class="co">#&gt; 18180 annotations reranked at the (NPC) pathway level, </span></span>
 <span><span class="co">#&gt; 14202 annotations reranked at the (classyfire) superclass level, </span></span>
@@ -192,20 +184,26 @@ steps successfully, this should be a piece of cake, you deserve it!</p>
 <span><span class="co">#&gt; 8697 annotations reranked at the (NPC) class level, and </span></span>
 <span><span class="co">#&gt; 8684 annotations reranked at the (classyfire) parent level. </span></span>
 <span><span class="co">#&gt; WITHOUT TAKING CONSISTENCY SCORE INTO ACCOUNT!</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:43] Filtering top 1 candidates and keeping only MS1 candidates with minimum 0 biological score OR 0 chemical score </span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:43] Keeping high confidence candidates only</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:43] Removed 202079 low confidence candidates out of the 203999 total ones.</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:43] 1920 high confidence candidates remaining.</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:43] Adding initial metadata (RT, etc.) and simplifying columns</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:48] Selecting columns to export</span></span>
-<span><span class="co">#&gt; TRACE [2025-04-03 16:20:48] Adding consensus again to droped candidates</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:49] Directory data/processed/20250403_162049_example created.</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:49] ... path to used parameters is data/processed/20250403_162049_example</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:49] ... path to used parameters is data/processed/20250403_162049_example</span></span>
-<span><span class="co">#&gt; INFO [2025-04-03 16:20:49] ... path to export is data/processed/20250403_162049_example/example_results.tsv</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> 126 done [37.9s]</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ann_pre</span> completed [35.693 seconds, 2.025 megabytes]</span></span>
-<span><span class="co">#&gt; → 126 targets <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ </span> 126 done [37.9s]<span style="color: #00BB00;">✔</span> ended pipeline [38.767 seconds, 4 completed, 122 skipped]</span></span></code></pre></div>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:00] Filtering top 1 candidates and keeping only MS1 candidates with minimum 0 biological score OR 0 chemical score </span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:00] Keeping high confidence candidates only</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:00] Removed 202079 low confidence candidates out of the 203999 total ones.</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:00] 1920 high confidence candidates remaining.</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:01] Processing full results</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:01] Adding initial metadata (RT, etc.) and simplifying columns</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:05] Selecting columns to export</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:06] Adding consensus again to droped candidates</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:07] Processing filtered results</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:07] Adding initial metadata (RT, etc.) and simplifying columns</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:10] Selecting columns to export</span></span>
+<span><span class="co">#&gt; TRACE [2025-04-03 19:58:10] Adding consensus again to droped candidates</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:11] Directory data/processed/20250403_195811_example created.</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:11] ... path to used parameters is data/processed/20250403_195811_example</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:11] ... path to used parameters is data/processed/20250403_195811_example</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:12] ... path to export is data/processed/20250403_195811_example/example_results_filtered.tsv</span></span>
+<span><span class="co">#&gt; INFO [2025-04-03 19:58:12] ... path to export is data/processed/20250403_195811_example/example_results.tsv</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">● completed target ann_pre [40.103 seconds, 4.088 megabytes]</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; ▶ ended pipeline [43.098 seconds]</span></span></span>
+<span><span class="co"><span style="color: #BB0000;">#&gt; </span></span></span></code></pre></div>
 <p>The final exported file is formatted in order to be easily imported
 in <a href="https://cytoscape.org/" class="external-link">Cytoscape</a> to further explore
 your data!</p>
