@@ -718,8 +718,10 @@ annotate_masses <-
     export_output(x = df_final, file = output_annotations[[1]])
 
     rm(edges, df_final)
-    return(c(
-      "annotations" = output_annotations[[1]],
-      "edges" = output_edges[[1]]
-    ))
+    return(
+      c(
+        "annotations" = output_annotations[[1]],
+        "edges" = output_edges[[1]]
+      )
+    )
   }

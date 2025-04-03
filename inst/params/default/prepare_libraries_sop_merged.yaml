@@ -12,7 +12,7 @@ files:
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
         #' GNPS prepared structure organism pairs library. STRING
-        gnps: data/interim/libraries/sop/gnps_11193898_prepared.tsv.gz
+        gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         #' Lotus prepared structure organism pairs library. STRING
