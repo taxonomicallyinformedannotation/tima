@@ -63,11 +63,13 @@
     "ms_clu_neg": [
       "H2O",
       "CH2O2",
-      "H2PO4"
+      "NaCl",
+      "C2H4O2"
     ],
     "ms_clu_pos": [
       "H2O",
-      "C2H3N"
+      "C2H3N",
+      "NaCl"
     ],
     "ms_neu": [
       "O",

@@ -549,8 +549,13 @@ ui <- shiny::fluidPage(
           label = "List of clusters to be used in positive",
           choices = list(
             "H2O", # (water)
+            "CH4O", # (methanol)
             "C2H3N", # (acetonitrile)
-            "NaCl" # (sodium chloride)
+            "C2H7N", # (ethylamine)
+            "C2H6O", # (ethanol)
+            "NaCl", # (sodium chloride)
+            "C3H8O", # (isopropanol)
+            "C2H6OS" # (dmso)
           ),
           selected = list(
             "H2O", # (water)
