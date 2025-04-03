@@ -490,9 +490,8 @@ weight_annotations <- function(
   rm(results_bio_cleaned)
   results_chemo |>
     decorate_chemo()
-  results <- results_chemo |>
-    clean_chemo() |>
-    tidytable::select(tidyselect::where(~ any(!is.na(.))))
+  results_list <- results_chemo |>
+    clean_chemo()
   rm(results_chemo)
 
   time <- format(Sys.time(), "%Y%m%d_%H%M%S")
@@ -501,6 +500,11 @@ weight_annotations <- function(
     paste0(time, "_", pattern)
   )
   final_output <- file.path(dir_time, output)
+  final_output_filtered <- file.path(
+    dir_time,
+    output |>
+      gsub(pattern = ".tsv", replacement = "_filtered.tsv", fixed = TRUE)
+  )
   export_params(
     parameters = get_params(step = "prepare_params"),
     directory = dir_time,
@@ -511,8 +515,14 @@ weight_annotations <- function(
     directory = dir_time,
     step = "prepare_params_advanced"
   )
-  export_output(x = results, file = final_output)
-  rm(results)
+  export_output(x = results_list$filtered, file = final_output_filtered)
+  export_output(x = results_list$full, file = final_output)
+  rm(results_list)
 
-  return(final_output)
+  return(
+    c(
+      "filtered" = final_output_filtered,
+      "full" = final_output
+    )
+  )
 }
