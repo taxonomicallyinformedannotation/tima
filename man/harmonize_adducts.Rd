@@ -4,12 +4,14 @@
 \alias{harmonize_adducts}
 \title{Harmonize adducts}
 \usage{
-harmonize_adducts(df, adducts_colname = "adduct")
+harmonize_adducts(df, adducts_colname = "adduct", adducts_translations)
 }
 \arguments{
 \item{df}{Dataframe}
 
 \item{adducts_colname}{Adducts colname}
+
+\item{adducts_translations}{Adducts translations}
 }
 \value{
 A table with harmonized adducts
