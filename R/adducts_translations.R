@@ -44,5 +44,8 @@ adducts_translations <-
     # mzmine
     "+NH4" = "+H4N",
     # mzmine
-    "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-" # weird MassBank
+    "+TFA" = "+C2HF3O2",
+    # MassBank
+    "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-"
+    # weird MassBank
   )
