@@ -45,7 +45,7 @@ list(
       tar_target(
         name = paths,
         command = {
-          paths <- tima:::get_default_paths(yaml = yaml_paths)
+          paths <- get_default_paths(yaml = yaml_paths)
         },
         format = "rds"
       )
@@ -276,7 +276,7 @@ list(
         tar_target(
           name = par_fin_par,
           command = {
-            par_fin_par <- tima:::parse_yaml_params(
+            par_fin_par <- parse_yaml_params(
               def = par_pre_par,
               usr = par_pre_par
             )
@@ -286,7 +286,7 @@ list(
         tar_target(
           name = par_fin_par2,
           command = {
-            par_fin_par2 <- tima:::parse_yaml_params(
+            par_fin_par2 <- parse_yaml_params(
               def = par_pre_par2,
               usr = par_pre_par2
             )
@@ -300,7 +300,7 @@ list(
           name = par_usr_ann_mas,
           command = {
             par_usr_ann_mas <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "annotate_masses"
@@ -312,7 +312,7 @@ list(
           name = par_usr_ann_spe,
           command = {
             par_usr_ann_spe <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "annotate_spectra"
@@ -324,7 +324,7 @@ list(
           name = par_usr_cre_com,
           command = {
             par_usr_cre_com <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "create_components"
@@ -336,7 +336,7 @@ list(
           name = par_usr_fil_ann,
           command = {
             par_usr_fil_ann <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "filter_annotations"
@@ -348,7 +348,7 @@ list(
           name = par_usr_cre_edg_spe,
           command = {
             par_usr_cre_edg_spe <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "create_edges_spectra"
@@ -360,7 +360,7 @@ list(
           name = par_usr_pre_ann_gnp,
           command = {
             par_usr_pre_ann_gnp <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_gnps"
@@ -372,7 +372,7 @@ list(
           name = par_usr_pre_ann_sir,
           command = {
             par_usr_pre_ann_sir <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_sirius"
@@ -384,7 +384,7 @@ list(
           name = par_usr_pre_ann_spe,
           command = {
             par_usr_pre_ann_spe <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_annotations_spectra"
@@ -396,7 +396,7 @@ list(
           name = par_usr_pre_fea_com,
           command = {
             par_usr_pre_fea_com <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_features_components"
@@ -408,7 +408,7 @@ list(
           name = par_usr_pre_fea_edg,
           command = {
             par_usr_pre_fea_edg <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_features_edges"
@@ -420,7 +420,7 @@ list(
           name = par_usr_pre_fea_tab,
           command = {
             par_usr_pre_fea_tab <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_features_tables"
@@ -432,7 +432,7 @@ list(
           name = par_usr_pre_lib_rt,
           command = {
             par_usr_pre_lib_rt <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_rt"
@@ -444,7 +444,7 @@ list(
           name = par_usr_pre_lib_sop_clo,
           command = {
             par_usr_pre_lib_sop_clo <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_closed"
@@ -456,7 +456,7 @@ list(
           name = par_usr_pre_lib_sop_ecm,
           command = {
             par_usr_pre_lib_sop_ecm <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_ecmdb"
@@ -468,7 +468,7 @@ list(
           name = par_usr_pre_lib_sop_hmd,
           command = {
             par_usr_pre_lib_sop_hmd <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_hmdb"
@@ -480,7 +480,7 @@ list(
           name = par_usr_pre_lib_sop_lot,
           command = {
             par_usr_pre_lib_sop_lot <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_lotus"
@@ -492,7 +492,7 @@ list(
           name = par_usr_pre_lib_sop_mer,
           command = {
             par_usr_pre_lib_sop_mer <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_sop_merged"
@@ -504,7 +504,7 @@ list(
           name = par_usr_pre_lib_spe,
           command = {
             par_usr_pre_lib_spe <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_libraries_spectra"
@@ -516,7 +516,7 @@ list(
           name = par_usr_pre_tax,
           command = {
             par_usr_pre_tax <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "prepare_taxa"
@@ -528,7 +528,7 @@ list(
           name = par_usr_wei_ann,
           command = {
             par_usr_wei_ann <-
-              tima:::prepare_params(
+              prepare_params(
                 params_small = par_fin_par,
                 params_advanced = par_fin_par2,
                 step = "weight_annotations"
@@ -544,7 +544,7 @@ list(
         name = par_ann_mas,
         command = {
           par_ann_mas <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_ann_mas,
               usr = par_usr_ann_mas[[1]]
             )
@@ -555,7 +555,7 @@ list(
         name = par_ann_spe,
         command = {
           par_ann_spe <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_ann_spe,
               usr = par_usr_ann_spe[[1]]
             )
@@ -566,7 +566,7 @@ list(
         name = par_cre_com,
         command = {
           par_cre_com <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_cre_com,
               usr = par_usr_cre_com[[1]]
             )
@@ -577,7 +577,7 @@ list(
         name = par_cre_edg_spe,
         command = {
           par_cre_edg_spe <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_cre_edg_spe,
               usr = par_usr_cre_edg_spe[[1]]
             )
@@ -588,7 +588,7 @@ list(
         name = par_fil_ann,
         command = {
           par_fil_ann <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_fil_ann,
               usr = par_usr_fil_ann[[1]]
             )
@@ -599,7 +599,7 @@ list(
         name = par_pre_ann_gnp,
         command = {
           par_pre_ann_gnp <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_ann_gnp,
               usr = par_usr_pre_ann_gnp[[1]]
             )
@@ -610,7 +610,7 @@ list(
         name = par_pre_ann_sir,
         command = {
           par_pre_ann_sir <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_ann_sir,
               usr = par_usr_pre_ann_sir[[1]]
             )
@@ -621,7 +621,7 @@ list(
         name = par_pre_ann_spe,
         command = {
           par_pre_ann_spe <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_ann_spe,
               usr = par_usr_pre_ann_spe[[1]]
             )
@@ -632,7 +632,7 @@ list(
         name = par_pre_fea_com,
         command = {
           par_pre_fea_com <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_fea_com,
               usr = par_usr_pre_fea_com[[1]]
             )
@@ -643,7 +643,7 @@ list(
         name = par_pre_fea_edg,
         command = {
           par_pre_fea_edg <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_fea_edg,
               usr = par_usr_pre_fea_edg[[1]]
             )
@@ -654,7 +654,7 @@ list(
         name = par_pre_fea_tab,
         command = {
           par_pre_fea_tab <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_fea_tab,
               usr = par_usr_pre_fea_tab[[1]]
             )
@@ -665,7 +665,7 @@ list(
         name = par_pre_lib_rt,
         command = {
           par_pre_lib_rt <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_rt,
               usr = par_usr_pre_lib_rt[[1]]
             )
@@ -676,7 +676,7 @@ list(
         name = par_pre_lib_sop_clo,
         command = {
           par_pre_lib_sop_clo <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_sop_clo,
               usr = par_usr_pre_lib_sop_clo[[1]]
             )
@@ -687,7 +687,7 @@ list(
         name = par_pre_lib_sop_ecm,
         command = {
           par_pre_lib_sop_ecm <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_sop_ecm,
               usr = par_usr_pre_lib_sop_ecm[[1]]
             )
@@ -698,7 +698,7 @@ list(
         name = par_pre_lib_sop_hmd,
         command = {
           par_pre_lib_sop_hmd <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_sop_hmd,
               usr = par_usr_pre_lib_sop_hmd[[1]]
             )
@@ -709,7 +709,7 @@ list(
         name = par_pre_lib_sop_lot,
         command = {
           par_pre_lib_sop_lot <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_sop_lot,
               usr = par_usr_pre_lib_sop_lot[[1]]
             )
@@ -720,7 +720,7 @@ list(
         name = par_pre_lib_sop_mer,
         command = {
           par_pre_lib_sop_mer <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_sop_mer,
               usr = par_usr_pre_lib_sop_mer[[1]]
             )
@@ -731,7 +731,7 @@ list(
         name = par_pre_lib_spe,
         command = {
           par_pre_lib_spe <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_lib_spe,
               usr = par_usr_pre_lib_spe[[1]]
             )
@@ -742,7 +742,7 @@ list(
         name = par_pre_tax,
         command = {
           par_pre_tax <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_pre_tax,
               usr = par_usr_pre_tax[[1]]
             )
@@ -753,7 +753,7 @@ list(
         name = par_wei_ann,
         command = {
           par_wei_ann <-
-            tima:::parse_yaml_params(
+            parse_yaml_params(
               def = par_def_wei_ann,
               usr = par_usr_wei_ann[[1]]
             )
@@ -828,35 +828,29 @@ list(
     list(
       ## In silico
       list(
-        ## Raw
-        list(
-          ## TODO ADD ISDB HMDB,
-          tar_target(
-            name = lib_spe_is_wik_pre_pos,
-            command = {
-              lib_spe_is_wik_pre_pos <-
-                get_file(
-                  url = paths$urls$spectra$pos$isdb,
-                  export = paths$data$interim$libraries$spectra$is$pos$isdb
-                )
-            },
-            format = "file"
-          ),
-          tar_target(
-            name = lib_spe_is_wik_pre_neg,
-            command = {
-              lib_spe_is_wik_pre_neg <-
-                get_file(
-                  url = paths$urls$spectra$neg$isdb,
-                  export = paths$data$interim$libraries$spectra$is$neg$isdb
-                )
-            },
-            format = "file"
-          )
-        )
-      ),
-      ## Prepared
-      list(
+        ## TODO ADD ISDB HMDB,
+        tar_target(
+          name = lib_spe_is_wik_pre_pos,
+          command = {
+            lib_spe_is_wik_pre_pos <-
+              get_file(
+                url = paths$urls$spectra$pos$isdb,
+                export = paths$data$interim$libraries$spectra$is$pos$isdb
+              )
+          },
+          format = "file"
+        ),
+        tar_target(
+          name = lib_spe_is_wik_pre_neg,
+          command = {
+            lib_spe_is_wik_pre_neg <-
+              get_file(
+                url = paths$urls$spectra$neg$isdb,
+                export = paths$data$interim$libraries$spectra$is$neg$isdb
+              )
+          },
+          format = "file"
+        ),
         ## TODO ADD IS HMDB PREPARED
         tar_target(
           name = lib_spe_is_wik_pre_sop,
@@ -864,16 +858,6 @@ list(
             lib_spe_is_wik_pre_sop <- get_file(
               url = paths$urls$sop$isdb,
               export = paths$data$interim$libraries$sop$isdb
-            )
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_sop_mer_str_pro,
-          command = {
-            lib_sop_mer_str_pro <- get_file(
-              url = paths$urls$examples$structures_processed,
-              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
             )
           },
           format = "file"
@@ -1051,27 +1035,29 @@ list(
       )
     ),
     ## Retention times
-    list(tar_target(
-      name = lib_rt,
-      command = {
-        lib_rt <- prepare_libraries_rt(
-          mgf_exp = par_pre_lib_rt$files$libraries$temporal$exp$mgf,
-          mgf_is = par_pre_lib_rt$files$libraries$temporal$is$mgf,
-          temp_exp = par_pre_lib_rt$files$libraries$temporal$exp$csv,
-          temp_is = par_pre_lib_rt$files$libraries$temporal$is$csv,
-          output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
-          output_sop = par_pre_lib_rt$files$libraries$sop$prepared$rt,
-          col_ik = par_pre_lib_rt$names$mgf$inchikey,
-          col_rt = par_pre_lib_rt$names$mgf$retention_time,
-          col_sm = par_pre_lib_rt$names$mgf$smiles,
-          name_inchikey = par_pre_lib_rt$names$inchikey,
-          name_rt = par_pre_lib_rt$names$rt$library,
-          name_smiles = par_pre_lib_rt$names$smiles,
-          unit_rt = par_pre_lib_rt$units$rt
-        )
-      },
-      format = "file"
-    )),
+    list(
+      tar_target(
+        name = lib_rt,
+        command = {
+          lib_rt <- prepare_libraries_rt(
+            mgf_exp = par_pre_lib_rt$files$libraries$temporal$exp$mgf,
+            mgf_is = par_pre_lib_rt$files$libraries$temporal$is$mgf,
+            temp_exp = par_pre_lib_rt$files$libraries$temporal$exp$csv,
+            temp_is = par_pre_lib_rt$files$libraries$temporal$is$csv,
+            output_rt = par_pre_lib_rt$files$libraries$temporal$prepared,
+            output_sop = par_pre_lib_rt$files$libraries$sop$prepared$rt,
+            col_ik = par_pre_lib_rt$names$mgf$inchikey,
+            col_rt = par_pre_lib_rt$names$mgf$retention_time,
+            col_sm = par_pre_lib_rt$names$mgf$smiles,
+            name_inchikey = par_pre_lib_rt$names$inchikey,
+            name_rt = par_pre_lib_rt$names$rt$library,
+            name_smiles = par_pre_lib_rt$names$smiles,
+            unit_rt = par_pre_lib_rt$units$rt
+          )
+        },
+        format = "file"
+      )
+    ),
     tar_target(
       name = lib_rt_rts,
       command = {
@@ -1110,7 +1096,7 @@ list(
                 )
               },
               error = function(e) {
-                tima:::fake_ecmdb(
+                fake_ecmdb(
                   export = paths$data$source$libraries$sop$ecmdb
                 )
               },
@@ -1137,12 +1123,12 @@ list(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths$data$source$libraries$sop$hmdb)
-                tima:::fake_hmdb(
+                fake_hmdb(
                   export = paths$data$source$libraries$sop$hmdb
                 )
               },
               error = function(e) {
-                tima:::fake_hmdb(
+                fake_hmdb(
                   export = paths$data$source$libraries$sop$hmdb
                 )
               },
@@ -1159,14 +1145,14 @@ list(
           command = {
             lib_sop_lot <- tryCatch(
               expr = {
-                tima:::get_last_version_from_zenodo(
+                get_last_version_from_zenodo(
                   doi = paths$urls$lotus$doi,
                   pattern = paths$urls$lotus$pattern,
                   path = paths$data$source$libraries$sop$lotus
                 )
               },
               error = function(e) {
-                tima:::fake_lotus(
+                fake_lotus(
                   export = paths$data$source$libraries$sop$lotus
                 )
               },
@@ -1231,6 +1217,16 @@ list(
       ),
       ## Merged
       list(
+        tar_target(
+          name = lib_sop_mer_str_pro,
+          command = {
+            lib_sop_mer_str_pro <- get_file(
+              url = paths$urls$examples$structures_processed,
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
+            )
+          },
+          format = "file"
+        ),
         tar_target(
           name = lib_sop_mer,
           command = {
@@ -1754,7 +1750,7 @@ list(
           import_spectra()
         sp |>
           Spectra::filterEmptySpectra() |>
-          tima:::extract_spectra() |>
+          extract_spectra() |>
           data.frame() |>
           saveRDS(file = "data/interim/benchmark/benchmark_spectra.rds")
         return("data/interim/benchmark/benchmark_spectra.rds")
@@ -1887,7 +1883,7 @@ list(
 
         extract_benchmark_spectra <- function(x, mode) {
           df <- x |>
-            tima:::extract_spectra() |>
+            extract_spectra() |>
             tidytable::mutate(acquisitionNum = tidytable::row_number()) |>
             tidytable::mutate(spectrum_id = acquisitionNum) |>
             tidytable::mutate(
@@ -2022,7 +2018,7 @@ list(
       name = benchmark_taxed_pos,
       command = {
         benchmark_taxed_pos <- benchmark_pre_meta_pos |>
-          tima:::benchmark_taxize_spectra(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_pos.tsv.gz"
@@ -2033,7 +2029,7 @@ list(
       name = benchmark_taxed_neg,
       command = {
         benchmark_taxed_neg <- benchmark_pre_meta_neg |>
-          tima:::benchmark_taxize_spectra(
+          benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_neg.tsv.gz"
@@ -2043,7 +2039,7 @@ list(
     tar_target(
       name = benchmark_def_ann_mas,
       command = {
-        benchmark_def_ann_mas <- tima:::parse_yaml_params(
+        benchmark_def_ann_mas <- parse_yaml_params(
           def = par_def_ann_mas,
           usr = par_def_ann_mas
         )
@@ -2102,7 +2098,7 @@ list(
     tar_target(
       name = benchmark_def_cre_edg_spe,
       command = {
-        benchmark_def_cre_edg_spe <- tima:::parse_yaml_params(
+        benchmark_def_cre_edg_spe <- parse_yaml_params(
           def = par_def_cre_edg_spe,
           usr = par_def_cre_edg_spe
         )
@@ -2141,7 +2137,7 @@ list(
     tar_target(
       name = benchmark_def_pre_fea_edg,
       command = {
-        benchmark_def_pre_fea_edg <- tima:::parse_yaml_params(
+        benchmark_def_pre_fea_edg <- parse_yaml_params(
           def = par_def_pre_fea_edg,
           usr = par_def_pre_fea_edg
         )
@@ -2178,7 +2174,7 @@ list(
     tar_target(
       name = benchmark_def_cre_edg_com,
       command = {
-        benchmark_def_cre_edg_com <- tima:::parse_yaml_params(
+        benchmark_def_cre_edg_com <- parse_yaml_params(
           def = par_def_cre_com,
           usr = par_def_cre_com
         )
@@ -2205,7 +2201,7 @@ list(
     tar_target(
       name = benchmark_def_pre_fea_com,
       command = {
-        benchmark_def_pre_fea_com <- tima:::parse_yaml_params(
+        benchmark_def_pre_fea_com <- parse_yaml_params(
           def = par_def_pre_fea_com,
           usr = par_def_pre_fea_com
         )
@@ -2232,7 +2228,7 @@ list(
     tar_target(
       name = benchmark_def_ann_spe,
       command = {
-        benchmark_def_ann_spe <- tima:::parse_yaml_params(
+        benchmark_def_ann_spe <- parse_yaml_params(
           def = par_def_ann_spe,
           usr = par_def_ann_spe
         )
@@ -2283,7 +2279,7 @@ list(
     tar_target(
       name = benchmark_def_pre_ann_spe,
       command = {
-        benchmark_def_pre_ann_spe <- tima:::parse_yaml_params(
+        benchmark_def_pre_ann_spe <- parse_yaml_params(
           def = par_def_pre_ann_spe,
           usr = par_def_pre_ann_spe
         )
@@ -2320,7 +2316,7 @@ list(
     tar_target(
       name = benchmark_def_pre_ann_sir,
       command = {
-        benchmark_def_pre_ann_sir <- tima:::parse_yaml_params(
+        benchmark_def_pre_ann_sir <- parse_yaml_params(
           def = par_def_pre_ann_sir,
           usr = par_def_pre_ann_sir
         )
@@ -2364,7 +2360,7 @@ list(
     tar_target(
       name = benchmark_def_fil_ann,
       command = {
-        benchmark_def_fil_ann <- tima:::parse_yaml_params(
+        benchmark_def_fil_ann <- parse_yaml_params(
           def = par_def_fil_ann,
           usr = par_def_fil_ann
         )
@@ -2465,7 +2461,7 @@ list(
     tar_target(
       name = benchmark_def_wei_ann,
       command = {
-        benchmark_def_wei_ann <- tima:::parse_yaml_params(
+        benchmark_def_wei_ann <- parse_yaml_params(
           def = par_def_wei_ann,
           usr = par_def_wei_ann
         )

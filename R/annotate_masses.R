@@ -95,7 +95,9 @@ annotate_masses <-
     tolerance_ppm = get_params(
       step = "annotate_masses"
     )$ms$tolerances$mass$ppm$ms1,
-    tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts
+    tolerance_rt = get_params(
+      step = "annotate_masses"
+    )$ms$tolerances$rt$adducts
   ) {
     stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
     stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
@@ -163,21 +165,18 @@ annotate_masses <-
       tidytable::filter(value_min > 0)
 
     if (!"adduct" %in% colnames(features_table)) {
-      logger::log_info("No previously attributed adducts detected")
       features_table$adduct <- NA_character_
-      already_assigned <- tidytable::tidytable(feature_id = NA_character_)
-    } else {
-      already_assigned <- features_table |>
-        tidytable::distinct(feature_id, adduct) |>
-        tidytable::filter(!is.na(adduct))
-      logger::log_info(
-        "Already {
-        nrow(already_assigned)
-        } adducts previously detected"
-      )
-      features_table <- features_table |>
-        harmonize_adducts()
     }
+    already_assigned <- features_table |>
+      tidytable::distinct(feature_id, adduct) |>
+      tidytable::filter(!is.na(adduct))
+    logger::log_info(
+      "Already {
+      nrow(already_assigned)
+      } adducts previously detected"
+    )
+    features_table <- features_table |>
+      harmonize_adducts(adducts_translations = adducts_translations)
 
     df_fea_min <- features_table |>
       tidytable::mutate(tidytable::across(

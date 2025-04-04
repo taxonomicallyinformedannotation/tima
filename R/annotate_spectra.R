@@ -308,7 +308,10 @@ annotate_spectra <- function(
         "target_precursorMz" = lib_precursors
       )
       df_meta <- df_meta |>
-        harmonize_adducts(adducts_colname = "target_adduct")
+        harmonize_adducts(
+          adducts_colname = "target_adduct",
+          adducts_translations = adducts_translations
+        )
       rm(lib_precursors)
 
       df_final$candidate_spectrum_entropy <- as.numeric(
