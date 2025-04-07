@@ -17,7 +17,7 @@ clean_collapse <- function(grouped_df, cols = NULL) {
 
   clean_collapse_df <- grouped_df |>
     tidytable::reframe(tidytable::across(
-      .cols = cols,
+      .cols = tidyselect::all_of(cols),
       .fns = function(x) {
         x <- list(paste(unique(x[!is.na(x)]), collapse = " $ "))
       }
