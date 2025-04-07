@@ -24,6 +24,7 @@ prepare_params <- function(
 
   logger::log_trace("All params")
   ann_can_fin <- params_advanced$annotations$candidates$final
+  ann_can_nei <- params_advanced$annotations$candidates$neighbors
   ann_ms1only <- params_advanced$annotations$ms1only
   ann_ms2_app <- params_advanced$annotations$ms2approx
   ann_thr_con <- params_advanced$annotations$thresholds$consistency
@@ -548,6 +549,8 @@ prepare_params <- function(
   ## weight_annotations
   yamls_params$weight_annotations$annotations$candidates$final <-
     ann_can_fin
+  yamls_params$weight_annotations$annotations$candidates$neighbors <-
+    ann_can_nei
   yamls_params$weight_annotations$annotations$ms1only <-
     ann_ms1only
   yamls_params$weight_annotations$annotations$thresholds$consistency <-

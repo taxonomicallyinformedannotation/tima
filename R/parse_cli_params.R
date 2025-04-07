@@ -12,7 +12,15 @@ parse_cli_params <- function(arguments, parameters) {
   mappings <- list(
     ann_can_fin = list(
       path = c("annotations", "candidates", "final"),
-      type = as.numeric
+      type = as.integer
+    ),
+    ann_can_nei = list(
+      path = c("organisms", "candidates", "neighbors"),
+      type = as.integer
+    ),
+    ann_can_sam = list(
+      path = c("organisms", "candidates", "samples"),
+      type = as.integer
     ),
     ann_ms1only = list(path = c("annotations", "ms1only"), type = as.logical),
     ann_ms2_app = list(
@@ -282,10 +290,6 @@ parse_cli_params <- function(arguments, parameters) {
     names_source = list(path = c("names", "source"), type = as.character),
     names_target = list(path = c("names", "target"), type = as.character),
     names_taxon = list(path = c("names", "taxon"), type = as.character),
-    org_can = list(
-      path = c("organisms", "candidates"),
-      type = as.integer
-    ),
     org_fil_mod = list(
       path = c("organisms", "filter", "mode"),
       type = as.logical

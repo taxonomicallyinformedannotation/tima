@@ -1648,6 +1648,7 @@ list(
         taxa = tax_pre,
         output = par_wei_ann$files$annotations$processed,
         candidates_final = par_wei_ann$annotations$candidates$final,
+        candidates_neighbors = par_wei_ann$annotations$candidates$neighbors,
         weight_spectral = par_wei_ann$weights$global$spectral,
         weight_chemical = par_wei_ann$weights$global$chemical,
         weight_biological = par_wei_ann$weights$global$biological,
