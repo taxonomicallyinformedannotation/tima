@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/prepare_taxa.R --fil-met-pre data/interim/taxa/example_taxed.tsv.gz --org-can 1 --names-extension TRUE --names-features "row ID" --names-filename filename --names-taxon ATTRIBUTE_species
 
 Usage:
-  prepare_taxa.R [--fil-fea-raw=<fil-fea-raw>] [--fil-met-raw=<fil-met-raw>] [--fil-met-pre=<fil-met-pre>] [--gnps-id=<gnps-id>] [--names-extension=<names-extension>] [--names-features=<names-features>] [--names-filename=<names-filename>] [--names-taxon=<names-taxon>] [--org-can=<org-can>] [--org-tax=<org-tax>] [--too-met=<too-met>]
+  prepare_taxa.R [--fil-fea-raw=<fil-fea-raw>] [--fil-met-raw=<fil-met-raw>] [--fil-met-pre=<fil-met-pre>] [--gnps-id=<gnps-id>] [--names-extension=<names-extension>] [--names-filename=<names-filename>] [--names-taxon=<names-taxon>] [--org-tax=<org-tax>] [--too-met=<too-met>]
 
 Arguments:
   fil-fea-raw                Raw features file. STRING
@@ -10,11 +10,9 @@ Arguments:
   fil-met-pre                Taxonomically informed features file. STRING
 
   names-extension            The file(s) extension is present in the sample name. BOOLEAN
-  names-features             Name of "feature IDs" variable in the input. STRING
   names-filename             Name of "filename" variable in the input. STRING
   names-taxon                Name of the "taxon name" variable in the input. STRING
 
-  org-can                    Number of organisms to keep per feature. INTEGER
   org-tax                    OPTIONAL. Force all features to be attributed to given taxon. Example: "Homo sapiens". STRING
 
 Options:

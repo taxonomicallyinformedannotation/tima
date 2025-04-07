@@ -3,8 +3,8 @@
 files:
   #' Features files.
   features:
-    #' Raw features file. STRING
-    raw: data/source/example_features.csv
+    #' Prepared features file. STRING
+    prepared: data/interim/features/example_features.tsv.gz
 
   #' Metadata files.
   metadata:
@@ -34,9 +34,6 @@ names:
   #' The file(s) extension is present in the sample name. BOOLEAN
   extension: true
 
-  #' Name of "feature IDs" variable in the input. STRING
-  features: row ID
-
   #' Name of "filename" variable in the input. STRING
   filename: filename
 
@@ -45,9 +42,6 @@ names:
 
 #' Organisms related parameters.
 organisms:
-  #' Number of organisms to keep per feature. INTEGER
-  candidates: 1
-
   #' OPTIONAL. If your experiment contains a single taxon, its scientific name.
   #' Else, you will need to provide a metadata file above.
   #' If you provide both, this one will have priority.

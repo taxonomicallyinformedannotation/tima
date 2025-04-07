@@ -84,7 +84,12 @@ filter_annotations <-
       file = features,
       colClasses = "character",
       na.strings = c("", "NA")
-    )
+    ) |>
+      tidytable::distinct(
+        feature_id,
+        rt,
+        mz
+      )
     logger::log_trace("... annotations")
     annotation_tables_list <- purrr::map(
       .x = annotations,

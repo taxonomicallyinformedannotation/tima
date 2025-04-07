@@ -1589,6 +1589,7 @@ list(
         fea_pre <- prepare_features_tables(
           features = input_features,
           output = par_pre_fea_tab$files$features$prepared,
+          candidates = par_pre_fea_tab$annotations$candidates$samples,
           name_features = par_pre_fea_tab$names$features,
           name_rt = par_pre_fea_tab$names$rt$features,
           name_mz = par_pre_fea_tab$names$precursor
@@ -1601,13 +1602,11 @@ list(
     name = tax_pre,
     command = {
       tax_pre <- prepare_taxa(
-        input = input_features,
-        name_features = par_pre_tax$names$features,
+        input = fea_pre,
         name_filename = par_pre_tax$names$filename,
         extension = par_pre_tax$names$extension,
         colname = par_pre_tax$names$taxon,
         metadata = par_pre_tax$files$metadata$raw,
-        top_k = par_pre_tax$organisms$candidates,
         org_tax_ott = lib_mer_org_tax_ott,
         output = par_pre_tax$files$metadata$prepared,
         taxon = par_pre_tax$organisms$taxon

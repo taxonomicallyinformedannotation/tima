@@ -222,6 +222,33 @@ ui <- shiny::fluidPage(
               "In case you have many edges, helps reducing the memory load."
             )
           ),
+        shiny::sliderInput(
+          inputId = "ann_can_sam",
+          label = "Number of samples to keep per feature",
+          min = 1L,
+          max = 5L,
+          value = 1L,
+          step = 1L,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Only has impact if you provided a metadata file in the
+              `Files` panel.",
+              "In this case,
+              it will take the intensity matrix of your features",
+              "and attribute the n samples where the highest intensity",
+              "was observed as source to your features.",
+              "Useful when your experiment contains
+              different biological sources.",
+              "As the samples where the measured intensity
+              is the highest are also the ones",
+              "with higher likelihood of the
+              corresponding compounds being isolated,",
+              "the number of samples can be kept low."
+            )
+          ),
         shiny::checkboxInput(
           inputId = "ann_ms1only",
           label = "Erase MS2 results and keep MS1 only",
@@ -774,33 +801,6 @@ ui <- shiny::fluidPage(
               "All features will be attributed to this source.",
               "For finer attribution,
               you need to provide a metadata file in the `Files` panel."
-            )
-          ),
-        shiny::sliderInput(
-          inputId = "org_can",
-          label = "Number of organisms to keep per feature",
-          min = 1,
-          max = 5,
-          value = 1,
-          step = 1,
-          ticks = FALSE
-        ) |>
-          shinyhelper::helper(
-            type = "inline",
-            content = c(
-              "Only has impact if you provided a metadata file in the
-              `Files` panel.",
-              "In this case,
-              it will take the intensity matrix of your features",
-              "and attribute the n organisms where the highest intensity",
-              "was observed as source to your features.",
-              "Useful when your experiment contains
-              different biological sources.",
-              "As the organisms where the measured intensity
-              is the highest are also the ones",
-              "with higher likelihood of the
-              corresponding compounds being isolated,",
-              "the number of organisms can be kept low."
             )
           ),
         shiny::checkboxInput(
@@ -1965,6 +1965,8 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$ann_can_fin)
   yaml_advanced$annotations$candidates$neighbors <-
     shiny::isolate(input$ann_can_nei)
+  yaml_advanced$annotations$candidates$samples <-
+    shiny::isolate(input$ann_can_sam)
   yaml_advanced$annotations$ms1only <-
     shiny::isolate(input$ann_ms1only)
   yaml_advanced$annotations$ms2approx <-
@@ -2175,8 +2177,6 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$names_target)
   yaml_advanced$names$taxon <-
     shiny::isolate(input$names_taxon)
-  yaml_advanced$organisms$candidates <-
-    shiny::isolate(input$org_can)
   yaml_advanced$organisms$filter$mode <-
     shiny::isolate(input$org_fil_mod)
   yaml_advanced$organisms$filter$level <-

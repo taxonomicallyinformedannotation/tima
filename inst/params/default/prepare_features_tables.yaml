@@ -1,4 +1,10 @@
 ---
+#' Annotations related parameters.
+annotations:
+  #' Number of candidates to keep per feature.
+  candidates:
+    #' Number of samples to keep per feature. INTEGER
+    samples: 1
 #' Files.
 files:
   #' Features files.

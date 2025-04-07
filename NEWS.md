@@ -2,6 +2,7 @@
 
 # tima 2.12.0
 
+* Added a parameter to limit the numbers of neighbors used for chemical consistency calculation (#193)
 * Added MERLIN spectral libraries (#190)
 * Added `RDKit`-based structures processing through `reticulate` (#19)
 * Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
@@ -12,6 +13,7 @@
 * Improved logs using `logger` (#189)
 * Keep (only) best molecular formula and canopus annotations from SIRIUS
 * New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
+* Refactored MS1 annotation step to work per sample (#194)
 * Updated to Massbank version `2024.11`
 
 # tima 2.11.1 (unreleased)

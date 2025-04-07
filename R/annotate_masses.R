@@ -183,7 +183,7 @@ annotate_masses <-
         .cols = c("mz"),
         .fns = as.numeric
       )) |>
-      tidytable::distinct(feature_id, .keep_all = TRUE)
+      tidytable::distinct(feature_id, sample, .keep_all = TRUE)
 
     if (any(names(features_table) == "rt")) {
       df_fea_min <- df_fea_min |>
@@ -204,7 +204,7 @@ annotate_masses <-
     df_couples_diff <- df_rt_tol |>
       dplyr::inner_join(
         df_fea_min,
-        by = dplyr::join_by(rt_min <= rt, rt_max >= rt)
+        by = dplyr::join_by(rt_min <= rt, rt_max >= rt, sample == sample)
       ) |>
       tidytable::distinct(
         feature_id = feature_id.x,

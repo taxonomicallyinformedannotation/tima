@@ -25,6 +25,7 @@ prepare_params <- function(
   logger::log_trace("All params")
   ann_can_fin <- params_advanced$annotations$candidates$final
   ann_can_nei <- params_advanced$annotations$candidates$neighbors
+  ann_can_sam <- params_advanced$annotations$candidates$samples
   ann_ms1only <- params_advanced$annotations$ms1only
   ann_ms2_app <- params_advanced$annotations$ms2approx
   ann_thr_con <- params_advanced$annotations$thresholds$consistency
@@ -132,7 +133,6 @@ prepare_params <- function(
   names_source <- params_advanced$names$source
   names_target <- params_advanced$names$target
   names_taxon <- params_advanced$names$taxon
-  org_can <- params_advanced$organisms$candidates
   org_fil_mod <- params_advanced$organisms$filter$mode
   org_fil_lev <- params_advanced$organisms$filter$level
   org_fil_val <- params_advanced$organisms$filter$value
@@ -389,6 +389,8 @@ prepare_params <- function(
     names_target
 
   ## prepare_features_tables
+  yamls_params$prepare_features_tables$annotations$candidates$samples <-
+    ann_can_sam
   yamls_params$prepare_features_tables$files$features$raw <-
     fil_fea_raw
   yamls_params$prepare_features_tables$files$features$prepared <-
@@ -525,8 +527,8 @@ prepare_params <- function(
     names_mgf_xl
 
   ## prepare_taxa
-  yamls_params$prepare_taxa$files$features$raw <-
-    fil_fea_raw
+  yamls_params$prepare_taxa$files$features$prepared <-
+    fil_fea_pre
   yamls_params$prepare_taxa$files$metadata$raw <-
     fil_met_raw
   yamls_params$prepare_taxa$files$metadata$prepared <-
@@ -535,14 +537,10 @@ prepare_params <- function(
     fil_lib_sop_mer_org_tax_ott
   yamls_params$prepare_taxa$names$extension <-
     names_extension
-  yamls_params$prepare_taxa$names$features <-
-    names_features
   yamls_params$prepare_taxa$names$filename <-
     names_filename
   yamls_params$prepare_taxa$names$taxon <-
     names_taxon
-  yamls_params$prepare_taxa$organisms$candidates <-
-    org_can
   yamls_params$prepare_taxa$organisms$taxon <-
     org_tax
 
