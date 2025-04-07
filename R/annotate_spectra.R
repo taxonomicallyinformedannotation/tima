@@ -169,7 +169,7 @@ annotate_spectra <- function(
     ## Fix needed
     lib_precursors <- spectral_library@backend@spectraData |>
       tidytable::transmute(
-        precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
+        precursor = tidytable::coalesce(tidytable::across(tidyselect::any_of(
           c("precursorMz", "precursor_mz")
         )))
       ) |>
@@ -198,7 +198,7 @@ annotate_spectra <- function(
       ## Fix needed
       lib_precursors <- spectral_library@backend@spectraData |>
         tidytable::transmute(
-          precursor = tidytable::coalesce(tidytable::across(tidytable::any_of(
+          precursor = tidytable::coalesce(tidytable::across(tidyselect::any_of(
             c("precursorMz", "precursor_mz")
           )))
         ) |>

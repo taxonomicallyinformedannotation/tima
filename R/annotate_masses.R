@@ -216,10 +216,12 @@ annotate_masses <-
         adduct_dest = adduct.y
       ) |>
       tidytable::select(
-        tidyselect::everything(),
-        feature_id_dest,
-        mz_dest,
-        adduct_dest
+        tidyselect::all_of(
+          tidyselect::everything(),
+          feature_id_dest,
+          mz_dest,
+          adduct_dest
+        )
       ) |>
       tidytable::filter(feature_id != feature_id_dest) |>
       tidytable::filter(mz_dest >= mz) |>
