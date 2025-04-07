@@ -205,6 +205,7 @@ prepare_libraries_rt <-
       )
       smiles <- unique(df_missing$smiles)
 
+      ## TODO replace with process_smiles
       get_inchikey <- function(smiles, toolkit = "rdkit") {
         url <- paste0(
           "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
