@@ -6,7 +6,7 @@ annotations:
     #' Number of final candidates. INTEGER
     final: 1
     #' Number of neighbors to keep per feature. INTEGER
-    neighbors: 24
+    neighbors: 16
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: false
