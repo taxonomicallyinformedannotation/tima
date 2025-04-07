@@ -7,6 +7,8 @@ annotations:
     final: 1
     #' Number of neighbors to keep per feature. INTEGER
     neighbors: 24
+    #' Number of samples to keep per feature. INTEGER
+    samples: 1
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: false
@@ -561,9 +563,6 @@ names:
 
 #' Organisms related parameters.
 organisms:
-  #' Number of organisms to keep per feature. INTEGER
-  candidates: 1
-
   #' Organisms filter related parameters.
   filter:
     #' Filter library to restrict it to a portion of organisms only. BOOLEAN
