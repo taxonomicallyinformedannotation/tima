@@ -56,13 +56,11 @@ to match the Open Tree of Life taxonomy</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_taxa</span><span class="op">(</span></span>
-<span>  input <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">raw</span>,</span>
+<span>  input <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">prepared</span>,</span>
 <span>  extension <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">extension</span>,</span>
-<span>  name_features <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">features</span>,</span>
 <span>  name_filename <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">filename</span>,</span>
 <span>  colname <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">taxon</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">raw</span>,</span>
-<span>  top_k <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">candidates</span>,</span>
 <span>  org_tax_ott <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span></span>
 <span>    <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">libraries</span><span class="op">$</span><span class="va">sop</span><span class="op">$</span><span class="va">merged</span><span class="op">$</span><span class="va">organisms</span><span class="op">$</span><span class="va">taxonomies</span><span class="op">$</span><span class="va">ott</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">prepared</span>,</span>
@@ -83,10 +81,6 @@ to match the Open Tree of Life taxonomy</p>
 (mzmine mainly)</p></dd>
 
 
-<dt id="arg-name-features">name_features<a class="anchor" aria-label="anchor" href="#arg-name-features"></a></dt>
-<dd><p>Name of the features column in the features file</p></dd>
-
-
 <dt id="arg-name-filename">name_filename<a class="anchor" aria-label="anchor" href="#arg-name-filename"></a></dt>
 <dd><p>Name of the file name column in the metadata file</p></dd>
 
@@ -97,10 +91,6 @@ to match the Open Tree of Life taxonomy</p>
 
 <dt id="arg-metadata">metadata<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
 <dd><p>File containing your metadata including biological source</p></dd>
-
-
-<dt id="arg-top-k">top_k<a class="anchor" aria-label="anchor" href="#arg-top-k"></a></dt>
-<dd><p>Number of organisms to be retained per feature top intensities</p></dd>
 
 
 <dt id="arg-org-tax-ott">org_tax_ott<a class="anchor" aria-label="anchor" href="#arg-org-tax-ott"></a></dt>
@@ -129,31 +119,6 @@ or attribute them to multiple ones,
 according to their relative intensities among the samples.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="copy_backbone.html">copy_backbone</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="go_to_cache.html">go_to_cache</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">github</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span></span>
-<span class="r-in"><span><span class="va">repo</span> <span class="op">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span></span>
-<span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">github</span>, <span class="va">repo</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">org_tax_ott</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"data/interim/libraries/"</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"sop/merged/organisms/taxonomies/ott.tsv"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dir</span>, <span class="va">org_tax_ott</span><span class="op">)</span>, export <span class="op">=</span> <span class="va">org_tax_ott</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="get_file.html">get_file</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  url <span class="op">=</span> <span class="fu"><a href="get_default_paths.html">get_default_paths</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">urls</span><span class="op">$</span><span class="va">examples</span><span class="op">$</span><span class="va">features</span>,</span></span>
-<span class="r-in"><span>  export <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_taxa"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">raw</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">prepare_taxa</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  taxon <span class="op">=</span> <span class="st">"Homo sapiens"</span>,</span></span>
-<span class="r-in"><span>  org_tax_ott <span class="op">=</span> <span class="va">org_tax_ott</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"data"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -55,6 +55,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_features_tables</span><span class="op">(</span></span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">raw</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">features</span><span class="op">$</span><span class="va">prepared</span>,</span>
+<span>  candidates <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">canidates</span><span class="op">$</span><span class="va">samples</span>,</span>
 <span>  name_adduct <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">adduct</span>,</span>
 <span>  name_features <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">features</span>,</span>
 <span>  name_rt <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"prepare_features_tables"</span><span class="op">)</span><span class="op">$</span><span class="va">names</span><span class="op">$</span><span class="va">rt</span><span class="op">$</span><span class="va">features</span>,</span>
@@ -72,6 +73,10 @@
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
 <dd><p>Path to the file to export the merged data to</p></dd>
+
+
+<dt id="arg-candidates">candidates<a class="anchor" aria-label="anchor" href="#arg-candidates"></a></dt>
+<dd><p>Number of samples to be retained per feature top intensities</p></dd>
 
 
 <dt id="arg-name-adduct">name_adduct<a class="anchor" aria-label="anchor" href="#arg-name-adduct"></a></dt>

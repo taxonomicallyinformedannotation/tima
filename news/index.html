@@ -47,7 +47,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.12.0" id="tima-2120">tima 2.12.0<a class="anchor" aria-label="anchor" href="#tima-2120"></a></h2>
-<ul><li>Added MERLIN spectral libraries (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/190" class="external-link">#190</a>)</li>
+<ul><li>Added a parameter to limit the numbers of neighbors used for chemical consistency calculation (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/193" class="external-link">#193</a>)</li>
+<li>Added MERLIN spectral libraries (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/190" class="external-link">#190</a>)</li>
 <li>Added <code>RDKit</code>-based structures processing through <code>reticulate</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/19" class="external-link">#19</a>)</li>
 <li>Breaking Change: <code>.RDS</code> spectra are now stored more efficiently. To avoid errors, delete any <code>.RDS</code> files created before version <code>2.12.0</code>
 </li>
@@ -59,6 +60,7 @@
 <li>Improved logs using <code>logger</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/189" class="external-link">#189</a>)</li>
 <li>Keep (only) best molecular formula and canopus annotations from SIRIUS</li>
 <li>New ISDB version with 1 million compounds (see <a href="https://doi.org/10.5281/zenodo.14887271" class="external-link uri">https://doi.org/10.5281/zenodo.14887271</a>)</li>
+<li>Refactored MS1 annotation step to work per sample (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/194" class="external-link">#194</a>)</li>
 <li>Updated to Massbank version <code>2024.11</code>
 </li>
 </ul></div>
