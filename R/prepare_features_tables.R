@@ -60,7 +60,7 @@ prepare_features_tables <-
 
     feature_table <- feature_table_0 |>
       tidytable::select(
-        tidyselect::all_of(c(name_features, name_rt, name_mz, name_adduct)),
+        tidyselect::any_of(c(name_features, name_rt, name_mz, name_adduct)),
         tidyselect::matches(" Peak area"),
         tidyselect::matches(":area"),
         tidyselect::matches("quant_"),
@@ -100,7 +100,7 @@ prepare_features_tables <-
     logger::log_trace("Filtering top intensities per feature")
     features_prepared <- feature_table |>
       tidytable::pivot_longer(
-        cols = !tidyselect::all_of(c(
+        cols = !tidyselect::any_of(c(
           name_features,
           name_rt,
           name_mz,
