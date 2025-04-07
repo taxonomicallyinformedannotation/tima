@@ -212,7 +212,7 @@ ms:
       #' Relative in ppm.
       ppm:
         #' Relative mass tolerance for MS1 in ppm. FLOAT
-        ms1: 10
+        ms1: 10.0
 
       #' Absolute in Dalton.
       dalton:

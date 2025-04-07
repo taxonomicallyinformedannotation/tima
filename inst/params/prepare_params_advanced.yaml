@@ -426,8 +426,8 @@ ms:
   thresholds:
     #' MS2 related parameters.
     ms2:
-      #' Intensity threshold for MS2. INTEGER
-      intensity: 5
+      #' Intensity threshold for MS2. FLOAT
+      intensity: 5.0
 
   #' Tolerances.
   tolerances:
@@ -436,10 +436,10 @@ ms:
       #' Relative in ppm.
       ppm:
         #' Relative mass tolerance for MS1 in ppm. FLOAT
-        ms1: 10
+        ms1: 10.0
 
         #' Relative mass tolerance for MS2 in ppm. FLOAT
-        ms2: 10
+        ms2: 10.0
 
       #' Absolute in Dalton.
       dalton:
