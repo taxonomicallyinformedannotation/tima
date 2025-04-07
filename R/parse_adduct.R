@@ -23,7 +23,7 @@ parse_adduct <- function(
     str = adduct_string,
     pattern = regex
   )
-  if (length(matches > 0)) {
+  if (length(matches) > 0) {
     matches <- matches[[1]]
   } else {
     matches <- matrix(NA)
