@@ -399,6 +399,7 @@ testthat::test_that(desc = "Test functions", code = {
   )
   calculate_mass_of_m(adduct_string = "[M+CH3COO]-/[M-CH3]-", mz = 123.456)
   calculate_mass_of_m(adduct_string = "[M+K-2H]-", mz = 123.456)
+  calculate_mass_of_m(adduct_string = NULL, mz = 123.456)
   ### Negative and no RT
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",

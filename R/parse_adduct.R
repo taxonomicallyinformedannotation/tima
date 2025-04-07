@@ -22,7 +22,12 @@ parse_adduct <- function(
   matches <- stringi::stri_match_all_regex(
     str = adduct_string,
     pattern = regex
-  )[[1]]
+  )
+  if (length(matches > 0)) {
+    matches <- matches[[1]]
+  } else {
+    matches <- matrix(NA)
+  }
 
   unexpected <- c(
     "n_mer" = 0,
