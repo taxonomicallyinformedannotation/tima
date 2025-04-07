@@ -66,6 +66,8 @@
 <span>  edges <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">networks</span><span class="op">$</span><span class="va">spectral</span><span class="op">$</span><span class="va">edges</span><span class="op">$</span><span class="va">prepared</span>,</span>
 <span>  taxa <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">prepared</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">files</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">processed</span>,</span>
+<span>  candidates_neighbors <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span></span>
+<span>    <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">neighbors</span>,</span>
 <span>  candidates_final <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">final</span>,</span>
 <span>  weight_spectral <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">weights</span><span class="op">$</span><span class="va">global</span><span class="op">$</span><span class="va">spectral</span>,</span>
 <span>  weight_chemical <span class="op">=</span> <span class="fu"><a href="get_params.html">get_params</a></span><span class="op">(</span>step <span class="op">=</span> <span class="st">"weight_annotations"</span><span class="op">)</span><span class="op">$</span><span class="va">weights</span><span class="op">$</span><span class="va">global</span><span class="op">$</span><span class="va">chemical</span>,</span>
@@ -174,6 +176,10 @@
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
 <dd><p>Output file</p></dd>
+
+
+<dt id="arg-candidates-neighbors">candidates_neighbors<a class="anchor" aria-label="anchor" href="#arg-candidates-neighbors"></a></dt>
+<dd><p>Number of neighbors candidates to keep</p></dd>
 
 
 <dt id="arg-candidates-final">candidates_final<a class="anchor" aria-label="anchor" href="#arg-candidates-final"></a></dt>
