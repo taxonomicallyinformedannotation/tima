@@ -765,16 +765,16 @@ list(
   ## Inputs
   list(
     tar_target(
-      name = par_pre_tax_fil_fea_raw,
+      name = par_pre_fea_tab_fil_fea_raw,
       command = {
-        par_pre_tax_fil_fea_raw <- par_pre_tax$files$features$raw
+        par_pre_fea_tab_fil_fea_raw <-par_pre_fea_tab$files$features$raw
       },
       format = "file"
     ),
     tar_target(
       name = input_features,
       command = {
-        input_features <- par_pre_tax_fil_fea_raw
+        input_features <- par_pre_fea_tab_fil_fea_raw
         # input_features <-
         #   ifelse(
         #     test = !is.null(gnps_features),
