@@ -1,6 +1,8 @@
 {
   "input": {
     "ann_can_fin": 1,
+    "ann_can_nei": 24,
+    "ann_can_sam": 1,
     "ann_ms1only": false,
     "ann_ms2_app": false,
     "ann_thr_con": 0,
@@ -142,7 +144,6 @@
     "names_source": "CLUSTERID1",
     "names_target": "CLUSTERID2",
     "names_taxon": "ATTRIBUTE_species",
-    "org_can": 1,
     "org_fil_lev": "phylum",
     "org_fil_mod": false,
     "org_fil_val": "Streptophyta",
