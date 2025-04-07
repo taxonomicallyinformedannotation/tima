@@ -458,15 +458,10 @@ annotate_masses <-
       )
     rm(df_adducted, df_nl_min)
 
-    if (nrow(df_addlossed) != 0) {
-      df_addlossed_min <- df_addlossed |>
-        tidytable::mutate_rowwise(
-          mass = calculate_mass_of_m(adduct_string = adduct, mz = mz)
-        )
-    } else {
-      df_addlossed_min <- df_addlossed |>
-        tidytable::mutate(mass = NA_real_)
-    }
+    df_addlossed_min <- df_addlossed |>
+      tidytable::mutate_rowwise(
+        mass = calculate_mass_of_m(adduct_string = adduct, mz = mz)
+      )
 
     ## Safety
     df_addlossed_min_1 <- df_addlossed_min |>
