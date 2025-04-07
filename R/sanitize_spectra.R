@@ -70,6 +70,7 @@ sanitize_spectra <-
         )
     }
 
+    logger::log_trace("Reducing spectra")
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
       Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
@@ -80,6 +81,7 @@ sanitize_spectra <-
         ppm = ppm,
         mz = c(">=")
       ) |>
+      Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
       Spectra::scalePeaks()
 
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData) && combine) {
@@ -105,7 +107,7 @@ sanitize_spectra <-
         Spectra::scalePeaks()
     }
 
-    # Removing empty spectra
+    logger::log_trace("Filtering empty spectra")
     spectra <- spectra |>
       Spectra::filterEmptySpectra()
     # Fix needed as some empty spectra are else not removed
@@ -123,6 +125,7 @@ sanitize_spectra <-
         as.character() |>
         as.logical()
     ]
+    logger::log_info("Considering {spectra |> length()} spectra")
 
     return(spectra)
   }
