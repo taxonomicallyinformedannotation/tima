@@ -191,10 +191,10 @@ ui <- shiny::fluidPage(
         shiny::sliderInput(
           inputId = "ann_can_fin",
           label = "Number of final candidates",
-          min = 1,
-          max = 500,
-          value = 1,
-          step = 1,
+          min = 1L,
+          max = 500L,
+          value = 1L,
+          step = 1L,
           ticks = FALSE
         ) |>
           shinyhelper::helper(
@@ -203,6 +203,23 @@ ui <- shiny::fluidPage(
               "Number of final candidates to consider.",
               "For 12 candidates, with 10, only the first 10 will be kept.",
               "This can end to more than n candidates, if some are ex aequo."
+            )
+          ),
+        shiny::sliderInput(
+          inputId = "ann_can_nei",
+          label = "Number of neighbors to keep per feature",
+          min = 1L,
+          max = 100L,
+          value = 24L,
+          step = 1L,
+          ticks = FALSE
+        ) |>
+          shinyhelper::helper(
+            type = "inline",
+            content = c(
+              "Number of neighbors to keep per feature.",
+              "This affects chemical consistency calculation.",
+              "In case you have many edges, helps reducing the memory load."
             )
           ),
         shiny::checkboxInput(
@@ -1946,6 +1963,8 @@ ui <- shiny::fluidPage(
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
+  yaml_advanced$annotations$candidates$neighbors <-
+    shiny::isolate(input$ann_can_nei)
   yaml_advanced$annotations$ms1only <-
     shiny::isolate(input$ann_ms1only)
   yaml_advanced$annotations$ms2approx <-

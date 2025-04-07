@@ -18,6 +18,8 @@ weight_annotations(
   edges = get_params(step = "weight_annotations")$files$networks$spectral$edges$prepared,
   taxa = get_params(step = "weight_annotations")$files$metadata$prepared,
   output = get_params(step = "weight_annotations")$files$annotations$processed,
+  candidates_neighbors = get_params(step =
+    "weight_annotations")$annotations$candidates$neighbors,
   candidates_final = get_params(step = "weight_annotations")$annotations$candidates$final,
   weight_spectral = get_params(step = "weight_annotations")$weights$global$spectral,
   weight_chemical = get_params(step = "weight_annotations")$weights$global$chemical,
@@ -103,6 +105,8 @@ weight_annotations(
 \item{taxa}{Prepared taxed features file}
 
 \item{output}{Output file}
+
+\item{candidates_neighbors}{Number of neighbors candidates to keep}
 
 \item{candidates_final}{Number of final candidates to keep}
 

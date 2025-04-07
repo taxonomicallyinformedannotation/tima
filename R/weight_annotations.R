@@ -22,6 +22,7 @@
 #' @param edges Prepared edges file
 #' @param taxa Prepared taxed features file
 #' @param output Output file
+#' @param candidates_neighbors Number of neighbors candidates to keep
 #' @param candidates_final Number of final candidates to keep
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_chemical Weight for the biological score
@@ -183,6 +184,9 @@ weight_annotations <- function(
   )$files$networks$spectral$edges$prepared,
   taxa = get_params(step = "weight_annotations")$files$metadata$prepared,
   output = get_params(step = "weight_annotations")$files$annotations$processed,
+  candidates_neighbors = get_params(
+    step = "weight_annotations"
+  )$annotations$candidates$neighbors,
   candidates_final = get_params(
     step = "weight_annotations"
   )$annotations$candidates$final,
@@ -312,7 +316,13 @@ weight_annotations <- function(
     file = edges,
     na.strings = c("", "NA"),
     colClasses = "character"
-  )
+  ) |>
+    tidytable::group_by(feature_source) |>
+    tidytable::slice_max(
+      order_by = candidate_score_similarity,
+      n = candidates_neighbors,
+      with_ties = FALSE
+    )
 
   logger::log_trace("... structure-organism pairs")
   library_table <- tidytable::fread(
