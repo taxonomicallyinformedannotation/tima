@@ -48,7 +48,7 @@ prepare_features_tables <-
     )
 
     logger::log_trace("Preparing features table")
-    feature_table_0 <- features |>
+    features_table_0 <- features |>
       tidytable::fread(na.strings = c("", "NA"), colClasses = "character")
 
     logger::log_trace("Formatting feature table")
@@ -58,7 +58,7 @@ prepare_features_tables <-
     logger::log_trace("... or 'quant_' in columns (SLAW format)")
     logger::log_trace("... or 'Peak height' in columns (SIRIUS format)")
 
-    feature_table <- feature_table_0 |>
+    features_table <- features_table_0 |>
       tidytable::select(
         tidyselect::any_of(c(name_features, name_rt, name_mz, name_adduct)),
         tidyselect::matches(" Peak area"),
@@ -67,14 +67,14 @@ prepare_features_tables <-
         tidyselect::matches(" Peak height")
       ) |>
       tidytable::select(-tidyselect::matches("quant_peaktable"))
-    rm(feature_table_0)
-    colnames(feature_table) <- colnames(feature_table) |>
+    rm(features_table_0)
+    colnames(features_table) <- colnames(features_table) |>
       stringi::stri_replace_all_fixed(
         pattern = " Peak area",
         replacement = "",
         vectorize_all = FALSE
       )
-    colnames(feature_table) <- colnames(feature_table) |>
+    colnames(features_table) <- colnames(features_table) |>
       stringi::stri_replace_all_fixed(
         pattern = ":area",
         replacement = "",
@@ -85,20 +85,20 @@ prepare_features_tables <-
         replacement = "",
         vectorize_all = FALSE
       )
-    colnames(feature_table) <- colnames(feature_table) |>
+    colnames(features_table) <- colnames(features_table) |>
       stringi::stri_replace_all_fixed(
         pattern = "quant_",
         replacement = "",
         vectorize_all = FALSE
       )
-    colnames(feature_table) <- colnames(feature_table) |>
+    colnames(features_table) <- colnames(features_table) |>
       stringi::stri_replace_all_fixed(
         pattern = " Peak height",
         replacement = "",
         vectorize_all = FALSE
       )
     logger::log_trace("Filtering top intensities per feature")
-    features_prepared <- feature_table |>
+    features_prepared <- features_table |>
       tidytable::pivot_longer(
         cols = !tidyselect::any_of(c(
           name_features,
@@ -124,7 +124,7 @@ prepare_features_tables <-
         )
       )) |>
       tidytable::arrange(feature_id |> as.numeric())
-    rm(feature_table)
+    rm(features_table)
 
     export_params(
       parameters = get_params(step = "prepare_features_tables"),

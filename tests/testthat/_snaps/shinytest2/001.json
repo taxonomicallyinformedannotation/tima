@@ -1,7 +1,7 @@
 {
   "input": {
     "ann_can_fin": 1,
-    "ann_can_nei": 24,
+    "ann_can_nei": 16,
     "ann_can_sam": 1,
     "ann_ms1only": false,
     "ann_ms2_app": false,

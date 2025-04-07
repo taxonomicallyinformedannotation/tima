@@ -210,7 +210,7 @@ ui <- shiny::fluidPage(
           label = "Number of neighbors to keep per feature",
           min = 1L,
           max = 100L,
-          value = 24L,
+          value = 16L,
           step = 1L,
           ticks = FALSE
         ) |>

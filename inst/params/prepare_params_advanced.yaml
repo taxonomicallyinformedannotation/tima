@@ -6,7 +6,7 @@ annotations:
     #' Number of final candidates. INTEGER
     final: 1
     #' Number of neighbors to keep per feature. INTEGER
-    neighbors: 24
+    neighbors: 16
     #' Number of samples to keep per feature. INTEGER
     samples: 1
 

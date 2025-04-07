@@ -419,7 +419,8 @@ testthat::test_that(desc = "Test functions", code = {
     "feature_id" = c(1, 2),
     "mz" = c(123.4567, 141.4678),
     "rt" = c(0.01, 0.02),
-    "adduct" = c("[M+XYZ]+", "[M+XYZ-H2O]+")
+    "adduct" = c("[M+XYZ]+", "[M+XYZ-H2O]+"),
+    "sample" = "sample.mzML"
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
   annotate_masses(
