@@ -33,9 +33,7 @@ split_tables_sop <- function(table, cache) {
 
   table_organisms <- table |>
     tidytable::select(
-      tidyselect::all_of(
-        tidyselect::contains("organism")
-      )
+      tidyselect::contains("organism")
     ) |>
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
@@ -46,11 +44,9 @@ split_tables_sop <- function(table, cache) {
 
   table_structural <- table_structural_initial |>
     tidytable::select(
-      tidyselect::all_of(
-        structure_smiles_initial,
-        structure_name,
-        tidyselect::contains("_tax")
-      )
+      structure_smiles_initial,
+      structure_name,
+      tidyselect::contains("_tax")
     ) |>
     tidytable::distinct() |>
     tidytable::inner_join(table_structural_standardized) |>
@@ -59,11 +55,9 @@ split_tables_sop <- function(table, cache) {
 
   table <- table |>
     tidytable::select(
-      tidyselect::all_of(
-        structure_smiles_initial,
-        tidyselect::contains("organism"),
-        tidyselect::contains("reference")
-      )
+      structure_smiles_initial,
+      tidyselect::contains("organism"),
+      tidyselect::contains("reference")
     ) |>
     tidytable::distinct() |>
     tidytable::inner_join(table_structural) |>
