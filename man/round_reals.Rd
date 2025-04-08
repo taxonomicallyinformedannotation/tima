@@ -4,15 +4,17 @@
 \alias{round_reals}
 \title{Round reals}
 \usage{
-round_reals(df, dig = 5)
+round_reals(df, dig = 5L, cols = c("structure_exact_mass", "structure_xlogp"))
 }
 \arguments{
 \item{df}{Dataframe to use}
 
 \item{dig}{Number of digits}
+
+\item{cols}{Columns}
 }
 \description{
-This function rounds some reals in a dataframe
+This function rounds reals in columns of a dataframe
 }
 \examples{
 NULL
