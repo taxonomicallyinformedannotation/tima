@@ -122,7 +122,7 @@ references:
     email: csardi.gabor@gmail.com
   year: '2025'
   doi: 10.32614/CRAN.package.archive
-  version: '>= 1.1.11'
+  version: '>= 1.1.12'
 - type: software
   title: BiocParallel
   abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
@@ -147,7 +147,7 @@ references:
     given-names: Nitesh
   year: '2025'
   doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.36.0'
+  version: '>= 1.40.0'
 - type: software
   title: docopt
   abstract: 'docopt: Command-Line Interface Specification Language'
@@ -162,7 +162,7 @@ references:
     orcid: https://orcid.org/0000-0002-6580-4718
   year: '2025'
   doi: 10.32614/CRAN.package.docopt
-  version: '>= 0.7.1'
+  version: '>= 0.7.2'
 - type: software
   title: dplyr
   abstract: 'dplyr: A Grammar of Data Manipulation'
@@ -262,7 +262,7 @@ references:
     given-names: Olivier
   year: '2025'
   doi: 10.32614/CRAN.package.gt
-  version: '>= 0.11.1'
+  version: '>= 1.0.0'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
@@ -288,7 +288,7 @@ references:
     email: hadley@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.httr2
-  version: '>= 1.1.1'
+  version: '>= 1.1.2'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -340,7 +340,7 @@ references:
     given-names: Michael
   year: '2025'
   doi: 10.18129/B9.bioc.IRanges
-  version: '>= 2.36.0'
+  version: '>= 2.40.1'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
@@ -354,7 +354,7 @@ references:
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2025'
   doi: 10.32614/CRAN.package.jsonlite
-  version: '>= 1.9.1'
+  version: '>= 2.0.0'
 - type: software
   title: logger
   abstract: 'logger: A Lightweight, Modern and Flexible Logging Utility'
@@ -532,7 +532,7 @@ references:
     orcid: https://orcid.org/0000-0001-5243-233X
   year: '2025'
   doi: 10.32614/CRAN.package.reticulate
-  version: '>= 1.41.0'
+  version: '>= 1.42.0'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -674,7 +674,7 @@ references:
     orcid: https://orcid.org/0000-0003-0637-6028
   year: '2025'
   doi: 10.32614/CRAN.package.stringi
-  version: '>= 1.8.4'
+  version: '>= 1.8.7'
 - type: software
   title: targets
   abstract: 'targets: Dynamic Function-Oriented ''Make''-Like Declarative Pipelines'
