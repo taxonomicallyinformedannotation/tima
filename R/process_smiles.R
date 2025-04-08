@@ -36,7 +36,7 @@ process_smiles <- function(
       table_processed_1 |>
         tidytable::mutate(
           structure_inchikey_connectivity_layer = structure_inchikey |>
-            stringi::stri_sub(from = 1, to = 14)
+            stringi::stri_sub(from = 1L, to = 14L)
         )
     )
   }
@@ -64,7 +64,7 @@ process_smiles <- function(
     ) |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = structure_inchikey |>
-        stringi::stri_sub(from = 1, to = 14)
+        stringi::stri_sub(from = 1L, to = 14L)
     )
 
   return(table_final)

@@ -25,13 +25,13 @@ create_edges <- function(
   ppm_tolerance,
   threshold
 ) {
-  indices <- 1:(nspecs - 1)
+  indices <- 1L:(nspecs - 1L)
 
   edges <- purrr::map(
     .progress = TRUE,
     .x = indices,
     .f = function(index) {
-      target_indices <- (index + 1):nspecs
+      target_indices <- (index + 1L):nspecs
       query_spectrum <- frags[[index]]
       query_precursor <- precs[[index]]
 

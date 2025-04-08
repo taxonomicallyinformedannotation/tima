@@ -2,6 +2,8 @@
 #'
 #' @description This function parses YAML parameters
 #'
+#' @export
+#'
 #' @param def Default path
 #' @param usr User path
 #'
