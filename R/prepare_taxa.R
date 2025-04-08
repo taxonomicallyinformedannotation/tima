@@ -41,7 +41,7 @@
 #' )
 #' get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
 #' get_file(
-#'   url = paste0(dir, "data/interim/features/example_features.tsv),
+#'   url = paste0(dir, "data/interim/features/example_features.tsv"),
 #'   export = get_params(step = "prepare_taxa")$files$features$prepared
 #' )
 #' prepare_taxa(

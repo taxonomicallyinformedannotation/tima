@@ -1,22 +1,23 @@
 #' @title Round reals
 #'
-#' @description This function rounds some reals in a dataframe
+#' @description This function rounds reals in columns of a dataframe
 #'
 #' @param df Dataframe to use
 #' @param dig Number of digits
+#' @param cols Columns
 #'
 #' @return NULL
 #'
 #' @examples NULL
-round_reals <- function(df, dig = 5) {
+round_reals <- function(
+  df,
+  dig = 5L,
+  cols = c("structure_exact_mass", "structure_xlogp")
+) {
   df |>
-    ## Round to 5 digits to avoid small discrepancies
-    ## TODO rename it as for now it gives the feeling all reals in df will be
     tidytable::mutate(tidytable::across(
-      .cols = c(
-        tidyselect::contains("structure_exact_mass"),
-        tidyselect::contains("structure_xlogp")
-      ),
+      .cols = cols |>
+        tidyselect::contains(),
       .fns = \(x) round(as.numeric(x), digits = dig)
     ))
 }

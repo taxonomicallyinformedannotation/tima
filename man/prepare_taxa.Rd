@@ -49,3 +49,26 @@ It can either attribute all features to a single organism,
 or attribute them to multiple ones,
 according to their relative intensities among the samples.
 }
+\examples{
+\dontrun{
+copy_backbone()
+go_to_cache()
+github <- "https://raw.githubusercontent.com/"
+repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+dir <- paste0(github, repo)
+org_tax_ott <- paste0(
+  "data/interim/libraries/",
+  "sop/merged/organisms/taxonomies/ott.tsv"
+)
+get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+get_file(
+  url = paste0(dir, "data/interim/features/example_features.tsv"),
+  export = get_params(step = "prepare_taxa")$files$features$prepared
+)
+prepare_taxa(
+  taxon = "Homo sapiens",
+  org_tax_ott = org_tax_ott
+)
+unlink("data", recursive = TRUE)
+}
+}
