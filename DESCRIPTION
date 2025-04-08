@@ -25,7 +25,7 @@ Depends:
     R (>= 4.3.0)
 Imports:
     archive (>= 1.1.12),
-    BiocParallel (>= 1.40.0),
+    BiocParallel (>= 1.36.0),
     docopt (>= 0.7.2),
     dplyr (>= 1.1.4),
     DT (>= 0.33),
@@ -34,7 +34,7 @@ Imports:
     httr (>= 1.4.7),
     httr2 (>= 1.1.2),
     igraph (>= 2.1.4),
-    IRanges (>= 2.40.1),
+    IRanges (>= 2.36.0),
     jsonlite (>= 2.0.0),
     logger (>= 0.4.0),
     methods,
