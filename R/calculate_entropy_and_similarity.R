@@ -46,12 +46,12 @@ calculate_entropy_and_similarity <- function(
         val_ind <- lib_precursors >=
           min(
             current_precursor - dalton,
-            current_precursor * (1 - (10^-6 * ppm))
+            current_precursor * (1 - (1E-6 * ppm))
           ) &
           lib_precursors <=
             max(
               current_precursor + dalton,
-              current_precursor * (1 + (10^-6 * ppm))
+              current_precursor * (1 + (1E-6 * ppm))
             )
 
         lib_spectra_sub <- lib_spectra[val_ind]

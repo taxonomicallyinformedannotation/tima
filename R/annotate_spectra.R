@@ -176,11 +176,11 @@ annotate_spectra <- function(
       tidytable::pull()
     minimal <- pmin(
       lib_precursors - dalton,
-      lib_precursors * (1 - (10^-6 * ppm))
+      lib_precursors * (1 - (1E-6 * ppm))
     )
     maximal <- pmax(
       lib_precursors + dalton,
-      lib_precursors * (1 + (10^-6 * ppm))
+      lib_precursors * (1 + (1E-6 * ppm))
     )
 
     if (approx == FALSE) {
@@ -205,11 +205,11 @@ annotate_spectra <- function(
         tidytable::pull()
       minimal <- pmin(
         lib_precursors - dalton,
-        lib_precursors * (1 - (10^-6 * ppm))
+        lib_precursors * (1 - (1E-6 * ppm))
       )
       maximal <- pmax(
         lib_precursors + dalton,
-        lib_precursors * (1 + (10^-6 * ppm))
+        lib_precursors * (1 + (1E-6 * ppm))
       )
       rm(df_3)
     }

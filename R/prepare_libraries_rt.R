@@ -177,7 +177,7 @@ prepare_libraries_rt <-
           tidytable::mutate(
             rt = tidytable::if_else(
               condition = unit == "seconds",
-              true = as.numeric(rt) / 60,
+              true = as.numeric(rt) / 60L,
               false = as.numeric(rt)
             )
           ) |>
@@ -312,8 +312,8 @@ prepare_libraries_rt <-
       tidytable::mutate(
         structure_inchikey_connectivity_layer = stringi::stri_sub(
           str = structure_inchikey,
-          from = 1,
-          to = 14
+          from = 1L,
+          to = 14L
         ),
         organism_name = NA_character_
       )

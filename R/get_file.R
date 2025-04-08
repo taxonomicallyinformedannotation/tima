@@ -28,8 +28,8 @@ get_file <-
       options(timeout = limit)
       create_dir(export = export)
 
-      download_with_retry <- function(url, destfile, attempts = 3) {
-        for (i in 1:attempts) {
+      download_with_retry <- function(url, destfile, attempts = 3L) {
+        for (i in 1L:attempts) {
           tryCatch(
             {
               httr2::request(url) |>
