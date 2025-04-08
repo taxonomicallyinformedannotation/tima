@@ -200,7 +200,7 @@
       "@type": "SoftwareApplication",
       "identifier": "archive",
       "name": "archive",
-      "version": ">= 1.1.11",
+      "version": ">= 1.1.12",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -213,7 +213,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.36.0",
+      "version": ">= 1.40.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -226,7 +226,7 @@
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
-      "version": ">= 0.7.1",
+      "version": ">= 0.7.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -278,7 +278,7 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
-      "version": ">= 0.11.1",
+      "version": ">= 1.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -304,7 +304,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.1.1",
+      "version": ">= 1.1.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -330,7 +330,7 @@
       "@type": "SoftwareApplication",
       "identifier": "IRanges",
       "name": "IRanges",
-      "version": ">= 2.36.0",
+      "version": ">= 2.40.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -343,7 +343,7 @@
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
-      "version": ">= 1.9.1",
+      "version": ">= 2.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -374,7 +374,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -387,7 +387,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -400,7 +400,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
-      "version": ">= 1.6.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -413,7 +413,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
-      "version": ">= 1.14.1",
+      "version": ">= 1.18.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -452,7 +452,7 @@
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
-      "version": ">= 1.41.0",
+      "version": ">= 1.42.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -517,7 +517,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.12.0",
+      "version": ">= 1.17.10",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -535,7 +535,7 @@
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
-      "version": ">= 1.8.4",
+      "version": ">= 1.8.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -630,7 +630,7 @@
     "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "1979.096KB",
+  "fileSize": "1979.097KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
