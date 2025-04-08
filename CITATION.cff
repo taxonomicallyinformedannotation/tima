@@ -147,7 +147,7 @@ references:
     given-names: Nitesh
   year: '2025'
   doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.40.0'
+  version: '>= 1.36.0'
 - type: software
   title: docopt
   abstract: 'docopt: Command-Line Interface Specification Language'
@@ -340,7 +340,7 @@ references:
     given-names: Michael
   year: '2025'
   doi: 10.18129/B9.bioc.IRanges
-  version: '>= 2.40.1'
+  version: '>= 2.36.0'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
