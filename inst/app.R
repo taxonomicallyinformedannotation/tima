@@ -2512,14 +2512,22 @@ server <- function(input, output, session) {
       vapply(
         X = fields_mandatory,
         FUN = function(x) {
-          ## TODO improve
           suppressWarnings(any(!is.null(input[[x]]), input[[x]] != ""))
         },
         FUN.VALUE = logical(1)
-      )
-    mandatory_filled <- all(mandatory_filled)
+      ) |>
+      all()
 
-    shinyjs::toggleState(id = "save", condition = mandatory_filled)
+    taxon_filled <- {
+      taxon_fil <- input[["fil_met_raw"]][1]
+      taxon_man <- input[["org_tax"]]
+      (!is.null(taxon_fil) && taxon_fil != "") ||
+        (!is.null(taxon_man) && taxon_man != "")
+    }
+
+    all_conditions <- mandatory_filled && taxon_filled
+
+    shinyjs::toggleState(id = "save", condition = all_conditions)
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
   })
 
