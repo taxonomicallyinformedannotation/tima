@@ -3,7 +3,7 @@
 #' @description This function prepares main parameters
 #'
 #' @export
-#' 
+#'
 #' @include create_dir.R
 #' @include export_params.R
 #' @include get_params.R
