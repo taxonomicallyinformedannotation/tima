@@ -1810,12 +1810,17 @@ ui <- shiny::fluidPage(
         shiny::h3("Thanks, your parameters were saved successfully!")
       )
     ),
-    targets::tar_watch_ui(
-      id = "targets",
-      seconds = 10,
-      targets_only = TRUE,
-      degree_from = 8,
-      display = "graph"
+    shinyjs::hidden(
+      shiny::div(
+        id = "targets",
+        targets::tar_watch_ui(
+          id = "targets",
+          seconds = 10,
+          targets_only = TRUE,
+          degree_from = 8,
+          display = "graph"
+        )
+      )
     ),
     shinyjs::hidden(
       shiny::downloadButton(
