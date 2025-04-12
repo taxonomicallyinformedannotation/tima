@@ -50,7 +50,6 @@ import_spectra <- function(
     EXPR = file_ext,
     "mgf" = {
       read_mgf_opti(f = file) |>
-        # TODO Change as soon as R 4.4.0 becomes oldrel
         # MsBackendMgf::readMgfSplit(f = file) |>
         Spectra::Spectra()
     },
