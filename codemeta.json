@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
+  "runtimePlatform": "R version 4.5.0 (2025-04-11)",
   "author": [
     {
       "@type": "Person",
@@ -194,7 +194,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 4.3.0"
+      "version": ">= 4.4.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -213,7 +213,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.36.0",
+      "version": ">= 1.40.2",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -330,7 +330,7 @@
       "@type": "SoftwareApplication",
       "identifier": "IRanges",
       "name": "IRanges",
-      "version": ">= 2.36.0",
+      "version": ">= 2.40.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -374,7 +374,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -387,7 +387,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -400,7 +400,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
-      "version": ">= 1.6.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -413,7 +413,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
-      "version": ">= 1.14.1",
+      "version": ">= 1.18.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -517,7 +517,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.12.0",
+      "version": ">= 1.16.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -630,7 +630,7 @@
     "SystemRequirements": "\n    python (>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "1979.095KB",
+  "fileSize": "2524.312KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

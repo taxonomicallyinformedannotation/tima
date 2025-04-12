@@ -15,6 +15,7 @@
 * New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Refactored MS1 annotation step to work per sample (#194)
 * Updated to Massbank version `2024.11`
+* Updated minimal R version to `4.4.0` (and related BioConductor dependencies)
 
 # tima 2.11.1 (unreleased)
 
