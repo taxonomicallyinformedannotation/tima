@@ -45,11 +45,11 @@ install <- function(
       "System Python not found. Installing Miniconda as fallback."
     )
 
-    if (!reticulate::miniconda_exists()) {
+    if (!reticulate::miniconda_path() |> file.exists()) {
       reticulate::install_miniconda()
     }
 
-    return(reticulate::miniconda_python())
+    return(reticulate::miniconda_path() |> file.exists())
   }
 
   setup_virtualenv <- function(envname = "tima-env") {

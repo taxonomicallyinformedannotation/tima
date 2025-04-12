@@ -13,13 +13,13 @@ install(
 )
 }
 \arguments{
-\item{package}{Package}
+\item{package}{Package name}
 
-\item{repos}{Repos}
+\item{repos}{Repositories for install.packages}
 
-\item{dependencies}{Flag for dependencies}
+\item{dependencies}{Whether to install dependencies}
 
-\item{test}{Flag for tests}
+\item{test}{Whether to retry with source or test install}
 }
 \description{
 This function runs some required install
