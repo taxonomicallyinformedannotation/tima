@@ -654,6 +654,13 @@ testthat::test_that(desc = "Test functions", code = {
   # tima:::.onLoad()
   # tima_full()
 
+  ## Errors
+  expect_error(
+    object = get_file(
+      url = "InVaLiDUrL"
+    )
+  )
+
   ## cleanup
   unlink("data", recursive = TRUE)
 

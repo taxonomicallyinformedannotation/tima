@@ -24,19 +24,19 @@ install <- function(
   dependencies = TRUE,
   test = FALSE
 ) {
-  if (Sys.info()[["sysname"]] == "Windows") {
+  system <- Sys.info()[["sysname"]]
+  if (system == "Windows" || isTRUE(test)) {
     logger::log_info("You should install RTools if not already done")
   }
-  if (Sys.info()[["sysname"]] == "Linux") {
-    logger::log_info("You may need system dependencies:")
+  if (system == "Linux") {
     logger::log_info(
-      "sudo apt install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev"
+      "You may need system dependencies: 'sudo apt install libarchive-dev libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev'"
     )
   }
 
   check_or_install_python <- function() {
     python <- Sys.which("python3")
-    if (python != "") {
+    if (python |> nzchar() && isFALSE(test)) {
       logger::log_info("System Python found at: {python}")
       return(python)
     }
@@ -45,11 +45,19 @@ install <- function(
       "System Python not found. Installing Miniconda as fallback."
     )
 
-    if (!reticulate::miniconda_path() |> file.exists()) {
+    minipath <- reticulate::miniconda_path()
+    if (!file.exists(minipath)) {
       reticulate::install_miniconda()
+      minipath <- reticulate::miniconda_path()
+    }
+    python_path <- if (system == "Windows") {
+      file.path(minipath, "python.exe")
+    } else {
+      file.path(minipath, "bin", "python")
     }
 
-    return(reticulate::miniconda_path())
+    logger::log_info("Using Miniconda Python at: {python_path}")
+    return(python_path)
   }
 
   setup_virtualenv <- function(envname = "tima-env") {
