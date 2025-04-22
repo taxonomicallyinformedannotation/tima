@@ -49,7 +49,7 @@ install <- function(
       reticulate::install_miniconda()
     }
 
-    return(reticulate::miniconda_path() |> file.exists())
+    return(reticulate::miniconda_path())
   }
 
   setup_virtualenv <- function(envname = "tima-env") {
