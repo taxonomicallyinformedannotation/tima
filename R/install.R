@@ -65,7 +65,18 @@ install <- function(
 
     if (!reticulate::virtualenv_exists(envname)) {
       logger::log_info("Creating Python virtualenv: {envname}")
-      reticulate::virtualenv_create(envname = envname, python = python)
+      tryCatch(
+        expr = {
+          reticulate::virtualenv_create(envname = envname, python = python)
+        },
+        error = function(e) {
+          logger::log_error("Creating Python virtualenv failed")
+          logger::log_error(e)
+          logger::log_info("Retrying with a clean python install")
+          python <- reticulate::install_python(version = "3")
+          reticulate::virtualenv_create(envname = envname, python = python)
+        }
+      )
     } else {
       logger::log_info("Using existing Python virtualenv: {envname}")
     }
@@ -80,7 +91,7 @@ install <- function(
 
   try_install <- function(from_source = FALSE) {
     tryCatch(
-      {
+      expr = {
         logger::log_trace("Installing R package: {package}")
         utils::install.packages(
           package,
