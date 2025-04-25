@@ -49,6 +49,7 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     )
+  logger::log_trace("Stereo loaded")
 
   met_2d <- tidytable::fread(
     str_met,
@@ -73,6 +74,7 @@ complement_metadata_structures <- function(
       .keep_all = TRUE
     ) |>
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+  logger::log_trace("Metadata loaded")
 
   nam_2d <- tidytable::fread(
     str_nam,
@@ -100,6 +102,7 @@ complement_metadata_structures <- function(
       .keep_all = TRUE
     ) |>
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
+  logger::log_trace("Names loaded")
 
   tax_cla <- tidytable::fread(
     str_tax_cla,
@@ -121,6 +124,7 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     )
+  logger::log_trace("Classyfire done")
 
   tax_npc <- tidytable::fread(
     str_tax_npc,
@@ -135,6 +139,7 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
+  logger::log_trace("NPClassifier done")
 
   met_i <- met_2d |>
     tidytable::select(
@@ -161,6 +166,7 @@ complement_metadata_structures <- function(
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
   rm(met_2d)
+  logger::log_trace("Metadata done")
 
   nam_i <- nam_2d |>
     tidytable::select(
@@ -183,6 +189,7 @@ complement_metadata_structures <- function(
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
   rm(nam_2d)
+  logger::log_trace("Names done")
 
   ## Always returning preferentially internal values
   ## (smiles > inchikey > external)
