@@ -24,6 +24,7 @@ select_annotations_columns <- function(
   str_tax_cla = get("str_tax_cla", envir = parent.frame()),
   str_tax_npc = get("str_tax_npc", envir = parent.frame())
 ) {
+  logger::log_trace("Selecting annotations columns")
   model <- columns_model()
   df <- df |>
     tidytable::select(tidyselect::any_of(
