@@ -23,6 +23,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     utils::head(1)
   archive::archive_read(sirius_zip, f) |>
     utils::read.delim(
+      quote = "",
       na.strings = c("", "NA"),
       colClasses = "character",
       stringsAsFactors = FALSE
