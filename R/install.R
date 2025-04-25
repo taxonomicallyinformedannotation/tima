@@ -103,16 +103,21 @@ install <- function(
           repos = repos,
           dependencies = dependencies,
           INSTALL_opts = c("--no-lock", "--no-test-load"),
-          type = if (from_source) "source" else getOption("pkgType")
+          type = if (from_source) {
+            "source"
+          } else {
+            getOption("pkgType")
+          }
         )
+        logger::log_trace("Installed succesfully R package: {package}")
 
         setup_virtualenv()
-        TRUE
+        return(TRUE)
       },
       error = function(e) {
         logger::log_error("Installation failed")
         logger::log_error(e)
-        FALSE
+        return(FALSE)
       }
     )
   }
