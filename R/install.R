@@ -65,6 +65,8 @@ install <- function(
 
     if (!reticulate::virtualenv_exists(envname)) {
       logger::log_info("Creating Python virtualenv: {envname}")
+      ## TODO improve this
+      rescue_python_version <- "3.13"
       tryCatch(
         expr = {
           reticulate::virtualenv_create(envname = envname, python = python)
@@ -72,12 +74,10 @@ install <- function(
         error = function(e) {
           logger::log_error("Creating Python virtualenv failed")
           logger::log_info("Retrying with a clean python install")
-          ## TODO improve this
-          rescue_python_version <- "3.12.2"
           python <- reticulate::install_python(version = rescue_python_version)
           reticulate::virtualenv_create(
             envname = envname,
-            python = rescue_python_version
+            python = python
           )
         }
       )
@@ -87,7 +87,8 @@ install <- function(
 
     logger::log_info("Installing RDKit in virtualenv: {envname}")
     reticulate::virtualenv_install(
-      envname,
+      envanme = envname,
+      python = python,
       packages = "rdkit",
       ignore_installed = TRUE
     )

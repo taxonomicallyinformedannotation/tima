@@ -73,7 +73,7 @@ Suggests:
     spelling (>= 2.3.1),
     testthat (>= 3.2.3)
 SystemRequirements:
-    python (>= 3.10)
+    python (< 3.14,>= 3.10)
 VignetteBuilder:
     knitr
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
