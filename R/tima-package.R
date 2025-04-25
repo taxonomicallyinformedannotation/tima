@@ -14,13 +14,16 @@ NULL
   shinybusy::use_busy_spinner()
   shinyWidgets::animations
   visNetwork::`%>%`
-  reticulate::py_require("rdkit")
+  reticulate::py_require(packages = "rdkit")
   setup_logger(filename = paste0(pkgname, ".log"))
   invisible()
 }
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("Welcome to ", pkgname)
-  packageStartupMessage(format(utils::citation(pkgname)))
+  packageStartupMessage(
+    utils::citation(package = pkgname) |>
+      format()
+  )
   setup_logger(filename = paste0(pkgname, ".log"))
 }
