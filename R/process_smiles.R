@@ -12,7 +12,7 @@
 process_smiles <- function(
   df,
   smiles_colname = "structure_smiles_initial",
-  cache
+  cache = NULL
 ) {
   logger::log_trace("Processing SMILES")
   reticulate::source_python(
@@ -24,8 +24,20 @@ process_smiles <- function(
     # tidytable::slice_sample(10000L) |>
     tidytable::distinct(!!as.name(smiles_colname))
 
-  table_processed_1 <- cache |>
-    tidytable::fread()
+  if (cache |> is.null()) {
+    table_processed_1 <- tidytable::tidytable(
+      !!as.name(smiles_colname) := NA_character_,
+      "structure_smiles" = NA_character_,
+      "structure_inchikey" = NA_character_,
+      "structure_molecular_formula" = NA_character_,
+      "structure_exact_mass" = NA_real_,
+      "structure_smiles_no_stereo" = NA_character_,
+      "structure_xlogp" = NA_real_
+    )
+  } else {
+    table_processed_1 <- cache |>
+      tidytable::fread()
+  }
 
   table_smiles_to_process <- table_smiles |>
     tidytable::anti_join(table_processed_1)
@@ -56,11 +68,14 @@ process_smiles <- function(
   reticulate::py$process_smiles(input_smi_file, output_csv_file)
 
   table_processed_2 <- output_csv_file |>
-    tidytable::fread()
+    tidytable::fread() |>
+    tidytable::rename(!!as.name(smiles_colname) := "structure_smiles_initial")
 
   table_final <- table_smiles |>
     tidytable::inner_join(
-      table_processed_1 |> tidytable::bind_rows(table_processed_2)
+      table_processed_1 |>
+        tidytable::bind_rows(table_processed_2) |>
+        tidytable::filter(!is.na(smiles_colname))
     ) |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = structure_inchikey |>
