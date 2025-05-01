@@ -364,6 +364,12 @@ testthat::test_that(desc = "Test functions", code = {
     )
   )
 
+  ## no cache
+  tidytable::tidytable(
+    "structure_smiles_initial" = "C[C@@H]1C=C(C(=O)[C@]2([C@H]1C[C@@H]3[C@@]4([C@@H]2C(=O)C(=C([C@@H]4CC(=O)O3)C)OC)C)C)OC"
+  ) |>
+    process_smiles()
+
   ### Features
   #### if no RT
   tidytable::tidytable(
