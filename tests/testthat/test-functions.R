@@ -435,39 +435,58 @@ testthat::test_that(desc = "Test functions", code = {
   )
 
   ## Performing MS2 annotation
-  x <- cbind(
+  ## Small spectra
+  x_small <- cbind(
     mz = c(10, 36, 63, 91, 93),
     intensity = c(14, 15, 999, 650, 1)
   ) |>
     list()
-  y <- cbind(
+  y_small <- cbind(
     mz = c(10, 12, 50, 63, 105),
     intensity = c(35, 5, 16, 999, 450)
   ) |>
     list()
-  ## The precursor m/z
+
+  n_query_large <- 1000
+  n_lib_large <- 1000
+  x_large <- cbind(
+    mz = sort(runif(n_query_large, 100, 1000)),
+    intensity = runif(n_query_large, 1, 1000)
+  ) |>
+    list()
+  y_large <- cbind(
+    mz = sort(runif(n_lib_large, 100, 1000)),
+    intensity = runif(n_lib_large, 1, 1000)
+  ) |>
+    list()
+
+  ## The precursor m/z for spectra
   pmz_x <- 91
   pmz_y <- 105
+
+  ### small
   calculate_entropy_and_similarity(
     lib_ids = 1L,
     lib_precursors = pmz_y,
-    lib_spectra = y,
+    lib_spectra = y_small,
     query_ids = 1L,
     query_precursors = pmz_x,
-    query_spectra = x,
+    query_spectra = x_small,
     dalton = 0.01,
     ppm = 1,
     threshold = 0,
     method = "gnps",
     approx = FALSE
   )
+
+  ### large
   calculate_entropy_and_similarity(
     lib_ids = 1L,
     lib_precursors = pmz_y,
-    lib_spectra = y,
+    lib_spectra = y_large,
     query_ids = 1L,
     query_precursors = pmz_x,
-    query_spectra = x,
+    query_spectra = x_large,
     dalton = 0.01,
     ppm = 1,
     threshold = 0,
