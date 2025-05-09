@@ -7,7 +7,6 @@
 #' @param dalton Dalton tolerance
 #' @param polarity Polarity
 #' @param ppm PPM tolerance
-#' @param combine Flag indicating whether to combine Default TRUE
 #'
 #' @return The sanitized spectra
 #'
@@ -83,29 +82,6 @@ sanitize_spectra <-
       ) |>
       Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
       Spectra::scalePeaks()
-
-    if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData) && combine) {
-      logger::log_trace("Combining spectra in case")
-      spectra <- spectra |>
-        Spectra::combineSpectra(
-          f = spectra$FEATURE_ID,
-          tolerance = dalton,
-          ppm = ppm
-        ) |>
-        Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
-        Spectra::scalePeaks()
-    }
-    if ("SLAW_ID" %in% colnames(spectra@backend@spectraData) && combine) {
-      logger::log_trace("Combining spectra in case")
-      spectra <- spectra |>
-        Spectra::combineSpectra(
-          f = spectra$SLAW_ID,
-          tolerance = dalton,
-          ppm = ppm
-        ) |>
-        Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
-        Spectra::scalePeaks()
-    }
 
     logger::log_trace("Filtering empty spectra")
     spectra <- spectra |>

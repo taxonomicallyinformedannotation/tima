@@ -66,14 +66,35 @@ import_spectra <- function(
       readRDS(file = file)
     }
   )
+  if (combine) {
+    if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
+      logger::log_trace("Combining spectra in case")
+      spectra <- spectra |>
+        Spectra::combineSpectra(
+          f = spectra$FEATURE_ID,
+          tolerance = dalton,
+          ppm = ppm
+        ) |>
+        Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
+    }
+    if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
+      logger::log_trace("Combining spectra in case")
+      spectra <- spectra |>
+        Spectra::combineSpectra(
+          f = spectra$SLAW_ID,
+          tolerance = dalton,
+          ppm = ppm
+        ) |>
+        Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
+    }
+  }
   if (sanitize) {
     spectra <- spectra |>
       sanitize_spectra(
         cutoff = cutoff,
         dalton = dalton,
         polarity = polarity,
-        ppm = ppm,
-        combine = combine
+        ppm = ppm
       )
   }
   return(spectra)

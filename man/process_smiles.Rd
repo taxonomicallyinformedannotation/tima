@@ -4,7 +4,7 @@
 \alias{process_smiles}
 \title{Process SMILES}
 \usage{
-process_smiles(df, smiles_colname = "structure_smiles_initial", cache)
+process_smiles(df, smiles_colname = "structure_smiles_initial", cache = NULL)
 }
 \arguments{
 \item{df}{Dataframe to use}
