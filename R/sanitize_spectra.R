@@ -27,8 +27,7 @@ sanitize_spectra <-
     cutoff = 0,
     dalton = 0.01,
     polarity = NA,
-    ppm = 10,
-    combine = TRUE
+    ppm = 10
   ) {
     logger::log_trace("Applying sanitization of the spectra")
 
