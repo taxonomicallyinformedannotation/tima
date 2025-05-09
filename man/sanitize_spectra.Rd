@@ -23,8 +23,6 @@ sanitize_spectra(
 \item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
-
-\item{combine}{Flag indicating whether to combine Default TRUE}
 }
 \value{
 The sanitized spectra

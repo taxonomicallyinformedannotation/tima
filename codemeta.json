@@ -638,10 +638,10 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=yaml"
     },
-    "SystemRequirements": "\n    python (>= 3.10)"
+    "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2525.42KB",
+  "fileSize": "2529.368KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
