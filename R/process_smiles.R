@@ -24,7 +24,10 @@ process_smiles <- function(
     # tidytable::slice_sample(10000L) |>
     tidytable::distinct(!!as.name(smiles_colname))
 
-  if (cache |> is.null()) {
+  if (
+    cache |>
+      is.null()
+  ) {
     table_processed_1 <- tidytable::tidytable(
       !!as.name(smiles_colname) := NA_character_,
       "structure_smiles" = NA_character_,

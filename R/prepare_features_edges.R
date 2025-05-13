@@ -42,7 +42,8 @@ prepare_features_edges <-
   ) {
     stopifnot(
       "Your input file(s) do(es) not exist" = all(
-        purrr::map(.x = input, .f = file.exists) |> unlist()
+        purrr::map(.x = input, .f = file.exists) |>
+          unlist()
       )
     )
     ## Load edges table

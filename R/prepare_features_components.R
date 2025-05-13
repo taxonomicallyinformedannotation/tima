@@ -37,7 +37,8 @@ prepare_features_components <-
   ) {
     stopifnot(
       "Input file(s) do(es) not exist" = all(
-        purrr::map(.x = input, .f = file.exists) |> unlist()
+        purrr::map(.x = input, .f = file.exists) |>
+          unlist()
       )
     )
 

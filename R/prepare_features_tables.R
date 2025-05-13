@@ -125,7 +125,10 @@ prepare_features_tables <-
           "sample"
         )
       )) |>
-      tidytable::arrange(feature_id |> as.numeric())
+      tidytable::arrange(
+        feature_id |>
+          as.numeric()
+      )
     rm(features_table)
 
     export_params(

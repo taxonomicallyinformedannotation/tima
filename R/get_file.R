@@ -44,7 +44,10 @@ get_file <-
                 "Something went wrong...retrying... attempt ",
                 i
               )
-              logger::log_error(e |> paste())
+              logger::log_error(
+                e |>
+                  paste()
+              )
             }
           )
         }
