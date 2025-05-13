@@ -9,7 +9,8 @@ filter_high_confidence_only(
   df,
   score_bio_min = 0.85,
   score_ini_min = 0.95,
-  score_final_min = 0.75
+  score_final_min = 0.75,
+  error_rt_max = 0.1
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ filter_high_confidence_only(
 \item{score_ini_min}{Minimal initial score. Current default to 0.95.}
 
 \item{score_final_min}{Minimal final score. Current default to 0.75.}
+
+\item{error_rt_max}{Maximal RT error. Current default to 0.1.}
 }
 \value{
 A dataframe containing only high confidence annotations

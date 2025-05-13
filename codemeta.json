@@ -276,7 +276,7 @@
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
-      "version": ">= 1.6.5",
+      "version": ">= 1.6.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -559,7 +559,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.10.1",
+      "version": ">= 1.11.3",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -572,7 +572,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tidyfst",
       "name": "tidyfst",
-      "version": ">= 1.8.1",
+      "version": ">= 1.8.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -641,7 +641,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2529.368KB",
+  "fileSize": "2530.071KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
