@@ -459,7 +459,7 @@ ms:
       adducts: 0.02
 
       #' Retention time tolerance for library in minutes. FLOAT
-      library: 0.1
+      library: .inf
 
 #' Names of the different variables in the input files.
 names:
