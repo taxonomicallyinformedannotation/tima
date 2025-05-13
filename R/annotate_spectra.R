@@ -369,7 +369,10 @@ annotate_spectra <- function(
       logger::log_trace("Filtering results above threshold only")
       df_final <- df_final |>
         tidytable::filter(candidate_score_similarity >= threshold) |>
-        tidytable::arrange(candidate_score_similarity |> tidytable::desc()) |>
+        tidytable::arrange(
+          candidate_score_similarity |>
+            tidytable::desc()
+        ) |>
         ## keep only the best result (per library for now)
         tidytable::distinct(
           feature_id,

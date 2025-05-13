@@ -256,8 +256,10 @@ prepare_libraries_spectra <-
             "synonyms" = NA_character_,
             "xlogp" = NA_character_,
             "rtime" = NA_real_,
-            "mz" = c(1, 2, 3) |> list(),
-            "intensity" = c(1, 2, 3) |> list(),
+            "mz" = c(1, 2, 3) |>
+              list(),
+            "intensity" = c(1, 2, 3) |>
+              list(),
             "library" = NA_character_,
             "precursor_mz" = 0
           ) |>

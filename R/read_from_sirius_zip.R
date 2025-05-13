@@ -17,7 +17,10 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     ) |>
     tidytable::arrange(Name, decreasing = TRUE) |>
     # avoid empty files
-    tidytable::filter(!Name |> startsWith("_")) |>
+    tidytable::filter(
+      !Name |>
+        startsWith("_")
+    ) |>
     tidytable::pull(Name) |>
     # because of structures and denovo sharing their name
     utils::head(1)

@@ -291,7 +291,8 @@ weight_annotations <- function(
 ) {
   stopifnot(
     "Annotations file(s) do(es) not exist" = all(
-      purrr::map(.x = annotations, .f = file.exists) |> unlist()
+      purrr::map(.x = annotations, .f = file.exists) |>
+        unlist()
     )
   )
   stopifnot("Your library file does not exist." = file.exists(library))
@@ -425,7 +426,10 @@ weight_annotations <- function(
       )
     )) |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
-    tidytable::arrange(candidate_score_similarity |> tidytable::desc()) |>
+    tidytable::arrange(
+      candidate_score_similarity |>
+        tidytable::desc()
+    ) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,

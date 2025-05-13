@@ -34,21 +34,25 @@ sanitize_spectra <-
     ## Fix needed
     if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Harmonizing names")
-      spectra$msLevel <- spectra$MSLEVEL |> as.integer()
+      spectra$msLevel <- spectra$MSLEVEL |>
+        as.integer()
     }
     if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Harmonizing names")
-      spectra$msLevel <- spectra$MS_LEVEL |> as.integer()
+      spectra$msLevel <- spectra$MS_LEVEL |>
+        as.integer()
     }
 
     if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Harmonizing names")
-      spectra$precursorMz <- spectra$PRECURSOR_MZ |> as.numeric()
+      spectra$precursorMz <- spectra$PRECURSOR_MZ |>
+        as.numeric()
     }
 
     if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Harmonizing spectrum id")
-      spectra$spectrum_id <- spectra$spectrum_id |> as.character()
+      spectra$spectrum_id <- spectra$spectrum_id |>
+        as.character()
     }
 
     if ("msLevel" %in% colnames(spectra@backend@spectraData)) {

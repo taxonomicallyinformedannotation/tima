@@ -70,7 +70,8 @@ prepare_annotations_spectra <-
   ) {
     stopifnot(
       "Input file(s) do(es) not exist" = all(
-        purrr::map(.x = input, .f = file.exists) |> unlist()
+        purrr::map(.x = input, .f = file.exists) |>
+          unlist()
       )
     )
     logger::log_trace("Loading and formatting spectral matches")

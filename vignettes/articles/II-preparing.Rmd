@@ -144,7 +144,7 @@ targets::tar_visnetwork(
     "benchmark",
     "par_",
     "paths"
-  ) |> 
+  ) |>
     tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8
@@ -227,7 +227,7 @@ targets::tar_visnetwork(
     "benchmark",
     "par_",
     "paths"
-  ) |> 
+  ) |>
     tidyselect::contains(),
   targets_only = TRUE,
   degree_from = 8

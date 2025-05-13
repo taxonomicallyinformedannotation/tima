@@ -65,12 +65,14 @@ filter_annotations <-
   ) {
     stopifnot(
       "Annotations file(s) do(es) not exist" = all(
-        purrr::map(.x = annotations, .f = file.exists) |> unlist()
+        purrr::map(.x = annotations, .f = file.exists) |>
+          unlist()
       )
     )
     stopifnot(
       "Retention time file(s) do(es) not exist" = all(
-        purrr::map(.x = rts, .f = file.exists) |> unlist()
+        purrr::map(.x = rts, .f = file.exists) |>
+          unlist()
       )
     )
     stopifnot("Your features file does not exist." = file.exists(features))

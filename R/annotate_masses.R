@@ -236,7 +236,10 @@ annotate_masses <-
         .N,
         by = .(bin = cut(delta, breaks = 10000L))
       ] |>
-        tidytable::arrange(N |> tidytable::desc()) |>
+        tidytable::arrange(
+          N |>
+            tidytable::desc()
+        ) |>
         tidytable::slice_head(n = 10L)
       logger::log_info(
         "Here are the top 10 observed m/z differences inside the RT windows:"
