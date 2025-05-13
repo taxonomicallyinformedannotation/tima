@@ -40,4 +40,4 @@ ms:
     #' For retention time.
     rt:
       #' Retention time tolerance for library in minutes. FLOAT
-      library: 0.1
+      library: .inf
