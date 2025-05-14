@@ -17,17 +17,17 @@
 #'
 #' @examples NULL
 summarize_results <- function(
-    df,
-    features_table,
-    components_table,
-    structure_organism_pairs_table,
-    annot_table_wei_chemo
+  df,
+  features_table,
+  components_table,
+  structure_organism_pairs_table,
+  annot_table_wei_chemo
 ) {
   logger::log_trace(
     "Adding initial metadata (RT, etc.) and simplifying columns"
   )
   model <- columns_model()
-  
+
   df3 <- features_table |>
     tidytable::left_join(df) |>
     tidytable::left_join(components_table) |>
@@ -111,13 +111,13 @@ summarize_results <- function(
     tidytable::arrange(rank_final) |>
     tidytable::ungroup()
   rm(df)
-  
+
   if (remove_ties == TRUE) {
     logger::log_info("Removing ties")
     df3 <- df3 |>
       tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
   }
-  
+
   if (summarize == TRUE) {
     logger::log_trace("Collecting garbage")
     gc()
@@ -140,7 +140,7 @@ summarize_results <- function(
         }
       )) |>
       tidytable::ungroup()
-    
+
     df5 <- df4 |>
       tidytable::left_join(
         df3 |>
@@ -152,7 +152,7 @@ summarize_results <- function(
     df5 <- df3
   }
   rm(df3)
-  
+
   logger::log_trace("Selecting columns to export")
   df6 <- df5 |>
     tidytable::mutate(tidytable::across(
@@ -184,7 +184,7 @@ summarize_results <- function(
       )
     ))
   rm(df5)
-  
+
   logger::log_trace("Adding consensus again to droped candidates")
   results <- tidytable::bind_rows(
     df6 |>
@@ -216,6 +216,6 @@ summarize_results <- function(
   ) |>
     tidytable::arrange(as.numeric(feature_id)) |>
     tidytable::select(tidyselect::where(~ any(!is.na(.))))
-  
+
   return(results)
 }
