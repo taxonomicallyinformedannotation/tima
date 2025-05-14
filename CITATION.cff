@@ -6,7 +6,7 @@
 cff-version: 1.2.0
 message: 'To cite package "tima" in publications use:'
 type: software
-license: GPL-3.0-or-later
+license: AGPL-3.0-or-later
 title: 'tima: Taxonomically Informed Metabolite Annotation'
 version: 2.12.0
 doi: 10.5281/zenodo.5797920
