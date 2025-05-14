@@ -20,7 +20,7 @@ data:
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         hmdb_minimal: data/interim/libraries/sop/hmdb_minimal.tsv.gz
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
-        massbank: data/interim/libraries/sop/massbank_202411_prepared.tsv.gz
+        massbank: data/interim/libraries/sop/massbank_2025051_prepared.tsv.gz
         merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
         isdb: data/interim/libraries/sop/wikidata_5607185_prepared.tsv.gz
         merged:
@@ -48,12 +48,12 @@ data:
           path: data/interim/libraries/spectra/exp
           pos:
             gnps: data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
-            massbank: data/interim/libraries/spectra/exp/massbank_202411_pos.rds
+            massbank: data/interim/libraries/spectra/exp/massbank_2025051_pos.rds
             merlin: data/interim/libraries/spectra/exp/merlin_13911806_pos.rds
             mona: data/interim/libraries/spectra/exp/mona_pos.rds
           neg:
             gnps: data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
-            massbank: data/interim/libraries/spectra/exp/massbank_202411_neg.rds
+            massbank: data/interim/libraries/spectra/exp/massbank_2025051_neg.rds
             merlin: data/interim/libraries/spectra/exp/merlin_13911806_neg.rds
             mona: data/interim/libraries/spectra/exp/mona_neg.rds
         is:
@@ -220,17 +220,17 @@ urls:
       structures: structure_metadata.tsv.gz
   sop:
     gnps: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
-    massbank: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/massbank_202411_prepared.tsv.gz
+    massbank: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/massbank_2025051_prepared.tsv.gz
     merlin: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
     isdb: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/wikidata_spectral_5607185_prepared.tsv.gz
   spectra:
     pos:
       gnps: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
-      massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_202411_pos.rds
+      massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_2025051_pos.rds
       merlin: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/merlin_13911806_pos.rds
       isdb: https://github.com/taxonomicallyinformedannotation/tima-isdb-pos/raw/main/wikidata_5607185_pos.rds
     neg:
       gnps: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
-      massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_202411_neg.rds
+      massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_2025051_neg.rds
       merlin: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/merlin_13911806_neg.rds
       isdb: https://github.com/taxonomicallyinformedannotation/tima-isdb-neg/raw/main/wikidata_5607185_neg.rds

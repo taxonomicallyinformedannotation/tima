@@ -38,10 +38,15 @@ import_spectra <- function(
   sanitize = TRUE,
   combine = TRUE
 ) {
-  file_ext <-
+  file_ext <- file |>
     stringi::stri_replace_all_regex(
-      str = file,
       pattern = ".*\\.",
+      replacement = "",
+      vectorize_all = FALSE
+    ) |>
+    ## See https://github.com/MassBank/MassBank-data/issues/299
+    stringi::stri_replace_all_regex(
+      pattern = "_.*",
       replacement = "",
       vectorize_all = FALSE
     )

@@ -60,6 +60,11 @@ sanitize_spectra <-
       spectra <- spectra |>
         Spectra::filterMsLevel(2L)
     }
+    ## In MassBank
+    if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
+      logger::log_trace("Filtering MS2 only")
+      spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
+    }
 
     if (!is.na(polarity)) {
       spectra <- spectra |>
@@ -87,8 +92,14 @@ sanitize_spectra <-
       Spectra::scalePeaks()
 
     logger::log_trace("Filtering empty spectra")
-    spectra <- spectra |>
-      Spectra::filterEmptySpectra()
+    # spectra <- spectra |>
+    #   Spectra::filterEmptySpectra()
+    ## Replaced as the above version errors
+    spectra <- spectra[
+      spectra@backend@peaksData |>
+        lengths() >
+        2
+    ]
     # Fix needed as some empty spectra are else not removed
     spectra <- spectra[
       !spectra@backend@peaksData |>
