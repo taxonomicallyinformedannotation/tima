@@ -13,6 +13,7 @@
 #' @param structure_organism_pairs_table Table containing the
 #'    structure - organism pairs
 #' @param remove_ties Remove ties. BOOLEAN
+#' @param summarize Boolean. summarize results (1 row per feature)
 #'
 #' @return A summarized table
 #'
@@ -23,7 +24,8 @@ summarize_results <- function(
   components_table,
   structure_organism_pairs_table,
   annot_table_wei_chemo,
-  remove_ties
+  remove_ties,
+  summarize
 ) {
   logger::log_trace(
     "Adding initial metadata (RT, etc.) and simplifying columns"

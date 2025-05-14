@@ -10,7 +10,8 @@ summarize_results(
   components_table,
   structure_organism_pairs_table,
   annot_table_wei_chemo,
-  remove_ties
+  remove_ties,
+  summarize
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ structure - organism pairs}
 chemically weighted annotation}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
+
+\item{summarize}{Boolean. summarize results (1 row per feature)}
 }
 \value{
 A summarized table
