@@ -7,7 +7,7 @@
   "relatedLink": ["https://taxonomicallyinformedannotation.github.io/tima", "https://taxonomicallyinformedannotation.github.io/tima-shinylive"],
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima/issues",
-  "license": "https://spdx.org/licenses/GPL-3.0",
+  "license": "https://spdx.org/licenses/AGPL-3.0",
   "version": "2.12.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
@@ -641,7 +641,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2566.104KB",
+  "fileSize": "2566.326KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

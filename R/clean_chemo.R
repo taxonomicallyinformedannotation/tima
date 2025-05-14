@@ -113,7 +113,8 @@ clean_chemo <-
         features_table = features_table,
         components_table = components_table,
         structure_organism_pairs_table = structure_organism_pairs_table,
-        annot_table_wei_chemo = annot_table_wei_chemo
+        annot_table_wei_chemo = annot_table_wei_chemo,
+        remove_ties = remove_ties
       )
     logger::log_trace("Processing filtered results")
     results_filtered <- df1_filtered |>
@@ -121,7 +122,8 @@ clean_chemo <-
         features_table = features_table,
         components_table = components_table,
         structure_organism_pairs_table = structure_organism_pairs_table,
-        annot_table_wei_chemo = annot_table_wei_chemo
+        annot_table_wei_chemo = annot_table_wei_chemo,
+        remove_ties = remove_ties
       )
     rm(
       annot_table_wei_chemo,

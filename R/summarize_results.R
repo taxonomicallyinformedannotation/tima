@@ -12,6 +12,7 @@
 #' @param features_table Prepared features file
 #' @param structure_organism_pairs_table Table containing the
 #'    structure - organism pairs
+#' @param remove_ties Remove ties. BOOLEAN
 #'
 #' @return A summarized table
 #'
@@ -21,7 +22,8 @@ summarize_results <- function(
   features_table,
   components_table,
   structure_organism_pairs_table,
-  annot_table_wei_chemo
+  annot_table_wei_chemo,
+  remove_ties
 ) {
   logger::log_trace(
     "Adding initial metadata (RT, etc.) and simplifying columns"
