@@ -71,6 +71,53 @@ import_spectra <- function(
       readRDS(file = file)
     }
   )
+
+  ## Fix needed
+  if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Harmonizing names")
+    spectra$msLevel <- spectra$MSLEVEL |>
+      as.integer()
+  }
+  if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Harmonizing names")
+    spectra$msLevel <- spectra$MS_LEVEL |>
+      as.integer()
+  }
+
+  if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Harmonizing names")
+    spectra$precursorMz <- spectra$PRECURSOR_MZ |>
+      as.numeric()
+  }
+
+  if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Harmonizing spectrum id")
+    spectra$spectrum_id <- spectra$spectrum_id |>
+      as.character()
+  }
+
+  if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Filtering MS2 only")
+    spectra <- spectra |>
+      Spectra::filterMsLevel(2L)
+  }
+  ## In MassBank
+  if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
+    logger::log_trace("Filtering MS2 only")
+    spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
+  }
+
+  if (!is.na(polarity)) {
+    spectra <- spectra |>
+      Spectra::filterPrecursorCharge(
+        z = if (polarity == "pos") {
+          c(1, 2, 3)
+        } else {
+          c(-1, -2, -3)
+        }
+      )
+  }
+
   if (combine) {
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       logger::log_trace("Combining spectra in case")

@@ -431,7 +431,7 @@ ms:
     #' MS2 related parameters.
     ms2:
       #' Intensity threshold for MS2. FLOAT
-      intensity: 5.0
+      intensity: 0.0
 
   #' Tolerances.
   tolerances:
