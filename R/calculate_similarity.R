@@ -72,6 +72,9 @@ calculate_similarity <- function(
       )
     )
   } else {
-    stop("Invalid method. Choose 'entropy' or 'gnps'.")
+    logger::log_fatal(
+      "Invalid method. Choose 'entropy' or 'gnps'."
+    )
+    stop()
   }
 }

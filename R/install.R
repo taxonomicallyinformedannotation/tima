@@ -131,7 +131,7 @@ install <- function(
 
   if (!success) {
     logger::log_fatal("All installation attempts failed")
-    stop("Installation failed.")
+    stop()
   }
 
   copy_backbone()
