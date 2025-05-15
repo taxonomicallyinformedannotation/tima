@@ -87,7 +87,10 @@ read_mgf_opti <- function(
 ) {
   requireNamespace("MsBackendMgf", quietly = TRUE)
   if (length(f) != 1L) {
-    stop("Please provide a single MGF file.")
+    logger::log_fatal(
+      "Please provide a single MGF file."
+    )
+    stop()
   }
 
   sp_list <- list()
