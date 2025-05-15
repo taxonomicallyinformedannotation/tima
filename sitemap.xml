@@ -2,7 +2,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/404.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/CONTRIBUTING.html</loc></url>
-<url><loc>https://taxonomicallyinformedannotation.github.io/tima/LICENSE-text.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/LICENSE.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/SECURITY.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/SUPPORT.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html</loc></url>
@@ -55,6 +55,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_last_version_from_zenodo.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_organism_taxonomy_ott.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_params.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_path.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/get_spectra_ids.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/gnps_wrapper.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/go_to_cache.html</loc></url>
@@ -99,6 +100,7 @@
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/select_sop_columns.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/setup_logger.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/split_tables_sop.html</loc></url>
+<url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/summarize_results.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/tima-package.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/tima_full.html</loc></url>
 <url><loc>https://taxonomicallyinformedannotation.github.io/tima/reference/transform_score_sirius_csi.html</loc></url>
