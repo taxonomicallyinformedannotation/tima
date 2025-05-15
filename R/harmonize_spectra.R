@@ -97,6 +97,10 @@ harmonize_spectra <- function(
     tidytable::pivot_wider(names_from = columns_missing) |>
     tidytable::mutate(join = "x")
 
+  if (!"precursorCharge" %in% names(spectra)) {
+    spectra$precursorCharge <- NA_integer_
+  }
+
   spectra_filtered <- spectra |>
     data.frame() |>
     tidytable::as_tidytable() |>
@@ -110,7 +114,7 @@ harmonize_spectra <- function(
           pattern = if (mode == "pos") {
             1
           } else {
-            0
+            -1
           },
           x = !!as.name(col_po),
           ignore.case = TRUE
@@ -124,7 +128,17 @@ harmonize_spectra <- function(
       mz,
       intensity
     ) |>
-    tidytable::mutate(join = "x")
+    tidytable::mutate(
+      join = "x",
+      precursorCharge = tidytable::coalesce(
+        precursorCharge,
+        tidytable::if_else(
+          condition = grepl("pos", mode, ignore.case = TRUE),
+          1L,
+          -1L
+        )
+      )
+    )
 
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(spectra_missing) |>
