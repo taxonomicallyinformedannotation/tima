@@ -4,7 +4,7 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
+sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, ppm = 10)
 }
 \arguments{
 \item{spectra}{Spectra object}
@@ -12,8 +12,6 @@ sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, polarity = NA, ppm = 10)
 \item{cutoff}{Absolute minimal intensity}
 
 \item{dalton}{Dalton tolerance}
-
-\item{polarity}{Polarity}
 
 \item{ppm}{PPM tolerance}
 }

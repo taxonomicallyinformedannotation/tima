@@ -5,7 +5,6 @@
 #' @param spectra Spectra object
 #' @param cutoff Absolute minimal intensity
 #' @param dalton Dalton tolerance
-#' @param polarity Polarity
 #' @param ppm PPM tolerance
 #'
 #' @return The sanitized spectra
@@ -26,58 +25,9 @@ sanitize_spectra <-
     spectra,
     cutoff = 0,
     dalton = 0.01,
-    polarity = NA,
     ppm = 10
   ) {
     logger::log_trace("Applying sanitization of the spectra")
-
-    ## Fix needed
-    if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Harmonizing names")
-      spectra$msLevel <- spectra$MSLEVEL |>
-        as.integer()
-    }
-    if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Harmonizing names")
-      spectra$msLevel <- spectra$MS_LEVEL |>
-        as.integer()
-    }
-
-    if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Harmonizing names")
-      spectra$precursorMz <- spectra$PRECURSOR_MZ |>
-        as.numeric()
-    }
-
-    if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Harmonizing spectrum id")
-      spectra$spectrum_id <- spectra$spectrum_id |>
-        as.character()
-    }
-
-    if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Filtering MS2 only")
-      spectra <- spectra |>
-        Spectra::filterMsLevel(2L)
-    }
-    ## In MassBank
-    if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Filtering MS2 only")
-      spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
-    }
-
-    if (!is.na(polarity)) {
-      spectra <- spectra |>
-        Spectra::filterPrecursorCharge(
-          z = if (polarity == "pos") {
-            c(1, 2, 3)
-          } else {
-            c(-1, -2, -3)
-          }
-        )
-    }
-
-    logger::log_trace("Reducing spectra")
     spectra <- spectra |>
       Spectra::dropNaSpectraVariables() |>
       Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
