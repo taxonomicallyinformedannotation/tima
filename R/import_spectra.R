@@ -145,7 +145,6 @@ import_spectra <- function(
       sanitize_spectra(
         cutoff = cutoff,
         dalton = dalton,
-        polarity = polarity,
         ppm = ppm
       )
   }
