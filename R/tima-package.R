@@ -5,6 +5,7 @@
 #' @useDynLib tima, .registration = TRUE
 ## usethis namespace: end
 NULL
+
 .datatable.aware <- TRUE
 
 .onLoad <- function(libname, pkgname) {

@@ -2,6 +2,7 @@
 
 # tima 2.12.0
 
+* Added a minimal output
 * Added a parameter to limit the numbers of neighbors used for chemical consistency calculation (#193)
 * Added MERLIN spectral libraries (#190)
 * Added `RDKit`-based structures processing through `reticulate` (#19)
