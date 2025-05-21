@@ -131,8 +131,7 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      ) |>
-      tidytable::left_join(results_candidates)
+      )
     logger::log_trace("Processing filtered results")
     results_filtered <- df1_filtered |>
       summarize_results(
@@ -142,8 +141,17 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      ) |>
-      tidytable::left_join(results_candidates)
+      )
+    if (
+      results_candidates |>
+        nrow() >
+        0L
+    ) {
+      results_full <- results_full |>
+        tidytable::left_join(results_candidates)
+      results_filtered <- results_filtered |>
+        tidytable::left_join(results_candidates)
+    }
     rm(
       annot_table_wei_chemo,
       features_table,

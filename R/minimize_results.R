@@ -26,57 +26,70 @@ minimize_results <- function(
       tidytable::contains("score"),
       as.numeric
     )) |>
-    tidytable::filter(feature_pred_tax_npc_01pat_val != "empty") |>
-    tidytable::group_by(feature_id) |>
-    tidytable::pivot_longer(
-      cols = tidytable::contains("feature_pred_tax"),
-      names_prefix = "feature_pred_tax"
-    ) |>
-    tidytable::mutate(
-      names = name |>
-        stringi::stri_replace_all_regex(
-          pattern = ".*_",
-          replacement = "",
-          vectorize_all = FALSE
+    tidytable::filter(feature_pred_tax_npc_01pat_val != "empty")
+  if (
+    df_classes |>
+      nrow() ==
+      0L
+  ) {
+    df_classes <- tidytable::tidytable(
+      feature_id = NA_integer_,
+      label_classyfire = NA_character_,
+      label_npclassifier = NA_character_
+    )
+  } else {
+    df_classes <- df_classes |>
+      tidytable::group_by(feature_id) |>
+      tidytable::pivot_longer(
+        cols = tidytable::contains("feature_pred_tax"),
+        names_prefix = "feature_pred_tax"
+      ) |>
+      tidytable::mutate(
+        names = name |>
+          stringi::stri_replace_all_regex(
+            pattern = ".*_",
+            replacement = "",
+            vectorize_all = FALSE
+          )
+      ) |>
+      tidytable::mutate(
+        values = name |>
+          stringi::stri_replace_all_fixed(
+            pattern = names,
+            replacement = "",
+            vectorize_all = TRUE
+          )
+      ) |>
+      tidytable::group_by(feature_id, values) |>
+      tidytable::select(-name) |>
+      tidytable::distinct() |>
+      tidytable::pivot_wider(names_from = names, values_from = value) |>
+      tidytable::mutate(
+        score = score |>
+          as.numeric()
+      ) |>
+      tidytable::filter(score > 0) |>
+      tidytable::mutate(
+        tax = tidytable::if_else(
+          condition = grepl(pattern = "npc", x = values),
+          true = "npc",
+          false = "cla"
         )
-    ) |>
-    tidytable::mutate(
-      values = name |>
-        stringi::stri_replace_all_fixed(
-          pattern = names,
-          replacement = "",
-          vectorize_all = TRUE
-        )
-    ) |>
-    tidytable::group_by(feature_id, values) |>
-    tidytable::select(-name) |>
-    tidytable::distinct() |>
-    tidytable::pivot_wider(names_from = names, values_from = value) |>
-    tidytable::mutate(
-      score = score |>
-        as.numeric()
-    ) |>
-    tidytable::filter(score > 0) |>
-    tidytable::mutate(
-      tax = tidytable::if_else(
-        condition = grepl(pattern = "npc", x = values),
-        true = "npc",
-        false = "cla"
-      )
-    ) |>
-    tidytable::arrange(tidytable::desc(values)) |>
-    tidytable::arrange(tidytable::desc(score)) |>
-    tidytable::distinct(feature_id, tax, .keep_all = TRUE) |>
-    tidytable::filter(score >= min_score_classes) |>
-    tidytable::select(-values, -score) |>
-    tidytable::group_by(feature_id) |>
-    tidytable::pivot_wider(names_from = tax, values_from = val) |>
-    tidytable::select(
-      feature_id,
-      label_classyfire = cla,
-      label_npclassifier = npc
-    ) |>
-    tidytable::distinct()
+      ) |>
+      tidytable::arrange(tidytable::desc(values)) |>
+      tidytable::arrange(tidytable::desc(score)) |>
+      tidytable::distinct(feature_id, tax, .keep_all = TRUE) |>
+      tidytable::filter(score >= min_score_classes) |>
+      tidytable::select(-values, -score) |>
+      tidytable::group_by(feature_id) |>
+      tidytable::pivot_wider(names_from = tax, values_from = val) |>
+      tidytable::select(
+        feature_id,
+        label_classyfire = cla,
+        label_npclassifier = npc
+      ) |>
+      tidytable::distinct()
+  }
 
   df_compounds <- df |>
     tidytable::select(
