@@ -107,9 +107,7 @@ clean_chemo <-
         features_table = features_table
       )
     results_candidates <- results_mini |>
-      tidytable::distinct(feature_id,
-                          candidates_evaluated,
-                          candidates_best)
+      tidytable::distinct(feature_id, candidates_evaluated, candidates_best)
 
     if (high_confidence) {
       df1 <- df1 |>
@@ -133,7 +131,7 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      ) |> 
+      ) |>
       tidytable::left_join(results_candidates)
     logger::log_trace("Processing filtered results")
     results_filtered <- df1_filtered |>
@@ -144,7 +142,7 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      ) |> 
+      ) |>
       tidytable::left_join(results_candidates)
     rm(
       annot_table_wei_chemo,
