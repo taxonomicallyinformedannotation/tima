@@ -4,6 +4,7 @@
 #'    obtained after chemical weighting
 #'
 #' @include filter_high_confidence_only.R
+#' @include minimize_results.R
 #' @include summarize_results.R
 #'
 #' @param annot_table_wei_chemo Table containing your
