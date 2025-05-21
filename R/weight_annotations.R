@@ -382,10 +382,6 @@ weight_annotations <- function(
           is.na(candidate_score_sirius_csi)
       )
   }
-  if (compounds_names == FALSE) {
-    annotation_table <- annotation_table |>
-      tidytable::select(-candidate_structure_name)
-  }
 
   logger::log_trace("Initial annotations:")
   annotation_stats <- annotation_table |>
@@ -492,21 +488,21 @@ weight_annotations <- function(
   )
 
   logger::log_trace("Performing taxonomically informed scoring")
-  results_bio <- weight_bio()
+  annot_table_wei_bio <- weight_bio()
   rm(annotation_table_taxed)
-  results_bio |>
+  annot_table_wei_bio |>
     decorate_bio()
-  results_bio_cleaned <- results_bio |>
+  annot_table_wei_bio_clean <- annot_table_wei_bio |>
     clean_bio()
-  rm(results_bio)
-  results_chemo <- results_bio_cleaned |>
+  rm(annot_table_wei_bio)
+  annot_table_wei_chemo <- annot_table_wei_bio_clean |>
     weight_chemo()
-  rm(results_bio_cleaned)
-  results_chemo |>
+  rm(annot_table_wei_bio_clean)
+  annot_table_wei_chemo |>
     decorate_chemo()
-  results_list <- results_chemo |>
+  results_list <- annot_table_wei_chemo |>
     clean_chemo()
-  rm(results_chemo)
+  rm(annot_table_wei_chemo)
 
   time <- format(Sys.time(), "%Y%m%d_%H%M%S")
   dir_time <- file.path(
@@ -519,6 +515,11 @@ weight_annotations <- function(
     output |>
       gsub(pattern = ".tsv", replacement = "_filtered.tsv", fixed = TRUE)
   )
+  final_output_mini <- file.path(
+    dir_time,
+    output |>
+      gsub(pattern = ".tsv", replacement = "_mini.tsv", fixed = TRUE)
+  )
   export_params(
     parameters = get_params(step = "prepare_params"),
     directory = dir_time,
@@ -529,6 +530,7 @@ weight_annotations <- function(
     directory = dir_time,
     step = "prepare_params_advanced"
   )
+  export_output(x = results_list$mini, file = final_output_mini)
   export_output(x = results_list$filtered, file = final_output_filtered)
   export_output(x = results_list$full, file = final_output)
   rm(results_list)

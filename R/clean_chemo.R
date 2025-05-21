@@ -16,6 +16,7 @@
 #' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
 #' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
+#' @param compounds_names Report compounds names. Can be very large. BOOLEAN
 #' @param high_confidence Report high confidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarize Boolean. summarize results (1 row per feature)
@@ -45,6 +46,7 @@ clean_chemo <-
       "minimal_ms1_condition",
       envir = parent.frame()
     ),
+    compounds_names = get("compounds_names", envir = parent.frame()),
     high_confidence = get("high_confidence", envir = parent.frame()),
     remove_ties = get("remove_ties", envir = parent.frame()),
     summarize = get("summarize", envir = parent.frame())
@@ -83,11 +85,6 @@ clean_chemo <-
         )
     }
 
-    if (high_confidence) {
-      df1 <- df1 |>
-        filter_high_confidence_only()
-    }
-
     df1 <- df1 |>
       tidytable::arrange(
         score_weighted_chemo |>
@@ -104,6 +101,25 @@ clean_chemo <-
         .by = c(feature_id)
       )
 
+    results_mini <- df1 |>
+      minimize_results(
+        features_table = features_table
+      )
+    results_candidates <- results_mini |>
+      tidytable::distinct(feature_id,
+                          candidates_evaluated,
+                          candidates_best)
+
+    if (high_confidence) {
+      df1 <- df1 |>
+        filter_high_confidence_only()
+    }
+
+    if (compounds_names == FALSE) {
+      df1 <- df1 |>
+        tidytable::select(-candidate_structure_name)
+    }
+
     df1_filtered <- df1 |>
       tidytable::filter(rank_final <= candidates_final)
 
@@ -116,7 +132,8 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      )
+      ) |> 
+      tidytable::left_join(results_candidates)
     logger::log_trace("Processing filtered results")
     results_filtered <- df1_filtered |>
       summarize_results(
@@ -126,7 +143,8 @@ clean_chemo <-
         annot_table_wei_chemo = annot_table_wei_chemo,
         remove_ties = remove_ties,
         summarize = summarize
-      )
+      ) |> 
+      tidytable::left_join(results_candidates)
     rm(
       annot_table_wei_chemo,
       features_table,
@@ -137,7 +155,8 @@ clean_chemo <-
     return(
       list(
         "full" = results_full,
-        "filtered" = results_filtered
+        "filtered" = results_filtered,
+        "mini" = results_mini
       )
     )
   }
