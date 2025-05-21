@@ -26,18 +26,27 @@ minimize_results <- function(
       tidytable::contains("score"),
       as.numeric
     )) |>
-    tidytable::filter(feature_pred_tax_cla_01kin_val != "empty") |>
+    tidytable::filter(feature_pred_tax_npc_01pat_val != "empty") |>
     tidytable::group_by(feature_id) |>
     tidytable::pivot_longer(
       cols = tidytable::contains("feature_pred_tax"),
       names_prefix = "feature_pred_tax"
     ) |>
     tidytable::mutate(
-      names = name |> gsub(pattern = ".*_", replacement = "")
+      names = name |>
+        stringi::stri_replace_all_regex(
+          pattern = ".*_",
+          replacement = "",
+          vectorize_all = FALSE
+        )
     ) |>
-    tidytable::mutate_rowwise(
+    tidytable::mutate(
       values = name |>
-        gsub(pattern = names, replacement = "")
+        stringi::stri_replace_all_fixed(
+          pattern = names,
+          replacement = "",
+          vectorize_all = TRUE
+        )
     ) |>
     tidytable::group_by(feature_id, values) |>
     tidytable::select(-name) |>
