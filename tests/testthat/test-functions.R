@@ -475,6 +475,20 @@ testthat::test_that(desc = "Test functions", code = {
     dalton = 0.01,
     ppm = 1,
     threshold = 0,
+    method = "cosine",
+    approx = FALSE
+  )
+
+  calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = pmz_y,
+    lib_spectra = y_small,
+    query_ids = 1L,
+    query_precursors = pmz_x,
+    query_spectra = x_small,
+    dalton = 0.01,
+    ppm = 1,
+    threshold = 0,
     method = "gnps",
     approx = FALSE
   )
@@ -493,6 +507,7 @@ testthat::test_that(desc = "Test functions", code = {
     method = "entropy",
     approx = TRUE
   )
+
   ### Negative
   annotate_spectra(
     libraries = list(
@@ -680,10 +695,27 @@ testthat::test_that(desc = "Test functions", code = {
   # tima_full()
 
   ## Errors
+  expect_error(calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = pmz_y,
+    lib_spectra = y_large,
+    query_ids = 1L,
+    query_precursors = pmz_x,
+    query_spectra = x_large,
+    dalton = 0.01,
+    ppm = 1,
+    threshold = 0,
+    method = "foo",
+    approx = TRUE
+  ))
   expect_error(
     object = get_file(
-      url = "InVaLiDUrL"
+      url = "InVaLiDUrL",
+      export = "InValidFile.txt"
     )
+  )
+  expect_error(
+    read_mgf_opti(f = c("foo", "bar"))
   )
 
   ## cleanup
