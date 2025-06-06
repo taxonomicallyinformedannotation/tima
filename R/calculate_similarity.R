@@ -25,6 +25,12 @@ calculate_similarity <- function(
   dalton,
   ppm
 ) {
+  if (!method %in% c("cosine", "entropy", "gnps")) {
+    logger::log_fatal(
+      "Invalid method. Choose 'cosine', 'entropy' or 'gnps'."
+    )
+    stop()
+  }
   if (method == "entropy") {
     return(
       msentropy::calculate_entropy_similarity(
@@ -39,20 +45,29 @@ calculate_similarity <- function(
         clean_spectra = TRUE
       )
     )
-  } else if (method == "gnps") {
+  } else {
     query_masses <- query_spectrum[, 1]
     target_masses <- target_spectrum[, 1]
-
-    ## Replaced with internal C version
-    # map <- MsCoreUtils::join_gnps(
-    map <- join_gnps_wrapper(
-      x = query_masses,
-      y = target_masses,
-      xPrecursorMz = query_precursor,
-      yPrecursorMz = target_precursor,
-      tolerance = dalton,
-      ppm = ppm
-    )
+    if (method == "gnps") {
+      ## Replaced with internal C version
+      # map <- MsCoreUtils::join_gnps(
+      map <- join_gnps_wrapper(
+        x = query_masses,
+        y = target_masses,
+        xPrecursorMz = query_precursor,
+        yPrecursorMz = target_precursor,
+        tolerance = dalton,
+        ppm = ppm
+      )
+    }
+    if (method == "cosine") {
+      map <- MsCoreUtils::join(
+        x = query_masses,
+        y = target_masses,
+        tolerance = dalton,
+        ppm = ppm
+      )
+    }
 
     matched_x <- map[[1]]
     matched_y <- map[[2]]
@@ -71,10 +86,5 @@ calculate_similarity <- function(
         y = y_mat
       )
     )
-  } else {
-    logger::log_fatal(
-      "Invalid method. Choose 'entropy' or 'gnps'."
-    )
-    stop()
   }
 }
