@@ -6,6 +6,8 @@
 #'
 #' @return NULL
 #'
+#' @export
+#' 
 #' @examples NULL
 fake_hmdb <- function(export) {
   logger::log_error("External failure. Returning empty file instead.")
