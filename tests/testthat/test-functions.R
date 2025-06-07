@@ -476,7 +476,7 @@ testthat::test_that(desc = "Test functions", code = {
     ppm = 1,
     threshold = 0,
     method = "cosine",
-    approx = FALSE
+    approx = TRUE
   )
 
   calculate_entropy_and_similarity(
