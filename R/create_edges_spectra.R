@@ -118,7 +118,7 @@ create_edges_spectra <- function(
         name_target = idz[name_target]
       )
     entropy_df <- tidytable::tidytable(entropy) |>
-      tidyfst::rn_col(var = name_source) |>
+      tidytable::mutate(!!as.name(name_source) := tidytable::row_number()) |>
       tidytable::mutate(
         name_source = idz[name_source],
         feature_spectrum_entropy = as.character(entropy),
