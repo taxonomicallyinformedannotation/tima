@@ -42,7 +42,7 @@ static double compute_unique_intensity_sum(const double *mz, const double *inten
     int *indices = (int*) safe_malloc(n * sizeof(int));
     int count = 0;
     for (int i = 0; i < n; i++) {
-        if (!ISNA(mz[i]))
+        if (!ISNA(mz[i]) && !ISNA(intensity[i]))
             indices[count++] = i;
     }
     if (count == 0) {
@@ -58,6 +58,21 @@ static double compute_unique_intensity_sum(const double *mz, const double *inten
     }
     free(indices);
     return sum;
+}
+
+/* --- Helper to return score=0.0 and matches=0 --- */
+static SEXP return_zero_result() {
+    SEXP result = PROTECT(allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(result, 0, ScalarReal(0.0));
+    SET_VECTOR_ELT(result, 1, ScalarInteger(0));
+
+    SEXP names = PROTECT(allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, mkChar("score"));
+    SET_STRING_ELT(names, 1, mkChar("matches"));
+    setAttrib(result, R_NamesSymbol, names);
+
+    UNPROTECT(2);
+    return result;
 }
 
 /* --- Helper for Binary Search for doubles ---
@@ -198,7 +213,7 @@ SEXP gnps(SEXP x, SEXP y) {
     int n = INTEGER(x_dim)[0];
     if (n != INTEGER(y_dim)[0])
         error("'x' and 'y' must have the same number of rows.");
-    
+
     double *x_data = REAL(x);
     double *y_data = REAL(y);
     if (!x_data || !y_data)
@@ -207,7 +222,7 @@ SEXP gnps(SEXP x, SEXP y) {
     double x_sum = compute_unique_intensity_sum(x_data, x_data + n, n);
     double y_sum = compute_unique_intensity_sum(y_data, y_data + n, n);
     if (x_sum == 0.0 || y_sum == 0.0)
-        return ScalarReal(0.0);
+        return return_zero_result();
 
     int *keep_idx = (int*) safe_malloc(n * sizeof(int));
     int l = 0;
@@ -217,7 +232,7 @@ SEXP gnps(SEXP x, SEXP y) {
     }
     if (l == 0) {
         free(keep_idx);
-        return ScalarReal(0.0);
+        return return_zero_result();
     }
 
     double *scores = (double*) safe_malloc(l * sizeof(double));
@@ -236,7 +251,7 @@ SEXP gnps(SEXP x, SEXP y) {
         free(scores);
         if (x_idx) free(x_idx);
         if (y_idx) free(y_idx);
-        return ScalarReal(0.0);
+        return return_zero_result();
     }
 
     int max_x = 0, max_y = 0;
@@ -271,16 +286,22 @@ SEXP gnps(SEXP x, SEXP y) {
         free(x_idx);
         free(y_idx);
         free(score_mat);
-        return ScalarReal(0.0);
+        return return_zero_result();
     }
 
     double total_score = 0.0;
+    int matched_peaks = 0;
     /* Use OpenMP reduction to safely sum the total score in parallel */
-    #pragma omp parallel for reduction(+:total_score)
+    #pragma omp parallel for reduction(+:total_score, matched_peaks)
     for (int i = 0; i < m; i++) {
         int j = assignment[i] - 1;
-        if (j >= 0 && j < m)
-            total_score += score_mat[i * m + j];
+        if (j >= 0 && j < m) {
+            double val = score_mat[i * m + j];
+            if (val > 0.0) {
+                total_score += val;
+                matched_peaks += 1;
+            }
+        }
     }
 
     free(keep_idx);
@@ -290,5 +311,15 @@ SEXP gnps(SEXP x, SEXP y) {
     free(score_mat);
     free(assignment);
 
-    return ScalarReal(total_score);
+    SEXP result = PROTECT(allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(result, 0, ScalarReal(total_score));
+    SET_VECTOR_ELT(result, 1, ScalarInteger(matched_peaks));
+  
+    SEXP names = PROTECT(allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, mkChar("score"));
+    SET_STRING_ELT(names, 1, mkChar("matches"));
+    setAttrib(result, R_NamesSymbol, names);
+  
+    UNPROTECT(2); // result, names
+    return result;
 }

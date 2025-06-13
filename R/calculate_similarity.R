@@ -12,6 +12,7 @@
 #' @param target_precursor Target precursor
 #' @param dalton Dalton tolerance
 #' @param ppm PPM tolerance
+#' @param return_matched_peaks Return matched peaks. Not compatible with 'entropy'. Default: FALSE
 #'
 #' @return Similarity score or NA_real_ if calculation fails
 #'
@@ -23,7 +24,9 @@ calculate_similarity <- function(
   query_precursor,
   target_precursor,
   dalton,
-  ppm
+  ppm,
+  return_matched_peaks = FALSE,
+  ...
 ) {
   if (!method %in% c("cosine", "entropy", "gnps")) {
     logger::log_fatal(
@@ -65,7 +68,9 @@ calculate_similarity <- function(
         x = query_masses,
         y = target_masses,
         tolerance = dalton,
-        ppm = ppm
+        ppm = ppm,
+        ## allows for type = c("outer", "inner", "left", "right")
+        ...
       )
     }
 
@@ -81,10 +86,18 @@ calculate_similarity <- function(
 
     return(
       # MsCoreUtils::gnps(
-      gnps_wrapper(
-        x = x_mat,
-        y = y_mat
-      )
+      ## Do not report number of matched peaks by default for now
+      if (return_matched_peaks == TRUE) {
+        gnps_wrapper(
+          x = x_mat,
+          y = y_mat
+        )
+      } else {
+        gnps_wrapper(
+          x = x_mat,
+          y = y_mat
+        )$score
+      }
     )
   }
 }
