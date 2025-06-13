@@ -11,7 +11,9 @@ calculate_similarity(
   query_precursor,
   target_precursor,
   dalton,
-  ppm
+  ppm,
+  return_matched_peaks = FALSE,
+  ...
 )
 }
 \arguments{
@@ -28,6 +30,8 @@ calculate_similarity(
 \item{dalton}{Dalton tolerance}
 
 \item{ppm}{PPM tolerance}
+
+\item{return_matched_peaks}{Return matched peaks. Not compatible with 'entropy'. Default: FALSE}
 }
 \value{
 Similarity score or NA_real_ if calculation fails
