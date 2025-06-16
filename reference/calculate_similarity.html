@@ -62,7 +62,9 @@ using either entropy or GNPS methods</p>
 <span>  <span class="va">query_precursor</span>,</span>
 <span>  <span class="va">target_precursor</span>,</span>
 <span>  <span class="va">dalton</span>,</span>
-<span>  <span class="va">ppm</span></span>
+<span>  <span class="va">ppm</span>,</span>
+<span>  return_matched_peaks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,6 +98,10 @@ using either entropy or GNPS methods</p>
 
 <dt id="arg-ppm">ppm<a class="anchor" aria-label="anchor" href="#arg-ppm"></a></dt>
 <dd><p>PPM tolerance</p></dd>
+
+
+<dt id="arg-return-matched-peaks">return_matched_peaks<a class="anchor" aria-label="anchor" href="#arg-return-matched-peaks"></a></dt>
+<dd><p>Return matched peaks. Not compatible with 'entropy'. Default: FALSE</p></dd>
 
 </dl></div>
     <div class="section level2">
