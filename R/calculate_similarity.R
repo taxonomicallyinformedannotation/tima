@@ -13,6 +13,7 @@
 #' @param dalton Dalton tolerance
 #' @param ppm PPM tolerance
 #' @param return_matched_peaks Return matched peaks. Not compatible with 'entropy'. Default: FALSE
+#' @param ... Not documented for now
 #'
 #' @return Similarity score or NA_real_ if calculation fails
 #'

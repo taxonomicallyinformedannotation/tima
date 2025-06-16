@@ -32,6 +32,8 @@ calculate_similarity(
 \item{ppm}{PPM tolerance}
 
 \item{return_matched_peaks}{Return matched peaks. Not compatible with 'entropy'. Default: FALSE}
+
+\item{...}{Not documented for now}
 }
 \value{
 Similarity score or NA_real_ if calculation fails
