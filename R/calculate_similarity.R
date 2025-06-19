@@ -30,9 +30,7 @@ calculate_similarity <- function(
   ...
 ) {
   if (!method %in% c("cosine", "entropy", "gnps")) {
-    logger::log_fatal(
-      "Invalid method. Choose 'cosine', 'entropy' or 'gnps'."
-    )
+    logger::log_fatal("Invalid method. Choose 'cosine', 'entropy' or 'gnps'.")
     stop()
   }
   if (method == "entropy") {
@@ -49,56 +47,46 @@ calculate_similarity <- function(
         clean_spectra = TRUE
       )
     )
-  } else {
-    query_masses <- query_spectrum[, 1]
-    target_masses <- target_spectrum[, 1]
-    if (method == "gnps") {
-      ## Replaced with internal C version
-      # map <- MsCoreUtils::join_gnps(
-      map <- join_gnps_wrapper(
-        x = query_masses,
-        y = target_masses,
-        xPrecursorMz = query_precursor,
-        yPrecursorMz = target_precursor,
-        tolerance = dalton,
-        ppm = ppm
-      )
-    }
-    if (method == "cosine") {
-      map <- MsCoreUtils::join(
-        x = query_masses,
-        y = target_masses,
-        tolerance = dalton,
-        ppm = ppm,
-        ## allows for type = c("outer", "inner", "left", "right")
-        ...
-      )
-    }
+  }
+  query_masses <- query_spectrum[, 1]
+  target_masses <- target_spectrum[, 1]
 
-    matched_x <- map[[1]]
-    matched_y <- map[[2]]
-
-    if (length(matched_x) == 0 || length(matched_y) == 0) {
-      return(0.0)
-    }
-
-    x_mat <- query_spectrum[matched_x, , drop = FALSE]
-    y_mat <- target_spectrum[matched_y, , drop = FALSE]
-
-    return(
-      # MsCoreUtils::gnps(
-      ## Do not report number of matched peaks by default for now
-      if (return_matched_peaks == TRUE) {
-        gnps_wrapper(
-          x = x_mat,
-          y = y_mat
-        )
-      } else {
-        gnps_wrapper(
-          x = x_mat,
-          y = y_mat
-        )$score
-      }
+  map <- switch(
+    method,
+    "gnps" = join_gnps_wrapper(
+      x = query_masses,
+      y = target_masses,
+      xPrecursorMz = query_precursor,
+      yPrecursorMz = target_precursor,
+      tolerance = dalton,
+      ppm = ppm
+    ),
+    "cosine" = MsCoreUtils::join(
+      x = query_masses,
+      y = target_masses,
+      tolerance = dalton,
+      ppm = ppm,
+      ## allows for type = c("outer", "inner", "left", "right")
+      ...
     )
+  )
+
+  matched_x <- map[[1]]
+  matched_y <- map[[2]]
+
+  if (length(matched_x) == 0L) {
+    return(0.0)
+  }
+
+  x_mat <- query_spectrum[matched_x, , drop = FALSE]
+  y_mat <- target_spectrum[matched_y, , drop = FALSE]
+
+  result <- gnps_wrapper(x = x_mat, y = y_mat)
+
+  if (return_matched_peaks) {
+    result
+  } else {
+    ## Do not report number of matched peaks by default for now
+    result$score
   }
 }
