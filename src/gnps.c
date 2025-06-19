@@ -314,12 +314,12 @@ SEXP gnps(SEXP x, SEXP y) {
     SEXP result = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(result, 0, ScalarReal(total_score));
     SET_VECTOR_ELT(result, 1, ScalarInteger(matched_peaks));
-  
+
     SEXP names = PROTECT(allocVector(STRSXP, 2));
     SET_STRING_ELT(names, 0, mkChar("score"));
     SET_STRING_ELT(names, 1, mkChar("matches"));
     setAttrib(result, R_NamesSymbol, names);
-  
+
     UNPROTECT(2); // result, names
     return result;
 }
