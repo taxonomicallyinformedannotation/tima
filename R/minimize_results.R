@@ -84,9 +84,13 @@ minimize_results <- function(
       tidytable::group_by(feature_id) |>
       tidytable::pivot_wider(names_from = tax, values_from = val) |>
       tidytable::select(
-        feature_id,
-        label_classyfire = cla,
-        label_npclassifier = npc
+        tidyselect::any_of(
+          c(
+            "feature_id",
+            "label_classyfire" = "cla",
+            "label_npclassifier" = "npc"
+          )
+        )
       ) |>
       tidytable::distinct()
   }
