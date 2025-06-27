@@ -153,8 +153,12 @@ prepare_libraries_spectra <-
                 ## TODO report the issue as otherwise precursorMz is lost
                 tidytable::rename(precursor_mz = precursorMz) |>
                 tidytable::mutate(
-                  inchikey_connectivity_layer = inchikey |>
-                    gsub(pattern = "-.*", replacement = "")
+                  inchikey_connectivity_layer = tidytable::if_else(
+                    condition = is.na(inchikey),
+                    true = inchikey_connectivity_layer,
+                    false = inchikey |>
+                      gsub(pattern = "-.*", replacement = "")
+                  )
                 ) |>
                 data.frame()
             }
