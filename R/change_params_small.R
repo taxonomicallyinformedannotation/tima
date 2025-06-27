@@ -94,6 +94,8 @@ change_params_small <- function(
       overwrite = TRUE
     )
     yaml_small$files$annotations$raw$sirius <- fil_sir_raw_rdy
+  } else {
+    yaml_small$files$annotations$raw$sirius <- NA
   }
   if (!is.null(fil_spe_raw)) {
     stopifnot("Your spectra file does not exist" = file.exists(fil_spe_raw))
@@ -111,6 +113,8 @@ change_params_small <- function(
   }
   if (!is.null(org_tax)) {
     yaml_small$organisms$taxon <- org_tax
+  } else {
+    yaml_small$organisms$taxon <- NA
   }
   if (!is.null(hig_con)) {
     yaml_small$options$high_confidence <- hig_con
@@ -119,8 +123,18 @@ change_params_small <- function(
     yaml_small$options$summarize <- summarize
   }
 
+  ## Dirty way to write null in the yaml
+  null_handler <- function(x) {
+    if (!is.na(x)) {
+      return(x)
+    }
+    res <- "null"
+    class(res) <- "verbatim"
+    return(res)
+  }
   yaml::write_yaml(
     x = yaml_small,
-    file = get_default_paths()$params$prepare_params
+    file = get_default_paths()$params$prepare_params,
+    handlers = list(logical = null_handler)
   )
 }
