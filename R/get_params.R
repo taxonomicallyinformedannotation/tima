@@ -28,11 +28,20 @@ get_params <- function(step) {
 
   default_path <-
     if (step == "prepare_params") {
-      get_path(file.path(paths$params$prepare_params))
+      file.path(
+        system.file(package = "tima"),
+        get_path(file.path(paths$params$prepare_params))
+      )
     } else if (step == "prepare_params_advanced") {
-      get_path(file.path(paths$params$prepare_params_advanced))
+      file.path(
+        system.file(package = "tima"),
+        get_path(file.path(paths$params$prepare_params_advanced))
+      )
     } else {
-      get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
+      file.path(
+        system.file(package = "tima"),
+        get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
+      )
     }
 
   # for advanced parameters to work
@@ -56,7 +65,11 @@ get_params <- function(step) {
 
   doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
 
-  params <- parse_yaml_params(def = default_path, usr = user_path)
+  if (file.exists(user_path)) {
+    params <- parse_yaml_params(def = default_path, usr = user_path)
+  } else {
+    params <- parse_yaml_params(def = default_path, usr = default_path)
+  }
 
   params <- parse_cli_params(
     arguments = docopt::docopt(doc = doc, version = paths$version),
