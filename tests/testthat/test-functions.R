@@ -272,6 +272,23 @@ testthat::test_that(desc = "Test functions", code = {
     pattern = "msp$"
   )[8L])
 
+  ## Additional tests
+  data.frame(
+    FEATURE_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789)),
+    precursorCharge = c(0L, 0L, 0L),
+    MS_LEVEL = c(1L, 2L, 3L),
+    PRECURSOR_MZ = c(123.4567, 234.5678, 345.6789),
+    Spectrum_type = c("MS1", "MS2", "MS3")
+  ) |>
+    Spectra::Spectra() |>
+    MsBackendMgf::export(
+      backend = MsBackendMgf::MsBackendMgf(),
+      file = "test.mgf"
+    )
+  "test.mgf" |>
+    import_spectra()
+
   ## for feature ID combination in spectra
   data.frame(
     FEATURE_ID = c("FT001", "FT002", "FT003"),
