@@ -72,6 +72,11 @@ import_spectra <- function(
     }
   )
 
+  if (0 %in% spectra@backend@spectraData$precursorCharge) {
+    logger::log_warn("Spectra with charge = 0 found in the MGF.")
+    logger::log_warn("Considering them even if this should not be the case.")
+  }
+
   ## Fix needed
   if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
     logger::log_trace("Harmonizing names")
@@ -110,10 +115,12 @@ import_spectra <- function(
   if (!is.na(polarity)) {
     spectra <- spectra |>
       Spectra::filterPrecursorCharge(
+        ## COMMENT: Considering 0 as both polarities...suboptimal
+        ## But allows reading broken MGFs
         z = if (polarity == "pos") {
-          c(1, 2, 3)
+          c(0, 1, 2, 3)
         } else {
-          c(-1, -2, -3)
+          c(0, -1, -2, -3)
         }
       )
   }
