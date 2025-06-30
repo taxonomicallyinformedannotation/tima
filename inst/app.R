@@ -1824,8 +1824,20 @@ ui <- shiny::fluidPage(
     ),
     shinyjs::hidden(
       shiny::downloadButton(
-        outputId = "results",
-        "Download results"
+        outputId = "results_mini",
+        "Download mini results"
+      )
+    ),
+    shinyjs::hidden(
+      shiny::downloadButton(
+        outputId = "results_filtered",
+        "Download filtered results"
+      )
+    ),
+    shinyjs::hidden(
+      shiny::downloadButton(
+        outputId = "results_full",
+        "Download full results"
       )
     ),
     shinyjs::hidden(shiny::actionButton(inputId = "close", label = "Close")),
@@ -2571,7 +2583,9 @@ server <- function(input, output, session) {
     shinyjs::hide("error")
     shinyjs::hide("job_msg")
     shinyjs::hide("job_end")
-    shinyjs::hide("results")
+    shinyjs::hide("results_mini")
+    shinyjs::hide("results_filtered")
+    shinyjs::hide("results_full")
     shinyjs::hide("close")
 
     ## Save the data (show an error message in case of error)
@@ -2595,7 +2609,9 @@ server <- function(input, output, session) {
         shinyjs::hide("error")
         shinyjs::hide("job_msg")
         shinyjs::hide("job_end")
-        shinyjs::hide("results")
+        shinyjs::hide("results_mini")
+        shinyjs::hide("results_filtered")
+        shinyjs::hide("results_full")
         shinyjs::hide("close")
       }
     )
@@ -2615,13 +2631,11 @@ server <- function(input, output, session) {
     ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
     if (R.Version()$os != "emscripten") {
       targets::tar_make(
-        names = tidyselect::matches("^ann_pre$"),
-        reporter = "verbose_positives"
+        names = tidyselect::matches("^ann_pre$")
       )
     } else {
       targets::tar_make(
         names = tidyselect::matches("^ann_pre$"),
-        reporter = "verbose_positives",
         callr_function = NULL
       )
     }
@@ -2629,24 +2643,28 @@ server <- function(input, output, session) {
     results <- tail(
       list.files(
         path = "data/processed",
+        pattern = ".tsv",
         full.names = TRUE,
         recursive = TRUE
       ),
-      n = 1
+      n = 3L
     )
-    process <- reactiveValues(status = targets::tar_active())
+    names(results) <- c("filtered", "mini", "full")
+    # process <- reactiveValues(status = targets::tar_active())
     observe({
       shiny::invalidateLater(millis = 5000)
-      process$status <- targets::tar_active()
+      # process$status <- targets::tar_active()
       shinyjs::hide("job_msg")
       shinyjs::show("job_end")
-      shinyjs::show("results")
-      output$results <- downloadHandler(
-        filename = basename(results),
-        content = function(file) {
-          writeLines(readLines(results), file)
-        }
-      )
+      lapply(names(results), function(name) {
+        output[[paste0("results_", name)]] <- downloadHandler(
+          filename = basename(results[[name]]),
+          content = function(file) {
+            writeLines(readLines(results[[name]]), file)
+          }
+        )
+        shinyjs::show(paste0("results_", name))
+      })
       shinyjs::show("close")
       shiny::observeEvent(eventExpr = input$close, handlerExpr = {
         shiny::stopApp()
