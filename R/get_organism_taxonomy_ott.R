@@ -60,7 +60,7 @@ get_organism_taxonomy_ott <- function(
       httr2::req_method("POST") |>
       ## weird hack to avoid error
       httr2::req_error(
-        is_error = function() {
+        is_error = function(resp) {
           return(FALSE)
         }
       ) |>
