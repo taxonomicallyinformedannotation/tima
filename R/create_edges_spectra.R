@@ -14,6 +14,7 @@
 #' @param name_target Name of the target features column
 #' @param method Similarity method
 #' @param threshold Minimal similarity to report
+#' @param matched_peaks Minimal number of matched peaks
 #' @param ppm Relative ppm tolerance to be used
 #' @param dalton Absolute Dalton tolerance to be used
 #' @param qutoff Intensity under which ms2 fragments will be removed.
@@ -44,6 +45,9 @@ create_edges_spectra <- function(
   threshold = get_params(
     step = "create_edges_spectra"
   )$similarities$thresholds$edges,
+  matched_peaks = get_params(
+    step = "create_edges_spectra"
+  )$similarities$thresholds$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(
     step = "create_edges_spectra"
@@ -77,7 +81,8 @@ create_edges_spectra <- function(
       method = method,
       ms2_tolerance = dalton,
       ppm_tolerance = ppm,
-      threshold = threshold
+      threshold = threshold,
+      matched_peaks = matched_peaks
     )
 
     logger::log_trace("Calculating features' entropy")
@@ -96,7 +101,8 @@ create_edges_spectra <- function(
       .f = function(x, peaks = fragz) {
         return(
           peaks[[x]] |>
-            length()
+            length() /
+            2
         )
       }
     )
@@ -140,7 +146,7 @@ create_edges_spectra <- function(
           name_source,
           name_target,
           "candidate_score_similarity" = "score",
-          "candidate_count_similarity_peaks_matched"
+          "candidate_count_similarity_peaks_matched" = "matched_peaks"
         )
       ))
 

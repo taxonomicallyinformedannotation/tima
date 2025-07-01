@@ -12,6 +12,7 @@
 #' @param ms2_tolerance MS2 tolerance
 #' @param ppm_tolerance ppm tolerance
 #' @param threshold Threshold
+#' @param matched_peaks Matched peaks
 #'
 #' @return NULL
 #'
@@ -23,7 +24,8 @@ create_edges <- function(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold
+  threshold,
+  matched_peaks
 ) {
   indices <- 1L:(nspecs - 1L)
 
@@ -35,7 +37,7 @@ create_edges <- function(
       query_spectrum <- frags[[index]]
       query_precursor <- precs[[index]]
 
-      scores <- purrr::map_dbl(
+      results <- purrr::map(
         .x = target_indices,
         .f = function(index) {
           target_spectrum <- frags[[index]]
@@ -47,18 +49,28 @@ create_edges <- function(
             query_precursor = query_precursor,
             target_precursor = target_precursor,
             dalton = ms2_tolerance,
-            ppm = ppm_tolerance
+            ppm = ppm_tolerance,
+            return_matched_peaks = TRUE
           )
         }
       )
+      scores <- results |>
+        purrr::map("score") |>
+        as.list() |>
+        unlist()
+      matches <- results |>
+        purrr::map("matches") |>
+        as.list() |>
+        unlist()
 
-      valid_indices <- which(scores >= threshold)
+      valid_indices <- which(scores >= threshold & matches >= matched_peaks)
 
       if (length(valid_indices) > 0) {
         data.frame(
           feature_id = index,
           target_id = target_indices[valid_indices],
-          score = scores[valid_indices]
+          score = scores[valid_indices],
+          matched_peaks = matches[valid_indices]
         )
       } else {
         NULL
@@ -72,7 +84,8 @@ create_edges <- function(
     tidytable::tidytable(
       feature_id = NA_integer_,
       target_id = NA_integer_,
-      score = NA_real_
+      score = NA_real_,
+      matched_peaks = NA_integer_
     )
   }
 }

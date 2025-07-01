@@ -11,7 +11,8 @@ create_edges(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold
+  threshold,
+  matched_peaks
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ create_edges(
 \item{ppm_tolerance}{ppm tolerance}
 
 \item{threshold}{Threshold}
+
+\item{matched_peaks}{Matched peaks}
 }
 \description{
 This function applies similarity calculation to a list of

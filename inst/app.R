@@ -397,6 +397,22 @@ ui <- shiny::fluidPage(
                 "Minimum similarity score between spectra.",
                 "To keep MS2 similarity edge."
               )
+            ),
+          shiny::sliderInput(
+            inputId = "sim_thr_mat",
+            label = "Minimal matched peaks (edges)",
+            min = 0,
+            max = 100,
+            step = 1,
+            value = 6,
+            ticks = FALSE
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Minimum number of matched peaks between spectra.",
+                "To keep MS2 similarity edge."
+              )
             )
         ),
         shiny::tabPanel(
@@ -2211,6 +2227,8 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$sim_thr_ann)
   yaml_advanced$similarities$thresholds$edges <-
     shiny::isolate(input$sim_thr_edg)
+  yaml_advanced$similarities$thresholds$matched_peaks <-
+    shiny::isolate(input$sim_thr_mat)
   # TODO
   # yaml_advanced$tools$metadata <-
   #   shiny::isolate(input$too_x)

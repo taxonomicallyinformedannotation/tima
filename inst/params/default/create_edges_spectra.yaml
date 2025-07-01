@@ -60,3 +60,6 @@ similarities:
   thresholds:
     #' For edges. FLOAT
     edges: 0.7
+
+    #' Matched peaks. INTEGER
+    matched_peaks: 6
