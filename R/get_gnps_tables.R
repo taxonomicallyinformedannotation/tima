@@ -89,7 +89,7 @@ get_gnps_tables <-
             httr2::request() |>
             httr2::req_method("GET") |>
             httr2::req_error(
-              is_error = function(resp) {
+              is_error = function() {
                 return(FALSE)
               }
             ) |>

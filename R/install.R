@@ -71,7 +71,7 @@ install <- function(
         expr = {
           reticulate::virtualenv_create(envname = envname, python = python)
         },
-        error = function(e) {
+        error = function() {
           logger::log_error("Creating Python virtualenv failed")
           logger::log_info("Retrying with a clean python install")
           python <- reticulate::install_python(version = rescue_python_version)

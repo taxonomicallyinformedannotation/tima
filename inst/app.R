@@ -1873,8 +1873,6 @@ ui <- shiny::fluidPage(
   list <- tima:::load_yaml_files()
 
   yamls_params <- list$yamls_params
-  yaml_files <- list$yaml_files
-  yaml_names <- list$yaml_names
 
   ## This allows to keep files correctly placed in `data/source` clean
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
@@ -2318,7 +2316,7 @@ ui <- shiny::fluidPage(
   )
 }
 
-server <- function(input, output, session) {
+server <- function(input, output) {
   ## Observe helpers
   shinyhelper::observe_helpers()
   targets::tar_watch_server(
