@@ -150,7 +150,7 @@ prepare_annotations_sirius <-
         expr = {
           utils::unzip(input_directory, list = TRUE)
         },
-        error = function(err) {
+        error = function(e) {
           list <- list()
           list$Name <- list.files(input_directory)
           return(list)
