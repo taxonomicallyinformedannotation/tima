@@ -55,8 +55,6 @@ change_params_small <- function(
   list <- load_yaml_files()
 
   yamls_params <- list$yamls_params
-  yaml_files <- list$yaml_files
-  yaml_names <- list$yaml_names
 
   yaml_small <- yamls_params[["params/prepare_params"]]
   if (!is.null(fil_pat)) {

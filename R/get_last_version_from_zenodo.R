@@ -56,7 +56,6 @@ get_last_version_from_zenodo <-
     )
 
     ## Extract individual file names and urls
-    fileurls <- content$files$links$self
     ## See https://github.com/zenodo/zenodo-rdm/issues/639
     # filenames <- content$files$filename
     filenames <- content$files$key
@@ -67,7 +66,6 @@ get_last_version_from_zenodo <-
       x = filenames,
       fixed = TRUE
     )
-    fileurl <- fileurls[indices]
     filename <- filenames[indices]
     ## Fix with new Zenodo (weird)
     file <- paste0(record_new$url, "/files/", filename)

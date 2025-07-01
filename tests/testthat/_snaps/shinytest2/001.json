@@ -154,6 +154,7 @@
     "sim_met_edg": "gnps",
     "sim_thr_ann": 0,
     "sim_thr_edg": 0.7,
+    "sim_thr_mat": 6,
     "summarize": false,
     "targets-accordion": "Choose display",
     "targets-degree_from": 8,
