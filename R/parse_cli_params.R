@@ -319,6 +319,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("similarities", "thresholds", "edges"),
       type = as.numeric
     ),
+    sim_thr_mat = list(
+      path = c("similarities", "thresholds", "matched_peaks"),
+      type = as.integer
+    ),
     too_met = list(path = c("tools", "metadata"), type = as.character),
     too_net_spe_com = list(
       path = c("tools", "networks", "spectral", "components"),

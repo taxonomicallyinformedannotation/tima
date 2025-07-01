@@ -1516,6 +1516,7 @@ list(
           name_target = par_cre_edg_spe$names$target,
           method = par_cre_edg_spe$similarities$methods$edges,
           threshold = par_cre_edg_spe$similarities$thresholds$edges,
+          matched_peaks = par_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
@@ -2112,7 +2113,8 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
+          threshold = benchmark_def_cre_edg_spe$similarities$thresholds$edges,
+          matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0
@@ -2127,7 +2129,8 @@ list(
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$annotations$thresholds$ms2$similarity$edges,
+          threshold = benchmark_def_cre_edg_spe$similarities$thresholds$edges,
+          matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           qutoff = 0

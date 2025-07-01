@@ -11,6 +11,8 @@ create_edges_spectra(
   name_target = get_params(step = "create_edges_spectra")$names$target,
   method = get_params(step = "create_edges_spectra")$similarities$methods$edges,
   threshold = get_params(step = "create_edges_spectra")$similarities$thresholds$edges,
+  matched_peaks = get_params(step =
+    "create_edges_spectra")$similarities$thresholds$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
@@ -28,6 +30,8 @@ create_edges_spectra(
 \item{method}{Similarity method}
 
 \item{threshold}{Minimal similarity to report}
+
+\item{matched_peaks}{Minimal number of matched peaks}
 
 \item{ppm}{Relative ppm tolerance to be used}
 

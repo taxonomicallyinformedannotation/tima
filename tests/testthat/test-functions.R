@@ -578,7 +578,8 @@ testthat::test_that(desc = "Test functions", code = {
     method = "gnps",
     ms2_tolerance = 0.01,
     ppm_tolerance = 10,
-    threshold = 0.1
+    threshold = 0.1,
+    matched_peaks = 0L
   )
 
   ### GNPS results

@@ -143,6 +143,7 @@ prepare_params <- function(
   sim_met_edg <- params_advanced$similarities$methods$edges
   sim_thr_ann <- params_advanced$similarities$thresholds$annotations
   sim_thr_edg <- params_advanced$similarities$thresholds$edges
+  sim_thr_mat <- params_advanced$similarities$thresholds$matched_peaks
   # too_met <- params_advanced$tools$metadata
   # too_net_spe_com <- params_advanced$tools$networks$spectral$components
   # too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
@@ -305,6 +306,8 @@ prepare_params <- function(
     sim_met_edg
   yamls_params$create_edges_spectra$similarities$thresholds$edges <-
     sim_thr_edg
+  yamls_params$create_edges_spectra$similarities$thresholds$matched_peaks <-
+    sim_thr_mat
 
   ## filter_annotations
   yamls_params$filter_annotations$files$annotations$filtered <-
