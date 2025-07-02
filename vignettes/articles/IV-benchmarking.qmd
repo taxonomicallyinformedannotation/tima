@@ -18,7 +18,7 @@ knitr:
     collapse: true
     comment: '#>'
   opts_knit:
-    root.dir: system.file(package = "tima")
+    root.dir: ../../inst
 opengraph:
     image:
       src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
