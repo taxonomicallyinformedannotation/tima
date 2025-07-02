@@ -3,26 +3,31 @@ title: 2 Preparing inputs
 author: 
   - name: Adriano Rutz
     orcid: 0000-0003-0443-9902
+comments:
+  hypothesis:
+    showHighlights: always
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+format:
+  html:
+    # code-links:
+    #  - repo: https://github.com/taxonomicallyinformedannotation/tima
+    smooth-scroll: true
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+  opts_knit:
+    root.dir: system.file(package = "tima")
 opengraph:
     image:
       src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
       alt: Taxonomically Informed Metabolite Annotation
 vignette: >
   %\VignetteIndexEntry{2 Preparing inputs}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-knitr::opts_knit$set(root.dir = system.file(package = "tima"))
-```
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")

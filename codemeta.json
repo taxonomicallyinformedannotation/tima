@@ -97,6 +97,19 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "quarto",
+      "name": "quarto",
+      "version": ">= 1.4.4",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=quarto"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
       "version": ">= 2.13.0",
@@ -641,7 +654,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2051.123KB",
+  "fileSize": "2051.045KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
