@@ -14,5 +14,8 @@
 ^\.dockerignore$
 ^codemeta\.json$
 _\.new\.png$
+^vignettes/\.quarto$
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
 ^vignettes/articles$
 CITATION.cff

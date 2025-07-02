@@ -19,3 +19,6 @@ _targets
 *_.new.png
 .quarto
 inst/python/__pycache__/*
+vignettes/*.html
+vignettes/*.pdf
+vignettes/articles/*_files$
