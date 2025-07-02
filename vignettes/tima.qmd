@@ -31,6 +31,18 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r hidden_install, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+install.packages(
+  "tima",
+  repos = c(
+    "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
+    "https://cloud.r-project.org"
+  )
+)
+tima::install()
+```
+
 This vignette describes the philosophy behind the infrastructure of **TIMA**.
 
 ## Philosophy
