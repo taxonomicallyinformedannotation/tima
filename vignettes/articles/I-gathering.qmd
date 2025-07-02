@@ -3,12 +3,13 @@ title: 1 Gathering everything you need
 author: 
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
-citation: true
+citation:
+  url: https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html
 comments:
   hypothesis:
     showHighlights: always
 creative_commons: CC BY-SA
-date: "`r Sys.Date()`"
+date: today
 format:
   html:
     # code-links:
@@ -21,6 +22,7 @@ knitr:
     comment: '#>'
   opts_knit:
     root.dir: ../../inst
+lang: en
 opengraph:
     image:
       src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg

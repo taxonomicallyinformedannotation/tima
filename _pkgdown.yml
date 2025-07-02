@@ -13,8 +13,6 @@ template:
     image:
       src: man/figures/logo.svg
       alt: "Taxonomically Informed Metabolite Annotation"
-    twitter:
-      creator: "@adafede"
   params:
     google_site_verification: Bt77rpBuC_R-0p62TWtA_ba5rvx-PuSEMv4LHg1UsOo
 

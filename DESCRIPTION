@@ -76,7 +76,6 @@ Suggests:
 SystemRequirements:
     python (< 3.14,>= 3.10)
 VignetteBuilder:
-    knitr,
     quarto
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
 ByteCompile: true
