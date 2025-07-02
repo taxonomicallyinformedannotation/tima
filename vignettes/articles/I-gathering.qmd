@@ -1,6 +1,8 @@
 ---
 title: 1 Gathering everything you need
-author: Adriano Rutz
+author: 
+  - name: Adriano Rutz
+    orcid: 0000-0003-0443-9902
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -8,8 +10,6 @@ opengraph:
     image:
       src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
       alt: Taxonomically Informed Metabolite Annotation
-    twitter:
-      creator: "@adafede"
 vignette: >
   %\VignetteIndexEntry{1 Gathering everything you need}
   %\VignetteEngine{knitr::rmarkdown}
