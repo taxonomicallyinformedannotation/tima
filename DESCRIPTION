@@ -64,6 +64,7 @@ Suggests:
     knitr (>= 1.50),
     lifecycle (>= 1.0.4),
     pkgload (>= 1.4.0),
+    quarto (>= 1.4.4),
     R.utils (>= 2.13.0),
     rlang (>= 1.1.6),
     shinyhelper (>= 0.3.2),
@@ -79,8 +80,9 @@ VignetteBuilder:
     quarto
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
 ByteCompile: true
-Config/Needs/website: rmarkdown
 Config/testthat/edition: 3
+Config/testthat/parallel: true
+Config/testthat/start-first: build-article, build-quarto-article, build-reference, build
 Encoding: UTF-8
 Language: en-US
 LazyData: true
