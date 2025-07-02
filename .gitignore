@@ -22,3 +22,6 @@ inst/python/__pycache__/*
 vignettes/*.html
 vignettes/*.pdf
 vignettes/articles/*_files$
+vignettes/*_files$
+
+/.quarto/
