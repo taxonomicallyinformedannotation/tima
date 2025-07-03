@@ -12,8 +12,8 @@ This package provides the infrastructure to perform Taxonomically Informed Metab
 Useful links:
 \itemize{
   \item \url{https://github.com/taxonomicallyinformedannotation/tima}
-  \item \url{https://taxonomicallyinformedannotation.github.io/tima}
   \item \url{https://taxonomicallyinformedannotation.github.io/tima-shinylive}
+  \item \url{https://taxonomicallyinformedannotation.github.io/tima}
   \item Report bugs at \url{https://github.com/taxonomicallyinformedannotation/tima/issues}
 }
 
