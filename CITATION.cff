@@ -13,6 +13,8 @@ doi: 10.5281/zenodo.5797920
 identifiers:
 - type: url
   value: https://taxonomicallyinformedannotation.github.io/tima-shinylive
+- type: url
+  value: https://taxonomicallyinformedannotation.github.io/tima/
 abstract: This package provides the infrastructure to perform Taxonomically Informed
   Metabolite Annotation.
 authors:
