@@ -14,8 +14,6 @@ creative_commons: CC BY-SA
 date: today
 format:
   html:
-    # code-links:
-    #  - repo: https://github.com/taxonomicallyinformedannotation/tima
     smooth-scroll: true
 google-scholar: true
 knitr:
