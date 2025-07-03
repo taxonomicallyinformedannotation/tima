@@ -6,6 +6,8 @@ author:
 citation:
   url: https://taxonomicallyinformedannotation.github.io/tima/articles/II-preparing.html
 comments:
+  giscus: 
+    repo: taxonomicallyinformedannotation/tima
   hypothesis:
     showHighlights: always
 creative_commons: CC BY-SA

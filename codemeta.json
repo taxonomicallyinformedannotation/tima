@@ -4,7 +4,7 @@
   "identifier": "tima",
   "description": "This package provides the infrastructure to perform Taxonomically Informed Metabolite Annotation.",
   "name": "tima: Taxonomically Informed Metabolite Annotation",
-  "relatedLink": ["https://taxonomicallyinformedannotation.github.io/tima", "https://taxonomicallyinformedannotation.github.io/tima-shinylive"],
+  "relatedLink": ["https://taxonomicallyinformedannotation.github.io/tima-shinylive", "https://taxonomicallyinformedannotation.github.io/tima"],
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
@@ -654,7 +654,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2051.045KB",
+  "fileSize": "2827698.792KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
