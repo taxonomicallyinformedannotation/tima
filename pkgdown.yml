@@ -1,0 +1,13 @@
+pandoc: 3.1.11
+pkgdown: 2.1.3
+pkgdown_sha: ~
+articles:
+  articles/I-gathering: I-gathering.html
+  articles/II-preparing: II-preparing.html
+  articles/III-processing: III-processing.html
+  articles/IV-benchmarking: IV-benchmarking.html
+  tima: tima.html
+last_built: 2025-07-03T15:27Z
+urls:
+  reference: https://taxonomicallyinformedannotation.github.io/tima/reference
+  article: https://taxonomicallyinformedannotation.github.io/tima/articles
