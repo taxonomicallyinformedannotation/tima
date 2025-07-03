@@ -12,9 +12,7 @@ version: 2.12.0
 doi: 10.5281/zenodo.5797920
 identifiers:
 - type: url
-  value: https://taxonomicallyinformedannotation.github.io/tima-shinylive
-- type: url
-  value: https://taxonomicallyinformedannotation.github.io/tima/
+  value: https://taxonomicallyinformedannotation.github.io/tima
 abstract: This package provides the infrastructure to perform Taxonomically Informed
   Metabolite Annotation.
 authors:
@@ -39,7 +37,7 @@ preferred-citation:
   doi: 10.5281/zenodo.5797920
 repository: https://bioconductor.org/
 repository-code: https://github.com/taxonomicallyinformedannotation/tima
-url: https://taxonomicallyinformedannotation.github.io/tima
+url: https://taxonomicallyinformedannotation.github.io/tima-shinylive
 contact:
 - family-names: Rutz
   given-names: Adriano
