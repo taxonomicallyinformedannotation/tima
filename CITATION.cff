@@ -795,6 +795,24 @@ references:
   doi: 10.32614/CRAN.package.yaml
   version: '>= 2.3.10'
 - type: software
+  title: altdoc
+  abstract: 'altdoc: Package Documentation Websites with ''Quarto'', ''Docsify'',
+    ''Docute'', or ''MkDocs'''
+  notes: Suggests
+  url: https://altdoc.etiennebacher.com
+  repository: https://CRAN.R-project.org/package=altdoc
+  authors:
+  - family-names: Bacher
+    given-names: Etienne
+    email: etienne.bacher@protonmail.com
+  - family-names: Arel-Bundock
+    given-names: Vincent
+    email: vincent.arel-bundock@umontreal.ca
+    orcid: https://orcid.org/0000-0003-2042-7063
+  year: '2025'
+  doi: 10.32614/CRAN.package.altdoc
+  version: '>= 0.5.0'
+- type: software
   title: BiocManager
   abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
   notes: Suggests
