@@ -74,9 +74,18 @@ tima::annotate_masses()
 
 ```{r annotate-spectra-1, warning=FALSE}
 tima::annotate_spectra()
+tima::prepare_annotations_spectra()
 ```
 
 There are multiple similarities available, including `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
+
+#### GNPS
+
+Optional
+
+```{r prepare-gnps-1, warning=FALSE}
+tima::prepare_annotations_gnps()
+```
 
 ### Fingerprint-based
 
