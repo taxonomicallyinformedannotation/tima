@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html
 comments:
   giscus: 
     repo: taxonomicallyinformedannotation/tima
@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
     image:

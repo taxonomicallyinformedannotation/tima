@@ -15,6 +15,7 @@
 * Keep (only) best molecular formula and canopus annotations from SIRIUS
 * New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Refactored MS1 annotation step to work per sample (#194)
+* Switched documentation from `pkgdown` to `altdoc`
 * Updated to Massbank version `2025.05.1`
 * Updated minimal R version to `4.4.0` (and related Bioconductor dependencies)
 

@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.qmd. Please edit that file -->
 
 
 # tima <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg' align="right" height="139" />
@@ -11,7 +11,6 @@ output: github_document
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima)
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
-[![R-Universe](https://taxonomicallyinformedannotation.r-universe.dev/badges/tima)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
 [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
@@ -138,11 +137,3 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
 - ROTL: <https://doi.org/10.1111/2041-210X.12593>
 - Spectral entropy: <https://doi.org/10.1038/s41592-021-01331-z>
-
-## Contributing
-
-See <https://taxonomicallyinformedannotation.github.io/tima/CONTRIBUTING.html>
-
-## Support
-
-See <https://taxonomicallyinformedannotation.github.io/tima/SUPPORT.html>

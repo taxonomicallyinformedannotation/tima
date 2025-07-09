@@ -25,3 +25,6 @@ vignettes/articles/*_files$
 vignettes/*_files$
 
 /.quarto/
+altdoc/freeze.rds
+_quarto/*
+!_quarto/_freeze/

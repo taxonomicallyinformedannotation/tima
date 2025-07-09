@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html
 comments:
   giscus: 
     repo: taxonomicallyinformedannotation/tima
@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
     image:
@@ -102,21 +100,15 @@ To get a small example:
 tima::get_example_files("spectral_lib_with_rt")
 ```
 
-###### MassBank
+###### GNPS, MassBank & MERLIN
 
-MassBank is downloaded and used by default.
+GNPS, MassBank & MERLIN are downloaded and used by default, for more info about them, see <https://github.com/Adafede/SpectRalLibRaRies>.
+
+In case you want to format your own spectral library to use it for spectral matching, adapt it the same way.
 
 ```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_exp_mb_raw"))
+targets::tar_make(names = tidyselect::matches("lib_spe_exp"))
 ```
-
-We are currently working to get all MONA and GNPS experimental spectra easily available.
-
-However, programmatic download of MONA is currently not supported, and GNPS spectra require some pre-processing.
-
-So for now, either use your GNPS job ID and download MONA manually, helpers to use them later on are already available. (see `scripts/prepare_libraries_spectra_exp_mona.R`).
-
-In case you want to format your own spectral library to use it for spectral matching, adapt the steps in `params/user/prepare_libraries_spectra.yaml` and `params/user/annotate_spectra.yaml`.
 
 ##### *In silico*
 
@@ -237,4 +229,4 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/II-preparing.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html).

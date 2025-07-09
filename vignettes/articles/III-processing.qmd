@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/articles/III-processing.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html
 comments:
   giscus: 
     repo: taxonomicallyinformedannotation/tima
@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
     image:
@@ -35,13 +33,14 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+logger::log_threshold(logger::INFO)
 ```
 
 This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
 If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
 
-```{r weight-all, message=FALSE}
-targets::tar_make(names = tidyselect::matches("ann_pre$"))
+```{r weight-all, warning=FALSE}
+tima::tima_full()
 ```
 
 The final exported file is formatted in order to be easily imported in [Cytoscape](https://cytoscape.org/) to further explore your data!

@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/articles/II-preparing.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html
 comments:
   giscus: 
     repo: taxonomicallyinformedannotation/tima
@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
     image:
@@ -35,6 +33,7 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+logger::log_threshold(logger::INFO)
 ```
 
 This vignette describes the main steps of the annotation process.
@@ -54,29 +53,17 @@ These annotations are of the lowest possible quality.
 However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
 
-```{r annotate-masses-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("^ann_ms1_pre"))
+```{r annotate-masses-1, warning=FALSE}
+tima::annotate_masses()
 ```
 
 ### Spectral
 
-```{r annotate-spectra-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("^ann_spe_pre"))
+```{r annotate-spectra-1, warning=FALSE}
+tima::annotate_spectra()
 ```
 
-We use the `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
-
-In case, a python implementation of the spectral matching steps is also available at: <https://github.com/mandelbrot-project/spectral_lib_matcher>.
-The python version also includes other similarity measures.
-
-<!-- #### GNPS -->
-<!-- We also provide an example GNPS job id, which is: `41c6068e905d482db5698ad81d145d7c` -->
-<!-- Before running the corresponding code, do not forget to modify `params/user/prepare_*yourAnnotationTool*.yaml`. -->
-<!-- Depending on the annotation tool you used, you can format its results using: -->
-
-```{r annotate-gnps, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("^ann_spe_exp_gnp_pre"))
-```
+There are multiple similarities available, including `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
 
 ### Fingerprint-based
 
@@ -133,14 +120,14 @@ These parameters were not optimized and were only used to give an example output
 If you are using the cli, do not forget to generate the summaries with the `--full-summary` option, or if you use the gui, generate them by clicking the corresponding icon.
 You can get an example running:
 
-```{r get-sirius, results="hide", message=FALSE, warning=FALSE}
+```{r get-sirius, warning=FALSE}
 tima:::get_example_sirius()
 ```
 
 The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).
 
-```{r prepare-sirius, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("^ann_sir_pre"))
+```{r prepare-sirius, warning=FALSE}
+tima::prepare_annotations_sirius()
 ```
 
 If you want to know how we attempt to combine the CSI score with other ones, see [R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
@@ -179,8 +166,8 @@ We are currently also working on CANOPUS integration for chemical class annotati
 A network is generated during the process.
 The edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
 
-```{r create-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("fea_edg_spe"))
+```{r create-edges, warning=FALSE}
+tima::create_edges_spectra()
 ```
 
 If needed, you can get an example of what your minimal feature table should look like by running:
@@ -189,20 +176,26 @@ If needed, you can get an example of what your minimal feature table should look
 tima::get_example_files(example = "features")
 ```
 
-```{r prepare-features, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("fea_pre"))
+Then, you can prepare your features for the next steps:
+
+```{r prepare-features, warning=FALSE}
+tima::prepare_features_tables()
 ```
 
-```{r prepare-edges, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("fea_edg_pre"))
+Prepare the edges:
+
+```{r prepare-edges, warning=FALSE}
+tima::prepare_features_edges()
 ```
 
-```{r create-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("fea_com"))
+Create and prepare the components:
+
+```{r create-components, warning=FALSE}
+tima::create_components()
 ```
 
-```{r prepare-components, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("fea_com_pre"))
+```{r prepare-components, warning=FALSE}
+tima::prepare_features_components()
 ```
 
 ## Biological source annotation
@@ -212,8 +205,8 @@ If all your features come from a single extract, it will attribute the biologica
 If you have multiple extracts aligned, it will take the *n* (according to your parameters) highest intensities of your aligned feature table and attribute the biological source of corresponding extracts.
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
-```{r prepare-taxa, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("tax_pre"))
+```{r prepare-taxa, warning=FALSE}
+tima::prepare_taxa()
 ```
 
 ## Filter annotations (based on retention time)
@@ -223,8 +216,8 @@ based on your own internal (experimental or predicted) retention times library.
 It is optional. 
 If you do not have one, it will simply group the annotations of all tools. 
 
-```{r filter-annotations, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("^ann_fil"))
+```{r filter-annotations, warning=FALSE}
+tima::filter_annotations()
 ```
 
 You are almost there! See already all the steps accomplished!
@@ -243,4 +236,4 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/III-processing.html).
+We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html).

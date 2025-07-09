@@ -19,3 +19,5 @@ _\.new\.png$
 ^vignettes/articles/*_files$
 ^vignettes/articles$
 CITATION.cff
+^altdoc$
+^_quarto$
