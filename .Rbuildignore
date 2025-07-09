@@ -10,6 +10,7 @@
 ^codecov\.yml$
 ^\.github$
 ^README\.Rmd$
+^README\.qmd$
 ^cran-comments\.md$
 ^\.dockerignore$
 ^codemeta\.json$
