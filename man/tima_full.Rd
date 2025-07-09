@@ -13,5 +13,7 @@ Everything you need.
 This function runs everything you need.
 }
 \examples{
-NULL
+\dontrun{
+tima_full()
+}
 }

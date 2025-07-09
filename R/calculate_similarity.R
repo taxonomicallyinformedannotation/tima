@@ -17,18 +17,46 @@
 #'
 #' @return Similarity score or NA_real_ if calculation fails
 #'
-#' @examples NULL
+#' @examples
+#' sp_1 <- cbind(
+#'   mz = c(10, 36, 63, 91, 93),
+#'   intensity = c(14, 15, 999, 650, 1)
+#' )
+#' precursor_1 <- 123.4567
+#' precursor_2 <- precursor_1 + 14
+#' sp_2 <- cbind(
+#'   mz = c(10, 12, 50, 63, 105),
+#'   intensity = c(35, 5, 16, 999, 450)
+#' )
+#' calculate_similarity(
+#'   method = "entropy",
+#'   query_spectrum = sp_1,
+#'   target_spectrum = sp_2,
+#'   query_precursor = precursor_1,
+#'   target_precursor = precursor_2,
+#'   dalton = 0.005,
+#'   ppm = 10.0
+#' )
+#' calculate_similarity(
+#'   method = "gnps",
+#'   query_spectrum = sp_1,
+#'   target_spectrum = sp_2,
+#'   query_precursor = precursor_1,
+#'   target_precursor = precursor_2,
+#'   dalton = 0.005,
+#'   ppm = 10.0,
+#'   return_matched_peaks = TRUE
+#' )
 calculate_similarity <- function(
-  method,
-  query_spectrum,
-  target_spectrum,
-  query_precursor,
-  target_precursor,
-  dalton,
-  ppm,
-  return_matched_peaks = FALSE,
-  ...
-) {
+    method,
+    query_spectrum,
+    target_spectrum,
+    query_precursor,
+    target_precursor,
+    dalton,
+    ppm,
+    return_matched_peaks = FALSE,
+    ...) {
   if (!method %in% c("cosine", "entropy", "gnps")) {
     logger::log_fatal("Invalid method. Choose 'cosine', 'entropy' or 'gnps'.")
     stop()
@@ -51,8 +79,7 @@ calculate_similarity <- function(
   query_masses <- query_spectrum[, 1]
   target_masses <- target_spectrum[, 1]
 
-  map <- switch(
-    method,
+  map <- switch(method,
     "gnps" = join_gnps_wrapper(
       x = query_masses,
       y = target_masses,

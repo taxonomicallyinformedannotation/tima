@@ -84,14 +84,17 @@ repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 data_interim <- "data/interim/"
 dir <- paste0(github, repo)
 dir <- paste0(dir, data_interim)
+dir_sop_mer <- paste0(dir, "libraries/sop/merged/")
+dir_str <- paste0(dir_sop_mer, "structures/")
+dir_tax <- paste0(dir_str, "taxonomies/")
 annotate_masses(
   features = paste0(dir, "features/example_features.tsv"),
-  library = paste0(dir, "libraries/sop/merged/keys.tsv"),
-  str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
-  str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-  str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
-  str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
-  str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+  library = paste0(dir_sop_mer, "keys.tsv"),
+  str_stereo = paste0(dir_str, "stereo.tsv"),
+  str_met = paste0(dir_str, "metadata.tsv"),
+  str_nam = paste0(dir_str, "names.tsv"),
+  str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
+  str_tax_npc = paste0(dir_tax, "npc.tsv")
 )
 unlink("data", recursive = TRUE)
 }

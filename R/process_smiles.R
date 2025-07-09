@@ -8,12 +8,15 @@
 #'
 #' @return NULL
 #'
-#' @examples NULL
+#' @examples
+#' data.frame(
+#'   "structure_smiles_initial" = "C[C@@H]1C=C(C(=O)[C@]2([C@H]1C[C@@H]3[C@@]4([C@@H]2C(=O)C(=C([C@@H]4CC(=O)O3)C)OC)C)C)OC"
+#' ) |>
+#'   process_smiles()
 process_smiles <- function(
-  df,
-  smiles_colname = "structure_smiles_initial",
-  cache = NULL
-) {
+    df,
+    smiles_colname = "structure_smiles_initial",
+    cache = NULL) {
   logger::log_trace("Processing SMILES")
   reticulate::source_python(
     file = system.file("python/process_smiles.py", package = "tima")

@@ -22,5 +22,5 @@ This function calculates the mass of M
 \examples{
 calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")
 calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+Na]+")
-calculate_mass_of_m(mz = 123.456, adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+")
+calculate_mass_of_m(mz = 123.4567, adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+")
 }
