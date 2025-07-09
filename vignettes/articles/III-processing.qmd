@@ -34,6 +34,7 @@ vignette: >
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
 logger::log_threshold(logger::INFO)
+tima::get_example_files()
 ```
 
 This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
