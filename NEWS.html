@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>tima</title>
+<title>news – tima</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -330,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./NEWS.html"> 
+    <a class="nav-link active" href="./NEWS.html" aria-current="page"> 
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
@@ -365,23 +330,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></a>
-  <ul class="collapse">
-  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a>
-  <ul class="collapse">
-  <li><a href="#docker" id="toc-docker" class="nav-link" data-scroll-target="#docker">Docker</a></li>
-  </ul></li>
-  <li><a href="#main-citations" id="toc-main-citations" class="nav-link" data-scroll-target="#main-citations">Main Citations</a>
-  <ul class="collapse">
-  <li><a href="#tima-1" id="toc-tima-1" class="nav-link" data-scroll-target="#tima-1">TIMA</a></li>
-  <li><a href="#lotus" id="toc-lotus" class="nav-link" data-scroll-target="#lotus">LOTUS</a></li>
-  <li><a href="#isdb" id="toc-isdb" class="nav-link" data-scroll-target="#isdb">ISDB</a></li>
-  <li><a href="#gnps" id="toc-gnps" class="nav-link" data-scroll-target="#gnps">GNPS</a></li>
-  <li><a href="#sirius" id="toc-sirius" class="nav-link" data-scroll-target="#sirius">SIRIUS</a></li>
-  <li><a href="#others" id="toc-others" class="nav-link" data-scroll-target="#others">Others</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima</a></li>
+  <li><a href="#tima-2.12.0" id="toc-tima-2.12.0" class="nav-link" data-scroll-target="#tima-2.12.0">tima 2.12.0</a></li>
+  <li><a href="#tima-2.11.1-unreleased" id="toc-tima-2.11.1-unreleased" class="nav-link" data-scroll-target="#tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</a></li>
+  <li><a href="#tima-2.11.0" id="toc-tima-2.11.0" class="nav-link" data-scroll-target="#tima-2.11.0">tima 2.11.0</a></li>
+  <li><a href="#tima-2.10.0" id="toc-tima-2.10.0" class="nav-link" data-scroll-target="#tima-2.10.0">tima 2.10.0</a></li>
+  <li><a href="#tima-2.9.6" id="toc-tima-2.9.6" class="nav-link" data-scroll-target="#tima-2.9.6">tima 2.9.6</a></li>
+  <li><a href="#tima-2.9.5" id="toc-tima-2.9.5" class="nav-link" data-scroll-target="#tima-2.9.5">tima 2.9.5</a></li>
+  <li><a href="#tima-2.9.4" id="toc-tima-2.9.4" class="nav-link" data-scroll-target="#tima-2.9.4">tima 2.9.4</a></li>
+  <li><a href="#tima-2.9.3" id="toc-tima-2.9.3" class="nav-link" data-scroll-target="#tima-2.9.3">tima 2.9.3</a></li>
+  <li><a href="#tima-2.9.2" id="toc-tima-2.9.2" class="nav-link" data-scroll-target="#tima-2.9.2">tima 2.9.2</a></li>
+  <li><a href="#tima-2.9.1" id="toc-tima-2.9.1" class="nav-link" data-scroll-target="#tima-2.9.1">tima 2.9.1</a></li>
+  <li><a href="#tima-2.9.0" id="toc-tima-2.9.0" class="nav-link" data-scroll-target="#tima-2.9.0">tima 2.9.0</a></li>
+  <li><a href="#tima-2.8.2" id="toc-tima-2.8.2" class="nav-link" data-scroll-target="#tima-2.8.2">tima 2.8.2</a></li>
+  <li><a href="#tima-2.8.1" id="toc-tima-2.8.1" class="nav-link" data-scroll-target="#tima-2.8.1">tima 2.8.1</a></li>
+  <li><a href="#tima-2.8.0" id="toc-tima-2.8.0" class="nav-link" data-scroll-target="#tima-2.8.0">tima 2.8.0</a></li>
+  <li><a href="#tima-2.7.4" id="toc-tima-2.7.4" class="nav-link" data-scroll-target="#tima-2.7.4">tima 2.7.4</a></li>
+  <li><a href="#tima-2.7.3" id="toc-tima-2.7.3" class="nav-link" data-scroll-target="#tima-2.7.3">tima 2.7.3</a></li>
+  <li><a href="#tima-2.7.2" id="toc-tima-2.7.2" class="nav-link" data-scroll-target="#tima-2.7.2">tima 2.7.2</a></li>
+  <li><a href="#tima-2.7.1" id="toc-tima-2.7.1" class="nav-link" data-scroll-target="#tima-2.7.1">tima 2.7.1</a></li>
+  <li><a href="#tima-2.7.0" id="toc-tima-2.7.0" class="nav-link" data-scroll-target="#tima-2.7.0">tima 2.7.0</a></li>
+  <li><a href="#tima-2.6.0" id="toc-tima-2.6.0" class="nav-link" data-scroll-target="#tima-2.6.0">tima 2.6.0</a></li>
+  <li><a href="#tima-2.5.6" id="toc-tima-2.5.6" class="nav-link" data-scroll-target="#tima-2.5.6">tima 2.5.6</a></li>
+  <li><a href="#tima-2.5.5" id="toc-tima-2.5.5" class="nav-link" data-scroll-target="#tima-2.5.5">tima 2.5.5</a></li>
+  <li><a href="#tima-2.5.4" id="toc-tima-2.5.4" class="nav-link" data-scroll-target="#tima-2.5.4">tima 2.5.4</a></li>
+  <li><a href="#tima-2.5.3" id="toc-tima-2.5.3" class="nav-link" data-scroll-target="#tima-2.5.3">tima 2.5.3</a></li>
+  <li><a href="#tima-2.5.2" id="toc-tima-2.5.2" class="nav-link" data-scroll-target="#tima-2.5.2">tima 2.5.2</a></li>
+  <li><a href="#tima-2.5.1" id="toc-tima-2.5.1" class="nav-link" data-scroll-target="#tima-2.5.1">tima 2.5.1</a></li>
+  <li><a href="#tima-2.5.0" id="toc-tima-2.5.0" class="nav-link" data-scroll-target="#tima-2.5.0">tima 2.5.0</a></li>
+  <li><a href="#tima-2.4.0" id="toc-tima-2.4.0" class="nav-link" data-scroll-target="#tima-2.4.0">tima 2.4.0</a></li>
+  <li><a href="#tima-2.3.0" id="toc-tima-2.3.0" class="nav-link" data-scroll-target="#tima-2.3.0">tima 2.3.0</a></li>
+  <li><a href="#tima-2.2.2" id="toc-tima-2.2.2" class="nav-link" data-scroll-target="#tima-2.2.2">tima 2.2.2</a></li>
+  <li><a href="#tima-2.2.1" id="toc-tima-2.2.1" class="nav-link" data-scroll-target="#tima-2.2.1">tima 2.2.1</a></li>
+  <li><a href="#tima-2.2.0" id="toc-tima-2.2.0" class="nav-link" data-scroll-target="#tima-2.2.0">tima 2.2.0</a></li>
+  <li><a href="#tima-2.1.0" id="toc-tima-2.1.0" class="nav-link" data-scroll-target="#tima-2.1.0">tima 2.1.0</a></li>
+  <li><a href="#tima-2.0.0" id="toc-tima-2.0.0" class="nav-link" data-scroll-target="#tima-2.0.0">tima 2.0.0</a></li>
   </ul>
 </nav>
     </div>
@@ -392,106 +375,366 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<!-- README.md is generated from README.qmd. Please edit that file -->
 <section id="tima" class="level1">
-<h1>tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></h1>
-<!-- badges: start -->
-<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" class="img-fluid" alt="Lifecycle: experimental"></a> <a href="https://CRAN.R-project.org/package=tima"><img src="https://www.r-pkg.org/badges/version/tima.png" class="img-fluid" alt="CRAN status"></a> <a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg" class="img-fluid" alt="Codecov test coverage"></a> <a href="https://hub.docker.com/r/adafede/tima-r/"><img src="https://badgen.net/badge/icon/docker?icon=docker&amp;label.png" class="img-fluid" alt="Docker"></a> <a href="https://doi.org/10.5281/zenodo.5797920"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg" class="img-fluid" alt="DOI"></a> <!-- badges: end --></p>
-<p>The initial work is available at <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a>, with many improvements made since then. The workflow is illustrated below.</p>
-<p><img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg" class="img-fluid" alt="Workflow"><br>
-</p>
-<p>This repository contains everything needed to perform <strong>T</strong>axonomically <strong>I</strong>nformed <strong>M</strong>etabolite <strong>A</strong>nnotation.</p>
-<section id="requirements" class="level2">
-<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<p>Here is what you <em>minimally</em> need:</p>
+<h1>tima</h1>
+</section>
+<section id="tima-2.12.0" class="level1">
+<h1>tima 2.12.0</h1>
 <ul>
-<li>A feature list (.csv) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv">example features</a>)</li>
-<li>A spectral file corresponding to the feature list (.mgf) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf">example spectra</a>)</li>
-<li>The biological source(s) of the sample(s) you are annotating (.csv) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv">example metadata</a>) (File is optional if only a single organism)</li>
-</ul>
-<p>Optionally, you may want to add:</p>
-<ul>
-<li>An in-house structure-organism pairs library (we provide <strong><a href="https://lotusnprod.github.io/lotus-manuscript/">LOTUS</a></strong> as starting point for each user)</li>
-<li>Your own manual or automated annotations (we currently support annotations coming from SIRIUS (with some limitations))</li>
-</ul>
-</section>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<p>As the package is not (yet) available on CRAN, you will need to install with:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tima"</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="fu">c</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://taxonomicallyinformedannotation.r-universe.dev"</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bioc.r-universe.dev"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://cloud.r-project.org"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Then, you should be able to install the rest with:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">install</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Normally, everything you need should then be installed (as tested in <a href="https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml">here</a>). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see <a href="#docker">Docker</a>).</p>
-<p>Once installed, you are ready to go through our <a href="https://taxonomicallyinformedannotation.github.io/tima/articles/">documentation</a>, with the major steps detailed.</p>
-<p>In case you do not have your data ready, you can obtain some example data using:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">get_example_files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Once you are done, you can open a small GUI to adapt your parameters and launch your job:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">run_app</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This command will open a small app in your default browser.</p>
-<section id="docker" class="level3">
-<h3 class="anchored" data-anchor-id="docker">Docker</h3>
-<p>A container is also available, together with a small compose file. Main commands are below:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull adafede/tima-r</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build . -t adafede/tima-r</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--user</span> tima-user <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="at">-p</span> 3838:3838 adafede/tima-r Rscript <span class="at">-e</span> <span class="st">"tima::run_app()"</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::tima_full()"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="main-citations" class="level2">
-<h2 class="anchored" data-anchor-id="main-citations">Main Citations</h2>
-<p>According to which steps you used, please give credit to the authors of the tools/resources used.</p>
-<section id="tima-1" class="level3">
-<h3 class="anchored" data-anchor-id="tima-1">TIMA</h3>
-<p>General: <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5797920" class="uri">https://doi.org/10.5281/zenodo.5797920</a></p>
-</section>
-<section id="lotus" class="level3">
-<h3 class="anchored" data-anchor-id="lotus">LOTUS</h3>
-<p>General: <a href="https://doi.org/10.7554/eLife.70780" class="uri">https://doi.org/10.7554/eLife.70780</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5794106" class="uri">https://doi.org/10.5281/zenodo.5794106</a></p>
-</section>
-<section id="isdb" class="level3">
-<h3 class="anchored" data-anchor-id="isdb">ISDB</h3>
-<p>General: <a href="https://doi.org/10.1021/acs.analchem.5b04804" class="uri">https://doi.org/10.1021/acs.analchem.5b04804</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5607185" class="uri">https://doi.org/10.5281/zenodo.5607185</a></p>
-</section>
-<section id="gnps" class="level3">
-<h3 class="anchored" data-anchor-id="gnps">GNPS</h3>
-<p>General: <a href="https://doi.org/10.1038/nbt.3597" class="uri">https://doi.org/10.1038/nbt.3597</a></p>
-</section>
-<section id="sirius" class="level3">
-<h3 class="anchored" data-anchor-id="sirius">SIRIUS</h3>
-<p>General: <a href="https://doi.org/10.1038/s41592-019-0344-8" class="uri">https://doi.org/10.1038/s41592-019-0344-8</a></p>
-<ul>
-<li><em>CSI:FingerId</em>: <a href="https://doi.org/10.1073/pnas.1509788112" class="uri">https://doi.org/10.1073/pnas.1509788112</a></li>
-<li><em>ZODIAC</em>: <a href="https://doi.org/10.1038/s42256-020-00234-6" class="uri">https://doi.org/10.1038/s42256-020-00234-6</a></li>
-<li><em>CANOPUS</em>: <a href="https://doi.org/10.1038/s41587-020-0740-8" class="uri">https://doi.org/10.1038/s41587-020-0740-8</a></li>
-<li><em>COSMIC</em>: <a href="https://doi.org/10.1038/s41587-021-01045-9" class="uri">https://doi.org/10.1038/s41587-021-01045-9</a></li>
+<li>Added a minimal output</li>
+<li>Added a parameter to limit the numbers of neighbors used for chemical consistency calculation (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/193">#193</a>)</li>
+<li>Added MERLIN spectral libraries (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/190">#190</a>)</li>
+<li>Added <code>RDKit</code>-based structures processing through <code>reticulate</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/19">#19</a>)</li>
+<li>Breaking Change: <code>.RDS</code> spectra are now stored more efficiently. To avoid errors, delete any <code>.RDS</code> files created before version <code>2.12.0</code></li>
+<li>Externalized spectral libraries preparation to <a href="https://github.com/Adafede/SpectRalLibRaRies">SpectRalLibRaRies</a></li>
+<li>Introduced similarity method argument (entropy and GNPS for now)</li>
+<li>Implemented GNPS similarity method in C</li>
+<li>Improved high confidence filtering</li>
+<li>Improved logs using <code>logger</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/189">#189</a>)</li>
+<li>Keep (only) best molecular formula and canopus annotations from SIRIUS</li>
+<li>New ISDB version with 1 million compounds (see <a href="https://doi.org/10.5281/zenodo.14887271" class="uri">https://doi.org/10.5281/zenodo.14887271</a>)</li>
+<li>Refactored MS1 annotation step to work per sample (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/194">#194</a>)</li>
+<li>Switched documentation from <code>pkgdown</code> to <code>altdoc</code></li>
+<li>Updated to Massbank version <code>2025.05.1</code></li>
+<li>Updated minimal R version to <code>4.4.0</code> (and related Bioconductor dependencies)</li>
 </ul>
 </section>
-<section id="others" class="level3">
-<h3 class="anchored" data-anchor-id="others">Others</h3>
+<section id="tima-2.11.1-unreleased" class="level1">
+<h1>tima 2.11.1 (unreleased)</h1>
 <ul>
-<li>The <em>RforMassSpectrometry</em> packages suite: <a href="https://doi.org/10.3390/metabo12020173" class="uri">https://doi.org/10.3390/metabo12020173</a></li>
-<li>ECMDB 2.0: <a href="https://doi.org/10.1093/nar/gkv1060" class="uri">https://doi.org/10.1093/nar/gkv1060</a></li>
-<li>HMDB 5.0: <a href="https://doi.org/10.1093/nar/gkab1062" class="uri">https://doi.org/10.1093/nar/gkab1062</a></li>
-<li>MassBank: <a href="https://doi.org/10.5281/zenodo.3378723" class="uri">https://doi.org/10.5281/zenodo.3378723</a></li>
-<li>Merlin: <a href="https://doi.org/10.5281/zenodo.13911806" class="uri">https://doi.org/10.5281/zenodo.13911806</a></li>
-<li>NPClassifier: <a href="https://doi.org/10.1021/acs.jnatprod.1c00399" class="uri">https://doi.org/10.1021/acs.jnatprod.1c00399</a></li>
-<li>ROTL: <a href="https://doi.org/10.1111/2041-210X.12593" class="uri">https://doi.org/10.1111/2041-210X.12593</a></li>
-<li>Spectral entropy: <a href="https://doi.org/10.1038/s41592-021-01331-z" class="uri">https://doi.org/10.1038/s41592-021-01331-z</a></li>
+<li>Added <code>SIRIUS</code> feature tables support (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/185">#185</a>)</li>
+<li>Added <code>.rar</code> compression support for <code>SIRIUS</code> workspaces (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/186">#186</a>)</li>
+</ul>
+</section>
+<section id="tima-2.11.0" class="level1">
+<h1>tima 2.11.0</h1>
+<ul>
+<li>Added convenience function to change small parameters (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/177">#177</a>)</li>
+<li>Added demo files download to the app</li>
+<li>Better packaging</li>
+<li>Improved documentation</li>
+<li>Fixed all CRAN warnings</li>
+<li>Fixed some edge cases in spectra import</li>
+<li>Reduced dependencies</li>
+<li>Reduced exports</li>
+<li>Removed <code>CompoundDb</code> dependency as it was causing too many issues</li>
+<li>Removed <code>pak</code> install and switched to <code>r-universe</code></li>
+<li>Replaced internal functions by <code>Spectra</code> equivalents (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/166">#166</a>)</li>
+<li>Shinylive version available at <a href="https://taxonomicallyinformedannotation.github.io/tima-shinylive" class="uri">https://taxonomicallyinformedannotation.github.io/tima-shinylive</a></li>
+<li>Simplified install and vignettes</li>
+<li>Switched from <code>base::lapply</code> to <code>purrr::map</code></li>
+</ul>
+</section>
+<section id="tima-2.10.0" class="level1">
+<h1>tima 2.10.0</h1>
+<ul>
+<li>Added alt text to vignettes</li>
+<li>Added the possibility to add internal libraries through the GUI (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/159">#159</a>)</li>
+<li>Added the possibility to filter confident annotations only (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/140">#140</a>)</li>
+<li>Added number of peaks in spectrum</li>
+<li>Brought back some older dependencies to be compatible with <code>oldrel</code></li>
+<li>Changed package name, <code>usethis</code> update</li>
+<li>Clearer handling of SIRIUS scores (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/146">#146</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/147">#147</a>)</li>
+<li>Exposed more parameters to the GUI (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/159">#159</a>)</li>
+<li>Facilitated install, no need to clone the directory anymore</li>
+<li>Finally made it to the <a href="https://r-universe.dev/builds/">r-universe</a></li>
+<li>Fixed adducts and removed nitrogen rule</li>
+<li>Fixed number of matched peaks</li>
+<li>Improved imports</li>
+<li>Reduced warnings</li>
+<li>Updated benchmarking steps</li>
+</ul>
+</section>
+<section id="tima-2.9.6" class="level1">
+<h1>tima 2.9.6</h1>
+<ul>
+<li>Added light-switch thanks to <code>pkgdown 2.1.0</code>.</li>
+<li>Attempt to simplify installation</li>
+<li>Fixed library/adducts confusion (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/123">#123</a>)</li>
+<li>Fixed some incorrect adduct differences annotations</li>
+<li>Refactored adducts / neutral losses / dimers annotation to allow for more flexibility (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/141">#141</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/144">#144</a>)</li>
+</ul>
+</section>
+<section id="tima-2.9.5" class="level1">
+<h1>tima 2.9.5</h1>
+<ul>
+<li>Do not re-package if already the latest version</li>
+<li>SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)</li>
+<li>Updated to Massbank version <code>2024.06</code></li>
+</ul>
+</section>
+<section id="tima-2.9.4" class="level1">
+<h1>tima 2.9.4</h1>
+<ul>
+<li>Automated update</li>
+<li>Added an option to remove ties (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/134">#134</a>)</li>
+<li>Added some details for SIRIUS, added manual workspace addition (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/132">#132</a>)</li>
+<li>Additional preprocessing (reduction) of noisy spectra</li>
+<li>Dependencies update</li>
+<li>Docker updates (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/131">#131</a>)</li>
+<li>Handle cases when same (feature_id, mslevel) pairs are present within an MGF (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/133">#133</a>)</li>
+<li>Improved documentation</li>
+<li>New working directory at <code>$HOME/.tima</code></li>
+<li>Updated R and Bioconductor versions</li>
+</ul>
+</section>
+<section id="tima-2.9.3" class="level1">
+<h1>tima 2.9.3</h1>
+<ul>
+<li>Allowed for SIRIUS jobs containing only summaries</li>
+<li>Allowed for underscores in job pattern</li>
+<li>Changed some default values (less stringent)</li>
+<li>Dependencies update</li>
+<li>Migrated app testing to <code>shinytest2</code></li>
+<li>Removed further some inconsistent MS1 annotations</li>
+<li>Removed tests dependencies by default</li>
+</ul>
+</section>
+<section id="tima-2.9.2" class="level1">
+<h1>tima 2.9.2</h1>
+<ul>
+<li>Added Nitrogen rule to filter out some annotations</li>
+<li>Better handling of partial downloads (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/118">#118</a>)</li>
+<li>Dependencies update (mainly <code>targets 1.5.1</code>, will invalidate previous targets)</li>
+<li>Fixed some port issues in Shiny (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/122">#122</a>)</li>
+<li>Removed completely empty columns from final output to avoid confusion (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/120">#120</a>)</li>
+</ul>
+</section>
+<section id="tima-2.9.1" class="level1">
+<h1>tima 2.9.1</h1>
+<ul>
+<li>Added <a href="https://caltechlibrary.github.io/waystation/">Waystation</a> action</li>
+<li>Added structures from spectral libraries to SOP library (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/113">#113</a>)</li>
+<li>Exposed all parameters (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/107">#107</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/108">#108</a>)</li>
+<li>Fixed for Zenodo API</li>
+<li>HMDB structures support</li>
+<li>Optimized grep/gsub by adding <code>perl=TRUE</code> or <code>fixed=TRUE</code></li>
+<li>Updated to Massbank version <code>2023.11</code></li>
+<li>Updated SIRIUS preparation (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/74">#74</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/115">#115</a>)</li>
+</ul>
+</section>
+<section id="tima-2.9.0" class="level1">
+<h1>tima 2.9.0</h1>
+<ul>
+<li>Added compounds names as parameter</li>
+<li>Added MassBank spectral library (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/77">#77</a>)</li>
+<li>Allowed files outside <code>data/source</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/89">#89</a>)</li>
+<li>Added RT library as annotation library (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/86">#86</a>)</li>
+<li>Better handling of download errors</li>
+<li>Fixed Docker mount path</li>
+<li>Improved naming (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/91">#91</a>)</li>
+<li>Internal variables refactoring</li>
+<li>Multiple Shiny fixes and tests addition (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/60">#60</a>)</li>
+<li>Multiple fixes (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/71">#71</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/81">#81</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/82">#82</a>)</li>
+<li>New adducts (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/79">#79</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/80">#80</a>)</li>
+<li>Refactored adducts, clusters and neutral losses</li>
+<li>Refactored biological and chemical score</li>
+<li>Refactored RT matching (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/76">#76</a>)</li>
+<li>Refactored Sirius scores (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/92">#92</a>)</li>
+<li>Removed GNPS dependency by default</li>
+</ul>
+</section>
+<section id="tima-2.8.2" class="level1">
+<h1>tima 2.8.2</h1>
+<ul>
+<li>Added spectral entropy</li>
+<li>Added MS1 only possibility</li>
+<li>Added Fluorine adduct</li>
+<li>Changed from pbmclapply to pblapply</li>
+<li>Documentation improvement</li>
+<li>Fixed empty chemical classes</li>
+<li>Fixed not classified taxa</li>
+<li>GitHub Actions improvement</li>
+<li><a href="https://rstudio.github.io/renv/index.html">renv</a> removal</li>
+<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
+<li>Reduced warnings (CRAN and jscpd)</li>
+</ul>
+</section>
+<section id="tima-2.8.1" class="level1">
+<h1>tima 2.8.1</h1>
+<ul>
+<li>Adapted tests</li>
+<li>Added <code>retry</code> parameter to <code>get_organism_taxonomy_ott</code></li>
+<li>Dependencies update</li>
+<li>Minor fixes</li>
+<li>Moved <code>/params</code> and <code>paths.yaml</code> to <code>/inst</code> as more standard. (see <a href="https://r-pkgs.org/misc.html#other-directories" class="uri">https://r-pkgs.org/misc.html#other-directories</a>)</li>
+<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
+<li>Replaced <code>extdata</code> loading</li>
+</ul>
+</section>
+<section id="tima-2.8.0" class="level1">
+<h1>tima 2.8.0</h1>
+<ul>
+<li>Added GUI prototype</li>
+<li>Started using <a href="https://rstudio.github.io/renv/index.html">renv</a></li>
+</ul>
+</section>
+<section id="tima-2.7.4" class="level1">
+<h1>tima 2.7.4</h1>
+<ul>
+<li>Clearer vocabulary</li>
+<li>ECMDB support</li>
+<li>Edges (mass and spectra-based) and components are generated if not present.</li>
+<li>Fixed case when no GNPS job ID</li>
+<li>Further <a href="https://books.ropensci.org/targets/">Targets</a> improvements</li>
+<li>Lot of fixes</li>
+<li>Parameters refactoring</li>
+<li>Re-introduced Classyfire support.</li>
+<li>Retention time matching additionally to MS2 if RT present in library</li>
+<li>Steps refactoring</li>
+</ul>
+</section>
+<section id="tima-2.7.3" class="level1">
+<h1>tima 2.7.3</h1>
+<ul>
+<li>Improved calculations over redundant formulas</li>
+<li>Minor fixes</li>
+<li>Parameters refactoring</li>
+<li>Spectral matching update (see <a href="https://github.com/rformassspectrometry/MetaboAnnotation/issues/93" class="uri">https://github.com/rformassspectrometry/MetaboAnnotation/issues/93</a>)</li>
+<li><a href="https://books.ropensci.org/targets/">Targets</a> implementation</li>
+</ul>
+</section>
+<section id="tima-2.7.2" class="level1">
+<h1>tima 2.7.2</h1>
+<ul>
+<li>Benchmark update (including negative mode)</li>
+<li>Improved parameters documentation</li>
+<li>Minor fixes</li>
+<li>Spectral comparison + intensity filtering update</li>
+<li>Switched r-base Docker image to bioconductor with ARM support</li>
+</ul>
+</section>
+<section id="tima-2.7.1" class="level1">
+<h1>tima 2.7.1</h1>
+<ul>
+<li>Added MONA helpers</li>
+<li>Added parallelization on process_spectra</li>
+<li>Added sqlite storing for spectra</li>
+<li>Improved code documentation</li>
+<li>Improved testing time</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.7.0" class="level1">
+<h1>tima 2.7.0</h1>
+<ul>
+<li>Added HMDB helpers for both taxo and ISDB</li>
+<li>Added MS2 annotation capability (kudos <a href="https://github.com/jorainer"><span class="citation" data-cites="jorainer">@jorainer</span></a> for the awesome <em>Spectra</em> suite)</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.6.0" class="level1">
+<h1>tima 2.6.0</h1>
+<ul>
+<li>Added Docker container</li>
+<li>Changed data architecture</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.5.6" class="level1">
+<h1>tima 2.5.6</h1>
+<ul>
+<li>Dependencies removal (e.g.&nbsp;metabo-store)</li>
+<li>Minor fixes</li>
+<li>Partial functions cleanup</li>
+</ul>
+</section>
+<section id="tima-2.5.5" class="level1">
+<h1>tima 2.5.5</h1>
+<ul>
+<li>Automation and parameters improvement</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.5.4" class="level1">
+<h1>tima 2.5.4</h1>
+<ul>
+<li>Minor fixes</li>
+<li>Metadata completion improvement</li>
+<li>Molecular formula and adducts formalism improvement</li>
+</ul>
+</section>
+<section id="tima-2.5.3" class="level1">
+<h1>tima 2.5.3</h1>
+<ul>
+<li>Imports improvements</li>
+<li>LOTUS update</li>
+</ul>
+</section>
+<section id="tima-2.5.2" class="level1">
+<h1>tima 2.5.2</h1>
+<ul>
+<li>Packaging improvements</li>
+</ul>
+</section>
+<section id="tima-2.5.1" class="level1">
+<h1>tima 2.5.1</h1>
+<ul>
+<li>Improved support for SIRIUS (with new summaries)</li>
+</ul>
+</section>
+<section id="tima-2.5.0" class="level1">
+<h1>tima 2.5.0</h1>
+<ul>
+<li>LOTUS update</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.4.0" class="level1">
+<h1>tima 2.4.0</h1>
+<ul>
+<li>Added chemical names and xlogp to output (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/33">#33</a>)</li>
+<li>Added support for case when no consensus is found (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/30">#30</a>)</li>
+<li>Improved output (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/34">#34</a>)</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.3.0" class="level1">
+<h1>tima 2.3.0</h1>
+<ul>
+<li>Added support for annotation without MN (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/28">#28</a>)</li>
+<li>Added support for multi tool annotations (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/27">#27</a>)</li>
+<li>Added support for classical MN GNPS jobs (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/25">#25</a>)</li>
+<li>Added support for new version of LOTUS</li>
+<li>General improvements for manual inputs</li>
+<li>Improved tests code coverage</li>
+<li>Minor fixes</li>
+<li>Updated adducts</li>
+</ul>
+</section>
+<section id="tima-2.2.2" class="level1">
+<h1>tima 2.2.2</h1>
+<ul>
+<li>Additional benchmark figure (<a href="https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html#candidates-distribution">Candidates distribution</a>)</li>
+<li>Minor fixes</li>
+</ul>
+</section>
+<section id="tima-2.2.1" class="level1">
+<h1>tima 2.2.1</h1>
+<ul>
+<li>Minor version name fixes</li>
+</ul>
+</section>
+<section id="tima-2.2.0" class="level1">
+<h1>tima 2.2.0</h1>
+<ul>
+<li>Added benchmark (<a href="https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html">here</a>)</li>
+<li>Various fixes</li>
+</ul>
+</section>
+<section id="tima-2.1.0" class="level1">
+<h1>tima 2.1.0</h1>
+<ul>
+<li>Fixes, deletion of binary dependencies.</li>
+</ul>
+</section>
+<section id="tima-2.0.0" class="level1">
+<h1>tima 2.0.0</h1>
+<ul>
+<li>Initial version.</li>
 </ul>
 
 
-</section>
-</section>
 </section>
 
 </main> <!-- /main -->

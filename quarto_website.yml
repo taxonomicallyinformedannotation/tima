@@ -1,0 +1,55 @@
+---
+project:
+  output-dir: ../docs/
+  type: website
+
+website:
+  title: "$ALTDOC_PACKAGE_NAME"
+  site-url: https://taxonomicallyinformedannotation.github.io/tima/
+  favicon: man/figures/logo.svg
+  image: man/figures/logo.svg
+  page-navigation: true
+  navbar:
+    title: TIMA
+    description: Taxonomically Informed Metabolite Annotation
+    logo: man/figures/logo.svg
+    logo-alt: tima logo
+    search: true
+    left:
+      - text: Get started
+        file: vignettes/tima.qmd
+      - text: Articles
+        menu:
+          - text: 1 Gathering everything you need
+            file: vignettes/articles/I-gathering.qmd
+          - text: 2 Preparing inputs
+            file: vignettes/articles/II-preparing.qmd
+          - text: 3 Performing Taxonomically Informed Metabolite Annotation
+            file: vignettes/articles/III-processing.qmd
+          - text: 4 Benchmarking Performance
+            file: vignettes/articles/IV-benchmarking.qmd
+      # - text: Functions
+      #   href: ./man
+      - text: News
+        file: $ALTDOC_NEWS
+      - text: License
+        file: $ALTDOC_LICENSE
+      - text: Citation
+        file: $ALTDOC_CITATION
+    right:
+      - icon: github
+        href: $ALTDOC_PACKAGE_URL_GITHUB
+        aria-label: $ALTDOC_PACKAGE_NAME GitHub
+
+format:
+  html:
+    respect-user-color-scheme: true
+    toc: true
+    theme:
+      light: flatly
+      dark: darkly
+    # number-sections: false
+
+knitr:
+  opts_knit:
+    root.dir: ../inst
