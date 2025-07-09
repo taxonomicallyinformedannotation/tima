@@ -71,20 +71,25 @@ To ensure optimal reproducibility and avoiding re-computing endlessly steps that
 Each step of the whole pipeline will be described next.
 
 ```{r targets, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
-library(targets)
-Sys.setenv(TAR_WARN = "false")
-targets::tar_visnetwork(
-  names = starts_with("ann"),
-  exclude = c(
-    "benchmark",
-    "par_",
-    "paths",
-    "_is",
-    "_exp"
-  ) |>
-    tidyselect::contains(),
-  targets_only = TRUE,
-  degree_from = 8
+try(
+  expr = {
+    library(targets)
+    Sys.setenv(TAR_WARN = "false")
+    targets::tar_visnetwork(
+      names = starts_with("ann"),
+      exclude = c(
+        "benchmark",
+        "par_",
+        "paths",
+        "_is",
+        "_exp"
+      ) |>
+        tidyselect::contains(),
+      targets_only = TRUE,
+      degree_from = 8
+    )
+  },
+  silent = TRUE
 )
 ```
 
