@@ -8,7 +8,10 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' tima_full()
+#' }
 tima_full <- function() {
   start <- Sys.time()
   if (file.exists("tima.log")) {

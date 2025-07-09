@@ -20,5 +20,7 @@ Opens the app
 This function runs the app
 }
 \examples{
-NULL
+\dontrun{
+run_app()
+}
 }

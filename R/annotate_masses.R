@@ -46,59 +46,61 @@
 #' data_interim <- "data/interim/"
 #' dir <- paste0(github, repo)
 #' dir <- paste0(dir, data_interim)
+#' dir_sop_mer <- paste0(dir, "libraries/sop/merged/")
+#' dir_str <- paste0(dir_sop_mer, "structures/")
+#' dir_tax <- paste0(dir_str, "taxonomies/")
 #' annotate_masses(
 #'   features = paste0(dir, "features/example_features.tsv"),
-#'   library = paste0(dir, "libraries/sop/merged/keys.tsv"),
-#'   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
-#'   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-#'   str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
-#'   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
-#'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+#'   library = paste0(dir_sop_mer, "keys.tsv"),
+#'   str_stereo = paste0(dir_str, "stereo.tsv"),
+#'   str_met = paste0(dir_str, "metadata.tsv"),
+#'   str_nam = paste0(dir_str, "names.tsv"),
+#'   str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
+#'   str_tax_npc = paste0(dir_tax, "npc.tsv")
 #' )
 #' unlink("data", recursive = TRUE)
 #' }
 annotate_masses <-
   function(
-    features = get_params(step = "annotate_masses")$files$features$prepared,
-    output_annotations = get_params(
-      step = "annotate_masses"
-    )$files$annotations$prepared$structural$ms1,
-    output_edges = get_params(
-      step = "annotate_masses"
-    )$files$networks$spectral$edges$raw,
-    name_source = get_params(step = "annotate_masses")$names$source,
-    name_target = get_params(step = "annotate_masses")$names$target,
-    library = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$keys,
-    str_stereo = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$stereo,
-    str_met = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$metadata,
-    str_nam = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$names,
-    str_tax_cla = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$taxonomies$cla,
-    str_tax_npc = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$taxonomies$npc,
-    adducts_list = get_params(step = "annotate_masses")$ms$adducts,
-    clusters_list = get_params(step = "annotate_masses")$ms$clusters,
-    neutral_losses_list = get_params(
-      step = "annotate_masses"
-    )$ms$neutral_losses,
-    ms_mode = get_params(step = "annotate_masses")$ms$polarity,
-    tolerance_ppm = get_params(
-      step = "annotate_masses"
-    )$ms$tolerances$mass$ppm$ms1,
-    tolerance_rt = get_params(
-      step = "annotate_masses"
-    )$ms$tolerances$rt$adducts
-  ) {
+      features = get_params(step = "annotate_masses")$files$features$prepared,
+      output_annotations = get_params(
+        step = "annotate_masses"
+      )$files$annotations$prepared$structural$ms1,
+      output_edges = get_params(
+        step = "annotate_masses"
+      )$files$networks$spectral$edges$raw,
+      name_source = get_params(step = "annotate_masses")$names$source,
+      name_target = get_params(step = "annotate_masses")$names$target,
+      library = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$keys,
+      str_stereo = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$structures$stereo,
+      str_met = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$structures$metadata,
+      str_nam = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$structures$names,
+      str_tax_cla = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$structures$taxonomies$cla,
+      str_tax_npc = get_params(
+        step = "annotate_masses"
+      )$files$libraries$sop$merged$structures$taxonomies$npc,
+      adducts_list = get_params(step = "annotate_masses")$ms$adducts,
+      clusters_list = get_params(step = "annotate_masses")$ms$clusters,
+      neutral_losses_list = get_params(
+        step = "annotate_masses"
+      )$ms$neutral_losses,
+      ms_mode = get_params(step = "annotate_masses")$ms$polarity,
+      tolerance_ppm = get_params(
+        step = "annotate_masses"
+      )$ms$tolerances$mass$ppm$ms1,
+      tolerance_rt = get_params(
+        step = "annotate_masses"
+      )$ms$tolerances$rt$adducts) {
     stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
     stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
 
@@ -417,7 +419,10 @@ annotate_masses <-
       tidytable::distinct(feature_id) |>
       tidytable::anti_join(already_assigned) |>
       tidytable::mutate(
-        adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
+        adduct = switch(ms_mode,
+          "pos" = "[M+H]+",
+          "neg" = "[M-H]-"
+        )
       )
     rm(already_assigned)
 
@@ -480,7 +485,10 @@ annotate_masses <-
       )
       df_addlossed_min_2 <- df_addlossed_min_2 |>
         tidytable::mutate(
-          adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
+          adduct = switch(ms_mode,
+            "pos" = "[M+H]+",
+            "neg" = "[M-H]-"
+          )
         ) |>
         tidytable::mutate_rowwise(
           mass = calculate_mass_of_m(adduct_string = adduct, mz = mz)
