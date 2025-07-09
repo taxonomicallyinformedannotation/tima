@@ -34,6 +34,7 @@ vignette: >
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
 logger::log_threshold(logger::INFO)
+tima::get_example_files(in_cache = FALSE)
 ```
 
 This vignette describes the main steps of the annotation process.
@@ -46,6 +47,18 @@ For the moment, we support 3 different types of annotations:
 * Internal MS^1^ exact mass-based library search
 * Internal MS^2^ library search (experimental and in silico)
 * [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
+
+If needed, you can get an example of what your minimal feature table should look like by running:
+
+```{r get-features, eval=FALSE, include=TRUE}
+tima::get_example_files(example = "features")
+```
+
+Then, you can prepare your features for the next steps:
+
+```{r prepare-features, warning=FALSE}
+tima::prepare_features_tables()
+```
 
 ### MS^1^-based
 
@@ -168,18 +181,6 @@ The edges are created based on the `spectral entropy similarity` calculated betw
 
 ```{r create-edges, warning=FALSE}
 tima::create_edges_spectra()
-```
-
-If needed, you can get an example of what your minimal feature table should look like by running:
-
-```{r get-features, eval=FALSE, include=TRUE}
-tima::get_example_files(example = "features")
-```
-
-Then, you can prepare your features for the next steps:
-
-```{r prepare-features, warning=FALSE}
-tima::prepare_features_tables()
 ```
 
 Prepare the edges:
