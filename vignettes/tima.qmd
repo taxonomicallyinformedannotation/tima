@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/articles/tima.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html
 comments:
   giscus: 
     repo: taxonomicallyinformedannotation/tima
@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-  opts_knit:
-    root.dir: ../inst
 lang: en
 opengraph:
     image:
@@ -92,8 +90,6 @@ targets::tar_visnetwork(
 
 ## Use
 
-Each step is detailed in the related [vignettes](https://taxonomicallyinformedannotation.github.io/tima/articles).
-
 All coming steps admit you already installed `tima`:
 
 ```{r install, eval=FALSE, include=TRUE}
@@ -109,7 +105,12 @@ tima::install()
 tima::get_example_files()
 ```
 
-We now recommend you to read the [first vignette](https://taxonomicallyinformedannotation.github.io/tima/articles/I-gathering.html).
+We now recommend you to read the following vignettes:
+
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html>
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html>
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html>
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html>
 
 ### tl;dr
 

@@ -45,6 +45,19 @@
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "altdoc",
+      "name": "altdoc",
+      "version": ">= 0.5.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=altdoc"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "BiocManager",
       "name": "BiocManager",
       "version": ">= 1.30.25",
@@ -654,7 +667,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "2827698.792KB",
+  "fileSize": "2843928.167KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

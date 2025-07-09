@@ -58,6 +58,7 @@ Imports:
     visNetwork (>= 2.1.2),
     yaml (>= 2.3.10)
 Suggests:
+    altdoc (>= 0.5.0),
     BiocManager (>= 1.30.25),
     knitr (>= 1.50),
     lifecycle (>= 1.0.4),

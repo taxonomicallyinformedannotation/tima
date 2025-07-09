@@ -1,5 +1,6 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
 
 # tima <img src='https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg' align="right" height="139" />
 
@@ -8,12 +9,11 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
-status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima)
+status](https://www.r-pkg.org/badges/version/tima.png)](https://CRAN.R-project.org/package=tima)
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
-[![R-Universe](https://taxonomicallyinformedannotation.r-universe.dev/badges/tima)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
 [![Codecov test
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
-[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://hub.docker.com/r/adafede/tima-r/)
+[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label.png)](https://hub.docker.com/r/adafede/tima-r/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 <!-- badges: end -->
 
@@ -30,22 +30,23 @@ This repository contains everything needed to perform **T**axonomically
 
 Here is what you *minimally* need:
 
-- A feature list (.csv) (see [example
-  features](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
-- A spectral file corresponding to the feature list (.mgf) (see [example
-  spectra](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
-- The biological source(s) of the sample(s) you are annotating (.csv)
-  (see [example
-  metadata](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
-  (File is optional if only a single organism)
+-   A feature list (.csv) (see [example
+    features](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
+-   A spectral file corresponding to the feature list (.mgf) (see
+    [example
+    spectra](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
+-   The biological source(s) of the sample(s) you are annotating (.csv)
+    (see [example
+    metadata](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
+    (File is optional if only a single organism)
 
 Optionally, you may want to add:
 
-- An in-house structure-organism pairs library (we provide
-  **[LOTUS](https://lotusnprod.github.io/lotus-manuscript/)** as
-  starting point for each user)
-- Your own manual or automated annotations (we currently support
-  annotations coming from SIRIUS (with some limitations))
+-   An in-house structure-organism pairs library (we provide
+    **[LOTUS](https://lotusnprod.github.io/lotus-manuscript/)** as
+    starting point for each user)
+-   Your own manual or automated annotations (we currently support
+    annotations coming from SIRIUS (with some limitations))
 
 ## Installation
 
@@ -144,29 +145,19 @@ General: <https://doi.org/10.1038/nbt.3597>
 
 General: <https://doi.org/10.1038/s41592-019-0344-8>
 
-- *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
-- *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
-- *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
-- *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
+-   *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
+-   *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
+-   *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
+-   *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
 
-- The *RforMassSpectrometry* packages suite:
-  <https://doi.org/10.3390/metabo12020173>
-- ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
-- HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
-- MassBank: <https://doi.org/10.5281/zenodo.3378723>
-- Merlin: <https://doi.org/10.5281/zenodo.13911806>
-- NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
-- ROTL: <https://doi.org/10.1111/2041-210X.12593>
-- Spectral entropy: <https://doi.org/10.1038/s41592-021-01331-z>
-
-## Contributing
-
-See
-<https://taxonomicallyinformedannotation.github.io/tima/CONTRIBUTING.html>
-
-## Support
-
-See
-<https://taxonomicallyinformedannotation.github.io/tima/SUPPORT.html>
+-   The *RforMassSpectrometry* packages suite:
+    <https://doi.org/10.3390/metabo12020173>
+-   ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
+-   HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
+-   MassBank: <https://doi.org/10.5281/zenodo.3378723>
+-   Merlin: <https://doi.org/10.5281/zenodo.13911806>
+-   NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+-   ROTL: <https://doi.org/10.1111/2041-210X.12593>
+-   Spectral entropy: <https://doi.org/10.1038/s41592-021-01331-z>
