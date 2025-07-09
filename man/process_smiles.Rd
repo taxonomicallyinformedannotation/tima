@@ -17,8 +17,9 @@ process_smiles(df, smiles_colname = "structure_smiles_initial", cache = NULL)
 This function processes SMILES
 }
 \examples{
+smiles <- "C=C[C@H]1[C@H](OC=C2C1=CCOC2=O)O[C@H]3[C@H]([C@H]([C@H]([C@H](O3)CO)O)O)O"
 data.frame(
-  "structure_smiles_initial" = "C[C@H]1C=C(C(=O)[C@]2([C@H]1C[C@H]3[C@]4([C@H]2C(=O)C(=C([C@H]4CC(=O)O3)C)OC)C)C)OC"
+  "structure_smiles_initial" = smiles
 ) |>
   process_smiles()
 }

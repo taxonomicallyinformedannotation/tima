@@ -3,6 +3,7 @@
 export(annotate_masses)
 export(annotate_spectra)
 export(calculate_mass_of_m)
+export(calculate_similarity)
 export(change_params_small)
 export(create_components)
 export(create_dir)
