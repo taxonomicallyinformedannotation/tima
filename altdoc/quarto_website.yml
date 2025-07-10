@@ -28,72 +28,6 @@ website:
             file: vignettes/articles/III-processing.qmd
           - text: 4 Benchmarking Performance
             file: vignettes/articles/IV-benchmarking.qmd
-      - text: Functions
-        menu:
-          - text: annotate_masses
-            file: man/annotate_masses.qmd
-          - text: annotate_spectra
-            file: man/annotate_spectra.qmd
-          - text: calculate_mass_of_m
-            file: man/calculate_mass_of_m.qmd
-          - text: calculate_similarity
-            file: man/calculate_similarity.qmd
-          - text: change_params_small
-            file: man/change_params_small.qmd
-          - text: create_edges_spectra
-            file: man/create_edges_spectra.qmd
-          - text: filter_annotations
-            file: man/filter_annotations.qmd
-          - text: get_example_files
-            file: man/get_example_files.qmd
-          - text: get_file
-            file: man/get_file.qmd
-          - text: get_last_version_from_zenodo
-            file: man/get_last_version_from_zenodo.qmd
-          - text: get_organism_taxonomy_ott
-            file: man/get_organism_taxonomy_ott.qmd
-          - text: import_spectra
-            file: man/import_spectra.qmd
-          - text: parse_adduct
-            file: man/parse_adduct.qmd
-          - text: prepare_annotations_gnps
-            file: man/prepare_annotations_gnps.qmd
-          - text: prepare_annotations_sirius
-            file: man/prepare_annotations_sirius.qmd
-          - text: prepare_annotations_spectra
-            file: man/prepare_annotations_spectra.qmd
-          - text: prepare_features_components
-            file: man/prepare_features_components.qmd
-          - text: prepare_features_edges
-            file: man/prepare_features_edges.qmd
-          - text: prepare_features_tables
-            file: man/prepare_features_tables.qmd
-          - text: prepare_libraries_rt
-            file: man/prepare_libraries_rt.qmd
-          - text: prepare_libraries_sop_closed
-            file: man/prepare_libraries_sop_closed.qmd
-          - text: prepare_libraries_sop_ecmdb
-            file: man/prepare_libraries_sop_ecmdb.qmd
-          - text: prepare_libraries_sop_hmdb
-            file: man/prepare_libraries_sop_hmdb.qmd
-          - text: prepare_libraries_sop_lotus
-            file: man/prepare_libraries_sop_lotus.qmd
-          - text: prepare_libraries_sop_merged
-            file: man/prepare_libraries_sop_merged.qmd
-          - text: prepare_libraries_spectra
-            file: man/prepare_libraries_spectra.qmd
-          - text: prepare_taxa
-            file: man/prepare_taxa.qmd
-          - text: process_smiles
-            file: man/process_smiles.qmd
-          - text: sanitize_spectra
-            file: man/sanitize_spectra.qmd
-          - text: weight_annotations
-            file: man/weight_annotations.qmd
-          - text: run_app
-            file: man/run_app.qmd
-          - text: tima_full
-            file: man/tima_full.qmd
       - text: News
         file: $ALTDOC_NEWS
       - text: License
@@ -104,15 +38,100 @@ website:
       - icon: github
         href: $ALTDOC_PACKAGE_URL_GITHUB
         aria-label: $ALTDOC_PACKAGE_NAME GitHub
+  sidebar:
+    contents:
+      - section: Functions
+        contents:
+          - section: Annotate
+            contents:
+              - text: annotate_masses
+                file: man/annotate_masses.qmd
+              - text: annotate_spectra
+                file: man/annotate_spectra.qmd
+          - section: Calculate
+            contents:
+              - text: calculate_mass_of_m
+                file: man/calculate_mass_of_m.qmd
+              - text: calculate_similarity
+                file: man/calculate_similarity.qmd
+          - text: change_params_small
+            file: man/change_params_small.qmd
+          - text: create_edges_spectra
+            file: man/create_edges_spectra.qmd
+          - text: filter_annotations
+            file: man/filter_annotations.qmd
+          - section: Get
+            contents:
+              - text: get_example_files
+                file: man/get_example_files.qmd
+              - text: get_file
+                file: man/get_file.qmd
+              - text: get_last_version_from_zenodo
+                file: man/get_last_version_from_zenodo.qmd
+              - text: get_organism_taxonomy_ott
+                file: man/get_organism_taxonomy_ott.qmd
+          - text: import_spectra
+            file: man/import_spectra.qmd
+          - text: parse_adduct
+            file: man/parse_adduct.qmd
+          - section: Prepare
+            contents:
+              - section: Annotations
+                contents:
+                  - text: prepare_annotations_gnps
+                    file: man/prepare_annotations_gnps.qmd
+                  - text: prepare_annotations_sirius
+                    file: man/prepare_annotations_sirius.qmd
+                  - text: prepare_annotations_spectra
+                    file: man/prepare_annotations_spectra.qmd
+              - section: Features
+                contents:
+                  - text: prepare_features_components
+                    file: man/prepare_features_components.qmd
+                  - text: prepare_features_edges
+                    file: man/prepare_features_edges.qmd
+                  - text: prepare_features_tables
+                    file: man/prepare_features_tables.qmd
+              - section: Libraries
+                contents:
+                  - text: prepare_libraries_rt
+                    file: man/prepare_libraries_rt.qmd
+                  - section: Structure Organism Pairs
+                    contents:
+                      - text: prepare_libraries_sop_closed
+                        file: man/prepare_libraries_sop_closed.qmd
+                      - text: prepare_libraries_sop_ecmdb
+                        file: man/prepare_libraries_sop_ecmdb.qmd
+                      - text: prepare_libraries_sop_hmdb
+                        file: man/prepare_libraries_sop_hmdb.qmd
+                      - text: prepare_libraries_sop_lotus
+                        file: man/prepare_libraries_sop_lotus.qmd
+                      - text: prepare_libraries_sop_merged
+                        file: man/prepare_libraries_sop_merged.qmd
+                  - text: prepare_libraries_spectra
+                    file: man/prepare_libraries_spectra.qmd
+              - text: prepare_taxa
+                file: man/prepare_taxa.qmd
+          - text: process_smiles
+            file: man/process_smiles.qmd
+          - text: sanitize_spectra
+            file: man/sanitize_spectra.qmd
+          - text: weight_annotations
+            file: man/weight_annotations.qmd
+          - text: run_app
+            file: man/run_app.qmd
+          - text: tima_full
+            file: man/tima_full.qmd
 
 format:
   html:
+    grid:
+      body-width: 1200px
     respect-user-color-scheme: true
     toc: true
     theme:
       light: flatly
       dark: darkly
-    # number-sections: false
 
 knitr:
   opts_knit:

@@ -33,7 +33,10 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
-logger::log_threshold(logger::INFO)
+logger::log_threshold(
+  level = logger::INFO,
+  namespace = logger::log_namespaces()
+  )
 tima::get_example_files()
 ```
 
