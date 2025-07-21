@@ -156,7 +156,7 @@ tima::prepare_annotations_sirius()
 ```
 
 If you want to know how we attempt to combine the CSI score with other ones, see [R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
-Note that starting from SIRIUS6, the _approx_ confidence score is the one considered, and not the exact one.
+Note that starting from SIRIUS 6, the _approx_ confidence score is the one considered, and not the exact one.
 
 ```{r annotations-all, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
