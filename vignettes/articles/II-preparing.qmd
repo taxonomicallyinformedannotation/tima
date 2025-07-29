@@ -38,8 +38,15 @@ logger::log_threshold(
   namespace = logger::log_namespaces()
 )
 tima::get_example_files(in_cache = FALSE)
+tima::get_example_files("spectral_lib_with_rt", in_cache = FALSE)
 targets::tar_make(
-  names = tidyselect::matches("lib_sop_mer")
+  names = tidyselect::matches("lib_mer_key")
+)
+targets::tar_make(
+  names = tidyselect::matches("lib_spe_exp")
+)
+targets::tar_make(
+  names = tidyselect::matches("lib_spe_is_wik_pre")
 )
 ```
 
