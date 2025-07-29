@@ -1,19 +1,16 @@
 ---
 name: External Use
-
 on:
   push:
     branches:
-      - "main"
-      - "dev"
+      - main
+      - dev
   pull_request:
     branches:
-      - "main"
-      - "dev"
-  workflow_dispatch:
-
+      - main
+      - dev
+  workflow_dispatch: null
 permissions: read-all
-
 jobs:
   tima-test:
     name: tima-${{ matrix.os }}
@@ -23,9 +20,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - "ubuntu-latest"
-          - "macos-latest"
-          - "windows-latest"
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
     defaults:
       run:
         shell: bash
@@ -40,20 +37,31 @@ jobs:
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev \
+        run: >
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends
+          libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev \
+
           && sudo apt-get clean \
+
           && sudo rm -rf /var/lib/apt/lists/*
       - name: Install (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type = "source")
+        run: >
+          install.packages("tima", repos =
+          c("https://taxonomicallyinformedannotation.r-universe.dev",
+          "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
+          "source")
+
           tima::install()
         shell: Rscript {0}
       - name: Install (MacOS and Windows)
         if: matrix.os != 'ubuntu-latest'
-        run: |
-          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type = "binary")
+        run: >
+          install.packages("tima", repos =
+          c("https://taxonomicallyinformedannotation.r-universe.dev",
+          "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
+          "binary")
+
           tima::install()
         shell: Rscript {0}
       - name: Get example files

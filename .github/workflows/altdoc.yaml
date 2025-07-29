@@ -1,16 +1,18 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+---
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - master
   release:
-    types: [published]
-  workflow_dispatch:
-
+    types:
+      - published
+  workflow_dispatch: null
 name: altdoc
-
 permissions:
   actions: write
   checks: write
@@ -25,11 +27,9 @@ permissions:
   repository-projects: read
   security-events: read
   statuses: read
-
 jobs:
   altdoc:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
     concurrency:
       group: altdoc-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
@@ -38,18 +38,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: quarto-dev/quarto-actions/setup@v2
-
       - name: Get Script
         run: curl -OLs https://eddelbuettel.github.io/r-ci/run.sh && chmod 0755 run.sh
-
       - name: Bootstrap
         run: ./run.sh bootstrap
-
       - name: Dependencies
         run: ./run.sh install_all
-
       - name: Build site
         run: |
           # If parallel = TRUE in render_docs()
@@ -59,7 +54,6 @@ jobs:
           pkgload::load_all()
           altdoc::render_docs(parallel = FALSE, freeze = FALSE, verbose = TRUE)
         shell: Rscript {0}
-
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4

@@ -1,12 +1,12 @@
 ---
 title: 4 Benchmarking Performance
-author: 
+author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
   url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html
 comments:
-  giscus: 
+  giscus:
     repo: taxonomicallyinformedannotation/tima
   hypothesis:
     showHighlights: always
@@ -19,12 +19,12 @@ google-scholar: true
 knitr:
   opts_chunk:
     collapse: true
-    comment: '#>'
+    comment: "#>"
 lang: en
 opengraph:
-    image:
-      src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
-      alt: Taxonomically Informed Metabolite Annotation
+  image:
+    src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
+    alt: Taxonomically Informed Metabolite Annotation
 vignette: >
   %\VignetteIndexEntry{4 Benchmarking Performance}
   %\VignetteEngine{quarto::html}

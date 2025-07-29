@@ -1,12 +1,12 @@
 ---
 title: 3 Performing Taxonomically Informed Metabolite Annotation
-author: 
+author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
   url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html
 comments:
-  giscus: 
+  giscus:
     repo: taxonomicallyinformedannotation/tima
   hypothesis:
     showHighlights: always
@@ -19,14 +19,15 @@ google-scholar: true
 knitr:
   opts_chunk:
     collapse: true
-    comment: '#>'
+    comment: "#>"
 lang: en
 opengraph:
-    image:
-      src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
-      alt: Taxonomically Informed Metabolite Annotation
+  image:
+    src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
+    alt: Taxonomically Informed Metabolite Annotation
 vignette: >
-  %\VignetteIndexEntry{3 Performing Taxonomically Informed Metabolite Annotation}
+  %\VignetteIndexEntry{3 Performing Taxonomically Informed Metabolite
+  Annotation}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
@@ -36,7 +37,7 @@ library("tima")
 logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
-  )
+)
 tima::get_example_files()
 ```
 
