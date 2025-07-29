@@ -341,7 +341,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.1.2",
+      "version": ">= 1.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -476,7 +476,7 @@
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
-      "version": ">= 1.0.4",
+      "version": ">= 1.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -489,7 +489,7 @@
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
-      "version": ">= 1.42.0",
+      "version": ">= 1.43.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -515,7 +515,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
-      "version": ">= 1.10.0",
+      "version": ">= 1.11.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -667,7 +667,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "3051.015KB",
+  "fileSize": "14340.818KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -765,7 +765,7 @@
       }
     }
   ],
-  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima/blob/master/NEWS.md",
+  "releaseNotes": "https://github.com/taxonomicallyinformedannotation/tima/blob/main/NEWS.md",
   "readme": "https://github.com/taxonomicallyinformedannotation/tima/blob/main/README.md",
   "contIntegration": ["https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"
