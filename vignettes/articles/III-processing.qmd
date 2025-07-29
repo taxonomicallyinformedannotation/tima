@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
   image:
@@ -36,6 +34,7 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+tima::go_to_cache()
 tima:::copy_backbone()
 logger::log_threshold(
   level = logger::INFO,
