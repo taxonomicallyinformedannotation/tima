@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
-  opts_knit:
-    root.dir: ../inst
 lang: en
 opengraph:
   image:
@@ -43,6 +41,7 @@ install.packages(
   )
 )
 tima::install()
+tima::go_to_cache()
 ```
 
 This vignette describes the philosophy behind the infrastructure of **TIMA**.

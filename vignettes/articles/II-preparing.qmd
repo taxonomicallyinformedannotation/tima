@@ -20,8 +20,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
-  opts_knit:
-    root.dir: ../../inst
 lang: en
 opengraph:
   image:
@@ -35,12 +33,13 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+tima::go_to_cache()
 tima:::copy_backbone()
 logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
 )
-tima::get_example_files(in_cache = FALSE)
+tima::get_example_files()
 targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
 ```
 
