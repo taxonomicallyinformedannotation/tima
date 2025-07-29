@@ -1,12 +1,12 @@
 ---
 title: 2 Preparing inputs
-author: 
+author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
   url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html
 comments:
-  giscus: 
+  giscus:
     repo: taxonomicallyinformedannotation/tima
   hypothesis:
     showHighlights: always
@@ -19,12 +19,12 @@ google-scholar: true
 knitr:
   opts_chunk:
     collapse: true
-    comment: '#>'
+    comment: "#>"
 lang: en
 opengraph:
-    image:
-      src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
-      alt: Taxonomically Informed Metabolite Annotation
+  image:
+    src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
+    alt: Taxonomically Informed Metabolite Annotation
 vignette: >
   %\VignetteIndexEntry{2 Preparing inputs}
   %\VignetteEngine{quarto::html}
@@ -36,7 +36,7 @@ library("tima")
 logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
-  )
+)
 tima::get_example_files(in_cache = FALSE)
 ```
 

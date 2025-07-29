@@ -17,9 +17,10 @@
 #' ) |>
 #'   process_smiles()
 process_smiles <- function(
-    df,
-    smiles_colname = "structure_smiles_initial",
-    cache = NULL) {
+  df,
+  smiles_colname = "structure_smiles_initial",
+  cache = NULL
+) {
   logger::log_trace("Processing SMILES")
   reticulate::source_python(
     file = system.file("python/process_smiles.py", package = "tima")
