@@ -132,7 +132,3 @@ format:
     theme:
       light: flatly
       dark: darkly
-
-knitr:
-  opts_knit:
-    root.dir: ../inst
