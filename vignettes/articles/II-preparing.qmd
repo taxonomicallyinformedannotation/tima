@@ -33,14 +33,15 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
-tima::go_to_cache()
 tima:::copy_backbone()
 logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
 )
 tima::get_example_files()
-targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_mer")
+)
 ```
 
 This vignette describes the main steps of the annotation process.

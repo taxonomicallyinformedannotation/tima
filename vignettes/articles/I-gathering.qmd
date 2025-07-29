@@ -33,8 +33,6 @@ vignette: >
 
 ```{r tima, include = FALSE}
 library("tima")
-tima::go_to_cache()
-tima:::copy_backbone()
 ```
 
 This vignette describes...
@@ -108,7 +106,9 @@ GNPS, MassBank & MERLIN are downloaded and used by default, for more info about 
 In case you want to format your own spectral library to use it for spectral matching, adapt it the same way.
 
 ```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_exp"))
+targets::tar_make(
+  names = tidyselect::matches("lib_spe_exp")
+)
 ```
 
 ##### *In silico*
@@ -122,11 +122,15 @@ For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
 ```{r get-isdb-wikidata, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_is_wik"))
+targets::tar_make(
+  names = tidyselect::matches("lib_spe_is_wik")
+)
 ```
 
 ```{r prepare-isdb-wikidata-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_spe_is_wik_pre"))
+targets::tar_make(
+  names = tidyselect::matches("lib_spe_is_wik_pre")
+)
 ```
 
 You can also complement with the in silico spectra from HMDB (not running by default as quite long):
@@ -157,11 +161,15 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 we provide it here as a starting point for your structure-organism pairs library.
 
 ```{r get-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_sop_lot$"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_lot$")
+)
 ```
 
 ```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_sop_lot_pre"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_lot_pre")
+)
 ```
 
 The process to download LOTUS looks like this:
@@ -187,7 +195,9 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
 
 ```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_sop_ecm_pre"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_ecm_pre")
+)
 ```
 
 ##### HMDB
@@ -195,7 +205,9 @@ targets::tar_make(names = tidyselect::matches("lib_sop_ecm_pre"))
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
 ```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_sop_hmd_pre"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_hmd_pre")
+)
 ```
 
 For these first steps, you do not need to change any parameters as they are implemented *by default*.
@@ -213,7 +225,9 @@ Before running the corresponding code, do not forget to modify `params/user/prep
 Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
 
 ```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_mer")
+)
 ```
 
 ```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
