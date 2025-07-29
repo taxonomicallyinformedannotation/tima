@@ -20,6 +20,8 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
+  opts_knit:
+    root.dir: ../../inst
 lang: en
 opengraph:
   image:

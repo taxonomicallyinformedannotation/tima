@@ -20,6 +20,8 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
+  opts_knit:
+    root.dir: ../../inst
 lang: en
 opengraph:
   image:
@@ -39,6 +41,7 @@ logger::log_threshold(
   namespace = logger::log_namespaces()
 )
 tima::get_example_files(in_cache = FALSE)
+targets::tar_make(names = tidyselect::matches("lib_sop_mer"))
 ```
 
 This vignette describes the main steps of the annotation process.
