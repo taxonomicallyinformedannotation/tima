@@ -21,6 +21,7 @@ knitr:
     collapse: true
     comment: "#>"
 lang: en
+license: CC BY
 opengraph:
   image:
     src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
