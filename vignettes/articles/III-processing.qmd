@@ -10,7 +10,7 @@ comments:
     repo: taxonomicallyinformedannotation/tima
   hypothesis:
     showHighlights: always
-creative_commons: CC BY-SA
+creative_commons: CC BY
 date: today
 format:
   html:
