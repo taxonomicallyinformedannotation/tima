@@ -51,6 +51,13 @@ keywords:
 - computationalMetabolomics
 - taxonomicDistance
 - specializedMetabolome
+- lc-msms
+- metabolite-annotation
+- metabolomics
+- natural-products
+- scoring-system
+- specialized-metabolome
+- taxonomy
 references:
 - type: article
   title: Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation
@@ -830,6 +837,18 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.BiocManager
   version: '>= 1.30.25'
+- type: software
+  title: BiocVersion
+  abstract: 'BiocVersion: Set the appropriate version of Bioconductor packages'
+  notes: Suggests
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Morgan
+    given-names: Martin
+    email: martin.morgan@roswellpark.org
+  year: '2025'
+  doi: 10.18129/B9.bioc.BiocVersion
+  version: '>= 3.20.0'
 - type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
