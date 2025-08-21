@@ -850,6 +850,24 @@ references:
   doi: 10.18129/B9.bioc.BiocVersion
   version: '>= 3.20.0'
 - type: software
+  title: grateful
+  abstract: 'grateful: Facilitate Citation of R Packages'
+  notes: Suggests
+  url: https://pakillo.github.io/grateful/
+  repository: https://CRAN.R-project.org/package=grateful
+  authors:
+  - family-names: Rodriguez-Sanchez
+    given-names: Francisco
+    email: f.rodriguez.sanc@gmail.com
+    orcid: https://orcid.org/0000-0002-7981-1599
+  - family-names: Jackson
+    given-names: Connor P.
+    email: connor@cpjackson.net
+    orcid: https://orcid.org/0000-0002-4220-5210
+  year: '2025'
+  doi: 10.32614/CRAN.package.grateful
+  version: '>= 0.2.12'
+- type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
   notes: Suggests
