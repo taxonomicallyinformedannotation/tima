@@ -140,6 +140,11 @@ desc_path <- if (file.exists("DESCRIPTION")) {
 } else {
   ".."
 }
+bib_path <- if (file.exists("grateful-refs.bib")) {
+  "grateful-refs.bib"
+} else {
+  "../grateful-refs.bib"
+}
 grateful::cite_packages(
   output = "table",
   out.dir = getwd(),

@@ -159,8 +159,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 - MassBank: <https://doi.org/10.5281/zenodo.3378723>
 - Merlin: <https://doi.org/10.5281/zenodo.13911806>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
-- ROTL: <https://doi.org/10.1111/2041-210X.12593>
-- Spectral entropy: <https://doi.org/10.1038/s41592-021-01331-z>
 
 ## Additional software credits
 
