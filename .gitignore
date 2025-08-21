@@ -28,3 +28,6 @@ vignettes/*_files$
 altdoc/freeze.rds
 _quarto/*
 !_quarto/_freeze/
+
+README_files/
+README.html
