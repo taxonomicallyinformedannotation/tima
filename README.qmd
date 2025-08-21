@@ -2,7 +2,6 @@
 format: 
   gfm: default
   html: default
-bibliography: grateful-refs.bib
 ---
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
@@ -141,10 +140,13 @@ desc_path <- if (file.exists("DESCRIPTION")) {
   ".."
 }
 # TIMA specific
-if (!file.exists("grateful-refs.bib")) {
-  file.copy(from = "../grateful-refs.bib", to = "grateful-refs.bib")
+bib_path <- if (file.exists("grateful-refs.bib")) {
+  "grateful-refs.bib"
+} else {
+  "../grateful-refs.bib"
 }
 grateful::cite_packages(
+  bib.file = bib_path,
   output = "table",
   out.dir = getwd(),
   path = desc_path
