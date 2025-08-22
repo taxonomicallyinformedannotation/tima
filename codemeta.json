@@ -71,6 +71,32 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "BiocVersion",
+      "name": "BiocVersion",
+      "version": ">= 3.20.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocVersion.html"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "grateful",
+      "name": "grateful",
+      "version": ">= 0.2.12",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=grateful"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
       "version": ">= 1.50",
@@ -666,8 +692,8 @@
     },
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
-  "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome"],
-  "fileSize": "14340.818KB",
+  "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome"],
+  "fileSize": "2572.569KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
