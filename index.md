@@ -170,7 +170,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocParallel | 1.42.1 | Wang et al. (2025) |
 | BiocVersion | 3.21.1 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
-| DT | 0.33 | Xie, Cheng, and Tan (2024) |
+| DT | 0.34.0 | Xie, Cheng, and Tan (2024) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | gt | 1.0.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
@@ -202,7 +202,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
-| visNetwork | 2.1.2 | Almende B.V. and Contributors and Thieurmel (2022) |
+| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2022) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
