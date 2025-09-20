@@ -177,7 +177,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | igraph | 2.1.4 | Csardi and Nepusz (2006); Csárdi et al. (2025) |
 | IRanges | 2.42.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| logger | 0.4.0 | Daróczi and Wickham (2024) |
+| logger | 0.4.1 | Daróczi and Wickham (2024) |
 | MetaboCoreUtils | 1.16.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.12.0 | Rainer et al. (2022b) |
@@ -195,7 +195,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinyWidgets | 0.9.0 | Perrier, Meyer, and Granjon (2025) |
 | Spectra | 1.18.2 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
-| targets | 1.11.3 | Landau (2021) |
+| targets | 1.11.4 | Landau (2021) |
 | testthat | 3.2.3 | Wickham (2011) |
 | tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
