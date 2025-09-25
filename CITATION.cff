@@ -55,6 +55,7 @@ keywords:
 - metabolite-annotation
 - metabolomics
 - natural-products
+- r
 - scoring-system
 - specialized-metabolome
 - taxonomy
@@ -210,6 +211,10 @@ references:
     email: joe@posit.co
   - family-names: Tan
     given-names: Xianying
+  - family-names: Aden-Buie
+    given-names: Garrick
+    email: garrick@posit.co
+    orcid: https://orcid.org/0000-0002-7111-0077
   year: '2025'
   doi: 10.32614/CRAN.package.DT
   version: '>= 0.33'
