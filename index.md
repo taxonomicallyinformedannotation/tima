@@ -170,14 +170,14 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocParallel | 1.42.1 | Wang et al. (2025) |
 | BiocVersion | 3.21.1 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
-| DT | 0.34.0 | Xie, Cheng, and Tan (2024) |
+| DT | 0.34.0 | Xie et al. (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
-| gt | 1.0.0 | Iannone et al. (2025) |
+| gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
 | igraph | 2.1.4 | Csardi and Nepusz (2006); Csárdi et al. (2025) |
 | IRanges | 2.42.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| logger | 0.4.1 | Daróczi and Wickham (2024) |
+| logger | 0.4.1 | Daróczi and Wickham (2025) |
 | MetaboCoreUtils | 1.16.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.12.0 | Rainer et al. (2022b) |
@@ -202,7 +202,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
-| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2022) |
+| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2025) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
@@ -219,7 +219,7 @@ Luraschi, Kevin Ushey, Aron Atkins, et al. 2024.
 
 <div id="ref-visNetwork" class="csl-entry">
 
-Almende B.V. and Contributors, and Benoit Thieurmel. 2022.
+Almende B.V. and Contributors, and Benoit Thieurmel. 2025.
 *<span class="nocase">visNetwork</span>: Network Visualization Using
 “<span class="nocase">vis.js</span>” Library*.
 <https://doi.org/10.32614/CRAN.package.visNetwork>.
@@ -262,7 +262,7 @@ in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 <div id="ref-logger" class="csl-entry">
 
-Daróczi, Gergely, and Hadley Wickham. 2024.
+Daróczi, Gergely, and Hadley Wickham. 2025.
 *<span class="nocase">logger</span>: A Lightweight, Modern and Flexible
 Logging Utility*. <https://doi.org/10.32614/CRAN.package.logger>.
 
@@ -586,8 +586,8 @@ Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
 
 <div id="ref-DT" class="csl-entry">
 
-Xie, Yihui, Joe Cheng, and Xianying Tan. 2024. *DT: A Wrapper of the
-JavaScript Library “DataTables”*.
+Xie, Yihui, Joe Cheng, Xianying Tan, and Garrick Aden-Buie. 2025. *DT: A
+Wrapper of the JavaScript Library “DataTables”*.
 <https://doi.org/10.32614/CRAN.package.DT>.
 
 </div>

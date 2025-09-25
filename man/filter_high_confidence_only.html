@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3fce331dd96f6c8030d7f0321bc35dad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-2c4dc7c799734541d6cccbaa945bd6c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-3fce331dd96f6c8030d7f0321bc35dad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-8a31036c803348cb054eb59479076bd4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -679,11 +679,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description">Description</a></li>
+  <li><a href="#filter-high-confidence-only" id="toc-filter-high-confidence-only" class="nav-link active" data-scroll-target="#filter-high-confidence-only">Filter high confidence only </a><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="nav-link" data-scroll-target="https\://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+  <ul class="collapse">
+  <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -694,7 +697,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>Filter high confidence only <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
+<section id="filter-high-confidence-only" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="filter-high-confidence-only">Filter high confidence only <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a></h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>This function filters highly confident annotations only.</p>
@@ -714,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table role="presentation">
 <tbody><tr>
-<td style="white-space: nowrap; font-family: monospace; vertical-align: top">
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="df">df</code>
 </td>
 <td>
@@ -722,7 +726,7 @@ Dataframe
 </td>
 </tr>
 <tr>
-<td style="white-space: nowrap; font-family: monospace; vertical-align: top">
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="score_bio_min">score_bio_min</code>
 </td>
 <td>
@@ -730,7 +734,7 @@ Minimal biological score. Current default to 0.85.
 </td>
 </tr>
 <tr>
-<td style="white-space: nowrap; font-family: monospace; vertical-align: top">
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="score_ini_min">score_ini_min</code>
 </td>
 <td>
@@ -738,7 +742,7 @@ Minimal initial score. Current default to 0.95.
 </td>
 </tr>
 <tr>
-<td style="white-space: nowrap; font-family: monospace; vertical-align: top">
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="score_final_min">score_final_min</code>
 </td>
 <td>
@@ -746,7 +750,7 @@ Minimal final score. Current default to 0.75.
 </td>
 </tr>
 <tr>
-<td style="white-space: nowrap; font-family: monospace; vertical-align: top">
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="error_rt_max">error_rt_max</code>
 </td>
 <td>
@@ -771,6 +775,7 @@ Maximal RT error. Current default to 0.1.
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
