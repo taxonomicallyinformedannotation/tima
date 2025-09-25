@@ -170,14 +170,14 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocParallel | 1.43.4 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
-| DT | 0.33 | Xie, Cheng, and Tan (2024) |
+| DT | 0.34.0 | Xie, Cheng, and Tan (2024) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
-| gt | 1.0.0 | Iannone et al. (2025) |
+| gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
 | igraph | 2.1.4 | Csardi and Nepusz (2006); Csárdi et al. (2025) |
 | IRanges | 2.43.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| logger | 0.4.0 | Daróczi and Wickham (2024) |
+| logger | 0.4.1 | Daróczi and Wickham (2024) |
 | MetaboCoreUtils | 1.17.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.17.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.13.0 | Rainer et al. (2022b) |
@@ -195,14 +195,14 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinyWidgets | 0.9.0 | Perrier, Meyer, and Granjon (2025) |
 | Spectra | 1.19.4 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
-| targets | 1.11.3 | Landau (2021) |
+| targets | 1.11.4 | Landau (2021) |
 | testthat | 3.2.3 | Wickham (2011) |
 | tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
-| visNetwork | 2.1.2 | Almende B.V. and Contributors and Thieurmel (2022) |
+| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2022) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
