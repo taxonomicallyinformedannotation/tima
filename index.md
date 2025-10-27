@@ -167,14 +167,14 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | archive | 1.1.12 | Hester and Csárdi (2025) |
 | base | 4.5.1 | R Core Team (2025) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.42.1 | Wang et al. (2025) |
+| BiocParallel | 1.42.2 | Wang et al. (2025) |
 | BiocVersion | 3.21.1 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
 | DT | 0.34.0 | Xie et al. (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
-| igraph | 2.1.4 | Csardi and Nepusz (2006); Csárdi et al. (2025) |
+| igraph | 2.2.0 | Csardi and Nepusz (2006); (**igraph2023?**); Csárdi et al. (2025) |
 | IRanges | 2.42.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | logger | 0.4.1 | Daróczi and Wickham (2025) |
@@ -184,7 +184,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsCoreUtils | 1.20.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | reticulate | 1.43.0 | Ushey, Allaire, and Tang (2025) |
-| rmarkdown | 2.29 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024) |
+| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); (**rmarkdown2025?**) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.11.1 | Chang et al. (2025) |
 | shinybusy | 0.3.3 | Meyer and Perrier (2024) |
@@ -207,15 +207,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
-
-<div id="ref-rmarkdown2024" class="csl-entry">
-
-Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
-Luraschi, Kevin Ushey, Aron Atkins, et al. 2024.
-*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
-<https://github.com/rstudio/rmarkdown>.
-
-</div>
 
 <div id="ref-visNetwork" class="csl-entry">
 
