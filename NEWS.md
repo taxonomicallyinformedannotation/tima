@@ -17,6 +17,7 @@
 * Refactored MS1 annotation step to work per sample (#194)
 * Switched documentation from `pkgdown` to `altdoc`
 * Updated to Massbank version `2025.05.1`
+* Updated minimal BioConductor version to `3.21` (and related Bioconductor dependencies)
 * Updated minimal R version to `4.4.0` (and related Bioconductor dependencies)
 
 # tima 2.11.1 (unreleased)
