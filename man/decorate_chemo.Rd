@@ -18,28 +18,30 @@ decorate_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{Table to decorate}
+\item{annot_table_wei_chemo}{Data frame containing chemically weighted annotations}
 
-\item{score_chemical_cla_kingdom}{Classyfire kingdom score}
+\item{score_chemical_cla_kingdom}{Numeric minimum score for Classyfire kingdom}
 
-\item{score_chemical_cla_superclass}{Classyfire superclass score}
+\item{score_chemical_cla_superclass}{Numeric minimum score for Classyfire superclass}
 
-\item{score_chemical_cla_class}{Classyfire class score}
+\item{score_chemical_cla_class}{Numeric minimum score for Classyfire class}
 
-\item{score_chemical_cla_parent}{Classyfire parent score}
+\item{score_chemical_cla_parent}{Numeric minimum score for Classyfire parent}
 
-\item{score_chemical_npc_pathway}{NPC pathway score}
+\item{score_chemical_npc_pathway}{Numeric minimum score for NPClassifier pathway}
 
-\item{score_chemical_npc_superclass}{NPC superclass score}
+\item{score_chemical_npc_superclass}{Numeric minimum score for NPClassifier superclass}
 
-\item{score_chemical_npc_class}{NPC class score}
+\item{score_chemical_npc_class}{Numeric minimum score for NPClassifier class}
 }
 \value{
-Message indicating the number of annotations
-weighted at each chemical level
+The input annotation table (unchanged), for use in pipelines
 }
 \description{
-This function outputs information about chemical weighting
+This function logs summary statistics about chemically weighted
+annotations, showing how many structures were reranked at each chemical
+classification level. Uses cascading filters where each level builds on
+the previous (higher specificity requires passing lower levels).
 }
 \examples{
 NULL

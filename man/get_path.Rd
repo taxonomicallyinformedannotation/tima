@@ -7,13 +7,17 @@
 get_path(base_path)
 }
 \arguments{
-\item{base_path}{Base path}
+\item{base_path}{Character string representing the base path to resolve.
+Can include "inst/" which will be handled appropriately.}
 }
 \value{
-A path
+Character string of the resolved absolute path that exists
 }
 \description{
-This function gets path
+This function resolves file paths by checking multiple locations,
+handling the difference between installed packages (where inst/ is removed)
+and development environments (where inst/ exists). It tries paths in order
+until one is found.
 }
 \examples{
 NULL

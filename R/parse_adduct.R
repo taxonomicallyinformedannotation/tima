@@ -31,7 +31,11 @@ parse_adduct <- function(
   regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
 ) {
   # Validate input
-  if (missing(adduct_string) || is.null(adduct_string) || nchar(adduct_string) == 0L) {
+  if (
+    missing(adduct_string) ||
+      is.null(adduct_string) ||
+      nchar(adduct_string) == 0L
+  ) {
     stop("Adduct string must be provided")
   }
 
@@ -122,15 +126,24 @@ parse_adduct <- function(
   )
 
   # Calculate masses of modification elements
-  mod_masses <- tryCatch({
-    MetaboCoreUtils::calculateMass(mod_elements)
-  }, error = function(e) {
-    logger::log_warn("Failed to calculate modification masses: ", conditionMessage(e))
-    return(failed_parse)
-  })
+  mod_masses <- tryCatch(
+    {
+      MetaboCoreUtils::calculateMass(mod_elements)
+    },
+    error = function(e) {
+      logger::log_warn(
+        "Failed to calculate modification masses: ",
+        conditionMessage(e)
+      )
+      return(failed_parse)
+    }
+  )
 
   # If mass calculation failed, mod_masses will be the failed_parse vector
-  if (length(mod_masses) == length(failed_parse) && all(names(mod_masses) == names(failed_parse))) {
+  if (
+    length(mod_masses) == length(failed_parse) &&
+      all(names(mod_masses) == names(failed_parse))
+  ) {
     return(failed_parse)
   }
 
