@@ -1,23 +1,25 @@
 #' @title Calculate entropy score
 #'
-#' @description This function applies similarity calculation to a list of
-#'        spectra to obtain entropy scores
+#' @description This function calculates spectral entropy and similarity scores
+#'     by comparing query spectra against library spectra. Uses entropy-based
+#'     similarity measures to match MS2 fragmentation patterns.
 #'
 #' @include calculate_similarity.R
 #'
-#' @param lib_ids Lib Ids
-#' @param lib_precursors Lib precursors
-#' @param lib_spectra Lib spectra
-#' @param query_ids Query Ids
-#' @param query_precursors Query precursors
-#' @param query_spectra Query spectra
-#' @param method Method
-#' @param dalton Dalton
-#' @param ppm Ppm
-#' @param threshold Threshold
-#' @param approx Approx
+#' @param lib_ids Character vector of library spectrum IDs
+#' @param lib_precursors Numeric vector of library precursor m/z values
+#' @param lib_spectra List of library spectra (each a matrix of mz/intensity)
+#' @param query_ids Character vector of query spectrum IDs
+#' @param query_precursors Numeric vector of query precursor m/z values
+#' @param query_spectra List of query spectra (each a matrix of mz/intensity)
+#' @param method Character string similarity method to use
+#' @param dalton Numeric absolute mass tolerance in Daltons
+#' @param ppm Numeric relative mass tolerance in ppm
+#' @param threshold Numeric minimum similarity threshold (0-1)
+#' @param approx Logical whether to perform approximate matching without
+#'     precursor mass filtering
 #'
-#' @return NULL
+#' @return Data frame with spectrum IDs, entropy scores, and similarity scores
 #'
 #' @examples NULL
 calculate_entropy_and_similarity <- function(
@@ -33,6 +35,53 @@ calculate_entropy_and_similarity <- function(
   threshold,
   approx
 ) {
+  # Validate inputs
+  if (
+    length(lib_ids) != length(lib_spectra) ||
+      length(lib_ids) != length(lib_precursors)
+  ) {
+    stop("lib_ids, lib_precursors, and lib_spectra must have the same length")
+  }
+
+  if (
+    length(query_ids) != length(query_spectra) ||
+      length(query_ids) != length(query_precursors)
+  ) {
+    stop(
+      "query_ids, query_precursors, and query_spectra must have the same length"
+    )
+  }
+
+  if (!is.numeric(dalton) || dalton <= 0) {
+    stop("dalton must be a positive number")
+  }
+
+  if (!is.numeric(ppm) || ppm <= 0) {
+    stop("ppm must be a positive number")
+  }
+
+  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
+    stop("threshold must be between 0 and 1")
+  }
+
+  if (!is.logical(approx)) {
+    stop("approx must be logical (TRUE/FALSE)")
+  }
+
+  logger::log_info(
+    "Calculating entropy and similarity for ",
+    length(query_spectra),
+    " spectra"
+  )
+  logger::log_debug(
+    "Parameters - Method: ",
+    method,
+    ", Dalton: ",
+    dalton,
+    ", PPM: ",
+    ppm
+  )
+
   results <- purrr::map(
     .progress = TRUE,
     .x = seq_along(query_spectra),

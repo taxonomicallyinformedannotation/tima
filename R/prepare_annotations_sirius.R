@@ -1,6 +1,9 @@
 #' @title Prepare annotations SIRIUS
 #'
-#' @description This function prepares Sirius results to make them compatible
+#' @description This function prepares SIRIUS annotation results (structure
+#'     predictions, CANOPUS chemical classifications, and formula predictions)
+#'     by harmonizing formats across SIRIUS versions (v5/v6), standardizing
+#'     column names, and integrating with structure metadata.
 #'
 #' @include columns_model.R
 #' @include get_params.R
@@ -10,18 +13,19 @@
 #' @include select_annotations_columns.R
 #' @include select_sirius_columns.R
 #'
-#' @param input_directory Directory containing the Sirius results
-#' @param output_ann Output where to save prepared annotation results
-#' @param output_can Output where to save prepared canopus results
-#' @param output_for Output where to save prepared formula results
-#' @param sirius_version Sirius version
-#' @param str_stereo File containing structures stereo
-#' @param str_met File containing structures metadata
-#' @param str_nam File containing structures names
-#' @param str_tax_cla File containing Classyfire taxonomy
-#' @param str_tax_npc File containing NPClassifier taxonomy
+#' @param input_directory Character string path to directory or zip file
+#'     containing SIRIUS results
+#' @param output_ann Character string path for prepared annotation results output
+#' @param output_can Character string path for prepared CANOPUS results output
+#' @param output_for Character string path for prepared formula results output
+#' @param sirius_version Character string SIRIUS version ("v5" or "v6")
+#' @param str_stereo Character string path to file with structure stereochemistry
+#' @param str_met Character string path to file with structure metadata
+#' @param str_nam Character string path to file with structure names
+#' @param str_tax_cla Character string path to file with ClassyFire taxonomy
+#' @param str_tax_npc Character string path to file with NPClassifier taxonomy
 #'
-#' @return The path to the prepared SIRIUS annotations
+#' @return Character string path to the prepared SIRIUS annotations file
 #'
 #' @export
 #'
@@ -65,11 +69,55 @@ prepare_annotations_sirius <-
       step = "prepare_annotations_sirius"
     )$files$libraries$sop$merged$structures$taxonomies$npc
   ) {
+    # Validate SIRIUS version
+    if (!sirius_version %in% c("5", "6", 5, 6)) {
+      stop("sirius_version must be '5' or '6', got: ", sirius_version)
+    }
+
+    # Validate output paths
+    output_paths <- list(
+      output_ann = output_ann,
+      output_can = output_can,
+      output_for = output_for
+    )
+
+    for (param_name in names(output_paths)) {
+      param_value <- output_paths[[param_name]]
+      if (!is.character(param_value) || length(param_value) != 1L) {
+        stop(param_name, " must be a single character string")
+      }
+    }
+
+    # Validate structure file paths
+    str_files <- list(
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    )
+
+    for (param_name in names(str_files)) {
+      param_value <- str_files[[param_name]]
+      if (!is.character(param_value) || length(param_value) != 1L) {
+        stop(param_name, " must be a single character string")
+      }
+      if (!file.exists(param_value)) {
+        stop(param_name, " file not found: ", param_value)
+      }
+    }
+
+    logger::log_info("Preparing SIRIUS ", sirius_version, " annotations")
+
+    # Handle NULL or missing input directory
     if (is.null(input_directory)) {
       input_directory <- "Th1sd1rw0nt3x1st"
     }
+
+    logger::log_debug("SIRIUS directory: ", input_directory)
+
     if (file.exists(input_directory)) {
-      logger::log_info("Loading parameters for SIRIUS ", sirius_version)
+      logger::log_trace("Loading SIRIUS results...")
       sirius_version <- as.character(sirius_version)
       canopus_filename <- switch(
         sirius_version,

@@ -19,31 +19,36 @@ calculate_entropy_and_similarity(
 )
 }
 \arguments{
-\item{lib_ids}{Lib Ids}
+\item{lib_ids}{Character vector of library spectrum IDs}
 
-\item{lib_precursors}{Lib precursors}
+\item{lib_precursors}{Numeric vector of library precursor m/z values}
 
-\item{lib_spectra}{Lib spectra}
+\item{lib_spectra}{List of library spectra (each a matrix of mz/intensity)}
 
-\item{query_ids}{Query Ids}
+\item{query_ids}{Character vector of query spectrum IDs}
 
-\item{query_precursors}{Query precursors}
+\item{query_precursors}{Numeric vector of query precursor m/z values}
 
-\item{query_spectra}{Query spectra}
+\item{query_spectra}{List of query spectra (each a matrix of mz/intensity)}
 
-\item{method}{Method}
+\item{method}{Character string similarity method to use}
 
-\item{dalton}{Dalton}
+\item{dalton}{Numeric absolute mass tolerance in Daltons}
 
-\item{ppm}{Ppm}
+\item{ppm}{Numeric relative mass tolerance in ppm}
 
-\item{threshold}{Threshold}
+\item{threshold}{Numeric minimum similarity threshold (0-1)}
 
-\item{approx}{Approx}
+\item{approx}{Logical whether to perform approximate matching without
+precursor mass filtering}
+}
+\value{
+Data frame with spectrum IDs, entropy scores, and similarity scores
 }
 \description{
-This function applies similarity calculation to a list of
-spectra to obtain entropy scores
+This function calculates spectral entropy and similarity scores
+by comparing query spectra against library spectra. Uses entropy-based
+similarity measures to match MS2 fragmentation patterns.
 }
 \examples{
 NULL

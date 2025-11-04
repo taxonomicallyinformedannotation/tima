@@ -16,21 +16,24 @@ complement_metadata_structures(
 \arguments{
 \item{df}{Data frame with structural metadata to be complemented}
 
-\item{str_stereo}{File containing structures stereo}
+\item{str_stereo}{Character string path to file with structure stereochemistry}
 
-\item{str_met}{File containing structures metadata}
+\item{str_met}{Character string path to file with structure metadata}
 
-\item{str_nam}{File containing structures names}
+\item{str_nam}{Character string path to file with structure names}
 
-\item{str_tax_cla}{File containing Classyfire taxonomy}
+\item{str_tax_cla}{Character string path to file with ClassyFire taxonomy}
 
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
+\item{str_tax_npc}{Character string path to file with NPClassifier taxonomy}
 }
 \value{
-Data frame with complemented structural metadata
+Data frame with enriched structural metadata
 }
 \description{
-This function complement structural metadata
+This function complements structural metadata by joining
+stereochemistry, metadata, names, and chemical taxonomy information
+from reference libraries. Enriches annotation results with comprehensive
+structure information.
 }
 \examples{
 NULL
