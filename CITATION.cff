@@ -138,11 +138,12 @@ references:
   url: https://github.com/Bioconductor/BiocParallel
   repository: https://bioconductor.org/
   authors:
+  - family-names: Wang
+    given-names: Jiefei
+    email: jiefei0804@gmail.com
   - family-names: Morgan
     given-names: Martin
     email: mtmorgan.bioc@gmail.com
-  - family-names: Wang
-    given-names: Jiefei
   - family-names: Obenchain
     given-names: Valerie
   - family-names: Lang
@@ -155,7 +156,7 @@ references:
     given-names: Nitesh
   year: '2025'
   doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.40.2'
+  version: '>= 1.42.2'
 - type: software
   title: docopt
   abstract: 'docopt: Command-Line Interface Specification Language'
@@ -333,6 +334,14 @@ references:
     given-names: Kirill
     email: kirill@cynkra.com
     orcid: https://orcid.org/0000-0002-1416-3412
+  - family-names: Schoch
+    given-names: David
+    email: david.schoch@cynkra.com
+    orcid: https://orcid.org/0000-0003-2952-4812
+  - family-names: Salmon
+    given-names: Maëlle
+    email: maelle@cynkra.com
+    orcid: https://orcid.org/0000-0002-2815-0399
   year: '2025'
   doi: 10.32614/CRAN.package.igraph
   version: '>= 2.1.4'
@@ -352,7 +361,7 @@ references:
     given-names: Michael
   year: '2025'
   doi: 10.18129/B9.bioc.IRanges
-  version: '>= 2.40.1'
+  version: '>= 2.42.0'
 - type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
@@ -427,7 +436,7 @@ references:
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2025'
   doi: 10.18129/B9.bioc.MetaboCoreUtils
-  version: '>= 1.14.0'
+  version: '>= 1.16.1'
 - type: software
   title: MsBackendMgf
   abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
@@ -450,7 +459,7 @@ references:
     orcid: https://orcid.org/0000-0001-7406-4443
   year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMgf
-  version: '>= 1.14.0'
+  version: '>= 1.16.0'
 - type: software
   title: MsBackendMsp
   abstract: 'MsBackendMsp: Mass Spectrometry Data Backend for NIST msp Files'
@@ -468,7 +477,7 @@ references:
     orcid: https://orcid.org/0000-0002-6977-7147
   year: '2025'
   doi: 10.18129/B9.bioc.MsBackendMsp
-  version: '>= 1.10.0'
+  version: '>= 1.12.0'
 - type: software
   title: MsCoreUtils
   abstract: 'MsCoreUtils: Core Utils for Mass Spectrometry Data'
@@ -494,7 +503,7 @@ references:
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2025'
   doi: 10.18129/B9.bioc.MsCoreUtils
-  version: '>= 1.18.0'
+  version: '>= 1.20.0'
 - type: software
   title: msentropy
   abstract: 'msentropy: Spectral Entropy for Mass Spectrometry Data'
@@ -662,7 +671,7 @@ references:
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2025'
   doi: 10.18129/B9.bioc.Spectra
-  version: '>= 1.16.1'
+  version: '>= 1.18.2'
 - type: software
   title: stats
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -853,7 +862,7 @@ references:
     email: martin.morgan@roswellpark.org
   year: '2025'
   doi: 10.18129/B9.bioc.BiocVersion
-  version: '>= 3.20.0'
+  version: '>= 3.21.1'
 - type: software
   title: grateful
   abstract: 'grateful: Facilitate Citation of R Packages'
