@@ -1,26 +1,66 @@
-## This was done because of targets re-running steps calling C code
+## These wrappers are needed for compatibility with the targets package
+## to prevent unnecessary re-running of steps that call C code.
 ## See https://github.com/ropensci/targets/issues/721
-## Probably having them return a hash of the source C file would be even better
+## A future improvement could return a hash of the source C file
 
-#' Wrapper for the C function "gnps"
+#' @title Wrapper for the C function "gnps"
 #'
-#' @param x A numeric matrix.
-#' @param y A numeric matrix.
-#' @return The result from the C function.
+#' @description Calculates GNPS-style spectral similarity score between
+#'     two matched peak matrices
+#'
+#' @param x Numeric matrix with matched peaks from query spectrum.
+#'     Must have columns for mz and intensity.
+#' @param y Numeric matrix with matched peaks from target spectrum.
+#'     Must have columns for mz and intensity.
+#'
+#' @return A list containing:
+#'   \item{score}{Numeric similarity score (0-1)}
+#'   \item{matches}{Integer count of matched peaks}
+#'
+#' @examples
+#' \dontrun{
+#' # Matched peaks from two spectra
+#' x_peaks <- cbind(mz = c(100, 200), intensity = c(50, 100))
+#' y_peaks <- cbind(mz = c(100, 200), intensity = c(45, 95))
+#' result <- gnps_wrapper(x = x_peaks, y = y_peaks)
+#' print(result$score)
+#' }
+#' @keywords internal
 gnps_wrapper <- function(x, y) {
   .Call("gnps", x = x, y = y)
 }
 
-#' Wrapper for the C function "join_gnps"
+#' @title Wrapper for the C function "join_gnps"
 #'
-#' @param x Numeric vector or matrix for query masses.
-#' @param y Numeric vector or matrix for target masses.
-#' @param xPrecursorMz Numeric vector of precursor values for queries.
-#' @param yPrecursorMz Numeric vector of precursor values for targets.
-#' @param tolerance Numeric value specifying the tolerance in daltons.
-#' @param ppm Numeric value specifying the tolerance in ppm.
-#' @return The result returned from the C function "join_gnps".
+#' @description Performs GNPS-style peak matching between query and target
+#'     mass lists with tolerance-based matching and precursor filtering
+#'
+#' @param x Numeric vector of query m/z values
+#' @param y Numeric vector of target m/z values
+#' @param xPrecursorMz Numeric precursor m/z for query spectrum
+#' @param yPrecursorMz Numeric precursor m/z for target spectrum
+#' @param tolerance Numeric value specifying the absolute tolerance in Daltons
+#' @param ppm Numeric value specifying the relative tolerance in ppm
+#'
+#' @return A list with two integer vectors:
+#'   \item{[[1]]}{Indices of matched peaks in x}
+#'   \item{[[2]]}{Indices of matched peaks in y}
+#'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' query_mz <- c(100.05, 200.10, 300.15)
+#' target_mz <- c(100.06, 200.11, 400.20)
+#' matches <- join_gnps_wrapper(
+#'   x = query_mz,
+#'   y = target_mz,
+#'   xPrecursorMz = 500.0,
+#'   yPrecursorMz = 500.0,
+#'   tolerance = 0.01,
+#'   ppm = 10
+#' )
+#' }
 join_gnps_wrapper <- function(
   x,
   y,

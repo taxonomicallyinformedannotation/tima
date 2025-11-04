@@ -1,14 +1,14 @@
 #' @title Export output
 #'
-#' @description This function creates the output directory
-#'    if it doesn't exist and exports the data frame to a tab-delimited file.
+#' @description This function creates the output directory if it doesn't exist
+#'     and exports a data frame to a tab-delimited file
 #'
 #' @include create_dir.R
 #'
-#' @param x data frame to be exported
-#' @param file path to the output file
+#' @param x Data frame to be exported
+#' @param file Character string path to the output file
 #'
-#' @return The path of the exported file
+#' @return The path to the exported file
 #'
 #' @export
 #'
@@ -17,24 +17,23 @@
 #' export_output(x = data.frame(), file = "output/file.tsv")
 #' unlink("output", recursive = TRUE)
 #' }
-export_output <- function(x, file = output) {
-  # ## Use default system data directory
-  # file <- file.path(
-  #   rappdirs::user_data_dir(
-  #     appname = appname,
-  #     appauthor = appauthor,
-  #     version = version
-  #   ),
-  #   file
-  # )
+export_output <- function(x, file) {
+  # Validate input
+  if (!is.data.frame(x) && !inherits(x, "tbl")) {
+    stop("Input 'x' must be a data frame or tibble")
+  }
 
-  ## Create the output directory if it doesn't exist
+  if (missing(file) || is.null(file) || nchar(file) == 0L) {
+    stop("Output file path must be specified")
+  }
+
+  # Create the output directory if it doesn't exist
   create_dir(export = file)
 
-  ## Log the path to the output file
-  logger::log_info("... path to export is {file}")
+  # Log the path to the output file
+  logger::log_info("Exporting to: ", file)
 
-  ## Write the data frame to a tab-delimited file
+  # Write the data frame to a tab-delimited file
   tidytable::fwrite(
     x = x,
     file = file,
@@ -42,6 +41,6 @@ export_output <- function(x, file = output) {
     na = ""
   )
 
-  ## To track the correct path later
+  # Return the file path for pipeline tracking
   return(file)
 }

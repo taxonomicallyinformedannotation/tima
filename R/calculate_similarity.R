@@ -1,21 +1,23 @@
 #' @title Calculate similarity between spectra
 #'
-#' @description Efficiently calculates similarity scores between query and target spectra
-#'        using either entropy or GNPS methods
+#' @description Efficiently calculates similarity scores between query and
+#'     target spectra using either entropy, cosine, or GNPS methods
 #'
 #' @include c_wrappers.R
 #'
-#' @param method Method ("entropy" or "gnps")
-#' @param query_spectrum Query spectrum matrix
-#' @param target_spectrum Target spectrum matrix
-#' @param query_precursor Query precursor
-#' @param target_precursor Target precursor
-#' @param dalton Dalton tolerance
-#' @param ppm PPM tolerance
-#' @param return_matched_peaks Return matched peaks. Not compatible with 'entropy'. Default: FALSE
-#' @param ... Not documented for now
+#' @param method Character string specifying method: "entropy", "gnps", or "cosine"
+#' @param query_spectrum Numeric matrix with columns for mz and intensity
+#' @param target_spectrum Numeric matrix with columns for mz and intensity
+#' @param query_precursor Numeric precursor m/z value for query
+#' @param target_precursor Numeric precursor m/z value for target
+#' @param dalton Numeric Dalton tolerance for peak matching
+#' @param ppm Numeric PPM tolerance for peak matching
+#' @param return_matched_peaks Logical; return matched peaks count?
+#'     Not compatible with 'entropy' method. Default: FALSE
+#' @param ... Additional arguments passed to MsCoreUtils::join
 #'
-#' @return Similarity score or NA_real_ if calculation fails
+#' @return Numeric similarity score (0-1), or list with score and matches
+#'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
 #'
 #' @export
 #'
@@ -60,11 +62,32 @@ calculate_similarity <- function(
   return_matched_peaks = FALSE,
   ...
 ) {
-  if (!method %in% c("cosine", "entropy", "gnps")) {
-    logger::log_fatal("Invalid method. Choose 'cosine', 'entropy' or 'gnps'.")
-    stop()
+  # Validate method
+  valid_methods <- c("cosine", "entropy", "gnps")
+  if (!method %in% valid_methods) {
+    stop(
+      "Invalid method '",
+      method,
+      "'. Must be one of: ",
+      paste(valid_methods, collapse = ", ")
+    )
   }
+
+  # Validate spectrum inputs
+  if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
+    stop("Spectra must be matrices")
+  }
+
+  if (ncol(query_spectrum) < 2L || ncol(target_spectrum) < 2L) {
+    stop("Spectra must have at least 2 columns (mz, intensity)")
+  }
+
+  # Handle entropy method separately
   if (method == "entropy") {
+    if (return_matched_peaks) {
+      logger::log_warn("return_matched_peaks not supported with entropy method")
+    }
+
     return(
       msentropy::calculate_entropy_similarity(
         peaks_a = query_spectrum,
@@ -79,9 +102,12 @@ calculate_similarity <- function(
       )
     )
   }
-  query_masses <- query_spectrum[, 1]
-  target_masses <- target_spectrum[, 1]
 
+  # Extract masses for matching
+  query_masses <- query_spectrum[, 1L]
+  target_masses <- target_spectrum[, 1L]
+
+  # Get peak matching map
   map <- switch(
     method,
     "gnps" = join_gnps_wrapper(
@@ -102,22 +128,25 @@ calculate_similarity <- function(
     )
   )
 
-  matched_x <- map[[1]]
-  matched_y <- map[[2]]
+  matched_x <- map[[1L]]
+  matched_y <- map[[2L]]
 
+  # No matches found
   if (length(matched_x) == 0L) {
-    return(0.0)
+    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 
+  # Extract matched peaks
   x_mat <- query_spectrum[matched_x, , drop = FALSE]
   y_mat <- target_spectrum[matched_y, , drop = FALSE]
 
+  # Calculate similarity
   result <- gnps_wrapper(x = x_mat, y = y_mat)
 
+  # Return appropriate format
   if (return_matched_peaks) {
     result
   } else {
-    ## Do not report number of matched peaks by default for now
     result$score
   }
 }
