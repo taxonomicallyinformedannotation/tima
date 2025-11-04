@@ -11,17 +11,19 @@ prepare_params(
 )
 }
 \arguments{
-\item{params_small}{params_small}
+\item{params_small}{List of basic parameters for the workflow}
 
-\item{params_advanced}{params_advanced}
+\item{params_advanced}{List of advanced parameters for the workflow}
 
-\item{step}{Step}
+\item{step}{Character string specifying the workflow step (default: NA)}
 }
 \value{
-The path to the yaml files containing prepared parameters
+Character vector of paths to YAML files containing prepared parameters
 }
 \description{
-This function prepares main parameters
+This function prepares and validates main parameters for the
+TIMA workflow. It loads YAML configuration files, extracts all parameters,
+and sets up the parameter structure for downstream analysis steps.
 }
 \examples{
 NULL

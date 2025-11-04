@@ -10,19 +10,31 @@ parse_adduct(
 )
 }
 \arguments{
-\item{adduct_string}{Adduct to be parsed}
+\item{adduct_string}{Character string representing the adduct in standard
+notation (e.g., "[M+H]+", "[2M+Na]+", "[M-H2O+H]+")}
 
-\item{regex}{Regex used for parsing}
+\item{regex}{Character string regular expression pattern for parsing
+(default handles standard adduct notation)}
 }
 \value{
-Parsed elements from adduct
+Named numeric vector containing:
+\item{n_mer}{Integer number of monomers (e.g., 2 for dimer)}
+\item{n_iso}{Integer isotope shift (e.g., 1 for M1)}
+\item{los_add_clu}{Numeric total mass change from modifications}
+\item{n_charges}{Integer absolute number of charges}
+\item{charge}{Integer charge sign (+1 or -1)}
+Returns all zeros if parsing fails.
 }
 \description{
-This function parses adducts
+This function parses mass spectrometry adduct notation strings
+into their components: multimer count, isotope shift, modifications,
+charge state, and charge sign. It handles complex adducts with multiple
+additions/losses.
 }
 \examples{
 \dontrun{
 parse_adduct("[M+H]+")
+parse_adduct("[2M+Na]+")
 parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")
 }
 }

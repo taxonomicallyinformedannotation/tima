@@ -14,21 +14,24 @@ filter_high_confidence_only(
 )
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame containing annotation results with score columns}
 
-\item{score_bio_min}{Minimal biological score. Current default to 0.85.}
+\item{score_bio_min}{Numeric minimum biological score threshold (default: 0.85)}
 
-\item{score_ini_min}{Minimal initial score. Current default to 0.95.}
+\item{score_ini_min}{Numeric minimum initial score threshold (default: 0.95)}
 
-\item{score_final_min}{Minimal final score. Current default to 0.75.}
+\item{score_final_min}{Numeric minimum final (chemical) score threshold (default: 0.75)}
 
-\item{error_rt_max}{Maximal RT error. Current default to 0.1.}
+\item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.1)}
 }
 \value{
-A dataframe containing only high confidence annotations
+Data frame containing only high-confidence annotations that meet
+at least one score threshold and pass RT error filtering
 }
 \description{
-This function filters highly confident annotations only.
+This function filters annotation results to retain only
+high-confidence candidates based on multiple scoring criteria
+(biological, initial, chemical) and retention time accuracy.
 }
 \examples{
 NULL

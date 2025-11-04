@@ -1,19 +1,22 @@
 #' @title Import spectra
 #'
-#' @description This function imports spectra from a file (.mgf or .sqlite)
+#' @description This function imports mass spectra from various file formats
+#'     (.mgf, .msp, .rds), harmonizes metadata field names, filters by MS level
+#'     and polarity, optionally combines replicate spectra, and sanitizes peak data.
 #'
 #' @include read_mgf_opti.R
 #' @include sanitize_spectra.R
 #'
-#' @param file File path of the spectrum file to be imported
-#' @param cutoff Absolute minimal intensity
-#' @param dalton Dalton tolerance
-#' @param polarity Polarity
-#' @param ppm PPM tolerance
-#' @param sanitize Flag indicating whether to sanitize. Default TRUE
-#' @param combine Flag indicating whether to combine Default TRUE
+#' @param file Character string path to the spectrum file (.mgf, .msp, or .rds)
+#' @param cutoff Numeric absolute minimal intensity threshold (default: 0)
+#' @param dalton Numeric Dalton tolerance for peak matching (default: 0.01)
+#' @param polarity Character string for polarity filtering: "pos", "neg", or NA
+#'     to keep all (default: NA)
+#' @param ppm Numeric PPM tolerance for peak matching (default: 10)
+#' @param sanitize Logical flag indicating whether to sanitize spectra (default: TRUE)
+#' @param combine Logical flag indicating whether to combine replicate spectra (default: TRUE)
 #'
-#' @return Spectra object containing the imported spectra
+#' @return Spectra object containing the imported and processed spectra
 #'
 #' @export
 #'
@@ -38,96 +41,117 @@ import_spectra <- function(
   sanitize = TRUE,
   combine = TRUE
 ) {
+  # Validate inputs
+  if (!file.exists(file)) {
+    stop("Spectra file not found: ", file)
+  }
+
+  if (!is.na(polarity) && !polarity %in% c("pos", "neg")) {
+    stop("Polarity must be 'pos', 'neg', or NA")
+  }
+
+  logger::log_info("Importing spectra from: ", file)
+
+  # Extract file extension (handle MassBank naming convention)
   file_ext <- file |>
     stringi::stri_replace_all_regex(
       pattern = ".*\\.",
       replacement = "",
       vectorize_all = FALSE
     ) |>
-    ## See https://github.com/MassBank/MassBank-data/issues/299
     stringi::stri_replace_all_regex(
       pattern = "_.*",
       replacement = "",
       vectorize_all = FALSE
     )
 
-  spectra <- switch(
-    EXPR = file_ext,
-    "mgf" = {
-      read_mgf_opti(f = file) |>
-        # MsBackendMgf::readMgfSplit(f = file) |>
-        Spectra::Spectra()
+  logger::log_debug("Detected file format: ", file_ext)
+
+  # Import spectra based on file format
+  spectra <- tryCatch(
+    {
+      switch(
+        EXPR = file_ext,
+        "mgf" = {
+          read_mgf_opti(f = file) |>
+            Spectra::Spectra()
+        },
+        "msp" = {
+          MsBackendMsp::readMsp(f = file) |>
+            Spectra::Spectra()
+        },
+        "rds" = {
+          readRDS(file = file)
+        },
+        stop(
+          "Unsupported file format: ",
+          file_ext,
+          ". Supported: mgf, msp, rds"
+        )
+      )
     },
-    "msp" = {
-      MsBackendMsp::readMsp(f = file) |>
-        Spectra::Spectra()
-    },
-    # "sqlite" = {
-    #   CompDb(x = file) |>
-    #     Spectra::Spectra() |>
-    #     setBackend(MsBackendMemory())
-    # },
-    "rds" = {
-      readRDS(file = file)
+    error = function(e) {
+      stop("Failed to import spectra: ", conditionMessage(e))
     }
   )
 
-  if (0 %in% spectra@backend@spectraData$precursorCharge) {
-    logger::log_warn("Spectra with charge = 0 found in the MGF.")
-    logger::log_warn("Considering them even if this should not be the case.")
+  logger::log_info("Loaded ", length(spectra), " spectra")
+
+  # Validate precursor charges
+  if (0L %in% spectra@backend@spectraData$precursorCharge) {
+    logger::log_warn(
+      "Found spectra with precursorCharge = 0. ",
+      "Treating as unknown polarity (should be avoided in practice)."
+    )
   }
 
-  ## Fix needed
+  # Harmonize metadata field names across different data sources
+  logger::log_trace("Harmonizing metadata field names")
+
   if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Harmonizing names")
-    spectra$msLevel <- spectra$MSLEVEL |>
-      as.integer()
+    spectra$msLevel <- as.integer(spectra$MSLEVEL)
   }
+
   if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Harmonizing names")
-    spectra$msLevel <- spectra$MS_LEVEL |>
-      as.integer()
+    spectra$msLevel <- as.integer(spectra$MS_LEVEL)
   }
 
   if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Harmonizing names")
-    spectra$precursorMz <- spectra$PRECURSOR_MZ |>
-      as.numeric()
+    spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
   }
 
   if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Harmonizing spectrum id")
-    spectra$spectrum_id <- spectra$spectrum_id |>
-      as.character()
+    spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
+  # Filter to MS2 spectra only
   if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Filtering MS2 only")
-    spectra <- spectra |>
-      Spectra::filterMsLevel(2L)
+    logger::log_trace("Filtering for MS2 spectra only")
+    spectra <- Spectra::filterMsLevel(spectra, 2L)
   }
-  ## In MassBank
+
+  # Handle MassBank-specific MS level field
   if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
-    logger::log_trace("Filtering MS2 only")
+    logger::log_trace("Filtering for MS2 spectra (MassBank format)")
     spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
   }
 
+  # Filter by polarity if specified
   if (!is.na(polarity)) {
-    spectra <- spectra |>
-      Spectra::filterPrecursorCharge(
-        ## COMMENT: Considering 0 as both polarities...suboptimal
-        ## But allows reading broken MGFs
-        z = if (polarity == "pos") {
-          c(0, 1, 2, 3)
-        } else {
-          c(0, -1, -2, -3)
-        }
-      )
+    logger::log_trace("Filtering for ", polarity, " polarity")
+    charge_values <- if (polarity == "pos") {
+      c(0L, 1L, 2L, 3L) # Include 0 for broken MGFs
+    } else {
+      c(0L, -1L, -2L, -3L)
+    }
+
+    spectra <- Spectra::filterPrecursorCharge(spectra, z = charge_values)
   }
 
+  # Combine replicate spectra if requested
   if (combine) {
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Combining spectra in case")
+      logger::log_trace("Combining spectra by FEATURE_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$FEATURE_ID,
@@ -135,9 +159,8 @@ import_spectra <- function(
           ppm = ppm
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
-    }
-    if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_trace("Combining spectra in case")
+    } else if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
+      logger::log_trace("Combining spectra by SLAW_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$SLAW_ID,
@@ -147,13 +170,19 @@ import_spectra <- function(
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
     }
   }
+
+  # Sanitize spectra if requested
   if (sanitize) {
-    spectra <- spectra |>
-      sanitize_spectra(
-        cutoff = cutoff,
-        dalton = dalton,
-        ppm = ppm
-      )
+    logger::log_trace("Sanitizing spectra")
+    spectra <- sanitize_spectra(
+      spectra = spectra,
+      cutoff = cutoff,
+      dalton = dalton,
+      ppm = ppm
+    )
   }
+
+  logger::log_info("Final spectrum count: ", length(spectra))
+
   return(spectra)
 }

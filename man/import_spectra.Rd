@@ -15,25 +15,28 @@ import_spectra(
 )
 }
 \arguments{
-\item{file}{File path of the spectrum file to be imported}
+\item{file}{Character string path to the spectrum file (.mgf, .msp, or .rds)}
 
-\item{cutoff}{Absolute minimal intensity}
+\item{cutoff}{Numeric absolute minimal intensity threshold (default: 0)}
 
-\item{dalton}{Dalton tolerance}
+\item{dalton}{Numeric Dalton tolerance for peak matching (default: 0.01)}
 
-\item{polarity}{Polarity}
+\item{polarity}{Character string for polarity filtering: "pos", "neg", or NA
+to keep all (default: NA)}
 
-\item{ppm}{PPM tolerance}
+\item{ppm}{Numeric PPM tolerance for peak matching (default: 10)}
 
-\item{sanitize}{Flag indicating whether to sanitize. Default TRUE}
+\item{sanitize}{Logical flag indicating whether to sanitize spectra (default: TRUE)}
 
-\item{combine}{Flag indicating whether to combine Default TRUE}
+\item{combine}{Logical flag indicating whether to combine replicate spectra (default: TRUE)}
 }
 \value{
-Spectra object containing the imported spectra
+Spectra object containing the imported and processed spectra
 }
 \description{
-This function imports spectra from a file (.mgf or .sqlite)
+This function imports mass spectra from various file formats
+(.mgf, .msp, .rds), harmonizes metadata field names, filters by MS level
+and polarity, optionally combines replicate spectra, and sanitizes peak data.
 }
 \examples{
 \dontrun{
