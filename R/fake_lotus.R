@@ -1,57 +1,76 @@
 #' @title Fake LOTUS
 #'
-#' @description This function fakes LOTUS in case the download failed
+#' @description This function creates a minimal fake LOTUS (natural products)
+#'     database file when the real download fails. Creates an empty TSV with
+#'     proper column structure to prevent pipeline failures during testing or
+#'     when external resources are unavailable.
 #'
-#' @param export Path to save the file to
+#' @param export Character string path where the fake LOTUS TSV file should be saved
 #'
-#' @return NULL
+#' @return Character string path to the created fake file
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' fake_lotus(export = "data/source/lotus.tsv.gz")
+#' }
 fake_lotus <- function(export) {
-  logger::log_error("External failure. Returning empty file instead.")
-  tidytable::tidytable(
-    structure_wikidata = NA,
-    structure_inchikey = NA,
-    structure_inchi = NA,
-    structure_smiles = NA,
-    structure_molecular_formula = NA,
-    structure_exact_mass = NA,
-    structure_xlogp = NA,
-    structure_smiles_2D = NA,
-    structure_cid = NA,
-    structure_nameIupac = NA,
-    structure_nameTraditional = NA,
-    structure_stereocenters_total = NA,
-    structure_stereocenters_unspecified = NA,
-    structure_taxonomy_npclassifier_01pathway = NA,
-    structure_taxonomy_npclassifier_02superclass = NA,
-    structure_taxonomy_npclassifier_03class = NA,
-    structure_taxonomy_classyfire_chemontid = NA,
-    structure_taxonomy_classyfire_01kingdom = NA,
-    structure_taxonomy_classyfire_02superclass = NA,
-    structure_taxonomy_classyfire_03class = NA,
-    structure_taxonomy_classyfire_04directparent = NA,
-    organism_wikidata = NA,
-    organism_name = NA,
-    organism_taxonomy_gbifid = NA,
-    organism_taxonomy_ncbiid = NA,
-    organism_taxonomy_ottid = NA,
-    organism_taxonomy_01domain = NA,
-    organism_taxonomy_02kingdom = NA,
-    organism_taxonomy_03phylum = NA,
-    organism_taxonomy_04class = NA,
-    organism_taxonomy_05order = NA,
-    organism_taxonomy_06family = NA,
-    organism_taxonomy_07tribe = NA,
-    organism_taxonomy_08genus = NA,
-    organism_taxonomy_09species = NA,
-    organism_taxonomy_10varietas = NA,
-    reference_wikidata = NA,
-    reference_doi = NA,
-    manual_validation = NA
-  ) |>
-    tidytable::fwrite(export)
+  # Validate input
+  if (missing(export) || !is.character(export) || length(export) != 1L) {
+    stop("export path must be a single character string")
+  }
+
+  logger::log_warn(
+    "LOTUS download failed. Creating empty placeholder file with proper structure."
+  )
+
+  # Create empty data frame with all expected LOTUS columns
+  fake_data <- tidytable::tidytable(
+    structure_wikidata = character(0),
+    structure_inchikey = character(0),
+    structure_inchi = character(0),
+    structure_smiles = character(0),
+    structure_molecular_formula = character(0),
+    structure_exact_mass = numeric(0),
+    structure_xlogp = numeric(0),
+    structure_smiles_2D = character(0),
+    structure_cid = character(0),
+    structure_nameIupac = character(0),
+    structure_nameTraditional = character(0),
+    structure_stereocenters_total = integer(0),
+    structure_stereocenters_unspecified = integer(0),
+    structure_taxonomy_npclassifier_01pathway = character(0),
+    structure_taxonomy_npclassifier_02superclass = character(0),
+    structure_taxonomy_npclassifier_03class = character(0),
+    structure_taxonomy_classyfire_chemontid = character(0),
+    structure_taxonomy_classyfire_01kingdom = character(0),
+    structure_taxonomy_classyfire_02superclass = character(0),
+    structure_taxonomy_classyfire_03class = character(0),
+    structure_taxonomy_classyfire_04directparent = character(0),
+    organism_wikidata = character(0),
+    organism_name = character(0),
+    organism_taxonomy_gbifid = character(0),
+    organism_taxonomy_ncbiid = character(0),
+    organism_taxonomy_ottid = character(0),
+    organism_taxonomy_01domain = character(0),
+    organism_taxonomy_02kingdom = character(0),
+    organism_taxonomy_03phylum = character(0),
+    organism_taxonomy_04class = character(0),
+    organism_taxonomy_05order = character(0),
+    organism_taxonomy_06family = character(0),
+    organism_taxonomy_07tribe = character(0),
+    organism_taxonomy_08genus = character(0),
+    organism_taxonomy_09species = character(0),
+    organism_taxonomy_10varietas = character(0),
+    reference_wikidata = character(0),
+    reference_doi = character(0),
+    manual_validation = logical(0)
+  )
+
+  # Write to file
+  tidytable::fwrite(fake_data, export)
+
+  logger::log_debug("Created fake LOTUS file at: ", export)
   return(export)
 }

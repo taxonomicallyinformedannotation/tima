@@ -7,11 +7,18 @@
 fake_ecmdb(export)
 }
 \arguments{
-\item{export}{Path to save the file to}
+\item{export}{Character string path where the fake ECMDB zip file should be saved}
+}
+\value{
+Character string path to the created fake file
 }
 \description{
-This function fakes ECMDB in case the download failed
+This function creates a minimal fake ECMDB JSON file when the
+real download fails. Used as a fallback to prevent pipeline failures
+during testing or when external resources are unavailable.
 }
 \examples{
-NULL
+\dontrun{
+fake_ecmdb(export = "data/source/ecmdb.json.zip")
+}
 }

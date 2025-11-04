@@ -10,18 +10,28 @@ get_example_files(
 )
 }
 \arguments{
-\item{example}{The example(s) you want to download}
+\item{example}{Character vector specifying which example files to download.
+Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"}
 
-\item{in_cache}{Flag to indicate if storing the files in cache}
+\item{in_cache}{Logical whether to store files in the cache directory (default: TRUE)}
 }
 \value{
-Example files.
+NULL (invisibly). Downloads files as a side effect.
 }
 \description{
-This function downloads example files
+This function downloads example data files for testing and
+demonstration purposes. Supports downloading features, metadata, SIRIUS
+annotations, mass spectra, and spectral libraries with retention times.
 }
 \examples{
 \dontrun{
-get_example_files(example = c("features"), in_cache = FALSE)
+# Download features and metadata examples
+get_example_files(example = c("features", "metadata"))
+
+# Download all example files to cache
+get_example_files(
+  example = c("features", "metadata", "sirius", "spectra"),
+  in_cache = TRUE
+)
 }
 }

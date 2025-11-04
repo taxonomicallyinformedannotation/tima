@@ -10,13 +10,20 @@ get_example_sirius(
 )
 }
 \arguments{
-\item{url}{URL where the example is accessible}
+\item{url}{List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)}
 
-\item{export}{Path where to save the example}
+\item{export}{List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)}
+}
+\value{
+NULL (invisibly). Downloads files as a side effect.
 }
 \description{
-This function gets example SIRIUS annotations
+This function downloads example SIRIUS annotation files for
+testing and demonstration purposes. Downloads both SIRIUS v5 and v6
+format files.
 }
 \examples{
-NULL
+\dontrun{
+get_example_sirius()
+}
 }

@@ -289,21 +289,115 @@ weight_annotations <- function(
   pattern = get_params(step = "weight_annotations")$files$pattern,
   force = get_params(step = "weight_annotations")$options$force
 ) {
-  stopifnot(
-    "Annotations file(s) do(es) not exist" = all(
-      purrr::map(.x = annotations, .f = file.exists) |>
-        unlist()
+  # Validate file paths
+  required_files <- list(
+    library = library,
+    components = components,
+    edges = edges,
+    taxa = taxa
+  )
+
+  for (file_name in names(required_files)) {
+    file_path <- required_files[[file_name]]
+    if (!file.exists(file_path)) {
+      stop("Required file not found: ", file_name, " at ", file_path)
+    }
+  }
+
+  # Validate annotations (can be multiple files)
+  missing_annotations <- annotations[!file.exists(annotations)]
+  if (length(missing_annotations) > 0L) {
+    stop(
+      "Annotation file(s) not found: ",
+      paste(missing_annotations, collapse = ", ")
     )
+  }
+
+  # Validate minimal_ms1_condition
+  if (!minimal_ms1_condition %in% c("OR", "AND")) {
+    stop(
+      "minimal_ms1_condition must be 'OR' or 'AND', got: ",
+      minimal_ms1_condition
+    )
+  }
+
+  # Validate weights sum to 1
+  weight_sum <- weight_spectral + weight_chemical + weight_biological
+  if (abs(weight_sum - 1.0) > 0.001) {
+    stop(
+      "Weights must sum to 1.0, got: ",
+      weight_sum,
+      " (spectral: ",
+      weight_spectral,
+      ", chemical: ",
+      weight_chemical,
+      ", biological: ",
+      weight_biological,
+      ")"
+    )
+  }
+
+  # Validate all weights are non-negative
+  if (weight_spectral < 0 || weight_chemical < 0 || weight_biological < 0) {
+    stop("All weights must be non-negative")
+  }
+
+  # Validate score parameters are in valid range
+  score_params <- list(
+    minimal_consistency = minimal_consistency,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo
   )
-  stopifnot("Your library file does not exist." = file.exists(library))
-  stopifnot("Your components file does not exist." = file.exists(components))
-  stopifnot("Your edges file does not exist." = file.exists(edges))
-  stopifnot("Your taxa file does not exist." = file.exists(taxa))
-  stopifnot(
-    "Condition must be 'OR' or 'AND'." = minimal_ms1_condition %in%
-      c("OR", "AND")
+
+  for (param_name in names(score_params)) {
+    param_value <- score_params[[param_name]]
+    if (!is.numeric(param_value) || param_value < 0 || param_value > 1) {
+      stop(param_name, " must be between 0 and 1, got: ", param_value)
+    }
+  }
+
+  # Validate logical parameters
+  logical_params <- list(
+    ms1_only = ms1_only,
+    compounds_names = compounds_names,
+    high_confidence = high_confidence,
+    remove_ties = remove_ties,
+    summarize = summarize,
+    force = force
   )
-  logger::log_trace("Loading files ...")
+
+  for (param_name in names(logical_params)) {
+    if (!is.logical(logical_params[[param_name]])) {
+      stop(param_name, " must be logical (TRUE/FALSE)")
+    }
+  }
+
+  # Validate candidates parameters
+  if (!is.numeric(candidates_neighbors) || candidates_neighbors < 1) {
+    stop("candidates_neighbors must be a positive integer")
+  }
+
+  if (!is.numeric(candidates_final) || candidates_final < 1) {
+    stop("candidates_final must be a positive integer")
+  }
+
+  logger::log_info("Starting annotation weighting and scoring")
+  logger::log_debug(
+    "Weights - Spectral: ",
+    weight_spectral,
+    ", Chemical: ",
+    weight_chemical,
+    ", Biological: ",
+    weight_biological
+  )
+  logger::log_debug(
+    "Candidates - Neighbors: ",
+    candidates_neighbors,
+    ", Final: ",
+    candidates_final
+  )
+
+  logger::log_trace("Loading input files...")
 
   logger::log_trace("... components")
   components_table <- tidytable::fread(
