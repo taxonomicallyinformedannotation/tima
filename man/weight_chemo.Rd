@@ -21,43 +21,37 @@ weight_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_bio_clean}{Table containing the biologically
-weighted annotation}
+\item{annot_table_wei_bio_clean}{Data frame with cleaned biologically weighted annotations}
 
-\item{weight_spectral}{Weight for the spectral score}
+\item{weight_spectral}{Numeric weight for spectral similarity score (0-1)}
 
-\item{weight_biological}{Weight for the biological score}
+\item{weight_biological}{Numeric weight for biological source score (0-1)}
 
-\item{weight_chemical}{Weight for the chemical consistency score}
+\item{weight_chemical}{Numeric weight for chemical consistency score (0-1)}
 
-\item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match
-(should be lower than \verb{ Classyfire superclass})}
+\item{score_chemical_cla_kingdom}{Numeric score for ClassyFire kingdom match}
 
-\item{score_chemical_cla_superclass}{Score for a \verb{Classyfire superclass}
-match
-(should be lower than \verb{Classyfire class})}
+\item{score_chemical_cla_superclass}{Numeric score for ClassyFire superclass match}
 
-\item{score_chemical_cla_class}{Score for a \verb{Classyfire class} match
-(should be lower than \verb{Classyfire parent})}
+\item{score_chemical_cla_class}{Numeric score for ClassyFire class match}
 
-\item{score_chemical_cla_parent}{Score for a \verb{Classyfire parent} match
-(should be the highest)}
+\item{score_chemical_cla_parent}{Numeric score for ClassyFire parent match (highest)}
 
-\item{score_chemical_npc_pathway}{Score for a \code{pathway} match
-(should be lower than \code{superclass})}
+\item{score_chemical_npc_pathway}{Numeric score for NPC pathway match}
 
-\item{score_chemical_npc_superclass}{Score for a \code{superclass} match
-(should be lower than \code{class})}
+\item{score_chemical_npc_superclass}{Numeric score for NPC superclass match}
 
-\item{score_chemical_npc_class}{Score for a \code{class} match
-(should be the highest)}
+\item{score_chemical_npc_class}{Numeric score for NPC class match (highest)}
 }
 \value{
-A table containing the chemically weighted annotation
+Data frame containing chemically weighted annotations with
+chemical consistency scores and final weighted scores
 }
 \description{
-This function weights the biologically weighted annotations
-according their chemical consistency
+This function weights biologically weighted annotations according
+to their chemical consistency by comparing chemical taxonomy (ClassyFire,
+NPClassifier) across molecular network neighbors. Higher chemical
+consistency within network components results in higher chemical scores.
 }
 \examples{
 NULL
