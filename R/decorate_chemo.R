@@ -49,10 +49,16 @@ decorate_chemo <- function(
     envir = parent.frame()
   )
 ) {
-  required_cols <- c("score_chemical", "candidate_structure_inchikey_connectivity_layer")
+  required_cols <- c(
+    "score_chemical",
+    "candidate_structure_inchikey_connectivity_layer"
+  )
   missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
   if (length(missing_cols) > 0) {
-    logger::log_warn("decorate_chemo: missing expected columns: %s", paste(missing_cols, collapse = ", "))
+    logger::log_warn(
+      "decorate_chemo: missing expected columns: %s",
+      paste(missing_cols, collapse = ", ")
+    )
     return(annot_table_wei_chemo)
   }
 

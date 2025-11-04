@@ -7,20 +7,31 @@
 run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
 }
 \arguments{
-\item{host}{Host. Default to 127.0.0.1}
+\item{host}{Character string specifying the host/IP address to listen on.
+Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.}
 
-\item{port}{Port. Default to 3838}
+\item{port}{Integer port number to listen on. Default: 3838}
 
-\item{browser}{Flag for browser use. Default to TRUE}
+\item{browser}{Logical whether to automatically launch a web browser when
+starting the app. Default: TRUE. Automatically set to FALSE in Docker.}
 }
 \value{
-Opens the app
+NULL (invisibly). Launches the Shiny app as a side effect.
 }
 \description{
-This function runs the app
+This function launches the TIMA Shiny web application for
+interactive metabolite annotation. It automatically detects if running
+inside a Docker container and adjusts network settings accordingly.
 }
 \examples{
 \dontrun{
+# Launch app on localhost
 run_app()
+
+# Launch on custom port
+run_app(port = 8080)
+
+# Allow external connections
+run_app(host = "0.0.0.0", port = 3838)
 }
 }

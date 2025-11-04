@@ -11,20 +11,27 @@ read_mgf_opti(
 )
 }
 \arguments{
-\item{f}{A character string specifying the path to a single MGF file.}
+\item{f}{Character string specifying the path to a single MGF file}
 
-\item{msLevel}{An integer specifying the MS level. Default is 2L.}
+\item{msLevel}{Integer MS level to assign to spectra (default: 2L for MS2)}
 
-\item{mapping}{A named character vector mapping MGF fields to standard spectra variables.
-Defaults to \code{Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())}.}
+\item{mapping}{Named character vector mapping MGF field names to standard
+spectra variable names. Default uses the mapping from MsBackendMgf.}
 }
 \value{
-A \code{DataFrame} containing the parsed spectra data.
+A DataFrame containing the parsed spectra data with standardized
+variable names
 }
 \description{
-This function reads a Mascot Generic Format (MGF) file while mimicking the
-\code{MsBackendMgf} implementation but using significantly lower memory,
-making it more suitable for large MGF files.
+This function reads a Mascot Generic Format (MGF) file using an
+optimized, memory-efficient approach. It mimics the \code{MsBackendMgf}
+implementation but uses significantly lower memory, making it suitable
+for processing large MGF files that might otherwise cause memory issues.
+}
+\details{
+The function processes spectra in batches to minimize memory usage
+and avoid loading the entire file into memory at once. It extracts all
+MGF fields and maps them to standard spectra variable names.
 }
 \examples{
 NULL

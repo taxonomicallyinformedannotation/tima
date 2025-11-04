@@ -7,15 +7,24 @@
 split_tables_sop(table, cache)
 }
 \arguments{
-\item{table}{Table to split}
+\item{table}{Data frame containing combined structure-organism pair data with
+columns for structures (SMILES, InChI, names), organisms, and references}
 
-\item{cache}{Cache where already processed SMILES are located}
+\item{cache}{Character string path to cache file where previously processed
+SMILES are stored, or NULL to skip caching}
 }
 \value{
-A list of tables from the structure organism pairs tables
+A list of normalized data frames:
+\item{table_keys}{Structure-organism pairs with reference DOIs}
+\item{table_structures_stereo}{Structure stereochemistry information}
+\item{table_organisms}{Organism taxonomy information}
+\item{table_structural}{Processed and standardized structure data}
 }
 \description{
-This function splits the structure organism table.
+This function splits a concatenated structure-organism pairs (SOP)
+table into separate standardized tables for structures, organisms, and their
+relationships. It processes SMILES strings, standardizes chemical structures,
+and creates normalized reference tables.
 }
 \examples{
 NULL

@@ -13,21 +13,30 @@ minimize_results(
 )
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame containing full annotation results with scores and
+chemical taxonomy predictions}
 
-\item{features_table}{Prepared features file}
+\item{features_table}{Data frame of features to join with minimized results}
 
-\item{min_score_classes}{Minimal score to keep classes}
+\item{min_score_classes}{Numeric minimum score threshold (0-1) for keeping
+chemical classifications (default: 0.6)}
 
-\item{min_score_compounds}{Minimal score to keep compounds}
+\item{min_score_compounds}{Numeric minimum score threshold (0-1) for keeping
+compound identifications (default: 0.4)}
 
-\item{best_percentile}{Best percentile}
+\item{best_percentile}{Numeric percentile threshold (0-1) for selecting top
+candidates within each feature (default: 0.9, keeps candidates with scores
+>= 90\% of the maximum score for that feature)}
 }
 \value{
-A minimized table
+A minimized data frame with features joined to their best chemical
+classifications and top compound identifications
 }
 \description{
-This function minimizes results
+This function minimizes annotation results by filtering to the
+most confident chemical classifications and compound identifications.
+It extracts the best-scoring chemical taxonomy predictions and the top
+compound candidates based on weighted chemical scores.
 }
 \examples{
 NULL

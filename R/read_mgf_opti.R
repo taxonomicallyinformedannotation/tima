@@ -68,16 +68,23 @@
 
 #' @title Read MGF opti
 #'
-#' @description This function reads a Mascot Generic Format (MGF) file while mimicking the
-#' `MsBackendMgf` implementation but using significantly lower memory,
-#' making it more suitable for large MGF files.
+#' @description This function reads a Mascot Generic Format (MGF) file using an
+#'     optimized, memory-efficient approach. It mimics the `MsBackendMgf`
+#'     implementation but uses significantly lower memory, making it suitable
+#'     for processing large MGF files that might otherwise cause memory issues.
 #'
-#' @param f A character string specifying the path to a single MGF file.
-#' @param msLevel An integer specifying the MS level. Default is 2L.
-#' @param mapping A named character vector mapping MGF fields to standard spectra variables.
-#' Defaults to `Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())`.
+#' @details The function processes spectra in batches to minimize memory usage
+#'     and avoid loading the entire file into memory at once. It extracts all
+#'     MGF fields and maps them to standard spectra variable names.
 #'
-#' @return A `DataFrame` containing the parsed spectra data.
+#' @param f Character string specifying the path to a single MGF file
+#' @param msLevel Integer MS level to assign to spectra (default: 2L for MS2)
+#' @param mapping Named character vector mapping MGF field names to standard
+#'     spectra variable names. Default uses the mapping from MsBackendMgf.
+#'
+#' @return A DataFrame containing the parsed spectra data with standardized
+#'     variable names
+#'
 #' @examples NULL
 #' @export
 read_mgf_opti <- function(
@@ -85,13 +92,33 @@ read_mgf_opti <- function(
   msLevel = 2L,
   mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())
 ) {
-  requireNamespace("MsBackendMgf", quietly = TRUE)
-  if (length(f) != 1L) {
-    logger::log_fatal(
-      "Please provide a single MGF file."
-    )
-    stop()
+  # Validate inputs
+  if (missing(f) || is.null(f) || length(f) == 0L) {
+    stop("File path 'f' must be provided")
   }
+
+  if (length(f) != 1L) {
+    stop(
+      "Please provide a single MGF file. For multiple files, call this function separately for each."
+    )
+  }
+
+  if (!file.exists(f)) {
+    stop("MGF file not found: ", f)
+  }
+
+  if (!is.numeric(msLevel) || msLevel < 1L) {
+    stop("msLevel must be a positive integer")
+  }
+
+  if (!requireNamespace("MsBackendMgf", quietly = TRUE)) {
+    stop("Package 'MsBackendMgf' is required but not installed")
+  }
+
+  logger::log_info(
+    "Reading MGF file with optimized memory-efficient parser: ",
+    f
+  )
 
   sp_list <- list()
   current_spectrum <- list()

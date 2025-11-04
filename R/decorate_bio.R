@@ -58,16 +58,24 @@ decorate_bio <- function(
     envir = parent.frame()
   )
 ) {
-  required_cols <- c("score_biological", "candidate_structure_inchikey_connectivity_layer")
+  required_cols <- c(
+    "score_biological",
+    "candidate_structure_inchikey_connectivity_layer"
+  )
   missing_cols <- setdiff(required_cols, names(annot_table_wei_bio))
   if (length(missing_cols) > 0) {
-    logger::log_warn("decorate_bio: missing expected columns: %s", paste(missing_cols, collapse = ", "))
+    logger::log_warn(
+      "decorate_bio: missing expected columns: %s",
+      paste(missing_cols, collapse = ", ")
+    )
     return(annot_table_wei_bio)
   }
 
   # Helper function to count unique structures at a given score threshold
   count_structures_at_level <- function(df, min_score) {
-    if (nrow(df) == 0) return(0L)
+    if (nrow(df) == 0) {
+      return(0L)
+    }
     df |>
       tidytable::filter(score_biological >= min_score) |>
       tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>

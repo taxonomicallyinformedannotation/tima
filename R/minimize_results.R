@@ -1,13 +1,23 @@
 #' @title Minimize results
 #'
-#' @description This function minimizes results
+#' @description This function minimizes annotation results by filtering to the
+#'     most confident chemical classifications and compound identifications.
+#'     It extracts the best-scoring chemical taxonomy predictions and the top
+#'     compound candidates based on weighted chemical scores.
 #'
-#' @param df Dataframe
-#' @param features_table Prepared features file
-#' @param min_score_classes Minimal score to keep classes
-#' @param min_score_compounds Minimal score to keep compounds
-#' @param best_percentile Best percentile
-#' @return A minimized table
+#' @param df Data frame containing full annotation results with scores and
+#'     chemical taxonomy predictions
+#' @param features_table Data frame of features to join with minimized results
+#' @param min_score_classes Numeric minimum score threshold (0-1) for keeping
+#'     chemical classifications (default: 0.6)
+#' @param min_score_compounds Numeric minimum score threshold (0-1) for keeping
+#'     compound identifications (default: 0.4)
+#' @param best_percentile Numeric percentile threshold (0-1) for selecting top
+#'     candidates within each feature (default: 0.9, keeps candidates with scores
+#'     >= 90% of the maximum score for that feature)
+#'
+#' @return A minimized data frame with features joined to their best chemical
+#'     classifications and top compound identifications
 #'
 #' @examples NULL
 minimize_results <- function(
@@ -17,8 +27,41 @@ minimize_results <- function(
   min_score_compounds = 0.4,
   best_percentile = 0.9
 ) {
-  logger::log_trace(
-    "Minimizing results"
+  # Validate inputs
+  if (!is.data.frame(df) && !inherits(df, "tbl")) {
+    stop("Input 'df' must be a data frame or tibble")
+  }
+
+  if (!is.data.frame(features_table) && !inherits(features_table, "tbl")) {
+    stop("Input 'features_table' must be a data frame or tibble")
+  }
+
+  if (nrow(df) == 0L) {
+    logger::log_warn("Empty annotation results provided")
+    return(features_table)
+  }
+
+  # Validate score thresholds
+  if (min_score_classes < 0 || min_score_classes > 1) {
+    stop("min_score_classes must be between 0 and 1")
+  }
+
+  if (min_score_compounds < 0 || min_score_compounds > 1) {
+    stop("min_score_compounds must be between 0 and 1")
+  }
+
+  if (best_percentile < 0 || best_percentile > 1) {
+    stop("best_percentile must be between 0 and 1")
+  }
+
+  logger::log_trace("Minimizing annotation results")
+  logger::log_debug(
+    "Thresholds - Classes: ",
+    min_score_classes,
+    ", Compounds: ",
+    min_score_compounds,
+    ", Percentile: ",
+    best_percentile
   )
   df_classes <- df |>
     tidytable::select(tidytable::contains(c("feature_id", "feature_pred"))) |>

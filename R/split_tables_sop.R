@@ -1,20 +1,45 @@
 #' @title Split Structure Organism Pairs table
 #'
-#' @description This function splits the structure organism table.
+#' @description This function splits a concatenated structure-organism pairs (SOP)
+#'     table into separate standardized tables for structures, organisms, and their
+#'     relationships. It processes SMILES strings, standardizes chemical structures,
+#'     and creates normalized reference tables.
 #'
 #' @include clean_collapse.R
 #' @include process_smiles.R
 #'
-#' @param table Table to split
-#' @param cache Cache where already processed SMILES are located
+#' @param table Data frame containing combined structure-organism pair data with
+#'     columns for structures (SMILES, InChI, names), organisms, and references
+#' @param cache Character string path to cache file where previously processed
+#'     SMILES are stored, or NULL to skip caching
 #'
-#' @return A list of tables from the structure organism pairs tables
+#' @return A list of normalized data frames:
+#'   \item{table_keys}{Structure-organism pairs with reference DOIs}
+#'   \item{table_structures_stereo}{Structure stereochemistry information}
+#'   \item{table_organisms}{Organism taxonomy information}
+#'   \item{table_structural}{Processed and standardized structure data}
 #'
 #' @examples NULL
 split_tables_sop <- function(table, cache) {
-  logger::log_trace(
-    "Splitting the concatenated library into smaller standardized pieces"
+  # Validate inputs
+  if (!is.data.frame(table) && !inherits(table, "tbl")) {
+    stop("Input 'table' must be a data frame or tibble")
+  }
+
+  if (nrow(table) == 0L) {
+    logger::log_warn("Empty table provided to split_tables_sop")
+    return(list(
+      table_keys = tidytable::tidytable(),
+      table_structures_stereo = tidytable::tidytable(),
+      table_organisms = tidytable::tidytable(),
+      table_structural = tidytable::tidytable()
+    ))
+  }
+
+  logger::log_info(
+    "Splitting concatenated SOP library into standardized components"
   )
+  logger::log_debug("Input table has ", nrow(table), " rows")
 
   table <- table |>
     tidytable::mutate(
