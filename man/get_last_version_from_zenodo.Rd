@@ -7,29 +7,30 @@
 get_last_version_from_zenodo(doi, pattern, path)
 }
 \arguments{
-\item{doi}{DOI of the Zenodo record}
+\item{doi}{Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")}
 
-\item{pattern}{Pattern to identify the file to download}
+\item{pattern}{Character string pattern to identify the specific file to download}
 
-\item{path}{Path to save the file to}
+\item{path}{Character string local path where the file should be saved}
 }
 \value{
-The path to the file
+Character string path to the downloaded file
 }
 \description{
-This function gets the last version
-of a file from a Zenodo record
+This function retrieves the latest version of a file from a
+Zenodo repository record. It checks the file size and only downloads
+if the local file is missing or differs from the remote version.
 }
 \details{
-Credit goes to partially to
-https://inbo.github.io/inborutils/
+Credit goes partially to https://inbo.github.io/inborutils/
+This function handles the new Zenodo API format and file structure.
 }
 \examples{
 \dontrun{
 get_last_version_from_zenodo(
   doi = "10.5281/zenodo.5794106",
   pattern = "frozen.csv.gz",
-  path = "frozen.csv.gz"
+  path = "data/frozen.csv.gz"
 )
 }
 }

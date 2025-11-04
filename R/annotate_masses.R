@@ -102,14 +102,74 @@ annotate_masses <-
       step = "annotate_masses"
     )$ms$tolerances$rt$adducts
   ) {
-    stopifnot("Your ppm tolerance must be <= 20" = tolerance_ppm <= 20)
-    stopifnot("Your rt tolerance must be <= 0.05" = tolerance_rt <= 0.05)
+    # Validate file paths
+    required_files <- list(
+      features = features,
+      library = library,
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    )
+
+    for (file_name in names(required_files)) {
+      file_path <- required_files[[file_name]]
+      if (!file.exists(file_path)) {
+        stop("Required file not found: ", file_name, " at ", file_path)
+      }
+    }
+
+    # Validate MS mode
+    if (!ms_mode %in% c("pos", "neg")) {
+      stop("ms_mode must be either 'pos' or 'neg', got: ", ms_mode)
+    }
+
+    # Validate tolerances
+    if (
+      !is.numeric(tolerance_ppm) || tolerance_ppm <= 0 || tolerance_ppm > 20
+    ) {
+      stop(
+        "tolerance_ppm must be a positive number <= 20, got: ",
+        tolerance_ppm
+      )
+    }
+
+    if (!is.numeric(tolerance_rt) || tolerance_rt <= 0 || tolerance_rt > 0.05) {
+      stop(
+        "tolerance_rt must be a positive number <= 0.05, got: ",
+        tolerance_rt
+      )
+    }
+
+    # Validate adducts, clusters, and neutral losses lists
+    if (!is.list(adducts_list) || is.null(adducts_list[[ms_mode]])) {
+      stop("adducts_list must contain '", ms_mode, "' mode adducts")
+    }
+
+    if (!is.list(clusters_list) || is.null(clusters_list[[ms_mode]])) {
+      stop("clusters_list must contain '", ms_mode, "' mode clusters")
+    }
+
+    logger::log_info("Starting mass-based annotation in ", ms_mode, " mode")
+    logger::log_debug(
+      "Tolerances: ",
+      tolerance_ppm,
+      " ppm, ",
+      tolerance_rt,
+      " min RT"
+    )
 
     features_table <- tidytable::fread(
       file = features,
       na.strings = c("", "NA"),
       colClasses = "character"
     )
+
+    if (nrow(features_table) == 0L) {
+      logger::log_warn("Empty features table provided")
+      return(list(annotations = output_annotations, edges = output_edges))
+    }
 
     if (ms_mode == "pos") {
       adducts <- adducts_list$pos

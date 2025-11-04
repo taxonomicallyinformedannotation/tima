@@ -1,29 +1,32 @@
 #' @title Harmonize spectra
 #'
-#' @description This function harmonizes spectra headers
+#' @description This function harmonizes spectra header fields by mapping
+#'     library-specific column names to standardized field names. It handles
+#'     different naming conventions across spectral libraries and ensures
+#'     consistent metadata structure.
 #'
 #' @param spectra Spectra object to be harmonized
-#' @param metad Metadata to identify the library
+#' @param metad Metadata to identify the library source
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
-#' @param col_ad Name of the adduct in mgf
-#' @param col_ce Name of the collision energy in mgf
-#' @param col_ci Name of the compound id in mgf
-#' @param col_em Name of the exact mass in mgf
-#' @param col_in Name of the InChI in mgf
-#' @param col_io Name of the InChI without stereo in mgf
-#' @param col_ik Name of the InChIKey in mgf
-#' @param col_il Name of the InChIKey without stereo in mgf
-#' @param col_mf Name of the molecular formula in mgf
-#' @param col_na Name of the name in mgf
-#' @param col_po Name of the polarity in mgf
-#' @param col_sm Name of the SMILES in mgf
-#' @param col_sn Name of the SMILES without stereo in mgf
-#' @param col_si Name of the spectrum id in mgf
-#' @param col_sp Name of the SPLASH in mgf
-#' @param col_sy Name of the synonyms in mgf
-#' @param col_xl Name of the xlogp in mgf
+#' @param col_ad Name of the adduct field in the input spectra
+#' @param col_ce Name of the collision energy field
+#' @param col_ci Name of the compound ID field
+#' @param col_em Name of the exact mass field
+#' @param col_in Name of the InChI field
+#' @param col_io Name of the InChI without stereochemistry field
+#' @param col_ik Name of the InChIKey field
+#' @param col_il Name of the InChIKey connectivity layer field
+#' @param col_mf Name of the molecular formula field
+#' @param col_na Name of the compound name field
+#' @param col_po Name of the polarity field
+#' @param col_sm Name of the SMILES field
+#' @param col_sn Name of the SMILES without stereochemistry field
+#' @param col_si Name of the spectrum ID field
+#' @param col_sp Name of the SPLASH field
+#' @param col_sy Name of the synonyms field
+#' @param col_xl Name of the xLogP field
 #'
-#' @return The harmonized spectra
+#' @return The harmonized Spectra object with standardized field names
 #'
 #' @examples NULL
 harmonize_spectra <- function(
@@ -48,6 +51,45 @@ harmonize_spectra <- function(
   col_sy = get("col_sy", envir = parent.frame()),
   col_xl = get("col_xl", envir = parent.frame())
 ) {
+  # Validate spectra object
+  if (!inherits(spectra, "Spectra")) {
+    stop("Input 'spectra' must be a Spectra object")
+  }
+
+  # Validate mode contains pos or neg
+  if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
+    stop("Mode must contain 'pos' or 'neg', got: ", mode)
+  }
+
+  # Validate all column name parameters are character strings
+  col_params <- list(
+    col_ad = col_ad,
+    col_ce = col_ce,
+    col_ci = col_ci,
+    col_em = col_em,
+    col_in = col_in,
+    col_io = col_io,
+    col_ik = col_ik,
+    col_il = col_il,
+    col_mf = col_mf,
+    col_na = col_na,
+    col_po = col_po,
+    col_sm = col_sm,
+    col_sn = col_sn,
+    col_si = col_si,
+    col_sp = col_sp,
+    col_sy = col_sy,
+    col_xl = col_xl
+  )
+
+  for (param_name in names(col_params)) {
+    param_value <- col_params[[param_name]]
+    if (!is.character(param_value) || length(param_value) != 1L) {
+      stop(param_name, " must be a single character string")
+    }
+  }
+
+  logger::log_trace("Harmonizing spectra headers for mode: ", mode)
   columns <- c(
     "adduct",
     "collision_energy",

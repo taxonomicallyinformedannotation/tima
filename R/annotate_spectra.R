@@ -62,22 +62,69 @@ annotate_spectra <- function(
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
-  stopifnot("Your input file does not exist." = file.exists(input))
-  stopifnot("Polarity must be 'pos' or 'neg'." = polarity %in% c("pos", "neg"))
-  ## Check if libraries exist
-  stopifnot(
-    "Library file(s) do(es) not exist" = all(
-      purrr::map(.x = libraries, .f = file.exists) |>
-        unlist()
-    )
-  )
-
-  ## Not checking for ppm and Da limits, everyone is free.
-  if (length(libraries) > 1) {
-    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
+  # Validate input file
+  if (!file.exists(input)) {
+    stop("Input file not found: ", input)
   }
 
-  logger::log_trace("Loading spectra")
+  # Validate polarity
+  if (!polarity %in% c("pos", "neg")) {
+    stop("Polarity must be 'pos' or 'neg', got: ", polarity)
+  }
+
+  # Validate libraries
+  if (length(libraries) == 0L) {
+    stop("At least one library must be provided")
+  }
+
+  missing_libs <- libraries[!file.exists(libraries)]
+  if (length(missing_libs) > 0L) {
+    stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
+  }
+
+  # Validate numeric parameters
+  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
+    stop("Threshold must be between 0 and 1, got: ", threshold)
+  }
+
+  if (!is.numeric(ppm) || ppm <= 0) {
+    stop("PPM tolerance must be positive, got: ", ppm)
+  }
+
+  if (!is.numeric(dalton) || dalton <= 0) {
+    stop("Dalton tolerance must be positive, got: ", dalton)
+  }
+
+  if (!is.numeric(qutoff) || qutoff < 0) {
+    stop("Intensity cutoff must be non-negative, got: ", qutoff)
+  }
+
+  # Validate logical parameters
+  if (!is.logical(approx)) {
+    stop("approx must be logical (TRUE/FALSE)")
+  }
+
+  logger::log_info("Starting spectral annotation in ", polarity, " mode")
+  logger::log_debug("Similarity threshold: ", threshold, ", method: ", method)
+  logger::log_debug("Tolerances: ", ppm, " ppm, ", dalton, " Da")
+
+  # Filter libraries by polarity if multiple provided
+  if (length(libraries) > 1) {
+    original_count <- length(libraries)
+    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
+    logger::log_debug(
+      "Filtered libraries by polarity: ",
+      original_count,
+      " -> ",
+      length(libraries)
+    )
+
+    if (length(libraries) == 0L) {
+      stop("No libraries match the specified polarity: ", polarity)
+    }
+  }
+
+  logger::log_trace("Loading query spectra from: ", input)
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,

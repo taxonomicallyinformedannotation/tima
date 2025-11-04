@@ -30,49 +30,52 @@ harmonize_spectra(
 \arguments{
 \item{spectra}{Spectra object to be harmonized}
 
-\item{metad}{Metadata to identify the library}
+\item{metad}{Metadata to identify the library source}
 
 \item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
 
-\item{col_ad}{Name of the adduct in mgf}
+\item{col_ad}{Name of the adduct field in the input spectra}
 
-\item{col_ce}{Name of the collision energy in mgf}
+\item{col_ce}{Name of the collision energy field}
 
-\item{col_ci}{Name of the compound id in mgf}
+\item{col_ci}{Name of the compound ID field}
 
-\item{col_em}{Name of the exact mass in mgf}
+\item{col_em}{Name of the exact mass field}
 
-\item{col_in}{Name of the InChI in mgf}
+\item{col_in}{Name of the InChI field}
 
-\item{col_io}{Name of the InChI without stereo in mgf}
+\item{col_io}{Name of the InChI without stereochemistry field}
 
-\item{col_ik}{Name of the InChIKey in mgf}
+\item{col_ik}{Name of the InChIKey field}
 
-\item{col_il}{Name of the InChIKey without stereo in mgf}
+\item{col_il}{Name of the InChIKey connectivity layer field}
 
-\item{col_mf}{Name of the molecular formula in mgf}
+\item{col_mf}{Name of the molecular formula field}
 
-\item{col_na}{Name of the name in mgf}
+\item{col_na}{Name of the compound name field}
 
-\item{col_po}{Name of the polarity in mgf}
+\item{col_po}{Name of the polarity field}
 
-\item{col_sm}{Name of the SMILES in mgf}
+\item{col_sm}{Name of the SMILES field}
 
-\item{col_sn}{Name of the SMILES without stereo in mgf}
+\item{col_sn}{Name of the SMILES without stereochemistry field}
 
-\item{col_si}{Name of the spectrum id in mgf}
+\item{col_si}{Name of the spectrum ID field}
 
-\item{col_sp}{Name of the SPLASH in mgf}
+\item{col_sp}{Name of the SPLASH field}
 
-\item{col_sy}{Name of the synonyms in mgf}
+\item{col_sy}{Name of the synonyms field}
 
-\item{col_xl}{Name of the xlogp in mgf}
+\item{col_xl}{Name of the xLogP field}
 }
 \value{
-The harmonized spectra
+The harmonized Spectra object with standardized field names
 }
 \description{
-This function harmonizes spectra headers
+This function harmonizes spectra header fields by mapping
+library-specific column names to standardized field names. It handles
+different naming conventions across spectral libraries and ensures
+consistent metadata structure.
 }
 \examples{
 NULL

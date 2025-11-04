@@ -7,12 +7,17 @@
 read_from_sirius_zip(sirius_zip, file)
 }
 \arguments{
-\item{sirius_zip}{Compressed directory containing the Sirius results}
+\item{sirius_zip}{Character string path to compressed SIRIUS workspace (.zip)}
 
-\item{file}{File to be read}
+\item{file}{Character string pattern to match files within the archive}
+}
+\value{
+Data frame (tidytable) containing the parsed file contents
 }
 \description{
-This function reads files from Sirius compressed workspace
+This function reads specific files from a compressed SIRIUS
+workspace directory. It handles file selection, filtering empty files,
+and parsing tab-delimited data.
 }
 \examples{
 NULL

@@ -7,11 +7,19 @@
 fake_lotus(export)
 }
 \arguments{
-\item{export}{Path to save the file to}
+\item{export}{Character string path where the fake LOTUS TSV file should be saved}
+}
+\value{
+Character string path to the created fake file
 }
 \description{
-This function fakes LOTUS in case the download failed
+This function creates a minimal fake LOTUS (natural products)
+database file when the real download fails. Creates an empty TSV with
+proper column structure to prevent pipeline failures during testing or
+when external resources are unavailable.
 }
 \examples{
-NULL
+\dontrun{
+fake_lotus(export = "data/source/lotus.tsv.gz")
+}
 }
