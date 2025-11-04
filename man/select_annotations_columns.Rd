@@ -14,23 +14,28 @@ select_annotations_columns(
 )
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame containing annotation results with structure and
+candidate information}
 
-\item{str_stereo}{File containing structures stereo}
+\item{str_stereo}{Character string path to file containing structure stereochemistry}
 
-\item{str_met}{File containing structures metadata}
+\item{str_met}{Character string path to file containing structure metadata}
 
-\item{str_nam}{File containing structures names}
+\item{str_nam}{Character string path to file containing structure names}
 
-\item{str_tax_cla}{File containing Classyfire taxonomy}
+\item{str_tax_cla}{Character string path to file containing Classyfire taxonomy}
 
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
+\item{str_tax_npc}{Character string path to file containing NPClassifier taxonomy}
 }
 \value{
-The dataframe with annotation columns selected
+Data frame with standardized annotation columns, cleaned values,
+and complemented metadata
 }
 \description{
-This function selects annotations columns
+This function selects and standardizes annotation columns by
+filtering to relevant fields, cleaning NULL/NA values, rounding numeric
+values, and complementing with structure metadata. Used to prepare
+annotation results for downstream analysis.
 }
 \examples{
 NULL

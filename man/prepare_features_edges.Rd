@@ -13,19 +13,23 @@ prepare_features_edges(
 )
 }
 \arguments{
-\item{input}{Input file if 'manual'}
+\item{input}{Named list containing paths to edge files. Must have "ms1" and
+"spectral" elements pointing to respective edge files.}
 
-\item{output}{Output file}
+\item{output}{Character string path where prepared edges should be saved}
 
-\item{name_source}{Name of the source features column}
+\item{name_source}{Character string name of the source feature column in input files}
 
-\item{name_target}{Name of the target features column}
+\item{name_target}{Character string name of the target feature column in input files}
 }
 \value{
-The path to the prepared edges
+Character string path to the prepared edges file
 }
 \description{
-This function prepares edges for further use
+This function prepares molecular network edges by combining
+MS1-based and spectral similarity edges, adding entropy information,
+and standardizing column names. Edges represent relationships between
+features in the molecular network.
 }
 \examples{
 \dontrun{
