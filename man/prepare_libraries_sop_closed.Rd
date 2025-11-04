@@ -12,15 +12,18 @@ prepare_libraries_sop_closed(
 )
 }
 \arguments{
-\item{input}{Input file}
+\item{input}{Character string path to input closed library file}
 
-\item{output}{Output file}
+\item{output}{Character string path where prepared library should be saved}
 }
 \value{
-The path to the prepared structure-organism pairs library CLOSED
+Character string path to the prepared structure-organism pairs library
 }
 \description{
-Prepare libraries of structure organism pairs CLOSED
+This function prepares closed (private/restricted) structure-
+organism pair libraries by formatting columns, rounding values, and
+standardizing structure. Falls back to an empty template if the closed
+resource is not accessible.
 }
 \examples{
 \dontrun{

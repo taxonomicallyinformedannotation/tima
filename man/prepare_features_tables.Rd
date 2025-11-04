@@ -15,25 +15,29 @@ prepare_features_tables(
 )
 }
 \arguments{
-\item{features}{Path to the file containing the features data}
+\item{features}{Character string path to raw features file}
 
-\item{output}{Path to the file to export the merged data to}
+\item{output}{Character string path where prepared features should be saved}
 
-\item{candidates}{Number of samples to be retained per feature top intensities}
+\item{candidates}{Integer number of top-intensity samples to retain per feature
+(recommended: ≤5 to reduce data size while keeping representative samples)}
 
-\item{name_adduct}{Name of the adduct column in the features data}
+\item{name_adduct}{Character string name of the adduct column in input}
 
-\item{name_features}{Name of the features column in the features data}
+\item{name_features}{Character string name of the feature ID column in input}
 
-\item{name_rt}{Name of the retention time column in the features data}
+\item{name_rt}{Character string name of the retention time column in input}
 
-\item{name_mz}{Name of the m/z column in the features data}
+\item{name_mz}{Character string name of the m/z column in input}
 }
 \value{
-The path to the prepared feature table
+Character string path to the prepared feature table
 }
 \description{
-This function prepares features
+This function prepares LC-MS feature tables by standardizing
+column names, filtering to top intensity samples per feature, and
+formatting data for downstream analysis. Supports multiple input formats
+(MZmine, SLAW, SIRIUS).
 }
 \examples{
 \dontrun{
