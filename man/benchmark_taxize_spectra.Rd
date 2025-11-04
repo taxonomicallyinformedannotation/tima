@@ -7,22 +7,25 @@
 benchmark_taxize_spectra(input, keys, org_tax_ott, output)
 }
 \arguments{
-\item{input}{Initial features}
+\item{input}{Character string path to the initial features file}
 
-\item{keys}{SOP keys}
+\item{keys}{Character string path to the structure-organism pair (SOP) keys file}
 
-\item{org_tax_ott}{Taxonomy}
+\item{org_tax_ott}{Character string path to the organism taxonomy (OTT) file}
 
-\item{output}{Prepared features}
+\item{output}{Character string path for the taxed benchmark output file}
 }
 \value{
-The path to the taxed benchmark
+Character string path to the taxed benchmark file
 }
 \description{
-This function adds taxa to the benchmark
+This function adds taxonomic information to benchmark features
+by linking them to structure-organism pairs and organism taxonomy data.
+For features with multiple organism associations, one is randomly selected.
 }
 \details{
-Because they are still quite dirty
+Benchmark data often lacks clean taxonomic assignments. This function
+performs a controlled joining process with random sampling for ambiguous cases.
 }
 \examples{
 NULL

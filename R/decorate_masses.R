@@ -1,29 +1,40 @@
 #' @title Decorate masses
 #'
-#' @description This function outputs information about MS1 annotation
+#' @description This function logs summary statistics about MS1-based
+#'     annotations, reporting the number of unique structures and features
+#'     annotated
 #'
-#' @param annotation_table_ms1 Table to decorate
+#' @param annotation_table_ms1 Data frame containing MS1 annotation results
+#'     with columns for feature_id and candidate_structure_inchikey_connectivity_layer
 #'
-#' @return Message indicating the number of annotations obtained by MS1
+#' @return The input annotation table (unchanged), for use in pipelines
 #'
 #' @examples NULL
 decorate_masses <- function(
   annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
 ) {
-  df_1 <- annotation_table_ms1 |>
+  # Filter for valid annotations (not NA and not "notAnnotated")
+  valid_annotations <- annotation_table_ms1 |>
     tidytable::filter(
-      !is.na(candidate_structure_inchikey_connectivity_layer) |
+      !is.na(candidate_structure_inchikey_connectivity_layer) &
         candidate_structure_inchikey_connectivity_layer != "notAnnotated"
     )
+
+  # Count unique structures and features
+  n_unique_structures <- valid_annotations |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
+    nrow()
+
+  n_unique_features <- valid_annotations |>
+    tidytable::distinct(feature_id) |>
+    nrow()
+
+  # Log summary
   logger::log_info(
-    "MS1 annotation led to {nrow(
-      df_1 |>
-        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-    )} annotations on {nrow(
-      df_1 |>
-        tidytable::distinct(feature_id)
-    )} features"
+    "MS1 annotation results: ",
+    n_unique_structures, " unique structures annotated across ",
+    n_unique_features, " features"
   )
-  rm(df_1)
+
   return(annotation_table_ms1)
 }

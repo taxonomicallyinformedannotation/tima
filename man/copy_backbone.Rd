@@ -7,13 +7,25 @@
 copy_backbone(cache_dir = fs::path_home(".tima"), package = "tima")
 }
 \arguments{
-\item{cache_dir}{Cache directory}
+\item{cache_dir}{Character string path to the cache directory
+(default: "~/.tima" in user's home directory)}
 
-\item{package}{Package}
+\item{package}{Character string name of the package (default: "tima")}
+}
+\value{
+NULL (invisibly). Creates cache directory structure as side effect.
 }
 \description{
-This function copies backbone
+This function copies the package backbone (default directory
+structure, configuration files, and parameters) to a cache directory.
+This sets up the working environment for TIMA workflows.
 }
 \examples{
-NULL
+\dontrun{
+# Copy to default cache location
+copy_backbone()
+
+# Copy to custom location
+copy_backbone(cache_dir = "~/my_tima_cache")
+}
 }

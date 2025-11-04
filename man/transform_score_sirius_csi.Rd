@@ -2,23 +2,37 @@
 % Please edit documentation in R/transform_score_sirius_csi.R
 \name{transform_score_sirius_csi}
 \alias{transform_score_sirius_csi}
-\title{Transform score sirius CSI}
+\title{Transform SIRIUS CSI score}
 \usage{
 transform_score_sirius_csi(csi_score, K = 50, scale = 10)
 }
 \arguments{
-\item{csi_score}{Original CSI score}
+\item{csi_score}{Numeric SIRIUS CSI score (can be negative)}
 
-\item{K}{Shift}
+\item{K}{Numeric shift parameter to adjust the sigmoid center (default: 50)}
 
-\item{scale}{Scale}
+\item{scale}{Numeric scale parameter controlling sigmoid steepness (default: 10)}
 }
 \value{
-A mass
+Numeric transformed score in the range (0, 1)
 }
 \description{
-This function calculates the mass of M
+This function transforms SIRIUS CSI (Compound Structure Identification)
+scores using a sigmoid function. The transformation maps raw scores to a
+0-1 range for better interpretability.
+}
+\details{
+This is an experimental transformation not officially approved by
+SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
 }
 \examples{
-NULL
+# Transform a single score
+transform_score_sirius_csi(csi_score = -20)
+
+# Transform with custom parameters
+transform_score_sirius_csi(csi_score = -20, K = 30, scale = 5)
+
+# Vectorized transformation
+scores <- c(-50, -20, 0, 20, 50)
+transform_score_sirius_csi(csi_score = scores)
 }

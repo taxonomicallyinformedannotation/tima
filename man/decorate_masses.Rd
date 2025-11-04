@@ -9,13 +9,16 @@ decorate_masses(
 )
 }
 \arguments{
-\item{annotation_table_ms1}{Table to decorate}
+\item{annotation_table_ms1}{Data frame containing MS1 annotation results
+with columns for feature_id and candidate_structure_inchikey_connectivity_layer}
 }
 \value{
-Message indicating the number of annotations obtained by MS1
+The input annotation table (unchanged), for use in pipelines
 }
 \description{
-This function outputs information about MS1 annotation
+This function logs summary statistics about MS1-based
+annotations, reporting the number of unique structures and features
+annotated
 }
 \examples{
 NULL

@@ -7,14 +7,23 @@
 go_to_cache(dir = ".tima")
 }
 \arguments{
-\item{dir}{Directory}
+\item{dir}{Character string name of the cache directory (default: ".tima").
+Will be created in the user's home directory.}
 }
 \value{
-Goes to cache
+NULL (invisibly). Changes working directory as side effect.
 }
 \description{
-This function goes to cache
+This function creates a cache directory in the user's home
+directory (if it doesn't exist) and changes the working directory to it.
+Useful for storing temporary files and intermediate results.
 }
 \examples{
-NULL
+\dontrun{
+# Create and navigate to cache directory
+go_to_cache()
+
+# Use custom cache directory name
+go_to_cache(dir = ".my_cache")
+}
 }
