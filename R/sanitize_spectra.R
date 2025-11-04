@@ -80,7 +80,11 @@ sanitize_spectra <- function(
   )
   spectra <- spectra[!has_null]
 
-  logger::log_info("Retained ", length(spectra), " valid spectra after sanitization")
+  logger::log_info(
+    "Retained ",
+    length(spectra),
+    " valid spectra after sanitization"
+  )
 
   return(spectra)
 }

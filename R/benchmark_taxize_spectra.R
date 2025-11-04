@@ -64,7 +64,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     )
 
   logger::log_trace("Sampling features with multiple organism associations")
-  set.seed(42L)  # Reproducible sampling
+  set.seed(42L) # Reproducible sampling
 
   # For features with organism data: randomly select one per feature
   # For features without organism data: keep as-is
@@ -97,7 +97,9 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     )
 
   logger::log_info(
-    "Added taxonomy to ", nrow(features_taxed), " benchmark features"
+    "Added taxonomy to ",
+    nrow(features_taxed),
+    " benchmark features"
   )
 
   export_output(x = features_taxed, file = output)

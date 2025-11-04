@@ -32,8 +32,10 @@ decorate_masses <- function(
   # Log summary
   logger::log_info(
     "MS1 annotation results: ",
-    n_unique_structures, " unique structures annotated across ",
-    n_unique_features, " features"
+    n_unique_structures,
+    " unique structures annotated across ",
+    n_unique_features,
+    " features"
   )
 
   return(annotation_table_ms1)

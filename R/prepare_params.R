@@ -1,6 +1,8 @@
 #' @title Prepare params
 #'
-#' @description This function prepares main parameters
+#' @description This function prepares and validates main parameters for the
+#'     TIMA workflow. It loads YAML configuration files, extracts all parameters,
+#'     and sets up the parameter structure for downstream analysis steps.
 #'
 #' @export
 #'
@@ -9,11 +11,11 @@
 #' @include get_params.R
 #' @include load_yaml_files.R
 #'
-#' @param params_small params_small
-#' @param params_advanced params_advanced
-#' @param step Step
+#' @param params_small List of basic parameters for the workflow
+#' @param params_advanced List of advanced parameters for the workflow
+#' @param step Character string specifying the workflow step (default: NA)
 #'
-#' @return The path to the yaml files containing prepared parameters
+#' @return Character vector of paths to YAML files containing prepared parameters
 #'
 #' @examples NULL
 prepare_params <- function(
@@ -21,10 +23,25 @@ prepare_params <- function(
   params_advanced = get_params(step = "prepare_params_advanced"),
   step = NA
 ) {
-  list <- load_yaml_files()
-  yamls_params <- list$yamls_params
+  # Validate inputs
+  if (!is.list(params_small)) {
+    stop("params_small must be a list")
+  }
 
-  logger::log_trace("All params")
+  if (!is.list(params_advanced)) {
+    stop("params_advanced must be a list")
+  }
+
+  logger::log_trace("Loading YAML parameter files")
+
+  # Load all YAML parameter files
+  yaml_data <- load_yaml_files()
+  yamls_params <- yaml_data$yamls_params
+
+  logger::log_debug("Loaded ", length(yamls_params), " parameter sets")
+  logger::log_trace("Extracting and validating all parameters")
+
+  # Extract annotation parameters
   ann_can_fin <- params_advanced$annotations$candidates$final
   ann_can_nei <- params_advanced$annotations$candidates$neighbors
   ann_can_sam <- params_advanced$annotations$candidates$samples
@@ -34,8 +51,10 @@ prepare_params <- function(
   ann_thr_ms1_bio <- params_advanced$annotations$thresholds$ms1$biological
   ann_thr_ms1_che <- params_advanced$annotations$thresholds$ms1$chemical
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
+
   # fil_pat <- params_advanced$files$pattern
-  # fil_ann_raw_spe <- params_advanced$files$annotations$raw$spectral
+
+  # Extract file paths - annotations
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
   # fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
@@ -48,8 +67,12 @@ prepare_params <- function(
   fil_ann_pre_str_spe <- params_advanced$files$annotations$prepared$structural$spectral
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
+
+  # Extract file paths - features
   # fil_fea_raw <- params_advanced$files$features$raw
   fil_fea_pre <- params_advanced$files$features$prepared
+
+  # Extract file paths - libraries (structure-organism pairs)
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
   fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
@@ -71,6 +94,8 @@ prepare_params <- function(
   fil_lib_sop_mer_str_nam <- params_advanced$files$libraries$sop$merged$structures$names
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
+
+  # Extract file paths - spectral libraries
   fil_lib_spe_neg <- params_advanced$files$libraries$spectral$neg
   fil_lib_spe_pos <- params_advanced$files$libraries$spectral$pos
   fil_lib_spe_raw <- params_advanced$files$libraries$spectral$raw
@@ -82,16 +107,22 @@ prepare_params <- function(
   fil_lib_tem_is_mgf_pos <- params_advanced$files$libraries$temporal$is$mgf$pos
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
   # fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
+
+  # Extract file paths - networks
   fil_net_spe_edg_raw_ms1 <- params_advanced$files$networks$spectral$edges$raw$ms1
   fil_net_spe_edg_raw_spe <- params_advanced$files$networks$spectral$edges$raw$spectral
   fil_net_spe_edg_pre <- params_advanced$files$networks$spectral$edges$prepared
   fil_net_spe_com_raw <- params_advanced$files$networks$spectral$components$raw
   fil_net_spe_com_pre <- params_advanced$files$networks$spectral$components$prepared
+
+  # Extract file paths - metadata
   # fil_met_raw <- params_advanced$files$metadata$raw
   fil_met_pre <- params_advanced$files$metadata$prepared
-  # fil_spe_raw <- params_advanced$files$spectral$raw
+
   # gnps_id <- params_advanced$gnps$id
   # gnps_workflow <- params_advanced$gnps$workflow
+
+  # Extract MS parameters
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
   ms_clu_neg <- params_advanced$ms$clusters$neg

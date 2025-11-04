@@ -11,20 +11,21 @@ clean_bio(
 )
 }
 \arguments{
-\item{annot_table_wei_bio}{Table containing your
-biologically weighted annotation}
+\item{annot_table_wei_bio}{Data frame containing biologically weighted annotations}
 
-\item{edges_table}{Table containing the edges between features}
+\item{edges_table}{Data frame containing network edges between features}
 
-\item{minimal_consistency}{Minimal consistency score for a class. FLOAT}
+\item{minimal_consistency}{Numeric minimum consistency score (0-1) required
+to retain a classification at each taxonomic level}
 }
 \value{
-A table containing the biologically weighted annotation
-where only a given number of initial candidates are kept
+Data frame containing filtered biologically weighted annotations
+with consistency scores
 }
 \description{
-This function cleans the results
-obtained after biological weighting
+This function cleans and filters biologically weighted
+annotation results by calculating chemical consistency scores across
+network neighbors. Only features with at least 2 neighbors are evaluated.
 }
 \examples{
 NULL

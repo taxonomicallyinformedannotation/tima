@@ -45,12 +45,19 @@ export_params <- function(
   logger::log_info("Exporting parameters to: ", filepath)
 
   # Write parameters to YAML file
-  tryCatch({
-    yaml::write_yaml(x = parameters, file = filepath)
-    logger::log_debug("Successfully exported ", length(parameters), " parameters")
-  }, error = function(e) {
-    stop("Failed to export parameters: ", conditionMessage(e))
-  })
+  tryCatch(
+    {
+      yaml::write_yaml(x = parameters, file = filepath)
+      logger::log_debug(
+        "Successfully exported ",
+        length(parameters),
+        " parameters"
+      )
+    },
+    error = function(e) {
+      stop("Failed to export parameters: ", conditionMessage(e))
+    }
+  )
 
   invisible(NULL)
 }

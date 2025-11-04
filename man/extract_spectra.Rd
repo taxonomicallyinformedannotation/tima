@@ -7,13 +7,16 @@
 extract_spectra(object)
 }
 \arguments{
-\item{object}{Object of class Spectra}
+\item{object}{Spectra object from the Spectra package}
 }
 \value{
-Data frame containing spectra data
+Data frame containing harmonized spectra metadata with additional
+mz and intensity list columns containing peak data
 }
 \description{
-This function extracts spectra from a \code{Spectra}object
+This function extracts and harmonizes spectra data from a
+Spectra object into a flat data frame format. It handles column name
+inconsistencies, type conversions, and extracts peak lists (mz/intensity).
 }
 \examples{
 NULL

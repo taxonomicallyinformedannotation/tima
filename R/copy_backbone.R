@@ -40,24 +40,30 @@ copy_backbone <- function(
 
   # Create cache directory
   logger::log_info("Creating cache directory at: ", cache_dir)
-  tryCatch({
-    fs::dir_create(path = cache_dir)
-  }, error = function(e) {
-    stop("Failed to create cache directory: ", conditionMessage(e))
-  })
+  tryCatch(
+    {
+      fs::dir_create(path = cache_dir)
+    },
+    error = function(e) {
+      stop("Failed to create cache directory: ", conditionMessage(e))
+    }
+  )
 
   # Copy package structure to cache
   logger::log_trace("Copying package backbone from: ", pkg_path)
-  tryCatch({
-    fs::dir_copy(
-      path = pkg_path,
-      new_path = cache_dir,
-      overwrite = TRUE
-    )
-    logger::log_info("Successfully copied package backbone to cache")
-  }, error = function(e) {
-    stop("Failed to copy package backbone: ", conditionMessage(e))
-  })
+  tryCatch(
+    {
+      fs::dir_copy(
+        path = pkg_path,
+        new_path = cache_dir,
+        overwrite = TRUE
+      )
+      logger::log_info("Successfully copied package backbone to cache")
+    },
+    error = function(e) {
+      stop("Failed to copy package backbone: ", conditionMessage(e))
+    }
+  )
 
   invisible(NULL)
 }
