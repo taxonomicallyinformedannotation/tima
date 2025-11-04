@@ -2,16 +2,28 @@
 % Please edit documentation in R/get_spectra_ids.R
 \name{get_spectra_ids}
 \alias{get_spectra_ids}
-\title{Get Spectra ids}
+\title{Get Spectra IDs}
 \usage{
 get_spectra_ids(spectra)
 }
 \arguments{
-\item{spectra}{Spectra.}
+\item{spectra}{Spectra object from the Spectra package}
+}
+\value{
+Character vector of spectrum IDs, or NULL if no valid ID field found
 }
 \description{
-This function extracts spectra IDs as they are yet not consistently named
+This function extracts spectrum identifiers from a Spectra object.
+Since different data sources use different field names for spectrum IDs,
+this function checks multiple common field names in priority order.
+}
+\details{
+Checks for ID fields in this order: SLAW_ID, FEATURE_ID,
+acquisitionNum, spectrum_id. Returns the first valid field found.
 }
 \examples{
-NULL
+\dontrun{
+# Extract IDs from Spectra object
+spec_ids <- get_spectra_ids(my_spectra)
+}
 }

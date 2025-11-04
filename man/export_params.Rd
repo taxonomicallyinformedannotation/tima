@@ -11,15 +11,21 @@ export_params(
 )
 }
 \arguments{
-\item{parameters}{list of parameters to be exported}
+\item{parameters}{Named list of parameters to be exported}
 
-\item{directory}{directory where the YAML file will be saved}
+\item{directory}{Character string path to the directory where the YAML file
+will be saved (default: data/interim/params/)}
 
-\item{step}{step identifier to be included in the YAML file name}
+\item{step}{Character string step identifier to be included in the YAML
+file name (required)}
+}
+\value{
+NULL (invisibly). Creates YAML file as side effect.
 }
 \description{
-This function writes the parameters
-to a YAML file in the specified directory.
+This function writes parameter configurations to a timestamped
+YAML file for reproducibility and tracking. Each export includes the
+step identifier and exact timestamp.
 }
 \examples{
 NULL

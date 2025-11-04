@@ -7,19 +7,22 @@
 sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, ppm = 10)
 }
 \arguments{
-\item{spectra}{Spectra object}
+\item{spectra}{Spectra object from the Spectra package}
 
-\item{cutoff}{Absolute minimal intensity}
+\item{cutoff}{Numeric absolute minimal intensity threshold (default: 0).
+Peaks below this intensity are removed.}
 
-\item{dalton}{Dalton tolerance}
+\item{dalton}{Numeric Dalton tolerance for peak matching (default: 0.01)}
 
-\item{ppm}{PPM tolerance}
+\item{ppm}{Numeric PPM tolerance for peak matching (default: 10)}
 }
 \value{
-The sanitized spectra
+A sanitized Spectra object with noise and artifacts removed
 }
 \description{
-This function sanitizes spectra
+This function sanitizes MS spectra by removing noise, artifacts,
+precursor peaks, and empty spectra. It applies multiple cleaning steps
+including intensity filtering, peak reduction, and normalization.
 }
 \examples{
 \dontrun{
