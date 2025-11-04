@@ -54,7 +54,7 @@ clean_bio <- function(
     )
 
   logger::log_trace(
-    "Calculating chemical consistency for features with ≥2 neighbors"
+    "Calculating chemical consistency for features with at least 2 neighbors"
   )
 
   # Filter edges: keep features with at least 2 neighbors
