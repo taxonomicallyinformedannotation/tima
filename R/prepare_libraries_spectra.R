@@ -82,6 +82,46 @@ prepare_libraries_spectra <-
     col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
     col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
   ) {
+    # Validate polarity
+    if (!is.character(polarity) || length(polarity) != 1L) {
+      stop("polarity must be a single character string")
+    }
+
+    if (!polarity %in% c("pos", "neg")) {
+      stop("polarity must be 'pos' or 'neg', got: ", polarity)
+    }
+
+    # Validate column name parameters (all should be character strings)
+    col_params <- list(
+      col_ad = col_ad,
+      col_ce = col_ce,
+      col_ci = col_ci,
+      col_em = col_em,
+      col_in = col_in,
+      col_io = col_io,
+      col_ik = col_ik,
+      col_il = col_il,
+      col_mf = col_mf,
+      col_na = col_na,
+      col_po = col_po,
+      col_sm = col_sm,
+      col_sn = col_sn,
+      col_si = col_si,
+      col_sp = col_sp,
+      col_sy = col_sy,
+      col_xl = col_xl
+    )
+
+    for (param_name in names(col_params)) {
+      param_value <- col_params[[param_name]]
+      if (!is.character(param_value) || length(param_value) != 1L) {
+        stop(param_name, " must be a single character string")
+      }
+    }
+
+    logger::log_info("Preparing spectral libraries")
+    logger::log_debug("Polarity: ", polarity)
+
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")

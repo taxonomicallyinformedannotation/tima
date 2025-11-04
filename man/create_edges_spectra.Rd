@@ -19,32 +19,33 @@ create_edges_spectra(
 )
 }
 \arguments{
-\item{input}{Query file containing spectra. Currently an '.mgf' file}
+\item{input}{Character string path to query MGF file containing spectra}
 
-\item{output}{Output file.}
+\item{output}{Character string path for output edges file}
 
-\item{name_source}{Name of the source features column}
+\item{name_source}{Character string name of source feature column}
 
-\item{name_target}{Name of the target features column}
+\item{name_target}{Character string name of target feature column}
 
-\item{method}{Similarity method}
+\item{method}{Character string similarity method to use}
 
-\item{threshold}{Minimal similarity to report}
+\item{threshold}{Numeric minimum similarity threshold (0-1) to report edge}
 
-\item{matched_peaks}{Minimal number of matched peaks}
+\item{matched_peaks}{Integer minimum number of matched peaks required}
 
-\item{ppm}{Relative ppm tolerance to be used}
+\item{ppm}{Numeric relative mass tolerance in ppm}
 
-\item{dalton}{Absolute Dalton tolerance to be used}
+\item{dalton}{Numeric absolute mass tolerance in Daltons}
 
-\item{qutoff}{Intensity under which ms2 fragments will be removed.}
+\item{qutoff}{Numeric intensity cutoff below which MS2 fragments are removed}
 }
 \value{
-The path to the created spectral edges
+Character string path to the created spectral edges file
 }
 \description{
-This function create edges
-based on fragmentation spectra similarity
+This function creates molecular network edges based on MS2
+fragmentation spectra similarity. Compares all spectra against each
+other using spectral similarity metrics to identify related features.
 }
 \examples{
 \dontrun{

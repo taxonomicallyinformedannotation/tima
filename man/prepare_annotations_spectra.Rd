@@ -22,26 +22,28 @@ prepare_annotations_spectra(
 )
 }
 \arguments{
-\item{input}{Input file}
+\item{input}{Character string path to spectral matching results file}
 
-\item{output}{Output file}
+\item{output}{Character string path for prepared spectral annotations output}
 
-\item{str_stereo}{File containing structures stereo}
+\item{str_stereo}{Character string path to structures stereochemistry file}
 
-\item{str_met}{File containing structures metadata}
+\item{str_met}{Character string path to structures metadata file}
 
-\item{str_nam}{File containing structures names}
+\item{str_nam}{Character string path to structures names file}
 
-\item{str_tax_cla}{File containing Classyfire taxonomy}
+\item{str_tax_cla}{Character string path to ClassyFire taxonomy file}
 
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
+\item{str_tax_npc}{Character string path to NPClassifier taxonomy file}
 }
 \value{
-The path to the prepared spectral annotations
+Character string path to prepared spectral annotations
 }
 \description{
-This function prepares the spectral matches
-obtained previously to make them compatible
+This function prepares MS2 spectral library matching results
+by standardizing column names, integrating structure metadata, and
+formatting for downstream TIMA annotation workflows. Handles various
+spectral matching result formats.
 }
 \examples{
 \dontrun{
@@ -52,11 +54,7 @@ repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 data_interim <- "data/interim/"
 dir <- paste0(github, repo)
 input <- get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral |>
-  gsub(
-    pattern = ".tsv.gz",
-    replacement = "_pos.tsv",
-    fixed = TRUE
-  )
+  gsub(pattern = ".tsv.gz", replacement = "_pos.tsv", fixed = TRUE)
 get_file(url = paste0(dir, input), export = input)
 dir <- paste0(dir, data_interim)
 prepare_annotations_spectra(

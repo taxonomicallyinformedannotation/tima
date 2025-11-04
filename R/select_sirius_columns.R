@@ -1,16 +1,34 @@
 #' @title Select sirius columns (canopus)
 #'
-#' @description This function selects sirius columns (canopus)
+#' @description This function selects and standardizes CANOPUS chemical
+#'     classification columns from SIRIUS results, mapping SIRIUS-specific
+#'     column names to TIMA standard names for downstream processing.
 #'
 #' @include harmonize_names_sirius.R
 #'
-#' @param df Dataframe
-#' @param sirius_version Sirius version
+#' @param df Data frame with SIRIUS CANOPUS results
+#' @param sirius_version Character string SIRIUS version ("5" or "6")
 #'
-#' @return The dataframe with selected canopus columns
+#' @return Data frame with standardized CANOPUS column names
 #'
 #' @examples NULL
 select_sirius_columns_canopus <- function(df, sirius_version) {
+  # Validate inputs
+  if (!is.data.frame(df)) {
+    stop("df must be a data frame")
+  }
+
+  if (nrow(df) == 0L) {
+    logger::log_warn("Empty CANOPUS data frame")
+    return(df)
+  }
+
+  if (!sirius_version %in% c("5", "6", 5, 6)) {
+    stop("sirius_version must be '5' or '6', got: ", sirius_version)
+  }
+
+  logger::log_trace("Selecting CANOPUS columns for SIRIUS v", sirius_version)
+
   df <- df |>
     tidytable::mutate(
       feature_id = switch(

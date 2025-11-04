@@ -7,10 +7,14 @@
 tima_full()
 }
 \value{
-Everything you need.
+NULL (invisibly). Runs complete workflow as side effect and saves
+timestamped log files.
 }
 \description{
-This function runs everything you need.
+This function runs the complete TIMA annotation workflow from
+start to finish, including all preparation, library loading, annotation,
+weighting, and output steps. Executes the full targets pipeline and
+saves logs with timestamps.
 }
 \examples{
 \dontrun{

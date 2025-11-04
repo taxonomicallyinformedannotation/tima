@@ -11,15 +11,18 @@ prepare_libraries_sop_ecmdb(
 )
 }
 \arguments{
-\item{input}{Input file}
+\item{input}{Character string path to ECMDB JSON zip file}
 
-\item{output}{Output file}
+\item{output}{Character string path for prepared ECMDB library output}
 }
 \value{
-The path to the prepared structure-organism pairs library ECMDB
+Character string path to prepared ECMDB structure-organism pairs
 }
 \description{
-Prepare libraries of structure organism pairs ECMDB
+This function prepares ECMDB (E. coli Metabolome Database)
+structure-organism pairs by parsing JSON data, extracting metabolite
+information, and formatting for TIMA workflows. Handles E. coli
+metabolite data with structures.
 }
 \examples{
 \dontrun{
