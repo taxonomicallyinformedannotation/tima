@@ -15,27 +15,28 @@ summarize_results(
 )
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame containing weighted annotation results}
 
-\item{features_table}{Prepared features file}
+\item{features_table}{Data frame with feature metadata (RT, m/z, etc.)}
 
-\item{components_table}{Prepared components file}
+\item{components_table}{Data frame with molecular network component assignments}
 
-\item{structure_organism_pairs_table}{Table containing the
-structure - organism pairs}
+\item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
 
-\item{annot_table_wei_chemo}{Table containing your
-chemically weighted annotation}
+\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations}
 
-\item{remove_ties}{Remove ties. BOOLEAN}
+\item{remove_ties}{Logical whether to remove tied scores (keep only highest)}
 
-\item{summarize}{Boolean. summarize results (1 row per feature)}
+\item{summarize}{Logical whether to collapse to 1 row per feature}
 }
 \value{
-A summarized table
+Data frame containing summarized annotation results
 }
 \description{
-This function summarizes results
+This function summarizes annotation results by adding feature
+metadata, filtering/collapsing columns, and optionally removing tied
+scores or summarizing to one row per feature. Creates a final, simplified
+results table for downstream analysis or reporting.
 }
 \examples{
 NULL

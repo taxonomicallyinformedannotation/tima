@@ -14,21 +14,23 @@ filter_annotations(
 )
 }
 \arguments{
-\item{annotations}{Prepared annotations file}
+\item{annotations}{Character vector of paths to prepared annotation files}
 
-\item{features}{Prepared features file}
+\item{features}{Character string path to prepared features file}
 
-\item{rts}{Prepared retention time library}
+\item{rts}{Character string path to prepared retention time library (optional)}
 
-\item{output}{Output file}
+\item{output}{Character string path for filtered annotations output}
 
-\item{tolerance_rt}{Tolerance to filter retention time}
+\item{tolerance_rt}{Numeric RT tolerance in minutes for library matching}
 }
 \value{
-The path to the filtered annotations
+Character string path to the filtered annotations file
 }
 \description{
-This function filters initial annotations.
+This function filters initial annotations by removing MS1-only
+annotations that also have spectral matches, and optionally filtering by
+retention time tolerance when RT libraries are available.
 }
 \examples{
 \dontrun{
@@ -38,23 +40,11 @@ github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
 annotations <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2]] |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
+  gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 features <- get_params(step = "filter_annotations")$files$features$prepared |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
+  gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 rts <- get_params(step = "filter_annotations")$files$libraries$temporal$prepared |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
+  gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 get_file(url = paste0(dir, annotations), export = annotations)
 get_file(url = paste0(dir, features), export = features)
 get_file(url = paste0(dir, rts), export = rts)

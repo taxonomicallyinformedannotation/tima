@@ -1,21 +1,22 @@
 #' @title Summarize results
 #'
-#' @description This function summarizes results
+#' @description This function summarizes annotation results by adding feature
+#'     metadata, filtering/collapsing columns, and optionally removing tied
+#'     scores or summarizing to one row per feature. Creates a final, simplified
+#'     results table for downstream analysis or reporting.
 #'
 #' @include clean_collapse.R
 #' @include columns_model.R
 #'
-#' @param df Dataframe
-#' @param annot_table_wei_chemo Table containing your
-#'    chemically weighted annotation
-#' @param components_table Prepared components file
-#' @param features_table Prepared features file
-#' @param structure_organism_pairs_table Table containing the
-#'    structure - organism pairs
-#' @param remove_ties Remove ties. BOOLEAN
-#' @param summarize Boolean. summarize results (1 row per feature)
+#' @param df Data frame containing weighted annotation results
+#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
+#' @param components_table Data frame with molecular network component assignments
+#' @param features_table Data frame with feature metadata (RT, m/z, etc.)
+#' @param structure_organism_pairs_table Data frame with structure-organism pairs
+#' @param remove_ties Logical whether to remove tied scores (keep only highest)
+#' @param summarize Logical whether to collapse to 1 row per feature
 #'
-#' @return A summarized table
+#' @return Data frame containing summarized annotation results
 #'
 #' @examples NULL
 summarize_results <- function(
@@ -27,9 +28,49 @@ summarize_results <- function(
   remove_ties,
   summarize
 ) {
-  logger::log_trace(
-    "Adding initial metadata (RT, etc.) and simplifying columns"
+  # Validate inputs
+  if (!is.data.frame(df)) {
+    stop("df must be a data frame")
+  }
+
+  if (!is.data.frame(features_table)) {
+    stop("features_table must be a data frame")
+  }
+
+  if (!is.data.frame(components_table)) {
+    stop("components_table must be a data frame")
+  }
+
+  if (!is.data.frame(structure_organism_pairs_table)) {
+    stop("structure_organism_pairs_table must be a data frame")
+  }
+
+  if (!is.data.frame(annot_table_wei_chemo)) {
+    stop("annot_table_wei_chemo must be a data frame")
+  }
+
+  if (!is.logical(remove_ties)) {
+    stop("remove_ties must be logical (TRUE/FALSE)")
+  }
+
+  if (!is.logical(summarize)) {
+    stop("summarize must be logical (TRUE/FALSE)")
+  }
+
+  if (nrow(df) == 0L) {
+    logger::log_warn("Empty results table provided")
+    return(df)
+  }
+
+  logger::log_info("Summarizing annotation results")
+  logger::log_debug(
+    "Options - Remove ties: ",
+    remove_ties,
+    ", Summarize: ",
+    summarize
   )
+
+  logger::log_trace("Adding feature metadata and simplifying columns")
   model <- columns_model()
 
   df3 <- features_table |>
