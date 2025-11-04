@@ -27,31 +27,35 @@ prepare_annotations_sirius(
 )
 }
 \arguments{
-\item{input_directory}{Directory containing the Sirius results}
+\item{input_directory}{Character string path to directory or zip file
+containing SIRIUS results}
 
-\item{output_ann}{Output where to save prepared annotation results}
+\item{output_ann}{Character string path for prepared annotation results output}
 
-\item{output_can}{Output where to save prepared canopus results}
+\item{output_can}{Character string path for prepared CANOPUS results output}
 
-\item{output_for}{Output where to save prepared formula results}
+\item{output_for}{Character string path for prepared formula results output}
 
-\item{sirius_version}{Sirius version}
+\item{sirius_version}{Character string SIRIUS version ("v5" or "v6")}
 
-\item{str_stereo}{File containing structures stereo}
+\item{str_stereo}{Character string path to file with structure stereochemistry}
 
-\item{str_met}{File containing structures metadata}
+\item{str_met}{Character string path to file with structure metadata}
 
-\item{str_nam}{File containing structures names}
+\item{str_nam}{Character string path to file with structure names}
 
-\item{str_tax_cla}{File containing Classyfire taxonomy}
+\item{str_tax_cla}{Character string path to file with ClassyFire taxonomy}
 
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
+\item{str_tax_npc}{Character string path to file with NPClassifier taxonomy}
 }
 \value{
-The path to the prepared SIRIUS annotations
+Character string path to the prepared SIRIUS annotations file
 }
 \description{
-This function prepares Sirius results to make them compatible
+This function prepares SIRIUS annotation results (structure
+predictions, CANOPUS chemical classifications, and formula predictions)
+by harmonizing formats across SIRIUS versions (v5/v6), standardizing
+column names, and integrating with structure metadata.
 }
 \examples{
 \dontrun{

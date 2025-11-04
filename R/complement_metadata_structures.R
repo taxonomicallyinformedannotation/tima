@@ -1,17 +1,20 @@
 #' @title Complement metadata of structures
 #'
-#' @description This function complement structural metadata
+#' @description This function complements structural metadata by joining
+#'     stereochemistry, metadata, names, and chemical taxonomy information
+#'     from reference libraries. Enriches annotation results with comprehensive
+#'     structure information.
 #'
 #' @include clean_collapse.R
 #'
 #' @param df Data frame with structural metadata to be complemented
-#' @param str_stereo File containing structures stereo
-#' @param str_met File containing structures metadata
-#' @param str_nam File containing structures names
-#' @param str_tax_cla File containing Classyfire taxonomy
-#' @param str_tax_npc File containing NPClassifier taxonomy
+#' @param str_stereo Character string path to file with structure stereochemistry
+#' @param str_met Character string path to file with structure metadata
+#' @param str_nam Character string path to file with structure names
+#' @param str_tax_cla Character string path to file with ClassyFire taxonomy
+#' @param str_tax_npc Character string path to file with NPClassifier taxonomy
 #'
-#' @return Data frame with complemented structural metadata
+#' @return Data frame with enriched structural metadata
 #'
 #' @examples NULL
 complement_metadata_structures <- function(
@@ -22,7 +25,41 @@ complement_metadata_structures <- function(
   str_tax_cla = get("str_tax_cla", envir = parent.frame()),
   str_tax_npc = get("str_tax_npc", envir = parent.frame())
 ) {
-  logger::log_trace("Trying to look for already computed metadata")
+  # Validate inputs
+  if (!is.data.frame(df)) {
+    stop("df must be a data frame")
+  }
+
+  if (nrow(df) == 0L) {
+    logger::log_warn("Empty data frame provided")
+    return(df)
+  }
+
+  # Validate file paths
+  str_files <- list(
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_nam = str_nam,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc
+  )
+
+  for (param_name in names(str_files)) {
+    param_value <- str_files[[param_name]]
+    if (!is.character(param_value) || length(param_value) != 1L) {
+      stop(param_name, " must be a single character string")
+    }
+    if (!file.exists(param_value)) {
+      stop(param_name, " file not found: ", param_value)
+    }
+  }
+
+  logger::log_trace(
+    "Complementing structural metadata from reference libraries"
+  )
+  logger::log_debug("Input: ", nrow(df), " rows")
+
+  # Load stereochemistry data
   stereo <- tidytable::fread(
     str_stereo,
     na.strings = c("", "NA"),
