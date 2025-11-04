@@ -12,42 +12,43 @@ prepare_taxa(
   metadata = get_params(step = "prepare_taxa")$files$metadata$raw,
   org_tax_ott = get_params(step =
     "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output = get_params(step = "prepare_taxa")$files$metadata$prepared,
+  output = get_params(step = "prepare_taxa")$files$features$taxed,
   taxon = get_params(step = "prepare_taxa")$organisms$taxon
 )
 }
 \arguments{
-\item{input}{File containing your features intensities}
+\item{input}{Character string path to features file with intensities}
 
-\item{extension}{Does your column names contain the file extension?
-(mzmine mainly)}
+\item{extension}{Logical whether column names contain file extensions}
 
-\item{name_filename}{Name of the file name column in the metadata file}
+\item{name_filename}{Character string name of filename column in metadata}
 
-\item{colname}{Name of the column containing biological source information}
+\item{colname}{Character string name of column with biological source info}
 
-\item{metadata}{File containing your metadata including biological source}
+\item{metadata}{Character string path to metadata file with organism info}
 
-\item{org_tax_ott}{File containing Open Tree of Life Taxonomy}
+\item{org_tax_ott}{Character string path to Open Tree of Life taxonomy file}
 
-\item{output}{Output file}
+\item{output}{Character string path for output file}
 
-\item{taxon}{If you want to enforce all features to a given taxon,
-put its name here.}
+\item{taxon}{Character string organism name to enforce for all features
+(e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.}
 }
 \value{
-The path to the prepared taxa
+Character string path to the prepared taxa file
 }
 \description{
-This function performs taxon name preparation
-to match the Open Tree of Life taxonomy
+This function prepares taxonomic information for features by
+matching organism names to Open Tree of Life taxonomy. Can attribute
+all features to a single organism or distribute them across multiple
+organisms based on relative intensities in samples.
 }
 \details{
-Depending if the features are aligned between samples
-originating from various organisms or not,
-It can either attribute all features to a single organism,
-or attribute them to multiple ones,
-according to their relative intensities among the samples.
+Depending on whether features are aligned between samples from
+various organisms, this function either:
+- Attributes all features to a single organism (if taxon specified), or
+- Attributes features to multiple organisms based on their relative
+intensities across samples (using metadata)
 }
 \examples{
 \dontrun{

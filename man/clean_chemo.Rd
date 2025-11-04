@@ -21,39 +21,38 @@ clean_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{Table containing your
-chemically weighted annotation}
+\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations}
 
-\item{components_table}{Prepared components file}
+\item{components_table}{Data frame with molecular network components}
 
-\item{features_table}{Prepared features file}
+\item{features_table}{Data frame with feature metadata}
 
-\item{structure_organism_pairs_table}{Table containing the
-structure - organism pairs}
+\item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
 
-\item{candidates_final}{Number of final candidates to keep}
+\item{candidates_final}{Integer number of final candidates to keep per feature}
 
-\item{minimal_ms1_bio}{Minimal biological score to keep MS1 based annotation}
+\item{minimal_ms1_bio}{Numeric minimal biological score for MS1 annotations (0-1)}
 
-\item{minimal_ms1_chemo}{Minimal chemical score to keep MS1 based annotation}
+\item{minimal_ms1_chemo}{Numeric minimal chemical score for MS1 annotations (0-1)}
 
-\item{minimal_ms1_condition}{Condition to be used. Must be "OR" or "AND".}
+\item{minimal_ms1_condition}{Character condition: "OR" or "AND" for MS1 filtering}
 
-\item{compounds_names}{Report compounds names. Can be very large. BOOLEAN}
+\item{compounds_names}{Logical whether to include compound names (can be large)}
 
-\item{high_confidence}{Report high confidence candidates only. BOOLEAN}
+\item{high_confidence}{Logical whether to filter for high confidence only}
 
-\item{remove_ties}{Remove ties. BOOLEAN}
+\item{remove_ties}{Logical whether to remove tied scores}
 
-\item{summarize}{Boolean. summarize results (1 row per feature)}
+\item{summarize}{Logical whether to summarize to 1 row per feature}
 }
 \value{
-A table containing the chemically weighted annotation
-where only a given number of initial candidates are kept
+Data frame with cleaned, filtered chemically weighted annotations
 }
 \description{
-This function cleans the results
-obtained after chemical weighting
+This function cleans chemically weighted annotation results by
+filtering to top candidates, optionally removing MS1-only annotations
+below score thresholds, and preparing final results for export. Can
+include compound names and apply high-confidence filters.
 }
 \examples{
 NULL
