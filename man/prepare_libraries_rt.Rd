@@ -21,38 +21,41 @@ prepare_libraries_rt(
 )
 }
 \arguments{
-\item{mgf_exp}{MGF containing experimental retention times}
+\item{mgf_exp}{Character vector of paths to MGF files with experimental RT}
 
-\item{mgf_is}{MGF containing in silico predicted retention times}
+\item{mgf_is}{Character vector of paths to MGF files with in silico predicted RT}
 
-\item{temp_exp}{File containing experimental retention times}
+\item{temp_exp}{Character vector of paths to CSV files with experimental RT}
 
-\item{temp_is}{File containing in silico predicted retention times}
+\item{temp_is}{Character vector of paths to CSV files with in silico predicted RT}
 
-\item{output_rt}{Output retention time file}
+\item{output_rt}{Character string path for prepared RT library output}
 
-\item{output_sop}{Output pseudo sop file}
+\item{output_sop}{Character string path for pseudo SOP output}
 
-\item{col_ik}{Name of the InChIKey in mgf}
+\item{col_ik}{Character string name of InChIKey column in MGF}
 
-\item{col_rt}{Name of the retention time in mgf}
+\item{col_rt}{Character string name of retention time column in MGF}
 
-\item{col_sm}{Name of the SMILES in mgf}
+\item{col_sm}{Character string name of SMILES column in MGF}
 
-\item{name_inchikey}{Name of the InChIKey in file}
+\item{name_inchikey}{Character string name of InChIKey column in CSV}
 
-\item{name_rt}{Name of the retention time in file}
+\item{name_rt}{Character string name of retention time column in CSV}
 
-\item{name_smiles}{Name of the SMILES in file}
+\item{name_smiles}{Character string name of SMILES column in CSV}
 
-\item{unit_rt}{Unit of the retention time. Must be "seconds" or "minutes"}
+\item{unit_rt}{Character string RT unit: "seconds" or "minutes"}
 }
 \value{
-The path to the prepared retention time library
+Character string path to the prepared retention time library
 }
 \description{
-This function prepares retention times libraries
-to be used for later
+This function prepares retention time libraries by combining
+experimental and in silico predicted retention times from multiple sources
+(MGF files, CSV files). It standardizes retention time units, validates
+structures, and creates both RT libraries and pseudo structure-organism
+pairs for RT-based annotation.
 }
 \examples{
 \dontrun{

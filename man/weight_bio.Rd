@@ -23,52 +23,45 @@ weight_bio(
 )
 }
 \arguments{
-\item{annotation_table_taxed}{Table containing the initial annotation
-eventually complemented by additional MS1 annotations}
+\item{annotation_table_taxed}{Data frame containing initial annotations with
+sample taxonomy information}
 
-\item{structure_organism_pairs_table}{Table containing the
-structure - organism pairs}
+\item{structure_organism_pairs_table}{Data frame containing structure-organism
+pairs with complete taxonomic hierarchies}
 
-\item{weight_spectral}{Weight for the spectral score}
+\item{weight_spectral}{Numeric weight for spectral similarity score (0-1)}
 
-\item{weight_biological}{Weight for the biological score}
+\item{weight_biological}{Numeric weight for biological source score (0-1)}
 
-\item{score_biological_domain}{Score for a \code{domain} match
-(should be lower than \code{kingdom})}
+\item{score_biological_domain}{Numeric score for domain-level taxonomic match}
 
-\item{score_biological_kingdom}{Score for a \code{kingdom} match
-(should be lower than \code{phylum})}
+\item{score_biological_kingdom}{Numeric score for kingdom-level match}
 
-\item{score_biological_phylum}{Score for a \code{phylum} match
-(should be lower than \code{class})}
+\item{score_biological_phylum}{Numeric score for phylum-level match}
 
-\item{score_biological_class}{Score for a \code{class} match
-(should be lower than \code{order})}
+\item{score_biological_class}{Numeric score for class-level match}
 
-\item{score_biological_order}{Score for a \code{order} match
-(should be lower than \code{family})}
+\item{score_biological_order}{Numeric score for order-level match}
 
-\item{score_biological_family}{Score for a \code{family} match
-(should be lower than \code{tribe})}
+\item{score_biological_family}{Numeric score for family-level match}
 
-\item{score_biological_tribe}{Score for a \code{tribe} match
-(should be lower than \code{genus})}
+\item{score_biological_tribe}{Numeric score for tribe-level match}
 
-\item{score_biological_genus}{Score for a \code{genus} match
-(should be lower than \code{species})}
+\item{score_biological_genus}{Numeric score for genus-level match}
 
-\item{score_biological_species}{Score for a \code{species} match
-(should be lower than \code{variety})}
+\item{score_biological_species}{Numeric score for species-level match}
 
-\item{score_biological_variety}{Score for a \code{variety} match
-(should be the highest)}
+\item{score_biological_variety}{Numeric score for variety-level match (highest)}
 }
 \value{
-A table containing the biologically weighted annotation
+Data frame containing biologically weighted annotations with
+biological scores and combined weighted scores
 }
 \description{
-This function weights the eventually MS1
-complemented annotations according their biological source
+This function weights MS annotations according to their biological
+source by comparing the taxonomic hierarchy of candidate structures'
+reported organisms with the sample's organism taxonomy. Higher taxonomic
+similarity results in higher biological scores.
 }
 \examples{
 NULL
