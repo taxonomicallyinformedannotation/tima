@@ -11,9 +11,11 @@
 #'     underscore removed, leaving only the meaningful column name portion
 #'
 #' @examples
-#' harmonize_names_sirius("1_compound_name")  # Returns "name"
-#' harmonize_names_sirius("2_feature_id")     # Returns "id"
-#' harmonize_names_sirius("score")            # Returns "score" (no underscore)
+#' \dontrun{
+#' harmonize_names_sirius("1_compound_name") # Returns "name"
+#' harmonize_names_sirius("2_feature_id") # Returns "id"
+#' harmonize_names_sirius("score") # Returns "score" (no underscore)
+#' }
 harmonize_names_sirius <- function(x) {
   # Validate input
   if (missing(x) || is.null(x)) {

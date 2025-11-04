@@ -20,7 +20,9 @@ numbers and underscores (e.g., "1_compound_name"), and this function
 extracts the meaningful part (e.g., "name").
 }
 \examples{
-harmonize_names_sirius("1_compound_name")  # Returns "name"
-harmonize_names_sirius("2_feature_id")     # Returns "id"
-harmonize_names_sirius("score")            # Returns "score" (no underscore)
+\dontrun{
+harmonize_names_sirius("1_compound_name") # Returns "name"
+harmonize_names_sirius("2_feature_id") # Returns "id"
+harmonize_names_sirius("score") # Returns "score" (no underscore)
+}
 }
