@@ -6,8 +6,15 @@
 \usage{
 fake_annotations_columns()
 }
+\value{
+Data frame with one row and columns for all annotation fields,
+with all values set to NA. Columns include feature IDs, structure
+information, scores, and taxonomic classifications.
+}
 \description{
-This function fakes annotations columns
+This function creates a template data frame with all expected
+annotation columns initialized to NA. Used as a fallback when no
+annotations are available or to ensure consistent column structure.
 }
 \examples{
 NULL

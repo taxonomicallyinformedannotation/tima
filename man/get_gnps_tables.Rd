@@ -7,7 +7,7 @@
 get_gnps_tables(
   gnps_job_id,
   gnps_job_example = get_default_paths()$gnps$example,
-  filename,
+  filename = "",
   workflow = "fbmn",
   path_features,
   path_metadata,
@@ -18,32 +18,37 @@ get_gnps_tables(
 )
 }
 \arguments{
-\item{gnps_job_id}{GNPS job ID}
+\item{gnps_job_id}{Character string GNPS job ID (32 characters). Can be NULL
+or empty string to skip download.}
 
-\item{gnps_job_example}{GNPS job example}
+\item{gnps_job_example}{Character string example GNPS job ID for testing}
 
-\item{filename}{Name of the file}
+\item{filename}{Character string name of the file to download (used for fake outputs)}
 
-\item{workflow}{Character string indicating the type of workflow,
-either "fbmn" or "classical"}
+\item{workflow}{Character string indicating workflow type: "fbmn" (feature-based)
+or "classical" molecular networking}
 
-\item{path_features}{Path to features}
+\item{path_features}{Character string path for features output (file path)}
 
-\item{path_metadata}{Path to metadata}
+\item{path_metadata}{Character string path for metadata output (file path or list)}
 
-\item{path_spectra}{Path to spectra}
+\item{path_spectra}{Character string path for spectra output (file path)}
 
-\item{path_source}{Path to store the source files}
+\item{path_source}{Character string path to store source files}
 
-\item{path_interim_a}{Path to store the interim annotations file}
+\item{path_interim_a}{Character string path to store interim annotations}
 
-\item{path_interim_f}{Path to store the interim features files}
+\item{path_interim_f}{Character string path to store interim features}
 }
 \value{
-The downloaded GNPS tables
+A named character vector with paths to the written/available files.
 }
 \description{
-This function gets GNPS tables from corresponding job ID.
+This function downloads and retrieves GNPS (Global Natural Products
+Social Molecular Networking) result tables from a completed job. It fetches
+features, metadata, spectra, and annotation files from GNPS servers. When a
+job ID is not provided or GNPS resources are missing, small fake files are
+written so downstream steps do not fail during testing.
 }
 \examples{
 NULL

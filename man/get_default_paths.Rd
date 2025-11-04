@@ -7,17 +7,24 @@
 get_default_paths(yaml = system.file("paths.yaml", package = "tima"))
 }
 \arguments{
-\item{yaml}{The YAML file containing the paths
-(default is "paths.yaml")}
+\item{yaml}{Character string path to the YAML file containing path definitions.
+Default is the paths.yaml file included in the package installation.}
 }
 \value{
-A list containing the paths specified in the YAML file
+Named list containing all configured paths and settings. The structure
+mirrors the YAML file hierarchy with nested lists for organized access.
 }
 \description{
-This function gets default paths
+This function loads and parses the default paths configuration
+from a YAML file. These paths define locations for data files, libraries,
+parameters, and other resources used throughout the TIMA workflow.
 }
 \examples{
 \dontrun{
-get_default_paths()
+# Get default paths
+paths <- get_default_paths()
+
+# Access specific paths
+data_path <- paths$data$source$path
 }
 }

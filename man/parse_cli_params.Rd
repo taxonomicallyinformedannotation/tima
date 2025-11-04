@@ -7,15 +7,19 @@
 parse_cli_params(arguments, parameters)
 }
 \arguments{
-\item{arguments}{CLI arguments}
+\item{arguments}{Named list of CLI arguments from docopt or similar parser}
 
-\item{parameters}{Parameters}
+\item{parameters}{Nested list of default parameters to be updated with CLI values}
 }
 \value{
-Parameters coming from the CLI
+Updated parameters list with CLI arguments merged in, maintaining the
+nested structure and applying type conversions as specified in the mappings
 }
 \description{
-This function parses command line parameters
+This function parses command-line interface (CLI) arguments and
+merges them into the parameter configuration structure. It uses a mapping
+system to translate CLI argument names to their corresponding nested paths
+in the parameters list, applying appropriate type conversions.
 }
 \examples{
 NULL

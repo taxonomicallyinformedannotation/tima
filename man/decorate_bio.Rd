@@ -44,7 +44,8 @@ The input annotation table (unchanged), for use in pipelines
 \description{
 This function logs summary statistics about biologically weighted
 annotations, showing how many structures were reranked at each taxonomic
-level based on organism occurrence data.
+level based on organism occurrence data. The function validates that the
+required columns are present and handles empty inputs gracefully.
 }
 \examples{
 NULL

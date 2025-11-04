@@ -21,8 +21,8 @@ join_gnps_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 }
 \value{
 A list with two integer vectors:
-\item{1}{Indices of matched peaks in x}
-\item{2}{Indices of matched peaks in y}
+\item{indices_x}{Indices of matched peaks in x}
+\item{indices_y}{Indices of matched peaks in y}
 }
 \description{
 Performs GNPS-style peak matching between query and target
