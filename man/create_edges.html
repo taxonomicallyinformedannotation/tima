@@ -684,6 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -700,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="create-edges">Create edges</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function applies similarity calculation to a list of spectra to create edges</p>
+<p>This function calculates pairwise spectral similarity between all spectra to create a network edge list. Uses parallel processing via purrr for efficiency.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -724,7 +725,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="frags">frags</code>
 </td>
 <td>
-Fragments
+List of fragment spectra matrices
 </td>
 </tr>
 <tr>
@@ -732,7 +733,7 @@ Fragments
 <code id="nspecs">nspecs</code>
 </td>
 <td>
-Number of spectra
+Integer number of spectra
 </td>
 </tr>
 <tr>
@@ -740,7 +741,7 @@ Number of spectra
 <code id="precs">precs</code>
 </td>
 <td>
-Precursors
+Numeric vector of precursor m/z values
 </td>
 </tr>
 <tr>
@@ -748,7 +749,7 @@ Precursors
 <code id="method">method</code>
 </td>
 <td>
-Method
+Character string similarity method ("entropy", "gnps", or "cosine")
 </td>
 </tr>
 <tr>
@@ -756,7 +757,7 @@ Method
 <code id="ms2_tolerance">ms2_tolerance</code>
 </td>
 <td>
-MS2 tolerance
+Numeric MS2 tolerance in Daltons
 </td>
 </tr>
 <tr>
@@ -764,7 +765,7 @@ MS2 tolerance
 <code id="ppm_tolerance">ppm_tolerance</code>
 </td>
 <td>
-ppm tolerance
+Numeric PPM tolerance
 </td>
 </tr>
 <tr>
@@ -772,7 +773,7 @@ ppm tolerance
 <code id="threshold">threshold</code>
 </td>
 <td>
-Threshold
+Numeric minimum similarity score threshold
 </td>
 </tr>
 <tr>
@@ -780,10 +781,14 @@ Threshold
 <code id="matched_peaks">matched_peaks</code>
 </td>
 <td>
-Matched peaks
+Integer minimum number of matched peaks required
 </td>
 </tr>
 </tbody></table>
+</section>
+<section id="value" class="level3">
+<h3 class="anchored" data-anchor-id="value">Value</h3>
+<p>A data frame with columns: feature_id, target_id, score, matched_peaks. Returns empty data frame with NA values if no edges pass thresholds.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

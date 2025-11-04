@@ -702,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="distance-between-two-elements-in-a-distance-matrix">Distance between two elements in a distance matrix</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates the distance between two elements in a distance matrix</p>
+<p>This function calculates the distance between two elements in a distance matrix by their indices. Returns 0 for identical elements.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -717,7 +717,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="d">d</code>
 </td>
 <td>
-Distance matrix
+Distance matrix or dist object
 </td>
 </tr>
 <tr>
@@ -725,7 +725,7 @@ Distance matrix
 <code id="idx1">idx1</code>
 </td>
 <td>
-Index of the first element
+Integer index of the first element
 </td>
 </tr>
 <tr>
@@ -733,18 +733,18 @@ Index of the first element
 <code id="idx2">idx2</code>
 </td>
 <td>
-Index of the second element
+Integer index of the second element
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Credit goes to usedist package</p>
+<p>Credit goes to usedist package for the algorithm</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Distance between the two elements</p>
+<p>Numeric distance between the two elements. Returns 0 if indices are identical, NA if indices are invalid.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

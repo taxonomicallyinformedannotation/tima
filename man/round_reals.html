@@ -684,6 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -700,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="round-reals">Round reals</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function rounds reals in columns of a dataframe</p>
+<p>This function rounds numeric values in specified columns of a dataframe. It only affects columns that contain the specified patterns in their names.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -715,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe to use
+Dataframe containing columns to round
 </td>
 </tr>
 <tr>
@@ -723,7 +724,7 @@ Dataframe to use
 <code id="dig">dig</code>
 </td>
 <td>
-Number of digits
+Integer number of decimal digits to round to (default: 5)
 </td>
 </tr>
 <tr>
@@ -731,10 +732,14 @@ Number of digits
 <code id="cols">cols</code>
 </td>
 <td>
-Columns
+Character vector of column name patterns to match (default: c("structure_exact_mass", "structure_xlogp"))
 </td>
 </tr>
 </tbody></table>
+</section>
+<section id="value" class="level3">
+<h3 class="anchored" data-anchor-id="value">Value</h3>
+<p>The dataframe with specified numeric columns rounded to the specified number of digits</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

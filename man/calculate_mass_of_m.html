@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="calculate-mass-of-m">Calculate mass of M</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates the mass of M</p>
+<p>This function calculates the neutral mass (M) from an observed m/z value and adduct notation. It accounts for charge, multimers, isotopes, and adduct modifications.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -718,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="adduct_string">adduct_string</code>
 </td>
 <td>
-Adduct to be parsed
+Character string representing the adduct (e.g., "[M+H]+", "[2M+Na]+")
 </td>
 </tr>
 <tr>
@@ -726,7 +726,7 @@ Adduct to be parsed
 <code id="mz">mz</code>
 </td>
 <td>
-mz
+Numeric observed m/z value
 </td>
 </tr>
 <tr>
@@ -734,14 +734,14 @@ mz
 <code id="electron_mass">electron_mass</code>
 </td>
 <td>
-Electron mass
+Numeric electron mass in Daltons (default: 5.485799E-4, CODATA 2018 value)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A mass</p>
+<p>Numeric neutral mass (M) in Daltons. Returns 0 if adduct parsing fails.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

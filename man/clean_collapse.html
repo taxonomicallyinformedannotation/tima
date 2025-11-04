@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="clean-collapse">Clean collapse</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function collapses a grouped dataframe and trims it</p>
+<p>This function collapses a grouped dataframe and trims it. It removes NA values, collapses unique values with " $ " separator, trims whitespace, and converts empty strings to NA.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="grouped_df">grouped_df</code>
 </td>
 <td>
-Grouped dataframe
+Grouped dataframe to be collapsed
 </td>
 </tr>
 <tr>
@@ -724,14 +724,14 @@ Grouped dataframe
 <code id="cols">cols</code>
 </td>
 <td>
-Column(s) to apply collapse to
+Character vector of column name(s) to apply collapse to. If NULL (default), applies to all columns.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Cleaned and collapsed dataframe</p>
+<p>A cleaned and collapsed dataframe with unique values collapsed per group</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

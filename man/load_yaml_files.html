@@ -700,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="load-yaml-files">Load yaml files</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function load yaml files</p>
+<p>This function loads YAML parameter files, preferring user-specified parameters over defaults when available. It combines default/user params with prepare_params files.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -709,7 +709,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A list of loaded yaml files</p>
+<p>A list containing:</p>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>yamls_params</code>
+</td>
+<td>
+Named list of parsed YAML content
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>yaml_files</code>
+</td>
+<td>
+Character vector of file paths
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>yaml_names</code>
+</td>
+<td>
+Character vector of parameter names
+</td>
+</tr>
+</tbody></table>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

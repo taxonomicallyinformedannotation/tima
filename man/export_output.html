@@ -701,11 +701,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="export-output">Export output</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function creates the output directory if it doesn’t exist and exports the data frame to a tab-delimited file.</p>
+<p>This function creates the output directory if it doesn’t exist and exports a data frame to a tab-delimited file</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">export_output(x, file = output)
+<pre><code class="language-R">export_output(x, file)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="x">x</code>
 </td>
 <td>
-data frame to be exported
+Data frame to be exported
 </td>
 </tr>
 <tr>
@@ -724,14 +724,14 @@ data frame to be exported
 <code id="file">file</code>
 </td>
 <td>
-path to the output file
+Character string path to the output file
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path of the exported file</p>
+<p>The path to the exported file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

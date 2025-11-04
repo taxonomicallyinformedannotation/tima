@@ -700,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="columns-model">Columns model</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function models columns</p>
+<p>This function defines the standardized column naming schema used throughout the TIMA package. It organizes columns into logical groups for features, candidates, components, and scoring.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -709,7 +709,89 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The columns model</p>
+<p>A named list containing character vectors of column names organized by category:</p>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>features_columns</code>
+</td>
+<td>
+Basic feature identifiers (ID, m/z, RT)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>features_calculated_columns</code>
+</td>
+<td>
+Calculated feature properties (entropy, taxonomy predictions)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>candidates_calculated_columns</code>
+</td>
+<td>
+Calculated candidate properties
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>candidates_sirius_for_columns</code>
+</td>
+<td>
+SIRIUS formula-level annotations
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>candidates_sirius_str_columns</code>
+</td>
+<td>
+SIRIUS structure-level scores
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>candidates_spectra_columns</code>
+</td>
+<td>
+Spectral library matching results
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>candidates_structures_columns</code>
+</td>
+<td>
+Chemical structure metadata and taxonomy
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>components_columns</code>
+</td>
+<td>
+Molecular network component IDs
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>rank_columns</code>
+</td>
+<td>
+Candidate ranking columns
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>score_columns</code>
+</td>
+<td>
+Candidate scoring columns
+</td>
+</tr>
+</tbody></table>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

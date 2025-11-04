@@ -703,11 +703,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-file">Get file</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function get files</p>
+<p>This function downloads files from a URL with retry logic and exponential backoff</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">get_file(url, export, limit = 3600)
+<pre><code class="language-R">get_file(url, export, limit = 3600L)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -718,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="url">url</code>
 </td>
 <td>
-URL of the file to be downloaded
+Character string URL of the file to be downloaded
 </td>
 </tr>
 <tr>
@@ -726,7 +726,7 @@ URL of the file to be downloaded
 <code id="export">export</code>
 </td>
 <td>
-File path where the file should be saved
+Character string file path where the file should be saved
 </td>
 </tr>
 <tr>
@@ -734,14 +734,14 @@ File path where the file should be saved
 <code id="limit">limit</code>
 </td>
 <td>
-Timeout limit (in seconds)
+Integer timeout limit in seconds (default: 3600)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the file</p>
+<p>The path to the downloaded file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

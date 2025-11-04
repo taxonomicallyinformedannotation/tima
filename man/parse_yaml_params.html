@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="parse-yaml-parameters">Parse YAML parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function parses YAML parameters</p>
+<p>This function parses YAML parameter files, loading default parameters and optionally overriding them with user-specified values</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -719,7 +719,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="def">def</code>
 </td>
 <td>
-Default path
+Character string path to the default YAML parameters file
 </td>
 </tr>
 <tr>
@@ -727,7 +727,7 @@ Default path
 <code id="usr">usr</code>
 </td>
 <td>
-User path
+Character string path to the user-specified YAML parameters file (optional). If it exists, it will override default values.
 </td>
 </tr>
 </tbody></table>

@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="harmonize-adducts">Harmonize adducts</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function annotates masses</p>
+<p>This function harmonizes adduct definitions by replacing various adduct notations with standardized forms according to a translation table</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Dataframe containing adduct column to harmonize
 </td>
 </tr>
 <tr>
@@ -724,7 +724,7 @@ Dataframe
 <code id="adducts_colname">adducts_colname</code>
 </td>
 <td>
-Adducts colname
+Character string name of the adduct column (default: "adduct")
 </td>
 </tr>
 <tr>
@@ -732,14 +732,14 @@ Adducts colname
 <code id="adducts_translations">adducts_translations</code>
 </td>
 <td>
-Adducts translations
+Named character vector mapping original adduct notations (names) to standardized forms (values)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A table with harmonized adducts</p>
+<p>The dataframe with harmonized adduct column</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

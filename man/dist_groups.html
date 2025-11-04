@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="dist-groups">Dist groups</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function gets distances per group</p>
+<p>This function calculates pairwise distances between observations and annotates them with group membership information</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="d">d</code>
 </td>
 <td>
-A distance object
+A distance object or matrix
 </td>
 </tr>
 <tr>
@@ -724,14 +724,64 @@ A distance object
 <code id="g">g</code>
 </td>
 <td>
-A grouping vector for the distance object
+A grouping vector for the observations in the distance object. Must have length equal to the number of observations.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A data frame containing distance information between pairs of observations in the distance object, with columns for the names or indices of the observations, the group labels for each observation, and the distance between the observations. The label column indicates whether the distance is within a group or between groups.</p>
+<p>A data frame containing distance information between pairs of observations with columns:</p>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Item1</code>
+</td>
+<td>
+Index of first observation
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Item2</code>
+</td>
+<td>
+Index of second observation
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Group1</code>
+</td>
+<td>
+Group label of first observation
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Group2</code>
+</td>
+<td>
+Group label of second observation
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Label</code>
+</td>
+<td>
+Factor indicating if distance is within or between groups
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>Distance</code>
+</td>
+<td>
+Numeric distance value rounded to 5 digits
+</td>
+</tr>
+</tbody></table>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
