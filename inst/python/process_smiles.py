@@ -2,6 +2,7 @@ import csv
 import concurrent.futures
 import gzip
 import os
+import sys
 from rdkit.Chem import SmilesMolSupplier, MolToSmiles, MolToInchiKey, RemoveStereochemistry
 from rdkit.Chem.Descriptors import ExactMolWt, MolLogP
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
@@ -27,22 +28,34 @@ def process_molecule(mol, original_smiles):
             MolToSmiles(mol),
             MolLogP(mol)
         ]
-    except Exception:
+    except Exception as e:
+        print(f"Warning: Failed to process SMILES '{original_smiles}': {e}", file=sys.stderr)
         return None
 
 def open_output_file(output_csv_file):
     """Opens an output file, supporting both .csv and .gz formats."""
-    if output_csv_file.endswith(".gz"):
-        return gzip.open(output_csv_file, "wt", newline="")
-    return open(output_csv_file, "w", newline="")
+    try:
+        if output_csv_file.endswith(".gz"):
+            return gzip.open(output_csv_file, "wt", newline="")
+        return open(output_csv_file, "w", newline="")
+    except IOError as e:
+        print(f"Error: Failed to open output file '{output_csv_file}': {e}", file=sys.stderr)
+        raise
 
 def process_smiles(input_smi_file, output_csv_file, num_workers=None, batch_size=1000, progress_interval=10000):
     """Processes a SMILES file using an optimized parallel approach."""
     
+    if not os.path.exists(input_smi_file):
+        raise FileNotFoundError(f"Input SMILES file not found: {input_smi_file}")
+
     if num_workers is None:
         num_workers = min(32, (os.cpu_count() or 1) * 2)
 
-    supplier = SmilesMolSupplier(input_smi_file, nameColumn=-1)
+    try:
+        supplier = SmilesMolSupplier(input_smi_file, nameColumn=-1)
+    except Exception as e:
+        print(f"Error: Failed to load SMILES file '{input_smi_file}': {e}", file=sys.stderr)
+        raise
 
     with open_output_file(output_csv_file) as f:
         writer = csv.writer(f)

@@ -13,17 +13,26 @@ install(
 )
 }
 \arguments{
-\item{package}{Package name}
+\item{package}{Character string name of the package to install (default: "tima")}
 
-\item{repos}{Repositories for install.packages}
+\item{repos}{Character vector of repository URLs for install.packages}
 
-\item{dependencies}{Whether to install dependencies}
+\item{dependencies}{Logical whether to install package dependencies (default: TRUE)}
 
-\item{test}{Whether to retry with source or test install}
+\item{test}{Logical whether to use fallback/test installation mode (default: FALSE)}
+}
+\value{
+NULL (invisibly). Installs packages and sets up Python environment as
+side effects.
 }
 \description{
-This function runs some required install
+This function installs the TIMA package and its dependencies,
+including setting up a Python virtual environment with RDKit for
+chemical structure processing. It handles different operating systems
+and provides fallback installation methods if needed.
 }
 \examples{
-NULL
+\dontrun{
+install()
+}
 }

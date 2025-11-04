@@ -18,6 +18,30 @@ round_reals <- function(
   dig = 5L,
   cols = c("structure_exact_mass", "structure_xlogp")
 ) {
+  # Validate inputs
+  if (!is.data.frame(df) && !inherits(df, "tbl")) {
+    stop("Input 'df' must be a data frame or tibble")
+  }
+
+  if (!is.numeric(dig) || dig < 0) {
+    stop("Number of digits 'dig' must be a non-negative integer")
+  }
+
+  if (length(cols) == 0) {
+    logger::log_trace("No column patterns specified, returning unchanged")
+    return(df)
+  }
+
+  # Check if any matching columns exist
+  matching_cols <- names(df)[sapply(cols, function(pattern) {
+    any(grepl(pattern, names(df), fixed = TRUE))
+  })]
+
+  if (length(matching_cols) == 0) {
+    logger::log_trace("No matching columns found for rounding")
+    return(df)
+  }
+
   df |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::contains(cols),
