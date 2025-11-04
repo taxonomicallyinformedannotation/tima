@@ -1,12 +1,16 @@
 #' @title Harmonize adducts
 #'
-#' @description This function annotates masses
+#' @description This function harmonizes adduct definitions by replacing
+#'     various adduct notations with standardized forms according to a
+#'     translation table
 #'
-#' @param df Dataframe
-#' @param adducts_colname Adducts colname
-#' @param adducts_translations Adducts translations
+#' @param df Dataframe containing adduct column to harmonize
+#' @param adducts_colname Character string name of the adduct column
+#'     (default: "adduct")
+#' @param adducts_translations Named character vector mapping original
+#'     adduct notations (names) to standardized forms (values)
 #'
-#' @return A table with harmonized adducts
+#' @return The dataframe with harmonized adduct column
 #'
 #' @examples NULL
 harmonize_adducts <- function(
@@ -14,12 +18,30 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
-  logger::log_trace("Trying to harmonize adducts definitions")
+  # Validate inputs
+  if (!adducts_colname %in% names(df)) {
+    logger::log_warn(
+      "Adduct column '",
+      adducts_colname,
+      "' not found in dataframe"
+    )
+    return(df)
+  }
+
+  if (length(adducts_translations) == 0L) {
+    logger::log_trace("No adduct translations provided, returning unchanged")
+    return(df)
+  }
+
+  logger::log_trace("Harmonizing adduct definitions")
+
+  # Perform vectorized string replacement
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
     str = df[[adducts_colname]],
     pattern = names(adducts_translations),
     replacement = adducts_translations,
     vectorize_all = FALSE
   )
+
   df
 }

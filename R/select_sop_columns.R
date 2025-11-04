@@ -1,14 +1,27 @@
 #' @title Select SOP columns
 #'
-#' @description This function selects sop columns
+#' @description This function selects and renames structure-organism pair (SOP)
+#'     columns to a standardized format, including chemical structures,
+#'     taxonomic classifications, and organism taxonomy
 #'
-#' @param df Dataframe
+#' @param df Dataframe containing structure-organism pair data
 #'
-#' @return The dataframe with selected structure organism pairs columns
+#' @return The dataframe with selected and renamed SOP columns in standardized format
 #'
 #' @examples NULL
 select_sop_columns <- function(df) {
-  df <- df |>
+  # Validate input
+  if (!is.data.frame(df) && !inherits(df, "tbl")) {
+    stop("Input must be a data frame or tibble")
+  }
+
+  if (nrow(df) == 0L) {
+    logger::log_warn("Empty dataframe provided to select_sop_columns")
+    return(df)
+  }
+
+  # Select and rename columns to standardized SOP format
+  df |>
     tidytable::select(
       structure_name,
       structure_inchikey,
@@ -40,6 +53,4 @@ select_sop_columns <- function(df) {
       organism_taxonomy_10varietas,
       reference_doi
     )
-
-  return(df)
 }

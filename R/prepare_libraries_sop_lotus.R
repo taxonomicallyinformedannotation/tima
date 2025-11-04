@@ -1,16 +1,20 @@
 #' @title Prepare libraries of structure organism pairs LOTUS
 #'
-#' @description This function prepares the LOTUS structure-organism pairs
+#' @description This function prepares the LOTUS (LOng-lasting, cUraTed collection
+#'     of cOnnectivity daTa for natural products) structure-organism pairs database.
+#'     It standardizes columns, extracts 2D InChIKeys, rounds numeric values,
+#'     and removes duplicates.
 #'
 #' @include fake_sop_columns.R
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'
-#' @param input Input file
-#' @param output Output file
+#' @param input Character string path to the raw LOTUS data file
+#' @param output Character string path for the prepared output file
 #'
-#' @return The path to the prepared structure-organism pairs library LOTUS
+#' @return Character string path to the prepared structure-organism pairs
+#'     library file
 #'
 #' @export
 #'
@@ -21,41 +25,57 @@
 #' prepare_libraries_sop_lotus()
 #' unlink("data", recursive = TRUE)
 #' }
-prepare_libraries_sop_lotus <-
-  function(
-    input = get_params(
-      step = "prepare_libraries_sop_lotus"
-    )$files$libraries$sop$raw$lotus,
-    output = get_params(
-      step = "prepare_libraries_sop_lotus"
-    )$files$libraries$sop$prepared$lotus
-  ) {
-    if (file.exists(input)) {
-      logger::log_trace("Loading and preparing LOTUS")
-      lotus_prepared <- input |>
-        tidytable::fread(
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        ) |>
-        tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
-            str = structure_inchikey,
-            from = 1,
-            to = 14
-          )
-        ) |>
-        tidytable::rename(structure_name = structure_nameTraditional) |>
-        select_sop_columns() |>
-        round_reals() |>
-        tidytable::distinct()
-    } else {
-      logger::log_warn(
-        "Sorry, LOTUS not found, returning an empty file instead"
-      )
-      lotus_prepared <- fake_sop_columns()
-    }
-
-    export_output(x = lotus_prepared, file = output)
-    rm(lotus_prepared)
-    return(output)
+prepare_libraries_sop_lotus <- function(
+  input = get_params(
+    step = "prepare_libraries_sop_lotus"
+  )$files$libraries$sop$raw$lotus,
+  output = get_params(
+    step = "prepare_libraries_sop_lotus"
+  )$files$libraries$sop$prepared$lotus
+) {
+  # Validate inputs
+  if (missing(output) || is.null(output) || nchar(output) == 0L) {
+    stop("Output path must be specified")
   }
+
+  # Process LOTUS data if available
+  if (file.exists(input)) {
+    logger::log_info("Loading LOTUS database from: ", input)
+
+    lotus_prepared <- input |>
+      tidytable::fread(
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      ) |>
+      tidytable::mutate(
+        # Extract 2D InChIKey (first 14 characters = connectivity layer)
+        structure_inchikey_2D = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1L,
+          to = 14L
+        )
+      ) |>
+      tidytable::rename(structure_name = structure_nameTraditional) |>
+      select_sop_columns() |>
+      round_reals() |>
+      tidytable::distinct()
+
+    logger::log_info(
+      "Prepared ",
+      nrow(lotus_prepared),
+      " unique structure-organism pairs from LOTUS"
+    )
+  } else {
+    logger::log_warn(
+      "LOTUS database not found at: ",
+      input,
+      ". Returning empty placeholder file."
+    )
+    lotus_prepared <- fake_sop_columns()
+  }
+
+  # Export prepared data
+  export_output(x = lotus_prepared, file = output)
+
+  return(output)
+}
