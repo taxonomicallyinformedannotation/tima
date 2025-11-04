@@ -11,15 +11,19 @@ prepare_libraries_sop_lotus(
 )
 }
 \arguments{
-\item{input}{Input file}
+\item{input}{Character string path to the raw LOTUS data file}
 
-\item{output}{Output file}
+\item{output}{Character string path for the prepared output file}
 }
 \value{
-The path to the prepared structure-organism pairs library LOTUS
+Character string path to the prepared structure-organism pairs
+library file
 }
 \description{
-This function prepares the LOTUS structure-organism pairs
+This function prepares the LOTUS (LOng-lasting, cUraTed collection
+of cOnnectivity daTa for natural products) structure-organism pairs database.
+It standardizes columns, extracts 2D InChIKeys, rounds numeric values,
+and removes duplicates.
 }
 \examples{
 \dontrun{

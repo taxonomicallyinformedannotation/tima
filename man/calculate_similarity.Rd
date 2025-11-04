@@ -17,30 +17,32 @@ calculate_similarity(
 )
 }
 \arguments{
-\item{method}{Method ("entropy" or "gnps")}
+\item{method}{Character string specifying method: "entropy", "gnps", or "cosine"}
 
-\item{query_spectrum}{Query spectrum matrix}
+\item{query_spectrum}{Numeric matrix with columns for mz and intensity}
 
-\item{target_spectrum}{Target spectrum matrix}
+\item{target_spectrum}{Numeric matrix with columns for mz and intensity}
 
-\item{query_precursor}{Query precursor}
+\item{query_precursor}{Numeric precursor m/z value for query}
 
-\item{target_precursor}{Target precursor}
+\item{target_precursor}{Numeric precursor m/z value for target}
 
-\item{dalton}{Dalton tolerance}
+\item{dalton}{Numeric Dalton tolerance for peak matching}
 
-\item{ppm}{PPM tolerance}
+\item{ppm}{Numeric PPM tolerance for peak matching}
 
-\item{return_matched_peaks}{Return matched peaks. Not compatible with 'entropy'. Default: FALSE}
+\item{return_matched_peaks}{Logical; return matched peaks count?
+Not compatible with 'entropy' method. Default: FALSE}
 
-\item{...}{Not documented for now}
+\item{...}{Additional arguments passed to MsCoreUtils::join}
 }
 \value{
-Similarity score or NA_real_ if calculation fails
+Numeric similarity score (0-1), or list with score and matches
+if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
 }
 \description{
-Efficiently calculates similarity scores between query and target spectra
-using either entropy or GNPS methods
+Efficiently calculates similarity scores between query and
+target spectra using either entropy, cosine, or GNPS methods
 }
 \examples{
 sp_1 <- cbind(

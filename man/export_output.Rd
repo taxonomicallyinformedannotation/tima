@@ -4,19 +4,19 @@
 \alias{export_output}
 \title{Export output}
 \usage{
-export_output(x, file = output)
+export_output(x, file)
 }
 \arguments{
-\item{x}{data frame to be exported}
+\item{x}{Data frame to be exported}
 
-\item{file}{path to the output file}
+\item{file}{Character string path to the output file}
 }
 \value{
-The path of the exported file
+The path to the exported file
 }
 \description{
-This function creates the output directory
-if it doesn't exist and exports the data frame to a tab-delimited file.
+This function creates the output directory if it doesn't exist
+and exports a data frame to a tab-delimited file
 }
 \examples{
 \dontrun{

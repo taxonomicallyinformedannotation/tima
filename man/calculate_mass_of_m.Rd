@@ -7,17 +7,22 @@
 calculate_mass_of_m(adduct_string, mz, electron_mass = 0.0005485799)
 }
 \arguments{
-\item{adduct_string}{Adduct to be parsed}
+\item{adduct_string}{Character string representing the adduct
+(e.g., "[M+H]+", "[2M+Na]+")}
 
-\item{mz}{mz}
+\item{mz}{Numeric observed m/z value}
 
-\item{electron_mass}{Electron mass}
+\item{electron_mass}{Numeric electron mass in Daltons
+(default: 5.485799E-4, CODATA 2018 value)}
 }
 \value{
-A mass
+Numeric neutral mass (M) in Daltons. Returns 0 if adduct
+parsing fails.
 }
 \description{
-This function calculates the mass of M
+This function calculates the neutral mass (M) from an observed
+m/z value and adduct notation. It accounts for charge, multimers,
+isotopes, and adduct modifications.
 }
 \examples{
 calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")

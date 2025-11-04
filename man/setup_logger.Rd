@@ -4,12 +4,22 @@
 \alias{setup_logger}
 \title{Setup logger}
 \usage{
-setup_logger(filename)
+setup_logger(filename = "tima.log")
 }
 \arguments{
-\item{filename}{Log file name. Default: \code{"tima.log"}.}
+\item{filename}{Character string specifying the log file name.
+Default: "tima.log"}
+}
+\value{
+NULL (invisibly). Sets up logger as side effect.
 }
 \description{
-Setup logger
+Configures the logger for the package with trace-level logging
+and output to both console and a log file
+}
+\examples{
+\dontrun{
+setup_logger("analysis.log")
+}
 }
 \keyword{internal}

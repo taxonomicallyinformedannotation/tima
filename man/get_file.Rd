@@ -4,20 +4,21 @@
 \alias{get_file}
 \title{Get file}
 \usage{
-get_file(url, export, limit = 3600)
+get_file(url, export, limit = 3600L)
 }
 \arguments{
-\item{url}{URL of the file to be downloaded}
+\item{url}{Character string URL of the file to be downloaded}
 
-\item{export}{File path where the file should be saved}
+\item{export}{Character string file path where the file should be saved}
 
-\item{limit}{Timeout limit (in seconds)}
+\item{limit}{Integer timeout limit in seconds (default: 3600)}
 }
 \value{
-The path to the file
+The path to the downloaded file
 }
 \description{
-This function get files
+This function downloads files from a URL with retry logic
+and exponential backoff
 }
 \examples{
 \dontrun{

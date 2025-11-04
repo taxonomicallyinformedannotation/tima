@@ -7,21 +7,24 @@
 dist_groups(d, g)
 }
 \arguments{
-\item{d}{A distance object}
+\item{d}{A distance object or matrix}
 
-\item{g}{A grouping vector for the distance object}
+\item{g}{A grouping vector for the observations in the distance object.
+Must have length equal to the number of observations.}
 }
 \value{
-A data frame containing distance information
-between pairs of observations in the distance object,
-with columns for the names or indices of the observations,
-the group labels for each observation,
-and the distance between the observations.
-The label column indicates whether the distance is
-within a group or between groups.
+A data frame containing distance information between pairs of
+observations with columns:
+\item{Item1}{Index of first observation}
+\item{Item2}{Index of second observation}
+\item{Group1}{Group label of first observation}
+\item{Group2}{Group label of second observation}
+\item{Label}{Factor indicating if distance is within or between groups}
+\item{Distance}{Numeric distance value rounded to 5 digits}
 }
 \description{
-This function gets distances per group
+This function calculates pairwise distances between observations
+and annotates them with group membership information
 }
 \examples{
 NULL

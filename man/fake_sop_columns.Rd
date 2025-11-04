@@ -6,8 +6,14 @@
 \usage{
 fake_sop_columns()
 }
+\value{
+A single-row data frame with standard SOP columns filled with
+NA_character_ values
+}
 \description{
-This function fakes sop columns
+This function creates an empty structure-organism pair (SOP)
+dataframe template with all standard column names and NA values.
+Used as a placeholder when actual SOP data is unavailable.
 }
 \examples{
 NULL

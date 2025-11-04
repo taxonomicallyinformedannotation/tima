@@ -7,13 +7,15 @@
 select_sop_columns(df)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Dataframe containing structure-organism pair data}
 }
 \value{
-The dataframe with selected structure organism pairs columns
+The dataframe with selected and renamed SOP columns in standardized format
 }
 \description{
-This function selects sop columns
+This function selects and renames structure-organism pair (SOP)
+columns to a standardized format, including chemical structures,
+taxonomic classifications, and organism taxonomy
 }
 \examples{
 NULL
