@@ -3,7 +3,8 @@
 #' @description This function logs summary statistics about chemically weighted
 #'     annotations, showing how many structures were reranked at each chemical
 #'     classification level. Uses cascading filters where each level builds on
-#'     the previous (higher specificity requires passing lower levels).
+#'     the previous (higher specificity requires passing lower levels). The
+#'     function validates required columns and handles empty inputs gracefully.
 #'
 #' @param annot_table_wei_chemo Data frame containing chemically weighted annotations
 #' @param score_chemical_cla_kingdom Numeric minimum score for Classyfire kingdom
@@ -19,14 +20,42 @@
 #' @examples NULL
 decorate_chemo <- function(
   annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
-  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir = parent.frame()),
-  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
-  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
-  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
-  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir = parent.frame()),
-  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
+  score_chemical_cla_kingdom = get(
+    "score_chemical_cla_kingdom",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_superclass = get(
+    "score_chemical_cla_superclass",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_class = get(
+    "score_chemical_cla_class",
+    envir = parent.frame()
+  ),
+  score_chemical_cla_parent = get(
+    "score_chemical_cla_parent",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_pathway = get(
+    "score_chemical_npc_pathway",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_superclass = get(
+    "score_chemical_npc_superclass",
+    envir = parent.frame()
+  ),
+  score_chemical_npc_class = get(
+    "score_chemical_npc_class",
+    envir = parent.frame()
+  )
 ) {
+  required_cols <- c("score_chemical", "candidate_structure_inchikey_connectivity_layer")
+  missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
+  if (length(missing_cols) > 0) {
+    logger::log_warn("decorate_chemo: missing expected columns: %s", paste(missing_cols, collapse = ", "))
+    return(annot_table_wei_chemo)
+  }
+
   # Classyfire hierarchy (cascading filters)
   df_cla_kingdom <- annot_table_wei_chemo |>
     tidytable::filter(score_chemical >= score_chemical_cla_kingdom) |>
@@ -86,34 +115,62 @@ decorate_chemo <- function(
     )
 
   # Count unique structures at each level
-  n_cla_kingdom <- nrow(df_cla_kingdom |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
-  n_cla_superclass <- nrow(df_cla_superclass |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
-  n_cla_class <- nrow(df_cla_class |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
-  n_cla_parent <- nrow(df_cla_parent |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
+  n_cla_kingdom <- nrow(
+    df_cla_kingdom |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
+  n_cla_superclass <- nrow(
+    df_cla_superclass |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
+  n_cla_class <- nrow(
+    df_cla_class |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
+  n_cla_parent <- nrow(
+    df_cla_parent |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
 
-  n_npc_pathway <- nrow(df_npc_pathway |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
-  n_npc_superclass <- nrow(df_npc_superclass |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
-  n_npc_class <- nrow(df_npc_class |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer))
+  n_npc_pathway <- nrow(
+    df_npc_pathway |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
+  n_npc_superclass <- nrow(
+    df_npc_superclass |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
+  n_npc_class <- nrow(
+    df_npc_class |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  )
 
   # Log summary statistics
   logger::log_info(
     "Chemically informed scoring reranked:\n",
     "  Classyfire hierarchy:\n",
-    "    Kingdom level:    ", n_cla_kingdom, " structures\n",
-    "    Superclass level: ", n_cla_superclass, " structures\n",
-    "    Class level:      ", n_cla_class, " structures\n",
-    "    Parent level:     ", n_cla_parent, " structures\n",
+    "    Kingdom level:    ",
+    n_cla_kingdom,
+    " structures\n",
+    "    Superclass level: ",
+    n_cla_superclass,
+    " structures\n",
+    "    Class level:      ",
+    n_cla_class,
+    " structures\n",
+    "    Parent level:     ",
+    n_cla_parent,
+    " structures\n",
     "  NPClassifier hierarchy:\n",
-    "    Pathway level:    ", n_npc_pathway, " structures\n",
-    "    Superclass level: ", n_npc_superclass, " structures\n",
-    "    Class level:      ", n_npc_class, " structures\n",
+    "    Pathway level:    ",
+    n_npc_pathway,
+    " structures\n",
+    "    Superclass level: ",
+    n_npc_superclass,
+    " structures\n",
+    "    Class level:      ",
+    n_npc_class,
+    " structures\n",
     "  (Note: WITHOUT consistency score filtering - for later predictions)"
   )
 

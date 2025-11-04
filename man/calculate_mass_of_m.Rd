@@ -8,7 +8,7 @@ calculate_mass_of_m(adduct_string, mz, electron_mass = 0.0005485799)
 }
 \arguments{
 \item{adduct_string}{Character string representing the adduct
-(e.g., "[M+H]+", "[2M+Na]+")}
+(e.g., \code{[M+H]+}, \code{[2M+Na]+})}
 
 \item{mz}{Numeric observed m/z value}
 

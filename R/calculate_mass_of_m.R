@@ -7,7 +7,7 @@
 #' @include parse_adduct.R
 #'
 #' @param adduct_string Character string representing the adduct
-#'     (e.g., "\[M+H\]+", "\[2M+Na\]+")
+#'     (e.g., \code{[M+H]+}, \code{[2M+Na]+})
 #' @param mz Numeric observed m/z value
 #' @param electron_mass Numeric electron mass in Daltons
 #'     (default: 5.485799E-4, CODATA 2018 value)

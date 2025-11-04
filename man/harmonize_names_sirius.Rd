@@ -7,18 +7,20 @@
 harmonize_names_sirius(x)
 }
 \arguments{
-\item{x}{Character string containing a name}
+\item{x}{Character string containing a SIRIUS column name to harmonize}
 }
 \value{
-Character string with the name modified according
-to the rules specified in the function
+Character string with everything before and including the last
+underscore removed, leaving only the meaningful column name portion
 }
 \description{
-This function harmonizes the names of Sirius
-outputs to make them compatible
+This function harmonizes SIRIUS output column names by removing
+numeric prefixes and underscores. SIRIUS often prefixes column names with
+numbers and underscores (e.g., "1_compound_name"), and this function
+extracts the meaningful part (e.g., "name").
 }
 \examples{
-\dontrun{
-harmonized_name <- harmonize_names_sirius("My_name")
-}
+harmonize_names_sirius("1_compound_name")  # Returns "name"
+harmonize_names_sirius("2_feature_id")     # Returns "id"
+harmonize_names_sirius("score")            # Returns "score" (no underscore)
 }

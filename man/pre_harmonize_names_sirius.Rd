@@ -7,18 +7,20 @@
 pre_harmonize_names_sirius(x)
 }
 \arguments{
-\item{x}{Character string containing a name}
+\item{x}{Character string containing a SIRIUS column name to pre-harmonize}
 }
 \value{
-Character string with the name modified according
-to the rules specified in the function
+Character string with everything from and including the first
+forward slash (/) removed, leaving only the base column name
 }
 \description{
-This function pre harmonizes Sirius names
-to make them compatible
+This function pre-processes SIRIUS column names by removing
+suffixes that appear after a forward slash. SIRIUS sometimes appends
+additional information after a slash (e.g., "columnName/suffix"), and
+this function removes everything from the slash onwards.
 }
 \examples{
-\dontrun{
-prepared_name <- pre_harmonize_names_sirius("My name/suffix")
-}
+pre_harmonize_names_sirius("column_name/suffix")  # Returns "column_name"
+pre_harmonize_names_sirius("simple_name")         # Returns "simple_name"
+pre_harmonize_names_sirius("name/extra/info")     # Returns "name"
 }

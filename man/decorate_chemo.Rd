@@ -41,7 +41,8 @@ The input annotation table (unchanged), for use in pipelines
 This function logs summary statistics about chemically weighted
 annotations, showing how many structures were reranked at each chemical
 classification level. Uses cascading filters where each level builds on
-the previous (higher specificity requires passing lower levels).
+the previous (higher specificity requires passing lower levels). The
+function validates required columns and handles empty inputs gracefully.
 }
 \examples{
 NULL

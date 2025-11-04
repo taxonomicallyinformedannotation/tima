@@ -11,22 +11,32 @@ get_organism_taxonomy_ott(
 )
 }
 \arguments{
-\item{df}{Dataframe containing your organism(s) name(s)}
+\item{df}{Data frame containing organism names in a column named "organism"}
 
-\item{url}{url of the ott api (for testing purposes)}
+\item{url}{Character string URL of the OTT API endpoint (default: production API,
+can be changed for testing)}
 
-\item{retry}{Boolean. Retry with generic epithet}
+\item{retry}{Logical indicating whether to retry failed queries using only the
+generic epithet (genus name) when full species names fail (default: TRUE)}
 }
 \value{
-The path to the obtained OTT taxonomy
+Data frame with taxonomic information including OTT IDs, ranks, and
+taxonomic hierarchy. Returns empty template if API is unavailable.
 }
 \description{
-This function retrieves taxonomy
-from the Open Tree of Life taxonomy
+This function retrieves taxonomic information from the Open Tree
+of Life (OTT) taxonomy service. It cleans organism names, queries the OTT
+API, and returns structured taxonomic data including OTT IDs and hierarchical
+classifications.
 }
 \examples{
 \dontrun{
-df <- data.frame("organism" = "Homo sapiens")
-get_organism_taxonomy_ott(df)
+# Single organism
+df <- data.frame(organism = "Homo sapiens")
+taxonomy <- get_organism_taxonomy_ott(df)
+
+# Multiple organisms
+df <- data.frame(organism = c("Homo sapiens", "Arabidopsis thaliana"))
+taxonomy <- get_organism_taxonomy_ott(df)
 }
 }

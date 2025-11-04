@@ -1,14 +1,29 @@
 #' @title Parse CLI parameters
 #'
-#' @description This function parses command line parameters
+#' @description This function parses command-line interface (CLI) arguments and
+#'     merges them into the parameter configuration structure. It uses a mapping
+#'     system to translate CLI argument names to their corresponding nested paths
+#'     in the parameters list, applying appropriate type conversions.
 #'
-#' @param arguments CLI arguments
-#' @param parameters Parameters
+#' @param arguments Named list of CLI arguments from docopt or similar parser
+#' @param parameters Nested list of default parameters to be updated with CLI values
 #'
-#' @return Parameters coming from the CLI
+#' @return Updated parameters list with CLI arguments merged in, maintaining the
+#'     nested structure and applying type conversions as specified in the mappings
 #'
 #' @examples NULL
 parse_cli_params <- function(arguments, parameters) {
+  # Validate inputs
+  if (!is.list(arguments)) {
+    stop("CLI arguments must be a list")
+  }
+
+  if (!is.list(parameters)) {
+    stop("Parameters must be a list")
+  }
+
+  # Define mappings from CLI argument names to parameter paths
+  # Each mapping specifies: path (nested list location) and type (conversion function)
   mappings <- list(
     ann_can_fin = list(
       path = c("annotations", "candidates", "final"),
