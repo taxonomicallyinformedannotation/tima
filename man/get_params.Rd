@@ -7,19 +7,21 @@
 get_params(step)
 }
 \arguments{
-\item{step}{Name of the step being performed}
+\item{step}{Character string name of the workflow step (e.g., "prepare_params",
+"annotate_masses"). Must match an available step in the package.}
 }
 \value{
-The parameters
+Named list containing the merged parameters for the specified step
 }
 \description{
-This function gets the parameters for the job.
-Combination of cli and yaml parameters
+This function retrieves and merges parameters for a workflow step,
+combining default parameters, user-specified YAML configurations, and
+command-line arguments. It handles both regular and advanced parameter sets.
 }
 \examples{
 \dontrun{
 copy_backbone()
 go_to_cache()
-get_params("prepare_params")
+params <- get_params("prepare_params")
 }
 }

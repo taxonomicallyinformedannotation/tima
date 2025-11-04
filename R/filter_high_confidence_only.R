@@ -33,8 +33,12 @@ filter_high_confidence_only <- function(
   }
 
   # Validate score thresholds are in valid range
-  if (any(c(score_bio_min, score_ini_min, score_final_min) < 0 |
-          c(score_bio_min, score_ini_min, score_final_min) > 1)) {
+  if (
+    any(
+      c(score_bio_min, score_ini_min, score_final_min) < 0 |
+        c(score_bio_min, score_ini_min, score_final_min) > 1
+    )
+  ) {
     stop("Score thresholds must be between 0 and 1")
   }
 
@@ -73,12 +77,19 @@ filter_high_confidence_only <- function(
   percent_removed <- round(100 * n_removed / n_before, 1)
 
   logger::log_info(
-    "Removed ", n_removed, " low-confidence candidates (",
-    percent_removed, "% of ", n_before, " total)"
+    "Removed ",
+    n_removed,
+    " low-confidence candidates (",
+    percent_removed,
+    "% of ",
+    n_before,
+    " total)"
   )
   logger::log_info(
-    n_after, " high-confidence candidates remaining (",
-    round(100 * n_after / n_before, 1), "%)"
+    n_after,
+    " high-confidence candidates remaining (",
+    round(100 * n_after / n_before, 1),
+    "%)"
   )
 
   return(df_filtered)

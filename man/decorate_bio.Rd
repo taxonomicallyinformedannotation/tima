@@ -18,32 +18,33 @@ decorate_bio(
 )
 }
 \arguments{
-\item{annot_table_wei_bio}{Table to decorate}
+\item{annot_table_wei_bio}{Data frame containing biologically weighted annotations}
 
-\item{score_biological_kingdom}{Kingdom score}
+\item{score_biological_kingdom}{Numeric minimum score for kingdom-level matches}
 
-\item{score_biological_phylum}{Phylum score}
+\item{score_biological_phylum}{Numeric minimum score for phylum-level matches}
 
-\item{score_biological_class}{Class score}
+\item{score_biological_class}{Numeric minimum score for class-level matches}
 
-\item{score_biological_order}{Order score}
+\item{score_biological_order}{Numeric minimum score for order-level matches}
 
-\item{score_biological_family}{Family score}
+\item{score_biological_family}{Numeric minimum score for family-level matches}
 
-\item{score_biological_tribe}{Tribe score}
+\item{score_biological_tribe}{Numeric minimum score for tribe-level matches}
 
-\item{score_biological_genus}{Genus score}
+\item{score_biological_genus}{Numeric minimum score for genus-level matches}
 
-\item{score_biological_species}{Species score}
+\item{score_biological_species}{Numeric minimum score for species-level matches}
 
-\item{score_biological_variety}{Variety score}
+\item{score_biological_variety}{Numeric minimum score for variety-level matches}
 }
 \value{
-Message indicating the number of annotations
-weighted at each biological level
+The input annotation table (unchanged), for use in pipelines
 }
 \description{
-This function outputs information about biological weighting
+This function logs summary statistics about biologically weighted
+annotations, showing how many structures were reranked at each taxonomic
+level based on organism occurrence data.
 }
 \examples{
 NULL

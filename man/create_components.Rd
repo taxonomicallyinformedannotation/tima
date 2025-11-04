@@ -10,15 +10,19 @@ create_components(
 )
 }
 \arguments{
-\item{input}{Input file(s) containing edges}
+\item{input}{Character vector of file path(s) containing edge data.
+Files should have feature_source and feature_target columns.}
 
-\item{output}{Output file.}
+\item{output}{Character string path for the output components file}
 }
 \value{
-The path to the created components
+Character string path to the created components file
 }
 \description{
-This function create components from edges
+This function creates network components (connected subgraphs)
+from edge lists using igraph. Each component represents a set of
+features that are connected through spectral similarity or other
+relationships.
 }
 \examples{
 \dontrun{
@@ -27,8 +31,7 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 data_interim <- "data/interim/"
-dir <- paste0(github, repo)
-dir <- paste0(dir, data_interim)
+dir <- paste0(github, repo, data_interim)
 get_file(
   url = paste0(dir, "features/example_edges.tsv"),
   export = get_params(step = "create_components")$files$networks$spectral$edges$prepared

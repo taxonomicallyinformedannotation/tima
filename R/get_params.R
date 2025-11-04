@@ -1,16 +1,18 @@
 #' @title Get parameters
 #'
-#' @description This function gets the parameters for the job.
-#'    Combination of cli and yaml parameters
+#' @description This function retrieves and merges parameters for a workflow step,
+#'     combining default parameters, user-specified YAML configurations, and
+#'     command-line arguments. It handles both regular and advanced parameter sets.
 #'
 #' @include get_default_paths.R
 #' @include get_path.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #'
-#' @param step Name of the step being performed
+#' @param step Character string name of the workflow step (e.g., "prepare_params",
+#'     "annotate_masses"). Must match an available step in the package.
 #'
-#' @return The parameters
+#' @return Named list containing the merged parameters for the specified step
 #'
 #' @export
 #'
@@ -18,63 +20,106 @@
 #' \dontrun{
 #' copy_backbone()
 #' go_to_cache()
-#' get_params("prepare_params")
+#' params <- get_params("prepare_params")
 #' }
 get_params <- function(step) {
-  paths <- get_default_paths()
-  steps <-
-    list.files(system.file("scripts/docopt", package = "tima")) |>
-    stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
-
-  default_path <-
-    if (step == "prepare_params") {
-      file.path(
-        system.file(package = "tima"),
-        get_path(file.path(paths$params$prepare_params))
-      )
-    } else if (step == "prepare_params_advanced") {
-      file.path(
-        system.file(package = "tima"),
-        get_path(file.path(paths$params$prepare_params_advanced))
-      )
-    } else {
-      file.path(
-        system.file(package = "tima"),
-        get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
-      )
-    }
-
-  # for advanced parameters to work
-  step <- step |>
-    gsub(
-      pattern = "_advanced",
-      replacement = "",
-      fixed = TRUE
-    )
-
-  stopifnot("Your step does not exist." = step %in% steps)
-
-  doc_path <-
-    file.path(
-      system.file("scripts/docopt", package = "tima"),
-      paste0(step, ".txt")
-    )
-
-  user_path <-
-    file.path(get_path(paths$params$user$path), paste0(step, ".yaml"))
-
-  doc <- readChar(con = doc_path, nchars = file.info(doc_path)$size)
-
-  if (file.exists(user_path)) {
-    params <- parse_yaml_params(def = default_path, usr = user_path)
-  } else {
-    params <- parse_yaml_params(def = default_path, usr = default_path)
+  # Validate input
+  if (missing(step) || is.null(step) || nchar(step) == 0L) {
+    stop("Step name must be provided")
   }
 
-  params <- parse_cli_params(
-    arguments = docopt::docopt(doc = doc, version = paths$version),
-    parameters = params
+  logger::log_trace("Getting parameters for step: ", step)
+
+  # Get default paths
+  paths <- get_default_paths()
+
+  # Get list of available steps
+  available_steps <- list.files(
+    path = system.file("scripts/docopt", package = "tima")
+  ) |>
+    stringi::stri_replace_all_fixed(pattern = ".txt", replacement = "")
+
+  # Determine default parameter file path based on step type
+  default_param_path <- if (step == "prepare_params") {
+    file.path(
+      system.file(package = "tima"),
+      get_path(file.path(paths$params$prepare_params))
+    )
+  } else if (step == "prepare_params_advanced") {
+    file.path(
+      system.file(package = "tima"),
+      get_path(file.path(paths$params$prepare_params_advanced))
+    )
+  } else {
+    file.path(
+      system.file(package = "tima"),
+      get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
+    )
+  }
+
+  # Validate default parameter file exists
+  if (!file.exists(default_param_path)) {
+    stop("Default parameter file not found: ", default_param_path)
+  }
+
+  # Normalize step name (remove _advanced suffix for validation)
+  step_normalized <- gsub(
+    pattern = "_advanced",
+    replacement = "",
+    x = step,
+    fixed = TRUE
   )
+
+  # Validate step exists
+  if (!step_normalized %in% available_steps) {
+    stop(
+      "Step '",
+      step,
+      "' does not exist. Available steps: ",
+      paste(head(available_steps, 10), collapse = ", "),
+      if (length(available_steps) > 10) "..." else ""
+    )
+  }
+
+  # Get docopt documentation path
+  docopt_path <- file.path(
+    system.file("scripts/docopt", package = "tima"),
+    paste0(step_normalized, ".txt")
+  )
+
+  # Read docopt documentation
+  if (!file.exists(docopt_path)) {
+    stop("Docopt file not found: ", docopt_path)
+  }
+
+  docopt_text <- readChar(
+    con = docopt_path,
+    nchars = file.info(docopt_path)$size
+  )
+
+  # Check for user-specified parameters
+  user_param_path <- file.path(
+    get_path(paths$params$user$path),
+    paste0(step_normalized, ".yaml")
+  )
+
+  # Load and merge YAML parameters
+  if (file.exists(user_param_path)) {
+    logger::log_debug("Loading user parameters from: ", user_param_path)
+    params <- parse_yaml_params(def = default_param_path, usr = user_param_path)
+  } else {
+    logger::log_trace("Using default parameters (no user overrides)")
+    params <- parse_yaml_params(
+      def = default_param_path,
+      usr = default_param_path
+    )
+  }
+
+  # Parse and merge CLI arguments
+  cli_args <- docopt::docopt(doc = docopt_text, version = paths$version)
+  params <- parse_cli_params(arguments = cli_args, parameters = params)
+
+  logger::log_trace("Parameters loaded successfully for step: ", step)
 
   return(params)
 }
