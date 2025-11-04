@@ -1,25 +1,26 @@
 #' @title Create edges spectra
 #'
-#' @description This function create edges
-#'    based on fragmentation spectra similarity
+#' @description This function creates molecular network edges based on MS2
+#'     fragmentation spectra similarity. Compares all spectra against each
+#'     other using spectral similarity metrics to identify related features.
 #'
 #' @include create_edges.R
 #' @include get_params.R
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
 #'
-#' @param input Query file containing spectra. Currently an '.mgf' file
-#' @param output Output file.
-#' @param name_source Name of the source features column
-#' @param name_target Name of the target features column
-#' @param method Similarity method
-#' @param threshold Minimal similarity to report
-#' @param matched_peaks Minimal number of matched peaks
-#' @param ppm Relative ppm tolerance to be used
-#' @param dalton Absolute Dalton tolerance to be used
-#' @param qutoff Intensity under which ms2 fragments will be removed.
+#' @param input Character string path to query MGF file containing spectra
+#' @param output Character string path for output edges file
+#' @param name_source Character string name of source feature column
+#' @param name_target Character string name of target feature column
+#' @param method Character string similarity method to use
+#' @param threshold Numeric minimum similarity threshold (0-1) to report edge
+#' @param matched_peaks Integer minimum number of matched peaks required
+#' @param ppm Numeric relative mass tolerance in ppm
+#' @param dalton Numeric absolute mass tolerance in Daltons
+#' @param qutoff Numeric intensity cutoff below which MS2 fragments are removed
 #'
-#' @return The path to the created spectral edges
+#' @return Character string path to the created spectral edges file
 #'
 #' @export
 #'
@@ -54,8 +55,43 @@ create_edges_spectra <- function(
   )$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
 ) {
-  stopifnot("Your input file does not exist." = file.exists(input))
-  ## Not checking for ppm and Da limits, everyone is free.
+  # Validate file paths
+  if (!is.character(input) || length(input) != 1L) {
+    stop("input must be a single character string")
+  }
+
+  if (!file.exists(input)) {
+    stop("Input file not found: ", input)
+  }
+
+  if (!is.character(output) || length(output) != 1L) {
+    stop("output must be a single character string")
+  }
+
+  # Validate numeric parameters
+  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
+    stop("threshold must be between 0 and 1, got: ", threshold)
+  }
+
+  if (!is.numeric(matched_peaks) || matched_peaks < 1) {
+    stop("matched_peaks must be a positive integer")
+  }
+
+  if (!is.numeric(ppm) || ppm <= 0) {
+    stop("ppm must be a positive number")
+  }
+
+  if (!is.numeric(dalton) || dalton <= 0) {
+    stop("dalton must be a positive number")
+  }
+
+  if (!is.numeric(qutoff) || qutoff < 0) {
+    stop("qutoff must be a non-negative number")
+  }
+
+  logger::log_info("Creating spectral similarity network edges")
+  logger::log_debug("Parameters - Threshold: ", threshold, ", Method: ", method)
+  logger::log_debug("Tolerances - PPM: ", ppm, ", Dalton: ", dalton)
 
   spectra <- input |>
     import_spectra(

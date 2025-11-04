@@ -11,15 +11,18 @@ prepare_libraries_sop_hmdb(
 )
 }
 \arguments{
-\item{input}{Input file}
+\item{input}{Character string path to HMDB SDF zip file}
 
-\item{output}{Output file}
+\item{output}{Character string path for prepared HMDB library output}
 }
 \value{
-The path to the prepared structure-organism pairs library HMDB
+Character string path to prepared HMDB structure-organism pairs
 }
 \description{
-This function prepares the HMDB structure-organism pairs
+This function prepares HMDB (Human Metabolome Database)
+structure-organism pairs by parsing SDF files, extracting metadata,
+and formatting for TIMA annotation workflows. Handles human metabolite
+data with structures and biofluid/tissue associations.
 }
 \examples{
 \dontrun{

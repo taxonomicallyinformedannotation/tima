@@ -7,15 +7,17 @@
 select_sirius_columns_canopus(df, sirius_version)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame with SIRIUS CANOPUS results}
 
-\item{sirius_version}{Sirius version}
+\item{sirius_version}{Character string SIRIUS version ("5" or "6")}
 }
 \value{
-The dataframe with selected canopus columns
+Data frame with standardized CANOPUS column names
 }
 \description{
-This function selects sirius columns (canopus)
+This function selects and standardizes CANOPUS chemical
+classification columns from SIRIUS results, mapping SIRIUS-specific
+column names to TIMA standard names for downstream processing.
 }
 \examples{
 NULL

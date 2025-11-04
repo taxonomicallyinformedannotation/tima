@@ -28,42 +28,45 @@ prepare_libraries_sop_merged(
 )
 }
 \arguments{
-\item{files}{List of libraries to be merged}
+\item{files}{Character vector or list of paths to prepared library files}
 
-\item{filter}{Boolean. TRUE or FALSE if you want to filter the library}
+\item{filter}{Logical whether to filter the merged library by taxonomy}
 
-\item{level}{Biological rank to be filtered.
-Kingdom, phylum, family, genus, ...}
+\item{level}{Character string taxonomic rank for filtering (kingdom, phylum,
+family, genus, etc.)}
 
-\item{value}{Name of the taxon or taxa to be kept,
-e.g. 'Gentianaceae|Apocynaceae'}
+\item{value}{Character string taxon name(s) to keep (can use | for multiple,
+e.g., 'Gentianaceae|Apocynaceae')}
 
-\item{cache}{Cache where already processed SMILES are located}
+\item{cache}{Character string path to cache directory for processed SMILES}
 
-\item{output_key}{Output file for keys}
+\item{output_key}{Character string path for output keys file}
 
-\item{output_org_tax_ott}{Output file for organisms taxonomy (OTT)}
+\item{output_org_tax_ott}{Character string path for organisms taxonomy (OTT) file}
 
-\item{output_str_stereo}{Output file for structures stereo}
+\item{output_str_stereo}{Character string path for structures stereochemistry file}
 
-\item{output_str_met}{Output file for structures metadata}
+\item{output_str_met}{Character string path for structures metadata file}
 
-\item{output_str_nam}{Output file for structures names}
+\item{output_str_nam}{Character string path for structures names file}
 
-\item{output_str_tax_cla}{Output file for structures taxonomy (Classyfire)}
+\item{output_str_tax_cla}{Character string path for ClassyFire taxonomy file}
 
-\item{output_str_tax_npc}{Output file for structures taxonomy (NPC)}
+\item{output_str_tax_npc}{Character string path for NPClassifier taxonomy file}
 }
 \value{
-The path to the prepared structure-organism pairs library MERGED
+Character string path to the prepared merged SOP library
 }
 \description{
-This function prepares the libraries made of
-all sub-libraries containing structure-organism pairs
+This function merges all structure-organism pair libraries
+(LOTUS, HMDB, ECMDB, etc.) into a single comprehensive library. Can
+optionally filter by taxonomic level to create biologically-focused
+subsets. Also splits structures into separate metadata tables.
 }
 \details{
-It can be restricted to specific taxa to have
-more biologically meaningful annotation.
+Creates merged library by combining all available SOP sources,
+optionally filtering by taxonomic criteria (e.g., only Gentianaceae).
+Splits output into structures metadata, names, taxonomy, and organisms.
 }
 \examples{
 \dontrun{
@@ -73,11 +76,7 @@ github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
 files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
-  gsub(
-    pattern = ".gz",
-    replacement = "",
-    fixed = TRUE
-  )
+  gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 get_file(url = paste0(dir, files), export = files)
 prepare_libraries_sop_merged(files = files)
 unlink("data", recursive = TRUE)
