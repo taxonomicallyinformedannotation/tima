@@ -10,15 +10,17 @@ parse_yaml_params(
 )
 }
 \arguments{
-\item{def}{Default path}
+\item{def}{Character string path to the default YAML parameters file}
 
-\item{usr}{User path}
+\item{usr}{Character string path to the user-specified YAML parameters file
+(optional). If it exists, it will override default values.}
 }
 \value{
 A list containing the parameters specified in the YAML files
 }
 \description{
-This function parses YAML parameters
+This function parses YAML parameter files, loading default
+parameters and optionally overriding them with user-specified values
 }
 \examples{
 NULL

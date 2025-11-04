@@ -7,15 +7,19 @@
 clean_collapse(grouped_df, cols = NULL)
 }
 \arguments{
-\item{grouped_df}{Grouped dataframe}
+\item{grouped_df}{Grouped dataframe to be collapsed}
 
-\item{cols}{Column(s) to apply collapse to}
+\item{cols}{Character vector of column name(s) to apply collapse to.
+If NULL (default), applies to all columns.}
 }
 \value{
-Cleaned and collapsed dataframe
+A cleaned and collapsed dataframe with unique values collapsed
+per group
 }
 \description{
-This function collapses a grouped dataframe and trims it
+This function collapses a grouped dataframe and trims it.
+It removes NA values, collapses unique values with " $ " separator,
+trims whitespace, and converts empty strings to NA.
 }
 \examples{
 NULL

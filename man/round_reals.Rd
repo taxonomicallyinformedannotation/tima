@@ -7,14 +7,21 @@
 round_reals(df, dig = 5L, cols = c("structure_exact_mass", "structure_xlogp"))
 }
 \arguments{
-\item{df}{Dataframe to use}
+\item{df}{Dataframe containing columns to round}
 
-\item{dig}{Number of digits}
+\item{dig}{Integer number of decimal digits to round to (default: 5)}
 
-\item{cols}{Columns}
+\item{cols}{Character vector of column name patterns to match
+(default: c("structure_exact_mass", "structure_xlogp"))}
+}
+\value{
+The dataframe with specified numeric columns rounded to the
+specified number of digits
 }
 \description{
-This function rounds reals in columns of a dataframe
+This function rounds numeric values in specified columns
+of a dataframe. It only affects columns that contain the specified
+patterns in their names.
 }
 \examples{
 NULL

@@ -7,21 +7,38 @@
 join_gnps_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 }
 \arguments{
-\item{x}{Numeric vector or matrix for query masses.}
+\item{x}{Numeric vector of query m/z values}
 
-\item{y}{Numeric vector or matrix for target masses.}
+\item{y}{Numeric vector of target m/z values}
 
-\item{xPrecursorMz}{Numeric vector of precursor values for queries.}
+\item{xPrecursorMz}{Numeric precursor m/z for query spectrum}
 
-\item{yPrecursorMz}{Numeric vector of precursor values for targets.}
+\item{yPrecursorMz}{Numeric precursor m/z for target spectrum}
 
-\item{tolerance}{Numeric value specifying the tolerance in daltons.}
+\item{tolerance}{Numeric value specifying the absolute tolerance in Daltons}
 
-\item{ppm}{Numeric value specifying the tolerance in ppm.}
+\item{ppm}{Numeric value specifying the relative tolerance in ppm}
 }
 \value{
-The result returned from the C function "join_gnps".
+A list with two integer vectors:
+\item{1}{Indices of matched peaks in x}
+\item{2}{Indices of matched peaks in y}
 }
 \description{
-Wrapper for the C function "join_gnps"
+Performs GNPS-style peak matching between query and target
+mass lists with tolerance-based matching and precursor filtering
+}
+\examples{
+\dontrun{
+query_mz <- c(100.05, 200.10, 300.15)
+target_mz <- c(100.06, 200.11, 400.20)
+matches <- join_gnps_wrapper(
+  x = query_mz,
+  y = target_mz,
+  xPrecursorMz = 500.0,
+  yPrecursorMz = 500.0,
+  tolerance = 0.01,
+  ppm = 10
+)
+}
 }

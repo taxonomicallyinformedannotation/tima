@@ -7,17 +7,20 @@
 create_dir(export)
 }
 \arguments{
-\item{export}{Path to the directory to be created}
+\item{export}{Character string path to the directory or file path
+from which to extract and create the directory}
 }
 \value{
-Message indicating the status of directory creation
+NULL (invisibly). Creates directory as a side effect.
 }
 \description{
 This function creates a directory at the specified path
-if it does not already exist.
+if it does not already exist. Handles both directory paths and
+file paths (extracting the directory component).
 }
 \examples{
 \dontrun{
-create_dir(export = "path/to/directory_of_file")
+create_dir(export = "path/to/directory")
+create_dir(export = "path/to/file.txt")
 }
 }

@@ -7,10 +7,15 @@
 load_yaml_files()
 }
 \value{
-A list of loaded yaml files
+A list containing:
+\item{yamls_params}{Named list of parsed YAML content}
+\item{yaml_files}{Character vector of file paths}
+\item{yaml_names}{Character vector of parameter names}
 }
 \description{
-This function load yaml files
+This function loads YAML parameter files, preferring user-specified
+parameters over defaults when available. It combines default/user params
+with prepare_params files.
 }
 \examples{
 NULL

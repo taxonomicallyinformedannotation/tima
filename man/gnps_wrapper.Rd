@@ -7,13 +7,28 @@
 gnps_wrapper(x, y)
 }
 \arguments{
-\item{x}{A numeric matrix.}
+\item{x}{Numeric matrix with matched peaks from query spectrum.
+Must have columns for mz and intensity.}
 
-\item{y}{A numeric matrix.}
+\item{y}{Numeric matrix with matched peaks from target spectrum.
+Must have columns for mz and intensity.}
 }
 \value{
-The result from the C function.
+A list containing:
+\item{score}{Numeric similarity score (0-1)}
+\item{matches}{Integer count of matched peaks}
 }
 \description{
-Wrapper for the C function "gnps"
+Calculates GNPS-style spectral similarity score between
+two matched peak matrices
 }
+\examples{
+\dontrun{
+# Matched peaks from two spectra
+x_peaks <- cbind(mz = c(100, 200), intensity = c(50, 100))
+y_peaks <- cbind(mz = c(100, 200), intensity = c(45, 95))
+result <- gnps_wrapper(x = x_peaks, y = y_peaks)
+print(result$score)
+}
+}
+\keyword{internal}

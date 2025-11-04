@@ -7,21 +7,22 @@
 dist_get(d, idx1, idx2)
 }
 \arguments{
-\item{d}{Distance matrix}
+\item{d}{Distance matrix or dist object}
 
-\item{idx1}{Index of the first element}
+\item{idx1}{Integer index of the first element}
 
-\item{idx2}{Index of the second element}
+\item{idx2}{Integer index of the second element}
 }
 \value{
-Distance between the two elements
+Numeric distance between the two elements. Returns 0 if indices
+are identical, NA if indices are invalid.
 }
 \description{
-This function calculates the distance between
-two elements in a distance matrix
+This function calculates the distance between two elements
+in a distance matrix by their indices. Returns 0 for identical elements.
 }
 \details{
-Credit goes to usedist package
+Credit goes to usedist package for the algorithm
 }
 \examples{
 NULL

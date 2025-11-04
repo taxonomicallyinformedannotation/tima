@@ -7,10 +7,22 @@
 columns_model()
 }
 \value{
-The columns model
+A named list containing character vectors of column names organized by category:
+\item{features_columns}{Basic feature identifiers (ID, m/z, RT)}
+\item{features_calculated_columns}{Calculated feature properties (entropy, taxonomy predictions)}
+\item{candidates_calculated_columns}{Calculated candidate properties}
+\item{candidates_sirius_for_columns}{SIRIUS formula-level annotations}
+\item{candidates_sirius_str_columns}{SIRIUS structure-level scores}
+\item{candidates_spectra_columns}{Spectral library matching results}
+\item{candidates_structures_columns}{Chemical structure metadata and taxonomy}
+\item{components_columns}{Molecular network component IDs}
+\item{rank_columns}{Candidate ranking columns}
+\item{score_columns}{Candidate scoring columns}
 }
 \description{
-This function models columns
+This function defines the standardized column naming schema
+used throughout the TIMA package. It organizes columns into logical
+groups for features, candidates, components, and scoring.
 }
 \examples{
 NULL

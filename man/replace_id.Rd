@@ -12,21 +12,21 @@ replace_id(
 )
 }
 \arguments{
-\item{x}{a character string containing the default ID}
+\item{x}{Character string containing the file path with default ID}
 
-\item{user_filename}{a user-specified value for a file name job ID}
+\item{user_filename}{Character string for a custom filename pattern}
 
-\item{user_gnps}{a user-specified value for a GNPS job ID}
+\item{user_gnps}{Character string for a GNPS job ID (if NULL, uses user_filename)}
 
-\item{example_gnps}{an example value for a GNPS job ID}
+\item{example_gnps}{Character string for the example GNPS job ID to detect}
 }
 \value{
-Character string with the GNPS job ID modified according
-to the rules specified in the function
+Character string with the ID replaced according to user specifications
 }
 \description{
-This function replaces the default ID
-in the example by a user-specified one
+This function replaces the default ID in file paths with
+user-specified values. It handles both GNPS job IDs and custom
+filename patterns, with special handling for example files.
 }
 \examples{
 \dontrun{

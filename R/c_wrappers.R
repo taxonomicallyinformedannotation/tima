@@ -43,8 +43,8 @@ gnps_wrapper <- function(x, y) {
 #' @param ppm Numeric value specifying the relative tolerance in ppm
 #'
 #' @return A list with two integer vectors:
-#'   \item{[[1]]}{Indices of matched peaks in x}
-#'   \item{[[2]]}{Indices of matched peaks in y}
+#'   \item{1}{Indices of matched peaks in x}
+#'   \item{2}{Indices of matched peaks in y}
 #'
 #' @export
 #'

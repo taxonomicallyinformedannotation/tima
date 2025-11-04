@@ -7,17 +7,21 @@
 harmonize_adducts(df, adducts_colname = "adduct", adducts_translations)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Dataframe containing adduct column to harmonize}
 
-\item{adducts_colname}{Adducts colname}
+\item{adducts_colname}{Character string name of the adduct column
+(default: "adduct")}
 
-\item{adducts_translations}{Adducts translations}
+\item{adducts_translations}{Named character vector mapping original
+adduct notations (names) to standardized forms (values)}
 }
 \value{
-A table with harmonized adducts
+The dataframe with harmonized adduct column
 }
 \description{
-This function annotates masses
+This function harmonizes adduct definitions by replacing
+various adduct notations with standardized forms according to a
+translation table
 }
 \examples{
 NULL

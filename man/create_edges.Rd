@@ -16,25 +16,30 @@ create_edges(
 )
 }
 \arguments{
-\item{frags}{Fragments}
+\item{frags}{List of fragment spectra matrices}
 
-\item{nspecs}{Number of spectra}
+\item{nspecs}{Integer number of spectra}
 
-\item{precs}{Precursors}
+\item{precs}{Numeric vector of precursor m/z values}
 
-\item{method}{Method}
+\item{method}{Character string similarity method ("entropy", "gnps", or "cosine")}
 
-\item{ms2_tolerance}{MS2 tolerance}
+\item{ms2_tolerance}{Numeric MS2 tolerance in Daltons}
 
-\item{ppm_tolerance}{ppm tolerance}
+\item{ppm_tolerance}{Numeric PPM tolerance}
 
-\item{threshold}{Threshold}
+\item{threshold}{Numeric minimum similarity score threshold}
 
-\item{matched_peaks}{Matched peaks}
+\item{matched_peaks}{Integer minimum number of matched peaks required}
+}
+\value{
+A data frame with columns: feature_id, target_id, score, matched_peaks.
+Returns empty data frame with NA values if no edges pass thresholds.
 }
 \description{
-This function applies similarity calculation to a list of
-spectra to create edges
+This function calculates pairwise spectral similarity between
+all spectra to create a network edge list. Uses parallel processing
+via purrr for efficiency.
 }
 \examples{
 NULL
