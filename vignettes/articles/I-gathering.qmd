@@ -41,7 +41,7 @@ This vignette describes...
 * All parameters you need
 * All inputs you need
 
-```{r change-tests, include = FALSE}
+```{r change-tests, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 source(file = "scripts/change_tests.R")
 ```
 

@@ -166,6 +166,43 @@ annotate_masses <-
       logger::log_warn(
         "Empty features table provided - no annotations to perform"
       )
+
+      # Annotations header (exact columns requested)
+      ann_cols <- c(
+        "feature_id",
+        "candidate_structure_error_mz",
+        "candidate_structure_name",
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_smiles_no_stereo",
+        "candidate_structure_molecular_formula",
+        "candidate_structure_exact_mass",
+        "candidate_structure_xlogp",
+        "candidate_library",
+        "candidate_structure_tax_npc_01pat",
+        "candidate_structure_tax_npc_02sup",
+        "candidate_structure_tax_npc_03cla",
+        "candidate_structure_tax_cla_chemontid",
+        "candidate_structure_tax_cla_01kin",
+        "candidate_structure_tax_cla_02sup",
+        "candidate_structure_tax_cla_03cla",
+        "candidate_structure_tax_cla_04dirpar",
+        "candidate_adduct"
+      )
+      empty_annotations <- as.data.frame(matrix(
+        ncol = length(ann_cols),
+        nrow = 0
+      ))
+      colnames(empty_annotations) <- ann_cols
+
+      # Edges header
+      edge_cols <- c("CLUSTERID1", "CLUSTERID2", "label")
+      empty_edges <- as.data.frame(matrix(ncol = length(edge_cols), nrow = 0))
+      colnames(empty_edges) <- edge_cols
+
+      # Write empty outputs
+      export_output(x = empty_annotations, file = output_annotations)
+      export_output(x = empty_edges, file = output_edges)
+
       return(list(annotations = output_annotations, edges = output_edges))
     }
 
