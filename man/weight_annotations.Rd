@@ -21,6 +21,8 @@ weight_annotations(
   candidates_neighbors = get_params(step =
     "weight_annotations")$annotations$candidates$neighbors,
   candidates_final = get_params(step = "weight_annotations")$annotations$candidates$final,
+  best_percentile = get_params(step =
+    "weight_annotations")$annotations$candidates$best_percentile,
   weight_spectral = get_params(step = "weight_annotations")$weights$global$spectral,
   weight_chemical = get_params(step = "weight_annotations")$weights$global$chemical,
   weight_biological = get_params(step = "weight_annotations")$weights$global$biological,
@@ -109,6 +111,10 @@ weight_annotations(
 \item{candidates_neighbors}{Number of neighbors candidates to keep}
 
 \item{candidates_final}{Number of final candidates to keep}
+
+\item{best_percentile}{Numeric percentile threshold (0-1) for selecting top
+candidates within each feature (default: 0.9). Used for consistent
+filtering between mini and filtered outputs.}
 
 \item{weight_spectral}{Weight for the spectral score}
 

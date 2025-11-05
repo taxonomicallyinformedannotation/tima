@@ -11,6 +11,7 @@ clean_chemo(
   structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
     parent.frame()),
   candidates_final = get("candidates_final", envir = parent.frame()),
+  best_percentile = get("best_percentile", envir = parent.frame()),
   minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
   minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
   minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
@@ -30,6 +31,11 @@ clean_chemo(
 \item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
 
 \item{candidates_final}{Integer number of final candidates to keep per feature}
+
+\item{best_percentile}{Numeric percentile threshold (0-1) for selecting top
+candidates within each feature (default: 0.9, keeps candidates with scores
+>= 90\% of the maximum score for that feature). Used for both filtered and
+mini outputs to ensure consistent row counts.}
 
 \item{minimal_ms1_bio}{Numeric minimal biological score for MS1 annotations (0-1)}
 

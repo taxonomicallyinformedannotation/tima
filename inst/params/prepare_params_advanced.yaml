@@ -3,6 +3,11 @@
 annotations:
   #' Number of candidates to keep per feature.
   candidates:
+    #' Best percentile threshold for keeping top candidates.
+    #' Keeps candidates with scores >= percentile * max_score per feature.
+    #' FLOAT between 0 and 1 (default: 0.9 = top 10%)
+    best_percentile: 0.9
+
     #' Number of final candidates. INTEGER
     final: 1
     #' Number of neighbors to keep per feature. INTEGER
