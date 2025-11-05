@@ -75,30 +75,14 @@ prepare_libraries_rt <- function(
     stop("output_sop must be a single character string")
   }
 
-  # Validate column name parameters
-  col_params <- list(
-    col_ik = col_ik,
-    col_rt = col_rt,
-    col_sm = col_sm,
-    name_inchikey = name_inchikey,
-    name_rt = name_rt,
-    name_smiles = name_smiles
-  )
-
-  for (param_name in names(col_params)) {
-    param_value <- col_params[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
-    }
-  }
-
   logger::log_info("Preparing retention time libraries")
   logger::log_debug("RT unit: ", unit_rt)
+
   ## default transforms from `Spectra`
-  if (col_rt == "RTINSECONDS") {
+  if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
     col_rt <- "rtime"
   }
-  if (col_sm == "SMILES") {
+  if (!is.na(col_sm) && col_sm == "SMILES") {
     col_sm <- "smiles"
   }
 

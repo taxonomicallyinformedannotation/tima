@@ -39,7 +39,7 @@ create_edges_spectra <- function(
   input = get_params(step = "create_edges_spectra")$files$spectral$raw,
   output = get_params(
     step = "create_edges_spectra"
-  )$files$networks$spectral$edges$raw,
+  )$files$networks$spectral$edges$raw$spectral,
   name_source = get_params(step = "create_edges_spectra")$names$source,
   name_target = get_params(step = "create_edges_spectra")$names$target,
   method = get_params(step = "create_edges_spectra")$similarities$methods$edges,
