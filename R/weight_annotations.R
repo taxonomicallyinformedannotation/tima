@@ -24,6 +24,9 @@
 #' @param output Output file
 #' @param candidates_neighbors Number of neighbors candidates to keep
 #' @param candidates_final Number of final candidates to keep
+#' @param best_percentile Numeric percentile threshold (0-1) for selecting top
+#'     candidates within each feature (default: 0.9). Used for consistent
+#'     filtering between mini and filtered outputs.
 #' @param weight_spectral Weight for the spectral score
 #' @param weight_chemical Weight for the biological score
 #' @param weight_biological Weight for the chemical consistency score
@@ -190,6 +193,9 @@ weight_annotations <- function(
   candidates_final = get_params(
     step = "weight_annotations"
   )$annotations$candidates$final,
+  best_percentile = get_params(
+    step = "weight_annotations"
+  )$annotations$candidates$best_percentile,
   weight_spectral = get_params(
     step = "weight_annotations"
   )$weights$global$spectral,

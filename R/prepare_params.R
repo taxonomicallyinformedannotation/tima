@@ -42,6 +42,7 @@ prepare_params <- function(
   logger::log_trace("Extracting and validating all parameters")
 
   # Extract annotation parameters
+  ann_can_bes <- params_advanced$annotations$candidates$best_percentile
   ann_can_fin <- params_advanced$annotations$candidates$final
   ann_can_nei <- params_advanced$annotations$candidates$neighbors
   ann_can_sam <- params_advanced$annotations$candidates$samples
@@ -581,6 +582,8 @@ prepare_params <- function(
     org_tax
 
   ## weight_annotations
+  yamls_params$weight_annotations$annotations$candidates$best_percentile <-
+    ann_can_bes
   yamls_params$weight_annotations$annotations$candidates$final <-
     ann_can_fin
   yamls_params$weight_annotations$annotations$candidates$neighbors <-

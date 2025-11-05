@@ -14,6 +14,10 @@
 #' @param features_table Data frame with feature metadata
 #' @param structure_organism_pairs_table Data frame with structure-organism pairs
 #' @param candidates_final Integer number of final candidates to keep per feature
+#' @param best_percentile Numeric percentile threshold (0-1) for selecting top
+#'     candidates within each feature (default: 0.9, keeps candidates with scores
+#'     >= 90% of the maximum score for that feature). Used for both filtered and
+#'     mini outputs to ensure consistent row counts.
 #' @param minimal_ms1_bio Numeric minimal biological score for MS1 annotations (0-1)
 #' @param minimal_ms1_chemo Numeric minimal chemical score for MS1 annotations (0-1)
 #' @param minimal_ms1_condition Character condition: "OR" or "AND" for MS1 filtering
@@ -39,6 +43,7 @@ clean_chemo <- function(
     envir = parent.frame()
   ),
   candidates_final = get("candidates_final", envir = parent.frame()),
+  best_percentile = get("best_percentile", envir = parent.frame()),
   minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
   minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
   minimal_ms1_condition = get(
@@ -63,6 +68,12 @@ clean_chemo <- function(
   # Validate numeric parameters
   if (!is.numeric(candidates_final) || candidates_final < 1) {
     stop("candidates_final must be a positive integer")
+  }
+
+  if (
+    !is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1
+  ) {
+    stop("best_percentile must be between 0 and 1, got: ", best_percentile)
   }
 
   if (
@@ -103,6 +114,11 @@ clean_chemo <- function(
 
   logger::log_info("Cleaning chemically weighted annotations")
   logger::log_debug("Keeping top ", candidates_final, " candidates per feature")
+  logger::log_debug(
+    "Using best_percentile: ",
+    best_percentile,
+    " for consistent filtering"
+  )
   logger::log_debug(
     "Options - High confidence: ",
     high_confidence,
@@ -163,7 +179,8 @@ clean_chemo <- function(
 
   results_mini <- df1 |>
     minimize_results(
-      features_table = features_table
+      features_table = features_table,
+      best_percentile = best_percentile
     )
   results_candidates <- results_mini |>
     tidytable::distinct(feature_id, candidates_evaluated, candidates_best)
@@ -178,7 +195,19 @@ clean_chemo <- function(
       tidytable::select(-candidate_structure_name)
   }
 
+  # Apply same percentile filtering as minimize_results for consistency
+  # This ensures filtered and mini outputs have the same number of rows
+  logger::log_trace(
+    "Applying ",
+    best_percentile,
+    " percentile filter to match minimize_results"
+  )
   df1_filtered <- df1 |>
+    tidytable::group_by(feature_id) |>
+    tidytable::filter(
+      score_weighted_chemo >= best_percentile * max(score_weighted_chemo)
+    ) |>
+    tidytable::ungroup() |>
     tidytable::filter(rank_final <= candidates_final)
 
   logger::log_trace("Processing full results")

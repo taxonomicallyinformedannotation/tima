@@ -14,6 +14,7 @@
 #' @return Numeric transformed score in the range (0, 1)
 #'
 #' @examples
+#' \dontrun{
 #' # Transform a single score
 #' transform_score_sirius_csi(csi_score = -20)
 #'
@@ -23,6 +24,7 @@
 #' # Vectorized transformation
 #' scores <- c(-50, -20, 0, 20, 50)
 #' transform_score_sirius_csi(csi_score = scores)
+#' }
 transform_score_sirius_csi <- function(csi_score, K = 50, scale = 10) {
   # Validate inputs
   if (!is.numeric(csi_score)) {

@@ -26,6 +26,7 @@ This is an experimental transformation not officially approved by
 SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
 }
 \examples{
+\dontrun{
 # Transform a single score
 transform_score_sirius_csi(csi_score = -20)
 
@@ -35,4 +36,5 @@ transform_score_sirius_csi(csi_score = -20, K = 30, scale = 5)
 # Vectorized transformation
 scores <- c(-50, -20, 0, 20, 50)
 transform_score_sirius_csi(csi_score = scores)
+}
 }

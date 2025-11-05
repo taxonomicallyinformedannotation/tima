@@ -190,6 +190,25 @@ ui <- shiny::fluidPage(
           title = "Annotations",
           shiny::h3("Annotations-related parameters"),
           shiny::sliderInput(
+            inputId = "ann_can_bes",
+            label = "Best percentile threshold for candidates",
+            min = 0.5,
+            max = 1.0,
+            value = 0.9,
+            step = 0.05,
+            ticks = FALSE
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Percentile threshold for selecting top candidates within each feature.",
+                "Keeps candidates with scores >= percentile * max_score.",
+                "Default 0.9 keeps candidates with scores >= 90% of the maximum score (top 10%).",
+                "This ensures mini and filtered outputs have the same row counts.",
+                "Lower values (e.g., 0.8) = more candidates, higher values (e.g., 0.95) = fewer candidates."
+              )
+            ),
+          shiny::sliderInput(
             inputId = "ann_can_fin",
             label = "Number of final candidates",
             min = 1L,
@@ -1999,6 +2018,8 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$ann_can_nei)
   yaml_advanced$annotations$candidates$samples <-
     shiny::isolate(input$ann_can_sam)
+  yaml_advanced$annotations$candidates$best_percentile <-
+    shiny::isolate(input$ann_can_bes)
   yaml_advanced$annotations$ms1only <-
     shiny::isolate(input$ann_ms1only)
   yaml_advanced$annotations$ms2approx <-

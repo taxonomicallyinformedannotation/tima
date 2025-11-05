@@ -25,6 +25,10 @@ parse_cli_params <- function(arguments, parameters) {
   # Define mappings from CLI argument names to parameter paths
   # Each mapping specifies: path (nested list location) and type (conversion function)
   mappings <- list(
+    ann_can_bes = list(
+      path = c("annotations", "candidates", "best_percentile"),
+      type = as.numeric
+    ),
     ann_can_fin = list(
       path = c("annotations", "candidates", "final"),
       type = as.integer
