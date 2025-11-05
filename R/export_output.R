@@ -23,8 +23,8 @@ export_output <- function(x, file) {
     stop("Input 'x' must be a data frame or tibble")
   }
 
-  if (missing(file) || is.null(file) || nchar(file) == 0L) {
-    stop("Output file path must be specified")
+  if (is.null(file) || !is.character(file) || length(file) != 1L || nchar(file) == 0L) {
+    stop("Output file path must be a non-empty character string")
   }
 
   # Create the output directory if it doesn't exist

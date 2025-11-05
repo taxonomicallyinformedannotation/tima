@@ -16,8 +16,8 @@
 #' }
 setup_logger <- function(filename = "tima.log") {
   # Validate filename
-  if (missing(filename) || is.null(filename) || nchar(filename) == 0L) {
-    stop("Log filename must be specified")
+  if (is.null(filename) || !is.character(filename) || length(filename) != 1L || nchar(filename) == 0L) {
+    stop("Log filename must be a non-empty character string")
   }
 
   # Configure logger with TRACE level (most verbose)

@@ -23,12 +23,12 @@ copy_backbone <- function(
   package = "tima"
 ) {
   # Validate inputs
-  if (missing(cache_dir) || is.null(cache_dir) || nchar(cache_dir) == 0L) {
-    stop("Cache directory path must be specified")
+  if (is.null(cache_dir) || !is.character(cache_dir) || length(cache_dir) != 1L || nchar(cache_dir) == 0L) {
+    stop("Cache directory path must be a non-empty character string")
   }
 
-  if (missing(package) || is.null(package) || nchar(package) == 0L) {
-    stop("Package name must be specified")
+  if (is.null(package) || !is.character(package) || length(package) != 1L || nchar(package) == 0L) {
+    stop("Package name must be a non-empty character string")
   }
 
   # Get package installation path
