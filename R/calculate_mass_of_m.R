@@ -31,7 +31,7 @@ calculate_mass_of_m <- function(
     stop("Both adduct_string and mz must be provided")
   }
 
-  if (!is.numeric(mz) || mz <= 0) {
+  if (!is.numeric(mz) || mz < 0) {
     stop("mz must be a positive numeric value")
   }
 

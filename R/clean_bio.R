@@ -209,17 +209,17 @@ clean_bio <- function(
   rm(df3)
 
   logger::log_trace("Splitting already computed predictions")
-  df1 <- df |>
+  df1 <- annotations_distinct |>
     tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
   df1b <- df1 |>
     tidytable::select(-tidyselect::contains("feature_pred_tax"))
 
-  df2 <- df |>
+  df2 <- annotations_distinct |>
     tidytable::select(-tidyselect::contains("feature_pred_tax")) |>
     tidytable::anti_join(df1) |>
     tidytable::bind_rows(df1b)
-  rm(df)
+  rm(annotations_distinct)
 
   logger::log_trace("Joining all except -1 together")
   supp_tables <- list(

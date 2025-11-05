@@ -43,9 +43,14 @@ prepare_features_edges <- function(
   name_source = get_params(step = "prepare_features_edges")$names$source,
   name_target = get_params(step = "prepare_features_edges")$names$target
 ) {
-  # Validate inputs
-  if (!is.list(input) || is.null(input$ms1) || is.null(input$spectral)) {
-    stop("input must be a list with 'ms1' and 'spectral' elements")
+  # Validate inputs - handle both list and named vector
+  input_names <- names(input)
+  if (
+    is.null(input_names) ||
+      !"ms1" %in% input_names ||
+      !"spectral" %in% input_names
+  ) {
+    stop("input must contain 'ms1' and 'spectral' elements")
   }
 
   if (!is.character(output) || length(output) != 1L) {
@@ -68,8 +73,8 @@ prepare_features_edges <- function(
   }
 
   logger::log_info("Preparing molecular network edges")
-  logger::log_debug("MS1 edges: ", input$ms1)
-  logger::log_debug("Spectral edges: ", input$spectral)
+  logger::log_debug("MS1 edges: ", input[["ms1"]])
+  logger::log_debug("Spectral edges: ", input[["spectral"]])
 
   # Load edges tables
   logger::log_trace("Loading edge tables")

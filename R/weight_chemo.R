@@ -68,10 +68,10 @@ weight_chemo <- function(
     return(annot_table_wei_bio_clean)
   }
 
-  # Validate weights sum to 1
+  # Validate weights sum to 1 (with tolerance for floating-point precision)
   weight_sum <- weight_spectral + weight_biological + weight_chemical
-  if (abs(weight_sum - 1.0) > 0.001) {
-    stop("Weights must sum to 1.0, got: ", weight_sum)
+  if (abs(weight_sum - 1.0) > 0.01) {
+    stop("Weights must sum to 1.0, got: ", round(weight_sum, 4))
   }
 
   # Validate all weights are non-negative

@@ -63,7 +63,7 @@ get_organism_taxonomy_ott <- function(
       organism = stringi::stri_replace_all_fixed(
         str = organism,
         pattern = "\u00D7 ",
-        replacement = " ",
+        replacement = "",
         vectorize_all = FALSE
       )
     ) |>
@@ -147,21 +147,24 @@ get_organism_taxonomy_ott <- function(
         httr::with_config(
           httr::config(ssl_verifypeer = FALSE),
           rotl::tnrs_match_names(
-            names = x,
+            names = batch,
             do_approximate_matching = FALSE,
             include_suppressed = FALSE
           )
         )
       }
     )
-  logger::log_trace("Request finished!")
 
-  new_matched_otl_exact <- new_matched_otl_exact_list |>
+  logger::log_trace("Initial taxonomy queries completed")
+
+  # Combine batch results
+  new_matched_otl_exact <- taxonomy_matches |>
     tidytable::bind_rows() |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.logical),
       .fns = as.character
     ))
+
   new_ott_id <- new_matched_otl_exact |>
     tidytable::filter(!is.na(ott_id)) |>
     tidytable::distinct(ott_id)
