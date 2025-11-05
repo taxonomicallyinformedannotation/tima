@@ -37,16 +37,17 @@ process_smiles <- function(
     stop("Column '", smiles_colname, "' not found in data frame")
   }
 
-  logger::log_trace("Processing SMILES strings with RDKit")
+  logger::log_info("Processing SMILES strings with RDKit")
 
   # Load Python script for SMILES processing
   tryCatch(
     {
-      reticulate::source_python(
-        file = system.file("python/process_smiles.py", package = "tima")
-      )
+      py_script <- system.file("python/process_smiles.py", package = "tima")
+      logger::log_trace("Loading Python SMILES processor from: {py_script}")
+      reticulate::source_python(file = py_script)
     },
     error = function(e) {
+      logger::log_error("Failed to load Python SMILES processor: {e$message}")
       stop("Failed to load Python SMILES processor: ", conditionMessage(e))
     }
   )
@@ -56,11 +57,15 @@ process_smiles <- function(
     tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
     tidytable::distinct(!!as.name(smiles_colname))
 
-  logger::log_debug("Found ", nrow(table_smiles), " unique SMILES to check")
+  n_unique <- nrow(table_smiles)
+  if (n_unique == 0L) {
+    logger::log_warn("No valid SMILES found to process")
+    return(df)
+  }
+  logger::log_debug("Found {n_unique} unique SMILES strings to process")
 
   # Load cached results if available
   if (is.null(cache)) {
-    logger::log_trace("No cache provided, processing all SMILES")
     table_processed_1 <- tidytable::tidytable(
       !!as.name(smiles_colname) := NA_character_,
       structure_smiles = NA_character_,
@@ -71,15 +76,16 @@ process_smiles <- function(
       structure_xlogp = NA_real_
     )
   } else {
-    logger::log_trace("Loading cached SMILES from: ", cache)
     tryCatch(
       {
         table_processed_1 <- tidytable::fread(cache)
+        logger::log_debug(
+          "Loaded {nrow(table_processed_1)} cached SMILES from cache"
+        )
       },
       error = function(e) {
         logger::log_warn(
-          "Failed to load cache, processing all SMILES: ",
-          conditionMessage(e)
+          "Failed to load cache, will process all SMILES: {e$message}"
         )
         table_processed_1 <- tidytable::tidytable(
           !!as.name(smiles_colname) := NA_character_,
@@ -98,7 +104,10 @@ process_smiles <- function(
   table_smiles_to_process <- table_smiles |>
     tidytable::anti_join(table_processed_1)
 
-  if (nrow(table_smiles_to_process) == 0L) {
+  n_to_process <- nrow(table_smiles_to_process)
+
+  if (n_to_process == 0L) {
+    logger::log_info("All SMILES already in cache, no processing needed")
     logger::log_info("All SMILES already cached, returning existing results")
     return(
       table_processed_1 |>

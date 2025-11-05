@@ -49,7 +49,7 @@ prepare_libraries_sop_ecmdb <- function(
       logger::log_info("Creating empty ECMDB library")
       ecmdb_prepared <- fake_sop_columns()
     } else {
-      logger::log_debug("Processing ECMDB from: ", input)
+      logger::log_debug("Processing ECMDB from: {input}")
       logger::log_trace("Loading ECMDB resources")
 
       file <- gsub(

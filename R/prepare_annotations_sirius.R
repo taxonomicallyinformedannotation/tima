@@ -107,14 +107,14 @@ prepare_annotations_sirius <-
       }
     }
 
-    logger::log_info("Preparing SIRIUS ", sirius_version, " annotations")
+    logger::log_info("Preparing SIRIUS {sirius_version} annotations")
 
     # Handle NULL or missing input directory
     if (is.null(input_directory)) {
       input_directory <- "Th1sd1rw0nt3x1st"
     }
 
-    logger::log_debug("SIRIUS directory: ", input_directory)
+    logger::log_debug("SIRIUS directory: {input_directory}")
 
     if (file.exists(input_directory)) {
       logger::log_trace("Loading SIRIUS results...")

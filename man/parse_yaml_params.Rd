@@ -20,7 +20,7 @@ A list containing the parameters specified in the YAML files
 }
 \description{
 This function parses YAML parameter files, loading default
-parameters and optionally overriding them with user-specified values
+parameters and optionally overriding them with user-specified values.
 }
 \examples{
 NULL

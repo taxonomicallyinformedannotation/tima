@@ -16,7 +16,7 @@ The path to the exported file
 }
 \description{
 This function creates the output directory if it doesn't exist
-and exports a data frame to a tab-delimited file
+and exports a data frame to a tab-delimited file.
 }
 \examples{
 \dontrun{

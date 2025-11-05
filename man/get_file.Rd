@@ -18,7 +18,7 @@ The path to the downloaded file
 }
 \description{
 This function downloads files from a URL with retry logic
-and exponential backoff
+and exponential backoff.
 }
 \examples{
 \dontrun{

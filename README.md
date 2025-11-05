@@ -165,26 +165,26 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | Package | Version | Citation |
 |:---|:---|:---|
 | archive | 1.1.12 | Hester and Csárdi (2025) |
-| base | 4.5.1 | R Core Team (2025) |
+| base | 4.5.2 | R Core Team (2025) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.43.4 | Wang et al. (2025) |
+| BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
 | DT | 0.34.0 | Xie, Cheng, and Tan (2024) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
-| igraph | 2.1.4 | Csardi and Nepusz (2006); Csárdi et al. (2025) |
-| IRanges | 2.43.0 | Lawrence et al. (2013) |
+| igraph | 2.2.1 | Csardi and Nepusz (2006); (**igraph2023?**); Csárdi et al. (2025) |
+| IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | logger | 0.4.1 | Daróczi and Wickham (2024) |
-| MetaboCoreUtils | 1.17.1 | Rainer et al. (2022a) |
-| MsBackendMgf | 1.17.0 | Gatto, Rainer, and Gibb (2025) |
-| MsBackendMsp | 1.13.0 | Rainer et al. (2022b) |
+| MetaboCoreUtils | 1.18.0 | Rainer et al. (2022a) |
+| MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
+| MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
-| reticulate | 1.43.0 | Ushey, Allaire, and Tang (2025) |
-| rmarkdown | 2.29 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024) |
+| reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
+| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); (**rmarkdown2025?**) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.11.1 | Chang et al. (2025) |
 | shinybusy | 0.3.3 | Meyer and Perrier (2024) |
@@ -193,7 +193,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinytest2 | 0.4.1 | Schloerke (2025) |
 | shinyvalidate | 0.1.3 | Sievert, Iannone, and Cheng (2023) |
 | shinyWidgets | 0.9.0 | Perrier, Meyer, and Granjon (2025) |
-| Spectra | 1.19.4 | Rainer et al. (2022d) |
+| Spectra | 1.20.0 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
 | testthat | 3.2.3 | Wickham (2011) |
@@ -207,15 +207,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
-
-<div id="ref-rmarkdown2024" class="csl-entry">
-
-Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
-Luraschi, Kevin Ushey, Aron Atkins, et al. 2024.
-*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
-<https://github.com/rstudio/rmarkdown>.
-
-</div>
 
 <div id="ref-visNetwork" class="csl-entry">
 

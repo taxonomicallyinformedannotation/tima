@@ -23,28 +23,41 @@ round_reals <- function(
     stop("Input 'df' must be a data frame or tibble")
   }
 
-  if (!is.numeric(dig) || dig < 0) {
-    stop("Number of digits 'dig' must be a non-negative integer")
+  if (!is.numeric(dig) || dig < 0L || dig != as.integer(dig)) {
+    stop("Number of digits 'dig' must be a non-negative integer, got: ", dig)
   }
 
-  if (length(cols) == 0) {
-    logger::log_trace("No column patterns specified, returning unchanged")
+  if (length(cols) == 0L) {
+    logger::log_trace("No column patterns specified for rounding")
     return(df)
   }
 
-  # Check if any matching columns exist
-  matching_cols <- names(df)[sapply(cols, function(pattern) {
-    any(grepl(pattern, names(df), fixed = TRUE))
-  })]
+  # Find columns that actually exist and match patterns
+  df_names <- names(df)
+  matching_cols <- character(0L)
 
-  if (length(matching_cols) == 0) {
-    logger::log_trace("No matching columns found for rounding")
+  for (pattern in cols) {
+    matches <- grep(pattern, df_names, fixed = TRUE, value = TRUE)
+    matching_cols <- c(matching_cols, matches)
+  }
+
+  matching_cols <- unique(matching_cols)
+
+  if (length(matching_cols) == 0L) {
+    logger::log_trace(
+      "No matching columns found for rounding patterns: {paste(cols, collapse = ', ')}"
+    )
     return(df)
   }
 
+  logger::log_trace(
+    "Rounding {length(matching_cols)} columns to {dig} decimal places"
+  )
+
+  # Only process columns that exist
   df |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::contains(cols),
-      .fns = \(x) round(as.numeric(x), digits = dig)
+      .cols = tidyselect::any_of(matching_cols),
+      .fns = ~ round(as.numeric(.x), digits = dig)
     ))
 }

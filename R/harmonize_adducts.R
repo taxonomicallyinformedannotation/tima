@@ -2,7 +2,7 @@
 #'
 #' @description This function harmonizes adduct definitions by replacing
 #'     various adduct notations with standardized forms according to a
-#'     translation table
+#'     translation table.
 #'
 #' @param df Dataframe containing adduct column to harmonize
 #' @param adducts_colname Character string name of the adduct column
@@ -19,21 +19,20 @@ harmonize_adducts <- function(
   adducts_translations
 ) {
   # Validate inputs
+  if (!is.data.frame(df) && !inherits(df, "tbl")) {
+    stop("Input 'df' must be a data frame or tibble")
+  }
+
   if (!adducts_colname %in% names(df)) {
-    logger::log_warn(
-      "Adduct column '",
-      adducts_colname,
-      "' not found in dataframe"
+    logger::log_debug(
+      "Adduct column '{adducts_colname}' not found in dataframe, skipping harmonization"
     )
     return(df)
   }
 
   if (length(adducts_translations) == 0L) {
-    logger::log_trace("No adduct translations provided, returning unchanged")
     return(df)
   }
-
-  logger::log_trace("Harmonizing adduct definitions")
 
   # Perform vectorized string replacement
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(

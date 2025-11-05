@@ -51,7 +51,7 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
     logger::log_info("Running in standard environment")
   }
 
-  logger::log_info("Starting TIMA Shiny app on ", host, ":", port)
+  logger::log_info("Starting TIMA Shiny app on {host}:{port}")
 
   # Ensure dependencies are installed
   install()

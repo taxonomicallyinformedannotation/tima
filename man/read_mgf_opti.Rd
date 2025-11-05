@@ -23,10 +23,10 @@ A DataFrame containing the parsed spectra data with standardized
 variable names
 }
 \description{
-This function reads a Mascot Generic Format (MGF) file using an
-optimized, memory-efficient approach. It mimics the \code{MsBackendMgf}
-implementation but uses significantly lower memory, making it suitable
-for processing large MGF files that might otherwise cause memory issues.
+This function reads a Mascot Generic Format (MGF) file using
+a memory-efficient approach. It mimics the \code{MsBackendMgf} implementation
+but uses significantly lower memory, making it suitable for processing
+large MGF files that might otherwise cause memory issues.
 }
 \details{
 The function processes spectra in batches to minimize memory usage

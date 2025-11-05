@@ -28,8 +28,6 @@ get_params <- function(step) {
     stop("Step name must be provided")
   }
 
-  logger::log_trace("Getting parameters for step: ", step)
-
   # Get default paths
   paths <- get_default_paths()
 
@@ -105,21 +103,30 @@ get_params <- function(step) {
 
   # Load and merge YAML parameters
   if (file.exists(user_param_path)) {
-    logger::log_debug("Loading user parameters from: ", user_param_path)
+    logger::log_debug("Loading user parameters from: {user_param_path}")
     params <- parse_yaml_params(def = default_param_path, usr = user_param_path)
   } else {
-    logger::log_trace("Using default parameters (no user overrides)")
     params <- parse_yaml_params(
       def = default_param_path,
       usr = default_param_path
     )
   }
 
-  # Parse and merge CLI arguments
-  cli_args <- docopt::docopt(doc = docopt_text, version = paths$version)
-  params <- parse_cli_params(arguments = cli_args, parameters = params)
+  # Validate that parameters were successfully loaded
+  if (!is.list(params) || length(params) == 0L) {
+    stop("Failed to load parameters for step: ", step)
+  }
 
-  logger::log_trace("Parameters loaded successfully for step: ", step)
+  # Parse and merge CLI arguments
+  cli_args <- tryCatch(
+    docopt::docopt(doc = docopt_text, version = paths$version),
+    error = function(e) {
+      logger::log_error("Failed to parse CLI arguments: {e$message}")
+      list() # Return empty list to use defaults
+    }
+  )
+
+  params <- parse_cli_params(arguments = cli_args, parameters = params)
 
   return(params)
 }

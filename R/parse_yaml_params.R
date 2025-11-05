@@ -1,7 +1,7 @@
 #' @title Parse YAML parameters
 #'
 #' @description This function parses YAML parameter files, loading default
-#'     parameters and optionally overriding them with user-specified values
+#'     parameters and optionally overriding them with user-specified values.
 #'
 #' @param def Character string path to the default YAML parameters file
 #' @param usr Character string path to the user-specified YAML parameters file
@@ -22,17 +22,69 @@ parse_yaml_params <- function(
   }
 
   # Read the default YAML file
-  params <- yaml::read_yaml(file = def)
+  params <- tryCatch(
+    yaml::read_yaml(file = def),
+    error = function(e) {
+      stop("Failed to parse default YAML file: ", conditionMessage(e))
+    }
+  )
 
-  # If a user-specified YAML file exists,
-  # read it and overwrite the default values with the user-specified ones
-  if (!is.null(usr) && nchar(usr) > 0L && file.exists(usr)) {
-    logger::log_debug("Loading user-specified parameters from: ", usr)
-    user_params <- yaml::read_yaml(file = usr)
-    # Deep merge would be better here, but for now simple override
-    params <- user_params
+  # Validate that parameters were successfully loaded
+  if (!is.list(params) || length(params) == 0L) {
+    stop("Default YAML file is empty or invalid: ", def)
+  }
+
+  # If a user-specified YAML file exists, merge it with defaults
+  if (!is.null(usr) && nchar(usr) > 0L && file.exists(usr) && usr != def) {
+    logger::log_debug("Loading user-specified parameters from: {usr}")
+
+    user_params <- tryCatch(
+      yaml::read_yaml(file = usr),
+      error = function(e) {
+        logger::log_error("Failed to parse user YAML file: {e$message}")
+        stop("Failed to parse user YAML file: ", conditionMessage(e))
+      }
+    )
+
+    if (!is.list(user_params)) {
+      logger::log_warn(
+        "User YAML file did not contain valid parameters, using defaults"
+      )
+    } else {
+      # Deep merge: user parameters override defaults
+      params <- merge_lists_recursive(params, user_params)
+    }
   }
 
   # Return the final list of parameters
   return(params)
+}
+
+#' @title Recursively merge two lists
+#' @description Deep merge where user values override defaults
+#' @param default Default list
+#' @param user User list to override defaults
+#' @return Merged list
+#' @keywords internal
+merge_lists_recursive <- function(default, user) {
+  if (!is.list(user)) {
+    return(user)
+  }
+
+  result <- default
+
+  for (name in names(user)) {
+    if (
+      name %in%
+        names(default) &&
+        is.list(default[[name]]) &&
+        is.list(user[[name]])
+    ) {
+      result[[name]] <- merge_lists_recursive(default[[name]], user[[name]])
+    } else {
+      result[[name]] <- user[[name]]
+    }
+  }
+
+  return(result)
 }

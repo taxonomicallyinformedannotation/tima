@@ -51,6 +51,59 @@
 #'   ppm = 10.0,
 #'   return_matched_peaks = TRUE
 #' )
+#' @title Calculate similarity between spectra
+#'
+#' @description Calculates similarity scores between query and
+#'     target spectra using either entropy, cosine, or GNPS methods.
+#'
+#' @include c_wrappers.R
+#'
+#' @param method Character string specifying method: "entropy", "gnps", or "cosine"
+#' @param query_spectrum Numeric matrix with columns for mz and intensity
+#' @param target_spectrum Numeric matrix with columns for mz and intensity
+#' @param query_precursor Numeric precursor m/z value for query
+#' @param target_precursor Numeric precursor m/z value for target
+#' @param dalton Numeric Dalton tolerance for peak matching
+#' @param ppm Numeric PPM tolerance for peak matching
+#' @param return_matched_peaks Logical; return matched peaks count?
+#'     Not compatible with 'entropy' method. Default: FALSE
+#' @param ... Additional arguments passed to MsCoreUtils::join
+#'
+#' @return Numeric similarity score (0-1), or list with score and matches
+#'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
+#'
+#' @export
+#'
+#' @examples
+#' sp_1 <- cbind(
+#'   mz = c(10, 36, 63, 91, 93),
+#'   intensity = c(14, 15, 999, 650, 1)
+#' )
+#' precursor_1 <- 123.4567
+#' precursor_2 <- precursor_1 + 14
+#' sp_2 <- cbind(
+#'   mz = c(10, 12, 50, 63, 105),
+#'   intensity = c(35, 5, 16, 999, 450)
+#' )
+#' calculate_similarity(
+#'   method = "entropy",
+#'   query_spectrum = sp_1,
+#'   target_spectrum = sp_2,
+#'   query_precursor = precursor_1,
+#'   target_precursor = precursor_2,
+#'   dalton = 0.005,
+#'   ppm = 10.0
+#' )
+#' calculate_similarity(
+#'   method = "gnps",
+#'   query_spectrum = sp_1,
+#'   target_spectrum = sp_2,
+#'   query_precursor = precursor_1,
+#'   target_precursor = precursor_2,
+#'   dalton = 0.005,
+#'   ppm = 10.0,
+#'   return_matched_peaks = TRUE
+#' )
 calculate_similarity <- function(
   method,
   query_spectrum,
@@ -82,13 +135,26 @@ calculate_similarity <- function(
     stop("Spectra must have at least 2 columns (mz, intensity)")
   }
 
-  # Handle entropy method separately
+  # Early exit for empty spectra
+  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
+    logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
+    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
+  }
+
+  # Validate numeric parameters
+  if (!is.numeric(dalton) || dalton < 0 || !is.numeric(ppm) || ppm < 0) {
+    stop("Dalton and PPM tolerances must be non-negative numbers")
+  }
+
+  # Handle entropy method separately (no peak matching needed)
   if (method == "entropy") {
     if (return_matched_peaks) {
-      logger::log_warn("return_matched_peaks not supported with entropy method")
+      logger::log_warn(
+        "return_matched_peaks not supported with entropy method, ignoring"
+      )
     }
 
-    return(
+    result <- tryCatch(
       msentropy::calculate_entropy_similarity(
         peaks_a = query_spectrum,
         peaks_b = target_spectrum,
@@ -99,33 +165,43 @@ calculate_similarity <- function(
         ms2_tolerance_in_ppm = ppm,
         max_peak_num = -1,
         clean_spectra = TRUE
-      )
+      ),
+      error = function(e) {
+        logger::log_warn("Entropy calculation failed: {e$message}")
+        0.0
+      }
     )
+    return(result)
   }
 
-  # Extract masses for matching
+  # Extract masses for matching (GNPS or cosine methods)
   query_masses <- query_spectrum[, 1L]
   target_masses <- target_spectrum[, 1L]
 
   # Get peak matching map
-  map <- switch(
-    method,
-    "gnps" = join_gnps_wrapper(
-      x = query_masses,
-      y = target_masses,
-      xPrecursorMz = query_precursor,
-      yPrecursorMz = target_precursor,
-      tolerance = dalton,
-      ppm = ppm
+  map <- tryCatch(
+    switch(
+      method,
+      "gnps" = join_gnps_wrapper(
+        x = query_masses,
+        y = target_masses,
+        xPrecursorMz = query_precursor,
+        yPrecursorMz = target_precursor,
+        tolerance = dalton,
+        ppm = ppm
+      ),
+      "cosine" = MsCoreUtils::join(
+        x = query_masses,
+        y = target_masses,
+        tolerance = dalton,
+        ppm = ppm,
+        ...
+      )
     ),
-    "cosine" = MsCoreUtils::join(
-      x = query_masses,
-      y = target_masses,
-      tolerance = dalton,
-      ppm = ppm,
-      ## allows for type = c("outer", "inner", "left", "right")
-      ...
-    )
+    error = function(e) {
+      logger::log_warn("Peak matching failed: {e$message}")
+      list(integer(0L), integer(0L))
+    }
   )
 
   matched_x <- map[[1L]]
@@ -133,6 +209,7 @@ calculate_similarity <- function(
 
   # No matches found
   if (length(matched_x) == 0L) {
+    logger::log_trace("No matching peaks found between spectra")
     return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 
@@ -140,8 +217,14 @@ calculate_similarity <- function(
   x_mat <- query_spectrum[matched_x, , drop = FALSE]
   y_mat <- target_spectrum[matched_y, , drop = FALSE]
 
-  # Calculate similarity
-  result <- gnps_wrapper(x = x_mat, y = y_mat)
+  # Calculate similarity using GNPS algorithm
+  result <- tryCatch(
+    gnps_wrapper(x = x_mat, y = y_mat),
+    error = function(e) {
+      logger::log_warn("Similarity calculation failed: {e$message}")
+      list(score = 0.0, matches = 0L)
+    }
+  )
 
   # Return appropriate format
   if (return_matched_peaks) {

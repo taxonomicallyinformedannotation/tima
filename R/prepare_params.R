@@ -32,14 +32,11 @@ prepare_params <- function(
     stop("params_advanced must be a list")
   }
 
-  logger::log_trace("Loading YAML parameter files")
+  logger::log_info("Preparing TIMA workflow parameters")
 
   # Load all YAML parameter files
   yaml_data <- load_yaml_files()
   yamls_params <- yaml_data$yamls_params
-
-  logger::log_debug("Loaded ", length(yamls_params), " parameter sets")
-  logger::log_trace("Extracting and validating all parameters")
 
   # Extract annotation parameters
   ann_can_bes <- params_advanced$annotations$candidates$best_percentile

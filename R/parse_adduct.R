@@ -34,9 +34,11 @@ parse_adduct <- function(
   if (
     missing(adduct_string) ||
       is.null(adduct_string) ||
+      !is.character(adduct_string) ||
+      length(adduct_string) != 1L ||
       nchar(adduct_string) == 0L
   ) {
-    stop("Adduct string must be provided")
+    stop("Adduct string must be a non-empty single character value")
   }
 
   # Define return value for failed parsing
@@ -62,20 +64,22 @@ parse_adduct <- function(
 
   # Check if matching was successful
   if (is.na(matches[1L, 1L])) {
-    logger::log_warn("Invalid adduct format: ", adduct_string)
-    logger::log_warn("Returning zeros (failed parse)")
+    logger::log_warn("Invalid adduct format: '{adduct_string}'")
+    logger::log_debug(
+      "Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)"
+    )
     return(failed_parse)
   }
 
   # Extract multimer count (e.g., 2 in [2M+H]+)
-  n_mer <- if (matches[2L] != "") {
+  n_mer <- if (nchar(matches[2L]) > 0L && matches[2L] != "") {
     as.integer(matches[2L])
   } else {
     1L
   }
 
   # Extract isotope shift (e.g., 1 in [M1+H]+)
-  n_iso <- if (matches[3L] != "") {
+  n_iso <- if (nchar(matches[3L]) > 0L && matches[3L] != "") {
     as.integer(matches[3L])
   } else {
     0L

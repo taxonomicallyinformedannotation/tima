@@ -63,8 +63,11 @@ weight_chemo <- function(
     stop("annot_table_wei_bio_clean must be a data frame")
   }
 
-  if (nrow(annot_table_wei_bio_clean) == 0L) {
-    logger::log_warn("Empty annotation table provided")
+  n_annotations <- nrow(annot_table_wei_bio_clean)
+  if (n_annotations == 0L) {
+    logger::log_warn(
+      "Empty annotation table provided, skipping chemical weighting"
+    )
     return(annot_table_wei_bio_clean)
   }
 
@@ -97,7 +100,12 @@ weight_chemo <- function(
     }
   }
 
-  logger::log_info("Weighting annotations by chemical consistency")
+  logger::log_info(
+    "Weighting {n_annotations} annotations by chemical consistency"
+  )
+  logger::log_debug(
+    "Weights - spectral: {weight_spectral}, biological: {weight_biological}, chemical: {weight_chemical}"
+  )
   logger::log_debug(
     "Weights - Spectral: ",
     weight_spectral,

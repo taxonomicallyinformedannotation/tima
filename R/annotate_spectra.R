@@ -99,6 +99,12 @@ annotate_spectra <- function(
     stop("Intensity cutoff must be non-negative, got: ", qutoff)
   }
 
+  logger::log_info("Starting spectral annotation in {polarity} mode")
+  logger::log_debug(
+    "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
+  )
+  logger::log_debug("Processing {length(libraries)} spectral library/libraries")
+
   # Validate logical parameters
   if (!is.logical(approx)) {
     stop("approx must be logical (TRUE/FALSE)")

@@ -40,10 +40,9 @@ get_organism_taxonomy_ott <- function(
     stop("Data frame must contain an 'organism' column")
   }
 
+  n_organisms <- nrow(df)
   logger::log_info(
-    "Processing ",
-    nrow(df),
-    " organism names for OTT taxonomy lookup"
+    "Processing {n_organisms} organism name(s) for OTT taxonomy lookup"
   )
 
   # Clean and prepare organism names
@@ -74,8 +73,9 @@ get_organism_taxonomy_ott <- function(
     tidytable::filter(!is.na(canonical_name))
 
   organisms <- organism_table$canonical_name
+  n_unique <- length(organisms)
 
-  logger::log_debug("Cleaned ", length(organisms), " unique organism names")
+  logger::log_debug("Cleaned to {n_unique} unique organism name(s)")
 
   # Test OTT API availability
   logger::log_trace("Testing Open Tree of Life API availability")
@@ -92,7 +92,7 @@ get_organism_taxonomy_ott <- function(
         httr2::resp_status_desc()
     },
     error = function(e) {
-      logger::log_error("Failed to connect to OTT API: ", conditionMessage(e))
+      logger::log_error("Failed to connect to OTT API: {conditionMessage(e)}")
       "ERROR"
     }
   )
@@ -100,11 +100,11 @@ get_organism_taxonomy_ott <- function(
   # Handle API unavailability
   if (api_status != "OK") {
     logger::log_error(
-      "Open Tree of Life API is unavailable (status: ",
-      api_status,
-      ")"
+      "Open Tree of Life API is unavailable (status: {api_status})"
     )
-    logger::log_warn("Returning empty taxonomy template")
+    logger::log_warn(
+      "Returning empty taxonomy template due to API unavailability"
+    )
 
     empty_matches <- data.frame(
       search_string = NA_character_,
@@ -125,7 +125,7 @@ get_organism_taxonomy_ott <- function(
     return(list(matches = empty_matches, taxonomy = empty_taxonomy))
   }
 
-  logger::log_trace("API available, submitting taxonomy queries")
+  logger::log_debug("OTT API is available, proceeding with taxonomy queries")
 
   # Split into smaller batches to avoid API limits
   batch_size <- 100L
@@ -137,7 +137,7 @@ get_organism_taxonomy_ott <- function(
     }
   )
 
-  logger::log_info("Querying OTT API in ", length(organism_batches), " batches")
+  logger::log_info("Querying OTT API in {length(organism_batches)} batches")
 
   # Query OTT API for each batch
   taxonomy_matches <- organism_batches |>
@@ -211,7 +211,7 @@ get_organism_taxonomy_ott <- function(
           ]
         }
       )
-    logger::log_info("Retrying with ", paste(organisms_new, collapse = ", "))
+    logger::log_info("Retrying with {paste(organisms_new, collapse = ', ')}")
     new_matched_otl_exact_list_2 <- organisms_new_split |>
       purrr::map(
         .f = function(x) {

@@ -104,7 +104,7 @@ prepare_features_tables <- function(
     stop("Features file is empty")
   }
 
-  logger::log_debug("Loaded ", nrow(features_table_0), " features")
+  logger::log_debug("Loaded {nrow(features_table_0)} features")
 
   # Format feature table
   logger::log_trace("Formatting feature table")

@@ -1,7 +1,7 @@
 #' @title Export output
 #'
 #' @description This function creates the output directory if it doesn't exist
-#'     and exports a data frame to a tab-delimited file
+#'     and exports a data frame to a tab-delimited file.
 #'
 #' @include create_dir.R
 #'
@@ -35,15 +35,38 @@ export_output <- function(x, file) {
   # Create the output directory if it doesn't exist
   create_dir(export = file)
 
-  # Log the path to the output file
-  logger::log_info("Exporting to: ", file)
+  # Log export operation with data dimensions
+  nrows <- nrow(x)
+  ncols <- ncol(x)
+  logger::log_info("Exporting data to: {file}")
+  logger::log_debug(
+    "Dimensions: {nrows} rows x {ncols} columns ({ncols} variables)"
+  )
+
+  # Determine if compression is needed
+  is_compressed <- grepl("\\.gz$", file, ignore.case = TRUE)
+
+  if (nrows > 100000L) {
+    logger::log_debug("Large dataset detected, export may take some time...")
+  }
 
   # Write the data frame to a tab-delimited file
-  tidytable::fwrite(
-    x = x,
-    file = file,
-    sep = "\t",
-    na = ""
+  tryCatch(
+    {
+      tidytable::fwrite(
+        x = x,
+        file = file,
+        sep = "\t",
+        na = "",
+        compress = if (is_compressed) "gzip" else "none",
+        showProgress = FALSE
+      )
+      logger::log_info("Successfully exported {nrows} rows to {file}")
+    },
+    error = function(e) {
+      logger::log_error("Failed to export data: {conditionMessage(e)}")
+      stop("Failed to export data to ", file, ": ", conditionMessage(e))
+    }
   )
 
   # Return the file path for pipeline tracking

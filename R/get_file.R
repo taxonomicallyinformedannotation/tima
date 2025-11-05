@@ -1,7 +1,7 @@
 #' @title Get file
 #'
 #' @description This function downloads files from a URL with retry logic
-#'     and exponential backoff
+#'     and exponential backoff.
 #'
 #' @param url Character string URL of the file to be downloaded
 #' @param export Character string file path where the file should be saved
@@ -25,26 +25,31 @@
 #' }
 get_file <- function(url, export, limit = 3600L) {
   # Validate inputs
-  if (missing(url) || nchar(url) == 0L) {
-    stop("URL must be specified")
+  if (missing(url) || !is.character(url) || nchar(url) == 0L) {
+    stop("URL must be a non-empty character string")
   }
 
-  if (missing(export) || nchar(export) == 0L) {
-    stop("Export path must be specified")
+  if (missing(export) || !is.character(export) || nchar(export) == 0L) {
+    stop("Export path must be a non-empty character string")
   }
 
-  if (limit <= 0L) {
-    stop("Timeout limit must be positive")
+  if (!is.numeric(limit) || limit <= 0L) {
+    stop("Timeout limit must be a positive number")
   }
 
   # Check if file already exists
   if (file.exists(export)) {
-    logger::log_info("File already exists, skipping download: ", export)
+    file_size_mb <- file.info(export)$size / 1024^2
+    logger::log_info(
+      "File already exists ({round(file_size_mb, 2)} MB), skipping download: {export}"
+    )
     return(export)
   }
 
   # Set timeout option
   options(timeout = limit)
+  logger::log_info("Downloading file from: {url}")
+  logger::log_debug("Timeout limit: {limit} seconds")
 
   # Create output directory if needed
   create_dir(export = export)
@@ -54,29 +59,31 @@ get_file <- function(url, export, limit = 3600L) {
     for (attempt in seq_len(max_attempts)) {
       tryCatch(
         {
-          logger::log_debug("Download attempt ", attempt, " of ", max_attempts)
+          logger::log_debug("Download attempt {attempt}/{max_attempts}")
 
           httr2::request(url) |>
             httr2::req_progress() |>
             httr2::req_perform(path = destfile)
 
           if (file.exists(destfile) && file.size(destfile) > 0L) {
-            logger::log_info("Successfully downloaded: ", destfile)
+            file_size_mb <- file.info(destfile)$size / 1024^2
+            logger::log_info(
+              "Successfully downloaded {round(file_size_mb, 2)} MB to: {destfile}"
+            )
             return(TRUE)
+          } else {
+            logger::log_warn("Downloaded file appears to be empty or missing")
           }
         },
         error = function(e) {
           logger::log_warn(
-            "Download attempt ",
-            attempt,
-            " failed: ",
-            conditionMessage(e)
+            "Download attempt {attempt} failed: {conditionMessage(e)}"
           )
 
           # Wait before retry with exponential backoff
           if (attempt < max_attempts) {
             wait_time <- 2L^attempt
-            logger::log_debug("Waiting ", wait_time, " seconds before retry...")
+            logger::log_debug("Waiting {wait_time} seconds before retry...")
             Sys.sleep(wait_time)
           }
         }
@@ -89,8 +96,10 @@ get_file <- function(url, export, limit = 3600L) {
   if (!download_with_retry(url = url, destfile = export)) {
     # Clean up partial download
     if (file.exists(export)) {
+      logger::log_trace("Removing incomplete download")
       file.remove(export)
     }
+    logger::log_error("Failed to download file after multiple attempts")
     stop("Failed to download file after multiple attempts: ", url)
   }
 

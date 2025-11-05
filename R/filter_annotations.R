@@ -106,7 +106,13 @@ filter_annotations <- function(
       rt,
       mz
     )
-  logger::log_trace("... annotations")
+
+  n_features <- nrow(features_table)
+  logger::log_info(
+    "Processing {n_features} unique features for annotation filtering"
+  )
+
+  logger::log_debug("Loading {length(annotations)} annotation file(s)")
   annotation_tables_list <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
@@ -114,14 +120,18 @@ filter_annotations <- function(
     colClasses = "character"
   )
 
+  # Filter out MS1 annotations when spectral matches exist
   if ("ms1" %in% names(annotation_tables_list)) {
-    logger::log_trace(
-      "Removing MS1 annotations for which we have spectral hits"
+    logger::log_info(
+      "Removing MS1 annotations superseded by spectral matches"
     )
     annotations_tables_spectral <- annotation_tables_list[names(
       annotation_tables_list
     )[names(annotation_tables_list) != "ms1"]] |>
       tidytable::bind_rows()
+
+    n_spectral <- nrow(annotations_tables_spectral)
+    logger::log_debug("Found {n_spectral} spectral annotations")
 
     spectral_keys <- annotations_tables_spectral |>
       tidytable::distinct(
@@ -130,20 +140,31 @@ filter_annotations <- function(
         # candidate_adduct,
         candidate_structure_inchikey_connectivity_layer
       )
+
+    n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
     annotation_table <- annotation_tables_list[["ms1"]] |>
       tidytable::anti_join(spectral_keys) |>
       tidytable::bind_rows(annotations_tables_spectral)
+    n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
+    logger::log_info("Removed {n_ms1_removed} redundant MS1 annotations")
   } else {
+    logger::log_debug("No MS1 annotations to filter, combining all annotations")
     annotation_table <- annotation_tables_list |>
       tidytable::bind_rows()
   }
+
+  n_total_annotations <- nrow(annotation_table)
+  logger::log_info(
+    "Total annotations before RT filtering: {n_total_annotations}"
+  )
+
   rm(
     annotation_tables_list,
     annotations_tables_spectral,
     spectral_keys
   )
 
-  logger::log_trace("... retention times")
+  logger::log_trace("Loading retention time library")
   if (!is.null(rts)) {
     rt_table <- purrr::map(
       .x = rts,
@@ -153,6 +174,9 @@ filter_annotations <- function(
     ) |>
       tidytable::bind_rows() |>
       tidytable::rename(rt_target = rt)
+
+    n_rt_standards <- nrow(rt_table)
+    logger::log_debug("Loaded {n_rt_standards} retention time standards")
   }
 
   features_annotated_table_1 <- features_table |>
@@ -161,7 +185,7 @@ filter_annotations <- function(
 
   if (!is.null(rts)) {
     logger::log_info(
-      "Filtering annotations outside of {tolerance_rt} minutes tolerance"
+      "Filtering annotations outside {tolerance_rt} min RT tolerance"
     )
     features_annotated_table_2 <- features_annotated_table_1 |>
       tidytable::left_join(rt_table) |>
@@ -181,13 +205,15 @@ filter_annotations <- function(
       ) |>
       tidytable::select(-rt_target, -type)
   } else {
-    logger::log_info("No RT library provided, not filtering anything")
+    logger::log_debug("No RT library provided, skipping RT filtering")
     features_annotated_table_2 <- features_annotated_table_1 |>
       tidytable::mutate(candidate_structure_error_rt = NA)
   }
 
+  n_removed_rt <- nrow(features_annotated_table_1) -
+    nrow(features_annotated_table_2)
   logger::log_info(
-    "{nrow(features_annotated_table_1) - nrow(features_annotated_table_2)} candidates were removed based on retention time."
+    "Removed {n_removed_rt} annotations based on retention time tolerance"
   )
   rm(features_annotated_table_1)
 

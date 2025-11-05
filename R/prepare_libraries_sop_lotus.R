@@ -40,7 +40,10 @@ prepare_libraries_sop_lotus <- function(
 
   # Process LOTUS data if available
   if (file.exists(input)) {
-    logger::log_info("Loading LOTUS database from: ", input)
+    logger::log_info("Loading LOTUS database from: {input}")
+
+    file_size_mb <- file.info(input)$size / 1024^2
+    logger::log_debug("File size: {round(file_size_mb, 2)} MB")
 
     lotus_prepared <- input |>
       tidytable::fread(
@@ -60,21 +63,20 @@ prepare_libraries_sop_lotus <- function(
       round_reals() |>
       tidytable::distinct()
 
+    n_pairs <- nrow(lotus_prepared)
     logger::log_info(
-      "Prepared ",
-      nrow(lotus_prepared),
-      " unique structure-organism pairs from LOTUS"
+      "Prepared {n_pairs} unique structure-organism pairs from LOTUS"
     )
   } else {
     logger::log_warn(
-      "LOTUS database not found at: ",
-      input,
-      ". Returning empty placeholder file."
+      "LOTUS database not found at: {input}"
     )
+    logger::log_warn("Returning empty placeholder file")
     lotus_prepared <- fake_sop_columns()
   }
 
   # Export prepared data
+  logger::log_trace("Exporting prepared LOTUS data")
   export_output(x = lotus_prepared, file = output)
 
   return(output)
