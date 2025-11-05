@@ -30,17 +30,6 @@ parse_adduct <- function(
   adduct_string,
   regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
 ) {
-  # Validate input
-  if (
-    missing(adduct_string) ||
-      is.null(adduct_string) ||
-      !is.character(adduct_string) ||
-      length(adduct_string) != 1L ||
-      nchar(adduct_string) == 0L
-  ) {
-    stop("Adduct string must be a non-empty single character value")
-  }
-
   # Define return value for failed parsing
   failed_parse <- c(
     n_mer = 0,
@@ -49,6 +38,20 @@ parse_adduct <- function(
     n_charges = 0,
     charge = 0
   )
+
+  # Return early if adduct_string is NULL or missing
+  if (missing(adduct_string) || is.null(adduct_string)) {
+    return(failed_parse)
+  }
+
+  # Validate input
+  if (
+    !is.character(adduct_string) ||
+      length(adduct_string) != 1L ||
+      nchar(adduct_string) == 0L
+  ) {
+    stop("Adduct string must be a non-empty single character value")
+  }
 
   # Match adduct string against regex pattern
   matches <- stringi::stri_match_all_regex(

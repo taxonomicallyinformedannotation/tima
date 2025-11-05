@@ -57,7 +57,10 @@ prepare_features_tables <- function(
     stop("output must be a single character string")
   }
 
-  if (!is.numeric(candidates) || candidates < 1L || candidates > 5L) {
+  if (
+    !is.null(candidates) &&
+      (!is.numeric(candidates) || candidates < 1L || candidates > 5L)
+  ) {
     stop("candidates must be an integer between 1 and 5, got: ", candidates)
   }
 
