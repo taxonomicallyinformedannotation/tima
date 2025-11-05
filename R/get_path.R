@@ -17,8 +17,8 @@
 #' @examples NULL
 get_path <- function(base_path) {
   # Validate input
-  if (missing(base_path) || is.null(base_path) || nchar(base_path) == 0L) {
-    stop("Base path must be provided")
+  if (is.null(base_path) || !is.character(base_path) || length(base_path) != 1L || nchar(base_path) == 0L) {
+    stop("Base path must be a non-empty character string")
   }
 
   # Try 1: Check if base path exists as-is

@@ -21,16 +21,16 @@ export_params <- function(
   step
 ) {
   # Validate inputs
-  if (missing(step) || is.null(step) || nchar(step) == 0L) {
-    stop("Step identifier must be specified")
+  if (is.null(step) || !is.character(step) || length(step) != 1L || nchar(step) == 0L) {
+    stop("Step identifier must be a non-empty character string")
   }
 
   if (!is.list(parameters)) {
     stop("Parameters must be a list")
   }
 
-  if (missing(directory) || is.null(directory) || nchar(directory) == 0L) {
-    stop("Output directory must be specified")
+  if (is.null(directory) || !is.character(directory) || length(directory) != 1L || nchar(directory) == 0L) {
+    stop("Output directory must be a non-empty character string")
   }
 
   # Create directory if it does not exist
