@@ -108,7 +108,7 @@ get_gnps_tables <- function(
           "Writing fake annotations failed with error: %s",
           conditionMessage(e)
         )
-        write.table(
+        utils::write.table(
           fake_annotations,
           file = ann_file,
           sep = "\t",
@@ -123,7 +123,7 @@ get_gnps_tables <- function(
           "Writing fake components failed with error: %s",
           conditionMessage(e)
         )
-        write.table(
+        utils::write.table(
           fake_components,
           file = comp_file,
           sep = "\t",
@@ -138,7 +138,7 @@ get_gnps_tables <- function(
           "Writing fake edges failed with error: %s",
           conditionMessage(e)
         )
-        write.table(
+        utils::write.table(
           fake_edges,
           file = edges_file,
           sep = "\t",
@@ -153,7 +153,7 @@ get_gnps_tables <- function(
           "Writing fake metadata failed with error: %s",
           conditionMessage(e)
         )
-        write.table(
+        utils::write.table(
           fake_metadata,
           file = path_metadata,
           sep = "\t",
@@ -294,7 +294,7 @@ get_gnps_tables <- function(
             "Writing fake metadata failed with error: %s",
             conditionMessage(e)
           )
-          write.table(
+          utils::write.table(
             fake_metadata,
             file = metadata_file,
             sep = "\t",

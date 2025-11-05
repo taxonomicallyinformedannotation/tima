@@ -98,6 +98,7 @@ utils::globalVariables(
     "delta",
     "delta_max",
     "delta_min",
+    "df",
     "Distance",
     "error_mz",
     "exactmass",
@@ -163,6 +164,7 @@ utils::globalVariables(
     "n",
     "Name",
     "name",
+    "new_matched_otl_exact_list",
     "npc",
     "on",
     "organism",
@@ -181,6 +183,7 @@ utils::globalVariables(
     "organism_taxonomy_ottid",
     "ott_id",
     "output",
+    "polarity",
     "precursorCharge",
     "precursorMz",
     "Precursor_MZ",
@@ -279,6 +282,7 @@ utils::globalVariables(
     "value_max",
     "value_min",
     "values",
+    "x",
     "xlogp"
   )
 )
