@@ -38,8 +38,14 @@ logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
 )
+```
+
+```{r get-example-files, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 tima::get_example_files(in_cache = FALSE)
 tima::get_example_files("spectral_lib_with_rt", in_cache = FALSE)
+```
+
+```{r libs, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 targets::tar_make(
   names = tidyselect::matches("lib_mer_key")
 )
@@ -109,7 +115,7 @@ As SIRIUS jobs are long to perform, we provide example SIRIUS workspaces (both S
 Note that spectral matches from SIRIUS are not supported for now.
 They have been generated on the 20 first lines of the example MGF with the following command:
 
-```{bash eval=FALSE, include=TRUE}
+```{bash run-sirius, eval=FALSE, include=TRUE}
 # this is run on SIRIUS 6
 sirius \
 --noCite \
