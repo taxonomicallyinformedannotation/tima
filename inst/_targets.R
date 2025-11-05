@@ -1322,7 +1322,7 @@ list(
               features = fea_pre,
               library = lib_mer_key,
               output_annotations = par_ann_mas$files$annotations$prepared$structural$ms1,
-              output_edges = par_ann_mas$files$networks$spectral$edges$raw,
+              output_edges = par_ann_mas$files$networks$spectral$edges$raw$ms1,
               name_source = par_ann_mas$names$source,
               name_target = par_ann_mas$names$target,
               str_stereo = lib_mer_str_stereo,
@@ -1511,7 +1511,7 @@ list(
       command = {
         fea_edg_spe <- create_edges_spectra(
           input = input_spectra,
-          output = par_cre_edg_spe$files$networks$spectral$edges$raw,
+          output = par_cre_edg_spe$files$networks$spectral$edges$raw$spectral,
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
           method = par_cre_edg_spe$similarities$methods$edges,
