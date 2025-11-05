@@ -6,7 +6,7 @@
 #'
 #' @include get_params.R
 #'
-#' @param annotations Character vector of paths to prepared annotation files
+#' @param annotations Character vector or list of paths to prepared annotation files
 #' @param features Character string path to prepared features file
 #' @param rts Character string path to prepared retention time library (optional)
 #' @param output Character string path for filtered annotations output
@@ -53,16 +53,39 @@ filter_annotations <- function(
   )$ms$tolerances$rt$library
 ) {
   # Validate inputs
-  if (!is.character(annotations) || length(annotations) == 0L) {
-    stop("annotations must be a non-empty character vector")
-  }
-
-  missing_annotations <- annotations[!file.exists(annotations)]
-  if (length(missing_annotations) > 0L) {
-    stop(
-      "Annotation file(s) not found: ",
-      paste(missing_annotations, collapse = ", ")
-    )
+  if (is.list(annotations)) {
+    if (length(annotations) == 0L) {
+      stop("annotations must be a non-empty list or character vector")
+    }
+    # Check all annotation files in list exist
+    missing_annotations <- lapply(annotations, function(ann) {
+      if (!is.character(ann) || length(ann) != 1L) {
+        stop("Each annotation element must be a single character string")
+      }
+      if (!file.exists(ann)) {
+        return(ann)
+      }
+      return(NULL)
+    })
+    missing_annotations <- Filter(Negate(is.null), missing_annotations)
+    if (length(missing_annotations) > 0L) {
+      stop(
+        "Annotation file(s) not found: ",
+        paste(unlist(missing_annotations), collapse = ", ")
+      )
+    }
+  } else {
+    # Character vector
+    if (!is.character(annotations) || length(annotations) == 0L) {
+      stop("annotations must be a non-empty character vector or list")
+    }
+    missing_annotations <- annotations[!file.exists(annotations)]
+    if (length(missing_annotations) > 0L) {
+      stop(
+        "Annotation file(s) not found: ",
+        paste(missing_annotations, collapse = ", ")
+      )
+    }
   }
 
   if (!is.character(features) || length(features) != 1L) {

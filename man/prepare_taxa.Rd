@@ -12,7 +12,7 @@ prepare_taxa(
   metadata = get_params(step = "prepare_taxa")$files$metadata$raw,
   org_tax_ott = get_params(step =
     "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
-  output = get_params(step = "prepare_taxa")$files$features$taxed,
+  output = get_params(step = "prepare_taxa")$files$metadata$prepared,
   taxon = get_params(step = "prepare_taxa")$organisms$taxon
 )
 }

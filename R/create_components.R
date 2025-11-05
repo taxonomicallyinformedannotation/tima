@@ -61,6 +61,7 @@ create_components <- function(
   ) |>
     tidytable::bind_rows() |>
     tidytable::select(feature_source, feature_target) |>
+    tidytable::filter(!is.na(feature_source)) |>
     tidytable::distinct()
 
   n_edges <- nrow(edges)

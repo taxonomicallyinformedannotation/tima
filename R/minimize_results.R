@@ -38,7 +38,14 @@ minimize_results <- function(
 
   if (nrow(df) == 0L) {
     logger::log_warn("Empty annotation results provided")
-    return(features_table)
+    # Return features_table with empty candidate columns to maintain structure
+    return(
+      features_table |>
+        tidytable::mutate(
+          candidates_evaluated = NA_integer_,
+          candidates_best = NA_integer_
+        )
+    )
   }
 
   # Validate score thresholds
