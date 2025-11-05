@@ -105,12 +105,15 @@ annotate_spectra <- function(
 
   if (is.list(libraries)) {
     # Check all library files in list exist
+    # Each element can be a character vector of file paths
     missing_libs <- lapply(libraries, function(lib) {
-      if (!is.character(lib) || length(lib) != 1L) {
-        stop("Each library element must be a single character string")
+      if (!is.character(lib)) {
+        stop("Each library element must be a character vector")
       }
-      if (!file.exists(lib)) {
-        return(lib)
+      # Check which files don't exist
+      missing <- lib[!file.exists(lib)]
+      if (length(missing) > 0L) {
+        return(missing)
       }
       return(NULL)
     })
