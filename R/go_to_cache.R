@@ -21,7 +21,9 @@
 #' }
 go_to_cache <- function(dir = ".tima") {
   # Validate input
-  if (is.null(dir) || !is.character(dir) || length(dir) != 1L || nchar(dir) == 0L) {
+  if (
+    is.null(dir) || !is.character(dir) || length(dir) != 1L || nchar(dir) == 0L
+  ) {
     stop("Cache directory name must be a non-empty character string")
   }
 

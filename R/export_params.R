@@ -21,7 +21,12 @@ export_params <- function(
   step
 ) {
   # Validate inputs
-  if (is.null(step) || !is.character(step) || length(step) != 1L || nchar(step) == 0L) {
+  if (
+    is.null(step) ||
+      !is.character(step) ||
+      length(step) != 1L ||
+      nchar(step) == 0L
+  ) {
     stop("Step identifier must be a non-empty character string")
   }
 
@@ -29,7 +34,12 @@ export_params <- function(
     stop("Parameters must be a list")
   }
 
-  if (is.null(directory) || !is.character(directory) || length(directory) != 1L || nchar(directory) == 0L) {
+  if (
+    is.null(directory) ||
+      !is.character(directory) ||
+      length(directory) != 1L ||
+      nchar(directory) == 0L
+  ) {
     stop("Output directory must be a non-empty character string")
   }
 

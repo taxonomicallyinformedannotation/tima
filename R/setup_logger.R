@@ -16,7 +16,12 @@
 #' }
 setup_logger <- function(filename = "tima.log") {
   # Validate filename
-  if (is.null(filename) || !is.character(filename) || length(filename) != 1L || nchar(filename) == 0L) {
+  if (
+    is.null(filename) ||
+      !is.character(filename) ||
+      length(filename) != 1L ||
+      nchar(filename) == 0L
+  ) {
     stop("Log filename must be a non-empty character string")
   }
 

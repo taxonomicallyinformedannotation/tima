@@ -23,7 +23,12 @@ export_output <- function(x, file) {
     stop("Input 'x' must be a data frame or tibble")
   }
 
-  if (is.null(file) || !is.character(file) || length(file) != 1L || nchar(file) == 0L) {
+  if (
+    is.null(file) ||
+      !is.character(file) ||
+      length(file) != 1L ||
+      nchar(file) == 0L
+  ) {
     stop("Output file path must be a non-empty character string")
   }
 
