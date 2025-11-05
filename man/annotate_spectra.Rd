@@ -18,10 +18,10 @@ annotate_spectra(
 )
 }
 \arguments{
-\item{input}{Query file containing spectra. Currently an '.mgf' file}
+\item{input}{Query file or list of files containing spectra. Currently '.mgf' file(s)}
 
 \item{libraries}{Libraries containing spectra to match against.
-Can be '.mgf' or '.sqlite' (Spectra formatted)}
+Can be '.mgf' or '.sqlite' (Spectra formatted). Accepts a vector or list of file paths.}
 
 \item{polarity}{MS polarity. Must be 'pos' or 'neg'.}
 

@@ -1,58 +1,5 @@
 #' @title Calculate similarity between spectra
 #'
-#' @description Efficiently calculates similarity scores between query and
-#'     target spectra using either entropy, cosine, or GNPS methods
-#'
-#' @include c_wrappers.R
-#'
-#' @param method Character string specifying method: "entropy", "gnps", or "cosine"
-#' @param query_spectrum Numeric matrix with columns for mz and intensity
-#' @param target_spectrum Numeric matrix with columns for mz and intensity
-#' @param query_precursor Numeric precursor m/z value for query
-#' @param target_precursor Numeric precursor m/z value for target
-#' @param dalton Numeric Dalton tolerance for peak matching
-#' @param ppm Numeric PPM tolerance for peak matching
-#' @param return_matched_peaks Logical; return matched peaks count?
-#'     Not compatible with 'entropy' method. Default: FALSE
-#' @param ... Additional arguments passed to MsCoreUtils::join
-#'
-#' @return Numeric similarity score (0-1), or list with score and matches
-#'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
-#'
-#' @export
-#'
-#' @examples
-#' sp_1 <- cbind(
-#'   mz = c(10, 36, 63, 91, 93),
-#'   intensity = c(14, 15, 999, 650, 1)
-#' )
-#' precursor_1 <- 123.4567
-#' precursor_2 <- precursor_1 + 14
-#' sp_2 <- cbind(
-#'   mz = c(10, 12, 50, 63, 105),
-#'   intensity = c(35, 5, 16, 999, 450)
-#' )
-#' calculate_similarity(
-#'   method = "entropy",
-#'   query_spectrum = sp_1,
-#'   target_spectrum = sp_2,
-#'   query_precursor = precursor_1,
-#'   target_precursor = precursor_2,
-#'   dalton = 0.005,
-#'   ppm = 10.0
-#' )
-#' calculate_similarity(
-#'   method = "gnps",
-#'   query_spectrum = sp_1,
-#'   target_spectrum = sp_2,
-#'   query_precursor = precursor_1,
-#'   target_precursor = precursor_2,
-#'   dalton = 0.005,
-#'   ppm = 10.0,
-#'   return_matched_peaks = TRUE
-#' )
-#' @title Calculate similarity between spectra
-#'
 #' @description Calculates similarity scores between query and
 #'     target spectra using either entropy, cosine, or GNPS methods.
 #'
@@ -138,7 +85,13 @@ calculate_similarity <- function(
   # Early exit for empty spectra
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
     logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
-    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
+    return(
+      if (return_matched_peaks) {
+        list(score = 0.0, matches = 0L)
+      } else {
+        0.0
+      }
+    )
   }
 
   # Validate numeric parameters
@@ -168,7 +121,13 @@ calculate_similarity <- function(
       ),
       error = function(e) {
         logger::log_warn("Entropy calculation failed: {e$message}")
-        0.0
+        return(
+          if (return_matched_peaks) {
+            list(score = 0.0, matches = 0L)
+          } else {
+            0.0
+          }
+        )
       }
     )
     return(result)

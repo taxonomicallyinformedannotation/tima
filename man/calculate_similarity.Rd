@@ -39,47 +39,12 @@ Not compatible with 'entropy' method. Default: FALSE}
 \value{
 Numeric similarity score (0-1), or list with score and matches
 if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
-
-Numeric similarity score (0-1), or list with score and matches
-if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
 }
 \description{
-Efficiently calculates similarity scores between query and
-target spectra using either entropy, cosine, or GNPS methods
-
 Calculates similarity scores between query and
 target spectra using either entropy, cosine, or GNPS methods.
 }
 \examples{
-sp_1 <- cbind(
-  mz = c(10, 36, 63, 91, 93),
-  intensity = c(14, 15, 999, 650, 1)
-)
-precursor_1 <- 123.4567
-precursor_2 <- precursor_1 + 14
-sp_2 <- cbind(
-  mz = c(10, 12, 50, 63, 105),
-  intensity = c(35, 5, 16, 999, 450)
-)
-calculate_similarity(
-  method = "entropy",
-  query_spectrum = sp_1,
-  target_spectrum = sp_2,
-  query_precursor = precursor_1,
-  target_precursor = precursor_2,
-  dalton = 0.005,
-  ppm = 10.0
-)
-calculate_similarity(
-  method = "gnps",
-  query_spectrum = sp_1,
-  target_spectrum = sp_2,
-  query_precursor = precursor_1,
-  target_precursor = precursor_2,
-  dalton = 0.005,
-  ppm = 10.0,
-  return_matched_peaks = TRUE
-)
 sp_1 <- cbind(
   mz = c(10, 36, 63, 91, 93),
   intensity = c(14, 15, 999, 650, 1)

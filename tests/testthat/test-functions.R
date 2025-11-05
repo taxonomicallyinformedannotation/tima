@@ -432,14 +432,14 @@ testthat::test_that(desc = "Test functions", code = {
   annotate_masses(
     features = "data/interim/features/example_features_no_rt.tsv.gz",
     ## shallow tolerance to speed up tests
-    tolerance_ppm = 1,
+    tolerance_ppm = 1.0,
     tolerance_rt = 0.01,
     ms_mode = "neg"
   )
   ### Positive
   annotate_masses(
     ## shallow tolerance to speed up tests
-    tolerance_ppm = 1,
+    tolerance_ppm = 1.0,
     tolerance_rt = 0.01,
     ms_mode = "pos"
   )
@@ -483,8 +483,8 @@ testthat::test_that(desc = "Test functions", code = {
     list()
 
   ## The precursor m/z for spectra
-  pmz_x <- 91
-  pmz_y <- 105
+  pmz_x <- 91.0
+  pmz_y <- 105.0
 
   ### small
   calculate_entropy_and_similarity(
@@ -495,8 +495,8 @@ testthat::test_that(desc = "Test functions", code = {
     query_precursors = pmz_x,
     query_spectra = x_small,
     dalton = 0.01,
-    ppm = 1,
-    threshold = 0,
+    ppm = 1.0,
+    threshold = 0.0,
     method = "cosine",
     approx = TRUE
   )
@@ -509,8 +509,8 @@ testthat::test_that(desc = "Test functions", code = {
     query_precursors = pmz_x,
     query_spectra = x_small,
     dalton = 0.01,
-    ppm = 1,
-    threshold = 0,
+    ppm = 1.0,
+    threshold = 0.0,
     method = "gnps",
     approx = FALSE
   )
@@ -524,8 +524,8 @@ testthat::test_that(desc = "Test functions", code = {
     query_precursors = pmz_x,
     query_spectra = x_large,
     dalton = 0.01,
-    ppm = 1,
-    threshold = 0,
+    ppm = 1.0,
+    threshold = 0.0,
     method = "entropy",
     approx = TRUE
   )
@@ -537,7 +537,7 @@ testthat::test_that(desc = "Test functions", code = {
       pos = paths$data$source$libraries$spectra$exp$with_rt
     ),
     ## shallow tolerance to speed up tests
-    ppm = 1,
+    ppm = 1.0,
     dalton = 0.001,
     polarity = "neg"
   )
@@ -551,38 +551,38 @@ testthat::test_that(desc = "Test functions", code = {
       pos = "data/interim/libraries/spectra/exp/internal_pos.rds"
     ),
     ## shallow tolerance to speed up tests
-    ppm = 1,
+    ppm = 1.0,
     dalton = 0.001,
     approx = TRUE,
-    threshold = 2
+    threshold = 1.0
   )
 
   ## Create MS2 based edges
   ## shallow tolerance to speed up tests
   create_edges_spectra(
-    ppm = 1,
+    ppm = 1.0,
     dalton = 0.001,
     method = "entropy"
   )
   ## if MS1 only
   create_edges_spectra(
     input = "data/source/example_spectra_ms1.mgf",
-    ppm = 1,
+    ppm = 1.0,
     dalton = 0.001
   )
   frag_matrix <- matrix(
     c(123.456, 234.567),
-    nrow = 1,
+    nrow = 1L,
     dimnames = list(NULL, c("mz", "int"))
   )
   # checks some of the internal if's...
   create_edges(
-    frags = rep(list(frag_matrix), 3),
-    nspecs = 3,
+    frags = rep(list(frag_matrix), 3L),
+    nspecs = 3L,
     precs = c(123.456, 234.567, 345.678),
     method = "gnps",
     ms2_tolerance = 0.01,
-    ppm_tolerance = 10,
+    ppm_tolerance = 10.0,
     threshold = 0.1,
     matched_peaks = 0L
   )
@@ -667,7 +667,7 @@ testthat::test_that(desc = "Test functions", code = {
     ms1_only = TRUE,
     remove_ties = TRUE,
     summarize = TRUE,
-    candidates_final = 1,
+    candidates_final = 1L,
     minimal_ms1_bio = 0.8,
     minimal_ms1_condition = "AND",
     compounds_names = TRUE,
@@ -707,7 +707,7 @@ testthat::test_that(desc = "Test functions", code = {
 
   ## CLI arguments check
   arguments <- list()
-  arguments$ann_can_fin <- 666
+  arguments$ann_can_fin <- 666L
 
   parse_cli_params(arguments = arguments, parameters = params)
 
@@ -726,8 +726,8 @@ testthat::test_that(desc = "Test functions", code = {
     query_precursors = pmz_x,
     query_spectra = x_large,
     dalton = 0.01,
-    ppm = 1,
-    threshold = 0,
+    ppm = 1.0,
+    threshold = 0.0,
     method = "foo",
     approx = TRUE
   ))

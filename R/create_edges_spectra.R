@@ -9,7 +9,7 @@
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
 #'
-#' @param input Character string path to query MGF file containing spectra
+#' @param input Character string path or list of paths to query MGF file(s) containing spectra
 #' @param output Character string path for output edges file
 #' @param name_source Character string name of source feature column
 #' @param name_target Character string name of target feature column
@@ -56,12 +56,34 @@ create_edges_spectra <- function(
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
 ) {
   # Validate file paths
-  if (!is.character(input) || length(input) != 1L) {
-    stop("input must be a single character string")
-  }
-
-  if (!file.exists(input)) {
-    stop("Input file not found: ", input)
+  if (is.list(input)) {
+    # Check all files in list exist
+    missing_files <- lapply(input, function(f) {
+      if (!is.character(f) || length(f) != 1L) {
+        stop("Each input element must be a single character string")
+      }
+      if (!file.exists(f)) {
+        return(f)
+      }
+      return(NULL)
+    })
+    missing_files <- Filter(Negate(is.null), missing_files)
+    if (length(missing_files) > 0L) {
+      stop(
+        "Input file(s) not found: ",
+        paste(unlist(missing_files), collapse = ", ")
+      )
+    }
+  } else {
+    # Single file path
+    if (!is.character(input) || length(input) != 1L) {
+      stop(
+        "input must be a single character string or a list of character strings"
+      )
+    }
+    if (!file.exists(input)) {
+      stop("Input file not found: ", input)
+    }
   }
 
   if (!is.character(output) || length(output) != 1L) {
