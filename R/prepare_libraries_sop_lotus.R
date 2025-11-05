@@ -33,11 +33,6 @@ prepare_libraries_sop_lotus <- function(
     step = "prepare_libraries_sop_lotus"
   )$files$libraries$sop$prepared$lotus
 ) {
-  # Validate inputs
-  if (missing(output) || is.null(output) || nchar(output) == 0L) {
-    stop("Output path must be specified")
-  }
-
   # Process LOTUS data if available
   if (file.exists(input)) {
     logger::log_info("Loading LOTUS database from: {input}")
