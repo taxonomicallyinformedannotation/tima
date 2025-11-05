@@ -95,7 +95,12 @@ testthat::test_that(desc = "Test functions", code = {
     gnps_job_id = paths$gnps$example2
   )
   ### When it is the example
-  get_gnps_tables(gnps_job_id = get_default_paths()$gnps$example)
+  get_gnps_tables(
+    path_features = paths$data$source$features,
+    path_metadata = paths$data$source$metadata,
+    path_spectra = paths$data$source$spectra,
+    gnps_job_id = get_default_paths()$gnps$example
+  )
   ### When no GNPS job ID and no metadata are given
   get_gnps_tables(
     filename = "noGNPS",

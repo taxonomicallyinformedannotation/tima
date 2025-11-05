@@ -930,7 +930,7 @@ prepare_params <- function(
   logger::log_trace("Exporting params")
   create_dir(export = yaml_export[[1]])
   purrr::map(
-    .x = seq_along(yamls_params),
+    .x = seq_along(yaml_export),
     .f = function(x) {
       yaml::write_yaml(x = yamls_params[[x]], file = yaml_export[x])
     }
