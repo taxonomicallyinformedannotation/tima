@@ -5,6 +5,8 @@
 #'     proper column structure to prevent pipeline failures during testing or
 #'     when external resources are unavailable.
 #'
+#' @include create_dir.R
+#'
 #' @param export Character string path where the fake LOTUS TSV file should be saved
 #'
 #' @return Character string path to the created fake file
@@ -69,6 +71,7 @@ fake_lotus <- function(export) {
   )
 
   # Write to file
+  create_dir(export = export)
   tidytable::fwrite(fake_data, export)
 
   logger::log_debug("Created fake LOTUS file at: {export}")
