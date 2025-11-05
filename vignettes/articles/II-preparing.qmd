@@ -40,6 +40,10 @@ logger::log_threshold(
 )
 ```
 
+```{r change-tests-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+# source(file = "scripts/change_tests.R")
+```
+
 ```{r get-example-files, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 tima::get_example_files(in_cache = FALSE)
 tima::get_example_files("spectral_lib_with_rt", in_cache = FALSE)
