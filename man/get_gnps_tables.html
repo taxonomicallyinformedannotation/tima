@@ -701,14 +701,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-gnps-tables">Get GNPS Tables</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function gets GNPS tables from corresponding job ID.</p>
+<p>This function downloads and retrieves GNPS (Global Natural Products Social Molecular Networking) result tables from a completed job. It fetches features, metadata, spectra, and annotation files from GNPS servers. When a job ID is not provided or GNPS resources are missing, small fake files are written so downstream steps do not fail during testing.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">get_gnps_tables(
   gnps_job_id,
   gnps_job_example = get_default_paths()\$gnps\$example,
-  filename,
+  filename = "",
   workflow = "fbmn",
   path_features,
   path_metadata,
@@ -727,7 +727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="gnps_job_id">gnps_job_id</code>
 </td>
 <td>
-GNPS job ID
+Character string GNPS job ID (32 characters). Can be NULL or empty string to skip download.
 </td>
 </tr>
 <tr>
@@ -735,7 +735,7 @@ GNPS job ID
 <code id="gnps_job_example">gnps_job_example</code>
 </td>
 <td>
-GNPS job example
+Character string example GNPS job ID for testing
 </td>
 </tr>
 <tr>
@@ -743,7 +743,7 @@ GNPS job example
 <code id="filename">filename</code>
 </td>
 <td>
-Name of the file
+Character string name of the file to download (used for fake outputs)
 </td>
 </tr>
 <tr>
@@ -751,7 +751,7 @@ Name of the file
 <code id="workflow">workflow</code>
 </td>
 <td>
-Character string indicating the type of workflow, either "fbmn" or "classical"
+Character string indicating workflow type: "fbmn" (feature-based) or "classical" molecular networking
 </td>
 </tr>
 <tr>
@@ -759,7 +759,7 @@ Character string indicating the type of workflow, either "fbmn" or "classical"
 <code id="path_features">path_features</code>
 </td>
 <td>
-Path to features
+Character string path for features output (file path)
 </td>
 </tr>
 <tr>
@@ -767,7 +767,7 @@ Path to features
 <code id="path_metadata">path_metadata</code>
 </td>
 <td>
-Path to metadata
+Character string path for metadata output (file path or list)
 </td>
 </tr>
 <tr>
@@ -775,7 +775,7 @@ Path to metadata
 <code id="path_spectra">path_spectra</code>
 </td>
 <td>
-Path to spectra
+Character string path for spectra output (file path)
 </td>
 </tr>
 <tr>
@@ -783,7 +783,7 @@ Path to spectra
 <code id="path_source">path_source</code>
 </td>
 <td>
-Path to store the source files
+Character string path to store source files
 </td>
 </tr>
 <tr>
@@ -791,7 +791,7 @@ Path to store the source files
 <code id="path_interim_a">path_interim_a</code>
 </td>
 <td>
-Path to store the interim annotations file
+Character string path to store interim annotations
 </td>
 </tr>
 <tr>
@@ -799,14 +799,14 @@ Path to store the interim annotations file
 <code id="path_interim_f">path_interim_f</code>
 </td>
 <td>
-Path to store the interim features files
+Character string path to store interim features
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The downloaded GNPS tables</p>
+<p>A named character vector with paths to the written/available files.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

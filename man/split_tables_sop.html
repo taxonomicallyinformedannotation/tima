@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="split-structure-organism-pairs-table">Split Structure Organism Pairs table</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function splits the structure organism table.</p>
+<p>This function splits a concatenated structure-organism pairs (SOP) table into separate standardized tables for structures, organisms, and their relationships. It processes SMILES strings, standardizes chemical structures, and creates normalized reference tables.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="table">table</code>
 </td>
 <td>
-Table to split
+Data frame containing combined structure-organism pair data with columns for structures (SMILES, InChI, names), organisms, and references
 </td>
 </tr>
 <tr>
@@ -724,14 +724,48 @@ Table to split
 <code id="cache">cache</code>
 </td>
 <td>
-Cache where already processed SMILES are located
+Character string path to cache file where previously processed SMILES are stored, or NULL to skip caching
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A list of tables from the structure organism pairs tables</p>
+<p>A list of normalized data frames:</p>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>table_keys</code>
+</td>
+<td>
+Structure-organism pairs with reference DOIs
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>table_structures_stereo</code>
+</td>
+<td>
+Structure stereochemistry information
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>table_organisms</code>
+</td>
+<td>
+Organism taxonomy information
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>table_structural</code>
+</td>
+<td>
+Processed and standardized structure data
+</td>
+</tr>
+</tbody></table>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

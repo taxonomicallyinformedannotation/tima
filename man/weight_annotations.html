@@ -725,6 +725,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   candidates_neighbors = get_params(step =
     "weight_annotations")\$annotations\$candidates\$neighbors,
   candidates_final = get_params(step = "weight_annotations")\$annotations\$candidates\$final,
+  best_percentile = get_params(step =
+    "weight_annotations")\$annotations\$candidates\$best_percentile,
   weight_spectral = get_params(step = "weight_annotations")\$weights\$global\$spectral,
   weight_chemical = get_params(step = "weight_annotations")\$weights\$global\$chemical,
   weight_biological = get_params(step = "weight_annotations")\$weights\$global\$biological,
@@ -887,6 +889,14 @@ Number of neighbors candidates to keep
 </td>
 <td>
 Number of final candidates to keep
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="best_percentile">best_percentile</code>
+</td>
+<td>
+Numeric percentile threshold (0-1) for selecting top candidates within each feature (default: 0.9). Used for consistent filtering between mini and filtered outputs.
 </td>
 </tr>
 <tr>

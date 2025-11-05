@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="run-app">Run app</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function runs the app</p>
+<p>This function launches the TIMA Shiny web application for interactive metabolite annotation. It automatically detects if running inside a Docker container and adjusts network settings accordingly.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -718,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="host">host</code>
 </td>
 <td>
-Host. Default to 127.0.0.1
+Character string specifying the host/IP address to listen on. Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.
 </td>
 </tr>
 <tr>
@@ -726,7 +726,7 @@ Host. Default to 127.0.0.1
 <code id="port">port</code>
 </td>
 <td>
-Port. Default to 3838
+Integer port number to listen on. Default: 3838
 </td>
 </tr>
 <tr>
@@ -734,21 +734,28 @@ Port. Default to 3838
 <code id="browser">browser</code>
 </td>
 <td>
-Flag for browser use. Default to TRUE
+Logical whether to automatically launch a web browser when starting the app. Default: TRUE. Automatically set to FALSE in Docker.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Opens the app</p>
+<p>NULL (invisibly). Launches the Shiny app as a side effect.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_app</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Launch app on localhost</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">run_app</span>()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Launch on custom port</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">run_app</span>(<span class="at">port =</span> <span class="dv">8080</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Allow external connections</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">run_app</span>(<span class="at">host =</span> <span class="st">"0.0.0.0"</span>, <span class="at">port =</span> <span class="dv">3838</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

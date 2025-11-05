@@ -702,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="benchmark-taxize-spectra">Benchmark taxize spectra</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function adds taxa to the benchmark</p>
+<p>This function adds taxonomic information to benchmark features by linking them to structure-organism pairs and organism taxonomy data. For features with multiple organism associations, one is randomly selected.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -717,7 +717,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Initial features
+Character string path to the initial features file
 </td>
 </tr>
 <tr>
@@ -725,7 +725,7 @@ Initial features
 <code id="keys">keys</code>
 </td>
 <td>
-SOP keys
+Character string path to the structure-organism pair (SOP) keys file
 </td>
 </tr>
 <tr>
@@ -733,7 +733,7 @@ SOP keys
 <code id="org_tax_ott">org_tax_ott</code>
 </td>
 <td>
-Taxonomy
+Character string path to the organism taxonomy (OTT) file
 </td>
 </tr>
 <tr>
@@ -741,18 +741,18 @@ Taxonomy
 <code id="output">output</code>
 </td>
 <td>
-Prepared features
+Character string path for the taxed benchmark output file
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Because they are still quite dirty</p>
+<p>Benchmark data often lacks clean taxonomic assignments. This function performs a controlled joining process with random sampling for ambiguous cases.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the taxed benchmark</p>
+<p>Character string path to the taxed benchmark file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

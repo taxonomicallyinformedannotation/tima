@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="parse-cli-parameters">Parse CLI parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function parses command line parameters</p>
+<p>This function parses command-line interface (CLI) arguments and merges them into the parameter configuration structure. It uses a mapping system to translate CLI argument names to their corresponding nested paths in the parameters list, applying appropriate type conversions.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="arguments">arguments</code>
 </td>
 <td>
-CLI arguments
+Named list of CLI arguments from docopt or similar parser
 </td>
 </tr>
 <tr>
@@ -724,14 +724,14 @@ CLI arguments
 <code id="parameters">parameters</code>
 </td>
 <td>
-Parameters
+Nested list of default parameters to be updated with CLI values
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Parameters coming from the CLI</p>
+<p>Updated parameters list with CLI arguments merged in, maintaining the nested structure and applying type conversions as specified in the mappings</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

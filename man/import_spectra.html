@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="import-spectra">Import spectra</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function imports spectra from a file (.mgf or .sqlite)</p>
+<p>This function imports mass spectra from various file formats (.mgf, .msp, .rds), harmonizes metadata field names, filters by MS level and polarity, optionally combines replicate spectra, and sanitizes peak data.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -726,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="file">file</code>
 </td>
 <td>
-File path of the spectrum file to be imported
+Character string path to the spectrum file (.mgf, .msp, or .rds)
 </td>
 </tr>
 <tr>
@@ -734,7 +734,7 @@ File path of the spectrum file to be imported
 <code id="cutoff">cutoff</code>
 </td>
 <td>
-Absolute minimal intensity
+Numeric absolute minimal intensity threshold (default: 0)
 </td>
 </tr>
 <tr>
@@ -742,7 +742,7 @@ Absolute minimal intensity
 <code id="dalton">dalton</code>
 </td>
 <td>
-Dalton tolerance
+Numeric Dalton tolerance for peak matching (default: 0.01)
 </td>
 </tr>
 <tr>
@@ -750,7 +750,7 @@ Dalton tolerance
 <code id="polarity">polarity</code>
 </td>
 <td>
-Polarity
+Character string for polarity filtering: "pos", "neg", or NA to keep all (default: NA)
 </td>
 </tr>
 <tr>
@@ -758,7 +758,7 @@ Polarity
 <code id="ppm">ppm</code>
 </td>
 <td>
-PPM tolerance
+Numeric PPM tolerance for peak matching (default: 10)
 </td>
 </tr>
 <tr>
@@ -766,7 +766,7 @@ PPM tolerance
 <code id="sanitize">sanitize</code>
 </td>
 <td>
-Flag indicating whether to sanitize. Default TRUE
+Logical flag indicating whether to sanitize spectra (default: TRUE)
 </td>
 </tr>
 <tr>
@@ -774,14 +774,14 @@ Flag indicating whether to sanitize. Default TRUE
 <code id="combine">combine</code>
 </td>
 <td>
-Flag indicating whether to combine Default TRUE
+Logical flag indicating whether to combine replicate spectra (default: TRUE)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Spectra object containing the imported spectra</p>
+<p>Spectra object containing the imported and processed spectra</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

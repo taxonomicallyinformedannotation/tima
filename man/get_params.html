@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-parameters">Get parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function gets the parameters for the job. Combination of cli and yaml parameters</p>
+<p>This function retrieves and merges parameters for a workflow step, combining default parameters, user-specified YAML configurations, and command-line arguments. It handles both regular and advanced parameter sets.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,14 +716,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="step">step</code>
 </td>
 <td>
-Name of the step being performed
+Character string name of the workflow step (e.g., "prepare_params", "annotate_masses"). Must match an available step in the package.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The parameters</p>
+<p>Named list containing the merged parameters for the specified step</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -732,7 +732,7 @@ Name of the step being performed
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">copy_backbone</span>()</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">get_params</span>(<span class="st">"prepare_params"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="st">"prepare_params"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

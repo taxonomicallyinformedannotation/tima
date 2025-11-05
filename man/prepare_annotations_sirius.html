@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-annotations-sirius">Prepare annotations SIRIUS</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares Sirius results to make them compatible</p>
+<p>This function prepares SIRIUS annotation results (structure predictions, CANOPUS chemical classifications, and formula predictions) by harmonizing formats across SIRIUS versions (v5/v6), standardizing column names, and integrating with structure metadata.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -738,7 +738,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input_directory">input_directory</code>
 </td>
 <td>
-Directory containing the Sirius results
+Character string path to directory or zip file containing SIRIUS results
 </td>
 </tr>
 <tr>
@@ -746,7 +746,7 @@ Directory containing the Sirius results
 <code id="output_ann">output_ann</code>
 </td>
 <td>
-Output where to save prepared annotation results
+Character string path for prepared annotation results output
 </td>
 </tr>
 <tr>
@@ -754,7 +754,7 @@ Output where to save prepared annotation results
 <code id="output_can">output_can</code>
 </td>
 <td>
-Output where to save prepared canopus results
+Character string path for prepared CANOPUS results output
 </td>
 </tr>
 <tr>
@@ -762,7 +762,7 @@ Output where to save prepared canopus results
 <code id="output_for">output_for</code>
 </td>
 <td>
-Output where to save prepared formula results
+Character string path for prepared formula results output
 </td>
 </tr>
 <tr>
@@ -770,7 +770,7 @@ Output where to save prepared formula results
 <code id="sirius_version">sirius_version</code>
 </td>
 <td>
-Sirius version
+Character string SIRIUS version ("v5" or "v6")
 </td>
 </tr>
 <tr>
@@ -778,7 +778,7 @@ Sirius version
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-File containing structures stereo
+Character string path to file with structure stereochemistry
 </td>
 </tr>
 <tr>
@@ -786,7 +786,7 @@ File containing structures stereo
 <code id="str_met">str_met</code>
 </td>
 <td>
-File containing structures metadata
+Character string path to file with structure metadata
 </td>
 </tr>
 <tr>
@@ -794,7 +794,7 @@ File containing structures metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-File containing structures names
+Character string path to file with structure names
 </td>
 </tr>
 <tr>
@@ -802,7 +802,7 @@ File containing structures names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-File containing Classyfire taxonomy
+Character string path to file with ClassyFire taxonomy
 </td>
 </tr>
 <tr>
@@ -810,14 +810,14 @@ File containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-File containing NPClassifier taxonomy
+Character string path to file with NPClassifier taxonomy
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared SIRIUS annotations</p>
+<p>Character string path to the prepared SIRIUS annotations file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

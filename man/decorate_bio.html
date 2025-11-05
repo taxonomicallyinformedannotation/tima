@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="decorate-bio">Decorate bio</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function outputs information about biological weighting</p>
+<p>This function logs summary statistics about biologically weighted annotations, showing how many structures were reranked at each taxonomic level based on organism occurrence data. The function validates that the required columns are present and handles empty inputs gracefully.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -727,7 +727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_bio">annot_table_wei_bio</code>
 </td>
 <td>
-Table to decorate
+Data frame containing biologically weighted annotations
 </td>
 </tr>
 <tr>
@@ -735,7 +735,7 @@ Table to decorate
 <code id="score_biological_kingdom">score_biological_kingdom</code>
 </td>
 <td>
-Kingdom score
+Numeric minimum score for kingdom-level matches
 </td>
 </tr>
 <tr>
@@ -743,7 +743,7 @@ Kingdom score
 <code id="score_biological_phylum">score_biological_phylum</code>
 </td>
 <td>
-Phylum score
+Numeric minimum score for phylum-level matches
 </td>
 </tr>
 <tr>
@@ -751,7 +751,7 @@ Phylum score
 <code id="score_biological_class">score_biological_class</code>
 </td>
 <td>
-Class score
+Numeric minimum score for class-level matches
 </td>
 </tr>
 <tr>
@@ -759,7 +759,7 @@ Class score
 <code id="score_biological_order">score_biological_order</code>
 </td>
 <td>
-Order score
+Numeric minimum score for order-level matches
 </td>
 </tr>
 <tr>
@@ -767,7 +767,7 @@ Order score
 <code id="score_biological_family">score_biological_family</code>
 </td>
 <td>
-Family score
+Numeric minimum score for family-level matches
 </td>
 </tr>
 <tr>
@@ -775,7 +775,7 @@ Family score
 <code id="score_biological_tribe">score_biological_tribe</code>
 </td>
 <td>
-Tribe score
+Numeric minimum score for tribe-level matches
 </td>
 </tr>
 <tr>
@@ -783,7 +783,7 @@ Tribe score
 <code id="score_biological_genus">score_biological_genus</code>
 </td>
 <td>
-Genus score
+Numeric minimum score for genus-level matches
 </td>
 </tr>
 <tr>
@@ -791,7 +791,7 @@ Genus score
 <code id="score_biological_species">score_biological_species</code>
 </td>
 <td>
-Species score
+Numeric minimum score for species-level matches
 </td>
 </tr>
 <tr>
@@ -799,14 +799,14 @@ Species score
 <code id="score_biological_variety">score_biological_variety</code>
 </td>
 <td>
-Variety score
+Numeric minimum score for variety-level matches
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Message indicating the number of annotations weighted at each biological level</p>
+<p>The input annotation table (unchanged), for use in pipelines</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

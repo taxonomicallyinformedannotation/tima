@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="pre-harmonize-names-sirius">Pre harmonize names sirius</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function pre harmonizes Sirius names to make them compatible</p>
+<p>This function pre-processes SIRIUS column names by removing suffixes that appear after a forward slash. SIRIUS sometimes appends additional information after a slash (e.g., "columnName/suffix"), and this function removes everything from the slash onwards.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,21 +716,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="x">x</code>
 </td>
 <td>
-Character string containing a name
+Character string containing a SIRIUS column name to pre-harmonize
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character string with the name modified according to the rules specified in the function</p>
+<p>Character string with everything from and including the first forward slash (/) removed, leaving only the base column name</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>prepared_name <span class="ot">&lt;-</span> <span class="fu">pre_harmonize_names_sirius</span>(<span class="st">"My name/suffix"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pre_harmonize_names_sirius</span>(<span class="st">"column_name/suffix"</span>) <span class="co"># Returns "column_name"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">pre_harmonize_names_sirius</span>(<span class="st">"simple_name"</span>) <span class="co"># Returns "simple_name"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pre_harmonize_names_sirius</span>(<span class="st">"name/extra/info"</span>) <span class="co"># Returns "name"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="select-sirius-columns-canopus">Select sirius columns (canopus)</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function selects sirius columns (canopus)</p>
+<p>This function selects and standardizes CANOPUS chemical classification columns from SIRIUS results, mapping SIRIUS-specific column names to TIMA standard names for downstream processing.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,7 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame with SIRIUS CANOPUS results
 </td>
 </tr>
 <tr>
@@ -724,14 +724,14 @@ Dataframe
 <code id="sirius_version">sirius_version</code>
 </td>
 <td>
-Sirius version
+Character string SIRIUS version ("5" or "6")
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The dataframe with selected canopus columns</p>
+<p>Data frame with standardized CANOPUS column names</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

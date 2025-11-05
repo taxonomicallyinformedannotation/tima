@@ -684,6 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -700,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="export-parameters">Export parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function writes the parameters to a YAML file in the specified directory.</p>
+<p>This function writes parameter configurations to a timestamped YAML file for reproducibility and tracking. Each export includes the step identifier and exact timestamp.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -719,7 +720,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="parameters">parameters</code>
 </td>
 <td>
-list of parameters to be exported
+Named list of parameters to be exported
 </td>
 </tr>
 <tr>
@@ -727,7 +728,7 @@ list of parameters to be exported
 <code id="directory">directory</code>
 </td>
 <td>
-directory where the YAML file will be saved
+Character string path to the directory where the YAML file will be saved (default: data/interim/params/)
 </td>
 </tr>
 <tr>
@@ -735,10 +736,14 @@ directory where the YAML file will be saved
 <code id="step">step</code>
 </td>
 <td>
-step identifier to be included in the YAML file name
+Character string step identifier to be included in the YAML file name (required)
 </td>
 </tr>
 </tbody></table>
+</section>
+<section id="value" class="level3">
+<h3 class="anchored" data-anchor-id="value">Value</h3>
+<p>NULL (invisibly). Creates YAML file as side effect.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-features-components">Prepare features components</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares the components (clusters in molecular network) for further use</p>
+<p>This function prepares molecular network component (cluster) assignments by loading, standardizing, and formatting component IDs for each feature. Components represent groups of related features in the molecular network.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -723,7 +723,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Input file
+Character vector of paths to input component files. Can be a single file or multiple files that will be combined.
 </td>
 </tr>
 <tr>
@@ -731,14 +731,14 @@ Input file
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path where prepared components should be saved
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared features’ components</p>
+<p>Character string path to the prepared features’ components file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -752,10 +752,8 @@ Output file
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"prepare_features_components"</span>)<span class="sc">$</span>files<span class="sc">$</span>networks<span class="sc">$</span>spectral<span class="sc">$</span>components<span class="sc">$</span>raw</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, input), <span class="at">export =</span> input)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_features_components</span>(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> input</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_features_components</span>(<span class="at">input =</span> input)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

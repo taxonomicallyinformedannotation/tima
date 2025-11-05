@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-features-table">Prepare features table</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares features</p>
+<p>This function prepares LC-MS feature tables by standardizing column names, filtering to top intensity samples per feature, and formatting data for downstream analysis. Supports multiple input formats (MZmine, SLAW, SIRIUS).</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -726,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="features">features</code>
 </td>
 <td>
-Path to the file containing the features data
+Character string path to raw features file
 </td>
 </tr>
 <tr>
@@ -734,7 +734,7 @@ Path to the file containing the features data
 <code id="output">output</code>
 </td>
 <td>
-Path to the file to export the merged data to
+Character string path where prepared features should be saved
 </td>
 </tr>
 <tr>
@@ -742,7 +742,7 @@ Path to the file to export the merged data to
 <code id="candidates">candidates</code>
 </td>
 <td>
-Number of samples to be retained per feature top intensities
+Integer number of top-intensity samples to retain per feature (recommended: ≤5 to reduce data size while keeping representative samples)
 </td>
 </tr>
 <tr>
@@ -750,7 +750,7 @@ Number of samples to be retained per feature top intensities
 <code id="name_adduct">name_adduct</code>
 </td>
 <td>
-Name of the adduct column in the features data
+Character string name of the adduct column in input
 </td>
 </tr>
 <tr>
@@ -758,7 +758,7 @@ Name of the adduct column in the features data
 <code id="name_features">name_features</code>
 </td>
 <td>
-Name of the features column in the features data
+Character string name of the feature ID column in input
 </td>
 </tr>
 <tr>
@@ -766,7 +766,7 @@ Name of the features column in the features data
 <code id="name_rt">name_rt</code>
 </td>
 <td>
-Name of the retention time column in the features data
+Character string name of the retention time column in input
 </td>
 </tr>
 <tr>
@@ -774,14 +774,14 @@ Name of the retention time column in the features data
 <code id="name_mz">name_mz</code>
 </td>
 <td>
-Name of the m/z column in the features data
+Character string name of the m/z column in input
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared feature table</p>
+<p>Character string path to the prepared feature table</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

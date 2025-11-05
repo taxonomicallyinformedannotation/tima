@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="weight-chemo">Weight chemo</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function weights the biologically weighted annotations according their chemical consistency</p>
+<p>This function weights biologically weighted annotations according to their chemical consistency by comparing chemical taxonomy (ClassyFire, NPClassifier) across molecular network neighbors. Higher chemical consistency within network components results in higher chemical scores.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -730,7 +730,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_bio_clean">annot_table_wei_bio_clean</code>
 </td>
 <td>
-Table containing the biologically weighted annotation
+Data frame with cleaned biologically weighted annotations
 </td>
 </tr>
 <tr>
@@ -738,7 +738,7 @@ Table containing the biologically weighted annotation
 <code id="weight_spectral">weight_spectral</code>
 </td>
 <td>
-Weight for the spectral score
+Numeric weight for spectral similarity score (0-1)
 </td>
 </tr>
 <tr>
@@ -746,7 +746,7 @@ Weight for the spectral score
 <code id="weight_biological">weight_biological</code>
 </td>
 <td>
-Weight for the biological score
+Numeric weight for biological source score (0-1)
 </td>
 </tr>
 <tr>
@@ -754,7 +754,7 @@ Weight for the biological score
 <code id="weight_chemical">weight_chemical</code>
 </td>
 <td>
-Weight for the chemical consistency score
+Numeric weight for chemical consistency score (0-1)
 </td>
 </tr>
 <tr>
@@ -762,7 +762,7 @@ Weight for the chemical consistency score
 <code id="score_chemical_cla_kingdom">score_chemical_cla_kingdom</code>
 </td>
 <td>
-Score for a <code style="white-space: pre;">Classyfire kingdom</code> match (should be lower than <code style="white-space: pre;"> Classyfire superclass</code>)
+Numeric score for ClassyFire kingdom match
 </td>
 </tr>
 <tr>
@@ -770,7 +770,7 @@ Score for a <code style="white-space: pre;">Classyfire kingdom</code> match (sho
 <code id="score_chemical_cla_superclass">score_chemical_cla_superclass</code>
 </td>
 <td>
-Score for a <code style="white-space: pre;">Classyfire superclass</code> match (should be lower than <code style="white-space: pre;">Classyfire class</code>)
+Numeric score for ClassyFire superclass match
 </td>
 </tr>
 <tr>
@@ -778,7 +778,7 @@ Score for a <code style="white-space: pre;">Classyfire superclass</code> match (
 <code id="score_chemical_cla_class">score_chemical_cla_class</code>
 </td>
 <td>
-Score for a <code style="white-space: pre;">Classyfire class</code> match (should be lower than <code style="white-space: pre;">Classyfire parent</code>)
+Numeric score for ClassyFire class match
 </td>
 </tr>
 <tr>
@@ -786,7 +786,7 @@ Score for a <code style="white-space: pre;">Classyfire class</code> match (shoul
 <code id="score_chemical_cla_parent">score_chemical_cla_parent</code>
 </td>
 <td>
-Score for a <code style="white-space: pre;">Classyfire parent</code> match (should be the highest)
+Numeric score for ClassyFire parent match (highest)
 </td>
 </tr>
 <tr>
@@ -794,7 +794,7 @@ Score for a <code style="white-space: pre;">Classyfire parent</code> match (shou
 <code id="score_chemical_npc_pathway">score_chemical_npc_pathway</code>
 </td>
 <td>
-Score for a <code>pathway</code> match (should be lower than <code>superclass</code>)
+Numeric score for NPC pathway match
 </td>
 </tr>
 <tr>
@@ -802,7 +802,7 @@ Score for a <code>pathway</code> match (should be lower than <code>superclass</c
 <code id="score_chemical_npc_superclass">score_chemical_npc_superclass</code>
 </td>
 <td>
-Score for a <code>superclass</code> match (should be lower than <code>class</code>)
+Numeric score for NPC superclass match
 </td>
 </tr>
 <tr>
@@ -810,14 +810,14 @@ Score for a <code>superclass</code> match (should be lower than <code>class</cod
 <code id="score_chemical_npc_class">score_chemical_npc_class</code>
 </td>
 <td>
-Score for a <code>class</code> match (should be the highest)
+Numeric score for NPC class match (highest)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A table containing the chemically weighted annotation</p>
+<p>Data frame containing chemically weighted annotations with chemical consistency scores and final weighted scores</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

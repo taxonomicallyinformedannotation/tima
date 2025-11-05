@@ -718,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="adduct_string">adduct_string</code>
 </td>
 <td>
-Character string representing the adduct (e.g., "[M+H]+", "[2M+Na]+")
+Character string representing the adduct (e.g., <code>[M+H]+</code>, <code>[2M+Na]+</code>)
 </td>
 </tr>
 <tr>
@@ -750,18 +750,15 @@ Numeric electron mass in Daltons (default: 5.485799E-4, CODATA 2018 value)
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">123.4567</span>, <span class="at">adduct_string =</span> <span class="st">"[M+H]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   n_iso 
-122.4483 </code></pre>
+<pre><code>[1] 122.4483</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">123.4567</span>, <span class="at">adduct_string =</span> <span class="st">"[M+Na]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   n_iso 
-100.4664 </code></pre>
+<pre><code>[1] 100.4664</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">123.4567</span>, <span class="at">adduct_string =</span> <span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   n_iso 
-185.0046 </code></pre>
+<pre><code>[1] 185.0046</code></pre>
 </div>
 </div>
 

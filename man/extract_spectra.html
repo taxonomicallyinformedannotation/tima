@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="extract-spectra-from-a-spectra-object">Extract spectra from a Spectra object</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function extracts spectra from a <code>Spectra</code>object</p>
+<p>This function extracts and harmonizes spectra data from a Spectra object into a flat data frame format. It handles column name inconsistencies, type conversions, and extracts peak lists (mz/intensity).</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,14 +716,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="object">object</code>
 </td>
 <td>
-Object of class Spectra
+Spectra object from the Spectra package
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Data frame containing spectra data</p>
+<p>Data frame containing harmonized spectra metadata with additional mz and intensity list columns containing peak data</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

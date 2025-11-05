@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-organism-taxonomy-open-tree-of-life-taxonomy">Get organism taxonomy (Open Tree of Life Taxonomy)</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function retrieves taxonomy from the Open Tree of Life taxonomy</p>
+<p>This function retrieves taxonomic information from the Open Tree of Life (OTT) taxonomy service. It cleans organism names, queries the OTT API, and returns structured taxonomic data including OTT IDs and hierarchical classifications.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -722,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe containing your organism(s) name(s)
+Data frame containing organism names in a column named "organism"
 </td>
 </tr>
 <tr>
@@ -730,7 +730,7 @@ Dataframe containing your organism(s) name(s)
 <code id="url">url</code>
 </td>
 <td>
-url of the ott api (for testing purposes)
+Character string URL of the OTT API endpoint (default: production API, can be changed for testing)
 </td>
 </tr>
 <tr>
@@ -738,22 +738,27 @@ url of the ott api (for testing purposes)
 <code id="retry">retry</code>
 </td>
 <td>
-Boolean. Retry with generic epithet
+Logical indicating whether to retry failed queries using only the generic epithet (genus name) when full species names fail (default: TRUE)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the obtained OTT taxonomy</p>
+<p>Data frame with taxonomic information including OTT IDs, ranks, and taxonomic hierarchy. Returns empty template if API is unavailable.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"organism"</span> <span class="ot">=</span> <span class="st">"Homo sapiens"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">get_organism_taxonomy_ott</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Single organism</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">organism =</span> <span class="st">"Homo sapiens"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>taxonomy <span class="ot">&lt;-</span> <span class="fu">get_organism_taxonomy_ott</span>(df)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple organisms</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">organism =</span> <span class="fu">c</span>(<span class="st">"Homo sapiens"</span>, <span class="st">"Arabidopsis thaliana"</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>taxonomy <span class="ot">&lt;-</span> <span class="fu">get_organism_taxonomy_ott</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-params">Prepare params</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares main parameters</p>
+<p>This function prepares and validates main parameters for the TIMA workflow. It loads YAML configuration files, extracts all parameters, and sets up the parameter structure for downstream analysis steps.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -720,7 +720,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="params_small">params_small</code>
 </td>
 <td>
-params_small
+List of basic parameters for the workflow
 </td>
 </tr>
 <tr>
@@ -728,7 +728,7 @@ params_small
 <code id="params_advanced">params_advanced</code>
 </td>
 <td>
-params_advanced
+List of advanced parameters for the workflow
 </td>
 </tr>
 <tr>
@@ -736,14 +736,14 @@ params_advanced
 <code id="step">step</code>
 </td>
 <td>
-Step
+Character string specifying the workflow step (default: NA)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the yaml files containing prepared parameters</p>
+<p>Character vector of paths to YAML files containing prepared parameters</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

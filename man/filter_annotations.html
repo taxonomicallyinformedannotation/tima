@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="filter-annotations">Filter annotations</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function filters initial annotations.</p>
+<p>This function filters initial annotations by removing MS1-only annotations that also have spectral matches, and optionally filtering by retention time tolerance when RT libraries are available.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -725,7 +725,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annotations">annotations</code>
 </td>
 <td>
-Prepared annotations file
+Character vector or list of paths to prepared annotation files
 </td>
 </tr>
 <tr>
@@ -733,7 +733,7 @@ Prepared annotations file
 <code id="features">features</code>
 </td>
 <td>
-Prepared features file
+Character string path to prepared features file
 </td>
 </tr>
 <tr>
@@ -741,7 +741,7 @@ Prepared features file
 <code id="rts">rts</code>
 </td>
 <td>
-Prepared retention time library
+Character string path to prepared retention time library (optional)
 </td>
 </tr>
 <tr>
@@ -749,7 +749,7 @@ Prepared retention time library
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path for filtered annotations output
 </td>
 </tr>
 <tr>
@@ -757,14 +757,14 @@ Output file
 <code id="tolerance_rt">tolerance_rt</code>
 </td>
 <td>
-Tolerance to filter retention time
+Numeric RT tolerance in minutes for library matching
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the filtered annotations</p>
+<p>Character string path to the filtered annotations file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -777,32 +777,20 @@ Tolerance to filter retention time
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>annotations <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"filter_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>annotations<span class="sc">$</span>prepared<span class="sc">$</span>structural[[<span class="dv">2</span>]] <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"filter_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>features<span class="sc">$</span>prepared <span class="sc">|&gt;</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>rts <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"filter_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>libraries<span class="sc">$</span>temporal<span class="sc">$</span>prepared <span class="sc">|&gt;</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, annotations), <span class="at">export =</span> annotations)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, features), <span class="at">export =</span> features)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, rts), <span class="at">export =</span> rts)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">filter_annotations</span>(</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotations =</span> annotations,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> features,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">rts =</span> rts</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="at">pattern =</span> <span class="st">".gz"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"filter_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>features<span class="sc">$</span>prepared <span class="sc">|&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="at">pattern =</span> <span class="st">".gz"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>rts <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"filter_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>libraries<span class="sc">$</span>temporal<span class="sc">$</span>prepared <span class="sc">|&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="at">pattern =</span> <span class="st">".gz"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, annotations), <span class="at">export =</span> annotations)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, features), <span class="at">export =</span> features)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, rts), <span class="at">export =</span> rts)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">filter_annotations</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotations =</span> annotations,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> features,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">rts =</span> rts</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -702,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="clean-chemo">Clean chemo</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function cleans the results obtained after chemical weighting</p>
+<p>This function cleans chemically weighted annotation results by filtering to top candidates, optionally removing MS1-only annotations below score thresholds, and preparing final results for export. Can include compound names and apply high-confidence filters.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -713,6 +713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
     parent.frame()),
   candidates_final = get("candidates_final", envir = parent.frame()),
+  best_percentile = get("best_percentile", envir = parent.frame()),
   minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
   minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
   minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
@@ -731,7 +732,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_chemo">annot_table_wei_chemo</code>
 </td>
 <td>
-Table containing your chemically weighted annotation
+Data frame with chemically weighted annotations
 </td>
 </tr>
 <tr>
@@ -739,7 +740,7 @@ Table containing your chemically weighted annotation
 <code id="components_table">components_table</code>
 </td>
 <td>
-Prepared components file
+Data frame with molecular network components
 </td>
 </tr>
 <tr>
@@ -747,7 +748,7 @@ Prepared components file
 <code id="features_table">features_table</code>
 </td>
 <td>
-Prepared features file
+Data frame with feature metadata
 </td>
 </tr>
 <tr>
@@ -755,7 +756,7 @@ Prepared features file
 <code id="structure_organism_pairs_table">structure_organism_pairs_table</code>
 </td>
 <td>
-Table containing the structure - organism pairs
+Data frame with structure-organism pairs
 </td>
 </tr>
 <tr>
@@ -763,7 +764,15 @@ Table containing the structure - organism pairs
 <code id="candidates_final">candidates_final</code>
 </td>
 <td>
-Number of final candidates to keep
+Integer number of final candidates to keep per feature
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="best_percentile">best_percentile</code>
+</td>
+<td>
+Numeric percentile threshold (0-1) for selecting top candidates within each feature (default: 0.9, keeps candidates with scores &gt;= 90% of the maximum score for that feature). Used for both filtered and mini outputs to ensure consistent row counts.
 </td>
 </tr>
 <tr>
@@ -771,7 +780,7 @@ Number of final candidates to keep
 <code id="minimal_ms1_bio">minimal_ms1_bio</code>
 </td>
 <td>
-Minimal biological score to keep MS1 based annotation
+Numeric minimal biological score for MS1 annotations (0-1)
 </td>
 </tr>
 <tr>
@@ -779,7 +788,7 @@ Minimal biological score to keep MS1 based annotation
 <code id="minimal_ms1_chemo">minimal_ms1_chemo</code>
 </td>
 <td>
-Minimal chemical score to keep MS1 based annotation
+Numeric minimal chemical score for MS1 annotations (0-1)
 </td>
 </tr>
 <tr>
@@ -787,7 +796,7 @@ Minimal chemical score to keep MS1 based annotation
 <code id="minimal_ms1_condition">minimal_ms1_condition</code>
 </td>
 <td>
-Condition to be used. Must be "OR" or "AND".
+Character condition: "OR" or "AND" for MS1 filtering
 </td>
 </tr>
 <tr>
@@ -795,7 +804,7 @@ Condition to be used. Must be "OR" or "AND".
 <code id="compounds_names">compounds_names</code>
 </td>
 <td>
-Report compounds names. Can be very large. BOOLEAN
+Logical whether to include compound names (can be large)
 </td>
 </tr>
 <tr>
@@ -803,7 +812,7 @@ Report compounds names. Can be very large. BOOLEAN
 <code id="high_confidence">high_confidence</code>
 </td>
 <td>
-Report high confidence candidates only. BOOLEAN
+Logical whether to filter for high confidence only
 </td>
 </tr>
 <tr>
@@ -811,7 +820,7 @@ Report high confidence candidates only. BOOLEAN
 <code id="remove_ties">remove_ties</code>
 </td>
 <td>
-Remove ties. BOOLEAN
+Logical whether to remove tied scores
 </td>
 </tr>
 <tr>
@@ -819,14 +828,14 @@ Remove ties. BOOLEAN
 <code id="summarize">summarize</code>
 </td>
 <td>
-Boolean. summarize results (1 row per feature)
+Logical whether to summarize to 1 row per feature
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A table containing the chemically weighted annotation where only a given number of initial candidates are kept</p>
+<p>Data frame with cleaned, filtered chemically weighted annotations</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>

@@ -679,11 +679,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#transform-score-sirius-csi" id="toc-transform-score-sirius-csi" class="nav-link active" data-scroll-target="#transform-score-sirius-csi">Transform score sirius CSI</a>
+  <li><a href="#transform-sirius-csi-score" id="toc-transform-sirius-csi-score" class="nav-link active" data-scroll-target="#transform-sirius-csi-score">Transform SIRIUS CSI score</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -697,15 +698,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="transform-score-sirius-csi" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="transform-score-sirius-csi">Transform score sirius CSI</h2>
+<section id="transform-sirius-csi-score" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="transform-sirius-csi-score">Transform SIRIUS CSI score</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates the mass of M</p>
+<p>This function transforms SIRIUS CSI (Compound Structure Identification) scores using a sigmoid function. The transformation maps raw scores to a 0-1 range for better interpretability.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">transform_score_sirius_csi(csi_score, K = 50, scale = 10)
+<pre><code class="language-R">transform_score_sirius_csi(csi_score = NULL, K = 50, scale = 10)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -716,7 +717,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="csi_score">csi_score</code>
 </td>
 <td>
-Original CSI score
+Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)
 </td>
 </tr>
 <tr>
@@ -724,7 +725,7 @@ Original CSI score
 <code id="K">K</code>
 </td>
 <td>
-Shift
+Numeric shift parameter to adjust the sigmoid center (default: 50)
 </td>
 </tr>
 <tr>
@@ -732,24 +733,40 @@ Shift
 <code id="scale">scale</code>
 </td>
 <td>
-Scale
+Numeric scale parameter controlling sigmoid steepness (default: 10)
 </td>
 </tr>
 </tbody></table>
 </section>
+<section id="details" class="level3">
+<h3 class="anchored" data-anchor-id="details">Details</h3>
+<p>This is an experimental transformation not officially approved by SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))</p>
+</section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A mass</p>
+<p>Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform a single score</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_score_sirius_csi</span>(<span class="at">csi_score =</span> <span class="sc">-</span><span class="dv">20</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform with custom parameters</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_score_sirius_csi</span>(<span class="at">csi_score =</span> <span class="sc">-</span><span class="dv">20</span>, <span class="at">K =</span> <span class="dv">30</span>, <span class="at">scale =</span> <span class="dv">5</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Vectorized transformation</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">50</span>, <span class="sc">-</span><span class="dv">20</span>, <span class="dv">0</span>, <span class="dv">20</span>, <span class="dv">50</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_score_sirius_csi</span>(<span class="at">csi_score =</span> scores)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Handle NA values</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>scores_with_na <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="cn">NA</span>, <span class="dv">0</span>, <span class="dv">20</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_score_sirius_csi</span>(<span class="at">csi_score =</span> scores_with_na)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Handle missing/absent score</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_score_sirius_csi</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

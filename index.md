@@ -174,7 +174,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
-| igraph | 2.2.1 | Csardi and Nepusz (2006); (**igraph2023?**); Csárdi et al. (2025) |
+| igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | logger | 0.4.1 | Daróczi and Wickham (2025) |
@@ -184,7 +184,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
-| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); (**rmarkdown2025?**) |
+| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.11.1 | Chang et al. (2025) |
 | shinybusy | 0.3.3 | Meyer and Perrier (2024) |
@@ -208,12 +208,31 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
 
+<div id="ref-rmarkdown2025" class="csl-entry">
+
+Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
+Luraschi, Kevin Ushey, Aron Atkins, et al. 2025.
+*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
+<https://github.com/rstudio/rmarkdown>.
+
+</div>
+
 <div id="ref-visNetwork" class="csl-entry">
 
 Almende B.V. and Contributors, and Benoit Thieurmel. 2025.
 *<span class="nocase">visNetwork</span>: Network Visualization Using
 “<span class="nocase">vis.js</span>” Library*.
 <https://doi.org/10.32614/CRAN.package.visNetwork>.
+
+</div>
+
+<div id="ref-igraph2023" class="csl-entry">
+
+Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, Kirill Müller, Tamás
+Nepusz, Daniel Noom, Maëlle Salmon, Vincent Traag, Brooke Foucault
+Welles, and Fabio Zanini. 2023. “Igraph Enables Fast and Robust Network
+Analysis Across Programming Languages.” *arXiv Preprint
+arXiv:2311.10260*. <https://doi.org/10.48550/arXiv.2311.10260>.
 
 </div>
 
@@ -236,7 +255,7 @@ Framework for r*. <https://doi.org/10.32614/CRAN.package.shiny>.
 
 <div id="ref-igraph2006" class="csl-entry">
 
-Csardi, Gabor, and Tamas Nepusz. 2006. “The Igraph Software Package for
+Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
 Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <https://igraph.org>.
 
@@ -245,9 +264,9 @@ Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <div id="ref-igraph2025" class="csl-entry">
 
 Csárdi, Gábor, Tamás Nepusz, Vincent Traag, Szabolcs Horvát, Fabio
-Zanini, Daniel Noom, and Kirill Müller. 2025.
-*<span class="nocase">igraph</span>: Network Analysis and Visualization
-in r*. <https://doi.org/10.5281/zenodo.7682609>.
+Zanini, Daniel Noom, Kirill Müller, David Schoch, and Maëlle Salmon.
+2025. *<span class="nocase">igraph</span>: Network Analysis and
+Visualization in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 

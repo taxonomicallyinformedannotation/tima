@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-annotations-gnps">Prepare annotations GNPS</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares GNPS obtained annotations</p>
+<p>This function prepares GNPS spectral library matching results by standardizing column names, integrating structure metadata, and formatting for downstream TIMA annotation workflows.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -733,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Input file
+Character string or vector of paths to GNPS annotation files
 </td>
 </tr>
 <tr>
@@ -741,7 +741,7 @@ Input file
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path for prepared GNPS annotations output
 </td>
 </tr>
 <tr>
@@ -749,7 +749,7 @@ Output file
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-File containing structures stereo
+Character string path to structures stereochemistry file
 </td>
 </tr>
 <tr>
@@ -757,7 +757,7 @@ File containing structures stereo
 <code id="str_met">str_met</code>
 </td>
 <td>
-File containing structures metadata
+Character string path to structures metadata file
 </td>
 </tr>
 <tr>
@@ -765,7 +765,7 @@ File containing structures metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-File containing structures names
+Character string path to structures names file
 </td>
 </tr>
 <tr>
@@ -773,7 +773,7 @@ File containing structures names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-File containing Classyfire taxonomy
+Character string path to ClassyFire taxonomy file
 </td>
 </tr>
 <tr>
@@ -781,14 +781,14 @@ File containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-File containing NPClassifier taxonomy
+Character string path to NPClassifier taxonomy file
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared GNPS annotations</p>
+<p>Character string path to prepared GNPS annotations</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

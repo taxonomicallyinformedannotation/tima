@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="sanitize-spectra">Sanitize spectra</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function sanitizes spectra</p>
+<p>This function sanitizes MS spectra by removing noise, artifacts, precursor peaks, and empty spectra. It applies multiple cleaning steps including intensity filtering, peak reduction, and normalization.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -718,7 +718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="spectra">spectra</code>
 </td>
 <td>
-Spectra object
+Spectra object from the Spectra package
 </td>
 </tr>
 <tr>
@@ -726,7 +726,7 @@ Spectra object
 <code id="cutoff">cutoff</code>
 </td>
 <td>
-Absolute minimal intensity
+Numeric absolute minimal intensity threshold (default: 0). Peaks below this intensity are removed.
 </td>
 </tr>
 <tr>
@@ -734,7 +734,7 @@ Absolute minimal intensity
 <code id="dalton">dalton</code>
 </td>
 <td>
-Dalton tolerance
+Numeric Dalton tolerance for peak matching (default: 0.01)
 </td>
 </tr>
 <tr>
@@ -742,14 +742,14 @@ Dalton tolerance
 <code id="ppm">ppm</code>
 </td>
 <td>
-PPM tolerance
+Numeric PPM tolerance for peak matching (default: 10)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The sanitized spectra</p>
+<p>A sanitized Spectra object with noise and artifacts removed</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-example-files">Get example files</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function downloads example files</p>
+<p>This function downloads example data files for testing and demonstration purposes. Supports downloading features, metadata, SIRIUS annotations, mass spectra, and spectral libraries with retention times.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -721,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="example">example</code>
 </td>
 <td>
-The example(s) you want to download
+Character vector specifying which example files to download. Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"
 </td>
 </tr>
 <tr>
@@ -729,21 +729,28 @@ The example(s) you want to download
 <code id="in_cache">in_cache</code>
 </td>
 <td>
-Flag to indicate if storing the files in cache
+Logical whether to store files in the cache directory (default: TRUE)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Example files.</p>
+<p>NULL (invisibly). Downloads files as a side effect.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_example_files</span>(<span class="at">example =</span> <span class="fu">c</span>(<span class="st">"features"</span>), <span class="at">in_cache =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Download features and metadata examples</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">get_example_files</span>(<span class="at">example =</span> <span class="fu">c</span>(<span class="st">"features"</span>, <span class="st">"metadata"</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Download all example files to cache</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">get_example_files</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">example =</span> <span class="fu">c</span>(<span class="st">"features"</span>, <span class="st">"metadata"</span>, <span class="st">"sirius"</span>, <span class="st">"spectra"</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">in_cache =</span> <span class="cn">TRUE</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

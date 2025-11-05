@@ -702,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="clean-bio">Clean bio</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function cleans the results obtained after biological weighting</p>
+<p>This function cleans and filters biologically weighted annotation results by calculating chemical consistency scores across network neighbors. Only features with at least 2 neighbors are evaluated.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -721,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_bio">annot_table_wei_bio</code>
 </td>
 <td>
-Table containing your biologically weighted annotation
+Data frame containing biologically weighted annotations
 </td>
 </tr>
 <tr>
@@ -729,7 +729,7 @@ Table containing your biologically weighted annotation
 <code id="edges_table">edges_table</code>
 </td>
 <td>
-Table containing the edges between features
+Data frame containing network edges between features
 </td>
 </tr>
 <tr>
@@ -737,14 +737,14 @@ Table containing the edges between features
 <code id="minimal_consistency">minimal_consistency</code>
 </td>
 <td>
-Minimal consistency score for a class. FLOAT
+Numeric minimum consistency score (0-1) required to retain a classification at each taxonomic level
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A table containing the biologically weighted annotation where only a given number of initial candidates are kept</p>
+<p>Data frame containing filtered biologically weighted annotations with consistency scores</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>

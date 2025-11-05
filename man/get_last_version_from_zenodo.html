@@ -704,7 +704,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-last-version-from-zenodo">Get last version from Zenodo</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function gets the last version of a file from a Zenodo record</p>
+<p>This function retrieves the latest version of a file from a Zenodo repository record. It checks the file size and only downloads if the local file is missing or differs from the remote version.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -719,7 +719,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="doi">doi</code>
 </td>
 <td>
-DOI of the Zenodo record
+Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")
 </td>
 </tr>
 <tr>
@@ -727,7 +727,7 @@ DOI of the Zenodo record
 <code id="pattern">pattern</code>
 </td>
 <td>
-Pattern to identify the file to download
+Character string pattern to identify the specific file to download
 </td>
 </tr>
 <tr>
@@ -735,18 +735,18 @@ Pattern to identify the file to download
 <code id="path">path</code>
 </td>
 <td>
-Path to save the file to
+Character string local path where the file should be saved
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Credit goes to partially to https://inbo.github.io/inborutils/</p>
+<p>Credit goes partially to https://inbo.github.io/inborutils/ This function handles the new Zenodo API format and file structure.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the file</p>
+<p>Character string path to the downloaded file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -756,7 +756,7 @@ Path to save the file to
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_last_version_from_zenodo</span>(</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">doi =</span> <span class="st">"10.5281/zenodo.5794106"</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern =</span> <span class="st">"frozen.csv.gz"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"frozen.csv.gz"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"data/frozen.csv.gz"</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 

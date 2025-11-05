@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="summarize-results">Summarize results</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function summarizes results</p>
+<p>This function summarizes annotation results by adding feature metadata, filtering/collapsing columns, and optionally removing tied scores or summarizing to one row per feature. Creates a final, simplified results table for downstream analysis or reporting.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -724,7 +724,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame containing weighted annotation results
 </td>
 </tr>
 <tr>
@@ -732,7 +732,7 @@ Dataframe
 <code id="features_table">features_table</code>
 </td>
 <td>
-Prepared features file
+Data frame with feature metadata (RT, m/z, etc.)
 </td>
 </tr>
 <tr>
@@ -740,7 +740,7 @@ Prepared features file
 <code id="components_table">components_table</code>
 </td>
 <td>
-Prepared components file
+Data frame with molecular network component assignments
 </td>
 </tr>
 <tr>
@@ -748,7 +748,7 @@ Prepared components file
 <code id="structure_organism_pairs_table">structure_organism_pairs_table</code>
 </td>
 <td>
-Table containing the structure - organism pairs
+Data frame with structure-organism pairs
 </td>
 </tr>
 <tr>
@@ -756,7 +756,7 @@ Table containing the structure - organism pairs
 <code id="annot_table_wei_chemo">annot_table_wei_chemo</code>
 </td>
 <td>
-Table containing your chemically weighted annotation
+Data frame with chemically weighted annotations
 </td>
 </tr>
 <tr>
@@ -764,7 +764,7 @@ Table containing your chemically weighted annotation
 <code id="remove_ties">remove_ties</code>
 </td>
 <td>
-Remove ties. BOOLEAN
+Logical whether to remove tied scores (keep only highest)
 </td>
 </tr>
 <tr>
@@ -772,14 +772,14 @@ Remove ties. BOOLEAN
 <code id="summarize">summarize</code>
 </td>
 <td>
-Boolean. summarize results (1 row per feature)
+Logical whether to collapse to 1 row per feature
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A summarized table</p>
+<p>Data frame containing summarized annotation results</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

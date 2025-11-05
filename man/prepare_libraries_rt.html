@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-libraries-of-retention-times">Prepare libraries of retention times</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares retention times libraries to be used for later</p>
+<p>This function prepares retention time libraries by combining experimental and in silico predicted retention times from multiple sources (MGF files, CSV files). It standardizes retention time units, validates structures, and creates both RT libraries and pseudo structure-organism pairs for RT-based annotation.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -732,7 +732,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="mgf_exp">mgf_exp</code>
 </td>
 <td>
-MGF containing experimental retention times
+Character vector of paths to MGF files with experimental RT
 </td>
 </tr>
 <tr>
@@ -740,7 +740,7 @@ MGF containing experimental retention times
 <code id="mgf_is">mgf_is</code>
 </td>
 <td>
-MGF containing in silico predicted retention times
+Character vector of paths to MGF files with in silico predicted RT
 </td>
 </tr>
 <tr>
@@ -748,7 +748,7 @@ MGF containing in silico predicted retention times
 <code id="temp_exp">temp_exp</code>
 </td>
 <td>
-File containing experimental retention times
+Character vector of paths to CSV files with experimental RT
 </td>
 </tr>
 <tr>
@@ -756,7 +756,7 @@ File containing experimental retention times
 <code id="temp_is">temp_is</code>
 </td>
 <td>
-File containing in silico predicted retention times
+Character vector of paths to CSV files with in silico predicted RT
 </td>
 </tr>
 <tr>
@@ -764,7 +764,7 @@ File containing in silico predicted retention times
 <code id="output_rt">output_rt</code>
 </td>
 <td>
-Output retention time file
+Character string path for prepared RT library output
 </td>
 </tr>
 <tr>
@@ -772,7 +772,7 @@ Output retention time file
 <code id="output_sop">output_sop</code>
 </td>
 <td>
-Output pseudo sop file
+Character string path for pseudo SOP output
 </td>
 </tr>
 <tr>
@@ -780,7 +780,7 @@ Output pseudo sop file
 <code id="col_ik">col_ik</code>
 </td>
 <td>
-Name of the InChIKey in mgf
+Character string name of InChIKey column in MGF
 </td>
 </tr>
 <tr>
@@ -788,7 +788,7 @@ Name of the InChIKey in mgf
 <code id="col_rt">col_rt</code>
 </td>
 <td>
-Name of the retention time in mgf
+Character string name of retention time column in MGF
 </td>
 </tr>
 <tr>
@@ -796,7 +796,7 @@ Name of the retention time in mgf
 <code id="col_sm">col_sm</code>
 </td>
 <td>
-Name of the SMILES in mgf
+Character string name of SMILES column in MGF
 </td>
 </tr>
 <tr>
@@ -804,7 +804,7 @@ Name of the SMILES in mgf
 <code id="name_inchikey">name_inchikey</code>
 </td>
 <td>
-Name of the InChIKey in file
+Character string name of InChIKey column in CSV
 </td>
 </tr>
 <tr>
@@ -812,7 +812,7 @@ Name of the InChIKey in file
 <code id="name_rt">name_rt</code>
 </td>
 <td>
-Name of the retention time in file
+Character string name of retention time column in CSV
 </td>
 </tr>
 <tr>
@@ -820,7 +820,7 @@ Name of the retention time in file
 <code id="name_smiles">name_smiles</code>
 </td>
 <td>
-Name of the SMILES in file
+Character string name of SMILES column in CSV
 </td>
 </tr>
 <tr>
@@ -828,14 +828,14 @@ Name of the SMILES in file
 <code id="unit_rt">unit_rt</code>
 </td>
 <td>
-Unit of the retention time. Must be "seconds" or "minutes"
+Character string RT unit: "seconds" or "minutes"
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared retention time library</p>
+<p>Character string path to the prepared retention time library</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

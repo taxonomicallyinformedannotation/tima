@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="minimize-results">Minimize results</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function minimizes results</p>
+<p>This function minimizes annotation results by filtering to the most confident chemical classifications and compound identifications. It extracts the best-scoring chemical taxonomy predictions and the top compound candidates based on weighted chemical scores.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -722,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame containing full annotation results with scores and chemical taxonomy predictions
 </td>
 </tr>
 <tr>
@@ -730,7 +730,7 @@ Dataframe
 <code id="features_table">features_table</code>
 </td>
 <td>
-Prepared features file
+Data frame of features to join with minimized results
 </td>
 </tr>
 <tr>
@@ -738,7 +738,7 @@ Prepared features file
 <code id="min_score_classes">min_score_classes</code>
 </td>
 <td>
-Minimal score to keep classes
+Numeric minimum score threshold (0-1) for keeping chemical classifications (default: 0.6)
 </td>
 </tr>
 <tr>
@@ -746,7 +746,7 @@ Minimal score to keep classes
 <code id="min_score_compounds">min_score_compounds</code>
 </td>
 <td>
-Minimal score to keep compounds
+Numeric minimum score threshold (0-1) for keeping compound identifications (default: 0.4)
 </td>
 </tr>
 <tr>
@@ -754,14 +754,14 @@ Minimal score to keep compounds
 <code id="best_percentile">best_percentile</code>
 </td>
 <td>
-Best percentile
+Numeric percentile threshold (0-1) for selecting top candidates within each feature (default: 0.9, keeps candidates with scores &gt;= 90% of the maximum score for that feature)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A minimized table</p>
+<p>A minimized data frame with features joined to their best chemical classifications and top compound identifications</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

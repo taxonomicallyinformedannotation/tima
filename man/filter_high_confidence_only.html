@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="filter-high-confidence-only">Filter high confidence only <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a></h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function filters highly confident annotations only.</p>
+<p>This function filters annotation results to retain only high-confidence candidates based on multiple scoring criteria (biological, initial, chemical) and retention time accuracy.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -722,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame containing annotation results with score columns
 </td>
 </tr>
 <tr>
@@ -730,7 +730,7 @@ Dataframe
 <code id="score_bio_min">score_bio_min</code>
 </td>
 <td>
-Minimal biological score. Current default to 0.85.
+Numeric minimum biological score threshold (default: 0.85)
 </td>
 </tr>
 <tr>
@@ -738,7 +738,7 @@ Minimal biological score. Current default to 0.85.
 <code id="score_ini_min">score_ini_min</code>
 </td>
 <td>
-Minimal initial score. Current default to 0.95.
+Numeric minimum initial score threshold (default: 0.95)
 </td>
 </tr>
 <tr>
@@ -746,7 +746,7 @@ Minimal initial score. Current default to 0.95.
 <code id="score_final_min">score_final_min</code>
 </td>
 <td>
-Minimal final score. Current default to 0.75.
+Numeric minimum final (chemical) score threshold (default: 0.75)
 </td>
 </tr>
 <tr>
@@ -754,14 +754,14 @@ Minimal final score. Current default to 0.75.
 <code id="error_rt_max">error_rt_max</code>
 </td>
 <td>
-Maximal RT error. Current default to 0.1.
+Numeric maximum retention time error in minutes (default: 0.1)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A dataframe containing only high confidence annotations</p>
+<p>Data frame containing only high-confidence annotations that meet at least one score threshold and pass RT error filtering</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

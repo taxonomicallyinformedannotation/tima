@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="parse-adduct">Parse adduct</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function parses adducts</p>
+<p>This function parses mass spectrometry adduct notation strings into their components: multimer count, isotope shift, modifications, charge state, and charge sign. It handles complex adducts with multiple additions/losses.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -721,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="adduct_string">adduct_string</code>
 </td>
 <td>
-Adduct to be parsed
+Character string representing the adduct in standard notation (e.g., "[M+H]+", "[2M+Na]+", "[M-H2O+H]+")
 </td>
 </tr>
 <tr>
@@ -729,14 +729,57 @@ Adduct to be parsed
 <code id="regex">regex</code>
 </td>
 <td>
-Regex used for parsing
+Character string regular expression pattern for parsing (default handles standard adduct notation)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Parsed elements from adduct</p>
+<p>Named numeric vector containing:</p>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>n_mer</code>
+</td>
+<td>
+Integer number of monomers (e.g., 2 for dimer)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>n_iso</code>
+</td>
+<td>
+Integer isotope shift (e.g., 1 for M1)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>los_add_clu</code>
+</td>
+<td>
+Numeric total mass change from modifications
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>n_charges</code>
+</td>
+<td>
+Integer absolute number of charges
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code>charge</code>
+</td>
+<td>
+Integer charge sign (+1 or -1)
+</td>
+</tr>
+</tbody></table>
+<p>Returns all zeros if parsing fails.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -744,7 +787,8 @@ Regex used for parsing
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H]+"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

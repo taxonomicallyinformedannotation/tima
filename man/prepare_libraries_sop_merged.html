@@ -704,7 +704,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-merged-structure-organism-pairs-libraries">Prepare merged structure organism pairs libraries</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares the libraries made of all sub-libraries containing structure-organism pairs</p>
+<p>This function merges all structure-organism pair libraries (LOTUS, HMDB, ECMDB, etc.) into a single comprehensive library. Can optionally filter by taxonomic level to create biologically-focused subsets. Also splits structures into separate metadata tables.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -740,7 +740,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="files">files</code>
 </td>
 <td>
-List of libraries to be merged
+Character vector or list of paths to prepared library files
 </td>
 </tr>
 <tr>
@@ -748,7 +748,7 @@ List of libraries to be merged
 <code id="filter">filter</code>
 </td>
 <td>
-Boolean. TRUE or FALSE if you want to filter the library
+Logical whether to filter the merged library by taxonomy
 </td>
 </tr>
 <tr>
@@ -756,7 +756,7 @@ Boolean. TRUE or FALSE if you want to filter the library
 <code id="level">level</code>
 </td>
 <td>
-Biological rank to be filtered. Kingdom, phylum, family, genus, …
+Character string taxonomic rank for filtering (kingdom, phylum, family, genus, etc.)
 </td>
 </tr>
 <tr>
@@ -764,7 +764,7 @@ Biological rank to be filtered. Kingdom, phylum, family, genus, …
 <code id="value">value</code>
 </td>
 <td>
-Name of the taxon or taxa to be kept, e.g.&nbsp;‘Gentianaceae|Apocynaceae’
+Character string taxon name(s) to keep (can use | for multiple, e.g., ‘Gentianaceae|Apocynaceae’)
 </td>
 </tr>
 <tr>
@@ -772,7 +772,7 @@ Name of the taxon or taxa to be kept, e.g.&nbsp;‘Gentianaceae|Apocynaceae’
 <code id="cache">cache</code>
 </td>
 <td>
-Cache where already processed SMILES are located
+Character string path to cache directory for processed SMILES
 </td>
 </tr>
 <tr>
@@ -780,7 +780,7 @@ Cache where already processed SMILES are located
 <code id="output_key">output_key</code>
 </td>
 <td>
-Output file for keys
+Character string path for output keys file
 </td>
 </tr>
 <tr>
@@ -788,7 +788,7 @@ Output file for keys
 <code id="output_org_tax_ott">output_org_tax_ott</code>
 </td>
 <td>
-Output file for organisms taxonomy (OTT)
+Character string path for organisms taxonomy (OTT) file
 </td>
 </tr>
 <tr>
@@ -796,7 +796,7 @@ Output file for organisms taxonomy (OTT)
 <code id="output_str_stereo">output_str_stereo</code>
 </td>
 <td>
-Output file for structures stereo
+Character string path for structures stereochemistry file
 </td>
 </tr>
 <tr>
@@ -804,7 +804,7 @@ Output file for structures stereo
 <code id="output_str_met">output_str_met</code>
 </td>
 <td>
-Output file for structures metadata
+Character string path for structures metadata file
 </td>
 </tr>
 <tr>
@@ -812,7 +812,7 @@ Output file for structures metadata
 <code id="output_str_nam">output_str_nam</code>
 </td>
 <td>
-Output file for structures names
+Character string path for structures names file
 </td>
 </tr>
 <tr>
@@ -820,7 +820,7 @@ Output file for structures names
 <code id="output_str_tax_cla">output_str_tax_cla</code>
 </td>
 <td>
-Output file for structures taxonomy (Classyfire)
+Character string path for ClassyFire taxonomy file
 </td>
 </tr>
 <tr>
@@ -828,18 +828,18 @@ Output file for structures taxonomy (Classyfire)
 <code id="output_str_tax_npc">output_str_tax_npc</code>
 </td>
 <td>
-Output file for structures taxonomy (NPC)
+Character string path for NPClassifier taxonomy file
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>It can be restricted to specific taxa to have more biologically meaningful annotation.</p>
+<p>Creates merged library by combining all available SOP sources, optionally filtering by taxonomic criteria (e.g., only Gentianaceae). Splits output into structures metadata, names, taxonomy, and organisms.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared structure-organism pairs library MERGED</p>
+<p>Character string path to the prepared merged SOP library</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -852,14 +852,10 @@ Output file for structures taxonomy (NPC)
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"prepare_libraries_sop_merged"</span>)<span class="sc">$</span>files<span class="sc">$</span>libraries<span class="sc">$</span>sop<span class="sc">$</span>prepared<span class="sc">$</span>lotus <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, files), <span class="at">export =</span> files)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_libraries_sop_merged</span>(<span class="at">files =</span> files)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="at">pattern =</span> <span class="st">".gz"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, files), <span class="at">export =</span> files)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_libraries_sop_merged</span>(<span class="at">files =</span> files)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="select-annotations-columns">Select annotations columns</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function selects annotations columns</p>
+<p>This function selects and standardizes annotation columns by filtering to relevant fields, cleaning NULL/NA values, rounding numeric values, and complementing with structure metadata. Used to prepare annotation results for downstream analysis.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -723,7 +723,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame containing annotation results with structure and candidate information
 </td>
 </tr>
 <tr>
@@ -731,7 +731,7 @@ Dataframe
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-File containing structures stereo
+Character string path to file containing structure stereochemistry
 </td>
 </tr>
 <tr>
@@ -739,7 +739,7 @@ File containing structures stereo
 <code id="str_met">str_met</code>
 </td>
 <td>
-File containing structures metadata
+Character string path to file containing structure metadata
 </td>
 </tr>
 <tr>
@@ -747,7 +747,7 @@ File containing structures metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-File containing structures names
+Character string path to file containing structure names
 </td>
 </tr>
 <tr>
@@ -755,7 +755,7 @@ File containing structures names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-File containing Classyfire taxonomy
+Character string path to file containing Classyfire taxonomy
 </td>
 </tr>
 <tr>
@@ -763,14 +763,14 @@ File containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-File containing NPClassifier taxonomy
+Character string path to file containing NPClassifier taxonomy
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The dataframe with annotation columns selected</p>
+<p>Data frame with standardized annotation columns, cleaned values, and complemented metadata</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

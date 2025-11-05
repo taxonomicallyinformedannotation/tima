@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-features-edges">Prepare features edges</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares edges for further use</p>
+<p>This function prepares molecular network edges by combining MS1-based and spectral similarity edges, adding entropy information, and standardizing column names. Edges represent relationships between features in the molecular network.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -724,7 +724,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Input file if ‘manual’
+Named list containing paths to edge files. Must have "ms1" and "spectral" elements pointing to respective edge files.
 </td>
 </tr>
 <tr>
@@ -732,7 +732,7 @@ Input file if ‘manual’
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path where prepared edges should be saved
 </td>
 </tr>
 <tr>
@@ -740,7 +740,7 @@ Output file
 <code id="name_source">name_source</code>
 </td>
 <td>
-Name of the source features column
+Character string name of the source feature column in input files
 </td>
 </tr>
 <tr>
@@ -748,14 +748,14 @@ Name of the source features column
 <code id="name_target">name_target</code>
 </td>
 <td>
-Name of the target features column
+Character string name of the target feature column in input files
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared edges</p>
+<p>Character string path to the prepared edges file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

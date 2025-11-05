@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="weight-bio">Weight bio</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function weights the eventually MS1 complemented annotations according their biological source</p>
+<p>This function weights MS annotations according to their biological source by comparing the taxonomic hierarchy of candidate structures’ reported organisms with the sample’s organism taxonomy. Higher taxonomic similarity results in higher biological scores.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -732,7 +732,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annotation_table_taxed">annotation_table_taxed</code>
 </td>
 <td>
-Table containing the initial annotation eventually complemented by additional MS1 annotations
+Data frame containing initial annotations with sample taxonomy information
 </td>
 </tr>
 <tr>
@@ -740,7 +740,7 @@ Table containing the initial annotation eventually complemented by additional MS
 <code id="structure_organism_pairs_table">structure_organism_pairs_table</code>
 </td>
 <td>
-Table containing the structure - organism pairs
+Data frame containing structure-organism pairs with complete taxonomic hierarchies
 </td>
 </tr>
 <tr>
@@ -748,7 +748,7 @@ Table containing the structure - organism pairs
 <code id="weight_spectral">weight_spectral</code>
 </td>
 <td>
-Weight for the spectral score
+Numeric weight for spectral similarity score (0-1)
 </td>
 </tr>
 <tr>
@@ -756,7 +756,7 @@ Weight for the spectral score
 <code id="weight_biological">weight_biological</code>
 </td>
 <td>
-Weight for the biological score
+Numeric weight for biological source score (0-1)
 </td>
 </tr>
 <tr>
@@ -764,7 +764,7 @@ Weight for the biological score
 <code id="score_biological_domain">score_biological_domain</code>
 </td>
 <td>
-Score for a <code>domain</code> match (should be lower than <code>kingdom</code>)
+Numeric score for domain-level taxonomic match
 </td>
 </tr>
 <tr>
@@ -772,7 +772,7 @@ Score for a <code>domain</code> match (should be lower than <code>kingdom</code>
 <code id="score_biological_kingdom">score_biological_kingdom</code>
 </td>
 <td>
-Score for a <code>kingdom</code> match (should be lower than <code>phylum</code>)
+Numeric score for kingdom-level match
 </td>
 </tr>
 <tr>
@@ -780,7 +780,7 @@ Score for a <code>kingdom</code> match (should be lower than <code>phylum</code>
 <code id="score_biological_phylum">score_biological_phylum</code>
 </td>
 <td>
-Score for a <code>phylum</code> match (should be lower than <code>class</code>)
+Numeric score for phylum-level match
 </td>
 </tr>
 <tr>
@@ -788,7 +788,7 @@ Score for a <code>phylum</code> match (should be lower than <code>class</code>)
 <code id="score_biological_class">score_biological_class</code>
 </td>
 <td>
-Score for a <code>class</code> match (should be lower than <code>order</code>)
+Numeric score for class-level match
 </td>
 </tr>
 <tr>
@@ -796,7 +796,7 @@ Score for a <code>class</code> match (should be lower than <code>order</code>)
 <code id="score_biological_order">score_biological_order</code>
 </td>
 <td>
-Score for a <code>order</code> match (should be lower than <code>family</code>)
+Numeric score for order-level match
 </td>
 </tr>
 <tr>
@@ -804,7 +804,7 @@ Score for a <code>order</code> match (should be lower than <code>family</code>)
 <code id="score_biological_family">score_biological_family</code>
 </td>
 <td>
-Score for a <code>family</code> match (should be lower than <code>tribe</code>)
+Numeric score for family-level match
 </td>
 </tr>
 <tr>
@@ -812,7 +812,7 @@ Score for a <code>family</code> match (should be lower than <code>tribe</code>)
 <code id="score_biological_tribe">score_biological_tribe</code>
 </td>
 <td>
-Score for a <code>tribe</code> match (should be lower than <code>genus</code>)
+Numeric score for tribe-level match
 </td>
 </tr>
 <tr>
@@ -820,7 +820,7 @@ Score for a <code>tribe</code> match (should be lower than <code>genus</code>)
 <code id="score_biological_genus">score_biological_genus</code>
 </td>
 <td>
-Score for a <code>genus</code> match (should be lower than <code>species</code>)
+Numeric score for genus-level match
 </td>
 </tr>
 <tr>
@@ -828,7 +828,7 @@ Score for a <code>genus</code> match (should be lower than <code>species</code>)
 <code id="score_biological_species">score_biological_species</code>
 </td>
 <td>
-Score for a <code>species</code> match (should be lower than <code>variety</code>)
+Numeric score for species-level match
 </td>
 </tr>
 <tr>
@@ -836,14 +836,14 @@ Score for a <code>species</code> match (should be lower than <code>variety</code
 <code id="score_biological_variety">score_biological_variety</code>
 </td>
 <td>
-Score for a <code>variety</code> match (should be the highest)
+Numeric score for variety-level match (highest)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A table containing the biologically weighted annotation</p>
+<p>Data frame containing biologically weighted annotations with biological scores and combined weighted scores</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

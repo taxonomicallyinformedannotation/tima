@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="decorate-chemo">Decorate chemo</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function outputs information about chemical weighting</p>
+<p>This function logs summary statistics about chemically weighted annotations, showing how many structures were reranked at each chemical classification level. Uses cascading filters where each level builds on the previous (higher specificity requires passing lower levels). The function validates required columns and handles empty inputs gracefully.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -727,7 +727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_chemo">annot_table_wei_chemo</code>
 </td>
 <td>
-Table to decorate
+Data frame containing chemically weighted annotations
 </td>
 </tr>
 <tr>
@@ -735,7 +735,7 @@ Table to decorate
 <code id="score_chemical_cla_kingdom">score_chemical_cla_kingdom</code>
 </td>
 <td>
-Classyfire kingdom score
+Numeric minimum score for Classyfire kingdom
 </td>
 </tr>
 <tr>
@@ -743,7 +743,7 @@ Classyfire kingdom score
 <code id="score_chemical_cla_superclass">score_chemical_cla_superclass</code>
 </td>
 <td>
-Classyfire superclass score
+Numeric minimum score for Classyfire superclass
 </td>
 </tr>
 <tr>
@@ -751,7 +751,7 @@ Classyfire superclass score
 <code id="score_chemical_cla_class">score_chemical_cla_class</code>
 </td>
 <td>
-Classyfire class score
+Numeric minimum score for Classyfire class
 </td>
 </tr>
 <tr>
@@ -759,7 +759,7 @@ Classyfire class score
 <code id="score_chemical_cla_parent">score_chemical_cla_parent</code>
 </td>
 <td>
-Classyfire parent score
+Numeric minimum score for Classyfire parent
 </td>
 </tr>
 <tr>
@@ -767,7 +767,7 @@ Classyfire parent score
 <code id="score_chemical_npc_pathway">score_chemical_npc_pathway</code>
 </td>
 <td>
-NPC pathway score
+Numeric minimum score for NPClassifier pathway
 </td>
 </tr>
 <tr>
@@ -775,7 +775,7 @@ NPC pathway score
 <code id="score_chemical_npc_superclass">score_chemical_npc_superclass</code>
 </td>
 <td>
-NPC superclass score
+Numeric minimum score for NPClassifier superclass
 </td>
 </tr>
 <tr>
@@ -783,14 +783,14 @@ NPC superclass score
 <code id="score_chemical_npc_class">score_chemical_npc_class</code>
 </td>
 <td>
-NPC class score
+Numeric minimum score for NPClassifier class
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Message indicating the number of annotations weighted at each chemical level</p>
+<p>The input annotation table (unchanged), for use in pipelines</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

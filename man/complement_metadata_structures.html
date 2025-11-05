@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="complement-metadata-of-structures">Complement metadata of structures</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function complement structural metadata</p>
+<p>This function complements structural metadata by joining stereochemistry, metadata, names, and chemical taxonomy information from reference libraries. Enriches annotation results with comprehensive structure information.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -731,7 +731,7 @@ Data frame with structural metadata to be complemented
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-File containing structures stereo
+Character string path to file with structure stereochemistry
 </td>
 </tr>
 <tr>
@@ -739,7 +739,7 @@ File containing structures stereo
 <code id="str_met">str_met</code>
 </td>
 <td>
-File containing structures metadata
+Character string path to file with structure metadata
 </td>
 </tr>
 <tr>
@@ -747,7 +747,7 @@ File containing structures metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-File containing structures names
+Character string path to file with structure names
 </td>
 </tr>
 <tr>
@@ -755,7 +755,7 @@ File containing structures names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-File containing Classyfire taxonomy
+Character string path to file with ClassyFire taxonomy
 </td>
 </tr>
 <tr>
@@ -763,14 +763,14 @@ File containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-File containing NPClassifier taxonomy
+Character string path to file with NPClassifier taxonomy
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Data frame with complemented structural metadata</p>
+<p>Data frame with enriched structural metadata</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="get-path">Get path</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function gets path</p>
+<p>This function resolves file paths by checking multiple locations, handling the difference between installed packages (where inst/ is removed) and development environments (where inst/ exists). It tries paths in order until one is found.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -716,14 +716,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="base_path">base_path</code>
 </td>
 <td>
-Base path
+Character string representing the base path to resolve. Can include "inst/" which will be handled appropriately.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A path</p>
+<p>Character string of the resolved absolute path that exists</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

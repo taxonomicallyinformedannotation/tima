@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-libraries-of-structure-organism-pairs-hmdb">Prepare libraries of structure organism pairs HMDB</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares the HMDB structure-organism pairs</p>
+<p>This function prepares HMDB (Human Metabolome Database) structure-organism pairs by parsing SDF files, extracting metadata, and formatting for TIMA annotation workflows. Handles human metabolite data with structures and biofluid/tissue associations.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -722,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Input file
+Character string path to HMDB SDF zip file
 </td>
 </tr>
 <tr>
@@ -730,14 +730,14 @@ Input file
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path for prepared HMDB library output
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared structure-organism pairs library HMDB</p>
+<p>Character string path to prepared HMDB structure-organism pairs</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

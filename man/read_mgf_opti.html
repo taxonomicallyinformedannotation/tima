@@ -684,6 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -701,7 +702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="read-mgf-opti">Read MGF opti</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function reads a Mascot Generic Format (MGF) file while mimicking the <code>MsBackendMgf</code> implementation but using significantly lower memory, making it more suitable for large MGF files.</p>
+<p>This function reads a Mascot Generic Format (MGF) file using a memory-efficient approach. It mimics the <code>MsBackendMgf</code> implementation but uses significantly lower memory, making it suitable for processing large MGF files that might otherwise cause memory issues.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -720,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="f">f</code>
 </td>
 <td>
-A character string specifying the path to a single MGF file.
+Character string specifying the path to a single MGF file
 </td>
 </tr>
 <tr>
@@ -728,7 +729,7 @@ A character string specifying the path to a single MGF file.
 <code id="msLevel">msLevel</code>
 </td>
 <td>
-An integer specifying the MS level. Default is 2L.
+Integer MS level to assign to spectra (default: 2L for MS2)
 </td>
 </tr>
 <tr>
@@ -736,14 +737,18 @@ An integer specifying the MS level. Default is 2L.
 <code id="mapping">mapping</code>
 </td>
 <td>
-A named character vector mapping MGF fields to standard spectra variables. Defaults to <code>Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())</code>.
+Named character vector mapping MGF field names to standard spectra variable names. Default uses the mapping from MsBackendMgf.
 </td>
 </tr>
 </tbody></table>
 </section>
+<section id="details" class="level3">
+<h3 class="anchored" data-anchor-id="details">Details</h3>
+<p>The function processes spectra in batches to minimize memory usage and avoid loading the entire file into memory at once. It extracts all MGF fields and maps them to standard spectra variable names.</p>
+</section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A <code>DataFrame</code> containing the parsed spectra data.</p>
+<p>A DataFrame containing the parsed spectra data with standardized variable names</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

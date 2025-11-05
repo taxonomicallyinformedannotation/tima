@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="decorate-masses">Decorate masses</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function outputs information about MS1 annotation</p>
+<p>This function logs summary statistics about MS1-based annotations, reporting the number of unique structures and features annotated</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -718,14 +718,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annotation_table_ms1">annotation_table_ms1</code>
 </td>
 <td>
-Table to decorate
+Data frame containing MS1 annotation results with columns for feature_id and candidate_structure_inchikey_connectivity_layer
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Message indicating the number of annotations obtained by MS1</p>
+<p>The input annotation table (unchanged), for use in pipelines</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

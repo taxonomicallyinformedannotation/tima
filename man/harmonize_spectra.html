@@ -701,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="harmonize-spectra">Harmonize spectra</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function harmonizes spectra headers</p>
+<p>This function harmonizes spectra header fields by mapping library-specific column names to standardized field names. It handles different naming conventions across spectral libraries and ensures consistent metadata structure.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -737,7 +737,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="spectra">spectra</code>
 </td>
 <td>
-Spectra object to be harmonized
+Data frame containing spectra data to be harmonized
 </td>
 </tr>
 <tr>
@@ -745,7 +745,7 @@ Spectra object to be harmonized
 <code id="metad">metad</code>
 </td>
 <td>
-Metadata to identify the library
+Metadata to identify the library source
 </td>
 </tr>
 <tr>
@@ -761,7 +761,7 @@ MS ionization mode. Must contain ‘pos’ or ‘neg’
 <code id="col_ad">col_ad</code>
 </td>
 <td>
-Name of the adduct in mgf
+Name of the adduct field in the input spectra
 </td>
 </tr>
 <tr>
@@ -769,7 +769,7 @@ Name of the adduct in mgf
 <code id="col_ce">col_ce</code>
 </td>
 <td>
-Name of the collision energy in mgf
+Name of the collision energy field
 </td>
 </tr>
 <tr>
@@ -777,7 +777,7 @@ Name of the collision energy in mgf
 <code id="col_ci">col_ci</code>
 </td>
 <td>
-Name of the compound id in mgf
+Name of the compound ID field
 </td>
 </tr>
 <tr>
@@ -785,7 +785,7 @@ Name of the compound id in mgf
 <code id="col_em">col_em</code>
 </td>
 <td>
-Name of the exact mass in mgf
+Name of the exact mass field
 </td>
 </tr>
 <tr>
@@ -793,7 +793,7 @@ Name of the exact mass in mgf
 <code id="col_in">col_in</code>
 </td>
 <td>
-Name of the InChI in mgf
+Name of the InChI field
 </td>
 </tr>
 <tr>
@@ -801,7 +801,7 @@ Name of the InChI in mgf
 <code id="col_io">col_io</code>
 </td>
 <td>
-Name of the InChI without stereo in mgf
+Name of the InChI without stereochemistry field
 </td>
 </tr>
 <tr>
@@ -809,7 +809,7 @@ Name of the InChI without stereo in mgf
 <code id="col_ik">col_ik</code>
 </td>
 <td>
-Name of the InChIKey in mgf
+Name of the InChIKey field
 </td>
 </tr>
 <tr>
@@ -817,7 +817,7 @@ Name of the InChIKey in mgf
 <code id="col_il">col_il</code>
 </td>
 <td>
-Name of the InChIKey without stereo in mgf
+Name of the InChIKey connectivity layer field
 </td>
 </tr>
 <tr>
@@ -825,7 +825,7 @@ Name of the InChIKey without stereo in mgf
 <code id="col_mf">col_mf</code>
 </td>
 <td>
-Name of the molecular formula in mgf
+Name of the molecular formula field
 </td>
 </tr>
 <tr>
@@ -833,7 +833,7 @@ Name of the molecular formula in mgf
 <code id="col_na">col_na</code>
 </td>
 <td>
-Name of the name in mgf
+Name of the compound name field
 </td>
 </tr>
 <tr>
@@ -841,7 +841,7 @@ Name of the name in mgf
 <code id="col_po">col_po</code>
 </td>
 <td>
-Name of the polarity in mgf
+Name of the polarity field
 </td>
 </tr>
 <tr>
@@ -849,7 +849,7 @@ Name of the polarity in mgf
 <code id="col_sm">col_sm</code>
 </td>
 <td>
-Name of the SMILES in mgf
+Name of the SMILES field
 </td>
 </tr>
 <tr>
@@ -857,7 +857,7 @@ Name of the SMILES in mgf
 <code id="col_sn">col_sn</code>
 </td>
 <td>
-Name of the SMILES without stereo in mgf
+Name of the SMILES without stereochemistry field
 </td>
 </tr>
 <tr>
@@ -865,7 +865,7 @@ Name of the SMILES without stereo in mgf
 <code id="col_si">col_si</code>
 </td>
 <td>
-Name of the spectrum id in mgf
+Name of the spectrum ID field
 </td>
 </tr>
 <tr>
@@ -873,7 +873,7 @@ Name of the spectrum id in mgf
 <code id="col_sp">col_sp</code>
 </td>
 <td>
-Name of the SPLASH in mgf
+Name of the SPLASH field
 </td>
 </tr>
 <tr>
@@ -881,7 +881,7 @@ Name of the SPLASH in mgf
 <code id="col_sy">col_sy</code>
 </td>
 <td>
-Name of the synonyms in mgf
+Name of the synonyms field
 </td>
 </tr>
 <tr>
@@ -889,14 +889,14 @@ Name of the synonyms in mgf
 <code id="col_xl">col_xl</code>
 </td>
 <td>
-Name of the xlogp in mgf
+Name of the xLogP field
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The harmonized spectra</p>
+<p>A data frame with harmonized column names and standardized field names</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

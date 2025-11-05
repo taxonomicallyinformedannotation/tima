@@ -704,7 +704,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-taxa">Prepare taxa</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function performs taxon name preparation to match the Open Tree of Life taxonomy</p>
+<p>This function prepares taxonomic information for features by matching organism names to Open Tree of Life taxonomy. Can attribute all features to a single organism or distribute them across multiple organisms based on relative intensities in samples.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -729,7 +729,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-File containing your features intensities
+Character string path to features file with intensities
 </td>
 </tr>
 <tr>
@@ -737,7 +737,7 @@ File containing your features intensities
 <code id="extension">extension</code>
 </td>
 <td>
-Does your column names contain the file extension? (mzmine mainly)
+Logical whether column names contain file extensions
 </td>
 </tr>
 <tr>
@@ -745,7 +745,7 @@ Does your column names contain the file extension? (mzmine mainly)
 <code id="name_filename">name_filename</code>
 </td>
 <td>
-Name of the file name column in the metadata file
+Character string name of filename column in metadata
 </td>
 </tr>
 <tr>
@@ -753,7 +753,7 @@ Name of the file name column in the metadata file
 <code id="colname">colname</code>
 </td>
 <td>
-Name of the column containing biological source information
+Character string name of column with biological source info
 </td>
 </tr>
 <tr>
@@ -761,7 +761,7 @@ Name of the column containing biological source information
 <code id="metadata">metadata</code>
 </td>
 <td>
-File containing your metadata including biological source
+Character string path to metadata file with organism info
 </td>
 </tr>
 <tr>
@@ -769,7 +769,7 @@ File containing your metadata including biological source
 <code id="org_tax_ott">org_tax_ott</code>
 </td>
 <td>
-File containing Open Tree of Life Taxonomy
+Character string path to Open Tree of Life taxonomy file
 </td>
 </tr>
 <tr>
@@ -777,7 +777,7 @@ File containing Open Tree of Life Taxonomy
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path for output file
 </td>
 </tr>
 <tr>
@@ -785,18 +785,18 @@ Output file
 <code id="taxon">taxon</code>
 </td>
 <td>
-If you want to enforce all features to a given taxon, put its name here.
+Character string organism name to enforce for all features (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Depending if the features are aligned between samples originating from various organisms or not, It can either attribute all features to a single organism, or attribute them to multiple ones, according to their relative intensities among the samples.</p>
+<p>Depending on whether features are aligned between samples from various organisms, this function either: - Attributes all features to a single organism (if taxon specified), or - Attributes features to multiple organisms based on their relative intensities across samples (using metadata)</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared taxa</p>
+<p>Character string path to the prepared taxa file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

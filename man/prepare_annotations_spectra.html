@@ -703,7 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-annotations-ms2">Prepare annotations MS2</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares the spectral matches obtained previously to make them compatible</p>
+<p>This function prepares MS2 spectral library matching results by standardizing column names, integrating structure metadata, and formatting for downstream TIMA annotation workflows. Handles various spectral matching result formats.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -733,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Input file
+Character string path to spectral matching results file
 </td>
 </tr>
 <tr>
@@ -741,7 +741,7 @@ Input file
 <code id="output">output</code>
 </td>
 <td>
-Output file
+Character string path for prepared spectral annotations output
 </td>
 </tr>
 <tr>
@@ -749,7 +749,7 @@ Output file
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-File containing structures stereo
+Character string path to structures stereochemistry file
 </td>
 </tr>
 <tr>
@@ -757,7 +757,7 @@ File containing structures stereo
 <code id="str_met">str_met</code>
 </td>
 <td>
-File containing structures metadata
+Character string path to structures metadata file
 </td>
 </tr>
 <tr>
@@ -765,7 +765,7 @@ File containing structures metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-File containing structures names
+Character string path to structures names file
 </td>
 </tr>
 <tr>
@@ -773,7 +773,7 @@ File containing structures names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-File containing Classyfire taxonomy
+Character string path to ClassyFire taxonomy file
 </td>
 </tr>
 <tr>
@@ -781,14 +781,14 @@ File containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-File containing NPClassifier taxonomy
+Character string path to NPClassifier taxonomy file
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the prepared spectral annotations</p>
+<p>Character string path to prepared spectral annotations</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -802,22 +802,18 @@ File containing NPClassifier taxonomy
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_interim <span class="ot">&lt;-</span> <span class="st">"data/interim/"</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"prepare_annotations_spectra"</span>)<span class="sc">$</span>files<span class="sc">$</span>annotations<span class="sc">$</span>raw<span class="sc">$</span>spectral<span class="sc">$</span>spectral <span class="sc">|&gt;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".tsv.gz"</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">"_pos.tsv"</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, input), <span class="at">export =</span> input)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, data_interim)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_annotations_spectra</span>(</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> input,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/stereo.tsv"</span>),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/metadata.tsv"</span>),</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/names.tsv"</span>),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span>),</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="at">pattern =</span> <span class="st">".tsv.gz"</span>, <span class="at">replacement =</span> <span class="st">"_pos.tsv"</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, input), <span class="at">export =</span> input)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, data_interim)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_annotations_spectra</span>(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> input,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/stereo.tsv"</span>),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/metadata.tsv"</span>),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/names.tsv"</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/taxonomies/classyfire.tsv"</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/structures/taxonomies/npc.tsv"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
