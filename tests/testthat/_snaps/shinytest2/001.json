@@ -1,5 +1,6 @@
 {
   "input": {
+    "ann_can_bes": 0.9,
     "ann_can_fin": 1,
     "ann_can_nei": 16,
     "ann_can_sam": 1,
