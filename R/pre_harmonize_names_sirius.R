@@ -11,9 +11,11 @@
 #'     forward slash (/) removed, leaving only the base column name
 #'
 #' @examples
-#' pre_harmonize_names_sirius("column_name/suffix")  # Returns "column_name"
-#' pre_harmonize_names_sirius("simple_name")         # Returns "simple_name"
-#' pre_harmonize_names_sirius("name/extra/info")     # Returns "name"
+#' \dontrun{
+#' pre_harmonize_names_sirius("column_name/suffix") # Returns "column_name"
+#' pre_harmonize_names_sirius("simple_name") # Returns "simple_name"
+#' pre_harmonize_names_sirius("name/extra/info") # Returns "name"
+#' }
 pre_harmonize_names_sirius <- function(x) {
   # Validate input
   if (missing(x) || is.null(x)) {

@@ -20,7 +20,9 @@ additional information after a slash (e.g., "columnName/suffix"), and
 this function removes everything from the slash onwards.
 }
 \examples{
-pre_harmonize_names_sirius("column_name/suffix")  # Returns "column_name"
-pre_harmonize_names_sirius("simple_name")         # Returns "simple_name"
-pre_harmonize_names_sirius("name/extra/info")     # Returns "name"
+\dontrun{
+pre_harmonize_names_sirius("column_name/suffix") # Returns "column_name"
+pre_harmonize_names_sirius("simple_name") # Returns "simple_name"
+pre_harmonize_names_sirius("name/extra/info") # Returns "name"
+}
 }
