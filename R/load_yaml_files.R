@@ -17,15 +17,19 @@ load_yaml_files <- function() {
 
   paths <- get_default_paths()
 
+  # Resolve paths using get_path() to handle inst/ prefix properly
+  default_path <- get_path(paths$params$default$path)
+  user_path <- get_path(paths$params$user$path)
+
   # Get file lists once for efficiency
   default_files <- list.files(
-    path = paths$params$default,
+    path = default_path,
     pattern = "\\.yaml$",
     full.names = TRUE
   )
 
   user_files <- list.files(
-    path = paths$params$user,
+    path = user_path,
     pattern = "\\.yaml$",
     full.names = TRUE
   )
@@ -41,11 +45,11 @@ load_yaml_files <- function() {
     param_files <- default_files
   }
 
-  # Combine with prepare_params files
+  # Combine with prepare_params files (also need to resolve these paths)
   yaml_files <- c(
     param_files,
-    paths$params$prepare_params,
-    paths$params$prepare_params_advanced
+    get_path(paths$params$prepare_params),
+    get_path(paths$params$prepare_params_advanced)
   )
 
   # Extract clean parameter names from file paths

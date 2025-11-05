@@ -17,7 +17,12 @@
 #' @examples NULL
 get_path <- function(base_path) {
   # Validate input
-  if (is.null(base_path) || !is.character(base_path) || length(base_path) != 1L || nchar(base_path) == 0L) {
+  if (
+    is.null(base_path) ||
+      !is.character(base_path) ||
+      length(base_path) != 1L ||
+      nchar(base_path) == 0L
+  ) {
     stop("Base path must be a non-empty character string")
   }
 
