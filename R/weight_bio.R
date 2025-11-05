@@ -556,7 +556,7 @@ weight_bio <- function(
     )) |>
     tidytable::mutate(
       candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
-        candidate_score_sirius_csi
+        candidate_score_sirius_csi |> as.numeric()
       )
     ) |>
     tidytable::mutate(

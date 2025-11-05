@@ -327,12 +327,12 @@ weight_annotations <- function(
     )
   }
 
-  # Validate weights sum to 1
+  # Validate weights sum to 1 (with tolerance for floating-point precision)
   weight_sum <- weight_spectral + weight_chemical + weight_biological
-  if (abs(weight_sum - 1.0) > 0.001) {
+  if (abs(weight_sum - 1.0) > 0.01) {
     stop(
       "Weights must sum to 1.0, got: ",
-      weight_sum,
+      round(weight_sum, 4),
       " (spectral: ",
       weight_spectral,
       ", chemical: ",

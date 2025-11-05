@@ -4,17 +4,17 @@
 \alias{transform_score_sirius_csi}
 \title{Transform SIRIUS CSI score}
 \usage{
-transform_score_sirius_csi(csi_score, K = 50, scale = 10)
+transform_score_sirius_csi(csi_score = NULL, K = 50, scale = 10)
 }
 \arguments{
-\item{csi_score}{Numeric SIRIUS CSI score (can be negative)}
+\item{csi_score}{Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)}
 
 \item{K}{Numeric shift parameter to adjust the sigmoid center (default: 50)}
 
 \item{scale}{Numeric scale parameter controlling sigmoid steepness (default: 10)}
 }
 \value{
-Numeric transformed score in the range (0, 1)
+Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
 }
 \description{
 This function transforms SIRIUS CSI (Compound Structure Identification)
@@ -36,5 +36,12 @@ transform_score_sirius_csi(csi_score = -20, K = 30, scale = 5)
 # Vectorized transformation
 scores <- c(-50, -20, 0, 20, 50)
 transform_score_sirius_csi(csi_score = scores)
+
+# Handle NA values
+scores_with_na <- c(-20, NA, 0, 20)
+transform_score_sirius_csi(csi_score = scores_with_na)
+
+# Handle missing/absent score
+transform_score_sirius_csi()
 }
 }

@@ -7,11 +7,11 @@
 #' @details This is an experimental transformation not officially approved by
 #'     SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
 #'
-#' @param csi_score Numeric SIRIUS CSI score (can be negative)
+#' @param csi_score Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)
 #' @param K Numeric shift parameter to adjust the sigmoid center (default: 50)
 #' @param scale Numeric scale parameter controlling sigmoid steepness (default: 10)
 #'
-#' @return Numeric transformed score in the range (0, 1)
+#' @return Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
 #'
 #' @examples
 #' \dontrun{
@@ -24,19 +24,36 @@
 #' # Vectorized transformation
 #' scores <- c(-50, -20, 0, 20, 50)
 #' transform_score_sirius_csi(csi_score = scores)
+#'
+#' # Handle NA values
+#' scores_with_na <- c(-20, NA, 0, 20)
+#' transform_score_sirius_csi(csi_score = scores_with_na)
+#'
+#' # Handle missing/absent score
+#' transform_score_sirius_csi()
 #' }
-transform_score_sirius_csi <- function(csi_score, K = 50, scale = 10) {
-  # Validate inputs
-  if (!is.numeric(csi_score)) {
-    stop("csi_score must be numeric")
+transform_score_sirius_csi <- function(csi_score = NULL, K = 50, scale = 10) {
+  # Handle NULL input
+  if (is.null(csi_score)) {
+    return(NA_real_)
   }
 
-  if (scale <= 0) {
-    stop("scale parameter must be positive")
+  # Validate inputs
+  if (!is.numeric(csi_score)) {
+    stop("csi_score must be numeric, NA, or NULL")
+  }
+
+  if (!is.numeric(K) || length(K) != 1L) {
+    stop("K must be a single numeric value")
+  }
+
+  if (!is.numeric(scale) || length(scale) != 1L || scale <= 0) {
+    stop("scale parameter must be a single positive numeric value")
   }
 
   # Apply sigmoid transformation: sigmoid((score + K) / scale)
   # This maps the shifted and scaled score to (0, 1)
+  # NA values are preserved automatically in vectorized operations
   shifted_score <- as.numeric(csi_score) + K
   transformed_score <- 1 / (1 + exp(-shifted_score / scale))
 
