@@ -902,13 +902,13 @@ prepare_params <- function(
   # #   yamls_params$`params/prepare_params_advanced`$files$spectral$raw |>
   # #   purrr::map(.f = replace_id)
 
-  yaml_export <- list$yaml_files |>
+  yaml_export <- yaml_data$yaml_files |>
     gsub(
       pattern = "default",
       replacement = "user",
       fixed = TRUE
     )
-  names(yaml_export) <- list$yaml_names
+  names(yaml_export) <- yaml_data$yaml_names
 
   if (!is.na(step)) {
     ## The dollar is for steps having similar names separated by underscores
