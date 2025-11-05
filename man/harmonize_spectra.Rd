@@ -28,7 +28,7 @@ harmonize_spectra(
 )
 }
 \arguments{
-\item{spectra}{Spectra object to be harmonized}
+\item{spectra}{Data frame containing spectra data to be harmonized}
 
 \item{metad}{Metadata to identify the library source}
 
@@ -69,7 +69,7 @@ harmonize_spectra(
 \item{col_xl}{Name of the xLogP field}
 }
 \value{
-The harmonized Spectra object with standardized field names
+A data frame with harmonized column names and standardized field names
 }
 \description{
 This function harmonizes spectra header fields by mapping

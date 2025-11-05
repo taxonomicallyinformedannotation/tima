@@ -5,7 +5,7 @@
 #'     different naming conventions across spectral libraries and ensures
 #'     consistent metadata structure.
 #'
-#' @param spectra Spectra object to be harmonized
+#' @param spectra Data frame containing spectra data to be harmonized
 #' @param metad Metadata to identify the library source
 #' @param mode MS ionization mode. Must contain 'pos' or 'neg'
 #' @param col_ad Name of the adduct field in the input spectra
@@ -26,7 +26,7 @@
 #' @param col_sy Name of the synonyms field
 #' @param col_xl Name of the xLogP field
 #'
-#' @return The harmonized Spectra object with standardized field names
+#' @return A data frame with harmonized column names and standardized field names
 #'
 #' @examples NULL
 harmonize_spectra <- function(
@@ -51,9 +51,9 @@ harmonize_spectra <- function(
   col_sy = get("col_sy", envir = parent.frame()),
   col_xl = get("col_xl", envir = parent.frame())
 ) {
-  # Validate spectra object
-  if (!inherits(spectra, "Spectra")) {
-    stop("Input 'spectra' must be a Spectra object")
+  # Validate spectra is a data frame
+  if (!is.data.frame(spectra)) {
+    stop("Input 'spectra' must be a data frame")
   }
 
   # Validate mode contains pos or neg
@@ -61,7 +61,7 @@ harmonize_spectra <- function(
     stop("Mode must contain 'pos' or 'neg', got: ", mode)
   }
 
-  # Validate all column name parameters are character strings
+  # Validate all column name parameters are character strings or NULL
   col_params <- list(
     col_ad = col_ad,
     col_ce = col_ce,
@@ -84,8 +84,11 @@ harmonize_spectra <- function(
 
   for (param_name in names(col_params)) {
     param_value <- col_params[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
+    if (
+      !is.null(param_value) &&
+        (!is.character(param_value) || length(param_value) != 1L)
+    ) {
+      stop(param_name, " must be a single character string or NULL")
     }
   }
 
