@@ -81,8 +81,32 @@ create_edges <- function(
       )
 
       # Extract scores and matches efficiently
-      scores <- vapply(results, `[[`, numeric(1L), "score")
-      matches <- vapply(results, `[[`, integer(1L), "matches")
+      # Handle both list format (score/matches) and numeric format (entropy)
+      scores <- vapply(
+        results,
+        function(x) {
+          if (is.list(x) && "score" %in% names(x)) {
+            x$score
+          } else if (is.numeric(x)) {
+            x
+          } else {
+            0.0
+          }
+        },
+        numeric(1L)
+      )
+
+      matches <- vapply(
+        results,
+        function(x) {
+          if (is.list(x) && "matches" %in% names(x)) {
+            x$matches
+          } else {
+            0L # No match count for entropy method
+          }
+        },
+        integer(1L)
+      )
 
       # Filter by thresholds
       valid_indices <- which(scores >= threshold & matches >= matched_peaks)

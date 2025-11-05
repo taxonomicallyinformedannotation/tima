@@ -11,9 +11,9 @@
 #' @include harmonize_adducts.R
 #' @include import_spectra.R
 #'
-#' @param input Query file containing spectra. Currently an '.mgf' file
+#' @param input Query file or list of files containing spectra. Currently '.mgf' file(s)
 #' @param libraries Libraries containing spectra to match against.
-#'    Can be '.mgf' or '.sqlite' (Spectra formatted)
+#'    Can be '.mgf' or '.sqlite' (Spectra formatted). Accepts a vector or list of file paths.
 #' @param polarity MS polarity. Must be 'pos' or 'neg'.
 #' @param output Output file.
 #' @param method Similarity method
@@ -63,8 +63,34 @@ annotate_spectra <- function(
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
   # Validate input file
-  if (!file.exists(input)) {
-    stop("Input file not found: ", input)
+  if (is.list(input)) {
+    # Check all files in list exist
+    missing_files <- lapply(input, function(f) {
+      if (!is.character(f) || length(f) != 1L) {
+        stop("Each input element must be a single character string")
+      }
+      if (!file.exists(f)) {
+        return(f)
+      }
+      return(NULL)
+    })
+    missing_files <- Filter(Negate(is.null), missing_files)
+    if (length(missing_files) > 0L) {
+      stop(
+        "Input file(s) not found: ",
+        paste(unlist(missing_files), collapse = ", ")
+      )
+    }
+  } else {
+    # Single file path
+    if (!is.character(input) || length(input) != 1L) {
+      stop(
+        "input must be a single character string or a list of character strings"
+      )
+    }
+    if (!file.exists(input)) {
+      stop("Input file not found: ", input)
+    }
   }
 
   # Validate polarity
@@ -77,9 +103,30 @@ annotate_spectra <- function(
     stop("At least one library must be provided")
   }
 
-  missing_libs <- libraries[!file.exists(libraries)]
-  if (length(missing_libs) > 0L) {
-    stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
+  if (is.list(libraries)) {
+    # Check all library files in list exist
+    missing_libs <- lapply(libraries, function(lib) {
+      if (!is.character(lib) || length(lib) != 1L) {
+        stop("Each library element must be a single character string")
+      }
+      if (!file.exists(lib)) {
+        return(lib)
+      }
+      return(NULL)
+    })
+    missing_libs <- Filter(Negate(is.null), missing_libs)
+    if (length(missing_libs) > 0L) {
+      stop(
+        "Library file(s) not found: ",
+        paste(unlist(missing_libs), collapse = ", ")
+      )
+    }
+  } else {
+    # Vector of file paths
+    missing_libs <- libraries[!file.exists(libraries)]
+    if (length(missing_libs) > 0L) {
+      stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
+    }
   }
 
   # Validate numeric parameters

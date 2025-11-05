@@ -20,7 +20,7 @@ create_edges_spectra(
 )
 }
 \arguments{
-\item{input}{Character string path to query MGF file containing spectra}
+\item{input}{Character string path or list of paths to query MGF file(s) containing spectra}
 
 \item{output}{Character string path for output edges file}
 
