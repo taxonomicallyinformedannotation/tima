@@ -33,7 +33,7 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
 
   # Set up consistent log format with timestamp and level
   logger::log_layout(logger::layout_glue_generator(
-    format = '[{time}] [{level}] {msg}'
+    format = "[{time}] [{level}] {msg}"
   ))
 
   # Set up appender to write to both console and file
@@ -41,8 +41,8 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
     appender = logger::appender_tee(file = filename)
   )
 
-  logger::log_info("Logger initialized - output: console + file: {filename}")
-  logger::log_debug("Log level threshold: {threshold}")
+  # logger::log_info("Logger initialized - output: console + file: {filename}")
+  # logger::log_debug("Log level threshold: {threshold}")
 
   invisible(NULL)
 }
