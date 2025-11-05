@@ -14,7 +14,7 @@ filter_annotations(
 )
 }
 \arguments{
-\item{annotations}{Character vector of paths to prepared annotation files}
+\item{annotations}{Character vector or list of paths to prepared annotation files}
 
 \item{features}{Character string path to prepared features file}
 

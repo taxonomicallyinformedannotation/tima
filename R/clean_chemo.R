@@ -182,8 +182,21 @@ clean_chemo <- function(
       features_table = features_table,
       best_percentile = best_percentile
     )
-  results_candidates <- results_mini |>
-    tidytable::distinct(feature_id, candidates_evaluated, candidates_best)
+
+  # Check if candidate columns exist before selecting them
+  if (
+    all(c("candidates_evaluated", "candidates_best") %in% names(results_mini))
+  ) {
+    results_candidates <- results_mini |>
+      tidytable::distinct(feature_id, candidates_evaluated, candidates_best)
+  } else {
+    # Create empty results_candidates if columns don't exist
+    results_candidates <- tidytable::tidytable(
+      feature_id = character(0),
+      candidates_evaluated = integer(0),
+      candidates_best = integer(0)
+    )
+  }
 
   if (high_confidence) {
     df1 <- df1 |>

@@ -161,31 +161,6 @@ annotate_spectra <- function(
   logger::log_debug("Similarity threshold: ", threshold, ", method: ", method)
   logger::log_debug("Tolerances: ", ppm, " ppm, ", dalton, " Da")
 
-  # Filter libraries by polarity if multiple provided
-  if (length(libraries) > 1) {
-    original_count <- length(libraries)
-    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
-    logger::log_debug(
-      "Filtered libraries by polarity: ",
-      original_count,
-      " -> ",
-      length(libraries)
-    )
-
-    if (length(libraries) == 0L) {
-      stop("No libraries match the specified polarity: ", polarity)
-    }
-  }
-
-  logger::log_trace("Loading query spectra from: ", input)
-  spectra <- input |>
-    import_spectra(
-      cutoff = qutoff,
-      dalton = dalton,
-      polarity = polarity,
-      ppm = ppm
-    )
-
   df_empty <- data.frame(
     feature_id = NA,
     candidate_spectrum_entropy = NA,
@@ -202,6 +177,33 @@ annotate_spectra <- function(
     candidate_score_similarity = NA,
     candidate_count_similarity_peaks_matched = NA
   )
+  # Filter libraries by polarity if multiple provided
+  if (length(libraries) > 1) {
+    original_count <- length(libraries)
+    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
+    logger::log_debug(
+      "Filtered libraries by polarity: ",
+      original_count,
+      " -> ",
+      length(libraries)
+    )
+
+    if (length(libraries) == 0L) {
+      logger::log_warn(
+        "No library matched the given polarity, returning an empty dataframe"
+      )
+      df_final <- df_empty
+    }
+  }
+
+  logger::log_trace("Loading query spectra from: ", input)
+  spectra <- input |>
+    import_spectra(
+      cutoff = qutoff,
+      dalton = dalton,
+      polarity = polarity,
+      ppm = ppm
+    )
 
   if (length(spectra) > 0) {
     logger::log_trace("Loading spectral libraries")
