@@ -89,10 +89,15 @@ weight_bio <- function(
     stop("structure_organism_pairs_table must be a data frame")
   }
 
-  if (nrow(annotation_table_taxed) == 0L) {
-    logger::log_warn("Empty annotation table provided")
+  n_annotations <- nrow(annotation_table_taxed)
+  if (n_annotations == 0L) {
+    logger::log_warn(
+      "Empty annotation table provided, skipping biological weighting"
+    )
     return(annotation_table_taxed)
   }
+
+  logger::log_info("Weighting {n_annotations} annotations by biological source")
 
   # Validate weights
   if (

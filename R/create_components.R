@@ -49,7 +49,7 @@ create_components <- function(
     )
   }
 
-  logger::log_info("Creating components from ", length(input), " edge file(s)")
+  logger::log_info("Creating components from {length(input)} edge file(s)")
 
   # Load and combine all edge files
   logger::log_trace("Loading edge data")
@@ -89,7 +89,7 @@ create_components <- function(
   # Organize features by component
   features_by_component <- split(feature_names, component_membership)
 
-  logger::log_info("Found ", length(features_by_component), " components")
+  logger::log_info("Found {length(features_by_component)} components")
 
   # Convert to tidy format
   logger::log_trace("Formatting component assignments")

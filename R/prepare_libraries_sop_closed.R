@@ -44,7 +44,7 @@ prepare_libraries_sop_closed <- function(
   logger::log_info("Preparing closed structure-organism pairs library")
 
   if (file.exists(input)) {
-    logger::log_debug("Loading closed resource from: ", input)
+    logger::log_debug("Loading closed resource from: {input}")
 
     closed <- tryCatch(
       {

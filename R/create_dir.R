@@ -22,23 +22,26 @@ create_dir <- function(export) {
     stop("Export path must be specified")
   }
 
+  if (!is.character(export) || length(export) != 1L) {
+    stop("Export path must be a single character string")
+  }
+
   # Determine if this is a file path or directory path
   # Check for file extension (contains dot in basename)
-  has_extension <- grepl(
-    pattern = "\\.",
-    x = basename(export)
-  )
+  basename_part <- basename(export)
+  has_extension <- grepl("\\.[^.]+$", basename_part) && !endsWith(export, "/")
 
   dirname_path <- if (has_extension) {
-    dirname(export)
+    dir_part <- dirname(export)
+    if (dir_part == ".") "." else dir_part
   } else {
     export
   }
 
-  # Create the directory at the specified path if it does not exist
+  # Create the directory if it doesn't exist
   if (!dir.exists(dirname_path)) {
-    dir.create(dirname_path, recursive = TRUE)
-    logger::log_debug("Created directory: ", dirname_path)
+    dir.create(dirname_path, recursive = TRUE, showWarnings = FALSE)
+    logger::log_debug("Created directory: {dirname_path}")
   }
 
   invisible(NULL)

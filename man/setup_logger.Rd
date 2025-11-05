@@ -4,22 +4,26 @@
 \alias{setup_logger}
 \title{Setup logger}
 \usage{
-setup_logger(filename = "tima.log")
+setup_logger(filename = "tima.log", threshold = logger::TRACE)
 }
 \arguments{
 \item{filename}{Character string specifying the log file name.
 Default: "tima.log"}
+
+\item{threshold}{Character or integer log level threshold
+(TRACE, DEBUG, INFO, WARN, ERROR). Default: logger::TRACE}
 }
 \value{
 NULL (invisibly). Sets up logger as side effect.
 }
 \description{
 Configures the logger for the package with trace-level logging
-and output to both console and a log file
+and output to both console and a log file.
 }
 \examples{
 \dontrun{
 setup_logger("analysis.log")
+setup_logger("analysis.log", threshold = logger::INFO)
 }
 }
 \keyword{internal}

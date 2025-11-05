@@ -101,7 +101,7 @@ extract_spectra <- function(object) {
       tidytable::rename(tidyselect::any_of(columns_to_harmonize))
   }
 
-  logger::log_debug("Extracted ", nrow(spectra), " spectra")
+  logger::log_debug("Extracted {nrow(spectra)} spectra")
 
   return(spectra)
 }

@@ -89,7 +89,7 @@ harmonize_spectra <- function(
     }
   }
 
-  logger::log_trace("Harmonizing spectra headers for mode: ", mode)
+  logger::log_trace("Harmonizing spectra headers for mode: {mode}")
   columns <- c(
     "adduct",
     "collision_energy",

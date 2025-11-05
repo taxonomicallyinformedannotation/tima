@@ -68,10 +68,10 @@
 
 #' @title Read MGF opti
 #'
-#' @description This function reads a Mascot Generic Format (MGF) file using an
-#'     optimized, memory-efficient approach. It mimics the `MsBackendMgf`
-#'     implementation but uses significantly lower memory, making it suitable
-#'     for processing large MGF files that might otherwise cause memory issues.
+#' @description This function reads a Mascot Generic Format (MGF) file using
+#'     a memory-efficient approach. It mimics the `MsBackendMgf` implementation
+#'     but uses significantly lower memory, making it suitable for processing
+#'     large MGF files that might otherwise cause memory issues.
 #'
 #' @details The function processes spectra in batches to minimize memory usage
 #'     and avoid loading the entire file into memory at once. It extracts all
@@ -108,56 +108,59 @@ read_mgf_opti <- function(
   }
 
   if (!is.numeric(msLevel) || msLevel < 1L) {
-    stop("msLevel must be a positive integer")
+    stop("msLevel must be a positive integer, got: ", msLevel)
   }
 
   if (!requireNamespace("MsBackendMgf", quietly = TRUE)) {
     stop("Package 'MsBackendMgf' is required but not installed")
   }
 
+  # Get file size for progress reporting
+  file_size_mb <- file.info(f)$size / 1024^2
   logger::log_info(
-    "Reading MGF file with optimized memory-efficient parser: ",
-    f
+    "Reading MGF file ({round(file_size_mb, 2)} MB) with optimized parser: {f}"
   )
+  logger::log_debug("Using MS level: {msLevel}")
 
   sp_list <- list()
   current_spectrum <- list()
   inside_spectrum <- FALSE
-  total_processed <- 0
-  batch_size <- 10000
-  chunk_id <- 1
-  line_counter <- 0
+  total_processed <- 0L
+  batch_size <- 10000L
+  chunk_id <- 1L
+  line_counter <- 0L
 
   con <- file(f, "r")
   on.exit(close(con), add = TRUE) # Ensure the file is closed on exit
 
   while (TRUE) {
-    line <- readLines(con, n = 1, warn = FALSE)
+    line <- readLines(con, n = 1L, warn = FALSE)
 
-    if (length(line) == 0) {
+    if (length(line) == 0L) {
       break
     }
 
     if (line == "BEGIN IONS") {
       inside_spectrum <- TRUE
       current_spectrum <- list()
-      line_counter <- 0
+      line_counter <- 0L
       next
     }
 
     if (line == "END IONS") {
       inside_spectrum <- FALSE
 
-      if (length(current_spectrum) > 0) {
-        spectrum_data <- unlist(current_spectrum)
+      if (length(current_spectrum) > 0L) {
+        spectrum_data <- unlist(current_spectrum, use.names = FALSE)
         sp_list[[chunk_id]] <- .extract_mgf_spectrum(spectrum_data)
-        chunk_id <- chunk_id + 1
+        chunk_id <- chunk_id + 1L
       }
 
-      total_processed <- total_processed + 1
+      total_processed <- total_processed + 1L
 
-      if (total_processed %% batch_size == 0) {
-        logger::log_info(sprintf("Read %d spectra...", total_processed))
+      # Progress logging at appropriate intervals
+      if (total_processed %% batch_size == 0L) {
+        logger::log_info("Processed {total_processed} spectra...")
       }
 
       current_spectrum <- list()
@@ -165,38 +168,46 @@ read_mgf_opti <- function(
     }
 
     if (inside_spectrum) {
-      line_counter <- line_counter + 1
+      line_counter <- line_counter + 1L
       current_spectrum[[line_counter]] <- line
     }
   }
 
+  logger::log_info("Total spectra read: {total_processed}")
+  logger::log_trace("Combining spectrum data into DataFrame")
   res <- MsCoreUtils::rbindFill(sp_list)
 
+  # Format charge field if present
   if ("CHARGE" %in% colnames(res)) {
     res$CHARGE <- .format_charge(res$CHARGE)
   }
 
+  # Map MGF field names to standard spectra variable names
+  logger::log_trace("Mapping field names to standard spectra variables")
   idx <- match(colnames(res), mapping)
   not_na <- !is.na(idx)
   if (any(not_na)) {
     colnames(res)[not_na] <- names(mapping)[idx][not_na]
   }
 
+  # Convert column types to match core spectra variables
   spv <- Spectra::coreSpectraVariables()
   spv <- spv[!names(spv) %in% c("mz", "intensity")]
   for (i in seq_along(res)) {
-    if (all(lengths(res[[i]]) == 1)) {
-      res[[i]] <- unlist(res[[i]])
+    if (all(lengths(res[[i]]) == 1L)) {
+      res[[i]] <- unlist(res[[i]], use.names = FALSE)
     }
     if (any(col <- names(spv) == colnames(res)[i])) {
-      res[[i]] <- methods::as(res[[i]], spv[col][1])
+      res[[i]] <- methods::as(res[[i]], spv[col][1L])
     }
   }
 
+  # Convert to DataFrame and set up peak lists
+  logger::log_trace("Finalizing DataFrame structure")
   res <- methods::as(res, "DataFrame")
   res$mz <- IRanges::NumericList(res$mz, compress = FALSE)
-  res$intensity <- IRanges::NumericList(res$intensity, compress = FALSE)
   res$dataOrigin <- f
+
   if (!"msLevel" %in% colnames(res)) {
     res$msLevel <- as.integer(msLevel)
   }

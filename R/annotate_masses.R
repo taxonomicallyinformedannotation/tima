@@ -151,25 +151,25 @@ annotate_masses <-
       stop("clusters_list must contain '", ms_mode, "' mode clusters")
     }
 
-    logger::log_info("Starting mass-based annotation in ", ms_mode, " mode")
-    logger::log_debug(
-      "Tolerances: ",
-      tolerance_ppm,
-      " ppm, ",
-      tolerance_rt,
-      " min RT"
-    )
+    logger::log_info("Starting mass-based annotation in {ms_mode} mode")
+    logger::log_debug("Tolerances: {tolerance_ppm} ppm, {tolerance_rt} min RT")
 
+    logger::log_trace("Loading features table from: {features}")
     features_table <- tidytable::fread(
       file = features,
       na.strings = c("", "NA"),
       colClasses = "character"
     )
 
-    if (nrow(features_table) == 0L) {
-      logger::log_warn("Empty features table provided")
+    n_features <- nrow(features_table)
+    if (n_features == 0L) {
+      logger::log_warn(
+        "Empty features table provided - no annotations to perform"
+      )
       return(list(annotations = output_annotations, edges = output_edges))
     }
+
+    logger::log_info("Processing {n_features} features for annotation")
 
     if (ms_mode == "pos") {
       adducts <- adducts_list$pos

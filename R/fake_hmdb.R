@@ -77,6 +77,6 @@ fake_hmdb <- function(export) {
   # Clean up temporary file
   unlink(fake_export)
 
-  logger::log_debug("Created fake HMDB file at: ", export)
+  logger::log_debug("Created fake HMDB file at: {export}")
   return(export)
 }

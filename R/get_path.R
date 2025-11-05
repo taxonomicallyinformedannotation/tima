@@ -28,7 +28,6 @@ get_path <- function(base_path) {
 
   # Try 1: Check if base path exists as-is
   if (file.exists(base_path)) {
-    logger::log_trace("Path found as-is: ", base_path)
     return(base_path)
   }
 
@@ -42,7 +41,6 @@ get_path <- function(base_path) {
   )
 
   if (file.exists(path_without_inst)) {
-    logger::log_trace("Path found without 'inst': ", path_without_inst)
     return(path_without_inst)
   }
 
@@ -56,18 +54,12 @@ get_path <- function(base_path) {
   )
 
   if (file.exists(path_with_pkg_dir)) {
-    logger::log_trace("Path found in package dir: ", path_with_pkg_dir)
     return(path_with_pkg_dir)
   }
 
   # If none of the paths exist, return the last attempt and let caller handle
   logger::log_warn(
-    "Path not found. Tried: ",
-    base_path,
-    ", ",
-    path_without_inst,
-    ", ",
-    path_with_pkg_dir
+    "Path not found. Tried: {base_path}, {path_without_inst}, {path_with_pkg_dir}"
   )
 
   return(path_with_pkg_dir)

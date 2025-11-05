@@ -80,7 +80,7 @@ prepare_features_components <- function(
       component_id = character(0)
     )
   } else {
-    logger::log_debug("Loaded ", nrow(table), " component assignments")
+    logger::log_debug("Loaded {nrow(table)} component assignments")
 
     # Standardize column names and select relevant columns
     table <- table |>

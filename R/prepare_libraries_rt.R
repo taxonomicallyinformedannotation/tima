@@ -76,7 +76,7 @@ prepare_libraries_rt <- function(
   }
 
   logger::log_info("Preparing retention time libraries")
-  logger::log_debug("RT unit: ", unit_rt)
+  logger::log_debug("RT unit: {unit_rt}")
 
   ## default transforms from `Spectra`
   if (!is.na(col_rt) && col_rt == "RTINSECONDS") {

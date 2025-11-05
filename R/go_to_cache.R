@@ -30,28 +30,34 @@ go_to_cache <- function(dir = ".tima") {
   # Construct full path to cache directory in home
   cache <- fs::path_home(dir)
 
+  logger::log_debug("Cache directory: {cache}")
+
   # Create cache directory if it doesn't exist
-  tryCatch(
-    {
-      fs::dir_create(cache)
-    },
-    error = function(e) {
-      stop(
-        "Failed to create cache directory at ",
-        cache,
-        ": ",
-        conditionMessage(e)
-      )
-    }
-  )
+  if (!dir.exists(cache)) {
+    tryCatch(
+      {
+        fs::dir_create(cache)
+      },
+      error = function(e) {
+        logger::log_error("Failed to create cache directory: {e$message}")
+        stop(
+          "Failed to create cache directory at ",
+          cache,
+          ": ",
+          conditionMessage(e)
+        )
+      }
+    )
+  }
 
   # Change to cache directory
   tryCatch(
     {
       setwd(dir = cache)
-      logger::log_info("Working directory changed to: ", cache)
+      logger::log_info("Working directory changed to: {cache}")
     },
     error = function(e) {
+      logger::log_error("Failed to change directory: {e$message}")
       stop(
         "Failed to change to cache directory ",
         cache,

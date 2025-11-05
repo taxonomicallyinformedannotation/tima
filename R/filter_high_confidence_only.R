@@ -64,7 +64,7 @@ filter_high_confidence_only <- function(
 
   # Apply RT error filter if column exists
   if ("candidate_structure_error_rt" %in% colnames(df_filtered)) {
-    logger::log_trace("Applying RT error filter (max: ", error_rt_max, " min)")
+    logger::log_trace("Applying RT error filter (max: {error_rt_max} min)")
     df_filtered <- df_filtered |>
       tidytable::filter(
         is.na(candidate_structure_error_rt) |

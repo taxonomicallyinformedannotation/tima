@@ -21,7 +21,7 @@ The dataframe with harmonized adduct column
 \description{
 This function harmonizes adduct definitions by replacing
 various adduct notations with standardized forms according to a
-translation table
+translation table.
 }
 \examples{
 NULL

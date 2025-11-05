@@ -105,7 +105,7 @@ create_edges <- function(
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
-    logger::log_info("Created ", nrow(result), " edges passing thresholds")
+    logger::log_info("Created {nrow(result)} edges passing thresholds")
     result
   } else {
     logger::log_warn("No edges passed the specified thresholds")

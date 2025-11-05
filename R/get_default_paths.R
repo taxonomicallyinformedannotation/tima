@@ -36,10 +36,10 @@ get_default_paths <- function(
   tryCatch(
     {
       paths_config <- yaml::read_yaml(file = yaml)
-      logger::log_trace("Loaded paths configuration from: ", yaml)
       return(paths_config)
     },
     error = function(e) {
+      logger::log_error("Failed to parse paths YAML: {e$message}")
       stop("Failed to parse paths YAML file: ", conditionMessage(e))
     }
   )
