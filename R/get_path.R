@@ -58,9 +58,9 @@ get_path <- function(base_path) {
   }
 
   # If none of the paths exist, return the last attempt and let caller handle
-  logger::log_warn(
-    "Path not found. Tried: {base_path}, {path_without_inst}, {path_with_pkg_dir}"
-  )
+  # logger::log_warn(
+  #  "Path not found. Tried: {base_path}, {path_without_inst}, {path_with_pkg_dir}"
+  # )
 
   return(path_with_pkg_dir)
 }
