@@ -93,12 +93,12 @@ get_organism_taxonomy_ott <- function(
     },
     error = function(e) {
       logger::log_error("Failed to connect to OTT API: {conditionMessage(e)}")
-      API_STATUS_ERROR
+      "ERROR"
     }
   )
 
   # Handle API unavailability
-  if (api_status != API_STATUS_OK) {
+  if (api_status != "OK") {
     logger::log_error(
       "Open Tree of Life API is unavailable (status: {api_status})"
     )
