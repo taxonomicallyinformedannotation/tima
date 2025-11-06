@@ -193,12 +193,19 @@ read_mgf_opti <- function(
   # Convert column types to match core spectra variables
   spv <- Spectra::coreSpectraVariables()
   spv <- spv[!names(spv) %in% c("mz", "intensity")]
+
+  # Pre-compute column name matches for efficiency
+  col_names <- colnames(res)
+  spv_names <- names(spv)
+
   for (i in seq_along(res)) {
     if (all(lengths(res[[i]]) == 1L)) {
       res[[i]] <- unlist(res[[i]], use.names = FALSE)
     }
-    if (any(col <- names(spv) == colnames(res)[i])) {
-      res[[i]] <- methods::as(res[[i]], spv[col][1L])
+    # Check if column name matches any core spectra variable
+    col_match <- match(col_names[i], spv_names, nomatch = 0L)
+    if (col_match > 0L) {
+      res[[i]] <- methods::as(res[[i]], spv[col_match])
     }
   }
 
