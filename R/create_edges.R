@@ -53,8 +53,11 @@ create_edges <- function(
     " pairwise similarities"
   )
 
+  # Disable progress bar in subprocess environments to prevent crashes
+  show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
+
   edges <- purrr::map(
-    .progress = TRUE,
+    .progress = show_progress,
     .x = indices,
     .f = function(index) {
       target_indices <- (index + 1L):nspecs
