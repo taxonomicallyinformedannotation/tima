@@ -82,8 +82,45 @@ calculate_entropy_and_similarity <- function(
     ppm
   )
 
+  # Detect if running in a subprocess (callr/targets environment)
+  # Disable progress bar to avoid subprocess issues
+  show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
+
+  count_matched_peaks <- function(query_mz, lib_mz, dalton, ppm) {
+    if (length(query_mz) == 0 || length(lib_mz) == 0) {
+      return(0L)
+    }
+
+    # Sort library m/z for binary search
+    lib_mz_sorted <- sort(lib_mz)
+
+    # Vectorized approach: calculate tolerances for all query peaks at once
+    tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
+
+    # Use findInterval for fast binary search
+    matched_count <- sum(vapply(
+      seq_along(query_mz),
+      function(i) {
+        mz <- query_mz[i]
+        tol <- tolerances[i]
+        lower_bound <- mz - tol
+        upper_bound <- mz + tol
+
+        # Binary search for matching peaks
+        low_idx <- findInterval(lower_bound, lib_mz_sorted)
+        high_idx <- findInterval(upper_bound, lib_mz_sorted, rightmost.closed = TRUE)
+
+        # Check if any peaks fall within tolerance
+        as.integer(high_idx > low_idx)
+      },
+      FUN.VALUE = integer(1)
+    ))
+
+    return(matched_count)
+  }
+
   results <- purrr::map(
-    .progress = TRUE,
+    .progress = show_progress,
     .x = seq_along(query_spectra),
     .f = function(spectrum_idx) {
       current_spectrum <- query_spectra[[spectrum_idx]]
@@ -129,60 +166,11 @@ calculate_entropy_and_similarity <- function(
             entropy_target <- msentropy::calculate_spectral_entropy(
               lib_spectrum
             )
-            # Count the number of peaks in the query that have a match
-            .count_matched_peaks_hybrid <- function(
-              query_mz,
-              lib_mz,
-              dalton,
-              ppm,
-              threshold = 1e5
-            ) {
-              n_query <- length(query_mz)
-              n_lib <- length(lib_mz)
 
-              # Use matrix method if the total comparison count is small
-              if (n_query * n_lib <= threshold) {
-                diff_matrix <- abs(outer(query_mz, lib_mz, FUN = "-"))
-                tolerances_matrix <- outer(
-                  pmax(dalton, ppm * query_mz * 1E-6),
-                  rep(1, n_lib)
-                )
-                match_matrix <- diff_matrix <= tolerances_matrix
-                return(sum(apply(match_matrix, 1, any)))
-              } else {
-                # Use binary search method for large comparisons
-                lib_mz <- sort(lib_mz)
-                matched_count <- 0
-
-                for (mz in query_mz) {
-                  tolerance <- max(dalton, ppm * mz * 1E-6)
-                  lower_bound <- mz - tolerance
-                  upper_bound <- mz + tolerance
-
-                  low_idx <- findInterval(lower_bound, lib_mz)
-                  high_idx <- findInterval(
-                    upper_bound,
-                    lib_mz,
-                    rightmost.closed = TRUE
-                  )
-
-                  if (
-                    high_idx >= low_idx + 1 ||
-                      (low_idx > 0 &&
-                        lib_mz[low_idx] >= lower_bound &&
-                        lib_mz[low_idx] <= upper_bound)
-                  ) {
-                    matched_count <- matched_count + 1
-                  }
-                }
-
-                return(matched_count)
-              }
-            }
-
+            # Count matched peaks using pre-defined function
             query_mz <- current_spectrum[, 1]
             lib_mz <- lib_spectrum[, 1]
-            matched_peaks <- .count_matched_peaks_hybrid(
+            matched_peaks <- count_matched_peaks(
               query_mz,
               lib_mz,
               dalton,
