@@ -78,7 +78,7 @@ get_organism_taxonomy_ott <- function(
   logger::log_debug("Cleaned to {n_unique} unique organism name(s)")
 
   # Test OTT API availability
-  logger::log_trace("Testing Open Tree of Life API availability")
+  logger::log_debug("Testing Open Tree of Life API availability")
 
   api_status <- tryCatch(
     {
@@ -93,12 +93,12 @@ get_organism_taxonomy_ott <- function(
     },
     error = function(e) {
       logger::log_error("Failed to connect to OTT API: {conditionMessage(e)}")
-      "ERROR"
+      API_STATUS_ERROR
     }
   )
 
   # Handle API unavailability
-  if (api_status != "OK") {
+  if (api_status != API_STATUS_OK) {
     logger::log_error(
       "Open Tree of Life API is unavailable (status: {api_status})"
     )
@@ -155,7 +155,7 @@ get_organism_taxonomy_ott <- function(
       }
     )
 
-  logger::log_trace("Initial taxonomy queries completed")
+  logger::log_debug("Initial taxonomy queries completed")
 
   # Combine batch results
   new_matched_otl_exact <- taxonomy_matches |>
@@ -245,7 +245,7 @@ get_organism_taxonomy_ott <- function(
   if (nrow(new_ott_id) != 0) {
     otts <- new_ott_id$ott_id
 
-    logger::log_trace("Getting taxonomy")
+    logger::log_debug("Getting taxonomy")
     # See https://github.com/ropensci/rotl/issues/147
     taxon_info <-
       httr::with_config(
@@ -256,7 +256,7 @@ get_organism_taxonomy_ott <- function(
           include_terminal_descendants = TRUE
         )
       )
-    logger::log_trace("Taxonomy retrieved!")
+    logger::log_info("Taxonomy retrieved!")
 
     taxon_lineage <- taxon_info |>
       rotl::tax_lineage()
@@ -375,6 +375,6 @@ get_organism_taxonomy_ott <- function(
     }
   }
 
-  logger::log_trace("Got OTTaxonomy!")
+  logger::log_info("Got OTTaxonomy!")
   return(biological_metadata)
 }
