@@ -104,10 +104,10 @@ create_components <- function(
       `cluster index` = features_by_component,
       componentindex = ComponentIndex
     ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = as.numeric
-    )) |>
+    # tidytable::mutate(tidytable::across(
+    #   .cols = tidyselect::where(is.character),
+    #   .fns = as.numeric
+    # )) |>
     tidytable::arrange(`cluster index`)
 
   logger::log_info(
