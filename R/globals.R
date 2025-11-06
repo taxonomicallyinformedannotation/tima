@@ -286,3 +286,8 @@ utils::globalVariables(
     "xlogp"
   )
 )
+
+# Sentinel constants used across the package
+API_STATUS_ERROR <- "ERROR"
+API_STATUS_OK <- "OK"
+
