@@ -10,7 +10,7 @@ library(targets)
 targets::tar_option_set(
   packages = c("tima"),
   imports = c("tima"),
-  memory = "auto",
+  memory = "transient",
   garbage_collection = TRUE
 )
 
