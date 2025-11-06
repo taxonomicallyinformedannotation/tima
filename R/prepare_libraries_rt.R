@@ -265,14 +265,14 @@ prepare_libraries_rt <- function(
       ) |>
       tidytable::distinct()
     logger::log_warn(
-      "There were still",
+      "There were still ",
       nrow(
         df_completed |>
           tidytable::filter(is.na(
             structure_inchikey
           ))
       ),
-      "entries for which no InChIKey could not be found in the end."
+      " entries for which no InChIKey could not be found in the end."
     )
     return(df_completed)
   }
