@@ -13,7 +13,7 @@
 #'
 #' @examples NULL
 load_yaml_files <- function() {
-  logger::log_trace("Loading YAML parameter files")
+  # logger::log_trace("Loading YAML parameter files")
 
   paths <- get_default_paths()
 
@@ -38,10 +38,10 @@ load_yaml_files <- function() {
   use_user <- length(user_files) >= length(default_files)
 
   if (use_user) {
-    logger::log_debug("Using user-specified parameters")
+    # logger::log_debug("Using user-specified parameters")
     param_files <- user_files
   } else {
-    logger::log_debug("Using default parameters")
+    # logger::log_debug("Using default parameters")
     param_files <- default_files
   }
 
@@ -61,7 +61,7 @@ load_yaml_files <- function() {
   yamls_parsed <- purrr::map(yaml_files, yaml::read_yaml)
   names(yamls_parsed) <- yaml_names
 
-  logger::log_trace("Loaded ", length(yamls_parsed), " YAML parameter files")
+  # logger::log_trace("Loaded ", length(yamls_parsed), " YAML parameter files")
 
   return(list(
     yamls_params = yamls_parsed,
