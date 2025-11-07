@@ -32,8 +32,10 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
   logger::log_threshold(threshold)
 
   # Set up consistent log format with timestamp and level
+  # Use POSIX formatting to force 3-digit milliseconds ("%OS3").
+  # Also pad the level to a fixed width using sprintf so columns align.
   logger::log_layout(logger::layout_glue_generator(
-    format = "[{time}] [{level}] {msg}"
+    format = "[{format(time, \"%Y-%m-%d %H:%M:%OS3\")} ] [{sprintf(\"%-5s\", toupper(level))}] {msg}"
   ))
 
   # Set up appender to write to both console and file
