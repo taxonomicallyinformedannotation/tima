@@ -4,6 +4,7 @@ FROM bioconductor/bioconductor_docker:RELEASE_3_21-R-4.5.0
 # Add a non-root user and set up the R library directory
 RUN useradd -m tima-user && \
     mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
+    mkdir -p /home/tima-user/.tima/data && \
     chown -R tima-user:tima-user /home/tima-user
 
 # Set the R library path to the new directory

@@ -44,5 +44,37 @@ create_dir <- function(export) {
     logger::log_debug("Created directory: {dirname_path}")
   }
 
+  # Verify directory is writable (important for Docker environments)
+  if (dir.exists(dirname_path)) {
+    # Test write permission by trying to create a temp file
+    test_file <- file.path(
+      dirname_path,
+      paste0(".tima_write_test_", Sys.getpid())
+    )
+    write_ok <- tryCatch(
+      {
+        writeLines("test", test_file)
+        file.remove(test_file)
+        TRUE
+      },
+      error = function(e) {
+        logger::log_warn(
+          "Directory exists but may not be writable: {dirname_path}"
+        )
+        logger::log_debug("Write test error: {conditionMessage(e)}")
+        FALSE
+      }
+    )
+
+    if (!write_ok) {
+      logger::log_warn(
+        "Permission issue detected in: {dirname_path}. ",
+        "This may cause download failures in Docker environments."
+      )
+    }
+  } else {
+    logger::log_error("Failed to create directory: {dirname_path}")
+  }
+
   invisible(NULL)
 }

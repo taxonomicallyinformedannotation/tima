@@ -108,7 +108,11 @@ calculate_entropy_and_similarity <- function(
 
         # Binary search for matching peaks
         low_idx <- findInterval(lower_bound, lib_mz_sorted)
-        high_idx <- findInterval(upper_bound, lib_mz_sorted, rightmost.closed = TRUE)
+        high_idx <- findInterval(
+          upper_bound,
+          lib_mz_sorted,
+          rightmost.closed = TRUE
+        )
 
         # Check if any peaks fall within tolerance
         as.integer(high_idx > low_idx)
