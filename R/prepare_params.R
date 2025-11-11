@@ -223,15 +223,15 @@ prepare_params <- function(
   opt_sum <- params_small$options$summarize
 
   # logger::log_trace("Advanced params")
-  yamls_params$`params/prepare_params_advanced`$files$pattern <- fil_pat
-  yamls_params$`params/prepare_params_advanced`$files$features$raw <- fil_fea_raw
-  yamls_params$`params/prepare_params_advanced`$files$metadata$raw <- fil_met_raw
-  yamls_params$`params/prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
-  yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
-  yamls_params$`params/prepare_params_advanced`$ms$polarity <- ms_pol
-  yamls_params$`params/prepare_params_advanced`$organisms$taxon <- org_tax
-  yamls_params$`params/prepare_params_advanced`$options$high_confidence <- opt_hig_con
-  yamls_params$`params/prepare_params_advanced`$options$summarize <- opt_sum
+  yamls_params$`prepare_params_advanced`$files$pattern <- fil_pat
+  yamls_params$`prepare_params_advanced`$files$features$raw <- fil_fea_raw
+  yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
+  yamls_params$`prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
+  yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
+  yamls_params$`prepare_params_advanced`$ms$polarity <- ms_pol
+  yamls_params$`prepare_params_advanced`$organisms$taxon <- org_tax
+  yamls_params$`prepare_params_advanced`$options$high_confidence <- opt_hig_con
+  yamls_params$`prepare_params_advanced`$options$summarize <- opt_sum
 
   if (!is.null(org_tax)) {
     if (org_tax == "") {
