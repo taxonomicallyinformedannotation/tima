@@ -36,8 +36,9 @@ parse_yaml_params <- function(
 
   # If a user-specified YAML file exists, merge it with defaults
   if (!is.null(usr) && nchar(usr) > 0L && file.exists(usr) && usr != def) {
-    logger::log_debug("Loading user-specified parameters from: {usr}")
-
+    if (usr != "params/prepare_params.yaml") {
+      logger::log_debug("Loading user-specified parameters from: {usr}")
+    }
     user_params <- tryCatch(
       yaml::read_yaml(file = usr),
       error = function(e) {
