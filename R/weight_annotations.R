@@ -521,8 +521,10 @@ weight_annotations <- function(
         model$candidates_structures_columns
       )
     )) |>
-    tidytable::mutate(candidate_score_similarity = candidate_score_similarity |>
-      as.numeric()) |>
+    tidytable::mutate(
+      candidate_score_similarity = candidate_score_similarity |>
+        as.numeric()
+    ) |>
     ## keep best score per structure (example if annotated by MS1 and MS2)
     tidytable::arrange(
       candidate_score_similarity |>
