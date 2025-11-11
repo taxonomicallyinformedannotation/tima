@@ -701,7 +701,11 @@ div.csl-indent {
   <ul>
   <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></a>
   <ul class="collapse">
-  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a>
+  <ul class="collapse">
+  <li><a href="#minimum-required-files" id="toc-minimum-required-files" class="nav-link" data-scroll-target="#minimum-required-files">Minimum Required Files</a></li>
+  <li><a href="#optional-additions" id="toc-optional-additions" class="nav-link" data-scroll-target="#optional-additions">Optional Additions</a></li>
+  </ul></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a>
   <ul class="collapse">
   <li><a href="#docker" id="toc-docker" class="nav-link" data-scroll-target="#docker">Docker</a></li>
@@ -739,17 +743,31 @@ div.csl-indent {
 <p>This repository contains everything needed to perform <strong>T</strong>axonomically <strong>I</strong>nformed <strong>M</strong>etabolite <strong>A</strong>nnotation.</p>
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
+<section id="minimum-required-files" class="level3">
+<h3 class="anchored" data-anchor-id="minimum-required-files">Minimum Required Files</h3>
 <p>Here is what you <em>minimally</em> need:</p>
 <ul>
-<li>A feature list (.csv) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv">example features</a>)</li>
-<li>A spectral file corresponding to the feature list (.mgf) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf">example spectra</a>)</li>
-<li>The biological source(s) of the sample(s) you are annotating (.csv) (see <a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv">example metadata</a>) (File is optional if only a single organism)</li>
-</ul>
-<p>Optionally, you may want to add:</p>
+<li><strong>Feature quantification table</strong> (.csv/.tsv) - Peak areas/heights across samples (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv">example</a>)
 <ul>
-<li>An in-house structure-organism pairs library (we provide <a href="https://lotusnprod.github.io/lotus-manuscript/"><strong>LOTUS</strong></a> as starting point for each user)</li>
-<li>Your own manual or automated annotations (we currently support annotations coming from SIRIUS (with some limitations))</li>
+<li>Must contain: feature ID, retention time, m/z, and sample intensity columns</li>
+<li><strong>Column names are customizable</strong></li>
+</ul></li>
+<li><strong>MS/MS spectra file</strong> (.mgf) - Fragment spectra for each or some features (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf">example</a>)</li>
+<li><strong>Sample metadata</strong> (.csv/.tsv) - Links samples to organisms (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv">example</a>)
+<ul>
+<li>Optional if analyzing only a single organism</li>
+</ul></li>
 </ul>
+</section>
+<section id="optional-additions" class="level3">
+<h3 class="anchored" data-anchor-id="optional-additions">Optional Additions</h3>
+<ul>
+<li><strong>Structure-organism pairs library</strong> - We provide <a href="https://lotusnprod.github.io/lotus-manuscript/"><strong>LOTUS</strong></a> (&gt;650k pairs) as default</li>
+<li><strong>External annotations</strong> - SIRIUS (v5/v6), GNPS-FBMN results</li>
+<li><strong>Custom spectral libraries</strong> - For in-house compound matching</li>
+</ul>
+<p><strong>Tip</strong>: All column names and file paths are customizable through the Shiny app interface or YAML/CLI parameters - no need to rename your files!</p>
+</section>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
