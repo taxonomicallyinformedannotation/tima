@@ -114,6 +114,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   local_size <- file.size(path)
 
   if (is.na(local_size) || zenodo_size != local_size) {
+    file.remove(path)
     logger::log_info(
       "Downloading ",
       filename,
