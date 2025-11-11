@@ -100,6 +100,10 @@ get_params <- function(step) {
     get_path(paths$params$user$path),
     paste0(step_normalized, ".yaml")
   )
+  if (step == "prepare_params" | step == "prepare_params_advanced") {
+    user_param_path <- user_param_path |>
+      gsub(pattern = "user/", replacement = "", fixed = TRUE)
+  }
 
   # Load and merge YAML parameters
   if (file.exists(user_param_path)) {
