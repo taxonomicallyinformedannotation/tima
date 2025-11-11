@@ -23,16 +23,24 @@ This repository contains everything needed to perform **T**axonomically **I**nfo
 
 ## Requirements
 
+### Minimum Required Files
+
 Here is what you *minimally* need:
 
--   A feature list (.csv) (see [example features](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
--   A spectral file corresponding to the feature list (.mgf) (see [example spectra](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
--   The biological source(s) of the sample(s) you are annotating (.csv) (see [example metadata](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv)) (File is optional if only a single organism)
+-   **Feature quantification table** (.csv/.tsv) - Peak areas/heights across samples ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
+    - Must contain: feature ID, retention time, m/z, and sample intensity columns
+    - **Column names are customizable**
+-   **MS/MS spectra file** (.mgf) - Fragment spectra for each or some features ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
+-   **Sample metadata** (.csv/.tsv) - Links samples to organisms ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
+    - Optional if analyzing only a single organism
 
-Optionally, you may want to add:
+### Optional Additions
 
--   An in-house structure-organism pairs library (we provide [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) as starting point for each user)
--   Your own manual or automated annotations (we currently support annotations coming from SIRIUS (with some limitations))
+-   **Structure-organism pairs library** - We provide [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (>650k pairs) as default
+-   **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
+-   **Custom spectral libraries** - For in-house compound matching
+
+**Tip**: All column names and file paths are customizable through the Shiny app interface or YAML/CLI parameters - no need to rename your files!
 
 ## Installation
 
