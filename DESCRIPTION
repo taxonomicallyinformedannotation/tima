@@ -99,6 +99,8 @@ Collate:
     'get_params.R'
     'dist_groups.R'
     'decorate_masses.R'
+    'constants.R'
+    'validators.R'
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'annotate_masses.R'

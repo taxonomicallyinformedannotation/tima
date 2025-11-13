@@ -1,0 +1,532 @@
+#' @title Input Validation Utilities
+#'
+#' @description This module provides reusable validation functions for
+#'     input parameters throughout the TIMA package. Centralizing validation
+#'     logic ensures consistency, reduces code duplication, and improves
+#'     error messages.
+#'
+#' @include constants.R
+#'
+#' @name validators
+#' @keywords internal
+
+#' Validate that files exist
+#'
+#' @description Checks that one or more file paths exist on the filesystem.
+#'     Provides detailed error messages indicating which files are missing.
+#'
+#' @param file_list Named list of file paths to validate. Names are used
+#'     in error messages to identify which file is missing.
+#' @param allow_null Logical, if TRUE, NULL values are allowed (default: FALSE)
+#'
+#' @return Invisible TRUE if all files exist, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_file_existence(list(
+#'   features = "data/features.tsv",
+#'   library = "data/library.tsv"
+#' ))
+#' }
+validate_file_existence <- function(file_list, allow_null = FALSE) {
+  if (!is.list(file_list)) {
+    stop("file_list must be a named list of file paths")
+  }
+
+  if (length(file_list) == 0L) {
+    stop("file_list cannot be empty")
+  }
+
+  missing_files <- list()
+
+  for (file_name in names(file_list)) {
+    file_path <- file_list[[file_name]]
+
+    # Handle NULL values
+    if (is.null(file_path)) {
+      if (!allow_null) {
+        missing_files[[file_name]] <- "NULL (file path is NULL)"
+      }
+      next
+    }
+
+    # Validate type
+    if (!is.character(file_path) || length(file_path) != 1L) {
+      stop(
+        "File path for '",
+        file_name,
+        "' must be a single character string, ",
+        "got: ",
+        class(file_path)[1L]
+      )
+    }
+
+    # Check existence
+    if (!file.exists(file_path)) {
+      missing_files[[file_name]] <- file_path
+    }
+  }
+
+  # Report missing files
+  if (length(missing_files) > 0L) {
+    error_msg <- paste0(
+      "The following required file(s) were not found:\n",
+      paste0(
+        "  - ",
+        names(missing_files),
+        ": ",
+        unlist(missing_files),
+        collapse = "\n"
+      ),
+      "\n\nPlease verify file paths and ensure all required files are present."
+    )
+    stop(error_msg)
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate MS ionization mode
+#'
+#' @description Ensures the MS mode is valid ('pos' or 'neg')
+#'
+#' @param ms_mode Character string indicating ionization mode
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_ms_mode("pos")  # OK
+#' validate_ms_mode("neg")  # OK
+#' validate_ms_mode("both") # Error
+#' }
+validate_ms_mode <- function(ms_mode) {
+  if (missing(ms_mode) || is.null(ms_mode)) {
+    stop("ms_mode must be provided")
+  }
+
+  if (!is.character(ms_mode) || length(ms_mode) != 1L) {
+    stop("ms_mode must be a single character string, got: ", class(ms_mode)[1L])
+  }
+
+  if (!ms_mode %in% VALID_MS_MODES) {
+    stop(
+      "Invalid ms_mode: '",
+      ms_mode,
+      "'. ",
+      "Must be one of: ",
+      paste(VALID_MS_MODES, collapse = ", "),
+      ".\n",
+      "Please check your configuration and ensure polarity is correctly specified."
+    )
+  }
+
+  logger::log_trace("MS mode validated: ", ms_mode)
+  invisible(TRUE)
+}
+
+#' Validate tolerance parameters
+#'
+#' @description Validates that tolerance values are within acceptable ranges
+#'
+#' @param tolerance_ppm Numeric mass tolerance in parts per million
+#' @param tolerance_rt Numeric retention time tolerance in minutes
+#' @param max_ppm Maximum allowed ppm tolerance (default: from constants)
+#' @param max_rt Maximum allowed RT tolerance (default: from constants)
+#' @param context Character string describing context (for error messages)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05)
+#' }
+validate_tolerances <- function(
+  tolerance_ppm = NULL,
+  tolerance_rt = NULL,
+  max_ppm = MAX_TOLERANCE_PPM,
+  max_rt = MAX_TOLERANCE_RT_ADDUCTS,
+  context = "annotation"
+) {
+  # Validate PPM tolerance
+  if (!is.null(tolerance_ppm)) {
+    if (!is.numeric(tolerance_ppm) || length(tolerance_ppm) != 1L) {
+      stop(
+        "tolerance_ppm must be a single numeric value, got: ",
+        class(tolerance_ppm)[1L]
+      )
+    }
+
+    if (tolerance_ppm <= 0) {
+      stop(
+        "tolerance_ppm must be positive, got: ",
+        tolerance_ppm,
+        ".\n",
+        "Recommended range: 1-",
+        max_ppm,
+        " ppm for ",
+        context
+      )
+    }
+
+    if (tolerance_ppm > max_ppm) {
+      logger::log_warn(
+        "tolerance_ppm (",
+        tolerance_ppm,
+        ") exceeds recommended maximum (",
+        max_ppm,
+        " ppm). This may result in excessive false positives."
+      )
+    }
+
+    logger::log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
+  }
+
+  # Validate RT tolerance
+  if (!is.null(tolerance_rt)) {
+    if (!is.numeric(tolerance_rt) || length(tolerance_rt) != 1L) {
+      stop(
+        "tolerance_rt must be a single numeric value, got: ",
+        class(tolerance_rt)[1L]
+      )
+    }
+
+    if (tolerance_rt <= 0) {
+      stop(
+        "tolerance_rt must be positive, got: ",
+        tolerance_rt,
+        " minutes.\n",
+        "Recommended range: 0.01-",
+        max_rt,
+        " minutes for ",
+        context
+      )
+    }
+
+    if (tolerance_rt > max_rt) {
+      logger::log_warn(
+        "tolerance_rt (",
+        tolerance_rt,
+        " min) exceeds recommended maximum (",
+        max_rt,
+        " min). This may group unrelated features."
+      )
+    }
+
+    logger::log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate adduct list structure
+#'
+#' @description Ensures adduct list contains required mode and is properly formatted
+#'
+#' @param adducts_list List containing adduct definitions
+#' @param ms_mode Required ionization mode ('pos' or 'neg')
+#' @param list_name Name of the list (for error messages)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_adduct_list <- function(
+  adducts_list,
+  ms_mode,
+  list_name = "adducts_list"
+) {
+  if (!is.list(adducts_list)) {
+    stop(list_name, " must be a list, got: ", class(adducts_list)[1L])
+  }
+
+  if (is.null(adducts_list[[ms_mode]])) {
+    stop(
+      list_name,
+      " must contain '",
+      ms_mode,
+      "' mode entries.\n",
+      "Available modes: ",
+      paste(names(adducts_list), collapse = ", "),
+      ".\n",
+      "Please ensure your configuration includes adducts for the specified polarity."
+    )
+  }
+
+  if (length(adducts_list[[ms_mode]]) == 0L) {
+    logger::log_warn(
+      list_name,
+      " for '",
+      ms_mode,
+      "' mode is empty. ",
+      "No ",
+      list_name,
+      " will be applied."
+    )
+  }
+
+  logger::log_trace(
+    list_name,
+    " validated: ",
+    length(adducts_list[[ms_mode]]),
+    " entries for ",
+    ms_mode,
+    " mode"
+  )
+
+  invisible(TRUE)
+}
+
+#' Validate numeric range
+#'
+#' @description Generic validator for numeric values within a range
+#'
+#' @param value Numeric value to validate
+#' @param min_value Minimum allowed value (inclusive)
+#' @param max_value Maximum allowed value (inclusive)
+#' @param param_name Name of the parameter (for error messages)
+#' @param allow_null Allow NULL values (default: FALSE)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_numeric_range <- function(
+  value,
+  min_value = -Inf,
+  max_value = Inf,
+  param_name = "value",
+  allow_null = FALSE
+) {
+  if (is.null(value)) {
+    if (!allow_null) {
+      stop(param_name, " cannot be NULL")
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.numeric(value) || length(value) != 1L) {
+    stop(
+      param_name,
+      " must be a single numeric value, got: ",
+      class(value)[1L]
+    )
+  }
+
+  if (is.na(value)) {
+    stop(param_name, " cannot be NA")
+  }
+
+  if (value < min_value || value > max_value) {
+    stop(
+      param_name,
+      " (",
+      value,
+      ") must be between ",
+      min_value,
+      " and ",
+      max_value
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate character parameter
+#'
+#' @description Generic validator for character string parameters
+#'
+#' @param value Character value to validate
+#' @param allowed_values Optional character vector of allowed values
+#' @param param_name Name of the parameter (for error messages)
+#' @param allow_null Allow NULL values (default: FALSE)
+#' @param allow_empty Allow empty strings (default: FALSE)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_character <- function(
+  value,
+  allowed_values = NULL,
+  param_name = "value",
+  allow_null = FALSE,
+  allow_empty = FALSE
+) {
+  if (is.null(value)) {
+    if (!allow_null) {
+      stop(param_name, " cannot be NULL")
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.character(value) || length(value) != 1L) {
+    stop(
+      param_name,
+      " must be a single character string, got: ",
+      class(value)[1L]
+    )
+  }
+
+  if (!allow_empty && nchar(value) == 0L) {
+    stop(param_name, " cannot be an empty string")
+  }
+
+  if (!is.null(allowed_values) && !value %in% allowed_values) {
+    stop(
+      param_name,
+      " (",
+      value,
+      ") must be one of: ",
+      paste(allowed_values, collapse = ", ")
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate logical parameter
+#'
+#' @description Generic validator for logical (boolean) parameters
+#'
+#' @param value Logical value to validate
+#' @param param_name Name of the parameter (for error messages)
+#' @param allow_null Allow NULL values (default: FALSE)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_logical <- function(value, param_name = "value", allow_null = FALSE) {
+  if (is.null(value)) {
+    if (!allow_null) {
+      stop(param_name, " cannot be NULL")
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.logical(value) || length(value) != 1L) {
+    stop(
+      param_name,
+      " must be a single logical value (TRUE/FALSE), got: ",
+      class(value)[1L]
+    )
+  }
+
+  if (is.na(value)) {
+    stop(param_name, " cannot be NA")
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate list or vector parameter
+#'
+#' @description Validates that a parameter is either a list or vector
+#'
+#' @param value Value to validate
+#' @param min_length Minimum required length
+#' @param max_length Maximum allowed length (NULL = no limit)
+#' @param param_name Name of the parameter (for error messages)
+#' @param allow_null Allow NULL values (default: FALSE)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_list_or_vector <- function(
+  value,
+  min_length = 0L,
+  max_length = NULL,
+  param_name = "value",
+  allow_null = FALSE
+) {
+  if (is.null(value)) {
+    if (!allow_null) {
+      stop(param_name, " cannot be NULL")
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.list(value) && !is.vector(value)) {
+    stop(
+      param_name,
+      " must be a list or vector, got: ",
+      class(value)[1L]
+    )
+  }
+
+  value_length <- length(value)
+
+  if (value_length < min_length) {
+    stop(
+      param_name,
+      " must have at least ",
+      min_length,
+      " element(s), got: ",
+      value_length
+    )
+  }
+
+  if (!is.null(max_length) && value_length > max_length) {
+    stop(
+      param_name,
+      " cannot have more than ",
+      max_length,
+      " element(s), got: ",
+      value_length
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate data frame parameter
+#'
+#' @description Validates data frame structure and required columns
+#'
+#' @param df Data frame to validate
+#' @param required_columns Character vector of required column names
+#' @param min_rows Minimum required number of rows
+#' @param param_name Name of the parameter (for error messages)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+validate_data_frame <- function(
+  df,
+  required_columns = NULL,
+  min_rows = 0L,
+  param_name = "data frame"
+) {
+  if (!is.data.frame(df)) {
+    stop(param_name, " must be a data frame, got: ", class(df)[1L])
+  }
+
+  if (nrow(df) < min_rows) {
+    stop(
+      param_name,
+      " must have at least ",
+      min_rows,
+      " row(s), got: ",
+      nrow(df)
+    )
+  }
+
+  if (!is.null(required_columns)) {
+    missing_cols <- setdiff(required_columns, names(df))
+    if (length(missing_cols) > 0L) {
+      stop(
+        param_name,
+        " is missing required column(s): ",
+        paste(missing_cols, collapse = ", "),
+        ".\n",
+        "Available columns: ",
+        paste(names(df), collapse = ", ")
+      )
+    }
+  }
+
+  invisible(TRUE)
+}
