@@ -35,6 +35,6 @@ mass <- 122.45
 adduct <- "[M+H]+"
 mz <- calculate_mz_from_mass(mass, adduct)
 mass_back <- calculate_mass_of_m(mz, adduct)
-all.equal(mass, mass_back)  # Should be TRUE
+all.equal(mass, mass_back) # Should be TRUE
 }
 }
