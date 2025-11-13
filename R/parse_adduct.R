@@ -26,19 +26,19 @@
 #' @examples
 #' \dontrun{
 #' # Simple adducts
-#' parse_adduct("[M+H]+")       # Protonated molecule
-#' parse_adduct("[M-H]-")       # Deprotonated molecule
-#' parse_adduct("[M+Na]+")      # Sodium adduct
+#' parse_adduct("[M+H]+") # Protonated molecule
+#' parse_adduct("[M-H]-") # Deprotonated molecule
+#' parse_adduct("[M+Na]+") # Sodium adduct
 #'
 #' # Complex adducts
-#' parse_adduct("[2M+Na]+")     # Dimer with sodium
-#' parse_adduct("[M+H-H2O]+")   # Protonated with water loss
-#' parse_adduct("[M1+H]+")      # M+1 isotopologue
-#' parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")  # Complex modification
+#' parse_adduct("[2M+Na]+") # Dimer with sodium
+#' parse_adduct("[M+H-H2O]+") # Protonated with water loss
+#' parse_adduct("[M1+H]+") # M+1 isotopologue
+#' parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+") # Complex modification
 #'
 #' # Error cases
-#' parse_adduct(NULL)           # Returns all zeros
-#' parse_adduct("invalid")      # Returns all zeros with warning
+#' parse_adduct(NULL) # Returns all zeros
+#' parse_adduct("invalid") # Returns all zeros with warning
 #' }
 parse_adduct <- function(
   adduct_string,
@@ -56,6 +56,7 @@ parse_adduct <- function(
   # Validate input type and format
   validation_result <- validate_adduct_string(adduct_string)
   if (!validation_result$valid) {
+    warning(validation_result$message, call. = FALSE)
     logger::log_warn(validation_result$message)
     return(failed_parse)
   }
@@ -63,12 +64,14 @@ parse_adduct <- function(
   # Parse adduct string using regex
   parse_result <- match_adduct_regex(adduct_string, regex)
   if (!parse_result$valid) {
-    logger::log_warn(
+    msg <- paste0(
       "Invalid adduct format: '",
       adduct_string,
       "'. ",
       "Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)"
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(failed_parse)
   }
 
@@ -82,12 +85,14 @@ parse_adduct <- function(
   # Process modifications
   modifications <- process_modifications(matches[4L])
   if (!modifications$valid) {
-    logger::log_warn(
+    msg <- paste0(
       "Failed to process modifications in: '",
       adduct_string,
       "'. ",
       modifications$message
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(failed_parse)
   }
 
@@ -101,11 +106,13 @@ parse_adduct <- function(
       charge_info$charge_sign
     )))
   ) {
-    logger::log_warn(
+    msg <- paste0(
       "Unexpected NA values during adduct parsing for: '",
       adduct_string,
       "'"
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(failed_parse)
   }
 
@@ -122,6 +129,7 @@ parse_adduct <- function(
     round(modifications$total_mass, 4),
     ", charges=",
     charge_info$n_charges,
+    ", polarity=",
     charge_info$charge_sign
   )
 

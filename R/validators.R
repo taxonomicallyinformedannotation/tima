@@ -176,13 +176,15 @@ validate_tolerances <- function(
     }
 
     if (tolerance_ppm > max_ppm) {
-      logger::log_warn(
+      msg <- paste0(
         "tolerance_ppm (",
         tolerance_ppm,
         ") exceeds recommended maximum (",
         max_ppm,
         " ppm). This may result in excessive false positives."
       )
+      warning(msg, call. = FALSE)
+      logger::log_warn(msg)
     }
 
     logger::log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
@@ -210,13 +212,15 @@ validate_tolerances <- function(
     }
 
     if (tolerance_rt > max_rt) {
-      logger::log_warn(
+      msg <- paste0(
         "tolerance_rt (",
         tolerance_rt,
         " min) exceeds recommended maximum (",
         max_rt,
         " min). This may group unrelated features."
       )
+      warning(msg, call. = FALSE)
+      logger::log_warn(msg)
     }
 
     logger::log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
@@ -259,7 +263,7 @@ validate_adduct_list <- function(
   }
 
   if (length(adducts_list[[ms_mode]]) == 0L) {
-    logger::log_warn(
+    msg <- paste0(
       list_name,
       " for '",
       ms_mode,
@@ -268,6 +272,8 @@ validate_adduct_list <- function(
       list_name,
       " will be applied."
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
   }
 
   logger::log_trace(
