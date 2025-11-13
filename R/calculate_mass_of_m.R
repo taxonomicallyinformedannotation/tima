@@ -168,16 +168,17 @@ calculate_mass_of_m <- function(
   # }
 
   # Log successful calculation at trace level
-  logger::log_trace(
-    "Calculated neutral mass: ",
-    round(neutral_mass, 4),
-    " Da ",
-    "from m/z ",
-    mz,
-    " with adduct '",
-    adduct_string,
-    "'"
-  )
+  ## COMMENT too many logs
+  # logger::log_trace(
+  #   "Calculated neutral mass: ",
+  #   round(neutral_mass, 4),
+  #   " Da ",
+  #   "from m/z ",
+  #   mz,
+  #   " with adduct '",
+  #   adduct_string,
+  #   "'"
+  # )
 
   return(neutral_mass)
 }
