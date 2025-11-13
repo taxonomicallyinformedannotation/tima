@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,9 +75,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -374,10 +374,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="../index.html" class="sidebar-logo-link">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -707,10 +703,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">parse_adduct(
-  adduct_string,
-  regex = "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
-)
+<pre><code class="language-R">parse_adduct(adduct_string, regex = ADDUCT_REGEX_PATTERN)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -729,7 +722,7 @@ Character string representing the adduct in standard notation (e.g., "[M+H]+", "
 <code id="regex">regex</code>
 </td>
 <td>
-Character string regular expression pattern for parsing (default handles standard adduct notation)
+Character string regular expression pattern for parsing (default: uses ADDUCT_REGEX_PATTERN from constants)
 </td>
 </tr>
 </tbody></table>
@@ -743,7 +736,7 @@ Character string regular expression pattern for parsing (default handles standar
 <code>n_mer</code>
 </td>
 <td>
-Integer number of monomers (e.g., 2 for dimer)
+Integer number of monomers (e.g., 2 for dimer, 1 for monomer)
 </td>
 </tr>
 <tr>
@@ -751,7 +744,7 @@ Integer number of monomers (e.g., 2 for dimer)
 <code>n_iso</code>
 </td>
 <td>
-Integer isotope shift (e.g., 1 for M1)
+Integer isotope shift (e.g., 1 for M+1 isotopologue, 0 for monoisotopic)
 </td>
 </tr>
 <tr>
@@ -759,7 +752,7 @@ Integer isotope shift (e.g., 1 for M1)
 <code>los_add_clu</code>
 </td>
 <td>
-Numeric total mass change from modifications
+Numeric total mass change in Daltons from all modifications
 </td>
 </tr>
 <tr>
@@ -767,7 +760,7 @@ Numeric total mass change from modifications
 <code>n_charges</code>
 </td>
 <td>
-Integer absolute number of charges
+Integer absolute number of charges (always positive)
 </td>
 </tr>
 <tr>
@@ -775,7 +768,7 @@ Integer absolute number of charges
 <code>charge</code>
 </td>
 <td>
-Integer charge sign (+1 or -1)
+Integer charge polarity (+1 for positive mode, -1 for negative mode)
 </td>
 </tr>
 </tbody></table>
@@ -786,9 +779,20 @@ Integer charge sign (+1 or -1)
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H]+"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple adducts</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H]+"</span>)       <span class="co"># Protonated molecule</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M-H]-"</span>)       <span class="co"># Deprotonated molecule</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+Na]+"</span>)      <span class="co"># Sodium adduct</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex adducts</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>)     <span class="co"># Dimer with sodium</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H-H2O]+"</span>)   <span class="co"># Protonated with water loss</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M1+H]+"</span>)      <span class="co"># M+1 isotopologue</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)  <span class="co"># Complex modification</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Error cases</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="cn">NULL</span>)           <span class="co"># Returns all zeros</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"invalid"</span>)      <span class="co"># Returns all zeros with warning</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
