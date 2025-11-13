@@ -25,15 +25,15 @@ DEFAULT_TOLERANCE_PPM_MS1 <- 10
 
 #' Default mass tolerance in ppm for MS2
 #' @export
-DEFAULT_TOLERANCE_PPM_MS2 <- 20
+DEFAULT_TOLERANCE_PPM_MS2 <- 10
 
 #' Default retention time tolerance in minutes for adduct grouping
 #' @export
-DEFAULT_TOLERANCE_RT_ADDUCTS <- 0.05
+DEFAULT_TOLERANCE_RT_ADDUCTS <- 0.02
 
 #' Default retention time tolerance in minutes for library matching
 #' @export
-DEFAULT_TOLERANCE_RT_LIBRARY <- 0.5
+DEFAULT_TOLERANCE_RT_LIBRARY <- Inf
 
 # Validation Thresholds ----
 
@@ -136,35 +136,35 @@ DEFAULT_NUM_WORKERS <- NULL
 #' Lower ranks (more specific) get higher scores
 #' @export
 DEFAULT_BIO_SCORES <- list(
-  domain = 1,
-  kingdom = 2,
-  phylum = 4,
-  class = 8,
-  order = 16,
-  infraorder = 20,
-  family = 32,
-  subfamily = 40,
-  tribe = 48,
-  subtribe = 56,
-  genus = 64,
-  subgenus = 80,
-  species = 128,
-  subspecies = 256,
-  variety = 512
+  domain = 0.1,
+  kingdom = 0.2,
+  phylum = 0.3,
+  class = 0.4,
+  order = 0.5,
+  infraorder = 0.55,
+  family = 0.6,
+  subfamily = 0.65,
+  tribe = 0.7,
+  subtribe = 0.75,
+  genus = 0.8,
+  subgenus = 0.85,
+  species = 0.9,
+  subspecies = 0.95,
+  variety = 1
 )
 
 #' Default chemical taxonomy score weights
 #' @export
 DEFAULT_CHEM_SCORES <- list(
   # ClassyFire
-  cla_kingdom = 1,
-  cla_superclass = 2,
-  cla_class = 4,
-  cla_parent = 8,
+  cla_kingdom = 0.25,
+  cla_superclass = 0.50,
+  cla_class = 0.75,
+  cla_parent = 1.00,
   # NPClassifier
-  npc_pathway = 1,
-  npc_superclass = 2,
-  npc_class = 4
+  npc_pathway = 0.33,
+  npc_superclass = 0.66,
+  npc_class = 1.00
 )
 
 # Annotation Filtering ----
@@ -175,23 +175,23 @@ DEFAULT_BEST_PERCENTILE <- 0.9
 
 #' Default number of neighboring candidates to retain
 #' @export
-DEFAULT_CANDIDATES_NEIGHBORS <- 50
+DEFAULT_CANDIDATES_NEIGHBORS <- 16
 
 #' Default number of final candidates to retain
 #' @export
-DEFAULT_CANDIDATES_FINAL <- 10
+DEFAULT_CANDIDATES_FINAL <- 1
 
 #' Minimum consistency score threshold
 #' @export
-DEFAULT_MINIMAL_CONSISTENCY <- 0.5
+DEFAULT_MINIMAL_CONSISTENCY <- 0.0
 
 #' Minimum MS1 biological score threshold
 #' @export
-DEFAULT_MINIMAL_MS1_BIO <- 2
+DEFAULT_MINIMAL_MS1_BIO <- 0.0
 
 #' Minimum MS1 chemical score threshold
 #' @export
-DEFAULT_MINIMAL_MS1_CHEMO <- 2
+DEFAULT_MINIMAL_MS1_CHEMO <- 0.0
 
 # Helper Functions ----
 
