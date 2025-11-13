@@ -4,25 +4,22 @@
 \alias{parse_adduct}
 \title{Parse adduct}
 \usage{
-parse_adduct(
-  adduct_string,
-  regex = "\\\\[(\\\\d*)M(?![a-z])(\\\\d*)([+-][\\\\w\\\\d].*)?.*\\\\](\\\\d*)([+-])?"
-)
+parse_adduct(adduct_string, regex = ADDUCT_REGEX_PATTERN)
 }
 \arguments{
 \item{adduct_string}{Character string representing the adduct in standard
 notation (e.g., "[M+H]+", "[2M+Na]+", "[M-H2O+H]+")}
 
 \item{regex}{Character string regular expression pattern for parsing
-(default handles standard adduct notation)}
+(default: uses ADDUCT_REGEX_PATTERN from constants)}
 }
 \value{
 Named numeric vector containing:
-\item{n_mer}{Integer number of monomers (e.g., 2 for dimer)}
-\item{n_iso}{Integer isotope shift (e.g., 1 for M1)}
-\item{los_add_clu}{Numeric total mass change from modifications}
-\item{n_charges}{Integer absolute number of charges}
-\item{charge}{Integer charge sign (+1 or -1)}
+\item{n_mer}{Integer number of monomers (e.g., 2 for dimer, 1 for monomer)}
+\item{n_iso}{Integer isotope shift (e.g., 1 for M+1 isotopologue, 0 for monoisotopic)}
+\item{los_add_clu}{Numeric total mass change in Daltons from all modifications}
+\item{n_charges}{Integer absolute number of charges (always positive)}
+\item{charge}{Integer charge polarity (+1 for positive mode, -1 for negative mode)}
 Returns all zeros if parsing fails.
 }
 \description{
@@ -33,8 +30,19 @@ additions/losses.
 }
 \examples{
 \dontrun{
-parse_adduct("[M+H]+")
-parse_adduct("[2M+Na]+")
-parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")
+# Simple adducts
+parse_adduct("[M+H]+")       # Protonated molecule
+parse_adduct("[M-H]-")       # Deprotonated molecule
+parse_adduct("[M+Na]+")      # Sodium adduct
+
+# Complex adducts
+parse_adduct("[2M+Na]+")     # Dimer with sodium
+parse_adduct("[M+H-H2O]+")   # Protonated with water loss
+parse_adduct("[M1+H]+")      # M+1 isotopologue
+parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+")  # Complex modification
+
+# Error cases
+parse_adduct(NULL)           # Returns all zeros
+parse_adduct("invalid")      # Returns all zeros with warning
 }
 }

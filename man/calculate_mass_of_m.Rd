@@ -4,28 +4,73 @@
 \alias{calculate_mass_of_m}
 \title{Calculate mass of M}
 \usage{
-calculate_mass_of_m(adduct_string, mz, electron_mass = 0.0005485799)
+calculate_mass_of_m(adduct_string, mz, electron_mass = ELECTRON_MASS_DALTONS)
 }
 \arguments{
 \item{adduct_string}{Character string representing the adduct
-(e.g., \code{[M+H]+}, \code{[2M+Na]+})}
+(e.g., \code{[M+H]+}, \code{[2M+Na]+}, \code{[M-H2O+H]+})}
 
-\item{mz}{Numeric observed m/z value}
+\item{mz}{Numeric observed m/z value in Daltons. Must be positive.}
 
 \item{electron_mass}{Numeric electron mass in Daltons
-(default: 5.485799E-4, CODATA 2018 value)}
+(default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)}
 }
 \value{
-Numeric neutral mass (M) in Daltons. Returns 0 if adduct
-parsing fails.
+Numeric neutral mass (M) in Daltons. Returns 0 if:
+- Adduct parsing fails
+- Invalid input parameters
+- Division by zero would occur (n_mer = 0 or n_charges = 0)
+Returns NA if calculated mass is negative (physically impossible)
 }
 \description{
 This function calculates the neutral mass (M) from an observed
 m/z value and adduct notation. It accounts for charge, multimers,
 isotopes, and adduct modifications.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The calculation follows the formula:
+M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) / n_mer)
+
+where:
+- z = number of charges
+- m/z = observed mass-to-charge ratio
+- iso = isotope shift (mass units)
+- modifications = total mass change from adduct modifications
+- sign = charge polarity (+1 or -1)
+- e_mass = electron mass
+- n_mer = multimer count
+}\if{html}{\out{</div>}}
 }
 \examples{
+\dontrun{
+# Simple protonated molecule
 calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")
-calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+Na]+")
-calculate_mass_of_m(mz = 123.4567, adduct_string = "[2M1-C6H12O6 (hexose)+NaCl+H]2+")
+# Expected: ~122.45 Da
+
+# Sodium adduct
+calculate_mass_of_m(mz = 145.4421, adduct_string = "[M+Na]+")
+# Expected: ~122.45 Da
+
+# Complex adduct with water loss
+calculate_mass_of_m(mz = 105.4467, adduct_string = "[M+H-H2O]+")
+# Expected: ~122.45 Da
+
+# Dimer
+calculate_mass_of_m(mz = 245.9053, adduct_string = "[2M+H]+")
+# Expected: ~122.45 Da
+
+# Doubly charged
+calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
+# Expected: ~122.45 Da
+
+# M+1 isotopologue
+calculate_mass_of_m(mz = 124.4600, adduct_string = "[M1+H]+")
+# Expected: ~122.45 Da
+
+# Using custom electron mass (for testing)
+calculate_mass_of_m(
+  mz = 123.4567,
+  adduct_string = "[M+H]+",
+  electron_mass = 0.0005486
+)
+}
 }
