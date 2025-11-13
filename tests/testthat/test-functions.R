@@ -451,8 +451,10 @@ testthat::test_that(desc = "Test functions", code = {
     "sample" = "sample.mzML"
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_features_adducts.csv")
-  annotate_masses(
-    features = "data/source/libraries/rt/example_features_adducts.csv"
+  expect_warning(
+    object = annotate_masses(
+      features = "data/source/libraries/rt/example_features_adducts.csv"
+    )
   )
 
   ## Performing MS2 annotation

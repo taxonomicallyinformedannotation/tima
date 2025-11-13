@@ -151,20 +151,21 @@ calculate_mass_of_m <- function(
     return(0)
   }
 
-  if (neutral_mass < 0) {
-    logger::log_warn(
-      "Calculated negative neutral mass (",
-      round(neutral_mass, 4),
-      " Da) ",
-      "for adduct '",
-      adduct_string,
-      "' and m/z ",
-      mz,
-      ". ",
-      "This is physically impossible. Returning NA."
-    )
-    return(NA_real_)
-  }
+  ## COMMENT: This is actually llowed for neutral mass calculations
+  # if (neutral_mass < 0) {
+  #   logger::log_warn(
+  #     "Calculated negative neutral mass (",
+  #     round(neutral_mass, 4),
+  #     " Da) ",
+  #     "for adduct '",
+  #     adduct_string,
+  #     "' and m/z ",
+  #     mz,
+  #     ". ",
+  #     "This is physically impossible. Returning NA."
+  #   )
+  #   return(NA_real_)
+  # }
 
   # Log successful calculation at trace level
   logger::log_trace(
@@ -331,7 +332,7 @@ calculate_neutral_mass_formula <- function(
 #' adduct <- "[M+H]+"
 #' mz <- calculate_mz_from_mass(mass, adduct)
 #' mass_back <- calculate_mass_of_m(mz, adduct)
-#' all.equal(mass, mass_back)  # Should be TRUE
+#' all.equal(mass, mass_back) # Should be TRUE
 #' }
 calculate_mz_from_mass <- function(
   neutral_mass,
