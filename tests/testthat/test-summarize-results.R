@@ -1,7 +1,6 @@
-#' @title Enhanced Test Suite for summarize_results
+#' @title Test Suite for summarize_results
 #'
-#' @description Comprehensive tests for the summarize_results function including
-#'     data frame operations, filtering, collapsing, and edge cases.
+#' @description Individual focused tests for summarize_results function.
 
 library(testthat)
 library(tima)
