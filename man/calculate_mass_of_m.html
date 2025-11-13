@@ -717,7 +717,7 @@ where:
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">calculate_mass_of_m(adduct_string, mz, electron_mass = ELECTRON_MASS_DALTONS)
+<pre><code class="language-R">calculate_mass_of_m(mz, adduct_string, electron_mass = ELECTRON_MASS_DALTONS)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -725,18 +725,18 @@ where:
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="adduct_string">adduct_string</code>
-</td>
-<td>
-Character string representing the adduct (e.g., <code>[M+H]+</code>, <code>[2M+Na]+</code>, <code>[M-H2O+H]+</code>)
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="mz">mz</code>
 </td>
 <td>
 Numeric observed m/z value in Daltons. Must be positive.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="adduct_string">adduct_string</code>
+</td>
+<td>
+Character string representing the adduct (e.g., <code>[M+H]+</code>, <code>[2M+Na]+</code>, <code>[M-H2O+H]+</code>)
 </td>
 </tr>
 <tr>

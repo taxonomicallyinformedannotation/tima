@@ -780,19 +780,19 @@ Integer charge polarity (+1 for positive mode, -1 for negative mode)
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple adducts</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H]+"</span>)       <span class="co"># Protonated molecule</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M-H]-"</span>)       <span class="co"># Deprotonated molecule</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+Na]+"</span>)      <span class="co"># Sodium adduct</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H]+"</span>) <span class="co"># Protonated molecule</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M-H]-"</span>) <span class="co"># Deprotonated molecule</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+Na]+"</span>) <span class="co"># Sodium adduct</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex adducts</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>)     <span class="co"># Dimer with sodium</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H-H2O]+"</span>)   <span class="co"># Protonated with water loss</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M1+H]+"</span>)      <span class="co"># M+1 isotopologue</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>)  <span class="co"># Complex modification</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>) <span class="co"># Dimer with sodium</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H-H2O]+"</span>) <span class="co"># Protonated with water loss</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M1+H]+"</span>) <span class="co"># M+1 isotopologue</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>) <span class="co"># Complex modification</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Error cases</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="cn">NULL</span>)           <span class="co"># Returns all zeros</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"invalid"</span>)      <span class="co"># Returns all zeros with warning</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="cn">NULL</span>) <span class="co"># Returns all zeros</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"invalid"</span>) <span class="co"># Returns all zeros with warning</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
