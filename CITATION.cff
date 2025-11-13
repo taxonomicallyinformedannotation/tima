@@ -218,7 +218,7 @@ references:
     orcid: https://orcid.org/0000-0002-7111-0077
   year: '2025'
   doi: 10.32614/CRAN.package.DT
-  version: '>= 0.33'
+  version: '>= 0.34'
 - type: software
   title: fs
   abstract: 'fs: Cross-Platform File System Operations Based on ''libuv'''
@@ -275,7 +275,7 @@ references:
     given-names: Olivier
   year: '2025'
   doi: 10.32614/CRAN.package.gt
-  version: '>= 1.0.0'
+  version: '>= 1.1.0'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
@@ -393,7 +393,7 @@ references:
     orcid: https://orcid.org/0000-0003-4757-117X
   year: '2025'
   doi: 10.32614/CRAN.package.logger
-  version: '>= 0.4.0'
+  version: '>= 0.4.1'
 - type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -533,7 +533,7 @@ references:
     email: lionel@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.purrr
-  version: '>= 1.1.0'
+  version: '>= 1.2.0'
 - type: software
   title: reticulate
   abstract: 'reticulate: Interface to ''Python'''
@@ -553,7 +553,7 @@ references:
     orcid: https://orcid.org/0000-0001-5243-233X
   year: '2025'
   doi: 10.32614/CRAN.package.reticulate
-  version: '>= 1.43.0'
+  version: '>= 1.44.0'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -709,7 +709,7 @@ references:
     orcid: https://orcid.org/0000-0003-1878-3253
   year: '2025'
   doi: 10.32614/CRAN.package.targets
-  version: '>= 1.11.3'
+  version: '>= 1.11.4'
 - type: software
   title: tidyfst
   abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
@@ -777,7 +777,7 @@ references:
     email: bthieurmel@gmail.com
   year: '2025'
   doi: 10.32614/CRAN.package.visNetwork
-  version: '>= 2.1.2'
+  version: '>= 2.1.4'
 - type: software
   title: yaml
   abstract: 'yaml: Methods to Convert R Data to YAML and Back'
@@ -832,7 +832,7 @@ references:
     orcid: https://orcid.org/0000-0003-2042-7063
   year: '2025'
   doi: 10.32614/CRAN.package.altdoc
-  version: '>= 0.5.0'
+  version: '>= 0.7.0'
 - type: software
   title: BiocManager
   abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
@@ -880,7 +880,7 @@ references:
     orcid: https://orcid.org/0000-0002-4220-5210
   year: '2025'
   doi: 10.32614/CRAN.package.grateful
-  version: '>= 0.2.12'
+  version: '>= 0.3.0'
 - type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
@@ -930,7 +930,7 @@ references:
     email: lionel@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.pkgload
-  version: '>= 1.4.0'
+  version: '>= 1.4.1'
 - type: software
   title: quarto
   abstract: 'quarto: R Interface to ''Quarto'' Markdown Publishing System'
@@ -948,7 +948,7 @@ references:
     orcid: https://orcid.org/0000-0003-4474-2498
   year: '2025'
   doi: 10.32614/CRAN.package.quarto
-  version: '>= 1.4.4'
+  version: '>= 1.5.1'
 - type: software
   title: R.utils
   abstract: 'R.utils: Various Programming Utilities'
@@ -1056,7 +1056,7 @@ references:
     email: james.hester@rstudio.com
   year: '2025'
   doi: 10.32614/CRAN.package.spelling
-  version: '>= 2.3.1'
+  version: '>= 2.3.2'
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'
@@ -1069,5 +1069,5 @@ references:
     email: hadley@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.testthat
-  version: '>= 3.2.3'
+  version: '>= 3.3.0'
 
