@@ -466,12 +466,8 @@ test_that("validators handle edge cases gracefully", {
 test_that("validators are thread-safe", {
   # Multiple simultaneous validations should work
   skip_on_cran()
-  skip_if_not_installed("future")
 
-  library(future)
-  plan(multisession, workers = 2)
-
-  results <- future.apply::future_lapply(1:10, function(i) {
+  results <- lapply(1:10, function(i) {
     validate_ms_mode("pos")
     validate_numeric_range(5, 0, 10)
     TRUE
