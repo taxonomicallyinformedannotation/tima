@@ -332,7 +332,6 @@ testthat::test_that(desc = "Test functions", code = {
     "inchikey" = NA
   ) |>
     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
-  prepare_libraries_rt(temp_exp = "data/source/libraries/rt/example_bad.tsv")
   expect_warning(
     object = prepare_libraries_rt(
       temp_exp = "data/source/libraries/rt/example_bad.tsv"
