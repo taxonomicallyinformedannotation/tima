@@ -117,21 +117,21 @@ parse_adduct <- function(
   }
 
   # Log successful parse at trace level
-  logger::log_trace(
-    "Successfully parsed adduct '",
-    adduct_string,
-    "': ",
-    "n_mer=",
-    n_mer,
-    ", n_iso=",
-    n_iso,
-    ", mass_change=",
-    round(modifications$total_mass, 4),
-    ", charges=",
-    charge_info$n_charges,
-    ", polarity=",
-    charge_info$charge_sign
-  )
+  # logger::log_trace(
+  #   "Successfully parsed adduct '",
+  #   adduct_string,
+  #   "': ",
+  #   "n_mer=",
+  #   n_mer,
+  #   ", n_iso=",
+  #   n_iso,
+  #   ", mass_change=",
+  #   round(modifications$total_mass, 4),
+  #   ", charges=",
+  #   charge_info$n_charges,
+  #   ", polarity=",
+  #   charge_info$charge_sign
+  # )
 
   # Return parsed components
   return(c(
