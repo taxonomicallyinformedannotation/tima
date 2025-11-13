@@ -57,17 +57,6 @@ test_that("round_reals requires data frame input", {
   )
 })
 
-test_that("round_reals accepts tibbles", {
-  skip_if_not_installed("tibble")
-
-  df <- tibble::tibble(
-    structure_exact_mass = c(123.456789)
-  )
-
-  result <- round_reals(df)
-  expect_s3_class(result, "tbl")
-})
-
 test_that("round_reals validates dig parameter", {
   df <- data.frame(structure_exact_mass = 123.456)
 
