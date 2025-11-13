@@ -20,9 +20,9 @@
 #' @include validators.R
 #' @include parse_adduct.R
 #'
+#' @param mz Numeric observed m/z value in Daltons. Must be positive.
 #' @param adduct_string Character string representing the adduct
 #'     (e.g., \code{[M+H]+}, \code{[2M+Na]+}, \code{[M-H2O+H]+})
-#' @param mz Numeric observed m/z value in Daltons. Must be positive.
 #' @param electron_mass Numeric electron mass in Daltons
 #'     (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)
 #'
@@ -68,8 +68,8 @@
 #' )
 #' }
 calculate_mass_of_m <- function(
-  adduct_string,
   mz,
+  adduct_string,
   electron_mass = ELECTRON_MASS_DALTONS
 ) {
   # Validate required inputs
@@ -91,12 +91,14 @@ calculate_mass_of_m <- function(
 
   # Check if parsing failed (all zeros returned)
   if (is_parse_failed(parsed_adduct)) {
-    logger::log_warn(
+    msg <- paste0(
       "Failed to parse adduct '",
       adduct_string,
       "', ",
       "cannot calculate neutral mass"
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(0)
   }
 
@@ -229,13 +231,15 @@ validate_mz <- function(mz) {
 
   # Sanity check: warn if m/z is suspiciously high
   if (mz > MAX_MASS_DALTONS) {
-    logger::log_warn(
+    msg <- paste0(
       "m/z value (",
       mz,
       " Da) exceeds typical small molecule range (",
       MAX_MASS_DALTONS,
       " Da). Please verify this is correct."
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
   }
 
   invisible(TRUE)
@@ -265,7 +269,7 @@ validate_electron_mass <- function(electron_mass) {
 
   if (relative_difference > 0.01) {
     # 1% tolerance
-    logger::log_warn(
+    msg <- paste0(
       "Provided electron_mass (",
       electron_mass,
       ") differs from ",
@@ -275,6 +279,8 @@ validate_electron_mass <- function(electron_mass) {
       round(relative_difference * 100, 2),
       "%"
     )
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
   }
 
   invisible(TRUE)
@@ -356,7 +362,9 @@ calculate_mz_from_mass <- function(
   parsed_adduct <- parse_adduct(adduct_string)
 
   if (is_parse_failed(parsed_adduct)) {
-    logger::log_warn("Failed to parse adduct: ", adduct_string)
+    msg <- paste0("Failed to parse adduct: ", adduct_string)
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(0)
   }
 

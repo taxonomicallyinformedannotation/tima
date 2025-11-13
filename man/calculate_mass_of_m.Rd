@@ -4,13 +4,13 @@
 \alias{calculate_mass_of_m}
 \title{Calculate mass of M}
 \usage{
-calculate_mass_of_m(adduct_string, mz, electron_mass = ELECTRON_MASS_DALTONS)
+calculate_mass_of_m(mz, adduct_string, electron_mass = ELECTRON_MASS_DALTONS)
 }
 \arguments{
+\item{mz}{Numeric observed m/z value in Daltons. Must be positive.}
+
 \item{adduct_string}{Character string representing the adduct
 (e.g., \code{[M+H]+}, \code{[2M+Na]+}, \code{[M-H2O+H]+})}
-
-\item{mz}{Numeric observed m/z value in Daltons. Must be positive.}
 
 \item{electron_mass}{Numeric electron mass in Daltons
 (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)}

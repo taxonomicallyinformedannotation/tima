@@ -58,7 +58,9 @@ summarize_results <- function(
   }
 
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty results table provided")
+    msg <- "Empty results table provided"
+    warning(msg, call. = FALSE)
+    logger::log_warn(msg)
     return(df)
   }
 
