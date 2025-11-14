@@ -55,8 +55,8 @@ complement_metadata_structures <- function(
   }
 
   # logger::log_trace(
-    "Complementing structural metadata from reference libraries"
-  )
+  #  "Complementing structural metadata from reference libraries"
+  #)
   logger::log_debug("Input: ", nrow(df), " rows")
 
   # Load stereochemistry data
