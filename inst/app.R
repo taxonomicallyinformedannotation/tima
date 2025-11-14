@@ -1,12 +1,3 @@
-# Check if runs in Docker environment or not
-if (file.exists("/.dockerenv")) {
-  options(shiny.host = "0.0.0.0")
-} else {
-  options(shiny.host = "127.0.0.1")
-}
-options(shiny.port = 3838)
-options(shiny.maxRequestSize = 2000 * 1024^2)
-
 #' @title Label mandatory
 #'
 #' @description This function adds an asterisk to mandatory inputs
@@ -2709,7 +2700,15 @@ server <- function(input, output) {
     })
   })
 }
+
 url <- "<http://127.0.0.1:3838>"
+# Check if runs in Docker environment or not
+if (file.exists("/.dockerenv")) {
+  host <- "0.0.0.0"
+} else {
+  host <- "127.0.0.1"
+}
+options(shiny.maxRequestSize = 2000 * 1024^2)
 logger::log_info(
   "Please, open: {url} on your favorite browser, but not Edge."
 )
@@ -2719,5 +2718,9 @@ shiny::shinyApp(
   onStart = function() {
     tima:::copy_backbone()
     tima:::go_to_cache()
-  }
+  },
+  options = list(
+    "host" = host,
+    "port" = 3838
+  )
 )

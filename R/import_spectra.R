@@ -41,26 +41,48 @@ import_spectra <- function(
   sanitize = TRUE,
   combine = TRUE
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate numeric parameters first (cheapest checks)
+  if (!is.numeric(cutoff) || cutoff < 0) {
+    stop("Cutoff must be a non-negative number, got: ", cutoff)
+  }
+
+  if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
+    stop(
+      "Dalton and PPM tolerances must be positive numbers ",
+      "(dalton: ",
+      dalton,
+      ", ppm: ",
+      ppm,
+      ")"
+    )
+  }
+
+  # Validate polarity
+  if (!is.na(polarity) && !polarity %in% c("pos", "neg")) {
+    stop("Polarity must be 'pos', 'neg', or NA, got: ", polarity)
+  }
+
+  # Validate file path (I/O check - more expensive)
+  if (!is.character(file) || length(file) != 1L) {
+    stop("file must be a single character string")
+  }
+
   if (!file.exists(file)) {
     stop("Spectra file not found: ", file)
   }
 
-  if (!is.na(polarity) && !polarity %in% c("pos", "neg")) {
-    stop("Polarity must be 'pos', 'neg', or NA")
-  }
-
-  if (!is.numeric(cutoff) || cutoff < 0) {
-    stop("Cutoff must be a non-negative number")
-  }
-
-  if (!is.numeric(dalton) || dalton < 0 || !is.numeric(ppm) || ppm < 0) {
-    stop("Dalton and PPM tolerances must be positive numbers")
-  }
+  # ============================================================================
+  # Import Spectra
+  # ============================================================================
 
   logger::log_info("Importing spectra from: {file}")
   logger::log_debug(
-    "Parameters: cutoff={cutoff}, dalton={dalton}, ppm={ppm}, polarity={ifelse(is.na(polarity), 'all', polarity)}"
+    "Parameters: cutoff={cutoff}, dalton={dalton}, ppm={ppm}, ",
+    "polarity={ifelse(is.na(polarity), 'all', polarity)}"
   )
 
   # Extract file extension (handle MassBank naming convention)
@@ -106,46 +128,67 @@ import_spectra <- function(
     },
     error = function(e) {
       logger::log_error("Failed to import spectra: {conditionMessage(e)}")
-      stop("Failed to import spectra: ", conditionMessage(e))
+      stop("Failed to import spectra from ", file, ": ", conditionMessage(e))
     }
   )
 
   n_initial <- length(spectra)
   logger::log_info("Loaded {n_initial} spectra from file")
 
+  # Early exit for empty files
+  if (n_initial == 0L) {
+    logger::log_warn("No spectra found in file")
+    return(spectra)
+  }
+
+  # ============================================================================
+  # Harmonize Metadata Fields
+  # ============================================================================
+
   # Validate precursor charges
   if (0L %in% spectra@backend@spectraData$precursorCharge) {
+    n_unknown <- sum(spectra@backend@spectraData$precursorCharge == 0L)
     logger::log_warn(
-      "Found {sum(spectra@backend@spectraData$precursorCharge == 0)} spectra with precursorCharge = 0 ",
+      "Found {n_unknown} spectra with precursorCharge = 0 ",
       "(unknown polarity - should be avoided in practice)"
     )
   }
 
   # Harmonize metadata field names across different data sources
-  if ("MSLEVEL" %in% colnames(spectra@backend@spectraData)) {
+  # (batch check for efficiency)
+  spec_cols <- colnames(spectra@backend@spectraData)
+
+  if ("MSLEVEL" %in% spec_cols) {
     spectra$msLevel <- as.integer(spectra$MSLEVEL)
   }
 
-  if ("MS_LEVEL" %in% colnames(spectra@backend@spectraData)) {
+  if ("MS_LEVEL" %in% spec_cols) {
     spectra$msLevel <- as.integer(spectra$MS_LEVEL)
   }
 
-  if ("PRECURSOR_MZ" %in% colnames(spectra@backend@spectraData)) {
+  if ("PRECURSOR_MZ" %in% spec_cols) {
     spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
   }
 
-  if ("spectrum_id" %in% colnames(spectra@backend@spectraData)) {
+  if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
+  # ============================================================================
+  # Filter Spectra
+  # ============================================================================
+
   # Filter to MS2 spectra only
-  if ("msLevel" %in% colnames(spectra@backend@spectraData)) {
+  if ("msLevel" %in% spec_cols) {
     n_before <- length(spectra)
     spectra <- Spectra::filterMsLevel(spectra, 2L)
     n_after <- length(spectra)
-    logger::log_debug(
-      "Filtered to MS2 spectra: {n_before} -> {n_after} spectra"
-    )
+    n_removed <- n_before - n_after
+    if (n_removed > 0L) {
+      logger::log_debug(
+        "Filtered to MS2 spectra: {n_before} -> {n_after} ({n_removed} removed)"
+      )
+    }
   }
 
   # Handle MassBank-specific MS level field
