@@ -26,7 +26,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     stop("file pattern must be a single character string")
   }
 
-  logger::log_trace("Reading '", file, "' from SIRIUS archive: ", sirius_zip)
+  # logger::log_trace("Reading '", file, "' from SIRIUS archive: ", sirius_zip)
 
   # List archive contents and filter
   matching_file <- sirius_zip |>
@@ -54,7 +54,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     )
   }
 
-  logger::log_debug("Extracting file: ", matching_file)
+  logger::log_debug("Extracting file: {matching_file}")
 
   # Read and parse the file from archive
   result <- archive::archive_read(sirius_zip, matching_file) |>
@@ -66,7 +66,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     ) |>
     tidytable::tidytable()
 
-  logger::log_trace("Successfully read ", nrow(result), " rows from archive")
+  # logger::log_trace("Successfully read ", nrow(result), " rows from archive")
 
   return(result)
 }

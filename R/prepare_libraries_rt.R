@@ -152,10 +152,10 @@ prepare_libraries_rt <- function(
 
   rts_from_mgf <-
     function(mgf) {
-      logger::log_trace("Importing spectra")
+      # logger::log_trace("Importing spectra")
       spectra <- mgf |>
         purrr::map(.f = import_spectra)
-      logger::log_trace("Extracting retention times")
+      # logger::log_trace("Extracting retention times")
       rts <- spectra |>
         purrr::map(.f = function(x) {
           x@backend@spectraData |>
@@ -173,7 +173,7 @@ prepare_libraries_rt <- function(
 
   rts_from_tab <-
     function(tab) {
-      logger::log_trace("Importing file")
+      # logger::log_trace("Importing file")
       rts <- tab |>
         purrr::map(.f = tidytable::fread) |>
         tidytable::bind_rows() |>

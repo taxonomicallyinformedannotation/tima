@@ -69,17 +69,10 @@ calculate_entropy_and_similarity <- function(
   }
 
   logger::log_info(
-    "Calculating entropy and similarity for ",
-    length(query_spectra),
-    " spectra"
+    "Calculating entropy and similarity for {length(query_spectra)} spectra"
   )
   logger::log_debug(
-    "Parameters - Method: ",
-    method,
-    ", Dalton: ",
-    dalton,
-    ", PPM: ",
-    ppm
+    "Parameters - Method: {method}, Dalton: {dalton}, PPM: {ppm}"
   )
 
   # Detect if running in a subprocess (callr/targets environment)

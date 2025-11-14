@@ -29,7 +29,7 @@ round_reals <- function(
 
   # Early exit for empty patterns
   if (length(cols) == 0L) {
-    logger::log_trace("No column patterns specified for rounding")
+    # logger::log_trace("No column patterns specified for rounding")
     return(df)
   }
 
@@ -58,15 +58,15 @@ round_reals <- function(
 
   # Early exit if no columns found
   if (length(matching_cols) == 0L) {
-    logger::log_trace(
-      "No matching columns found for rounding patterns: {paste(cols, collapse = ', ')}"
-    )
+    # logger::log_trace(
+    #  "No matching columns found for rounding patterns: {paste(cols, collapse = ', ')}"
+    #)
     return(df)
   }
 
-  logger::log_trace(
-    "Rounding {length(matching_cols)} columns to {dig} decimal places: {paste(matching_cols, collapse = ', ')}"
-  )
+  # logger::log_trace(
+  # "Rounding {length(matching_cols)} columns to {dig} decimal places: {paste(matching_cols, collapse = ', ')}"
+  #)
 
   # ============================================================================
   # Apply Rounding

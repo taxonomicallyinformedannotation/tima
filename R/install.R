@@ -49,7 +49,7 @@ install <- function(
   }
 
   system <- Sys.info()[["sysname"]]
-  logger::log_info("Detected operating system: ", system)
+  logger::log_info("Detected operating system: {system}")
 
   if (system == "Windows" || isTRUE(test)) {
     logger::log_info("You should install RTools if not already done")
@@ -63,7 +63,7 @@ install <- function(
   check_or_install_python <- function() {
     python <- Sys.which("python3")
     if (python |> nzchar() && isFALSE(test)) {
-      logger::log_info("System Python found at: ", python)
+      logger::log_info("System Python found at: {python}")
       return(python)
     }
 
@@ -82,7 +82,7 @@ install <- function(
       file.path(minipath, "bin", "python")
     }
 
-    logger::log_info("Using Miniconda Python at: ", python_path)
+    logger::log_info("Using Miniconda Python at: {python_path}")
     return(python_path)
   }
 
@@ -90,7 +90,7 @@ install <- function(
     python <- check_or_install_python()
 
     if (!reticulate::virtualenv_exists(envname)) {
-      logger::log_info("Creating Python virtualenv: ", envname)
+      logger::log_info("Creating Python virtualenv: {envname}")
       # Rescue version for fallback if default Python doesn't work
       rescue_python_version <- "3.13"
       tryCatch(
@@ -115,10 +115,10 @@ install <- function(
         }
       )
     } else {
-      logger::log_info("Using existing Python virtualenv: ", envname)
+      logger::log_info("Using existing Python virtualenv: {envname}")
     }
 
-    logger::log_info("Installing RDKit in virtualenv: ", envname)
+    logger::log_info("Installing RDKit in virtualenv: {envname}")
     reticulate::virtualenv_install(
       envname = envname,
       python = python,
@@ -148,13 +148,13 @@ install <- function(
             getOption("pkgType")
           }
         )
-        logger::log_info("Successfully installed R package: ", package)
+        logger::log_info("Successfully installed R package: {package}")
 
         setup_virtualenv()
         return(TRUE)
       },
       error = function(e) {
-        logger::log_error("Installation failed: ", conditionMessage(e))
+        logger::log_error("Installation failed: {conditionMessage(e)}")
         return(FALSE)
       }
     )

@@ -55,8 +55,8 @@ select_annotations_columns <- function(
     }
   }
 
-  logger::log_trace("Selecting and standardizing annotation columns")
-  logger::log_debug("Input: ", nrow(df), " rows, ", ncol(df), " columns")
+  # logger::log_trace("Selecting and standardizing annotation columns")
+  logger::log_debug("Input: {nrow(df)} rows, {ncol(df)} columns")
 
   # Get column model
   model <- columns_model()
@@ -103,7 +103,7 @@ select_annotations_columns <- function(
     # Complement with structure metadata
     complement_metadata_structures()
 
-  logger::log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
+  # logger::log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 
   return(df)
 }

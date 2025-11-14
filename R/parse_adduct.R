@@ -49,7 +49,7 @@ parse_adduct <- function(
 
   # Early return for NULL or missing input (guard clause pattern)
   if (missing(adduct_string) || is.null(adduct_string)) {
-    logger::log_trace("Adduct string is NULL or missing, returning zero values")
+    # logger::log_trace("Adduct string is NULL or missing, returning zero values")
     return(failed_parse)
   }
 

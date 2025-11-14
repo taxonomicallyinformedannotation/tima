@@ -72,7 +72,7 @@ summarize_results <- function(
     summarize
   )
 
-  logger::log_trace("Adding feature metadata and simplifying columns")
+  # logger::log_trace("Adding feature metadata and simplifying columns")
   model <- columns_model()
 
   df3 <- features_table |>
@@ -166,9 +166,9 @@ summarize_results <- function(
   }
 
   if (summarize == TRUE) {
-    logger::log_trace("Collecting garbage")
+    # logger::log_trace("Collecting garbage")
     gc()
-    logger::log_trace("Summarizing results")
+    # logger::log_trace("Summarizing results")
     df4 <- df3 |>
       tidytable::group_by(feature_id) |>
       tidytable::reframe(tidytable::across(
@@ -200,7 +200,7 @@ summarize_results <- function(
   }
   rm(df3)
 
-  logger::log_trace("Selecting columns to export")
+  # logger::log_trace("Selecting columns to export")
   df6 <- df5 |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::everything(),
@@ -232,7 +232,7 @@ summarize_results <- function(
     ))
   rm(df5)
 
-  logger::log_trace("Adding consensus again to droped candidates")
+  # logger::log_trace("Adding consensus again to droped candidates")
   results <- tidytable::bind_rows(
     df6 |>
       tidytable::filter(

@@ -213,11 +213,11 @@ clean_chemo <- function(
 
   # Apply same percentile filtering as minimize_results for consistency
   # This ensures filtered and mini outputs have the same number of rows
-  logger::log_trace(
-    "Applying ",
-    best_percentile,
-    " percentile filter to match minimize_results"
-  )
+  # logger::log_trace(
+  #  "Applying ",
+  #  best_percentile,
+  #  " percentile filter to match minimize_results"
+  #)
   df1_filtered <- df1 |>
     tidytable::group_by(feature_id) |>
     tidytable::filter(
@@ -226,7 +226,7 @@ clean_chemo <- function(
     tidytable::ungroup() |>
     tidytable::filter(rank_final <= candidates_final)
 
-  logger::log_trace("Processing full results")
+  # logger::log_trace("Processing full results")
   results_full <- df1 |>
     summarize_results(
       features_table = features_table,
@@ -236,7 +236,7 @@ clean_chemo <- function(
       remove_ties = remove_ties,
       summarize = summarize
     )
-  logger::log_trace("Processing filtered results")
+  # logger::log_trace("Processing filtered results")
   results_filtered <- df1_filtered |>
     summarize_results(
       features_table = features_table,

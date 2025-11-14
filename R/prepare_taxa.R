@@ -93,7 +93,7 @@ prepare_taxa <- function(
 
   # Check if using single taxon or metadata-based assignment
   if (!is.null(taxon) && !is.na(taxon)) {
-    logger::log_info("Assigning all features to single organism: ", taxon)
+    logger::log_info("Assigning all features to single organism: {taxon}")
   } else {
     if (!is.character(metadata) || length(metadata) != 1L) {
       stop("metadata path must be provided if taxon is not specified")
@@ -113,7 +113,7 @@ prepare_taxa <- function(
     stopifnot("Your input file does not exist" = file.exists(input))
   }
 
-  logger::log_trace("Loading feature table")
+  # logger::log_trace("Loading feature table")
   feature_table_0 <- tidytable::fread(
     file = input,
     na.strings = c("", "NA"),
@@ -121,7 +121,7 @@ prepare_taxa <- function(
   )
 
   if (is.null(taxon)) {
-    logger::log_trace("Loading metadata table")
+    # logger::log_trace("Loading metadata table")
     metadata_table <- tidytable::fread(
       file = metadata,
       na.strings = c("", "NA"),
@@ -130,21 +130,21 @@ prepare_taxa <- function(
   }
 
   if (!is.null(taxon)) {
-    logger::log_trace("Forcing all features to given organism")
+    # logger::log_trace("Forcing all features to given organism")
     metadata_table <- data.frame(taxon)
     colnames(metadata_table) <- colname
   }
 
-  logger::log_trace("Preparing organisms names")
+  # logger::log_trace("Preparing organisms names")
   organism_table <- metadata_table |>
     tidytable::filter(!is.na(!!as.name(colname))) |>
     tidytable::distinct(!!as.name(colname)) |>
     tidytable::select(organism = !!as.name(colname)) |>
     tidytable::separate_rows(organism, sep = "\\|", )
 
-  logger::log_trace(
-    "Retrieving already computed Open Tree of Life Taxonomy"
-  )
+  # logger::log_trace(
+  #  "Retrieving already computed Open Tree of Life Taxonomy"
+  #)
   organism_table_filled <- organism_table |>
     tidytable::left_join(
       tidytable::fread(
@@ -156,7 +156,7 @@ prepare_taxa <- function(
     )
   rm(organism_table)
 
-  logger::log_trace("Submitting the rest to OTL")
+  # logger::log_trace("Submitting the rest to OTL")
   organism_table_missing <- organism_table_filled |>
     tidytable::filter(is.na(organism_taxonomy_ottid))
 
@@ -164,7 +164,7 @@ prepare_taxa <- function(
     biological_metadata_1 <- organism_table_missing |>
       get_organism_taxonomy_ott()
 
-    logger::log_trace("Joining all results")
+    # logger::log_trace("Joining all results")
     biological_metadata <- organism_table_filled |>
       tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
       tidytable::rename(organism_name = organism) |>
@@ -179,7 +179,7 @@ prepare_taxa <- function(
 
   if (is.null(taxon)) {
     if (extension == FALSE) {
-      logger::log_trace("Removing filename extensions")
+      # logger::log_trace("Removing filename extensions")
       metadata_table <- metadata_table |>
         tidytable::mutate(
           filename = stringi::stri_replace_all_fixed(
@@ -199,7 +199,7 @@ prepare_taxa <- function(
         )
     }
   }
-  logger::log_trace("Joining with metadata table")
+  # logger::log_trace("Joining with metadata table")
   if (!is.null(taxon)) {
     metadata_table_joined <- tidytable::inner_join(
       feature_table_0 |>
@@ -224,7 +224,7 @@ prepare_taxa <- function(
   }
   rm(feature_table_0, metadata_table)
 
-  logger::log_trace("Joining with cleaned taxonomy table")
+  # logger::log_trace("Joining with cleaned taxonomy table")
   taxed_features_table <-
     tidytable::left_join(
       metadata_table_joined,

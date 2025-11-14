@@ -159,7 +159,7 @@ weight_bio <- function(
   # Filter Structure-Organism Pairs
   # ============================================================================
 
-  logger::log_trace("Filtering structure-organism pairs")
+  # logger::log_trace("Filtering structure-organism pairs")
   df0 <- structure_organism_pairs_table |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
@@ -193,9 +193,9 @@ weight_bio <- function(
       }
     ))
 
-  logger::log_debug("Filtered to ", nrow(df0), " structure-organism pairs")
+  logger::log_debug("Filtered to {nrow(df0)} structure-organism pairs")
 
-  logger::log_trace("Preparing annotation table")
+  # logger::log_trace("Preparing annotation table")
   df1 <- annotation_table_taxed |>
     tidytable::select(
       candidate_structure_inchikey_connectivity_layer,
@@ -301,35 +301,85 @@ weight_bio <- function(
   # Calculate Biological Scores at All Taxonomic Levels
   # ============================================================================
 
-  logger::log_trace("Calculating biological score at all levels ...")
+  # logger::log_trace("Calculating biological score at all levels ...")
 
   # Define all taxonomic levels and their scores (DRY principle)
   taxonomic_levels <- list(
-    list(level = "domain", num = "01", candidate = "candidate_organism_01_domain",
-         sample = "sample_organism_01_domain", score = score_biological_domain),
-    list(level = "kingdom", num = "02", candidate = "candidate_organism_02_kingdom",
-         sample = "sample_organism_02_kingdom", score = score_biological_kingdom),
-    list(level = "phylum", num = "03", candidate = "candidate_organism_03_phylum",
-         sample = "sample_organism_03_phylum", score = score_biological_phylum),
-    list(level = "class", num = "04", candidate = "candidate_organism_04_class",
-         sample = "sample_organism_04_class", score = score_biological_class),
-    list(level = "order", num = "05", candidate = "candidate_organism_05_order",
-         sample = "sample_organism_05_order", score = score_biological_order),
-    list(level = "family", num = "06", candidate = "candidate_organism_06_family",
-         sample = "sample_organism_06_family", score = score_biological_family),
-    list(level = "tribe", num = "07", candidate = "candidate_organism_07_tribe",
-         sample = "sample_organism_07_tribe", score = score_biological_tribe),
-    list(level = "genus", num = "08", candidate = "candidate_organism_08_genus",
-         sample = "sample_organism_08_genus", score = score_biological_genus),
-    list(level = "species", num = "09", candidate = "candidate_organism_09_species",
-         sample = "sample_organism_09_species", score = score_biological_species),
-    list(level = "varietas", num = "10", candidate = "candidate_organism_10_varietas",
-         sample = "sample_organism_10_varietas", score = score_biological_variety)
+    list(
+      level = "domain",
+      num = "01",
+      candidate = "candidate_organism_01_domain",
+      sample = "sample_organism_01_domain",
+      score = score_biological_domain
+    ),
+    list(
+      level = "kingdom",
+      num = "02",
+      candidate = "candidate_organism_02_kingdom",
+      sample = "sample_organism_02_kingdom",
+      score = score_biological_kingdom
+    ),
+    list(
+      level = "phylum",
+      num = "03",
+      candidate = "candidate_organism_03_phylum",
+      sample = "sample_organism_03_phylum",
+      score = score_biological_phylum
+    ),
+    list(
+      level = "class",
+      num = "04",
+      candidate = "candidate_organism_04_class",
+      sample = "sample_organism_04_class",
+      score = score_biological_class
+    ),
+    list(
+      level = "order",
+      num = "05",
+      candidate = "candidate_organism_05_order",
+      sample = "sample_organism_05_order",
+      score = score_biological_order
+    ),
+    list(
+      level = "family",
+      num = "06",
+      candidate = "candidate_organism_06_family",
+      sample = "sample_organism_06_family",
+      score = score_biological_family
+    ),
+    list(
+      level = "tribe",
+      num = "07",
+      candidate = "candidate_organism_07_tribe",
+      sample = "sample_organism_07_tribe",
+      score = score_biological_tribe
+    ),
+    list(
+      level = "genus",
+      num = "08",
+      candidate = "candidate_organism_08_genus",
+      sample = "sample_organism_08_genus",
+      score = score_biological_genus
+    ),
+    list(
+      level = "species",
+      num = "09",
+      candidate = "candidate_organism_09_species",
+      sample = "sample_organism_09_species",
+      score = score_biological_species
+    ),
+    list(
+      level = "varietas",
+      num = "10",
+      candidate = "candidate_organism_10_varietas",
+      sample = "sample_organism_10_varietas",
+      score = score_biological_variety
+    )
   )
 
   # Calculate scores for all levels
   supp_tables <- lapply(taxonomic_levels, function(tax_level) {
-    logger::log_trace("... {tax_level$level}")
+    # logger::log_trace("... {tax_level$level}")
 
     df2 |>
       score_per_level_bio(
@@ -340,7 +390,7 @@ weight_bio <- function(
       )
   })
 
-  logger::log_trace("Keeping best biological score")
+  # logger::log_trace("Keeping best biological score")
 
   annot_table_wei_bio_init <- purrr::reduce(
     .x = supp_tables,

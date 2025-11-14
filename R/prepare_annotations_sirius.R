@@ -117,7 +117,7 @@ prepare_annotations_sirius <-
     logger::log_debug("SIRIUS directory: {input_directory}")
 
     if (file.exists(input_directory)) {
-      logger::log_trace("Loading SIRIUS results...")
+      # logger::log_trace("Loading SIRIUS results...")
       sirius_version <- as.character(sirius_version)
       canopus_filename <- switch(
         sirius_version,
@@ -145,7 +145,7 @@ prepare_annotations_sirius <-
         "6" = "spectral_matches_all.tsv"
       )
 
-      logger::log_trace("Loading and formatting SIRIUS results...")
+      # logger::log_trace("Loading and formatting SIRIUS results...")
       canopus <- input_directory |>
         read_from_sirius_zip(file = canopus_filename)
       # not available in previous SIRIUS version
@@ -153,7 +153,7 @@ prepare_annotations_sirius <-
         canopus <- canopus |>
           tidytable::filter(formulaRank == 1L)
       }
-      logger::log_trace("... CANOPUS loaded")
+      # logger::log_trace("... CANOPUS loaded")
 
       formulas <- input_directory |>
         read_from_sirius_zip(file = formulas_filename)
@@ -162,11 +162,11 @@ prepare_annotations_sirius <-
         formulas <- formulas |>
           tidytable::filter(formulaRank == 1L)
       }
-      logger::log_trace("... formulas loaded")
+      # logger::log_trace("... formulas loaded")
 
       structures <- input_directory |>
         read_from_sirius_zip(file = structures_filename)
-      logger::log_trace("... structures loaded")
+      # logger::log_trace("... structures loaded")
 
       files <- input_directory |>
         utils::unzip(list = TRUE)
@@ -182,7 +182,7 @@ prepare_annotations_sirius <-
             read_from_sirius_zip(file = denovo_filename)
         }
       }
-      logger::log_trace("... de novo loaded")
+      # logger::log_trace("... de novo loaded")
 
       # TODO
       # if (!is.null(spectral_filename)) {
@@ -247,12 +247,12 @@ prepare_annotations_sirius <-
       canopus_prepared <- canopus |>
         select_sirius_columns_canopus(sirius_version = sirius_version)
       rm(canopus)
-      logger::log_trace("... CANOPUS prepared")
+      # logger::log_trace("... CANOPUS prepared")
 
       formulas_prepared <- formulas |>
         select_sirius_columns_formulas(sirius_version = sirius_version)
       rm(formulas)
-      logger::log_trace("... formulas prepared")
+      # logger::log_trace("... formulas prepared")
 
       structures_prepared <- structures_summary_ready |>
         select_sirius_columns_structures(sirius_version = sirius_version)
@@ -273,12 +273,12 @@ prepare_annotations_sirius <-
         tidytable::bind_rows(structures_prepared, structures_prepared_2) |>
         tidytable::distinct()
       rm(structures_prepared_2)
-      logger::log_trace("... structures prepared")
+      # logger::log_trace("... structures prepared")
 
       denovo_prepared <- denovo |>
         tidytable::mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
-      logger::log_trace("... denovo prepared")
+      # logger::log_trace("... denovo prepared")
 
       # TODO add spectral
       supp_tables <- list(formulas_prepared, canopus_prepared, denovo_prepared)
@@ -289,7 +289,7 @@ prepare_annotations_sirius <-
           tidytable::left_join(x, y)
         }
       )
-      logger::log_trace("Everything joined together")
+      # logger::log_trace("Everything joined together")
       table <- table |>
         tidytable::distinct() |>
         tidytable::mutate(
@@ -339,7 +339,7 @@ prepare_annotations_sirius <-
           -candidate_count_similarity_peaks_matched
         )
     }
-    logger::log_trace("Splitting SIRIUS results")
+    # logger::log_trace("Splitting SIRIUS results")
     model <- columns_model()
 
     table_can <- table |>

@@ -79,7 +79,7 @@ calculate_similarity <- function(
 
   # Early exit for empty spectra (before expensive type checks)
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
-    logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
+    # logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
     return(
       if (return_matched_peaks) {
         list(score = 0.0, matches = 0L)
@@ -179,7 +179,7 @@ calculate_similarity <- function(
 
   # Early exit if no matches
   if (length(matched_x) == 0L) {
-    logger::log_trace("No matching peaks found between spectra")
+    # logger::log_trace("No matching peaks found between spectra")
     return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 

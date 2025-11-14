@@ -34,7 +34,7 @@ get_spectra_ids <- function(spectra) {
   )
 
   if (!is.null(valid_field)) {
-    logger::log_trace("Found spectrum IDs in field: ", valid_field)
+    # logger::log_trace("Found spectrum IDs in field: ", valid_field)
     return(spectra@backend@spectraData[[valid_field]])
   } else {
     logger::log_warn(

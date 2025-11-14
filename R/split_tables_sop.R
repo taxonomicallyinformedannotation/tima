@@ -39,7 +39,7 @@ split_tables_sop <- function(table, cache) {
   logger::log_info(
     "Splitting concatenated SOP library into standardized components"
   )
-  logger::log_debug("Input table has ", nrow(table), " rows")
+  logger::log_debug("Input table has {nrow(table)} rows")
 
   table <- table |>
     tidytable::mutate(
@@ -63,7 +63,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  logger::log_trace("Sanitizing structures")
+  # logger::log_trace("Sanitizing structures")
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 

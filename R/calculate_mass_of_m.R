@@ -387,15 +387,15 @@ calculate_mz_from_mass <- function(
   charged_mass <- total_mass + (n_charges * charge_sign * electron_mass)
   mz <- (charged_mass / n_charges) - n_iso
 
-  logger::log_trace(
-    "Calculated m/z: ",
-    round(mz, 4),
-    " from mass ",
-    round(neutral_mass, 4),
-    " with adduct '",
-    adduct_string,
-    "'"
-  )
+  # logger::log_trace(
+  #  "Calculated m/z: ",
+  #  round(mz, 4),
+  #  " from mass ",
+  #  round(neutral_mass, 4),
+  #  " with adduct '",
+  #  adduct_string,
+  #  "'"
+  #)
 
   return(mz)
 }

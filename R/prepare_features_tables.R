@@ -100,7 +100,7 @@ prepare_features_tables <- function(
   )
 
   # Load features table with error handling
-  logger::log_trace("Loading features table")
+  # logger::log_trace("Loading features table")
   features_table_0 <- tryCatch(
     {
       tidytable::fread(
@@ -125,11 +125,11 @@ prepare_features_tables <- function(
   # Format Feature Table (detect format and standardize)
   # ============================================================================
 
-  logger::log_trace("Formatting feature table")
-  logger::log_trace(
-    "Detecting format: MZmine ('Peak area' or ':area'), ",
-    "SLAW ('quant_'), or SIRIUS ('Peak height')"
-  )
+  # logger::log_trace("Formatting feature table")
+  # logger::log_trace(
+  #  "Detecting format: MZmine ('Peak area' or ':area'), ",
+  #  "SLAW ('quant_'), or SIRIUS ('Peak height')"
+  #)
 
   features_table <- features_table_0 |>
     tidytable::select(
@@ -143,7 +143,7 @@ prepare_features_tables <- function(
   rm(features_table_0)
 
   # Standardize column names (batch replacements for efficiency)
-  logger::log_trace("Standardizing column names")
+  # logger::log_trace("Standardizing column names")
 
   # Define replacements (pattern -> replacement)
   replacements <- list(
@@ -170,9 +170,9 @@ prepare_features_tables <- function(
   # Filter to Top Intensity Samples
   # ============================================================================
 
-  logger::log_trace(
-    "Filtering to top {candidates} intensity samples per feature"
-  )
+  # logger::log_trace(
+  #  "Filtering to top {candidates} intensity samples per feature"
+  #)
 
   features_prepared <- features_table |>
     tidytable::pivot_longer(

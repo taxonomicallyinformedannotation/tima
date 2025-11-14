@@ -116,15 +116,15 @@ prepare_libraries_spectra <-
             unlist()
         )
       ) {
-        logger::log_trace("Importing")
+        # logger::log_trace("Importing")
         spectra <- purrr::map(.x = input, .f = import_spectra, combine = FALSE)
 
-        logger::log_trace("Extracting")
+        # logger::log_trace("Extracting")
         spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
         rm(spectra)
 
-        logger::log_trace("Harmonizing")
-        logger::log_trace("... pos")
+        # logger::log_trace("Harmonizing")
+        # logger::log_trace("... pos")
         spectra_harmonized_pos <- purrr::map(
           .x = spectra_extracted,
           .f = harmonize_spectra,
@@ -168,7 +168,7 @@ prepare_libraries_spectra <-
         spectra_pos <- spectra_harmonized_pos |>
           Spectra::Spectra()
 
-        logger::log_trace("... neg")
+        # logger::log_trace("... neg")
         spectra_harmonized_neg <- purrr::map(
           .x = spectra_extracted,
           .f = harmonize_spectra,
@@ -209,7 +209,7 @@ prepare_libraries_spectra <-
         spectra_neg <- spectra_harmonized_neg |>
           Spectra::Spectra()
 
-        logger::log_trace("Extracting structures for the SOP library.")
+        # logger::log_trace("Extracting structures for the SOP library.")
         sop <- tidytable::bind_rows(
           spectra_harmonized_pos,
           spectra_harmonized_neg
