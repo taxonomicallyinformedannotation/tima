@@ -20,7 +20,11 @@ clean_bio <- function(
   edges_table = get("edges_table", envir = parent.frame()),
   minimal_consistency = get("minimal_consistency", envir = parent.frame())
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate data frames
   if (
     !is.data.frame(annot_table_wei_bio) && !inherits(annot_table_wei_bio, "tbl")
   ) {
@@ -31,9 +35,27 @@ clean_bio <- function(
     stop("edges_table must be a data frame or tibble")
   }
 
-  if (minimal_consistency < 0 || minimal_consistency > 1) {
-    stop("minimal_consistency must be between 0 and 1")
+  # Validate consistency threshold
+  if (!is.numeric(minimal_consistency) ||
+      minimal_consistency < 0 ||
+      minimal_consistency > 1) {
+    stop("minimal_consistency must be between 0 and 1, got: ", minimal_consistency)
   }
+
+  # Early exit for empty inputs
+  if (nrow(annot_table_wei_bio) == 0L) {
+    logger::log_warn("Empty annotation table provided")
+    return(annot_table_wei_bio)
+  }
+
+  if (nrow(edges_table) == 0L) {
+    logger::log_warn("Empty edges table provided, cannot calculate consistency")
+    return(annot_table_wei_bio)
+  }
+
+  # ============================================================================
+  # Extract Distinct Structure-Taxonomy Pairs
+  # ============================================================================
 
   logger::log_trace("Extracting distinct structure-taxonomy pairs")
 
@@ -52,6 +74,10 @@ clean_bio <- function(
       score_weighted_bio,
       .keep_all = TRUE
     )
+
+  # ============================================================================
+  # Filter Edges for Consistency Calculation
+  # ============================================================================
 
   logger::log_trace(
     "Calculating chemical consistency for features with at least 2 neighbors"
@@ -73,10 +99,18 @@ clean_bio <- function(
     tidytable::select(-n)
 
   logger::log_debug(
-    "Found ",
-    nrow(edges_filtered),
-    " valid edges for consistency calculation"
+    "Found {nrow(edges_filtered)} valid edges for consistency calculation"
   )
+
+  # Early exit if no valid edges
+  if (nrow(edges_filtered) == 0L) {
+    logger::log_warn("No features with >=2 neighbors found, skipping consistency")
+    return(annot_table_wei_bio)
+  }
+
+  # ============================================================================
+  # Join Edges with Annotations
+  # ============================================================================
 
   # Join edges with annotations
   df3 <- tidytable::right_join(
@@ -98,6 +132,10 @@ clean_bio <- function(
     tidytable::filter(!is.na(feature_source))
 
   logger::log_trace("Calculating consistency scores across network edges")
+
+  # ============================================================================
+  # Calculate Consistency Scores
+  # ============================================================================
 
   # Function to calculate consistency per taxonomic level
   clean_per_level_bio <- function(

@@ -206,7 +206,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | Spectra | 1.20.0 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
-| testthat | 3.2.3 | Wickham (2011) |
+| testthat | 3.3.0 | Wickham (2011) |
 | tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
