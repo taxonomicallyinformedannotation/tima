@@ -49,135 +49,146 @@ decorate_chemo <- function(
     envir = parent.frame()
   )
 ) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
   required_cols <- c(
     "score_chemical",
     "candidate_structure_inchikey_connectivity_layer"
   )
   missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
+
   if (length(missing_cols) > 0) {
     logger::log_warn(
-      "decorate_chemo: missing expected columns: %s",
-      paste(missing_cols, collapse = ", ")
+      "decorate_chemo: missing expected columns: {paste(missing_cols, collapse = ', ')}"
     )
     return(annot_table_wei_chemo)
   }
 
-  # Classyfire hierarchy (cascading filters)
-  df_cla_kingdom <- annot_table_wei_chemo |>
-    tidytable::filter(score_chemical >= score_chemical_cla_kingdom) |>
-    tidytable::filter(
-      feature_pred_tax_cla_01kin_val != "notAnnotated" &
-        feature_pred_tax_cla_01kin_val != "notConsistent" &
-        feature_pred_tax_cla_01kin_val != "empty"
-    )
+  # ============================================================================
+  # Helper Function
+  # ============================================================================
 
-  df_cla_superclass <- df_cla_kingdom |>
-    tidytable::filter(score_chemical >= score_chemical_cla_superclass) |>
-    tidytable::filter(
-      feature_pred_tax_cla_02sup_val != "notAnnotated" &
-        feature_pred_tax_cla_02sup_val != "notConsistent" &
-        feature_pred_tax_cla_02sup_val != "empty"
-    )
+  # Filter for valid annotations at a specific level
+  filter_valid_level <- function(df, score_threshold, col_name) {
+    df |>
+      tidytable::filter(score_chemical >= score_threshold) |>
+      tidytable::filter(
+        !!as.name(col_name) != "notAnnotated" &
+          !!as.name(col_name) != "notConsistent" &
+          !!as.name(col_name) != "empty"
+      )
+  }
 
-  df_cla_class <- df_cla_superclass |>
-    tidytable::filter(score_chemical >= score_chemical_cla_class) |>
-    tidytable::filter(
-      feature_pred_tax_cla_03cla_val != "notAnnotated" &
-        feature_pred_tax_cla_03cla_val != "notConsistent" &
-        feature_pred_tax_cla_03cla_val != "empty"
+  # Count unique structures
+  count_unique_structures <- function(df) {
+    nrow(
+      df |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
     )
+  }
 
-  df_cla_parent <- df_cla_class |>
-    tidytable::filter(score_chemical >= score_chemical_cla_parent) |>
-    tidytable::filter(
-      feature_pred_tax_cla_04dirpar_val != "notAnnotated" &
-        feature_pred_tax_cla_04dirpar_val != "notConsistent" &
-        feature_pred_tax_cla_04dirpar_val != "empty"
-    )
+  # ============================================================================
+  # Classyfire Hierarchy (cascading filters)
+  # ============================================================================
 
-  # NPClassifier hierarchy (cascading filters, independent of Classyfire)
-  df_npc_pathway <- annot_table_wei_chemo |>
-    tidytable::filter(score_chemical >= score_chemical_npc_pathway) |>
-    tidytable::filter(
-      feature_pred_tax_npc_01pat_val != "notAnnotated" &
-        feature_pred_tax_npc_01pat_val != "notConsistent" &
-        feature_pred_tax_npc_01pat_val != "empty"
-    )
-
-  df_npc_superclass <- df_npc_pathway |>
-    tidytable::filter(score_chemical >= score_chemical_npc_superclass) |>
-    tidytable::filter(
-      feature_pred_tax_npc_02sup_val != "notAnnotated" &
-        feature_pred_tax_npc_02sup_val != "notConsistent" &
-        feature_pred_tax_npc_02sup_val != "empty"
-    )
-
-  df_npc_class <- df_npc_superclass |>
-    tidytable::filter(score_chemical >= score_chemical_npc_class) |>
-    tidytable::filter(
-      feature_pred_tax_npc_03cla_val != "notAnnotated" &
-        feature_pred_tax_npc_03cla_val != "notConsistent" &
-        feature_pred_tax_npc_03cla_val != "empty"
-    )
-
-  # Count unique structures at each level
-  n_cla_kingdom <- nrow(
-    df_cla_kingdom |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-  )
-  n_cla_superclass <- nrow(
-    df_cla_superclass |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-  )
-  n_cla_class <- nrow(
-    df_cla_class |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-  )
-  n_cla_parent <- nrow(
-    df_cla_parent |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  df_cla_kingdom <- filter_valid_level(
+    annot_table_wei_chemo,
+    score_chemical_cla_kingdom,
+    "feature_pred_tax_cla_01kin_val"
   )
 
-  n_npc_pathway <- nrow(
-    df_npc_pathway |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-  )
-  n_npc_superclass <- nrow(
-    df_npc_superclass |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
-  )
-  n_npc_class <- nrow(
-    df_npc_class |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+  df_cla_superclass <- filter_valid_level(
+    df_cla_kingdom,
+    score_chemical_cla_superclass,
+    "feature_pred_tax_cla_02sup_val"
   )
 
-  # Log summary statistics
+  df_cla_class <- filter_valid_level(
+    df_cla_superclass,
+    score_chemical_cla_class,
+    "feature_pred_tax_cla_03cla_val"
+  )
+
+  df_cla_parent <- filter_valid_level(
+    df_cla_class,
+    score_chemical_cla_parent,
+    "feature_pred_tax_cla_04dirpar_val"
+  )
+
+  # ============================================================================
+  # NPClassifier Hierarchy (cascading filters, independent of Classyfire)
+  # ============================================================================
+
+  df_npc_pathway <- filter_valid_level(
+    annot_table_wei_chemo,
+    score_chemical_npc_pathway,
+    "feature_pred_tax_npc_01pat_val"
+  )
+
+  df_npc_superclass <- filter_valid_level(
+    df_npc_pathway,
+    score_chemical_npc_superclass,
+    "feature_pred_tax_npc_02sup_val"
+  )
+
+  df_npc_class <- filter_valid_level(
+    df_npc_superclass,
+    score_chemical_npc_class,
+    "feature_pred_tax_npc_03cla_val"
+  )
+
+  # ============================================================================
+  # Count Unique Structures
+  # ============================================================================
+
+  # Classyfire counts
+  cla_dataframes <- list(
+    kingdom = df_cla_kingdom,
+    superclass = df_cla_superclass,
+    class = df_cla_class,
+    parent = df_cla_parent
+  )
+
+  cla_counts <- vapply(
+    cla_dataframes,
+    count_unique_structures,
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+  names(cla_counts) <- names(cla_dataframes)
+
+  # NPClassifier counts
+  npc_dataframes <- list(
+    pathway = df_npc_pathway,
+    superclass = df_npc_superclass,
+    class = df_npc_class
+  )
+
+  npc_counts <- vapply(
+    npc_dataframes,
+    count_unique_structures,
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+  names(npc_counts) <- names(npc_dataframes)
+
+  # ============================================================================
+  # Log Summary Statistics
+  # ============================================================================
+
   logger::log_info(
-    "Chemically informed scoring reranked:\n",
-    "  Classyfire hierarchy:\n",
-    "    Kingdom level:    ",
-    n_cla_kingdom,
-    " structures\n",
-    "    Superclass level: ",
-    n_cla_superclass,
-    " structures\n",
-    "    Class level:      ",
-    n_cla_class,
-    " structures\n",
-    "    Parent level:     ",
-    n_cla_parent,
-    " structures\n",
-    "  NPClassifier hierarchy:\n",
-    "    Pathway level:    ",
-    n_npc_pathway,
-    " structures\n",
-    "    Superclass level: ",
-    n_npc_superclass,
-    " structures\n",
-    "    Class level:      ",
-    n_npc_class,
-    " structures\n",
-    "  (Note: WITHOUT consistency score filtering - for later predictions)"
+    "Chemically informed metabolite annotation reranked:\n",
+    "  Classyfire:\n",
+    "    Kingdom level:    {cla_counts['kingdom']} structures\n",
+    "    Superclass level: {cla_counts['superclass']} structures\n",
+    "    Class level:      {cla_counts['class']} structures\n",
+    "    Parent level:     {cla_counts['parent']} structures\n",
+    "  NPClassifier:\n",
+    "    Pathway level:    {npc_counts['pathway']} structures\n",
+    "    Superclass level: {npc_counts['superclass']} structures\n",
+    "    Class level:      {npc_counts['class']} structures"
   )
 
   return(annot_table_wei_chemo)

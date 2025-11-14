@@ -249,4 +249,3 @@ test_that("prepare_libraries_sop_merged triggers SMILES processing", {
 
   unlink("data", recursive = TRUE)
 })
-

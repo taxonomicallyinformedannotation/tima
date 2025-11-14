@@ -101,4 +101,3 @@ test_that("prepare_features_components works", {
 
   unlink("data", recursive = TRUE)
 })
-

@@ -6,12 +6,14 @@ test_that("calculate_entropy_and_similarity works with small spectra", {
   x_small <- cbind(
     mz = c(10, 36, 63, 91, 93),
     intensity = c(14, 15, 999, 650, 1)
-  ) |> list()
+  ) |>
+    list()
 
   y_small <- cbind(
     mz = c(10, 12, 50, 63, 105),
     intensity = c(35, 5, 16, 999, 450)
-  ) |> list()
+  ) |>
+    list()
 
   pmz_x <- 91.0
   pmz_y <- 105.0
@@ -57,12 +59,14 @@ test_that("calculate_entropy_and_similarity works with large spectra", {
   x_large <- cbind(
     mz = sort(runif(n_query_large, 100, 1000)),
     intensity = runif(n_query_large, 1, 1000)
-  ) |> list()
+  ) |>
+    list()
 
   y_large <- cbind(
     mz = sort(runif(n_lib_large, 100, 1000)),
     intensity = runif(n_lib_large, 1, 1000)
-  ) |> list()
+  ) |>
+    list()
 
   pmz_x <- 91.0
   pmz_y <- 105.0
@@ -246,4 +250,3 @@ test_that("create_edges_spectra handles MS1 only data", {
 
   unlink("data", recursive = TRUE)
 })
-

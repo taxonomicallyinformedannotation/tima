@@ -176,4 +176,3 @@ test_that("weight_annotations works with MS1 only mode", {
 
   unlink("data", recursive = TRUE)
 })
-
