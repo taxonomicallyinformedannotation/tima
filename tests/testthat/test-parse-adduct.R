@@ -297,6 +297,6 @@ test_that("parse_adduct is fast enough for batch processing", {
   results <- lapply(adducts, parse_adduct)
   elapsed <- as.numeric(Sys.time() - start_time, units = "secs")
 
-  expect_true(elapsed < 1.0) # Should parse 1000 in under 1 second
+  expect_true(elapsed < 1.0)
   expect_equal(length(results), 1000)
 })
