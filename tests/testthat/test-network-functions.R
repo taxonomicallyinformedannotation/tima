@@ -82,11 +82,13 @@ test_that("create_edges handles empty spectra", {
 
 test_that("create_edges validates method parameter", {
   frags <- list(
-    matrix(c(100, 200, 150, 300),
+    matrix(
+      c(100, 200, 150, 300),
       nrow = 2,
       dimnames = list(NULL, c("mz", "int"))
     ),
-    matrix(c(100, 250, 150, 350),
+    matrix(
+      c(100, 250, 150, 350),
       nrow = 2,
       dimnames = list(NULL, c("mz", "int"))
     )
