@@ -14,8 +14,6 @@ Must have length equal to the number of observations.}
 }
 \value{
 A data frame containing distance information between pairs of
-
-A data frame containing distance information between pairs of
 observations with columns:
 \item{Item1}{Index of first observation}
 \item{Item2}{Index of second observation}
@@ -27,6 +25,7 @@ observations with columns:
 \description{
 This function calculates pairwise distances between observations
 and annotates them with group membership information. Optimized for
+large distance matrices.
 }
 \examples{
 NULL

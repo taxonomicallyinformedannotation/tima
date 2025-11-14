@@ -7,6 +7,9 @@ library(testthat)
 
 # test_that("create_components handles empty edges", {
 #   skip_on_cran()
+#
+#   # Use isolated test environment with automatic cleanup
+#   withr::local_tempdir()
 #   copy_backbone(cache_dir = ".")
 #   paths <- get_default_paths()
 #
@@ -21,14 +24,15 @@ library(testthat)
 #     file = paths$data$interim$features$edges
 #   )
 #
-#   # Should handle gracefully
+#   # Should handle gracefully without error
 #   expect_no_error(create_components())
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # test_that("create_components creates valid output structure", {
 #   skip_on_cran()
+#
+#   # Use isolated test environment with automatic cleanup
+#   withr::local_tempdir()
 #   copy_backbone(cache_dir = ".")
 #   paths <- get_default_paths()
 #
@@ -49,8 +53,6 @@ library(testthat)
 #   expect_s3_class(result, "data.frame")
 #   expect_true("component_id" %in% colnames(result) ||
 #     "feature_id" %in% colnames(result))
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # =============================================================================
@@ -78,28 +80,54 @@ test_that("create_edges handles empty spectra", {
   expect_true(nrow(result) >= 0) # May be empty if no matches
 })
 
-# test_that("create_edges validates method parameter", {
-#   frags <- list(
-#     matrix(c(100, 200, 150, 300),
-#       nrow = 2,
-#       dimnames = list(NULL, c("mz", "int"))
-#     )
-#   )
-#
-#   expect_error(
-#     create_edges(
-#       frags = frags,
-#       nspecs = 1L,
-#       precs = c(100),
-#       method = "invalid_method", # Invalid
-#       ms2_tolerance = 0.01,
-#       ppm_tolerance = 10,
-#       threshold = 0.5,
-#       matched_peaks = 6L
-#     ),
-#     "method"
-#   )
-# })
+test_that("create_edges validates method parameter", {
+  frags <- list(
+    matrix(c(100, 200, 150, 300),
+      nrow = 2,
+      dimnames = list(NULL, c("mz", "int"))
+    ),
+    matrix(c(100, 250, 150, 350),
+      nrow = 2,
+      dimnames = list(NULL, c("mz", "int"))
+    )
+  )
+
+  # Should error when method is invalid
+  expect_error(
+    create_edges(
+      frags = frags,
+      nspecs = 2L,
+      precs = c(100, 110),
+      method = "invalid_method_that_does_not_exist",
+      ms2_tolerance = 0.01,
+      ppm_tolerance = 10,
+      threshold = 0.5,
+      matched_peaks = 1L
+    )
+  )
+})
+
+test_that("create_edges handles single spectrum gracefully", {
+  # Single spectrum - should return empty result
+  frags <- list(
+    matrix(c(100, 200), nrow = 1, dimnames = list(NULL, c("mz", "int")))
+  )
+
+  result <- create_edges(
+    frags = frags,
+    nspecs = 1L,
+    precs = c(100),
+    method = "cosine",
+    ms2_tolerance = 0.01,
+    ppm_tolerance = 10,
+    threshold = 0.5,
+    matched_peaks = 1L
+  )
+
+  expect_s3_class(result, "data.frame")
+  # Should have NA values since no edges possible
+  expect_true(all(is.na(result[1, ])))
+})
 
 test_that("create_edges handles single peak spectra", {
   # Single peak spectrum
@@ -180,19 +208,12 @@ test_that("create_edges with different similarity methods", {
 # Tests for extract_spectra()
 # =============================================================================
 
-# test_that("extract_spectra validates input file", {
-#   expect_error(
-#     extract_spectra(input = "nonexistent_file.mgf"),
-#     NA # Should handle gracefully or return meaningful error
-#   )
-# })
-
 # test_that("extract_spectra handles MGF format", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
-#   paths <- get_default_paths()
 #
-#   # Create minimal MGF file
+#   # Create a temporary MGF file
+#   temp_mgf <- withr::local_tempfile(fileext = ".mgf")
+#
 #   mgf_content <- "BEGIN IONS
 # TITLE=Feature_1
 # PEPMASS=123.456
@@ -200,18 +221,49 @@ test_that("create_edges with different similarity methods", {
 # 100.0 1000
 # 200.0 2000
 # END IONS
+#
+# BEGIN IONS
+# TITLE=Feature_2
+# PEPMASS=234.567
+# CHARGE=1+
+# 150.0 1500
+# 250.0 2500
+# END IONS
 # "
 #
-#   temp_mgf <- tempfile(fileext = ".mgf")
 #   writeLines(mgf_content, temp_mgf)
 #
 #   result <- extract_spectra(input = temp_mgf)
 #
 #   expect_type(result, "list")
 #   expect_true(length(result) > 0)
+#   expect_true(all(c("spectra", "precursors") %in% names(result) |
+#     "Spectra" %in% class(result)))
+# })
+
+test_that("extract_spectra handles nonexistent file gracefully", {
+  # Should either error or return empty result
+  expect_error(
+    extract_spectra(input = "nonexistent_file_12345.mgf")
+  )
+})
+
+# test_that("extract_spectra handles empty MGF file", {
+#   skip_on_cran()
 #
-#   unlink(temp_mgf)
-#   unlink("data", recursive = TRUE)
+#   temp_mgf <- withr::local_tempfile(fileext = ".mgf")
+#   writeLines("", temp_mgf)
+#
+#   # Should handle gracefully - either return empty or error with message
+#   result <- tryCatch(
+#     extract_spectra(input = temp_mgf),
+#     error = function(e) NULL
+#   )
+#
+#   # Either result is NULL (errored) or is a valid but empty structure
+#   if (!is.null(result)) {
+#     expect_type(result, "list")
+#   }
 # })
 
 # =============================================================================
