@@ -27,14 +27,14 @@ library(tima)
 #   prepare_libraries_sop_closed()
 #   prepare_libraries_sop_merged()
 #
-#   # Invalid MS mode should error
+#   # Invalid MS mode should error - function checks for 'pos' or 'neg' only
 #   expect_error(
 #     annotate_masses(
 #       tolerance_ppm = 10,
 #       tolerance_rt = 0.02,
 #       ms_mode = "invalid"
 #     ),
-#     "polarity"
+#     "pos.*neg"
 #   )
 #
 #   expect_error(
@@ -43,7 +43,7 @@ library(tima)
 #       tolerance_rt = 0.02,
 #       ms_mode = "positive"
 #     ),
-#     "polarity"
+#     "pos.*neg"
 #   )
 #
 #   unlink("data", recursive = TRUE)
@@ -214,7 +214,7 @@ test_that("annotate_masses validates file existence", {
 #   unlink("data", recursive = TRUE)
 # })
 
-# test_that("annotate_masses warns about high tolerances", {
+# test_that("annotate_masses accepts high but valid tolerances", {
 #   skip_on_cran()
 #
 #   copy_backbone(cache_dir = ".")
@@ -232,14 +232,13 @@ test_that("annotate_masses validates file existence", {
 #   prepare_libraries_sop_closed()
 #   prepare_libraries_sop_merged()
 #
-#   # High tolerance may warn
-#   expect_warning(
+#   # High tolerance at upper limits (20 ppm, 0.05 min)
+#   expect_no_error(
 #     annotate_masses(
-#       tolerance_ppm = 25,
-#       tolerance_rt = 0.1,
+#       tolerance_ppm = 20,
+#       tolerance_rt = 0.05,
 #       ms_mode = "pos"
-#     ),
-#     NA # May or may not warn - implementation dependent
+#     )
 #   )
 #
 #   unlink("data", recursive = TRUE)

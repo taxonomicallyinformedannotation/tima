@@ -313,7 +313,7 @@ annotate_spectra <- function(
     safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
       logger::log_debug(
-        "Annotating {nrow(spectra@backend@spectraData)} spectra against {lib_name}"
+        "Annotating {nrow(spectra@backend@spectraData)} spectra against {nrow(spectral_library@backend@spectraData)} references"
       )
       df_final <-
         calculate_entropy_and_similarity(
