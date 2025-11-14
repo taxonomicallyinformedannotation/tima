@@ -14,6 +14,10 @@
 #'
 #' @examples NULL
 dist_get <- function(d, idx1, idx2) {
+  # ============================================================================
+  # Input Validation and Conversion
+  # ============================================================================
+
   # Convert input to distance object if needed
   if (!inherits(d, "dist")) {
     d <- stats::as.dist(d)
@@ -22,14 +26,20 @@ dist_get <- function(d, idx1, idx2) {
   # Get size of distance matrix
   n <- attr(d, "Size")
 
-  # Validate indices
-  if (any(idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n)) {
-    warning("Some indices are out of bounds, returning NA for those")
+  # Validate indices (vectorized check)
+  invalid_indices <- idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n
+  if (any(invalid_indices)) {
+    warning(
+      "Some indices are out of bounds (n=", n, "), returning NA for those"
+    )
   }
+
+  # ============================================================================
+  # Calculate Distance
+  # ============================================================================
 
   # Calculate linear index into lower triangle of distance matrix
   # Uses vectorized operations for efficiency
-
   i <- pmin(idx1, idx2)
   j <- pmax(idx1, idx2)
 
@@ -48,8 +58,7 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @description This function calculates pairwise distances between observations
 #'     and annotates them with group membership information. Optimized for
-#'
-#' @return A data frame containing distance information between pairs of
+#'     large distance matrices.
 #'
 #' @param d A distance object or matrix
 #' @param g A grouping vector for the observations in the distance object.
@@ -66,6 +75,10 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @examples NULL
 dist_groups <- function(d, g) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
   # Convert d to a dist object
   d <- stats::as.dist(d)
 
@@ -76,13 +89,14 @@ dist_groups <- function(d, g) {
   n_obs <- attr(d, "Size")
   if (length(g) != n_obs) {
     stop(
-      "Length of grouping vector (",
-      length(g),
-      ") does not match number of observations (",
-      n_obs,
-      ")"
+      "Length of grouping vector (", length(g),
+      ") does not match number of observations (", n_obs, ")"
     )
   }
+
+  # ============================================================================
+  # Generate Pairwise Combinations
+  # ============================================================================
 
   # Get all pairwise combinations of observation indices
   idx_pairs <- utils::combn(n_obs, 2L)
@@ -92,6 +106,10 @@ dist_groups <- function(d, g) {
   # Get group memberships for each pair
   group1 <- g[idx1]
   group2 <- g[idx2]
+
+  # ============================================================================
+  # Create Comparison Labels
+  # ============================================================================
 
   # Create descriptive labels for within/between group comparisons
   level1 <- levels(g)[pmin(as.numeric(group1), as.numeric(group2))]
@@ -103,7 +121,11 @@ dist_groups <- function(d, g) {
     paste("Between", level1, "and", level2)
   )
 
-  # Build result data frame
+  # ============================================================================
+  # Build Result Data Frame
+  # ============================================================================
+
+  # Build result data frame with all distance information
   data.frame(
     Item1 = idx1,
     Item2 = idx2,
