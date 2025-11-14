@@ -35,6 +35,10 @@ prepare_features_components <- function(
     step = "prepare_features_components"
   )$files$networks$spectral$components$prepared
 ) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
   # Validate inputs
   if (!is.character(input) || length(input) == 0L) {
     stop("input must be a non-empty character vector")
@@ -44,16 +48,18 @@ prepare_features_components <- function(
     stop("output must be a single character string")
   }
 
-  # Check file existence
+  # File existence check
   missing_files <- input[!file.exists(input)]
   if (length(missing_files) > 0L) {
     stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
   }
 
+  # ============================================================================
+  # Load Component Data
+  # ============================================================================
+
   logger::log_info(
-    "Preparing molecular network components from ",
-    length(input),
-    " file(s)"
+    "Preparing molecular network components from {length(input)} file(s)"
   )
 
   # Load and combine component tables
@@ -73,6 +79,11 @@ prepare_features_components <- function(
     }
   )
 
+  # ============================================================================
+  # Process Component Assignments
+  # ============================================================================
+
+  # Early exit for empty data
   if (nrow(table) == 0L) {
     logger::log_warn("No component data found in input files")
     table <- tidytable::tidytable(
@@ -91,11 +102,13 @@ prepare_features_components <- function(
       tidytable::distinct()
 
     logger::log_info(
-      "Prepared ",
-      nrow(table),
-      " unique feature-component assignments"
+      "Prepared {nrow(table)} unique feature-component assignments"
     )
   }
+
+  # ============================================================================
+  # Export Results
+  # ============================================================================
 
   # Export parameters and results
   export_params(

@@ -30,7 +30,9 @@ dist_get <- function(d, idx1, idx2) {
   invalid_indices <- idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n
   if (any(invalid_indices)) {
     warning(
-      "Some indices are out of bounds (n=", n, "), returning NA for those"
+      "Some indices are out of bounds (n=",
+      n,
+      "), returning NA for those"
     )
   }
 
@@ -89,8 +91,11 @@ dist_groups <- function(d, g) {
   n_obs <- attr(d, "Size")
   if (length(g) != n_obs) {
     stop(
-      "Length of grouping vector (", length(g),
-      ") does not match number of observations (", n_obs, ")"
+      "Length of grouping vector (",
+      length(g),
+      ") does not match number of observations (",
+      n_obs,
+      ")"
     )
   }
 
