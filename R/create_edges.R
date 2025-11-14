@@ -29,7 +29,11 @@ create_edges <- function(
   threshold,
   matched_peaks
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Early exit for insufficient spectra
   if (nspecs < 2L) {
     logger::log_warn("Less than 2 spectra provided, no edges to create")
     return(tidytable::tidytable(
@@ -40,18 +44,29 @@ create_edges <- function(
     ))
   }
 
+  # Validate input consistency
   if (length(frags) != nspecs || length(precs) != nspecs) {
-    stop("Length mismatch: frags, precs, and nspecs must be consistent")
+    stop(
+      "Length mismatch: frags (",
+      length(frags),
+      "), ",
+      "precs (",
+      length(precs),
+      "), nspecs (",
+      nspecs,
+      ") must be consistent"
+    )
   }
+
+  # ============================================================================
+  # Calculate Pairwise Similarities
+  # ============================================================================
 
   # Create all pairwise comparisons
   indices <- seq_len(nspecs - 1L)
+  n_comparisons <- sum(indices)
 
-  logger::log_debug(
-    "Calculating ",
-    sum(seq_len(nspecs - 1L)),
-    " pairwise similarities"
-  )
+  logger::log_debug("Calculating {n_comparisons} pairwise similarities")
 
   # Disable progress bar in subprocess environments to prevent crashes
   show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
@@ -83,7 +98,7 @@ create_edges <- function(
         }
       )
 
-      # Extract scores and matches efficiently
+      # Extract scores and matches
       # Handle both list format (score/matches) and numeric format (entropy)
       scores <- vapply(
         results,
@@ -96,7 +111,8 @@ create_edges <- function(
             0.0
           }
         },
-        numeric(1L)
+        numeric(1L),
+        USE.NAMES = FALSE
       )
 
       matches <- vapply(
@@ -108,7 +124,8 @@ create_edges <- function(
             0L # No match count for entropy method
           }
         },
-        integer(1L)
+        integer(1L),
+        USE.NAMES = FALSE
       )
 
       # Filter by thresholds
@@ -127,8 +144,12 @@ create_edges <- function(
     }
   )
 
+  # ============================================================================
+  # Combine and Return Results
+  # ============================================================================
+
   # Remove NULL entries and combine
-  edges <- edges[!vapply(edges, is.null, logical(1L))]
+  edges <- edges[!vapply(edges, is.null, logical(1L), USE.NAMES = FALSE)]
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)

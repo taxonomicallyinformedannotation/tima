@@ -26,7 +26,7 @@ dist_get <- function(d, idx1, idx2) {
   # Get size of distance matrix
   n <- attr(d, "Size")
 
-  # Validate indices (vectorized check)
+  # Validate indices
   invalid_indices <- idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n
   if (any(invalid_indices)) {
     warning(
@@ -41,7 +41,6 @@ dist_get <- function(d, idx1, idx2) {
   # ============================================================================
 
   # Calculate linear index into lower triangle of distance matrix
-  # Uses vectorized operations for efficiency
   i <- pmin(idx1, idx2)
   j <- pmax(idx1, idx2)
 

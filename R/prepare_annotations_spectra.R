@@ -107,7 +107,7 @@ prepare_annotations_spectra <- function(
     )
   }
 
-  # Check all files exist (vectorized)
+  # Check all files exist
   str_files_vec <- unlist(str_files)
   missing_str_files <- str_files_vec[!file.exists(str_files_vec)]
   if (length(missing_str_files) > 0L) {

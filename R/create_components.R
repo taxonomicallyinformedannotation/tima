@@ -38,8 +38,12 @@ create_components <- function(
     step = "create_components"
   )$files$networks$spectral$components$raw
 ) {
-  # Validate input files exist
-  input_exists <- vapply(input, file.exists, logical(1L))
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # File existence check
+  input_exists <- vapply(input, file.exists, logical(1L), USE.NAMES = FALSE)
 
   if (!all(input_exists)) {
     missing_files <- input[!input_exists]
@@ -48,6 +52,10 @@ create_components <- function(
       paste(missing_files, collapse = ", ")
     )
   }
+
+  # ============================================================================
+  # Load Edge Data
+  # ============================================================================
 
   logger::log_info("Creating components from {length(input)} edge file(s)")
 
@@ -64,6 +72,7 @@ create_components <- function(
     tidytable::filter(!is.na(feature_source)) |>
     tidytable::distinct()
 
+  # Calculate statistics
   n_edges <- nrow(edges)
   n_unique_features <- length(unique(c(
     edges$feature_source,
@@ -71,12 +80,23 @@ create_components <- function(
   )))
 
   logger::log_info(
-    "Loaded ",
-    n_edges,
-    " edges connecting ",
-    n_unique_features,
-    " unique features"
+    "Loaded {n_edges} edges connecting {n_unique_features} unique features"
   )
+
+  # Early exit for empty edges
+  if (n_edges == 0L) {
+    logger::log_warn("No edges found, creating empty components file")
+    components_table <- tidytable::tidytable(
+      `cluster index` = character(0),
+      componentindex = character(0)
+    )
+    export_output(x = components_table, file = output)
+    return(output)
+  }
+
+  # ============================================================================
+  # Build Graph and Find Components
+  # ============================================================================
 
   # Create undirected graph from edges
   logger::log_trace("Building graph structure")
@@ -91,6 +111,10 @@ create_components <- function(
   features_by_component <- split(feature_names, component_membership)
 
   logger::log_info("Found {length(features_by_component)} components")
+
+  # ============================================================================
+  # Format Component Assignments
+  # ============================================================================
 
   # Convert to tidy format
   logger::log_trace("Formatting component assignments")
@@ -110,14 +134,17 @@ create_components <- function(
     # )) |>
     tidytable::arrange(`cluster index`)
 
+  # Calculate component size statistics
+  component_sizes <- table(components_table$componentindex)
   logger::log_info(
-    "Component sizes - Min: ",
-    min(table(components_table$componentindex)),
-    ", Max: ",
-    max(table(components_table$componentindex)),
-    ", Mean: ",
-    round(mean(table(components_table$componentindex)), 1)
+    "Component sizes - Min: {min(component_sizes)}, ",
+    "Max: {max(component_sizes)}, ",
+    "Mean: {round(mean(component_sizes), 1)}"
   )
+
+  # ============================================================================
+  # Export Results
+  # ============================================================================
 
   # Export parameters and results
   export_params(
@@ -127,7 +154,7 @@ create_components <- function(
 
   export_output(x = components_table, file = output)
 
-  logger::log_info("Components written to: ", output)
+  logger::log_info("Components written to: {output}")
 
   return(output)
 }
