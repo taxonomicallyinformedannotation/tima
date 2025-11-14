@@ -291,10 +291,10 @@ test_that("round-trip works for matrix of masses and adducts", {
 
 # Test: Logging ----
 
-# test_that("calculate_mz_from_mass logs appropriately", {
-#   # Should complete without error
-#   expect_silent(calculate_mz_from_mass(100, "[M+H]+"))
-# })
+test_that("calculate_mz_from_mass completes without error", {
+  # Should complete successfully for valid input
+  expect_silent(calculate_mz_from_mass(100, "[M+H]+"))
+})
 
 # Test: Performance ----
 
