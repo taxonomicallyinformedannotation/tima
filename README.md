@@ -15,7 +15,7 @@ status](https://www.r-pkg.org/badges/version/tima.png)](https://CRAN.R-project.o
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
 [![r-universe
 badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic.png)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
-[![Docker](https://img.shields.io/badge/adafede/tima--r?logo=docker)](https://hub.docker.com/r/adafede/tima-r/)
+[![Docker](https://img.shields.io/badge/adafede/tima--r?logo=docker.png)](https://hub.docker.com/r/adafede/tima-r/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 
 <!-- badges: end -->
@@ -176,7 +176,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 |:---|:---|:---|
 | archive | 1.1.12 | Hester and Csárdi (2025) |
 | base | 4.5.2 | R Core Team (2025) |
-| BiocManager | 1.30.26 | Morgan and Ramos (2025) |
+| BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
@@ -193,6 +193,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
+| R.utils | 2.13.0 | (**Rutils?**) |
 | reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); (**rmarkdown2025?**) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
@@ -213,6 +214,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
 | visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2022) |
+| withr | 3.0.2 | (**withr?**) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
