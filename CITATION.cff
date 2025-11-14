@@ -850,7 +850,7 @@ references:
     orcid: https://orcid.org/0000-0002-3242-0582
   year: '2025'
   doi: 10.32614/CRAN.package.BiocManager
-  version: '>= 1.30.25'
+  version: '>= 1.30.26'
 - type: software
   title: BiocVersion
   abstract: 'BiocVersion: Set the appropriate version of Bioconductor packages'
