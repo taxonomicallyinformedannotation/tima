@@ -34,16 +34,15 @@ vignette: >
 
 ```{r tima, include = FALSE}
 library("tima")
+if (dir.exists("../../inst")) {
+  knitr::opts_knit$set(root.dir = "../../inst")
+}
 ```
 
 This vignette describes...
 
 * All parameters you need
 * All inputs you need
-
-```{r change-tests, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-source(file = "scripts/change_tests.R")
-```
 
 ## Parameters
 
@@ -69,16 +68,8 @@ All parameters will be saved and reported at the end of your analysis.
 You should provide your own files in the main menu.
 For this tutorial, we will use some example files you can get running:
 
-```{r unlink-spectra, include = FALSE}
-unlink("data/source/example_spectra.mgf")
-```
-
 ```{r get-files, eval=FALSE, include=TRUE}
 tima::get_example_files()
-```
-
-```{r get-files-no-cache, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-tima::get_example_files(in_cache = FALSE)
 ```
 
 ### Libraries
@@ -96,7 +87,7 @@ We currently support spectral libraries in MSP or MGF format.
 
 To get a small example:
 
-```{r spectra-rt, results="hide", message=FALSE, warning=FALSE}
+```{r spectra-rt, eval=FALSE, include=TRUE}
 tima::get_example_files("spectral_lib_with_rt")
 ```
 
@@ -106,7 +97,7 @@ GNPS, MassBank & MERLIN are downloaded and used by default, for more info about 
 
 In case you want to format your own spectral library to use it for spectral matching, adapt it the same way.
 
-```{r spectra-mb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r spectra-mb, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_spe_exp")
 )
@@ -122,13 +113,13 @@ We generated an *in silico* spectral library of the structures found in Wikidata
 For more info, see <https://doi.org/10.5281/zenodo.5607185>.
 It is made available in both polarities.
 
-```{r get-isdb-wikidata, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r get-isdb-wikidata, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_spe_is_wik")
 )
 ```
 
-```{r prepare-isdb-wikidata-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r prepare-isdb-wikidata-1,  eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_spe_is_wik_pre")
 )
@@ -161,13 +152,13 @@ As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
 **A**nnotation in mind,
 we provide it here as a starting point for your structure-organism pairs library.
 
-```{r get-lotus, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r get-lotus, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_sop_lot$")
 )
 ```
 
-```{r prepare-lotus-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r prepare-lotus-2, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_sop_lot_pre")
 )
@@ -195,7 +186,7 @@ If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
 By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
 
-```{r prepare-ecmdb-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r prepare-ecmdb-1, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_sop_ecm_pre")
 )
@@ -205,7 +196,7 @@ targets::tar_make(
 
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
-```{r prepare-hmdb, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r prepare-hmdb, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_sop_hmd_pre")
 )
@@ -225,7 +216,7 @@ Before running the corresponding code, do not forget to modify `params/user/prep
 
 Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
 
-```{r libraries-sop-1, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r libraries-sop-1, eval=FALSE, include=TRUE}
 targets::tar_make(
   names = tidyselect::matches("lib_sop_mer")
 )
