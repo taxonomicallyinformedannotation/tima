@@ -55,27 +55,51 @@ create_edges_spectra <- function(
   )$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
 ) {
-  # Validate file paths
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate numeric parameters first (cheap checks)
+  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
+    stop("threshold must be between 0 and 1, got: ", threshold)
+  }
+
+  if (!is.numeric(matched_peaks) || matched_peaks < 1) {
+    stop("matched_peaks must be a positive integer, got: ", matched_peaks)
+  }
+
+  if (!is.numeric(ppm) || ppm <= 0) {
+    stop("ppm must be a positive number, got: ", ppm)
+  }
+
+  if (!is.numeric(dalton) || dalton <= 0) {
+    stop("dalton must be a positive number, got: ", dalton)
+  }
+
+  if (!is.numeric(qutoff) || qutoff < 0) {
+    stop("qutoff must be a non-negative number, got: ", qutoff)
+  }
+
+  # Validate output path
+  if (!is.character(output) || length(output) != 1L) {
+    stop("output must be a single character string")
+  }
+
+  # Validate input file paths
   if (is.list(input)) {
-    # Check all files in list exist
-    missing_files <- lapply(input, function(f) {
-      if (!is.character(f) || length(f) != 1L) {
-        stop("Each input element must be a single character string")
-      }
-      if (!file.exists(f)) {
-        return(f)
-      }
-      return(NULL)
-    })
-    missing_files <- Filter(Negate(is.null), missing_files)
+    input_vec <- unlist(input)
+    if (!is.character(input_vec)) {
+      stop("All input elements must be character strings")
+    }
+
+    missing_files <- input_vec[!file.exists(input_vec)]
     if (length(missing_files) > 0L) {
       stop(
         "Input file(s) not found: ",
-        paste(unlist(missing_files), collapse = ", ")
+        paste(missing_files, collapse = ", ")
       )
     }
   } else {
-    # Single file path
     if (!is.character(input) || length(input) != 1L) {
       stop(
         "input must be a single character string or a list of character strings"
@@ -86,134 +110,26 @@ create_edges_spectra <- function(
     }
   }
 
-  if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
-  }
-
-  # Validate numeric parameters
-  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
-    stop("threshold must be between 0 and 1, got: ", threshold)
-  }
-
-  if (!is.numeric(matched_peaks) || matched_peaks < 1) {
-    stop("matched_peaks must be a positive integer")
-  }
-
-  if (!is.numeric(ppm) || ppm <= 0) {
-    stop("ppm must be a positive number")
-  }
-
-  if (!is.numeric(dalton) || dalton <= 0) {
-    stop("dalton must be a positive number")
-  }
-
-  if (!is.numeric(qutoff) || qutoff < 0) {
-    stop("qutoff must be a non-negative number")
-  }
+  # ============================================================================
+  # Import and Process Spectra
+  # ============================================================================
 
   logger::log_info("Creating spectral similarity network edges")
-  logger::log_debug("Parameters - Threshold: ", threshold, ", Method: ", method)
-  logger::log_debug("Tolerances - PPM: ", ppm, ", Dalton: ", dalton)
+  logger::log_debug("Parameters - Threshold: {threshold}, Method: {method}")
+  logger::log_debug("Tolerances - PPM: {ppm}, Dalton: {dalton}")
 
+  # Import spectra with specified parameters
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,
       dalton = dalton,
       ppm = ppm
     )
-  if (length(spectra) > 1) {
-    logger::log_trace("Performing spectral comparison")
-    logger::log_trace(
-      "As we do not limit the precursors delta,
-      expect a (relatively) long processing time."
-    )
-    logger::log_with_separator("Take yourself a break, you deserve it.")
-    nspecz <- length(spectra)
-    fragz <- spectra@backend@peaksData
-    precz <- spectra@backend@spectraData$precursorMz
 
-    edges <- create_edges(
-      frags = fragz,
-      nspecs = nspecz,
-      precs = precz,
-      method = method,
-      ms2_tolerance = dalton,
-      ppm_tolerance = ppm,
-      threshold = threshold,
-      matched_peaks = matched_peaks
-    )
-
-    logger::log_trace("Calculating features' entropy")
-    entropy <- vapply(
-      fragz,
-      msentropy::calculate_spectral_entropy,
-      FUN.VALUE = numeric(1)
-    )
-    logger::log_trace("Counting features' number of peaks")
-    npeaks <- vapply(
-      fragz,
-      function(peak_matrix) nrow(peak_matrix),
-      FUN.VALUE = numeric(1)
-    )
-    rm(nspecz, fragz)
-
-    edges <- edges |>
-      tidytable::select(
-        !!as.name(name_source) := "feature_id",
-        !!as.name(name_target) := "target_id",
-        tidyselect::everything()
-      )
-
-    idz <- spectra |>
-      get_spectra_ids()
-    rm(spectra)
-    edges <- edges |>
-      tidytable::mutate(
-        name_source = idz[name_source],
-        name_target = idz[name_target]
-      )
-    entropy_df <- tidytable::tidytable(entropy) |>
-      tidytable::mutate(!!as.name(name_source) := tidytable::row_number()) |>
-      tidytable::mutate(
-        name_source = idz[name_source],
-        feature_spectrum_entropy = as.character(entropy),
-        feature_spectrum_peaks = as.character(npeaks)
-      ) |>
-      tidytable::mutate(
-        !!as.name(name_source) := as.integer(!!as.name(name_source))
-      ) |>
-      tidytable::distinct(
-        !!as.name(name_source),
-        feature_spectrum_entropy,
-        feature_spectrum_peaks
-      )
-    rm(entropy, npeaks, idz)
-
-    edges <- edges |>
-      tidytable::select(tidyselect::any_of(
-        c(
-          name_source,
-          name_target,
-          "candidate_score_similarity" = "score",
-          "candidate_count_similarity_peaks_matched" = "matched_peaks"
-        )
-      ))
-
-    edges <- edges |>
-      tidytable::filter(candidate_score_similarity >= threshold)
-
-    edges <- edges |>
-      tidytable::full_join(entropy_df) |>
-      tidytable::mutate(
-        !!as.name(name_target) := tidytable::coalesce(
-          !!as.name(name_target),
-          !!as.name(name_source)
-        )
-      )
-    rm(entropy_df)
-  } else {
+  # Early exit if only one or no spectra
+  if (length(spectra) <= 1L) {
     logger::log_warn(
-      "No spectra were found, returning an empty dataframe instead"
+      "Only {length(spectra)} spectrum found - need at least 2 for network edges"
     )
     edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
@@ -223,7 +139,109 @@ create_edges_spectra <- function(
       "candidate_score_similarity" = NA,
       "candidate_count_similarity_peaks_matched" = NA
     )
+    export_output(x = empty_edges, file = output)
+    return(output)
   }
+
+  # ============================================================================
+  # Compute Spectral Similarities
+  # ============================================================================
+
+  logger::log_trace(
+    "Performing spectral comparison on {length(spectra)} spectra"
+  )
+  logger::log_trace(
+    "As the precursors delta is not limited, expect a long processing time."
+  )
+  logger::log_with_separator("Take yourself a break, you deserve it.")
+
+  # Extract data (cache for reuse)
+  nspecz <- length(spectra)
+  fragz <- spectra@backend@peaksData
+  precz <- spectra@backend@spectraData$precursorMz
+
+  # Create edges
+  edges <- create_edges(
+    frags = fragz,
+    nspecs = nspecz,
+    precs = precz,
+    method = method,
+    ms2_tolerance = dalton,
+    ppm_tolerance = ppm,
+    threshold = threshold,
+    matched_peaks = matched_peaks
+  )
+
+  # Calculate spectral entropy
+  logger::log_trace("Calculating features' entropy")
+  entropy <- vapply(
+    fragz,
+    msentropy::calculate_spectral_entropy,
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  )
+  logger::log_trace("Counting features' number of peaks")
+  npeaks <- vapply(
+    X = fragz,
+    FUN = nrow,
+    FUN.VALUE = numeric(1)
+  )
+  rm(nspecz, fragz)
+
+  edges <- edges |>
+    tidytable::select(
+      !!as.name(name_source) := "feature_id",
+      !!as.name(name_target) := "target_id",
+      tidyselect::everything()
+    )
+
+  idz <- spectra |>
+    get_spectra_ids()
+  rm(spectra)
+  edges <- edges |>
+    tidytable::mutate(
+      name_source = idz[name_source],
+      name_target = idz[name_target]
+    )
+  entropy_df <- tidytable::tidytable(entropy) |>
+    tidytable::mutate(!!as.name(name_source) := tidytable::row_number()) |>
+    tidytable::mutate(
+      name_source = idz[name_source],
+      feature_spectrum_entropy = as.character(entropy),
+      feature_spectrum_peaks = as.character(npeaks)
+    ) |>
+    tidytable::mutate(
+      !!as.name(name_source) := as.integer(!!as.name(name_source))
+    ) |>
+    tidytable::distinct(
+      !!as.name(name_source),
+      feature_spectrum_entropy,
+      feature_spectrum_peaks
+    )
+  rm(entropy, npeaks, idz)
+
+  edges <- edges |>
+    tidytable::select(tidyselect::any_of(
+      c(
+        name_source,
+        name_target,
+        "candidate_score_similarity" = "score",
+        "candidate_count_similarity_peaks_matched" = "matched_peaks"
+      )
+    ))
+
+  edges <- edges |>
+    tidytable::filter(candidate_score_similarity >= threshold)
+
+  edges <- edges |>
+    tidytable::full_join(entropy_df) |>
+    tidytable::mutate(
+      !!as.name(name_target) := tidytable::coalesce(
+        !!as.name(name_target),
+        !!as.name(name_source)
+      )
+    )
+  rm(entropy_df)
 
   export_params(
     parameters = get_params(step = "create_edges_spectra"),

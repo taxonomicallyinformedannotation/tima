@@ -51,17 +51,21 @@ harmonize_spectra <- function(
   col_sy = get("col_sy", envir = parent.frame()),
   col_xl = get("col_xl", envir = parent.frame())
 ) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate mode first (cheapest check)
+  if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
+    stop("Mode must contain 'pos' or 'neg', got: ", mode)
+  }
+
   # Validate spectra is a data frame
   if (!is.data.frame(spectra)) {
     stop("Input 'spectra' must be a data frame")
   }
 
-  # Validate mode contains pos or neg
-  if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
-    stop("Mode must contain 'pos' or 'neg', got: ", mode)
-  }
-
-  # Validate all column name parameters are character strings or NULL
+  # Validate all column name parameters
   col_params <- list(
     col_ad = col_ad,
     col_ce = col_ce,
@@ -82,17 +86,26 @@ harmonize_spectra <- function(
     col_xl = col_xl
   )
 
-  for (param_name in names(col_params)) {
-    param_value <- col_params[[param_name]]
-    if (
-      !is.null(param_value) &&
-        (!is.character(param_value) || length(param_value) != 1L)
-    ) {
-      stop(param_name, " must be a single character string or NULL")
-    }
+  # Check all parameters are single character strings or NULL
+  is_valid <- sapply(col_params, function(param) {
+    is.null(param) || (is.character(param) && length(param) == 1L)
+  })
+
+  if (!all(is_valid)) {
+    invalid_params <- names(col_params)[!is_valid]
+    stop(
+      "Column name parameter(s) must be single character strings or NULL: ",
+      paste(invalid_params, collapse = ", ")
+    )
   }
 
+  # ============================================================================
+  # Harmonize Column Names
+  # ============================================================================
+
   logger::log_trace("Harmonizing spectra headers for mode: {mode}")
+
+  # Define standard column names
   columns <- c(
     "adduct",
     "collision_energy",
@@ -111,30 +124,35 @@ harmonize_spectra <- function(
     "synonyms",
     "xlogp"
   )
-  columns_full <-
-    c(
-      "adduct" = col_ad,
-      "collision_energy" = col_ce,
-      "compound_id" = col_ci,
-      "exactmass" = col_em,
-      "formula" = col_mf,
-      "inchi" = col_in,
-      "inchi_no_stereo" = col_io,
-      "inchikey" = col_ik,
-      "inchikey_connectivity_layer" = col_il,
-      "name" = col_na,
-      "smiles" = col_sm,
-      "smiles_no_stereo" = col_sn,
-      "spectrum_id" = col_si,
-      "splash" = col_sp,
-      "synonyms" = col_sy,
-      "xlogp" = col_xl
-    )
-  columns_full <- columns_full[!is.na((columns_full))]
-  columns_missing <-
-    columns[!columns %in% names(columns_full)]
+
+  # Map provided column names to standard names
+  columns_full <- c(
+    "adduct" = col_ad,
+    "collision_energy" = col_ce,
+    "compound_id" = col_ci,
+    "exactmass" = col_em,
+    "formula" = col_mf,
+    "inchi" = col_in,
+    "inchi_no_stereo" = col_io,
+    "inchikey" = col_ik,
+    "inchikey_connectivity_layer" = col_il,
+    "name" = col_na,
+    "smiles" = col_sm,
+    "smiles_no_stereo" = col_sn,
+    "spectrum_id" = col_si,
+    "splash" = col_sp,
+    "synonyms" = col_sy,
+    "xlogp" = col_xl
+  )
+
+  # Remove NA mappings (columns not provided)
+  columns_full <- columns_full[!is.na(columns_full)]
+
+  # Identify missing columns that need to be added
+  columns_missing <- columns[!columns %in% names(columns_full)]
   names(columns_missing) <- columns_missing
 
+  # Create data frame for missing columns
   spectra_missing <- columns_missing |>
     data.frame() |>
     tidytable::as_tidytable() |>
@@ -142,6 +160,7 @@ harmonize_spectra <- function(
     tidytable::pivot_wider(names_from = columns_missing) |>
     tidytable::mutate(join = "x")
 
+  # Ensure precursorCharge column exists
   if (!"precursorCharge" %in% names(spectra)) {
     spectra$precursorCharge <- NA_integer_
   }
