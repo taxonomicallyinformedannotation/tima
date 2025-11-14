@@ -47,7 +47,7 @@
       "@type": "SoftwareApplication",
       "identifier": "altdoc",
       "name": "altdoc",
-      "version": ">= 0.5.0",
+      "version": ">= 0.7.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -86,7 +86,7 @@
       "@type": "SoftwareApplication",
       "identifier": "grateful",
       "name": "grateful",
-      "version": ">= 0.2.12",
+      "version": ">= 0.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -125,7 +125,7 @@
       "@type": "SoftwareApplication",
       "identifier": "pkgload",
       "name": "pkgload",
-      "version": ">= 1.4.0",
+      "version": ">= 1.4.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -138,7 +138,7 @@
       "@type": "SoftwareApplication",
       "identifier": "quarto",
       "name": "quarto",
-      "version": ">= 1.4.4",
+      "version": ">= 1.5.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -229,7 +229,7 @@
       "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
-      "version": ">= 2.3.1",
+      "version": ">= 2.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -242,7 +242,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.2.3",
+      "version": ">= 3.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -315,7 +315,7 @@
       "@type": "SoftwareApplication",
       "identifier": "DT",
       "name": "DT",
-      "version": ">= 0.33",
+      "version": ">= 0.34",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -341,7 +341,7 @@
       "@type": "SoftwareApplication",
       "identifier": "gt",
       "name": "gt",
-      "version": ">= 1.0.0",
+      "version": ">= 1.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -419,7 +419,7 @@
       "@type": "SoftwareApplication",
       "identifier": "logger",
       "name": "logger",
-      "version": ">= 0.4.0",
+      "version": ">= 0.4.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -502,7 +502,7 @@
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
-      "version": ">= 1.1.0",
+      "version": ">= 1.2.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -515,7 +515,7 @@
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
-      "version": ">= 1.43.0",
+      "version": ">= 1.44.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -611,7 +611,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.11.3",
+      "version": ">= 1.11.4",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -668,7 +668,7 @@
       "@type": "SoftwareApplication",
       "identifier": "visNetwork",
       "name": "visNetwork",
-      "version": ">= 2.1.2",
+      "version": ">= 2.1.4",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -693,7 +693,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "434229.365KB",
+  "fileSize": "2984.856KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

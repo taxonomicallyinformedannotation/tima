@@ -18,11 +18,16 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate dataframe
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
     stop("Input 'df' must be a data frame or tibble")
   }
 
+  # Early exit if column doesn't exist
   if (!adducts_colname %in% names(df)) {
     logger::log_debug(
       "Adduct column '{adducts_colname}' not found in dataframe, skipping harmonization"
@@ -30,17 +35,38 @@ harmonize_adducts <- function(
     return(df)
   }
 
-  if (length(adducts_translations) == 0L) {
+  # Early exit if no translations provided
+  if (missing(adducts_translations) || length(adducts_translations) == 0L) {
+    logger::log_trace("No adduct translations provided, skipping harmonization")
     return(df)
   }
 
-  # Perform vectorized string replacement
+  # Validate translations are named character vector
+  if (!is.character(adducts_translations) || is.null(names(adducts_translations))) {
+    stop("adducts_translations must be a named character vector")
+  }
+
+  # ============================================================================
+  # Harmonize Adducts
+  # ============================================================================
+
+  # Perform vectorized string replacement (efficient for large datasets)
+  n_before <- length(unique(df[[adducts_colname]]))
+
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
     str = df[[adducts_colname]],
     pattern = names(adducts_translations),
     replacement = adducts_translations,
     vectorize_all = FALSE
   )
+
+  n_after <- length(unique(df[[adducts_colname]]))
+
+  if (n_before != n_after) {
+    logger::log_trace(
+      "Harmonized adducts: {n_before} unique forms -> {n_after} unique forms"
+    )
+  }
 
   df
 }
