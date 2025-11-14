@@ -95,7 +95,7 @@ decorate_bio <- function(
   # Calculate Counts for Each Taxonomic Level
   # ============================================================================
 
-  # Create vectorized score list for efficient processing
+  # Create score list for efficient processing
   levels <- list(
     kingdom = score_biological_kingdom,
     phylum = score_biological_phylum,
@@ -108,7 +108,7 @@ decorate_bio <- function(
     variety = score_biological_variety
   )
 
-  # Calculate all counts (vectorized approach)
+  # Calculate all counts
   counts <- vapply(
     levels,
     function(score) count_structures_at_level(annot_table_wei_bio, score),
