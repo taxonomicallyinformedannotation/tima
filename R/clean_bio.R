@@ -107,11 +107,48 @@ clean_bio <- function(
     "Found {nrow(edges_filtered)} valid edges for consistency calculation"
   )
 
-  # Early exit if no valid edges
+  # Early exit if no valid edges - add required columns with defaults
   if (nrow(edges_filtered) == 0L) {
     logger::log_warn(
-      "No features with >=2 neighbors found, skipping consistency"
+      "No features with >=2 neighbors found, skipping consistency calculation"
     )
+    logger::log_debug(
+      "Adding default feature_pred_tax columns (all features marked as 'empty')"
+    )
+
+    # Add required columns with default values
+    annot_table_wei_bio <- annot_table_wei_bio |>
+      tidytable::mutate(
+        # Classyfire kingdom
+        feature_pred_tax_cla_01kin_val = "empty",
+        consistency_structure_cla_kin = 1,
+        feature_pred_tax_cla_01kin_score = 0,
+        # NPC pathway
+        feature_pred_tax_npc_01pat_val = "empty",
+        consistency_structure_npc_pat = 1,
+        feature_pred_tax_npc_01pat_score = 0,
+        # Classyfire superclass
+        feature_pred_tax_cla_02sup_val = "empty",
+        consistency_structure_cla_sup = 1,
+        feature_pred_tax_cla_02sup_score = 0,
+        # NPC superclass
+        feature_pred_tax_npc_02sup_val = "empty",
+        consistency_structure_npc_sup = 1,
+        feature_pred_tax_npc_02sup_score = 0,
+        # Classyfire class
+        feature_pred_tax_cla_03cla_val = "empty",
+        consistency_structure_cla_cla = 1,
+        feature_pred_tax_cla_03cla_score = 0,
+        # NPC class
+        feature_pred_tax_npc_03cla_val = "empty",
+        consistency_structure_npc_cla = 1,
+        feature_pred_tax_npc_03cla_score = 0,
+        # Classyfire parent
+        feature_pred_tax_cla_04dirpar_val = "empty",
+        consistency_structure_cla_par = 1,
+        feature_pred_tax_cla_04dirpar_score = 0
+      )
+
     return(annot_table_wei_bio)
   }
 
