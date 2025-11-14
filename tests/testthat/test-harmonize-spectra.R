@@ -332,61 +332,64 @@ test_that("harmonize_spectra validates vectorized column parameters", {
   )
 })
 
-# test_that("harmonize_spectra mode validation is case insensitive", {
-#   test_spectra <- tidytable::tidytable(
-#     id = c(1),
-#     polarity = c("POSITIVE")
-#   )
-#
-#   # Should accept uppercase
-#   expect_no_error(
-#     harmonize_spectra(
-#       spectra = test_spectra,
-#       metad = "test",
-#       mode = "POSITIVE",
-#       col_ad = NULL,
-#       col_ce = NULL,
-#       col_ci = NULL,
-#       col_em = NULL,
-#       col_in = NULL,
-#       col_io = NULL,
-#       col_ik = NULL,
-#       col_il = NULL,
-#       col_mf = NULL,
-#       col_na = NULL,
-#       col_po = "polarity",
-#       col_sm = NULL,
-#       col_sn = NULL,
-#       col_si = NULL,
-#       col_sp = NULL,
-#       col_sy = NULL,
-#       col_xl = NULL
-#     )
-#   )
-#
-#   # Should accept mixed case
-#   expect_no_error(
-#     harmonize_spectra(
-#       spectra = test_spectra,
-#       metad = "test",
-#       mode = "PoSiTiVe",
-#       col_ad = NULL,
-#       col_ce = NULL,
-#       col_ci = NULL,
-#       col_em = NULL,
-#       col_in = NULL,
-#       col_io = NULL,
-#       col_ik = NULL,
-#       col_il = NULL,
-#       col_mf = NULL,
-#       col_na = NULL,
-#       col_po = "polarity",
-#       col_sm = NULL,
-#       col_sn = NULL,
-#       col_si = NULL,
-#       col_sp = NULL,
-#       col_sy = NULL,
-#       col_xl = NULL
-#     )
-#   )
-# })
+test_that("harmonize_spectra mode validation is case insensitive", {
+  test_spectra <- tidytable::tidytable(
+    id = c(1),
+    polarity = c("POSITIVE"),
+    precursorMz = c(195.088),
+    mz = I(list(c(100, 150, 195))),
+    intensity = I(list(c(100, 500, 1000)))
+  )
+
+  # Should accept uppercase
+  expect_no_error(
+    harmonize_spectra(
+      spectra = test_spectra,
+      metad = "test",
+      mode = "POSITIVE",
+      col_ad = NULL,
+      col_ce = NULL,
+      col_ci = NULL,
+      col_em = NULL,
+      col_in = NULL,
+      col_io = NULL,
+      col_ik = NULL,
+      col_il = NULL,
+      col_mf = NULL,
+      col_na = NULL,
+      col_po = "polarity",
+      col_sm = NULL,
+      col_sn = NULL,
+      col_si = NULL,
+      col_sp = NULL,
+      col_sy = NULL,
+      col_xl = NULL
+    )
+  )
+
+  # Should accept mixed case
+  expect_no_error(
+    harmonize_spectra(
+      spectra = test_spectra,
+      metad = "test",
+      mode = "PoSiTiVe",
+      col_ad = NULL,
+      col_ce = NULL,
+      col_ci = NULL,
+      col_em = NULL,
+      col_in = NULL,
+      col_io = NULL,
+      col_ik = NULL,
+      col_il = NULL,
+      col_mf = NULL,
+      col_na = NULL,
+      col_po = "polarity",
+      col_sm = NULL,
+      col_sn = NULL,
+      col_si = NULL,
+      col_sp = NULL,
+      col_sy = NULL,
+      col_xl = NULL
+    )
+  )
+})

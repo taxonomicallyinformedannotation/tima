@@ -294,22 +294,22 @@ test_that("weight_chemo accepts valid parameters", {
       "Organic compounds",
       "Organic compounds"
     ),
-    feature_pred_tax_cla_01kin_score = c(0.95, 0.95),
+    feature_pred_tax_cla_01kin_score = c("0.95", "0.95"),
     feature_pred_tax_cla_02sup_val = c("Alkaloids", "Alkaloids"),
-    feature_pred_tax_cla_02sup_score = c(0.90, 0.90),
+    feature_pred_tax_cla_02sup_score = c("0.90", "0.90"),
     feature_pred_tax_cla_03cla_val = c("Indole alkaloids", "Indole alkaloids"),
-    feature_pred_tax_cla_03cla_score = c(0.85, 0.85),
+    feature_pred_tax_cla_03cla_score = c("0.85", "0.85"),
     feature_pred_tax_cla_04dirpar_val = c("Indole parent", "Indole parent"),
-    feature_pred_tax_cla_04dirpar_score = c(0.80, 0.80),
+    feature_pred_tax_cla_04dirpar_score = c("0.80", "0.80"),
     feature_pred_tax_npc_01pat_val = c("Alkaloids", "Alkaloids"),
-    feature_pred_tax_npc_01pat_score = c(0.90, 0.90),
+    feature_pred_tax_npc_01pat_score = c("0.90", "0.90"),
     feature_pred_tax_npc_02sup_val = c("Indole alkaloids", "Indole alkaloids"),
-    feature_pred_tax_npc_02sup_score = c(0.85, 0.85),
+    feature_pred_tax_npc_02sup_score = c("0.85", "0.85"),
     feature_pred_tax_npc_03cla_val = c("Simple indoles", "Simple indoles"),
-    feature_pred_tax_npc_03cla_score = c(0.80, 0.80),
-    candidate_score_sirius_csi = c(0.95, 0.85),
+    feature_pred_tax_npc_03cla_score = c("0.80", "0.80"),
+    candidate_score_sirius_csi = c("0.95", "0.85"),
     candidate_score_pseudo_initial = c(0.90, 0.80),
-    score_biological = c(0.80, 0.70),
+    score_biological = c(0.80, 0.70)
   )
 
   # Should complete without error
