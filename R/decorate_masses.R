@@ -13,6 +13,10 @@
 decorate_masses <- function(
   annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
 ) {
+  # ============================================================================
+  # Filter Valid Annotations
+  # ============================================================================
+
   # Filter for valid annotations (not NA and not "notAnnotated")
   valid_annotations <- annotation_table_ms1 |>
     tidytable::filter(
@@ -20,22 +24,27 @@ decorate_masses <- function(
         candidate_structure_inchikey_connectivity_layer != "notAnnotated"
     )
 
-  # Count unique structures and features
+  # ============================================================================
+  # Count Unique Structures and Features
+  # ============================================================================
+
+  # Count unique structures
   n_unique_structures <- valid_annotations |>
     tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
     nrow()
 
+  # Count unique features
   n_unique_features <- valid_annotations |>
     tidytable::distinct(feature_id) |>
     nrow()
 
-  # Log summary
+  # ============================================================================
+  # Log Summary Statistics
+  # ============================================================================
+
   logger::log_info(
-    "MS1 annotation results: ",
-    n_unique_structures,
-    " unique structures annotated across ",
-    n_unique_features,
-    " features"
+    "MS1 annotation results: {n_unique_structures} unique structures ",
+    "annotated across {n_unique_features} features"
   )
 
   return(annotation_table_ms1)
