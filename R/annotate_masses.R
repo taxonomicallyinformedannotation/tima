@@ -102,30 +102,16 @@ annotate_masses <-
       step = "annotate_masses"
     )$ms$tolerances$rt$adducts
   ) {
-    # Validate file paths
-    required_files <- list(
-      features = features,
-      library = library,
-      str_stereo = str_stereo,
-      str_met = str_met,
-      str_nam = str_nam,
-      str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc
-    )
+    # ============================================================================
+    # Input Validation
+    # ============================================================================
 
-    for (file_name in names(required_files)) {
-      file_path <- required_files[[file_name]]
-      if (!file.exists(file_path)) {
-        stop("Required file not found: ", file_name, " at ", file_path)
-      }
-    }
-
-    # Validate MS mode
+    # Validate MS mode first (cheapest check)
     if (!ms_mode %in% c("pos", "neg")) {
       stop("ms_mode must be either 'pos' or 'neg', got: ", ms_mode)
     }
 
-    # Validate tolerances
+    # Validate tolerances (numeric checks)
     if (
       !is.numeric(tolerance_ppm) || tolerance_ppm <= 0 || tolerance_ppm > 20
     ) {
@@ -151,8 +137,34 @@ annotate_masses <-
       stop("clusters_list must contain '", ms_mode, "' mode clusters")
     }
 
+    # File existence check
+    required_files <- c(
+      features = features,
+      library = library,
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    )
+
+    file_exists_check <- file.exists(required_files)
+    if (!all(file_exists_check)) {
+      missing_files <- names(required_files)[!file_exists_check]
+      stop(
+        "Required file(s) not found: ",
+        paste(missing_files, collapse = ", "),
+        "\nPaths: ",
+        paste(required_files[!file_exists_check], collapse = ", ")
+      )
+    }
+
     logger::log_info("Starting mass-based annotation in {ms_mode} mode")
     logger::log_debug("Tolerances: {tolerance_ppm} ppm, {tolerance_rt} min RT")
+
+    # ============================================================================
+    # Load and Validate Features
+    # ============================================================================
 
     logger::log_trace("Loading features table from: {features}")
     features_table <- tidytable::fread(
@@ -167,7 +179,7 @@ annotate_masses <-
         "Empty features table provided - no annotations to perform"
       )
 
-      # Annotations header (exact columns requested)
+      # Return empty results with proper structure
       ann_cols <- c(
         "feature_id",
         "candidate_structure_error_mz",
@@ -194,7 +206,6 @@ annotate_masses <-
       ))
       colnames(empty_annotations) <- ann_cols
 
-      # Edges header
       edge_cols <- c("CLUSTERID1", "CLUSTERID2", "label")
       empty_edges <- as.data.frame(matrix(ncol = length(edge_cols), nrow = 0))
       colnames(empty_edges) <- edge_cols
@@ -208,14 +219,19 @@ annotate_masses <-
 
     logger::log_info("Processing {n_features} features for annotation")
 
-    if (ms_mode == "pos") {
-      adducts <- adducts_list$pos
-      clusters <- clusters_list$pos
-    }
-    if (ms_mode == "neg") {
-      adducts <- adducts_list$neg
-      clusters <- clusters_list$neg
-    }
+    # ============================================================================
+    # Select Mode-Specific Adducts and Clusters
+    # ============================================================================
+
+    # Direct assignment is faster than conditional blocks
+    adducts <- adducts_list[[ms_mode]]
+    clusters <- clusters_list[[ms_mode]]
+
+    # ============================================================================
+    # Load and Join Library Tables
+    # ============================================================================
+
+    logger::log_trace("Loading library and supplementary data")
 
     library_table <-
       tidytable::fread(
@@ -224,6 +240,7 @@ annotate_masses <-
         colClasses = "character"
       )
 
+    # Load all supplementary files
     supp_files <- list(str_stereo, str_met, str_nam, str_tax_cla, str_tax_npc)
 
     supp_tables <- purrr::map(.x = supp_files, .f = function(file_path) {
@@ -234,6 +251,7 @@ annotate_masses <-
       )
     })
 
+    # Single reduce operation for all joins
     joined_table <- purrr::reduce(
       .x = c(list(library_table), supp_tables),
       .f = function(x, y) {
@@ -241,6 +259,7 @@ annotate_masses <-
       }
     )
 
+    # Filter and prepare structure-organism pairs
     structure_organism_pairs_table <- joined_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::mutate(tidytable::across(

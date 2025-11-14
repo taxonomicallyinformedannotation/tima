@@ -49,7 +49,7 @@ get_file <- function(url, export, limit = 3600L) {
   # Set timeout option
   options(timeout = limit)
   logger::log_info("Downloading file from: {url}")
-  logger::log_debug("Timeout limit: {limit} seconds")
+  # logger::log_debug("Timeout limit: {limit} seconds")
 
   # Create output directory if needed
   create_dir(export = export)
@@ -59,7 +59,7 @@ get_file <- function(url, export, limit = 3600L) {
     for (attempt in seq_len(max_attempts)) {
       tryCatch(
         {
-          logger::log_debug("Download attempt {attempt}/{max_attempts}")
+          # logger::log_debug("Download attempt {attempt}/{max_attempts}")
 
           httr2::request(url) |>
             httr2::req_progress() |>
