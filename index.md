@@ -15,7 +15,7 @@ status](https://www.r-pkg.org/badges/version/tima.png)](https://CRAN.R-project.o
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
 [![r-universe
 badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic.png)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
-[![Docker](https://badgen.net/badge/docker/tima-r?icon&label.png)](https://hub.docker.com/r/adafede/tima-r/)
+[![Docker](https://img.shields.io/badge/adafede/tima--r?logo=docker.png)](https://hub.docker.com/r/adafede/tima-r/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 
 <!-- badges: end -->
