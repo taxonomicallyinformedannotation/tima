@@ -100,7 +100,6 @@ utils::globalVariables(
     "delta_min",
     "df",
     "Distance",
-    "empty_edges",
     "error_mz",
     "exactmass",
     "exact_mass",

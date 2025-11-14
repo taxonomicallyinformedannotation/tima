@@ -55,19 +55,24 @@ clean_chemo <- function(
   remove_ties = get("remove_ties", envir = parent.frame()),
   summarize = get("summarize", envir = parent.frame())
 ) {
-  # Validate data frames
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate data frame
   if (!is.data.frame(annot_table_wei_chemo)) {
     stop("annot_table_wei_chemo must be a data frame")
   }
 
+  # Early exit for empty input
   if (nrow(annot_table_wei_chemo) == 0L) {
     logger::log_warn("Empty annotation table provided")
     return(annot_table_wei_chemo)
   }
 
-  # Validate numeric parameters
+  # Validate numeric parameters (combined checks)
   if (!is.numeric(candidates_final) || candidates_final < 1) {
-    stop("candidates_final must be a positive integer")
+    stop("candidates_final must be a positive integer, got: ", candidates_final)
   }
 
   if (
@@ -79,7 +84,7 @@ clean_chemo <- function(
   if (
     !is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1
   ) {
-    stop("minimal_ms1_bio must be between 0 and 1")
+    stop("minimal_ms1_bio must be between 0 and 1, got: ", minimal_ms1_bio)
   }
 
   if (
@@ -87,7 +92,7 @@ clean_chemo <- function(
       minimal_ms1_chemo < 0 ||
       minimal_ms1_chemo > 1
   ) {
-    stop("minimal_ms1_chemo must be between 0 and 1")
+    stop("minimal_ms1_chemo must be between 0 and 1, got: ", minimal_ms1_chemo)
   }
 
   # Validate condition
@@ -106,42 +111,40 @@ clean_chemo <- function(
     summarize = summarize
   )
 
-  for (param_name in names(logical_params)) {
-    if (!is.logical(logical_params[[param_name]])) {
-      stop(param_name, " must be logical (TRUE/FALSE)")
-    }
+  is_valid_logical <- sapply(logical_params, is.logical)
+  if (!all(is_valid_logical)) {
+    invalid_params <- names(logical_params)[!is_valid_logical]
+    stop(
+      "Parameter(s) must be logical (TRUE/FALSE): ",
+      paste(invalid_params, collapse = ", ")
+    )
   }
 
+  # ============================================================================
+  # Log Processing Parameters
+  # ============================================================================
+
   logger::log_info("Cleaning chemically weighted annotations")
-  logger::log_debug("Keeping top ", candidates_final, " candidates per feature")
+  logger::log_debug("Keeping top {candidates_final} candidates per feature")
   logger::log_debug(
-    "Using best_percentile: ",
-    best_percentile,
-    " for consistent filtering"
+    "Using best_percentile: {best_percentile} for consistent filtering"
   )
   logger::log_debug(
-    "Options - High confidence: ",
-    high_confidence,
-    ", Remove ties: ",
-    remove_ties,
-    ", Summarize: ",
-    summarize
+    "Options - High confidence: {high_confidence}, ",
+    "Remove ties: {remove_ties}, Summarize: {summarize}"
   )
   logger::log_info(
-    "Filtering top ",
-    candidates_final,
-    " candidates and keeping only MS1 candidates with minimum ",
-    minimal_ms1_bio,
-    " biological score ",
-    minimal_ms1_condition,
-    " ",
-    minimal_ms1_chemo,
-    " chemical score "
+    "Filtering top {candidates_final} candidates and keeping only MS1 ",
+    "candidates with minimum {minimal_ms1_bio} biological score ",
+    "{minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
   )
 
+  # ============================================================================
+  # Filter MS1 Annotations Based on Scores
+  # ============================================================================
+
   ## Those lines are to keep ms1 annotation
-  ## Only if a good biological
-  ## Or chemical consistency score is obtained
+  ## Only if a good biological OR chemical consistency score is obtained
   if (minimal_ms1_condition == "OR") {
     df1 <- annot_table_wei_chemo |>
       tidytable::filter(

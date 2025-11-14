@@ -139,7 +139,7 @@ create_edges_spectra <- function(
       "candidate_score_similarity" = NA,
       "candidate_count_similarity_peaks_matched" = NA
     )
-    export_output(x = empty_edges, file = output)
+    export_output(x = edges, file = output)
     return(output)
   }
 
