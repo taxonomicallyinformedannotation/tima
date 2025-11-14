@@ -468,16 +468,16 @@ test_that("validators handle edge cases gracefully", {
   expect_error(validate_data_frame(df, min_rows = 1), "must have at least")
 })
 
-# test_that("validators are thread-safe", {
-#   # Multiple simultaneous validations should work
-#   skip_on_cran()
-#
-#   results <- lapply(1:10, function(i) {
-#     validate_ms_mode("pos")
-#     validate_numeric_range(5, 0, 10)
-#     TRUE
-#   })
-#
-#   expect_true(all(unlist(results)))
-#   plan(sequential)
-# })
+test_that("validators are thread-safe", {
+  # Multiple simultaneous validations should work
+  skip_on_cran()
+  skip("Thread safety testing requires parallel package setup")
+
+  results <- lapply(1:10, function(i) {
+    validate_ms_mode("pos")
+    validate_numeric_range(5, 0, 10)
+    TRUE
+  })
+
+  expect_true(all(unlist(results)))
+})

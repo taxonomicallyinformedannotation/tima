@@ -100,29 +100,29 @@ test_that("calculate_mass_of_m warns about very high m/z", {
 
 # Test: Invalid adduct handling ----
 
-# test_that("calculate_mass_of_m returns 0 for invalid adduct with warning", {
-#   expect_warning(
-#     mass <- calculate_mass_of_m(mz = 100, adduct_string = "invalid"),
-#     "Failed to parse"
-#   )
-#   expect_equal(mass, 0)
-# })
+test_that("calculate_mass_of_m returns 0 for invalid adduct with warning", {
+  expect_warning(
+    mass <- calculate_mass_of_m(mz = 100, adduct_string = "invalid"),
+    "Failed to parse"
+  )
+  expect_equal(mass, 0)
+})
 
-# test_that("calculate_mass_of_m returns 0 for empty adduct", {
-#   result <- calculate_mass_of_m(mz = 100, adduct_string = "")
-#   # Either returns 0 or throws error - both acceptable
-#   expect_true(
-#     is.numeric(result) || inherits(try(result, silent = TRUE), "try-error")
-#   )
-# })
+test_that("calculate_mass_of_m returns 0 for empty adduct", {
+  expect_warning(
+    result <- calculate_mass_of_m(mz = 100, adduct_string = ""),
+    "Failed to parse"
+  )
+  expect_equal(result, 0)
+})
 
 # Test: Division by zero protection ----
 
-# test_that("calculate_mass_of_m handles zero multimer count", {
-#   # This would require a malformed adduct that parse_adduct returns n_mer=0
-#   # Typically handled by parse_adduct returning failed parse
-#   expect_silent(parse_adduct("[M+H]+")) # Sanity check
-# })
+test_that("calculate_mass_of_m handles zero multimer count", {
+  # This would require a malformed adduct that parse_adduct returns n_mer=0
+  # Typically handled by parse_adduct returning failed parse
+  expect_silent(parse_adduct("[M+H]+")) # Sanity check
+})
 
 test_that("calculate_mass_of_m handles zero charges", {
   # Parse_adduct should fail gracefully
