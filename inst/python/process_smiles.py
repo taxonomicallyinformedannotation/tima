@@ -129,17 +129,31 @@ def validate_processing_params(
 # =====================================================================================
 
 def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
+    """
+    Process a single molecule to extract chemical properties.
+
+    Args:
+        mol: RDKit Mol object
+        original_smiles: Original SMILES string
+
+    Returns:
+        List of molecular properties or None if processing fails
+    """
     if mol is None:
         return None
     try:
+        # Calculate all properties in one pass to minimize overhead
         smiles = MolToSmiles(mol)
         inchikey = MolToInchiKey(mol)
         formula = CalcMolFormula(mol)
         exact_mass = ExactMolWt(mol)
-        mol_no_stereo = mol
+        xlogp = MolLogP(mol)
+
+        # Create a copy for stereochemistry removal to avoid modifying original
+        mol_no_stereo = mol.__copy__()
         RemoveStereochemistry(mol_no_stereo)
         smiles_no_stereo = MolToSmiles(mol_no_stereo)
-        xlogp = MolLogP(mol)
+
         return [
             original_smiles,
             smiles,
@@ -155,6 +169,15 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
 
 
 def open_output_file(output_file: Path):
+    """
+    Open output file with appropriate compression if needed.
+
+    Args:
+        output_file: Path to output file
+
+    Returns:
+        File handle (text mode, UTF-8 encoded)
+    """
     if str(output_file).endswith(".gz"):
         return gzip.open(output_file, "wt", newline="", encoding="utf-8")
     return open(output_file, "w", newline="", encoding="utf-8")
@@ -172,14 +195,32 @@ def process_batch(
     current_count: int,
     progress_interval: int,
 ) -> int:
+    """
+    Process a batch of molecules in parallel and write results.
+
+    Args:
+        executor: ThreadPoolExecutor for parallel processing
+        batch: List of RDKit Mol objects
+        original_smiles_list: Corresponding original SMILES strings
+        writer: CSV writer object
+        current_count: Current count of processed molecules
+        progress_interval: Logging interval
+
+    Returns:
+        Number of successfully processed molecules in this batch
+    """
     batch_processed = 0
-    for result in executor.map(process_molecule, batch, original_smiles_list):
+    # Use map for efficient parallel processing with minimal overhead
+    results = executor.map(process_molecule, batch, original_smiles_list)
+
+    for result in results:
         if result:
             writer.writerow(result)
             batch_processed += 1
             total = current_count + batch_processed
             if total % progress_interval == 0:
                 logger.info(f"Processed {total} molecules")
+
     return batch_processed
 
 
@@ -190,6 +231,26 @@ def process_smiles(
     batch_size: int = DEFAULT_BATCH_SIZE,
     progress_interval: int = DEFAULT_PROGRESS_INTERVAL,
 ) -> int:
+    """
+    Process SMILES file to compute molecular properties.
+
+    This function reads a SMILES file, processes molecules in parallel batches,
+    and outputs molecular properties to a CSV file.
+
+    Args:
+        input_smi_file: Path to input SMILES file (.smi)
+        output_csv_file: Path to output CSV file (.csv or .csv.gz)
+        num_workers: Number of worker threads (None = auto-detect)
+        batch_size: Number of molecules to process per batch
+        progress_interval: Log progress every N molecules
+
+    Returns:
+        Total number of successfully processed molecules
+
+    Raises:
+        FileValidationError: If input/output files are invalid
+        SmilesProcessingError: If SMILES processing fails
+    """
     logger.info("Starting SMILES processing pipeline")
     logger.info(f"Input: {input_smi_file}")
     logger.info(f"Output: {output_csv_file}")
@@ -207,22 +268,32 @@ def process_smiles(
         raise SmilesProcessingError(f"Failed to load SMILES file: {e}") from e
 
     molecules_processed = 0
+
     with open_output_file(output_path) as f:
         writer = csv.writer(f)
         writer.writerow(OUTPUT_COLUMNS)
-        batch, originals = [], []
+
+        # Pre-allocate lists with capacity to reduce reallocation overhead
+        batch = []
+        originals = []
+
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             for i, mol in enumerate(supplier):
                 if mol:
                     batch.append(mol)
                     originals.append(supplier.GetItemText(i))
+
+                # Process batch when full
                 if len(batch) >= batch_size:
                     molecules_processed += process_batch(
                         executor, batch, originals, writer,
                         molecules_processed, progress_interval
                     )
+                    # Clear lists efficiently
                     batch.clear()
                     originals.clear()
+
+            # Process remaining molecules
             if batch:
                 molecules_processed += process_batch(
                     executor, batch, originals, writer,

@@ -62,7 +62,11 @@ calculate_similarity <- function(
   return_matched_peaks = FALSE,
   ...
 ) {
-  # Validate method
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate method first (cheapest check)
   valid_methods <- c("cosine", "entropy", "gnps")
   if (!method %in% valid_methods) {
     stop(
@@ -70,6 +74,18 @@ calculate_similarity <- function(
       method,
       "'. Must be one of: ",
       paste(valid_methods, collapse = ", ")
+    )
+  }
+
+  # Early exit for empty spectra (before expensive type checks)
+  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
+    logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
+    return(
+      if (return_matched_peaks) {
+        list(score = 0.0, matches = 0L)
+      } else {
+        0.0
+      }
     )
   }
 
@@ -82,24 +98,15 @@ calculate_similarity <- function(
     stop("Spectra must have at least 2 columns (mz, intensity)")
   }
 
-  # Early exit for empty spectra
-  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
-    logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
-    return(
-      if (return_matched_peaks) {
-        list(score = 0.0, matches = 0L)
-      } else {
-        0.0
-      }
-    )
-  }
-
-  # Validate numeric parameters
+  # Validate numeric parameters (combine checks for efficiency)
   if (!is.numeric(dalton) || dalton < 0 || !is.numeric(ppm) || ppm < 0) {
     stop("Dalton and PPM tolerances must be non-negative numbers")
   }
 
-  # Handle entropy method separately (no peak matching needed)
+  # ============================================================================
+  # Method: Entropy (no peak matching required)
+  # ============================================================================
+
   if (method == "entropy") {
     if (return_matched_peaks) {
       logger::log_warn(
@@ -133,11 +140,15 @@ calculate_similarity <- function(
     return(result)
   }
 
-  # Extract masses for matching (GNPS or cosine methods)
+  # ============================================================================
+  # Methods: GNPS or Cosine (require peak matching)
+  # ============================================================================
+
+  # Extract masses efficiently (direct column access)
   query_masses <- query_spectrum[, 1L]
   target_masses <- target_spectrum[, 1L]
 
-  # Get peak matching map
+  # Get peak matching map using optimized C implementation for GNPS
   map <- tryCatch(
     switch(
       method,
@@ -166,17 +177,17 @@ calculate_similarity <- function(
   matched_x <- map[[1L]]
   matched_y <- map[[2L]]
 
-  # No matches found
+  # Early exit if no matches
   if (length(matched_x) == 0L) {
     logger::log_trace("No matching peaks found between spectra")
     return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 
-  # Extract matched peaks
+  # Extract matched peaks (drop=FALSE preserves matrix structure)
   x_mat <- query_spectrum[matched_x, , drop = FALSE]
   y_mat <- target_spectrum[matched_y, , drop = FALSE]
 
-  # Calculate similarity using GNPS algorithm
+  # Calculate similarity using optimized C GNPS algorithm
   result <- tryCatch(
     gnps_wrapper(x = x_mat, y = y_mat),
     error = function(e) {

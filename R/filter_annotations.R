@@ -52,26 +52,46 @@ filter_annotations <- function(
     step = "filter_annotations"
   )$ms$tolerances$rt$library
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate tolerance first (cheapest check)
+  if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
+    stop("tolerance_rt must be a positive number, got: ", tolerance_rt)
+  }
+
+  # Validate output path
+  if (!is.character(output) || length(output) != 1L) {
+    stop("output must be a single character string")
+  }
+
+  # Validate features
+  if (!is.character(features) || length(features) != 1L) {
+    stop("features must be a single character string")
+  }
+
+  if (!file.exists(features)) {
+    stop("Features file not found: ", features)
+  }
+
+  # Validate annotations (handle both list and character vector)
   if (is.list(annotations)) {
     if (length(annotations) == 0L) {
       stop("annotations must be a non-empty list or character vector")
     }
-    # Check all annotation files in list exist
-    missing_annotations <- lapply(annotations, function(ann) {
-      if (!is.character(ann) || length(ann) != 1L) {
-        stop("Each annotation element must be a single character string")
-      }
-      if (!file.exists(ann)) {
-        return(ann)
-      }
-      return(NULL)
-    })
-    missing_annotations <- Filter(Negate(is.null), missing_annotations)
+
+    # Validation for list elements
+    ann_vec <- unlist(annotations)
+    if (!is.character(ann_vec)) {
+      stop("All annotation elements must be character strings")
+    }
+
+    missing_annotations <- ann_vec[!file.exists(ann_vec)]
     if (length(missing_annotations) > 0L) {
       stop(
         "Annotation file(s) not found: ",
-        paste(unlist(missing_annotations), collapse = ", ")
+        paste(missing_annotations, collapse = ", ")
       )
     }
   } else {
@@ -79,6 +99,7 @@ filter_annotations <- function(
     if (!is.character(annotations) || length(annotations) == 0L) {
       stop("annotations must be a non-empty character vector or list")
     }
+
     missing_annotations <- annotations[!file.exists(annotations)]
     if (length(missing_annotations) > 0L) {
       stop(
@@ -88,37 +109,27 @@ filter_annotations <- function(
     }
   }
 
-  if (!is.character(features) || length(features) != 1L) {
-    stop("features must be a single character string")
-  }
-
-  if (!file.exists(features)) {
-    stop("Features file not found: ", features)
-  }
-
-  if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
-  }
-
-  if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
-    stop("tolerance_rt must be a positive number, got: ", tolerance_rt)
-  }
-
-  logger::log_info("Filtering annotations")
-  logger::log_debug("RT tolerance: ", tolerance_rt, " minutes")
-  stopifnot(
-    "Retention time file(s) do(es) not exist" = all(
-      purrr::map(.x = rts, .f = file.exists) |>
-        unlist()
-    )
-  )
-  stopifnot("Your features file does not exist." = file.exists(features))
-
-  if (length(rts) == 0) {
+  # Validate RT files
+  if (length(rts) > 0) {
+    rts_exist <- purrr::map_lgl(rts, file.exists)
+    if (!all(rts_exist)) {
+      stop(
+        "Retention time file(s) not found: ",
+        paste(rts[!rts_exist], collapse = ", ")
+      )
+    }
+  } else {
     rts <- NULL
   }
 
-  logger::log_trace("... features")
+  # ============================================================================
+  # Load and Process Data
+  # ============================================================================
+
+  logger::log_info("Filtering annotations")
+  logger::log_debug("RT tolerance: {tolerance_rt} minutes")
+
+  logger::log_trace("Loading features table")
   features_table <- tidytable::fread(
     file = features,
     colClasses = "character",
@@ -135,6 +146,10 @@ filter_annotations <- function(
     "Processing {n_features} unique features for annotation filtering"
   )
 
+  # ============================================================================
+  # Load and Merge Annotations
+  # ============================================================================
+
   logger::log_debug("Loading {length(annotations)} annotation file(s)")
   annotation_tables_list <- purrr::map(
     .x = annotations,
@@ -143,19 +158,23 @@ filter_annotations <- function(
     colClasses = "character"
   )
 
-  # Filter out MS1 annotations when spectral matches exist
+  # Filter MS1 annotations when spectral matches exist
   if ("ms1" %in% names(annotation_tables_list)) {
     logger::log_info(
       "Removing MS1 annotations superseded by spectral matches"
     )
-    annotations_tables_spectral <- annotation_tables_list[names(
-      annotation_tables_list
-    )[names(annotation_tables_list) != "ms1"]] |>
+
+    # Extract spectral annotations (all non-MS1)
+    spectral_names <- names(annotation_tables_list)[
+      names(annotation_tables_list) != "ms1"
+    ]
+    annotations_tables_spectral <- annotation_tables_list[spectral_names] |>
       tidytable::bind_rows()
 
     n_spectral <- nrow(annotations_tables_spectral)
     logger::log_debug("Found {n_spectral} spectral annotations")
 
+    # Create key for anti-join
     spectral_keys <- annotations_tables_spectral |>
       tidytable::distinct(
         feature_id,
@@ -165,11 +184,17 @@ filter_annotations <- function(
       )
 
     n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
+
+    # Remove redundant MS1 and combine
     annotation_table <- annotation_tables_list[["ms1"]] |>
       tidytable::anti_join(spectral_keys) |>
       tidytable::bind_rows(annotations_tables_spectral)
+
     n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
     logger::log_info("Removed {n_ms1_removed} redundant MS1 annotations")
+
+    # Clean up intermediate objects
+    rm(annotations_tables_spectral, spectral_keys, spectral_names)
   } else {
     logger::log_debug("No MS1 annotations to filter, combining all annotations")
     annotation_table <- annotation_tables_list |>
@@ -181,11 +206,8 @@ filter_annotations <- function(
     "Total annotations before RT filtering: {n_total_annotations}"
   )
 
-  rm(
-    annotation_tables_list,
-    annotations_tables_spectral,
-    spectral_keys
-  )
+  # Clean up
+  rm(annotation_tables_list)
 
   logger::log_trace("Loading retention time library")
   if (!is.null(rts)) {
