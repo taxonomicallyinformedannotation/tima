@@ -71,4 +71,3 @@ test_that("read_mgf_opti fails with multiple files", {
     read_mgf_opti(f = c("foo", "bar"))
   )
 })
-

@@ -179,4 +179,3 @@ test_that("get_gnps_tables handles empty GNPS job ID", {
 
   unlink("data", recursive = TRUE)
 })
-

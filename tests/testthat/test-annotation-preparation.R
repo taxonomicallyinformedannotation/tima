@@ -60,7 +60,9 @@ test_that("prepare_annotations_sirius handles non-existent directory", {
     prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
   )
   expect_no_error(
-    prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist.xyz")
+    prepare_annotations_sirius(
+      input_directory = "randomDirThatDoesNotExist.xyz"
+    )
   )
 
   unlink("data", recursive = TRUE)
@@ -131,4 +133,3 @@ test_that("prepare_annotations_spectra works", {
 
   unlink("data", recursive = TRUE)
 })
-

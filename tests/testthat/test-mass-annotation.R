@@ -167,4 +167,3 @@ test_that("annotate_masses handles pre-assigned adducts", {
 test_that("parse_adduct fails gracefully with invalid input", {
   expect_error(parse_adduct("foo bar"))
 })
-

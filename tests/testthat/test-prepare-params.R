@@ -79,4 +79,3 @@ test_that("get_params retrieves advanced parameters", {
 
   unlink("data", recursive = TRUE)
 })
-

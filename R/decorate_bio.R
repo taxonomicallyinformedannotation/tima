@@ -58,98 +58,81 @@ decorate_bio <- function(
     envir = parent.frame()
   )
 ) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
   required_cols <- c(
     "score_biological",
     "candidate_structure_inchikey_connectivity_layer"
   )
   missing_cols <- setdiff(required_cols, names(annot_table_wei_bio))
+
   if (length(missing_cols) > 0) {
     logger::log_warn(
-      "decorate_bio: missing expected columns: %s",
-      paste(missing_cols, collapse = ", ")
+      "decorate_bio: missing expected columns: {paste(missing_cols, collapse = ', ')}"
     )
     return(annot_table_wei_bio)
   }
 
-  # Helper function to count unique structures at a given score threshold
+  # ============================================================================
+  # Helper Function (DRY principle)
+  # ============================================================================
+
+  # Count unique structures at a given score threshold
   count_structures_at_level <- function(df, min_score) {
-    if (nrow(df) == 0) {
+    if (nrow(df) == 0L) {
       return(0L)
     }
+
     df |>
       tidytable::filter(score_biological >= min_score) |>
       tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
       nrow()
   }
 
-  # Calculate counts for each taxonomic level
-  n_kingdom <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_kingdom
-  )
-  n_phylum <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_phylum
-  )
-  n_class <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_class
-  )
-  n_order <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_order
-  )
-  n_family <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_family
-  )
-  n_tribe <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_tribe
-  )
-  n_genus <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_genus
-  )
-  n_species <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_species
-  )
-  n_variety <- count_structures_at_level(
-    annot_table_wei_bio,
-    score_biological_variety
+  # ============================================================================
+  # Calculate Counts for Each Taxonomic Level
+  # ============================================================================
+
+  # Create vectorized score list for efficient processing
+  levels <- list(
+    kingdom = score_biological_kingdom,
+    phylum = score_biological_phylum,
+    class = score_biological_class,
+    order = score_biological_order,
+    family = score_biological_family,
+    tribe = score_biological_tribe,
+    genus = score_biological_genus,
+    species = score_biological_species,
+    variety = score_biological_variety
   )
 
-  # Log summary statistics
+  # Calculate all counts (vectorized approach)
+  counts <- vapply(
+    levels,
+    function(score) count_structures_at_level(annot_table_wei_bio, score),
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+
+  names(counts) <- names(levels)
+
+  # ============================================================================
+  # Log Summary Statistics
+  # ============================================================================
+
   logger::log_info(
     "Taxonomically informed metabolite annotation reranked:\n",
-    "  Kingdom level: ",
-    n_kingdom,
-    " structures\n",
-    "  Phylum level:  ",
-    n_phylum,
-    " structures\n",
-    "  Class level:   ",
-    n_class,
-    " structures\n",
-    "  Order level:   ",
-    n_order,
-    " structures\n",
-    "  Family level:  ",
-    n_family,
-    " structures\n",
-    "  Tribe level:   ",
-    n_tribe,
-    " structures\n",
-    "  Genus level:   ",
-    n_genus,
-    " structures\n",
-    "  Species level: ",
-    n_species,
-    " structures\n",
-    "  Variety level: ",
-    n_variety,
-    " structures"
+    "  Kingdom level: {counts['kingdom']} structures\n",
+    "  Phylum level:  {counts['phylum']} structures\n",
+    "  Class level:   {counts['class']} structures\n",
+    "  Order level:   {counts['order']} structures\n",
+    "  Family level:  {counts['family']} structures\n",
+    "  Tribe level:   {counts['tribe']} structures\n",
+    "  Genus level:   {counts['genus']} structures\n",
+    "  Species level: {counts['species']} structures\n",
+    "  Variety level: {counts['variety']} structures"
   )
 
   return(annot_table_wei_bio)

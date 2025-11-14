@@ -67,4 +67,3 @@ test_that("get_example_files works with default parameters", {
 test_that("install function works in test mode", {
   expect_no_error(install(test = TRUE))
 })
-

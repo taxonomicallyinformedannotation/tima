@@ -174,4 +174,3 @@ test_that("benchmark_taxize_spectra works", {
 
   unlink("data", recursive = TRUE)
 })
-
