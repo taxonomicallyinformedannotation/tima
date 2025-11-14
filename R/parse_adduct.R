@@ -56,11 +56,53 @@ parse_adduct <- function(
   # Validate input type and format
   validation_result <- validate_adduct_string(adduct_string)
   if (!validation_result$valid) {
-    warning(validation_result$message, call. = FALSE)
-    logger::log_warn(validation_result$message)
+    # Suppress warnings for empty strings (common edge case)
+    if (!is.na(adduct_string) && nchar(adduct_string) > 0L) {
+      warning(validation_result$message, call. = FALSE)
+      logger::log_warn(validation_result$message)
+    }
     return(failed_parse)
   }
 
+  # Handle alternative adduct notations (e.g., "[M+CH3COO]-/[M-CH3]-")
+  # These are common in databases where multiple adduct possibilities exist
+  if (grepl("[/|]", adduct_string)) {
+    alternatives <- strsplit(adduct_string, "[/|]")[[1L]]
+    alternatives <- trimws(alternatives)
+
+    # Try each alternative until one parses successfully
+    for (alt_adduct in alternatives) {
+      if (nchar(alt_adduct) > 0L) {
+        result <- parse_single_adduct(alt_adduct, regex, failed_parse)
+        if (!all(result == 0)) {
+          logger::log_debug(
+            "Successfully parsed alternative '",
+            alt_adduct,
+            "' from composite adduct '",
+            adduct_string,
+            "'"
+          )
+          return(result)
+        }
+      }
+    }
+
+    # If none of the alternatives worked, return failed parse silently
+    logger::log_debug(
+      "Could not parse any alternative from: '",
+      adduct_string,
+      "'"
+    )
+    return(failed_parse)
+  }
+
+  # Standard single adduct parsing
+  parse_single_adduct(adduct_string, regex, failed_parse)
+}
+
+#' Parse a single adduct (internal helper)
+#' @keywords internal
+parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   # Parse adduct string using regex
   parse_result <- match_adduct_regex(adduct_string, regex)
   if (!parse_result$valid) {
@@ -70,8 +112,7 @@ parse_adduct <- function(
       "'. ",
       "Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)"
     )
-    warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    logger::log_debug(msg)
     return(failed_parse)
   }
 
@@ -91,8 +132,7 @@ parse_adduct <- function(
       "'. ",
       modifications$message
     )
-    warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    logger::log_debug(msg)
     return(failed_parse)
   }
 
@@ -111,8 +151,7 @@ parse_adduct <- function(
       adduct_string,
       "'"
     )
-    warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    logger::log_debug(msg)
     return(failed_parse)
   }
 
