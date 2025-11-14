@@ -250,23 +250,23 @@ test_that("extract_spectra handles nonexistent file gracefully", {
   )
 })
 
-# test_that("extract_spectra handles empty MGF file", {
-#   skip_on_cran()
-#
-#   temp_mgf <- withr::local_tempfile(fileext = ".mgf")
-#   writeLines("", temp_mgf)
-#
-#   # Should handle gracefully - either return empty or error with message
-#   result <- tryCatch(
-#     extract_spectra(input = temp_mgf),
-#     error = function(e) NULL
-#   )
-#
-#   # Either result is NULL (errored) or is a valid but empty structure
-#   if (!is.null(result)) {
-#     expect_type(result, "list")
-#   }
-# })
+test_that("extract_spectra handles empty MGF file", {
+  skip_on_cran()
+
+  temp_mgf <- withr::local_tempfile(fileext = ".mgf")
+  writeLines("", temp_mgf)
+
+  # Should handle gracefully - either return empty or error with message
+  result <- tryCatch(
+    extract_spectra(input = temp_mgf),
+    error = function(e) NULL
+  )
+
+  # Either result is NULL (errored) or is a valid but empty structure
+  if (!is.null(result)) {
+    expect_type(result, "list")
+  }
+})
 
 # =============================================================================
 # Performance tests for vectorized operations
