@@ -419,176 +419,176 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 
 # Data cleaning tests ----
 
-# test_that("summarize_results converts all columns to character", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # All columns should be character
-#   column_types <- sapply(result, class)
-#   expect_true(all(sapply(column_types, function(x) "character" %in% x)))
-# })
+test_that("summarize_results converts all columns to character", {
+  test_data <- create_test_annotation_data()
 
-# test_that("summarize_results trims whitespace", {
-#   test_data <- create_test_annotation_data()
-#
-#   # Add some whitespace
-#   test_data$df$feature_id[1] <- " FT_1 "
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Should not have leading/trailing whitespace
-#   if ("feature_id" %in% names(result)) {
-#     expect_false(any(
-#       grepl("^\\s|\\s$", result$feature_id, perl = TRUE),
-#       na.rm = TRUE
-#     ))
-#   }
-# })
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
 
-# test_that("summarize_results converts empty strings to NA", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Empty strings should be NA
-#   has_empty_strings <- any(sapply(result, function(col) {
-#     any(col == "", na.rm = TRUE)
-#   }))
-#
-#   expect_false(has_empty_strings)
-# })
+  # All columns should be character
+  column_types <- sapply(result, class)
+  expect_true(all(sapply(column_types, function(x) "character" %in% x)))
+})
+
+test_that("summarize_results trims whitespace", {
+  test_data <- create_test_annotation_data()
+
+  # Add some whitespace
+  test_data$df$feature_id[1] <- " FT_1 "
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  # Should not have leading/trailing whitespace
+  if ("feature_id" %in% names(result)) {
+    expect_false(any(
+      grepl("^\\s|\\s$", result$feature_id, perl = TRUE),
+      na.rm = TRUE
+    ))
+  }
+})
+
+test_that("summarize_results converts empty strings to NA", {
+  test_data <- create_test_annotation_data()
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  # Empty strings should be NA
+  has_empty_strings <- any(sapply(result, function(col) {
+    any(col == "", na.rm = TRUE)
+  }))
+
+  expect_false(has_empty_strings)
+})
 
 # Edge cases ----
 
-# test_that("summarize_results handles single feature", {
-#   test_data <- create_test_annotation_data(n_features = 1, n_candidates = 2)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true(nrow(result) > 0)
-# })
+test_that("summarize_results handles single feature", {
+  test_data <- create_test_annotation_data(n_features = 1, n_candidates = 2)
 
-# test_that("summarize_results handles single candidate", {
-#   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 1)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true(nrow(result) > 0)
-# })
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
 
-# test_that("summarize_results handles many features", {
-#   skip_on_cran()
-#
-#   test_data <- create_test_annotation_data(n_features = 100, n_candidates = 5)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true(nrow(result) > 0)
-# })
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) > 0)
+})
+
+test_that("summarize_results handles single candidate", {
+  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 1)
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) > 0)
+})
+
+test_that("summarize_results handles many features", {
+  skip_on_cran()
+
+  test_data <- create_test_annotation_data(n_features = 100, n_candidates = 5)
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) > 0)
+})
 
 # Combined options tests ----
 
-# test_that("summarize_results works with both remove_ties=TRUE and summarize=TRUE", {
-#   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = TRUE,
-#     summarize = TRUE
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#
-#   # Should have one row per feature (or fewer if some features have no annotations)
-#   if ("feature_id" %in% names(result)) {
-#     expect_equal(
-#       nrow(result),
-#       length(unique(result$feature_id))
-#     )
-#   }
-# })
+test_that("summarize_results works with both remove_ties=TRUE and summarize=TRUE", {
+  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = TRUE,
+    summarize = TRUE
+  )
+
+  expect_s3_class(result, "data.frame")
+
+  # Should have one row per feature (or fewer if some features have no annotations)
+  if ("feature_id" %in% names(result)) {
+    expect_equal(
+      nrow(result),
+      length(unique(result$feature_id))
+    )
+  }
+})
 
 # Performance tests ----
 
-# test_that("summarize_results completes in reasonable time", {
-#   skip_on_cran()
-#
-#   test_data <- create_test_annotation_data(n_features = 50, n_candidates = 10)
-#
-#   start_time <- Sys.time()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = TRUE,
-#     summarize = TRUE
-#   )
-#
-#   end_time <- Sys.time()
-#   elapsed <- as.numeric(end_time - start_time, units = "secs")
-#
-#   # Should complete in under 5 seconds for moderate data
-#   expect_true(elapsed < 5)
-# })
+test_that("summarize_results completes in reasonable time", {
+  skip_on_cran()
+
+  test_data <- create_test_annotation_data(n_features = 50, n_candidates = 10)
+
+  start_time <- Sys.time()
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = TRUE,
+    summarize = TRUE
+  )
+
+  end_time <- Sys.time()
+  elapsed <- as.numeric(end_time - start_time, units = "secs")
+
+  # Should complete in under 5 seconds for moderate data
+  expect_true(elapsed < 5)
+})
 
 # Robustness tests ----
 

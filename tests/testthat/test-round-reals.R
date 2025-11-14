@@ -243,12 +243,23 @@ test_that("round_reals is fast for large data frames", {
 
 # Test: Logging behavior ----
 
-# test_that("round_reals logs when no columns match", {
-#   df <- data.frame(unrelated = c(123.456))
-#
-#   # Should log trace message
-#   expect_silent(round_reals(df)) # Silent to user, may log internally
-# })
+test_that("round_reals handles no matching columns gracefully", {
+  df <- data.frame(unrelated = c(123.456))
+
+  # Should complete without error, may log internally
+  expect_silent(round_reals(df))
+})
+
+test_that("round_reals logs appropriately for column operations", {
+  df <- data.frame(
+    structure_exact_mass = c(123.456789),
+    structure_xlogp = c(2.345678)
+  )
+
+  # Should complete successfully
+  result <- round_reals(df)
+  expect_s3_class(result, "data.frame")
+})
 
 # test_that("round_reals logs when no patterns specified", {
 #   df <- data.frame(structure_exact_mass = c(123.456))

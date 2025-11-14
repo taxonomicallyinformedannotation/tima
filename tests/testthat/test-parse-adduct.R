@@ -245,37 +245,38 @@ test_that("parse_adduct always returns named numeric vector of length 5", {
 
 # Test: Logging behavior ----
 
-# test_that("parse_adduct logs warnings for invalid input", {
-#   expect_warning(parse_adduct("bad_format"), "Invalid adduct format")
-# })
+test_that("parse_adduct logs debug for invalid input", {
+  # Should return failed parse result, may log debug message
+  result <- parse_adduct("bad_format")
+  expect_true(is_parse_failed(result))
+})
 
-# test_that("parse_adduct logs trace for successful parse", {
-#   # Note: This requires logger to be configured for trace level
-#   # Just verify no errors
-#   expect_silent(parse_adduct("[M+H]+"))
-# })
+test_that("parse_adduct handles successful parse silently", {
+  # Should not error for valid input
+  expect_silent(parse_adduct("[M+H]+"))
+})
 
 # Test: Real-world adduct examples ----
 
-# test_that("parse_adduct handles common positive mode adducts", {
-#   common_pos <- c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", "[2M+H]+")
-#
-#   for (adduct in common_pos) {
-#     result <- parse_adduct(adduct)
-#     expect_equal(result["charge"], 1, label = adduct)
-#     expect_true(result["n_mer"] > 0, label = adduct)
-#   }
-# })
+test_that("parse_adduct handles common positive mode adducts", {
+  common_pos <- c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", "[2M+H]+")
 
-# test_that("parse_adduct handles common negative mode adducts", {
-#   common_neg <- c("[M-H]-", "[M+Cl]-", "[M+HCOO]-", "[2M-H]-")
-#
-#   for (adduct in common_neg) {
-#     result <- parse_adduct(adduct)
-#     expect_equal(result["charge"], -1, label = adduct)
-#     expect_true(result["n_mer"] > 0, label = adduct)
-#   }
-# })
+  for (adduct in common_pos) {
+    result <- parse_adduct(adduct)
+    expect_equal(unname(result["charge"]), 1, label = adduct)
+    expect_true(unname(result["n_mer"]) > 0, label = adduct)
+  }
+})
+
+test_that("parse_adduct handles common negative mode adducts", {
+  common_neg <- c("[M-H]-", "[M+Cl]-", "[M+HCOO]-", "[2M-H]-")
+
+  for (adduct in common_neg) {
+    result <- parse_adduct(adduct)
+    expect_equal(unname(result["charge"]), -1, label = adduct)
+    expect_true(unname(result["n_mer"]) > 0, label = adduct)
+  }
+})
 
 # Test: Performance ----
 
