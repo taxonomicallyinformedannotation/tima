@@ -47,20 +47,35 @@ test_that("calculate_mz_from_mass requires adduct_string", {
   )
 })
 
-# test_that("calculate_mz_from_mass validates neutral_mass range", {
-#   # Should accept positive values
-#   expect_silent(calculate_mz_from_mass(100, "[M+H]+"))
-# })
+test_that("calculate_mz_from_mass validates neutral_mass range", {
+  # Should accept positive values without error
+  expect_silent(calculate_mz_from_mass(100, "[M+H]+"))
+
+  # Should accept small positive values
+  expect_silent(calculate_mz_from_mass(0.1, "[M+H]+"))
+
+  # Very large values should still work
+  expect_silent(calculate_mz_from_mass(10000, "[M+H]+"))
+})
 
 # Test: Invalid adduct handling ----
 
-# test_that("calculate_mz_from_mass returns 0 for invalid adduct", {
-#   expect_warning(
-#     mz <- calculate_mz_from_mass(100, "invalid"),
-#     "Failed to parse"
-#   )
-#   expect_equal(mz, 0)
-# })
+test_that("calculate_mz_from_mass handles invalid adduct gracefully", {
+  # Invalid adducts should return 0 with a warning
+  expect_warning(
+    mz <- calculate_mz_from_mass(100, "invalid_adduct"),
+    "Failed to parse"
+  )
+  expect_equal(mz, 0)
+})
+
+test_that("calculate_mz_from_mass handles empty adduct", {
+  expect_warning(
+    mz <- calculate_mz_from_mass(100, ""),
+    "Failed to parse"
+  )
+  expect_equal(mz, 0)
+})
 
 # Test: Multimers ----
 
@@ -101,12 +116,6 @@ test_that("calculate_mz_from_mass handles triply charged", {
   expect_true(mz_triple < neutral_mass)
 })
 
-# Test: Division by zero protection ----
-
-# test_that("calculate_mz_from_mass handles zero charges gracefully", {
-#   # parse_adduct should return failed parse for malformed adduct
-#   expect_silent(parse_adduct("[M+H]+")) # Baseline
-# })
 
 # Test: Round-trip accuracy ----
 
