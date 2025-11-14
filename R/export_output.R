@@ -18,11 +18,11 @@
 #' unlink("output", recursive = TRUE)
 #' }
 export_output <- function(x, file) {
-  # Validate input
-  if (!is.data.frame(x) && !inherits(x, "tbl")) {
-    stop("Input 'x' must be a data frame or tibble")
-  }
+  # ============================================================================
+  # Input Validation (fast checks first)
+  # ============================================================================
 
+  # Validate file path first (cheapest check)
   if (
     is.null(file) ||
       !is.character(file) ||
@@ -32,25 +32,40 @@ export_output <- function(x, file) {
     stop("Output file path must be a non-empty character string")
   }
 
+  # Validate data frame (more expensive check)
+  if (!is.data.frame(x) && !inherits(x, "tbl")) {
+    stop("Input 'x' must be a data frame or tibble")
+  }
+
+  # ============================================================================
+  # Prepare Export
+  # ============================================================================
+
   # Create the output directory if it doesn't exist
   create_dir(export = file)
 
-  # Log export operation with data dimensions
+  # Get dimensions for logging (cache for reuse)
   nrows <- nrow(x)
   ncols <- ncol(x)
+
   logger::log_info("Exporting data to: {file}")
   logger::log_debug(
-    "Dimensions: {nrows} rows x {ncols} columns ({ncols} variables)"
+    "Dimensions: {nrows} rows x {ncols} columns"
   )
 
-  # Determine if compression is needed
+  # Determine compression method (once)
   is_compressed <- grepl("\\.gz$", file, ignore.case = TRUE)
 
+  # Warn for large datasets
   if (nrows > 100000L) {
-    logger::log_debug("Large dataset detected, export may take some time...")
+    logger::log_debug("Large dataset detected ({nrows} rows), export may take time...")
   }
 
-  # Write the data frame to a tab-delimited file
+  # ============================================================================
+  # Write Data
+  # ============================================================================
+
+  # Write the data frame to a tab-delimited file with error handling
   tryCatch(
     {
       tidytable::fwrite(

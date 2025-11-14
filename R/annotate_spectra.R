@@ -62,77 +62,21 @@ annotate_spectra <- function(
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
-  # Validate input file
-  if (is.list(input)) {
-    # Check all files in list exist
-    missing_files <- lapply(input, function(f) {
-      if (!is.character(f) || length(f) != 1L) {
-        stop("Each input element must be a single character string")
-      }
-      if (!file.exists(f)) {
-        return(f)
-      }
-      return(NULL)
-    })
-    missing_files <- Filter(Negate(is.null), missing_files)
-    if (length(missing_files) > 0L) {
-      stop(
-        "Input file(s) not found: ",
-        paste(unlist(missing_files), collapse = ", ")
-      )
-    }
-  } else {
-    # Single file path
-    if (!is.character(input) || length(input) != 1L) {
-      stop(
-        "input must be a single character string or a list of character strings"
-      )
-    }
-    if (!file.exists(input)) {
-      stop("Input file not found: ", input)
-    }
-  }
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
 
-  # Validate polarity
+  # Validate polarity first (cheapest check)
   if (!polarity %in% c("pos", "neg")) {
     stop("Polarity must be 'pos' or 'neg', got: ", polarity)
   }
 
-  # Validate libraries
-  if (length(libraries) == 0L) {
-    stop("At least one library must be provided")
+  # Validate logical parameters early
+  if (!is.logical(approx)) {
+    stop("approx must be logical (TRUE/FALSE)")
   }
 
-  if (is.list(libraries)) {
-    # Check all library files in list exist
-    # Each element can be a character vector of file paths
-    missing_libs <- lapply(libraries, function(lib) {
-      if (!is.character(lib)) {
-        stop("Each library element must be a character vector")
-      }
-      # Check which files don't exist
-      missing <- lib[!file.exists(lib)]
-      if (length(missing) > 0L) {
-        return(missing)
-      }
-      return(NULL)
-    })
-    missing_libs <- Filter(Negate(is.null), missing_libs)
-    if (length(missing_libs) > 0L) {
-      stop(
-        "Library file(s) not found: ",
-        paste(unlist(missing_libs), collapse = ", ")
-      )
-    }
-  } else {
-    # Vector of file paths
-    missing_libs <- libraries[!file.exists(libraries)]
-    if (length(missing_libs) > 0L) {
-      stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
-    }
-  }
-
-  # Validate numeric parameters
+  # Validate numeric parameters (combined checks for efficiency)
   if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
     stop("Threshold must be between 0 and 1, got: ", threshold)
   }
@@ -149,21 +93,68 @@ annotate_spectra <- function(
     stop("Intensity cutoff must be non-negative, got: ", qutoff)
   }
 
+  # Validate input files
+  if (is.list(input)) {
+    input_vec <- unlist(input)
+    if (!is.character(input_vec)) {
+      stop("All input elements must be character strings")
+    }
+
+    missing_files <- input_vec[!file.exists(input_vec)]
+    if (length(missing_files) > 0L) {
+      stop(
+        "Input file(s) not found: ",
+        paste(missing_files, collapse = ", ")
+      )
+    }
+  } else {
+    if (!is.character(input) || length(input) != 1L) {
+      stop(
+        "input must be a single character string or a list of character strings"
+      )
+    }
+    if (!file.exists(input)) {
+      stop("Input file not found: ", input)
+    }
+  }
+
+  # Validate libraries
+  if (length(libraries) == 0L) {
+    stop("At least one library must be provided")
+  }
+
+  if (is.list(libraries)) {
+    # Flatten and check all library files at once
+    lib_vec <- unlist(libraries)
+    if (!is.character(lib_vec)) {
+      stop("All library elements must be character strings")
+    }
+
+    missing_libs <- lib_vec[!file.exists(lib_vec)]
+    if (length(missing_libs) > 0L) {
+      stop(
+        "Library file(s) not found: ",
+        paste(missing_libs, collapse = ", ")
+      )
+    }
+  } else {
+    missing_libs <- libraries[!file.exists(libraries)]
+    if (length(missing_libs) > 0L) {
+      stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
+    }
+  }
+
+  # ============================================================================
+  # Processing
+  # ============================================================================
+
   logger::log_info("Starting spectral annotation in {polarity} mode")
   logger::log_debug(
     "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
   )
   logger::log_debug("Processing {length(libraries)} spectral library/libraries")
 
-  # Validate logical parameters
-  if (!is.logical(approx)) {
-    stop("approx must be logical (TRUE/FALSE)")
-  }
-
-  logger::log_info("Starting spectral annotation in ", polarity, " mode")
-  logger::log_debug("Similarity threshold: ", threshold, ", method: ", method)
-  logger::log_debug("Tolerances: ", ppm, " ppm, ", dalton, " Da")
-
+  # Pre-define empty result structure for early exits
   df_empty <- data.frame(
     feature_id = NA,
     candidate_spectrum_entropy = NA,
@@ -180,15 +171,13 @@ annotate_spectra <- function(
     candidate_score_similarity = NA,
     candidate_count_similarity_peaks_matched = NA
   )
+
   # Filter libraries by polarity if multiple provided
   if (length(libraries) > 1) {
     original_count <- length(libraries)
     libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
     logger::log_debug(
-      "Filtered libraries by polarity: ",
-      original_count,
-      " -> ",
-      length(libraries)
+      "Filtered libraries by polarity: {original_count} -> {length(libraries)}"
     )
 
     if (length(libraries) == 0L) {

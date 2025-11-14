@@ -44,7 +44,11 @@ prepare_features_tables <- function(
   name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
   name_mz = get_params(step = "prepare_features_tables")$names$precursor
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate file paths first
   if (!is.character(features) || length(features) != 1L) {
     stop("features must be a single character string")
   }
@@ -57,6 +61,7 @@ prepare_features_tables <- function(
     stop("output must be a single character string")
   }
 
+  # Validate candidates parameter
   if (
     !is.null(candidates) &&
       (!is.numeric(candidates) || candidates < 1L || candidates > 5L)
@@ -65,30 +70,36 @@ prepare_features_tables <- function(
   }
 
   # Validate column name parameters
-  col_names <- list(
+  col_names <- c(
     name_adduct = name_adduct,
     name_features = name_features,
     name_rt = name_rt,
     name_mz = name_mz
   )
 
-  for (col_name in names(col_names)) {
-    if (
-      !is.character(col_names[[col_name]]) ||
-        length(col_names[[col_name]]) != 1L
-    ) {
-      stop(col_name, " must be a single character string")
-    }
+  # Check all are single character strings at once
+  is_valid <- sapply(col_names, function(x) {
+    is.character(x) && length(x) == 1L
+  })
+
+  if (!all(is_valid)) {
+    invalid_cols <- names(col_names)[!is_valid]
+    stop(
+      "Column name parameter(s) must be single character strings: ",
+      paste(invalid_cols, collapse = ", ")
+    )
   }
 
-  logger::log_info("Preparing features table from: ", features)
+  # ============================================================================
+  # Load and Process Features
+  # ============================================================================
+
+  logger::log_info("Preparing features table from: {features}")
   logger::log_debug(
-    "Retaining top ",
-    candidates,
-    " intensity samples per feature"
+    "Retaining top {candidates} intensity samples per feature"
   )
 
-  # Load features table
+  # Load features table with error handling
   logger::log_trace("Loading features table")
   features_table_0 <- tryCatch(
     {
@@ -103,13 +114,17 @@ prepare_features_tables <- function(
     }
   )
 
+  # Early exit for empty file
   if (nrow(features_table_0) == 0L) {
     stop("Features file is empty")
   }
 
   logger::log_debug("Loaded {nrow(features_table_0)} features")
 
-  # Format feature table
+  # ============================================================================
+  # Format Feature Table (detect format and standardize)
+  # ============================================================================
+
   logger::log_trace("Formatting feature table")
   logger::log_trace(
     "Detecting format: MZmine ('Peak area' or ':area'), ",
@@ -127,43 +142,38 @@ prepare_features_tables <- function(
     tidytable::select(-tidyselect::matches("quant_peaktable"))
   rm(features_table_0)
 
-  # Standardize column names
+  # Standardize column names (batch replacements for efficiency)
   logger::log_trace("Standardizing column names")
-  colnames(features_table) <- colnames(features_table) |>
-    stringi::stri_replace_all_fixed(
-      pattern = " Peak area",
-      replacement = "",
+
+  # Define replacements (pattern -> replacement)
+  replacements <- list(
+    c(" Peak area", ""),
+    c(":area", ""),
+    c("datafile:", ""),
+    c("quant_", ""),
+    c(" Peak height", "")
+  )
+
+  # Apply all replacements to column names
+  col_names_std <- colnames(features_table)
+  for (replacement in replacements) {
+    col_names_std <- stringi::stri_replace_all_fixed(
+      col_names_std,
+      pattern = replacement[1],
+      replacement = replacement[2],
       vectorize_all = FALSE
     )
-  colnames(features_table) <- colnames(features_table) |>
-    stringi::stri_replace_all_fixed(
-      pattern = ":area",
-      replacement = "",
-      vectorize_all = FALSE
-    ) |>
-    stringi::stri_replace_all_fixed(
-      pattern = "datafile:",
-      replacement = "",
-      vectorize_all = FALSE
-    )
-  colnames(features_table) <- colnames(features_table) |>
-    stringi::stri_replace_all_fixed(
-      pattern = "quant_",
-      replacement = "",
-      vectorize_all = FALSE
-    )
-  colnames(features_table) <- colnames(features_table) |>
-    stringi::stri_replace_all_fixed(
-      pattern = " Peak height",
-      replacement = "",
-      vectorize_all = FALSE
-    )
+  }
+  colnames(features_table) <- col_names_std
+
+  # ============================================================================
+  # Filter to Top Intensity Samples
+  # ============================================================================
 
   logger::log_trace(
-    "Filtering to top ",
-    candidates,
-    " intensity samples per feature"
+    "Filtering to top {candidates} intensity samples per feature"
   )
+
   features_prepared <- features_table |>
     tidytable::pivot_longer(
       cols = !tidyselect::any_of(c(
@@ -196,9 +206,7 @@ prepare_features_tables <- function(
   rm(features_table)
 
   logger::log_info(
-    "Prepared ",
-    nrow(features_prepared),
-    " feature-sample pairs"
+    "Prepared {nrow(features_prepared)} feature-sample pairs"
   )
 
   export_params(
