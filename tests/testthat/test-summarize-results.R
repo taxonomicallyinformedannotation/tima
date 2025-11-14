@@ -223,59 +223,59 @@ test_that("summarize_results handles empty input gracefully", {
 
 # Remove ties functionality ----
 
-# test_that("summarize_results removes ties when requested", {
-#   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
-#
-#   # Add some tied scores
-#   test_data$df$rank_final <- rep(
-#     c(1, 1, 2, 3, 4),
-#     length.out = nrow(test_data$df)
-#   )
-#
-#   result_with_ties <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   result_without_ties <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = TRUE,
-#     summarize = FALSE
-#   )
-#
-#   # Should have fewer rows when ties are removed
-#   expect_true(nrow(result_without_ties) <= nrow(result_with_ties))
-# })
+test_that("summarize_results removes ties when requested", {
+  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
 
-# test_that("remove_ties keeps only one entry per feature-rank combination", {
-#   test_data <- create_test_annotation_data(n_features = 2, n_candidates = 3)
-#   test_data$df$rank_final <- c(1, 1, 2, 1, 2, 3)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = TRUE,
-#     summarize = FALSE
-#   )
-#
-#   # Check for unique feature_id + rank_final combinations
-#   if ("feature_id" %in% names(result) && "rank_final" %in% names(result)) {
-#     combinations <- paste(result$feature_id, result$rank_final)
-#     expect_equal(length(combinations), length(unique(combinations)))
-#   }
-# })
+  # Add some tied scores
+  test_data$df$rank_final <- rep(
+    c(1, 1, 2, 3, 4),
+    length.out = nrow(test_data$df)
+  )
+
+  result_with_ties <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  result_without_ties <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = TRUE,
+    summarize = FALSE
+  )
+
+  # Should have fewer rows when ties are removed
+  expect_true(nrow(result_without_ties) <= nrow(result_with_ties))
+})
+
+test_that("remove_ties keeps only one entry per feature-rank combination", {
+  test_data <- create_test_annotation_data(n_features = 2, n_candidates = 3)
+  test_data$df$rank_final <- c(1, 1, 2, 1, 2, 3)
+
+  result <- summarize_results(
+    df = test_data$df,
+    features_table = test_data$features_table,
+    components_table = test_data$components_table,
+    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+    remove_ties = TRUE,
+    summarize = FALSE
+  )
+
+  # Check for unique feature_id + rank_final combinations
+  if ("feature_id" %in% names(result) && "rank_final" %in% names(result)) {
+    combinations <- paste(result$feature_id, result$rank_final)
+    expect_equal(length(combinations), length(unique(combinations)))
+  }
+})
 
 # Summarize functionality ----
 
