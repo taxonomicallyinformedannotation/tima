@@ -98,7 +98,7 @@ import_spectra <- function(
       vectorize_all = FALSE
     )
 
-  logger::log_trace("Detected file format: {file_ext}")
+  # logger::log_trace("Detected file format: {file_ext}")
 
   # Import spectra based on file format
   spectra <- tryCatch(
@@ -243,9 +243,9 @@ import_spectra <- function(
       n_after <- length(spectra)
       logger::log_debug("Combined replicates: {n_before} -> {n_after} spectra")
     } else {
-      logger::log_trace(
-        "No replicate grouping field found, skipping combination"
-      )
+      # logger::log_trace(
+      #  "No replicate grouping field found, skipping combination"
+      #)
     }
   }
 

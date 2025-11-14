@@ -120,7 +120,7 @@ get_file <- function(url, export, limit = 3600L) {
   if (!download_success) {
     # Clean up partial download
     if (file.exists(export)) {
-      logger::log_trace("Removing incomplete download")
+      # logger::log_trace("Removing incomplete download")
       unlink(export, force = TRUE)
     }
     logger::log_error("Failed to download file after multiple attempts")

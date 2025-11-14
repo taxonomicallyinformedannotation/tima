@@ -62,7 +62,7 @@ clean_bio <- function(
   # Extract Distinct Structure-Taxonomy Pairs
   # ============================================================================
 
-  logger::log_trace("Extracting distinct structure-taxonomy pairs")
+  # logger::log_trace("Extracting distinct structure-taxonomy pairs")
 
   # Extract unique structure-taxonomy combinations
   annotations_distinct <- annot_table_wei_bio |>
@@ -84,9 +84,9 @@ clean_bio <- function(
   # Filter Edges for Consistency Calculation
   # ============================================================================
 
-  logger::log_trace(
-    "Calculating chemical consistency for features with at least 2 neighbors"
-  )
+  # logger::log_trace(
+  #   "Calculating chemical consistency for features with at least 2 neighbors"
+  # )
 
   # Filter edges: keep features with at least 2 neighbors
   # TODO: Implement more sophisticated filtering criteria:
@@ -175,7 +175,7 @@ clean_bio <- function(
   ) |>
     tidytable::filter(!is.na(feature_source))
 
-  logger::log_trace("Calculating consistency scores across network edges")
+  # logger::log_trace("Calculating consistency scores across network edges")
 
   # ============================================================================
   # Calculate Consistency Scores
@@ -232,7 +232,7 @@ clean_bio <- function(
       )
   }
 
-  logger::log_trace("... at the (classyfire) kingdom level")
+  # logger::log_trace("... at the (classyfire) kingdom level")
   freq_cla_kin <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_cla_01kin",
@@ -240,7 +240,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_cla_01kin_score",
       feature_val_name = "feature_pred_tax_cla_01kin_val"
     )
-  logger::log_trace("... at the (NPC) pathway level")
+  # logger::log_trace("... at the (NPC) pathway level")
   freq_npc_pat <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_npc_01pat",
@@ -248,7 +248,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_npc_01pat_score",
       feature_val_name = "feature_pred_tax_npc_01pat_val"
     )
-  logger::log_trace("... at the (classyfire) superclass level")
+  # logger::log_trace("... at the (classyfire) superclass level")
   freq_cla_sup <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_cla_02sup",
@@ -256,7 +256,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_cla_02sup_score",
       feature_val_name = "feature_pred_tax_cla_02sup_val"
     )
-  logger::log_trace("... at the (NPC) superclass level")
+  # logger::log_trace("... at the (NPC) superclass level")
   freq_npc_sup <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_npc_02sup",
@@ -264,7 +264,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_npc_02sup_score",
       feature_val_name = "feature_pred_tax_npc_02sup_val"
     )
-  logger::log_trace("... at the (classyfire) class level")
+  # logger::log_trace("... at the (classyfire) class level")
   freq_cla_cla <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_cla_03cla",
@@ -272,7 +272,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_cla_03cla_score",
       feature_val_name = "feature_pred_tax_cla_03cla_val"
     )
-  logger::log_trace("... at the (NPC) class level")
+  # logger::log_trace("... at the (NPC) class level")
   freq_npc_cla <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_npc_03cla",
@@ -280,7 +280,7 @@ clean_bio <- function(
       feature_score_name = "feature_pred_tax_npc_03cla_score",
       feature_val_name = "feature_pred_tax_npc_03cla_val"
     )
-  logger::log_trace("... at the (classyfire) parent level")
+  # logger::log_trace("... at the (classyfire) parent level")
   freq_cla_par <- df3 |>
     clean_per_level_bio(
       candidates = "candidate_structure_tax_cla_04dirpar",
@@ -290,7 +290,7 @@ clean_bio <- function(
     )
   rm(df3)
 
-  logger::log_trace("Splitting already computed predictions")
+  # logger::log_trace("Splitting already computed predictions")
   df1 <- annotations_distinct |>
     tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
@@ -303,7 +303,7 @@ clean_bio <- function(
     tidytable::bind_rows(df1b)
   rm(annotations_distinct)
 
-  logger::log_trace("Joining all except -1 together")
+  # logger::log_trace("Joining all except -1 together")
   supp_tables <- list(
     freq_cla_kin,
     freq_npc_pat,
@@ -428,7 +428,7 @@ clean_bio <- function(
     )
   rm(df2, supp_tables)
 
-  logger::log_trace("Adding already computed predictions back")
+  # logger::log_trace("Adding already computed predictions back")
   annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
     tidytable::anti_join(df1b) |>
     tidytable::bind_rows(df1)

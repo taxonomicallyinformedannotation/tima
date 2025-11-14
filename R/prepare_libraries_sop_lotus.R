@@ -71,7 +71,7 @@ prepare_libraries_sop_lotus <- function(
   }
 
   # Export prepared data
-  logger::log_trace("Exporting prepared LOTUS data")
+  # logger::log_trace("Exporting prepared LOTUS data")
   export_output(x = lotus_prepared, file = output)
 
   return(output)

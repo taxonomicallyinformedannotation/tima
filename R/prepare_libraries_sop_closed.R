@@ -63,7 +63,7 @@ prepare_libraries_sop_closed <- function(
       logger::log_warn("Closed library file is empty")
       closed_prepared <- fake_sop_columns()
     } else {
-      logger::log_trace("Formatting closed resource (", nrow(closed), " rows)")
+      # logger::log_trace("Formatting closed resource (", nrow(closed), " rows)")
 
       closed_prepared <- closed |>
         tidytable::mutate(

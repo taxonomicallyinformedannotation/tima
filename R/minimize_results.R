@@ -61,7 +61,7 @@ minimize_results <- function(
     stop("best_percentile must be between 0 and 1")
   }
 
-  logger::log_trace("Minimizing annotation results")
+  # logger::log_trace("Minimizing annotation results")
   logger::log_debug(
     "Thresholds - Classes: ",
     min_score_classes,

@@ -188,7 +188,7 @@ annotate_spectra <- function(
     }
   }
 
-  logger::log_trace("Loading query spectra from: ", input)
+  logger::log_debug("Loading query spectra from: {input}")
   spectra <- input |>
     import_spectra(
       cutoff = qutoff,
@@ -198,7 +198,7 @@ annotate_spectra <- function(
     )
 
   if (length(spectra) > 0) {
-    logger::log_trace("Loading spectral libraries")
+    logger::log_debug("Loading spectral libraries")
     spectral_library <- unlist(libraries) |>
       purrr::map(
         .f = import_spectra,
@@ -278,7 +278,7 @@ annotate_spectra <- function(
     )
 
     if (approx == FALSE) {
-      logger::log_trace("Reducing library size")
+      # logger::log_trace("Reducing library size")
       df_3 <- dplyr::inner_join(
         tidytable::tidytable(minimal, maximal, lib_precursors),
         tidytable::tidytable(val = unique(query_precursors)),
@@ -312,7 +312,7 @@ annotate_spectra <- function(
     lib_spectra <- spectral_library@backend@peaksData
     safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
     if (length(safety) != 0) {
-      logger::log_trace("Annotating")
+      logger::log_debug("Annotating {nrow(spectra)} spectra against {lib_name}")
       df_final <-
         calculate_entropy_and_similarity(
           lib_ids = lib_ids,
@@ -460,7 +460,7 @@ annotate_spectra <- function(
       ## COMMENT AR: Not doing it because of thresholding
       ## df_final[is.na(df_final)] <- 0
 
-      logger::log_trace("Filtering results above threshold only")
+      # logger::log_trace("Filtering results above threshold only")
       df_final <- df_final |>
         tidytable::filter(candidate_score_similarity >= threshold) |>
         tidytable::arrange(

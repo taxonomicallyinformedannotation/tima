@@ -34,7 +34,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     colClasses = "character"
   )
 
-  logger::log_trace("Loading structure-organism pairs")
+  logger::log_debug("Loading structure-organism pairs from: {keys}")
   sop <- tidytable::fread(
     keys,
     na.strings = c("", "NA"),
@@ -49,7 +49,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
       )
     )
 
-  logger::log_trace("Loading organism taxonomy")
+  logger::log_debug("Loading organism taxonomy from: {org_tax_ott}")
   taxo <- tidytable::fread(
     org_tax_ott,
     na.strings = c("", "NA"),
@@ -63,7 +63,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
         tidytable::distinct(organism_name, inchikey_connectivity_layer)
     )
 
-  logger::log_trace("Sampling features with multiple organism associations")
+  logger::log_debug("Sampling features with multiple organism associations")
   set.seed(42L) # Reproducible sampling
 
   # For features with organism data: randomly select one per feature
@@ -76,7 +76,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
         tidytable::filter(is.na(organism_name))
     )
 
-  logger::log_trace("Adding full taxonomic hierarchy")
+  logger::log_debug("Adding full taxonomic hierarchy")
   features_taxed <- features_sampled |>
     tidytable::left_join(
       taxo |>

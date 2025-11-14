@@ -27,7 +27,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
     stop("sirius_version must be '5' or '6', got: ", sirius_version)
   }
 
-  logger::log_trace("Selecting CANOPUS columns for SIRIUS v", sirius_version)
+  # logger::log_trace("Selecting CANOPUS columns for SIRIUS v", sirius_version)
 
   df <- df |>
     tidytable::mutate(

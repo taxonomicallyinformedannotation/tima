@@ -84,7 +84,7 @@ prepare_annotations_gnps <- function(
         unlist()
     )
   ) {
-    logger::log_trace("Loading and formatting GNPS results")
+    # logger::log_trace("Loading and formatting GNPS results")
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- purrr::map(
       .x = input,

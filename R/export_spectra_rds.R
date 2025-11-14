@@ -38,6 +38,6 @@ export_spectra_rds <- function(file, spectra) {
   # Save spectra as RDS
   saveRDS(valid_spectra, file = file)
 
-  logger::log_trace("Successfully exported spectra")
+  # logger::log_trace("Successfully exported spectra")
   invisible(NULL)
 }

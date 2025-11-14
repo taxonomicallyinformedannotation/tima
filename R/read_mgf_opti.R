@@ -174,7 +174,7 @@ read_mgf_opti <- function(
   }
 
   logger::log_info("Total spectra read: {total_processed}")
-  logger::log_trace("Combining spectrum data into DataFrame")
+  # logger::log_trace("Combining spectrum data into DataFrame")
   res <- MsCoreUtils::rbindFill(sp_list)
 
   # Format charge field if present
@@ -183,7 +183,7 @@ read_mgf_opti <- function(
   }
 
   # Map MGF field names to standard spectra variable names
-  logger::log_trace("Mapping field names to standard spectra variables")
+  # logger::log_trace("Mapping field names to standard spectra variables")
   idx <- match(colnames(res), mapping)
   not_na <- !is.na(idx)
   if (any(not_na)) {
@@ -210,7 +210,7 @@ read_mgf_opti <- function(
   }
 
   # Convert to DataFrame and set up peak lists
-  logger::log_trace("Finalizing DataFrame structure")
+  # logger::log_trace("Finalizing DataFrame structure")
   res <- methods::as(res, "DataFrame")
   res$mz <- IRanges::NumericList(res$mz, compress = FALSE)
   res$dataOrigin <- f

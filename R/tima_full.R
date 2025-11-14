@@ -25,9 +25,8 @@ tima_full <- function() {
   }
 
   logger::log_info("Starting complete TIMA annotation workflow")
-  logger::log_trace("This script runs the full TIMA pipeline")
-  logger::log_trace("Authors: AR")
-  logger::log_trace("Contributors: PMA")
+  logger::log_info("Authors: AR")
+  logger::log_info("Contributors: PMA")
 
   # Navigate to cache directory
   go_to_cache()
@@ -39,7 +38,7 @@ tima_full <- function() {
       targets::tar_make(names = tidyselect::matches("^ann_pre$"))
     },
     error = function(e) {
-      logger::log_error("Pipeline failed: ", conditionMessage(e))
+      logger::log_error("Pipeline failed: {conditionMessage(e)}")
       stop("TIMA full workflow failed: ", conditionMessage(e))
     }
   )
@@ -62,7 +61,7 @@ tima_full <- function() {
 
     if (success) {
       file.remove(logs)
-      logger::log_info("Log saved to: ", output_log)
+      logger::log_info("Log saved to: {output_log}")
     } else {
       logger::log_warn("Failed to archive log file")
     }

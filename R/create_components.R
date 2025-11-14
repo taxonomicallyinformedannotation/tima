@@ -60,7 +60,7 @@ create_components <- function(
   logger::log_info("Creating components from {length(input)} edge file(s)")
 
   # Load and combine all edge files
-  logger::log_trace("Loading edge data")
+  # logger::log_trace("Loading edge data")
   edges <- purrr::map(
     .x = input,
     .f = tidytable::fread,
@@ -99,11 +99,11 @@ create_components <- function(
   # ============================================================================
 
   # Create undirected graph from edges
-  logger::log_trace("Building graph structure")
+  # logger::log_trace("Building graph structure")
   network_graph <- igraph::graph_from_data_frame(edges, directed = FALSE)
 
   # Find connected components
-  logger::log_trace("Identifying connected components")
+  # logger::log_trace("Identifying connected components")
   component_membership <- igraph::components(graph = network_graph)$membership
   feature_names <- names(igraph::V(network_graph))
 
@@ -117,7 +117,7 @@ create_components <- function(
   # ============================================================================
 
   # Convert to tidy format
-  logger::log_trace("Formatting component assignments")
+  # logger::log_trace("Formatting component assignments")
   components_table <- features_by_component |>
     rbind() |>
     t() |>

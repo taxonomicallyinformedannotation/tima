@@ -166,7 +166,7 @@ annotate_masses <-
     # Load and Validate Features
     # ============================================================================
 
-    logger::log_trace("Loading features table from: {features}")
+    # logger::log_trace("Loading features table from: {features}")
     features_table <- tidytable::fread(
       file = features,
       na.strings = c("", "NA"),
@@ -231,7 +231,7 @@ annotate_masses <-
     # Load and Join Library Tables
     # ============================================================================
 
-    logger::log_trace("Loading library and supplementary data")
+    # logger::log_trace("Loading library and supplementary data")
 
     library_table <-
       tidytable::fread(
@@ -268,7 +268,7 @@ annotate_masses <-
       )) |>
       round_reals()
 
-    logger::log_trace("Filtering desired adducts and adding mz tolerance")
+    # logger::log_trace("Filtering desired adducts and adding mz tolerance")
     df_add_em <- structure_organism_pairs_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(exact_mass = structure_exact_mass) |>
@@ -312,14 +312,14 @@ annotate_masses <-
         as.numeric()
     }
 
-    logger::log_trace("Calculating rt tolerance")
+    # logger::log_trace("Calculating rt tolerance")
     df_rt_tol <- df_fea_min |>
       tidytable::mutate(
         rt_min = as.numeric(rt - tolerance_rt),
         rt_max = as.numeric(rt + tolerance_rt)
       )
 
-    logger::log_trace("Joining within given rt tolerance")
+    # logger::log_trace("Joining within given rt tolerance")
     df_couples_diff <- df_rt_tol |>
       dplyr::inner_join(
         df_fea_min,
@@ -382,7 +382,7 @@ annotate_masses <-
       tidytable::tidytable() |>
       tidytable::rename(cluster = 1)
 
-    logger::log_trace("Forming adducts and clusters")
+    # logger::log_trace("Forming adducts and clusters")
     add_clu_table <- adducts_table |>
       tidytable::mutate(join = "x") |>
       tidytable::left_join(
@@ -427,7 +427,7 @@ annotate_masses <-
 
     # TODO add safety if no monocharged?
 
-    logger::log_trace(
+    # logger::log_trace(
       "Calculating delta mz for single charge adducts and clusters"
     )
     differences <-
@@ -465,7 +465,7 @@ annotate_masses <-
           MetaboCoreUtils::calculateMass()
       )
 
-    logger::log_trace(
+    # logger::log_trace(
       "Joining within given delta mz tolerance (neutral losses)"
     )
     df_nl <- df_couples_diff |>
@@ -483,7 +483,7 @@ annotate_masses <-
         adduct_dest
       )
 
-    logger::log_trace("Joining within given delta mz tolerance (adducts)")
+    # logger::log_trace("Joining within given delta mz tolerance (adducts)")
     df_add <- df_couples_diff |>
       dplyr::inner_join(
         differences,
@@ -517,7 +517,7 @@ annotate_masses <-
     df_nl_min <- df_nl |>
       tidytable::distinct(feature_id, loss, mass)
 
-    logger::log_trace("Keeping initial and destination feature")
+    # logger::log_trace("Keeping initial and destination feature")
     df_add_a <- df_add |>
       tidytable::distinct(feature_id, adduct)
 
@@ -544,13 +544,13 @@ annotate_masses <-
       tidytable::distinct()
     rm(df_add_a, df_add_b, df_add_enforced)
 
-    logger::log_trace("Joining with initial results (adducts)")
+    # logger::log_trace("Joining with initial results (adducts)")
     df_adducted <- df_fea_min |>
       tidytable::distinct(feature_id, rt, mz) |>
       tidytable::left_join(df_add_full)
     rm(df_add_full)
 
-    logger::log_trace("Joining with initial results (neutral losses)")
+    # logger::log_trace("Joining with initial results (neutral losses)")
     df_addlossed <- df_adducted |>
       tidytable::left_join(df_nl_min) |>
       tidytable::bind_rows(df_adducted) |>
@@ -617,7 +617,7 @@ annotate_masses <-
       df_addlossed_min_2
     )
 
-    logger::log_trace("Joining within given mz tol to exact mass library")
+    # logger::log_trace("Joining within given mz tol to exact mass library")
     df_addlossed_em <- df_addlossed_rdy |>
       dplyr::inner_join(
         df_add_em,
@@ -628,7 +628,7 @@ annotate_masses <-
       tidytable::select(feature_id, rt, mz, library, error_mz, exact_mass) |>
       tidytable::distinct()
 
-    logger::log_trace("Keeping unique exact masses and molecular formulas")
+    # logger::log_trace("Keeping unique exact masses and molecular formulas")
     df_em_mf <- structure_organism_pairs_table |>
       tidytable::distinct(structure_exact_mass, structure_molecular_formula)
     df_str_unique <- structure_organism_pairs_table |>
@@ -653,8 +653,8 @@ annotate_masses <-
         .fns = as.character
       ))
 
-    logger::log_trace("Joining exact masses with single charge adducts")
-    logger::log_trace("Getting back to M")
+    # logger::log_trace("Joining exact masses with single charge adducts")
+    # logger::log_trace("Getting back to M")
     df_annotated_1 <- tidytable::left_join(
       x = df_addlossed_em,
       y = df_em_mf,
@@ -664,7 +664,7 @@ annotate_masses <-
       tidytable::distinct()
     rm(df_addlossed_em)
 
-    logger::log_trace("Calculating multicharged and in source dimers")
+    # logger::log_trace("Calculating multicharged and in source dimers")
     adducts_table_multi <- adducts_table |>
       tidytable::filter(!adduct %in% add_clu_table$adduct) |>
       tidytable::mutate(join = "x")
@@ -700,7 +700,7 @@ annotate_masses <-
 
     rm(adducts_table_multi)
 
-    logger::log_trace("Joining within given rt tolerance")
+    # logger::log_trace("Joining within given rt tolerance")
     df_multi_nl <- df_multi |>
       dplyr::inner_join(
         df_addlossed_rdy,
@@ -713,9 +713,9 @@ annotate_masses <-
       )
     rm(df_fea_min, df_multi, neutral_losses, df_addlossed_rdy)
 
-    logger::log_trace(
-      "Joining within given mz tol and filtering possible adducts"
-    )
+    # logger::log_trace(
+    #   "Joining within given mz tol and filtering possible adducts"
+    # )
     df_multi_nl_em <- df_multi_nl |>
       dplyr::inner_join(
         df_add_em,
@@ -756,9 +756,9 @@ annotate_masses <-
       tidytable::distinct()
     rm(df_em_mf, df_multi_nl_em)
 
-    logger::log_trace(
-      "Joining single adducts, in source dimers, and multicharged"
-    )
+    # logger::log_trace(
+    #   "Joining single adducts, in source dimers, and multicharged"
+    # )
     df_annotated_final <- tidytable::bind_rows(
       df_annotated_1,
       df_annotated_2
@@ -780,7 +780,7 @@ annotate_masses <-
 
     rm(df_annotated_1, df_annotated_2, df_str_unique)
 
-    logger::log_trace("Adding chemical classification")
+    # logger::log_trace("Adding chemical classification")
     df_final <- tidytable::left_join(
       df_annotated_final,
       structure_organism_pairs_table |>

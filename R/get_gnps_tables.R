@@ -231,10 +231,10 @@ get_gnps_tables <- function(
       }
     )
   } else {
-    logger::log_trace(
-      "Features file already exists, skipping download: %s",
-      features_file
-    )
+    # logger::log_trace(
+    #   "Features file already exists, skipping download: %s",
+    #  features_file
+    #)
   }
 
   # Attempt to download metadata if path provided and file not present
@@ -304,10 +304,10 @@ get_gnps_tables <- function(
       )
     }
   } else {
-    logger::log_trace(
-      "Metadata file already exists, skipping download: %s",
-      metadata_file
-    )
+    # logger::log_trace(
+    #  "Metadata file already exists, skipping download: %s",
+    #  metadata_file
+    #)
   }
 
   # Spectra
@@ -325,10 +325,10 @@ get_gnps_tables <- function(
       }
     )
   } else {
-    logger::log_trace(
-      "Spectra file already exists, skipping download: %s",
-      spectra_file
-    )
+    # logger::log_trace(
+    #  "Spectra file already exists, skipping download: %s",
+    #  spectra_file
+    #)
   }
 
   # Annotations
@@ -349,10 +349,10 @@ get_gnps_tables <- function(
       }
     )
   } else {
-    logger::log_trace(
-      "Annotations file already exists, skipping download: %s",
-      annotations_file
-    )
+    # logger::log_trace(
+    #  "Annotations file already exists, skipping download: %s",
+    #  annotations_file
+    #)
   }
 
   # Components
@@ -373,10 +373,10 @@ get_gnps_tables <- function(
       }
     )
   } else {
-    logger::log_trace(
-      "Components file already exists, skipping download: %s",
-      components_file
-    )
+    # logger::log_trace(
+    # "Components file already exists, skipping download: %s",
+    # components_file
+    #)
   }
 
   # Edges
@@ -394,10 +394,10 @@ get_gnps_tables <- function(
       }
     )
   } else {
-    logger::log_trace(
-      "Edges file already exists, skipping download: %s",
-      edges_file
-    )
+    # logger::log_trace(
+    #  "Edges file already exists, skipping download: %s",
+    #  edges_file
+    #)
   }
 
   return(

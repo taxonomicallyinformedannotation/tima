@@ -43,7 +43,7 @@ process_smiles <- function(
   tryCatch(
     {
       py_script <- system.file("python/process_smiles.py", package = "tima")
-      logger::log_trace("Loading Python SMILES processor from: {py_script}")
+      # logger::log_trace("Loading Python SMILES processor from: {py_script}")
       reticulate::source_python(file = py_script)
     },
     error = function(e) {

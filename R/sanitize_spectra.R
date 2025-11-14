@@ -68,7 +68,7 @@ sanitize_spectra <- function(
   # ============================================================================
 
   # Apply sequential sanitization steps with detailed logging
-  logger::log_trace("Applying sanitization pipeline...")
+  # logger::log_trace("Applying sanitization pipeline...")
 
   spectra <- spectra |>
     Spectra::dropNaSpectraVariables() |>

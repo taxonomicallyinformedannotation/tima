@@ -109,7 +109,7 @@ prepare_libraries_sop_merged <- function(
   }
 
   logger::log_info("Preparing merged structure-organism pairs library")
-  logger::log_debug("Filter mode: ", filter)
+  logger::log_debug("Filter mode: {filter}")
 
   if (isTRUE(filter)) {
     # Validate taxonomic filter parameters
@@ -140,9 +140,9 @@ prepare_libraries_sop_merged <- function(
     }
   }
 
-  logger::log_info("Filtering by ", level, ": ", value)
+  logger::log_info("Filtering by {level}: {value}")
 
-  logger::log_trace("Loading and concatenating prepared libraries")
+  # logger::log_trace("Loading and concatenating prepared libraries")
   libraries <- files |>
     purrr::map(
       .f = tidytable::fread,
@@ -154,14 +154,14 @@ prepare_libraries_sop_merged <- function(
     tidytable::bind_rows() |>
     split_tables_sop(cache = cache)
 
-  logger::log_trace("Keeping keys")
+  # logger::log_trace("Keeping keys")
   table_keys <- tables$key |>
     data.frame()
 
-  logger::log_trace("Keeping organisms")
+  # logger::log_trace("Keeping organisms")
   table_org_tax_ott <- tables$org_tax_ott
 
-  logger::log_trace("Completing organisms taxonomy")
+  # logger::log_trace("Completing organisms taxonomy")
   table_org_tax_ott_2 <- table_keys |>
     tidytable::anti_join(table_org_tax_ott) |>
     tidytable::distinct(organism = organism_name) |>
@@ -192,7 +192,7 @@ prepare_libraries_sop_merged <- function(
       )
   }
 
-  logger::log_trace("Keeping structures")
+  # logger::log_trace("Keeping structures")
   table_structures_stereo <- tables$str_stereo
   table_structures_metadata <- tables$str_met
   table_structures_names <- tables$str_nam
@@ -207,7 +207,7 @@ prepare_libraries_sop_merged <- function(
   ## If filter is TRUE,
   ## filter the library based on the specified level and value
   if (filter == TRUE) {
-    logger::log_trace("Filtering library")
+    # logger::log_trace("Filtering library")
     table_keys <- table_keys |>
       tidytable::left_join(table_org_tax_ott)
 

@@ -40,7 +40,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
     stop("path must be a single character string")
   }
 
-  logger::log_info("Retrieving latest version from Zenodo: ", doi)
+  logger::log_info("Retrieving latest version from Zenodo: {doi}")
 
   # Extract record number from DOI
   record <- stringi::stri_replace_all_fixed(
@@ -116,15 +116,9 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   if (is.na(local_size) || zenodo_size != local_size) {
     file.remove(path)
     logger::log_info(
-      "Downloading ",
-      filename,
-      " from https://doi.org/",
-      doi,
-      " (",
-      content$metadata$title,
-      ")"
+      "Downloading {filename} from https://doi.org/{doi} ({content$metadata$title})"
     )
-    logger::log_debug("Size: ", zenodo_size, " bytes")
+    logger::log_debug("Size: {zenodo_size} bytes")
 
     create_dir(export = path)
     get_file(url = file_url, export = path)

@@ -129,7 +129,7 @@ filter_annotations <- function(
   logger::log_info("Filtering annotations")
   logger::log_debug("RT tolerance: {tolerance_rt} minutes")
 
-  logger::log_trace("Loading features table")
+  # logger::log_trace("Loading features table")
   features_table <- tidytable::fread(
     file = features,
     colClasses = "character",
@@ -209,7 +209,7 @@ filter_annotations <- function(
   # Clean up
   rm(annotation_tables_list)
 
-  logger::log_trace("Loading retention time library")
+  # logger::log_trace("Loading retention time library")
   if (!is.null(rts)) {
     rt_table <- purrr::map(
       .x = rts,

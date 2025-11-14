@@ -37,7 +37,7 @@ harmonize_adducts <- function(
 
   # Early exit if no translations provided
   if (missing(adducts_translations) || length(adducts_translations) == 0L) {
-    logger::log_trace("No adduct translations provided, skipping harmonization")
+    # logger::log_trace("No adduct translations provided, skipping harmonization")
     return(df)
   }
 
@@ -65,9 +65,9 @@ harmonize_adducts <- function(
   n_after <- length(unique(df[[adducts_colname]]))
 
   if (n_before != n_after) {
-    logger::log_trace(
-      "Harmonized adducts: {n_before} unique forms -> {n_after} unique forms"
-    )
+    # logger::log_trace(
+    #  "Harmonized adducts: {n_before} unique forms -> {n_after} unique forms"
+    #)
   }
 
   df
