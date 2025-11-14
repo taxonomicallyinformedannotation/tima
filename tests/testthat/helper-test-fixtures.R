@@ -12,9 +12,11 @@
 #' @param include_adduct Include adduct column
 #' @return tidytable with feature data
 #' @keywords internal
-create_test_features <- function(n_features = 10,
-                                  include_rt = TRUE,
-                                  include_adduct = FALSE) {
+create_test_features <- function(
+  n_features = 10,
+  include_rt = TRUE,
+  include_adduct = FALSE
+) {
   features <- tidytable::tidytable(
     "feature_id" = paste0("FT", sprintf("%04d", seq_len(n_features))),
     "mz" = runif(n_features, 100, 500),
@@ -50,15 +52,29 @@ create_test_library <- function(n_compounds = 20, ms_mode = "pos") {
   }
 
   tidytable::tidytable(
-    "structure_inchikey" = paste0("FAKE", sprintf("%015d", seq_len(n_compounds))),
-    "structure_smiles" = replicate(n_compounds, paste0(
-      "C",
-      paste0(sample(c("C", "O", "N"), 10, replace = TRUE), collapse = "")
-    )),
+    "structure_inchikey" = paste0(
+      "FAKE",
+      sprintf("%015d", seq_len(n_compounds))
+    ),
+    "structure_smiles" = replicate(
+      n_compounds,
+      paste0(
+        "C",
+        paste0(sample(c("C", "O", "N"), 10, replace = TRUE), collapse = "")
+      )
+    ),
     "structure_exact_mass" = runif(n_compounds, 100, 600),
-    "structure_molecular_formula" = replicate(n_compounds, paste0(
-      "C", sample(10:30, 1), "H", sample(10:50, 1), "O", sample(1:10, 1)
-    )),
+    "structure_molecular_formula" = replicate(
+      n_compounds,
+      paste0(
+        "C",
+        sample(10:30, 1),
+        "H",
+        sample(10:50, 1),
+        "O",
+        sample(1:10, 1)
+      )
+    ),
     "adduct" = sample(adducts, n_compounds, replace = TRUE),
     "organism_name" = sample(
       c("Arabidopsis thaliana", "Solanum lycopersicum", "Oryza sativa"),
@@ -98,7 +114,10 @@ create_test_spectra <- function(n_spectra = 5, n_peaks_range = c(5, 20)) {
 #' @keywords internal
 setup_test_env <- function(test_name = "test") {
   # Create unique temp directory
-  temp_dir <- file.path(tempdir(), paste0("tima_test_", test_name, "_", Sys.getpid()))
+  temp_dir <- file.path(
+    tempdir(),
+    paste0("tima_test_", test_name, "_", Sys.getpid())
+  )
   dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
 
   # Set as working directory
@@ -106,10 +125,13 @@ setup_test_env <- function(test_name = "test") {
   setwd(temp_dir)
 
   # Store cleanup info
-  withr::defer({
-    setwd(old_wd)
-    unlink(temp_dir, recursive = TRUE)
-  }, envir = parent.frame())
+  withr::defer(
+    {
+      setwd(old_wd)
+      unlink(temp_dir, recursive = TRUE)
+    },
+    envir = parent.frame()
+  )
 
   temp_dir
 }
@@ -128,7 +150,9 @@ setup_tima_structure <- function(base_path = ".") {
     file.path(base_path, "data/processed")
   )
 
-  lapply(dirs, function(d) dir.create(d, recursive = TRUE, showWarnings = FALSE))
+  lapply(dirs, function(d) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  })
 
   invisible(TRUE)
 }
@@ -145,9 +169,13 @@ expect_has_columns <- function(df, required_cols, test_name = "test") {
   testthat::expect_true(
     all(required_cols %in% colnames(df)),
     info = paste0(
-      test_name, ": Missing required columns. ",
-      "Expected: ", paste(required_cols, collapse = ", "), ". ",
-      "Found: ", paste(colnames(df), collapse = ", ")
+      test_name,
+      ": Missing required columns. ",
+      "Expected: ",
+      paste(required_cols, collapse = ", "),
+      ". ",
+      "Found: ",
+      paste(colnames(df), collapse = ", ")
     )
   )
 }
@@ -159,12 +187,25 @@ expect_has_columns <- function(df, required_cols, test_name = "test") {
 #' @param max_val Maximum expected value
 #' @param value_name Name of values (for error messages)
 #' @keywords internal
-expect_values_in_range <- function(values, min_val, max_val, value_name = "values") {
+expect_values_in_range <- function(
+  values,
+  min_val,
+  max_val,
+  value_name = "values"
+) {
   testthat::expect_true(
     all(values >= min_val & values <= max_val, na.rm = TRUE),
     info = paste0(
-      value_name, " should be between ", min_val, " and ", max_val, ". ",
-      "Found range: ", min(values, na.rm = TRUE), " to ", max(values, na.rm = TRUE)
+      value_name,
+      " should be between ",
+      min_val,
+      " and ",
+      max_val,
+      ". ",
+      "Found range: ",
+      min(values, na.rm = TRUE),
+      " to ",
+      max(values, na.rm = TRUE)
     )
   )
 }
@@ -233,4 +274,3 @@ cleanup_test_files <- function(paths) {
   }
   invisible(TRUE)
 }
-
