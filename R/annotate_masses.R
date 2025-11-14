@@ -428,8 +428,8 @@ annotate_masses <-
     # TODO add safety if no monocharged?
 
     # logger::log_trace(
-      "Calculating delta mz for single charge adducts and clusters"
-    )
+    #  "Calculating delta mz for single charge adducts and clusters"
+    #)
     differences <-
       dist_groups(
         d = stats::dist(add_clu_table$adduct_mass),
@@ -466,8 +466,8 @@ annotate_masses <-
       )
 
     # logger::log_trace(
-      "Joining within given delta mz tolerance (neutral losses)"
-    )
+    #  "Joining within given delta mz tolerance (neutral losses)"
+    #)
     df_nl <- df_couples_diff |>
       dplyr::inner_join(
         neutral_losses,
