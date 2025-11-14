@@ -35,6 +35,9 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+if (dir.exists("../../inst")) {
+  knitr::opts_knit$set(root.dir = "../../inst")
+}
 tima:::copy_backbone()
 logger::log_threshold(
   level = logger::INFO,

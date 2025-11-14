@@ -34,30 +34,12 @@ vignette: >
 
 ```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
 library("tima")
+if (dir.exists("../../inst")) {
+  knitr::opts_knit$set(root.dir = "../../inst")
+}
 logger::log_threshold(
   level = logger::INFO,
   namespace = logger::log_namespaces()
-)
-```
-
-```{r change-tests-2, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-# source(file = "scripts/change_tests.R")
-```
-
-```{r get-example-files, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-tima::get_example_files(in_cache = FALSE)
-tima::get_example_files("spectral_lib_with_rt", in_cache = FALSE)
-```
-
-```{r libs, results="hide", message=FALSE, warning=FALSE, include = FALSE}
-targets::tar_make(
-  names = tidyselect::matches("lib_mer_key")
-)
-targets::tar_make(
-  names = tidyselect::matches("lib_spe_exp")
-)
-targets::tar_make(
-  names = tidyselect::matches("lib_spe_is_wik_pre")
 )
 ```
 
@@ -80,7 +62,7 @@ tima::get_example_files(example = "features")
 
 Then, you can prepare your features for the next steps:
 
-```{r prepare-features, warning=FALSE}
+```{r prepare-features, eval=FALSE, include=TRUE}
 tima::prepare_features_tables()
 ```
 
@@ -90,13 +72,13 @@ These annotations are of the lowest possible quality.
 However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
 Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
 
-```{r annotate-masses-1, warning=FALSE}
+```{r annotate-masses-1, eval=FALSE, include=TRUE}
 tima::annotate_masses()
 ```
 
 ### Spectral
 
-```{r annotate-spectra-1, warning=FALSE}
+```{r annotate-spectra-1, eval=FALSE, include=TRUE}
 tima::annotate_spectra()
 tima::prepare_annotations_spectra()
 ```
@@ -107,7 +89,7 @@ There are multiple similarities available, including `spectral entropy` from <ht
 
 Optional
 
-```{r prepare-gnps-1, warning=FALSE}
+```{r prepare-gnps-1, eval=FALSE, include=TRUE}
 tima::prepare_annotations_gnps()
 ```
 
@@ -166,13 +148,13 @@ These parameters were not optimized and were only used to give an example output
 If you are using the cli, do not forget to generate the summaries with the `--full-summary` option, or if you use the gui, generate them by clicking the corresponding icon.
 You can get an example running:
 
-```{r get-sirius, warning=FALSE}
+```{r get-sirius, eval=FALSE, include=TRUE}
 tima:::get_example_sirius()
 ```
 
 The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).
 
-```{r prepare-sirius, warning=FALSE}
+```{r prepare-sirius, eval=FALSE, include=TRUE}
 tima::prepare_annotations_sirius()
 ```
 
@@ -212,23 +194,23 @@ We are currently also working on CANOPUS integration for chemical class annotati
 A network is generated during the process.
 The edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
 
-```{r create-edges, warning=FALSE}
+```{r create-edges, eval=FALSE, include=TRUE}
 tima::create_edges_spectra()
 ```
 
 Prepare the edges:
 
-```{r prepare-edges, warning=FALSE}
+```{r prepare-edges, eval=FALSE, include=TRUE}
 tima::prepare_features_edges()
 ```
 
 Create and prepare the components:
 
-```{r create-components, warning=FALSE}
+```{r create-components, eval=FALSE, include=TRUE}
 tima::create_components()
 ```
 
-```{r prepare-components, warning=FALSE}
+```{r prepare-components, eval=FALSE, include=TRUE}
 tima::prepare_features_components()
 ```
 
@@ -239,7 +221,7 @@ If all your features come from a single extract, it will attribute the biologica
 If you have multiple extracts aligned, it will take the *n* (according to your parameters) highest intensities of your aligned feature table and attribute the biological source of corresponding extracts.
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
-```{r prepare-taxa, warning=FALSE}
+```{r prepare-taxa, eval=FALSE, include=TRUE}
 tima::prepare_taxa()
 ```
 
@@ -250,7 +232,7 @@ based on your own internal (experimental or predicted) retention times library.
 It is optional. 
 If you do not have one, it will simply group the annotations of all tools. 
 
-```{r filter-annotations, warning=FALSE}
+```{r filter-annotations, eval=FALSE, include=TRUE}
 tima::filter_annotations()
 ```
 
