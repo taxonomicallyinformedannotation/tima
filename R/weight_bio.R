@@ -80,6 +80,10 @@ weight_bio <- function(
     envir = parent.frame()
   )
 ) {
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
   # Validate data frames
   if (!is.data.frame(annotation_table_taxed)) {
     stop("annotation_table_taxed must be a data frame")
@@ -89,6 +93,7 @@ weight_bio <- function(
     stop("structure_organism_pairs_table must be a data frame")
   }
 
+  # Early exit for empty input
   n_annotations <- nrow(annotation_table_taxed)
   if (n_annotations == 0L) {
     logger::log_warn(
@@ -97,24 +102,25 @@ weight_bio <- function(
     return(annotation_table_taxed)
   }
 
-  logger::log_info("Weighting {n_annotations} annotations by biological source")
-
   # Validate weights
-  if (
-    !is.numeric(weight_spectral) || weight_spectral < 0 || weight_spectral > 1
-  ) {
-    stop("weight_spectral must be between 0 and 1, got: ", weight_spectral)
+  weights <- list(
+    spectral = weight_spectral,
+    biological = weight_biological
+  )
+
+  is_valid_weight <- sapply(weights, function(w) {
+    is.numeric(w) && w >= 0 && w <= 1
+  })
+
+  if (!all(is_valid_weight)) {
+    invalid_weights <- names(weights)[!is_valid_weight]
+    stop(
+      "Weight(s) must be between 0 and 1: ",
+      paste(invalid_weights, collapse = ", ")
+    )
   }
 
-  if (
-    !is.numeric(weight_biological) ||
-      weight_biological < 0 ||
-      weight_biological > 1
-  ) {
-    stop("weight_biological must be between 0 and 1, got: ", weight_biological)
-  }
-
-  # Validate biological scores (all should be between 0 and 1)
+  # Validate biological scores
   bio_scores <- list(
     domain = score_biological_domain,
     kingdom = score_biological_kingdom,
@@ -128,20 +134,30 @@ weight_bio <- function(
     variety = score_biological_variety
   )
 
-  for (level in names(bio_scores)) {
-    score <- bio_scores[[level]]
-    if (!is.numeric(score) || score < 0 || score > 1) {
-      stop("score_biological_", level, " must be between 0 and 1, got: ", score)
-    }
+  is_valid_score <- sapply(bio_scores, function(s) {
+    is.numeric(s) && s >= 0 && s <= 1
+  })
+
+  if (!all(is_valid_score)) {
+    invalid_scores <- names(bio_scores)[!is_valid_score]
+    stop(
+      "Biological score(s) must be between 0 and 1: ",
+      paste(paste0("score_biological_", invalid_scores), collapse = ", ")
+    )
   }
 
-  logger::log_info("Weighting annotations by biological source")
+  # ============================================================================
+  # Log Processing Information
+  # ============================================================================
+
+  logger::log_info("Weighting {n_annotations} annotations by biological source")
   logger::log_debug(
-    "Weights - Spectral: ",
-    weight_spectral,
-    ", Biological: ",
-    weight_biological
+    "Weights - Spectral: {weight_spectral}, Biological: {weight_biological}"
   )
+
+  # ============================================================================
+  # Filter Structure-Organism Pairs
+  # ============================================================================
 
   logger::log_trace("Filtering structure-organism pairs")
   df0 <- structure_organism_pairs_table |>
@@ -255,186 +271,76 @@ weight_bio <- function(
     )
   rm(df0)
 
-  logger::log_trace("Calculating biological score at all levels ...")
-  score_per_level_bio <-
-    function(df, candidates, samples, score, score_name) {
-      score <- df |>
-        tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
-        tidytable::filter(!is.na(!!as.name(samples))) |>
-        tidytable::filter(!!as.name(samples) != "ND") |>
-        tidytable::filter(!is.na(!!as.name(candidates))) |>
-        tidytable::filter(!!as.name(candidates) != "notClassified") |>
-        tidytable::filter(
-          stringi::stri_detect_regex(
-            pattern = !!as.name(candidates),
-            str = !!as.name(samples)
-          )
-        ) |>
-        tidytable::mutate(
-          !!as.name(score_name) := tidytable::if_else(
-            condition = !!as.name(samples) != "notClassified",
-            true = !!as.name(score) * 1,
-            false = 0
-          )
-        )
-    }
+  # ============================================================================
+  # Helper Function for Taxonomic Level Scoring
+  # ============================================================================
 
-  logger::log_trace("... domain")
-  step_dom <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_01_domain",
-      samples = "sample_organism_01_domain",
-      score = "score_biological_domain",
-      score_name = "score_biological_01"
-    )
-  logger::log_trace("... kingdom")
-  step_kin <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_02_kingdom",
-      samples = "sample_organism_02_kingdom",
-      score = "score_biological_kingdom",
-      score_name = "score_biological_02"
-    )
-  logger::log_trace("... phylum")
-  step_phy <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_03_phylum",
-      samples = "sample_organism_03_phylum",
-      score = "score_biological_phylum",
-      score_name = "score_biological_03"
-    )
-  logger::log_trace("... class")
-  step_cla <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_04_class",
-      samples = "sample_organism_04_class",
-      score = "score_biological_class",
-      score_name = "score_biological_04"
-    )
-  logger::log_trace("... order")
-  step_ord <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_05_order",
-      samples = "sample_organism_05_order",
-      score = "score_biological_order",
-      score_name = "score_biological_05"
-    )
-  # logger::log_trace("... infraorder")
-  # step_ord2 <- df2 |>
-  #   score_per_level_bio(
-  #     candidates = "candidate_organism_05_1_infraorder",
-  #     samples = "sample_organism_05_1_infraorder",
-  #     score = "score_biological_infraorder",
-  #     score_name = "score_biological_05_1"
-  #   )
-  logger::log_trace("... family")
-  step_fam <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_06_family",
-      samples = "sample_organism_06_family",
-      score = "score_biological_family",
-      score_name = "score_biological_06"
-    )
-  # logger::log_trace("... subfamily")
-  # step_fam2 <- df2 |>
-  #   score_per_level_bio(
-  #     candidates = "candidate_organism_06_1_subfamily",
-  #     samples = "sample_organism_06_1_subfamily",
-  #     score = "score_biological_subfamily",
-  #     score_name = "score_biological_06_1"
-  #   )
-  logger::log_trace("... tribe")
-  step_tri <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_07_tribe",
-      samples = "sample_organism_07_tribe",
-      score = "score_biological_tribe",
-      score_name = "score_biological_07"
-    )
-  # logger::log_trace("... subtribe")
-  # step_tri2 <- df2 |>
-  #   score_per_level_bio(
-  #     candidates = "candidate_organism_07_1_subtribe",
-  #     samples = "sample_organism_07_1_subtribe",
-  #     score = "score_biological_subtribe",
-  #     score_name = "score_biological_07_1"
-  #   )
-  logger::log_trace("... genus")
-  step_gen <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_08_genus",
-      samples = "sample_organism_08_genus",
-      score = "score_biological_genus",
-      score_name = "score_biological_08"
-    )
-  # logger::log_trace("... subgenus")
-  # step_gen2 <- df2 |>
-  #   score_per_level_bio(
-  #     candidates = "candidate_organism_08_1_subgenus",
-  #     samples = "sample_organism_08_1_subgenus",
-  #     score = "score_biological_subgenus",
-  #     score_name = "score_biological_08_1"
-  #   )
-  logger::log_trace("... species")
-  step_spe <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_09_species",
-      samples = "sample_organism_09_species",
-      score = "score_biological_species",
-      score_name = "score_biological_09"
-    )
-  # logger::log_trace("... subspecies")
-  # step_spe2 <- df2 |>
-  #   score_per_level_bio(
-  #     candidates = "candidate_organism_09_1_subspecies",
-  #     samples = "sample_organism_09_1_subspecies",
-  #     score = "score_biological_subspecies",
-  #     score_name = "score_biological_09_1"
-  #   )
-  logger::log_trace("... varietas")
-  step_var <- df2 |>
-    score_per_level_bio(
-      candidates = "candidate_organism_10_varietas",
-      samples = "sample_organism_10_varietas",
-      score = "score_biological_variety",
-      score_name = "score_biological_10"
-    )
+  score_per_level_bio <- function(df, candidates, samples, score, score_name) {
+    df |>
+      tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
+      tidytable::filter(!is.na(!!as.name(samples))) |>
+      tidytable::filter(!!as.name(samples) != "ND") |>
+      tidytable::filter(!is.na(!!as.name(candidates))) |>
+      tidytable::filter(!!as.name(candidates) != "notClassified") |>
+      tidytable::filter(
+        stringi::stri_detect_regex(
+          pattern = !!as.name(candidates),
+          str = !!as.name(samples)
+        )
+      ) |>
+      tidytable::mutate(
+        !!as.name(score_name) := tidytable::if_else(
+          condition = !!as.name(samples) != "notClassified",
+          true = !!as.name(score) * 1,
+          false = 0
+        )
+      )
+  }
+
+  # ============================================================================
+  # Calculate Biological Scores at All Taxonomic Levels
+  # ============================================================================
+
+  logger::log_trace("Calculating biological score at all levels ...")
+
+  # Define all taxonomic levels and their scores (DRY principle)
+  taxonomic_levels <- list(
+    list(level = "domain", num = "01", candidate = "candidate_organism_01_domain",
+         sample = "sample_organism_01_domain", score = score_biological_domain),
+    list(level = "kingdom", num = "02", candidate = "candidate_organism_02_kingdom",
+         sample = "sample_organism_02_kingdom", score = score_biological_kingdom),
+    list(level = "phylum", num = "03", candidate = "candidate_organism_03_phylum",
+         sample = "sample_organism_03_phylum", score = score_biological_phylum),
+    list(level = "class", num = "04", candidate = "candidate_organism_04_class",
+         sample = "sample_organism_04_class", score = score_biological_class),
+    list(level = "order", num = "05", candidate = "candidate_organism_05_order",
+         sample = "sample_organism_05_order", score = score_biological_order),
+    list(level = "family", num = "06", candidate = "candidate_organism_06_family",
+         sample = "sample_organism_06_family", score = score_biological_family),
+    list(level = "tribe", num = "07", candidate = "candidate_organism_07_tribe",
+         sample = "sample_organism_07_tribe", score = score_biological_tribe),
+    list(level = "genus", num = "08", candidate = "candidate_organism_08_genus",
+         sample = "sample_organism_08_genus", score = score_biological_genus),
+    list(level = "species", num = "09", candidate = "candidate_organism_09_species",
+         sample = "sample_organism_09_species", score = score_biological_species),
+    list(level = "varietas", num = "10", candidate = "candidate_organism_10_varietas",
+         sample = "sample_organism_10_varietas", score = score_biological_variety)
+  )
+
+  # Calculate scores for all levels
+  supp_tables <- lapply(taxonomic_levels, function(tax_level) {
+    logger::log_trace("... {tax_level$level}")
+
+    df2 |>
+      score_per_level_bio(
+        candidates = tax_level$candidate,
+        samples = tax_level$sample,
+        score = tax_level$score,
+        score_name = paste0("score_biological_", tax_level$num)
+      )
+  })
 
   logger::log_trace("Keeping best biological score")
-  supp_tables <- list(
-    step_dom,
-    step_kin,
-    step_phy,
-    step_cla,
-    step_ord,
-    # step_ord2,
-    step_fam,
-    # step_fam2,
-    step_tri,
-    # step_tri2,
-    step_gen,
-    # step_gen2,
-    step_spe,
-    # step_spe2,
-    step_var
-  )
-  rm(
-    step_dom,
-    step_kin,
-    step_phy,
-    step_cla,
-    step_ord,
-    ## step_ord2,
-    step_fam,
-    ## step_fam2,
-    step_tri,
-    ## step_tri2,
-    step_gen,
-    ## step_gen2,
-    step_spe,
-    ## step_spe2,
-    step_var
-  )
 
   annot_table_wei_bio_init <- purrr::reduce(
     .x = supp_tables,
