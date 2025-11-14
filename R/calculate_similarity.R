@@ -108,11 +108,11 @@ calculate_similarity <- function(
   # ============================================================================
 
   if (method == "entropy") {
-    if (return_matched_peaks) {
-      logger::log_warn(
-        "return_matched_peaks not supported with entropy method, ignoring"
-      )
-    }
+    # if (return_matched_peaks) {
+    #   logger::log_warn(
+    #     "return_matched_peaks not supported with entropy method, ignoring"
+    #   )
+    # }
 
     result <- tryCatch(
       msentropy::calculate_entropy_similarity(
