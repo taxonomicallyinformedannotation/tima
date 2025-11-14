@@ -20,7 +20,7 @@ test_that("import_spectra handles MGF files correctly", {
     )
 
   result <- import_spectra("test.mgf")
-  expect_s3_class(result, "data.frame")
+  expect_s4_class(result, "Spectra")
 
   unlink("test.mgf")
   unlink("data", recursive = TRUE)
@@ -36,7 +36,7 @@ test_that("import_spectra handles MSP files with failures", {
 
   if (file.exists(msp_file)) {
     result <- import_spectra(msp_file)
-    expect_s3_class(result, "data.frame")
+    expect_s4_class(result, "Spectra")
   } else {
     skip("MSP test file not found")
   }
@@ -50,8 +50,8 @@ test_that("sanitize_spectra handles FEATURE_ID column", {
     Spectra::Spectra() |>
     sanitize_spectra()
 
-  expect_s3_class(df, "data.frame")
-  expect_true("feature_id" %in% colnames(df))
+  expect_s4_class(df, "Spectra")
+  expect_true("FEATURE_ID" %in% colnames(df@backend@spectraData))
 })
 
 test_that("sanitize_spectra handles SLAW_ID column", {
@@ -62,8 +62,8 @@ test_that("sanitize_spectra handles SLAW_ID column", {
     Spectra::Spectra() |>
     sanitize_spectra()
 
-  expect_s3_class(df, "data.frame")
-  expect_true("feature_id" %in% colnames(df))
+  expect_s4_class(df, "Spectra")
+  expect_true("SLAW_ID" %in% colnames(df@backend@spectraData))
 })
 
 test_that("read_mgf_opti fails with multiple files", {

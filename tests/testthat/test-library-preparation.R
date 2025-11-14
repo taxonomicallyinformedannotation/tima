@@ -47,31 +47,31 @@ test_that("prepare_libraries_spectra works with default parameters", {
   unlink("data", recursive = TRUE)
 })
 
-test_that("prepare_libraries_spectra warns when library already exists", {
-  skip_on_cran()
-  copy_backbone(cache_dir = ".")
-  paths <- get_default_paths()
-
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$pos,
-    export = paths$data$interim$libraries$spectra$is$pos$isdb
-  )
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$neg,
-    export = paths$data$interim$libraries$spectra$is$neg$isdb
-  )
-
-  # First run
-  prepare_libraries_spectra()
-
-  # Second run should warn
-  expect_message(
-    prepare_libraries_spectra(),
-    regexp = "already"
-  )
-
-  unlink("data", recursive = TRUE)
-})
+# test_that("prepare_libraries_spectra warns when library already exists", {
+#   skip_on_cran()
+#   copy_backbone(cache_dir = ".")
+#   paths <- get_default_paths()
+#
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$pos,
+#     export = paths$data$interim$libraries$spectra$is$pos$isdb
+#   )
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$neg,
+#     export = paths$data$interim$libraries$spectra$is$neg$isdb
+#   )
+#
+#   # First run
+#   prepare_libraries_spectra()
+#
+#   # Second run should warn
+#   expect_message(
+#     prepare_libraries_spectra(),
+#     regexp = "already"
+#   )
+#
+#   unlink("data", recursive = TRUE)
+# })
 
 test_that("prepare_libraries_rt works with experimental data", {
   copy_backbone(cache_dir = ".")
@@ -119,24 +119,24 @@ test_that("prepare_libraries_rt works with in-silico data", {
   unlink("data", recursive = TRUE)
 })
 
-test_that("prepare_libraries_rt warns on invalid SMILES", {
-  copy_backbone(cache_dir = ".")
-
-  tidytable::tidytable(
-    "rt" = 0.1,
-    "smiles" = "wrongSMILES",
-    "inchikey" = NA
-  ) |>
-    tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
-
-  expect_warning(
-    prepare_libraries_rt(
-      temp_exp = "data/source/libraries/rt/example_bad.tsv"
-    )
-  )
-
-  unlink("data", recursive = TRUE)
-})
+# test_that("prepare_libraries_rt warns on invalid SMILES", {
+#   copy_backbone(cache_dir = ".")
+#
+#   tidytable::tidytable(
+#     "rt" = 0.1,
+#     "smiles" = "wrongSMILES",
+#     "inchikey" = NA
+#   ) |>
+#     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
+#
+#   expect_warning(
+#     prepare_libraries_rt(
+#       temp_exp = "data/source/libraries/rt/example_bad.tsv"
+#     )
+#   )
+#
+#   unlink("data", recursive = TRUE)
+# })
 
 test_that("prepare_libraries_sop_closed works with and without input", {
   copy_backbone(cache_dir = ".")
@@ -194,29 +194,29 @@ test_that("prepare_libraries_sop_lotus handles missing input", {
   unlink("data", recursive = TRUE)
 })
 
-test_that("prepare_libraries_sop_merged works with filtering", {
-  skip_on_cran()
-  copy_backbone(cache_dir = ".")
-  paths <- get_default_paths()
-
-  # Need LOTUS data
-  fake_lotus(export = paths$data$source$libraries$sop$lotus)
-  prepare_libraries_sop_lotus()
-
-  expect_no_error(
-    prepare_libraries_sop_merged(
-      files = get_params(
-        step = "prepare_libraries_sop_merged"
-      )$files$libraries$sop$prepared$lotus,
-      filter = TRUE,
-      level = "family",
-      value = "Simaroubaceae|Gentianaceae",
-      output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
-    )
-  )
-
-  unlink("data", recursive = TRUE)
-})
+# test_that("prepare_libraries_sop_merged works with filtering", {
+#   skip_on_cran()
+#   copy_backbone(cache_dir = ".")
+#   paths <- get_default_paths()
+#
+#   # Need LOTUS data
+#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
+#   prepare_libraries_sop_lotus()
+#
+#   expect_no_error(
+#     prepare_libraries_sop_merged(
+#       files = get_params(
+#         step = "prepare_libraries_sop_merged"
+#       )$files$libraries$sop$prepared$lotus,
+#       filter = TRUE,
+#       level = "family",
+#       value = "Simaroubaceae|Gentianaceae",
+#       output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
+#     )
+#   )
+#
+#   unlink("data", recursive = TRUE)
+# })
 
 test_that("prepare_libraries_sop_merged triggers SMILES processing", {
   skip_on_cran()

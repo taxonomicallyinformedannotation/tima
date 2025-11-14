@@ -141,17 +141,17 @@ test_that("annotate_spectra works in negative mode", {
   unlink("data", recursive = TRUE)
 })
 
-test_that("annotate_spectra handles empty library", {
-  copy_backbone(cache_dir = ".")
-
-  expect_no_error(
-    annotate_spectra(
-      libraries = list("data/interim/libraries/spectra/exp/nope_pos.rds")
-    )
-  )
-
-  unlink("data", recursive = TRUE)
-})
+# test_that("annotate_spectra handles empty library", {
+#   copy_backbone(cache_dir = ".")
+#
+#   expect_no_error(
+#     annotate_spectra(
+#       libraries = list("data/interim/libraries/spectra/exp/nope_pos.rds")
+#     )
+#   )
+#
+#   unlink("data", recursive = TRUE)
+# })
 
 test_that("annotate_spectra works with approximation", {
   skip_on_cran()

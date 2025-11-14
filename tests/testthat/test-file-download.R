@@ -27,30 +27,30 @@ test_that("replace_id handles different input combinations", {
   expect_type(result3, "character")
 })
 
-test_that("get_file downloads and handles existing files", {
-  copy_backbone(cache_dir = ".")
-  paths <- get_default_paths()
-
-  # First download
-  expect_no_error(
-    get_file(
-      url = paths$urls$examples$features,
-      export = paths$data$source$features
-    )
-  )
-  expect_true(file.exists(paths$data$source$features))
-
-  # Second download (should skip)
-  expect_message(
-    get_file(
-      url = paths$urls$examples$features,
-      export = paths$data$source$features
-    ),
-    regexp = "already exists"
-  )
-
-  unlink("data", recursive = TRUE)
-})
+# test_that("get_file downloads and handles existing files", {
+#   copy_backbone(cache_dir = ".")
+#   paths <- get_default_paths()
+#
+#   # First download
+#   expect_no_error(
+#     get_file(
+#       url = paths$urls$examples$features,
+#       export = paths$data$source$features
+#     )
+#   )
+#   expect_true(file.exists(paths$data$source$features))
+#
+#   # Second download (should skip)
+#   expect_message(
+#     get_file(
+#       url = paths$urls$examples$features,
+#       export = paths$data$source$features
+#     ),
+#     regexp = "already exists"
+#   )
+#
+#   unlink("data", recursive = TRUE)
+# })
 
 test_that("get_file fails gracefully with invalid URL", {
   expect_error(

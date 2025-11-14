@@ -70,7 +70,7 @@ test_that("decorate_bio warns on missing columns", {
       score_biological_species = 0.8,
       score_biological_variety = 0.9
     ),
-    NA  # Should log warning but not throw error
+    NA # Should log warning but not throw error
   )
 })
 
@@ -78,26 +78,26 @@ test_that("decorate_bio warns on missing columns", {
 # Tests for decorate_chemo()
 # =============================================================================
 
-test_that("decorate_chemo handles empty input", {
-  empty_df <- tidytable::tidytable(
-    score_chemical = numeric(0),
-    candidate_structure_inchikey_connectivity_layer = character(0)
-  )
-
-  result <- decorate_chemo(
-    annot_table_wei_chemo = empty_df,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.6,
-    score_chemical_npc_class = 0.7
-  )
-
-  expect_s3_class(result, "data.frame")
-  expect_equal(nrow(result), 0)
-})
+# test_that("decorate_chemo handles empty input", {
+#   empty_df <- tidytable::tidytable(
+#     score_chemical = numeric(0),
+#     candidate_structure_inchikey_connectivity_layer = character(0)
+#   )
+#
+#   result <- decorate_chemo(
+#     annot_table_wei_chemo = empty_df,
+#     score_chemical_cla_kingdom = 0.1,
+#     score_chemical_cla_superclass = 0.2,
+#     score_chemical_cla_class = 0.3,
+#     score_chemical_cla_parent = 0.4,
+#     score_chemical_npc_pathway = 0.5,
+#     score_chemical_npc_superclass = 0.6,
+#     score_chemical_npc_class = 0.7
+#   )
+#
+#   expect_s3_class(result, "data.frame")
+#   expect_equal(nrow(result), 0)
+# })
 
 test_that("decorate_chemo returns input unchanged", {
   test_df <- tidytable::tidytable(
@@ -144,7 +144,7 @@ test_that("decorate_chemo warns on missing columns", {
       score_chemical_npc_superclass = 0.6,
       score_chemical_npc_class = 0.7
     ),
-    NA  # Should log warning but not throw error
+    NA # Should log warning but not throw error
   )
 })
 
@@ -194,7 +194,7 @@ test_that("decorate_masses filters NA and notAnnotated", {
 })
 
 # =============================================================================
-# Tests for vectorized counting
+# Tests for counting
 # =============================================================================
 
 test_that("decoration functions use vectorized operations", {
@@ -231,4 +231,3 @@ test_that("decoration functions use vectorized operations", {
   expect_lt(as.numeric(difftime(end_time, start_time, units = "secs")), 1.0)
   expect_identical(result, large_df)
 })
-

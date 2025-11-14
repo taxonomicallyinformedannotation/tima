@@ -50,7 +50,6 @@ test_that("prepare_params works for all workflow steps", {
   for (step in steps) {
     expect_no_error(
       prepare_params(step = step),
-      info = paste("Failed for step:", step)
     )
   }
 
