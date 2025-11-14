@@ -42,7 +42,9 @@ harmonize_adducts <- function(
   }
 
   # Validate translations are named character vector
-  if (!is.character(adducts_translations) || is.null(names(adducts_translations))) {
+  if (
+    !is.character(adducts_translations) || is.null(names(adducts_translations))
+  ) {
     stop("adducts_translations must be a named character vector")
   }
 

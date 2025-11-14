@@ -65,16 +65,22 @@ prepare_annotations_spectra <- function(
     step = "prepare_annotations_spectra"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # Validate inputs
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate input files
   if (!is.character(input) || length(input) == 0L) {
     stop("input must be a non-empty character vector")
   }
 
+  # Vectorized file existence check
   missing_files <- input[!file.exists(input)]
   if (length(missing_files) > 0L) {
     stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
   }
 
+  # Validate output
   if (!is.character(output) || length(output) != 1L) {
     stop("output must be a single character string")
   }
@@ -88,22 +94,38 @@ prepare_annotations_spectra <- function(
     str_tax_npc = str_tax_npc
   )
 
-  for (param_name in names(str_files)) {
-    param_value <- str_files[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
-    }
-    if (!file.exists(param_value)) {
-      stop(param_name, " file not found: ", param_value)
-    }
+  # Check all are single strings
+  is_valid_string <- sapply(str_files, function(x) {
+    is.character(x) && length(x) == 1L
+  })
+
+  if (!all(is_valid_string)) {
+    invalid_params <- names(str_files)[!is_valid_string]
+    stop(
+      "Parameter(s) must be single character strings: ",
+      paste(invalid_params, collapse = ", ")
+    )
   }
 
+  # Check all files exist (vectorized)
+  str_files_vec <- unlist(str_files)
+  missing_str_files <- str_files_vec[!file.exists(str_files_vec)]
+  if (length(missing_str_files) > 0L) {
+    stop(
+      "Structure file(s) not found: ",
+      paste(missing_str_files, collapse = ", ")
+    )
+  }
+
+  # ============================================================================
+  # Load and Process Spectral Annotations
+  # ============================================================================
+
   logger::log_info(
-    "Preparing spectral matching annotations from ",
-    length(input),
-    " file(s)"
+    "Preparing spectral matching annotations from {length(input)} file(s)"
   )
   logger::log_trace("Loading and formatting spectral matches")
+
   table <-
     purrr::map(
       .x = input,

@@ -36,10 +36,15 @@ clean_bio <- function(
   }
 
   # Validate consistency threshold
-  if (!is.numeric(minimal_consistency) ||
+  if (
+    !is.numeric(minimal_consistency) ||
       minimal_consistency < 0 ||
-      minimal_consistency > 1) {
-    stop("minimal_consistency must be between 0 and 1, got: ", minimal_consistency)
+      minimal_consistency > 1
+  ) {
+    stop(
+      "minimal_consistency must be between 0 and 1, got: ",
+      minimal_consistency
+    )
   }
 
   # Early exit for empty inputs
@@ -104,7 +109,9 @@ clean_bio <- function(
 
   # Early exit if no valid edges
   if (nrow(edges_filtered) == 0L) {
-    logger::log_warn("No features with >=2 neighbors found, skipping consistency")
+    logger::log_warn(
+      "No features with >=2 neighbors found, skipping consistency"
+    )
     return(annot_table_wei_bio)
   }
 

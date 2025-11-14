@@ -43,7 +43,11 @@ prepare_features_edges <- function(
   name_source = get_params(step = "prepare_features_edges")$names$source,
   name_target = get_params(step = "prepare_features_edges")$names$target
 ) {
-  # Validate inputs - handle both list and named vector
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
+
+  # Validate input structure (must have ms1 and spectral)
   input_names <- names(input)
   if (
     is.null(input_names) ||
@@ -53,6 +57,7 @@ prepare_features_edges <- function(
     stop("input must contain 'ms1' and 'spectral' elements")
   }
 
+  # Validate output and column names
   if (!is.character(output) || length(output) != 1L) {
     stop("output must be a single character string")
   }
@@ -65,12 +70,16 @@ prepare_features_edges <- function(
     stop("name_target must be a single character string")
   }
 
-  # Check file existence
+  # File existence check
   all_files <- unlist(input)
   missing_files <- all_files[!file.exists(all_files)]
   if (length(missing_files) > 0L) {
     stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
   }
+
+  # ============================================================================
+  # Load Edge Tables
+  # ============================================================================
 
   logger::log_info("Preparing molecular network edges")
   logger::log_debug("MS1 edges: {input[['ms1']]}")
@@ -99,6 +108,10 @@ prepare_features_edges <- function(
   logger::log_debug("MS1 edges: {nrow(edges_ms1)} rows")
   logger::log_debug("Spectral edges: {nrow(edges_ms2)} rows")
 
+  # ============================================================================
+  # Extract Entropy Information
+  # ============================================================================
+
   # Extract entropy information from spectral edges
   features_entropy <- edges_ms2 |>
     tidytable::select(
@@ -109,10 +122,12 @@ prepare_features_edges <- function(
     tidytable::distinct()
 
   logger::log_trace(
-    "Extracted entropy for ",
-    nrow(features_entropy),
-    " features"
+    "Extracted entropy for {nrow(features_entropy)} features"
   )
+
+  # ============================================================================
+  # Combine and Format Edges
+  # ============================================================================
 
   # Combine and format edges table
   logger::log_trace("Combining and formatting edge tables")
@@ -129,7 +144,12 @@ prepare_features_edges <- function(
 
   logger::log_info("Prepared {nrow(edges_table_treated)} total edges")
 
+  # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)
+
+  # ============================================================================
+  # Export Results
+  # ============================================================================
 
   # Export parameters and results
   export_params(
