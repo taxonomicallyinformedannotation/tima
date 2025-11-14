@@ -52,7 +52,7 @@ harmonize_adducts <- function(
   # Harmonize Adducts
   # ============================================================================
 
-  # Perform vectorized string replacement (efficient for large datasets)
+  # Perform string replacement
   n_before <- length(unique(df[[adducts_colname]]))
 
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
