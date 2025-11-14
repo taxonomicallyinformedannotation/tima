@@ -164,6 +164,31 @@ test_that("calculate_mass_of_m handles NULL input", {
 #   unlink("data", recursive = TRUE)
 # })
 
-# test_that("parse_adduct fails gracefully with invalid input", {
-#   expect_error(parse_adduct("foo bar"))
-# })
+test_that("parse_adduct handles invalid input gracefully", {
+  # parse_adduct returns all zeros for invalid input, doesn't error
+  result <- parse_adduct("foo bar")
+  expect_type(result, "double")
+  expect_equal(unname(result["n_mer"]), 0)
+  expect_equal(unname(result["n_charges"]), 0)
+})
+
+test_that("parse_adduct handles alternative adduct notations", {
+  # Test with alternative notations separated by /
+  result <- parse_adduct("[M+CH3COO]-/[M-CH3]-")
+  expect_type(result, "double")
+  # Should successfully parse the first valid alternative
+  expect_true(unname(result["n_mer"]) > 0)
+  expect_true(unname(result["n_charges"]) > 0)
+})
+
+test_that("parse_adduct handles NULL input", {
+  result <- parse_adduct(NULL)
+  expect_type(result, "double")
+  expect_equal(unname(result["n_mer"]), 0)
+})
+
+test_that("parse_adduct handles empty string input", {
+  result <- parse_adduct("")
+  expect_type(result, "double")
+  expect_equal(unname(result["n_mer"]), 0)
+})
