@@ -13,6 +13,10 @@
 #'
 #' @examples NULL
 load_yaml_files <- function() {
+  # ============================================================================
+  # Get Paths and List Files
+  # ============================================================================
+
   # logger::log_trace("Loading YAML parameter files")
 
   paths <- get_default_paths()
@@ -21,7 +25,7 @@ load_yaml_files <- function() {
   default_path <- get_path(paths$params$default$path)
   user_path <- get_path(paths$params$user$path)
 
-  # Get file lists once for efficiency
+  # Get file lists once for efficiency (cached for reuse)
   default_files <- list.files(
     path = default_path,
     pattern = "\\.yaml$",
@@ -34,16 +38,24 @@ load_yaml_files <- function() {
     full.names = TRUE
   )
 
+  # ============================================================================
+  # Determine Which Parameter Set to Use
+  # ============================================================================
+
   # Use user params if available and at least as complete as defaults
   use_user <- length(user_files) >= length(default_files)
 
-  if (use_user) {
-    # logger::log_debug("Using user-specified parameters")
-    param_files <- user_files
+  param_files <- if (use_user) {
+    # logger::log_debug("Using {length(user_files)} user-specified parameters")
+    user_files
   } else {
-    # logger::log_debug("Using default parameters")
-    param_files <- default_files
+    # logger::log_debug("Using {length(default_files)} default parameters")
+    default_files
   }
+
+  # ============================================================================
+  # Combine with Prepare Params Files
+  # ============================================================================
 
   # Combine with prepare_params files (also need to resolve these paths)
   yaml_files <- c(
@@ -55,13 +67,29 @@ load_yaml_files <- function() {
   # Extract clean parameter names from file paths
   yaml_names <- yaml_files |>
     basename() |>
-    gsub(pattern = "\\.yaml$", replacement = "")
+    stringi::stri_replace_all_regex(
+      pattern = "\\.yaml$",
+      replacement = "",
+      vectorize_all = FALSE
+    )
 
-  # Load all YAML files
-  yamls_parsed <- purrr::map(yaml_files, yaml::read_yaml)
+  # ============================================================================
+  # Load All YAML Files
+  # ============================================================================
+
+  # Load all YAML files with error handling
+  yamls_parsed <- tryCatch(
+    {
+      purrr::map(yaml_files, yaml::read_yaml)
+    },
+    error = function(e) {
+      stop("Failed to parse YAML files: ", conditionMessage(e))
+    }
+  )
+
   names(yamls_parsed) <- yaml_names
 
-  # logger::log_trace("Loaded ", length(yamls_parsed), " YAML parameter files")
+  # logger::log_trace("Loaded {length(yamls_parsed)} YAML parameter files")
 
   return(list(
     yamls_params = yamls_parsed,
